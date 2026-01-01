@@ -55,6 +55,7 @@ This documentation has been reorganized into modular components for better perfo
 │   ├── IMPLEMENTATION_EXAMPLES.md   # Working code snippets
 │   ├── ENHANCEMENT_ROADMAP.md       # Phase planning & future features
 │   └── TROUBLESHOOTING.md           # Common issues & solutions
+├── STAFF_DASHBOARD_DATA_GUIDE.md     # Staff Dashboard data processing guide (NEW)
 ├── /3-day-tees/                      # 3-Day Tees Fast Turnaround Service (NEW)
 │   ├── OVERVIEW.md                  # Architecture, 25 components, multi-SKU patterns
 │   ├── PRICING-FORMULA.md           # 7-step pricing + 25% rush fee

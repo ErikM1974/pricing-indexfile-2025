@@ -1,0 +1,654 @@
+/* =====================================================
+   STAFF DASHBOARD WIDGETS
+   Specialized widget styles for metrics, charts, celebrations
+   ===================================================== */
+
+/* =====================================================
+   CHART CONTAINERS
+   ===================================================== */
+.chart-container {
+    position: relative;
+    height: 200px;
+    margin-top: 1rem;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.chart-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* =====================================================
+   METRICS MINI CARDS
+   Small stat displays for quick glance
+   ===================================================== */
+.metrics-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.metrics-mini-card {
+    background: var(--light-bg);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.metrics-mini-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.metrics-mini-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.metrics-mini-change {
+    font-size: 0.6875rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.metrics-mini-change.positive {
+    color: var(--success);
+}
+
+.metrics-mini-change.negative {
+    color: var(--danger);
+}
+
+/* =====================================================
+   ORDER TYPE BREAKDOWN
+   Pie/Bar chart display for order distribution
+   ===================================================== */
+.order-type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.order-type-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--light-bg);
+    border-radius: 6px;
+}
+
+.order-type-color {
+    width: 4px;
+    height: 24px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.order-type-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.order-type-name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.order-type-count {
+    font-size: 0.6875rem;
+    color: var(--text-light);
+}
+
+.order-type-revenue {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Order type colors */
+.order-type-color.dtg { background: #3b82f6; }
+.order-type-color.embroidery { background: #8b5cf6; }
+.order-type-color.screen-print { background: #10b981; }
+.order-type-color.cap-embroidery { background: #f59e0b; }
+.order-type-color.transfers { background: #ec4899; }
+.order-type-color.other { background: #6b7280; }
+
+/* =====================================================
+   CELEBRATIONS WIDGET
+   Birthdays, anniversaries
+   ===================================================== */
+.celebrations-widget {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+.celebrations-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.celebrations-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.celebrations-title i {
+    color: #f59e0b;
+}
+
+.celebration-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.celebration-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 8px;
+}
+
+.celebration-item.birthday {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+}
+
+.celebration-item.anniversary {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.celebration-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+}
+
+.celebration-info {
+    flex: 1;
+}
+
+.celebration-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.celebration-detail {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.celebration-date {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+/* Empty state */
+.celebrations-empty {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-light);
+    font-size: 0.875rem;
+}
+
+/* =====================================================
+   QUICK TIPS WIDGET
+   ===================================================== */
+.tips-widget {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--success);
+    margin-bottom: 1rem;
+}
+
+.tips-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tips-header i {
+    color: var(--success);
+}
+
+.tips-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #166534;
+}
+
+.tips-content {
+    font-size: 0.8125rem;
+    color: #15803d;
+    line-height: 1.5;
+}
+
+.tips-content a {
+    color: #166534;
+    font-weight: 500;
+}
+
+/* =====================================================
+   SHOPWORKS DATA INDICATOR
+   Shows data source and freshness
+   ===================================================== */
+.data-source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: #059669;
+}
+
+.data-source-badge i {
+    font-size: 0.625rem;
+}
+
+.data-source-badge.loading {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #2563eb;
+}
+
+.data-source-badge.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+}
+
+.data-freshness {
+    font-size: 0.625rem;
+    color: var(--text-light);
+    margin-left: 0.5rem;
+}
+
+/* =====================================================
+   EMPTY STATES
+   ===================================================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.empty-state-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--light-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.empty-state-icon i {
+    font-size: 1.25rem;
+    color: var(--text-light);
+}
+
+.empty-state-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.empty-state-message {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    max-width: 300px;
+}
+
+/* =====================================================
+   ERROR STATES
+   ===================================================== */
+.error-state {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+}
+
+.error-state-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.error-state-icon i {
+    color: var(--danger);
+}
+
+.error-state-content {
+    flex: 1;
+}
+
+.error-state-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--danger);
+}
+
+.error-state-message {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-top: 0.125rem;
+}
+
+.error-state-retry {
+    font-size: 0.8125rem;
+    color: var(--wsu-crimson);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    padding: 0;
+}
+
+.error-state-retry:hover {
+    text-decoration: underline;
+}
+
+/* =====================================================
+   SKELETON LOADERS
+   ===================================================== */
+.skeleton {
+    background: linear-gradient(90deg, var(--border-light) 25%, var(--hover-bg) 50%, var(--border-light) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-text.short {
+    width: 60%;
+}
+
+.skeleton-text.medium {
+    width: 80%;
+}
+
+.skeleton-value {
+    height: 2rem;
+    width: 50%;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-bar {
+    height: 8px;
+    width: 100%;
+}
+
+.skeleton-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+/* =====================================================
+   LEADERBOARD STYLES
+   Rep ranking display
+   ===================================================== */
+.leaderboard-podium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-top: 1rem;
+}
+
+.podium-position {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.podium-position.first { order: 2; }
+.podium-position.second { order: 1; }
+.podium-position.third { order: 3; }
+
+.podium-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--wsu-crimson);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.podium-position.first .podium-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 1.125rem;
+}
+
+.podium-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.podium-position.first .podium-badge {
+    background: #fbbf24;
+    color: #92400e;
+}
+
+.podium-position.second .podium-badge {
+    background: #9ca3af;
+    color: #374151;
+}
+
+.podium-position.third .podium-badge {
+    background: #d97706;
+    color: white;
+}
+
+.podium-name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.125rem;
+}
+
+.podium-revenue {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.podium-bar {
+    width: 60px;
+    margin-top: 0.5rem;
+    border-radius: 4px 4px 0 0;
+}
+
+.podium-position.first .podium-bar {
+    height: 80px;
+    background: linear-gradient(to top, #fbbf24, #fcd34d);
+}
+
+.podium-position.second .podium-bar {
+    height: 60px;
+    background: linear-gradient(to top, #9ca3af, #d1d5db);
+}
+
+.podium-position.third .podium-bar {
+    height: 40px;
+    background: linear-gradient(to top, #d97706, #fbbf24);
+}
+
+/* =====================================================
+   REFRESH CONTROLS
+   ===================================================== */
+.refresh-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.refresh-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--light-bg);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background: var(--hover-bg);
+    color: var(--wsu-crimson);
+}
+
+.refresh-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+.last-updated {
+    font-size: 0.6875rem;
+    color: var(--text-light);
+}
+
+/* =====================================================
+   RESPONSIVE ADJUSTMENTS
+   ===================================================== */
+@media (max-width: 768px) {
+    .metrics-mini-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .leaderboard-podium {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .podium-position {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: var(--light-bg);
+        border-radius: 8px;
+    }
+
+    .podium-position.first,
+    .podium-position.second,
+    .podium-position.third {
+        order: unset;
+    }
+
+    .podium-bar {
+        display: none;
+    }
+
+    .podium-avatar {
+        margin-bottom: 0;
+    }
+
+    .celebration-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+}

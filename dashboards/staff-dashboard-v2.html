@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Staff Tools Portal - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Dashboard Styles -->
+    <link href="/shared_components/css/dashboard-styles.css" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-layout.css" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-widgets.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- =====================================================
+             SIDEBAR NAVIGATION (Preserved from original)
+             ===================================================== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo-link" title="Go to main site">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Northwest%20Custom%20Apparel%20Logo%20Light.png"
+                         alt="Northwest Custom Apparel" class="company-logo">
+                </a>
+                <div class="company-name">Staff Portal</div>
+                <div class="company-year">2025</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-search">
+                    <input type="text" class="sidebar-search-input" placeholder="Search tools..." id="sidebarSearch">
+                </div>
+
+                <div class="sidebar-content">
+                    <!-- Quote Builders (Primary) -->
+                    <div class="nav-section" data-section="quote-builders">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📝</span>
+                                <span>Quote Builders</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/embroidery-quote-builder.html" class="nav-link"><span>Embroidery</span></a>
+                            <a href="/cap-embroidery-quote-builder.html" class="nav-link"><span>Cap Embroidery</span></a>
+                            <a href="/dtg-quote-builder.html" class="nav-link"><span>DTG</span></a>
+                            <a href="/screenprint-quote-builder.html" class="nav-link"><span>Screen Print</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Vendors -->
+                    <div class="nav-section collapsed" data-section="vendors">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🏭</span>
+                                <span>Vendors</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/richardson-2025.html" class="nav-link"><span>Richardson Caps</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Contract -->
+                    <div class="nav-section collapsed" data-section="contract">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📋</span>
+                                <span>Contract</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/dtg-contract/" class="nav-link"><span>Contract DTG</span></a>
+                            <a href="/calculators/embroidery-contract/" class="nav-link"><span>Contract Embroidery</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Specialty Items -->
+                    <div class="nav-section collapsed" data-section="specialty">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>⭐</span>
+                                <span>Specialty Items</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/calculators/embroidered-emblem/" class="nav-link"><span>Embroidered Emblems</span></a>
+                            <a href="/calculators/laser-tumbler-polarcamel.html" class="nav-link"><span>Laser Tumblers</span></a>
+                            <a href="/calculators/webstores.html" class="nav-link"><span>Webstore Setup</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Training -->
+                    <div class="nav-section collapsed" data-section="training">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📖</span>
+                                <span>Training</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/training/customer-service.html" class="nav-link"><span>Customer Service Manual</span></a>
+                            <a href="/training/sales-coordinator-manual.html" class="nav-link"><span>Sales Coordinator Manual</span></a>
+                            <a href="/training/quick-reference-tips.html" class="nav-link"><span>Quick Hitter Tips Archive</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Company Policies -->
+                    <div class="nav-section" data-section="policies">
+                        <a href="policies-hub.html" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>📋</span>
+                                    <span>Company Policies</span>
+                                </div>
+                                <span>→</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Art Operations -->
+                    <div class="nav-section collapsed" data-section="art">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🎨</span>
+                                <span>Art Operations</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/ae-art-dashboard.html" class="nav-link"><span>AE Art Dashboard</span></a>
+                            <a href="/art-hub-dashboard.html" class="nav-link"><span>Art Hub Dashboard</span></a>
+                            <a href="/calculators/art-invoice-creator.html" class="nav-link"><span>Art Invoice Creator</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Forms -->
+                    <div class="nav-section collapsed" data-section="forms">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📝</span>
+                                <span>Forms</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/digitizingform.html" class="nav-link"><span>Digitizing Order Form</span></a>
+                            <a href="/purchasingform.html" class="nav-link"><span>Purchasing Request Form</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Administration -->
+                    <div class="nav-section collapsed" data-section="admin">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>⚙️</span>
+                                <span>Administration</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/announcements-create.html" class="nav-link"><span>Create Announcements</span></a>
+                            <a href="/announcements-manage.html" class="nav-link"><span>Manage Announcements</span></a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- =====================================================
+             MAIN CONTENT AREA
+             ===================================================== -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: white; border-bottom: 1px solid var(--border-color);">
+                <div class="header-left">
+                    <h1 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin: 0;">Staff Dashboard</h1>
+                </div>
+                <div class="header-right" style="display: flex; align-items: center; gap: 1rem;">
+                    <span id="dataSourceBadge" class="data-source-badge">
+                        <i class="fas fa-database"></i>
+                        <span>Loading...</span>
+                    </span>
+                    <span id="lastUpdated" class="last-updated"></span>
+                    <button class="refresh-btn" onclick="StaffDashboardInit.refresh()" title="Refresh data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Partial Data Warning (shown when API returns incomplete data) -->
+            <div id="partialDataWarning" style="display: none; padding: 0 1.5rem;"></div>
+
+            <!-- Dashboard Zones Container -->
+            <div class="dashboard-zones">
+
+                <!-- =====================================================
+                     ZONE 1: ANNOUNCEMENTS HERO
+                     Training/Process updates with visual prominence
+                     ===================================================== -->
+                <section class="zone-announcements">
+                    <div class="announcements-hero" id="announcementsHero">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="announcements-list" id="announcementsList">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     ZONE 2: QUICK ACCESS TOOLS
+                     Primary action area - Quote builders, calculators
+                     ===================================================== -->
+                <section class="zone-quick-access">
+                    <div class="zone-header">
+                        <h2 class="zone-title">
+                            <i class="fas fa-bolt"></i>
+                            Quick Access Tools
+                        </h2>
+                    </div>
+
+                    <div class="quick-access-grid">
+                        <!-- Quote Builders -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <span class="tool-category-title">Quote Builders</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/embroidery-quote-builder.html" class="tool-btn">Embroidery</a>
+                                <a href="/cap-embroidery-quote-builder.html" class="tool-btn">Cap Emb</a>
+                                <a href="/dtg-quote-builder.html" class="tool-btn">DTG</a>
+                                <a href="/screenprint-quote-builder.html" class="tool-btn">Screen Print</a>
+                            </div>
+                        </div>
+
+                        <!-- Manual Pricing -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                                <span class="tool-category-title">Manual Pricing</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <div class="tool-dropdown">
+                                    <button class="tool-dropdown-btn">
+                                        <span>Select Calculator</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="tool-dropdown-menu">
+                                        <a href="javascript:void(0)" onclick="openManualPricingModal('dtg')" class="tool-dropdown-item">DTG</a>
+                                        <a href="javascript:void(0)" onclick="openManualPricingModal('dtf')" class="tool-dropdown-item">DTF</a>
+                                        <a href="javascript:void(0)" onclick="openManualPricingModal('embroidery')" class="tool-dropdown-item">Embroidery</a>
+                                        <a href="javascript:void(0)" onclick="openManualPricingModal('cap-embroidery')" class="tool-dropdown-item">Cap Embroidery</a>
+                                        <a href="javascript:void(0)" onclick="openManualPricingModal('screen-print')" class="tool-dropdown-item">Screen Print</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contract -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-handshake"></i>
+                                </div>
+                                <span class="tool-category-title">Contract</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/calculators/dtg-contract/" class="tool-btn">Contract DTG</a>
+                                <a href="/calculators/embroidery-contract/" class="tool-btn">Contract Emb</a>
+                            </div>
+                        </div>
+
+                        <!-- Quick Links -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <span class="tool-category-title">Quick Links</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/pages/3-day-tees.html" class="tool-btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border-color: #059669;">
+                                    <i class="fas fa-clock"></i> 3-Day Tees
+                                </a>
+                                <a href="/top-sellers-showcase.html" class="tool-btn">
+                                    <i class="fas fa-star"></i> Top Sellers
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     ZONE 3: SALES METRICS
+                     ShopWorks API - Revenue, Team Performance
+                     ===================================================== -->
+                <section class="zone-metrics">
+                    <!-- Revenue Card -->
+                    <div class="metrics-revenue-card">
+                        <div class="metrics-revenue-header">
+                            <span class="metrics-revenue-title" id="revenueTitle">Revenue: Last 30 Days</span>
+                            <div class="date-range-toggle">
+                                <button class="date-range-btn" data-days="7">7D</button>
+                                <button class="date-range-btn active" data-days="30">30D</button>
+                                <button class="date-range-btn" data-days="60">60D</button>
+                            </div>
+                        </div>
+                        <div class="metrics-revenue-value" id="ytdRevenue">
+                            <span class="skeleton skeleton-value"></span>
+                        </div>
+                        <div class="metrics-date-range" id="dateRangeDisplay">
+                            <!-- Populated by JS: "Dec 1, 2025 - Dec 31, 2025" -->
+                        </div>
+                        <div class="metrics-revenue-comparison">
+                            <span class="metrics-comparison-badge positive" id="ytdGrowth">
+                                <i class="fas fa-arrow-up"></i> --
+                            </span>
+                            <span class="metrics-comparison-label" id="comparisonLabel">vs. last year</span>
+                        </div>
+                    </div>
+
+                    <!-- Team Performance Card -->
+                    <div class="metrics-team-card">
+                        <div class="metrics-team-header">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title" id="teamPerformanceTitle">
+                                    <i class="fas fa-users"></i>
+                                    Team Performance
+                                </h3>
+                                <div class="metrics-date-range" id="teamDateRange"></div>
+                            </div>
+                            <div class="refresh-control">
+                                <button class="refresh-btn" onclick="StaffDashboardInit.loadMetrics(true)" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="rep-list" id="salesTeamList">
+                            <!-- Populated by JavaScript -->
+                            <div class="metrics-loading">
+                                <div class="loading"></div>
+                                <span>Loading from ShopWorks...</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     ZONE 4: SECONDARY CONTENT
+                     Production Schedule (demoted), Recent Policies
+                     ===================================================== -->
+                <section class="zone-secondary">
+                    <!-- Production Schedule Widget (Collapsible) -->
+                    <div class="widget-collapsible collapsed" data-widget="production">
+                        <div class="widget-header">
+                            <h3 class="widget-title">
+                                <i class="fas fa-industry"></i>
+                                Production Schedule
+                            </h3>
+                            <i class="fas fa-chevron-down widget-toggle"></i>
+                        </div>
+                        <div class="widget-content">
+                            <div class="production-mini-grid">
+                                <div class="production-mini-card">
+                                    <div class="production-mini-label">DTG</div>
+                                    <div class="production-mini-status">
+                                        <i class="fas fa-check-circle"></i> Available
+                                    </div>
+                                </div>
+                                <div class="production-mini-card">
+                                    <div class="production-mini-label">Embroidery</div>
+                                    <div class="production-mini-status">
+                                        <i class="fas fa-check-circle"></i> Available
+                                    </div>
+                                </div>
+                                <div class="production-mini-card">
+                                    <div class="production-mini-label">Screen Print</div>
+                                    <div class="production-mini-status">
+                                        <i class="fas fa-check-circle"></i> Available
+                                    </div>
+                                </div>
+                                <div class="production-mini-card">
+                                    <div class="production-mini-label">Cap Emb</div>
+                                    <div class="production-mini-status">
+                                        <i class="fas fa-check-circle"></i> Available
+                                    </div>
+                                </div>
+                                <div class="production-mini-card">
+                                    <div class="production-mini-label">Transfers</div>
+                                    <div class="production-mini-status">
+                                        <i class="fas fa-check-circle"></i> Available
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Policies Widget -->
+                    <div class="widget-collapsible" data-widget="policies">
+                        <div class="widget-header">
+                            <h3 class="widget-title">
+                                <i class="fas fa-book"></i>
+                                Recent Policies
+                            </h3>
+                            <i class="fas fa-chevron-down widget-toggle"></i>
+                        </div>
+                        <div class="widget-content">
+                            <div class="policy-mini-list">
+                                <a href="/dashboards/policies-hub.html#sales-office" class="policy-mini-card">
+                                    <div class="policy-mini-icon">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="policy-mini-content">
+                                        <div class="policy-mini-title">Sales & Office Procedures</div>
+                                        <div class="policy-mini-date">Updated Oct 31, 2025</div>
+                                    </div>
+                                    <span class="policy-mini-badge">NEW</span>
+                                </a>
+                                <a href="/dashboards/policies-hub.html#customer-notification" class="policy-mini-card">
+                                    <div class="policy-mini-icon">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    <div class="policy-mini-content">
+                                        <div class="policy-mini-title">Customer Notification SOP</div>
+                                        <div class="policy-mini-date">Updated Sep 16, 2025</div>
+                                    </div>
+                                </a>
+                                <a href="/dashboards/policies-hub.html#ltm-decision" class="policy-mini-card">
+                                    <div class="policy-mini-icon">
+                                        <i class="fas fa-balance-scale"></i>
+                                    </div>
+                                    <div class="policy-mini-content">
+                                        <div class="policy-mini-title">LTM Order Decision Algorithm</div>
+                                        <div class="policy-mini-date">Updated Sep 09, 2025</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- End dashboard-zones -->
+        </main>
+    </div><!-- End dashboard-container -->
+
+    <!-- =====================================================
+         SAMPLE ANNOUNCEMENTS DATA
+         (Replace with API call in production)
+         ===================================================== -->
+    <script>
+        // Sample announcements data - replace with API call
+        var staffAnnouncementsData = [
+            {
+                id: 'ann-001',
+                type: 'training',
+                title: 'New LTM Order Policy Update',
+                preview: 'Framework for handling Less-Than-Minimum orders: existing vs. new customers, upselling, and referrals.',
+                content: 'Full policy details available in the policies hub.',
+                date: '2025-09-09'
+            },
+            {
+                id: 'ann-002',
+                type: 'process',
+                title: 'Customer Notification SOP Updated',
+                preview: 'Standard procedure for notifying customers when orders are ready for pickup, including ShopWorks logging.',
+                date: '2025-09-16'
+            },
+            {
+                id: 'ann-003',
+                type: 'general',
+                title: 'Welcome to the New Dashboard!',
+                preview: 'We\'ve redesigned the staff dashboard for better usability. Quick access tools are now front and center.',
+                date: '2025-12-31'
+            }
+        ];
+    </script>
+
+    <!-- =====================================================
+         EXTERNAL JAVASCRIPT
+         ===================================================== -->
+    <!-- Dashboard Services -->
+    <script src="/shared_components/js/staff-dashboard-service.js"></script>
+    <script src="/shared_components/js/staff-dashboard-announcements.js"></script>
+    <script src="/shared_components/js/staff-dashboard-init.js"></script>
+
+    <!-- Sidebar Toggle Function (minimal inline for critical functionality) -->
+    <script>
+        function toggleSidebarSection(section) {
+            section.classList.toggle('collapsed');
+            // Save state
+            const states = {};
+            document.querySelectorAll('.nav-section').forEach(s => {
+                const id = s.dataset.section;
+                if (id) states[id] = s.classList.contains('collapsed');
+            });
+            localStorage.setItem('staffDashboard_sidebarStates', JSON.stringify(states));
+        }
+
+        // Restore sidebar states on load
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const states = JSON.parse(localStorage.getItem('staffDashboard_sidebarStates') || '{}');
+                Object.entries(states).forEach(([id, collapsed]) => {
+                    const section = document.querySelector(`[data-section="${id}"]`);
+                    if (section) section.classList.toggle('collapsed', collapsed);
+                });
+            } catch (e) {}
+        });
+
+        // Manual pricing modal placeholder (implement as needed)
+        function openManualPricingModal(type) {
+            alert('Manual pricing calculator for ' + type + ' - implement modal or redirect');
+        }
+    </script>
+</body>
+</html>
