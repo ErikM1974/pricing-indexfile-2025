@@ -17,6 +17,15 @@
     <link href="/shared_components/css/staff-dashboard-widgets.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Caspio Authentication Embed (Hidden) -->
+    <div class="caspio-auth" style="display: none;">
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
     <div class="dashboard-container">
         <!-- =====================================================
              SIDEBAR NAVIGATION (Preserved from original)
@@ -195,9 +204,26 @@
                         </div>
                     </div>
 
-                    <a href="/dashboards/staff-login.html" class="login-link" title="Sign In">
-                        <i class="fas fa-sign-in-alt"></i>
-                    </a>
+                    <!-- User Profile Widget -->
+                    <div class="user-menu" onclick="toggleUserDropdown(event)">
+                        <div class="user-info">
+                            <div class="user-name" id="headerUserName">Loading...</div>
+                            <div class="user-role">Staff Member</div>
+                        </div>
+                        <div class="user-avatar" id="headerUserAvatar">?</div>
+                        <i class="fas fa-chevron-down user-menu-chevron"></i>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <div class="dropdown-user-name" id="dropdownUserName">Loading...</div>
+                                <div class="dropdown-user-email" id="dropdownUserEmail">email@nwcustomapparel.com</div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" onclick="handleLogout(); return false;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -769,6 +795,127 @@
             if (event.key === 'Escape') {
                 closeStaffDirectory();
             }
+        });
+
+        // =====================================================
+        // USER AUTHENTICATION & DROPDOWN
+        // =====================================================
+
+        // User dropdown toggle
+        function toggleUserDropdown(event) {
+            event.stopPropagation();
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                userMenu.classList.remove('active');
+            } else {
+                dropdown.classList.add('show');
+                userMenu.classList.add('active');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userMenu = document.querySelector('.user-menu');
+
+            if (dropdown && userMenu && !userMenu.contains(event.target)) {
+                dropdown.classList.remove('show');
+                userMenu.classList.remove('active');
+            }
+        });
+
+        // Handle logout
+        function handleLogout() {
+            sessionStorage.removeItem('caspioUserData');
+            try {
+                window.location.href = 'https://c3eku948.caspio.com/folderlogout';
+            } catch (error) {
+                window.location.href = 'https://www.teamnwca.com';
+            }
+        }
+
+        // Initialize user from Caspio
+        function initializeUser() {
+            let userData = window.caspioUser;
+
+            // If not in window, check sessionStorage
+            if (!userData && sessionStorage.getItem('caspioUserData')) {
+                try {
+                    userData = JSON.parse(sessionStorage.getItem('caspioUserData'));
+                } catch (e) {
+                    console.error('Error parsing stored user data:', e);
+                }
+            }
+
+            // Extract user data with fallbacks
+            const firstName = userData?.firstName || 'Team';
+            const lastName = userData?.lastName || 'Member';
+            const email = userData?.email || '';
+
+            // Update header user info
+            const headerUserName = document.getElementById('headerUserName');
+            const headerUserAvatar = document.getElementById('headerUserAvatar');
+
+            if (headerUserName) {
+                headerUserName.textContent = `${firstName} ${lastName}`;
+            }
+
+            if (headerUserAvatar) {
+                const initials = firstName.charAt(0).toUpperCase() +
+                                (lastName ? lastName.charAt(0).toUpperCase() : '');
+                headerUserAvatar.textContent = initials;
+            }
+
+            // Update dropdown user info
+            const dropdownUserName = document.getElementById('dropdownUserName');
+            const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+
+            if (dropdownUserName) {
+                dropdownUserName.textContent = `${firstName} ${lastName}`;
+            }
+
+            if (dropdownUserEmail) {
+                dropdownUserEmail.textContent = email || 'staff@nwcustomapparel.com';
+            }
+
+            console.log('[StaffDashboard] User initialized:', firstName, lastName);
+        }
+
+        // Caspio DataPageReady Event Listener
+        document.addEventListener('DataPageReady', function(event) {
+            console.log('[StaffDashboard] Caspio DataPage Ready');
+        });
+
+        // Wait for Caspio user data with retry mechanism
+        window.addEventListener('load', function() {
+            let retryCount = 0;
+            const maxRetries = 10;
+
+            function attemptInitialization() {
+                if (window.caspioUser && window.caspioUser.firstName) {
+                    console.log('[StaffDashboard] Caspio user data found, initializing...');
+                    initializeUser();
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    console.log(`[StaffDashboard] Waiting for Caspio user data... attempt ${retryCount}/${maxRetries}`);
+                    setTimeout(attemptInitialization, 500);
+                } else {
+                    console.log('[StaffDashboard] Max retries reached, initializing with fallback');
+                    initializeUser();
+                }
+            }
+
+            // Start checking after initial delay
+            setTimeout(attemptInitialization, 1000);
+        });
+
+        // Also listen for the custom event from Caspio
+        window.addEventListener('caspioUserReady', function(event) {
+            console.log('[StaffDashboard] Caspio user ready event received:', event.detail);
+            initializeUser();
         });
     </script>
 </body>
