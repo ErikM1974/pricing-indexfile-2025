@@ -8,512 +8,537 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="shared_components/css/dashboard-styles.css" rel="stylesheet">
-    
-    <style>
-        /* Policy Hub Specific Styles */
-        .policies-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .hub-header {
-            background: linear-gradient(135deg, var(--wsu-crimson) 0%, var(--wsu-grey) 100%);
-            color: white;
-            padding: 3rem 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        }
-        
-        .hub-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .hub-header p {
-            font-size: 1.125rem;
-            opacity: 0.95;
-        }
-        
-        .policy-search {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--wsu-crimson);
-            box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-        
-        .policy-categories {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .category-filter {
-            padding: 0.5rem 1rem;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        .category-filter:hover {
-            background: var(--light-bg);
-            border-color: var(--wsu-crimson);
-        }
-        
-        .category-filter.active {
-            background: var(--wsu-crimson);
-            color: white;
-            border-color: var(--wsu-crimson);
-        }
-        
-        .policies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .policy-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-            border-left: 4px solid var(--wsu-crimson);
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        
-        .policy-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-        }
-        
-        .policy-card.new-policy::before {
-            content: 'NEW';
-            position: absolute;
-            top: -8px;
-            right: 1rem;
-            background: #22c55e;
-            color: white;
-            font-size: 0.625rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
-        }
-        
-        .policy-category {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: var(--light-bg);
-            color: var(--wsu-grey);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.75rem;
-        }
-        
-        .policy-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .policy-description {
-            color: var(--text-secondary);
-            font-size: 0.9375rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-        
-        .policy-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        
-        .policy-updated {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .policy-owner {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .quick-actions {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-        }
-        
-        .quick-actions-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-        
-        .quick-links {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .quick-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1rem;
-            background: var(--light-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        
-        .quick-link:hover {
-            background: var(--wsu-crimson);
-            color: white;
-            border-color: var(--wsu-crimson);
-            transform: translateY(-1px);
-        }
-        
-        .back-to-dashboard {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 0.75rem 1.25rem;
-            background: var(--wsu-crimson);
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(152, 30, 50, 0.3);
-            transition: all 0.2s ease;
-            z-index: 100;
-        }
-        
-        .back-to-dashboard:hover {
-            background: var(--wsu-crimson-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(152, 30, 50, 0.4);
-        }
-        
-        @media (max-width: 768px) {
-            .policies-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .hub-header h1 {
-                font-size: 1.875rem;
-            }
-            
-            .back-to-dashboard {
-                bottom: 1rem;
-                right: 1rem;
-            }
-        }
-    </style>
+    <link href="/shared_components/css/dashboard-styles.css" rel="stylesheet">
+    <link href="/pages/css/policies-hub.css" rel="stylesheet">
 </head>
 <body>
-    <div class="policies-container">
-        <!-- Header -->
-        <div class="hub-header">
-            <h1><i class="fas fa-book-open"></i> Company Policies Hub</h1>
-            <p>Quick reference for all NWCA operational policies and guidelines</p>
-        </div>
-        
-        <!-- Search Bar -->
-        <div class="policy-search">
-            <div style="position: relative;">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" id="policySearch" placeholder="Search policies by title or keyword...">
+    <div class="policies-page-wrapper">
+        <!-- Table of Contents Sidebar -->
+        <aside class="toc-sidebar">
+            <div class="toc-card">
+                <div class="toc-title">Table of Contents</div>
+                <div id="tocContent">
+                    <!-- Generated by JavaScript -->
+                </div>
             </div>
-        </div>
-        
-        <!-- Category Filters -->
-        <div class="policy-categories">
-            <button class="category-filter active" data-category="all">All Policies</button>
-            <button class="category-filter" data-category="financial">Financial</button>
-            <button class="category-filter" data-category="operations">Operations</button>
-            <button class="category-filter" data-category="customer-service">Customer Service</button>
-            <button class="category-filter" data-category="hr">HR & Team</button>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h3 class="quick-actions-title">Quick Actions</h3>
-            <div class="quick-links">
-                <a href="#" class="quick-link" onclick="window.print(); return false;">
-                    <i class="fas fa-print"></i> Print All Policies
+        </aside>
+
+        <!-- Main Content -->
+        <div class="policies-container">
+            <!-- Header -->
+            <div class="hub-header">
+                <h1><i class="fas fa-book-open"></i>Company Policies Hub</h1>
+                <p>Quick reference for all NWCA operational policies and guidelines</p>
+            </div>
+
+            <!-- Search & View Controls -->
+            <div class="search-controls">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="policySearch" placeholder="Search policies by title or keyword...">
+                </div>
+                <div class="view-toggle">
+                    <button class="view-toggle-btn active" data-view="grid" title="Grid View">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="view-toggle-btn" data-view="list" title="List View">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Filters with Icons & Counts -->
+            <div class="policy-categories">
+                <button class="category-filter active" data-category="all">
+                    <i class="fas fa-layer-group"></i>
+                    All Policies
+                    <span class="count" id="countAll">9</span>
+                </button>
+                <button class="category-filter" data-category="financial">
+                    <i class="fas fa-dollar-sign"></i>
+                    Financial
+                    <span class="count" id="countFinancial">4</span>
+                </button>
+                <button class="category-filter" data-category="operations">
+                    <i class="fas fa-cogs"></i>
+                    Operations
+                    <span class="count" id="countOperations">5</span>
+                </button>
+                <button class="category-filter" data-category="customer-service">
+                    <i class="fas fa-headset"></i>
+                    Customer Service
+                    <span class="count" id="countCustomerService">0</span>
+                </button>
+                <button class="category-filter" data-category="hr">
+                    <i class="fas fa-users"></i>
+                    HR & Team
+                    <span class="count" id="countHR">0</span>
+                </button>
+            </div>
+
+            <!-- Recently Updated Section -->
+            <div class="recently-updated" id="recentlyUpdated">
+                <div class="recently-updated-header">
+                    <i class="fas fa-clock"></i>
+                    Recently Updated
+                </div>
+                <div class="recent-items" id="recentItems">
+                    <!-- Generated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Policies Grid View -->
+            <div class="policies-grid" id="policiesGrid">
+                <!-- DTG Artwork Information Checklist -->
+                <a href="policies/dtg-artwork-checklist.html" class="policy-card new-policy" data-category="operations" id="policy-dtg-artwork" data-date="2025-11-11">
+                    <span class="policy-category">Operations</span>
+                    <h3 class="policy-title">DTG Artwork Information Checklist</h3>
+                    <p class="policy-description">Complete guide for customer intake and artwork preparation for Direct-to-Garment printing. Includes 5-phase playbook.</p>
+                    <p class="policy-description-full">Complete guide for customer intake and artwork preparation for Direct-to-Garment printing. Includes 5-phase playbook covering garment selection, creative briefs, print placement, technical artwork requirements, and sales communication toolkit. Essential reference for all customer-facing staff.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Nov 11, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Art Department
+                        </span>
+                    </div>
                 </a>
-                <a href="mailto:sales@nwcustomapparel.com?subject=Policy%20Question" class="quick-link">
-                    <i class="fas fa-envelope"></i> Ask a Question
+
+                <!-- Sales & Office Procedures -->
+                <a href="policies/sales-office-procedures.html" class="policy-card" data-category="operations" id="policy-sales-office" data-date="2025-10-31">
+                    <span class="policy-category">Operations</span>
+                    <h3 class="policy-title">Sales & Office Procedures</h3>
+                    <p class="policy-description">Comprehensive office standards including punctuality, customer service protocols, and phone policies.</p>
+                    <p class="policy-description-full">Comprehensive office standards including punctuality (Lombardi Time philosophy), customer service protocols, phone policies (3-ring rule), digital communications, and daily operational responsibilities. Essential guide for all team members covering opening/closing procedures, customer interaction standards, and individual role assignments.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Oct 31, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Erik M.
+                        </span>
+                    </div>
                 </a>
-                <a href="#" class="quick-link" onclick="alert('Policy request form coming soon!'); return false;">
-                    <i class="fas fa-plus-circle"></i> Request New Policy
+
+                <!-- Retail vs Wholesale Pricing Policy -->
+                <a href="policies/retail-vs-wholesale-pricing-policy.html" class="policy-card" data-category="financial" id="policy-retail-wholesale" data-date="2025-10-21">
+                    <span class="policy-category">Financial</span>
+                    <h3 class="policy-title">Retail vs. Wholesale Pricing Policy</h3>
+                    <p class="policy-description">Essential understanding of our two business models and different pricing strategies.</p>
+                    <p class="policy-description-full">Essential understanding of our two business models and why we maintain different pricing for retail customers vs. wholesale partners. Explains the Condo Care decision and how to protect our 40% jacket margins. Critical for all staff to understand customer pricing strategies.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Oct 21, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Erik M.
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Pricing Negotiation Policy -->
+                <a href="pricing-negotiation-policy.html" class="policy-card" data-category="financial" id="policy-pricing-negotiation" data-date="2025-01-28">
+                    <span class="policy-category">Financial</span>
+                    <h3 class="policy-title">Pricing Negotiation Strategy & Policy</h3>
+                    <p class="policy-description">Critical strategies for defending pricing and maintaining profitability with scripts.</p>
+                    <p class="policy-description-full">Critical strategies for defending our $30 customer-supplied pricing and maintaining profitability. Includes scripts for common scenarios, value-add alternatives to discounting, and the seven dangers that destroy margins. Essential reference for all AEs.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Jan 28, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Erik M.
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Bundle Kitting Process -->
+                <a href="policies/bundle-kitting-xmas-2025.html" class="policy-card" data-category="operations" id="policy-bundle-kitting" data-date="2025-10-03">
+                    <span class="policy-category">Operations</span>
+                    <h3 class="policy-title">Christmas Bundle Kitting Process 2025</h3>
+                    <p class="policy-description">Step-by-step workflow for producing and assembling customer gift bundles.</p>
+                    <p class="policy-description-full">Step-by-step workflow for producing and assembling customer gift bundles with multiple decoration methods. Covers order intake, department coordination, quality control, and final kitting with photography.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Oct 03, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Ruth N.
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Payment Terms Policy -->
+                <a href="policies/payment-terms.html" class="policy-card" data-category="financial" id="policy-payment-terms" data-date="2025-08-22">
+                    <span class="policy-category">Financial</span>
+                    <h3 class="policy-title">Payment Terms Guide</h3>
+                    <p class="policy-description">Comprehensive guide to all payment terms including Net terms and special cases.</p>
+                    <p class="policy-description-full">Comprehensive guide to all payment terms including Pay on Pickup, Prepaid, Net terms, and special cases. Essential reference for all customer transactions.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Aug 22, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Erik M.
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Less Than Minimum Fee Policy -->
+                <a href="policies/ltm-fee-policy.html" class="policy-card" data-category="financial" id="policy-ltm-fee" data-date="2025-08-22">
+                    <span class="policy-category">Financial</span>
+                    <h3 class="policy-title">Less Than Minimum (LTM) Fee Policy</h3>
+                    <p class="policy-description">Essential guide for applying the $50 LTM fee on orders under minimums.</p>
+                    <p class="policy-description-full">Essential guide for applying the $50 LTM fee on orders under minimums. Covers fee calculations, waiver eligibility, and customer communication for embroidery, DTG, DTF, and screen print services.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Aug 22, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Erik M.
+                        </span>
+                    </div>
+                </a>
+
+                <!-- LTM Order Decision Algorithm -->
+                <a href="policies/ltm-order-decision-algorithm.html" class="policy-card" data-category="operations" id="policy-ltm-algorithm" data-date="2025-01-09">
+                    <span class="policy-category">Operations</span>
+                    <h3 class="policy-title">LTM Order Decision Algorithm</h3>
+                    <p class="policy-description">Comprehensive framework for AEs to handle Less-Than-Minimum order inquiries.</p>
+                    <p class="policy-description-full">Comprehensive framework for AEs to handle Less-Than-Minimum order inquiries. Includes decision tree for existing vs. new customers, upselling scripts, strategic filtering, and referral procedures.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Jan 09, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Erik M.
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Customer Notification SOP -->
+                <a href="policies/customer-notification-sop.html" class="policy-card" data-category="operations" id="policy-customer-notification" data-date="2025-09-16">
+                    <span class="policy-category">Operations</span>
+                    <h3 class="policy-title">Customer Notification for Order Pickup</h3>
+                    <p class="policy-description">Standard operating procedure for notifying customers when orders are ready.</p>
+                    <p class="policy-description-full">Standard operating procedure for notifying customers when orders are ready for pickup. Includes call scripts, Shopworks logging instructions with visual guide, and follow-up protocols.</p>
+                    <div class="policy-meta">
+                        <span class="policy-updated">
+                            <i class="far fa-calendar"></i> Sep 16, 2025
+                        </span>
+                        <span class="policy-owner">
+                            <i class="far fa-user"></i> Office Admin
+                        </span>
+                    </div>
                 </a>
             </div>
-        </div>
-        
-        <!-- Policies Grid -->
-        <div class="policies-grid" id="policiesGrid">
-            <!-- DTG Artwork Information Checklist -->
-            <a href="policies/dtg-artwork-checklist.html" class="policy-card new-policy" data-category="operations">
-                <span class="policy-category">Operations</span>
-                <h3 class="policy-title">DTG Artwork Information Checklist</h3>
-                <p class="policy-description">
-                    Complete guide for customer intake and artwork preparation for Direct-to-Garment printing. Includes 5-phase playbook covering garment selection, creative briefs, print placement, technical artwork requirements, and sales communication toolkit. Essential reference for all customer-facing staff.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Nov 11, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Art Department
-                    </span>
-                </div>
-            </a>
 
-            <!-- Sales & Office Procedures -->
-            <a href="policies/sales-office-procedures.html" class="policy-card" data-category="operations">
-                <span class="policy-category">Operations</span>
-                <h3 class="policy-title">Sales & Office Procedures</h3>
-                <p class="policy-description">
-                    Comprehensive office standards including punctuality (Lombardi Time philosophy), customer service protocols, phone policies (3-ring rule), digital communications, and daily operational responsibilities. Essential guide for all team members covering opening/closing procedures, customer interaction standards, and individual role assignments.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Oct 31, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Erik M.
-                    </span>
+            <!-- Policies List View (hidden by default) -->
+            <div class="policies-list" id="policiesList">
+                <div class="policy-list-header">
+                    <span>Policy</span>
+                    <span>Category</span>
+                    <span>Updated</span>
+                    <span>Owner</span>
                 </div>
-            </a>
+                <!-- List items generated by JavaScript -->
+            </div>
 
-            <!-- Retail vs Wholesale Pricing Policy -->
-            <a href="policies/retail-vs-wholesale-pricing-policy.html" class="policy-card" data-category="financial">
-                <span class="policy-category">Financial</span>
-                <h3 class="policy-title">Retail vs. Wholesale Pricing Policy</h3>
-                <p class="policy-description">
-                    Essential understanding of our two business models and why we maintain different pricing for retail customers vs. wholesale partners. Explains the Condo Care decision and how to protect our 40% jacket margins. Critical for all staff to understand customer pricing strategies.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Oct 21, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Erik M.
-                    </span>
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3 class="quick-actions-title">Quick Actions</h3>
+                <div class="quick-links">
+                    <a href="#" class="quick-link" onclick="window.print(); return false;">
+                        <i class="fas fa-print"></i> Print All Policies
+                    </a>
+                    <a href="mailto:sales@nwcustomapparel.com?subject=Policy%20Question" class="quick-link">
+                        <i class="fas fa-envelope"></i> Ask a Question
+                    </a>
+                    <a href="#" class="quick-link" onclick="alert('Policy request form coming soon!'); return false;">
+                        <i class="fas fa-plus-circle"></i> Request New Policy
+                    </a>
                 </div>
-            </a>
-
-            <!-- Pricing Negotiation Policy -->
-            <a href="pricing-negotiation-policy.html" class="policy-card" data-category="financial">
-                <span class="policy-category">Financial</span>
-                <h3 class="policy-title">Pricing Negotiation Strategy & Policy</h3>
-                <p class="policy-description">
-                    Critical strategies for defending our $30 customer-supplied pricing and maintaining profitability. Includes scripts for common scenarios, value-add alternatives to discounting, and the seven dangers that destroy margins. Essential reference for all AEs.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Jan 28, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Erik M.
-                    </span>
-                </div>
-            </a>
-
-            <!-- Bundle Kitting Process -->
-            <a href="policies/bundle-kitting-xmas-2025.html" class="policy-card" data-category="operations">
-                <span class="policy-category">Operations</span>
-                <h3 class="policy-title">Christmas Bundle Kitting Process 2025</h3>
-                <p class="policy-description">
-                    Step-by-step workflow for producing and assembling customer gift bundles with multiple decoration methods. Covers order intake, department coordination, quality control, and final kitting with photography.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Oct 03, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Ruth N.
-                    </span>
-                </div>
-            </a>
-
-            <!-- Payment Terms Policy -->
-            <a href="policies/payment-terms.html" class="policy-card" data-category="financial">
-                <span class="policy-category">Financial</span>
-                <h3 class="policy-title">Payment Terms Guide</h3>
-                <p class="policy-description">
-                    Comprehensive guide to all payment terms including Pay on Pickup, Prepaid, Net terms, and special cases. Essential reference for all customer transactions.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Aug 22, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Erik M.
-                    </span>
-                </div>
-            </a>
-
-            <!-- Less Than Minimum Fee Policy -->
-            <a href="policies/ltm-fee-policy.html" class="policy-card" data-category="financial">
-                <span class="policy-category">Financial</span>
-                <h3 class="policy-title">Less Than Minimum (LTM) Fee Policy</h3>
-                <p class="policy-description">
-                    Essential guide for applying the $50 LTM fee on orders under minimums. Covers fee calculations, waiver eligibility, and customer communication for embroidery, DTG, DTF, and screen print services.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Aug 22, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Erik M.
-                    </span>
-                </div>
-            </a>
-
-            <!-- LTM Order Decision Algorithm -->
-            <a href="policies/ltm-order-decision-algorithm.html" class="policy-card" data-category="operations">
-                <span class="policy-category">Operations</span>
-                <h3 class="policy-title">LTM Order Decision Algorithm</h3>
-                <p class="policy-description">
-                    Comprehensive framework for AEs to handle Less-Than-Minimum order inquiries. Includes decision tree for existing vs. new customers, upselling scripts, strategic filtering, and referral procedures.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Jan 09, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Erik M.
-                    </span>
-                </div>
-            </a>
-
-            <!-- Customer Notification SOP -->
-            <a href="policies/customer-notification-sop.html" class="policy-card" data-category="operations">
-                <span class="policy-category">Operations</span>
-                <h3 class="policy-title">Customer Notification for Order Pickup</h3>
-                <p class="policy-description">
-                    Standard operating procedure for notifying customers when orders are ready for pickup. Includes call scripts, Shopworks logging instructions with visual guide, and follow-up protocols.
-                </p>
-                <div class="policy-meta">
-                    <span class="policy-updated">
-                        <i class="far fa-calendar"></i> Sep 16, 2025
-                    </span>
-                    <span class="policy-owner">
-                        <i class="far fa-user"></i> Office Admin
-                    </span>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
-    
+
     <!-- Back to Dashboard Button -->
-    <a href="staff-dashboard.html" class="back-to-dashboard">
+    <a href="/dashboards/staff-dashboard-v2.html" class="back-to-dashboard">
         <i class="fas fa-arrow-left"></i> Back to Dashboard
     </a>
-    
+
     <script>
-        // Search functionality
-        document.getElementById('policySearch').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
+        // =====================================================
+        // POLICIES HUB FUNCTIONALITY
+        // =====================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initPoliciesHub();
+        });
+
+        function initPoliciesHub() {
+            generateTableOfContents();
+            generateRecentlyUpdated();
+            generateListView();
+            initSearch();
+            initCategoryFilters();
+            initViewToggle();
+            restoreViewPreference();
+        }
+
+        // =====================================================
+        // TABLE OF CONTENTS
+        // =====================================================
+        function generateTableOfContents() {
+            const tocContent = document.getElementById('tocContent');
             const cards = document.querySelectorAll('.policy-card');
-            
+
+            // Group policies by category
+            const categories = {
+                financial: { icon: 'fa-dollar-sign', label: 'Financial', items: [] },
+                operations: { icon: 'fa-cogs', label: 'Operations', items: [] }
+            };
+
             cards.forEach(card => {
-                const title = card.querySelector('.policy-title').textContent.toLowerCase();
-                const description = card.querySelector('.policy-description').textContent.toLowerCase();
-                
-                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                const category = card.dataset.category;
+                const title = card.querySelector('.policy-title').textContent;
+                const id = card.id;
+
+                if (categories[category]) {
+                    categories[category].items.push({ title, id });
+                }
+            });
+
+            // Build TOC HTML
+            let html = '';
+            for (const [key, cat] of Object.entries(categories)) {
+                if (cat.items.length > 0) {
+                    html += `
+                        <div class="toc-category">
+                            <div class="toc-category-title">
+                                <i class="fas ${cat.icon}"></i>
+                                ${cat.label} (${cat.items.length})
+                            </div>
+                            <ul class="toc-links">
+                                ${cat.items.map(item => `
+                                    <li><a href="#${item.id}" class="toc-link">${item.title}</a></li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+            }
+
+            tocContent.innerHTML = html;
+
+            // Smooth scroll for TOC links
+            tocContent.querySelectorAll('.toc-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        target.style.animation = 'highlight 1s ease';
+                        setTimeout(() => target.style.animation = '', 1000);
+                    }
+                });
+            });
+        }
+
+        // =====================================================
+        // RECENTLY UPDATED SECTION
+        // =====================================================
+        function generateRecentlyUpdated() {
+            const recentItems = document.getElementById('recentItems');
+            const cards = Array.from(document.querySelectorAll('.policy-card'));
+
+            // Sort by date (newest first)
+            cards.sort((a, b) => {
+                const dateA = new Date(a.dataset.date);
+                const dateB = new Date(b.dataset.date);
+                return dateB - dateA;
+            });
+
+            // Take top 3
+            const recent = cards.slice(0, 3);
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            let html = recent.map(card => {
+                const title = card.querySelector('.policy-title').textContent;
+                const dateText = card.querySelector('.policy-updated').textContent.trim();
+                const isNew = new Date(card.dataset.date) > thirtyDaysAgo;
+                const href = card.getAttribute('href');
+
+                return `
+                    <a href="${href}" class="recent-item">
+                        ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                        <span class="recent-item-title">${title}</span>
+                        <span class="recent-item-date">${dateText}</span>
+                    </a>
+                `;
+            }).join('');
+
+            recentItems.innerHTML = html;
+        }
+
+        // =====================================================
+        // LIST VIEW GENERATION
+        // =====================================================
+        function generateListView() {
+            const listContainer = document.getElementById('policiesList');
+            const cards = document.querySelectorAll('.policy-card');
+            const header = listContainer.querySelector('.policy-list-header');
+
+            let html = header.outerHTML;
+
+            cards.forEach(card => {
+                const title = card.querySelector('.policy-title').textContent;
+                const category = card.querySelector('.policy-category').textContent;
+                const date = card.querySelector('.policy-updated').textContent.trim();
+                const owner = card.querySelector('.policy-owner').textContent.trim();
+                const href = card.getAttribute('href');
+                const isNew = card.classList.contains('new-policy');
+                const dataCategory = card.dataset.category;
+
+                html += `
+                    <a href="${href}" class="policy-list-item" data-category="${dataCategory}">
+                        <span class="policy-list-title">
+                            ${title}
+                            ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                        </span>
+                        <span class="policy-list-category">${category}</span>
+                        <span class="policy-list-date">${date}</span>
+                        <span class="policy-list-owner">${owner}</span>
+                    </a>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+        }
+
+        // =====================================================
+        // SEARCH FUNCTIONALITY
+        // =====================================================
+        function initSearch() {
+            const searchInput = document.getElementById('policySearch');
+
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.policy-card');
+                const listItems = document.querySelectorAll('.policy-list-item');
+
+                // Filter grid cards
+                cards.forEach(card => {
+                    const title = card.querySelector('.policy-title').textContent.toLowerCase();
+                    const description = card.querySelector('.policy-description-full')?.textContent.toLowerCase() || '';
+                    const matches = title.includes(searchTerm) || description.includes(searchTerm);
+                    card.style.display = matches ? 'block' : 'none';
+                });
+
+                // Filter list items
+                listItems.forEach(item => {
+                    const title = item.querySelector('.policy-list-title').textContent.toLowerCase();
+                    const matches = title.includes(searchTerm);
+                    item.style.display = matches ? 'grid' : 'none';
+                });
+            });
+        }
+
+        // =====================================================
+        // CATEGORY FILTERING
+        // =====================================================
+        function initCategoryFilters() {
+            const filterButtons = document.querySelectorAll('.category-filter');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active state
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Filter content
+                    const category = this.dataset.category;
+                    filterByCategory(category);
+                });
+            });
+        }
+
+        function filterByCategory(category) {
+            const cards = document.querySelectorAll('.policy-card');
+            const listItems = document.querySelectorAll('.policy-list-item');
+
+            // Filter grid cards
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
                 }
             });
-        });
-        
-        // Category filtering
-        document.querySelectorAll('.category-filter').forEach(button => {
-            button.addEventListener('click', function() {
-                // Update active state
-                document.querySelectorAll('.category-filter').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                this.classList.add('active');
-                
-                // Filter cards
-                const category = this.dataset.category;
-                const cards = document.querySelectorAll('.policy-card');
-                
-                cards.forEach(card => {
-                    if (category === 'all' || card.dataset.category === category) {
-                        card.style.display = 'block';
+
+            // Filter list items
+            listItems.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'grid';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // =====================================================
+        // VIEW TOGGLE (Grid vs List)
+        // =====================================================
+        function initViewToggle() {
+            const toggleBtns = document.querySelectorAll('.view-toggle-btn');
+            const grid = document.getElementById('policiesGrid');
+            const list = document.getElementById('policiesList');
+
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const view = this.dataset.view;
+
+                    // Update button states
+                    toggleBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Toggle views
+                    if (view === 'grid') {
+                        grid.classList.remove('hidden');
+                        list.classList.remove('active');
                     } else {
-                        card.style.display = 'none';
+                        grid.classList.add('hidden');
+                        list.classList.add('active');
                     }
+
+                    // Save preference
+                    localStorage.setItem('policiesViewPreference', view);
                 });
             });
-        });
+        }
+
+        function restoreViewPreference() {
+            const savedView = localStorage.getItem('policiesViewPreference');
+            if (savedView) {
+                const btn = document.querySelector(`.view-toggle-btn[data-view="${savedView}"]`);
+                if (btn) {
+                    btn.click();
+                }
+            }
+        }
+
+        // Add highlight animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes highlight {
+                0%, 100% { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); }
+                50% { box-shadow: 0 0 0 4px rgba(152, 30, 50, 0.3); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
