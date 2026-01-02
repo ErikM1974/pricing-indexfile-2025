@@ -316,10 +316,10 @@ class DTFPricingService {
      * Get margin denominator for a quantity
      */
     getMarginDenominator(quantity) {
-        if (!this.apiData) return 0.6; // Default 40% margin
-        
+        if (!this.apiData) return 0.57; // 2026 margin (43%)
+
         const tier = this.apiData.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
-        return tier ? tier.marginDenominator : 0.6;
+        return tier ? tier.marginDenominator : 0.57;
     }
 
     /**

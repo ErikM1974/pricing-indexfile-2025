@@ -173,8 +173,8 @@
                         console.log(`  → FREE sample`);
                         return result;
                     } else {
-                        // Calculate markup with half-dollar ceiling: (cost ÷ 0.60) rounded UP to nearest $0.50
-                        const priceWithMargin = minPrice / 0.60;
+                        // Calculate markup with half-dollar ceiling: (cost ÷ 0.57) rounded UP to nearest $0.50 (2026 margin)
+                        const priceWithMargin = minPrice / 0.57;
                         const samplePrice = Math.ceil(priceWithMargin * 2) / 2;  // Half-dollar ceiling
 
                         const result = {
@@ -797,8 +797,8 @@
                 // Get upcharge from API (handles tall sizes automatically!)
                 const upcharge = parseFloat(data.sellingPriceDisplayAddOns?.[size] || 0);
 
-                // Calculate sample pricing: blank product with 40% margin (÷0.6)
-                const priceWithMargin = baseCost / 0.6;
+                // Calculate sample pricing: blank product with 43% margin (÷0.57) - 2026
+                const priceWithMargin = baseCost / 0.57;
 
                 // Round using half-dollar ceiling (consistent with DTG/Screen Print)
                 const roundedPrice = Math.ceil(priceWithMargin * 2) / 2;

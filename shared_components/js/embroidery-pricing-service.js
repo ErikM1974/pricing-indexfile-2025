@@ -77,11 +77,11 @@ class EmbroideryPricingService {
     async generateManualPricingData(manualCost) {
         console.log('[EmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
 
-        // Default tiers matching API structure
+        // Default tiers matching API structure - 2026 margin (43%)
         const defaultTiers = [
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.6 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.6 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.6 }
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57 }
         ];
 
         // Fetch current embroidery costs from API (throws error if fails - no silent fallback)

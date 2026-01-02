@@ -44,7 +44,7 @@ class CapProfitabilityAnalyzer {
         // LTM fee now correctly returned by API after fix
         this.ltmFee = 50;  // $50 for orders under 24 caps
         
-        this.marginDenominator = 0.6;
+        this.marginDenominator = 0.57; // 2026 margin (43%)
         
         // Test caps
         this.testCaps = [
@@ -256,7 +256,7 @@ class CapProfitabilityAnalyzer {
         const shirtCost = 3.53;  // PC61
         const shirtEmbCost = 13;  // 24-47 tier after increase
         const shirtTotalCost = shirtCost + shirtMachineCost + (shirtOverhead / 24);
-        const shirtBasePrice = Math.ceil((shirtCost / 0.6) + shirtEmbCost);
+        const shirtBasePrice = Math.ceil((shirtCost / 0.57) + shirtEmbCost); // 2026 margin
         const shirtProfit = shirtBasePrice - shirtTotalCost;
         const shirtMargin = (shirtProfit / shirtBasePrice) * 100;
         

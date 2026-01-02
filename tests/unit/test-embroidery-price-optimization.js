@@ -37,7 +37,7 @@ class EmbroideryPriceOptimizer {
         };
         
         // Current financial parameters
-        this.marginDenominator = 0.6;
+        this.marginDenominator = 0.57; // 2026 margin (43%)
         this.ltmFee = 50;
         
         // Test quantities for each tier
@@ -103,7 +103,7 @@ class EmbroideryPriceOptimizer {
         const priceBeforeLTM = requiredSellingPrice - ltmPerPiece;
         
         // Back-calculate required embroidery cost
-        // priceBeforeLTM = ceil((garmentCost / 0.6) + embCost)
+        // priceBeforeLTM = ceil((garmentCost / 0.57) + embCost) -- 2026 formula
         // We need to find embCost that makes this work
         
         const baseWithoutEmb = garmentCost / this.marginDenominator;

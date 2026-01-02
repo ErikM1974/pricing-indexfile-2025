@@ -15,7 +15,7 @@ class EmbroideryPricingCalculator {
             '72+': { embCost: 10.00, hasLTM: false }
         };
         
-        this.marginDenominator = 0.6;
+        this.marginDenominator = 0.57; // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
         this.ltmFee = 50.00;
         this.digitizingFee = 100.00;
         this.additionalStitchRate = 1.25; // per 1000 stitches over 8000
@@ -62,7 +62,7 @@ class EmbroideryPricingCalculator {
             if (data) {
                 // Extract configuration from tiersR
                 if (data.tiersR && data.tiersR.length > 0) {
-                    this.marginDenominator = data.tiersR[0].MarginDenominator || 0.6;
+                    this.marginDenominator = data.tiersR[0].MarginDenominator || 0.57; // 2026 fallback
                     
                     // Build tiers object from API data
                     this.tiers = {};

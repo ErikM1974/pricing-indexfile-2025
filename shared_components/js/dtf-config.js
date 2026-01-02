@@ -98,7 +98,7 @@ const DTFConfig = {
         maxTransferLocations: 8,
         minQuantity: 10,  // Firm minimum - cannot order less than 10
         defaultQuantity: 24,
-        garmentMargin: 0.6,  // 40% margin (divide by 0.6)
+        garmentMargin: 0.57,  // 43% margin (2026) - synced with API Pricing_Tiers.MarginDenominator
         showFreight: true,
         showLTMFee: true,
         includeFreightInTransfers: true,  // Include freight calculation based on transfers

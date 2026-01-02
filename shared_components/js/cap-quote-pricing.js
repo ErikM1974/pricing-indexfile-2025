@@ -325,7 +325,7 @@ class CapQuotePricingCalculator {
         
         console.log('[CapQuotePricingCalculator] 🔍 DETAILED BREAKDOWN:');
         console.log('  🔍 Base cap cost: $' + baseCapPrice.toFixed(2));
-        console.log('  🔍 Cap selling price (÷0.6): $' + capSellingPrice.toFixed(2));
+        console.log('  🔍 Cap selling price (÷margin): $' + capSellingPrice.toFixed(2));
         console.log('  🔍 Front embroidery: $' + frontEmbroideryPrice.toFixed(2));
         console.log('  🔍 Additional embroidery: $' + additionalEmbroideryPrice.toFixed(2) + ' (NOT included in base price)');
         console.log('  🔍 Base decorated price (cap + front only): $' + decoratedPrice.toFixed(2));
@@ -514,7 +514,7 @@ class CapQuotePricingCalculator {
     getMarginDenominatorFromAPI(quantity) {
         if (!this.pricingData.primary?.tiersR) {
             console.warn('[CapQuotePricingCalculator] No tier data available for margin denominator');
-            return 0.6; // Fallback
+            return 0.57; // 2026 margin fallback
         }
         
         const tier = this.pricingData.primary.tiersR.find(t => {
@@ -529,7 +529,7 @@ class CapQuotePricingCalculator {
             return false;
         });
         
-        return tier?.MarginDenominator || 0.6;
+        return tier?.MarginDenominator || 0.57; // 2026 margin fallback
     }
     
     /**

@@ -1,7 +1,7 @@
 /**
  * Comprehensive Cap Embroidery Pricing Test
  * Tests all 354 cap styles from SanmarCaps.csv
- * Validates pricing formula: (Base Cap / 0.6) + Embroidery Cost, round UP
+ * Validates pricing formula: (Base Cap / 0.57) + Embroidery Cost, round UP (2026 margin)
  */
 
 const fs = require('fs');
@@ -14,11 +14,11 @@ const TEST_QUANTITIES = [24, 48, 72];
 const CHECKPOINT_INTERVAL = 25; // Save progress every 25 styles
 const CSV_FILE = '/mnt/c/Users/erik/Downloads/SanmarCaps.csv';
 
-// Expected embroidery costs from API
+// Expected embroidery costs from API (2026 - increased by $1.00)
 const EXPECTED_EMBROIDERY = {
-    '24-47': 12.00,
-    '48-71': 10.00,
-    '72+': 8.50
+    '24-47': 13.00,
+    '48-71': 11.00,
+    '72+': 9.50
 };
 
 // Colors for console output
@@ -135,8 +135,8 @@ function calculateExpectedPrice(baseCapPrice, quantity) {
         embCost = EXPECTED_EMBROIDERY['24-47'];
     }
 
-    // Apply formula: (Base / 0.6) + Embroidery, round UP
-    const marginDenom = 0.6;
+    // Apply formula: (Base / 0.57) + Embroidery, round UP (2026 margin)
+    const marginDenom = 0.57;
     const markedUpCap = baseCapPrice / marginDenom;
     const decoratedPrice = markedUpCap + embCost;
     const finalPrice = Math.ceil(decoratedPrice);
@@ -290,12 +290,12 @@ Test Duration: ${minutes}m ${seconds}s
 Average Rate: ${rate} styles/minute
 
 Formula Used:
-  (Base Cap Price / 0.6) + Embroidery Cost, then Round UP
+  (Base Cap Price / 0.57) + Embroidery Cost, then Round UP (2026)
 
-Expected Embroidery Costs:
-  24-47 pieces: $12.00
-  48-71 pieces: $10.00
-  72+ pieces: $8.50
+Expected Embroidery Costs (2026):
+  24-47 pieces: $13.00
+  48-71 pieces: $11.00
+  72+ pieces: $9.50
 
 Output Files:
   Summary: cap-test-results-summary.txt
@@ -322,7 +322,7 @@ async function runAllTests() {
         totalStyles = capStyles.length;
 
         console.log(`\n📊 Testing ${totalStyles} cap styles at quantities: ${TEST_QUANTITIES.join(', ')}`);
-        console.log(`📐 Formula: (Base Cap / 0.6) + Embroidery, round UP\n`);
+        console.log(`📐 Formula: (Base Cap / 0.57) + Embroidery, round UP (2026)\n`);
 
         // Prepare CSV for failures
         const failuresCsv = ['Style,Status,BasePrice,Q24_Expected,Q48_Expected,Q72_Expected,Errors'];

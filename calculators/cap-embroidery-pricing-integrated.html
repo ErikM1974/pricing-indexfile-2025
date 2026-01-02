@@ -1444,14 +1444,20 @@
         function calculateCapPrice(baseCapPrice, quantity, sizeUpcharge = 0) {
             console.log('💰 Calculating cap price for quantity:', quantity);
             console.log('💰 Base cap price:', baseCapPrice);
-            
-            // Apply margin to cap price
-            const marginDenominator = 0.6;
-            const capSellingPrice = baseCapPrice / marginDenominator;
-            console.log('💰 Cap selling price (÷0.6):', capSellingPrice.toFixed(2));
-            
-            // Get embroidery price for the tier and 8000 stitches
+
+            // Get margin from API data, fallback to 0.57 (2026 margin)
             const tier = getTierForQuantity(quantity);
+            let marginDenominator = 0.57; // 2026 margin fallback
+            if (pricingData && pricingData.apiData && pricingData.apiData.tiersR) {
+                const tierData = pricingData.apiData.tiersR.find(t => t.TierLabel === tier);
+                if (tierData && tierData.MarginDenominator) {
+                    marginDenominator = tierData.MarginDenominator;
+                }
+            }
+            const capSellingPrice = baseCapPrice / marginDenominator;
+            console.log('💰 Cap selling price (÷' + marginDenominator + '):', capSellingPrice.toFixed(2));
+
+            // Get embroidery price for the tier and 8000 stitches
             const embroideryPrice = getEmbroideryPriceForTier(tier);
             console.log('💰 Embroidery price for tier', tier + ':', embroideryPrice);
             

@@ -517,7 +517,7 @@ class DTFPricingCalculator {
         }
 
         // Step 1: Garment cost with margin
-        const marginDenominator = DTFConfig.settings.garmentMargin; // 0.6
+        const marginDenominator = DTFConfig.settings.garmentMargin; // 0.57 (2026)
         const markedUpGarment = garmentCost / marginDenominator;
 
         // Step 2: Calculate transfer costs for all selected locations

@@ -440,7 +440,7 @@ class DTGPricingService {
                 TierLabel: '24-47',
                 MinQuantity: 1,
                 MaxQuantity: 47,
-                MarginDenominator: 0.6,
+                MarginDenominator: 0.57, // 2026 margin (43%)
                 Note: 'Fallback tier - tiers parameter was invalid'
             };
         }
@@ -474,7 +474,7 @@ class DTGPricingService {
                 TierLabel: '24-47',
                 MinQuantity: 1,
                 MaxQuantity: 47,
-                MarginDenominator: 0.6,
+                MarginDenominator: 0.57, // 2026 margin (43%)
                 Note: 'Fallback tier for quantities under 24'
             };
         }

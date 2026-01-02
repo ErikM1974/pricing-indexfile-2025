@@ -25,7 +25,7 @@ class ProfitabilityAnalyzer {
         this.businessConfig = {
             threadCostPer1000: 0.10,  // Estimate for thread/backing per 1000 stitches
             setupTimeMinutes: 5,       // Per order setup time
-            marginDenominator: 0.6,     // From API
+            marginDenominator: 0.57,    // 2026 margin (43%)
             orderMixPercent: {
                 small: 30,   // Under 24 pieces
                 medium: 50,  // 24-71 pieces

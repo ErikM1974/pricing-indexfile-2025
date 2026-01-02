@@ -90,8 +90,8 @@ class LTMOptimizer {
             const bundle = await this.fetchAPI('/api/pricing-bundle?method=EMB&styleNumber=PC61');
             
             this.tiers = {};
-            this.marginDenominator = 0.6;
-            
+            this.marginDenominator = 0.57; // 2026 margin (43%)
+
             if (bundle.tiersR) {
                 bundle.tiersR.forEach(tier => {
                     this.tiers[tier.TierLabel] = {
@@ -99,7 +99,7 @@ class LTMOptimizer {
                         ltmFee: tier.LTM_Fee || 0
                     };
                 });
-                this.marginDenominator = bundle.tiersR[0].MarginDenominator || 0.6;
+                this.marginDenominator = bundle.tiersR[0].MarginDenominator || 0.57;
             }
             
             if (bundle.allEmbroideryCostsR) {

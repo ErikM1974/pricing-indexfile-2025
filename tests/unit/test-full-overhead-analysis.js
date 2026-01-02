@@ -139,12 +139,12 @@ class FullOverheadAnalyzer {
         try {
             const bundle = await this.fetchAPI('/api/pricing-bundle?method=EMB&styleNumber=PC61');
             
-            this.marginDenominator = 0.6;
+            this.marginDenominator = 0.57; // 2026 margin (43%)
             this.ltmFee = 50;
             this.embCost = 6;
-            
+
             if (bundle.tiersR) {
-                this.marginDenominator = bundle.tiersR[0].MarginDenominator || 0.6;
+                this.marginDenominator = bundle.tiersR[0].MarginDenominator || 0.57;
                 this.ltmFee = bundle.tiersR[0].LTM_Fee || 50;
             }
             
