@@ -374,6 +374,228 @@
                 
                 // Initialize image gallery
                 this.initializeImageGallery();
+
+                // Initialize cap browser
+                this.initCapBrowser();
+            }
+
+            // ============================================================================
+            // Cap Browser - Visual browsing and quick-add functionality
+            // ============================================================================
+
+            initCapBrowser() {
+                // Get browser elements
+                this.capBrowserToggle = document.getElementById('capBrowserToggle');
+                this.capBrowserContent = document.getElementById('capBrowserContent');
+                this.capSearchInput = document.getElementById('capSearchInput');
+                this.clearCapSearch = document.getElementById('clearCapSearch');
+                this.categoryChips = document.querySelectorAll('.category-chip');
+                this.capGrid = document.getElementById('capGrid');
+
+                if (!this.capBrowserToggle || !this.capGrid) {
+                    console.log('[Richardson] Cap browser elements not found, skipping initialization');
+                    return;
+                }
+
+                // Track current filter state
+                this.currentCategory = 'all';
+                this.currentSearch = '';
+
+                // Bind toggle event
+                this.capBrowserToggle.addEventListener('click', () => this.toggleCapBrowser());
+
+                // Bind search events
+                if (this.capSearchInput) {
+                    this.capSearchInput.addEventListener('input', (e) => {
+                        this.currentSearch = e.target.value.toLowerCase();
+                        this.filterAndRenderCaps();
+                        this.clearCapSearch.style.display = this.currentSearch ? 'block' : 'none';
+                    });
+                }
+
+                if (this.clearCapSearch) {
+                    this.clearCapSearch.addEventListener('click', () => {
+                        this.capSearchInput.value = '';
+                        this.currentSearch = '';
+                        this.clearCapSearch.style.display = 'none';
+                        this.filterAndRenderCaps();
+                    });
+                }
+
+                // Bind category filter events
+                this.categoryChips.forEach(chip => {
+                    chip.addEventListener('click', () => {
+                        // Update active state
+                        this.categoryChips.forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+
+                        this.currentCategory = chip.dataset.category;
+                        this.filterAndRenderCaps();
+                    });
+                });
+
+                console.log('[Richardson] Cap browser initialized with', capData.length, 'caps');
+            }
+
+            toggleCapBrowser() {
+                const isExpanded = this.capBrowserContent.classList.contains('expanded');
+
+                if (isExpanded) {
+                    this.capBrowserContent.classList.remove('expanded');
+                    this.capBrowserToggle.querySelector('.toggle-icon').textContent = '+';
+                } else {
+                    this.capBrowserContent.classList.add('expanded');
+                    this.capBrowserToggle.querySelector('.toggle-icon').textContent = '−';
+
+                    // Render caps on first open
+                    if (!this.capBrowserRendered) {
+                        this.filterAndRenderCaps();
+                        this.capBrowserRendered = true;
+                    }
+                }
+            }
+
+            getCapCategory(cap) {
+                const style = cap.style.toUpperCase();
+                const desc = cap.description.toLowerCase();
+
+                // Category detection logic
+                if (desc.includes('trucker') || style.includes('112') || style.includes('113') ||
+                    style.includes('115') || style.includes('163') || style.includes('168') ||
+                    style.includes('222') || style.includes('312')) {
+                    return 'trucker';
+                }
+                if (desc.includes('beanie') || desc.includes('knit') || desc.includes('cuff') ||
+                    style.startsWith('R15') || style.startsWith('R18') || style.startsWith('R20') ||
+                    style.match(/^1[234]\d$/)) {
+                    return 'beanie';
+                }
+                if (desc.includes('visor') || style.includes('R45') || style.includes('160')) {
+                    return 'visor';
+                }
+                if (desc.includes('camo') || desc.includes('duck') || style.includes('840') ||
+                    style.includes('846') || style.includes('855') || style.includes('856')) {
+                    return 'camo';
+                }
+                if (desc.includes('performance') || desc.includes('pulse') || desc.includes('ignite') ||
+                    desc.includes('matrix') || style.includes('PTS') || style.includes('176')) {
+                    return 'performance';
+                }
+                if (desc.includes('r-flex') || desc.includes('fitted') || style.includes('185') ||
+                    style.includes('PTS65')) {
+                    return 'fitted';
+                }
+
+                return 'other';
+            }
+
+            filterAndRenderCaps() {
+                // Filter caps based on current search and category
+                let filteredCaps = capData.filter(cap => {
+                    // Search filter
+                    if (this.currentSearch) {
+                        const searchMatch = cap.style.toLowerCase().includes(this.currentSearch) ||
+                                           cap.description.toLowerCase().includes(this.currentSearch);
+                        if (!searchMatch) return false;
+                    }
+
+                    // Category filter
+                    if (this.currentCategory !== 'all') {
+                        const capCategory = this.getCapCategory(cap);
+                        if (capCategory !== this.currentCategory) return false;
+                    }
+
+                    return true;
+                });
+
+                this.renderCapGrid(filteredCaps);
+            }
+
+            renderCapGrid(caps) {
+                if (!this.capGrid) return;
+
+                if (caps.length === 0) {
+                    this.capGrid.innerHTML = `
+                        <div class="no-caps-found">
+                            <i class="fas fa-search"></i>
+                            <p>No caps match your search</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const html = caps.map(cap => {
+                    const category = this.getCapCategory(cap);
+                    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+
+                    return `
+                        <div class="cap-card" data-style="${cap.style}">
+                            <div class="cap-card-header">
+                                <span class="cap-style">${cap.style}</span>
+                                <span class="cap-category-badge">${categoryLabel}</span>
+                            </div>
+                            <div class="cap-card-body">
+                                <p class="cap-description">${cap.description}</p>
+                                <p class="cap-price">$${cap.price.toFixed(2)} blank</p>
+                            </div>
+                            <button type="button" class="quick-add-btn" onclick="window.richardsonCalculator.quickAddCap('${cap.style}')">
+                                <i class="fas fa-plus"></i> Add to Quote
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                this.capGrid.innerHTML = html;
+            }
+
+            quickAddCap(styleNumber) {
+                // Find the cap data
+                const cap = capData.find(c => c.style === styleNumber);
+                if (!cap) {
+                    console.error('[Richardson] Cap not found:', styleNumber);
+                    return;
+                }
+
+                // Add a new line item with this style pre-selected
+                const lineItemId = this.addLineItem();
+
+                // Find the style input for this line item and set the value
+                setTimeout(() => {
+                    const lineItemElement = document.getElementById(lineItemId);
+                    if (lineItemElement) {
+                        const styleInput = lineItemElement.querySelector('.style-input');
+                        if (styleInput) {
+                            styleInput.value = cap.style;
+                            styleInput.dataset.style = cap.style;
+                            styleInput.dataset.description = cap.description;
+                            styleInput.dataset.price = cap.price;
+
+                            // Update validation indicator
+                            const indicator = lineItemElement.querySelector('.validation-indicator');
+                            if (indicator) {
+                                indicator.textContent = '✓';
+                                indicator.className = 'validation-indicator valid';
+                            }
+
+                            // Focus on quantity input
+                            const quantityInput = lineItemElement.querySelector('.quantity-input');
+                            if (quantityInput) {
+                                quantityInput.focus();
+                            }
+                        }
+
+                        // Scroll to the new line item
+                        lineItemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Flash highlight effect
+                        lineItemElement.style.backgroundColor = '#e8f5e9';
+                        setTimeout(() => {
+                            lineItemElement.style.backgroundColor = '';
+                        }, 1000);
+                    }
+                }, 50);
+
+                console.log('[Richardson] Quick added cap:', styleNumber);
             }
 
             addInitialLineItem() {
@@ -508,6 +730,8 @@
                 
                 // Update counter when new line added
                 this.updateQuoteCounter();
+
+                return lineItemId;
             }
 
             setupAutocomplete(input, list) {

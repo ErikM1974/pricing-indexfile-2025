@@ -181,6 +181,53 @@
                         </button>
                     </div>
 
+                    <!-- Cap Browser Section (Collapsible) -->
+                    <div class="form-group cap-browser-accordion">
+                        <button type="button" class="cap-browser-toggle" id="capBrowserToggle">
+                            <div class="toggle-header">
+                                <i class="fas fa-th-large"></i>
+                                <span>Browse All Caps</span>
+                                <span class="cap-count-badge" id="capCountBadge">133 styles</span>
+                            </div>
+                            <i class="fas fa-chevron-down cap-browser-icon"></i>
+                        </button>
+                        <div class="cap-browser-content" id="capBrowserContent">
+                            <div class="cap-browser-inner">
+                                <!-- Search Bar -->
+                                <div class="cap-search-bar">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="capSearchInput" placeholder="Search by style number or description..." class="form-input">
+                                    <button type="button" id="clearCapSearch" class="clear-search-btn hidden">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Category Filters -->
+                                <div class="cap-category-filters" id="capCategoryFilters">
+                                    <button type="button" class="category-chip active" data-category="all">All</button>
+                                    <button type="button" class="category-chip" data-category="trucker">Trucker</button>
+                                    <button type="button" class="category-chip" data-category="performance">Performance</button>
+                                    <button type="button" class="category-chip" data-category="beanie">Beanie</button>
+                                    <button type="button" class="category-chip" data-category="visor">Visor</button>
+                                    <button type="button" class="category-chip" data-category="camo">Camo</button>
+                                    <button type="button" class="category-chip" data-category="fitted">Fitted/R-Flex</button>
+                                    <button type="button" class="category-chip" data-category="other">Other</button>
+                                </div>
+
+                                <!-- Cap Grid -->
+                                <div class="cap-grid" id="capGrid">
+                                    <!-- Caps will be dynamically added here -->
+                                </div>
+
+                                <!-- No Results Message -->
+                                <div class="no-results-message hidden" id="noResultsMessage">
+                                    <i class="fas fa-search"></i>
+                                    <p>No caps found matching your search</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Setup Fees Section (Collapsible) -->
                     <div class="form-group setup-fees-accordion">
                         <button type="button" class="setup-accordion-toggle" id="setupFeesToggle">
