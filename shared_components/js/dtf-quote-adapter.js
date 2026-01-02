@@ -13,8 +13,8 @@
         ltmFee: 50.00,
         freight: 15.00,
         laborPerTransfer: 2.00,
-        targetMargin: 0.40,
-        marginDivisor: 0.60,
+        targetMargin: 0.43,        // 2026 margin - synced with API
+        marginDivisor: 0.57,       // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
         defaultGarmentCost: 5.50
     };
 

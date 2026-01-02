@@ -14,8 +14,8 @@ class JDSApiService {
         this.cacheDuration = 60 * 60 * 1000; // 1 hour
 
         // Business logic constants (not from API)
-        this.MARGIN_DENOMINATOR = 0.60;     // 40% margin on blank
-        this.ENGRAVING_LABOR_COST = 2.85;   // Labor + overhead + engraving
+        this.MARGIN_DENOMINATOR = 0.57;     // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
+        this.ENGRAVING_LABOR_COST = 3.00;   // 2026 labor cost (increased from $2.85)
         this.SETUP_FEE = 75.00;
         this.SECOND_LOGO_PRICE = 3.16;
         this.SMALL_ORDER_HANDLING_FEE = 50.00;  // Handling fee for orders of 1-11 pieces

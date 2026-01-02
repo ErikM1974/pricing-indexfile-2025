@@ -113,6 +113,15 @@ Test configuration and fallback values updated for consistency:
     - Fallback updated: `|| 0.57`
     - Comment: "2026 fallback"
 
+26. **shared_components/js/dtf-quote-adapter.js:16-17**
+    - Updated: `targetMargin: 0.43` and `marginDivisor: 0.57`
+    - Comment: "2026 margin (43%) - synced with API"
+
+27. **shared_components/js/jds-api-service.js:17-18**
+    - Updated: `MARGIN_DENOMINATOR: 0.57` (was 0.60)
+    - Updated: `ENGRAVING_LABOR_COST: 3.00` (was 2.85)
+    - Comment: "2026 margin (43%) and labor increase"
+
 ## Files Using API Values Correctly (No Changes Needed)
 
 These files properly use `tier.MarginDenominator` from API with no hardcoded fallbacks:
@@ -139,12 +148,115 @@ In addition to the margin change, embroidery costs were increased by $1.00 acros
 
 See `MESSAGE_TO_CASPIO_PROXY_EMBROIDERY_INCREASE.md` for full details including AL/AL-CAP tiers.
 
+## DTG Print Cost Increase ($0.50)
+
+DTG print costs were increased by $0.50 across all locations and tiers to ensure consistent price increases (the margin change alone left many products with $0 increase due to HalfDollarUp rounding).
+
+### Updated DTG Costs (Caspio `DTG_Costs` table)
+
+#### Left Chest (LC)
+| Tier | 2025 Cost | 2026 Cost |
+|------|-----------|-----------|
+| 12-23 | $8.00 | $8.50 |
+| 24-47 | $7.00 | $7.50 |
+| 48-71 | $6.00 | $6.50 |
+| 72+ | $5.00 | $5.50 |
+
+#### Full Front (FF) / Full Back (FB)
+| Tier | 2025 Cost | 2026 Cost |
+|------|-----------|-----------|
+| 12-23 | $10.50 | $11.00 |
+| 24-47 | $9.50 | $10.00 |
+| 48-71 | $7.00 | $7.50 |
+| 72+ | $6.25 | $6.75 |
+
+#### Jumbo Front (JF) / Jumbo Back (JB)
+| Tier | 2025 Cost | 2026 Cost |
+|------|-----------|-----------|
+| 12-23 | $12.50 | $13.00 |
+| 24-47 | $11.50 | $12.00 |
+| 48-71 | $9.00 | $9.50 |
+| 72+ | $8.25 | $8.75 |
+
+### DTG Pricing Formula
+```
+DTG Price = HalfDollarUp(garmentCost / MarginDenominator + PrintCost) + SizeUpcharge
+HalfDollarUp = Math.ceil(price * 2) / 2  // Rounds UP to nearest $0.50
+```
+
+### DTG Frontend Files (No Changes Needed)
+DTG pricing is fully API-driven. All 33 DTG-related files use the API endpoint:
+```
+/api/pricing-bundle?method=DTG&styleNumber=XXX → allDtgCostsR[].PrintCost
+```
+
+No hardcoded DTG print costs exist in the frontend - the Caspio update is automatically reflected.
+
 ## Future Changes
 
-If the margin changes again:
-1. Update `Pricing_Tiers.MarginDenominator` in Caspio (backend)
-2. Update fallback values in the 25 files listed above
-3. Files using API values will automatically get the new margin
+If pricing changes again:
+1. **Margin**: Update `Pricing_Tiers.MarginDenominator` in Caspio, then update 25 frontend fallback files
+2. **Embroidery costs**: Update `Embroidery_Costs` table in Caspio (auto-reflects in frontend)
+3. **DTG print costs**: Update `DTG_Costs` table in Caspio (auto-reflects in frontend)
+
+Files using API values will automatically get new values with no code changes.
+
+## DTF Transfer Cost Increase (+$0.50) and Labor Increase ($2.00 → $2.50)
+
+DTF pricing was updated to achieve 8-10% price increase (matching embroidery/DTG) and ensure DTF prices remain appropriately higher than DTG (since transfers are purchased externally from Supacolor).
+
+### Updated DTF Costs (Caspio `DTF_Pricing` table)
+
+#### Transfer Costs (unit_price)
+
+| Size | 10-23 | 24-47 | 48-71 | 72+ |
+|------|-------|-------|-------|-----|
+| Small (≤5"×5") | $6.50 | $5.75 | $4.50 | $3.75 |
+| Medium (≤9"×12") | $10.00 | $8.75 | $7.00 | $5.50 |
+| Large (≤12"×16.5") | $15.00 | $13.00 | $10.50 | $8.50 |
+
+#### Pressing Labor Cost
+
+| 2025 | 2026 |
+|------|------|
+| $2.00 | $2.50 |
+
+### Labor Cost Justification
+
+| Employee | Rate | Transfers/hr | Cost/Transfer |
+|----------|------|--------------|---------------|
+| Brian | $27/hr | 30 | $0.90 |
+| Joe | $21/hr | 30 | $0.70 |
+| **Burdened avg** | | | **$1.08** |
+
+$2.50 labor = 2.3× burdened cost (industry standard markup)
+
+### DTF Pricing Formula
+```
+DTF Price = HalfDollarUp(garmentCost / MarginDenominator + TransferCost + Freight + Labor)
+HalfDollarUp = Math.ceil(price * 2) / 2  // Rounds UP to nearest $0.50
+```
+
+### DTF Frontend Files (No Changes Needed)
+DTF pricing is fully API-driven. The Caspio update is automatically reflected.
+
+## JDS Laser Tumbler Labor Increase ($2.85 → $3.00)
+
+JDS laser tumbler engraving labor was increased from $2.85 to $3.00 to match 2026 labor cost increases across other methods.
+
+### Updated JDS Costs (Frontend hardcoded - no Caspio table)
+
+| Fee | 2025 | 2026 |
+|-----|------|------|
+| Engraving Labor | $2.85 | $3.00 |
+| Setup Fee | $75.00 | $75.00 (unchanged) |
+| Second Logo | $3.16 | $3.16 (unchanged) |
+| Small Order Fee | $50.00 | $50.00 (unchanged) |
+
+### JDS Pricing Formula
+```
+JDS Price = (JDS Wholesale / MarginDenominator) + EngravingLabor + SetupFee/Qty + SecondLogoPrice
+```
 
 ## Related Documentation
 
