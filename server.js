@@ -344,9 +344,9 @@ app.get('/*.js', (req, res) => {
   res.sendFile(path.join(__dirname, fileName));
 });
 
-// Serve specific HTML files from their new directories
+// Serve specific HTML files from their locations
 app.get('/staff-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboards', 'staff-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
 });
 
 app.get('/bundle-orders-dashboard.html', (req, res) => {

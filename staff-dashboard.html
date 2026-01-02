@@ -32,40 +32,7 @@
             </div>
 
             <nav class="sidebar-nav">
-                <div class="sidebar-search">
-                    <input type="text" class="sidebar-search-input" placeholder="Search tools..." id="sidebarSearch">
-                </div>
-
                 <div class="sidebar-content">
-                    <!-- Inksoft Transform Tool -->
-                    <div class="nav-section" data-section="inksoft-trans">
-                        <a href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/" target="_blank" class="nav-section-header-link">
-                            <div class="nav-section-header">
-                                <div class="nav-section-title">
-                                    <span>🔄</span>
-                                    <span>Inksoft Transform</span>
-                                </div>
-                                <span>→</span>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Training -->
-                    <div class="nav-section" data-section="training">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>📖</span>
-                                <span>Training</span>
-                            </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-content">
-                            <a href="/training/customer-service.html" class="nav-link"><span>Customer Service Manual</span></a>
-                            <a href="/training/sales-coordinator-manual.html" class="nav-link"><span>Sales Coordinator Manual</span></a>
-                            <a href="/training/quick-reference-tips.html" class="nav-link"><span>Quick Hitter Tips Archive</span></a>
-                        </div>
-                    </div>
-
                     <!-- Company Policies -->
                     <div class="nav-section" data-section="policies">
                         <a href="/pages/policies-hub.html" class="nav-section-header-link">
@@ -77,6 +44,23 @@
                                 <span>→</span>
                             </div>
                         </a>
+                    </div>
+
+                    <!-- Training -->
+                    <div class="nav-section collapsed" data-section="training">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📖</span>
+                                <span>Training</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/training/customer-service.html" class="nav-link"><span>Customer Service Manual</span></a>
+                            <a href="/training/sales-coordinator-manual.html" class="nav-link"><span>Sales Coordinator Manual</span></a>
+                            <a href="/training/quick-reference-tips.html" class="nav-link"><span>Quick Hitter Tips Archive</span></a>
+                            <a href="/training/training-games-hub.html" class="nav-link"><span>🎮 Training Games Hub</span></a>
+                        </div>
                     </div>
 
                     <!-- Office Assistant -->
@@ -98,24 +82,6 @@
                         </div>
                     </div>
 
-                    <!-- Administration -->
-                    <div class="nav-section collapsed" data-section="admin">
-                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
-                            <div class="nav-section-title">
-                                <span>⚙️</span>
-                                <span>Administration</span>
-                            </div>
-                            <span class="chevron">▼</span>
-                        </div>
-                        <div class="nav-section-content">
-                            <a href="/sanmar-vendor-portal.html" class="nav-link"><span>Sanmar Vendor Portal</span></a>
-                            <a href="/admin/announcements-create.html" class="nav-link"><span>Create Announcements</span></a>
-                            <a href="/admin/announcements-manage.html" class="nav-link"><span>Manage Announcements</span></a>
-                            <a href="/universal-records-admin.html" class="nav-link"><span>Universal Records Admin</span></a>
-                            <a href="/training/adriyella-admin.html" class="nav-link"><span>Adriyella Task Admin</span></a>
-                        </div>
-                    </div>
-
                     <!-- Employee Bundles -->
                     <div class="nav-section collapsed" data-section="employee-bundles">
                         <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
@@ -133,17 +99,35 @@
                         </div>
                     </div>
 
-                    <!-- Training Games Hub -->
-                    <div class="nav-section" data-section="training-games">
-                        <a href="/training/training-games-hub.html" class="nav-section-header-link">
+                    <!-- Inksoft Transform Tool -->
+                    <div class="nav-section" data-section="inksoft-trans">
+                        <a href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/" target="_blank" class="nav-section-header-link">
                             <div class="nav-section-header">
                                 <div class="nav-section-title">
-                                    <span>🎮</span>
-                                    <span>Training Games Hub</span>
+                                    <span>🔄</span>
+                                    <span>Inksoft Transform</span>
                                 </div>
                                 <span>→</span>
                             </div>
                         </a>
+                    </div>
+
+                    <!-- Administration -->
+                    <div class="nav-section collapsed" data-section="admin">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>⚙️</span>
+                                <span>Administration</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/sanmar-vendor-portal.html" class="nav-link"><span>Sanmar Vendor Portal</span></a>
+                            <a href="/admin/announcements-create.html" class="nav-link"><span>Create Announcements</span></a>
+                            <a href="/admin/announcements-manage.html" class="nav-link"><span>Manage Announcements</span></a>
+                            <a href="/universal-records-admin.html" class="nav-link"><span>Universal Records Admin</span></a>
+                            <a href="/training/adriyella-admin.html" class="nav-link"><span>Adriyella Task Admin</span></a>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -642,10 +626,6 @@
             }
         });
 
-        // Manual pricing modal placeholder (implement as needed)
-        function openManualPricingModal(type) {
-            alert('Manual pricing calculator for ' + type + ' - implement modal or redirect');
-        }
 
         // =====================================================
         // CELEBRATION DROPDOWN FUNCTIONS

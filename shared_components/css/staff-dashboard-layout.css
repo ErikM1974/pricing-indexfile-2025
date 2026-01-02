@@ -1116,6 +1116,12 @@
     color: rgba(255, 255, 255, 0.9);
 }
 
+/* Ensure all text elements in nav sections inherit white color */
+.nav-section-header span,
+.nav-section-title span {
+    color: inherit;
+}
+
 /* Section Content (links) */
 .nav-section-content {
     padding-left: 0.5rem;
@@ -1152,6 +1158,10 @@
 .nav-section-content .nav-link:active {
     transform: translateX(2px);
     background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-section-content .nav-link span {
+    color: inherit;
 }
 
 /* Single-link sections (Company Policies style) */
