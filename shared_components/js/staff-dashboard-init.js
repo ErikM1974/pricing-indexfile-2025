@@ -198,6 +198,8 @@ const StaffDashboardInit = (function() {
 
     /**
      * Load metrics from ShopWorks API
+     * Revenue uses selected date range (7/30/60D)
+     * Team Performance uses YTD (Jan 1 - today) separately
      */
     async function loadMetrics(forceRefresh = false) {
         if (!StaffDashboardService) {
@@ -209,8 +211,26 @@ const StaffDashboardInit = (function() {
         showMetricsLoading();
 
         try {
+            // Load revenue metrics with selected date range (7/30/60D)
             const metrics = await StaffDashboardService.getMetrics(currentDateRange, forceRefresh);
-            renderMetrics(metrics);
+
+            // Load team performance with hybrid approach (archived + live data)
+            // Uses Caspio archive for older data + ManageOrders for recent days
+            const teamDataYTD = await loadTeamPerformanceYTDHybrid();
+
+            // Render revenue (uses metrics.yoy for the selected period)
+            renderRevenueCard(metrics.yoy, metrics.revenue, metrics.period);
+
+            // Render team with YTD data (no YoY comparison)
+            renderTeamPerformanceYTD(teamDataYTD);
+
+            // Update data source badge
+            updateDataSourceBadge(metrics.hasPartialData);
+
+            if (metrics.hasPartialData) {
+                showPartialDataWarning();
+            }
+
             updateLastRefreshTime();
         } catch (error) {
             console.error('Failed to load metrics:', error);
@@ -469,6 +489,80 @@ const StaffDashboardInit = (function() {
     }
 
     /**
+     * Render team performance list for YTD (no YoY comparisons)
+     * Fresh start for 2026 - shows only current year totals
+     */
+    function renderTeamPerformanceYTD(teamData) {
+        const container = document.getElementById('salesTeamList');
+        const titleEl = document.getElementById('teamPerformanceTitle');
+        const dateRangeEl = document.getElementById('teamDateRange');
+
+        // Update title to show 2026 YTD
+        if (titleEl) {
+            titleEl.innerHTML = '<i class="fas fa-users"></i> Team Performance: 2026 YTD';
+        }
+        if (dateRangeEl && teamData && teamData.dateRange) {
+            dateRangeEl.textContent = `${teamData.dateRange.startFormatted} - ${teamData.dateRange.endFormatted}`;
+        }
+
+        if (!container) return;
+
+        // Handle null data
+        if (!teamData) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="empty-state-title">Unable to load team data</div>
+                    <div class="empty-state-message">Please try refreshing the page.</div>
+                </div>
+            `;
+            return;
+        }
+
+        if (teamData.reps.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="empty-state-title">No sales data</div>
+                    <div class="empty-state-message">No orders found for 2026 yet.</div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = teamData.reps.map(rep => {
+            // Build subtitle for "Other" group
+            const otherSubtitle = rep.name === 'Other' && rep.firstNamesDisplay
+                ? `<div class="rep-subtitle">${escapeHtml(rep.firstNamesDisplay)}</div>`
+                : '';
+
+            // No YoY display for YTD view - clean slate for 2026
+
+            return `
+            <div class="rep-card">
+                <div class="rep-info">
+                    <div class="rep-avatar">${rep.initials}</div>
+                    <div class="rep-name-group">
+                        <span class="rep-name">${escapeHtml(rep.name)}</span>
+                        ${otherSubtitle}
+                    </div>
+                </div>
+                <div class="rep-progress">
+                    <div class="rep-progress-bar" style="width: ${rep.percentage}%"></div>
+                </div>
+                <div class="rep-stats">
+                    <div class="rep-revenue">${rep.formattedRevenue}</div>
+                    <div class="rep-orders">${rep.orders} orders</div>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    /**
      * Update data source badge
      */
     function updateDataSourceBadge(hasPartialData = false) {
@@ -634,6 +728,12 @@ const StaffDashboardInit = (function() {
                 console.warn('Background archiving failed:', e.message)
             );
 
+            // Part 4: Archive per-rep data for days about to fall off
+            // For YTD team performance tracking beyond 60-day limit
+            archivePerRepSoonToExpireDays().catch(e =>
+                console.warn('[PerRep] Background archiving failed:', e.message)
+            );
+
             // Update banner
             console.log(`YTD Total: $${ytdRevenue.toFixed(2)}`);
             updateSalesGoal(ytdRevenue);
@@ -679,6 +779,162 @@ const StaffDashboardInit = (function() {
 
         if (archivedCount > 0) {
             console.log(`Archived ${archivedCount} days (55-60 days ago) to Caspio`);
+        }
+    }
+
+    /**
+     * Archive per-rep daily sales for days 55-60 ago
+     * Similar to archiveSoonToExpireDays but breaks down by sales rep
+     * for YTD team performance tracking.
+     */
+    async function archivePerRepSoonToExpireDays() {
+        const today = new Date();
+        const year = today.getFullYear();
+        let archivedCount = 0;
+
+        for (let daysAgo = 55; daysAgo <= 60; daysAgo++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - daysAgo);
+            const dateStr = date.toISOString().split('T')[0];
+
+            // Only archive if in current year
+            if (date.getFullYear() !== year) continue;
+
+            try {
+                // Fetch orders for this day
+                const orders = await StaffDashboardService.fetchOrders(dateStr, dateStr);
+
+                // Aggregate by rep using existing normalization
+                const repTotals = {};
+                for (const order of orders) {
+                    // Use CustomerServiceRep field (same as processTeamPerformanceYTD)
+                    const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Other';
+                    if (!repTotals[repName]) {
+                        repTotals[repName] = { revenue: 0, orderCount: 0 };
+                    }
+                    repTotals[repName].revenue += parseFloat(order.cur_SubTotal) || 0;
+                    repTotals[repName].orderCount++;
+                }
+
+                // Format for API
+                const reps = Object.entries(repTotals).map(([name, data]) => ({
+                    name,
+                    revenue: Math.round(data.revenue * 100) / 100,
+                    orderCount: data.orderCount
+                }));
+
+                // Archive to Caspio
+                if (reps.length > 0) {
+                    await StaffDashboardService.archivePerRepDailySales(dateStr, reps);
+                    archivedCount++;
+                }
+            } catch (e) {
+                console.warn(`[PerRep] Could not archive ${dateStr}:`, e.message);
+            }
+        }
+
+        if (archivedCount > 0) {
+            console.log(`[PerRep] Archived ${archivedCount} days (55-60 days ago) to Caspio`);
+        }
+    }
+
+    /**
+     * Load team performance YTD using hybrid approach:
+     * Archived data from Caspio + live data from ManageOrders
+     * Falls back to ManageOrders-only on failure.
+     */
+    async function loadTeamPerformanceYTDHybrid() {
+        try {
+            // 1. Get archived data from Caspio
+            const archived = await StaffDashboardService.fetchYTDPerRepFromArchive();
+
+            // 2. Determine what live data we need
+            const lastArchived = archived.lastArchivedDate || '2025-12-31';
+            const today = new Date().toISOString().split('T')[0];
+
+            let liveRepTotals = {};
+
+            // If there are days not yet archived, fetch from ManageOrders
+            if (lastArchived < today) {
+                const nextDay = new Date(lastArchived);
+                nextDay.setDate(nextDay.getDate() + 1);
+                const startDate = nextDay.toISOString().split('T')[0];
+
+                console.log(`[TeamPerformance] Hybrid load: archived through ${lastArchived}, fetching live ${startDate} to ${today}`);
+
+                const liveOrders = await StaffDashboardService.fetchOrders(startDate, today);
+
+                // Aggregate by rep
+                for (const order of liveOrders) {
+                    const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Other';
+                    if (!liveRepTotals[repName]) {
+                        liveRepTotals[repName] = { revenue: 0, orders: 0 };
+                    }
+                    liveRepTotals[repName].revenue += parseFloat(order.cur_SubTotal) || 0;
+                    liveRepTotals[repName].orders++;
+                }
+            }
+
+            // 3. Merge archived + live totals
+            const mergedTotals = {};
+
+            // Add archived data
+            for (const rep of (archived.reps || [])) {
+                mergedTotals[rep.name] = {
+                    revenue: rep.totalRevenue || 0,
+                    orders: rep.totalOrders || 0
+                };
+            }
+
+            // Add live data
+            for (const [name, data] of Object.entries(liveRepTotals)) {
+                if (!mergedTotals[name]) {
+                    mergedTotals[name] = { revenue: 0, orders: 0 };
+                }
+                mergedTotals[name].revenue += data.revenue;
+                mergedTotals[name].orders += data.orders;
+            }
+
+            // 4. Format for display (same structure as processTeamPerformanceYTD)
+            const reps = Object.entries(mergedTotals)
+                .filter(([name]) => name !== 'Unassigned')
+                .map(([name, data]) => ({
+                    name,
+                    revenue: data.revenue,
+                    orders: data.orders,
+                    initials: StaffDashboardService.getInitials(name),
+                    formattedRevenue: StaffDashboardService.formatCurrency(data.revenue)
+                }))
+                .sort((a, b) => b.revenue - a.revenue);
+
+            // Calculate percentages
+            const maxRevenue = reps[0]?.revenue || 1;
+            reps.forEach(rep => {
+                rep.percentage = Math.round((rep.revenue / maxRevenue) * 100);
+            });
+
+            console.log(`[TeamPerformance] Hybrid load complete: ${reps.length} reps, archived=${archived.reps?.length || 0}, live=${Object.keys(liveRepTotals).length}`);
+
+            return {
+                reps,
+                totalReps: reps.length,
+                topPerformer: reps[0] || null,
+                period: '2026 YTD',
+                dateRange: {
+                    start: `${new Date().getFullYear()}-01-01`,
+                    end: today,
+                    startFormatted: 'Jan 1, 2026',
+                    endFormatted: StaffDashboardService.formatDateForDisplay(today)
+                },
+                isHybrid: true,
+                lastArchivedDate: lastArchived
+            };
+        } catch (e) {
+            console.warn('[TeamPerformance] Hybrid load failed, falling back to ManageOrders-only:', e.message);
+            // Fallback to existing ManageOrders-only approach
+            const ytdRange = StaffDashboardService.getYTD2026Range();
+            const ytdOrders = await StaffDashboardService.fetchOrders(ytdRange.start, ytdRange.end);
+            return StaffDashboardService.processTeamPerformanceYTD(ytdOrders, ytdRange);
         }
     }
 

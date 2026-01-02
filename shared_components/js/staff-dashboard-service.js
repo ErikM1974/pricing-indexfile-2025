@@ -62,6 +62,20 @@ const StaffDashboardService = (function() {
     }
 
     /**
+     * Get Year-to-Date range for current year (Jan 1 to today)
+     * Used for Team Performance YTD display
+     * Note: Works within 60-day API limit early in year; archive system needed later
+     */
+    function getYTD2026Range() {
+        const end = new Date();
+        const year = end.getFullYear();
+        return {
+            start: `${year}-01-01`,
+            end: formatDate(end)
+        };
+    }
+
+    /**
      * Get last year's same period for comparison (dynamic days, same dates last year)
      * Fixed: Properly handles year boundary crossing (e.g., Dec 25 to Jan 1)
      */
@@ -583,6 +597,67 @@ const StaffDashboardService = (function() {
     }
 
     /**
+     * Process team performance for YTD display (no YoY comparison)
+     * Used for fresh start at beginning of year
+     */
+    function processTeamPerformanceYTD(orders, dateRange) {
+        const repMetrics = {};
+
+        orders.forEach(order => {
+            const originalName = order.CustomerServiceRep;
+            const rep = normalizeRepName(originalName);
+            const subtotal = parseFloat(order.cur_SubTotal) || 0;
+
+            if (!repMetrics[rep]) {
+                repMetrics[rep] = {
+                    name: rep,
+                    revenue: 0,
+                    orders: 0,
+                    initials: getInitials(rep),
+                    firstNames: new Set()
+                };
+            }
+
+            repMetrics[rep].revenue += subtotal;
+            repMetrics[rep].orders += 1;
+
+            // Track first names for "Other" group
+            if (rep === 'Other' && originalName) {
+                const firstName = originalName.trim().split(' ')[0];
+                if (firstName) repMetrics[rep].firstNames.add(firstName);
+            }
+        });
+
+        const repArray = Object.values(repMetrics)
+            .filter(rep => rep.name !== 'Unassigned')
+            .sort((a, b) => b.revenue - a.revenue);
+
+        const maxRevenue = repArray.length > 0 ? repArray[0].revenue : 0;
+        repArray.forEach(rep => {
+            rep.percentage = maxRevenue > 0 ? (rep.revenue / maxRevenue) * 100 : 0;
+            rep.formattedRevenue = formatCurrency(rep.revenue);
+            // Convert firstNames Set to comma-separated string
+            if (rep.firstNames && rep.firstNames.size > 0) {
+                rep.firstNamesDisplay = Array.from(rep.firstNames).join(', ');
+            }
+            // No YoY comparison for YTD display
+        });
+
+        return {
+            reps: repArray,
+            totalReps: repArray.length,
+            topPerformer: repArray[0] || null,
+            period: '2026 YTD',
+            dateRange: dateRange ? {
+                start: dateRange.start,
+                end: dateRange.end,
+                startFormatted: formatDateForDisplay(dateRange.start),
+                endFormatted: formatDateForDisplay(dateRange.end)
+            } : null
+        };
+    }
+
+    /**
      * Process order type breakdown from fetched orders
      */
     function processOrderTypeBreakdown(orders, days) {
@@ -822,6 +897,39 @@ const StaffDashboardService = (function() {
     }
 
     // =====================================================
+    // PER-REP DAILY SALES ARCHIVE FUNCTIONS
+    // Archives sales broken down by sales rep for YTD tracking
+    // =====================================================
+
+    /**
+     * Archive per-rep daily sales to Caspio
+     * @param {string} date - Date in YYYY-MM-DD format
+     * @param {Array} reps - Array of { name, revenue, orderCount }
+     */
+    async function archivePerRepDailySales(date, reps) {
+        const url = `${API_CONFIG.baseURL}/caspio/daily-sales-by-rep`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date, reps })
+        });
+        if (!response.ok) throw new Error(`Failed to archive per-rep: ${response.status}`);
+        return response.json();
+    }
+
+    /**
+     * Fetch YTD per-rep totals from Caspio archive
+     * @param {number} year - Year to fetch (defaults to current year)
+     * @returns {Promise<{success, year, reps, lastArchivedDate, totalRevenue, totalOrders}>}
+     */
+    async function fetchYTDPerRepFromArchive(year = new Date().getFullYear()) {
+        const url = `${API_CONFIG.baseURL}/caspio/daily-sales-by-rep/ytd?year=${year}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch per-rep YTD: ${response.status}`);
+        return response.json();
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -844,6 +952,17 @@ const StaffDashboardService = (function() {
         archiveDailySales,
         ensureYesterdayArchived,
 
+        // Per-Rep Daily Sales Archive (Team YTD tracking)
+        archivePerRepDailySales,
+        fetchYTDPerRepFromArchive,
+
+        // Date range utilities
+        getYTD2026Range,
+        getDateRange,
+
+        // Processing functions
+        processTeamPerformanceYTD,
+
         // Cache management
         clearCache,
 
@@ -853,6 +972,7 @@ const StaffDashboardService = (function() {
         formatDate,
         formatDateForDisplay,
         getInitials,
+        normalizeRepName,
 
         // State
         isLoading: () => isLoading,
