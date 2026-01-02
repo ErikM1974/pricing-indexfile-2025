@@ -391,7 +391,12 @@
 
     <script>
         // Initialize calculator when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize Richardson data from API (filters SanMar styles, loads embroidery costs)
+            console.log('[Richardson] Starting async initialization...');
+            await initializeRichardsonData();
+            console.log('[Richardson] API data loaded, creating calculator...');
+
             window.richardsonCalculator = new RichardsonCalculator();
 
             // Images are now handled by the gallery in RichardsonCalculator class

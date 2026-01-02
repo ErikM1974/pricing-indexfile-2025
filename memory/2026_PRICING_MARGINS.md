@@ -258,6 +258,33 @@ JDS laser tumbler engraving labor was increased from $2.85 to $3.00 to match 202
 JDS Price = (JDS Wholesale / MarginDenominator) + EngravingLabor + SetupFee/Qty + SecondLogoPrice
 ```
 
+## Richardson Caps Calculator Refactor (Jan 2, 2026)
+
+### Changes Made:
+1. **Filter SanMar overlap** - Removed 23 Richardson styles that SanMar carries
+2. **API embroidery costs** - Now fetches from `/api/pricing-bundle?method=CAP` instead of hardcoded
+3. **Fallback values** - Updated to 2026 pricing as backup
+
+### Files Modified:
+- `calculators/richardson-caps-calculator.js` - API initialization, filtering logic
+- `calculators/richardson-2025.html` - Async initialization call
+
+### SanMar Richardson Styles Filtered Out (23 styles):
+```
+111, 112, 115, 168, 169, 173, 212, 220, 225, 256, 312, 326, 336, 355, 356,
+112FP, 112FPR, 112PFP, 112PL, 112PT, 168P, 256P, 323FPC
+```
+
+### Cap Count:
+- Before: 156 Richardson styles
+- After: 133 Richardson-only styles (not available via SanMar)
+
+### API Endpoints Used:
+- `GET /api/decorated-cap-prices?brand=Richardson&tier=72+` - SanMar Richardson styles
+- `GET /api/pricing-bundle?method=CAP&styleNumber=112` - Embroidery costs
+
+---
+
 ## Related Documentation
 
 - Backend update: `caspio-pricing-proxy/MESSAGE_TO_CLAUDE_PRICING_2026_MARGINS.md`

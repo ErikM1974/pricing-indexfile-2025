@@ -1,5 +1,16 @@
-        // Richardson cap data
-        const capData = [
+        // ============================================================================
+        // Richardson Caps Calculator - API Configuration & Data
+        // ============================================================================
+
+        // API Base URL
+        const RICHARDSON_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        // Data initialization status
+        let richardsonDataInitialized = false;
+        let sanmarRichardsonStyles = []; // Styles to filter out (available via SanMar)
+
+        // Richardson cap data (will be filtered to remove SanMar overlap)
+        let capData = [
             { style: 'PTS20M', description: 'Pulse Mesh Back R-Flex', price: 8.75 }, 
             { style: 'PTS205', description: 'Pulse R-Flex', price: 9.50 }, 
             { style: 'PTS30S', description: 'Ignite LT R-Flex', price: 10.00 }, 
@@ -156,12 +167,80 @@
             { style: '943', description: 'Summit Pack', price: 11.50 }
         ];
 
-        // Embroidery pricing by stitch count
-        const embroideryCosts = {
-            '5000': { '1-23': 9.75, '24-47': 8.75, '48-71': 7.75, '72+': 6.75 },
-            '8000': { '1-23': 12.00, '24-47': 11.00, '48-71': 10.00, '72+': 8.50 },
-            '10000': { '1-23': 13.50, '24-47': 12.50, '48-71': 11.50, '72+': 11.00 }
+        // Embroidery pricing by stitch count (fallback values - API preferred)
+        // Note: These are 2026 updated values as fallback only
+        let embroideryCosts = {
+            '5000': { '1-23': 10.00, '24-47': 9.00, '48-71': 8.00, '72+': 7.00 },
+            '8000': { '1-23': 13.00, '24-47': 12.00, '48-71': 11.00, '72+': 9.50 },
+            '10000': { '1-23': 14.50, '24-47': 13.50, '48-71': 12.50, '72+': 12.00 }
         };
+
+        // Store original cap data for reference (before filtering)
+        const allRichardsonCaps = [...capData];
+
+        /**
+         * Initialize Richardson data from API
+         * - Fetches SanMar Richardson styles to filter out
+         * - Fetches embroidery costs from API
+         * @returns {Promise<void>}
+         */
+        async function initializeRichardsonData() {
+            if (richardsonDataInitialized) {
+                console.log('[Richardson] Data already initialized');
+                return;
+            }
+
+            console.log('[Richardson] Initializing data from API...');
+
+            try {
+                // Fetch SanMar Richardson styles (to filter out)
+                const sanmarResponse = await fetch(`${RICHARDSON_API_BASE}/api/decorated-cap-prices?brand=Richardson&tier=72%2B`);
+                if (sanmarResponse.ok) {
+                    const sanmarData = await sanmarResponse.json();
+                    sanmarRichardsonStyles = Object.keys(sanmarData.prices || {});
+                    console.log(`[Richardson] Found ${sanmarRichardsonStyles.length} SanMar Richardson styles to filter out:`, sanmarRichardsonStyles);
+
+                    // Filter capData to only show Richardson-direct styles (not available via SanMar)
+                    const originalCount = capData.length;
+                    capData = allRichardsonCaps.filter(cap => !sanmarRichardsonStyles.includes(cap.style));
+                    console.log(`[Richardson] Filtered caps: ${originalCount} → ${capData.length} (removed ${originalCount - capData.length} SanMar styles)`);
+                } else {
+                    console.warn('[Richardson] Could not fetch SanMar styles, showing all Richardson caps');
+                }
+
+                // Fetch embroidery costs from API
+                const embResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=CAP&styleNumber=112`);
+                if (embResponse.ok) {
+                    const embData = await embResponse.json();
+                    if (embData.allEmbroideryCostsR && embData.allEmbroideryCostsR.length > 0) {
+                        // Convert API format to our format
+                        const apiCosts = {};
+                        embData.allEmbroideryCostsR.forEach(cost => {
+                            const stitch = cost.StitchCount?.toString() || '8000';
+                            const tier = cost.TierLabel;
+                            if (!apiCosts[stitch]) apiCosts[stitch] = {};
+                            apiCosts[stitch][tier] = parseFloat(cost.EmbroideryCost);
+                        });
+
+                        // Only update if we got valid data
+                        if (Object.keys(apiCosts).length > 0) {
+                            embroideryCosts = apiCosts;
+                            console.log('[Richardson] Embroidery costs loaded from API:', embroideryCosts);
+                        }
+                    }
+                } else {
+                    console.warn('[Richardson] Could not fetch embroidery costs, using fallback values');
+                }
+
+                richardsonDataInitialized = true;
+                console.log('[Richardson] Data initialization complete');
+
+            } catch (error) {
+                console.error('[Richardson] Error initializing data:', error);
+                console.log('[Richardson] Using fallback data');
+                richardsonDataInitialized = true; // Mark as initialized even on error to prevent retry loops
+            }
+        }
 
         // Leatherette patch pricing (flat rate)
         const leatherettePricing = {
