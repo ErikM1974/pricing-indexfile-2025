@@ -341,7 +341,7 @@ class CapEmbroideryManualQuoteService {
             // API data reference (from live pricing system)
             apiDataUsed: {
                 tierLabel: quoteData.tier,
-                marginDenominator: quoteData.marginDenominator || 0.6,
+                marginDenominator: quoteData.marginDenominator || 0.57, // 2026 margin fallback
                 roundingMethod: 'CeilDollar', // Standard for cap embroidery
                 baseCost8k: quoteData.apiBaseCost || this.getBaseCost8k(quoteData.tier),
                 apiEndpoint: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP&styleNumber=MANUAL',

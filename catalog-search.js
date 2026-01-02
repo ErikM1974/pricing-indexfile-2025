@@ -1682,12 +1682,18 @@ class CatalogSearch {
 
     /**
      * Calculate decorated cap price for a quantity tier
-     * Formula: ceil((baseCapPrice / 0.6) + embroideryCost)
+     * Formula: ceil((baseCapPrice / marginDenominator) + embroideryCost)
+     * MarginDenominator comes from API tiersR, fallback to 0.57 (2026 margin)
      */
-    calculateCapPrice(basePrice, tierLabel, embroideryCosts) {
+    calculateCapPrice(basePrice, tierLabel, embroideryCosts, tiersR = []) {
         const embCost = embroideryCosts.find(e => e.TierLabel === tierLabel && e.StitchCount === 8000);
         if (!embCost) return null;
-        const decorated = (basePrice / 0.6) + embCost.EmbroideryCost;
+
+        // Get margin from API tier data, fallback to 2026 default
+        const tier = tiersR.find(t => t.TierLabel === tierLabel);
+        const marginDenominator = tier?.MarginDenominator || 0.57;
+
+        const decorated = (basePrice / marginDenominator) + embCost.EmbroideryCost;
         return Math.ceil(decorated);
     }
 
@@ -1703,10 +1709,11 @@ class CatalogSearch {
         const basePrice = pricingData.sizes[0]?.price || 0;
         const sizeName = pricingData.sizes[0]?.size || 'OSFA';
 
-        // Calculate prices for each tier
-        const price24 = this.calculateCapPrice(basePrice, '24-47', pricingData.allEmbroideryCostsR);
-        const price48 = this.calculateCapPrice(basePrice, '48-71', pricingData.allEmbroideryCostsR);
-        const price72 = this.calculateCapPrice(basePrice, '72+', pricingData.allEmbroideryCostsR);
+        // Calculate prices for each tier (using API margin from tiersR)
+        const tiersR = pricingData.tiersR || [];
+        const price24 = this.calculateCapPrice(basePrice, '24-47', pricingData.allEmbroideryCostsR, tiersR);
+        const price48 = this.calculateCapPrice(basePrice, '48-71', pricingData.allEmbroideryCostsR, tiersR);
+        const price72 = this.calculateCapPrice(basePrice, '72+', pricingData.allEmbroideryCostsR, tiersR);
 
         if (!price24 || !price48 || !price72) return '';
 
@@ -1779,7 +1786,8 @@ class CatalogSearch {
                 const bestPrice = this.calculateCapPrice(
                     pricingData.sizes[0]?.price || 0,
                     '72+',
-                    pricingData.allEmbroideryCostsR
+                    pricingData.allEmbroideryCostsR,
+                    pricingData.tiersR || []
                 );
                 if (bestPrice) {
                     decoratedPriceHTML = `<span class="as-low-as">As low as:</span> $${bestPrice}.00`;

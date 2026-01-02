@@ -594,7 +594,8 @@
                 }
                 
                 // Calculate pricing for each item
-                const marginDenominator = 0.6;
+                // 2026 margin (43%) - matches API Pricing_Tiers.MarginDenominator
+                const marginDenominator = 0.57;
                 let subtotal = 0;
                 
                 lineItems.forEach(item => {

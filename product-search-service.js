@@ -12,7 +12,8 @@ class ProductSearchService {
         this.requestCache = new Map(); // Prevent duplicate concurrent requests
 
         // Price calculation constants
-        this.MARGIN = 0.60;
+        // 43% margin (2026) - synced with API Pricing_Tiers.MarginDenominator
+        this.MARGIN = 0.57;
         this.FIXED_ADDITION = 15.00;
 
         // Smart search - Brand name detection dictionary

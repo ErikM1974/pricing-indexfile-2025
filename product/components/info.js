@@ -87,8 +87,8 @@ export class ProductInfo {
                 const lowestCost = Math.min(...costs);
                 console.log('Lowest cost:', lowestCost);
                 
-                // Calculate price with 40% margin: cost / 0.60
-                const priceWithMargin = lowestCost / 0.60;
+                // Calculate price with 43% margin (2026) - synced with API MarginDenominator
+                const priceWithMargin = lowestCost / 0.57;
                 console.log('Price with margin:', priceWithMargin);
                 
                 // Add $15 for basic logo embroidery
