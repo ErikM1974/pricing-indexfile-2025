@@ -74,7 +74,8 @@
       "Bash(tests/unit/test-optimal-profitability.js )",
       "Bash(tests/unit/test-premium-strategy.js )",
       "Bash(tests/unit/test-profitability-analysis.js )",
-      "Bash(MESSAGE_TO_CASPIO_PROXY_EMBROIDERY_INCREASE.md)"
+      "Bash(MESSAGE_TO_CASPIO_PROXY_EMBROIDERY_INCREASE.md)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": [],
     "ask": [],
