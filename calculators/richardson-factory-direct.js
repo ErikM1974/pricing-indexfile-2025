@@ -277,9 +277,6 @@ class RichardsonPricingLookup {
         // Price display elements
         this.pricePlaceholder = document.getElementById('pricePlaceholder');
         this.priceBreakdown = document.getElementById('priceBreakdown');
-        this.capBasePrice = document.getElementById('capBasePrice');
-        this.embellishmentCost = document.getElementById('embellishmentCost');
-        this.decoratedPrice = document.getElementById('decoratedPrice');
         this.ltmNotice = document.getElementById('ltmNotice');
         this.ltmPerUnit = document.getElementById('ltmPerUnit');
         this.pricePerCap = document.getElementById('pricePerCap');
@@ -472,10 +469,6 @@ class RichardsonPricingLookup {
         // Update display
         this.pricePlaceholder.classList.add('hidden');
         this.priceBreakdown.classList.remove('hidden');
-
-        this.capBasePrice.textContent = `$${this.selectedCap.price.toFixed(2)}`;
-        this.embellishmentCost.textContent = `$${embCost.toFixed(2)} (${embellishmentType === 'embroidery' ? '8K stitch' : 'leatherette'})`;
-        this.decoratedPrice.textContent = `$${decoratedRounded.toFixed(2)}`;
 
         if (hasLTM) {
             this.ltmNotice.classList.remove('hidden');
