@@ -244,5 +244,58 @@
         </div>
     </div>
 
+    <!-- Hidden Caspio Auth Check -->
+    <div style="display: none;">
+        <div id="auth-check">[@authfield:First_Name]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
+    <script>
+        // Check if already authenticated - redirect to dashboard
+        function checkAuthAndRedirect() {
+            const authCheck = document.getElementById('auth-check');
+            const authValue = authCheck?.textContent?.trim();
+
+            // If auth field has a real name (not token placeholder), user is logged in
+            if (authValue && authValue !== '' && !authValue.includes('[@authfield') && !authValue.includes('@authfield')) {
+                console.log('[Login] User already authenticated, redirecting to dashboard');
+                window.location.href = '/staff-dashboard.html';
+                return true;
+            }
+
+            // Also check window.caspioUser
+            if (window.caspioUser && window.caspioUser.firstName) {
+                console.log('[Login] Caspio user found, redirecting to dashboard');
+                window.location.href = '/staff-dashboard.html';
+                return true;
+            }
+
+            return false;
+        }
+
+        // Check on page load with retries
+        window.addEventListener('load', function() {
+            let retryCount = 0;
+            const maxRetries = 5;
+
+            function attemptCheck() {
+                if (!checkAuthAndRedirect() && retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(attemptCheck, 300);
+                }
+            }
+
+            setTimeout(attemptCheck, 500);
+        });
+
+        // Listen for Caspio events
+        document.addEventListener('DataPageReady', function() {
+            setTimeout(checkAuthAndRedirect, 100);
+        });
+
+        window.addEventListener('caspioUserReady', function() {
+            checkAuthAndRedirect();
+        });
+    </script>
 </body>
 </html>
