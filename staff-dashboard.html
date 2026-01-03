@@ -81,6 +81,24 @@
             background: rgba(255,255,255,0.1);
             border-color: rgba(255,255,255,0.5);
         }
+        /* User Welcome */
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            color: #166534;
+            font-size: 0.875rem;
+        }
+        .welcome-text {
+            font-weight: 400;
+        }
+        .user-name {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -259,6 +277,11 @@
                             <span class="celebration-icon">👥</span>
                             <span class="celebration-label">Staff</span>
                         </div>
+                    </div>
+
+                    <div class="user-welcome" id="userWelcome" style="display: none;">
+                        <span class="welcome-text">Welcome,</span>
+                        <span class="user-name" id="userName"></span>
                     </div>
 
                     <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out-link" title="Sign Out">
@@ -965,9 +988,20 @@
             }
 
             // Store user info for use elsewhere
-            sessionStorage.setItem('nwca_user_name', firstName + (lastName ? ' ' + lastName : ''));
+            const fullName = firstName + (lastName ? ' ' + lastName : '');
+            sessionStorage.setItem('nwca_user_name', fullName);
             sessionStorage.setItem('nwca_user_email', email);
             sessionStorage.setItem('nwca_user_role', role);
+
+            // Show welcome message with user name
+            if (firstName && firstName !== '') {
+                const userNameEl = document.getElementById('userName');
+                const userWelcomeEl = document.getElementById('userWelcome');
+                if (userNameEl && userWelcomeEl) {
+                    userNameEl.textContent = firstName;
+                    userWelcomeEl.style.display = 'flex';
+                }
+            }
 
             console.log('[Auth] Dashboard loaded for:', firstName);
         }
