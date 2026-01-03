@@ -15,8 +15,93 @@
     <link href="/shared_components/css/dashboard-styles.css" rel="stylesheet">
     <link href="/shared_components/css/staff-dashboard-layout.css" rel="stylesheet">
     <link href="/shared_components/css/staff-dashboard-widgets.css" rel="stylesheet">
+    <!-- Caspio Authentication Styles -->
+    <style>
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        .loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #981e32;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            color: #6b7280;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Hidden Caspio Container */
+        .caspio-hidden-container {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        /* Sign Out Link */
+        .sign-out-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .sign-out-link:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.5);
+        }
+    </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Verifying authentication...</div>
+    </div>
+
+    <!-- Hidden Caspio Authentication Container -->
+    <div class="caspio-hidden-container">
+        <div id="caspio-auth-data">
+            <span id="auth-firstname"></span>
+            <span id="auth-lastname"></span>
+            <span id="auth-email"></span>
+            <span id="auth-role"></span>
+            <span id="auth-lastlogin"></span>
+        </div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
     <div class="dashboard-container">
         <!-- =====================================================
              SIDEBAR NAVIGATION (Preserved from original)
@@ -179,8 +264,9 @@
                         </div>
                     </div>
 
-                    <a href="/dashboards/staff-login.html" class="login-link" title="Sign In">
-                        <i class="fas fa-sign-in-alt"></i>
+                    <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out-link" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign Out</span>
                     </a>
                 </div>
             </header>
@@ -820,6 +906,82 @@
     <script src="/shared_components/js/staff-dashboard-service.js"></script>
     <script src="/shared_components/js/staff-dashboard-announcements.js"></script>
     <script src="/shared_components/js/staff-dashboard-init.js"></script>
+
+    <!-- Caspio Authentication Script -->
+    <script>
+        // =====================================================
+        // CASPIO AUTHENTICATION CHECK
+        // =====================================================
+        const LOGIN_URL = '/dashboards/staff-login.html';
+        const AUTH_TIMEOUT = 5000; // 5 seconds to wait for Caspio
+        let authCheckComplete = false;
+
+        function checkCaspioAuth() {
+            // Look for authenticated user data from Caspio
+            const firstName = document.getElementById('auth-firstname')?.textContent?.trim();
+            const email = document.getElementById('auth-email')?.textContent?.trim();
+
+            // Check if we have valid auth data (Caspio populates these fields when logged in)
+            if (firstName && firstName !== '' && !firstName.includes('[@authfield')) {
+                // User is authenticated
+                authCheckComplete = true;
+                showDashboard(firstName);
+                return true;
+            }
+            return false;
+        }
+
+        function showDashboard(firstName) {
+            // Hide loading overlay
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('fade-out');
+            }
+
+            // Store user info for use elsewhere
+            const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || '';
+            const email = document.getElementById('auth-email')?.textContent?.trim() || '';
+            const role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
+
+            sessionStorage.setItem('nwca_user_name', firstName + (lastName ? ' ' + lastName : ''));
+            sessionStorage.setItem('nwca_user_email', email);
+            sessionStorage.setItem('nwca_user_role', role);
+
+            console.log('[Auth] Dashboard loaded for:', firstName);
+        }
+
+        function redirectToLogin() {
+            if (!authCheckComplete) {
+                console.log('[Auth] Not authenticated, redirecting to login');
+                window.location.href = LOGIN_URL;
+            }
+        }
+
+        // Wait for page load then check auth
+        window.addEventListener('load', function() {
+            // Give Caspio time to render auth data
+            setTimeout(function() {
+                if (!checkCaspioAuth()) {
+                    // Try again after a short delay
+                    setTimeout(function() {
+                        if (!checkCaspioAuth()) {
+                            redirectToLogin();
+                        }
+                    }, 1500);
+                }
+            }, 1000);
+        });
+
+        // Fallback timeout - if no auth after timeout, redirect to login
+        setTimeout(function() {
+            if (!authCheckComplete) {
+                console.log('[Auth] Timeout reached, checking final state');
+                if (!checkCaspioAuth()) {
+                    redirectToLogin();
+                }
+            }
+        }, AUTH_TIMEOUT);
+    </script>
 
     <!-- Sidebar Toggle Function (minimal inline for critical functionality) -->
     <script>
