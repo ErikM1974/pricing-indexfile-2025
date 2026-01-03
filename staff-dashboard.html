@@ -1008,8 +1008,10 @@
                     console.log(`[Auth] Waiting for Caspio user data... attempt ${retryCount}/${maxRetries}`);
                     setTimeout(attemptInitialization, 500);
                 } else {
-                    console.log('[Auth] Max retries reached, redirecting to login');
-                    redirectToLogin();
+                    // Fallback: show dashboard anyway (matches old behavior)
+                    console.log('[Auth] Max retries reached, initializing with fallback');
+                    authCheckComplete = true;
+                    initializePortal();
                 }
             }
 
@@ -1017,13 +1019,12 @@
             setTimeout(attemptInitialization, 1000);
         });
 
-        // Fallback timeout - if no auth after timeout, redirect to login
+        // Fallback timeout - if no auth after timeout, show dashboard anyway
         setTimeout(function() {
             if (!authCheckComplete) {
-                console.log('[Auth] Timeout reached, checking final state');
-                if (!checkCaspioAuth()) {
-                    redirectToLogin();
-                }
+                console.log('[Auth] Timeout reached, initializing with fallback');
+                authCheckComplete = true;
+                initializePortal();
             }
         }, AUTH_TIMEOUT);
     </script>
