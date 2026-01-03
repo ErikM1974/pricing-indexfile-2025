@@ -91,14 +91,11 @@
     </div>
 
     <!-- Hidden Caspio Authentication Container -->
-    <div class="caspio-hidden-container">
-        <div id="caspio-auth-data">
-            <span id="auth-firstname"></span>
-            <span id="auth-lastname"></span>
-            <span id="auth-email"></span>
-            <span id="auth-role"></span>
-            <span id="auth-lastlogin"></span>
-        </div>
+    <div class="caspio-auth" style="display: none;">
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
 
@@ -913,8 +910,9 @@
         // CASPIO AUTHENTICATION CHECK
         // =====================================================
         const LOGIN_URL = '/dashboards/staff-login.html';
-        const AUTH_TIMEOUT = 5000; // 5 seconds to wait for Caspio
+        const AUTH_TIMEOUT = 8000; // 8 seconds to wait for Caspio
         let authCheckComplete = false;
+        let portalInitialized = false;
 
         function checkCaspioAuth() {
             // Look for authenticated user data from Caspio
@@ -922,16 +920,44 @@
             const email = document.getElementById('auth-email')?.textContent?.trim();
 
             // Check if we have valid auth data (Caspio populates these fields when logged in)
-            if (firstName && firstName !== '' && !firstName.includes('[@authfield')) {
+            // Skip if tokens are still present (not yet processed by Caspio)
+            if (firstName && firstName !== '' && !firstName.includes('[@authfield') && !firstName.includes('@authfield')) {
                 // User is authenticated
                 authCheckComplete = true;
-                showDashboard(firstName);
+                initializePortal();
                 return true;
             }
+
+            // Also check window.caspioUser (set by some Caspio DataPages)
+            if (window.caspioUser && window.caspioUser.firstName) {
+                authCheckComplete = true;
+                initializePortal();
+                return true;
+            }
+
             return false;
         }
 
-        function showDashboard(firstName) {
+        function initializePortal() {
+            // Prevent double initialization
+            if (portalInitialized) return;
+            portalInitialized = true;
+
+            // Get user info from DOM or caspioUser object
+            let firstName, lastName, email, role;
+
+            if (window.caspioUser && window.caspioUser.firstName) {
+                firstName = window.caspioUser.firstName;
+                lastName = window.caspioUser.lastName || '';
+                email = window.caspioUser.email || '';
+                role = window.caspioUser.role || 'Staff';
+            } else {
+                firstName = document.getElementById('auth-firstname')?.textContent?.trim() || '';
+                lastName = document.getElementById('auth-lastname')?.textContent?.trim() || '';
+                email = document.getElementById('auth-email')?.textContent?.trim() || '';
+                role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
+            }
+
             // Hide loading overlay
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
@@ -939,10 +965,6 @@
             }
 
             // Store user info for use elsewhere
-            const lastName = document.getElementById('auth-lastname')?.textContent?.trim() || '';
-            const email = document.getElementById('auth-email')?.textContent?.trim() || '';
-            const role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
-
             sessionStorage.setItem('nwca_user_name', firstName + (lastName ? ' ' + lastName : ''));
             sessionStorage.setItem('nwca_user_email', email);
             sessionStorage.setItem('nwca_user_role', role);
@@ -957,19 +979,42 @@
             }
         }
 
-        // Wait for page load then check auth
+        // Caspio DataPageReady Event Listener
+        document.addEventListener('DataPageReady', function(event) {
+            console.log('[Auth] Caspio DataPage Ready');
+            // Check auth when DataPage loads
+            setTimeout(checkCaspioAuth, 100);
+        });
+
+        // Listen for the custom caspioUserReady event
+        window.addEventListener('caspioUserReady', function(event) {
+            console.log('[Auth] Caspio user ready event received:', event.detail);
+            if (!authCheckComplete) {
+                checkCaspioAuth();
+            }
+        });
+
+        // Wait for page load then check auth with retry mechanism
         window.addEventListener('load', function() {
-            // Give Caspio time to render auth data
-            setTimeout(function() {
-                if (!checkCaspioAuth()) {
-                    // Try again after a short delay
-                    setTimeout(function() {
-                        if (!checkCaspioAuth()) {
-                            redirectToLogin();
-                        }
-                    }, 1500);
+            let retryCount = 0;
+            const maxRetries = 10;
+
+            function attemptInitialization() {
+                // Check if Caspio has set the user data
+                if (checkCaspioAuth()) {
+                    console.log('[Auth] Caspio user data found, portal initialized');
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    console.log(`[Auth] Waiting for Caspio user data... attempt ${retryCount}/${maxRetries}`);
+                    setTimeout(attemptInitialization, 500);
+                } else {
+                    console.log('[Auth] Max retries reached, redirecting to login');
+                    redirectToLogin();
                 }
-            }, 1000);
+            }
+
+            // Start checking after initial delay
+            setTimeout(attemptInitialization, 1000);
         });
 
         // Fallback timeout - if no auth after timeout, redirect to login
