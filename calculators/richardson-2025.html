@@ -4,35 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Richardson Cap Pricing Calculator - Northwest Custom Apparel</title>
+    <title>Richardson Pricing Factory Direct 2026 - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Shared Calculator Styles -->
     <link href="../shared_components/css/calculator-base.css" rel="stylesheet">
-    <!-- Modern CSS Enhancements Layer (Progressive Enhancement) -->
     <link href="../shared_components/css/calculator-modern-enhancements.css" rel="stylesheet">
-    <!-- Richardson-Specific Styles -->
+    <!-- Richardson Factory Direct Styles -->
     <link href="richardson-2025-styles.css" rel="stylesheet">
-    <!-- Richardson Color Selector Styles -->
-    <link href="richardson-color-selector.css" rel="stylesheet">
 
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
-    <!-- Base Quote Service -->
-    <script src="../shared_components/js/base-quote-service.js"></script>
     <!-- Calculator Utilities -->
     <script src="../shared_components/js/calculator-utilities.js"></script>
-    <!-- Richardson 112 Image Data -->
-    <script src="richardson-112-images.js"></script>
-    <!-- Richardson Color Selector Enhancement -->
-    <script src="richardson-color-selector-enhancement.js"></script>
-    <!-- Richardson Quote Service -->
-    <script src="richardson-quote-service.js"></script>
-    <!-- Richardson Calculator Class -->
-    <script src="richardson-caps-calculator.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -43,14 +27,8 @@
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Dashboard</a>
                     <span>/</span>
-                    <span>Richardson Cap Pricing</span>
+                    <span>Richardson Factory Direct</span>
                 </nav>
-            </div>
-            <div class="header-right">
-                <button class="help-btn" onclick="if(window.richardsonCalculator && window.richardsonCalculator.currentQuote) { window.richardsonCalculator.printQuote(); } else { alert('Please generate a quote first'); }">
-                    <i class="fas fa-print"></i>
-                    Print Quote
-                </button>
             </div>
         </div>
     </header>
@@ -59,459 +37,159 @@
     <main class="main-container">
         <div class="page-header">
             <div class="page-header-left">
-                <h1 class="page-title">Richardson Cap Pricing Calculator</h1>
-                <p class="page-subtitle">Build multi-style cap quotes with embroidery or leatherette patch</p>
+                <h1 class="page-title">Richardson Pricing Factory Direct 2026</h1>
+                <p class="page-subtitle">Real-time pricing for Richardson caps ordered direct from factory</p>
             </div>
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/richardson-sports-logo-vector.png?ver=1" alt="Richardson Headwear" class="richardson-logo">
         </div>
 
-        <!-- Compact Richardson 112 Hero Strip -->
-        <div class="compact-showcase" id="productShowcase">
-            <div class="showcase-strip">
-                <div class="strip-content">
-                    <div class="strip-text">
-                        <i class="fas fa-star" style="color: #fbbf24;"></i>
-                        <span class="strip-title">Featured: Richardson 112</span>
-                        <span class="strip-subtitle">#1 Best Seller</span>
+        <!-- SanMar Notice -->
+        <div class="sanmar-notice" id="sanmarNotice">
+            <div class="notice-header">
+                <i class="fas fa-info-circle"></i>
+                <div class="notice-text">
+                    <strong>23 Richardson styles available via SanMar</strong>
+                    <span class="notice-subtitle">Better pricing through SanMar supplier</span>
+                </div>
+            </div>
+            <div class="notice-styles" id="sanmarStylesList">
+                111, 112, 112FP, 112FPR, 112PFP, 112PL, 112PM, 112PT, 115, 168, 168P, 169, 173, 212, 220, 225, 256, 256P, 312, 323FPC, 326, 336, 355, 356
+            </div>
+            <a href="/calculators/cap-embroidery-pricing.html" class="btn btn-primary sanmar-link">
+                <i class="fas fa-external-link-alt"></i>
+                View Cap Embroidery Pricing
+            </a>
+        </div>
+
+        <!-- Price Lookup Card -->
+        <div class="pricing-card">
+            <h2 class="section-title">
+                <i class="fas fa-calculator"></i>
+                Quick Price Lookup
+            </h2>
+
+            <div class="lookup-form">
+                <!-- Cap Style -->
+                <div class="form-group">
+                    <label class="form-label" for="capStyle">Cap Style</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="capStyle" class="form-input"
+                               placeholder="Search style number..." autocomplete="off">
+                        <div class="autocomplete-list hidden" id="styleAutocomplete"></div>
+                        <span class="validation-indicator" id="styleValidation"></span>
                     </div>
-                    <div class="strip-images">
-                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114122" 
-                             alt="Front" class="strip-thumb modal-trigger" title="Front View - Click to enlarge"
-                             data-full="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114122"
-                             data-caption="Richardson 112 - Front View">
-                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114123" 
-                             alt="Side" class="strip-thumb modal-trigger" title="Side View - Click to enlarge"
-                             data-full="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114123"
-                             data-caption="Richardson 112 - Side View">
-                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114124" 
-                             alt="Back" class="strip-thumb modal-trigger" title="Back View - Click to enlarge"
-                             data-full="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9114124"
-                             data-caption="Richardson 112 - Back View">
-                        <span class="view-hint"><i class="fas fa-search-plus"></i> Click to view</span>
+                    <div class="style-description" id="styleDescription"></div>
+                </div>
+
+                <!-- Quantity -->
+                <div class="form-group">
+                    <label class="form-label" for="quantity">Quantity</label>
+                    <input type="number" id="quantity" class="form-input"
+                           value="24" min="1" max="9999">
+                    <div class="quantity-tier" id="quantityTier">Tier: 24-47</div>
+                </div>
+
+                <!-- Embellishment Type -->
+                <div class="form-group">
+                    <label class="form-label">Embellishment Type</label>
+                    <div class="embellishment-options">
+                        <label class="radio-option">
+                            <input type="radio" name="embellishment" value="embroidery" checked>
+                            <span>Embroidery (8K stitches)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="embellishment" value="leatherette">
+                            <span>Leatherette Patch</span>
+                        </label>
                     </div>
-                    <div class="strip-features">
-                        <span class="mini-badge">Mid-Profile</span>
-                        <span class="mini-badge">Pre-Curved</span>
-                        <span class="mini-badge">Snapback</span>
-                        <span class="mini-badge">60/40 Blend</span>
+                </div>
+            </div>
+
+            <!-- Real-Time Price Display -->
+            <div class="price-display" id="priceDisplay">
+                <div class="price-placeholder" id="pricePlaceholder">
+                    <i class="fas fa-search"></i>
+                    <span>Select a cap style to see pricing</span>
+                </div>
+                <div class="price-breakdown hidden" id="priceBreakdown">
+                    <div class="price-row">
+                        <span class="price-label">Cap Base Price:</span>
+                        <span class="price-value" id="capBasePrice">--</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">+ Embellishment:</span>
+                        <span class="price-value" id="embellishmentCost">--</span>
+                    </div>
+                    <div class="price-row price-subtotal">
+                        <span class="price-label">Decorated Price:</span>
+                        <span class="price-value" id="decoratedPrice">--</span>
+                    </div>
+                    <div class="ltm-notice hidden" id="ltmNotice">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>LTM Fee: $50.00 for orders under 24 pieces</span>
+                        <span class="ltm-per-unit" id="ltmPerUnit"></span>
+                    </div>
+                    <div class="price-row price-total">
+                        <span class="price-label">Price Per Cap:</span>
+                        <span class="price-value" id="pricePerCap">--</span>
+                    </div>
+                    <div class="price-row line-total">
+                        <span class="price-label">Line Total:</span>
+                        <span class="price-value" id="lineTotal">--</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Calculator Container -->
-        <div class="calculator-container">
-            <!-- Input Section -->
-            <div class="input-section">
-                <h2 class="section-title">
-                    <i class="fas fa-calculator"></i>
-                    Build Your Quote
-                </h2>
-
-                <form id="pricingForm">
-                    <!-- Customer Info -->
-                    <div class="form-group">
-                        <label class="form-label" for="customerName">Company Name</label>
-                        <input type="text" id="customerName" class="form-input" placeholder="e.g., Milton High School">
-                    </div>
-
-                    <!-- Sales Representative -->
-                    <div class="form-group">
-                        <label class="form-label" for="mainSalesRep">Sales Representative *</label>
-                        <select id="mainSalesRep" class="form-select" required>
-                            <option value="sales@nwcustomapparel.com" selected>General Sales: sales@nwcustomapparel.com</option>
-                            <option value="ruth@nwcustomapparel.com">Ruth Nhong: ruth@nwcustomapparel.com</option>
-                            <option value="taylar@nwcustomapparel.com">Taylar Hanson: taylar@nwcustomapparel.com</option>
-                            <option value="nika@nwcustomapparel.com">Nika Lao: nika@nwcustomapparel.com</option>
-                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark: taneisha@nwcustomapparel.com</option>
-                            <option value="erik@nwcustomapparel.com">Erik Mickelson: erik@nwcustomapparel.com</option>
-                            <option value="adriyella@nwcustomapparel.com">Adriyella: adriyella@nwcustomapparel.com</option>
-                            <option value="bradley@nwcustomapparel.com">Bradley Wright: bradley@nwcustomapparel.com</option>
-                            <option value="jim@nwcustomapparel.com">Jim Mickelson: jim@nwcustomapparel.com</option>
-                            <option value="art@nwcustomapparel.com">Steve Deland: art@nwcustomapparel.com</option>
-                        </select>
-                    </div>
-
-                    <!-- Embellishment Type -->
-                    <div class="form-group">
-                        <label class="form-label">Embellishment Type</label>
-                        <div class="embellishment-options">
-                            <label class="radio-option">
-                                <input type="radio" name="embellishment" value="embroidery" checked>
-                                <span>Embroidery</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="embellishment" value="leatherette">
-                                <span>Leatherette Patch</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Stitch Count (Hidden - Always 8000) -->
-                    <input type="hidden" id="stitchCount" value="8000">
-
-                    <!-- Line Items -->
-                    <div class="form-group">
-                        <div class="cap-styles-header">
-                            <label class="form-label">Cap Styles</label>
-                            
-                            <!-- Real-Time Quote Preview Counter -->
-                            <div id="quotePreviewCounter" class="quote-preview-counter">
-                                <div class="drag-handle" title="Drag to reposition">
-                                    <i class="fas fa-grip-vertical"></i>
-                                </div>
-                                <div class="counter-content">
-                                    <div class="counter-main">
-                                        <span class="counter-label">Total Caps:</span>
-                                        <span class="counter-value" id="totalCapsCount">0</span>
-                                    </div>
-                                    <div class="counter-estimate">
-                                        <span id="estimatedTotal">Add caps to see pricing</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="lineItemsContainer" class="line-items-container">
-                            <!-- Dynamic line items will be added here -->
-                        </div>
-                        <button type="button" id="addStyleBtn" class="btn btn-secondary" style="margin-top: 0.75rem; width: auto;">
-                            <i class="fas fa-plus"></i>
-                            Add Another Style
-                        </button>
-                    </div>
-
-                    <!-- Cap Browser Section (Collapsible) -->
-                    <div class="form-group cap-browser-accordion">
-                        <button type="button" class="cap-browser-toggle" id="capBrowserToggle">
-                            <div class="toggle-header">
-                                <i class="fas fa-th-large"></i>
-                                <span>Browse All Caps</span>
-                                <span class="cap-count-badge" id="capCountBadge">133 styles</span>
-                            </div>
-                            <i class="fas fa-chevron-down cap-browser-icon"></i>
-                        </button>
-                        <div class="cap-browser-content" id="capBrowserContent">
-                            <div class="cap-browser-inner">
-                                <!-- Search Bar -->
-                                <div class="cap-search-bar">
-                                    <i class="fas fa-search"></i>
-                                    <input type="text" id="capSearchInput" placeholder="Search by style number or description..." class="form-input">
-                                    <button type="button" id="clearCapSearch" class="clear-search-btn hidden">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Category Filters -->
-                                <div class="cap-category-filters" id="capCategoryFilters">
-                                    <button type="button" class="category-chip active" data-category="all">All</button>
-                                    <button type="button" class="category-chip" data-category="trucker">Trucker</button>
-                                    <button type="button" class="category-chip" data-category="performance">Performance</button>
-                                    <button type="button" class="category-chip" data-category="beanie">Beanie</button>
-                                    <button type="button" class="category-chip" data-category="visor">Visor</button>
-                                    <button type="button" class="category-chip" data-category="camo">Camo</button>
-                                    <button type="button" class="category-chip" data-category="fitted">Fitted/R-Flex</button>
-                                    <button type="button" class="category-chip" data-category="other">Other</button>
-                                </div>
-
-                                <!-- Cap Grid -->
-                                <div class="cap-grid" id="capGrid">
-                                    <!-- Caps will be dynamically added here -->
-                                </div>
-
-                                <!-- No Results Message -->
-                                <div class="no-results-message hidden" id="noResultsMessage">
-                                    <i class="fas fa-search"></i>
-                                    <p>No caps found matching your search</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Setup Fees Section (Collapsible) -->
-                    <div class="form-group setup-fees-accordion">
-                        <button type="button" class="setup-accordion-toggle" id="setupFeesToggle">
-                            <div class="toggle-header">
-                                <i class="fas fa-dollar-sign"></i>
-                                <span>Setup Fees (Optional)</span>
-                            </div>
-                            <i class="fas fa-chevron-down setup-accordion-icon"></i>
-                        </button>
-                        <div class="setup-accordion-content" id="setupFeesContent">
-                            <div class="setup-fees-inner">
-                                <!-- Digitizing Fee -->
-                                <div class="checkbox-group" style="margin-bottom: 1rem;">
-                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                        <input type="checkbox" id="digitizingFee" value="100">
-                                        <span>Digitizing Fee - $100.00</span>
-                                    </label>
-                                </div>
-                                
-                                <!-- Graphic Design Fee -->
-                                <div class="form-group" style="margin-bottom: 1rem;">
-                                    <label class="form-label" style="font-size: 0.875rem;">Graphic Design Fee</label>
-                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                        <select id="graphicDesignFee" class="form-select" style="flex: 1;">
-                                            <option value="0">None</option>
-                                            <option value="50">$50.00</option>
-                                            <option value="75">$75.00</option>
-                                            <option value="custom">Custom Amount</option>
-                                        </select>
-                                        <input type="number" id="graphicDesignCustom" class="form-input" placeholder="Amount" 
-                                               style="display: none; width: 120px;" min="0" step="0.01">
-                                    </div>
-                                </div>
-                                
-                                <!-- Additional Fees -->
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" style="font-size: 0.875rem;">Additional Fees</label>
-                                    <div id="additionalFeesContainer">
-                                        <!-- Dynamic fees will be added here -->
-                                    </div>
-                                    <button type="button" id="addFeeBtn" class="btn btn-secondary" style="margin-top: 0.5rem; font-size: 0.875rem;">
-                                        <i class="fas fa-plus"></i>
-                                        Add Fee
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notes Section -->
-                    <div class="form-group">
-                        <label class="form-label" for="quoteNotes">
-                            <i class="fas fa-sticky-note"></i>
-                            Quote Notes (Optional)
-                        </label>
-                        <textarea id="quoteNotes" class="form-input" rows="3" 
-                                  placeholder="Add any special notes or instructions for this quote..."></textarea>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="button-container">
-                        <button type="submit" class="btn btn-primary btn-fullwidth btn-generate-quote">
-                            <i class="fas fa-calculator"></i>
-                            Generate Quote
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Results Section - Below Form -->
-            <div class="results-section" id="resultsSection" style="display: none;">
-                <!-- Empty State (for JavaScript compatibility) -->
-                <div id="emptyState" class="hidden"></div>
-                
-                <!-- Error Display Area -->
-                <div id="errorDisplay" class="error-display hidden" style="margin: 1rem 0; padding: 1rem; background: #fee; border: 1px solid #fcc; border-radius: 6px; color: #c00;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span id="errorMessage"></span>
+        <!-- Cap Browser (Collapsible) -->
+        <div class="cap-browser-accordion">
+            <button type="button" class="cap-browser-toggle" id="capBrowserToggle">
+                <div class="toggle-header">
+                    <i class="fas fa-th-large"></i>
+                    <span>Browse All Factory Direct Caps</span>
+                    <span class="cap-count-badge" id="capCountBadge">133 styles</span>
                 </div>
-                <div class="results-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        Quote Details
-                    </h2>
-                </div>
+                <span class="toggle-icon">+</span>
+            </button>
+            <div class="cap-browser-content" id="capBrowserContent">
+                <div class="cap-browser-inner">
+                    <!-- Search Bar -->
+                    <div class="cap-search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="capSearchInput" placeholder="Search by style number or description..." class="form-input">
+                        <button type="button" id="clearCapSearch" class="clear-search-btn hidden">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
 
-                <div id="resultsDisplay">
-                    <!-- Quote results will be displayed here -->
+                    <!-- Category Filters -->
+                    <div class="cap-category-filters" id="capCategoryFilters">
+                        <button type="button" class="category-chip active" data-category="all">All</button>
+                        <button type="button" class="category-chip" data-category="trucker">Trucker</button>
+                        <button type="button" class="category-chip" data-category="performance">Performance</button>
+                        <button type="button" class="category-chip" data-category="beanie">Beanie</button>
+                        <button type="button" class="category-chip" data-category="visor">Visor</button>
+                        <button type="button" class="category-chip" data-category="camo">Camo</button>
+                        <button type="button" class="category-chip" data-category="fitted">Fitted/R-Flex</button>
+                        <button type="button" class="category-chip" data-category="other">Other</button>
+                    </div>
+
+                    <!-- Cap Grid -->
+                    <div class="cap-grid" id="capGrid">
+                        <!-- Caps will be dynamically added here -->
+                    </div>
+
+                    <!-- No Results Message -->
+                    <div class="no-caps-found hidden" id="noResultsMessage">
+                        <i class="fas fa-search"></i>
+                        <p>No caps found matching your search</p>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Quote Modal -->
-    <div id="quoteModal" class="modal-backdrop">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Email Quote</h2>
-                <button type="button" class="modal-close" id="modalClose">&times;</button>
-            </div>
-
-            <p style="margin: 1rem 0; padding: 0.75rem; background: #f0f7f1; border-radius: 6px; font-size: 0.875rem; color: #155724;">
-                <i class="fas fa-info-circle"></i> Emailing your saved quote. No changes will be made to the quote in our system.
-            </p>
-
-            <!-- Sales Rep Selection -->
-            <div class="form-group">
-                <label class="form-label" for="salesRep">Sales Representative</label>
-                <select id="salesRep" class="form-select" required>
-                    <option value="">Select a sales rep...</option>
-                    <option value="sales@nwcustomapparel.com" selected>General Sales</option>
-                    <option value="taylar@nwcustomapparel.com">Taylar</option>
-                    <option value="nika@nwcustomapparel.com">Nika</option>
-                    <option value="erik@nwcustomapparel.com">Erik</option>
-                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                </select>
-            </div>
-
-            <form id="quoteForm">
-                <div class="form-group">
-                    <label class="form-label" for="quoteCustomerName">Customer Name</label>
-                    <input type="text" id="quoteCustomerName" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="customerEmail">Customer Email</label>
-                    <input type="email" id="customerEmail" class="form-input" required placeholder="customer@example.com">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="customerPhone">Phone Number (optional)</label>
-                    <input type="tel" id="customerPhone" class="form-input" placeholder="(555) 123-4567">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="companyName">Company Name (optional)</label>
-                    <input type="text" id="companyName" class="form-input">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="notes">Notes (optional)</label>
-                    <textarea id="notes" class="form-input" rows="3" placeholder="Any special instructions or notes..."></textarea>
-                </div>
-
-
-                <div id="quotePreview" class="quote-summary">
-                    <!-- Quote preview will be shown here -->
-                </div>
-
-                <button type="submit" class="btn btn-success btn-fullwidth">
-                    <i class="fas fa-paper-plane"></i>
-                    Send Quote
-                </button>
-            </form>
-
-            <div id="successMessage" class="success-message hidden">
-                <i class="fas fa-check-circle"></i>
-                <span>Quote sent successfully!</span>
-                <span id="quoteIdDisplay" style="display: block; font-weight: bold; margin-top: 0.5rem;"></span>
-            </div>
-
-            <div id="errorMessage" class="error-message hidden">
-                <i class="fas fa-exclamation-circle"></i>
-                <span id="errorText">An error occurred. Please try again.</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Image Gallery Modal -->
-    <div id="imageModal" class="image-modal">
-        <div class="modal-overlay"></div>
-        <div class="modal-gallery-content">
-            <!-- Content will be dynamically generated by JavaScript -->
-        </div>
-    </div>
-
-    <!-- Quote Generation Loading Animation -->
-    <div id="quoteLoadingOverlay" class="quote-loading-overlay">
-        <div class="loading-content">
-            <div class="stitch-animation">
-                <svg class="needle-svg" width="300" height="100" viewBox="0 0 300 100">
-                    <!-- Needle -->
-                    <g id="needle" transform="translate(0, 50)">
-                        <line x1="0" y1="0" x2="15" y2="0" stroke="#6b7280" stroke-width="2"/>
-                        <circle cx="15" cy="0" r="2" fill="#6b7280"/>
-                        <path d="M 15 0 Q 20 -3, 25 0" stroke="#4cb354" stroke-width="1.5" fill="none"/>
-                    </g>
-                    <!-- Thread path will be drawn by animation -->
-                    <path id="threadPath" d="M 0 50" stroke="#4cb354" stroke-width="2" fill="none" stroke-linecap="round"/>
-                </svg>
-                <div class="stitch-dots">
-                    <span class="stitch-dot"></span>
-                    <span class="stitch-dot"></span>
-                    <span class="stitch-dot"></span>
-                    <span class="stitch-dot"></span>
-                    <span class="stitch-dot"></span>
-                </div>
-            </div>
-            <div class="loading-text">
-                <h3>Stitching together your perfect quote<span class="loading-dots">...</span></h3>
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <p class="progress-text">Calculating best pricing... <span id="progressPercent">0</span>%</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Initialize calculator when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Initialize Richardson data from API (filters SanMar styles, loads embroidery costs)
-            console.log('[Richardson] Starting async initialization...');
-            await initializeRichardsonData();
-            console.log('[Richardson] API data loaded, creating calculator...');
-
-            window.richardsonCalculator = new RichardsonCalculator();
-
-            // Images are now handled by the gallery in RichardsonCalculator class
-
-            // Enhanced Color Selector Integration
-            // Override the original addLineItem method to include color selector
-            if (window.richardsonCalculator && window.RichardsonColorSelector) {
-                const originalAddLineItem = window.richardsonCalculator.addLineItem.bind(window.richardsonCalculator);
-
-                window.richardsonCalculator.addLineItem = function() {
-                    // Call original method
-                    originalAddLineItem();
-
-                    // Get the newly added line item (last one in container)
-                    const lineItems = document.querySelectorAll('.line-item');
-                    const newLineItem = lineItems[lineItems.length - 1];
-
-                    if (newLineItem) {
-                        // Enhance with color selector capability
-                        RichardsonColorSelector.enhanceLineItem(newLineItem);
-
-                        console.log('[Richardson] Line item enhanced with color selector');
-                    }
-                };
-
-                // Also enhance any existing line items (like the initial one)
-                const existingLineItems = document.querySelectorAll('.line-item');
-                existingLineItems.forEach(lineItem => {
-                    RichardsonColorSelector.enhanceLineItem(lineItem);
-                    console.log('[Richardson] Existing line item enhanced with color selector');
-                });
-
-                console.log('[Richardson] Color selector integration activated');
-            }
-
-            // Setup Fees Accordion Toggle
-            const setupToggle = document.getElementById('setupFeesToggle');
-            const setupContent = document.getElementById('setupFeesContent');
-            
-            if (setupToggle && setupContent) {
-                setupToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Toggle active classes
-                    this.classList.toggle('active');
-                    setupContent.classList.toggle('active');
-                    
-                    // Update aria-expanded for accessibility
-                    const isExpanded = this.classList.contains('active');
-                    this.setAttribute('aria-expanded', isExpanded);
-                });
-                
-                // Handle graphic design custom amount field
-                const graphicDesignFee = document.getElementById('graphicDesignFee');
-                const graphicDesignCustom = document.getElementById('graphicDesignCustom');
-                
-                if (graphicDesignFee && graphicDesignCustom) {
-                    graphicDesignFee.addEventListener('change', function() {
-                        if (this.value === 'custom') {
-                            graphicDesignCustom.style.display = 'block';
-                        } else {
-                            graphicDesignCustom.style.display = 'none';
-                            graphicDesignCustom.value = '';
-                        }
-                    });
-                }
-            }
-        });
-    </script>
+    <!-- Richardson Factory Direct Calculator -->
+    <script src="richardson-factory-direct.js"></script>
 </body>
 </html>

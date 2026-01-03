@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2025-12-31
+**Last Updated:** 2026-01-02
 **Total Active Files:** ~266 (includes Screen Print systems + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -70,6 +70,14 @@
 | `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-service.js` | Pricing data adapter | Caspio API | ✅ Active |
 | `/shared_components/js/screenprint-fast-quote-service.js` | **NEW** Fast quote service | EmailJS, Caspio API | ✅ Active |
+
+### Cap Embroidery System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/cap-embroidery-pricing.html` | SanMar cap pricing (23 Richardson styles) | cap-embroidery-pricing-service.js | ✅ Active |
+| `/calculators/richardson-2025.html` | Richardson Factory Direct pricing (133 styles) | richardson-factory-direct.js | ✅ Active |
+| `/calculators/richardson-factory-direct.js` | Richardson pricing lookup (2026 refactor - simplified) | API pricing-bundle | ✅ Active |
+| `/calculators/richardson-2025-styles.css` | Richardson page styles | - | ✅ Active |
 
 ### Special Calculators
 | File | Purpose | Dependencies | Status |
@@ -236,6 +244,14 @@ cap-embroidery-fix.css
 | `/employee-bundles/wcttr-bundle.html` | WCTTR (West Coast Truck and Trailer Repair) employee bundle labels | Caspio datapage | ✅ Active |
 
 ## 🗑️ Recently Removed (For Reference)
+
+### Richardson Simplification (2026-01-02)
+**Context:** Richardson quote builder simplified to real-time pricing lookup (81% code reduction)
+- `richardson-caps-calculator.js` (2,659 lines) → Replaced by `richardson-factory-direct.js` (450 lines)
+- `richardson-quote-service.js` (262 lines) → Quote building removed
+- `richardson-112-images.js` → 112 is SanMar product, not Factory Direct
+- `richardson-color-selector-enhancement.js` → Color picker not needed
+- `richardson-color-selector.css` → Color picker styles removed
 
 ### Removed During Cleanup (2025-01-27)
 - **71 JavaScript files** - Orphaned, unused, or duplicate
