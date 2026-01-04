@@ -483,3 +483,83 @@ New method for generating line items in ShopWorks PUSH API format - one line ite
 .size-input.inventory-low { border-left: 3px solid #f59e0b; }
 .size-input.inventory-out { border-left: 3px solid #ef4444; }
 ```
+
+---
+
+## Pants Products (PT20) - Added Jan 2026
+
+### Overview
+Industrial work pants (PT20) use **waist/inseam sizing** instead of standard S/M/L/XL. The quote builder now supports this format with a specialized picker UI.
+
+### Size Format
+- **4-digit codes**: First 2 digits = waist, last 2 = inseam
+- Example: `3032` = waist 30, inseam 32
+- Display format: `30x32` (human readable)
+- SKU format: `PT20_3032` (base + underscore + code)
+
+### Available Sizes (PT20 Example)
+| Waist | Inseams Available |
+|-------|-------------------|
+| 28, 29 | 28, 30 |
+| 30-36 | 28, 30, 32, 34, 37 |
+| 38-42 | 30, 32, 34 |
+| 44-60 | 30, 32, 34 (varies) |
+
+### UI Implementation
+1. **Size Category**: `pants` (detected when >50% of sizes are 4-digit)
+2. **Column Treatment**: All S/M/L/XL/2XL columns disabled (show N/A)
+3. **Size Picker**: Click "+" in XXXL column opens popup
+4. **Grouped by Waist**: Collapsible sections for each waist size
+5. **Common Waists Expanded**: 30, 32, 34, 36 open by default
+
+### Key Functions
+- `analyzeSizeCategory()` - Returns `pants` category for waist/inseam products
+- `updateRowForSizeCategory()` - Disables columns, sets up picker button
+- `openExtendedSizePopup()` - Renders grouped waist/inseam picker
+- `toggleWaistGroup()` - Expands/collapses waist sections
+- `createChildRow()` - Handles pants size display format (30x32)
+- `getPartNumber()` - Generates SKU with pants suffix
+
+### Pricing Flow
+1. API returns prices keyed by 4-digit code (e.g., `3032: 19.00`)
+2. Filter out $0 discontinued sizes before finding base price
+3. Standard embroidery upcharge applied on top
+
+### Testing
+```
+Style: PT20
+Color: Black
+Available sizes: 70+ waist/inseam combinations
+```
+
+---
+
+## Known Issues / Fixes Applied (continued)
+
+### 15. Tall Product Column Headers (FIXED - Jan 2026)
+- **Problem**: PC90HT showed "LT" and "XLT" text in parent row columns
+- **Root Cause**: `updateColumnLabel()` was being called for tall-only products
+- **Solution**: Disabled all columns for tall products like OSFA, no label updates
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2768-2795`
+
+### 16. PT20 Pants Support (ADDED - Jan 2026)
+- **Problem**: PT20 Industrial Work Pant was blocked, showed blank
+- **Solution**: Added full pants support with waist/inseam picker UI
+- **Features**: Grouped by waist, 3-column layout, collapsible sections
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2718-2746`
+
+### 17. Pants Pricing Using $0 Sizes (FIXED - Jan 2026)
+- **Problem**: Calculator picked $0 discontinued sizes as base price
+- **Solution**: Filter `price > 0` before finding lowest base price
+- **File**: `shared_components/js/embroidery-quote-pricing.js:354-364`
+
+### 18. Pants Child Row Prices Missing (FIXED - Jan 2026)
+- **Problem**: PT20 child rows showed "-" instead of unit prices
+- **Root Cause**: Regex didn't include 4-digit pants pattern
+- **Solution**: Added `\\d{4}` to extended size regex
+- **File**: `quote-builders/embroidery-quote-builder-new.html:4104`
+
+### 19. Pants Modal Too Narrow (FIXED - Jan 2026)
+- **Problem**: 3rd column of waist/inseam sizes cut off in popup
+- **Solution**: Increased `.size-popup` width from 340px to 480px
+- **File**: `quote-builders/embroidery-quote-builder-new.html:1105-1106`
