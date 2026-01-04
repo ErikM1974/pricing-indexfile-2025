@@ -247,10 +247,11 @@ class EmbroideryPricingCalculator {
             return 'Hoodie';
         }
 
-        // Cap patterns
+        // Cap patterns - specific prefixes to avoid false positives on CAR, CAT, etc.
         if (style.includes('CAP') ||
             style.includes('HAT') ||
-            style.startsWith('C')) {
+            /^C[P0-9]/.test(style) ||  // CP80, CP90, C112, C888, etc.
+            style.startsWith('NE')) {   // New Era caps
             return 'Cap';
         }
 
