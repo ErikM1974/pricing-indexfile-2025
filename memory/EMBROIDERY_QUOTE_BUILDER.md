@@ -277,3 +277,209 @@ Use these styles for testing child row behavior:
 - **PC61Y** - Youth Tee (YS, YM, YL, YXL)
 - **Tall shirts** - LT, XLT, 2XLT sizes
 - **Toddler items** - 3T, 4T, 5T sizes
+
+### Testing Cap Products
+- **C112** - Port & Company Trucker Cap (triggers cap warning)
+- **112** - Richardson Trucker (triggers cap warning)
+- **CP80** - Port Authority Cap (triggers cap warning)
+- **NE1000** - New Era Cap (triggers cap warning)
+
+---
+
+## Additional Known Issues / Fixes Applied
+
+### 9. Cap Products Warning (FIXED - Jan 2026)
+- **Problem**: Caps (C112, CP80, NE1000) allowed without warning in garment builder
+- **Solution**: Added `isCapProduct()` detection with warning toast
+- **Behavior**: Warning shown but entry allowed (user may need to quote cap embroidery)
+- **Patterns**: `/^C[P0-9]/`, `NE*` prefix, title keywords (CAP, HAT, BEANIE, SNAPBACK)
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2322-2325`
+
+### 10. Extended Sizes Fallback Fixed (FIXED - Jan 2026)
+- **Problem**: API failure/no data returned ALL 47 sizes instead of empty
+- **Root Cause**: Fallback at lines 1581, 1635 returned `SIZE06_EXTENDED_SIZES`
+- **Solution**: Changed fallback to `return []` to trigger "No sizes available" UI
+- **File**: `quote-builders/embroidery-quote-builder-new.html:1581,1635`
+
+### 11. Search Box Improvements (FIXED - Jan 2026)
+- **Problem**: Typing "J790" showed stale results from "J7" search
+- **Solution**: Reduced debounce (200ms → 150ms), added result ranking, keyboard navigation
+- **Features**: Text highlighting, 10 result limit, Arrow key navigation
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2038-2170`
+
+### 12. Child Row Description Format (FIXED - Jan 2026)
+- **Problem**: Child rows showed "2XL upcharge" instead of product name
+- **Solution**: Changed to "Product Name - Size" format with bold size
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2899`
+
+### 13. Duplicate Style in Description (FIXED - Jan 2026)
+- **Problem**: Style appeared 3 times in description (API returns embedded style)
+- **Solution**: Added `cleanProductTitle()` to strip style from API title
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2384-2397`
+
+### 14. OSFA & Dynamic Size Columns (FIXED - Jan 2026)
+- **Problem**: OSFA products (caps, bags, beanies) showed irrelevant S/M/L/XL/2XL columns
+- **Solution**: Added size category detection and dynamic column UI after color selection
+- **Size Categories**:
+  | Category | Products | UI Treatment |
+  |----------|----------|--------------|
+  | `osfa-only` | Caps, bags, beanies | Single Qty input, size columns disabled |
+  | `combo-only` | Fitted caps (NE1000) | Columns show S/M, L/XL |
+  | `youth-only` | Youth products (PC61Y) | Columns show YS, YM, YL, YXL |
+  | `toddler-only` | Toddler items (CAR54T) | Columns show 2T, 3T, 4T, 5T |
+  | `tall-only` | Tall shirts (PC54T) | Columns show LT, XLT, 2XLT |
+  | `standard` | Regular garments | Normal S/M/L/XL/2XL + extended popup |
+- **Key Functions**:
+  - `analyzeSizeCategory()` - Classifies product into category
+  - `updateRowForSizeCategory()` - Updates UI based on category
+  - `detectAndAdjustSizeUI()` - Main detection called after color selection
+  - `extractAllSizes()` - Gets all sizes from Size01-06 fields
+- **Pricing**: No change needed - relative upcharge model already handles non-standard base sizes
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2436-2716`
+
+---
+
+## Testing OSFA & Dynamic Size Products
+
+### OSFA-Only Products (Single Qty Input)
+- **CP90, CP91** - Port & Company Beanies
+- **C112, 112** - Richardson Trucker Caps
+- **BG100** - Port Authority Tote Bag
+
+### Combo Size Products (S/M, L/XL Columns)
+- **NE1000** - New Era Fitted Cap
+
+### Youth-Only Products (YS, YM, YL, YXL Columns)
+- **PC61Y** - Youth Essential Tee
+
+### Toddler-Only Products (2T-6T Columns)
+- **CAR54T** - Toddler Core Cotton Tee
+
+### Tall-Only Products (LT, XLT Columns)
+- **PC54T** - Tall Essential Tee
+
+---
+
+## SKU Validation Service (Added Jan 2026)
+
+### Overview
+New service for validating SKUs against ShopWorks and transforming SanMar sizes to ShopWorks format.
+
+**File**: `shared_components/js/sku-validation-service.js`
+
+### Key Features
+1. **SanMar → ShopWorks SKU Transformation**
+   - Standard sizes (S, M, L, XL) use BASE SKU only
+   - Extended sizes get suffix: `_2X`, `_3X`, `_4X`, etc.
+   - **CRITICAL**: ShopWorks uses `_2X` NOT `_2XL`
+
+2. **SKU Validation After Color Selection**
+   - Validates which sizes exist for style+color combination
+   - Disables unavailable size inputs with "N/A" placeholder
+   - Shows visual indicators for valid/invalid sizes
+
+3. **Caching**
+   - 5-minute cache duration
+   - Reduces API calls for repeated products
+
+### ShopWorks Suffix Format (Verified from shopworksparts.csv)
+
+| SanMar Size | ShopWorks Suffix | Example |
+|-------------|------------------|---------|
+| S, M, L, XL | (none) | PC54 |
+| XS | _XS | PC54_XS |
+| 2XL | **_2X** | PC54_2X |
+| 3XL | **_3X** | PC54_3X |
+| 4XL | _4X | PC54_4X |
+| OSFA | _OSFA | C950_OSFA |
+| S/M, M/L, L/XL | _S/M, etc. | C808_S/M |
+| LT, XLT | _LT, _XLT | PC54T_LT |
+
+### Usage Example
+```javascript
+const skuService = new SKUValidationService();
+
+// Transform size to SKU
+const sku = skuService.sanmarToShopWorksSKU('PC54', '2XL');
+// Returns: 'PC54_2X'
+
+// Get valid sizes for product/color
+const { validSizes, skuMap } = await skuService.getValidSKUs('PC54', 'Ash');
+// validSizes: ['S', 'M', 'L', 'XL', '2XL', '3XL']
+```
+
+---
+
+## Per-Size Line Items (Added Jan 2026)
+
+### Overview
+New method for generating line items in ShopWorks PUSH API format - one line item per size per color.
+
+**File**: `shared_components/js/embroidery-quote-pricing.js` - `generateLineItems()` method
+
+### Line Item Format (ShopWorks PUSH API Pattern)
+
+```javascript
+{
+    partNumber: 'PC54',           // BASE only - no suffix
+    inventorySku: 'PC54_2X',      // Full SKU with suffix
+    description: 'P&C PC54 Ash | LC 8K',
+    color: 'Ash',                 // CATALOG_COLOR for API
+    displayColor: 'Athletic Heather',  // COLOR_NAME for display
+    size: '2XL',
+    quantity: 3,
+    unitPrice: 28.00,
+    total: 84.00,
+    logoPosition: 'LC',
+    stitchCount: 8000,
+    hasUpcharge: true,
+    upchargeAmount: 2.00
+}
+```
+
+### Key Principles (from 3-Day Tees Pattern)
+1. **partNumber = BASE only** - ShopWorks handles suffix via size field
+2. **One line item per size** - Not grouped by upcharge amount
+3. **Use CATALOG_COLOR** - Not COLOR_NAME for API queries
+4. **Description format**: `Brand Style Color | LogoPosition StitchK`
+
+### Invoice Generator Support
+**File**: `shared_components/js/embroidery-quote-invoice.js` - `generatePerSizeProductsTable()` method
+
+- Groups line items by product (partNumber + color)
+- Sorts sizes in logical order
+- Shows upcharge indicators for extended sizes
+- Subtotal per product group
+
+---
+
+## Visual Grouping CSS (Added Jan 2026)
+
+### Parent/Child Row Styling
+```css
+/* Parent row styling */
+.product-table tr.parent-row {
+    border-left: 4px solid var(--nwca-blue);
+}
+
+/* Child row styling */
+.product-table tr.child-row {
+    border-left: 4px solid var(--nwca-blue);
+}
+
+/* Tree structure indicator */
+.product-table tr.child-row td:first-child::before {
+    content: "└";
+    color: #999;
+    margin-right: 6px;
+}
+
+/* Size availability states */
+.size-input.size-available { border-color: #22c55e; }
+.size-input.size-unavailable { background: #f0f0f0; }
+
+/* Inventory indicators */
+.size-input.inventory-ok { border-left: 3px solid #22c55e; }
+.size-input.inventory-low { border-left: 3px solid #f59e0b; }
+.size-input.inventory-out { border-left: 3px solid #ef4444; }
+```

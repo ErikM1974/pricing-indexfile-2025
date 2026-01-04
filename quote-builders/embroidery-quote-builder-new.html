@@ -248,6 +248,17 @@
             font-size: 13px;
         }
 
+        /* Keyboard navigation selection state */
+        .suggestion-item.selected {
+            background-color: #e3f2fd;
+        }
+
+        /* Highlight matched text in search results */
+        .suggestion-item .style strong {
+            color: #1976d2;
+            font-weight: 700;
+        }
+
         /* Excel-Style Product Table */
         .product-table-wrapper {
             flex: 1;
@@ -339,18 +350,33 @@
 
         /* Child rows for extended sizes (2XL+) */
         .product-table tr.child-row {
-            background: #fef9e7;
+            background: #fafafa;
         }
 
         .product-table tr.child-row td:first-child {
             padding-left: 25px;
-            font-style: italic;
-            color: #856404;
+        }
+
+        /* Child row style display (part number) */
+        .product-table tr.child-row .style-display {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* Child row description display (product name + size) */
+        .product-table tr.child-row .desc-display {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Add padding to child row description cell */
+        .product-table tr.child-row td:nth-child(2) {
+            padding-left: 8px;
         }
 
         .product-table tr.child-row .cell-input,
         .product-table tr.child-row .cell-select {
-            background: #fef9e7;
+            background: #fafafa;
         }
 
         .product-table tr.child-row .size-input:disabled {
@@ -367,19 +393,19 @@
 
         .child-indicator {
             font-size: 10px;
-            color: #856404;
+            color: #ccc;
             margin-right: 5px;
         }
 
         /* Child row color picker styling */
         .child-color-picker .color-picker-selected {
-            background: #fef9e7;
+            background: #fafafa;
             padding: 4px 6px;
             height: 32px;
         }
 
         .child-color-picker .color-picker-selected:hover {
-            background: #fdf5d5;
+            background: #f0f0f0;
         }
 
         .child-color-picker .color-swatch {
@@ -400,6 +426,53 @@
         .product-table tr.child-row.different-color td:first-child {
             color: #856404;
             font-weight: 600;
+        }
+
+        /* Parent/Child Row Visual Grouping */
+        .product-table tr.parent-row {
+            border-left: 4px solid var(--nwca-blue);
+        }
+
+        .product-table tr.child-row {
+            border-left: 4px solid var(--nwca-blue);
+        }
+
+        /* Tree structure indicator for child rows */
+        .product-table tr.child-row td:first-child::before {
+            content: "└";
+            color: #999;
+            margin-right: 6px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        /* Last child row gets bottom border */
+        .product-table tr.child-row:last-of-type,
+        .product-table tr.child-row + tr:not(.child-row) {
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Size badge for extended sizes */
+        .size-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--nwca-blue);
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .size-badge.upcharge {
+            background: #f59e0b;
+        }
+
+        /* Upcharge indicator */
+        .upcharge-indicator {
+            color: #f59e0b;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 4px;
         }
 
         /* Cell inputs - Excel style */
@@ -437,6 +510,41 @@
         .cell-input.size-input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
+        }
+
+        /* Size Input Validation States */
+        .size-input.size-available {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .size-input.size-available:focus {
+            box-shadow: inset 0 0 0 2px #22c55e;
+        }
+
+        .size-input.size-unavailable {
+            background-color: #f0f0f0 !important;
+            color: #999 !important;
+            cursor: not-allowed;
+            border-color: #ddd !important;
+        }
+
+        .size-input.size-unavailable::placeholder {
+            color: #bbb;
+        }
+
+        /* Inventory Status Indicators */
+        .size-input.inventory-ok {
+            border-left: 3px solid #22c55e;
+        }
+
+        .size-input.inventory-low {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .size-input.inventory-out {
+            border-left: 3px solid #ef4444;
+            background: #fef2f2;
         }
 
         .cell-select {
@@ -900,6 +1008,60 @@
             background: var(--nwca-red);
         }
 
+        .toast.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        /* OSFA-only row styling */
+        .osfa-only-row td.size-disabled {
+            background-color: #f5f5f5;
+        }
+
+        .osfa-only-row td.size-disabled input {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .osfa-qty-input {
+            width: 60px !important;
+            text-align: center;
+            font-weight: 600;
+            background-color: #fff !important;
+            cursor: text !important;
+        }
+
+        /* Size label override for non-standard columns */
+        .size-label-override {
+            display: block;
+            font-size: 9px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        /* Visual indicator for non-standard products */
+        tr[data-size-category="osfa-only"] {
+            background-color: #f8f9fa;
+        }
+
+        tr[data-size-category="combo-only"],
+        tr[data-size-category="youth-only"],
+        tr[data-size-category="toddler-only"],
+        tr[data-size-category="tall-only"] {
+            background-color: #fff9e6;
+        }
+
+        /* Size-disabled cells */
+        td.size-disabled input {
+            background-color: #f5f5f5 !important;
+            color: #999 !important;
+            cursor: not-allowed !important;
+        }
+
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -940,8 +1102,8 @@
             padding: 0;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             z-index: 2000;
-            min-width: 340px;
-            max-width: 400px;
+            min-width: 480px;
+            max-width: 520px;
         }
         .size-popup.hidden { display: none; }
 
@@ -1013,6 +1175,55 @@
             border-color: var(--nwca-blue);
             outline: none;
             box-shadow: 0 0 0 2px rgba(0, 63, 127, 0.2);
+        }
+
+        /* Pants waist group styles */
+        .pants-waist-group {
+            grid-column: 1 / -1;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        .waist-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--nwca-blue);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            user-select: none;
+        }
+        .waist-header:hover {
+            background: #002a56;
+        }
+        .waist-header i {
+            width: 12px;
+            text-align: center;
+        }
+        .waist-count {
+            margin-left: auto;
+            font-weight: normal;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .waist-sizes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        .waist-sizes .size-popup-item {
+            margin: 0;
+        }
+        /* Max height for pants popup grid with scroll */
+        .size-popup-grid:has(.pants-waist-group) {
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .size-popup-actions {
@@ -1407,6 +1618,7 @@
     <script src="/shared_components/js/embroidery-quote-pricing.js?v=20251219-no-monogram"></script>
     <script src="/shared_components/js/embroidery-quote-service.js"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20251219-no-monogram"></script>
+    <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -1551,8 +1763,8 @@
                 const response = await fetch(url);
 
                 if (!response.ok) {
-                    console.warn('Failed to fetch extended sizes, using defaults');
-                    return SIZE06_EXTENDED_SIZES; // Fallback to all sizes
+                    console.warn('Failed to fetch extended sizes for this product');
+                    return []; // Return empty to trigger "No extended sizes available" message
                 }
 
                 const skus = await response.json();
@@ -1606,7 +1818,7 @@
 
             } catch (error) {
                 console.error('Error fetching extended sizes:', error);
-                return SIZE06_EXTENDED_SIZES; // Fallback to all sizes on error
+                return []; // Return empty to trigger "No extended sizes available" message
             }
         }
 
@@ -1644,45 +1856,107 @@
             backdrop.classList.remove('hidden');
             applyBtn.disabled = true;
 
-            // Show loading spinner
-            grid.innerHTML = `
-                <div class="size-popup-loading" style="grid-column: 1 / -1;">
-                    <div class="spinner"></div>
-                    <span>Loading available sizes...</span>
-                </div>
-            `;
+            // Check if this is a pants product (use stored sizes directly)
+            const isPants = parentRow.dataset.sizeCategory === 'pants';
+            let availableSizes;
 
-            // Fetch available sizes from API
-            const availableSizes = await getAvailableExtendedSizes(styleNumber, catalogColor);
+            if (isPants && parentRow.dataset.pantsSizes) {
+                // For pants, use the sizes stored from analyzeSizeCategory
+                availableSizes = JSON.parse(parentRow.dataset.pantsSizes);
+                // Update popup header for pants
+                popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Waist/Inseam Sizes';
+                popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for each waist/inseam combination. These create separate line items.';
+            } else {
+                // Show loading spinner for non-pants
+                grid.innerHTML = `
+                    <div class="size-popup-loading" style="grid-column: 1 / -1;">
+                        <div class="spinner"></div>
+                        <span>Loading available sizes...</span>
+                    </div>
+                `;
+                // Fetch available sizes from API
+                availableSizes = await getAvailableExtendedSizes(styleNumber, catalogColor);
+                // Reset header for non-pants
+                popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Extended Sizes (Size06)';
+                popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for extended sizes. These create separate line items.';
+            }
 
-            // Check if we have any extended sizes
-            if (availableSizes.length === 0) {
+            // Check if we have any sizes
+            if (!availableSizes || availableSizes.length === 0) {
                 grid.innerHTML = `
                     <div class="size-popup-empty" style="grid-column: 1 / -1;">
                         <i class="fas fa-info-circle"></i><br>
-                        No extended sizes available for ${styleNumber}.
+                        No ${isPants ? 'waist/inseam' : 'extended'} sizes available for ${styleNumber}.
                     </div>
                 `;
                 applyBtn.disabled = true;
-                console.log(`ℹ️ No extended sizes available for ${styleNumber}`);
+                console.log(`ℹ️ No ${isPants ? 'pants' : 'extended'} sizes available for ${styleNumber}`);
                 return;
             }
 
             // Generate size inputs with current values
-            grid.innerHTML = availableSizes.map(size => {
-                const currentQty = getExtendedSizeQty(rowId, size);
-                return `
-                    <div class="size-popup-item">
-                        <label>${size}</label>
-                        <input type="number"
-                               min="0"
-                               data-size="${size}"
-                               value="${currentQty || ''}"
-                               placeholder="0"
-                               class="size-popup-input">
-                    </div>
-                `;
-            }).join('');
+            if (isPants) {
+                // Group pants sizes by waist for better UX
+                const waistGroups = {};
+                availableSizes.forEach(size => {
+                    if (/^\d{4}$/.test(size)) {
+                        const waist = size.substring(0, 2);
+                        if (!waistGroups[waist]) waistGroups[waist] = [];
+                        waistGroups[waist].push(size);
+                    }
+                });
+
+                // Common waists that should be expanded by default
+                const commonWaists = ['30', '32', '34', '36'];
+
+                grid.innerHTML = Object.keys(waistGroups).sort((a, b) => parseInt(a) - parseInt(b)).map(waist => {
+                    const isExpanded = commonWaists.includes(waist);
+                    const sizesHtml = waistGroups[waist].map(size => {
+                        const currentQty = getExtendedSizeQty(rowId, size);
+                        const inseam = size.substring(2, 4);
+                        return `
+                            <div class="size-popup-item">
+                                <label>${waist}x${inseam}</label>
+                                <input type="number"
+                                       min="0"
+                                       data-size="${size}"
+                                       value="${currentQty || ''}"
+                                       placeholder="0"
+                                       class="size-popup-input">
+                            </div>
+                        `;
+                    }).join('');
+
+                    return `
+                        <div class="pants-waist-group ${isExpanded ? 'expanded' : 'collapsed'}">
+                            <div class="waist-header" onclick="toggleWaistGroup(this)">
+                                <i class="fas fa-chevron-${isExpanded ? 'down' : 'right'}"></i>
+                                <span>Waist ${waist}</span>
+                                <span class="waist-count">(${waistGroups[waist].length} sizes)</span>
+                            </div>
+                            <div class="waist-sizes" style="${isExpanded ? '' : 'display: none;'}">
+                                ${sizesHtml}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Non-pants: flat list (existing behavior)
+                grid.innerHTML = availableSizes.map(size => {
+                    const currentQty = getExtendedSizeQty(rowId, size);
+                    return `
+                        <div class="size-popup-item">
+                            <label>${size}</label>
+                            <input type="number"
+                                   min="0"
+                                   data-size="${size}"
+                                   value="${currentQty || ''}"
+                                   placeholder="0"
+                                   class="size-popup-input">
+                        </div>
+                    `;
+                }).join('');
+            }
 
             // Enable apply button
             applyBtn.disabled = false;
@@ -1709,6 +1983,28 @@
             popup.classList.add('hidden');
             backdrop.classList.add('hidden');
             popup.dataset.rowId = '';
+        }
+
+        /**
+         * Toggle a waist group in the pants size picker
+         * @param {HTMLElement} headerElement - The clicked waist-header element
+         */
+        function toggleWaistGroup(headerElement) {
+            const group = headerElement.closest('.pants-waist-group');
+            const sizesDiv = group.querySelector('.waist-sizes');
+            const icon = headerElement.querySelector('i');
+
+            if (group.classList.contains('expanded')) {
+                group.classList.remove('expanded');
+                group.classList.add('collapsed');
+                sizesDiv.style.display = 'none';
+                icon.className = 'fas fa-chevron-right';
+            } else {
+                group.classList.remove('collapsed');
+                group.classList.add('expanded');
+                sizesDiv.style.display = '';
+                icon.className = 'fas fa-chevron-down';
+            }
         }
 
         /**
@@ -2025,22 +2321,40 @@
             const suggestions = document.getElementById('search-suggestions');
 
             let debounceTimer;
+            let selectedIndex = -1;
 
             searchInput.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
                 const query = this.value.trim();
+                selectedIndex = -1; // Reset selection on new input
 
-                if (query.length < 2) {
+                if (query.length < 3) {
                     suggestions.classList.remove('show');
                     return;
                 }
 
-                debounceTimer = setTimeout(() => searchProducts(query), 200);
+                debounceTimer = setTimeout(() => searchProducts(query), 150);
             });
 
             searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
+                const items = suggestions.querySelectorAll('.suggestion-item');
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateSelection(items, selectedIndex);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateSelection(items, selectedIndex);
+                } else if (e.key === 'Enter') {
+                    if (selectedIndex >= 0 && items[selectedIndex]) {
+                        e.preventDefault();
+                        items[selectedIndex].click();
+                    }
+                } else if (e.key === 'Escape') {
                     suggestions.classList.remove('show');
+                    selectedIndex = -1;
                 }
             });
 
@@ -2048,8 +2362,32 @@
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.search-input-wrapper')) {
                     suggestions.classList.remove('show');
+                    selectedIndex = -1;
                 }
             });
+        }
+
+        /**
+         * Update visual selection state for keyboard navigation
+         */
+        function updateSelection(items, selectedIndex) {
+            items.forEach((item, i) => {
+                item.classList.toggle('selected', i === selectedIndex);
+            });
+            if (selectedIndex >= 0 && items[selectedIndex]) {
+                items[selectedIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        /**
+         * Highlight matched text in search results
+         */
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            // Escape regex special characters in query
+            const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedQuery})`, 'gi');
+            return text.replace(regex, '<strong>$1</strong>');
         }
 
         /**
@@ -2092,14 +2430,19 @@
 
                 if (data && data.length > 0) {
                     // Rank results: exact matches first, then starts-with, then contains
-                    const rankedResults = rankSearchResults(data, query);
+                    // Limit to 10 results for focused display
+                    const rankedResults = rankSearchResults(data, query).slice(0, 10);
 
-                    suggestions.innerHTML = rankedResults.map(product => `
-                        <div class="suggestion-item" onclick="selectProduct('${product.value}')">
-                            <span class="style">${product.value}</span>
-                            <span class="name">${product.label || ''}</span>
-                        </div>
-                    `).join('');
+                    suggestions.innerHTML = rankedResults.map(product => {
+                        // Extract product name (remove style prefix from label)
+                        const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
+                        return `
+                            <div class="suggestion-item" onclick="selectProduct('${product.value}')">
+                                <span class="style">${highlightMatch(product.value, query)}</span>
+                                <span class="name">${productName}</span>
+                            </div>
+                        `;
+                    }).join('');
                     suggestions.classList.add('show');
 
                     // Cache product data (convert to expected format)
@@ -2240,8 +2583,19 @@
                 }
 
                 if (product) {
-                    // Update description
-                    descInput.value = product.PRODUCT_TITLE || styleNumber;
+                    // Check for cap products and show warning (allow entry per user preference)
+                    if (isCapProduct(styleNumber, product.PRODUCT_TITLE)) {
+                        showToast('Cap detected - this builder is designed for garments. Use Cap Quote Builder for caps.', 'warning', 5000);
+                    }
+
+                    // Pants products (PT20, etc.) are now supported via size picker popup
+                    // Size category detection will handle waist/inseam sizing
+
+                    // Clean product title (remove duplicate style numbers from API response)
+                    const cleanTitle = cleanProductTitle(product.PRODUCT_TITLE, styleNumber);
+
+                    // Update description with clean title
+                    descInput.value = cleanTitle || styleNumber;
 
                     // Fetch colors using product-colors API
                     const colorsResponse = await fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`);
@@ -2271,7 +2625,7 @@
 
                     // Store product info
                     row.dataset.style = styleNumber;
-                    row.dataset.productName = product.PRODUCT_TITLE || styleNumber;
+                    row.dataset.productName = cleanTitle || styleNumber;
 
                 } else {
                     descInput.value = 'Not found';
@@ -2292,6 +2646,552 @@
                 .replace(/'/g, '&#39;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;');
+        }
+
+        /**
+         * Extract clean product name from API title
+         * API returns: "NF0A3LH4 - The North Face DryVent Rain Jacket. NF0A3LH4"
+         * We want: "The North Face DryVent Rain Jacket"
+         */
+        function cleanProductTitle(title, styleNumber) {
+            if (!title || !styleNumber) return title || '';
+
+            // Escape special regex characters in style number
+            const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+            // Remove style number prefix pattern: "STYLE - " or "STYLE. "
+            let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
+
+            // Remove trailing style number: ". STYLE" or " STYLE" at end
+            cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
+
+            return cleaned.trim() || title;
+        }
+
+        /**
+         * Check if a style number is a cap/hat product
+         * @param {string} style - Style number
+         * @param {string} productTitle - Product title/description
+         * @returns {boolean} True if cap/hat
+         */
+        function isCapProduct(style, productTitle = '') {
+            if (!style) return false;
+            const styleUpper = style.toUpperCase();
+            const titleUpper = (productTitle || '').toUpperCase();
+
+            // Check style patterns from embroidery-quote-pricing.js
+            // CP* caps (CP80, CP90, etc), NE* caps (NE1000), C+digit (C112)
+            if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
+                return true;
+            }
+
+            // Check title keywords
+            if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
+                titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK')) {
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Check if product is pants (waist/inseam sizing not supported)
+         * @param {string} style - Style number
+         * @param {string} productTitle - Product title/description
+         * @returns {boolean} True if pants
+         */
+        function isPantsProduct(style, productTitle = '') {
+            if (!style) return false;
+            const styleUpper = style.toUpperCase();
+            const titleUpper = (productTitle || '').toUpperCase();
+
+            // Red Kap work pants (PT prefix)
+            if (styleUpper.startsWith('PT') && /^PT\d/.test(styleUpper)) return true;
+
+            // Title keywords for pants
+            if (titleUpper.includes('PANT') || titleUpper.includes('WORK PANT') ||
+                titleUpper.includes('CARGO') || titleUpper.includes('TROUSER') ||
+                titleUpper.includes('INDUSTRIAL PANT')) {
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Analyze available sizes and determine the product's size category
+         * Handles OSFA, combo sizes, youth, toddler, tall, and standard products
+         * @param {string[]} availableSizes - Array of available sizes from API
+         * @returns {Object} Category info with display configuration
+         */
+        function analyzeSizeCategory(availableSizes) {
+            if (!availableSizes || availableSizes.length === 0) {
+                return { category: 'unknown', columns: [], useQtyOnly: false };
+            }
+
+            const sizes = availableSizes.map(s => s.toUpperCase());
+            const STANDARD = ['S', 'M', 'L', 'XL'];
+            const COMBO = ['S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X'];
+            const YOUTH = ['YXS', 'YS', 'YM', 'YL', 'YXL'];
+            const TODDLER = ['2T', '3T', '4T', '5T', '5/6T', '6T'];
+            const TALL = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT'];
+            const ONE_SIZE = ['OSFA', 'OSFM'];
+            const PANTS_PATTERN = /^\d{4}$/;  // 4-digit waist/inseam codes like 2737, 2830
+
+            // Count sizes in each category for dominant detection
+            const youthCount = sizes.filter(s => YOUTH.includes(s)).length;
+            const toddlerCount = sizes.filter(s => TODDLER.includes(s)).length;
+            const tallCount = sizes.filter(s => TALL.includes(s)).length;
+            const comboCount = sizes.filter(s => COMBO.includes(s)).length;
+            const osfaCount = sizes.filter(s => ONE_SIZE.includes(s)).length;
+            const standardCount = sizes.filter(s => STANDARD.includes(s)).length;
+            const pantsCount = sizes.filter(s => PANTS_PATTERN.test(s)).length;
+
+            // Priority 1: Pants (waist/inseam sizes like 3032 for 30x32)
+            if (pantsCount > 0 && pantsCount >= sizes.length / 2) {
+                // Extract all valid pants sizes (4-digit codes)
+                const pantsSizes = sizes.filter(s => PANTS_PATTERN.test(s));
+                return {
+                    category: 'pants',
+                    columns: [],
+                    useQtyOnly: false,
+                    pantsSizes: pantsSizes,
+                    baseSize: pantsSizes[0],
+                    message: 'Select waist/inseam sizes'
+                };
+            }
+
+            // Priority 2: OSFA-only (caps, bags, beanies)
+            if (osfaCount > 0 && osfaCount === sizes.length) {
+                return {
+                    category: 'osfa-only',
+                    columns: [],
+                    useQtyOnly: true,
+                    baseSize: sizes[0],
+                    message: 'One Size Fits All'
+                };
+            }
+
+            // Priority 3: Combo-only (fitted caps like NE1000)
+            if (comboCount > 0 && comboCount === sizes.length) {
+                return {
+                    category: 'combo-only',
+                    columns: sizes,
+                    useQtyOnly: false,
+                    baseSize: sizes[0]
+                };
+            }
+
+            // Priority 4: Youth-dominant (has youth sizes AND more youth than standard)
+            // PC61Y returns both S,M,L,XL AND YS,YM,YL,YXL - youth should win
+            if (youthCount > 0 && youthCount >= standardCount) {
+                return {
+                    category: 'youth-only',
+                    columns: YOUTH.filter(y => sizes.includes(y)),
+                    useQtyOnly: false,
+                    baseSize: sizes.find(s => YOUTH.includes(s)) || sizes[0]
+                };
+            }
+
+            // Priority 5: Toddler-dominant
+            if (toddlerCount > 0 && toddlerCount >= standardCount) {
+                return {
+                    category: 'toddler-only',
+                    columns: TODDLER.filter(t => sizes.includes(t)),
+                    useQtyOnly: false,
+                    baseSize: sizes.find(s => TODDLER.includes(s)) || sizes[0]
+                };
+            }
+
+            // Priority 6: Tall-dominant (LT, XLT without S, M, L, XL)
+            if (tallCount > 0 && standardCount === 0) {
+                return {
+                    category: 'tall-only',
+                    columns: sizes.filter(s => TALL.includes(s) || s === '2XL'),
+                    useQtyOnly: false,
+                    baseSize: sizes.find(s => TALL.includes(s)) || sizes[0]
+                };
+            }
+
+            // Priority 7: Standard (has S, M, L, XL as dominant)
+            if (standardCount > 0) {
+                return {
+                    category: 'standard',
+                    columns: ['S', 'M', 'L', 'XL', '2XL'],
+                    useQtyOnly: false,
+                    baseSize: 'S',
+                    extendedSizes: sizes.filter(s => !STANDARD.includes(s) && s !== '2XL')
+                };
+            }
+
+            // Fallback for unknown patterns
+            return {
+                category: 'other',
+                columns: sizes.slice(0, 5),
+                useQtyOnly: false,
+                baseSize: sizes[0]
+            };
+        }
+
+        /**
+         * Update row UI based on size category
+         * Handles OSFA (single qty input), combo sizes, and other non-standard layouts
+         * @param {HTMLElement} row - The product row element
+         * @param {Object} sizeInfo - Result from analyzeSizeCategory()
+         */
+        function updateRowForSizeCategory(row, sizeInfo) {
+            const rowId = row.dataset.rowId;
+            const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
+            const xxxlCell = row.querySelector('.xxxl-picker-btn');
+
+            // Store category info for later use
+            row.dataset.sizeCategory = sizeInfo.category;
+            row.dataset.baseSize = sizeInfo.baseSize || '';
+
+            // Handle PANTS (waist/inseam sizes) - use size picker popup
+            if (sizeInfo.category === 'pants') {
+                // Disable all size columns (parent row doesn't take quantities)
+                sizeInputs.forEach(input => {
+                    input.disabled = true;
+                    input.value = '';
+                    input.placeholder = '-';
+                    input.closest('td').classList.add('size-disabled');
+                });
+
+                // Enable XXXL cell as "Select Sizes" picker button
+                if (xxxlCell && sizeInfo.pantsSizes && sizeInfo.pantsSizes.length > 0) {
+                    row.dataset.pantsSizes = JSON.stringify(sizeInfo.pantsSizes);
+                    row.dataset.extendedSizes = JSON.stringify(sizeInfo.pantsSizes); // For compatibility
+                    xxxlCell.classList.add('pants-picker-btn');
+                    xxxlCell.disabled = false;
+                    xxxlCell.placeholder = '+';
+                    xxxlCell.closest('td').classList.remove('size-disabled');
+                } else if (xxxlCell) {
+                    xxxlCell.disabled = true;
+                    xxxlCell.placeholder = '-';
+                    xxxlCell.closest('td').classList.add('size-disabled');
+                }
+
+                row.classList.add('pants-row');
+                row.classList.add('non-standard-sizes');
+                showToast('Pants product - click + to select waist/inseam sizes', 'info', 4000);
+                return;
+            }
+
+            if (sizeInfo.useQtyOnly) {
+                // OSFA-only: Hide all size columns, convert to single qty input
+                sizeInputs.forEach(input => {
+                    input.disabled = true;
+                    input.value = '';
+                    input.placeholder = '-';
+                    input.closest('td').classList.add('size-disabled');
+                });
+
+                // Convert XXXL cell to qty input for OSFA
+                if (xxxlCell) {
+                    xxxlCell.classList.remove('xxxl-picker-btn');
+                    xxxlCell.classList.add('osfa-qty-input');
+                    xxxlCell.removeAttribute('readonly');
+                    xxxlCell.type = 'number';
+                    xxxlCell.min = '0';
+                    xxxlCell.placeholder = 'Qty';
+                    xxxlCell.value = '';
+                    xxxlCell.disabled = false;
+                    xxxlCell.onclick = null;
+                    xxxlCell.onkeydown = null;
+                    xxxlCell.onchange = () => onOSFAQtyChange(rowId);
+                    xxxlCell.closest('td').classList.remove('size-disabled');
+                }
+
+                // Update header for this row (visual indicator)
+                row.classList.add('osfa-only-row');
+
+            } else if (sizeInfo.category === 'tall-only') {
+                // TALL products: All sizes via extended size popup (like OSFA but with size picker)
+                // Parent row has disabled columns; child rows handle each tall size
+                const ALL_TALL = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT'];
+                const availableTallSizes = ALL_TALL.filter(s => sizeInfo.columns.includes(s));
+
+                // Disable ALL size columns (parent row doesn't take quantities)
+                sizeInputs.forEach((input, index) => {
+                    input.disabled = true;
+                    input.value = '';
+                    input.placeholder = '-';
+                    input.closest('td').classList.add('size-disabled');
+                });
+
+                // Enable XXXL picker for ALL tall sizes
+                if (availableTallSizes.length > 0 && xxxlCell) {
+                    row.dataset.extendedSizes = JSON.stringify(availableTallSizes);
+                    xxxlCell.disabled = false;
+                    xxxlCell.placeholder = '+';
+                    xxxlCell.closest('td').classList.remove('size-disabled');
+                } else if (xxxlCell) {
+                    xxxlCell.disabled = true;
+                    xxxlCell.placeholder = '-';
+                    xxxlCell.closest('td').classList.add('size-disabled');
+                }
+
+                row.classList.add('non-standard-sizes');
+                row.classList.add('tall-only-row');
+
+            } else if (sizeInfo.category !== 'standard' && sizeInfo.category !== 'unknown') {
+                // Non-standard columns (combo, youth, toddler)
+                const columns = sizeInfo.columns;
+
+                sizeInputs.forEach((input, index) => {
+                    if (index < columns.length) {
+                        // Remap this column to new size
+                        const newSize = columns[index];
+                        input.dataset.size = newSize;
+                        input.disabled = false;
+                        input.placeholder = '0';
+                        input.closest('td').classList.remove('size-disabled');
+
+                        // Update column header visually
+                        updateColumnLabel(row, index, newSize);
+                    } else {
+                        // Hide extra columns
+                        input.disabled = true;
+                        input.value = '';
+                        input.placeholder = '-';
+                        input.closest('td').classList.add('size-disabled');
+                    }
+                });
+
+                // Handle XXXL picker based on extended sizes
+                if (!sizeInfo.extendedSizes || sizeInfo.extendedSizes.length === 0) {
+                    if (xxxlCell) {
+                        xxxlCell.disabled = true;
+                        xxxlCell.placeholder = '-';
+                        xxxlCell.closest('td').classList.add('size-disabled');
+                    }
+                }
+
+                // Add visual indicator class
+                row.classList.add('non-standard-sizes');
+            }
+            // Standard category keeps default UI
+        }
+
+        /**
+         * Update column label for a specific row's size input
+         * Creates inline label overlay showing the actual size name
+         */
+        function updateColumnLabel(row, colIndex, newLabel) {
+            const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
+            const input = sizeInputs[colIndex];
+            if (!input) return;
+
+            const td = input.closest('td');
+
+            // Add a label overlay showing the size
+            let label = td.querySelector('.size-label-override');
+            if (!label) {
+                label = document.createElement('span');
+                label.className = 'size-label-override';
+                td.insertBefore(label, input);
+            }
+            label.textContent = newLabel;
+        }
+
+        /**
+         * Handle quantity change for OSFA-only products
+         * Updates dataset, qty display, and triggers pricing recalculation
+         */
+        function onOSFAQtyChange(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            const osfaInput = row.querySelector('.osfa-qty-input');
+            const qty = parseInt(osfaInput?.value) || 0;
+
+            // Store OSFA qty in dataset
+            row.dataset.osfaQty = qty;
+            row.dataset.isOsfaOnly = 'true';
+
+            // Update qty display
+            const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
+            if (qtyDisplay) qtyDisplay.textContent = qty;
+
+            // Trigger pricing recalculation
+            recalculatePricing();
+        }
+
+        /**
+         * Fetch available sizes and adjust UI based on product type
+         * Called after color selection to determine proper size columns
+         */
+        async function detectAndAdjustSizeUI(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            const styleNumber = row.dataset.style;
+            const catalogColor = row.dataset.catalogColor;
+
+            if (!styleNumber || !catalogColor) return;
+
+            try {
+                // Fetch all available sizes for this style+color
+                const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    console.error(`[Size Detection] API failed for ${styleNumber}:`);
+                    console.error(`  Status: ${response.status} ${response.statusText}`);
+                    console.error(`  URL: ${url}`);
+                    console.error(`  CatalogColor: ${catalogColor}`);
+
+                    // Try fallback: fetch without color filter to at least get size info
+                    try {
+                        const altUrl = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`;
+                        console.log(`[Size Detection] Trying fallback without color: ${altUrl}`);
+                        const altResponse = await fetch(altUrl);
+
+                        if (altResponse.ok) {
+                            const skus = await altResponse.json();
+                            if (skus && skus.length > 0) {
+                                console.log(`[Size Detection] Fallback succeeded with ${skus.length} SKUs`);
+                                const allSizes = extractAllSizes(skus);
+                                const sizeInfo = analyzeSizeCategory(allSizes);
+                                console.log(`📐 Size category for ${styleNumber} (fallback): ${sizeInfo.category}`, sizeInfo);
+                                updateRowForSizeCategory(row, sizeInfo);
+                                row.dataset.availableSizes = JSON.stringify(allSizes);
+                                return;
+                            }
+                        }
+                    } catch (fallbackError) {
+                        console.error('[Size Detection] Fallback also failed:', fallbackError);
+                    }
+                    return;
+                }
+
+                const skus = await response.json();
+
+                // Extract ALL available sizes (not just Size06)
+                const allSizes = extractAllSizes(skus);
+
+                // Analyze and update UI
+                const sizeInfo = analyzeSizeCategory(allSizes);
+                console.log(`📐 Size category for ${styleNumber}: ${sizeInfo.category}`, sizeInfo);
+
+                updateRowForSizeCategory(row, sizeInfo);
+
+                // Store for pricing calculations
+                row.dataset.availableSizes = JSON.stringify(allSizes);
+
+                // Validate size availability using SKU service
+                validateSizeAvailability(row, allSizes);
+
+            } catch (error) {
+                console.error('Error detecting size category:', error);
+            }
+        }
+
+        /**
+         * Validate size availability and update UI indicators
+         * Uses SKUValidationService to check which sizes exist in ShopWorks
+         *
+         * @param {HTMLElement} row - Product row element
+         * @param {string[]} availableSizes - Sizes available for this product/color
+         */
+        function validateSizeAvailability(row, availableSizes) {
+            if (!row || !availableSizes) return;
+
+            const styleNumber = row.dataset.style;
+            const catalogColor = row.dataset.catalogColor;
+            const skuService = window.skuValidationService || new SKUValidationService();
+            window.skuValidationService = skuService; // Cache for reuse
+
+            // Get all size inputs in this row
+            const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
+            const xxxlCell = row.querySelector('.xxxl-picker-btn');
+
+            // Standard size columns (S, M, L, XL, XXL)
+            const columnSizes = ['S', 'M', 'L', 'XL', '2XL'];
+
+            sizeInputs.forEach((input, index) => {
+                const size = columnSizes[index];
+                if (!size) return;
+
+                const isAvailable = availableSizes.includes(size);
+                const sku = skuService.sanmarToShopWorksSKU(styleNumber, size);
+
+                // Update input state based on availability
+                if (isAvailable) {
+                    input.classList.add('size-available');
+                    input.classList.remove('size-unavailable');
+                    input.disabled = false;
+                    input.placeholder = '0';
+                    input.title = `${size} (SKU: ${sku})`;
+                } else {
+                    input.classList.add('size-unavailable');
+                    input.classList.remove('size-available');
+                    input.disabled = true;
+                    input.value = '';
+                    input.placeholder = 'N/A';
+                    input.title = `${size} not available for this style/color`;
+                    input.closest('td')?.classList.add('size-disabled');
+                }
+
+                // Store SKU on input for reference
+                input.dataset.sku = sku;
+            });
+
+            // Update extended size picker (XXXL column) if present
+            if (xxxlCell && !xxxlCell.classList.contains('osfa-qty-input')) {
+                const extendedSizes = availableSizes.filter(s =>
+                    !columnSizes.includes(s) && s !== 'OSFA'
+                );
+                const hasExtended = extendedSizes.length > 0;
+
+                if (hasExtended) {
+                    xxxlCell.classList.remove('size-unavailable');
+                    xxxlCell.disabled = false;
+                    xxxlCell.title = `Extended sizes: ${extendedSizes.join(', ')}`;
+                    row.dataset.extendedSizes = JSON.stringify(extendedSizes);
+                } else {
+                    xxxlCell.classList.add('size-unavailable');
+                    xxxlCell.disabled = true;
+                    xxxlCell.placeholder = '-';
+                    xxxlCell.title = 'No extended sizes available';
+                }
+            }
+
+            console.log(`[SKU Validation] ${styleNumber} validated:`, {
+                availableSizes,
+                catalogColor,
+                validatedAt: new Date().toISOString()
+            });
+        }
+
+        /**
+         * Extract ALL sizes from SKU data (Size01-06 fields)
+         * Returns sizes in logical display order
+         */
+        function extractAllSizes(skus) {
+            const sizes = new Set();
+
+            skus.forEach(sku => {
+                ['Size01', 'Size02', 'Size03', 'Size04', 'Size05', 'Size06'].forEach(field => {
+                    if (sku[field] && typeof sku[field] === 'string' && sku[field].trim()) {
+                        sizes.add(sku[field].trim());
+                    }
+                });
+            });
+
+            // Return in logical order
+            const ORDER = ['S', 'M', 'L', 'XL', '2XL', 'XS', 'S/M', 'M/L', 'L/XL',
+                           'YXS', 'YS', 'YM', 'YL', 'YXL', '2T', '3T', '4T', '5T', '6T',
+                           'LT', 'XLT', '2XLT', '3XLT', 'OSFA', 'OSFM'];
+            return [...sizes].sort((a, b) => {
+                const ai = ORDER.indexOf(a);
+                const bi = ORDER.indexOf(b);
+                if (ai === -1 && bi === -1) return a.localeCompare(b);
+                if (ai === -1) return 1;
+                if (bi === -1) return -1;
+                return ai - bi;
+            });
         }
 
         // Generate inline style for color swatch (image or fallback hex)
@@ -2445,14 +3345,14 @@
             // Close dropdown
             row.querySelector('.color-picker-dropdown').classList.add('hidden');
 
-            // Enable size inputs
+            // Enable size inputs initially (may be disabled by detectAndAdjustSizeUI for special products)
             row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
 
-            // Check if product is tall/youth/toddler-only and gray out unavailable sizes
+            // Detect size category and adjust UI (OSFA, combo, youth, toddler, tall, standard)
             // This runs async but doesn't block - will update UI when API returns
-            detectProductTypeAndAdjustUI(rowId);
+            detectAndAdjustSizeUI(rowId);
 
-            // Focus first size input (may be overridden by detectProductTypeAndAdjustUI for special products)
+            // Focus first size input (may be overridden by detectAndAdjustSizeUI for special products)
             const firstSize = row.querySelector('.size-input');
             if (firstSize) firstSize.focus();
 
@@ -2740,17 +3640,30 @@
                 return;
             }
 
-            // Calculate standard sizes total for parent row
-            let standardTotal = 0;
-            STANDARD_SIZES.forEach(size => {
-                const input = row.querySelector(`[data-size="${size}"]`);
-                if (input) {
-                    standardTotal += parseInt(input.value) || 0;
-                }
+            const sizeCategory = row.dataset.sizeCategory;
+
+            // OSFA-only products are handled separately by onOSFAQtyChange()
+            if (sizeCategory === 'osfa-only') {
+                recalculatePricing();
+                return;
+            }
+
+            // Calculate total from ALL enabled size inputs (handles remapped columns)
+            // This works for standard, combo-only, youth-only, toddler-only, tall-only
+            let total = 0;
+            row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+                total += parseInt(input.value) || 0;
             });
 
-            // Update parent row quantity (standard sizes only)
-            document.getElementById(`row-qty-${rowId}`).textContent = standardTotal;
+            // Add quantities from child rows (extended sizes)
+            const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+            childRows.forEach(childRow => {
+                const qtyDisplay = childRow.querySelector('.qty-display');
+                total += parseInt(qtyDisplay?.textContent) || 0;
+            });
+
+            // Update parent row quantity display
+            document.getElementById(`row-qty-${rowId}`).textContent = total;
 
             // Handle 2XL size (has direct input) - create/update/remove child rows
             // Note: Size06 sizes (XS, 3XL, 4XL, 5XL, 6XL) are handled by the Extended Size Picker popup
@@ -2791,6 +3704,10 @@
          * Uses SIZE_TO_SUFFIX which contains ALL size suffixes (tall, youth, toddler, etc.)
          */
         function getPartNumber(baseStyle, size) {
+            // For pants sizes (4-digit codes like 3032), append directly with underscore
+            if (/^\d{4}$/.test(size)) {
+                return `${baseStyle}_${size}`;
+            }
             return baseStyle + (SIZE_TO_SUFFIX[size] || '');
         }
 
@@ -2847,9 +3764,18 @@
 
             // Determine which column this size goes to:
             // - Size05 (XXL column): only 2XL
-            // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL
+            // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL, pants sizes
             const isSize05 = size === '2XL';
-            const isSize06 = SIZE06_EXTENDED_SIZES.includes(size);
+            const isPantsSize = /^\d{4}$/.test(size);  // 4-digit pants sizes like 3032
+            const isSize06 = SIZE06_EXTENDED_SIZES.includes(size) || isPantsSize;
+
+            // Format display size (pants: "3032" -> "30x32", others: keep as-is)
+            let displaySize = size;
+            if (isPantsSize) {
+                const waist = size.substring(0, 2);
+                const inseam = size.substring(2, 4);
+                displaySize = `${waist}x${inseam}`;
+            }
 
             // Create cell content - only the specific size column is editable
             childRow.innerHTML = `
@@ -2858,7 +3784,7 @@
                     <span class="style-display">${partNumber}</span>
                 </td>
                 <td>
-                    <span class="desc-display" style="color: #856404; font-size: 12px;">${size} upcharge</span>
+                    <span class="desc-display" style="color: #666; font-size: 12px;">${escapeHtml(parentRow.dataset.productName)} - <strong>${displaySize}</strong></span>
                 </td>
                 <td>
                     <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
@@ -2881,7 +3807,7 @@
                 <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
                 <td class="cell-price unit-price-display" id="row-price-${childRowId}">-</td>
                 <td class="cell-actions">
-                    <button class="btn-delete-row" onclick="clearExtendedSize(${parentRowId}, '${size}')" title="Remove ${size}">
+                    <button class="btn-delete-row" onclick="clearExtendedSize(${parentRowId}, '${size}')" title="Remove ${displaySize}">
                         <i class="fas fa-times"></i>
                     </button>
                 </td>
@@ -3173,9 +4099,9 @@
                             pp.lineItems.forEach(li => {
                                 const description = li.description;
                                 // Match ALL extended sizes in description (handles grouped sizes like "3XL(2) 4XL(3)" or "3T(5)")
-                                // Uses SIZE06_EXTENDED_SIZES for comprehensive matching including toddler, youth, tall, etc.
+                                // Uses SIZE06_EXTENDED_SIZES for comprehensive matching including toddler, youth, tall, pants (4-digit), etc.
                                 const extendedSizeRegex = new RegExp(
-                                    '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL']).join('|') + ')(?=\\(|\\s|$)',
+                                    '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
                                     'g'
                                 );
                                 const sizeMatches = description.match(extendedSizeRegex);
@@ -3229,12 +4155,14 @@
                     totalQty: 0
                 };
 
-                // Collect standard size inputs (S, M, L, XL, 2XL) from parent row
-                // IMPORTANT: Exclude .xxxl-picker-btn which shows TOTAL, not individual sizes
-                row.querySelectorAll('.size-input:not(.xxxl-picker-btn)').forEach(input => {
+                // Collect size inputs from parent row (standard or remapped sizes)
+                // IMPORTANT: Exclude .xxxl-picker-btn (shows TOTAL) and .osfa-qty-input (handled separately)
+                // Note: For non-standard products (combo, youth, toddler, tall), data-size is remapped
+                const sizeCategory = row.dataset.sizeCategory;
+                row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
                     const size = input.dataset.size;
                     const qty = parseInt(input.value) || 0;
-                    if (qty > 0) {
+                    if (qty > 0 && size) {
                         colorGroups[parentCatalogColor].sizeBreakdown[size] = qty;
                         colorGroups[parentCatalogColor].totalQty += qty;
                     }
@@ -3501,16 +4429,26 @@
             }
         }
 
-        function showToast(message, type = 'info') {
+        function showToast(message, type = 'info', duration = 3000) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+
+            // Select icon based on type
+            const icons = {
+                success: 'check',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+            const icon = icons[type] || 'info-circle';
+
+            toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
             container.appendChild(toast);
 
             setTimeout(() => {
                 toast.remove();
-            }, 3000);
+            }, duration);
         }
     </script>
 </body>

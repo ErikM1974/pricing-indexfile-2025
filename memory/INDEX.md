@@ -26,6 +26,7 @@ This documentation has been reorganized into modular components for better perfo
 ├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints - read data)
 ├── MANAGEORDERS_PUSH_WEBSTORE.md    # ManageOrders PUSH API (4 endpoints - create orders)
 ├── SANMAR_TO_SHOPWORKS_GUIDE.md     # Transform Sanmar products for ShopWorks/ManageOrders
+├── SHOPWORKS_SIZE_MAPPING.md        # SanMar→ShopWorks data transformation (169K→15K records, color fields, size suffixes)
 ├── PRODUCT_SKU_PATTERNS.md          # Quick reference for product SKU patterns
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory

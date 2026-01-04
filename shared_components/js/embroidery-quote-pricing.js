@@ -347,14 +347,16 @@ class EmbroideryPricingCalculator {
             }
         }
 
-        // If no standard sizes found, use the first available size with lowest upcharge
+        // If no standard sizes found, use the first available size with valid price
         if (standardBasePrice === 0) {
             console.warn(`[EmbroideryPricingCalculator] No standard sizes found for ${product.style}, using alternative base`);
 
-            // Find the size with the lowest price (or no upcharge)
-            const availableSizes = Object.entries(priceData.basePrices);
+            // Find sizes with valid prices (filter out $0 discontinued sizes)
+            const availableSizes = Object.entries(priceData.basePrices)
+                .filter(([size, price]) => price > 0);  // Exclude $0 discontinued sizes
+
             if (availableSizes.length > 0) {
-                // Sort by price to get the lowest base price
+                // Sort by price to get the lowest valid base price
                 availableSizes.sort((a, b) => a[1] - b[1]);
                 baseSize = availableSizes[0][0];
                 standardBasePrice = availableSizes[0][1];
@@ -493,7 +495,184 @@ class EmbroideryPricingCalculator {
             subtotal: lineSubtotal
         };
     }
-    
+
+    /**
+     * Generate line items in ShopWorks PUSH API format
+     * One line item per size per color (proven pattern from 3-Day Tees)
+     *
+     * @param {Object} product - Product with sizeBreakdown, style, color, catalogColor
+     * @param {Object} pricingData - Pricing data with basePrices, sizeUpcharges
+     * @param {Object} logo - Logo with position, stitchCount
+     * @param {string} tier - Pricing tier
+     * @param {number} additionalStitchCost - Extra stitch fee to add to price
+     * @returns {Array} Array of line items in ShopWorks format
+     */
+    async generateLineItems(product, pricingData, logo, tier, additionalStitchCost = 0) {
+        const lineItems = [];
+        const skuService = window.skuValidationService || (window.SKUValidationService ? new window.SKUValidationService() : null);
+        const embCost = this.getEmbroideryCost(tier);
+
+        // Get standard base price for calculating upcharges
+        const standardSizes = ['S', 'M', 'L', 'XL'];
+        let standardBasePrice = 0;
+        let baseSize = null;
+
+        for (const size of standardSizes) {
+            if (pricingData.basePrices[size]) {
+                standardBasePrice = pricingData.basePrices[size];
+                baseSize = size;
+                break;
+            }
+        }
+
+        // Fallback if no standard sizes
+        if (standardBasePrice === 0) {
+            const availableSizes = Object.entries(pricingData.basePrices);
+            if (availableSizes.length > 0) {
+                availableSizes.sort((a, b) => a[1] - b[1]);
+                baseSize = availableSizes[0][0];
+                standardBasePrice = availableSizes[0][1];
+            }
+        }
+
+        const baseSizeUpcharge = baseSize ? (pricingData.sizeUpcharges[baseSize] || 0) : 0;
+
+        // Generate one line item per size
+        for (const [size, quantity] of Object.entries(product.sizeBreakdown)) {
+            if (quantity <= 0) continue;
+
+            // Calculate pricing for this size
+            const apiUpcharge = pricingData.sizeUpcharges[size] || 0;
+            const relativeUpcharge = apiUpcharge - baseSizeUpcharge;
+
+            // Calculate decorated price
+            const garmentCost = standardBasePrice / this.marginDenominator;
+            const baseDecoratedPrice = garmentCost + embCost;
+            const roundedBase = this.roundPrice(baseDecoratedPrice);
+            const finalPrice = roundedBase + relativeUpcharge + additionalStitchCost;
+
+            // Build description: Brand Style Color | LogoPosition StitchK
+            const description = this.buildLineItemDescription(product, logo);
+
+            // Generate SKU using validation service
+            const inventorySku = skuService
+                ? skuService.sanmarToShopWorksSKU(product.style, size)
+                : product.style + (this.getSizeSuffix(size) || '');
+
+            lineItems.push({
+                // ShopWorks PUSH API format (proven pattern)
+                partNumber: product.style,              // BASE only - ShopWorks handles suffix via size field
+                inventorySku: inventorySku,             // Full SKU for internal tracking
+                description: description,
+                color: product.catalogColor,            // CATALOG_COLOR for API
+                displayColor: product.color,            // COLOR_NAME for display
+                size: size,
+                quantity: quantity,
+                unitPrice: finalPrice,
+                total: finalPrice * quantity,
+
+                // Embroidery-specific metadata
+                logoPosition: logo?.position || 'LC',
+                stitchCount: logo?.stitchCount || 8000,
+                hasUpcharge: relativeUpcharge > 0,
+                upchargeAmount: relativeUpcharge,
+                basePrice: roundedBase,
+                extraStitchCost: additionalStitchCost
+            });
+        }
+
+        return lineItems;
+    }
+
+    /**
+     * Build description string for line item
+     * Format: "Brand Style Color | Position StitchK"
+     *
+     * @param {Object} product - Product data
+     * @param {Object} logo - Logo data
+     * @returns {string} Formatted description
+     */
+    buildLineItemDescription(product, logo) {
+        // Extract brand from title (first word or known brand)
+        const brand = this.extractBrand(product.title || '');
+        const logoAbbrev = this.abbreviatePosition(logo?.position || 'LC');
+        const stitchK = Math.round((logo?.stitchCount || 8000) / 1000);
+
+        return `${brand} ${product.style} ${product.color} | ${logoAbbrev} ${stitchK}K`;
+    }
+
+    /**
+     * Extract brand name from product title
+     *
+     * @param {string} title - Full product title
+     * @returns {string} Brand abbreviation
+     */
+    extractBrand(title) {
+        const brandMap = {
+            'Port & Company': 'P&C',
+            'Port Authority': 'PA',
+            'Sport-Tek': 'ST',
+            'District': 'DT',
+            'New Era': 'NE',
+            'Nike': 'Nike',
+            'OGIO': 'OGIO',
+            'Carhartt': 'CTT',
+            'CornerStone': 'CS',
+            'Red Kap': 'RK'
+        };
+
+        for (const [full, abbrev] of Object.entries(brandMap)) {
+            if (title.includes(full)) return abbrev;
+        }
+
+        // Return first word as fallback
+        return title.split(' ')[0] || 'SanMar';
+    }
+
+    /**
+     * Abbreviate logo position
+     *
+     * @param {string} position - Full position name
+     * @returns {string} Abbreviated position
+     */
+    abbreviatePosition(position) {
+        const positionMap = {
+            'Left Chest': 'LC',
+            'Right Chest': 'RC',
+            'Full Front': 'FF',
+            'Full Back': 'FB',
+            'Left Sleeve': 'LS',
+            'Right Sleeve': 'RS',
+            'Left Cuff': 'LCF',
+            'Right Cuff': 'RCF',
+            'Front Center': 'FC',
+            'Back Yoke': 'BY',
+            'Cap Front': 'CF',
+            'Cap Back': 'CB',
+            'Cap Side': 'CSD'
+        };
+
+        return positionMap[position] || position.substring(0, 2).toUpperCase();
+    }
+
+    /**
+     * Get size suffix for SKU (fallback if no SKU service)
+     * @private
+     */
+    getSizeSuffix(size) {
+        const suffixMap = {
+            'S': '', 'M': '', 'L': '', 'XL': '',
+            'XS': '_XS',
+            '2XL': '_2X', '3XL': '_3X', '4XL': '_4X',
+            '5XL': '_5X', '6XL': '_6X',
+            'LT': '_LT', 'XLT': '_XLT',
+            '2XLT': '_2XLT', '3XLT': '_3XLT',
+            'OSFA': '_OSFA',
+            'S/M': '_S/M', 'M/L': '_M/L', 'L/XL': '_L/XL'
+        };
+        return suffixMap[size] || `_${size}`;
+    }
+
     /**
      * Calculate complete quote pricing
      */
