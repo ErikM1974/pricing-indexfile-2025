@@ -75,7 +75,11 @@
       "Bash(tests/unit/test-premium-strategy.js )",
       "Bash(tests/unit/test-profitability-analysis.js )",
       "Bash(MESSAGE_TO_CASPIO_PROXY_EMBROIDERY_INCREASE.md)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(wc:*)",
+      "Bash(cmd.exe /c start http://localhost:3000/quote-builders/embroidery-quote-builder-new.html)",
+      "Bash(jq:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": [],
