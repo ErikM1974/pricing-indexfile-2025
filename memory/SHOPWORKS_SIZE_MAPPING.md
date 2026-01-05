@@ -16,6 +16,11 @@
 6. [Size Suffix Categories](#complete-size-suffix-categories)
 7. [JavaScript Implementation](#javascript-implementation-reference)
 8. [Quote Builder Application](#application-to-quote-builder)
+9. [CSV Validation Script Reference](#csv-validation-script-reference)
+10. [PT* Pants Styles Analysis](#pt-pants-styles-complete-analysis)
+11. [Expanded SIZE_TO_SUFFIX Mapping](#expanded-size_to_suffix-mapping-97-sizes)
+12. [Validation Troubleshooting](#validation-troubleshooting)
+13. [ShopWorks Parts Validation](#shopworks-parts-validation-jan-2026)
 
 ---
 
@@ -42,9 +47,9 @@
 | Metric | Count |
 |--------|-------|
 | Total Records | 169,041 |
-| Unique Styles | ~3,200 |
+| Unique Styles | 4,249 (validated Jan 2026) |
 | Unique Colors | 3,746 (COLOR_NAME) / 4,842 (CATALOG_COLOR) |
-| Unique Sizes | 301 |
+| Unique Sizes | 242 (validated Jan 2026) |
 | Active Products | 127,115 (75.2%) |
 | Discontinued | 39,581 (23.4%) |
 
@@ -550,3 +555,317 @@ This mapping enables proper size detection in quote builders:
 - `/memory/MANAGEORDERS_INTEGRATION.md` - ShopWorks PULL API integration
 - `/memory/CASPIO_API_CORE.md` - API endpoints including sanmar-shopworks
 - `/memory/EMBROIDERY_QUOTE_BUILDER.md` - Quote builder implementation
+
+---
+
+## CSV Validation Script Reference
+
+**Script:** `tests/unit/csv-validation-report.js`
+**Purpose:** Validates all SanMar CSV products against SIZE_TO_SUFFIX mapping
+**Created:** January 2026
+
+### How to Run
+
+```bash
+node tests/unit/csv-validation-report.js [path-to-csv]
+```
+
+### Latest Validation Results (Jan 2026)
+
+| Metric | Value |
+|--------|-------|
+| Total Rows Parsed | 169,041 |
+| Unique Styles | 4,249 |
+| Unique Sizes | 242 |
+| Unmapped Sizes | 0 (all mapped!) |
+| Empty CATALOG_COLOR | 127 rows |
+
+### What the Script Validates
+
+1. **Size Mapping Coverage**: Ensures every size value in the CSV has a corresponding entry in `SIZE_TO_SUFFIX`
+2. **PT* Pants Detection**: Identifies all pants products and their size patterns
+3. **OSFA Detection**: Counts one-size-fits-all products
+4. **Data Quality**: Flags rows with empty CATALOG_COLOR
+
+### Validation Output
+
+```
+=== CSV VALIDATION REPORT ===
+Total rows parsed: 169,041
+Unique styles: 4,249
+Unique sizes: 242
+
+=== SIZE MAPPING STATUS ===
+✓ All sizes are properly mapped!
+
+=== PT* PANTS STYLES ANALYSIS ===
+Found 16 PT* styles with 3 distinct patterns
+```
+
+---
+
+## PT* Pants Styles Complete Analysis
+
+All 16 PT* (Red Kap Industrial) pants styles in the SanMar catalog have been validated.
+
+### Size Pattern Classification
+
+| Pattern | Styles | Size Format | Example Sizes |
+|---------|--------|-------------|---------------|
+| 4-digit waist+inseam | PT20, PT26, PT60, PT88 | `WWII` | 2830, 3030, 3232, 4634, 5432 |
+| Waist-only (shorts) | PT66 | `W30-W50` | W30, W32, W34, W36, W38, W40, W42, W44, W46, W48, W50 |
+| Standard extended | PT333, LPT333 | `S-3XL` | S, M, L, XL, 2XL, 3XL |
+| OSFA | PT38-PT49, PT390, PT400 | `OSFA` | OSFA only |
+
+### Detailed Style Breakdown
+
+| Style | Product | Size Pattern | Size Count |
+|-------|---------|--------------|------------|
+| PT20 | Work Pant | 4-digit | 78 |
+| PT26 | Work Short | 4-digit | 78 |
+| PT60 | Cargo Pant | 4-digit | 78 |
+| PT88 | Cell Phone Pant | 4-digit | 78 |
+| PT66 | Cargo Short | Waist-only | 11 |
+| PT333 | Performance Pant | Standard | 8 |
+| LPT333 | Ladies Perf Pant | Standard | 8 |
+| PT38 | Shop Coat | OSFA | 1 |
+| PT39 | Lab Coat | OSFA | 1 |
+| PT42-PT49 | Coveralls/Coats | OSFA | 1 each |
+| PT390 | Chef Coat | OSFA | 1 |
+| PT400 | Work Smock | OSFA | 1 |
+
+### Quote Builder Handling
+
+The embroidery quote builder detects pants products automatically:
+
+```javascript
+// 4-digit pattern for pants with inseam (PT20, PT26, PT60, PT88)
+const PANTS_SIZE_PATTERN = /^\d{4}$/;
+
+// Waist-only pattern for shorts (PT66)
+const WAIST_ONLY_PATTERN = /^W\d{2}$/;
+```
+
+**Pants Display:**
+- 4-digit sizes → Formatted as "30×30", "32×32", etc.
+- Waist-only → Formatted as "Waist 30", "Waist 32", etc.
+
+---
+
+## Expanded SIZE_TO_SUFFIX Mapping (97+ Sizes)
+
+The validation script identified 97 unique size values requiring explicit mapping.
+The complete mapping is in `shared_components/js/sku-validation-service.js`.
+
+### Size Categories Covered
+
+| Category | Sizes | Suffix Format |
+|----------|-------|---------------|
+| **Standard** | S, M, L, XL | (no suffix - base product) |
+| **Extra-small** | XS, XXS, 2XS | `_XS`, `_XXS`, `_2XS` |
+| **Extended** | 2XL-6XL | `_2X`, `_3X`, `_4X`, `_5X`, `_6X` |
+| **Extra-extended** | 7XL-10XL | `_7X`, `_8X`, `_9X`, `_10X` |
+| **Aliases** | XXL, XXXL | → `_2X`, `_3X` |
+| **Tall** | LT, XLT, 2XLT-4XLT, MT, ST, XST | `_LT`, `_XLT`, etc. |
+| **Long** | LL, ML, XLL, 2XLL, 3XLL | `_LL`, `_ML`, etc. |
+| **Short** | LS, MS, XLS, 2XLS, 3XLS | `_LS`, `_MS`, etc. |
+| **Regular** | SR, MR, LR, XLR, 2XLR-6XLR | `_SR`, `_MR`, etc. |
+| **Petite** | SP, MP, LP, XLP, 2XLP | `_SP`, `_MP`, etc. |
+| **Youth** | YXS, YS, YM, YL, YXL | `_YXS`, `_YS`, etc. |
+| **Toddler** | 2T-6T, 5/6T | `_2T`, `_3T`, `_6T`, `_5/6T` |
+| **Infant** | NB, 06M, 12M, 18M, 24M, 306, 612, 1824 | `_NB`, `_06M`, etc. |
+| **Combo** | S/M, M/L, L/XL, 2/3X, 4/5X | `_S/M`, `_M/L`, etc. |
+| **OSFA** | OSFA | `_OSFA` |
+| **Waist-only** | W30-W50 | `_W30`, `_W32`, etc. |
+| **Numeric** | 0-42 (belts/shoes) | `_0`, `_8`, `_42` |
+| **4-digit pants** | 2830-5434 | `_2830`, `_3232`, etc. |
+
+### Key Additions (Jan 2026)
+
+These sizes were missing from the original mapping and have been added:
+
+```javascript
+// Extra-extended (large workwear)
+'7XL': '_7X', '8XL': '_8X', '9XL': '_9X', '10XL': '_10X',
+
+// Waist-only shorts (PT66, CT103542)
+'W30': '_W30', 'W31': '_W31', 'W32': '_W32', 'W33': '_W33',
+'W34': '_W34', 'W35': '_W35', 'W36': '_W36', 'W38': '_W38',
+'W40': '_W40', 'W42': '_W42', 'W44': '_W44', 'W46': '_W46',
+'W48': '_W48', 'W50': '_W50',
+
+// Regular/Long/Short/Petite variants (dress shirts/pants)
+'SR': '_SR', 'MR': '_MR', 'LR': '_LR', 'XLR': '_XLR',
+'2XLR': '_2XLR', '3XLR': '_3XLR', '4XLR': '_4XLR', '5XLR': '_5XLR', '6XLR': '_6XLR',
+'ML': '_ML', 'LL': '_LL', 'XLL': '_XLL', '2XLL': '_2XLL', '3XLL': '_3XLL',
+'MS': '_MS', 'LS': '_LS', 'XLS': '_XLS', '2XLS': '_2XLS', '3XLS': '_3XLS',
+'SP': '_SP', 'MP': '_MP', 'LP': '_LP', 'XLP': '_XLP', '2XLP': '_2XLP',
+
+// Missing tall variants
+'MT': '_MT', 'ST': '_ST', 'XST': '_XST',
+
+// Aliases
+'XXL': '_2X', 'XXXL': '_3X', 'XXS': '_XXS',
+
+// Missing infant
+'1824': '_1824', '306': '_306', '612': '_612'
+```
+
+---
+
+## Validation Troubleshooting
+
+### Running the Validation Script
+
+```bash
+# Default: uses sample path
+node tests/unit/csv-validation-report.js
+
+# Specify custom CSV path
+node tests/unit/csv-validation-report.js "/path/to/Sanmar New Pricing.csv"
+```
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| "File not found" | CSV path incorrect | Use absolute path with quotes |
+| Unmapped size errors | New size in SanMar data | Add to SIZE_TO_SUFFIX in sku-validation-service.js |
+| Empty CATALOG_COLOR | Data quality issue | 127 rows affected, API should have clean data |
+
+### Re-running After Updates
+
+If you update `SIZE_TO_SUFFIX` in sku-validation-service.js, also update the mapping in the validation script to keep them in sync.
+
+---
+
+## ShopWorks Parts Validation (Jan 2026)
+
+**Source:** `shopworksparts.csv` (15,160 products)
+**Purpose:** Ensure generated inventorySku values match ShopWorks exactly
+**Validated:** 2026-01-04
+
+### Critical Discovery: XXL Suffix Mismatch
+
+ShopWorks uses **THREE different suffixes** for extended sizes:
+
+| Suffix | Count | Used By |
+|--------|-------|---------|
+| `_2X` | 2,094 | Most unisex/men's products |
+| `_XXL` | 586 | Ladies products, District, Cornerstone |
+| `_2XL` | 35 | Newer brands (Mercer+Mettle, TravisMathew) |
+
+**Problem:** The original mapping had `'XXL': '_2X'` which is **WRONG** for 586 products.
+
+### XXL_STYLES Set (442 Active Styles)
+
+Styles that require `_XXL` suffix instead of `_2X`:
+
+```javascript
+static XXL_STYLES = new Set([
+    // Cornerstone
+    'CS411', 'CS413', 'CS419', 'CS451',
+
+    // District Made (Ladies)
+    'DM104L', 'DM106L', 'DM107L', 'DM108L', 'DM1170L', 'DM1190L', ...
+
+    // District (various)
+    'DT110', 'DT1104', 'DT5001', 'DT5002', 'DT6001', 'DT6002', ...
+
+    // Ladies (L*)
+    'L100', 'L110', 'L500', 'L500LS', 'L508', 'L510', ...
+
+    // Ladies Port Authority (LK*)
+    'LK110', 'LK110SV', 'LK111', 'LK200', 'LK200LS', ...
+
+    // Ladies Port & Company (LPC*)
+    'LPC54', 'LPC54LS', 'LPC380', 'LPC61', ...
+
+    // Ladies Sport-Tek (LST*)
+    'LST104', 'LST225', 'LST235', 'LST350', 'LST353', ...
+
+    // Ladies Wicking (LSW*)
+    'LSW285', 'LSW2850', 'LSW287', ...
+
+    // Ladies (LW*)
+    'LW100', 'LW102', 'LW380', 'LW400', ...
+
+    // Outdoor Research
+    'OR322218', 'OR322225', 'OR322226', 'OR322227', 'OR322228', ...
+
+    // Red House, TravisMathew
+    'RH79', 'TTCM3914', 'TTCM4367', 'TTCW5646', 'TTCW5647', ...
+]);
+```
+
+### Lowercase Suffix Styles
+
+Some products use lowercase suffixes in ShopWorks:
+
+| Style | Size | ShopWorks SKU |
+|-------|------|---------------|
+| WW3150S | SS | `WW3150S_ss` |
+| OR322226 | XXXL | `OR322226_xxxl` |
+| OR322227 | XXXL | `OR322227_xxxl` |
+| OR322228 | XXXL | `OR322228_xxxl` |
+| OR322264 | XXXL | `OR322264_xxxl` |
+| OR322267 | XXXL | `OR322267_xxxl` |
+| OR322269 | XXXL | `OR322269_xxxl` |
+
+### Additional Infant Sizes
+
+4-digit infant sizes with leading zeros:
+
+| Size | Meaning | ShopWorks Suffix |
+|------|---------|------------------|
+| `0003` | 0-3 months | `_0003` |
+| `0306` | 3-6 months | `_0306` |
+| `0612` | 6-12 months | `_0612` |
+| `1218` | 12-18 months | `_1218` |
+| `1824` | 18-24 months | `_1824` |
+
+**Note:** These are distinct from the 3-digit versions (`306`, `612`).
+
+### Updated sanmarToShopWorksSKU Logic
+
+```javascript
+sanmarToShopWorksSKU(style, size) {
+    const normalizedSize = size.toUpperCase().trim();
+
+    // Special handling: XXL → _XXL for Ladies/District products
+    if (normalizedSize === 'XXL' && SKUValidationService.XXL_STYLES.has(style)) {
+        return `${style}_XXL`;
+    }
+
+    // Special handling: SS → _ss for styles with lowercase suffix
+    if (normalizedSize === 'SS' && SKUValidationService.LOWERCASE_SS_STYLES.has(style)) {
+        return `${style}_ss`;
+    }
+
+    // Special handling: XXXL → _xxxl for styles with lowercase suffix
+    if (normalizedSize === 'XXXL' && SKUValidationService.LOWERCASE_XXXL_STYLES.has(style)) {
+        return `${style}_xxxl`;
+    }
+
+    // Standard lookup
+    const suffix = SKUValidationService.SIZE_TO_SUFFIX[normalizedSize];
+    if (suffix !== undefined) {
+        return suffix ? `${style}${suffix}` : style;
+    }
+
+    // Fallback
+    return `${style}_${normalizedSize}`;
+}
+```
+
+### Test Script
+
+**File:** `tests/unit/test-sku-validation-fixes.js`
+
+```bash
+node tests/unit/test-sku-validation-fixes.js
+```
+
+Validates all special cases:
+- 32 test cases covering XXL_STYLES, lowercase suffixes, infant sizes
+- ✓ All tests pass

@@ -24,8 +24,49 @@ class SKUValidationService {
     static STANDARD_SIZES = ['S', 'M', 'L', 'XL'];
 
     /**
+     * Styles that use _XXL suffix instead of _2X
+     * (Ladies, District, Cornerstone products from ShopWorks)
+     * Generated from shopworksparts.csv - 442 active styles
+     * ADDED 2026-01-04: Fix for ShopWorks XXL suffix mismatch
+     */
+    static XXL_STYLES = new Set([
+        'CS411', 'CS413', 'CS419', 'CS451',
+        'DM104L', 'DM106L', 'DM107L', 'DM108L', 'DM1170L', 'DM1190L', 'DM130L', 'DM1350L', 'DM136L', 'DM138L', 'DM139L', 'DM476', 'DM493',
+        'DT110', 'DT1104', 'DT1105', 'DT1309', 'DT1310', 'DT1311', 'DT132L', 'DT135', 'DT1375', 'DT137L', 'DT1390L', 'DT141', 'DT151', 'DT153', 'DT154', 'DT155', 'DT156', 'DT188', 'DT2100', 'DT2800', 'DT296', 'DT456', 'DT488', 'DT5001', 'DT5002', 'DT6001', 'DT6002', 'DT6020', 'DT6021', 'DT6101', 'DT6103', 'DT6105', 'DT6110', 'DT6111', 'DT6201', 'DT6302', 'DT6402', 'DT6503', 'DT664', 'DT665', 'DT671', 'DT672', 'DT673', 'DT7501', 'DT7509', 'DT7510', 'DT8001', 'DT8101', 'DT8103',
+        'L100', 'L110', 'L123', 'L130', 'L131', 'L132', 'L151', 'L152', 'L211', 'L216', 'L217', 'L219', 'L222', 'L223', 'L224', 'L226', 'L227', 'L230', 'L231', 'L232', 'L233', 'L235', 'L236', 'L239', 'L248', 'L249', 'L293', 'L298', 'L304', 'L317', 'L318', 'L321', 'L324', 'L325', 'L331', 'L332', 'L333', 'L335', 'L339', 'L344', 'L354', 'L365', 'L405', 'L406', 'L407', 'L420', 'L422', 'L425', 'L428', 'L455', 'L469', 'L474', 'L475', 'L500', 'L500LS', 'L508', 'L510', 'L515', 'L5200', 'L525', 'L527', 'L528', 'L540', 'L540LS', 'L543', 'L5430', 'L545', 'L547', 'L555', 'L562', 'L568', 'L569', 'L570', 'L571', 'L572', 'L573', 'L574', 'L575', 'L576', 'L580', 'L608', 'L612', 'L617', 'L638', 'L640', 'L654', 'L658', 'L659', 'L662', 'L663', 'L664', 'L665', 'L700', 'L701', 'L702', 'L705', 'L706', 'L709', 'L714', 'L717', 'L718', 'L719', 'L720', 'L721', 'L7620', 'L7710', 'L787', 'L790', 'L792', 'L804', 'L805', 'L806', 'L807', 'L814', 'L850', 'L851', 'L852', 'L853', 'L854', 'L900', 'L901', 'L902', 'L903', 'L904', 'L905', 'L906', 'L919', 'L920', 'L921',
+        'LK110', 'LK110SV', 'LK111', 'LK112', 'LK200', 'LK200LS', 'LK210', 'LK240', 'LK398', 'LK542', 'LK5431', 'LK5432', 'LK5433', 'LK5434', 'LK5600', 'LK5601', 'LK5602', 'LK582', 'LK583', 'LK584', 'LK585', 'LK587', 'LK595', 'LK600', 'LK646', 'LK682', 'LK683', 'LK6840', 'LK750', 'LK8000', 'LK810', 'LK820', 'LK825', 'LK826', 'LK829', 'LK830', 'LK863', 'LK864', 'LK867', 'LK870', 'LK880', 'LK881', 'LKP1500', 'LKP155',
+        'LM1008', 'LM2000',
+        'LPC098V', 'LPC099TT', 'LPC099V', 'LPC140P', 'LPC140V', 'LPC147V', 'LPC330V', 'LPC380', 'LPC380TT', 'LPC381V', 'LPC450', 'LPC450V', 'LPC450VLS', 'LPC455V', 'LPC54', 'LPC54LS', 'LPC54TT', 'LPC54V', 'LPC55', 'LPC61', 'LPC78H', 'LPC78ZH',
+        'LPST800', 'LPST871', 'LPST880', 'LPST890', 'LPST891', 'LPST95',
+        'LSP10', 'LSP11',
+        'LST104', 'LST225', 'LST235', 'LST236', 'LST237', 'LST241', 'LST245', 'LST253', 'LST254', 'LST264', 'LST272', 'LST274', 'LST280', 'LST293', 'LST296', 'LST298', 'LST299', 'LST30', 'LST304', 'LST307', 'LST311', 'LST340', 'LST350', 'LST352', 'LST353', 'LST353LS', 'LST356', 'LST357', 'LST358', 'LST360', 'LST361', 'LST362', 'LST380', 'LST390', 'LST396', 'LST397', 'LST40', 'LST400', 'LST400LS', 'LST401', 'LST402', 'LST403', 'LST405', 'LST406', 'LST407', 'LST410', 'LST411', 'LST420', 'LST420LS', 'LST441', 'LST442', 'LST444', 'LST446', 'LST450', 'LST465', 'LST466', 'LST468', 'LST469', 'LST470', 'LST470LS', 'LST475', 'LST484', 'LST485', 'LST486', 'LST490', 'LST520', 'LST530', 'LST535', 'LST550', 'LST560', 'LST561', 'LST562', 'LST570', 'LST590', 'LST6041', 'LST6043', 'LST630', 'LST640', 'LST641', 'LST650', 'LST652', 'LST653', 'LST655', 'LST659', 'LST660', 'LST665', 'LST672', 'LST680', 'LST685', 'LST690', 'LST695', 'LST700', 'LST710', 'LST711', 'LST725', 'LST740', 'LST76', 'LST800', 'LST850', 'LST852', 'LST853', 'LST854', 'LST855', 'LST856', 'LST857', 'LST860', 'LST870', 'LST885', 'LST90', 'LST94', 'LST940', 'LST941', 'LST970', 'LST980',
+        'LSW285', 'LSW2850', 'LSW287', 'LSW2870', 'LSW289', 'LSW2890', 'LSW415', 'LSW4150', 'LSW416',
+        'LW100', 'LW102', 'LW380', 'LW382', 'LW400', 'LW401', 'LW644', 'LW645', 'LW657', 'LW668', 'LW669', 'LW670', 'LW672', 'LW676', 'LW680', 'LW700', 'LW701', 'LW703', 'LW713', 'LW714', 'LW715', 'LW808', 'LW809', 'LW816', 'LW960', 'LW963',
+        'OR322218', 'OR322225', 'OR322226', 'OR322227', 'OR322228', 'OR322229', 'OR322263', 'OR322264', 'OR322265', 'OR322267', 'OR322268',
+        'RH79',
+        'TTCM3914', 'TTCM4367', 'TTCM4413', 'TTCM4414', 'TTCM4879', 'TTCM5645', 'TTCM5660', 'TTCW5646', 'TTCW5647', 'TTCW6108'
+    ]);
+
+    /**
+     * Styles that use lowercase _ss suffix in ShopWorks
+     * ADDED 2026-01-04: Fix for ShopWorks lowercase suffix
+     */
+    static LOWERCASE_SS_STYLES = new Set([
+        'WW3150S'
+    ]);
+
+    /**
+     * Styles that use lowercase _xxxl suffix in ShopWorks
+     * ADDED 2026-01-04: Fix for ShopWorks lowercase suffix
+     */
+    static LOWERCASE_XXXL_STYLES = new Set([
+        'OR322226', 'OR322227', 'OR322228', 'OR322264', 'OR322267', 'OR322269'
+    ]);
+
+    /**
      * Size to ShopWorks suffix mapping
      * VERIFIED from shopworksparts.csv - ShopWorks uses _2X NOT _2XL
+     * UPDATED 2026-01-04: Added 97 additional sizes from SanMar CSV validation
      */
     static SIZE_TO_SUFFIX = {
         // Standard sizes - no suffix (use base SKU)
@@ -41,6 +82,16 @@ class SKUValidationService {
         '4XL': '_4X',
         '5XL': '_5X',
         '6XL': '_6X',
+        '7XL': '_7X',      // Extra-extended (S608ES, K500ES)
+        '8XL': '_8X',      // Extra-extended
+        '9XL': '_9X',      // Extra-extended
+        '10XL': '_10X',    // Extra-extended
+
+        // Aliases for extended sizes (XXL = 2XL, XXXL = 3XL)
+        'XXL': '_2X',      // 594 styles use XXL - maps to same as 2XL
+        'XXXL': '_3X',     // Maps to same as 3XL
+        'XXS': '_XXS',     // Extra-extra small (18 styles)
+        '2XS': '_2XS',     // Alternative extra-extra small (15 styles)
 
         // Tall sizes
         'LT': '_LT',
@@ -48,12 +99,24 @@ class SKUValidationService {
         '2XLT': '_2XLT',
         '3XLT': '_3XLT',
         '4XLT': '_4XLT',
+        'ST': '_ST',       // Short tall (WW3150T, WW4750T)
+        'MT': '_MT',       // Medium tall (WW4750T, CTTC003)
+        'XST': '_XST',     // Extra small tall (WW4750T)
 
         // One-size / combination sizes
         'OSFA': '_OSFA',
         'S/M': '_S/M',
         'M/L': '_M/L',
         'L/XL': '_L/XL',
+        'S/XL': '_S/XL',   // CT102368
+        'XS/S': '_XS/S',   // CT106171
+        'X/2X': '_X/2X',   // CT106171
+        '2/3X': '_2/3X',   // CSV104, CSV101
+        '3/4X': '_3/4X',   // CT106171
+        '4/5X': '_4/5X',   // CSV104, CSV102
+        '2-5X': '_2-5X',   // CT102368
+        'T/C': '_T/C',     // Toddler/Child (NE302)
+        'C/Y': '_C/Y',     // Child/Youth (NE302)
 
         // Youth sizes
         'YXS': '_YXS',
@@ -67,14 +130,112 @@ class SKUValidationService {
         '3T': '_3T',
         '4T': '_4T',
         '5T': '_5T',
+        '6T': '_6T',       // 5100P (was missing)
         '5/6': '_5/6',
+        '5/6T': '_5/6T',   // RS3330, RS3321
 
         // Infant sizes
         'NB': '_NB',
         '6M': '_6M',
+        '06M': '_06M',     // With leading zero (CAR78IZH, CAR54I)
         '12M': '_12M',
         '18M': '_18M',
-        '24M': '_24M'
+        '24M': '_24M',
+        '306': '_306',     // 3-6 months (BC3001B, BC100B)
+        '612': '_612',     // 6-12 months (BC100B, BC3001B)
+        // ShopWorks 4-digit infant sizes (leading zeros preserved)
+        '0003': '_0003',   // 0-3 months
+        '0306': '_0306',   // 3-6 months (different from '306')
+        '0612': '_0612',   // 6-12 months (different from '612')
+        '1218': '_1218',   // 12-18 months
+        '1824': '_1824',   // 18-24 months
+
+        // Waist-only sizes (shorts) - PT66, CT103542
+        'W30': '_W30',
+        'W31': '_W31',
+        'W32': '_W32',
+        'W33': '_W33',
+        'W34': '_W34',
+        'W35': '_W35',
+        'W36': '_W36',
+        'W38': '_W38',
+        'W40': '_W40',
+        'W42': '_W42',
+        'W44': '_W44',
+        'W46': '_W46',
+        'W48': '_W48',
+        'W50': '_W50',
+
+        // Regular variants (CS10, CS20 - Cornerstone work shirts)
+        'SR': '_SR',       // Small Regular
+        'MR': '_MR',       // Medium Regular
+        'LR': '_LR',       // Large Regular
+        'XLR': '_XLR',     // XL Regular
+        '2XLR': '_2XLR',   // 2XL Regular
+        '3XLR': '_3XLR',   // 3XL Regular
+        '4XLR': '_4XLR',   // 4XL Regular
+        '5XLR': '_5XLR',   // 5XL Regular
+        '6XLR': '_6XLR',   // 6XL Regular
+
+        // Long variants (CS10LONG, CS20LONG - Cornerstone)
+        'ML': '_ML',       // Medium Long
+        'LL': '_LL',       // Large Long
+        'XLL': '_XLL',     // XL Long
+        '2XLL': '_2XLL',   // 2XL Long
+        '3XLL': '_3XLL',   // 3XL Long
+
+        // Short variants (CTS104393 - Carhartt)
+        'MS': '_MS',       // Medium Short
+        'LS': '_LS',       // Large Short
+        'XLS': '_XLS',     // XL Short
+        '2XLS': '_2XLS',   // 2XL Short
+        '3XLS': '_3XLS',   // 3XL Short
+        'SS': '_SS',       // Small Short (WW3150S)
+        'XSS': '_XSS',     // XS Short
+        '2XSS': '_2XSS',   // 2XS Short
+        'ss': '_ss',       // lowercase variant (WW3150S uses _ss in ShopWorks)
+        'xxxl': '_xxxl',   // lowercase variant (OR322226 uses _xxxl in ShopWorks)
+
+        // Petite variants (WW4550P - Wonderwink)
+        'SP': '_SP',       // Small Petite
+        'MP': '_MP',       // Medium Petite
+        'LP': '_LP',       // Large Petite
+        'XLP': '_XLP',     // XL Petite
+        'XSP': '_XSP',     // XS Petite
+        '2XLP': '_2XLP',   // 2XL Petite
+        '2XSP': '_2XSP',   // 2XS Petite
+
+        // Numeric belt/shoe sizes (TM1MW454, MM4001, DT2020)
+        '0': '_0',
+        '1': '_1',
+        '2': '_2',
+        '3': '_3',
+        '4': '_4',
+        '5': '_5',
+        '6': '_6',
+        '7': '_7',
+        '8': '_8',
+        '9': '_9',
+        '10': '_10',
+        '11': '_11',
+        '12': '_12',
+        '13': '_13',
+        '14': '_14',
+        '16': '_16',
+        '18': '_18',
+        '20': '_20',
+        '30': '_30',
+        '32': '_32',
+        '33': '_33',
+        '34': '_34',
+        '35': '_35',
+        '36': '_36',
+        '38': '_38',
+        '40': '_40',
+        '42': '_42',
+
+        // Special combo sizes
+        'SM': '_SM'        // 212 style
     };
 
     /**
@@ -96,6 +257,23 @@ class SKUValidationService {
         }
 
         const normalizedSize = size.toUpperCase().trim();
+
+        // Special handling: XXL → _XXL for Ladies/District products
+        // These styles use _XXL in ShopWorks instead of the default _2X
+        if (normalizedSize === 'XXL' && SKUValidationService.XXL_STYLES.has(style)) {
+            return `${style}_XXL`;
+        }
+
+        // Special handling: SS → _ss for styles with lowercase suffix in ShopWorks
+        if (normalizedSize === 'SS' && SKUValidationService.LOWERCASE_SS_STYLES.has(style)) {
+            return `${style}_ss`;
+        }
+
+        // Special handling: XXXL → _xxxl for styles with lowercase suffix in ShopWorks
+        if (normalizedSize === 'XXXL' && SKUValidationService.LOWERCASE_XXXL_STYLES.has(style)) {
+            return `${style}_xxxl`;
+        }
+
         const suffix = SKUValidationService.SIZE_TO_SUFFIX[normalizedSize];
 
         // Known size with explicit mapping
