@@ -3116,18 +3116,6 @@
                 }
 
                 if (product) {
-                    // Check for cap products - now supported with cap-specific pricing
-                    const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE);
-                    const capBadge = document.getElementById(`cap-badge-${rowId}`);
-                    if (isCap) {
-                        row.dataset.isCap = 'true';
-                        if (capBadge) capBadge.style.display = 'inline-flex';
-                        showToast('Cap detected - using cap embroidery pricing', 'info', 3000);
-                    } else {
-                        row.dataset.isCap = 'false';
-                        if (capBadge) capBadge.style.display = 'none';
-                    }
-
                     // Pants products (PT20, etc.) are now supported via size picker popup
                     // Size category detection will handle waist/inseam sizing
 
@@ -3137,10 +3125,26 @@
                     // Update description with clean title
                     descInput.value = cleanTitle || styleNumber;
 
-                    // Fetch colors using product-colors API
+                    // Fetch colors using product-colors API (also returns CATEGORY_NAME)
                     const colorsResponse = await fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`);
                     const colorsData = await colorsResponse.json();
                     const colors = colorsData.colors || [];
+
+                    // Store product category from API
+                    const categoryName = colorsData.CATEGORY_NAME || '';
+                    row.dataset.category = categoryName;
+
+                    // Check for cap products using CATEGORY_NAME (definitive) or pattern matching (fallback)
+                    const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);
+                    const capBadge = document.getElementById(`cap-badge-${rowId}`);
+                    if (isCap) {
+                        row.dataset.isCap = 'true';
+                        if (capBadge) capBadge.style.display = 'inline-flex';
+                        showToast('Cap detected - using cap embroidery pricing', 'info', 3000);
+                    } else {
+                        row.dataset.isCap = 'false';
+                        if (capBadge) capBadge.style.display = 'none';
+                    }
 
                     if (colors && colors.length > 0) {
                         // Populate custom color picker dropdown with swatches
@@ -3212,9 +3216,18 @@
          * Check if a style number is a cap/hat product
          * @param {string} style - Style number
          * @param {string} productTitle - Product title/description
+         * @param {string} categoryName - CATEGORY_NAME from SanMar API (most reliable)
          * @returns {boolean} True if cap/hat
          */
-        function isCapProduct(style, productTitle = '') {
+        function isCapProduct(style, productTitle = '', categoryName = '') {
+            // BEST METHOD: Check CATEGORY_NAME from SanMar API
+            // SanMar categorizes all caps/hats under "Caps" category
+            if (categoryName && categoryName.toLowerCase() === 'caps') {
+                console.log(`[isCapProduct] ${style} detected as cap via CATEGORY_NAME: "${categoryName}"`);
+                return true;
+            }
+
+            // FALLBACK: Pattern matching for cases where category isn't available
             if (!style) return false;
             const styleUpper = style.toUpperCase();
             const titleUpper = (productTitle || '').toUpperCase();
@@ -3225,11 +3238,13 @@
             // C+digit (C112, C118)
             // Richardson styles (112, 110, 115, etc) - numeric only
             if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
+                console.log(`[isCapProduct] ${style} detected as cap via style pattern`);
                 return true;
             }
 
             // Richardson caps - 2-3 digit numeric styles (100-999)
             if (/^\d{2,3}$/.test(styleUpper)) {
+                console.log(`[isCapProduct] ${style} detected as cap via Richardson numeric pattern`);
                 return true;
             }
 
@@ -3237,6 +3252,7 @@
             if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
                 titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||
                 titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {
+                console.log(`[isCapProduct] ${style} detected as cap via title keyword`);
                 return true;
             }
 
