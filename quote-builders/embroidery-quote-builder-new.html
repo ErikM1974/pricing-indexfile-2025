@@ -1362,6 +1362,30 @@
             cursor: text !important;
         }
 
+        /* Cap badge indicator */
+        .desc-cell {
+            position: relative;
+        }
+
+        .cap-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .cap-badge i {
+            font-size: 10px;
+        }
+
         /* Size label override for non-standard columns */
         .size-label-override {
             display: block;
@@ -2972,11 +2996,14 @@
                            onchange="onStyleChange(this, ${rowId})"
                            onkeydown="handleCellKeydown(event, this)">
                 </td>
-                <td>
+                <td class="desc-cell">
                     <input type="text" class="cell-input desc-input"
                            placeholder="(auto)"
                            data-field="description"
                            readonly>
+                    <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
+                        <i class="fas fa-hat-cowboy"></i> Cap
+                    </span>
                 </td>
                 <td>
                     <div class="color-picker-wrapper" data-row-id="${rowId}">
@@ -3060,9 +3087,16 @@
                 }
 
                 if (product) {
-                    // Check for cap products and show warning (allow entry per user preference)
-                    if (isCapProduct(styleNumber, product.PRODUCT_TITLE)) {
-                        showToast('Cap detected - this builder is designed for garments. Use Cap Quote Builder for caps.', 'warning', 5000);
+                    // Check for cap products - now supported with cap-specific pricing
+                    const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE);
+                    const capBadge = document.getElementById(`cap-badge-${rowId}`);
+                    if (isCap) {
+                        row.dataset.isCap = 'true';
+                        if (capBadge) capBadge.style.display = 'inline-flex';
+                        showToast('Cap detected - using cap embroidery pricing', 'info', 3000);
+                    } else {
+                        row.dataset.isCap = 'false';
+                        if (capBadge) capBadge.style.display = 'none';
                     }
 
                     // Pants products (PT20, etc.) are now supported via size picker popup
@@ -3156,15 +3190,24 @@
             const styleUpper = style.toUpperCase();
             const titleUpper = (productTitle || '').toUpperCase();
 
-            // Check style patterns from embroidery-quote-pricing.js
-            // CP* caps (CP80, CP90, etc), NE* caps (NE1000), C+digit (C112)
+            // Check style patterns:
+            // CP* caps (CP80, CP90, etc)
+            // NE* caps (NE1000, NE400)
+            // C+digit (C112, C118)
+            // Richardson styles (112, 110, 115, etc) - numeric only
             if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
+                return true;
+            }
+
+            // Richardson caps - 2-3 digit numeric styles (100-999)
+            if (/^\d{2,3}$/.test(styleUpper)) {
                 return true;
             }
 
             // Check title keywords
             if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
-                titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK')) {
+                titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||
+                titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {
                 return true;
             }
 
@@ -4751,6 +4794,7 @@
                             productName: row.dataset.productName || style,
                             sizeBreakdown: group.sizeBreakdown,
                             totalQuantity: group.totalQty,
+                            isCap: row.dataset.isCap === 'true',  // Cap detection for pricing routing
                             logoAssignments: {
                                 primary: { logoId: 'primary', quantity: group.totalQty },
                                 additional: []
