@@ -393,40 +393,81 @@ class EmbroideryInvoiceGenerator {
         if (!pricingData.logos || pricingData.logos.length === 0) {
             return '';
         }
-        
+
         let specsHTML = `
             <div style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>
         `;
-        
-        // List primary logo
-        pricingData.logos.forEach((logo, index) => {
-            if (logo.isPrimary !== false) {
+
+        // Find primary logo
+        const primaryLogo = pricingData.logos.find(l => l.isPrimary !== false) || pricingData.logos[0];
+        if (primaryLogo) {
+            const position = primaryLogo.position || 'Left Chest';
+            const stitchCount = primaryLogo.stitchCount || 8000;
+            const extraStitches = stitchCount - 8000;
+
+            // Primary logo (base 8K included)
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches) -
+                    <span style="color: #4cb354;">BASE (8K INCLUDED)</span>
+                </div>
+            `;
+
+            // Additional stitches line item (when primary > 8K)
+            if (extraStitches > 0) {
+                const extraK = extraStitches / 1000;
+                const asCostPerUnit = extraK * 1.25;
                 specsHTML += `
-                    <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                        ✓ <strong>Left Chest</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
-                        <span style="color: #4cb354;">INCLUDED IN BASE PRICE</span>
+                    <div style="font-size: 11px; color: #333; margin: 4px 0; margin-left: 15px;">
+                        + <strong>Additional Stitches</strong> (+${extraK}K) -
+                        <span style="color: #ff6b35;">+$${asCostPerUnit.toFixed(2)} per piece</span>
                     </div>
                 `;
             }
-        });
-        
+
+            // Primary digitizing if needed
+            if (primaryLogo.needsDigitizing) {
+                specsHTML += `
+                    <div style="font-size: 10px; color: #666; margin: 2px 0; margin-left: 15px;">
+                        + Digitizing: $100
+                    </div>
+                `;
+            }
+        }
+
         // Add additional logos with clear pricing and digitizing info
         const additionalLogos = pricingData.logos.filter(l => l.isPrimary === false);
-        additionalLogos.forEach((logo, index) => {
-            const alCost = pricingData.alCost || 11.50;
-            const needsDigitizing = logo.needsDigitizing || false;
-            const digitizingText = needsDigitizing ? ' [+$100 Digitizing]' : '';
-            
-            specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    ✓ <strong>Right Chest</strong> (${logo.stitchCount.toLocaleString()} stitches) - 
-                    <span style="color: #ff6b35;">ADDITIONAL (+$${alCost.toFixed(2)} per piece)</span>
-                    <span style="color: #666;">${digitizingText}</span>
-                </div>
-            `;
-        });
-        
+        if (additionalLogos.length > 0) {
+            // Determine AL base rate from tier
+            const tier = pricingData.tier || '1-23';
+            let alBaseRate = 12.50;
+            if (tier.includes('72')) alBaseRate = 8.50;
+            else if (tier.includes('48')) alBaseRate = 9.50;
+            else if (tier.includes('24')) alBaseRate = 11.50;
+
+            additionalLogos.forEach((logo, index) => {
+                const position = logo.position || 'Additional Logo';
+                const stitchCount = logo.stitchCount || 8000;
+                const extraStitches = Math.max(0, stitchCount - 8000);
+                const extraK = extraStitches / 1000;
+                const stitchCost = extraK * 1.25;
+                const alUnitPrice = alBaseRate + stitchCost;
+                const needsDigitizing = logo.needsDigitizing || false;
+
+                const stitchNote = extraStitches > 0 ? ` (+${extraK}K stitches)` : '';
+                const digitizingText = needsDigitizing ? ' [+$100 Digitizing]' : '';
+
+                specsHTML += `
+                    <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                        ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote} -
+                        <span style="color: #ff6b35;">+$${alUnitPrice.toFixed(2)} per piece</span>
+                        <span style="color: #666; font-size: 10px;">${digitizingText}</span>
+                    </div>
+                `;
+            });
+        }
+
         // Add setup fees if present
         if (pricingData.setupFees > 0) {
             const digitizingCount = pricingData.logos.filter(l => l.needsDigitizing).length;
@@ -438,19 +479,19 @@ class EmbroideryInvoiceGenerator {
                 `;
             }
         }
-        
+
         // Add LTM notice if applicable (only when NOT distributed into unit prices)
         if (pricingData.ltmFee > 0 && !pricingData.ltmDistributed) {
             const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
             specsHTML += `
                 <div style="font-size: 9px; color: #dc3545; margin-top: 5px; font-style: italic;">
-                    ⚠ Small Batch Fee: ADDITIONAL (+$${ltmPerPiece} per piece for orders under 24)
+                    ⚠ Small Batch Fee: +$${ltmPerPiece} per piece (orders under 24)
                 </div>
             `;
         }
-        
+
         specsHTML += `</div>`;
-        
+
         return specsHTML;
     }
     
@@ -503,9 +544,37 @@ class EmbroideryInvoiceGenerator {
                 return desc.includes('4XL') || desc.includes('5XL') || desc.includes('6XL');
             });
             
-            // Get AL cost from actual data
-            const alCost = pricingData.alCost || (regularSizes[0] && regularSizes[0].alCost) || 0
-            
+            // Build dynamic AL breakdown from logos
+            const additionalLogos = (pricingData.logos || []).filter(l => l.isPrimary === false);
+            const tier = pricingData.tier || '1-23';
+            let alBaseRate = 12.50;
+            if (tier.includes('72')) alBaseRate = 8.50;
+            else if (tier.includes('48')) alBaseRate = 9.50;
+            else if (tier.includes('24')) alBaseRate = 11.50;
+
+            // Calculate primary logo additional stitches cost
+            const primaryLogo = (pricingData.logos || []).find(l => l.isPrimary !== false);
+            const primaryExtraStitches = primaryLogo ? Math.max(0, (primaryLogo.stitchCount || 8000) - 8000) : 0;
+            const primaryASCost = (primaryExtraStitches / 1000) * 1.25;
+
+            // Build AL cost lines
+            let alBreakdownLines = '';
+            let totalALCost = 0;
+            additionalLogos.forEach(logo => {
+                const extraStitches = Math.max(0, (logo.stitchCount || 8000) - 8000);
+                const stitchCost = (extraStitches / 1000) * 1.25;
+                const alUnitPrice = alBaseRate + stitchCost;
+                totalALCost += alUnitPrice;
+                const stitchNote = extraStitches > 0 ? ` (+${extraStitches/1000}K)` : '';
+                alBreakdownLines += `+ AL ${logo.position || 'Additional'}${stitchNote}: $${alUnitPrice.toFixed(2)}<br>`;
+            });
+
+            // Add additional stitches line if primary > 8K
+            let asBreakdownLine = '';
+            if (primaryASCost > 0) {
+                asBreakdownLine = `+ Additional Stitches (+${primaryExtraStitches/1000}K): $${primaryASCost.toFixed(2)}<br>`;
+            }
+
             // Add regular sizes if exists
             if (regularSizes.length > 0) {
                 const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
@@ -515,7 +584,13 @@ class EmbroideryInvoiceGenerator {
                 const unitPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                 const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
                 const sizeDesc = regularSizes.map(item => this.parseSizeDisplay(item)).join(' ');
-                
+
+                // Build pricing breakdown - only show extras if they exist
+                let priceBreakdown = `Base (includes primary logo): $${basePrice.toFixed(2)}<br>`;
+                if (asBreakdownLine) priceBreakdown += asBreakdownLine;
+                if (alBreakdownLines) priceBreakdown += alBreakdownLines;
+                priceBreakdown += `= $${unitPrice.toFixed(2)} each`;
+
                 // Format the pricing breakdown like the screen
                 tableHTML += `
                     <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
@@ -528,9 +603,7 @@ class EmbroideryInvoiceGenerator {
                             </div>
                         </div>
                         <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
-                            Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
-                            + AL Right Chest: $${alCost.toFixed(2)}<br>
-                            = $${unitPrice.toFixed(2)} each
+                            ${priceBreakdown}
                         </div>
                     </div>
                 `;
@@ -543,7 +616,13 @@ class EmbroideryInvoiceGenerator {
                     const displayPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                     const basePrice = item.basePrice;
                     const sizeDesc = this.parseSizeDisplay(item);
-                    
+
+                    // Build pricing breakdown dynamically
+                    let priceBreakdown = `Base (includes primary logo): $${basePrice.toFixed(2)}<br>`;
+                    if (asBreakdownLine) priceBreakdown += asBreakdownLine;
+                    if (alBreakdownLines) priceBreakdown += alBreakdownLines;
+                    priceBreakdown += `= $${displayPrice.toFixed(2)} each`;
+
                     tableHTML += `
                         <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -555,15 +634,13 @@ class EmbroideryInvoiceGenerator {
                                 </div>
                             </div>
                             <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
-                                Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
-                                + AL Right Chest: $${alCost.toFixed(2)}<br>
-                                = $${displayPrice.toFixed(2)} each
+                                ${priceBreakdown}
                             </div>
                         </div>
                     `;
                 });
             }
-            
+
             // Add 3XL sizes
             if (size3XL.length > 0) {
                 size3XL.forEach(item => {
@@ -571,7 +648,13 @@ class EmbroideryInvoiceGenerator {
                     const displayPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                     const basePrice = item.basePrice;
                     const sizeDesc = this.parseSizeDisplay(item);
-                    
+
+                    // Build pricing breakdown dynamically
+                    let priceBreakdown = `Base (includes primary logo): $${basePrice.toFixed(2)}<br>`;
+                    if (asBreakdownLine) priceBreakdown += asBreakdownLine;
+                    if (alBreakdownLines) priceBreakdown += alBreakdownLines;
+                    priceBreakdown += `= $${displayPrice.toFixed(2)} each`;
+
                     tableHTML += `
                         <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -583,15 +666,13 @@ class EmbroideryInvoiceGenerator {
                                 </div>
                             </div>
                             <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
-                                Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
-                                + AL Right Chest: $${alCost.toFixed(2)}<br>
-                                = $${displayPrice.toFixed(2)} each
+                                ${priceBreakdown}
                             </div>
                         </div>
                     `;
                 });
             }
-            
+
             // Add other larger sizes if any
             if (largerSizes.length > 0) {
                 largerSizes.forEach(item => {
@@ -599,7 +680,13 @@ class EmbroideryInvoiceGenerator {
                     const displayPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                     const basePrice = item.basePrice;
                     const sizeDesc = this.parseSizeDisplay(item);
-                    
+
+                    // Build pricing breakdown dynamically
+                    let priceBreakdown = `Base (includes primary logo): $${basePrice.toFixed(2)}<br>`;
+                    if (asBreakdownLine) priceBreakdown += asBreakdownLine;
+                    if (alBreakdownLines) priceBreakdown += alBreakdownLines;
+                    priceBreakdown += `= $${displayPrice.toFixed(2)} each`;
+
                     tableHTML += `
                         <div style="padding: 8px 10px; border-bottom: 1px solid #e0e0e0;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -611,9 +698,7 @@ class EmbroideryInvoiceGenerator {
                                 </div>
                             </div>
                             <div style="margin-left: 15px; font-size: 10px; color: #666; line-height: 1.4;">
-                                Base (includes primary logo): $${basePrice.toFixed(2)} = $${basePrice.toFixed(2)} each<br>
-                                + AL Right Chest: $${alCost.toFixed(2)}<br>
-                                = $${displayPrice.toFixed(2)} each
+                                ${priceBreakdown}
                             </div>
                         </div>
                     `;

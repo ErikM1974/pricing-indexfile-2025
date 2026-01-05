@@ -96,22 +96,174 @@
         }
 
         /* Logo Preset Bar */
-        .logo-bar {
-            background: white;
+        /* Logo Configuration Section */
+        .logo-section {
+            background: #f8f9fa;
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            padding: 15px 20px;
         }
 
-        .logo-bar-label {
+        .primary-logo-config {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .logo-section-label {
             font-weight: 600;
             color: #333;
             font-size: 14px;
+            min-width: 120px;
         }
 
+        .logo-section-label i {
+            margin-right: 6px;
+            color: var(--nwca-green);
+        }
+
+        .logo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-select {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            background: white;
+        }
+
+        .stitch-input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .stitch-input-group input {
+            width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .digitizing-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .digitizing-label input {
+            cursor: pointer;
+        }
+
+        /* Additional Logos Section */
+        .additional-logos-section {
+            padding-top: 12px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .al-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .add-logo-btn {
+            padding: 6px 14px;
+            background: var(--nwca-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .add-logo-btn:hover {
+            background: #3da344;
+        }
+
+        .additional-logos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .no-logos {
+            color: #999;
+            font-size: 12px;
+            font-style: italic;
+            padding: 8px;
+        }
+
+        .additional-logo-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .additional-logo-row select {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .additional-logo-row .stitch-input-group input {
+            width: 70px;
+            padding: 5px 8px;
+            font-size: 12px;
+        }
+
+        .additional-logo-row .stitch-input-group span {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .al-digitizing {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+
+        .al-price {
+            font-weight: 600;
+            color: var(--nwca-green);
+            min-width: 75px;
+            font-size: 13px;
+        }
+
+        .remove-al-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .remove-al-btn:hover {
+            color: #a71d2a;
+        }
+
+        /* Legacy preset-btn kept for any remaining uses */
         .preset-btn {
             padding: 8px 16px;
             border: 2px solid var(--border-color);
@@ -1420,24 +1572,39 @@
     <div class="power-main">
         <!-- Left: Content Area -->
         <div class="power-content">
-            <!-- Logo Preset Bar -->
-            <div class="logo-bar">
-                <span class="logo-bar-label"><i class="fas fa-palette"></i> Logo:</span>
-                <button class="preset-btn active" data-preset="lc-8k" onclick="selectLogoPreset('lc-8k')">
-                    <i class="fas fa-check"></i> Left Chest 8K
-                </button>
-                <button class="preset-btn" data-preset="fb-10k" onclick="selectLogoPreset('fb-10k')">
-                    Full Back 10K
-                </button>
-                <button class="preset-btn" data-preset="custom" onclick="openLogoModal()">
-                    <i class="fas fa-sliders-h"></i> Custom...
-                </button>
+            <!-- Logo Configuration Section -->
+            <div class="logo-section">
+                <!-- Primary Logo -->
+                <div class="primary-logo-config">
+                    <span class="logo-section-label"><i class="fas fa-palette"></i> Primary Logo</span>
+                    <div class="logo-controls">
+                        <select id="primary-position" class="logo-select">
+                            <option value="Left Chest" selected>Left Chest</option>
+                            <option value="Right Chest">Right Chest</option>
+                            <option value="Center Chest">Center Chest</option>
+                        </select>
+                        <div class="stitch-input-group">
+                            <label>Stitches:</label>
+                            <input type="number" id="primary-stitches" value="8000"
+                                   min="1000" max="50000" step="1000">
+                        </div>
+                        <label class="digitizing-label">
+                            <input type="checkbox" id="primary-digitizing">
+                            Digitizing ($100)
+                        </label>
+                    </div>
+                </div>
 
-                <div class="logo-config-display">
-                    <span>Current: <strong id="current-logo-display">Left Chest, 8000 stitches</strong></span>
-                    <div class="digitizing-toggle">
-                        <input type="checkbox" id="digitizing-checkbox">
-                        <label for="digitizing-checkbox">Digitizing ($100)</label>
+                <!-- Additional Logos -->
+                <div class="additional-logos-section">
+                    <div class="al-section-header">
+                        <span class="logo-section-label">Additional Logos</span>
+                        <button id="add-logo-btn" class="add-logo-btn" onclick="addAdditionalLogo()">
+                            <i class="fas fa-plus"></i> Add Logo
+                        </button>
+                    </div>
+                    <div id="additional-logos-list" class="additional-logos-list">
+                        <div class="no-logos">No additional logos added</div>
                     </div>
                 </div>
             </div>
@@ -1540,6 +1707,13 @@
                     <span class="label">Products Subtotal:</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
+
+                <div class="pricing-row" id="additional-stitches-row" style="display: none;">
+                    <span class="label">Additional Stitches:</span>
+                    <span class="value" id="additional-stitches-fee">$0.00</span>
+                </div>
+
+                <div id="additional-logos-pricing"></div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
                     <span class="label">LTM Fee (&lt; 24 pcs):</span>
@@ -1712,12 +1886,18 @@
         // State
         let pricingCalculator = null;
         let quoteService = null;
-        let currentLogo = {
+        // Primary logo configuration
+        let primaryLogo = {
             position: 'Left Chest',
             stitchCount: 8000,
             needsDigitizing: false,
             isPrimary: true
         };
+
+        // Additional logos array
+        let additionalLogos = [];
+        // Example entry: { id: 'al-1', position: 'Right Chest', stitchCount: 8000, needsDigitizing: false, isPrimary: false }
+
         let products = [];
         let rowCounter = 0;
         let productCache = {}; // Cache product data for quick lookup
@@ -2299,7 +2479,7 @@
                 // Setup event listeners
                 setupSearchAutocomplete();
                 setupKeyboardShortcuts();
-                setupDigitizingToggle();
+                setupPrimaryLogoHandlers();
                 setupLTMToggle();
 
                 // Add initial empty row
@@ -2320,75 +2500,109 @@
         // LOGO PRESETS
         // ============================================================
 
-        function selectLogoPreset(presetId) {
-            // Update UI
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.querySelector('i')?.remove();
-            });
+        // ============================================================
+        // PRIMARY LOGO HANDLERS
+        // ============================================================
 
-            const selectedBtn = document.querySelector(`[data-preset="${presetId}"]`);
-            if (selectedBtn) {
-                selectedBtn.classList.add('active');
-                if (!selectedBtn.querySelector('i')) {
-                    const icon = document.createElement('i');
-                    icon.className = 'fas fa-check';
-                    selectedBtn.prepend(icon);
-                }
+        function setupPrimaryLogoHandlers() {
+            // Position dropdown
+            const positionSelect = document.getElementById('primary-position');
+            if (positionSelect) {
+                positionSelect.addEventListener('change', function() {
+                    primaryLogo.position = this.value;
+                    recalculatePricing();
+                });
             }
 
-            // Update logo config
-            if (presetId === 'lc-8k') {
-                currentLogo.position = 'Left Chest';
-                currentLogo.stitchCount = 8000;
-            } else if (presetId === 'fb-10k') {
-                currentLogo.position = 'Full Back';
-                currentLogo.stitchCount = 10000;
+            // Stitch count input
+            const stitchInput = document.getElementById('primary-stitches');
+            if (stitchInput) {
+                stitchInput.addEventListener('change', function() {
+                    primaryLogo.stitchCount = parseInt(this.value) || 8000;
+                    recalculatePricing();
+                });
             }
 
-            updateLogoDisplay();
+            // Digitizing checkbox
+            const digitizingCheckbox = document.getElementById('primary-digitizing');
+            if (digitizingCheckbox) {
+                digitizingCheckbox.addEventListener('change', function() {
+                    primaryLogo.needsDigitizing = this.checked;
+                    recalculatePricing();
+                });
+            }
+        }
+
+        // ============================================================
+        // ADDITIONAL LOGO MANAGEMENT
+        // ============================================================
+
+        function addAdditionalLogo() {
+            const id = 'al-' + Date.now();
+            const newLogo = {
+                id: id,
+                position: 'Right Chest',
+                stitchCount: 8000,
+                needsDigitizing: false,
+                isPrimary: false
+            };
+            additionalLogos.push(newLogo);
+            renderAdditionalLogos();
             recalculatePricing();
         }
 
-        function openLogoModal() {
-            document.getElementById('logo-position').value = currentLogo.position;
-            document.getElementById('logo-stitches').value = currentLogo.stitchCount;
-            document.getElementById('logo-modal').classList.add('show');
-        }
-
-        function closeLogoModal() {
-            document.getElementById('logo-modal').classList.remove('show');
-        }
-
-        function applyCustomLogo() {
-            currentLogo.position = document.getElementById('logo-position').value;
-            currentLogo.stitchCount = parseInt(document.getElementById('logo-stitches').value) || 8000;
-
-            // Update preset buttons
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.querySelector('i')?.remove();
-            });
-
-            const customBtn = document.querySelector('[data-preset="custom"]');
-            customBtn.classList.add('active');
-
-            updateLogoDisplay();
-            closeLogoModal();
+        function removeAdditionalLogo(id) {
+            additionalLogos = additionalLogos.filter(logo => logo.id !== id);
+            renderAdditionalLogos();
             recalculatePricing();
         }
 
-        function updateLogoDisplay() {
-            const display = document.getElementById('current-logo-display');
-            display.textContent = `${currentLogo.position}, ${currentLogo.stitchCount.toLocaleString()} stitches`;
-        }
-
-        function setupDigitizingToggle() {
-            const checkbox = document.getElementById('digitizing-checkbox');
-            checkbox.addEventListener('change', function() {
-                currentLogo.needsDigitizing = this.checked;
+        function updateAdditionalLogo(id, field, value) {
+            const logo = additionalLogos.find(l => l.id === id);
+            if (logo) {
+                logo[field] = value;
                 recalculatePricing();
-            });
+            }
+        }
+
+        function renderAdditionalLogos() {
+            const container = document.getElementById('additional-logos-list');
+            if (!container) return;
+
+            if (additionalLogos.length === 0) {
+                container.innerHTML = '<div class="no-logos">No additional logos added</div>';
+                return;
+            }
+
+            container.innerHTML = additionalLogos.map(logo => `
+                <div class="additional-logo-row" data-logo-id="${logo.id}">
+                    <select class="al-position" onchange="updateAdditionalLogo('${logo.id}', 'position', this.value)">
+                        <option value="Right Chest" ${logo.position === 'Right Chest' ? 'selected' : ''}>Right Chest</option>
+                        <option value="Left Sleeve" ${logo.position === 'Left Sleeve' ? 'selected' : ''}>Left Sleeve</option>
+                        <option value="Right Sleeve" ${logo.position === 'Right Sleeve' ? 'selected' : ''}>Right Sleeve</option>
+                    </select>
+                    <div class="stitch-input-group">
+                        <input type="number" class="al-stitches" value="${logo.stitchCount}"
+                               min="1000" step="1000"
+                               onchange="updateAdditionalLogo('${logo.id}', 'stitchCount', parseInt(this.value) || 8000)">
+                        <span>stitches</span>
+                    </div>
+                    <label class="al-digitizing">
+                        <input type="checkbox" ${logo.needsDigitizing ? 'checked' : ''}
+                               onchange="updateAdditionalLogo('${logo.id}', 'needsDigitizing', this.checked)">
+                        Digitizing
+                    </label>
+                    <span class="al-price" id="al-price-${logo.id}">$0.00/ea</span>
+                    <button class="remove-al-btn" onclick="removeAdditionalLogo('${logo.id}')" title="Remove logo">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Legacy functions for backward compatibility
+        function setupDigitizingToggle() {
+            // Now handled by setupPrimaryLogoHandlers
         }
 
         function setupLTMToggle() {
@@ -4211,13 +4425,14 @@
             }
 
             // Calculate using the existing pricing calculator
-            const logos = [{
-                ...currentLogo,
-                id: 'primary'
-            }];
+            // Combine primary logo + all additional logos
+            const allLogos = [
+                { ...primaryLogo, id: 'primary' },
+                ...additionalLogos
+            ];
 
             try {
-                const pricing = await pricingCalculator.calculateQuote(productList, logos);
+                const pricing = await pricingCalculator.calculateQuote(productList, allLogos);
 
                 if (pricing) {
                     // Update row prices - match line items to rows by style AND color
@@ -4435,6 +4650,57 @@
             } else {
                 setupRow.style.display = 'none';
             }
+
+            // Additional Stitches row (when primary logo > 8K)
+            const asRow = document.getElementById('additional-stitches-row');
+            const extraStitches = primaryLogo.stitchCount - 8000;
+            if (extraStitches > 0 && pricing.totalQuantity > 0) {
+                asRow.style.display = 'flex';
+                const extraK = extraStitches / 1000;
+                const asFee = extraK * 1.25 * pricing.totalQuantity;
+                document.getElementById('additional-stitches-fee').textContent =
+                    `+${extraK}K × ${pricing.totalQuantity} = $${asFee.toFixed(2)}`;
+            } else {
+                asRow.style.display = 'none';
+            }
+
+            // Additional Logos pricing section
+            const alContainer = document.getElementById('additional-logos-pricing');
+            if (additionalLogos.length > 0 && pricing.totalQuantity > 0) {
+                // Calculate AL pricing based on tier
+                const tier = pricing.tier || '1-23';
+                let alBaseRate = 12.50; // Default tier 1-23
+                if (tier.includes('72')) alBaseRate = 8.50;
+                else if (tier.includes('48')) alBaseRate = 9.50;
+                else if (tier.includes('24')) alBaseRate = 11.50;
+
+                let alHtml = '';
+                additionalLogos.forEach(logo => {
+                    const logoExtraStitches = Math.max(0, logo.stitchCount - 8000);
+                    const logoExtraK = logoExtraStitches / 1000;
+                    const stitchCost = logoExtraK * 1.25;
+                    const alUnitPrice = alBaseRate + stitchCost;
+                    const alTotal = alUnitPrice * pricing.totalQuantity;
+
+                    // Update price in the logo row
+                    const priceEl = document.getElementById(`al-price-${logo.id}`);
+                    if (priceEl) {
+                        priceEl.textContent = `$${alUnitPrice.toFixed(2)}/ea`;
+                    }
+
+                    // Add line item to quote summary
+                    const stitchNote = logoExtraStitches > 0 ? ` (+${logoExtraK}K)` : '';
+                    alHtml += `
+                        <div class="pricing-row al-pricing-row">
+                            <span class="label">AL: ${logo.position}${stitchNote}:</span>
+                            <span class="value">$${alTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+                alContainer.innerHTML = alHtml;
+            } else {
+                alContainer.innerHTML = '';
+            }
         }
 
         // ============================================================
@@ -4451,8 +4717,12 @@
             showLoading(true);
 
             try {
-                const logos = [{ ...currentLogo, id: 'primary' }];
-                const pricing = await pricingCalculator.calculateQuote(products, logos);
+                // Combine primary logo + all additional logos
+                const allLogos = [
+                    { ...primaryLogo, id: 'primary' },
+                    ...additionalLogos
+                ];
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
 
                 // Generate and open print window
                 const invoiceGenerator = new EmbroideryInvoiceGenerator();
@@ -4502,8 +4772,12 @@
             showLoading(true);
 
             try {
-                const logos = [{ ...currentLogo, id: 'primary' }];
-                const pricing = await pricingCalculator.calculateQuote(products, logos);
+                // Combine primary logo + all additional logos
+                const allLogos = [
+                    { ...primaryLogo, id: 'primary' },
+                    ...additionalLogos
+                ];
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
 
                 const quoteData = {
                     customerName: customerName,
@@ -4512,7 +4786,7 @@
                     phone: document.getElementById('customer-phone').value || '',
                     salesRepEmail: document.getElementById('sales-rep').value,
                     products: products,
-                    logos: logos,
+                    logos: allLogos,
                     pricing: pricing
                 };
 
@@ -4556,10 +4830,14 @@
             }
 
             try {
-                const logos = [{ ...currentLogo, id: 'primary' }];
-                const pricing = await pricingCalculator.calculateQuote(products, logos);
+                // Combine primary logo + all additional logos
+                const allLogos = [
+                    { ...primaryLogo, id: 'primary' },
+                    ...additionalLogos
+                ];
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
 
-                const text = generateQuoteText(products, pricing);
+                const text = generateQuoteText(products, pricing, allLogos);
                 await navigator.clipboard.writeText(text);
 
                 showToast('Quote copied to clipboard!', 'success');
@@ -4569,7 +4847,7 @@
             }
         }
 
-        function generateQuoteText(products, pricing) {
+        function generateQuoteText(products, pricing, logos) {
             const lines = [
                 'NORTHWEST CUSTOM APPAREL - EMBROIDERY QUOTE',
                 '================================================',
@@ -4577,11 +4855,19 @@
                 `Customer: ${document.getElementById('customer-name').value || 'N/A'}`,
                 `Company: ${document.getElementById('company-name').value || 'N/A'}`,
                 '',
-                `Logo: ${currentLogo.position}, ${currentLogo.stitchCount.toLocaleString()} stitches`,
-                '',
-                'PRODUCTS:',
-                '------------------------------------------------'
+                `Primary Logo: ${primaryLogo.position}, ${primaryLogo.stitchCount.toLocaleString()} stitches`,
             ];
+
+            // Add additional logos if any
+            if (additionalLogos.length > 0) {
+                additionalLogos.forEach(logo => {
+                    lines.push(`Additional Logo: ${logo.position}, ${logo.stitchCount.toLocaleString()} stitches`);
+                });
+            }
+
+            lines.push('');
+            lines.push('PRODUCTS:');
+            lines.push('------------------------------------------------');
 
             products.forEach(p => {
                 const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
