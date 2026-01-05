@@ -1856,8 +1856,9 @@
             backdrop.classList.remove('hidden');
             applyBtn.disabled = true;
 
-            // Check if this is a pants product (use stored sizes directly)
+            // Check if this is a pants or shorts product (use stored sizes directly)
             const isPants = parentRow.dataset.sizeCategory === 'pants';
+            const isShorts = parentRow.dataset.sizeCategory === 'shorts';
             let availableSizes;
 
             if (isPants && parentRow.dataset.pantsSizes) {
@@ -1866,6 +1867,12 @@
                 // Update popup header for pants
                 popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Waist/Inseam Sizes';
                 popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for each waist/inseam combination. These create separate line items.';
+            } else if (isShorts && parentRow.dataset.shortsSizes) {
+                // For shorts (waist-only), use the sizes stored from analyzeSizeCategory
+                availableSizes = JSON.parse(parentRow.dataset.shortsSizes);
+                // Update popup header for shorts
+                popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Waist Sizes';
+                popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for each waist size. These create separate line items.';
             } else {
                 // Show loading spinner for non-pants
                 grid.innerHTML = `
@@ -1883,19 +1890,38 @@
 
             // Check if we have any sizes
             if (!availableSizes || availableSizes.length === 0) {
+                const sizeType = isPants ? 'waist/inseam' : (isShorts ? 'waist' : 'extended');
                 grid.innerHTML = `
                     <div class="size-popup-empty" style="grid-column: 1 / -1;">
                         <i class="fas fa-info-circle"></i><br>
-                        No ${isPants ? 'waist/inseam' : 'extended'} sizes available for ${styleNumber}.
+                        No ${sizeType} sizes available for ${styleNumber}.
                     </div>
                 `;
                 applyBtn.disabled = true;
-                console.log(`ℹ️ No ${isPants ? 'pants' : 'extended'} sizes available for ${styleNumber}`);
+                console.log(`ℹ️ No ${sizeType} sizes available for ${styleNumber}`);
                 return;
             }
 
             // Generate size inputs with current values
-            if (isPants) {
+            if (isShorts) {
+                // Shorts: simple waist-only list (W30, W32, etc.)
+                grid.innerHTML = availableSizes.map(size => {
+                    const currentQty = getExtendedSizeQty(rowId, size);
+                    // Display as "Waist 30" instead of "W30"
+                    const waistNum = size.replace('W', '');
+                    return `
+                        <div class="size-popup-item">
+                            <label>Waist ${waistNum}</label>
+                            <input type="number"
+                                   min="0"
+                                   data-size="${size}"
+                                   value="${currentQty || ''}"
+                                   placeholder="0"
+                                   class="size-popup-input">
+                        </div>
+                    `;
+                }).join('');
+            } else if (isPants) {
                 // Group pants sizes by waist for better UX
                 const waistGroups = {};
                 availableSizes.forEach(size => {
@@ -2737,6 +2763,7 @@
             const TALL = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT'];
             const ONE_SIZE = ['OSFA', 'OSFM'];
             const PANTS_PATTERN = /^\d{4}$/;  // 4-digit waist/inseam codes like 2737, 2830
+            const WAIST_ONLY_PATTERN = /^W\d{2}$/;  // Waist-only codes like W30, W32 (PT66 shorts)
 
             // Count sizes in each category for dominant detection
             const youthCount = sizes.filter(s => YOUTH.includes(s)).length;
@@ -2746,8 +2773,23 @@
             const osfaCount = sizes.filter(s => ONE_SIZE.includes(s)).length;
             const standardCount = sizes.filter(s => STANDARD.includes(s)).length;
             const pantsCount = sizes.filter(s => PANTS_PATTERN.test(s)).length;
+            const waistOnlyCount = sizes.filter(s => WAIST_ONLY_PATTERN.test(s)).length;
 
-            // Priority 1: Pants (waist/inseam sizes like 3032 for 30x32)
+            // Priority 1a: Waist-only shorts (W30, W32, etc. - PT66, CT103542)
+            if (waistOnlyCount > 0 && waistOnlyCount >= sizes.length / 2) {
+                // Extract all valid waist-only sizes
+                const waistSizes = sizes.filter(s => WAIST_ONLY_PATTERN.test(s));
+                return {
+                    category: 'shorts',
+                    columns: [],
+                    useQtyOnly: false,
+                    shortsSizes: waistSizes,
+                    baseSize: waistSizes[0],
+                    message: 'Select waist sizes'
+                };
+            }
+
+            // Priority 1b: Pants (waist/inseam sizes like 3032 for 30x32)
             if (pantsCount > 0 && pantsCount >= sizes.length / 2) {
                 // Extract all valid pants sizes (4-digit codes)
                 const pantsSizes = sizes.filter(s => PANTS_PATTERN.test(s));
@@ -2875,6 +2917,37 @@
                 row.classList.add('pants-row');
                 row.classList.add('non-standard-sizes');
                 showToast('Pants product - click + to select waist/inseam sizes', 'info', 4000);
+                return;
+            }
+
+            // Handle SHORTS (waist-only sizes like W30, W32) - use size picker popup
+            if (sizeInfo.category === 'shorts') {
+                // Disable all size columns (parent row doesn't take quantities)
+                sizeInputs.forEach(input => {
+                    input.disabled = true;
+                    input.value = '';
+                    input.placeholder = '-';
+                    input.closest('td').classList.add('size-disabled');
+                });
+
+                // Enable XXXL cell as "Select Sizes" picker button
+                if (xxxlCell && sizeInfo.shortsSizes && sizeInfo.shortsSizes.length > 0) {
+                    row.dataset.shortsSizes = JSON.stringify(sizeInfo.shortsSizes);
+                    row.dataset.extendedSizes = JSON.stringify(sizeInfo.shortsSizes); // For compatibility
+                    row.dataset.sizeCategory = 'shorts'; // Ensure category is set
+                    xxxlCell.classList.add('shorts-picker-btn');
+                    xxxlCell.disabled = false;
+                    xxxlCell.placeholder = '+';
+                    xxxlCell.closest('td').classList.remove('size-disabled');
+                } else if (xxxlCell) {
+                    xxxlCell.disabled = true;
+                    xxxlCell.placeholder = '-';
+                    xxxlCell.closest('td').classList.add('size-disabled');
+                }
+
+                row.classList.add('shorts-row');
+                row.classList.add('non-standard-sizes');
+                showToast('Shorts product - click + to select waist sizes', 'info', 4000);
                 return;
             }
 
@@ -3764,17 +3837,21 @@
 
             // Determine which column this size goes to:
             // - Size05 (XXL column): only 2XL
-            // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL, pants sizes
+            // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL, pants sizes, shorts sizes
             const isSize05 = size === '2XL';
             const isPantsSize = /^\d{4}$/.test(size);  // 4-digit pants sizes like 3032
-            const isSize06 = SIZE06_EXTENDED_SIZES.includes(size) || isPantsSize;
+            const isShortsSize = /^W\d{2}$/.test(size);  // Waist-only shorts sizes like W30
+            const isSize06 = SIZE06_EXTENDED_SIZES.includes(size) || isPantsSize || isShortsSize;
 
-            // Format display size (pants: "3032" -> "30x32", others: keep as-is)
+            // Format display size (pants: "3032" -> "30x32", shorts: "W30" -> "Waist 30", others: keep as-is)
             let displaySize = size;
             if (isPantsSize) {
                 const waist = size.substring(0, 2);
                 const inseam = size.substring(2, 4);
                 displaySize = `${waist}x${inseam}`;
+            } else if (isShortsSize) {
+                const waist = size.replace('W', '');
+                displaySize = `Waist ${waist}`;
             }
 
             // Create cell content - only the specific size column is editable

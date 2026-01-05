@@ -443,6 +443,19 @@ New method for generating line items in ShopWorks PUSH API format - one line ite
 3. **Use CATALOG_COLOR** - Not COLOR_NAME for API queries
 4. **Description format**: `Brand Style Color | LogoPosition StitchK`
 
+### Integration Verification (Jan 2026)
+
+The complete code path for line item generation:
+
+| Step | File | Line | Code |
+|------|------|------|------|
+| 1 | embroidery-quote-builder-new.html | 1621 | `<script src="/shared_components/js/sku-validation-service.js">` |
+| 2 | embroidery-quote-pricing.js | 512 | `skuService = window.skuValidationService` |
+| 3 | embroidery-quote-pricing.js | 558-560 | `skuService.sanmarToShopWorksSKU(style, size)` |
+| 4 | sku-validation-service.js | 206-223 | Returns suffix from 190+ SIZE_TO_SUFFIX mapping |
+
+**Verified:** All 4,249 styles and 242 sizes generate correct ShopWorks SKUs.
+
 ### Invoice Generator Support
 **File**: `shared_components/js/embroidery-quote-invoice.js` - `generatePerSizeProductsTable()` method
 
@@ -486,16 +499,30 @@ New method for generating line items in ShopWorks PUSH API format - one line ite
 
 ---
 
-## Pants Products (PT20) - Added Jan 2026
+## Pants & Shorts Products - Updated Jan 2026
 
 ### Overview
-Industrial work pants (PT20) use **waist/inseam sizing** instead of standard S/M/L/XL. The quote builder now supports this format with a specialized picker UI.
+Industrial work pants and shorts use specialized sizing instead of standard S/M/L/XL. The quote builder now supports all 16 PT* styles with three different size patterns:
 
-### Size Format
-- **4-digit codes**: First 2 digits = waist, last 2 = inseam
+### PT* Styles Supported (16 Total)
+| Style | Size Pattern | Example Sizes |
+|-------|-------------|---------------|
+| **PT20, PT26, PT60, PT88** | 4-digit waist+inseam | 3032 (30x32) |
+| **PT66** | Waist-only (W*) | W30, W32, W34 |
+| **PT333, LPT333** | Standard extended | S-4XL, XS, XXL |
+| **PT38, PT390, PT400, PT42-PT49** | OSFA only | One size |
+
+### Size Format - 4-Digit (Pants)
+- **Format**: First 2 digits = waist, last 2 = inseam
 - Example: `3032` = waist 30, inseam 32
 - Display format: `30x32` (human readable)
 - SKU format: `PT20_3032` (base + underscore + code)
+
+### Size Format - Waist-Only (Shorts)
+- **Format**: W + 2-digit waist (e.g., W30, W32)
+- Display format: `Waist 30` (human readable)
+- SKU format: `PT66_W30` (base + underscore + size)
+- Category: `shorts` (detected when >50% of sizes match W##)
 
 ### Available Sizes (PT20 Example)
 | Waist | Inseams Available |
@@ -563,3 +590,18 @@ Available sizes: 70+ waist/inseam combinations
 - **Problem**: 3rd column of waist/inseam sizes cut off in popup
 - **Solution**: Increased `.size-popup` width from 340px to 480px
 - **File**: `quote-builders/embroidery-quote-builder-new.html:1105-1106`
+
+### 20. PT66 Shorts Support (ADDED - Jan 2026)
+- **Problem**: PT66 cargo shorts used waist-only sizing (W30, W32) not handled
+- **Solution**: Added `shorts` category detection and UI handling
+- **Features**: Detects W## pattern, displays as "Waist 30", simple flat list UI
+- **File**: `quote-builders/embroidery-quote-builder-new.html:2752-2764`
+
+### 21. SIZE_TO_SUFFIX Expansion (ADDED - Jan 2026)
+- **Problem**: 97 size values from SanMar CSV were unmapped
+- **Solution**: Added comprehensive size mappings to sku-validation-service.js
+- **Added**: 7XL-10XL, W30-W50 (waist), XXL/XXXL (aliases), MT/ST/XST (tall),
+  Regular/Long/Short/Petite variants (SR, ML, XLS, LP, etc.), 6T, 06M, 5/6T,
+  Numeric belt/shoe sizes, and more
+- **File**: `shared_components/js/sku-validation-service.js:26-192`
+- **Validation**: All 169,041 CSV rows now have mapped sizes

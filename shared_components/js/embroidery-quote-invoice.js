@@ -688,9 +688,122 @@ class EmbroideryInvoiceGenerator {
         if (item.description && item.description.includes('(')) {
             return item.description;
         }
-        
+
         // Fallback if no size information in description
         return item.quantity.toString();
+    }
+
+    /**
+     * Generate products table for per-size line items (ShopWorks format)
+     * Each line item represents one size for one product/color
+     *
+     * @param {Object} pricingData - Pricing data with perSizeLineItems array
+     * @returns {string} HTML table
+     */
+    generatePerSizeProductsTable(pricingData) {
+        if (!pricingData.perSizeLineItems || pricingData.perSizeLineItems.length === 0) {
+            return this.generateProductsTable(pricingData);
+        }
+
+        const lineItems = pricingData.perSizeLineItems;
+        const totalPieces = lineItems.reduce((sum, item) => sum + item.quantity, 0);
+
+        let tableHTML = `
+            <div style="margin: 15px 0;">
+                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                    👕 Products (${totalPieces} pieces total)
+                </div>
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">Part #</th>
+                            <th style="width: 180px;">Description</th>
+                            <th style="width: 80px;">Color</th>
+                            <th style="width: 50px; text-align: center;">Size</th>
+                            <th style="width: 40px; text-align: center;">Qty</th>
+                            <th style="width: 60px; text-align: right;">Unit</th>
+                            <th style="width: 70px; text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Group line items by product (partNumber + color)
+        const productGroups = this.groupLineItemsByProduct(lineItems);
+
+        for (const [groupKey, items] of Object.entries(productGroups)) {
+            // Sort items by size order
+            const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL',
+                              'LT', 'XLT', '2XLT', '3XLT', 'OSFA', 'S/M', 'M/L', 'L/XL'];
+            items.sort((a, b) => {
+                const aIdx = sizeOrder.indexOf(a.size) !== -1 ? sizeOrder.indexOf(a.size) : 99;
+                const bIdx = sizeOrder.indexOf(b.size) !== -1 ? sizeOrder.indexOf(b.size) : 99;
+                return aIdx - bIdx;
+            });
+
+            items.forEach((item, index) => {
+                const isFirstRow = index === 0;
+                const isChildRow = !isFirstRow;
+                const rowClass = isChildRow ? 'child-size-row' : 'parent-size-row';
+
+                tableHTML += `
+                    <tr class="${rowClass}">
+                        <td>${item.partNumber}${item.hasUpcharge ? '' : ''}</td>
+                        <td>${isFirstRow ? item.description : ''}</td>
+                        <td>${isFirstRow ? item.displayColor : ''}</td>
+                        <td style="text-align: center;">
+                            ${item.size}
+                            ${item.hasUpcharge ? '<span style="color:#f59e0b;font-size:9px;"> +$' + item.upchargeAmount.toFixed(0) + '</span>' : ''}
+                        </td>
+                        <td style="text-align: center;">${item.quantity}</td>
+                        <td style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
+                        <td style="text-align: right;">$${item.total.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            // Add subtotal row for this product group
+            const groupTotal = items.reduce((sum, item) => sum + item.total, 0);
+            const groupQty = items.reduce((sum, item) => sum + item.quantity, 0);
+            tableHTML += `
+                <tr class="product-group-subtotal" style="background: #f8f9fa; font-weight: 600;">
+                    <td colspan="4" style="text-align: right; font-size: 10px;">
+                        ${items[0].partNumber} ${items[0].displayColor} Subtotal:
+                    </td>
+                    <td style="text-align: center;">${groupQty}</td>
+                    <td></td>
+                    <td style="text-align: right;">$${groupTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        }
+
+        tableHTML += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        return tableHTML;
+    }
+
+    /**
+     * Group line items by product (partNumber + catalogColor)
+     *
+     * @param {Array} lineItems - Array of line items
+     * @returns {Object} Grouped line items
+     */
+    groupLineItemsByProduct(lineItems) {
+        const groups = {};
+
+        lineItems.forEach(item => {
+            const key = `${item.partNumber}:${item.color}`;
+            if (!groups[key]) {
+                groups[key] = [];
+            }
+            groups[key].push(item);
+        });
+
+        return groups;
     }
     
     /**
