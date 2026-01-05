@@ -439,8 +439,8 @@ class EmbroideryInvoiceGenerator {
             }
         }
         
-        // Add LTM notice if applicable
-        if (pricingData.ltmFee > 0) {
+        // Add LTM notice if applicable (only when NOT distributed into unit prices)
+        if (pricingData.ltmFee > 0 && !pricingData.ltmDistributed) {
             const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
             specsHTML += `
                 <div style="font-size: 9px; color: #dc3545; margin-top: 5px; font-style: italic;">
@@ -511,7 +511,8 @@ class EmbroideryInvoiceGenerator {
                 const totalQty = regularSizes.reduce((sum, item) => sum + item.quantity, 0);
                 const item = regularSizes[0];
                 const basePrice = item.basePrice;
-                const unitPrice = item.unitPriceWithLTM || item.unitPrice;
+                // Use distributed price only when LTM is distributed
+                const unitPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                 const totalAmount = regularSizes.reduce((sum, item) => sum + item.total, 0);
                 const sizeDesc = regularSizes.map(item => this.parseSizeDisplay(item)).join(' ');
                 
@@ -538,7 +539,8 @@ class EmbroideryInvoiceGenerator {
             // Add 2XL sizes
             if (size2XL.length > 0) {
                 size2XL.forEach(item => {
-                    const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    // Use distributed price only when LTM is distributed
+                    const displayPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                     const basePrice = item.basePrice;
                     const sizeDesc = this.parseSizeDisplay(item);
                     
@@ -565,7 +567,8 @@ class EmbroideryInvoiceGenerator {
             // Add 3XL sizes
             if (size3XL.length > 0) {
                 size3XL.forEach(item => {
-                    const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    // Use distributed price only when LTM is distributed
+                    const displayPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                     const basePrice = item.basePrice;
                     const sizeDesc = this.parseSizeDisplay(item);
                     
@@ -592,7 +595,8 @@ class EmbroideryInvoiceGenerator {
             // Add other larger sizes if any
             if (largerSizes.length > 0) {
                 largerSizes.forEach(item => {
-                    const displayPrice = item.unitPriceWithLTM || item.unitPrice;
+                    // Use distributed price only when LTM is distributed
+                    const displayPrice = pricingData.ltmDistributed && item.unitPriceWithLTM ? item.unitPriceWithLTM : item.unitPrice;
                     const basePrice = item.basePrice;
                     const sizeDesc = this.parseSizeDisplay(item);
                     
