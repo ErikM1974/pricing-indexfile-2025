@@ -27,10 +27,19 @@ class EmbroideryPricingCalculator {
         
         // Additional Logo (AL) tiers - will be fetched from API
         this.alTiers = {};
-        
+
         // Rounding method - will be fetched from API
         this.roundingMethod = null;
-        
+
+        // =========================================
+        // CAP EMBROIDERY PRICING (for unified builder)
+        // =========================================
+        this.capTiers = {};          // Cap pricing tiers (from CAP endpoint)
+        this.capAlTiers = {};        // Cap AL pricing (from CAP-AL endpoint)
+        this.capInitialized = false; // Track cap pricing loaded
+        this.capStitchCount = 8000;  // Fixed 8000 for caps
+        this.capRoundingMethod = 'HalfDollarUp'; // Caps use half-dollar rounding
+
         // Track API status
         this.apiError = false;
         
@@ -39,6 +48,8 @@ class EmbroideryPricingCalculator {
             mainPricing: false,      // Main embroidery pricing loaded
             alPricing: false,        // AL pricing loaded
             configuration: false,    // Config values loaded
+            capPricing: false,       // Cap pricing loaded
+            capAlPricing: false,     // Cap AL pricing loaded
             criticalFailures: [],    // List of critical failures
             warnings: []             // List of non-critical warnings
         };
@@ -195,7 +206,7 @@ class EmbroideryPricingCalculator {
         try {
             const response = await fetch(`${this.baseURL}/api/pricing-rules?method=EmbroideryShirts`);
             const data = await response.json();
-            
+
             if (data && data.length > 0) {
                 const roundingRule = data.find(rule => rule.RuleName === 'RoundingMethod');
                 if (roundingRule) {
@@ -208,7 +219,219 @@ class EmbroideryPricingCalculator {
             this.roundingMethod = 'CeilDollar'; // Default for embroidery
         }
     }
-    
+
+    // =========================================
+    // CAP EMBROIDERY PRICING METHODS
+    // =========================================
+
+    /**
+     * Initialize cap pricing configuration from CAP API endpoint
+     * Called on-demand when a cap product is detected
+     */
+    async initializeCapConfig() {
+        if (this.capInitialized) {
+            return; // Already loaded
+        }
+
+        console.log('[EmbroideryPricingCalculator] Initializing cap pricing configuration...');
+
+        try {
+            // Fetch cap pricing bundle
+            const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=C112`);
+            const data = await response.json();
+
+            if (data && data.allEmbroideryCostsR) {
+                // Build cap tiers from API data
+                this.capTiers = {};
+                data.allEmbroideryCostsR.forEach(cost => {
+                    if (cost.StitchCount === 8000) {
+                        this.capTiers[cost.TierLabel] = {
+                            embCost: cost.EmbroideryCost,
+                            hasLTM: cost.TierLabel === '1-23'
+                        };
+                    }
+                });
+
+                // Get margin denominator from tiers
+                if (data.tiersR && data.tiersR.length > 0) {
+                    this.capMarginDenominator = data.tiersR[0].MarginDenominator || 0.57;
+                }
+
+                // Get rounding method
+                if (data.rulesR && data.rulesR.RoundingMethod) {
+                    this.capRoundingMethod = data.rulesR.RoundingMethod;
+                }
+
+                console.log('[EmbroideryPricingCalculator] Cap pricing loaded:');
+                console.log('- Cap Tiers:', this.capTiers);
+                console.log('- Cap Margin:', this.capMarginDenominator);
+                console.log('- Cap Rounding:', this.capRoundingMethod);
+
+                this.apiStatus.capPricing = true;
+            }
+
+            // Fetch cap AL pricing
+            try {
+                const alResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=CAP-AL`);
+                const alData = await alResponse.json();
+
+                if (alData && alData.allEmbroideryCostsR) {
+                    this.capAlTiers = {};
+                    alData.allEmbroideryCostsR.forEach(cost => {
+                        if (cost.ItemType === 'AL' || cost.StitchCount === 8000) {
+                            this.capAlTiers[cost.TierLabel] = {
+                                embCost: cost.EmbroideryCost
+                            };
+                        }
+                    });
+                    console.log('[EmbroideryPricingCalculator] Cap AL pricing loaded:', this.capAlTiers);
+                    this.apiStatus.capAlPricing = true;
+                }
+            } catch (alError) {
+                console.error('[EmbroideryPricingCalculator] Failed to load cap AL pricing:', alError);
+                this.apiStatus.criticalFailures.push('Cap AL pricing unavailable');
+            }
+
+            this.capInitialized = true;
+            console.log('[EmbroideryPricingCalculator] Cap pricing initialization complete');
+
+        } catch (error) {
+            console.error('[EmbroideryPricingCalculator] Failed to load cap pricing:', error);
+            this.apiStatus.criticalFailures.push('Cap pricing unavailable');
+            throw error; // Re-throw to prevent silent failure
+        }
+    }
+
+    /**
+     * Round price using cap-specific rounding (HalfDollarUp)
+     */
+    roundCapPrice(price) {
+        if (isNaN(price)) return null;
+
+        // Caps use HalfDollarUp rounding
+        if (this.capRoundingMethod === 'CeilDollar') {
+            return Math.ceil(price);
+        }
+
+        // Default HalfDollarUp - round UP to nearest $0.50
+        if (price % 0.5 === 0) return price;
+        return Math.ceil(price * 2) / 2;
+    }
+
+    /**
+     * Get cap embroidery cost for tier
+     */
+    getCapEmbroideryCost(tier) {
+        return this.capTiers[tier]?.embCost || 9.00; // Cap default if not loaded
+    }
+
+    /**
+     * Calculate price for a cap product
+     * Uses CAP pricing: fixed 8K stitches, HalfDollarUp rounding
+     */
+    async calculateCapProductPrice(product, totalQuantity) {
+        // Ensure cap pricing is initialized
+        if (!this.capInitialized) {
+            await this.initializeCapConfig();
+        }
+
+        const tier = this.getTier(totalQuantity);
+        const embCost = this.getCapEmbroideryCost(tier);
+        const marginDenom = this.capMarginDenominator || 0.57;
+
+        console.log(`[EmbroideryPricingCalculator] Cap product ${product.style}: tier=${tier}, embCost=$${embCost}`);
+
+        // Fetch size pricing for this cap style
+        const sizePricingData = await this.fetchSizePricing(product.style);
+
+        if (!sizePricingData || sizePricingData.length === 0) {
+            console.error('[CRITICAL] No size pricing data for cap', product.style);
+            return null;
+        }
+
+        // Use first color's data
+        const priceData = sizePricingData.find(d => d.color === product.color) || sizePricingData[0];
+
+        const lineItems = [];
+        let lineSubtotal = 0;
+
+        // Get base price (caps typically use OSFA or first available size)
+        let standardBasePrice = 0;
+        const osfaSizes = ['OSFA', 'S/M', 'M/L', 'L/XL', 'OS'];
+
+        // Try OSFA sizes first
+        for (const size of osfaSizes) {
+            if (priceData.basePrices[size] && priceData.basePrices[size] > 0) {
+                standardBasePrice = priceData.basePrices[size];
+                break;
+            }
+        }
+
+        // Fallback to first available price
+        if (standardBasePrice === 0) {
+            const availablePrices = Object.entries(priceData.basePrices)
+                .filter(([_, price]) => price > 0)
+                .sort((a, b) => a[1] - b[1]);
+
+            if (availablePrices.length > 0) {
+                standardBasePrice = availablePrices[0][1];
+            }
+        }
+
+        if (standardBasePrice === 0) {
+            console.error(`[EmbroideryPricingCalculator] No base price found for cap ${product.style}`);
+            return null;
+        }
+
+        console.log(`[EmbroideryPricingCalculator] Cap ${product.style} base price: $${standardBasePrice}`);
+
+        // Calculate decorated price for each size in the order
+        for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+            if (qty <= 0) continue;
+
+            // Get size-specific base price and upcharge
+            const sizeBasePrice = priceData.basePrices[size] || standardBasePrice;
+            const upcharge = priceData.sizeUpcharges[size] || 0;
+
+            // Calculate decorated price: (garment / margin) + embroidery + upcharge
+            const garmentCost = sizeBasePrice / marginDenom;
+            const decoratedPrice = garmentCost + embCost;
+            const roundedPrice = this.roundCapPrice(decoratedPrice);
+            const finalPrice = roundedPrice + upcharge;
+
+            console.log(`[CAP PRICING DEBUG] ${product.style} ${size}:
+                Base: $${sizeBasePrice}
+                Margin: ${marginDenom}
+                Garment: $${garmentCost.toFixed(2)}
+                Emb: $${embCost}
+                Decorated: $${decoratedPrice.toFixed(2)}
+                Rounded: $${roundedPrice}
+                Upcharge: $${upcharge}
+                Final: $${finalPrice}`);
+
+            lineItems.push({
+                description: `${size}(${qty})`,
+                quantity: qty,
+                unitPrice: finalPrice,
+                basePrice: roundedPrice,
+                extraStitchCost: 0, // Caps don't have extra stitch
+                alCost: 0,
+                total: finalPrice * qty,
+                isCap: true
+            });
+
+            lineSubtotal += finalPrice * qty;
+        }
+
+        return {
+            product: product,
+            tier: tier,
+            lineItems: lineItems,
+            subtotal: lineSubtotal,
+            isCap: true
+        };
+    }
+
     /**
      * Round price based on API rules
      */
@@ -675,21 +898,22 @@ class EmbroideryPricingCalculator {
 
     /**
      * Calculate complete quote pricing
+     * Supports mixed quotes with caps (CAP pricing) and garments (EMB pricing)
      */
     async calculateQuote(products, logos) {
         if (!products || products.length === 0) {
             return null;
         }
-        
+
         // Ensure configuration is loaded
         if (!this.initialized) {
             await this.initializeConfig();
         }
-        
+
         // Prevent calculation if API has critical errors
         if (this.apiError) {
             console.error('[EmbroideryPricingCalculator] CRITICAL: Cannot calculate prices - API configuration unavailable');
-            
+
             // Return error result instead of incorrect prices
             return {
                 success: false,
@@ -708,31 +932,65 @@ class EmbroideryPricingCalculator {
                 setupFeesTotal: 0
             };
         }
-        
+
+        // =========================================
+        // DUAL PRICING: Separate caps from garments
+        // =========================================
+        const capProducts = products.filter(p => p.isCap === true);
+        const garmentProducts = products.filter(p => p.isCap !== true);
+
+        console.log(`[EmbroideryPricingCalculator] Mixed quote: ${capProducts.length} caps, ${garmentProducts.length} garments`);
+
+        // Initialize cap pricing if any caps in the quote
+        if (capProducts.length > 0 && !this.capInitialized) {
+            await this.initializeCapConfig();
+        }
+
         const totalQuantity = products.reduce((sum, p) => sum + p.totalQuantity, 0);
+        const capQuantity = capProducts.reduce((sum, p) => sum + p.totalQuantity, 0);
+        const garmentQuantity = garmentProducts.reduce((sum, p) => sum + p.totalQuantity, 0);
+
         const tier = this.getTier(totalQuantity);
         const tierEmbCost = this.getEmbroideryCost(tier);
-        
+
         // Separate primary and additional logos
         const primaryLogos = logos.filter(l => l.isPrimary);
         const additionalLogos = logos.filter(l => !l.isPrimary);
-        
-        // Calculate additional stitch cost for PRIMARY logos only (included in base price)
+
+        // Calculate additional stitch cost for PRIMARY logos only (GARMENTS ONLY)
+        // Caps have fixed 8K stitches - no extra stitch charge
         let primaryAdditionalStitchCost = 0;
-        primaryLogos.forEach(logo => {
-            const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
-            primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
-        });
-        
-        // Calculate each product's pricing (with primary logo)
+        if (garmentProducts.length > 0) {
+            primaryLogos.forEach(logo => {
+                const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
+                primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
+            });
+        }
+
+        // Calculate each product's pricing
         const productPricing = [];
         let subtotal = 0;
-        
-        for (const product of products) {
+        let garmentSubtotal = 0;
+        let capSubtotal = 0;
+
+        // Calculate GARMENT products with standard EMB pricing
+        for (const product of garmentProducts) {
             const pricing = await this.calculateProductPrice(product, totalQuantity, primaryAdditionalStitchCost);
+            if (pricing) {
+                pricing.isCap = false;
+                productPricing.push(pricing);
+                subtotal += pricing.subtotal;
+                garmentSubtotal += pricing.subtotal;
+            }
+        }
+
+        // Calculate CAP products with CAP pricing
+        for (const product of capProducts) {
+            const pricing = await this.calculateCapProductPrice(product, totalQuantity);
             if (pricing) {
                 productPricing.push(pricing);
                 subtotal += pricing.subtotal;
+                capSubtotal += pricing.subtotal;
             }
         }
         
@@ -839,10 +1097,10 @@ class EmbroideryPricingCalculator {
         
         // Calculate setup fees
         const setupFees = logos.filter(l => l.needsDigitizing).length * this.digitizingFee;
-        
+
         // Final totals
         const grandTotal = subtotal + ltmTotal + setupFees + additionalServicesTotal;
-        
+
         return {
             products: productPricing,
             totalQuantity: totalQuantity,
@@ -856,7 +1114,14 @@ class EmbroideryPricingCalculator {
             additionalServices: additionalServices,
             additionalServicesTotal: additionalServicesTotal,
             grandTotal: grandTotal,
-            logos: logos
+            logos: logos,
+            // Mixed quote breakdown
+            hasCaps: capProducts.length > 0,
+            hasGarments: garmentProducts.length > 0,
+            capQuantity: capQuantity,
+            garmentQuantity: garmentQuantity,
+            capSubtotal: capSubtotal,
+            garmentSubtotal: garmentSubtotal
         };
     }
     

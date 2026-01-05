@@ -940,6 +940,25 @@
             font-weight: 600;
         }
 
+        /* Sub-breakdown rows for mixed quotes (caps + garments) */
+        .pricing-row.sub-breakdown {
+            padding: 4px 0 4px 16px;
+            font-size: 12px;
+            border-bottom: 1px dashed #e8e8e8;
+            background: #fafafa;
+        }
+
+        .pricing-row.sub-breakdown .label {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .pricing-row.sub-breakdown .value.sub-value {
+            font-weight: 500;
+            font-size: 12px;
+            color: #555;
+        }
+
         /* LTM Distribution Toggle Button */
         .ltm-value-group {
             display: flex;
@@ -1862,6 +1881,16 @@
                 <div class="pricing-row">
                     <span class="label">Products Subtotal:</span>
                     <span class="value" id="subtotal">$0.00</span>
+                </div>
+
+                <!-- Mixed Quote Breakdown (caps + garments) -->
+                <div class="pricing-row sub-breakdown" id="garment-subtotal-row" style="display: none;">
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments:</span>
+                    <span class="value sub-value" id="garment-subtotal">$0.00</span>
+                </div>
+                <div class="pricing-row sub-breakdown" id="cap-subtotal-row" style="display: none;">
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps:</span>
+                    <span class="value sub-value" id="cap-subtotal">$0.00</span>
                 </div>
 
                 <div class="pricing-row" id="additional-stitches-row" style="display: none;">
@@ -4816,6 +4845,32 @@
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
+            // Mixed quote breakdown (caps + garments)
+            const garmentSubtotalRow = document.getElementById('garment-subtotal-row');
+            const capSubtotalRow = document.getElementById('cap-subtotal-row');
+            const isMixedQuote = pricing.hasCaps && pricing.hasGarments;
+
+            if (isMixedQuote) {
+                // Show breakdown rows
+                garmentSubtotalRow.style.display = 'flex';
+                capSubtotalRow.style.display = 'flex';
+                document.getElementById('garment-subtotal').textContent = `$${(pricing.garmentSubtotal || 0).toFixed(2)}`;
+                document.getElementById('cap-subtotal').textContent = `$${(pricing.capSubtotal || 0).toFixed(2)}`;
+            } else if (pricing.hasCaps && !pricing.hasGarments) {
+                // Caps only - show just cap breakdown
+                garmentSubtotalRow.style.display = 'none';
+                capSubtotalRow.style.display = 'flex';
+                document.getElementById('cap-subtotal').textContent = `$${(pricing.capSubtotal || 0).toFixed(2)}`;
+            } else if (pricing.hasGarments && !pricing.hasCaps) {
+                // Garments only - hide breakdown rows (default view)
+                garmentSubtotalRow.style.display = 'none';
+                capSubtotalRow.style.display = 'none';
+            } else {
+                // No products
+                garmentSubtotalRow.style.display = 'none';
+                capSubtotalRow.style.display = 'none';
+            }
+
             // LTM row - keep visible in both states so button is always accessible
             const ltmRow = document.getElementById('ltm-row');
             const ltmBtn = document.getElementById('ltm-distribute-btn');
@@ -5088,20 +5143,44 @@
                 });
             }
 
-            lines.push('');
-            lines.push('PRODUCTS:');
-            lines.push('------------------------------------------------');
+            // Separate caps from garments
+            const capProducts = products.filter(p => p.isCap === true);
+            const garmentProducts = products.filter(p => p.isCap !== true);
 
-            products.forEach(p => {
-                const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
-                lines.push(`${p.style} - ${p.color} | ${sizes} | Total: ${p.totalQuantity}`);
-            });
+            // Show garment products if any
+            if (garmentProducts.length > 0) {
+                lines.push('');
+                lines.push('GARMENTS:');
+                lines.push('------------------------------------------------');
+                garmentProducts.forEach(p => {
+                    const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
+                    lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQuantity}`);
+                });
+            }
+
+            // Show cap products if any
+            if (capProducts.length > 0) {
+                lines.push('');
+                lines.push('CAPS (Cap Embroidery Pricing):');
+                lines.push('------------------------------------------------');
+                capProducts.forEach(p => {
+                    const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
+                    lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQuantity}`);
+                });
+            }
 
             lines.push('');
             lines.push('------------------------------------------------');
             lines.push(`Total Pieces: ${pricing.totalQuantity}`);
             lines.push(`Tier: ${pricing.tier}`);
-            lines.push(`Subtotal: $${pricing.subtotal.toFixed(2)}`);
+
+            // Show breakdown for mixed quotes
+            if (pricing.hasCaps && pricing.hasGarments) {
+                lines.push(`  Garments Subtotal: $${pricing.garmentSubtotal.toFixed(2)}`);
+                lines.push(`  Caps Subtotal: $${pricing.capSubtotal.toFixed(2)}`);
+            }
+
+            lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
             if (pricing.ltmFee > 0) lines.push(`LTM Fee: $${pricing.ltmFee.toFixed(2)}`);
             if (pricing.setupFees > 0) lines.push(`Setup: $${pricing.setupFees.toFixed(2)}`);
             lines.push(`TOTAL: $${pricing.grandTotal.toFixed(2)}`);
