@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-02
-**Total Active Files:** ~266 (includes Screen Print systems + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
+**Last Updated:** 2026-01-06
+**Total Active Files:** ~268 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -66,10 +66,11 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/screen-print-pricing.html` | Screen print calculator | screenprint-pricing-v2.js, screenprint-pricing-service.js | ✅ Active |
-| `/quote-builders/screenprint-fast-quote.html` | **NEW** Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |
+| `/quote-builders/screenprint-quote-builder-new.html` | **NEW** Screen Print Quote Builder 2026 (Excel-style) | screenprint-pricing-service.js | ✅ Active |
+| `/quote-builders/screenprint-fast-quote.html` | Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-service.js` | Pricing data adapter | Caspio API | ✅ Active |
-| `/shared_components/js/screenprint-fast-quote-service.js` | **NEW** Fast quote service | EmailJS, Caspio API | ✅ Active |
+| `/shared_components/js/screenprint-fast-quote-service.js` | Fast quote service | EmailJS, Caspio API | ✅ Active |
 
 ### Cap Embroidery System
 | File | Purpose | Dependencies | Status |
@@ -205,6 +206,7 @@ cap-embroidery-fix.css
 | File | Purpose | Status |
 |------|---------|--------|
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
+| `/memory/SCREENPRINT_QUOTE_BUILDER.md` | **NEW** Screen Print Quote Builder 2026 documentation | ✅ Active |
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |
