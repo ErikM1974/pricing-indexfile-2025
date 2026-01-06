@@ -608,6 +608,14 @@ body {
     font-size: 13px;
     background: transparent;
     padding: 0;
+    -moz-appearance: textfield; /* Firefox: hide spinners */
+}
+
+/* Hide number input spinners to match other builders */
+.size-input::-webkit-inner-spin-button,
+.size-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .size-input:focus {

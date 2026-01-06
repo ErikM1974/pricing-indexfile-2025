@@ -367,6 +367,7 @@ class DTFQuoteBuilder {
 
             // Extract product info from bundle - try multiple field patterns
             const productName = bundleData.product?.PRODUCT_TITLE ||
+                               bundleData.product?.PRODUCT_DESCRIPTION ||
                                bundleData.product?.title ||
                                bundleData.product?.description ||
                                bundleData.product?.STYLE_NAME ||
