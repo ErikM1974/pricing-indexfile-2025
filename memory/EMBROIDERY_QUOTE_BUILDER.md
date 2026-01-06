@@ -605,3 +605,103 @@ Available sizes: 70+ waist/inseam combinations
   Numeric belt/shoe sizes, and more
 - **File**: `shared_components/js/sku-validation-service.js:26-192`
 - **Validation**: All 169,041 CSV rows now have mapped sizes
+
+### 22. Dual Cap/Garment Pricing Engine (ADDED - Jan 2026)
+- **Problem**: Quote builder could only price garments, not caps
+- **Solution**: Implemented unified pricing engine with automatic cap detection
+- **Features**:
+  - Automatic cap detection via `CATEGORY_NAME` from API (primary)
+  - Pattern matching fallback: `/^C[P0-9]/`, `/^NE/`, `/^\d{2,3}$/`, title keywords
+  - Separate pricing tiers for caps vs garments (don't combine for discounts)
+  - Different stitch rates: Caps $1.00/1K vs Garments $1.25/1K
+  - Different rounding: Caps HalfDollarUp vs Garments CeilDollar
+  - Different AL base: Cap AL 5K base vs Garment AL 8K base
+  - Separate LTM fees per product type
+- **Files**:
+  - `shared_components/js/embroidery-quote-pricing.js` - Dual pricing engine
+  - `quote-builders/embroidery-quote-builder-new.html:3599-3609` - Cap detection
+- **API Endpoints**:
+  - `/api/pricing-bundle?method=EMB` - Garment pricing
+  - `/api/pricing-bundle?method=CAP` - Cap pricing
+  - `/api/pricing-bundle?method=EMB-AL` - Garment additional logos
+  - `/api/pricing-bundle?method=CAP-AL` - Cap additional logos
+- **Audit Status**: Pre-launch audit completed Jan 5, 2026 - 92% confidence
+
+---
+
+## Dual Pricing Engine Reference (Jan 2026)
+
+### Cap vs Garment Pricing Differences
+
+| Factor | Garments (EMB) | Caps (CAP) |
+|--------|----------------|------------|
+| **Primary Stitch Rate** | $1.25/1K over 8K | $1.00/1K over 8K |
+| **AL Base Stitches** | 8,000 | **5,000** |
+| **AL Stitch Rate** | $1.25/1K | $1.00/1K |
+| **Rounding Method** | CeilDollar | HalfDollarUp |
+| **Tier Calculation** | Based on garment qty only | Based on cap qty only |
+| **LTM Fee** | $50 when qty < 24 | $50 when qty < 24 (separate) |
+
+### Cap Detection Logic
+
+**Primary Method (Most Reliable):**
+```javascript
+// From API - CATEGORY_NAME field
+const categoryName = colorsData.CATEGORY_NAME || '';
+const isCap = categoryName.toLowerCase() === 'caps';
+```
+
+**Fallback Method (Pattern Matching):**
+```javascript
+// Style patterns
+/^C[P0-9]/  // CP80, C112, C888
+/^NE/       // New Era caps (NE1000, NE400)
+/^\d{2,3}$/ // Richardson numeric (99, 110, 112)
+
+// Title keywords (case-insensitive)
+CAP, HAT, BEANIE, SNAPBACK, TRUCKER, RICHARDSON
+```
+
+### Mixed Quote Handling
+
+When a quote contains both caps and garments:
+
+1. **Separate Tier Calculation**
+   - 20 shirts = 1-23 tier for garments
+   - 50 caps = 48-71 tier for caps
+   - They do NOT combine for tier discounts
+
+2. **Separate LTM Fees**
+   - 12 shirts + 12 caps = TWO $50 LTM fees = $100 total
+   - Each product type evaluated independently
+
+3. **Separate Logo Configurations**
+   - Garment logos: Left Chest, Right Chest, Full Back, etc.
+   - Cap logos: Cap Front, Cap Back, Left Side, Right Side
+
+### API Pricing Values (2026)
+
+**Embroidery Costs (from Caspio):**
+
+| Tier | Shirt | Cap | AL (Garment) | AL-CAP |
+|------|-------|-----|--------------|--------|
+| 1-23 | $16.00 | $13.00 | $13.50 | $6.75 |
+| 24-47 | $14.00 | $13.00 | $12.50 | $5.75 |
+| 48-71 | $13.00 | $11.00 | $10.50 | $5.50 |
+| 72+ | $12.00 | $9.50 | $9.50 | $5.25 |
+
+**Additional Configuration:**
+- Margin Denominator: 0.57 (43% margin)
+- Digitizing Fee: $100 per logo
+- LTM Fee: $50 per product type when qty < 24
+
+### Testing Cap Products
+
+| Style | Type | Expected Behavior |
+|-------|------|-------------------|
+| C112 | Trucker Cap | Cap badge shown, cap pricing |
+| CP80 | Port Authority Cap | Cap badge shown, cap pricing |
+| NE1000 | New Era Cap | Cap badge shown, cap pricing |
+| 112 | Richardson | Cap badge shown, cap pricing |
+| PC54 | T-Shirt | No badge, garment pricing |
+| PC90H | Hoodie | No badge, garment pricing |
