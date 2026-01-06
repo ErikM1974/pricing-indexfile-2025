@@ -2409,7 +2409,7 @@
         // Based on Python Inksoft/Inksoft_Size_Translation_Import.csv
         const SIZE06_EXTENDED_SIZES = [
             // Extended large
-            'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
+            'XS', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
             // One-size
             'OSFA', 'OSFM',
             // Combos (for fitted caps)
@@ -5462,39 +5462,17 @@
                 // Create product entry for each color group with quantities
                 Object.entries(colorGroups).forEach(([catalogColor, group]) => {
                     if (group.totalQty > 0) {
-                        const isCap = row.dataset.isCap === 'true';
-
-                        // Get global AL config for this product type
-                        const alConfig = isCap ? globalAL.cap : globalAL.garment;
-                        const additionalLogos = alConfig.enabled ? [{
-                            id: `global-al-${isCap ? 'cap' : 'garment'}`,
-                            position: alConfig.position,
-                            stitchCount: alConfig.stitchCount,
-                            quantity: group.totalQty
-                        }] : [];
-
                         products.push({
                             style: style,
                             color: group.color,
                             catalogColor: group.catalogColor,
                             productName: row.dataset.productName || style,
                             sizeBreakdown: group.sizeBreakdown,
-                            totalQuantity: group.totalQty,
-                            isCap: isCap,  // Cap detection for pricing routing
-                            rowId: rowId,  // Track row for AL price updates
-                            logoAssignments: {
-                                primary: { logoId: 'primary', quantity: group.totalQty },
-                                additional: additionalLogos
-                            }
+                            totalQty: group.totalQty,
+                            rowId: rowId
                         });
                     }
                 });
-            });
-
-            // Sort products: garments first, caps last (for consistent pricing display)
-            products.sort((a, b) => {
-                if (a.isCap === b.isCap) return 0;
-                return a.isCap ? 1 : -1; // Garments first, caps last
             });
 
             return products;
