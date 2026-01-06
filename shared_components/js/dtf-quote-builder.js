@@ -824,6 +824,39 @@ class DTFQuoteBuilder {
         const totalQty = this.getTotalQuantity();
         const locationCount = this.selectedLocations.length;
 
+        // BLOCK PRICING when under minimum quantity (10 pieces)
+        // This prevents incorrect $0 transfer costs from being displayed
+        if (totalQty < 10) {
+            document.getElementById('total-qty').textContent = totalQty;
+            document.getElementById('pricing-tier').textContent = 'Min 10';
+            document.getElementById('transfer-cost').textContent = '--';
+            document.getElementById('labor-cost').textContent = '--';
+            document.getElementById('freight-cost').textContent = '--';
+            document.getElementById('ltm-row').style.display = 'none';
+            document.getElementById('subtotal').textContent = '--';
+            document.getElementById('grand-total').textContent = '--';
+
+            // Clear product row prices - show "--" instead of misleading $0
+            this.products.forEach(product => {
+                const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
+                if (row) {
+                    const priceSpan = row.querySelector('.row-price');
+                    if (priceSpan) priceSpan.textContent = '--';
+                    const metaDiv = document.getElementById(`meta-${product.id}`);
+                    if (metaDiv) {
+                        const unitPreview = metaDiv.querySelector('.unit-preview');
+                        if (unitPreview) unitPreview.textContent = '--';
+                    }
+                }
+            });
+
+            // Keep continue button disabled
+            const continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) continueBtn.disabled = true;
+
+            return; // Exit early - don't calculate pricing
+        }
+
         // Ensure pricing data is loaded from API
         try {
             await this.pricingCalculator.ensureLoaded();
@@ -834,7 +867,7 @@ class DTFQuoteBuilder {
         }
 
         // Get tier label from API
-        const tier = totalQty < 10 ? 'Min 10' : this.pricingCalculator.getTierForQuantity(totalQty);
+        const tier = this.pricingCalculator.getTierForQuantity(totalQty);
 
         // Update sidebar displays
         document.getElementById('total-qty').textContent = totalQty;
