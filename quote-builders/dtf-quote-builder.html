@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!-- DTF Quote Builder Styles -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260106r">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260106t">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
@@ -244,9 +244,14 @@
                 </div>
 
                 <div class="pricing-row ltm-row" id="ltm-row" style="display: none;">
-                    <span class="label">LTM Fee (< 24 pcs):</span>
-                    <span class="value" id="ltm-fee">$0.00</span>
-                    <button type="button" class="btn-hide-ltm" id="hide-ltm-btn" onclick="toggleLTMVisibility()">Hide LTM</button>
+                    <span class="label">LTM Fee (&lt; 24 pcs):</span>
+                    <span class="ltm-value-group">
+                        <button class="ltm-distribute-btn" id="ltm-distribute-btn"
+                                title="Click to hide/show LTM as separate line">
+                            <span class="btn-text">Hide LTM</span>
+                        </button>
+                        <span class="value" id="ltm-fee">$50.00</span>
+                    </span>
                 </div>
 
                 <div class="pricing-divider"></div>
@@ -383,7 +388,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=20260106s"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=20260106t"></script>
 
     <script>
         // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
@@ -468,11 +473,6 @@
             }
         }
 
-        function toggleLTMVisibility() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.toggleLTMVisibility();
-            }
-        }
     </script>
 </body>
 </html>

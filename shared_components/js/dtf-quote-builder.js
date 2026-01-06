@@ -16,7 +16,7 @@ class DTFQuoteBuilder {
         this.products = [];
         this.pricingData = null;
         this.productIndex = 0;
-        this.ltmHidden = false; // Track if user has hidden the LTM fee display
+        this.ltmDistributed = false; // When true, LTM is distributed into unit prices
 
         // Location configuration
         this.locationConfig = {
@@ -67,6 +67,7 @@ class DTFQuoteBuilder {
         this.setupLocationListeners();
         this.setupSearchListeners();
         this.setupGlobalListeners();
+        this.setupLTMToggle();
 
         // Hide loading overlay
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -900,14 +901,37 @@ class DTFQuoteBuilder {
         document.getElementById('labor-cost').textContent = `$${laborCost.toFixed(2)}/pc`;
         document.getElementById('freight-cost').textContent = `$${freightCost.toFixed(2)}/pc`;
 
-        // LTM row
+        // LTM row with distribution toggle (matches DTG pattern)
         const ltmRow = document.getElementById('ltm-row');
         const ltmFeeEl = document.getElementById('ltm-fee');
+        const ltmBtn = document.getElementById('ltm-distribute-btn');
+
         if (totalLtmFee > 0 && totalQty > 0) {
             ltmRow.style.display = 'flex';
-            ltmFeeEl.textContent = `$${ltmPerUnit.toFixed(2)}/pc`;
+
+            if (this.ltmDistributed) {
+                // Distributed state - LTM built into unit prices
+                ltmFeeEl.textContent = `(+$${ltmPerUnit.toFixed(2)}/ea)`;
+                ltmFeeEl.classList.add('distributed');
+                if (ltmBtn) {
+                    ltmBtn.classList.add('active');
+                    ltmBtn.querySelector('.btn-text').textContent = 'Show LTM';
+                }
+            } else {
+                // Standard state - LTM shown as flat fee
+                ltmFeeEl.textContent = `$${totalLtmFee.toFixed(2)}`;
+                ltmFeeEl.classList.remove('distributed');
+                if (ltmBtn) {
+                    ltmBtn.classList.remove('active');
+                    ltmBtn.querySelector('.btn-text').textContent = 'Hide LTM';
+                }
+            }
         } else {
             ltmRow.style.display = 'none';
+            // Reset distributed state when LTM no longer applies
+            if (this.ltmDistributed) {
+                this.ltmDistributed = false;
+            }
         }
 
         // Calculate subtotal and grand total
@@ -919,12 +943,14 @@ class DTFQuoteBuilder {
 
             let productTotal = 0;
             let baseUnitPrice = 0; // For display in style column
+            let baseDisplayPrice = 0; // Price shown in unit preview (may or may not include LTM)
 
             Object.entries(product.quantities).forEach(([size, qty]) => {
                 if (qty > 0) {
                     const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
                     // Use margin from API (not hardcoded 0.57)
                     const garmentCost = (product.baseCost + upcharge) / marginDenom;
+                    // Full unit price always includes LTM for calculation
                     const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                     // Use rounding from API
                     const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
@@ -933,6 +959,13 @@ class DTFQuoteBuilder {
                     // Track base unit price (S/M/LG size - no upcharge) for display
                     if (baseUnitPrice === 0 && ['S', 'M', 'LG'].includes(size)) {
                         baseUnitPrice = roundedPrice;
+                        // Display price: include LTM if distributed, exclude if shown separately
+                        if (this.ltmDistributed || ltmPerUnit === 0) {
+                            baseDisplayPrice = roundedPrice;
+                        } else {
+                            const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
+                            baseDisplayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
+                        }
                     }
                 }
             });
@@ -942,6 +975,13 @@ class DTFQuoteBuilder {
                 const garmentCost = product.baseCost / marginDenom;
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                 baseUnitPrice = this.pricingCalculator.applyRounding(unitPrice);
+                // Display price based on distribution state
+                if (this.ltmDistributed || ltmPerUnit === 0) {
+                    baseDisplayPrice = baseUnitPrice;
+                } else {
+                    const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
+                    baseDisplayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
+                }
             }
 
             // Update row price
@@ -954,7 +994,7 @@ class DTFQuoteBuilder {
                 const unitPreview = metaDiv.querySelector('.unit-preview');
                 const locCodes = metaDiv.querySelector('.location-codes');
                 if (unitPreview) {
-                    unitPreview.textContent = baseUnitPrice > 0 ? `$${baseUnitPrice.toFixed(2)}/ea` : '--';
+                    unitPreview.textContent = baseDisplayPrice > 0 ? `$${baseDisplayPrice.toFixed(2)}/ea` : '--';
                 }
                 if (locCodes) {
                     locCodes.textContent = this.getLocationCodesString();
@@ -1254,25 +1294,25 @@ class DTFQuoteBuilder {
     }
 
     /**
-     * Toggle LTM fee visibility (display only - still calculated)
+     * Setup LTM distribution toggle (matches DTG pattern)
+     * When distributed, $50 LTM is built into unit prices instead of shown as separate line
      */
-    toggleLTMVisibility() {
-        this.ltmHidden = !this.ltmHidden;
+    setupLTMToggle() {
+        const btn = document.getElementById('ltm-distribute-btn');
+        if (!btn) return;
 
-        const ltmRow = document.getElementById('ltm-row');
-        const hideBtn = document.getElementById('hide-ltm-btn');
+        btn.addEventListener('click', () => {
+            this.ltmDistributed = !this.ltmDistributed;
 
-        if (ltmRow && this.currentPricingData?.totalLtmFee > 0) {
-            if (this.ltmHidden) {
-                ltmRow.classList.add('ltm-hidden');
-                if (hideBtn) hideBtn.textContent = 'Show LTM';
+            if (this.ltmDistributed) {
+                this.showToast('LTM fee distributed into unit prices', 'success');
             } else {
-                ltmRow.classList.remove('ltm-hidden');
-                if (hideBtn) hideBtn.textContent = 'Hide LTM';
+                this.showToast('LTM fee shown as separate line', 'info');
             }
-        }
 
-        this.showToast(this.ltmHidden ? 'LTM fee hidden from display' : 'LTM fee shown', 'info');
+            // Re-render pricing with new distribution state
+            this.updatePricing();
+        });
     }
 
     /**

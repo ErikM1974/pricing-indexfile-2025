@@ -1630,28 +1630,45 @@ body {
 }
 
 /* =============================================
-   HIDE LTM BUTTON
+   LTM DISTRIBUTION TOGGLE (matches DTG pattern)
    ============================================= */
-.btn-hide-ltm {
-    background: none;
-    border: 1px solid #e5e7eb;
-    color: var(--text-muted);
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
+.ltm-value-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ltm-distribute-btn {
+    padding: 4px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background: transparent;
     cursor: pointer;
-    margin-left: 8px;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+.ltm-distribute-btn .btn-text {
+    font-size: 11px;
+    font-weight: 500;
     white-space: nowrap;
-    transition: all 0.2s;
 }
 
-.btn-hide-ltm:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    color: var(--text-dark);
+.ltm-distribute-btn:hover {
+    border-color: var(--nwca-green);
+    color: var(--nwca-green);
+    background: #f0fdf4;
 }
 
-/* LTM row when hidden (via toggle) */
-.ltm-row.ltm-hidden {
-    display: none !important;
+.ltm-distribute-btn.active {
+    background: var(--nwca-green);
+    border-color: var(--nwca-green);
+    color: white;
+}
+
+/* Distributed value style - shows per-unit amount */
+#ltm-fee.distributed {
+    color: var(--nwca-green);
+    font-style: italic;
+    font-size: 12px;
 }
