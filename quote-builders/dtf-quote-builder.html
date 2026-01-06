@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTF Quote Builder 2026 | Northwest Custom Apparel</title>
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- DTF Quote Builder Styles -->
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260106r">
+
+    <!-- Quote Builder Shared Components -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
+    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
+    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
+    <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
+    <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Error Banner (hidden by default) -->
+    <div id="error-banner" class="error-banner" style="display: none;"></div>
+
+    <!-- Compact Header -->
+    <header class="power-header dtf-header">
+        <a href="/staff-dashboard.html">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel"
+                 class="logo">
+        </a>
+        <div style="text-align: center;">
+            <div style="font-size: 18px; font-weight: 600;">DTF Quote Builder 2026</div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px;">Direct-to-Film Transfers</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="power-main dtf-quote-builder">
+        <!-- Left: Content Area -->
+        <div class="power-content">
+            <!-- Location Selection Section -->
+            <div class="location-config-section">
+                <div class="location-header">
+                    <span class="location-label"><i class="fas fa-map-marker-alt"></i> Transfer Locations</span>
+                    <span class="location-hint">Select print locations (front/back zones are mutually exclusive)</span>
+                </div>
+
+                <!-- Location Groups -->
+                <div class="location-groups">
+                    <!-- Small (5" x 5") -->
+                    <div class="location-group">
+                        <span class="size-badge size-small">Small (5"x5")</span>
+                        <div class="location-checkboxes">
+                            <label class="location-checkbox" data-zone="front">
+                                <input type="checkbox" name="location" value="left-chest" data-size="Small" data-zone="front">
+                                <span class="checkbox-label">Left Chest</span>
+                            </label>
+                            <label class="location-checkbox" data-zone="front">
+                                <input type="checkbox" name="location" value="right-chest" data-size="Small" data-zone="front">
+                                <span class="checkbox-label">Right Chest</span>
+                            </label>
+                            <label class="location-checkbox" data-zone="sleeves">
+                                <input type="checkbox" name="location" value="left-sleeve" data-size="Small" data-zone="sleeves">
+                                <span class="checkbox-label">Left Sleeve</span>
+                            </label>
+                            <label class="location-checkbox" data-zone="sleeves">
+                                <input type="checkbox" name="location" value="right-sleeve" data-size="Small" data-zone="sleeves">
+                                <span class="checkbox-label">Right Sleeve</span>
+                            </label>
+                            <label class="location-checkbox" data-zone="back">
+                                <input type="checkbox" name="location" value="back-of-neck" data-size="Small" data-zone="back">
+                                <span class="checkbox-label">Back of Neck</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Medium (9" x 12") -->
+                    <div class="location-group">
+                        <span class="size-badge size-medium">Medium (9"x12")</span>
+                        <div class="location-checkboxes">
+                            <label class="location-checkbox" data-zone="front">
+                                <input type="checkbox" name="location" value="center-front" data-size="Medium" data-zone="front">
+                                <span class="checkbox-label">Center Front</span>
+                            </label>
+                            <label class="location-checkbox" data-zone="back">
+                                <input type="checkbox" name="location" value="center-back" data-size="Medium" data-zone="back">
+                                <span class="checkbox-label">Center Back</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Large (12" x 16.5") -->
+                    <div class="location-group">
+                        <span class="size-badge size-large">Large (12"x16.5")</span>
+                        <div class="location-checkboxes">
+                            <label class="location-checkbox" data-zone="front">
+                                <input type="checkbox" name="location" value="full-front" data-size="Large" data-zone="front">
+                                <span class="checkbox-label">Full Front</span>
+                            </label>
+                            <label class="location-checkbox" data-zone="back">
+                                <input type="checkbox" name="location" value="full-back" data-size="Large" data-zone="back">
+                                <span class="checkbox-label">Full Back</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Locations Summary -->
+                <div class="selected-locations-summary" id="selected-locations-summary" style="display: none;">
+                    <span class="summary-label">Selected:</span>
+                    <div class="selected-badges" id="selected-badges"></div>
+                </div>
+            </div>
+
+            <!-- Product Grid Section -->
+            <div class="product-grid-section">
+                <!-- Search Row -->
+                <div class="search-row">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text"
+                               id="product-search"
+                               class="search-input"
+                               placeholder="Type style # to add (e.g., PC54, G500...)"
+                               autocomplete="off"
+                               disabled>
+                        <div id="search-suggestions" class="search-suggestions"></div>
+                    </div>
+                    <span class="search-hint" id="search-hint">Select at least one location to add products</span>
+                </div>
+
+                <!-- Excel-Style Product Table -->
+                <div class="product-table-wrapper">
+                    <table class="product-table" id="product-table">
+                        <thead>
+                            <tr>
+                                <th class="style-col">Style</th>
+                                <th class="desc-col">Description</th>
+                                <th class="color-col">Color</th>
+                                <th class="size-col">S</th>
+                                <th class="size-col">M</th>
+                                <th class="size-col">LG</th>
+                                <th class="size-col">XL</th>
+                                <th class="size-col">XXL</th>
+                                <th class="size-col extended-col" style="line-height: 1.1;">XXXL<br><span style="font-size: 10px; font-weight: 400;">(Other)</span></th>
+                                <th class="qty-col">Qty</th>
+                                <th class="price-col">Unit $</th>
+                                <th class="actions-col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-tbody">
+                            <!-- Product rows will be added here -->
+                        </tbody>
+                    </table>
+
+                    <!-- Empty State -->
+                    <div class="empty-table-message" id="empty-table-message">
+                        <i class="fas fa-box-open"></i>
+                        <p>No products added yet</p>
+                        <span>Search for a style above to add products</span>
+                    </div>
+                </div>
+
+                <!-- Add Product Button -->
+                <div class="add-product-row">
+                    <button type="button" class="btn-add-product" onclick="focusProductSearch()">
+                        <i class="fas fa-plus"></i> Add Product <span class="hint">(or press Tab from last cell)</span>
+                    </button>
+                </div>
+
+                <!-- Keyboard Hints -->
+                <div class="keyboard-hint">
+                    <kbd>Tab</kbd> Next cell &nbsp;|&nbsp;
+                    <kbd>Enter</kbd> Next row &nbsp;|&nbsp;
+                    <kbd>Ctrl+S</kbd> Save &nbsp;|&nbsp;
+                    <kbd>Ctrl+P</kbd> Print PDF
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Pricing Sidebar -->
+        <div class="power-sidebar">
+            <!-- Selected Locations Panel -->
+            <div class="sidebar-panel locations-panel">
+                <div class="panel-title">
+                    <i class="fas fa-map-marker-alt"></i> Selected Locations
+                </div>
+                <div class="locations-list" id="sidebar-locations-list">
+                    <div class="no-locations">No locations selected</div>
+                </div>
+            </div>
+
+            <!-- Pricing Panel -->
+            <div class="sidebar-panel pricing-panel">
+                <div class="panel-title">
+                    <i class="fas fa-calculator"></i> Quote Summary
+                </div>
+
+                <div class="pricing-row">
+                    <span class="label">Total Pieces:</span>
+                    <span class="value" id="total-qty">0</span>
+                </div>
+
+                <div class="pricing-row">
+                    <span class="label">Pricing Tier:</span>
+                    <span class="tier-badge" id="pricing-tier">10-23</span>
+                </div>
+
+                <div class="pricing-divider"></div>
+
+                <div class="pricing-row" id="transfer-cost-row">
+                    <span class="label">Transfer Costs:</span>
+                    <span class="value" id="transfer-cost">$0.00</span>
+                </div>
+
+                <div class="pricing-row" id="labor-cost-row">
+                    <span class="label">Labor (per piece):</span>
+                    <span class="value" id="labor-cost">$0.00</span>
+                </div>
+
+                <div class="pricing-row" id="freight-cost-row">
+                    <span class="label">Freight (per piece):</span>
+                    <span class="value" id="freight-cost">$0.00</span>
+                </div>
+
+                <div class="pricing-row ltm-row" id="ltm-row" style="display: none;">
+                    <span class="label">LTM Fee (< 24 pcs):</span>
+                    <span class="value" id="ltm-fee">$0.00</span>
+                    <button type="button" class="btn-hide-ltm" id="hide-ltm-btn" onclick="toggleLTMVisibility()">Hide LTM</button>
+                </div>
+
+                <div class="pricing-divider"></div>
+
+                <div class="pricing-row">
+                    <span class="label">Products Subtotal:</span>
+                    <span class="value" id="subtotal">$0.00</span>
+                </div>
+
+                <div class="pricing-row grand-total">
+                    <span class="label">GRAND TOTAL:</span>
+                    <span class="value" id="grand-total">$0.00</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="sidebar-actions">
+                <button class="btn-copy-quote" id="copy-quote-btn" onclick="copyQuoteToClipboard()">
+                    <i class="fas fa-copy"></i> Copy Quote
+                </button>
+                <button class="btn-continue" id="continue-btn" disabled onclick="continueToSummary()">
+                    <i class="fas fa-arrow-right"></i> Continue to Summary
+                </button>
+                <button class="btn-save-draft" onclick="saveDraft()">
+                    <i class="fas fa-save"></i> Save Draft
+                </button>
+                <button class="btn-clear-all" onclick="clearAllProducts()">
+                    <i class="fas fa-trash-alt"></i> Clear All Products
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Phase Modal -->
+    <div class="summary-modal" id="summary-modal" style="display: none;">
+        <div class="summary-modal-content">
+            <div class="summary-header">
+                <h2><i class="fas fa-file-invoice"></i> Quote Summary</h2>
+                <button class="close-modal" onclick="closeSummaryModal()">&times;</button>
+            </div>
+
+            <div class="summary-body">
+                <!-- Quote ID -->
+                <div class="quote-id-section">
+                    <span class="quote-id-label">Quote ID:</span>
+                    <span class="quote-id-value" id="quote-id">DTF----</span>
+                    <button class="btn-copy-id" onclick="copyQuoteId()" title="Copy Quote ID">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+
+                <!-- Locations Summary -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Print Locations</h3>
+                    <div id="summary-locations"></div>
+                </div>
+
+                <!-- Products Summary -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-tshirt"></i> Products</h3>
+                    <div id="summary-products"></div>
+                </div>
+
+                <!-- Pricing Summary -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-calculator"></i> Pricing Details</h3>
+                    <div id="summary-pricing"></div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-user"></i> Customer Information</h3>
+                    <div class="customer-form">
+                        <div class="form-row">
+                            <label for="customer-name">Customer Name</label>
+                            <input type="text" id="customer-name" placeholder="Enter customer name">
+                        </div>
+                        <div class="form-row">
+                            <label for="customer-email">Email</label>
+                            <input type="email" id="customer-email" placeholder="customer@example.com">
+                        </div>
+                        <div class="form-row">
+                            <label for="quote-notes">Notes</label>
+                            <textarea id="quote-notes" placeholder="Any special instructions or notes..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-footer">
+                <button class="btn-back" onclick="closeSummaryModal()">
+                    <i class="fas fa-arrow-left"></i> Back to Quote
+                </button>
+                <div class="action-buttons">
+                    <button class="btn-print" onclick="printQuote()">
+                        <i class="fas fa-print"></i> Print PDF
+                    </button>
+                    <button class="btn-email" onclick="emailQuote()">
+                        <i class="fas fa-envelope"></i> Email Quote
+                    </button>
+                    <button class="btn-save" onclick="saveQuote()">
+                        <i class="fas fa-save"></i> Save Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extended Size Picker Backdrop -->
+    <div id="size-popup-backdrop" class="size-popup-backdrop hidden" onclick="closeExtendedSizePopup()"></div>
+
+    <!-- Extended Size Picker Popup -->
+    <div id="extended-size-popup" class="size-popup hidden">
+        <div class="size-popup-header">
+            <h4><i class="fas fa-ruler"></i> Extended Sizes</h4>
+            <button class="close-popup" onclick="closeExtendedSizePopup()">&times;</button>
+        </div>
+        <div class="size-popup-body" id="size-popup-body">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+        <div class="size-popup-footer">
+            <button class="btn-cancel" onclick="closeExtendedSizePopup()">Cancel</button>
+            <button class="btn-apply" onclick="applyExtendedSizes()">Apply</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Exact Match Search Module -->
+    <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
+
+    <!-- DTF Quote Builder Scripts (4 files - consolidated architecture) -->
+    <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
+    <script src="/shared_components/js/dtf-quote-products.js?v=20260106r"></script>
+    <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=20260106r"></script>
+
+    <script>
+        // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DTF Quote Builder: Inline init complete');
+        });
+
+        // Global functions for onclick handlers
+        function continueToSummary() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.showSummary();
+            }
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summary-modal').style.display = 'none';
+        }
+
+        function saveDraft() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.saveDraft();
+            }
+        }
+
+        function saveQuote() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.saveQuote();
+            }
+        }
+
+        function printQuote() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.printQuote();
+            }
+        }
+
+        function emailQuote() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.emailQuote();
+            }
+        }
+
+        function copyQuoteId() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.copyQuoteId();
+            }
+        }
+
+        function clearAllProducts() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.clearAllProducts();
+            }
+        }
+
+        function copyQuoteToClipboard() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.copyQuoteToClipboard();
+            }
+        }
+
+        function openExtendedSizePopup(productId) {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.openExtendedSizePopup(productId);
+            }
+        }
+
+        function closeExtendedSizePopup() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.closeExtendedSizePopup();
+            }
+        }
+
+        function applyExtendedSizes() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.applyExtendedSizes();
+            }
+        }
+
+        function focusProductSearch() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.focusProductSearch();
+            }
+        }
+
+        function toggleLTMVisibility() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.toggleLTMVisibility();
+            }
+        }
+    </script>
+</body>
+</html>

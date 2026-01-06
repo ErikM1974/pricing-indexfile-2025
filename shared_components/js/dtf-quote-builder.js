@@ -16,6 +16,7 @@ class DTFQuoteBuilder {
         this.products = [];
         this.pricingData = null;
         this.productIndex = 0;
+        this.ltmHidden = false; // Track if user has hidden the LTM fee display
 
         // Location configuration
         this.locationConfig = {
@@ -381,7 +382,7 @@ class DTFQuoteBuilder {
                 bundleProduct: bundleData.product,
                 fields: bundleData.product ? Object.keys(bundleData.product) : []
             });
-            const baseCost = bundleData.garmentCost || bundleData.product?.CASE_PRICE || 0;
+            const baseCost = bundleData.garmentCost || bundleData.CASE_PRICE || bundleData.product?.CASE_PRICE || 0;
 
             // Add product row to table
             this.addProductRow({
@@ -433,8 +434,10 @@ class DTFQuoteBuilder {
         row.innerHTML = `
             <td class="style-col">
                 <strong>${product.styleNumber}</strong>
-                <div class="sku-pattern" title="ShopWorks SKUs: ${product.styleNumber}, ${product.styleNumber}_2X, ${product.styleNumber}_3X, etc.">
-                    <small>2XL+: _2X, _3X...</small>
+                <div class="product-name">${product.description}</div>
+                <div class="product-meta" id="meta-${product.id}">
+                    <span class="location-codes">${this.getLocationCodesString()}</span>
+                    <span class="unit-preview">--</span>
                 </div>
             </td>
             <td class="desc-cell">
@@ -882,6 +885,8 @@ class DTFQuoteBuilder {
             if (!row) return;
 
             let productTotal = 0;
+            let baseUnitPrice = 0; // For display in style column
+
             Object.entries(product.quantities).forEach(([size, qty]) => {
                 if (qty > 0) {
                     const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
@@ -891,12 +896,37 @@ class DTFQuoteBuilder {
                     // Use rounding from API
                     const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
                     productTotal += roundedPrice * qty;
+
+                    // Track base unit price (S/M/LG size - no upcharge) for display
+                    if (baseUnitPrice === 0 && ['S', 'M', 'LG'].includes(size)) {
+                        baseUnitPrice = roundedPrice;
+                    }
                 }
             });
+
+            // If no base price yet, calculate it for display
+            if (baseUnitPrice === 0 && totalQty > 0) {
+                const garmentCost = product.baseCost / marginDenom;
+                const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                baseUnitPrice = this.pricingCalculator.applyRounding(unitPrice);
+            }
 
             // Update row price
             const priceSpan = row.querySelector('.row-price');
             if (priceSpan) priceSpan.textContent = `$${productTotal.toFixed(2)}`;
+
+            // Update unit preview in style column
+            const metaDiv = document.getElementById(`meta-${product.id}`);
+            if (metaDiv) {
+                const unitPreview = metaDiv.querySelector('.unit-preview');
+                const locCodes = metaDiv.querySelector('.location-codes');
+                if (unitPreview) {
+                    unitPreview.textContent = baseUnitPrice > 0 ? `$${baseUnitPrice.toFixed(2)}/ea` : '--';
+                }
+                if (locCodes) {
+                    locCodes.textContent = this.getLocationCodesString();
+                }
+            }
 
             grandTotal += productTotal;
         });
@@ -957,6 +987,27 @@ class DTFQuoteBuilder {
             '6XL': upcharges['6XL'] || upcharges['6X'] || defaults['6XL']
         };
         return upchargeMap[size] || 0;
+    }
+
+    /**
+     * Get location codes string for display (e.g., "LC+CB" for Left Chest + Center Back)
+     */
+    getLocationCodesString() {
+        if (this.selectedLocations.length === 0) return '--';
+
+        const codeMap = {
+            'left-chest': 'LC',
+            'right-chest': 'RC',
+            'left-sleeve': 'LS',
+            'right-sleeve': 'RS',
+            'back-of-neck': 'BN',
+            'center-front': 'CF',
+            'center-back': 'CB',
+            'full-front': 'FF',
+            'full-back': 'FB'
+        };
+
+        return this.selectedLocations.map(loc => codeMap[loc] || loc).join('+');
     }
 
     // ==================== SUMMARY & SAVE ====================
@@ -1155,6 +1206,41 @@ class DTFQuoteBuilder {
     }
 
     // ==================== UTILITY FUNCTIONS ====================
+
+    /**
+     * Focus the product search input (called by Add Product button)
+     */
+    focusProductSearch() {
+        const searchInput = document.getElementById('product-search');
+        if (searchInput && !searchInput.disabled) {
+            searchInput.focus();
+            searchInput.select();
+        } else if (searchInput && searchInput.disabled) {
+            this.showToast('Select a location first', 'warning');
+        }
+    }
+
+    /**
+     * Toggle LTM fee visibility (display only - still calculated)
+     */
+    toggleLTMVisibility() {
+        this.ltmHidden = !this.ltmHidden;
+
+        const ltmRow = document.getElementById('ltm-row');
+        const hideBtn = document.getElementById('hide-ltm-btn');
+
+        if (ltmRow && this.currentPricingData?.totalLtmFee > 0) {
+            if (this.ltmHidden) {
+                ltmRow.classList.add('ltm-hidden');
+                if (hideBtn) hideBtn.textContent = 'Show LTM';
+            } else {
+                ltmRow.classList.remove('ltm-hidden');
+                if (hideBtn) hideBtn.textContent = 'Hide LTM';
+            }
+        }
+
+        this.showToast(this.ltmHidden ? 'LTM fee hidden from display' : 'LTM fee shown', 'info');
+    }
 
     /**
      * Copy Quote ID to clipboard
