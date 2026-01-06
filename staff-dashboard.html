@@ -99,6 +99,57 @@
         .user-name {
             font-weight: 600;
         }
+        /* Price Alert Banner */
+        .price-alert-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: #ffffff !important;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 100;
+            text-align: center;
+        }
+        .price-alert-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex: 1;
+            color: #ffffff !important;
+        }
+        .price-alert-content span,
+        .price-alert-content strong {
+            color: #ffffff !important;
+        }
+        .price-alert-content i {
+            font-size: 1.2rem;
+            color: #ffffff !important;
+        }
+        .price-alert-close {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #ffffff !important;
+            cursor: pointer;
+            padding: 4px 8px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .price-alert-close:hover {
+            opacity: 1;
+        }
+        .price-alert-close i {
+            color: #ffffff !important;
+        }
+        .price-alert-banner.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -115,6 +166,17 @@
         <div id="auth-email">[@authfield:Email]</div>
         <div id="auth-role">[@authfield:Role]</div>
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
+    <!-- 2026 Price Increase Alert Banner -->
+    <div class="price-alert-banner" id="priceAlertBanner">
+        <div class="price-alert-content">
+            <i class="fas fa-info-circle"></i>
+            <span><strong>2026 Pricing Update:</strong> Due to SanMar cost increases, all decoration services have been adjusted 5-7% effective January 5, 2026. Quote builders reflect current pricing.</span>
+        </div>
+        <button class="price-alert-close" onclick="dismissPriceAlert()" aria-label="Dismiss">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <div class="dashboard-container">
@@ -1091,8 +1153,22 @@
                 StaffDashboardEmployees.renderBirthdayList('birthdayList');
                 StaffDashboardEmployees.renderAnniversaryList('anniversaryList');
             }
+
+            // Check if price alert was dismissed this session
+            if (sessionStorage.getItem('priceAlertDismissed_2026') === 'true') {
+                const banner = document.getElementById('priceAlertBanner');
+                if (banner) banner.classList.add('hidden');
+            }
         });
 
+        // Price Alert Banner - Dismiss functionality
+        function dismissPriceAlert() {
+            const banner = document.getElementById('priceAlertBanner');
+            if (banner) {
+                banner.classList.add('hidden');
+                sessionStorage.setItem('priceAlertDismissed_2026', 'true');
+            }
+        }
 
         // =====================================================
         // MANUAL PRICING MODAL FUNCTIONS
