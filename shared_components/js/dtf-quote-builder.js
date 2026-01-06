@@ -436,14 +436,19 @@ class DTFQuoteBuilder {
                 </div>
             </td>
             <td class="desc-cell">
-                <input type="text" class="cell-input desc-input"
-                       value="${product.description}"
-                       title="${product.description}"
-                       readonly>
+                <div class="desc-row">
+                    <input type="text" class="cell-input desc-input"
+                           value="${product.description}"
+                           title="${product.description}"
+                           placeholder="(auto)"
+                           data-field="description"
+                           readonly>
+                </div>
+                <div class="pricing-breakdown" id="breakdown-${product.id}"></div>
             </td>
             <td class="color-col">
                 <div class="color-picker-wrapper" data-product-id="${product.id}">
-                    <div class="color-picker-selected">
+                    <div class="color-picker-selected" tabindex="0">
                         <span class="color-swatch empty"></span>
                         <span class="color-name placeholder">Select color...</span>
                         <i class="fas fa-chevron-down picker-arrow"></i>
@@ -453,13 +458,13 @@ class DTFQuoteBuilder {
                     </div>
                 </div>
             </td>
-            <td class="size-col"><input type="number" class="size-input" data-size="S" min="0" value="" placeholder="-"></td>
-            <td class="size-col"><input type="number" class="size-input" data-size="M" min="0" value="" placeholder="-"></td>
-            <td class="size-col"><input type="number" class="size-input" data-size="LG" min="0" value="" placeholder="-"></td>
-            <td class="size-col"><input type="number" class="size-input" data-size="XL" min="0" value="" placeholder="-"></td>
-            <td class="size-col"><input type="number" class="size-input" data-size="XXL" min="0" value="" placeholder="-"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" disabled></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" disabled></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="LG" min="0" value="" placeholder="0" disabled></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" disabled></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XXL" min="0" value="" placeholder="0" disabled></td>
             <td class="size-col extended-picker-cell">
-                <button type="button" class="btn-extended-picker" data-product-id="${product.id}" title="Click for XS, 3XL, 4XL, 5XL, 6XL" onclick="openExtendedSizePopup(${product.id})">
+                <button type="button" class="btn-extended-picker" data-product-id="${product.id}" title="Click for XS, 3XL, 4XL, 5XL, 6XL" onclick="openExtendedSizePopup(${product.id})" disabled>
                     <span class="ext-qty-badge" id="ext-badge-${product.id}">+</span>
                 </button>
             </td>
@@ -523,6 +528,16 @@ class DTFQuoteBuilder {
             dropdown.classList.toggle('hidden');
         });
 
+        // Handle keyboard on color picker (Enter/Space to toggle)
+        trigger.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                dropdown.classList.toggle('hidden');
+            } else if (e.key === 'Escape') {
+                dropdown.classList.add('hidden');
+            }
+        });
+
         // Handle option selection
         options.forEach(option => {
             option.addEventListener('click', (e) => {
@@ -557,9 +572,32 @@ class DTFQuoteBuilder {
                 // Close dropdown
                 dropdown.classList.add('hidden');
 
+                // Enable size inputs now that color is selected
+                this.enableSizeInputs(productId);
+
                 console.log(`[DTFQuoteBuilder] Color selected: ${colorName} (${catalogColor})`);
             });
         });
+    }
+
+    /**
+     * Enable size inputs after color is selected
+     */
+    enableSizeInputs(productId) {
+        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+        if (!row) return;
+
+        row.querySelectorAll('.size-input').forEach(input => {
+            input.disabled = false;
+        });
+
+        // Also enable extended picker button
+        const extButton = row.querySelector('.btn-extended-picker');
+        if (extButton) {
+            extButton.disabled = false;
+        }
+
+        console.log(`[DTFQuoteBuilder] Size inputs enabled for product ${productId}`);
     }
 
     // ==================== EXTENDED SIZE POPUP ====================
