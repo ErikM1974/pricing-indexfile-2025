@@ -83,7 +83,8 @@
       "Bash(git restore:*)",
       "Bash(for style in C855 NE1000 STC26 C223 OE650 C918 DT600 C118)",
       "Bash(do grep -E \"^[^,]*,$style,\" \"Sanmar New Pricing 1-4-26.csv\")",
-      "Bash(curl -s \"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP-AL\")"
+      "Bash(curl -s \"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP-AL\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nEnhance embroidery quote builder with cap/garment pricing engine\n\n- Update pricing margins documentation for 2026\n- Expand quote builder UI with dual pricing support\n- Improve invoice generation for cap vs garment pricing\n- Refine pricing calculations for unified quote builder\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": [],
