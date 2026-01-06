@@ -146,7 +146,35 @@ In addition to the margin change, embroidery costs were increased by $1.00 acros
 | 48-71 | Cap | $10.00 | $11.00 |
 | 72+ | Cap | $8.50 | $9.50 |
 
-See `MESSAGE_TO_CASPIO_PROXY_EMBROIDERY_INCREASE.md` for full details including AL/AL-CAP tiers.
+### Additional Logo (AL) Costs - Garments
+
+| Tier | EmbroideryCost | BaseStitchCount | AdditionalStitchRate |
+|------|----------------|-----------------|---------------------|
+| 1-23 | $13.50 | 8000 | $1.25/1K |
+| 24-47 | $12.50 | 8000 | $1.25/1K |
+| 48-71 | $10.50 | 8000 | $1.25/1K |
+| 72+ | $9.50 | 8000 | $1.25/1K |
+
+### Additional Logo (AL-CAP) Costs - Caps
+
+| Tier | EmbroideryCost | BaseStitchCount | AdditionalStitchRate |
+|------|----------------|-----------------|---------------------|
+| 1-23 | $6.75 | 5000 | $1.00/1K |
+| 24-47 | $5.75 | 5000 | $1.00/1K |
+| 48-71 | $5.50 | 5000 | $1.00/1K |
+| 72+ | $5.25 | 5000 | $1.00/1K |
+
+### Key Differences: AL vs AL-CAP
+
+| Property | AL (Garment) | AL-CAP (Cap) |
+|----------|--------------|--------------|
+| API ItemType | `'AL'` | `'AL-CAP'` |
+| BaseStitchCount | 8000 | **5000** |
+| AdditionalStitchRate | $1.25/1K | **$1.00/1K** |
+| Typical position | Right Chest, Sleeve | Cap Back, Cap Side |
+
+**Formula:** `AL Price = EmbroideryCost + (ExtraStitches / 1000) × AdditionalStitchRate`
+- ExtraStitches = max(0, logoStitchCount - BaseStitchCount)
 
 ## DTG Print Cost Increase ($0.50)
 

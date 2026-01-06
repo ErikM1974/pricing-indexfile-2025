@@ -388,89 +388,52 @@ class EmbroideryInvoiceGenerator {
     
     /**
      * Generate embroidery specifications section
+     * Supports separate garment and cap logo configurations
      */
     generateEmbroiderySpecs(pricingData) {
-        if (!pricingData.logos || pricingData.logos.length === 0) {
+        // Check if we have the new logoConfigs structure
+        const hasLogoConfigs = pricingData.logoConfigs &&
+            (pricingData.garmentLogos?.length > 0 || pricingData.capLogos?.length > 0);
+
+        // If no logoConfigs and no legacy logos, return empty
+        if (!hasLogoConfigs && (!pricingData.logos || pricingData.logos.length === 0)) {
             return '';
         }
 
         let specsHTML = `
             <div style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
-                <div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>
         `;
 
-        // Find primary logo
-        const primaryLogo = pricingData.logos.find(l => l.isPrimary !== false) || pricingData.logos[0];
-        if (primaryLogo) {
-            const position = primaryLogo.position || 'Left Chest';
-            const stitchCount = primaryLogo.stitchCount || 8000;
-            const extraStitches = stitchCount - 8000;
+        // Determine AL base rate from tier
+        const tier = pricingData.tier || '1-23';
+        let alBaseRate = 12.50;
+        if (tier.includes('72')) alBaseRate = 8.50;
+        else if (tier.includes('48')) alBaseRate = 9.50;
+        else if (tier.includes('24')) alBaseRate = 11.50;
 
-            // Primary logo (base 8K included)
-            specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches) -
-                    <span style="color: #4cb354;">BASE (8K INCLUDED)</span>
-                </div>
-            `;
-
-            // Additional stitches line item (when primary > 8K)
-            if (extraStitches > 0) {
-                const extraK = extraStitches / 1000;
-                const asCostPerUnit = extraK * 1.25;
-                specsHTML += `
-                    <div style="font-size: 11px; color: #333; margin: 4px 0; margin-left: 15px;">
-                        + <strong>Additional Stitches</strong> (+${extraK}K) -
-                        <span style="color: #ff6b35;">+$${asCostPerUnit.toFixed(2)} per piece</span>
-                    </div>
-                `;
+        // Handle new separate logo configs
+        if (hasLogoConfigs) {
+            // GARMENT EMBROIDERY SECTION
+            if (pricingData.garmentLogos && pricingData.garmentLogos.length > 0 && pricingData.hasGarments) {
+                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">GARMENT EMBROIDERY:</div>`;
+                specsHTML += this.generateLogoListHTML(pricingData.garmentLogos, alBaseRate, 'garment');
             }
 
-            // Primary digitizing if needed
-            if (primaryLogo.needsDigitizing) {
-                specsHTML += `
-                    <div style="font-size: 10px; color: #666; margin: 2px 0; margin-left: 15px;">
-                        + Digitizing: $100
-                    </div>
-                `;
+            // CAP EMBROIDERY SECTION
+            if (pricingData.capLogos && pricingData.capLogos.length > 0 && pricingData.hasCaps) {
+                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2196F3; margin-bottom: 8px; margin-top: ${pricingData.hasGarments ? '12px' : '0'};">CAP EMBROIDERY:</div>`;
+                specsHTML += this.generateLogoListHTML(pricingData.capLogos, alBaseRate, 'cap');
             }
-        }
-
-        // Add additional logos with clear pricing and digitizing info
-        const additionalLogos = pricingData.logos.filter(l => l.isPrimary === false);
-        if (additionalLogos.length > 0) {
-            // Determine AL base rate from tier
-            const tier = pricingData.tier || '1-23';
-            let alBaseRate = 12.50;
-            if (tier.includes('72')) alBaseRate = 8.50;
-            else if (tier.includes('48')) alBaseRate = 9.50;
-            else if (tier.includes('24')) alBaseRate = 11.50;
-
-            additionalLogos.forEach((logo, index) => {
-                const position = logo.position || 'Additional Logo';
-                const stitchCount = logo.stitchCount || 8000;
-                const extraStitches = Math.max(0, stitchCount - 8000);
-                const extraK = extraStitches / 1000;
-                const stitchCost = extraK * 1.25;
-                const alUnitPrice = alBaseRate + stitchCost;
-                const needsDigitizing = logo.needsDigitizing || false;
-
-                const stitchNote = extraStitches > 0 ? ` (+${extraK}K stitches)` : '';
-                const digitizingText = needsDigitizing ? ' [+$100 Digitizing]' : '';
-
-                specsHTML += `
-                    <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                        ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote} -
-                        <span style="color: #ff6b35;">+$${alUnitPrice.toFixed(2)} per piece</span>
-                        <span style="color: #666; font-size: 10px;">${digitizingText}</span>
-                    </div>
-                `;
-            });
+        } else {
+            // Legacy: All logos are garment logos
+            specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>`;
+            specsHTML += this.generateLogoListHTML(pricingData.logos, alBaseRate, 'garment');
         }
 
         // Add setup fees if present
         if (pricingData.setupFees > 0) {
-            const digitizingCount = pricingData.logos.filter(l => l.needsDigitizing).length;
+            const digitizingCount = pricingData.setupFeesCount ||
+                (pricingData.logos ? pricingData.logos.filter(l => l.needsDigitizing).length : 0);
             if (digitizingCount > 0) {
                 specsHTML += `
                     <div style="font-size: 10px; color: #666; margin-top: 5px;">
@@ -493,6 +456,95 @@ class EmbroideryInvoiceGenerator {
         specsHTML += `</div>`;
 
         return specsHTML;
+    }
+
+    /**
+     * Generate HTML for a list of logos (used by generateEmbroiderySpecs)
+     */
+    generateLogoListHTML(logos, alBaseRate, type = 'garment') {
+        if (!logos || logos.length === 0) return '';
+
+        let html = '';
+
+        // Cap position display names
+        const capPositionNames = {
+            'CF': 'Cap Front',
+            'CB': 'Cap Back',
+            'CL': 'Left Side',
+            'CR': 'Right Side'
+        };
+
+        // Find primary logo
+        const primaryLogo = logos.find(l => l.isPrimary !== false) || logos[0];
+        if (primaryLogo) {
+            let position = primaryLogo.position || (type === 'cap' ? 'Cap Front' : 'Left Chest');
+            // Convert cap position codes to readable names
+            if (type === 'cap' && capPositionNames[position]) {
+                position = capPositionNames[position];
+            }
+            const stitchCount = primaryLogo.stitchCount || 8000;
+            const extraStitches = stitchCount - 8000;
+
+            // Primary logo (base 8K included)
+            html += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches) -
+                    <span style="color: #4cb354;">BASE (8K INCLUDED)</span>
+                </div>
+            `;
+
+            // Additional stitches line item (when primary > 8K) - GARMENTS ONLY
+            if (extraStitches > 0 && type === 'garment') {
+                const extraK = extraStitches / 1000;
+                const asCostPerUnit = extraK * 1.25;
+                html += `
+                    <div style="font-size: 11px; color: #333; margin: 4px 0; margin-left: 15px;">
+                        + <strong>Additional Stitches</strong> (+${extraK}K) -
+                        <span style="color: #ff6b35;">+$${asCostPerUnit.toFixed(2)} per piece</span>
+                    </div>
+                `;
+            }
+
+            // Primary digitizing if needed
+            if (primaryLogo.needsDigitizing) {
+                html += `
+                    <div style="font-size: 10px; color: #666; margin: 2px 0; margin-left: 15px;">
+                        + Digitizing: $100
+                    </div>
+                `;
+            }
+        }
+
+        // Add additional logos with clear pricing and digitizing info
+        const additionalLogos = logos.filter(l => l.isPrimary === false);
+        if (additionalLogos.length > 0) {
+            additionalLogos.forEach((logo) => {
+                let position = logo.position || 'Additional Logo';
+                // Convert cap position codes to readable names
+                if (type === 'cap' && capPositionNames[position]) {
+                    position = capPositionNames[position];
+                }
+                const stitchCount = logo.stitchCount || (type === 'cap' ? 5000 : 8000);
+                const extraStitches = Math.max(0, stitchCount - 8000);
+                const extraK = extraStitches / 1000;
+                const stitchCost = extraK * 1.25;
+                const alUnitPrice = alBaseRate + stitchCost;
+                const needsDigitizing = logo.needsDigitizing || false;
+
+                const stitchNote = extraStitches > 0 ? ` (+${extraK}K stitches)` : '';
+                const digitizingText = needsDigitizing ? ' [+$100 Digitizing]' : '';
+
+                html += `
+                    <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                        ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote} -
+                        <span style="color: #ff6b35;">+$${alUnitPrice.toFixed(2)} per piece</span>
+                        <span style="color: #666; font-size: 10px;">${digitizingText}</span>
+                    </div>
+                `;
+            });
+        }
+
+        return html;
     }
     
     /**

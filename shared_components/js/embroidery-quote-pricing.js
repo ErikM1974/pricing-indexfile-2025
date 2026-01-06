@@ -39,6 +39,7 @@ class EmbroideryPricingCalculator {
         this.capInitialized = false; // Track cap pricing loaded
         this.capStitchCount = 8000;  // Fixed 8000 for caps
         this.capRoundingMethod = 'HalfDollarUp'; // Caps use half-dollar rounding
+        this.capAdditionalStitchRate = 1.00; // Cap default: $1.00/1K (vs Shirt $1.25/1K)
 
         // Track API status
         this.apiError = false;
@@ -139,10 +140,12 @@ class EmbroideryPricingCalculator {
                     this.alTiers = {};
                     alData.allEmbroideryCostsR.forEach(cost => {
                         if (cost.ItemType === 'AL') {
-                            console.log(`🔍 [DEBUG] AL Tier ${cost.TierLabel}: EmbroideryCost = $${cost.EmbroideryCost}`);
+                            console.log(`🔍 [DEBUG] AL Tier ${cost.TierLabel}: EmbroideryCost = $${cost.EmbroideryCost}, BaseStitchCount = ${cost.BaseStitchCount}, AdditionalStitchRate = $${cost.AdditionalStitchRate}`);
                             this.alTiers[cost.TierLabel] = {
                                 embCost: cost.EmbroideryCost,
-                                hasLTM: cost.TierLabel === '1-23'
+                                hasLTM: cost.TierLabel === '1-23',
+                                baseStitchCount: cost.BaseStitchCount || 8000,
+                                additionalStitchRate: cost.AdditionalStitchRate || 1.25
                             };
                         }
                     });
@@ -249,6 +252,13 @@ class EmbroideryPricingCalculator {
                             embCost: cost.EmbroideryCost,
                             hasLTM: cost.TierLabel === '1-23'
                         };
+                        // Store cap-specific additional stitch rate (from first Cap record)
+                        // Caps use $1.00/1K (NOT Shirt's $1.25/1K)
+                        if (cost.AdditionalStitchRate && !this._capRateLoaded) {
+                            this.capAdditionalStitchRate = cost.AdditionalStitchRate;
+                            this._capRateLoaded = true;
+                            console.log(`[EmbroideryPricingCalculator] Cap additional stitch rate: $${this.capAdditionalStitchRate}/1K`);
+                        }
                     }
                 });
 
@@ -278,9 +288,12 @@ class EmbroideryPricingCalculator {
                 if (alData && alData.allEmbroideryCostsR) {
                     this.capAlTiers = {};
                     alData.allEmbroideryCostsR.forEach(cost => {
-                        if (cost.ItemType === 'AL' || cost.StitchCount === 8000) {
+                        // Match AL-CAP (not 'AL') - API returns ItemType='AL-CAP' for cap additional logos
+                        if (cost.ItemType === 'AL-CAP') {
                             this.capAlTiers[cost.TierLabel] = {
-                                embCost: cost.EmbroideryCost
+                                embCost: cost.EmbroideryCost,
+                                baseStitchCount: cost.BaseStitchCount || 5000,
+                                additionalStitchRate: cost.AdditionalStitchRate || 1.00
                             };
                         }
                     });
@@ -329,7 +342,7 @@ class EmbroideryPricingCalculator {
      * Calculate price for a cap product
      * Uses CAP pricing: fixed 8K stitches, HalfDollarUp rounding
      */
-    async calculateCapProductPrice(product, totalQuantity) {
+    async calculateCapProductPrice(product, totalQuantity, capStitchCount = 8000) {
         // Ensure cap pricing is initialized
         if (!this.capInitialized) {
             await this.initializeCapConfig();
@@ -339,7 +352,14 @@ class EmbroideryPricingCalculator {
         const embCost = this.getCapEmbroideryCost(tier);
         const marginDenom = this.capMarginDenominator || 0.57;
 
-        console.log(`[EmbroideryPricingCalculator] Cap product ${product.style}: tier=${tier}, embCost=$${embCost}`);
+        // Calculate extra stitch cost for caps
+        // Base is 8000 stitches, charge extra per 1000 above that
+        // CRITICAL: Caps use $1.00/1K (NOT Shirt's $1.25/1K)
+        const capBaseStitches = 8000;
+        const extraCapStitches = Math.max(0, capStitchCount - capBaseStitches);
+        const capExtraStitchCost = (extraCapStitches / 1000) * (this.capAdditionalStitchRate || 1.00);
+
+        console.log(`[EmbroideryPricingCalculator] Cap product ${product.style}: tier=${tier}, embCost=$${embCost}, stitches=${capStitchCount}, extraStitchCost=$${capExtraStitchCost.toFixed(2)}`);
 
         // Fetch size pricing for this cap style
         const sizePricingData = await this.fetchSizePricing(product.style);
@@ -393,10 +413,13 @@ class EmbroideryPricingCalculator {
             const sizeBasePrice = priceData.basePrices[size] || standardBasePrice;
             const upcharge = priceData.sizeUpcharges[size] || 0;
 
-            // Calculate decorated price: (garment / margin) + embroidery + upcharge
+            // Calculate decorated price using bottom-up logic (same as garments)
+            // Step 1: Calculate and ROUND the base price (garment + embroidery for 8K stitches)
             const garmentCost = sizeBasePrice / marginDenom;
-            const decoratedPrice = garmentCost + embCost;
-            const roundedPrice = this.roundCapPrice(decoratedPrice);
+            const baseDecoratedPrice = garmentCost + embCost;  // Base with 8K stitches
+            const roundedBase = this.roundCapPrice(baseDecoratedPrice);  // Round the base FIRST
+            // Step 2: Add extra stitch fees on top (no more rounding)
+            const roundedPrice = roundedBase + capExtraStitchCost;
             const finalPrice = roundedPrice + upcharge;
 
             console.log(`[CAP PRICING DEBUG] ${product.style} ${size}:
@@ -404,8 +427,10 @@ class EmbroideryPricingCalculator {
                 Margin: ${marginDenom}
                 Garment: $${garmentCost.toFixed(2)}
                 Emb: $${embCost}
-                Decorated: $${decoratedPrice.toFixed(2)}
-                Rounded: $${roundedPrice}
+                Base Decorated: $${baseDecoratedPrice.toFixed(2)}
+                Rounded Base: $${roundedBase}
+                ExtraStitch: $${capExtraStitchCost.toFixed(2)} (added AFTER rounding)
+                Price w/Extra: $${roundedPrice.toFixed(2)}
                 Upcharge: $${upcharge}
                 Final: $${finalPrice}`);
 
@@ -413,8 +438,8 @@ class EmbroideryPricingCalculator {
                 description: `${size}(${qty})`,
                 quantity: qty,
                 unitPrice: finalPrice,
-                basePrice: roundedPrice,
-                extraStitchCost: 0, // Caps don't have extra stitch
+                basePrice: roundedBase,  // Store rounded base (8K stitches) for display - consistent with garments
+                extraStitchCost: capExtraStitchCost,
                 alCost: 0,
                 total: finalPrice * qty,
                 isCap: true
@@ -899,8 +924,11 @@ class EmbroideryPricingCalculator {
     /**
      * Calculate complete quote pricing
      * Supports mixed quotes with caps (CAP pricing) and garments (EMB pricing)
+     * @param {Array} products - Products to price
+     * @param {Array} logos - Legacy: all logos (garment logos for backward compat)
+     * @param {Object} logoConfigs - NEW: Separate configs { garment: {primary, additional}, cap: {primary, additional} }
      */
-    async calculateQuote(products, logos) {
+    async calculateQuote(products, logos, logoConfigs = null) {
         if (!products || products.length === 0) {
             return null;
         }
@@ -950,18 +978,50 @@ class EmbroideryPricingCalculator {
         const capQuantity = capProducts.reduce((sum, p) => sum + p.totalQuantity, 0);
         const garmentQuantity = garmentProducts.reduce((sum, p) => sum + p.totalQuantity, 0);
 
-        const tier = this.getTier(totalQuantity);
-        const tierEmbCost = this.getEmbroideryCost(tier);
+        // CRITICAL: Separate tiers for caps and garments
+        // Caps and garments CANNOT be combined for quantity discounts
+        const garmentTier = garmentQuantity > 0 ? this.getTier(garmentQuantity) : '1-23';
+        const capTier = capQuantity > 0 ? this.getTier(capQuantity) : '1-23';
+        const tierEmbCost = this.getEmbroideryCost(garmentTier);
 
-        // Separate primary and additional logos
-        const primaryLogos = logos.filter(l => l.isPrimary);
-        const additionalLogos = logos.filter(l => !l.isPrimary);
+        console.log(`[EmbroideryPricingCalculator] Separate tiers: garments=${garmentTier} (${garmentQuantity} pcs), caps=${capTier} (${capQuantity} pcs)`);
+
+        // =========================================
+        // USE SEPARATE LOGO CONFIGS IF PROVIDED
+        // =========================================
+        let garmentLogos, garmentPrimaryLogos, garmentAdditionalLogos;
+        let capLogos, capPrimaryLogo, capAdditionalLogos;
+
+        if (logoConfigs) {
+            // New: Use separate configs for garments vs caps
+            garmentPrimaryLogos = [logoConfigs.garment.primary].filter(Boolean);
+            garmentAdditionalLogos = logoConfigs.garment.additional || [];
+            garmentLogos = [...garmentPrimaryLogos, ...garmentAdditionalLogos];
+
+            capPrimaryLogo = logoConfigs.cap.primary;
+            capAdditionalLogos = logoConfigs.cap.additional || [];
+            capLogos = [capPrimaryLogo, ...capAdditionalLogos].filter(Boolean);
+
+            console.log(`[EmbroideryPricingCalculator] Using separate logo configs: ${garmentLogos.length} garment logos, ${capLogos.length} cap logos`);
+        } else {
+            // Legacy: All logos are garment logos
+            garmentPrimaryLogos = logos.filter(l => l.isPrimary);
+            garmentAdditionalLogos = logos.filter(l => !l.isPrimary);
+            garmentLogos = logos;
+            capPrimaryLogo = null;
+            capAdditionalLogos = [];
+            capLogos = [];
+        }
+
+        // For backward compat
+        const primaryLogos = garmentPrimaryLogos;
+        const additionalLogos = garmentAdditionalLogos;
 
         // Calculate additional stitch cost for PRIMARY logos only (GARMENTS ONLY)
         // Caps have fixed 8K stitches - no extra stitch charge
         let primaryAdditionalStitchCost = 0;
         if (garmentProducts.length > 0) {
-            primaryLogos.forEach(logo => {
+            garmentPrimaryLogos.forEach(logo => {
                 const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
                 primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
             });
@@ -974,8 +1034,9 @@ class EmbroideryPricingCalculator {
         let capSubtotal = 0;
 
         // Calculate GARMENT products with standard EMB pricing
+        // Uses garmentQuantity for tier determination (NOT combined total)
         for (const product of garmentProducts) {
-            const pricing = await this.calculateProductPrice(product, totalQuantity, primaryAdditionalStitchCost);
+            const pricing = await this.calculateProductPrice(product, garmentQuantity, primaryAdditionalStitchCost);
             if (pricing) {
                 pricing.isCap = false;
                 productPricing.push(pricing);
@@ -985,8 +1046,13 @@ class EmbroideryPricingCalculator {
         }
 
         // Calculate CAP products with CAP pricing
+        // Uses capQuantity for tier determination (NOT combined total)
+        // Get cap stitch count from logo config (default 8000)
+        const capStitchCount = capPrimaryLogo?.stitchCount || 8000;
+        console.log(`[EmbroideryPricingCalculator] Cap stitch count from config: ${capStitchCount}`);
+
         for (const product of capProducts) {
-            const pricing = await this.calculateCapProductPrice(product, totalQuantity);
+            const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount);
             if (pricing) {
                 productPricing.push(pricing);
                 subtotal += pricing.subtotal;
@@ -994,45 +1060,90 @@ class EmbroideryPricingCalculator {
             }
         }
         
-        // Apply LTM if needed
+        // Apply LTM separately for caps and garments
+        // Each product type has its own LTM if qty < 24
         let ltmTotal = 0;
-        let ltmPerUnit = 0;
-        if (totalQuantity < 24) {
-            ltmTotal = this.ltmFee;
-            ltmPerUnit = ltmTotal / totalQuantity;
-            
-            // Add LTM to each line item
-            productPricing.forEach(pp => {
+        let garmentLtm = 0;
+        let capLtm = 0;
+
+        // Garment LTM: apply if garments exist and qty < 24
+        if (garmentQuantity > 0 && garmentQuantity < 24) {
+            garmentLtm = this.ltmFee;
+            const garmentLtmPerUnit = garmentLtm / garmentQuantity;
+            productPricing.filter(pp => !pp.isCap).forEach(pp => {
                 pp.lineItems.forEach(item => {
-                    item.ltmPerUnit = ltmPerUnit;
-                    item.unitPriceWithLTM = item.unitPrice + ltmPerUnit;
+                    item.ltmPerUnit = garmentLtmPerUnit;
+                    item.unitPriceWithLTM = item.unitPrice + garmentLtmPerUnit;
                 });
             });
         }
+
+        // Cap LTM: apply if caps exist and qty < 24
+        if (capQuantity > 0 && capQuantity < 24) {
+            capLtm = this.ltmFee;
+            const capLtmPerUnit = capLtm / capQuantity;
+            productPricing.filter(pp => pp.isCap).forEach(pp => {
+                pp.lineItems.forEach(item => {
+                    item.ltmPerUnit = capLtmPerUnit;
+                    item.unitPriceWithLTM = item.unitPrice + capLtmPerUnit;
+                });
+            });
+        }
+
+        ltmTotal = garmentLtm + capLtm;
+        const ltmPerUnit = totalQuantity > 0 ? ltmTotal / totalQuantity : 0;
+
+        console.log(`[EmbroideryPricingCalculator] LTM: garments=$${garmentLtm} (${garmentQuantity}<24), caps=$${capLtm} (${capQuantity}<24), total=$${ltmTotal}`);
         
         // Calculate additional logos pricing
         const additionalServices = [];
         let additionalServicesTotal = 0;
         
         // Process additional logos for each product
+        // Supports both:
+        // 1. Global AL (legacy): assignment has logoId referencing additionalLogos array
+        // 2. Per-product AL (new): assignment has position/stitchCount embedded
         for (const product of products) {
             if (product.logoAssignments?.additional) {
                 for (const assignment of product.logoAssignments.additional) {
-                    const logo = additionalLogos.find(l => l.id === assignment.logoId);
+                    // Per-product AL: data is embedded in assignment
+                    // Global AL: data comes from additionalLogos array
+                    let logo = null;
+                    let isCap = product.isCap === true;
+
+                    if (assignment.position && assignment.stitchCount) {
+                        // Per-product AL - data is embedded
+                        logo = {
+                            id: assignment.id,
+                            position: assignment.position,
+                            stitchCount: assignment.stitchCount
+                        };
+                    } else if (assignment.logoId) {
+                        // Global AL - find from additionalLogos array
+                        logo = additionalLogos.find(l => l.id === assignment.logoId);
+                    }
+
                     if (logo) {
                         const quantity = assignment.quantity || 0;
                         if (quantity > 0) {
                             // Calculate additional logo price (NO margin division)
-                            const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
-                            const stitchCost = (extraStitches / 1000) * this.additionalStitchRate;
+                            // Use different base stitch count and rate for caps vs garments
+                            const baseStitches = isCap ? 5000 : this.baseStitchCount;
+                            const stitchRate = isCap ? this.capAdditionalStitchRate : this.additionalStitchRate;
+                            const extraStitches = Math.max(0, logo.stitchCount - baseStitches);
+                            const stitchCost = (extraStitches / 1000) * stitchRate;
                             
                             // Use AL tier cost from API - ERROR if not available
-                            if (!this.alTiers[tier] || !this.alTiers[tier].embCost) {
-                                console.error('[EmbroideryPricingCalculator] AL pricing not available for tier:', tier);
+                            // Use appropriate tier for caps vs garments
+                            const alTier = isCap ? capTier : garmentTier;
+                            const alTierData = isCap ? this.capAlTiers : this.alTiers;
+
+                            if (!alTierData[alTier] || !alTierData[alTier].embCost) {
+                                console.error('[EmbroideryPricingCalculator] AL pricing not available for tier:', alTier, 'isCap:', isCap);
                                 // Show error to user if not already shown
                                 if (!document.getElementById('pricing-api-warning')) {
                                     this.showAPIWarning(
-                                        'Cannot calculate Additional Logo pricing. AL pricing data is unavailable. ' +
+                                        `Cannot calculate Additional Logo pricing. ${isCap ? 'Cap' : 'Garment'} AL pricing data is unavailable. ` +
                                         'Please contact IT support immediately.',
                                         'al-pricing'
                                     );
@@ -1040,7 +1151,7 @@ class EmbroideryPricingCalculator {
                                 // Return zero price to prevent incorrect quotes
                                 const unitPrice = 0;
                                 const total = 0;
-                                
+
                                 additionalServices.push({
                                     type: 'additional_logo',
                                     description: `⚠️ ERROR: ${logo.position} - PRICING UNAVAILABLE`,
@@ -1054,12 +1165,12 @@ class EmbroideryPricingCalculator {
                                 });
                                 continue; // Skip to next logo
                             }
-                            
-                            const alTierCost = this.alTiers[tier].embCost;
-                            
+
+                            const alTierCost = alTierData[alTier].embCost;
+
                             // Debug logging for AL calculation
-                            console.log(`🔍 [DEBUG] AL Calculation for ${logo.position}:`);
-                            console.log(`   - Tier: ${tier}`);
+                            console.log(`🔍 [DEBUG] AL Calculation for ${logo.position} (${isCap ? 'Cap' : 'Garment'}):`);
+                            console.log(`   - Tier: ${alTier}`);
                             console.log(`   - AL Tier Cost: $${alTierCost}`);
                             console.log(`   - Stitch Count: ${logo.stitchCount}`);
                             console.log(`   - Extra Stitches: ${extraStitches}`);
@@ -1084,7 +1195,11 @@ class EmbroideryPricingCalculator {
                                 total: total,
                                 productStyle: product.style,
                                 logoPosition: logo.position,
-                                stitchCount: logo.stitchCount
+                                stitchCount: logo.stitchCount,
+                                // For per-product AL UI updates
+                                rowId: product.rowId,
+                                alId: logo.id,
+                                isCap: isCap
                             });
                             
                             additionalServicesTotal += total;
@@ -1095,8 +1210,24 @@ class EmbroideryPricingCalculator {
             
         }
         
-        // Calculate setup fees
-        const setupFees = logos.filter(l => l.needsDigitizing).length * this.digitizingFee;
+        // Calculate setup fees separately for garments and caps
+        let garmentDigitizingCount = 0;
+        let capDigitizingCount = 0;
+        if (logoConfigs) {
+            // Count garment logos needing digitizing
+            if (logoConfigs.garment.primary?.needsDigitizing) garmentDigitizingCount++;
+            garmentDigitizingCount += (logoConfigs.garment.additional || []).filter(l => l.needsDigitizing).length;
+            // Count cap logos needing digitizing
+            if (logoConfigs.cap.primary?.needsDigitizing) capDigitizingCount++;
+            capDigitizingCount += (logoConfigs.cap.additional || []).filter(l => l.needsDigitizing).length;
+        } else {
+            // Legacy: just count from logos array (all treated as garment)
+            garmentDigitizingCount = logos.filter(l => l.needsDigitizing).length;
+        }
+        const garmentSetupFees = garmentDigitizingCount * this.digitizingFee;
+        const capSetupFees = capDigitizingCount * this.digitizingFee;
+        const setupFees = garmentSetupFees + capSetupFees;
+        const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
         // Final totals
         const grandTotal = subtotal + ltmTotal + setupFees + additionalServicesTotal;
@@ -1104,24 +1235,35 @@ class EmbroideryPricingCalculator {
         return {
             products: productPricing,
             totalQuantity: totalQuantity,
-            tier: tier,
+            tier: garmentTier,  // Primary tier for backward compat (garment-based)
+            garmentTier: garmentTier,  // NEW: Separate garment tier
+            capTier: capTier,  // NEW: Separate cap tier
             embroideryRate: tierEmbCost,
             additionalStitchCost: primaryAdditionalStitchCost,
             subtotal: subtotal,
             ltmFee: ltmTotal,
+            garmentLtmFee: garmentLtm,  // NEW: Separate garment LTM
+            capLtmFee: capLtm,          // NEW: Separate cap LTM
             ltmPerUnit: ltmPerUnit,
             setupFees: setupFees,
+            garmentSetupFees: garmentSetupFees,  // Garment digitizing fees
+            capSetupFees: capSetupFees,          // Cap digitizing fees
+            setupFeesCount: digitizingCount,  // Number of logos needing digitizing
             additionalServices: additionalServices,
             additionalServicesTotal: additionalServicesTotal,
             grandTotal: grandTotal,
             logos: logos,
+            logoConfigs: logoConfigs,  // NEW: Separate cap/garment logo configs
             // Mixed quote breakdown
             hasCaps: capProducts.length > 0,
             hasGarments: garmentProducts.length > 0,
             capQuantity: capQuantity,
             garmentQuantity: garmentQuantity,
             capSubtotal: capSubtotal,
-            garmentSubtotal: garmentSubtotal
+            garmentSubtotal: garmentSubtotal,
+            // Separate logo arrays for invoice/display
+            garmentLogos: garmentLogos,
+            capLogos: capLogos
         };
     }
     

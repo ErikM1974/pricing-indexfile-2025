@@ -79,7 +79,11 @@
       "Bash(wc:*)",
       "Bash(cmd.exe /c start http://localhost:3000/quote-builders/embroidery-quote-builder-new.html)",
       "Bash(jq:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(git restore:*)",
+      "Bash(for style in C855 NE1000 STC26 C223 OE650 C918 DT600 C118)",
+      "Bash(do grep -E \"^[^,]*,$style,\" \"Sanmar New Pricing 1-4-26.csv\")",
+      "Bash(curl -s \"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP-AL\")"
     ],
     "deny": [],
     "ask": [],

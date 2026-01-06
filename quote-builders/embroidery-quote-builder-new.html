@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Embroidery Quote Builder | Northwest Custom Apparel</title>
+    <title>2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel</title>
 
     <!-- NWCA Favicon -->
     <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
@@ -1405,6 +1405,226 @@
             font-size: 10px;
         }
 
+        /* Pricing breakdown line in description cell */
+        .desc-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 4px 8px !important;
+        }
+
+        .desc-cell .desc-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .desc-cell .desc-input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pricing-breakdown {
+            font-size: 10px;
+            color: #666;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding-left: 2px;
+            display: none; /* Hidden until pricing is calculated */
+            line-height: 1.4;
+        }
+
+        .pricing-breakdown.visible {
+            display: block;
+        }
+
+        .pricing-breakdown .breakdown-wrapper {
+            cursor: help;
+        }
+
+        .pricing-breakdown .breakdown-icon {
+            color: #999;
+        }
+
+        .pricing-breakdown .breakdown-pos {
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .pricing-breakdown .breakdown-sep,
+        .pricing-breakdown .breakdown-plus,
+        .pricing-breakdown .breakdown-eq {
+            color: #9ca3af;
+        }
+
+        .pricing-breakdown .breakdown-base {
+            color: #2563eb;
+        }
+
+        .pricing-breakdown .breakdown-extra {
+            color: #059669;
+        }
+
+        .pricing-breakdown .breakdown-al {
+            color: #7c3aed;
+        }
+
+        .pricing-breakdown .breakdown-total {
+            color: #111;
+            font-weight: 600;
+        }
+
+        /* Per-Product Additional Logo (AL) Button and Config */
+        .al-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: #f0fdf4;
+            border: 1px solid #22c55e;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #16a34a;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .al-btn:hover {
+            background: #22c55e;
+            color: white;
+        }
+
+        .al-btn.has-al {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+
+        .al-btn.has-al:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .al-btn .al-badge {
+            background: #3b82f6;
+            color: white;
+            border-radius: 10px;
+            padding: 0 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .al-btn.has-al .al-label {
+            display: none;
+        }
+
+        .al-btn:not(.has-al) .al-badge {
+            display: none;
+        }
+
+        /* AL Configuration Row */
+        .al-config-row {
+            background: #fffbeb !important;
+            border-left: 3px solid #f59e0b;
+        }
+
+        .al-config-row td {
+            padding: 8px !important;
+            vertical-align: middle;
+        }
+
+        .al-indicator {
+            color: #d97706;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .al-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .al-position-select {
+            padding: 4px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            min-width: 120px;
+        }
+
+        .al-stitch-input {
+            width: 70px;
+            padding: 4px 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .al-stitch-label {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .al-price-cell {
+            text-align: right;
+        }
+
+        .al-unit-price {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .al-total {
+            font-size: 11px;
+            color: #6b7280;
+            margin-left: 8px;
+        }
+
+        .remove-al-btn {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .remove-al-btn:hover {
+            background: #fee2e2;
+        }
+
+        .add-al-row {
+            background: #fefce8 !important;
+        }
+
+        .add-al-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            background: #f0fdf4;
+            border: 1px dashed #22c55e;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #16a34a;
+            cursor: pointer;
+        }
+
+        .add-al-btn:hover {
+            background: #dcfce7;
+            border-style: solid;
+        }
+
+        .add-al-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Size label override for non-standard columns */
         .size-label-override {
             display: block;
@@ -1735,7 +1955,10 @@
                  alt="Northwest Custom Apparel"
                  class="logo">
         </a>
-        <div style="font-size: 18px; font-weight: 600;">2026 Embroidery Quote Builder</div>
+        <div style="text-align: center;">
+            <div style="font-size: 18px; font-weight: 600;">2026 Embroidery Quote Builder</div>
+            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">👕 Garments + 🧢 Caps • One Quote</div>
+        </div>
         <div class="header-actions">
             <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
                 <i class="fas fa-arrow-left"></i> Dashboard
@@ -1770,16 +1993,70 @@
                     </div>
                 </div>
 
-                <!-- Additional Logos -->
-                <div class="additional-logos-section">
-                    <div class="al-section-header">
-                        <span class="logo-section-label">Additional Logos</span>
-                        <button id="add-logo-btn" class="add-logo-btn" onclick="addAdditionalLogo()">
-                            <i class="fas fa-plus"></i> Add Logo
-                        </button>
+                <!-- Global Garment AL Toggle -->
+                <div class="al-toggle-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;">
+                    <div class="al-toggle-row" style="display: flex; align-items: center; gap: 12px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" id="garment-al-toggle" onchange="toggleGlobalAL('garment')">
+                            <span style="font-size: 13px;">Additional logo on garments</span>
+                        </label>
+                        <div id="garment-al-config" style="display: none; align-items: center; gap: 8px;">
+                            <span style="color: #666;">→</span>
+                            <select id="garment-al-position" class="logo-select" onchange="updateGlobalAL('garment')">
+                                <option value="Right Chest">Right Chest</option>
+                                <option value="Left Chest">Left Chest</option>
+                                <option value="Left Sleeve">Left Sleeve</option>
+                                <option value="Right Sleeve">Right Sleeve</option>
+                            </select>
+                            <input type="number" id="garment-al-stitches" value="8000" min="1000" max="50000" step="1000"
+                                   style="width: 70px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;"
+                                   onchange="updateGlobalAL('garment')">
+                            <span style="font-size: 12px; color: #666;">stitches</span>
+                        </div>
                     </div>
-                    <div id="additional-logos-list" class="additional-logos-list">
-                        <div class="no-logos">No additional logos added</div>
+                </div>
+            </div>
+
+            <!-- Cap Logo Configuration Section (hidden by default, shown when caps added) -->
+            <div id="cap-logo-section" class="logo-section cap-logo-section" style="display: none;">
+                <!-- Cap Primary Logo -->
+                <div class="primary-logo-config">
+                    <span class="logo-section-label"><i class="fas fa-hat-cowboy"></i> Cap Front Logo</span>
+                    <div class="logo-controls">
+                        <select id="cap-primary-position" class="logo-select" disabled>
+                            <option value="CF" selected>Cap Front</option>
+                        </select>
+                        <div class="stitch-input-group">
+                            <label>Stitches:</label>
+                            <input type="number" id="cap-primary-stitches" value="8000"
+                                   min="1000" max="50000" step="1000">
+                        </div>
+                        <label class="digitizing-label">
+                            <input type="checkbox" id="cap-primary-digitizing">
+                            Digitizing ($100)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Global Cap AL Toggle -->
+                <div class="al-toggle-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;">
+                    <div class="al-toggle-row" style="display: flex; align-items: center; gap: 12px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" id="cap-al-toggle" onchange="toggleGlobalAL('cap')">
+                            <span style="font-size: 13px;">Additional logo on caps</span>
+                        </label>
+                        <div id="cap-al-config" style="display: none; align-items: center; gap: 8px;">
+                            <span style="color: #666;">→</span>
+                            <select id="cap-al-position" class="logo-select" onchange="updateGlobalAL('cap')">
+                                <option value="Cap Back">Cap Back</option>
+                                <option value="Cap Left">Cap Left</option>
+                                <option value="Cap Right">Cap Right</option>
+                            </select>
+                            <input type="number" id="cap-al-stitches" value="5000" min="1000" max="50000" step="1000"
+                                   style="width: 70px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;"
+                                   onchange="updateGlobalAL('cap')">
+                            <span style="font-size: 12px; color: #666;">stitches</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1872,10 +2149,28 @@
                     <span class="label">Total Pieces:</span>
                     <span class="value" id="total-qty">0</span>
                 </div>
+                <!-- Quantity breakdown for mixed quotes -->
+                <div class="pricing-row sub-breakdown" id="garment-qty-row" style="display: none;">
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments:</span>
+                    <span class="value sub-value" id="garment-qty">0</span>
+                </div>
+                <div class="pricing-row sub-breakdown" id="cap-qty-row" style="display: none;">
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps:</span>
+                    <span class="value sub-value" id="cap-qty">0</span>
+                </div>
 
                 <div class="pricing-row">
                     <span class="label">Pricing Tier:</span>
                     <span class="tier-badge" id="pricing-tier">1-23</span>
+                </div>
+                <!-- Tier breakdown for mixed quotes -->
+                <div class="pricing-row sub-breakdown" id="garment-tier-row" style="display: none;">
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment Tier:</span>
+                    <span class="tier-badge small" id="garment-tier">1-23</span>
+                </div>
+                <div class="pricing-row sub-breakdown" id="cap-tier-row" style="display: none;">
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap Tier:</span>
+                    <span class="tier-badge small" id="cap-tier">1-23</span>
                 </div>
 
                 <div class="pricing-row">
@@ -1897,8 +2192,18 @@
                     <span class="label">Additional Stitches:</span>
                     <span class="value" id="additional-stitches-fee">$0.00</span>
                 </div>
+                <!-- Separate Additional Stitches rows for mixed quotes -->
+                <div class="pricing-row sub-breakdown" id="garment-stitches-row" style="display: none;">
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments:</span>
+                    <span class="value sub-value" id="garment-stitches-fee">$0.00</span>
+                </div>
+                <div class="pricing-row sub-breakdown" id="cap-stitches-row" style="display: none;">
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps:</span>
+                    <span class="value sub-value" id="cap-stitches-fee">$0.00</span>
+                </div>
 
                 <div id="additional-logos-pricing"></div>
+                <div id="cap-additional-logos-pricing"></div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
                     <span class="label">LTM Fee (&lt; 24 pcs):</span>
@@ -1910,10 +2215,28 @@
                         <span class="value" id="ltm-fee">$50.00</span>
                     </span>
                 </div>
+                <!-- Separate LTM rows for mixed quotes -->
+                <div class="pricing-row sub-breakdown" id="garment-ltm-row" style="display: none;">
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment LTM:</span>
+                    <span class="value sub-value" id="garment-ltm-fee">$50.00</span>
+                </div>
+                <div class="pricing-row sub-breakdown" id="cap-ltm-row" style="display: none;">
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap LTM:</span>
+                    <span class="value sub-value" id="cap-ltm-fee">$50.00</span>
+                </div>
 
                 <div class="pricing-row" id="setup-row" style="display: none;">
                     <span class="label">Setup (Digitizing):</span>
                     <span class="value" id="setup-fee">$100.00</span>
+                </div>
+                <!-- Setup (Digitizing) breakdown for mixed quotes -->
+                <div class="pricing-row sub-breakdown" id="garment-setup-row" style="display: none;">
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment Digitizing:</span>
+                    <span class="value sub-value" id="garment-setup-fee">$100.00</span>
+                </div>
+                <div class="pricing-row sub-breakdown" id="cap-setup-row" style="display: none;">
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap Digitizing:</span>
+                    <span class="value sub-value" id="cap-setup-fee">$100.00</span>
                 </div>
 
                 <div class="pricing-row total">
@@ -2109,14 +2432,53 @@
             isPrimary: true
         };
 
-        // Additional logos array
+        // Additional logos array (for garments)
         let additionalLogos = [];
         // Example entry: { id: 'al-1', position: 'Right Chest', stitchCount: 8000, needsDigitizing: false, isPrimary: false }
+
+        // Cap Logo Configuration (separate from garment logos)
+        let capPrimaryLogo = {
+            position: 'CF',  // Cap Front (always)
+            stitchCount: 8000,
+            needsDigitizing: false,
+            isPrimary: true
+        };
+        let capAdditionalLogos = [];
+        // Example entry: { id: 'cap-al-1', position: 'CB', stitchCount: 5000, needsDigitizing: false, isPrimary: false }
 
         let products = [];
         let rowCounter = 0;
         let productCache = {}; // Cache product data for quick lookup
         let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
+        // Global AL config (applies to all products of type when enabled)
+        let globalAL = {
+            garment: { enabled: false, position: 'Right Chest', stitchCount: 8000 },
+            cap: { enabled: false, position: 'Cap Back', stitchCount: 5000 }
+        };
+
+        // Toggle global AL on/off
+        function toggleGlobalAL(type) {
+            const checkbox = document.getElementById(`${type}-al-toggle`);
+            const config = document.getElementById(`${type}-al-config`);
+
+            globalAL[type].enabled = checkbox.checked;
+            config.style.display = checkbox.checked ? 'flex' : 'none';
+
+            // Recalculate all product prices
+            recalculateAllPrices();
+        }
+
+        // Update global AL config (position or stitch count change)
+        function updateGlobalAL(type) {
+            const position = document.getElementById(`${type}-al-position`).value;
+            const stitches = parseInt(document.getElementById(`${type}-al-stitches`).value) || (type === 'cap' ? 5000 : 8000);
+
+            globalAL[type].position = position;
+            globalAL[type].stitchCount = stitches;
+
+            // Recalculate all product prices
+            recalculateAllPrices();
+        }
 
         // Extended sizes available for Size06 (Other) column
         // Note: Actual available sizes are fetched dynamically per product via API
@@ -2695,6 +3057,7 @@
                 setupSearchAutocomplete();
                 setupKeyboardShortcuts();
                 setupPrimaryLogoHandlers();
+                setupCapPrimaryLogoHandlers();  // Cap logo handlers
                 setupLTMToggle();
 
                 // Add initial empty row
@@ -2813,6 +3176,102 @@
                     </button>
                 </div>
             `).join('');
+        }
+
+        // ============================================================
+        // CAP ADDITIONAL LOGO MANAGEMENT
+        // ============================================================
+
+        function addCapAdditionalLogo() {
+            const id = 'cap-al-' + Date.now();
+            const newLogo = {
+                id: id,
+                position: 'CB',  // Cap Back default
+                stitchCount: 5000,  // Default 5000 for cap additional logos
+                needsDigitizing: false,
+                isPrimary: false
+            };
+            capAdditionalLogos.push(newLogo);
+            renderCapAdditionalLogos();
+            recalculatePricing();
+        }
+
+        function removeCapAdditionalLogo(id) {
+            capAdditionalLogos = capAdditionalLogos.filter(logo => logo.id !== id);
+            renderCapAdditionalLogos();
+            recalculatePricing();
+        }
+
+        function updateCapAdditionalLogo(id, field, value) {
+            const logo = capAdditionalLogos.find(l => l.id === id);
+            if (logo) {
+                logo[field] = value;
+                recalculatePricing();
+            }
+        }
+
+        function renderCapAdditionalLogos() {
+            const container = document.getElementById('cap-additional-logos-list');
+            if (!container) return;
+
+            if (capAdditionalLogos.length === 0) {
+                container.innerHTML = '<div class="no-logos">No additional cap logos added</div>';
+                return;
+            }
+
+            container.innerHTML = capAdditionalLogos.map(logo => `
+                <div class="additional-logo-row" data-logo-id="${logo.id}">
+                    <select class="al-position" onchange="updateCapAdditionalLogo('${logo.id}', 'position', this.value)">
+                        <option value="CB" ${logo.position === 'CB' ? 'selected' : ''}>Cap Back</option>
+                        <option value="CL" ${logo.position === 'CL' ? 'selected' : ''}>Left Side</option>
+                        <option value="CR" ${logo.position === 'CR' ? 'selected' : ''}>Right Side</option>
+                    </select>
+                    <div class="stitch-input-group">
+                        <input type="number" class="al-stitches" value="${logo.stitchCount}"
+                               min="1000" step="1000"
+                               onchange="updateCapAdditionalLogo('${logo.id}', 'stitchCount', parseInt(this.value) || 5000)">
+                        <span>stitches</span>
+                    </div>
+                    <label class="al-digitizing">
+                        <input type="checkbox" ${logo.needsDigitizing ? 'checked' : ''}
+                               onchange="updateCapAdditionalLogo('${logo.id}', 'needsDigitizing', this.checked)">
+                        Digitizing
+                    </label>
+                    <span class="al-price" id="cap-al-price-${logo.id}">$0.00/ea</span>
+                    <button class="remove-al-btn" onclick="removeCapAdditionalLogo('${logo.id}')" title="Remove logo">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Update cap logo section visibility based on caps in quote
+        function updateCapLogoSectionVisibility() {
+            const hasCaps = document.querySelectorAll('tr[data-is-cap="true"]').length > 0;
+            const capSection = document.getElementById('cap-logo-section');
+            if (capSection) {
+                capSection.style.display = hasCaps ? 'block' : 'none';
+            }
+        }
+
+        // Setup cap primary logo event handlers
+        function setupCapPrimaryLogoHandlers() {
+            const stitchesInput = document.getElementById('cap-primary-stitches');
+            const digitizingCheckbox = document.getElementById('cap-primary-digitizing');
+
+            if (stitchesInput) {
+                stitchesInput.addEventListener('change', function() {
+                    capPrimaryLogo.stitchCount = parseInt(this.value) || 8000;
+                    recalculatePricing();
+                });
+            }
+
+            if (digitizingCheckbox) {
+                digitizingCheckbox.addEventListener('change', function() {
+                    capPrimaryLogo.needsDigitizing = this.checked;
+                    recalculatePricing();
+                });
+            }
         }
 
         // Legacy functions for backward compatibility
@@ -3026,13 +3485,16 @@
                            onkeydown="handleCellKeydown(event, this)">
                 </td>
                 <td class="desc-cell">
-                    <input type="text" class="cell-input desc-input"
-                           placeholder="(auto)"
-                           data-field="description"
-                           readonly>
-                    <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
-                        <i class="fas fa-hat-cowboy"></i> Cap
-                    </span>
+                    <div class="desc-row">
+                        <input type="text" class="cell-input desc-input"
+                               placeholder="(auto)"
+                               data-field="description"
+                               readonly>
+                        <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
+                            <i class="fas fa-hat-cowboy"></i> Cap
+                        </span>
+                    </div>
+                    <div class="pricing-breakdown" id="breakdown-${rowId}"></div>
                 </td>
                 <td>
                     <div class="color-picker-wrapper" data-row-id="${rowId}">
@@ -3146,6 +3608,12 @@
                         if (capBadge) capBadge.style.display = 'none';
                     }
 
+                    // Reorder row: caps go below garments
+                    reorderRowByProductType(row);
+
+                    // Update cap logo section visibility (show if caps exist, hide if not)
+                    updateCapLogoSectionVisibility();
+
                     if (colors && colors.length > 0) {
                         // Populate custom color picker dropdown with swatches
                         pickerDropdown.innerHTML = colors.map(c => `
@@ -3210,6 +3678,127 @@
             cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
 
             return cleaned.trim() || title;
+        }
+
+        // Position abbreviation mapping for compact breakdown display
+        const POSITION_ABBREV = {
+            'Left Chest': 'LC', 'Right Chest': 'RC', 'Center Chest': 'CC',
+            'Full Front': 'FF', 'Full Back': 'FB', 'Upper Back': 'UB',
+            'Left Sleeve': 'LS', 'Right Sleeve': 'RS',
+            'CF': 'CF', 'CB': 'CB', 'CL': 'CL', 'CR': 'CR',
+            'Cap Front': 'CF', 'Cap Back': 'CB'
+        };
+
+        // Full names for tooltip display
+        const POSITION_FULL_NAMES = {
+            'LC': 'Left Chest', 'RC': 'Right Chest', 'CC': 'Center Chest',
+            'FF': 'Full Front', 'FB': 'Full Back', 'UB': 'Upper Back',
+            'LS': 'Left Sleeve', 'RS': 'Right Sleeve',
+            'CF': 'Cap Front', 'CB': 'Cap Back', 'CL': 'Cap Left Side', 'CR': 'Cap Right Side'
+        };
+
+        /**
+         * Format price - remove unnecessary decimals ($23.00 -> $23, $25.50 stays)
+         */
+        function formatPrice(price) {
+            if (price % 1 === 0) return price.toFixed(0);
+            return price.toFixed(2);
+        }
+
+        /**
+         * Build pricing breakdown HTML for a product row
+         * Shows compact format: └─ LC 10K | Base $23 + Extra $2.50 = $25.50/ea
+         * Includes hover tooltip with full calculation details
+         *
+         * @param {Object} product - Product data with isCap flag
+         * @param {Object} lineItem - Line item from pricing calculator
+         * @param {Object} logoConfig - Logo configuration (position, stitchCount)
+         * @returns {string} HTML string for breakdown
+         */
+        function buildPricingBreakdown(product, lineItem, logoConfig) {
+            if (!lineItem) return '';
+
+            const isCap = product?.isCap || false;
+            const logoPos = logoConfig?.position || (isCap ? 'CF' : 'Left Chest');
+            const stitchCount = logoConfig?.stitchCount || 8000;
+            const stitchK = Math.round(stitchCount / 1000);
+
+            // Get abbreviated position name
+            const posAbbrev = POSITION_ABBREV[logoPos] || logoPos.substring(0, 2).toUpperCase();
+            const posFullName = POSITION_FULL_NAMES[posAbbrev] || logoPos;
+
+            const basePrice = lineItem.basePrice || 0;
+            const extraStitchCost = lineItem.extraStitchCost || 0;
+            const alCost = lineItem.alCost || 0;
+            const unitPrice = lineItem.unitPrice || 0;
+
+            // Calculate extra stitches for tooltip
+            const baseStitches = isCap ? 8000 : 8000;
+            const extraK = stitchCount > baseStitches ? Math.round((stitchCount - baseStitches) / 1000) : 0;
+            const rate = isCap ? 1.00 : 1.25;
+
+            // Build tooltip text with full formula (&#10; = newline in title attribute)
+            let tooltipParts = [`Position: ${posFullName}`, `Stitches: ${stitchCount.toLocaleString()}`];
+            tooltipParts.push(`Base: $${basePrice.toFixed(2)}`);
+            if (extraStitchCost > 0) {
+                tooltipParts.push(`Extra: ${extraK}K × $${rate.toFixed(2)} = $${extraStitchCost.toFixed(2)}`);
+            }
+            if (alCost > 0) {
+                tooltipParts.push(`AL: $${alCost.toFixed(2)}`);
+            }
+            tooltipParts.push(`Unit: $${unitPrice.toFixed(2)}`);
+            const tooltipText = tooltipParts.join('&#10;');
+
+            // Build visible breakdown with compact format
+            let html = `<span class="breakdown-wrapper" title="${tooltipText}">`;
+            html += `<span class="breakdown-icon">└─</span>`;
+            html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
+
+            // If there are extra costs, show detailed breakdown
+            if (extraStitchCost > 0 || alCost > 0) {
+                html += ` <span class="breakdown-sep">|</span> `;
+                html += `<span class="breakdown-base">Base $${formatPrice(basePrice)}</span>`;
+
+                if (extraStitchCost > 0) {
+                    html += ` <span class="breakdown-plus">+</span> `;
+                    html += `<span class="breakdown-extra">Extra $${formatPrice(extraStitchCost)}</span>`;
+                }
+
+                if (alCost > 0) {
+                    html += ` <span class="breakdown-plus">+</span> `;
+                    html += `<span class="breakdown-al">AL $${formatPrice(alCost)}</span>`;
+                }
+
+                html += ` <span class="breakdown-eq">=</span> `;
+                html += `<span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
+            } else {
+                // Simple format: just position, stitch count, and price
+                html += ` <span class="breakdown-sep">|</span> <span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
+            }
+
+            html += `</span>`;
+            return html;
+        }
+
+        /**
+         * Update the pricing breakdown display for a product row
+         * @param {number} rowId - Row ID
+         * @param {Object} product - Product data
+         * @param {Object} lineItem - Line item from pricing calculator
+         * @param {Object} logoConfig - Logo configuration
+         */
+        function updateRowBreakdown(rowId, product, lineItem, logoConfig) {
+            const breakdownEl = document.getElementById(`breakdown-${rowId}`);
+            if (!breakdownEl) return;
+
+            const breakdownHtml = buildPricingBreakdown(product, lineItem, logoConfig);
+            if (breakdownHtml) {
+                breakdownEl.innerHTML = breakdownHtml;
+                breakdownEl.classList.add('visible');
+            } else {
+                breakdownEl.innerHTML = '';
+                breakdownEl.classList.remove('visible');
+            }
         }
 
         /**
@@ -3643,6 +4232,51 @@
 
             if (!styleNumber || !catalogColor) return;
 
+            // =========================================
+            // CAP SPECIAL HANDLING
+            // Caps use /api/sizes-by-style-color endpoint
+            // =========================================
+            if (row.dataset.isCap === 'true') {
+                try {
+                    const capUrl = `${API_BASE}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
+                    console.log(`[Cap Sizes] Fetching sizes for ${styleNumber}: ${capUrl}`);
+                    const capResponse = await fetch(capUrl);
+
+                    let capSizes = ['OSFA']; // Default fallback
+                    if (capResponse.ok) {
+                        const capData = await capResponse.json();
+                        const sizes = capData.data || capData.sizes || capData;
+                        if (Array.isArray(sizes) && sizes.length > 0) {
+                            capSizes = sizes;
+                        }
+                    } else {
+                        console.warn(`[Cap Sizes] API failed for ${styleNumber}, using OSFA fallback`);
+                    }
+
+                    console.log(`[Cap Sizes] ${styleNumber} sizes:`, capSizes);
+
+                    // Analyze cap sizes and update UI
+                    const sizeInfo = analyzeSizeCategory(capSizes);
+                    console.log(`📐 Cap size category for ${styleNumber}: ${sizeInfo.category}`, sizeInfo);
+
+                    updateRowForSizeCategory(row, sizeInfo);
+                    row.dataset.availableSizes = JSON.stringify(capSizes);
+                    row.dataset.capSizes = JSON.stringify(capSizes);
+                    return; // Exit - cap handling complete
+                } catch (capError) {
+                    console.error('[Cap Sizes] Error fetching cap sizes:', capError);
+                    // Fall through to use OSFA
+                    const osfaInfo = { category: 'osfa-only', columns: [], useQtyOnly: true, baseSize: 'OSFA', message: 'One Size Fits All' };
+                    updateRowForSizeCategory(row, osfaInfo);
+                    row.dataset.availableSizes = JSON.stringify(['OSFA']);
+                    row.dataset.capSizes = JSON.stringify(['OSFA']);
+                    return;
+                }
+            }
+
+            // =========================================
+            // STANDARD GARMENT HANDLING
+            // =========================================
             try {
                 // Fetch all available sizes for this style+color
                 const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
@@ -4544,6 +5178,31 @@
             recalculatePricing();
         }
 
+        /**
+         * Reorder a product row based on type: garments first, caps below
+         * Called after cap detection to maintain visual organization
+         */
+        function reorderRowByProductType(row) {
+            if (!row) return;
+
+            const tbody = document.getElementById('product-tbody');
+            if (!tbody) return;
+
+            const isCap = row.dataset.isCap === 'true';
+
+            if (isCap) {
+                // Cap rows go at the end (after all other rows)
+                tbody.appendChild(row);
+            } else {
+                // Garment rows go before any cap rows
+                const firstCapRow = tbody.querySelector('tr[data-is-cap="true"]:not(.child-row)');
+                if (firstCapRow) {
+                    tbody.insertBefore(row, firstCapRow);
+                }
+                // If no cap rows yet, row stays where it is (already at end)
+            }
+        }
+
         function deleteRow(rowId) {
             const row = document.getElementById(`row-${rowId}`);
             if (!row) return;
@@ -4560,8 +5219,12 @@
                 delete childRowMap[rowId];
             }
 
+
             row.remove();
             recalculatePricing();
+
+            // Update cap logo section visibility (hide if no caps remain)
+            updateCapLogoSectionVisibility();
         }
 
         // ============================================================
@@ -4675,14 +5338,26 @@
             }
 
             // Calculate using the existing pricing calculator
-            // Combine primary logo + all additional logos
+            // Build separate logo configs for garments and caps
+            const logoConfigs = {
+                garment: {
+                    primary: { ...primaryLogo, id: 'primary' },
+                    additional: additionalLogos
+                },
+                cap: {
+                    primary: { ...capPrimaryLogo, id: 'cap-primary' },
+                    additional: capAdditionalLogos
+                }
+            };
+
+            // For backward compatibility, also create combined array (garment logos only for non-cap products)
             const allLogos = [
                 { ...primaryLogo, id: 'primary' },
                 ...additionalLogos
             ];
 
             try {
-                const pricing = await pricingCalculator.calculateQuote(productList, allLogos);
+                const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs);
 
                 if (pricing) {
                     // Update row prices - match line items to rows by style AND color
@@ -4712,6 +5387,17 @@
                                             : standardLineItem.unitPrice;
                                         priceCell.textContent = `$${displayPrice.toFixed(2)}`;
                                     }
+
+                                    // Update pricing breakdown in description cell
+                                    const logoConfig = pp.isCap ? logoConfigs.cap.primary : logoConfigs.garment.primary;
+
+                                    // Find AL cost for this row from additionalServices
+                                    const rowAL = pricing.additionalServices?.find(al => al.rowId == rowId);
+                                    const lineItemWithAL = {
+                                        ...standardLineItem,
+                                        alCost: rowAL ? rowAL.unitPrice : 0
+                                    };
+                                    updateRowBreakdown(rowId, pp.product, lineItemWithAL, logoConfig);
                                 }
                             }
 
@@ -4758,8 +5444,8 @@
 
         function collectProductsFromTable() {
             const products = [];
-            // Only collect from parent rows (not child rows)
-            const rows = document.querySelectorAll('#product-tbody tr:not(.child-row)');
+            // Only collect from parent rows (not child rows or AL config rows)
+            const rows = document.querySelectorAll('#product-tbody tr:not(.child-row):not(.al-config-row)');
 
             rows.forEach(row => {
                 const rowId = parseInt(row.id.replace('row-', ''));
@@ -4832,6 +5518,17 @@
                 // Create product entry for each color group with quantities
                 Object.entries(colorGroups).forEach(([catalogColor, group]) => {
                     if (group.totalQty > 0) {
+                        const isCap = row.dataset.isCap === 'true';
+
+                        // Get global AL config for this product type
+                        const alConfig = isCap ? globalAL.cap : globalAL.garment;
+                        const additionalLogos = alConfig.enabled ? [{
+                            id: `global-al-${isCap ? 'cap' : 'garment'}`,
+                            position: alConfig.position,
+                            stitchCount: alConfig.stitchCount,
+                            quantity: group.totalQty
+                        }] : [];
+
                         products.push({
                             style: style,
                             color: group.color,
@@ -4839,14 +5536,21 @@
                             productName: row.dataset.productName || style,
                             sizeBreakdown: group.sizeBreakdown,
                             totalQuantity: group.totalQty,
-                            isCap: row.dataset.isCap === 'true',  // Cap detection for pricing routing
+                            isCap: isCap,  // Cap detection for pricing routing
+                            rowId: rowId,  // Track row for AL price updates
                             logoAssignments: {
                                 primary: { logoId: 'primary', quantity: group.totalQty },
-                                additional: []
+                                additional: additionalLogos
                             }
                         });
                     }
                 });
+            });
+
+            // Sort products: garments first, caps last (for consistent pricing display)
+            products.sort((a, b) => {
+                if (a.isCap === b.isCap) return 0;
+                return a.isCap ? 1 : -1; // Garments first, caps last
             });
 
             return products;
@@ -4857,14 +5561,51 @@
             window.currentPricingData = pricing;
 
             document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
-            document.getElementById('pricing-tier').textContent = pricing.tier || '1-23';
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
-            // Mixed quote breakdown (caps + garments)
+            // Quantity breakdown for mixed quotes
+            const garmentQtyRow = document.getElementById('garment-qty-row');
+            const capQtyRow = document.getElementById('cap-qty-row');
+            const isMixedQuote = pricing.hasCaps && pricing.hasGarments;
+
+            if (isMixedQuote) {
+                garmentQtyRow.style.display = 'flex';
+                capQtyRow.style.display = 'flex';
+                document.getElementById('garment-qty').textContent = pricing.garmentQuantity || 0;
+                document.getElementById('cap-qty').textContent = pricing.capQuantity || 0;
+            } else {
+                garmentQtyRow.style.display = 'none';
+                capQtyRow.style.display = 'none';
+            }
+
+            // Tier display - show separate tiers for mixed quotes
+            const pricingTierEl = document.getElementById('pricing-tier');
+            const garmentTierRow = document.getElementById('garment-tier-row');
+            const capTierRow = document.getElementById('cap-tier-row');
+
+            if (isMixedQuote) {
+                // Mixed quote - show "Mixed" and separate tier breakdown
+                pricingTierEl.textContent = 'Mixed';
+                garmentTierRow.style.display = 'flex';
+                capTierRow.style.display = 'flex';
+                document.getElementById('garment-tier').textContent = pricing.garmentTier || '1-23';
+                document.getElementById('cap-tier').textContent = pricing.capTier || '1-23';
+            } else if (pricing.hasCaps) {
+                // Caps only
+                pricingTierEl.textContent = pricing.capTier || '1-23';
+                garmentTierRow.style.display = 'none';
+                capTierRow.style.display = 'none';
+            } else {
+                // Garments only or no products
+                pricingTierEl.textContent = pricing.garmentTier || pricing.tier || '1-23';
+                garmentTierRow.style.display = 'none';
+                capTierRow.style.display = 'none';
+            }
+
+            // Mixed quote subtotal breakdown (caps + garments)
             const garmentSubtotalRow = document.getElementById('garment-subtotal-row');
             const capSubtotalRow = document.getElementById('cap-subtotal-row');
-            const isMixedQuote = pricing.hasCaps && pricing.hasGarments;
 
             if (isMixedQuote) {
                 // Show breakdown rows
@@ -4887,96 +5628,242 @@
                 capSubtotalRow.style.display = 'none';
             }
 
-            // LTM row - keep visible in both states so button is always accessible
+            // LTM display - show separate rows for mixed quotes with both LTMs
             const ltmRow = document.getElementById('ltm-row');
             const ltmBtn = document.getElementById('ltm-distribute-btn');
             const ltmFeeEl = document.getElementById('ltm-fee');
+            const garmentLtmRow = document.getElementById('garment-ltm-row');
+            const capLtmRow = document.getElementById('cap-ltm-row');
 
             if (pricing.ltmFee > 0) {
-                // Show LTM row (always visible when LTM applies)
-                ltmRow.style.display = 'flex';
-                const ltmPerUnit = pricing.ltmFee / pricing.totalQuantity;
+                const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
+                const hasCapLtm = (pricing.capLtmFee || 0) > 0;
 
-                if (ltmDistributed) {
-                    // Distributed state - LTM built into unit prices
-                    ltmFeeEl.textContent = `(+$${ltmPerUnit.toFixed(2)}/ea)`;
-                    ltmFeeEl.classList.add('distributed');
-                    ltmBtn.querySelector('.btn-text').textContent = 'Show LTM';
-                    ltmBtn.classList.add('active');
-                } else {
-                    // Default state - LTM shown as separate line
+                if (hasGarmentLtm && hasCapLtm) {
+                    // Mixed quote with both LTMs - show separate breakdown rows
+                    ltmRow.style.display = 'flex';  // Keep header visible
+                    garmentLtmRow.style.display = 'flex';
+                    capLtmRow.style.display = 'flex';
+
+                    // Update main LTM row to show combined total
                     ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
                     ltmFeeEl.classList.remove('distributed');
                     ltmBtn.querySelector('.btn-text').textContent = 'Hide LTM';
                     ltmBtn.classList.remove('active');
+
+                    // Update breakdown rows
+                    document.getElementById('garment-ltm-fee').textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
+                    document.getElementById('cap-ltm-fee').textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+                } else {
+                    // Single type LTM - show main row, hide breakdown
+                    ltmRow.style.display = 'flex';
+                    garmentLtmRow.style.display = 'none';
+                    capLtmRow.style.display = 'none';
+
+                    const ltmPerUnit = pricing.ltmFee / pricing.totalQuantity;
+
+                    if (ltmDistributed) {
+                        // Distributed state - LTM built into unit prices
+                        ltmFeeEl.textContent = `(+$${ltmPerUnit.toFixed(2)}/ea)`;
+                        ltmFeeEl.classList.add('distributed');
+                        ltmBtn.querySelector('.btn-text').textContent = 'Show LTM';
+                        ltmBtn.classList.add('active');
+                    } else {
+                        // Default state - LTM shown as separate line
+                        ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
+                        ltmFeeEl.classList.remove('distributed');
+                        ltmBtn.querySelector('.btn-text').textContent = 'Hide LTM';
+                        ltmBtn.classList.remove('active');
+                    }
                 }
             } else {
-                // No LTM fee (qty >= 24) - hide row entirely
+                // No LTM fee (qty >= 24) - hide all LTM rows
                 ltmRow.style.display = 'none';
+                garmentLtmRow.style.display = 'none';
+                capLtmRow.style.display = 'none';
                 // Reset distributed state when LTM no longer applies
                 if (ltmDistributed) {
                     ltmDistributed = false;
                 }
             }
 
-            // Setup row
+            // Setup (Digitizing) row - with garment/cap breakdown
             const setupRow = document.getElementById('setup-row');
+            const garmentSetupRow = document.getElementById('garment-setup-row');
+            const capSetupRow = document.getElementById('cap-setup-row');
+
             if (pricing.setupFees > 0) {
                 setupRow.style.display = 'flex';
                 document.getElementById('setup-fee').textContent = `$${pricing.setupFees.toFixed(2)}`;
+
+                const hasGarmentSetup = (pricing.garmentSetupFees || 0) > 0;
+                const hasCapSetup = (pricing.capSetupFees || 0) > 0;
+
+                if (hasGarmentSetup && hasCapSetup) {
+                    // Mixed quote - show breakdown
+                    garmentSetupRow.style.display = 'flex';
+                    capSetupRow.style.display = 'flex';
+                    document.getElementById('garment-setup-fee').textContent = `$${pricing.garmentSetupFees.toFixed(2)}`;
+                    document.getElementById('cap-setup-fee').textContent = `$${pricing.capSetupFees.toFixed(2)}`;
+                } else {
+                    // Single type - hide breakdown
+                    garmentSetupRow.style.display = 'none';
+                    capSetupRow.style.display = 'none';
+                }
             } else {
                 setupRow.style.display = 'none';
+                garmentSetupRow.style.display = 'none';
+                capSetupRow.style.display = 'none';
             }
 
-            // Additional Stitches row (when primary logo > 8K)
+            // Additional Stitches - separate garment vs cap calculations
+            // Garments use $1.25/K rate, Caps use $1.00/K rate
             const asRow = document.getElementById('additional-stitches-row');
-            const extraStitches = primaryLogo.stitchCount - 8000;
-            if (extraStitches > 0 && pricing.totalQuantity > 0) {
+            const garmentStitchesRow = document.getElementById('garment-stitches-row');
+            const capStitchesRow = document.getElementById('cap-stitches-row');
+
+            // Get logo configs (garment primary logo from top, cap logo from cap section)
+            const garmentStitches = parseInt(document.getElementById('primary-stitches').value) || 8000;
+            const capStitchesInput = document.getElementById('cap-primary-stitches');
+            const capStitches = capStitchesInput ? (parseInt(capStitchesInput.value) || 8000) : 8000;
+
+            // Calculate garment extra stitches (rate: $1.25/K)
+            const garmentExtraK = Math.max(0, (garmentStitches - 8000) / 1000);
+            const garmentQty = pricing.garmentQuantity || 0;
+            const garmentStitchFee = garmentExtraK * 1.25 * garmentQty;
+
+            // Calculate cap extra stitches (rate: $1.00/K)
+            const capExtraK = Math.max(0, (capStitches - 8000) / 1000);
+            const capQty = pricing.capQuantity || 0;
+            const capStitchFee = capExtraK * 1.00 * capQty;
+
+            const totalStitchFee = garmentStitchFee + capStitchFee;
+            const hasGarmentStitches = garmentExtraK > 0 && garmentQty > 0;
+            const hasCapStitches = capExtraK > 0 && capQty > 0;
+
+            if (totalStitchFee > 0) {
                 asRow.style.display = 'flex';
-                const extraK = extraStitches / 1000;
-                const asFee = extraK * 1.25 * pricing.totalQuantity;
-                document.getElementById('additional-stitches-fee').textContent =
-                    `+${extraK}K × ${pricing.totalQuantity} = $${asFee.toFixed(2)}`;
+
+                if (hasGarmentStitches && hasCapStitches) {
+                    // Mixed quote - show total and breakdown rows
+                    document.getElementById('additional-stitches-fee').textContent = `$${totalStitchFee.toFixed(2)}`;
+
+                    garmentStitchesRow.style.display = 'flex';
+                    document.getElementById('garment-stitches-fee').textContent =
+                        `+${garmentExtraK}K × ${garmentQty} × $1.25 = $${garmentStitchFee.toFixed(2)}`;
+
+                    capStitchesRow.style.display = 'flex';
+                    document.getElementById('cap-stitches-fee').textContent =
+                        `+${capExtraK}K × ${capQty} × $1.00 = $${capStitchFee.toFixed(2)}`;
+                } else if (hasGarmentStitches) {
+                    // Garments only - single line with formula
+                    document.getElementById('additional-stitches-fee').textContent =
+                        `+${garmentExtraK}K × ${garmentQty} = $${garmentStitchFee.toFixed(2)}`;
+                    garmentStitchesRow.style.display = 'none';
+                    capStitchesRow.style.display = 'none';
+                } else if (hasCapStitches) {
+                    // Caps only - single line with formula
+                    document.getElementById('additional-stitches-fee').textContent =
+                        `+${capExtraK}K × ${capQty} = $${capStitchFee.toFixed(2)}`;
+                    garmentStitchesRow.style.display = 'none';
+                    capStitchesRow.style.display = 'none';
+                }
             } else {
                 asRow.style.display = 'none';
+                garmentStitchesRow.style.display = 'none';
+                capStitchesRow.style.display = 'none';
             }
 
-            // Additional Logos pricing section
+            // Additional Logos pricing section (GARMENTS) - reads from globalAL state
             const alContainer = document.getElementById('additional-logos-pricing');
-            if (additionalLogos.length > 0 && pricing.totalQuantity > 0) {
-                // Calculate AL pricing based on tier
-                const tier = pricing.tier || '1-23';
-                let alBaseRate = 12.50; // Default tier 1-23
-                if (tier.includes('72')) alBaseRate = 8.50;
-                else if (tier.includes('48')) alBaseRate = 9.50;
-                else if (tier.includes('24')) alBaseRate = 11.50;
+            if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
+                // Calculate AL pricing based on garment tier (fetch from API)
+                const tier = pricing.garmentTier || pricing.tier || '1-23';
+                let alBaseRate = 13.50; // 2026 fallback
+                if (pricingCalculator.alTiers && pricingCalculator.alTiers[tier]) {
+                    alBaseRate = pricingCalculator.alTiers[tier].embCost;
+                } else {
+                    // Tier-based fallback if API unavailable (2026 AL costs)
+                    if (tier.includes('72')) alBaseRate = 9.50;
+                    else if (tier.includes('48')) alBaseRate = 10.50;
+                    else if (tier.includes('24')) alBaseRate = 12.50;
+                    console.warn('[Garment AL] Using fallback rates - API data unavailable for tier:', tier);
+                }
 
-                let alHtml = '';
-                additionalLogos.forEach(logo => {
-                    const logoExtraStitches = Math.max(0, logo.stitchCount - 8000);
-                    const logoExtraK = logoExtraStitches / 1000;
-                    const stitchCost = logoExtraK * 1.25;
-                    const alUnitPrice = alBaseRate + stitchCost;
-                    const alTotal = alUnitPrice * pricing.totalQuantity;
+                // Get base stitch count and rate from API (with fallbacks)
+                const alConfig = pricingCalculator.alTiers && pricingCalculator.alTiers[tier];
+                const alBaseStitches = alConfig?.baseStitchCount || 8000;
+                const alStitchRate = alConfig?.additionalStitchRate || 1.25;
 
-                    // Update price in the logo row
-                    const priceEl = document.getElementById(`al-price-${logo.id}`);
-                    if (priceEl) {
-                        priceEl.textContent = `$${alUnitPrice.toFixed(2)}/ea`;
-                    }
+                // Use globalAL.garment config instead of legacy additionalLogos array
+                const logo = globalAL.garment;
+                const logoExtraStitches = Math.max(0, logo.stitchCount - alBaseStitches);
+                const logoExtraK = logoExtraStitches / 1000;
+                const stitchCost = logoExtraK * alStitchRate;
+                const alUnitPrice = alBaseRate + stitchCost;
+                const alTotal = alUnitPrice * pricing.garmentQuantity;
 
-                    // Add line item to quote summary
-                    const stitchNote = logoExtraStitches > 0 ? ` (+${logoExtraK}K)` : '';
-                    alHtml += `
-                        <div class="pricing-row al-pricing-row">
-                            <span class="label">AL: ${logo.position}${stitchNote}:</span>
-                            <span class="value">$${alTotal.toFixed(2)}</span>
-                        </div>
-                    `;
-                });
-                alContainer.innerHTML = alHtml;
+                // Add line item to quote summary
+                const stitchNote = logoExtraStitches > 0 ? ` (+${logoExtraK}K)` : '';
+                alContainer.innerHTML = `
+                    <div class="pricing-row al-pricing-row">
+                        <span class="label"><i class="fas fa-tshirt" style="font-size: 10px; margin-right: 3px;"></i> AL: ${logo.position}${stitchNote}:</span>
+                        <span class="value">$${alTotal.toFixed(2)}</span>
+                    </div>
+                    <div class="pricing-row sub-breakdown">
+                        <span class="label">$${alUnitPrice.toFixed(2)} × ${pricing.garmentQuantity}</span>
+                        <span class="value sub-value"></span>
+                    </div>
+                `;
             } else {
                 alContainer.innerHTML = '';
+            }
+
+            // Cap Additional Logos pricing section - reads from globalAL state
+            const capAlContainer = document.getElementById('cap-additional-logos-pricing');
+            if (globalAL.cap.enabled && pricing.capQuantity > 0) {
+                // Get cap AL pricing based on CAP tier (not combined tier)
+                const capTier = pricing.capTier || '1-23';
+                let capAlBaseRate = 6.75; // 2026 fallback (AL-CAP tier 1-23)
+                if (pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier]) {
+                    capAlBaseRate = pricingCalculator.capAlTiers[capTier].embCost;
+                } else {
+                    // Tier-based fallback if API unavailable (2026 AL-CAP costs)
+                    if (capTier.includes('72')) capAlBaseRate = 5.25;
+                    else if (capTier.includes('48')) capAlBaseRate = 5.50;
+                    else if (capTier.includes('24')) capAlBaseRate = 5.75;
+                    console.warn('[Cap AL] Using fallback rates - API data unavailable for tier:', capTier);
+                }
+
+                // Get base stitch count and rate from API (with fallbacks)
+                const capAlConfig = pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier];
+                const capAlBaseStitches = capAlConfig?.baseStitchCount || 5000;
+                const capAlStitchRate = capAlConfig?.additionalStitchRate || 1.00;
+
+                // Use globalAL.cap config instead of legacy capAdditionalLogos array
+                const logo = globalAL.cap;
+                // Cap AL base is 5000 stitches (from API, not 8000 like garments)
+                const logoExtraStitches = Math.max(0, logo.stitchCount - capAlBaseStitches);
+                const logoExtraK = Math.ceil(logoExtraStitches / 1000); // Round up per 1K
+                // Cap AL rate is $1.00/1K from API (not $1.25 like garments)
+                const stitchCost = logoExtraK * capAlStitchRate;
+                const capAlUnitPrice = capAlBaseRate + stitchCost;
+                const capAlTotal = capAlUnitPrice * pricing.capQuantity;
+
+                // Add line item to quote summary
+                const stitchNote = logoExtraStitches > 0 ? ` (+${logoExtraK}K)` : '';
+                capAlContainer.innerHTML = `
+                    <div class="pricing-row al-pricing-row cap-al">
+                        <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 10px; margin-right: 3px;"></i> AL: ${logo.position}${stitchNote}:</span>
+                        <span class="value">$${capAlTotal.toFixed(2)}</span>
+                    </div>
+                    <div class="pricing-row sub-breakdown">
+                        <span class="label">$${capAlUnitPrice.toFixed(2)} × ${pricing.capQuantity}</span>
+                        <span class="value sub-value"></span>
+                    </div>
+                `;
+            } else {
+                capAlContainer.innerHTML = '';
             }
         }
 
@@ -4994,12 +5881,24 @@
             showLoading(true);
 
             try {
-                // Combine primary logo + all additional logos
+                // Build separate logo configs for garments and caps
+                const logoConfigs = {
+                    garment: {
+                        primary: { ...primaryLogo, id: 'primary' },
+                        additional: additionalLogos
+                    },
+                    cap: {
+                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
+                        additional: capAdditionalLogos
+                    }
+                };
+
+                // For backward compatibility, also create combined array
                 const allLogos = [
                     { ...primaryLogo, id: 'primary' },
                     ...additionalLogos
                 ];
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
 
                 // Generate and open print window
                 const invoiceGenerator = new EmbroideryInvoiceGenerator();
@@ -5124,14 +6023,29 @@
             }
 
             try {
-                // Combine primary logo + all additional logos
+                // Combine all logos for backward compat
                 const allLogos = [
                     { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos
+                    ...additionalLogos,
+                    { ...capPrimaryLogo, id: 'cap-primary' },
+                    ...capAdditionalLogos
                 ];
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
 
-                const text = generateQuoteText(products, pricing, allLogos);
+                // Build separate logo configs for cap vs garment
+                const logoConfigs = {
+                    garment: {
+                        primary: { ...primaryLogo, id: 'primary' },
+                        additional: additionalLogos
+                    },
+                    cap: {
+                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
+                        additional: capAdditionalLogos
+                    }
+                };
+
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+
+                const text = generateQuoteText(products, pricing, logoConfigs);
                 await navigator.clipboard.writeText(text);
 
                 showToast('Quote copied to clipboard!', 'success');
@@ -5141,27 +6055,52 @@
             }
         }
 
-        function generateQuoteText(products, pricing, logos) {
+        function generateQuoteText(products, pricing, logoConfigs) {
+            // Cap position name mapping
+            const capPositionNames = {
+                'CF': 'Cap Front',
+                'CB': 'Cap Back',
+                'CL': 'Left Side',
+                'CR': 'Right Side'
+            };
+
             const lines = [
                 'NORTHWEST CUSTOM APPAREL - EMBROIDERY QUOTE',
                 '================================================',
                 `Date: ${new Date().toLocaleDateString()}`,
                 `Customer: ${document.getElementById('customer-name').value || 'N/A'}`,
                 `Company: ${document.getElementById('company-name').value || 'N/A'}`,
-                '',
-                `Primary Logo: ${primaryLogo.position}, ${primaryLogo.stitchCount.toLocaleString()} stitches`,
             ];
-
-            // Add additional logos if any
-            if (additionalLogos.length > 0) {
-                additionalLogos.forEach(logo => {
-                    lines.push(`Additional Logo: ${logo.position}, ${logo.stitchCount.toLocaleString()} stitches`);
-                });
-            }
 
             // Separate caps from garments
             const capProducts = products.filter(p => p.isCap === true);
             const garmentProducts = products.filter(p => p.isCap !== true);
+
+            // Show garment embroidery section if garments in quote
+            if (garmentProducts.length > 0) {
+                lines.push('');
+                lines.push('GARMENT EMBROIDERY:');
+                lines.push(`  Primary: ${logoConfigs.garment.primary.position}, ${logoConfigs.garment.primary.stitchCount.toLocaleString()} stitches`);
+                if (logoConfigs.garment.additional.length > 0) {
+                    logoConfigs.garment.additional.forEach(logo => {
+                        lines.push(`  Additional: ${logo.position}, ${logo.stitchCount.toLocaleString()} stitches`);
+                    });
+                }
+            }
+
+            // Show cap embroidery section if caps in quote
+            if (capProducts.length > 0) {
+                lines.push('');
+                lines.push('CAP EMBROIDERY:');
+                const capPosName = capPositionNames[logoConfigs.cap.primary.position] || logoConfigs.cap.primary.position;
+                lines.push(`  Front Logo: ${capPosName}, ${logoConfigs.cap.primary.stitchCount.toLocaleString()} stitches`);
+                if (logoConfigs.cap.additional.length > 0) {
+                    logoConfigs.cap.additional.forEach(logo => {
+                        const posName = capPositionNames[logo.position] || logo.position;
+                        lines.push(`  Additional: ${posName}, ${logo.stitchCount.toLocaleString()} stitches`);
+                    });
+                }
+            }
 
             // Show garment products if any
             if (garmentProducts.length > 0) {
@@ -5177,7 +6116,7 @@
             // Show cap products if any
             if (capProducts.length > 0) {
                 lines.push('');
-                lines.push('CAPS (Cap Embroidery Pricing):');
+                lines.push('CAPS:');
                 lines.push('------------------------------------------------');
                 capProducts.forEach(p => {
                     const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
@@ -5188,16 +6127,45 @@
             lines.push('');
             lines.push('------------------------------------------------');
             lines.push(`Total Pieces: ${pricing.totalQuantity}`);
-            lines.push(`Tier: ${pricing.tier}`);
-
-            // Show breakdown for mixed quotes
+            // Show quantity breakdown for mixed quotes
             if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`  Garments Subtotal: $${pricing.garmentSubtotal.toFixed(2)}`);
-                lines.push(`  Caps Subtotal: $${pricing.capSubtotal.toFixed(2)}`);
+                lines.push(`  Garments: ${pricing.garmentQuantity}`);
+                lines.push(`  Caps: ${pricing.capQuantity}`);
             }
 
-            lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
-            if (pricing.ltmFee > 0) lines.push(`LTM Fee: $${pricing.ltmFee.toFixed(2)}`);
+            // Show tier (with breakdown for mixed quotes)
+            if (pricing.hasCaps && pricing.hasGarments) {
+                lines.push(`Pricing Tier: Mixed`);
+                lines.push(`  Garment Tier: ${pricing.garmentTier}`);
+                lines.push(`  Cap Tier: ${pricing.capTier}`);
+            } else if (pricing.hasCaps) {
+                lines.push(`Tier: ${pricing.capTier}`);
+            } else {
+                lines.push(`Tier: ${pricing.garmentTier || pricing.tier}`);
+            }
+
+            // Show subtotal breakdown for mixed quotes
+            if (pricing.hasCaps && pricing.hasGarments) {
+                lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
+                lines.push(`  Garments Subtotal: $${pricing.garmentSubtotal.toFixed(2)}`);
+                lines.push(`  Caps Subtotal: $${pricing.capSubtotal.toFixed(2)}`);
+            } else {
+                lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
+            }
+
+            // Show LTM (with breakdown for mixed quotes)
+            if (pricing.ltmFee > 0) {
+                const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
+                const hasCapLtm = (pricing.capLtmFee || 0) > 0;
+
+                if (hasGarmentLtm && hasCapLtm) {
+                    lines.push(`LTM Fee (< 24 pcs): $${pricing.ltmFee.toFixed(2)}`);
+                    lines.push(`  Garment LTM: $${pricing.garmentLtmFee.toFixed(2)}`);
+                    lines.push(`  Cap LTM: $${pricing.capLtmFee.toFixed(2)}`);
+                } else {
+                    lines.push(`LTM Fee: $${pricing.ltmFee.toFixed(2)}`);
+                }
+            }
             if (pricing.setupFees > 0) lines.push(`Setup: $${pricing.setupFees.toFixed(2)}`);
             lines.push(`TOTAL: $${pricing.grandTotal.toFixed(2)}`);
             lines.push('');
