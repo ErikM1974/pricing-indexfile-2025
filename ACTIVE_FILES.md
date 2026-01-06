@@ -53,20 +53,33 @@
 |------|---------|--------------|--------|
 | `/calculators/dtg-pricing.html` | DTG pricing calculator | dtg-adapter.js, dtg-pricing-service.js | ✅ Active |
 | `/calculators/dtg-manual-pricing.html` | Manual DTG pricing | dtg-config.js | ✅ Active |
-| `/quote-builders/dtg-quote-builder.html` | DTG quote generation | 11 service files | ✅ Active |
+| `/quote-builders/dtg-quote-builder.html` | DTG Quote Builder 2026 (Excel-style) | dtg-quote-pricing.js | ✅ Active |
+
+### DTF System (Consolidated 2026-01-06)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/dtf-pricing.html` | DTF pricing calculator | dtf-quote-pricing.js | ✅ Active |
+| `/calculators/dtf-manual-pricing.html` | Manual DTF pricing | dtf-quote-pricing.js | ✅ Active |
+| `/quote-builders/dtf-quote-builder.html` | DTF Quote Builder 2026 (Excel-style) | 4 JS files below | ✅ Active |
+| `/shared_components/js/dtf-quote-builder.js` | Main DTF quote controller | DTFQuotePricing class | ✅ Active |
+| `/shared_components/js/dtf-quote-pricing.js` | **CONSOLIDATED** Pricing + Config + Service (DTFConfig, DTFPricingService, DTFQuotePricing) | Caspio API | ✅ Active |
+| `/shared_components/js/dtf-quote-products.js` | DTF quote product manager | ExactMatchSearch | ✅ Active |
+| `/shared_components/js/dtf-quote-service.js` | DTF quote database service | EmailJS, Caspio API | ✅ Active |
+| `/shared_components/css/dtf-quote-builder.css` | DTF quote builder styles (green theme) | - | ✅ Active |
+
+**DTF Refactor (2026-01-06):** Consolidated 10 files → 4 files. Deleted: dtf-adapter.js, dtf-quote-adapter.js, dtf-pricing-calculator.js, dtf-integration.js, dtf-config.js, dtf-pricing-service.js (2,410+ lines removed)
 
 ### Embroidery System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/embroidery-pricing.html` | Embroidery calculator | embroidery-pricing-service.js | ✅ Active |
-| `/quote-builders/embroidery-quote-builder.html` | Embroidery quotes | 7 service files | ✅ Active |
-| `/quote-builders/cap-embroidery-quote-builder.html` | Cap embroidery quotes | 6 service files | ✅ Active |
+| `/quote-builders/embroidery-quote-builder.html` | Embroidery/Cap Combo Quote Builder 2026 (Excel-style) | embroidery-quote-pricing.js | ✅ Active |
 
 ### Screen Print System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/screen-print-pricing.html` | Screen print calculator | screenprint-pricing-v2.js, screenprint-pricing-service.js | ✅ Active |
-| `/quote-builders/screenprint-quote-builder-new.html` | **NEW** Screen Print Quote Builder 2026 (Excel-style) | screenprint-pricing-service.js | ✅ Active |
+| `/quote-builders/screenprint-quote-builder.html` | Screen Print Quote Builder 2026 (Excel-style) | screenprint-pricing-service.js | ✅ Active |
 | `/quote-builders/screenprint-fast-quote.html` | Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-service.js` | Pricing data adapter | Caspio API | ✅ Active |
@@ -287,7 +300,7 @@ cap-embroidery-fix.css
 - **JavaScript Files:** ~112 (down from 297)
 - **CSS Files:** ~62
 - **Active Calculators:** 15
-- **Active Quote Builders:** 4
+- **Active Quote Builders:** 5
 - **Active Dashboards:** 8 (includes new staff-dashboard-v2)
 
 ### Organization Health
