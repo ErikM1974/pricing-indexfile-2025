@@ -1,7 +1,7 @@
 # Embroidery Quote Builder Development
 
 ## Overview
-The embroidery quote builder (`quote-builders/embroidery-quote-builder-new.html`) is an Excel-style interface for creating embroidery quotes with multiple products, colors, and size breakdowns.
+The embroidery quote builder (`quote-builders/embroidery-quote-builder.html`) is an Excel-style interface for creating embroidery quotes with multiple products, colors, and size breakdowns.
 
 ## Key Features Implemented
 1. **Product Table** - Add rows with style number, color, sizes, pricing
@@ -201,7 +201,7 @@ Replaced standard `<select>` with custom dropdown showing:
 - **Root Cause**: Regex at line 3126 only matched `/(\dXL|XS)/g` - missing toddler, youth, tall, etc.
 - **Solution**: Build regex dynamically from `SIZE06_EXTENDED_SIZES` array
 - **Affected Products**: CAR54T (toddler), PC61Y (youth), tall shirts, etc.
-- **File**: `quote-builders/embroidery-quote-builder-new.html:3126`
+- **File**: `quote-builders/embroidery-quote-builder.html:3126`
 
 ### 6. Cap Type False Positive (FIXED - Jan 2026)
 - **Problem**: CAR54T detected as "Cap" because it starts with "C"
@@ -214,7 +214,7 @@ Replaced standard `<select>` with custom dropdown showing:
 - **Root Cause**: `getPartNumber()` used incomplete `SIZE_MODIFIERS` (only had XL sizes)
 - **Solution**: Changed to use `SIZE_TO_SUFFIX` which has ALL 47 size suffixes
 - **Affected Products**: PC54T (tall), CAR54T (toddler), PC61Y (youth), etc.
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2743`
+- **File**: `quote-builders/embroidery-quote-builder.html:2743`
 
 ### 8. Tall/Youth/Toddler Products Show Irrelevant Size Columns (FIXED - Jan 2026)
 - **Problem**: PC54T showed S, M, L, XL columns with 0s - confusing since sizes don't exist
@@ -223,7 +223,7 @@ Replaced standard `<select>` with custom dropdown showing:
   - Detects tall-only, youth-only, or toddler-only products
   - Grays out unavailable S/M/L/XL columns with "N/A" placeholder
   - Focuses cursor on extended size picker instead
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2341` (function), `:2453` (call)
+- **File**: `quote-builders/embroidery-quote-builder.html:2341` (function), `:2453` (call)
 
 ---
 
@@ -244,7 +244,7 @@ Replaced standard `<select>` with custom dropdown showing:
 
 | File | Purpose |
 |------|---------|
-| `quote-builders/embroidery-quote-builder-new.html` | Main quote builder |
+| `quote-builders/embroidery-quote-builder.html` | Main quote builder |
 | `shared_components/js/embroidery-pricing-service.js` | Pricing calculations |
 | `Python Inksoft/Inksoft_Size_Translation_Import.csv` | Size mapping reference |
 | `Python Inksoft/web/transform.py` | SIZE_MODIFIERS dictionary |
@@ -293,29 +293,29 @@ Use these styles for testing child row behavior:
 - **Solution**: Added `isCapProduct()` detection with warning toast
 - **Behavior**: Warning shown but entry allowed (user may need to quote cap embroidery)
 - **Patterns**: `/^C[P0-9]/`, `NE*` prefix, title keywords (CAP, HAT, BEANIE, SNAPBACK)
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2322-2325`
+- **File**: `quote-builders/embroidery-quote-builder.html:2322-2325`
 
 ### 10. Extended Sizes Fallback Fixed (FIXED - Jan 2026)
 - **Problem**: API failure/no data returned ALL 47 sizes instead of empty
 - **Root Cause**: Fallback at lines 1581, 1635 returned `SIZE06_EXTENDED_SIZES`
 - **Solution**: Changed fallback to `return []` to trigger "No sizes available" UI
-- **File**: `quote-builders/embroidery-quote-builder-new.html:1581,1635`
+- **File**: `quote-builders/embroidery-quote-builder.html:1581,1635`
 
 ### 11. Search Box Improvements (FIXED - Jan 2026)
 - **Problem**: Typing "J790" showed stale results from "J7" search
 - **Solution**: Reduced debounce (200ms → 150ms), added result ranking, keyboard navigation
 - **Features**: Text highlighting, 10 result limit, Arrow key navigation
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2038-2170`
+- **File**: `quote-builders/embroidery-quote-builder.html:2038-2170`
 
 ### 12. Child Row Description Format (FIXED - Jan 2026)
 - **Problem**: Child rows showed "2XL upcharge" instead of product name
 - **Solution**: Changed to "Product Name - Size" format with bold size
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2899`
+- **File**: `quote-builders/embroidery-quote-builder.html:2899`
 
 ### 13. Duplicate Style in Description (FIXED - Jan 2026)
 - **Problem**: Style appeared 3 times in description (API returns embedded style)
 - **Solution**: Added `cleanProductTitle()` to strip style from API title
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2384-2397`
+- **File**: `quote-builders/embroidery-quote-builder.html:2384-2397`
 
 ### 14. OSFA & Dynamic Size Columns (FIXED - Jan 2026)
 - **Problem**: OSFA products (caps, bags, beanies) showed irrelevant S/M/L/XL/2XL columns
@@ -335,7 +335,7 @@ Use these styles for testing child row behavior:
   - `detectAndAdjustSizeUI()` - Main detection called after color selection
   - `extractAllSizes()` - Gets all sizes from Size01-06 fields
 - **Pricing**: No change needed - relative upcharge model already handles non-standard base sizes
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2436-2716`
+- **File**: `quote-builders/embroidery-quote-builder.html:2436-2716`
 
 ---
 
@@ -449,7 +449,7 @@ The complete code path for line item generation:
 
 | Step | File | Line | Code |
 |------|------|------|------|
-| 1 | embroidery-quote-builder-new.html | 1621 | `<script src="/shared_components/js/sku-validation-service.js">` |
+| 1 | embroidery-quote-builder.html | 1621 | `<script src="/shared_components/js/sku-validation-service.js">` |
 | 2 | embroidery-quote-pricing.js | 512 | `skuService = window.skuValidationService` |
 | 3 | embroidery-quote-pricing.js | 558-560 | `skuService.sanmarToShopWorksSKU(style, size)` |
 | 4 | sku-validation-service.js | 206-223 | Returns suffix from 190+ SIZE_TO_SUFFIX mapping |
@@ -567,13 +567,13 @@ Available sizes: 70+ waist/inseam combinations
 - **Problem**: PC90HT showed "LT" and "XLT" text in parent row columns
 - **Root Cause**: `updateColumnLabel()` was being called for tall-only products
 - **Solution**: Disabled all columns for tall products like OSFA, no label updates
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2768-2795`
+- **File**: `quote-builders/embroidery-quote-builder.html:2768-2795`
 
 ### 16. PT20 Pants Support (ADDED - Jan 2026)
 - **Problem**: PT20 Industrial Work Pant was blocked, showed blank
 - **Solution**: Added full pants support with waist/inseam picker UI
 - **Features**: Grouped by waist, 3-column layout, collapsible sections
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2718-2746`
+- **File**: `quote-builders/embroidery-quote-builder.html:2718-2746`
 
 ### 17. Pants Pricing Using $0 Sizes (FIXED - Jan 2026)
 - **Problem**: Calculator picked $0 discontinued sizes as base price
@@ -584,18 +584,18 @@ Available sizes: 70+ waist/inseam combinations
 - **Problem**: PT20 child rows showed "-" instead of unit prices
 - **Root Cause**: Regex didn't include 4-digit pants pattern
 - **Solution**: Added `\\d{4}` to extended size regex
-- **File**: `quote-builders/embroidery-quote-builder-new.html:4104`
+- **File**: `quote-builders/embroidery-quote-builder.html:4104`
 
 ### 19. Pants Modal Too Narrow (FIXED - Jan 2026)
 - **Problem**: 3rd column of waist/inseam sizes cut off in popup
 - **Solution**: Increased `.size-popup` width from 340px to 480px
-- **File**: `quote-builders/embroidery-quote-builder-new.html:1105-1106`
+- **File**: `quote-builders/embroidery-quote-builder.html:1105-1106`
 
 ### 20. PT66 Shorts Support (ADDED - Jan 2026)
 - **Problem**: PT66 cargo shorts used waist-only sizing (W30, W32) not handled
 - **Solution**: Added `shorts` category detection and UI handling
 - **Features**: Detects W## pattern, displays as "Waist 30", simple flat list UI
-- **File**: `quote-builders/embroidery-quote-builder-new.html:2752-2764`
+- **File**: `quote-builders/embroidery-quote-builder.html:2752-2764`
 
 ### 21. SIZE_TO_SUFFIX Expansion (ADDED - Jan 2026)
 - **Problem**: 97 size values from SanMar CSV were unmapped
@@ -619,7 +619,7 @@ Available sizes: 70+ waist/inseam combinations
   - Separate LTM fees per product type
 - **Files**:
   - `shared_components/js/embroidery-quote-pricing.js` - Dual pricing engine
-  - `quote-builders/embroidery-quote-builder-new.html:3599-3609` - Cap detection
+  - `quote-builders/embroidery-quote-builder.html:3599-3609` - Cap detection
 - **API Endpoints**:
   - `/api/pricing-bundle?method=EMB` - Garment pricing
   - `/api/pricing-bundle?method=CAP` - Cap pricing

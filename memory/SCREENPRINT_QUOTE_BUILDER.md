@@ -26,7 +26,7 @@ The Screen Print Quote Builder 2026 is an Excel-style spreadsheet quote builder 
 
 | File | Purpose |
 |------|---------|
-| `/quote-builders/screenprint-quote-builder-new.html` | Main quote builder (~6000 lines) |
+| `/quote-builders/screenprint-quote-builder.html` | Main quote builder |
 | `/shared_components/js/screenprint-pricing-service.js` | Core pricing engine (656 lines) |
 | `/shared_components/js/screenprint-quote-service.js` | Quote save/load operations |
 | `/shared_components/js/screenprint-quote-pricing.js` | Pricing calculations |
