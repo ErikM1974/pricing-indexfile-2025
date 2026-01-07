@@ -495,15 +495,20 @@
         window.childRowMap = childRowMap;  // Expose to JS class
 
         // Use shared ExtendedSizesConfig module (2026 consolidation)
-        // This provides 45+ sizes and API-driven dynamic loading
-        const SIZE_TO_SUFFIX = window.ExtendedSizesConfig?.SIZE_TO_SUFFIX || {
-            'XS': '_XS', 'XXL': '_2X', '2XL': '_2X', 'XXXL': '_3X', '3XL': '_3X',
-            '4XL': '_4X', '5XL': '_5X', '6XL': '_6X'
-        };
-
-        const EXTENDED_SIZE_ORDER = window.ExtendedSizesConfig?.EXTENDED_SIZE_ORDER || [
-            'XS', 'XXL', '2XL', 'XXXL', '3XL', '4XL', '5XL', '6XL'
-        ];
+        // REQUIRED - no fallback. Shows error if module not loaded.
+        if (!window.ExtendedSizesConfig) {
+            console.error('❌ ExtendedSizesConfig module not loaded! Check script includes.');
+            document.body.innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #c00;">
+                    <h2>Configuration Error</h2>
+                    <p>Extended sizes module failed to load. Please refresh the page.</p>
+                    <p style="font-size: 12px; color: #666;">If this persists, contact support.</p>
+                </div>
+            `;
+            throw new Error('ExtendedSizesConfig module required but not loaded');
+        }
+        const SIZE_TO_SUFFIX = window.ExtendedSizesConfig.SIZE_TO_SUFFIX;
+        const EXTENDED_SIZE_ORDER = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER;
 
         /**
          * Add a new empty row for user to type style number

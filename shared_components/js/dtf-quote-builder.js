@@ -732,19 +732,39 @@ class DTFQuoteBuilder {
 
         // Fetch available extended sizes from API (excluding 2XL/XXL which has its own column)
         let extendedSizes = [];
+        let apiError = false;
+
         try {
-            if (window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
-                const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber);
-                // Filter out 2XL/XXL since DTF has a dedicated column for it
-                extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
+            if (!window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
+                throw new Error('ExtendedSizesConfig module not loaded');
             }
+            const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber);
+            // Filter out 2XL/XXL since DTF has a dedicated column for it
+            extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
         } catch (error) {
-            console.warn('[DTFQuoteBuilder] Failed to fetch extended sizes:', error);
+            console.error('[DTFQuoteBuilder] Failed to fetch extended sizes:', error);
+            apiError = true;
         }
 
-        // Fallback to default sizes if API fails or returns empty
+        // Show appropriate message based on result
+        if (apiError) {
+            body.innerHTML = `
+                <div class="ext-popup-error" style="padding: 20px; text-align: center; color: #c00;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Unable to load extended sizes. Please try again.</p>
+                </div>
+            `;
+            return;
+        }
+
         if (extendedSizes.length === 0) {
-            extendedSizes = ['XS', '3XL', '4XL', '5XL', '6XL'];
+            body.innerHTML = `
+                <div class="ext-popup-empty" style="padding: 20px; text-align: center; color: #666;">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No extended sizes available for this product.</p>
+                </div>
+            `;
+            return;
         }
 
         // Build quantities using fallback function that checks BOTH child rows AND parent inputs
