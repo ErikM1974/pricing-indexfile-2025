@@ -1,65 +1,53 @@
 /**
- * DTF Quote Pricing - CONSOLIDATED MODULE
+ * DTF Quote Pricing - CONSOLIDATED MODULE (100% API-DRIVEN)
  *
  * This file combines:
- * - DTFConfig (transfer configuration)
- * - DTFPricingService (API fetching)
+ * - DTFConfig (location configuration ONLY - no pricing)
+ * - DTFPricingService (API fetching - NO FALLBACKS)
  * - DTFQuotePricing (calculation logic)
  *
  * ⚠️ SHARED COMPONENT - USED BY DTF QUOTE BUILDER
+ * ⚠️ ALL PRICING DATA COMES FROM API - NO HARDCODED VALUES
+ *
+ * If API fails, pricing is blocked entirely to prevent wrong quotes.
  *
  * Pricing Formula:
  * Price Per Piece = ROUND_UP_HALF_DOLLAR(
- *     (GarmentCost / MarginDenominator)     // 0.57 from Pricing_Tiers API
- *     + SUM(TransferCosts per location)     // unit_price from DTF_Pricing API
- *     + (PressingLaborCost × LocationCount) // $2.00 from DTF_Pricing API
+ *     (GarmentCost / MarginDenominator)     // From Pricing_Tiers API
+ *     + SUM(TransferCosts per location)     // From DTF_Pricing API
+ *     + (PressingLaborCost × LocationCount) // From DTF_Pricing API
  *     + (FreightPerTransfer × LocationCount)// From Transfer_Freight API
- *     + (LTM_Fee / Quantity)                // $50 from Pricing_Tiers API (10-23 tier)
+ *     + (LTM_Fee / Quantity)                // From Pricing_Tiers API
  * )
  */
 
 // ============================================================================
-// CONFIGURATION (from dtf-config.js)
+// CONFIGURATION (Location mappings only - NO PRICING VALUES)
 // ============================================================================
 
 const DTFConfig = {
-    // Transfer size options with simplified customer-facing pricing tiers
+    // Transfer size definitions (dimensions only - pricing comes from API)
     transferSizes: {
         'small': {
             name: 'Up to 5" x 5"',
             displayName: 'Small (Up to 5" x 5")',
             maxWidth: 5,
-            maxHeight: 5,
-            pricingTiers: [
-                { minQty: 10, maxQty: 23, unitPrice: 6.00, range: '10-23' },
-                { minQty: 24, maxQty: 47, unitPrice: 5.25, range: '24-47' },
-                { minQty: 48, maxQty: 71, unitPrice: 4.00, range: '48-71' },
-                { minQty: 72, maxQty: 999999, unitPrice: 3.25, range: '72+' }
-            ]
+            maxHeight: 5
+            // NO pricingTiers - comes from API
         },
         'medium': {
             name: 'Up to 9" x 12"',
             displayName: 'Medium (Up to 9" x 12")',
             maxWidth: 9,
-            maxHeight: 12,
-            pricingTiers: [
-                { minQty: 10, maxQty: 23, unitPrice: 9.50, range: '10-23' },
-                { minQty: 24, maxQty: 47, unitPrice: 8.25, range: '24-47' },
-                { minQty: 48, maxQty: 71, unitPrice: 6.50, range: '48-71' },
-                { minQty: 72, maxQty: 999999, unitPrice: 5.00, range: '72+' }
-            ]
+            maxHeight: 12
+            // NO pricingTiers - comes from API
         },
         'large': {
             name: 'Up to 12" x 16.5"',
             displayName: 'Large (Up to 12" x 16.5")',
             maxWidth: 12,
-            maxHeight: 16.5,
-            pricingTiers: [
-                { minQty: 10, maxQty: 23, unitPrice: 14.50, range: '10-23' },
-                { minQty: 24, maxQty: 47, unitPrice: 12.50, range: '24-47' },
-                { minQty: 48, maxQty: 71, unitPrice: 10.00, range: '48-71' },
-                { minQty: 72, maxQty: 999999, unitPrice: 8.00, range: '72+' }
-            ]
+            maxHeight: 16.5
+            // NO pricingTiers - comes from API
         }
     },
 
@@ -88,53 +76,16 @@ const DTFConfig = {
         // Sleeves are independent - no conflicts
     },
 
-    // Labor costs
-    laborCost: {
-        costPerLocation: 2.00,
-        getTotalLaborCost: function(locationCount) {
-            return this.costPerLocation * locationCount;
-        }
-    },
-
-    // Freight costs (tiered structure based on quantity)
-    freightCost: {
-        tiers: [
-            { minQty: 10, maxQty: 49, costPerTransfer: 0.50 },
-            { minQty: 50, maxQty: 99, costPerTransfer: 0.35 },
-            { minQty: 100, maxQty: 199, costPerTransfer: 0.25 },
-            { minQty: 200, maxQty: 999999, costPerTransfer: 0.15 }
-        ],
-        getFreightPerTransfer: function(quantity) {
-            const tier = this.tiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-            return tier ? tier.costPerTransfer : 0.15;
-        },
-        getTotalFreight: function(quantity, locationCount) {
-            return this.getFreightPerTransfer(quantity) * locationCount;
-        }
-    },
-
-    // System settings
+    // System settings (non-pricing only)
     settings: {
         maxTransferLocations: 8,
         minQuantity: 10,
-        defaultQuantity: 24,
-        garmentMargin: 0.57,  // 43% margin (2026)
-        showFreight: true,
-        showLTMFee: true,
-        includeFreightInTransfers: true,
-        ltmFeeThreshold: 24,
-        ltmFeeAmount: 50.00
+        defaultQuantity: 24
+        // NO pricing values - all come from API
     },
 
-    // Helper functions
+    // Helper functions (location lookups only - no pricing)
     helpers: {
-        getTransferPrice: function(sizeKey, quantity) {
-            const size = DTFConfig.transferSizes[sizeKey];
-            if (!size) return 0;
-            const tier = size.pricingTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-            return tier ? tier.unitPrice : 0;
-        },
-
         getSizeForLocation: function(locationValue) {
             const location = DTFConfig.transferLocations.find(l => l.value === locationValue);
             return location ? location.size : null;
@@ -332,43 +283,98 @@ class DTFPricingService {
         })).sort((a, b) => a.minQuantity - b.minQuantity);
     }
 
+    /**
+     * Get transfer price for a size and quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getTransferPrice(sizeKey, quantity) {
-        if (!this.apiData) return 0;
+        if (!this.apiData?.transferSizes) {
+            throw new Error('API data not loaded - cannot get transfer price');
+        }
         const size = this.apiData.transferSizes[sizeKey];
-        if (!size) return 0;
+        if (!size) {
+            throw new Error(`Unknown transfer size: ${sizeKey}`);
+        }
         const tier = size.pricingTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-        return tier ? tier.unitPrice : 0;
+        if (!tier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier.unitPrice;
     }
 
+    /**
+     * Get freight cost per transfer - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getFreightPerTransfer(quantity) {
-        if (!this.apiData) return 0.15;
+        if (!this.apiData?.freightTiers) {
+            throw new Error('API data not loaded - cannot get freight cost');
+        }
         const tier = this.apiData.freightTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-        return tier ? tier.costPerTransfer : 0.15;
+        if (!tier) {
+            throw new Error(`No freight tier found for quantity ${quantity}`);
+        }
+        return tier.costPerTransfer;
     }
 
+    /**
+     * Get LTM fee for quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getLTMFee(quantity) {
-        if (!this.apiData) return quantity < 24 ? 50 : 0;
+        if (!this.apiData?.pricingTiers) {
+            throw new Error('API data not loaded - cannot get LTM fee');
+        }
         const tier = this.apiData.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
         return tier ? tier.ltmFee : 0;
     }
 
+    /**
+     * Get margin denominator for quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getMarginDenominator(quantity) {
-        if (!this.apiData) return 0.57;
+        if (!this.apiData?.pricingTiers) {
+            throw new Error('API data not loaded - cannot get margin');
+        }
         const tier = this.apiData.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
-        return tier ? tier.marginDenominator : 0.57;
+        if (!tier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier.marginDenominator;
     }
 
+    /**
+     * Get labor cost per location - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getLaborCostPerLocation() {
-        return this.apiData?.laborCostPerLocation || 2;
+        if (!this.apiData?.laborCostPerLocation) {
+            throw new Error('API data not loaded - cannot get labor cost');
+        }
+        return this.apiData.laborCostPerLocation;
     }
 
+    /**
+     * Apply rounding method from API - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     applyRounding(price) {
-        if (!this.apiData) return this.roundUpToHalfDollar(price);
+        if (!this.apiData) {
+            throw new Error('API data not loaded - cannot apply rounding');
+        }
         const method = this.apiData.roundingMethod;
         if (method === 'HalfDollarCeil_Final' || method === 'HalfDollarUp_Final') {
             return this.roundUpToHalfDollar(price);
         }
         return price;
+    }
+
+    /**
+     * Check if API data is loaded and valid
+     */
+    isLoaded() {
+        return !!(this.apiData?.transferSizes && this.apiData?.freightTiers && this.apiData?.pricingTiers);
     }
 
     roundUpToHalfDollar(price) {
@@ -463,31 +469,38 @@ class DTFQuotePricing {
         return this.pricingData;
     }
 
+    /**
+     * Get tier label for quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getTierForQuantity(quantity) {
         if (!this.pricingData?.pricingTiers) {
-            if (quantity < 24) return '10-23';
-            if (quantity < 48) return '24-47';
-            if (quantity < 72) return '48-71';
-            return '72+';
+            throw new Error('Pricing data not loaded - cannot determine tier');
         }
         const tier = this.pricingData.pricingTiers.find(
             t => quantity >= t.minQuantity && quantity <= t.maxQuantity
         );
-        return tier ? tier.tierLabel : '72+';
+        if (!tier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier.tierLabel;
     }
 
+    /**
+     * Get full tier data for quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     getTierData(quantity) {
         if (!this.pricingData?.pricingTiers) {
-            return {
-                tierLabel: this.getTierForQuantity(quantity),
-                marginDenominator: 0.57,
-                ltmFee: quantity < 24 ? 50 : 0
-            };
+            throw new Error('Pricing data not loaded - cannot get tier data');
         }
         const tier = this.pricingData.pricingTiers.find(
             t => quantity >= t.minQuantity && quantity <= t.maxQuantity
         );
-        return tier || { tierLabel: '72+', marginDenominator: 0.57, ltmFee: 0 };
+        if (!tier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier;
     }
 
     calculateLTMPerUnit(aggregateQuantity) {
@@ -547,12 +560,17 @@ class DTFQuotePricing {
         return this.pricingService.applyRounding(price);
     }
 
+    /**
+     * Calculate unit price for a garment - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
+     */
     calculateUnitPrice(garmentCost, selectedLocations, aggregateQuantity) {
         const tierData = this.getTierData(aggregateQuantity);
         const tierLabel = this.getTierForQuantity(aggregateQuantity);
         const locationCount = selectedLocations.length;
 
-        const marginDenominator = tierData.marginDenominator || 0.57;
+        // marginDenominator comes from API - no fallback
+        const marginDenominator = tierData.marginDenominator;
         const garmentWithMargin = garmentCost / marginDenominator;
 
         const transferBreakdown = this.calculateTransferCosts(selectedLocations, aggregateQuantity);

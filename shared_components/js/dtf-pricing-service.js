@@ -1,7 +1,10 @@
 /**
- * DTF Pricing Service
+ * DTF Pricing Service (100% API-DRIVEN)
  * Direct API implementation for DTF (Direct-to-Film) transfer pricing
  * Fetches pricing data from Caspio API and transforms for calculator use
+ *
+ * ⚠️ NO FALLBACK VALUES - If API fails, errors are thrown
+ * This prevents wrong pricing from being shown to users.
  */
 
 class DTFPricingService {
@@ -181,8 +184,11 @@ class DTFPricingService {
         // Extract pricing tiers for margins and LTM
         const pricingTiers = this.buildPricingTiers(apiData.tiersR);
         
-        // Get labor cost (should be consistent $2 across all records)
-        const laborCostPerLocation = apiData.allDtfCostsR[0]?.PressingLaborCost || 2;
+        // Get labor cost from API - NO FALLBACK
+        const laborCostPerLocation = apiData.allDtfCostsR[0]?.PressingLaborCost;
+        if (laborCostPerLocation === undefined) {
+            throw new Error('API response missing PressingLaborCost');
+        }
         
         // Get rounding method
         const roundingMethod = apiData.rulesR?.RoundingMethod || 'HalfDollarCeil_Final';
@@ -280,69 +286,106 @@ class DTFPricingService {
     }
 
     /**
-     * Get transfer price for a specific size and quantity
+     * Get transfer price for a specific size and quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
      */
     getTransferPrice(sizeKey, quantity) {
-        if (!this.apiData) return 0;
-        
+        if (!this.apiData?.transferSizes) {
+            throw new Error('API data not loaded - cannot get transfer price');
+        }
+
         const size = this.apiData.transferSizes[sizeKey];
-        if (!size) return 0;
-        
+        if (!size) {
+            throw new Error(`Unknown transfer size: ${sizeKey}`);
+        }
+
         const tier = size.pricingTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-        return tier ? tier.unitPrice : 0;
+        if (!tier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier.unitPrice;
     }
 
     /**
-     * Get freight cost per transfer for a quantity
+     * Get freight cost per transfer for a quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
      */
     getFreightPerTransfer(quantity) {
-        if (!this.apiData) return 0.15; // Default to lowest tier
-        
+        if (!this.apiData?.freightTiers) {
+            throw new Error('API data not loaded - cannot get freight cost');
+        }
+
         const tier = this.apiData.freightTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
-        return tier ? tier.costPerTransfer : 0.15;
+        if (!tier) {
+            throw new Error(`No freight tier found for quantity ${quantity}`);
+        }
+        return tier.costPerTransfer;
     }
 
     /**
-     * Get LTM fee for a quantity
+     * Get LTM fee for a quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
      */
     getLTMFee(quantity) {
-        if (!this.apiData) return quantity < 24 ? 50 : 0; // Default logic
-        
+        if (!this.apiData?.pricingTiers) {
+            throw new Error('API data not loaded - cannot get LTM fee');
+        }
+
         const tier = this.apiData.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
         return tier ? tier.ltmFee : 0;
     }
 
     /**
-     * Get margin denominator for a quantity
+     * Get margin denominator for a quantity - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
      */
     getMarginDenominator(quantity) {
-        if (!this.apiData) return 0.57; // 2026 margin (43%)
+        if (!this.apiData?.pricingTiers) {
+            throw new Error('API data not loaded - cannot get margin');
+        }
 
         const tier = this.apiData.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
-        return tier ? tier.marginDenominator : 0.57;
+        if (!tier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier.marginDenominator;
     }
 
     /**
-     * Get labor cost per location
+     * Get labor cost per location - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
      */
     getLaborCostPerLocation() {
-        return this.apiData?.laborCostPerLocation || 2;
+        if (!this.apiData?.laborCostPerLocation) {
+            throw new Error('API data not loaded - cannot get labor cost');
+        }
+        return this.apiData.laborCostPerLocation;
     }
 
     /**
-     * Apply rounding based on API rules
+     * Apply rounding based on API rules - REQUIRES API DATA
+     * @throws {Error} if API data not loaded
      */
     applyRounding(price) {
-        if (!this.apiData) return this.roundUpToHalfDollar(price);
-        
+        if (!this.apiData) {
+            throw new Error('API data not loaded - cannot apply rounding');
+        }
+
         const method = this.apiData.roundingMethod;
-        
+
         // HalfDollarCeil_Final - always round UP to nearest $0.50
         if (method === 'HalfDollarCeil_Final' || method === 'HalfDollarUp_Final') {
             return this.roundUpToHalfDollar(price);
         }
-        
+
         return price; // No rounding if method unknown
+    }
+
+    /**
+     * Check if API data is loaded and valid
+     */
+    isLoaded() {
+        return !!(this.apiData?.transferSizes && this.apiData?.freightTiers && this.apiData?.pricingTiers);
     }
 
     /**

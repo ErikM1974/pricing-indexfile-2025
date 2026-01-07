@@ -110,67 +110,129 @@ class DTFPricingCalculator {
         return apiData;
     }
 
+    /**
+     * Store API data in instance for pricing calculations
+     * DTFConfig no longer contains pricing - all from API
+     */
     mergeApiDataIntoConfig(apiData) {
-        // Update transfer sizes and pricing from API
+        // Store transfer pricing tiers in instance (NOT in DTFConfig)
+        this.transferPricingTiers = {};
         if (apiData.allDtfCostsR && Array.isArray(apiData.allDtfCostsR)) {
-            // Build pricing tiers from allDtfCostsR
-            const tierMap = {};
-
             apiData.allDtfCostsR.forEach(cost => {
-                const priceType = cost.price_type; // 'Small', 'Medium', 'Large'
-                const quantityRange = cost.quantity_range; // '10-23', '24-47', etc.
+                const priceType = cost.price_type;
+                const quantityRange = cost.quantity_range;
                 const unitPrice = parseFloat(cost.unit_price);
-
                 const sizeKey = priceType.toLowerCase();
 
-                if (!tierMap[sizeKey]) {
-                    tierMap[sizeKey] = [];
+                if (!this.transferPricingTiers[sizeKey]) {
+                    this.transferPricingTiers[sizeKey] = [];
                 }
 
-                // Parse quantity range
                 const [minQty, maxQty] = this.parseQuantityRange(quantityRange);
-
-                tierMap[sizeKey].push({
+                this.transferPricingTiers[sizeKey].push({
                     minQty,
                     maxQty,
                     unitPrice,
                     range: quantityRange
                 });
             });
-
-            // Update DTFConfig with parsed tiers
-            Object.keys(tierMap).forEach(sizeKey => {
-                if (DTFConfig.transferSizes[sizeKey]) {
-                    DTFConfig.transferSizes[sizeKey].pricingTiers = tierMap[sizeKey];
-                }
-            });
         }
 
-        // Update freight costs from API
+        // Store freight tiers in instance (NOT in DTFConfig)
+        this.freightTiers = [];
         if (apiData.freightR && Array.isArray(apiData.freightR)) {
-            DTFConfig.freightCost.tiers = apiData.freightR.map(freight => {
+            this.freightTiers = apiData.freightR.map(freight => {
                 const [minQty, maxQty] = this.parseQuantityRange(freight.quantity_range);
                 return {
                     minQty,
                     maxQty,
                     costPerTransfer: parseFloat(freight.cost_per_transfer)
                 };
-            });
+            }).sort((a, b) => a.minQty - b.minQty);
         }
 
-        // Update labor cost from API
+        // Store labor cost in instance (NOT in DTFConfig)
+        this.laborCostPerLocation = 0;
         if (apiData.allDtfCostsR && apiData.allDtfCostsR[0] && apiData.allDtfCostsR[0].PressingLaborCost) {
-            DTFConfig.laborCost.costPerLocation = parseFloat(apiData.allDtfCostsR[0].PressingLaborCost);
-            console.log('[DTF Calculator] Labor cost updated from API:', DTFConfig.laborCost.costPerLocation);
+            this.laborCostPerLocation = parseFloat(apiData.allDtfCostsR[0].PressingLaborCost);
+            console.log('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
         }
 
-        // Update margin denominator from API tier data
-        if (apiData.tiersR && apiData.tiersR[0] && apiData.tiersR[0].MarginDenominator) {
-            DTFConfig.settings.garmentMargin = parseFloat(apiData.tiersR[0].MarginDenominator);
-            console.log('[DTF Calculator] Margin denominator updated from API:', DTFConfig.settings.garmentMargin);
+        // Store margin and LTM data from pricing tiers
+        this.pricingTiers = [];
+        this.ltmFeeAmount = 0;
+        this.ltmFeeThreshold = 24;
+        if (apiData.tiersR && Array.isArray(apiData.tiersR)) {
+            this.pricingTiers = apiData.tiersR.map(tier => ({
+                tierLabel: tier.TierLabel,
+                minQuantity: tier.MinQuantity,
+                maxQuantity: tier.MaxQuantity,
+                marginDenominator: tier.MarginDenominator,
+                ltmFee: tier.LTM_Fee || 0
+            })).sort((a, b) => a.minQuantity - b.minQuantity);
+
+            // Find LTM fee from first tier (10-23)
+            const ltmTier = this.pricingTiers.find(t => t.ltmFee > 0);
+            if (ltmTier) {
+                this.ltmFeeAmount = ltmTier.ltmFee;
+                this.ltmFeeThreshold = ltmTier.maxQuantity + 1; // LTM applies below this
+            }
+
+            // Get margin from first tier
+            if (this.pricingTiers[0]) {
+                this.marginDenominator = this.pricingTiers[0].marginDenominator;
+                console.log('[DTF Calculator] Margin denominator from API:', this.marginDenominator);
+            }
         }
 
-        console.log('[DTF Calculator] Config updated with API data');
+        console.log('[DTF Calculator] API data stored in instance - no hardcoded fallbacks');
+
+        // Update dynamic LTM fee displays now that we have API data
+        this.updateLTMFeeDisplays();
+    }
+
+    /**
+     * Update all LTM fee display elements with API value
+     */
+    updateLTMFeeDisplays() {
+        const ltmFee = this.ltmFeeAmount || 0;
+        const formattedFee = `$${ltmFee.toFixed(2)}`;
+
+        // Update warning text
+        const warningAmount = document.getElementById('dtf-ltm-warning-amount');
+        if (warningAmount) {
+            warningAmount.textContent = formattedFee;
+        }
+
+        // Update tooltip fee display
+        const setupFeeAmount = document.getElementById('dtf-setup-fee-amount');
+        if (setupFeeAmount) {
+            setupFeeAmount.textContent = `${formattedFee} (GRT-50)`;
+        }
+    }
+
+    /**
+     * Get transfer price for size and quantity from API data
+     */
+    getTransferPrice(sizeKey, quantity) {
+        if (!this.transferPricingTiers || !this.transferPricingTiers[sizeKey]) {
+            console.error(`[DTF Calculator] No pricing data for size: ${sizeKey}`);
+            return 0;
+        }
+        const tier = this.transferPricingTiers[sizeKey].find(t => quantity >= t.minQty && quantity <= t.maxQty);
+        return tier ? tier.unitPrice : 0;
+    }
+
+    /**
+     * Get freight per transfer from API data
+     */
+    getFreightPerTransfer(quantity) {
+        if (!this.freightTiers || this.freightTiers.length === 0) {
+            console.error('[DTF Calculator] No freight tier data');
+            return 0;
+        }
+        const tier = this.freightTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
+        return tier ? tier.costPerTransfer : 0;
     }
 
     parseQuantityRange(range) {
@@ -260,7 +322,7 @@ class DTFPricingCalculator {
                 </div>
                 <div id="dtf-ltm-warning" class="dtf-ltm-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Orders under 24 pieces include a $50.00 setup fee
+                    Orders under 24 pieces include a <span id="dtf-ltm-warning-amount">setup</span> fee
                 </div>
 
                 <!-- Setup Fee Tooltip -->
@@ -270,7 +332,7 @@ class DTFPricingCalculator {
                         Art Setup Fee
                     </div>
                     <div style="font-size: 14px; color: #78350f; line-height: 1.6;">
-                        <div style="font-size: 18px; font-weight: 700; color: #f59e0b; margin: 8px 0;">$50.00 (GRT-50)</div>
+                        <div style="font-size: 18px; font-weight: 700; color: #f59e0b; margin: 8px 0;" id="dtf-setup-fee-amount">Loading...</div>
                         <p><strong>This one-time fee covers:</strong></p>
                         <ul style="margin: 8px 0; padding-left: 20px;">
                             <li>Custom logo mockup on your products</li>
@@ -386,13 +448,17 @@ class DTFPricingCalculator {
     renderTierButtons() {
         const container = document.getElementById('dtf-tier-buttons');
 
+        // Get LTM fee from API data (stored in instance)
+        const ltmFee = this.ltmFeeAmount || 0;
+        const ltmLabel = ltmFee > 0 ? `+ $${ltmFee.toFixed(0)} Small Batch Fee` : '';
+
         const tiers = [
             {
                 value: '10-23',
                 label: '10-23 pieces',
-                isLTM: true,
-                ltmFee: 50.00,
-                ltmLabel: '+ $50 Small Batch Fee'
+                isLTM: ltmFee > 0,
+                ltmFee: ltmFee,
+                ltmLabel: ltmLabel
             },
             { value: '24-47', label: '24-47 pieces' },
             { value: '48-71', label: '48-71 pieces' },
@@ -415,7 +481,7 @@ class DTFPricingCalculator {
         // Add conditional quantity input for 10-23 tier
         const showInput = this.currentData.selectedTier === '10-23';
         const currentQty = this.currentData.quantity || 10;
-        const ltmFeePerPiece = (50 / currentQty).toFixed(2);
+        const ltmFeePerPiece = ltmFee > 0 ? (ltmFee / currentQty).toFixed(2) : '0.00';
 
         html += `
             <div class="dtf-quantity-input-container universal-quantity-input-container ${showInput ? 'show' : ''}">
@@ -426,8 +492,8 @@ class DTFPricingCalculator {
                        min="10" max="23" value="${currentQty}" placeholder="Enter 10-23" />
                 <small class="dtf-quantity-hint universal-quantity-hint">
                     <i class="fas fa-info-circle"></i>
-                    Required for accurate $50 fee distribution:
-                    <strong id="dtf-ltm-fee-calc">$50 ÷ ${currentQty} = $${ltmFeePerPiece}/piece</strong>
+                    Required for accurate fee distribution:
+                    <strong id="dtf-ltm-fee-calc">$${ltmFee.toFixed(0)} ÷ ${currentQty} = $${ltmFeePerPiece}/piece</strong>
                 </small>
             </div>
         `;
@@ -439,8 +505,9 @@ class DTFPricingCalculator {
         const feeCalcElement = document.getElementById('dtf-ltm-fee-calc');
         if (feeCalcElement && this.currentData.selectedTier === '10-23') {
             const qty = this.currentData.quantity || 10;
-            const feePerPiece = (50 / qty).toFixed(2);
-            feeCalcElement.textContent = `$50 ÷ ${qty} = $${feePerPiece}/piece`;
+            const ltmFee = this.ltmFeeAmount || 0;
+            const feePerPiece = ltmFee > 0 ? (ltmFee / qty).toFixed(2) : '0.00';
+            feeCalcElement.textContent = `$${ltmFee.toFixed(0)} ÷ ${qty} = $${feePerPiece}/piece`;
         }
     }
 
@@ -517,7 +584,8 @@ class DTFPricingCalculator {
         }
 
         // Step 1: Garment cost with margin
-        const marginDenominator = DTFConfig.settings.garmentMargin; // 0.57 (2026)
+        // Margin from API (stored in instance) - not hardcoded
+        const marginDenominator = this.marginDenominator || 0.57;
         const markedUpGarment = garmentCost / marginDenominator;
 
         // Step 2: Calculate transfer costs for all selected locations
@@ -539,23 +607,24 @@ class DTFPricingCalculator {
             });
         });
 
-        // Step 3: Labor cost ($2 per location)
+        // Step 3: Labor cost from API (stored in instance)
         const locationCount = this.currentData.selectedLocations.size;
-        const laborCost = locationCount * DTFConfig.laborCost.costPerLocation;
+        const laborCost = locationCount * (this.laborCostPerLocation || 0);
 
-        // Step 4: Freight (cost per transfer × number of locations)
-        const freightPerTransfer = DTFConfig.freightCost.getFreightPerTransfer(quantity);
+        // Step 4: Freight from API (stored in instance)
+        const freightPerTransfer = this.getFreightPerTransfer(quantity);
         const freightCost = freightPerTransfer * locationCount;
 
         // Step 5: Subtotal (before LTM)
         const subtotal = markedUpGarment + totalTransferCost + laborCost + freightCost;
 
-        // Step 6: LTM Fee (only for quantities under 24)
+        // Step 6: LTM Fee from API (only for quantities under threshold)
         let ltmFee = 0;
         let ltmFeePerUnit = 0;
-        if (quantity < DTFConfig.settings.ltmFeeThreshold) {
-            ltmFee = DTFConfig.settings.ltmFeeAmount; // $50
-            ltmFeePerUnit = ltmFee / quantity;
+        const ltmThreshold = this.ltmFeeThreshold || 24;
+        if (quantity < ltmThreshold) {
+            ltmFee = this.ltmFeeAmount || 0;
+            ltmFeePerUnit = ltmFee > 0 ? ltmFee / quantity : 0;
         }
 
         // Step 7: Total per unit (subtotal + LTM fee per unit)
