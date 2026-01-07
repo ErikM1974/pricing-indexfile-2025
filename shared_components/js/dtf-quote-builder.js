@@ -984,9 +984,9 @@ class DTFQuoteBuilder {
                 }
             }
 
-            // Update row price
+            // Update row price (per-unit, not line total)
             const priceSpan = row.querySelector('.row-price');
-            if (priceSpan) priceSpan.textContent = `$${productTotal.toFixed(2)}`;
+            if (priceSpan) priceSpan.textContent = `$${baseDisplayPrice.toFixed(2)}`;
 
             // Update unit preview in style column
             const metaDiv = document.getElementById(`meta-${product.id}`);
