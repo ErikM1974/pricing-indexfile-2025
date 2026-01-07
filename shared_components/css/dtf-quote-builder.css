@@ -842,6 +842,25 @@ body {
     color: #92400e;
 }
 
+/* Minimum order warning (qty < 10) */
+.min-order-warning {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #92400e;
+}
+
+.min-order-warning i {
+    color: #f59e0b;
+    font-size: 14px;
+}
+
 .grand-total {
     background: var(--dtf-primary);
     border-radius: 0 0 7px 7px;
@@ -1671,4 +1690,79 @@ body {
     color: var(--nwca-green);
     font-style: italic;
     font-size: 12px;
+}
+
+/* =============================================
+   CHILD ROW STYLES (Extended Sizes)
+   Matches DTG/Embroidery pattern
+   ============================================= */
+
+/* Child row basic styling */
+.product-table tr.child-row {
+    background: #f8f9fa;
+}
+
+.product-table tr.child-row:hover {
+    background: #f0f0f0;
+}
+
+/* Child row indentation with └ symbol */
+.product-table tr.child-row td:first-child {
+    position: relative;
+    padding-left: 28px;
+}
+
+.product-table tr.child-row td:first-child::before {
+    content: "└";
+    position: absolute;
+    left: 10px;
+    color: #9ca3af;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+/* Child row style display */
+.product-table tr.child-row .style-display {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.product-table tr.child-row .desc-display {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Different color indicator (yellow warning) */
+.product-table tr.child-row.different-color {
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+}
+
+.product-table tr.child-row.different-color td:first-child {
+    color: #856404;
+    font-weight: 600;
+}
+
+/* Child row color picker wrapper */
+.product-table tr.child-row .child-color-picker .color-picker-selected {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+.product-table tr.child-row .child-color-picker .color-picker-selected:hover {
+    border-color: var(--dtf-primary);
+    background: #f9fafb;
+}
+
+/* Child row delete button */
+.product-table tr.child-row .btn-delete-row {
+    color: #9ca3af;
+}
+
+.product-table tr.child-row .btn-delete-row:hover {
+    color: #dc2626;
+    background: #fef2f2;
 }

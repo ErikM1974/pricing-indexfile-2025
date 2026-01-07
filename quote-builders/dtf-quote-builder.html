@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!-- DTF Quote Builder Styles -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260106t">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260107b">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
@@ -174,19 +174,17 @@
                     </table>
 
                     <!-- Empty State -->
-                    <div class="empty-table-message" id="empty-table-message">
+                    <div class="empty-table-message" id="empty-table-message" style="display: none;">
                         <i class="fas fa-box-open"></i>
                         <p>No products added yet</p>
-                        <span>Search for a style above to add products</span>
+                        <span>Type a style number or search above</span>
                     </div>
                 </div>
 
                 <!-- Add Product Button -->
-                <div class="add-product-row">
-                    <button type="button" class="btn-add-product" onclick="focusProductSearch()">
-                        <i class="fas fa-plus"></i> Add Product <span class="hint">(or press Tab from last cell)</span>
-                    </button>
-                </div>
+                <button class="add-row-btn" onclick="addNewRow()">
+                    <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
+                </button>
 
                 <!-- Keyboard Hints -->
                 <div class="keyboard-hint">
@@ -224,6 +222,12 @@
                 <div class="pricing-row">
                     <span class="label">Pricing Tier:</span>
                     <span class="tier-badge" id="pricing-tier">10-23</span>
+                </div>
+
+                <!-- Minimum Order Warning (shown when qty < 10) -->
+                <div id="min-order-warning" class="min-order-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Minimum order: 10 pieces. Pricing shown based on 10-23 tier.</span>
                 </div>
 
                 <div class="pricing-divider"></div>
@@ -388,7 +392,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=20260106u"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=20260107b"></script>
 
     <script>
         // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
@@ -472,6 +476,832 @@
                 dtfQuoteBuilder.focusProductSearch();
             }
         }
+
+        // ============================================================
+        // ROW-BASED INPUT FUNCTIONS (Match other quote builders)
+        // ============================================================
+
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        let rowCounter = 0;
+        const productCache = {};
+
+        // Child row tracking (like DTG/Embroidery pattern)
+        // Using var so it's accessible globally for dtf-quote-builder.js class
+        var childRowMap = {};  // { parentRowId: { 'XXL': childRowId, '3XL': childRowId } }
+        window.childRowMap = childRowMap;  // Expose to JS class
+
+        const SIZE_TO_SUFFIX = {
+            'XS': '_XS',
+            'XXL': '_2X', '2XL': '_2X',
+            'XXXL': '_3X', '3XL': '_3X',
+            '4XL': '_4X',
+            '5XL': '_5X',
+            '6XL': '_6X'
+        };
+
+        const EXTENDED_SIZE_ORDER = ['XS', 'XXL', '2XL', 'XXXL', '3XL', '4XL', '5XL', '6XL'];
+
+        /**
+         * Add a new empty row for user to type style number
+         * Matches pattern from DTG/Embroidery/Screen Print quote builders
+         */
+        function addNewRow() {
+            const tbody = document.getElementById('product-tbody');
+            const rowId = ++rowCounter;
+
+            const row = document.createElement('tr');
+            row.id = `row-${rowId}`;
+            row.className = 'new-row';
+            row.dataset.rowId = rowId;
+            row.dataset.productId = rowId;  // Match what updatePricing() expects
+
+            row.innerHTML = `
+                <td>
+                    <input type="text" class="cell-input style-input"
+                           placeholder="Style #"
+                           data-field="style"
+                           onchange="onStyleChange(this, ${rowId})"
+                           onkeydown="handleCellKeydown(event, this)">
+                </td>
+                <td class="desc-cell">
+                    <div class="desc-row">
+                        <input type="text" class="cell-input desc-input"
+                               placeholder="(auto)"
+                               data-field="description"
+                               readonly>
+                    </div>
+                    <div class="pricing-breakdown" id="breakdown-${rowId}"></div>
+                </td>
+                <td>
+                    <div class="color-picker-wrapper" data-row-id="${rowId}">
+                        <div class="color-picker-selected disabled" onclick="toggleColorPicker(${rowId})" tabindex="0" onkeydown="handleColorPickerKeydown(event, ${rowId})">
+                            <span class="color-swatch empty"></span>
+                            <span class="color-name placeholder">Select color...</span>
+                            <i class="fas fa-chevron-down picker-arrow"></i>
+                        </div>
+                        <div class="color-picker-dropdown hidden" id="color-dropdown-${rowId}"></div>
+                    </div>
+                </td>
+                <td><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="LG" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="XXL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
+                <td class="cell-qty" id="row-qty-${rowId}">0</td>
+                <td class="cell-price" id="row-price-${rowId}">-</td>
+                <td class="cell-actions">
+                    <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+
+            // Focus on the style input
+            setTimeout(() => {
+                row.querySelector('.style-input').focus();
+            }, 50);
+
+            // Remove the "new-row" highlight after a moment
+            setTimeout(() => {
+                row.classList.remove('new-row');
+            }, 1000);
+        }
+
+        /**
+         * Handle style number change - fetch product data
+         */
+        async function onStyleChange(input, rowId) {
+            const styleNumber = input.value.trim().toUpperCase();
+            if (!styleNumber) return;
+
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            // Skip if this is a child row (child rows don't have editable style/description inputs)
+            if (row.classList.contains('child-row')) return;
+
+            const descInput = row.querySelector('[data-field="description"]');
+            const pickerSelected = row.querySelector('.color-picker-selected');
+            const pickerDropdown = row.querySelector('.color-picker-dropdown');
+
+            try {
+                // Fetch product details, colors, AND pricing bundle (for sizeUpcharges)
+                const [detailsResponse, colorsResponse, bundleResponse] = await Promise.all([
+                    fetch(`${API_BASE}/api/product-details?styleNumber=${styleNumber}`),
+                    fetch(`${API_BASE}/api/color-swatches?styleNumber=${styleNumber}`),
+                    fetch(`${API_BASE}/api/pricing-bundle?method=DTF&styleNumber=${styleNumber}`)
+                ]);
+
+                const details = await detailsResponse.json();
+                const colors = await colorsResponse.json();
+                const bundleData = await bundleResponse.json();
+
+                const firstDetail = Array.isArray(details) ? details[0] : details;
+
+                if (firstDetail) {
+                    // Clean product title
+                    const cleanTitle = cleanProductTitle(firstDetail.PRODUCT_TITLE, styleNumber);
+                    if (descInput) descInput.value = cleanTitle || styleNumber;
+
+                    // Store data on row
+                    row.dataset.style = styleNumber;
+                    row.dataset.productName = cleanTitle || styleNumber;
+                    row.dataset.baseCost = firstDetail.CASE_PRICE || 0;
+                    // Store sizeUpcharges for pricing calculations
+                    row.dataset.sizeUpcharges = JSON.stringify(bundleData.sizeUpcharges || {});
+
+                    // Populate color picker
+                    if (colors && colors.length > 0) {
+                        pickerDropdown.innerHTML = colors.map(c => `
+                            <div class="color-picker-option"
+                                 data-color-name="${escapeHtml(c.COLOR_NAME)}"
+                                 data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
+                                 data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
+                                 onclick="selectColor(${rowId}, this)">
+                                <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                                <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
+                            </div>
+                        `).join('');
+
+                        pickerSelected.classList.remove('disabled');
+                        row.dataset.colors = JSON.stringify(colors);
+                    }
+                } else {
+                    if (descInput) descInput.value = 'Not found';
+                    showToast(`Style ${styleNumber} not found`, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showToast('Error loading product', 'error');
+            }
+        }
+
+        /**
+         * Handle keyboard navigation in cells
+         */
+        function handleCellKeydown(event, input) {
+            const row = input.closest('tr');
+            const cells = Array.from(row.querySelectorAll('input:not([readonly]):not(:disabled)'));
+            const currentIndex = cells.indexOf(input);
+
+            if (event.key === 'Tab' && !event.shiftKey) {
+                // Tab to next cell
+                if (currentIndex === cells.length - 1) {
+                    // Last cell in row - add new row
+                    event.preventDefault();
+                    addNewRow();
+                }
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                const tbody = document.getElementById('product-tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const currentRowIndex = rows.indexOf(row);
+
+                if (currentRowIndex === rows.length - 1) {
+                    addNewRow();
+                } else {
+                    // Focus same column in next row
+                    const nextRow = rows[currentRowIndex + 1];
+                    const nextCells = Array.from(nextRow.querySelectorAll('input:not([readonly]):not(:disabled)'));
+                    if (nextCells[currentIndex]) {
+                        nextCells[currentIndex].focus();
+                    }
+                }
+            }
+        }
+
+        /**
+         * Handle size input changes
+         */
+        function onSizeChange(rowId) {
+            console.log(`[DEBUG onSizeChange] Called for row ${rowId}`);
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) {
+                console.log(`[DEBUG onSizeChange] Row not found: row-${rowId}`);
+                return;
+            }
+
+            // Skip if this is a child row (child rows use onChildSizeChange)
+            if (row.classList.contains('child-row')) {
+                console.log(`[DEBUG onSizeChange] Skipping child row ${rowId}`);
+                if (dtfQuoteBuilder) dtfQuoteBuilder.recalculatePricing();
+                return;
+            }
+
+            // Handle XXL (2XL) - auto-create child row when quantity entered
+            const xxlInput = row.querySelector('[data-size="XXL"]');
+            console.log(`[DEBUG onSizeChange] XXL input:`, xxlInput ? `value=${xxlInput.value}, disabled=${xxlInput.disabled}` : 'not found');
+            if (xxlInput && !xxlInput.disabled) {
+                const qty = parseInt(xxlInput.value) || 0;
+                const existingChildId = childRowMap[rowId]?.['XXL'];
+                console.log(`[DEBUG onSizeChange] XXL qty=${qty}, existingChildId=${existingChildId}`);
+
+                if (qty > 0 && !existingChildId) {
+                    // CREATE CHILD ROW for XXL
+                    console.log(`[DEBUG onSizeChange] Creating child row for XXL qty=${qty}`);
+                    createChildRow(rowId, 'XXL', qty);
+                    // Disable parent's XXL input
+                    xxlInput.disabled = true;
+                    xxlInput.style.background = '#f5f5f5';
+                    xxlInput.style.color = '#999';
+                } else if (qty > 0 && existingChildId) {
+                    // Update existing child row
+                    const childRow = document.getElementById(`row-${existingChildId}`);
+                    if (childRow) {
+                        const childInput = childRow.querySelector('.extended-size-qty');
+                        if (childInput) childInput.value = qty;
+                        document.getElementById(`row-qty-${existingChildId}`).textContent = qty;
+                    }
+                }
+            }
+
+            // Calculate total quantity from standard sizes (S, M, LG, XL)
+            let total = 0;
+            row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(:disabled)').forEach(input => {
+                const size = input.dataset.size;
+                // Skip XXL - it's handled separately via child rows
+                if (size !== 'XXL') {
+                    total += parseInt(input.value) || 0;
+                }
+            });
+
+            // Add quantities from child rows
+            const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+            childRows.forEach(childRow => {
+                const qtyDisplay = childRow.querySelector('.cell-qty');
+                total += parseInt(qtyDisplay?.textContent) || 0;
+            });
+
+            // Update quantity display
+            const qtyCell = document.getElementById(`row-qty-${rowId}`);
+            if (qtyCell) qtyCell.textContent = total;
+
+            // Trigger pricing recalculation via dtfQuoteBuilder
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.updatePricingFromRow(rowId, row);
+            }
+        }
+
+        /**
+         * Select a color from the picker (parent row)
+         */
+        function selectColor(rowId, optionEl) {
+            const row = document.getElementById(`row-${rowId}`);
+            const colorName = optionEl.dataset.colorName;
+            const catalogColor = optionEl.dataset.catalogColor;
+            const swatchUrl = optionEl.dataset.swatchUrl || '';
+            const hex = optionEl.dataset.hex || '#ccc';
+
+            // Update display
+            const pickerSelected = row.querySelector('.color-picker-selected');
+            const swatch = pickerSelected.querySelector('.color-swatch');
+            const nameSpan = pickerSelected.querySelector('.color-name');
+
+            if (swatchUrl) {
+                swatch.style.backgroundImage = `url('${swatchUrl}')`;
+                swatch.style.backgroundColor = '';
+                swatch.style.backgroundSize = 'cover';
+            } else {
+                swatch.style.backgroundImage = '';
+                swatch.style.backgroundColor = hex;
+            }
+            swatch.classList.remove('empty');
+            nameSpan.textContent = colorName;
+            nameSpan.classList.remove('placeholder');
+
+            // Store data on row
+            row.dataset.color = colorName;
+            row.dataset.catalogColor = catalogColor;
+            row.dataset.swatchUrl = swatchUrl;
+            row.dataset.hex = hex;
+
+            // Close dropdown
+            row.querySelector('.color-picker-dropdown').classList.add('hidden');
+
+            // Cascade color to child rows (unless they have manually set colors)
+            cascadeColorToChildRows(rowId, colorName, catalogColor, swatchUrl, hex);
+
+            // Enable size inputs
+            row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+
+            // Focus first size
+            const firstSize = row.querySelector('.size-input:not(.xxxl-picker-btn)');
+            if (firstSize) firstSize.focus();
+        }
+
+        /**
+         * Toggle color picker dropdown
+         */
+        function toggleColorPicker(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            const dropdown = row.querySelector('.color-picker-dropdown');
+            const selected = row.querySelector('.color-picker-selected');
+
+            if (selected.classList.contains('disabled')) return;
+
+            // Close all other dropdowns
+            document.querySelectorAll('.color-picker-dropdown').forEach(d => {
+                if (d !== dropdown) d.classList.add('hidden');
+            });
+
+            dropdown.classList.toggle('hidden');
+        }
+
+        /**
+         * Handle keyboard events on color picker
+         */
+        function handleColorPickerKeydown(event, rowId) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleColorPicker(rowId);
+            } else if (event.key === 'Escape') {
+                const row = document.getElementById(`row-${rowId}`);
+                row.querySelector('.color-picker-dropdown').classList.add('hidden');
+            }
+        }
+
+        /**
+         * Delete a row
+         */
+        function deleteRow(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (row) {
+                // Also delete any child rows
+                const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+                childRows.forEach(childRow => {
+                    const childId = parseInt(childRow.dataset.rowId);
+                    childRow.remove();
+                    if (dtfQuoteBuilder) {
+                        dtfQuoteBuilder.removeProduct(childId);
+                    }
+                });
+                // Clear child row tracking
+                delete childRowMap[rowId];
+
+                row.remove();
+                if (dtfQuoteBuilder) {
+                    dtfQuoteBuilder.removeProduct(rowId);
+                    dtfQuoteBuilder.recalculatePricing();
+                }
+            }
+        }
+
+        // ============================================================
+        // CHILD ROW FUNCTIONS (Extended Sizes - Like Embroidery/DTG)
+        // ============================================================
+
+        /**
+         * Create a child row for an extended size (XXL, 3XL, 4XL, etc.)
+         * @param {number} parentRowId - ID of the parent row
+         * @param {string} size - Size name (XXL, 3XL, 4XL, 5XL, 6XL, XS)
+         * @param {number} qty - Quantity for this size
+         */
+        function createChildRow(parentRowId, size, qty) {
+            const parentRow = document.getElementById(`row-${parentRowId}`);
+            if (!parentRow) {
+                console.error('[DTF] Cannot create child row: parent not found', parentRowId);
+                return null;
+            }
+
+            // Use shared counter from JS class to prevent ID collisions with parent rows
+            const childRowId = dtfQuoteBuilder.getNextRowId();
+            const baseStyle = parentRow.dataset.styleNumber || '';
+            const suffix = SIZE_TO_SUFFIX[size] || '';
+            const partNumber = baseStyle + suffix;  // e.g., PC61_2X
+
+            // Get parent's color info
+            const parentColor = parentRow.dataset.color || '';
+            const parentCatalogColor = parentRow.dataset.catalogColor || '';
+            const parentSwatchUrl = parentRow.dataset.swatchUrl || '';
+            const parentHex = parentRow.dataset.hex || '#ccc';
+            const parentColors = parentRow.dataset.colors ? JSON.parse(parentRow.dataset.colors) : [];
+
+            console.log(`[DEBUG createChildRow] Reading from parent: color="${parentColor}", swatchUrl="${parentSwatchUrl || '(none)'}", colors=${parentColors.length} available`);
+
+            // Build color options HTML for child row picker
+            const colorOptionsHtml = parentColors.map(c =>
+                `<div class="color-picker-option ${c.COLOR_NAME === parentColor ? 'selected' : ''}"
+                     data-color-name="${escapeHtml(c.COLOR_NAME)}"
+                     data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
+                     data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
+                     data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
+                     onclick="selectChildColor(${childRowId}, ${parentRowId}, this)">
+                    <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                    <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
+                </div>`
+            ).join('');
+
+            // Build current color display style
+            const currentSwatchStyle = parentSwatchUrl
+                ? `background-image: url('${parentSwatchUrl}'); background-size: cover; background-position: center;`
+                : `background-color: ${parentHex};`;
+
+            const childRow = document.createElement('tr');
+            childRow.id = `row-${childRowId}`;
+            childRow.className = 'child-row';
+            childRow.dataset.rowId = childRowId;
+            childRow.dataset.productId = childRowId;
+            childRow.dataset.parentRowId = parentRowId;
+            childRow.dataset.extendedSize = size;
+            childRow.dataset.style = partNumber;
+            childRow.dataset.baseStyle = baseStyle;
+            childRow.dataset.baseCost = parentRow.dataset.baseCost || '0';
+            childRow.dataset.sizeUpcharges = parentRow.dataset.sizeUpcharges || '{}';
+            childRow.dataset.color = parentColor;
+            childRow.dataset.catalogColor = parentCatalogColor;
+            childRow.dataset.swatchUrl = parentSwatchUrl;
+            childRow.dataset.hex = parentHex;
+            childRow.dataset.productName = parentRow.dataset.productName || '';
+            childRow.dataset.colorManuallySet = 'false';  // Track if user manually changed color
+
+            const displaySize = size === 'XXXL' ? '3XL' : (size === 'XXL' ? '2XL' : size);
+            const productName = parentRow.dataset.productName || '';
+
+            // Determine which column gets the qty (matching Embroidery pattern)
+            // XXL goes in column 5 (XXL position), other extended sizes go in column 6 (XXXL/Other position)
+            const isXXL = size === 'XXL';
+
+            childRow.innerHTML = `
+                <td>
+                    <span class="style-display">${escapeHtml(partNumber)}</span>
+                </td>
+                <td class="desc-cell">
+                    <span class="desc-display">${escapeHtml(productName)} - ${displaySize}</span>
+                </td>
+                <td>
+                    <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
+                        <div class="color-picker-selected" onclick="toggleColorPicker(${childRowId})" tabindex="0" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
+                            <span class="color-swatch" style="${currentSwatchStyle}"></span>
+                            <span class="color-name">${escapeHtml(parentColor)}</span>
+                            <i class="fas fa-chevron-down picker-arrow"></i>
+                        </div>
+                        <div class="color-picker-dropdown hidden" id="color-dropdown-${childRowId}">
+                            ${colorOptionsHtml}
+                        </div>
+                    </div>
+                </td>
+                <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
+                <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
+                <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
+                <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
+                <td><input type="number" class="cell-input size-input extended-size-qty" data-size="XXL"
+                           ${isXXL ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, 'XXL')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
+                <td><input type="number" class="cell-input size-input extended-size-qty" data-size="${size}"
+                           ${!isXXL ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
+                <td class="cell-qty" id="row-qty-${childRowId}">${qty}</td>
+                <td class="cell-price" id="row-price-${childRowId}">-</td>
+                <td class="cell-actions">
+                    <button class="btn-delete-row" onclick="removeChildRow(${parentRowId}, '${size}')" title="Remove ${displaySize}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+
+            // Insert in correct position (maintain size order)
+            const existingChildren = Array.from(
+                document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`)
+            );
+            const newSizeIndex = EXTENDED_SIZE_ORDER.indexOf(size);
+            let insertAfter = parentRow;
+
+            for (const existingChild of existingChildren) {
+                const existingSize = existingChild.dataset.extendedSize;
+                const existingSizeIndex = EXTENDED_SIZE_ORDER.indexOf(existingSize);
+                if (existingSizeIndex < newSizeIndex) {
+                    insertAfter = existingChild;
+                }
+            }
+
+            insertAfter.after(childRow);
+
+            // Track in childRowMap
+            if (!childRowMap[parentRowId]) childRowMap[parentRowId] = {};
+            childRowMap[parentRowId][size] = childRowId;
+
+            console.log(`[DTF] Created child row ${childRowId} for ${baseStyle} ${size} qty=${qty}`);
+
+            // Trigger pricing recalculation
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.updatePricingFromRow(childRowId, childRow);
+            }
+
+            return childRowId;
+        }
+
+        /**
+         * Remove a child row
+         * @param {number} parentRowId - ID of the parent row
+         * @param {string} size - Size to remove (XXL, 3XL, etc.)
+         */
+        function removeChildRow(parentRowId, size) {
+            const childRowId = childRowMap[parentRowId]?.[size];
+            if (childRowId) {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) childRow.remove();
+                delete childRowMap[parentRowId][size];
+
+                // If removing XXL, re-enable parent's XXL input
+                if (size === 'XXL' || size === '2XL') {
+                    const parentRow = document.getElementById(`row-${parentRowId}`);
+                    if (parentRow) {
+                        const xxlInput = parentRow.querySelector('[data-size="XXL"]');
+                        if (xxlInput) {
+                            xxlInput.disabled = false;
+                            xxlInput.value = '';
+                            xxlInput.style.background = '';
+                            xxlInput.style.color = '';
+                        }
+                    }
+                }
+
+                // Update parent's XXXL button display
+                updateExtendedSizeDisplay(parentRowId);
+
+                // Recalculate pricing
+                if (dtfQuoteBuilder) {
+                    dtfQuoteBuilder.removeProduct(childRowId);
+                    dtfQuoteBuilder.recalculatePricing();
+                }
+
+                console.log(`[DTF] Removed child row ${childRowId} for size ${size}`);
+            }
+        }
+
+        /**
+         * Handle size change in a child row
+         */
+        function onChildSizeChange(childRowId, parentRowId, size) {
+            const childRow = document.getElementById(`row-${childRowId}`);
+            if (!childRow) return;
+
+            const input = childRow.querySelector('.extended-size-qty');
+            const qty = parseInt(input?.value) || 0;
+
+            // Update qty display
+            const qtyCell = document.getElementById(`row-qty-${childRowId}`);
+            if (qtyCell) qtyCell.textContent = qty;
+
+            // If quantity is 0, remove the child row
+            if (qty === 0) {
+                removeChildRow(parentRowId, size);
+                return;
+            }
+
+            // Update extended size display on parent
+            updateExtendedSizeDisplay(parentRowId);
+
+            // Trigger pricing recalculation
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.updatePricingFromRow(childRowId, childRow);
+            }
+        }
+
+        /**
+         * Update the parent row's XXXL button display to show count of extended sizes
+         */
+        function updateExtendedSizeDisplay(parentRowId) {
+            const parentRow = document.getElementById(`row-${parentRowId}`);
+            if (!parentRow) return;
+
+            const xxxlBtn = parentRow.querySelector('.xxxl-picker-btn');
+            if (!xxxlBtn) return;
+
+            // Count total extended size quantities from child rows
+            const childRows = document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`);
+            let totalExtQty = 0;
+            childRows.forEach(childRow => {
+                // Skip XXL child rows for this count (they have their own column)
+                const size = childRow.dataset.extendedSize;
+                if (size !== 'XXL' && size !== '2XL') {
+                    const qtyDisplay = childRow.querySelector('.cell-qty');
+                    totalExtQty += parseInt(qtyDisplay?.textContent) || 0;
+                }
+            });
+
+            // Update display
+            if (totalExtQty > 0) {
+                xxxlBtn.value = totalExtQty;
+                xxxlBtn.placeholder = '';
+            } else {
+                xxxlBtn.value = '';
+                xxxlBtn.placeholder = '+';
+            }
+        }
+
+        /**
+         * Get the current quantity for an extended size
+         * Checks child rows first, falls back to parent row input
+         * This fixes the "can't add extended sizes after the fact" bug
+         * @param {number} parentRowId - ID of the parent row
+         * @param {string} size - Size name (XS, XXL, 3XL, 4XL, 5XL, 6XL)
+         */
+        function getExtendedSizeQty(parentRowId, size) {
+            // Normalize size aliases
+            const normalizedSize = size === 'XXXL' ? '3XL' : size;
+
+            // DEBUG: Log what we're looking for
+            console.log(`[DEBUG getExtendedSizeQty] parentRowId=${parentRowId}, size=${size}, normalized=${normalizedSize}`);
+
+            // Check if there's a child row for this size
+            if (childRowMap[parentRowId] && childRowMap[parentRowId][normalizedSize]) {
+                const childRowId = childRowMap[parentRowId][normalizedSize];
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) {
+                    const qtyCell = childRow.querySelector('.cell-qty');
+                    if (qtyCell) {
+                        const qty = parseInt(qtyCell.textContent) || 0;
+                        console.log(`[DEBUG getExtendedSizeQty] Found child row ${childRowId}, qty=${qty}`);
+                        return qty;
+                    }
+                }
+            }
+
+            // Fallback: check parent row's input for this size (if not yet converted to child row)
+            // Note: 3XL, 4XL, 5XL, 6XL have NO parent input - they only exist in popup/child rows
+            const parentRow = document.getElementById(`row-${parentRowId}`);
+            if (parentRow) {
+                // Map size to input data-size attribute (only XXL/2XL has parent input)
+                let inputSize = normalizedSize;
+                if (normalizedSize === '2XL') inputSize = 'XXL';
+                // 3XL+ only exist in popup/child rows, no parent input to check
+
+                const sizeInput = parentRow.querySelector(`[data-size="${inputSize}"]`);
+                console.log(`[DEBUG getExtendedSizeQty] Checking parent input [data-size="${inputSize}"], found=${!!sizeInput}, disabled=${sizeInput?.disabled}, value=${sizeInput?.value}`);
+                if (sizeInput && !sizeInput.disabled && !sizeInput.classList.contains('xxxl-picker-btn')) {
+                    const val = parseInt(sizeInput.value) || 0;
+                    if (val > 0) {
+                        console.log(`[DEBUG getExtendedSizeQty] Using parent input value=${val}`);
+                        return val;
+                    }
+                }
+            }
+
+            console.log(`[DEBUG getExtendedSizeQty] Returning 0 (no value found)`);
+            return 0;
+        }
+        // Expose to global scope for JS class to use
+        window.getExtendedSizeQty = getExtendedSizeQty;
+
+        /**
+         * Select a color for a child row (called from child row color picker)
+         * @param {number} childRowId - ID of the child row
+         * @param {number} parentRowId - ID of the parent row
+         * @param {Element} optionEl - The clicked option element
+         */
+        function selectChildColor(childRowId, parentRowId, optionEl) {
+            const childRow = document.getElementById(`row-${childRowId}`);
+            if (!childRow) return;
+
+            const colorName = optionEl.dataset.colorName;
+            const catalogColor = optionEl.dataset.catalogColor;
+            const swatchUrl = optionEl.dataset.swatchUrl;
+            const hex = optionEl.dataset.hex || '#ccc';
+
+            // Update child row data attributes
+            childRow.dataset.color = colorName;
+            childRow.dataset.catalogColor = catalogColor;
+            childRow.dataset.swatchUrl = swatchUrl;
+            childRow.dataset.hex = hex;
+            childRow.dataset.colorManuallySet = 'true';  // Prevent cascade override
+
+            // Update display
+            const swatch = childRow.querySelector('.color-picker-selected .color-swatch');
+            const nameSpan = childRow.querySelector('.color-picker-selected .color-name');
+
+            if (swatch) {
+                if (swatchUrl) {
+                    swatch.style.backgroundImage = `url('${swatchUrl}')`;
+                    swatch.style.backgroundColor = '';
+                    swatch.style.backgroundSize = 'cover';
+                    swatch.style.backgroundPosition = 'center';
+                } else {
+                    swatch.style.backgroundImage = '';
+                    swatch.style.backgroundColor = hex;
+                }
+            }
+            if (nameSpan) nameSpan.textContent = colorName;
+
+            // Close dropdown
+            const dropdown = childRow.querySelector('.color-picker-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+
+            // Update visual indicator for different color
+            updateChildRowColorIndicators(parentRowId);
+
+            // Recalculate pricing
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.recalculatePricing();
+            }
+
+            console.log(`[DTF] Child row ${childRowId} color changed to ${colorName} (catalog: ${catalogColor})`);
+        }
+
+        /**
+         * Cascade parent's color change to child rows (unless manually overridden)
+         * @param {number} parentRowId - ID of the parent row
+         * @param {string} colorName - Display color name
+         * @param {string} catalogColor - Catalog color code
+         * @param {string} swatchUrl - URL to color swatch image
+         * @param {string} hex - Hex color code
+         */
+        function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl, hex) {
+            if (!childRowMap[parentRowId]) return;
+
+            Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (!childRow) return;
+
+                // Skip if user manually set this child's color
+                if (childRow.dataset.colorManuallySet === 'true') return;
+
+                // Update child row color data
+                childRow.dataset.color = colorName;
+                childRow.dataset.catalogColor = catalogColor;
+                childRow.dataset.swatchUrl = swatchUrl || '';
+                childRow.dataset.hex = hex || '#ccc';
+
+                // Update color picker display
+                const swatch = childRow.querySelector('.color-picker-selected .color-swatch');
+                const nameSpan = childRow.querySelector('.color-picker-selected .color-name');
+
+                if (swatch) {
+                    if (swatchUrl) {
+                        swatch.style.backgroundImage = `url('${swatchUrl}')`;
+                        swatch.style.backgroundColor = '';
+                        swatch.style.backgroundSize = 'cover';
+                        swatch.style.backgroundPosition = 'center';
+                    } else {
+                        swatch.style.backgroundImage = '';
+                        swatch.style.backgroundColor = hex || '#ccc';
+                    }
+                }
+                if (nameSpan) nameSpan.textContent = colorName;
+            });
+
+            // Update visual indicators
+            updateChildRowColorIndicators(parentRowId);
+        }
+
+        /**
+         * Update visual styling for child rows based on color match with parent
+         * @param {number} parentRowId - ID of the parent row
+         */
+        function updateChildRowColorIndicators(parentRowId) {
+            const parentRow = document.getElementById(`row-${parentRowId}`);
+            if (!parentRow || !childRowMap[parentRowId]) return;
+
+            const parentCatalogColor = parentRow.dataset.catalogColor;
+
+            Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (!childRow) return;
+
+                const childCatalogColor = childRow.dataset.catalogColor;
+
+                // Add/remove visual indicator for different color
+                if (childCatalogColor !== parentCatalogColor) {
+                    childRow.classList.add('different-color');
+                } else {
+                    childRow.classList.remove('different-color');
+                }
+            });
+        }
+
+        // Helper functions
+        function cleanProductTitle(title, styleNumber) {
+            if (!title || !styleNumber) return title || '';
+            const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
+            cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
+            return cleaned.trim() || title;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function getSwatchStyle(color) {
+            if (color.COLOR_SQUARE_IMAGE) {
+                return `background-image: url('${color.COLOR_SQUARE_IMAGE}'); background-size: cover; background-position: center;`;
+            }
+            return `background-color: ${color.HEX_CODE || '#ccc'};`;
+        }
+
+        function showToast(message, type = 'info', duration = 3000) {
+            console.log(`[${type}] ${message}`);
+            // Simple alert for now - can be enhanced with a toast library
+            if (type === 'error') {
+                alert(message);
+            }
+        }
+
+        // Note: No auto-row on page load - users add products via search box
+        // The addProductRow() method handles row creation when selecting from search
 
     </script>
 </body>

@@ -52,6 +52,14 @@ class DTFQuoteBuilder {
         this.init();
     }
 
+    /**
+     * Get the next row ID - shared between parent rows and child rows
+     * This prevents ID collisions between addProductRow() and createChildRow()
+     */
+    getNextRowId() {
+        return ++this.productIndex;
+    }
+
     async init() {
         console.log('[DTFQuoteBuilder] Initializing Excel-style layout...');
 
@@ -355,41 +363,62 @@ class DTFQuoteBuilder {
         });
     }
 
+    /**
+     * Clean product title by removing duplicate style numbers
+     * Matches pattern used by Embroidery/Screen Print/DTG quote builders
+     */
+    cleanProductTitle(title, styleNumber) {
+        if (!title || !styleNumber) return title || '';
+
+        // Escape special regex characters in style number
+        const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // Remove style number prefix pattern: "STYLE - " or "STYLE. "
+        let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
+
+        // Remove trailing style number: ". STYLE" or " STYLE" at end
+        cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
+
+        return cleaned.trim();
+    }
+
     async selectProduct(styleNumber) {
         console.log('[DTFQuoteBuilder] Product selected:', styleNumber);
 
         try {
-            // Get pricing bundle (includes product info)
-            const bundleResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF&styleNumber=${styleNumber}`);
-            const bundleData = await bundleResponse.json();
+            // Fetch pricing bundle, product details, and color swatches in parallel
+            const [bundleResponse, detailsResponse, swatchResponse] = await Promise.all([
+                fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF&styleNumber=${styleNumber}`),
+                fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`),
+                fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`)
+            ]);
 
-            // Get color swatches
-            const swatchResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
+            const bundleData = await bundleResponse.json();
+            const productDetails = await detailsResponse.json();
             const swatches = await swatchResponse.json();
 
-            // Extract product info from bundle - try multiple field patterns
-            const productName = bundleData.product?.PRODUCT_TITLE ||
-                               bundleData.product?.PRODUCT_DESCRIPTION ||
-                               bundleData.product?.title ||
-                               bundleData.product?.description ||
-                               bundleData.product?.STYLE_NAME ||
-                               bundleData.styleName ||
-                               bundleData.productTitle ||
-                               styleNumber;
+            // Get first product detail (API returns array)
+            const firstDetail = Array.isArray(productDetails) ? productDetails[0] : productDetails;
 
-            console.log('[DTFQuoteBuilder] Product bundle data:', {
+            // Use PRODUCT_TITLE (like other quote builders), not PRODUCT_DESCRIPTION
+            const productTitle = firstDetail?.PRODUCT_TITLE || styleNumber;
+            const cleanedTitle = this.cleanProductTitle(productTitle, styleNumber);
+
+            // Extract garment cost (CASE_PRICE) from product details API
+            const baseCost = firstDetail?.CASE_PRICE || 0;
+
+            console.log('[DTFQuoteBuilder] Product data:', {
                 styleNumber,
-                productName,
-                bundleProduct: bundleData.product,
-                fields: bundleData.product ? Object.keys(bundleData.product) : []
+                productTitle: cleanedTitle,
+                baseCost,
+                hasDetails: !!firstDetail
             });
-            const baseCost = bundleData.garmentCost || bundleData.CASE_PRICE || bundleData.product?.CASE_PRICE || 0;
 
             // Add product row to table
             this.addProductRow({
-                id: ++this.productIndex,
+                id: this.getNextRowId(),
                 styleNumber: styleNumber,
-                description: productName,
+                description: cleanedTitle,
                 colors: swatches || [],
                 baseCost: baseCost,
                 sizeUpcharges: bundleData.sizeUpcharges || {}
@@ -432,14 +461,17 @@ class DTFQuoteBuilder {
         row.dataset.productId = product.id;
         row.dataset.styleNumber = product.styleNumber;
         row.dataset.baseCost = product.baseCost;
+        // Store additional data for child row inheritance
+        row.dataset.colors = JSON.stringify(product.colors || []);
+        row.dataset.sizeUpcharges = JSON.stringify(product.sizeUpcharges || {});
+        row.dataset.productName = product.description || '';
         row.innerHTML = `
-            <td class="style-col">
-                <strong>${product.styleNumber}</strong>
-                <div class="product-name">${product.description}</div>
-                <div class="product-meta" id="meta-${product.id}">
-                    <span class="location-codes">${this.getLocationCodesString()}</span>
-                    <span class="unit-preview">--</span>
-                </div>
+            <td>
+                <input type="text" class="cell-input style-input"
+                       placeholder="Style #"
+                       data-field="style"
+                       value="${product.styleNumber}"
+                       readonly>
             </td>
             <td class="desc-cell">
                 <div class="desc-row">
@@ -464,11 +496,11 @@ class DTFQuoteBuilder {
                     </div>
                 </div>
             </td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" disabled></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" disabled></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="LG" min="0" value="" placeholder="0" disabled></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" disabled></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XXL" min="0" value="" placeholder="0" disabled></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="LG" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XXL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
             <td class="size-col extended-picker-cell">
                 <button type="button" class="btn-extended-picker" data-product-id="${product.id}" title="Click for XS, 3XL, 4XL, 5XL, 6XL" onclick="openExtendedSizePopup(${product.id})" disabled>
                     <span class="ext-qty-badge" id="ext-badge-${product.id}">+</span>
@@ -576,6 +608,14 @@ class DTFQuoteBuilder {
                     productData.color = colorName;            // Display name
                 }
 
+                // Also update row dataset attributes for child row inheritance
+                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                if (row) {
+                    row.dataset.color = colorName;
+                    row.dataset.catalogColor = catalogColor;
+                    row.dataset.swatchUrl = imageUrl || '';
+                }
+
                 // Close dropdown
                 dropdown.classList.add('hidden');
 
@@ -666,28 +706,41 @@ class DTFQuoteBuilder {
 
     /**
      * Open extended size popup for a product
+     * Reads existing quantities from child rows (not row dataset anymore)
      */
     openExtendedSizePopup(productId) {
         this.currentPopupProductId = productId;
-        const productData = this.products.find(p => p.id === productId);
-        if (!productData) return;
+
+        // Build quantities using fallback function that checks BOTH child rows AND parent inputs
+        // This fixes the "can't add extended sizes after the fact" bug
+        const quantities = {
+            XS: window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, 'XS') : 0,
+            XXXL: window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '3XL') : 0,
+            '4XL': window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '4XL') : 0,
+            '5XL': window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '5XL') : 0,
+            '6XL': window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '6XL') : 0
+        };
+
+        // Store reference to parent row
+        this.currentPopupRow = document.getElementById(`row-${productId}`);
 
         const popup = document.getElementById('extended-size-popup');
         const backdrop = document.getElementById('size-popup-backdrop');
         const body = document.getElementById('size-popup-body');
 
-        // Extended sizes: XS, XXXL (3XL), 4XL, 5XL, 6XL
+        // Extended sizes for popup: XS, XXXL (3XL), 4XL, 5XL, 6XL (NOT XXL - that has its own column)
         const extendedSizes = ['XS', 'XXXL', '4XL', '5XL', '6XL'];
 
         body.innerHTML = `
             <div class="extended-sizes-grid">
                 ${extendedSizes.map(size => {
                     const displaySize = size === 'XXXL' ? '3XL' : size;
+                    const currentQty = quantities[size] || '';
                     return `
                         <div class="ext-size-input-group">
                             <label>${displaySize}</label>
                             <input type="number" class="ext-size-input" data-size="${size}"
-                                   min="0" value="${productData.quantities[size] || ''}"
+                                   min="0" value="${currentQty}"
                                    placeholder="0">
                         </div>
                     `;
@@ -717,34 +770,69 @@ class DTFQuoteBuilder {
         popup.classList.add('hidden');
         backdrop.classList.add('hidden');
         this.currentPopupProductId = null;
+        this.currentPopupRow = null;  // Clear row reference
     }
 
     /**
-     * Apply extended sizes from popup
+     * Apply extended sizes from popup - CREATES CHILD ROWS (like Embroidery/DTG pattern)
      */
     applyExtendedSizes() {
         const productId = this.currentPopupProductId;
         if (!productId) return;
 
-        const productData = this.products.find(p => p.id === productId);
-        if (!productData) return;
-
         const body = document.getElementById('size-popup-body');
         const inputs = body.querySelectorAll('.ext-size-input');
 
-        let extTotal = 0;
+        // Process each extended size input from popup
         inputs.forEach(input => {
             const size = input.dataset.size;
             const qty = parseInt(input.value) || 0;
-            productData.quantities[size] = qty;
-            extTotal += qty;
+
+            // Access global childRowMap (defined in HTML)
+            const existingChildRowId = window.childRowMap?.[productId]?.[size];
+
+            if (qty > 0 && !existingChildRowId) {
+                // CREATE NEW CHILD ROW using global function
+                if (typeof createChildRow === 'function') {
+                    createChildRow(productId, size, qty);
+                }
+            } else if (qty > 0 && existingChildRowId) {
+                // UPDATE EXISTING CHILD ROW
+                const childRow = document.getElementById(`row-${existingChildRowId}`);
+                if (childRow) {
+                    const qtyInput = childRow.querySelector('.extended-size-qty');
+                    if (qtyInput) qtyInput.value = qty;
+                    const qtyDisplay = document.getElementById(`row-qty-${existingChildRowId}`);
+                    if (qtyDisplay) qtyDisplay.textContent = qty;
+                }
+            } else if (qty === 0 && existingChildRowId) {
+                // REMOVE CHILD ROW using global function
+                if (typeof removeChildRow === 'function') {
+                    removeChildRow(productId, size);
+                }
+            }
         });
 
-        // Update badge in main table
+        // Update parent's XXXL button display using global function
+        if (typeof updateExtendedSizeDisplay === 'function') {
+            updateExtendedSizeDisplay(productId);
+        }
+
+        // Update badge in main table (for addProductRow-created rows)
+        const childRows = document.querySelectorAll(`tr[data-parent-row-id="${productId}"]`);
+        let extTotal = 0;
+        childRows.forEach(childRow => {
+            // Count only non-XXL sizes (XXL has its own column in header)
+            const size = childRow.dataset.extendedSize;
+            if (size !== 'XXL' && size !== '2XL') {
+                const qtyDisplay = childRow.querySelector('.cell-qty');
+                extTotal += parseInt(qtyDisplay?.textContent) || 0;
+            }
+        });
         this.updateExtendedBadge(productId, extTotal);
 
-        // Update pricing
-        this.handleSizeInputChange(productId);
+        // Recalculate all pricing
+        this.recalculatePricing();
 
         // Close popup
         this.closeExtendedSizePopup();
@@ -825,38 +913,33 @@ class DTFQuoteBuilder {
         const totalQty = this.getTotalQuantity();
         const locationCount = this.selectedLocations.length;
 
-        // BLOCK PRICING when under minimum quantity (10 pieces)
-        // This prevents incorrect $0 transfer costs from being displayed
-        if (totalQty < 10) {
-            document.getElementById('total-qty').textContent = totalQty;
-            document.getElementById('pricing-tier').textContent = 'Min 10';
+        // Track if under minimum quantity (10 pieces)
+        const isUnderMinimum = totalQty > 0 && totalQty < 10;
+
+        // Show/hide minimum order warning
+        const minOrderWarning = document.getElementById('min-order-warning');
+        if (minOrderWarning) {
+            minOrderWarning.style.display = isUnderMinimum ? 'block' : 'none';
+        }
+
+        // Handle zero quantity case
+        if (totalQty === 0) {
+            document.getElementById('total-qty').textContent = '0';
+            document.getElementById('pricing-tier').textContent = '--';
             document.getElementById('transfer-cost').textContent = '--';
             document.getElementById('labor-cost').textContent = '--';
             document.getElementById('freight-cost').textContent = '--';
             document.getElementById('ltm-row').style.display = 'none';
             document.getElementById('subtotal').textContent = '--';
             document.getElementById('grand-total').textContent = '--';
-
-            // Clear product row prices - show "--" instead of misleading $0
-            this.products.forEach(product => {
-                const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
-                if (row) {
-                    const priceSpan = row.querySelector('.row-price');
-                    if (priceSpan) priceSpan.textContent = '--';
-                    const metaDiv = document.getElementById(`meta-${product.id}`);
-                    if (metaDiv) {
-                        const unitPreview = metaDiv.querySelector('.unit-preview');
-                        if (unitPreview) unitPreview.textContent = '--';
-                    }
-                }
-            });
-
-            // Keep continue button disabled
             const continueBtn = document.getElementById('continue-btn');
             if (continueBtn) continueBtn.disabled = true;
-
-            return; // Exit early - don't calculate pricing
+            return;
         }
+
+        // For quantities under 10, use minimum tier (10) for pricing calculation
+        // This shows estimated pricing so users understand costs
+        const pricingQty = isUnderMinimum ? 10 : totalQty;
 
         // Ensure pricing data is loaded from API
         try {
@@ -867,23 +950,27 @@ class DTFQuoteBuilder {
             return;
         }
 
-        // Get tier label from API
-        const tier = this.pricingCalculator.getTierForQuantity(totalQty);
+        // Get tier label from API (use pricingQty for tier lookup)
+        const tier = this.pricingCalculator.getTierForQuantity(pricingQty);
 
         // Update sidebar displays
         document.getElementById('total-qty').textContent = totalQty;
-        document.getElementById('pricing-tier').textContent = tier;
+        // Show tier with warning if under minimum
+        const tierDisplay = isUnderMinimum ? `${totalQty} (Min 10)` : tier;
+        document.getElementById('pricing-tier').textContent = tierDisplay;
 
-        // Calculate costs from API (not hardcoded)
-        const transferBreakdown = this.pricingCalculator.calculateTransferCosts(this.selectedLocations, totalQty);
+        // Calculate costs from API using pricingQty (ensures valid tier pricing)
+        const transferBreakdown = this.pricingCalculator.calculateTransferCosts(this.selectedLocations, pricingQty);
         const transferCost = transferBreakdown.total;
         const laborCostPerLoc = this.pricingCalculator.getLaborCostPerLocation();
         const laborCost = laborCostPerLoc * locationCount;
-        const freightPerTransfer = this.pricingCalculator.getFreightPerTransfer(totalQty);
+        const freightPerTransfer = this.pricingCalculator.getFreightPerTransfer(pricingQty);
         const freightCost = freightPerTransfer * locationCount;
-        const ltmPerUnit = this.pricingCalculator.calculateLTMPerUnit(totalQty);
-        const totalLtmFee = ltmPerUnit * totalQty;
-        const marginDenom = this.pricingCalculator.getMarginDenominator(totalQty);
+        const ltmPerUnit = this.pricingCalculator.calculateLTMPerUnit(pricingQty);
+        // Get original LTM fee from API (not ltmPerUnit * qty which causes precision loss: $4.16 × 12 = $49.92)
+        const tierData = this.pricingCalculator.getTierData(pricingQty);
+        const totalLtmFee = tierData.ltmFee || 0;
+        const marginDenom = this.pricingCalculator.getMarginDenominator(pricingQty);
 
         // Store for quote save
         this.currentPricingData = {
@@ -937,16 +1024,22 @@ class DTFQuoteBuilder {
         // Calculate subtotal and grand total
         let grandTotal = 0;
 
+        // Process products from the products array (parent rows)
         this.products.forEach(product => {
             const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
             if (!row) return;
+
+            // Skip child rows here - they're processed separately below
+            if (row.classList.contains('child-row')) return;
 
             let productTotal = 0;
             let baseUnitPrice = 0; // For display in style column
             let baseDisplayPrice = 0; // Price shown in unit preview (may or may not include LTM)
 
+            // Only count non-extended sizes (S, M, LG, XL) - extended sizes are in child rows
+            const standardSizes = ['S', 'M', 'LG', 'XL'];
             Object.entries(product.quantities).forEach(([size, qty]) => {
-                if (qty > 0) {
+                if (qty > 0 && standardSizes.includes(size)) {
                     const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
                     // Use margin from API (not hardcoded 0.57)
                     const garmentCost = (product.baseCost + upcharge) / marginDenom;
@@ -985,23 +1078,48 @@ class DTFQuoteBuilder {
             }
 
             // Update row price (per-unit, not line total)
-            const priceSpan = row.querySelector('.row-price');
+            // Support both class-based (.row-price) and ID-based (#row-price-{id}) selectors
+            const rowId = row.dataset.rowId || row.dataset.productId || product.id;
+            const priceSpan = row.querySelector('.row-price') || document.getElementById(`row-price-${rowId}`);
             if (priceSpan) priceSpan.textContent = `$${baseDisplayPrice.toFixed(2)}`;
 
-            // Update unit preview in style column
-            const metaDiv = document.getElementById(`meta-${product.id}`);
-            if (metaDiv) {
-                const unitPreview = metaDiv.querySelector('.unit-preview');
-                const locCodes = metaDiv.querySelector('.location-codes');
-                if (unitPreview) {
-                    unitPreview.textContent = baseDisplayPrice > 0 ? `$${baseDisplayPrice.toFixed(2)}/ea` : '--';
-                }
-                if (locCodes) {
-                    locCodes.textContent = this.getLocationCodesString();
-                }
-            }
-
             grandTotal += productTotal;
+        });
+
+        // Process child rows (extended sizes) - they have different unit prices with upcharges
+        const childRows = document.querySelectorAll('#product-tbody .child-row');
+        childRows.forEach(childRow => {
+            const extendedSize = childRow.dataset.extendedSize;
+            const baseCost = parseFloat(childRow.dataset.baseCost) || 0;
+            const sizeUpcharges = childRow.dataset.sizeUpcharges ? JSON.parse(childRow.dataset.sizeUpcharges) : {};
+            const qtyDisplay = childRow.querySelector('.cell-qty');
+            const qty = parseInt(qtyDisplay?.textContent) || 0;
+
+            if (qty > 0) {
+                // Get size upcharge for this extended size (XXL/2XL, 3XL/XXXL, 4XL, 5XL, 6XL)
+                const upcharge = this.getSizeUpcharge(extendedSize, sizeUpcharges);
+
+                // Calculate unit price with upcharge
+                const garmentCost = (baseCost + upcharge) / marginDenom;
+                const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
+
+                // Calculate display price (with or without LTM based on distribution state)
+                let displayPrice;
+                if (this.ltmDistributed || ltmPerUnit === 0) {
+                    displayPrice = roundedPrice;
+                } else {
+                    const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
+                    displayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
+                }
+
+                // Display unit price on child row
+                const priceCell = document.getElementById(`row-price-${childRow.dataset.rowId}`);
+                if (priceCell) priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                // Add to grand total
+                grandTotal += roundedPrice * qty;
+            }
         });
 
         // Update subtotal and grand total
@@ -1016,9 +1134,23 @@ class DTFQuoteBuilder {
     }
 
     getTotalQuantity() {
-        return this.products.reduce((sum, p) => {
-            return sum + Object.values(p.quantities).reduce((s, q) => s + q, 0);
+        // Count quantities from products array (only standard sizes - extended in child rows)
+        const standardSizes = ['S', 'M', 'LG', 'XL'];
+        let total = this.products.reduce((sum, p) => {
+            // Only count standard sizes to avoid double-counting child rows
+            return sum + Object.entries(p.quantities)
+                .filter(([size]) => standardSizes.includes(size))
+                .reduce((s, [, q]) => s + (q || 0), 0);
         }, 0);
+
+        // Add child row quantities (extended sizes)
+        const childRows = document.querySelectorAll('#product-tbody .child-row');
+        childRows.forEach(childRow => {
+            const qtyDisplay = childRow.querySelector('.cell-qty');
+            total += parseInt(qtyDisplay?.textContent) || 0;
+        });
+
+        return total;
     }
 
     getTierForQuantity(qty) {
@@ -1050,16 +1182,103 @@ class DTFQuoteBuilder {
 
     getSizeUpcharge(size, upcharges) {
         if (!upcharges) return 0;
+
+        // Normalize size aliases (XXL -> 2XL, XXXL -> 3XL)
+        const sizeAliases = {
+            'XXL': '2XL',
+            'XXXL': '3XL'
+        };
+        const normalizedSize = sizeAliases[size] || size;
+
         // Common size upcharge patterns - default values if not in upcharges
         const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
         const upchargeMap = {
-            '2XL': upcharges['2XL'] || upcharges['2X'] || defaults['2XL'],
-            '3XL': upcharges['3XL'] || upcharges['3X'] || defaults['3XL'],
+            '2XL': upcharges['2XL'] || upcharges['2X'] || upcharges['XXL'] || defaults['2XL'],
+            '3XL': upcharges['3XL'] || upcharges['3X'] || upcharges['XXXL'] || defaults['3XL'],
             '4XL': upcharges['4XL'] || upcharges['4X'] || defaults['4XL'],
             '5XL': upcharges['5XL'] || upcharges['5X'] || defaults['5XL'],
             '6XL': upcharges['6XL'] || upcharges['6X'] || defaults['6XL']
         };
-        return upchargeMap[size] || 0;
+        return upchargeMap[normalizedSize] || 0;
+    }
+
+    // ==================== BRIDGE METHODS FOR ROW-BASED INPUT ====================
+
+    /**
+     * Recalculate pricing - wrapper for updatePricing()
+     * Called from global deleteRow() function
+     */
+    recalculatePricing() {
+        this.updatePricing();
+    }
+
+    /**
+     * Update pricing from a specific row's DOM data
+     * Called from global onSizeChange() function
+     * @param {number} rowId - The row ID
+     * @param {HTMLElement} row - The row element
+     */
+    updatePricingFromRow(rowId, row) {
+        // Find or create the product entry in this.products array
+        let product = this.products.find(p => p.id === rowId);
+
+        if (!product) {
+            // Create new product entry if doesn't exist
+            const styleInput = row.querySelector('.style-input');
+            const descInput = row.querySelector('.desc-input');
+            const baseCost = parseFloat(row.dataset.baseCost) || 0;
+            const sizeUpcharges = row.dataset.sizeUpcharges ? JSON.parse(row.dataset.sizeUpcharges) : {};
+
+            product = {
+                id: rowId,
+                styleNumber: styleInput ? styleInput.value : '',
+                description: descInput ? descInput.value : '',
+                baseCost: baseCost,
+                sizeUpcharges: sizeUpcharges,
+                color: row.dataset.colorName || '',
+                catalogColor: row.dataset.catalogColor || '',
+                quantities: { XS: 0, S: 0, M: 0, LG: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 }
+            };
+            this.products.push(product);
+        }
+
+        // Update quantities from row inputs (standard sizes)
+        row.querySelectorAll('.size-input:not(.xxxl-picker-btn)').forEach(input => {
+            const size = input.dataset.size;
+            const qty = parseInt(input.value) || 0;
+            if (size && product.quantities.hasOwnProperty(size)) {
+                product.quantities[size] = qty;
+            }
+        });
+
+        // Update extended sizes from row data attribute (set by applyExtendedSizes)
+        if (row.dataset.extendedSizes) {
+            try {
+                const extendedQtys = JSON.parse(row.dataset.extendedSizes);
+                Object.entries(extendedQtys).forEach(([size, qty]) => {
+                    if (product.quantities.hasOwnProperty(size)) {
+                        product.quantities[size] = qty;
+                    }
+                });
+            } catch (e) {
+                console.warn('[DTFQuoteBuilder] Failed to parse extended sizes:', e);
+            }
+        }
+
+        // Recalculate pricing
+        this.updatePricing();
+    }
+
+    /**
+     * Remove a product from the products array
+     * Called from global deleteRow() function
+     * @param {number} rowId - The row ID to remove
+     */
+    removeProduct(rowId) {
+        const index = this.products.findIndex(p => p.id === rowId);
+        if (index !== -1) {
+            this.products.splice(index, 1);
+        }
     }
 
     /**
@@ -1100,13 +1319,40 @@ class DTFQuoteBuilder {
         }).join('');
         document.getElementById('summary-locations').innerHTML = locationsHTML;
 
-        // Build products summary
+        // Build products summary (including child row quantities)
         const productsHTML = this.products.map(p => {
-            const totalQty = Object.values(p.quantities).reduce((s, q) => s + q, 0);
+            // Get standard sizes from products array (S, M, LG, XL only)
+            const standardSizes = ['S', 'M', 'LG', 'XL'];
+            const allQuantities = {};
+            let totalQty = 0;
+
+            standardSizes.forEach(size => {
+                const qty = p.quantities[size] || 0;
+                if (qty > 0) {
+                    allQuantities[size] = qty;
+                    totalQty += qty;
+                }
+            });
+
+            // Add child row quantities
+            const childMap = window.childRowMap?.[p.id] || {};
+            Object.entries(childMap).forEach(([size, childRowId]) => {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) {
+                    const qtyDisplay = childRow.querySelector('.cell-qty');
+                    const qty = parseInt(qtyDisplay?.textContent) || 0;
+                    if (qty > 0) {
+                        // Normalize display size (XXL->2XL, XXXL->3XL)
+                        const displaySize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
+                        allQuantities[displaySize] = qty;
+                        totalQty += qty;
+                    }
+                }
+            });
+
             if (totalQty === 0) return '';
 
-            const sizesStr = Object.entries(p.quantities)
-                .filter(([_, qty]) => qty > 0)
+            const sizesStr = Object.entries(allQuantities)
                 .map(([size, qty]) => `${size}: ${qty}`)
                 .join(', ');
 
@@ -1177,15 +1423,38 @@ class DTFQuoteBuilder {
                 size: this.locationConfig[loc]?.size
             })),
             // Product data with catalogColor for inventory API
-            products: this.products.map(p => ({
-                styleNumber: p.styleNumber,
-                description: p.description,
-                color: p.color,              // Display name
-                catalogColor: p.catalogColor, // CATALOG_COLOR for API/ShopWorks
-                baseCost: p.baseCost,
-                sizeUpcharges: p.sizeUpcharges,
-                quantities: p.quantities
-            })),
+            // Includes child row quantities for extended sizes
+            products: this.products.map(p => {
+                // Start with standard sizes from products array
+                const standardSizes = ['S', 'M', 'LG', 'XL'];
+                const allQuantities = {};
+                standardSizes.forEach(size => {
+                    allQuantities[size] = p.quantities[size] || 0;
+                });
+
+                // Add child row quantities (extended sizes)
+                const childMap = window.childRowMap?.[p.id] || {};
+                Object.entries(childMap).forEach(([size, childRowId]) => {
+                    const childRow = document.getElementById(`row-${childRowId}`);
+                    if (childRow) {
+                        const qtyDisplay = childRow.querySelector('.cell-qty');
+                        const qty = parseInt(qtyDisplay?.textContent) || 0;
+                        // Normalize size names (XXL->2XL, XXXL->3XL)
+                        const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
+                        allQuantities[normalizedSize] = qty;
+                    }
+                });
+
+                return {
+                    styleNumber: p.styleNumber,
+                    description: p.description,
+                    color: p.color,              // Display name
+                    catalogColor: p.catalogColor, // CATALOG_COLOR for API/ShopWorks
+                    baseCost: p.baseCost,
+                    sizeUpcharges: p.sizeUpcharges,
+                    quantities: allQuantities
+                };
+            }),
             // Quantity and pricing
             totalQuantity: totalQty,
             grandTotal: grandTotal,
