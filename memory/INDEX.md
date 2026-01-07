@@ -19,6 +19,9 @@ This documentation has been reorganized into modular components for better perfo
 ├── PRICING_MANUAL_CORE.md            # Manual pricing calculator core
 ├── SHOPWORKS_EDP_INTEGRATION.md      # ShopWorks EDP integration & pricing sync
 ├── QUOTE_BUILDER_GUIDE.md            # Complete quote builder development guide
+├── QUOTE_BUILDER_BEST_PRACTICES.md   # Copy-paste code patterns (color picker, search, LTM)
+├── QUOTE_BUILDER_API_INTEGRATION.md  # API endpoints for quote builders
+├── QUOTE_BUILDER_LINE_ITEMS.md       # Parent/child row patterns
 ├── PRICING_CALCULATOR_GUIDE.md       # Pricing calculator development guide
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator guide
 ├── STAFF_DIRECTORY.md                # Staff contact information
@@ -130,6 +133,43 @@ This documentation has been reorganized into modular components for better perfo
 #### Shared Components
 - **[calculator-components.md](./templates/calculator-components.md)** - BaseQuoteService, utilities, CSS
 
+### For Quote Builder Development
+
+**Quick Start - Building a new quote builder (DTF, DTG, Embroidery, Stickers, etc.)**
+
+1. **[QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md)** - START HERE - Copy-paste ready code
+   - Color picker implementation (complete code)
+   - Product search with ExactMatchSearch
+   - Size upcharge lookup function
+   - LTM distribution toggle
+   - Small quantity handling (show pricing with warning)
+   - Common bugs and how to prevent them
+
+2. **[QUOTE_BUILDER_API_INTEGRATION.md](./QUOTE_BUILDER_API_INTEGRATION.md)** - API endpoints
+   - `/api/pricing-bundle` - Pricing tiers and margins
+   - `/api/sanmar-products/colors` - Color swatches
+   - `/api/sanmar-products/styles` - Search/autocomplete
+   - `/api/quote_sessions` and `/api/quote_items` - Save quotes
+
+3. **[QUOTE_BUILDER_LINE_ITEMS.md](./QUOTE_BUILDER_LINE_ITEMS.md)** - Parent/child row patterns
+   - Extended sizes create child rows (XXL, 3XL, 4XL, etc.)
+   - Size to part number suffix mapping (_2X, _3X, etc.)
+   - Color inheritance and cascade
+
+4. **[QUOTE_BUILDER_GUIDE.md](./QUOTE_BUILDER_GUIDE.md)** - Architecture and flow
+   - 3-phase architecture (Config → Products → Summary)
+   - Database schema (quote_sessions, quote_items)
+   - Service class template
+
+5. **[QUOTE_BUILDER_TEMPLATE.md](./QUOTE_BUILDER_TEMPLATE.md)** - HTML row structure
+   - Required dataset attributes
+   - Event handler patterns (onchange, onkeydown)
+
+**Reference Implementation:** DTF Quote Builder
+- `/quote-builders/dtf-quote-builder.html`
+- `/shared_components/js/dtf-quote-builder.js`
+- `/shared_components/css/dtf-quote-builder.css`
+
 ### For 3-Day Tees Development
 1. **[3-day-tees/OVERVIEW.md](./3-day-tees/OVERVIEW.md)** - Start here for architecture overview
    - 25 reusable components
@@ -158,6 +198,13 @@ This documentation has been reorganized into modular components for better perfo
    - Error handling & fallbacks
 
 ## 📋 Task-Based Navigation
+
+### "I need to create a new quote builder" (DTF, DTG, Stickers, etc.)
+1. **START HERE:** Read **[QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md)** - Copy-paste ready code
+2. Review **[QUOTE_BUILDER_API_INTEGRATION.md](./QUOTE_BUILDER_API_INTEGRATION.md)** for API endpoints
+3. Study **[QUOTE_BUILDER_LINE_ITEMS.md](./QUOTE_BUILDER_LINE_ITEMS.md)** for parent/child row patterns
+4. Reference DTF implementation: `/quote-builders/dtf-quote-builder.html`
+5. Copy DTF CSS/JS structure and modify for your method type
 
 ### "I need to create a new pricing calculator"
 1. Determine type: Manual, Contract, or Specialty
