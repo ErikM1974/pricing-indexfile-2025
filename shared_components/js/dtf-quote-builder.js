@@ -706,40 +706,66 @@ class DTFQuoteBuilder {
 
     /**
      * Open extended size popup for a product
+     * Uses API-driven dynamic sizes from ExtendedSizesConfig (2026 consolidation)
      * Reads existing quantities from child rows (not row dataset anymore)
      */
-    openExtendedSizePopup(productId) {
+    async openExtendedSizePopup(productId) {
         this.currentPopupProductId = productId;
-
-        // Build quantities using fallback function that checks BOTH child rows AND parent inputs
-        // This fixes the "can't add extended sizes after the fact" bug
-        const quantities = {
-            XS: window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, 'XS') : 0,
-            XXXL: window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '3XL') : 0,
-            '4XL': window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '4XL') : 0,
-            '5XL': window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '5XL') : 0,
-            '6XL': window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, '6XL') : 0
-        };
 
         // Store reference to parent row
         this.currentPopupRow = document.getElementById(`row-${productId}`);
+        const styleNumber = this.currentPopupRow?.dataset?.styleNumber || '';
 
         const popup = document.getElementById('extended-size-popup');
         const backdrop = document.getElementById('size-popup-backdrop');
         const body = document.getElementById('size-popup-body');
 
-        // Extended sizes for popup: XS, XXXL (3XL), 4XL, 5XL, 6XL (NOT XXL - that has its own column)
-        const extendedSizes = ['XS', 'XXXL', '4XL', '5XL', '6XL'];
+        // Show popup with loading state
+        popup.classList.remove('hidden');
+        backdrop.classList.remove('hidden');
+        body.innerHTML = `
+            <div class="ext-popup-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                Loading available sizes...
+            </div>
+        `;
 
+        // Fetch available extended sizes from API (excluding 2XL/XXL which has its own column)
+        let extendedSizes = [];
+        try {
+            if (window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
+                const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber);
+                // Filter out 2XL/XXL since DTF has a dedicated column for it
+                extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
+            }
+        } catch (error) {
+            console.warn('[DTFQuoteBuilder] Failed to fetch extended sizes:', error);
+        }
+
+        // Fallback to default sizes if API fails or returns empty
+        if (extendedSizes.length === 0) {
+            extendedSizes = ['XS', '3XL', '4XL', '5XL', '6XL'];
+        }
+
+        // Build quantities using fallback function that checks BOTH child rows AND parent inputs
+        const quantities = {};
+        extendedSizes.forEach(size => {
+            // Handle 3XL/XXXL mapping - API returns '3XL', internal may use 'XXXL'
+            const lookupSize = size === '3XL' ? 'XXXL' : size;
+            quantities[size] = window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, lookupSize) : 0;
+        });
+
+        // Render the size inputs
         body.innerHTML = `
             <div class="extended-sizes-grid">
                 ${extendedSizes.map(size => {
-                    const displaySize = size === 'XXXL' ? '3XL' : size;
+                    // Use consistent display (3XL) but store internal key (XXXL for backwards compat)
+                    const internalSize = size === '3XL' ? 'XXXL' : size;
                     const currentQty = quantities[size] || '';
                     return `
                         <div class="ext-size-input-group">
-                            <label>${displaySize}</label>
-                            <input type="number" class="ext-size-input" data-size="${size}"
+                            <label>${size}</label>
+                            <input type="number" class="ext-size-input" data-size="${internalSize}"
                                    min="0" value="${currentQty}"
                                    placeholder="0">
                         </div>
@@ -748,12 +774,11 @@ class DTFQuoteBuilder {
             </div>
             <div class="ext-popup-note">
                 <i class="fas fa-info-circle"></i>
-                These sizes have additional upcharges for transfers.
+                ${extendedSizes.length > 5
+                    ? 'Extended sizes available for this product. Additional upcharges may apply.'
+                    : 'These sizes have additional upcharges for transfers.'}
             </div>
         `;
-
-        popup.classList.remove('hidden');
-        backdrop.classList.remove('hidden');
 
         // Focus first input
         const firstInput = body.querySelector('.ext-size-input');
