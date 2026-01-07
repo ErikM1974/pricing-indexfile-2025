@@ -363,10 +363,6 @@
     <script src="/shared_components/js/dtg-quote-service.js"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
 
-    <!-- Shared Quote Builder Modules (2026 Consolidation) -->
-    <script src="/shared_components/js/extended-sizes-config.js"></script>
-    <script src="/shared_components/js/quote-builder-core.js"></script>
-
     <!-- Power Quote Controller -->
     <script>
         // ============================================================
@@ -2919,18 +2915,13 @@
 
         /**
          * Generate ShopWorks-compatible part number
-         * Uses shared ExtendedSizesConfig module when available, falls back to local SIZE_TO_SUFFIX
+         * Uses SIZE_TO_SUFFIX which contains ALL size suffixes (tall, youth, toddler, etc.)
          */
         function getPartNumber(baseStyle, size) {
             // For pants sizes (4-digit codes like 3032), append directly with underscore
             if (/^\d{4}$/.test(size)) {
                 return `${baseStyle}_${size}`;
             }
-            // Use shared module if available
-            if (window.ExtendedSizesConfig) {
-                return window.ExtendedSizesConfig.getPartNumber(baseStyle, size);
-            }
-            // Fallback to local mapping
             return baseStyle + (SIZE_TO_SUFFIX[size] || '');
         }
 
