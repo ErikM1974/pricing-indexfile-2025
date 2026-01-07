@@ -1,8 +1,29 @@
 # DTF Pricing Calculator - Complete Implementation Specification
 
-**Last Updated:** 2025-10-07
+**Last Updated:** 2026-01-06
 **Purpose:** Complete technical specification to rebuild the DTF pricing calculator from scratch if code is lost
 **Screenshot Reference:** `/mnt/c/Users/erik/Downloads/wite space.png`
+
+---
+
+## ⚠️ CRITICAL: 100% API-DRIVEN PRICING (Updated Jan 2026)
+
+**NO HARDCODED PRICING VALUES ANYWHERE.**
+
+All pricing data MUST come from the API:
+- Transfer costs (Small/Medium/Large × quantity tiers)
+- Labor cost per location ($2.50/location from API)
+- Freight costs per transfer
+- LTM fee ($50 from API)
+- Margin denominator (0.57 from API)
+
+**If API fails:** Show error, block all pricing calculations, disable continue button.
+**NO FALLBACKS.** Wrong pricing is worse than no pricing.
+
+**Files enforcing this rule:**
+- `dtf-quote-pricing.js` - All getters throw errors if API not loaded
+- `dtf-pricing-service.js` - All getters throw errors if API not loaded
+- `dtf-config.js` - Contains ONLY location mappings, NO pricing values
 
 ---
 
@@ -356,8 +377,8 @@ GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?m
             "quantity_range": "10-23",
             "min_quantity": 10,
             "max_quantity": 23,
-            "unit_price": 6,
-            "PressingLaborCost": 2
+            "unit_price": 6.50,
+            "PressingLaborCost": 2.50
         },
         {
             "PK_ID": 2,
@@ -366,10 +387,11 @@ GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?m
             "quantity_range": "24-47",
             "min_quantity": 24,
             "max_quantity": 47,
-            "unit_price": 5.25,
-            "PressingLaborCost": 2
+            "unit_price": 5.75,
+            "PressingLaborCost": 2.50
         }
         // ... more price rows for Medium and Large
+        // NOTE: All values come from API - never hardcode!
     ],
     "freightR": [
         {
@@ -401,7 +423,7 @@ GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?m
 **From `allDtfCostsR` array:**
 - Lookup transfer pricing by: price_type (Small/Medium/Large) + quantity_range
 - Extract unit_price for the transfer
-- Extract PressingLaborCost ($2 per location for all)
+- Extract PressingLaborCost ($2.50 per location from API - NOT hardcoded!)
 
 **From `freightR` array:**
 - Lookup freight cost by quantity
@@ -481,8 +503,8 @@ Step 2: Transfer Costs (Sum of All Active Locations)
     transferCosts = sum of all unit_prices
 
 Step 3: Labor Cost
-    laborCost = $2.00 × (number of active locations)
-    From allDtfCostsR[].PressingLaborCost
+    laborCost = $2.50 × (number of active locations)
+    From allDtfCostsR[].PressingLaborCost (API value - never hardcode!)
 
 Step 4: Freight Cost
     - Count number of active locations
@@ -533,52 +555,56 @@ function roundHalfDollarCeil(amount) {
 
 ### 8.1 Sample Calculation #1: Standard Tier (No LTM)
 
+**NOTE:** All values below come from API. If API values change, calculations change too.
+
 **Scenario:**
 - Product: PC54
 - Garment Base Cost: $5.50
 - Quantity: 24 pieces (24-47 tier)
 - Locations: Left Chest + Full Back + Right Sleeve (3 locations)
 
-**Calculation:**
+**Calculation (using current API values):**
 
 ```
 Step 1: Garment with Margin
-    $5.50 / 0.6 = $9.17 (rounded for display)
+    $5.50 / 0.57 = $9.65 (margin from API tiersR.MarginDenominator)
 
-Step 2: Transfer Costs
-    Left Chest (Small, 24-47):     $5.25
-    Full Back (Large, 24-47):     $12.50
-    Right Sleeve (Small, 24-47):   $5.25
+Step 2: Transfer Costs (from API allDtfCostsR)
+    Left Chest (Small, 24-47):     $5.75
+    Full Back (Large, 24-47):     $13.00
+    Right Sleeve (Small, 24-47):   $5.75
                                  -------
-    Total:                        $23.00
+    Total:                        $24.50
 
-Step 3: Labor
-    $2.00 × 3 locations = $6.00
+Step 3: Labor (from API PressingLaborCost)
+    $2.50 × 3 locations = $7.50
 
-Step 4: Freight (24 qty falls in 10-49 range)
+Step 4: Freight (24 qty falls in 10-49 range, from API freightR)
     $0.50 per transfer × 3 = $1.50
 
 Step 5: Subtotal
-    $9.17 + $23.00 + $6.00 + $1.50 = $39.67
+    $9.65 + $24.50 + $7.50 + $1.50 = $43.15
 
 Step 6: LTM Fee
     24-47 tier has LTM_Fee = 0
     $0.00
 
 Step 7: Total Before Rounding
-    $39.67 + $0.00 = $39.67
+    $43.15 + $0.00 = $43.15
 
 Step 8: Round to Nearest $0.50
-    $39.67 × 2 = 79.34
-    ceil(79.34) = 80
-    80 / 2 = $40.00
+    $43.15 × 2 = 86.30
+    ceil(86.30) = 87
+    87 / 2 = $43.50
 ```
 
-**FINAL PRICE: $40.00 per shirt**
+**FINAL PRICE: $43.50 per shirt**
 
 ---
 
 ### 8.2 Sample Calculation #2: LTM Tier with Small Batch Fee
+
+**NOTE:** All values below come from API. If API values change, calculations change too.
 
 **Scenario:**
 - Product: PC61
@@ -586,49 +612,49 @@ Step 8: Round to Nearest $0.50
 - Quantity: 15 pieces (10-23 tier)
 - Locations: Center Front + Center Back (2 locations)
 
-**Calculation:**
+**Calculation (using current API values):**
 
 ```
 Step 1: Garment with Margin
-    $6.50 / 0.6 = $10.83 (rounded for display)
+    $6.50 / 0.57 = $11.40 (margin from API tiersR.MarginDenominator)
 
-Step 2: Transfer Costs
-    Center Front (Medium, 10-23):   $9.50
-    Center Back (Medium, 10-23):    $9.50
+Step 2: Transfer Costs (from API allDtfCostsR)
+    Center Front (Medium, 10-23):  $10.00
+    Center Back (Medium, 10-23):   $10.00
                                   -------
-    Total:                         $19.00
+    Total:                         $20.00
 
-Step 3: Labor
-    $2.00 × 2 locations = $4.00
+Step 3: Labor (from API PressingLaborCost)
+    $2.50 × 2 locations = $5.00
 
-Step 4: Freight (15 qty falls in 10-49 range)
+Step 4: Freight (15 qty falls in 10-49 range, from API freightR)
     $0.50 per transfer × 2 = $1.00
 
 Step 5: Subtotal
-    $10.83 + $19.00 + $4.00 + $1.00 = $34.83
+    $11.40 + $20.00 + $5.00 + $1.00 = $37.40
 
-Step 6: LTM Fee
+Step 6: LTM Fee (from API tiersR.LTM_Fee)
     10-23 tier has LTM_Fee = $50
     $50 / 15 = $3.33 per shirt
 
 Step 7: Total Before Rounding
-    $34.83 + $3.33 = $38.16
+    $37.40 + $3.33 = $40.73
 
 Step 8: Round to Nearest $0.50
-    $38.16 × 2 = 76.32
-    ceil(76.32) = 77
-    77 / 2 = $38.50
+    $40.73 × 2 = 81.46
+    ceil(81.46) = 82
+    82 / 2 = $41.00
 ```
 
-**FINAL PRICE: $38.50 per shirt**
+**FINAL PRICE: $41.00 per shirt**
 
 **NOTE:** If quantity was 10 instead of 15:
 - LTM Fee = $50 / 10 = $5.00 per shirt
-- Total would be $39.83 → rounds to $40.00
+- Total would be $42.40 → rounds to $42.50
 
 If quantity was 23:
 - LTM Fee = $50 / 23 = $2.17 per shirt
-- Total would be $37.00 → rounds to $37.00
+- Total would be $39.57 → rounds to $40.00
 
 This is why the conditional input field is critical for the 10-23 tier.
 
@@ -636,49 +662,51 @@ This is why the conditional input field is critical for the 10-23 tier.
 
 ### 8.3 Sample Calculation #3: High Quantity with Multiple Locations
 
+**NOTE:** All values below come from API. If API values change, calculations change too.
+
 **Scenario:**
 - Product: PC54
 - Garment Base Cost: $5.50
 - Quantity: 100 pieces (72+ tier)
 - Locations: Full Front + Full Back + Left Sleeve + Right Sleeve (4 locations)
 
-**Calculation:**
+**Calculation (using current API values):**
 
 ```
 Step 1: Garment with Margin
-    $5.50 / 0.6 = $9.17
+    $5.50 / 0.57 = $9.65 (margin from API tiersR.MarginDenominator)
 
-Step 2: Transfer Costs
-    Full Front (Large, 72+):      $8.00
-    Full Back (Large, 72+):       $8.00
-    Left Sleeve (Small, 72+):     $3.25
-    Right Sleeve (Small, 72+):    $3.25
+Step 2: Transfer Costs (from API allDtfCostsR)
+    Full Front (Large, 72+):      $8.50
+    Full Back (Large, 72+):       $8.50
+    Left Sleeve (Small, 72+):     $3.75
+    Right Sleeve (Small, 72+):    $3.75
                                 -------
-    Total:                       $22.50
+    Total:                       $24.50
 
-Step 3: Labor
-    $2.00 × 4 locations = $8.00
+Step 3: Labor (from API PressingLaborCost)
+    $2.50 × 4 locations = $10.00
 
-Step 4: Freight (100 qty falls in 100-199 range)
+Step 4: Freight (100 qty falls in 100-199 range, from API freightR)
     $0.25 per transfer × 4 = $1.00
 
 Step 5: Subtotal
-    $9.17 + $22.50 + $8.00 + $1.00 = $40.67
+    $9.65 + $24.50 + $10.00 + $1.00 = $45.15
 
 Step 6: LTM Fee
     72+ tier has LTM_Fee = 0
     $0.00
 
 Step 7: Total Before Rounding
-    $40.67 + $0.00 = $40.67
+    $45.15 + $0.00 = $45.15
 
 Step 8: Round to Nearest $0.50
-    $40.67 × 2 = 81.34
-    ceil(81.34) = 82
-    82 / 2 = $41.00
+    $45.15 × 2 = 90.30
+    ceil(90.30) = 91
+    91 / 2 = $45.50
 ```
 
-**FINAL PRICE: $41.00 per shirt**
+**FINAL PRICE: $45.50 per shirt**
 
 ---
 
@@ -826,8 +854,21 @@ Step 8: Round to Nearest $0.50
 - Forces resolution of API issues immediately
 - Maintains trust in the system
 
-**Alternative:**
-- Show error message with phone number
+**Implementation (as of Jan 2026):**
+All pricing getter methods throw errors if API data not loaded:
+```javascript
+getTransferPrice(sizeKey, quantity) {
+    if (!this.apiData?.transferSizes) {
+        throw new Error('API data not loaded - cannot get transfer price');
+    }
+    // ... lookup logic
+}
+```
+
+**Alternative when API fails:**
+- Show error message with phone number (253-922-5793)
+- Block all pricing calculations (show "--" for values)
+- Disable "Continue to Summary" button
 - Customer can call for accurate quote
 - IT team alerted to API failure
 
@@ -1014,6 +1055,7 @@ function selectTier(tierLabel, ltmFee) {
 | Date       | Version | Changes                                      | Author        |
 |------------|---------|----------------------------------------------|---------------|
 | 2025-10-07 | 1.0     | Initial specification document created       | Claude Code   |
+| 2026-01-06 | 2.0     | **100% API-driven architecture** - Removed all hardcoded pricing fallbacks. All pricing getters now throw errors if API not loaded. Updated sample calculations with correct API values (Labor $2.50, transfer prices +$0.50). Added critical warning section. | Claude Code   |
 
 ---
 
