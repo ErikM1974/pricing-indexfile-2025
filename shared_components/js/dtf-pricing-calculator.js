@@ -597,7 +597,7 @@ class DTFPricingCalculator {
             if (!location) return;
 
             const sizeKey = location.size;
-            const transferPrice = DTFConfig.helpers.getTransferPrice(sizeKey, quantity);
+            const transferPrice = this.getTransferPrice(sizeKey, quantity);
 
             totalTransferCost += transferPrice;
             transferDetails.push({
