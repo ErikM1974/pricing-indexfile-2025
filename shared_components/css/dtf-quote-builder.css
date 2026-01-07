@@ -1143,6 +1143,21 @@ body {
     margin-right: 6px;
 }
 
+.ext-popup-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 20px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.ext-popup-loading i {
+    font-size: 18px;
+    color: var(--dtf-primary);
+}
+
 .size-popup-footer {
     display: flex;
     justify-content: flex-end;
