@@ -21,25 +21,25 @@ const fetch = require('node-fetch');
 
 const BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
-// Expected pricing values (hardcoded for verification)
+// Expected pricing values (from live API - updated 2026-01-06)
 const EXPECTED_TRANSFER_COSTS = {
     'small': {
-        '10-23': 6.00,
-        '24-47': 5.25,
-        '48-71': 4.00,
-        '72+': 3.25
+        '10-23': 6.50,
+        '24-47': 5.75,
+        '48-71': 4.50,
+        '72+': 3.75
     },
     'medium': {
-        '10-23': 9.50,
-        '24-47': 8.25,
-        '48-71': 6.50,
-        '72+': 5.00
+        '10-23': 10.00,
+        '24-47': 8.75,
+        '48-71': 7.00,
+        '72+': 5.50
     },
     'large': {
-        '10-23': 14.50,
-        '24-47': 12.50,
-        '48-71': 10.00,
-        '72+': 8.00
+        '10-23': 15.00,
+        '24-47': 13.00,
+        '48-71': 10.50,
+        '72+': 8.50
     }
 };
 
@@ -50,7 +50,7 @@ const EXPECTED_FREIGHT_COSTS = [
     { minQty: 200, maxQty: 999999, cost: 0.15 }
 ];
 
-const LABOR_COST_PER_LOCATION = 2.00;
+const LABOR_COST_PER_LOCATION = 2.50;
 const MARGIN_DENOMINATOR = 0.57;
 const LTM_FEE = 50.00;
 const LTM_THRESHOLD = 24; // LTM applies when qty < 24
@@ -239,23 +239,23 @@ async function runTests() {
     section('3. TRANSFER COST TESTS');
     // -------------------------------------------------------------------------
 
-    // Small transfer costs
-    assert(getTransferCost('small', 10) === 6.00, 'Small @ 10 pcs = $6.00', 6.00, getTransferCost('small', 10));
-    assert(getTransferCost('small', 24) === 5.25, 'Small @ 24 pcs = $5.25', 5.25, getTransferCost('small', 24));
-    assert(getTransferCost('small', 48) === 4.00, 'Small @ 48 pcs = $4.00', 4.00, getTransferCost('small', 48));
-    assert(getTransferCost('small', 72) === 3.25, 'Small @ 72 pcs = $3.25', 3.25, getTransferCost('small', 72));
+    // Small transfer costs (from API)
+    assert(getTransferCost('small', 10) === 6.50, 'Small @ 10 pcs = $6.50', 6.50, getTransferCost('small', 10));
+    assert(getTransferCost('small', 24) === 5.75, 'Small @ 24 pcs = $5.75', 5.75, getTransferCost('small', 24));
+    assert(getTransferCost('small', 48) === 4.50, 'Small @ 48 pcs = $4.50', 4.50, getTransferCost('small', 48));
+    assert(getTransferCost('small', 72) === 3.75, 'Small @ 72 pcs = $3.75', 3.75, getTransferCost('small', 72));
 
-    // Medium transfer costs
-    assert(getTransferCost('medium', 10) === 9.50, 'Medium @ 10 pcs = $9.50', 9.50, getTransferCost('medium', 10));
-    assert(getTransferCost('medium', 24) === 8.25, 'Medium @ 24 pcs = $8.25', 8.25, getTransferCost('medium', 24));
-    assert(getTransferCost('medium', 48) === 6.50, 'Medium @ 48 pcs = $6.50', 6.50, getTransferCost('medium', 48));
-    assert(getTransferCost('medium', 72) === 5.00, 'Medium @ 72 pcs = $5.00', 5.00, getTransferCost('medium', 72));
+    // Medium transfer costs (from API)
+    assert(getTransferCost('medium', 10) === 10.00, 'Medium @ 10 pcs = $10.00', 10.00, getTransferCost('medium', 10));
+    assert(getTransferCost('medium', 24) === 8.75, 'Medium @ 24 pcs = $8.75', 8.75, getTransferCost('medium', 24));
+    assert(getTransferCost('medium', 48) === 7.00, 'Medium @ 48 pcs = $7.00', 7.00, getTransferCost('medium', 48));
+    assert(getTransferCost('medium', 72) === 5.50, 'Medium @ 72 pcs = $5.50', 5.50, getTransferCost('medium', 72));
 
-    // Large transfer costs
-    assert(getTransferCost('large', 10) === 14.50, 'Large @ 10 pcs = $14.50', 14.50, getTransferCost('large', 10));
-    assert(getTransferCost('large', 24) === 12.50, 'Large @ 24 pcs = $12.50', 12.50, getTransferCost('large', 24));
-    assert(getTransferCost('large', 48) === 10.00, 'Large @ 48 pcs = $10.00', 10.00, getTransferCost('large', 48));
-    assert(getTransferCost('large', 72) === 8.00, 'Large @ 72 pcs = $8.00', 8.00, getTransferCost('large', 72));
+    // Large transfer costs (from API)
+    assert(getTransferCost('large', 10) === 15.00, 'Large @ 10 pcs = $15.00', 15.00, getTransferCost('large', 10));
+    assert(getTransferCost('large', 24) === 13.00, 'Large @ 24 pcs = $13.00', 13.00, getTransferCost('large', 24));
+    assert(getTransferCost('large', 48) === 10.50, 'Large @ 48 pcs = $10.50', 10.50, getTransferCost('large', 48));
+    assert(getTransferCost('large', 72) === 8.50, 'Large @ 72 pcs = $8.50', 8.50, getTransferCost('large', 72));
 
     // -------------------------------------------------------------------------
     section('4. FREIGHT COST TESTS');
@@ -289,25 +289,25 @@ async function runTests() {
     // -------------------------------------------------------------------------
 
     // Test case: PC61 ($2.32 cost), Left Chest (small), 24 pcs
-    // Expected: (2.32/0.57) + 5.25 + 2.00 + 0.50 + 0 = 4.07 + 5.25 + 2.00 + 0.50 = 11.82 → $12.00
+    // Expected: (2.32/0.57) + 5.75 + 2.50 + 0.50 + 0 = 4.07 + 5.75 + 2.50 + 0.50 = 12.82 → $13.00
     const test1 = calculateUnitPrice(2.32, ['left-chest'], 24);
     assertClose(test1.garmentWithMargin, 4.07, 0.01, 'PC61 garment margin: $2.32/0.57 = ~$4.07');
-    assert(test1.transferCost === 5.25, 'PC61 transfer (small@24): $5.25', 5.25, test1.transferCost);
-    assert(test1.laborCost === 2.00, 'PC61 labor (1 loc): $2.00', 2.00, test1.laborCost);
+    assert(test1.transferCost === 5.75, 'PC61 transfer (small@24): $5.75', 5.75, test1.transferCost);
+    assert(test1.laborCost === 2.50, 'PC61 labor (1 loc): $2.50', 2.50, test1.laborCost);
     assert(test1.freightCost === 0.50, 'PC61 freight (24 pcs): $0.50', 0.50, test1.freightCost);
     assert(test1.ltmPerUnit === 0.00, 'PC61 LTM (24 pcs): $0.00', 0.00, test1.ltmPerUnit);
-    assertClose(test1.subtotal, 11.82, 0.01, 'PC61 subtotal: ~$11.82');
-    assert(test1.finalPrice === 12.00, 'PC61 final (rounded): $12.00', 12.00, test1.finalPrice);
+    assertClose(test1.subtotal, 12.82, 0.01, 'PC61 subtotal: ~$12.82');
+    assert(test1.finalPrice === 13.00, 'PC61 final (rounded): $13.00', 13.00, test1.finalPrice);
 
     // Test case: Same product at 23 pcs (with LTM)
     // LTM = $50/23 = $2.17
     const test2 = calculateUnitPrice(2.32, ['left-chest'], 23);
     assert(test2.tierLabel === '10-23', 'PC61@23 tier: 10-23', '10-23', test2.tierLabel);
-    assert(test2.transferCost === 6.00, 'PC61 transfer (small@23): $6.00', 6.00, test2.transferCost);
+    assert(test2.transferCost === 6.50, 'PC61 transfer (small@23): $6.50', 6.50, test2.transferCost);
     assert(test2.ltmPerUnit === 2.17, 'PC61 LTM (23 pcs): $2.17', 2.17, test2.ltmPerUnit);
-    // (2.32/0.57) + 6.00 + 2.00 + 0.50 + 2.17 = 4.07 + 6.00 + 2.00 + 0.50 + 2.17 = 14.74 → $15.00
-    assertClose(test2.subtotal, 14.74, 0.01, 'PC61@23 subtotal: ~$14.74');
-    assert(test2.finalPrice === 15.00, 'PC61@23 final (rounded): $15.00', 15.00, test2.finalPrice);
+    // (2.32/0.57) + 6.50 + 2.50 + 0.50 + 2.17 = 4.07 + 6.50 + 2.50 + 0.50 + 2.17 = 15.74 → $16.00
+    assertClose(test2.subtotal, 15.74, 0.01, 'PC61@23 subtotal: ~$15.74');
+    assert(test2.finalPrice === 16.00, 'PC61@23 final (rounded): $16.00', 16.00, test2.finalPrice);
 
     // -------------------------------------------------------------------------
     section('7. LTM BOUNDARY TEST (23 vs 24)');
@@ -330,27 +330,27 @@ async function runTests() {
 
     // Test: 2 locations (left-chest + center-back)
     const multiLoc1 = calculateUnitPrice(2.32, ['left-chest', 'center-back'], 24);
-    // Transfer: small(5.25) + medium(8.25) = 13.50
-    // Labor: 2 × $2.00 = $4.00
+    // Transfer: small(5.75) + medium(8.75) = 14.50
+    // Labor: 2 × $2.50 = $5.00
     // Freight: 2 × $0.50 = $1.00
-    assert(multiLoc1.transferCost === 13.50, '2-loc transfer: $5.25+$8.25=$13.50', 13.50, multiLoc1.transferCost);
-    assert(multiLoc1.laborCost === 4.00, '2-loc labor: 2×$2.00=$4.00', 4.00, multiLoc1.laborCost);
+    assert(multiLoc1.transferCost === 14.50, '2-loc transfer: $5.75+$8.75=$14.50', 14.50, multiLoc1.transferCost);
+    assert(multiLoc1.laborCost === 5.00, '2-loc labor: 2×$2.50=$5.00', 5.00, multiLoc1.laborCost);
     assert(multiLoc1.freightCost === 1.00, '2-loc freight: 2×$0.50=$1.00', 1.00, multiLoc1.freightCost);
-    // Total: 4.07 + 13.50 + 4.00 + 1.00 = 22.57 → $23.00
-    assertClose(multiLoc1.subtotal, 22.57, 0.01, '2-loc subtotal: ~$22.57');
-    assert(multiLoc1.finalPrice === 23.00, '2-loc final: $23.00', 23.00, multiLoc1.finalPrice);
+    // Total: 4.07 + 14.50 + 5.00 + 1.00 = 24.57 → $25.00
+    assertClose(multiLoc1.subtotal, 24.57, 0.01, '2-loc subtotal: ~$24.57');
+    assert(multiLoc1.finalPrice === 25.00, '2-loc final: $25.00', 25.00, multiLoc1.finalPrice);
 
     // Test: 3 locations (left-chest + center-back + full-back)
     const multiLoc2 = calculateUnitPrice(2.32, ['left-chest', 'center-back', 'full-back'], 24);
-    // Transfer: small(5.25) + medium(8.25) + large(12.50) = 26.00
-    // Labor: 3 × $2.00 = $6.00
+    // Transfer: small(5.75) + medium(8.75) + large(13.00) = 27.50
+    // Labor: 3 × $2.50 = $7.50
     // Freight: 3 × $0.50 = $1.50
-    assert(multiLoc2.transferCost === 26.00, '3-loc transfer: $5.25+$8.25+$12.50=$26.00', 26.00, multiLoc2.transferCost);
-    assert(multiLoc2.laborCost === 6.00, '3-loc labor: 3×$2.00=$6.00', 6.00, multiLoc2.laborCost);
+    assert(multiLoc2.transferCost === 27.50, '3-loc transfer: $5.75+$8.75+$13.00=$27.50', 27.50, multiLoc2.transferCost);
+    assert(multiLoc2.laborCost === 7.50, '3-loc labor: 3×$2.50=$7.50', 7.50, multiLoc2.laborCost);
     assert(multiLoc2.freightCost === 1.50, '3-loc freight: 3×$0.50=$1.50', 1.50, multiLoc2.freightCost);
-    // Total: 4.07 + 26.00 + 6.00 + 1.50 = 37.57 → $38.00
-    assertClose(multiLoc2.subtotal, 37.57, 0.01, '3-loc subtotal: ~$37.57');
-    assert(multiLoc2.finalPrice === 38.00, '3-loc final: $38.00', 38.00, multiLoc2.finalPrice);
+    // Total: 4.07 + 27.50 + 7.50 + 1.50 = 40.57 → $41.00
+    assertClose(multiLoc2.subtotal, 40.57, 0.01, '3-loc subtotal: ~$40.57');
+    assert(multiLoc2.finalPrice === 41.00, '3-loc final: $41.00', 41.00, multiLoc2.finalPrice);
 
     // -------------------------------------------------------------------------
     section('9. SIZE UPCHARGE TESTS');
@@ -360,21 +360,21 @@ async function runTests() {
     const upcharge1 = calculateUnitPrice(2.32, ['left-chest'], 24, 2.00);
     // Effective cost: 2.32 + 2.00 = 4.32
     // Garment margin: 4.32 / 0.57 = 7.58
-    // Total: 7.58 + 5.25 + 2.00 + 0.50 = 15.33 → $15.50
+    // Total: 7.58 + 5.75 + 2.50 + 0.50 = 16.33 → $16.50
     assert(upcharge1.effectiveCost === 4.32, '2XL effective cost: $2.32+$2.00=$4.32', 4.32, upcharge1.effectiveCost);
     assertClose(upcharge1.garmentWithMargin, 7.58, 0.01, '2XL garment margin: $4.32/0.57=~$7.58');
-    assertClose(upcharge1.subtotal, 15.33, 0.01, '2XL subtotal: ~$15.33');
-    assert(upcharge1.finalPrice === 15.50, '2XL final: $15.50', 15.50, upcharge1.finalPrice);
+    assertClose(upcharge1.subtotal, 16.33, 0.01, '2XL subtotal: ~$16.33');
+    assert(upcharge1.finalPrice === 16.50, '2XL final: $16.50', 16.50, upcharge1.finalPrice);
 
     // Test: 3XL with $4.00 upcharge
     const upcharge2 = calculateUnitPrice(2.32, ['left-chest'], 24, 4.00);
     // Effective cost: 2.32 + 4.00 = 6.32
     // Garment margin: 6.32 / 0.57 = 11.09
-    // Total: 11.09 + 5.25 + 2.00 + 0.50 = 18.84 → $19.00
+    // Total: 11.09 + 5.75 + 2.50 + 0.50 = 19.84 → $20.00
     assert(upcharge2.effectiveCost === 6.32, '3XL effective cost: $2.32+$4.00=$6.32', 6.32, upcharge2.effectiveCost);
     assertClose(upcharge2.garmentWithMargin, 11.09, 0.01, '3XL garment margin: $6.32/0.57=~$11.09');
-    assertClose(upcharge2.subtotal, 18.84, 0.01, '3XL subtotal: ~$18.84');
-    assert(upcharge2.finalPrice === 19.00, '3XL final: $19.00', 19.00, upcharge2.finalPrice);
+    assertClose(upcharge2.subtotal, 19.84, 0.01, '3XL subtotal: ~$19.84');
+    assert(upcharge2.finalPrice === 20.00, '3XL final: $20.00', 20.00, upcharge2.finalPrice);
 
     // -------------------------------------------------------------------------
     section('10. HIGH QUANTITY TIER TESTS');
@@ -383,19 +383,19 @@ async function runTests() {
     // Test at 72+ tier (note: 72 is in freight tier 50-99 = $0.35)
     const tier72 = calculateUnitPrice(2.32, ['left-chest'], 72);
     assert(tier72.tierLabel === '72+', 'Tier at 72 pcs: 72+', '72+', tier72.tierLabel);
-    assert(tier72.transferCost === 3.25, 'Transfer (small@72+): $3.25', 3.25, tier72.transferCost);
+    assert(tier72.transferCost === 3.75, 'Transfer (small@72+): $3.75', 3.75, tier72.transferCost);
     assert(tier72.freightCost === 0.35, 'Freight at 72 pcs: $0.35 (50-99 tier)', 0.35, tier72.freightCost);
     assert(tier72.ltmPerUnit === 0, 'No LTM at 72+', 0, tier72.ltmPerUnit);
-    // Total: 4.07 + 3.25 + 2.00 + 0.35 = 9.67 → $10.00
-    assertClose(tier72.subtotal, 9.67, 0.02, '72+ subtotal: ~$9.67');
-    assert(tier72.finalPrice === 10.00, '72+ final: $10.00', 10.00, tier72.finalPrice);
+    // Total: 4.07 + 3.75 + 2.50 + 0.35 = 10.67 → $11.00
+    assertClose(tier72.subtotal, 10.67, 0.02, '72+ subtotal: ~$10.67');
+    assert(tier72.finalPrice === 11.00, '72+ final: $11.00', 11.00, tier72.finalPrice);
 
     // Test at 100+ (different freight tier)
     const tier100 = calculateUnitPrice(2.32, ['left-chest'], 100);
     assert(tier100.freightCost === 0.25, 'Freight at 100 pcs: $0.25', 0.25, tier100.freightCost);
-    // Total: 4.07 + 3.25 + 2.00 + 0.25 = 9.57 → $10.00
-    assertClose(tier100.subtotal, 9.57, 0.01, '100+ subtotal: ~$9.57');
-    assert(tier100.finalPrice === 10.00, '100+ final: $10.00', 10.00, tier100.finalPrice);
+    // Total: 4.07 + 3.75 + 2.50 + 0.25 = 10.57 → $11.00
+    assertClose(tier100.subtotal, 10.57, 0.01, '100+ subtotal: ~$10.57');
+    assert(tier100.finalPrice === 11.00, '100+ final: $11.00', 11.00, tier100.finalPrice);
 
     // -------------------------------------------------------------------------
     section('11. API VALIDATION (Live Data)');
