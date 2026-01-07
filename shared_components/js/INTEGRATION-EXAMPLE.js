@@ -90,9 +90,9 @@ function initializeColorPicker() {
             updatePricing(productId);
         },
 
-        // Get child rows for a parent (for cascading color to children)
-        getChildRows: (productId) => {
-            return window.childRowMap?.[productId] || {};
+        // Get child row map for a parent (for cascading color to children)
+        getChildRowMap: () => {
+            return window.childRowMap || {};
         }
     });
 }
@@ -117,24 +117,37 @@ function initializeQuoteBuilderCore() {
         // Quote ID prefix (DTG, RICH, EMB, SPC, etc.)
         prefix: 'DTG',
 
-        // Your child row tracking map
-        childRowMap: window.childRowMap || {},
+        // Builder name for logging
+        builderName: 'DTG Quote Builder',
 
-        // CSS class for child rows
-        childRowClass: 'child-row',
+        // DOM element IDs
+        tableBodyId: 'product-tbody',
+        totalQtyId: 'total-quantity',
+        pricingTierId: 'pricing-tier',
+
+        // Feature flags
+        enableDuplicateCheck: true,  // Prevent same style+color twice
+        enableAutoFocus: true,       // Auto-focus on new inputs
+
+        // Callback when row is added
+        onRowAdded: (rowId) => {
+            console.log(`Row ${rowId} added`);
+        },
 
         // Callback when row is deleted
-        onRowDelete: (rowId, isChildRow, parentId) => {
+        onRowDeleted: (rowId) => {
             console.log(`Row ${rowId} deleted`);
-            if (isChildRow) {
-                console.log(`Was child of parent ${parentId}`);
-            }
             updatePricing();
         },
 
-        // Callback when child row is created
-        onChildRowCreate: (parentId, size, childRowId) => {
-            console.log(`Created child row ${childRowId} for ${parentId}, size ${size}`);
+        // Callback when size input changes
+        onSizeChange: (rowId, size, qty) => {
+            console.log(`Row ${rowId} size ${size} changed to ${qty}`);
+        },
+
+        // Callback to trigger pricing recalculation
+        onPricingRecalc: () => {
+            updatePricing();
         }
     });
 }
@@ -243,14 +256,16 @@ class MyQuoteBuilder {
         this.colorPicker = new ColorPickerComponent({
             enableDuplicateCheck: true,
             onColorSelect: (id, data) => this.onColorSelected(id, data),
-            getChildRows: (id) => this.childRowMap[id] || {}
+            getChildRowMap: () => this.childRowMap  // Returns full map, component extracts per-parent
         });
 
         // 3. Quote Builder Core
         this.quoteCore = new QuoteBuilderCore({
             prefix: 'MY',
-            childRowMap: this.childRowMap,
-            onRowDelete: () => this.recalculate()
+            builderName: 'My Quote Builder',
+            tableBodyId: 'my-table-body',
+            onRowDeleted: () => this.recalculate(),
+            onPricingRecalc: () => this.recalculate()
         });
 
         // 4. Pricing Sidebar

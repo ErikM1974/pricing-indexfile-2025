@@ -428,48 +428,52 @@ class PricingSidebarComponent {
 
     /**
      * Update mixed quote breakdown (Embroidery)
+     * Shows breakdown for garments and/or caps based on what's in the quote
      */
     updateMixedQuoteBreakdown(pricing) {
         const hasGarments = pricing.garmentQty > 0;
         const hasCaps = pricing.capQty > 0;
-        const isMixed = hasGarments && hasCaps;
 
-        // Only show breakdown if mixed
-        if (isMixed) {
-            // Quantity breakdown
+        // Show garment breakdown if garments exist
+        if (hasGarments) {
             this.showElement('sidebar-garment-qty-row');
-            this.showElement('sidebar-cap-qty-row');
             this.updateElement('sidebar-garment-qty', pricing.garmentQty);
-            this.updateElement('sidebar-cap-qty', pricing.capQty);
-
-            // Tier breakdown
             this.showElement('sidebar-garment-tier-row');
-            this.showElement('sidebar-cap-tier-row');
             this.updateElement('sidebar-garment-tier', pricing.garmentTier || '-');
-            this.updateElement('sidebar-cap-tier', pricing.capTier || '-');
-
-            // Subtotal breakdown
             this.showElement('sidebar-garment-subtotal-row');
-            this.showElement('sidebar-cap-subtotal-row');
             this.updateElement('sidebar-garment-subtotal', this.formatCurrency(pricing.garmentSubtotal || 0));
-            this.updateElement('sidebar-cap-subtotal', this.formatCurrency(pricing.capSubtotal || 0));
-
-            // LTM breakdown
-            if (pricing.garmentLTM > 0 || pricing.capLTM > 0) {
-                if (pricing.garmentLTM > 0) {
-                    this.showElement('sidebar-garment-ltm-row');
-                    this.updateElement('sidebar-garment-ltm', this.formatCurrency(pricing.garmentLTM));
-                }
-                if (pricing.capLTM > 0) {
-                    this.showElement('sidebar-cap-ltm-row');
-                    this.updateElement('sidebar-cap-ltm', this.formatCurrency(pricing.capLTM));
-                }
+            if (pricing.garmentLTM > 0) {
+                this.showElement('sidebar-garment-ltm-row');
+                this.updateElement('sidebar-garment-ltm', this.formatCurrency(pricing.garmentLTM));
+            } else {
+                this.hideElement('sidebar-garment-ltm-row');
             }
         } else {
-            // Hide all breakdowns
-            ['garment-qty', 'cap-qty', 'garment-tier', 'cap-tier',
-             'garment-subtotal', 'cap-subtotal', 'garment-ltm', 'cap-ltm']
-            .forEach(id => this.hideElement(`sidebar-${id}-row`));
+            this.hideElement('sidebar-garment-qty-row');
+            this.hideElement('sidebar-garment-tier-row');
+            this.hideElement('sidebar-garment-subtotal-row');
+            this.hideElement('sidebar-garment-ltm-row');
+        }
+
+        // Show cap breakdown if caps exist
+        if (hasCaps) {
+            this.showElement('sidebar-cap-qty-row');
+            this.updateElement('sidebar-cap-qty', pricing.capQty);
+            this.showElement('sidebar-cap-tier-row');
+            this.updateElement('sidebar-cap-tier', pricing.capTier || '-');
+            this.showElement('sidebar-cap-subtotal-row');
+            this.updateElement('sidebar-cap-subtotal', this.formatCurrency(pricing.capSubtotal || 0));
+            if (pricing.capLTM > 0) {
+                this.showElement('sidebar-cap-ltm-row');
+                this.updateElement('sidebar-cap-ltm', this.formatCurrency(pricing.capLTM));
+            } else {
+                this.hideElement('sidebar-cap-ltm-row');
+            }
+        } else {
+            this.hideElement('sidebar-cap-qty-row');
+            this.hideElement('sidebar-cap-tier-row');
+            this.hideElement('sidebar-cap-subtotal-row');
+            this.hideElement('sidebar-cap-ltm-row');
         }
     }
 
