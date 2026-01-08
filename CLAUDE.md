@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🔴 TOP 6 NEVER-BREAK RULES (Read First!)
+## 🔴 TOP 8 NEVER-BREAK RULES (Read First!)
 
 These rules prevent disasters. **Violating any of these caused 71+ orphaned files requiring massive cleanup.**
 
@@ -12,6 +12,8 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 4. **NO Silent API Failures** - ALWAYS show errors when API fails. Never use fallback data silently.
 5. **ALWAYS Update ACTIVE_FILES.md** - Every file create/delete/move must update documentation immediately.
 6. **NO Memory File Bloat** - No dev logs (DAY-*.md), no duplicate docs. Keep INDEX.md under 200 lines.
+7. **USE CONFIG FOR API URLs** - Don't hardcode `caspio-pricing-proxy` URL. Use `APP_CONFIG.API.BASE_URL` or config object.
+8. **SYNC CALCULATOR & QUOTE BUILDER PRICES** - If both exist for a method, test identical inputs. Prices must match.
 
 ## 🚨 CRITICAL: 3-Day Tees Order Submission
 
