@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Monogram Form - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="/shared_components/css/quote-builder-common.css" rel="stylesheet">
+    <link href="/shared_components/css/monogram-form.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Staff Dashboard</a>
+                    <span>/</span>
+                    <span>Monogram Form</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <span class="current-date" id="currentDate"></span>
+                <a href="/staff-dashboard.html" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-signature"></i>
+                    Monogram Form 2026
+                </h1>
+                <p class="page-subtitle">Embroidery personalization tracking for production</p>
+            </div>
+            <div class="page-header-actions">
+                <button type="button" class="btn-icon" id="searchBtn" title="Search existing forms">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button type="button" class="btn-icon" id="newFormBtn" title="Start new form">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Panel (Hidden by default) -->
+        <div class="search-panel" id="searchPanel" style="display: none;">
+            <div class="search-panel-header">
+                <h3><i class="fas fa-search"></i> Search Existing Forms</h3>
+                <button type="button" class="btn-close" id="closeSearchBtn">&times;</button>
+            </div>
+            <div class="search-panel-body">
+                <div class="search-inputs">
+                    <div class="search-field">
+                        <label>Order Number</label>
+                        <input type="text" id="searchOrderNumber" placeholder="e.g., 139465">
+                    </div>
+                    <div class="search-field">
+                        <label>Company Name</label>
+                        <input type="text" id="searchCompanyName" placeholder="e.g., Puyallup">
+                    </div>
+                    <button type="button" class="btn-primary" id="doSearchBtn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div class="search-results" id="searchResults">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <form id="monogramForm" class="form-container">
+            <!-- Order Lookup Section -->
+            <section class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    Order Information
+                </h2>
+                <div class="form-row">
+                    <div class="form-group order-lookup-group">
+                        <label for="orderNumber">Order Number <span class="required">*</span></label>
+                        <div class="input-with-button">
+                            <input type="text" id="orderNumber" name="orderNumber"
+                                   placeholder="Enter ShopWorks order number" required>
+                            <button type="button" id="lookupOrderBtn" class="btn-lookup">
+                                <i class="fas fa-search"></i> Lookup
+                            </button>
+                        </div>
+                        <span class="field-hint">Enter order number to auto-populate order details</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyName">Company <span class="required">*</span></label>
+                        <input type="text" id="companyName" name="companyName"
+                               placeholder="Auto-filled from order" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salesRepEmail">Sales Rep Email</label>
+                        <input type="email" id="salesRepEmail" name="salesRepEmail"
+                               placeholder="e.g., sales@nwcustomapparel.com">
+                    </div>
+                </div>
+
+                <!-- Order Status Indicator -->
+                <div class="order-status" id="orderStatus" style="display: none;">
+                    <div class="status-badge status-loading" id="orderStatusBadge">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span id="orderStatusText">Looking up order...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Monogram Details Section -->
+            <section class="form-section">
+                <h2 class="section-title">
+                    <i class="fas fa-palette"></i>
+                    Monogram Details
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fontStyle">Font Style</label>
+                        <input type="text" id="fontStyle" name="fontStyle"
+                               placeholder="e.g., Sansita, Script, Block">
+                    </div>
+                    <div class="form-group">
+                        <label for="threadColor">Thread Color</label>
+                        <input type="text" id="threadColor" name="threadColor"
+                               placeholder="e.g., White, Navy, Gold">
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label for="notesToProduction">Notes to Production</label>
+                    <textarea id="notesToProduction" name="notesToProduction" rows="3"
+                              placeholder="Special instructions for the production team..."></textarea>
+                </div>
+            </section>
+
+            <!-- Names Table Section -->
+            <section class="form-section names-section">
+                <div class="section-header-row">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i>
+                        Names
+                        <span class="name-count" id="nameCount">(0 entries)</span>
+                    </h2>
+                    <div class="section-actions">
+                        <button type="button" class="btn-secondary btn-sm" id="addRowBtn">
+                            <i class="fas fa-plus"></i> Add Row
+                        </button>
+                        <button type="button" class="btn-secondary btn-sm" id="add5RowsBtn">
+                            <i class="fas fa-plus"></i> Add 5 Rows
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="names-table" id="namesTable">
+                        <thead>
+                            <tr>
+                                <th class="col-num">#</th>
+                                <th class="col-style">Style</th>
+                                <th class="col-desc">Description</th>
+                                <th class="col-color">Color</th>
+                                <th class="col-size">Size</th>
+                                <th class="col-note">Note</th>
+                                <th class="col-name">Monogram Name</th>
+                                <th class="col-action"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="namesTableBody">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <button type="button" class="btn-secondary" id="addRowBtnBottom">
+                        <i class="fas fa-plus"></i> Add Row
+                    </button>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="form-actions">
+                <div class="actions-left">
+                    <button type="button" class="btn-secondary" id="clearFormBtn">
+                        <i class="fas fa-eraser"></i> Clear Form
+                    </button>
+                </div>
+                <div class="actions-right">
+                    <button type="button" class="btn-secondary" id="saveDraftBtn">
+                        <i class="fas fa-save"></i> Save Draft
+                    </button>
+                    <button type="button" class="btn-primary" id="printPdfBtn">
+                        <i class="fas fa-print"></i> Print PDF
+                    </button>
+                </div>
+            </section>
+        </form>
+    </main>
+
+    <!-- Print Template (Hidden, used for PDF generation) -->
+    <div id="printTemplate" class="print-template">
+        <div class="print-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="print-logo">
+            <div class="print-header-right">
+                <span class="print-date" id="printDate"></span>
+                <h1 class="print-title">Monogram Form 2026</h1>
+            </div>
+        </div>
+
+        <div class="print-order-info">
+            <div class="print-field">
+                <strong>Order#</strong>
+                <span id="printOrderNumber"></span>
+            </div>
+            <div class="print-field">
+                <strong>Company</strong>
+                <span id="printCompanyName"></span>
+            </div>
+            <div class="print-field">
+                <strong>Sales Rep Email</strong>
+                <span id="printSalesRepEmail"></span>
+            </div>
+        </div>
+
+        <div class="print-monogram-details">
+            <h3>Monogram Details</h3>
+            <div class="print-detail-row">
+                <div class="print-field">
+                    <strong>Font Style</strong>
+                    <span id="printFontStyle"></span>
+                </div>
+                <div class="print-field">
+                    <strong>Thread Color</strong>
+                    <span id="printThreadColor"></span>
+                </div>
+            </div>
+            <div class="print-notes">
+                <strong>Notes to Production</strong>
+                <p id="printNotes"></p>
+            </div>
+        </div>
+
+        <div class="print-names-section">
+            <h3>Names</h3>
+            <table class="print-names-table" id="printNamesTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Style</th>
+                        <th>Description</th>
+                        <th>Shirt Color</th>
+                        <th>Size</th>
+                        <th>Note</th>
+                        <th>Monogram Name</th>
+                    </tr>
+                </thead>
+                <tbody id="printNamesTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="print-footer">
+            <span>Page <span class="page-number"></span></span>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="/shared_components/js/monogram-form-service.js"></script>
+    <script src="/shared_components/js/monogram-form-controller.js"></script>
+</body>
+</html>
