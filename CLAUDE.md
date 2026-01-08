@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🔴 TOP 5 NEVER-BREAK RULES (Read First!)
+## 🔴 TOP 6 NEVER-BREAK RULES (Read First!)
 
 These rules prevent disasters. **Violating any of these caused 71+ orphaned files requiring massive cleanup.**
 
@@ -11,6 +11,7 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 3. **NO Inline Code** - Zero `<style>` or `<script>` tags with content in HTML files.
 4. **NO Silent API Failures** - ALWAYS show errors when API fails. Never use fallback data silently.
 5. **ALWAYS Update ACTIVE_FILES.md** - Every file create/delete/move must update documentation immediately.
+6. **NO Memory File Bloat** - No dev logs (DAY-*.md), no duplicate docs. Keep INDEX.md under 200 lines.
 
 ## 🚨 CRITICAL: 3-Day Tees Order Submission
 
