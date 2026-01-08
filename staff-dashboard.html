@@ -117,8 +117,9 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            flex: 1;
             color: #ffffff !important;
+            max-width: calc(100% - 80px);
+            margin: 0 auto;
         }
         .price-alert-content span,
         .price-alert-content strong {
@@ -371,7 +372,7 @@
                             <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
                         </div>
                         <div class="progress-text">
-                            <span id="goalCurrent">$0</span> of $3M (<span id="goalPercent">0</span>%)
+                            <span id="goalCurrent">$0</span> <span class="goal-percent">(<span id="goalPercent">0</span>%)</span>
                         </div>
                     </div>
                 </div>
