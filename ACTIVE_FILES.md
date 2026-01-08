@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-01-06
+**Last Updated:** 2026-01-07
 **Total Active Files:** ~268 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -55,19 +55,30 @@
 | `/calculators/dtg-manual-pricing.html` | Manual DTG pricing | dtg-config.js | ✅ Active |
 | `/quote-builders/dtg-quote-builder.html` | DTG Quote Builder 2026 (Excel-style) | dtg-quote-pricing.js | ✅ Active |
 
-### DTF System (Consolidated 2026-01-06)
+### DTF System
+
+#### DTF Pricing Calculator (Customer-facing)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/dtf-pricing.html` | DTF pricing calculator | dtf-quote-pricing.js | ✅ Active |
-| `/calculators/dtf-manual-pricing.html` | Manual DTF pricing | dtf-quote-pricing.js | ✅ Active |
+| `/pricing/dtf/index.html` | DTF pricing page | dtf-pricing-calculator.js | ✅ Active |
+| `/shared_components/js/dtf-pricing-calculator.js` | DTF calculator UI & pricing logic | dtf-pricing-service.js, DTFConfig | ✅ Active |
+| `/shared_components/js/dtf-pricing-service.js` | API data fetcher & transformer | Caspio API | ✅ Active |
+| `/shared_components/js/dtf-integration.js` | Coordinates calculator, adapter, events | dtf-pricing-calculator.js | ✅ Active |
+| `/shared_components/js/dtf-adapter.js` | Caspio data adapter | Caspio API | ✅ Active |
+| `/shared_components/js/dtf-config.js` | Location mappings (no pricing values) | - | ✅ Active |
+| `/shared_components/css/dtf-toggle-pricing.css` | Toggle interface styles | - | ✅ Active |
+
+#### DTF Quote Builder (Staff)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
 | `/quote-builders/dtf-quote-builder.html` | DTF Quote Builder 2026 (Excel-style) | 4 JS files below | ✅ Active |
 | `/shared_components/js/dtf-quote-builder.js` | Main DTF quote controller | DTFQuotePricing class | ✅ Active |
-| `/shared_components/js/dtf-quote-pricing.js` | **CONSOLIDATED** Pricing + Config + Service (DTFConfig, DTFPricingService, DTFQuotePricing) | Caspio API | ✅ Active |
+| `/shared_components/js/dtf-quote-pricing.js` | **CONSOLIDATED** Pricing + Config + Service | Caspio API | ✅ Active |
 | `/shared_components/js/dtf-quote-products.js` | DTF quote product manager | ExactMatchSearch | ✅ Active |
 | `/shared_components/js/dtf-quote-service.js` | DTF quote database service | EmailJS, Caspio API | ✅ Active |
 | `/shared_components/css/dtf-quote-builder.css` | DTF quote builder styles (green theme) | - | ✅ Active |
 
-**DTF Refactor (2026-01-06):** Consolidated 10 files → 4 files. Deleted: dtf-adapter.js, dtf-quote-adapter.js, dtf-pricing-calculator.js, dtf-integration.js, dtf-config.js, dtf-pricing-service.js (2,410+ lines removed)
+**DTF Formula Alignment (2026-01-07):** Fixed dtf-pricing-calculator.js to use pre-transformed API data from service. Both calculator and quote builder now use identical pricing formula. See `/memory/DTF_PRICING_SYSTEM.md`.
 
 ### Embroidery System
 | File | Purpose | Dependencies | Status |

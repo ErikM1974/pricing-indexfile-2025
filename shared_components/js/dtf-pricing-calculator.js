@@ -113,48 +113,118 @@ class DTFPricingCalculator {
     /**
      * Store API data in instance for pricing calculations
      * DTFConfig no longer contains pricing - all from API
+     *
+     * Handles TWO data formats:
+     * 1. Pre-transformed data from dtf-pricing-service.js (pricingTiers, transferSizes, freightTiers)
+     * 2. Raw API data (tiersR, allDtfCostsR, freightR) - accessed via apiData.raw
      */
     mergeApiDataIntoConfig(apiData) {
+        // Check if data is already transformed by dtf-pricing-service.js
+        if (apiData.pricingTiers && Array.isArray(apiData.pricingTiers) &&
+            apiData.transferSizes && apiData.freightTiers) {
+
+            console.log('[DTF Calculator] Using pre-transformed API data from service');
+
+            // Use already-transformed pricing tiers directly
+            this.pricingTiers = apiData.pricingTiers;
+
+            // Store transfer pricing tiers from pre-built structure
+            this.transferPricingTiers = {};
+            Object.entries(apiData.transferSizes).forEach(([sizeKey, sizeData]) => {
+                if (sizeData.pricingTiers && Array.isArray(sizeData.pricingTiers)) {
+                    this.transferPricingTiers[sizeKey] = sizeData.pricingTiers;
+                }
+            });
+            console.log('[DTF Calculator] Transfer pricing tiers loaded:', Object.keys(this.transferPricingTiers));
+
+            // Use pre-built freight tiers
+            this.freightTiers = apiData.freightTiers;
+            console.log('[DTF Calculator] Freight tiers loaded:', this.freightTiers.length, 'tiers');
+
+            // Use pre-extracted labor cost
+            this.laborCostPerLocation = apiData.laborCostPerLocation || 0;
+            console.log('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
+
+            // Extract LTM fee from first tier with LTM
+            this.ltmFeeAmount = 0;
+            this.ltmFeeThreshold = 24;
+            const ltmTier = this.pricingTiers.find(t => t.ltmFee > 0);
+            if (ltmTier) {
+                this.ltmFeeAmount = ltmTier.ltmFee;
+                this.ltmFeeThreshold = ltmTier.maxQuantity + 1;
+            }
+
+            // Get margin from first tier
+            if (this.pricingTiers[0]) {
+                this.marginDenominator = this.pricingTiers[0].marginDenominator;
+                console.log('[DTF Calculator] Margin denominator from API:', this.marginDenominator);
+            }
+
+            console.log('[DTF Calculator] Pre-transformed data loaded successfully');
+            this.updateLTMFeeDisplays();
+            return;
+        }
+
+        // FALLBACK: Process raw API data (legacy support or direct API calls)
+        // Check for raw data nested under .raw property
+        const rawData = apiData.raw || apiData;
+
+        // Size mapping from API format to our keys (matches dtf-quote-pricing.js)
+        const sizeMap = {
+            'Up to 5" x 5"': 'small',
+            'Up to 9" x 12"': 'medium',
+            'Up to 12" x 16.5"': 'large'
+        };
+
         // Store transfer pricing tiers in instance (NOT in DTFConfig)
         this.transferPricingTiers = {};
-        if (apiData.allDtfCostsR && Array.isArray(apiData.allDtfCostsR)) {
-            apiData.allDtfCostsR.forEach(cost => {
-                const priceType = cost.price_type;
-                const quantityRange = cost.quantity_range;
-                const unitPrice = parseFloat(cost.unit_price);
-                const sizeKey = priceType.toLowerCase();
+        if (rawData.allDtfCostsR && Array.isArray(rawData.allDtfCostsR)) {
+            rawData.allDtfCostsR.forEach(cost => {
+                // Use cost.size with sizeMap (matches dtf-quote-pricing.js)
+                const sizeKey = sizeMap[cost.size];
+                if (!sizeKey) {
+                    console.warn('[DTF Calculator] Unknown size from API:', cost.size);
+                    return;
+                }
 
                 if (!this.transferPricingTiers[sizeKey]) {
                     this.transferPricingTiers[sizeKey] = [];
                 }
 
-                const [minQty, maxQty] = this.parseQuantityRange(quantityRange);
+                // Use min_quantity and max_quantity directly from API
                 this.transferPricingTiers[sizeKey].push({
-                    minQty,
-                    maxQty,
-                    unitPrice,
-                    range: quantityRange
+                    minQty: cost.min_quantity,
+                    maxQty: cost.max_quantity,
+                    unitPrice: parseFloat(cost.unit_price),
+                    range: cost.quantity_range || `${cost.min_quantity}-${cost.max_quantity}`,
+                    laborCost: cost.PressingLaborCost
                 });
             });
+
+            // Sort each size's tiers by minQty
+            Object.keys(this.transferPricingTiers).forEach(size => {
+                this.transferPricingTiers[size].sort((a, b) => a.minQty - b.minQty);
+            });
+
+            console.log('[DTF Calculator] Transfer pricing tiers loaded:', Object.keys(this.transferPricingTiers));
         }
 
         // Store freight tiers in instance (NOT in DTFConfig)
         this.freightTiers = [];
-        if (apiData.freightR && Array.isArray(apiData.freightR)) {
-            this.freightTiers = apiData.freightR.map(freight => {
-                const [minQty, maxQty] = this.parseQuantityRange(freight.quantity_range);
-                return {
-                    minQty,
-                    maxQty,
-                    costPerTransfer: parseFloat(freight.cost_per_transfer)
-                };
-            }).sort((a, b) => a.minQty - b.minQty);
+        if (rawData.freightR && Array.isArray(rawData.freightR)) {
+            this.freightTiers = rawData.freightR.map(freight => ({
+                minQty: freight.min_quantity,
+                maxQty: freight.max_quantity,
+                costPerTransfer: parseFloat(freight.cost_per_transfer)
+            })).sort((a, b) => a.minQty - b.minQty);
+
+            console.log('[DTF Calculator] Freight tiers loaded:', this.freightTiers.length, 'tiers');
         }
 
         // Store labor cost in instance (NOT in DTFConfig)
         this.laborCostPerLocation = 0;
-        if (apiData.allDtfCostsR && apiData.allDtfCostsR[0] && apiData.allDtfCostsR[0].PressingLaborCost) {
-            this.laborCostPerLocation = parseFloat(apiData.allDtfCostsR[0].PressingLaborCost);
+        if (rawData.allDtfCostsR && rawData.allDtfCostsR[0] && rawData.allDtfCostsR[0].PressingLaborCost) {
+            this.laborCostPerLocation = parseFloat(rawData.allDtfCostsR[0].PressingLaborCost);
             console.log('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
         }
 
@@ -162,8 +232,8 @@ class DTFPricingCalculator {
         this.pricingTiers = [];
         this.ltmFeeAmount = 0;
         this.ltmFeeThreshold = 24;
-        if (apiData.tiersR && Array.isArray(apiData.tiersR)) {
-            this.pricingTiers = apiData.tiersR.map(tier => ({
+        if (rawData.tiersR && Array.isArray(rawData.tiersR)) {
+            this.pricingTiers = rawData.tiersR.map(tier => ({
                 tierLabel: tier.TierLabel,
                 minQuantity: tier.MinQuantity,
                 maxQuantity: tier.MaxQuantity,
@@ -233,6 +303,21 @@ class DTFPricingCalculator {
         }
         const tier = this.freightTiers.find(t => quantity >= t.minQty && quantity <= t.maxQty);
         return tier ? tier.costPerTransfer : 0;
+    }
+
+    /**
+     * Get tier data for a specific quantity - REQUIRES API DATA
+     * Matches dtf-quote-pricing.js getTierData() method
+     */
+    getTierDataForQuantity(quantity) {
+        if (!this.pricingTiers || this.pricingTiers.length === 0) {
+            console.error('[DTF Calculator] No pricing tier data available');
+            return null;
+        }
+        const tier = this.pricingTiers.find(t =>
+            quantity >= t.minQuantity && quantity <= t.maxQuantity
+        );
+        return tier || null;
     }
 
     parseQuantityRange(range) {
@@ -559,11 +644,22 @@ class DTFPricingCalculator {
         this.updatePricingDisplay();
     }
 
+    /**
+     * Calculate pricing - 100% API-DRIVEN, matches dtf-quote-pricing.js
+     *
+     * Formula: PRICE = HalfDollarCeil(
+     *     (GarmentCost / MarginDenominator)  // From API Pricing_Tiers
+     *     + TransferCosts                     // From API DTF_Pricing
+     *     + (LaborCost × LocationCount)       // From API DTF_Pricing
+     *     + (FreightCost × LocationCount)     // From API Transfer_Freight
+     *     + (LTM_Fee / Quantity)              // From API Pricing_Tiers
+     * )
+     */
     calculatePricing() {
         const quantity = this.currentData.quantity;
         const garmentCost = this.currentData.garmentCost;
 
-        // Check if any locations are selected - must select at least one location
+        // Check if any locations are selected
         if (this.currentData.selectedLocations.size === 0) {
             return {
                 error: 'No locations selected',
@@ -579,14 +675,31 @@ class DTFPricingCalculator {
             return {
                 error: 'No garment cost',
                 unitPrice: 0,
-                totalOrder: 0
+                totalOrder: 0,
+                quantity: quantity,
+                locationCount: this.currentData.selectedLocations.size
             };
         }
 
-        // Step 1: Garment cost with margin
-        // Margin from API (stored in instance) - not hardcoded
-        const marginDenominator = this.marginDenominator || 0.57;
-        const markedUpGarment = garmentCost / marginDenominator;
+        // Get tier data for current quantity - MUST come from API
+        const tierData = this.getTierDataForQuantity(quantity);
+        if (!tierData) {
+            return {
+                error: 'No pricing tier data',
+                unitPrice: 0,
+                totalOrder: 0,
+                quantity: quantity,
+                locationCount: this.currentData.selectedLocations.size
+            };
+        }
+
+        // Step 1: Garment cost with margin (from API tier - NO FALLBACK)
+        const marginDenominator = tierData.marginDenominator;
+        if (!marginDenominator || marginDenominator === 0) {
+            console.error('[DTF Calculator] Invalid margin denominator from API');
+            return { error: 'Invalid margin data', unitPrice: 0, totalOrder: 0 };
+        }
+        const garmentWithMargin = garmentCost / marginDenominator;
 
         // Step 2: Calculate transfer costs for all selected locations
         let totalTransferCost = 0;
@@ -597,7 +710,7 @@ class DTFPricingCalculator {
             if (!location) return;
 
             const sizeKey = location.size;
-            const transferPrice = DTFConfig.helpers.getTransferPrice(sizeKey, quantity);
+            const transferPrice = this.getTransferPrice(sizeKey, quantity);
 
             totalTransferCost += transferPrice;
             transferDetails.push({
@@ -607,49 +720,58 @@ class DTFPricingCalculator {
             });
         });
 
-        // Step 3: Labor cost from API (stored in instance)
+        // Step 3: Labor cost (from API - NO FALLBACK)
         const locationCount = this.currentData.selectedLocations.size;
-        const laborCost = locationCount * (this.laborCostPerLocation || 0);
-
-        // Step 4: Freight from API (stored in instance)
-        const freightPerTransfer = this.getFreightPerTransfer(quantity);
-        const freightCost = freightPerTransfer * locationCount;
-
-        // Step 5: Subtotal (before LTM)
-        const subtotal = markedUpGarment + totalTransferCost + laborCost + freightCost;
-
-        // Step 6: LTM Fee from API (only for quantities under threshold)
-        let ltmFee = 0;
-        let ltmFeePerUnit = 0;
-        const ltmThreshold = this.ltmFeeThreshold || 24;
-        if (quantity < ltmThreshold) {
-            ltmFee = this.ltmFeeAmount || 0;
-            ltmFeePerUnit = ltmFee > 0 ? ltmFee / quantity : 0;
+        if (this.laborCostPerLocation === undefined || this.laborCostPerLocation === null) {
+            console.error('[DTF Calculator] No labor cost data from API');
+            return { error: 'No labor cost data', unitPrice: 0, totalOrder: 0 };
         }
+        const totalLaborCost = this.laborCostPerLocation * locationCount;
 
-        // Step 7: Total per unit (subtotal + LTM fee per unit)
-        const totalPerUnit = subtotal + ltmFeePerUnit;
+        // Step 4: Freight (from API)
+        const freightPerTransfer = this.getFreightPerTransfer(quantity);
+        const totalFreightCost = freightPerTransfer * locationCount;
 
-        // Step 8: Round UP to nearest $0.50 (HalfDollarCeil)
-        const finalUnitPrice = this.roundHalfDollarCeil(totalPerUnit);
+        // Step 5: LTM Fee (from API tier data, distributed per unit)
+        // ltmFee can be 0 for 24+ qty tiers - this is valid API data
+        const ltmFee = tierData.ltmFee || 0;
+        // Floor to cents like dtf-quote-pricing.js: Math.floor((ltmFee / qty) * 100) / 100
+        const ltmFeePerUnit = (ltmFee > 0 && quantity > 0)
+            ? Math.floor((ltmFee / quantity) * 100) / 100
+            : 0;
+
+        // Step 6: Subtotal before rounding
+        const subtotalBeforeRounding =
+            garmentWithMargin +
+            totalTransferCost +
+            totalLaborCost +
+            totalFreightCost +
+            ltmFeePerUnit;
+
+        // Step 7: Round UP to nearest $0.50 (HalfDollarCeil)
+        const finalUnitPrice = this.roundHalfDollarCeil(subtotalBeforeRounding);
 
         // Total order calculation
-        const totalOrder = (finalUnitPrice * quantity);
+        const totalOrder = finalUnitPrice * quantity;
 
         return {
             quantity,
-            garmentCost: markedUpGarment,
+            garmentCost,
+            garmentWithMargin,
+            marginDenominator,
             transferDetails,
             totalTransferCost,
-            laborCost,
-            locationCount,
+            laborCostPerLocation: this.laborCostPerLocation,
+            totalLaborCost,
             freightPerTransfer,
-            freightCost,
+            totalFreightCost,
+            locationCount,
             ltmFee,
             ltmFeePerUnit,
-            subtotal,
+            subtotalBeforeRounding,
             finalUnitPrice,
-            totalOrder
+            totalOrder,
+            tierLabel: tierData.tierLabel
         };
     }
 

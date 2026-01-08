@@ -101,10 +101,8 @@ class DTFIntegration {
             this.calculator.updateQuantity(data.quantity);
         }
 
-        // Update freight (only if not using automatic freight calculation)
-        if (data.freight !== undefined && !DTFConfig.settings.includeFreightInTransfers) {
-            this.calculator.updateFreight(data.freight);
-        }
+        // Freight is now handled internally from API data - no external update needed
+        // The calculator gets freight from this.freightTiers loaded via mergeApiDataIntoConfig()
 
         // Update LTM fee - commented out as updateLTMFee method doesn't exist
         // The calculator handles LTM fee internally based on quantity

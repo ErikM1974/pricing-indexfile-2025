@@ -23,6 +23,7 @@ This documentation has been reorganized into modular components for better perfo
 ├── QUOTE_BUILDER_API_INTEGRATION.md  # API endpoints for quote builders
 ├── QUOTE_BUILDER_LINE_ITEMS.md       # Parent/child row patterns
 ├── PRICING_CALCULATOR_GUIDE.md       # Pricing calculator development guide
+├── DTF_PRICING_SYSTEM.md             # DTF pricing formula, API data, calculator/quote builder alignment
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator guide
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── DATABASE_PATTERNS.md              # Database schema patterns
@@ -136,6 +137,8 @@ This documentation has been reorganized into modular components for better perfo
 ### For Quote Builder Development
 
 **Quick Start - Building a new quote builder (DTF, DTG, Embroidery, Stickers, etc.)**
+
+> **DTF-Specific:** See **[DTF_PRICING_SYSTEM.md](./DTF_PRICING_SYSTEM.md)** for DTF pricing formula, API data mapping, and calculator/quote builder alignment.
 
 1. **[QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md)** - START HERE - Copy-paste ready code
    - Color picker implementation (complete code)
