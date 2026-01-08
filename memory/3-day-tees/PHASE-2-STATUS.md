@@ -374,11 +374,6 @@ heroku restart
 - [API-PATTERNS.md](API-PATTERNS.md) - API endpoint documentation
 - [EMAILJS-CONFIGURATION.md](EMAILJS-CONFIGURATION.md) - Email template setup
 
-**Summary Documents:**
-- [DAY-5-MORNING-SUMMARY.md](DAY-5-MORNING-SUMMARY.md) - Stripe foundation
-- [DAY-5-AFTERNOON-SUMMARY.md](DAY-5-AFTERNOON-SUMMARY.md) - Payment integration
-- [DAY-6-MORNING-SUMMARY.md](DAY-6-MORNING-SUMMARY.md) - Error handling
-
 ---
 
 ## ✅ Success Criteria Met

@@ -697,8 +697,6 @@ curl http://localhost:3000/api/stripe-config
 
 ## 🔗 Related Documentation
 
-- **Day 5 Morning Summary:** `memory/3-day-tees/DAY-5-MORNING-SUMMARY.md`
-- **Day 5 Afternoon Summary:** `memory/3-day-tees/DAY-5-AFTERNOON-SUMMARY.md`
 - **Stripe Prerequisites:** `memory/3-day-tees/STRIPE-PREREQUISITES.md`
 - **Stripe Documentation:** https://stripe.com/docs/testing
 - **Test Cards Reference:** https://stripe.com/docs/testing#cards

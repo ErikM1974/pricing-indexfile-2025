@@ -316,5 +316,5 @@ JDS Price = (JDS Wholesale / MarginDenominator) + EngravingLabor + SetupFee/Qty 
 ## Related Documentation
 
 - Backend update: `caspio-pricing-proxy/MESSAGE_TO_CLAUDE_PRICING_2026_MARGINS.md`
-- Pricing formulas: `memory/PRICING_MANUAL_CORE.md`
+- Pricing formulas: `memory/MANUAL_CALCULATOR_CONCEPTS.md`
 - API documentation: `memory/CASPIO_API_CORE.md`

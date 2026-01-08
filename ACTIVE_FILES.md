@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-01-07
+**Last Updated:** 2026-01-08
 **Total Active Files:** ~268 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -95,6 +95,17 @@
 | `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-service.js` | Pricing data adapter | Caspio API | ✅ Active |
 | `/shared_components/js/screenprint-fast-quote-service.js` | Fast quote service | EmailJS, Caspio API | ✅ Active |
+
+### Monogram Form System (NEW 2026-01-08)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/quote-builders/monogram-form.html` | Monogram/personalization tracking form | monogram-form-service.js, monogram-form-controller.js | ✅ Active |
+| `/shared_components/js/monogram-form-service.js` | API service (ManageOrders, Caspio) | ManageOrders API | ✅ Active |
+| `/shared_components/js/monogram-form-controller.js` | UI controller and state management | monogram-form-service.js | ✅ Active |
+| `/shared_components/css/monogram-form.css` | Monogram form styling | quote-builder-common.css | ✅ Active |
+| `/memory/MONOGRAM_FORM_SYSTEM.md` | Implementation documentation | - | 📚 Docs |
+
+**Features:** Order lookup from ShopWorks, dynamic name entry (up to 50), print PDF for production, search by order/company.
 
 ### Cap Embroidery System
 | File | Purpose | Dependencies | Status |
@@ -283,6 +294,15 @@ cap-embroidery-fix.css
 - `richardson-112-images.js` → 112 is SanMar product, not Factory Direct
 - `richardson-color-selector-enhancement.js` → Color picker not needed
 - `richardson-color-selector.css` → Color picker styles removed
+
+### Memory System Cleanup (2026-01-08)
+**Context:** Cleaned up /memory/ docs to reduce Claude Code context bloat
+- `/memory/3-day-tees/DAY-5-MORNING-SUMMARY.md` (413 lines) → Deleted (outdated dev log)
+- `/memory/3-day-tees/DAY-5-AFTERNOON-SUMMARY.md` (498 lines) → Deleted (outdated dev log)
+- `/memory/3-day-tees/DAY-6-MORNING-SUMMARY.md` (357 lines) → Deleted (outdated dev log)
+- `/memory/PRICING_MANUAL_CORE.md` (294 lines) → Deleted (duplicated MANUAL_CALCULATOR_CONCEPTS.md)
+- `/memory/INDEX.md` (525 lines → 130 lines) → Trimmed by 75%
+- **Total savings:** ~1,957 lines of duplicate/stale content
 
 ### Removed During Cleanup (2025-01-27)
 - **71 JavaScript files** - Orphaned, unused, or duplicate
