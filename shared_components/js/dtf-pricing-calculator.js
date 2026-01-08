@@ -280,6 +280,46 @@ class DTFPricingCalculator {
         return tier.costPerTransfer;
     }
 
+    /**
+     * Get margin denominator for specific quantity tier (matches quote builder)
+     * @throws {Error} if API data not loaded
+     */
+    getMarginDenominator(quantity) {
+        if (!this.pricingTiers || this.pricingTiers.length === 0) {
+            console.error('[DTF Calculator] API data not loaded - cannot get margin');
+            throw new Error('API data not loaded - cannot get margin');
+        }
+        const tier = this.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
+        if (!tier) {
+            console.error(`[DTF Calculator] No pricing tier found for quantity ${quantity}`);
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+        return tier.marginDenominator;
+    }
+
+    /**
+     * Get LTM fee for specific quantity tier (matches quote builder)
+     * Returns 0 if quantity is above LTM threshold
+     */
+    getLTMFee(quantity) {
+        if (!this.pricingTiers || this.pricingTiers.length === 0) {
+            return 0;
+        }
+        const tier = this.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
+        return tier ? (tier.ltmFee || 0) : 0;
+    }
+
+    /**
+     * Get tier label for quantity (e.g., "48-71 pieces")
+     */
+    getTierLabel(quantity) {
+        if (!this.pricingTiers || this.pricingTiers.length === 0) {
+            return '';
+        }
+        const tier = this.pricingTiers.find(t => quantity >= t.minQuantity && quantity <= t.maxQuantity);
+        return tier ? tier.tierLabel : '';
+    }
+
     parseQuantityRange(range) {
         // Parse "10-23", "24-47", "72+" etc.
         if (range.includes('+')) {
@@ -628,12 +668,14 @@ class DTFPricingCalculator {
             };
         }
 
-        // Step 1: Garment cost with margin (from API - no fallback)
-        const marginDenominator = this.marginDenominator;
-        if (!marginDenominator) {
-            console.error('[DTF Calculator] Margin denominator not loaded from API');
+        // Step 1: Garment cost with margin (tier-specific from API - matches quote builder)
+        let marginDenominator;
+        try {
+            marginDenominator = this.getMarginDenominator(quantity);
+        } catch (error) {
+            console.error('[DTF Calculator] Error getting margin:', error.message);
             return {
-                error: 'Pricing data not loaded',
+                error: error.message,
                 unitPrice: 0,
                 totalOrder: 0
             };
@@ -690,14 +732,10 @@ class DTFPricingCalculator {
         // Step 5: Subtotal (before LTM)
         const subtotal = markedUpGarment + totalTransferCost + laborCost + freightCost;
 
-        // Step 6: LTM Fee from API (only for quantities under threshold)
-        let ltmFee = 0;
-        let ltmFeePerUnit = 0;
-        const ltmThreshold = this.ltmFeeThreshold || 24;
-        if (quantity < ltmThreshold) {
-            ltmFee = this.ltmFeeAmount || 0;
-            ltmFeePerUnit = ltmFee > 0 ? ltmFee / quantity : 0;
-        }
+        // Step 6: LTM Fee from API (tier-specific - matches quote builder)
+        // LTM fee is stored per-tier, so getLTMFee returns 0 for tiers without LTM
+        const ltmFee = this.getLTMFee(quantity);
+        const ltmFeePerUnit = ltmFee > 0 ? ltmFee / quantity : 0;
 
         // Step 7: Total per unit (subtotal + LTM fee per unit)
         const totalPerUnit = subtotal + ltmFeePerUnit;
@@ -708,20 +746,28 @@ class DTFPricingCalculator {
         // Total order calculation
         const totalOrder = (finalUnitPrice * quantity);
 
+        // Get tier label for display
+        const tierLabel = this.getTierLabel(quantity);
+
         return {
             quantity,
+            tierLabel,
+            marginDenominator,
             garmentCost: markedUpGarment,
             transferDetails,
             totalTransferCost,
             laborCost,
+            laborCostPerLocation: this.laborCostPerLocation,
             locationCount,
             freightPerTransfer,
             freightCost,
             ltmFee,
             ltmFeePerUnit,
             subtotal,
+            totalPerUnit,
             finalUnitPrice,
-            totalOrder
+            totalOrder,
+            hasLTM: ltmFee > 0
         };
     }
 
