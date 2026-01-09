@@ -490,6 +490,27 @@ class MonogramFormService {
     }
 
     // ============================================
+    // Thread Colors API
+    // ============================================
+
+    /**
+     * Fetch available thread colors from API
+     * Returns array of in-stock thread colors
+     */
+    async fetchThreadColors() {
+        try {
+            const response = await fetch(`${this.baseURL}/api/thread-colors?instock=true`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch thread colors: ${response.status}`);
+            }
+            return await response.json(); // Returns array directly
+        } catch (error) {
+            console.error('[MonogramService] Thread colors fetch error:', error);
+            throw error; // CLAUDE.md Rule #4: No silent API failures
+        }
+    }
+
+    // ============================================
     // Utility Methods
     // ============================================
 

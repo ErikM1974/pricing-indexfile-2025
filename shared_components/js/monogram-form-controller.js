@@ -15,6 +15,10 @@ class MonogramFormController {
         this.isDirty = false;
         this.orderLoaded = false;  // Track if order data is loaded (affects row mode)
 
+        // Thread color state
+        this.threadColors = [];           // All available thread colors from API
+        this.selectedThreadColors = [];   // Currently selected thread color names
+
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -38,6 +42,9 @@ class MonogramFormController {
 
         // Bind event listeners
         this.bindEventListeners();
+
+        // Initialize thread color dropdown
+        this.initThreadColorDropdown();
 
         // Check for URL parameters
         this.checkURLParameters();
@@ -120,6 +127,274 @@ class MonogramFormController {
             document.getElementById('orderNumber').value = orderNumber;
             this.handleOrderLookup();
         }
+    }
+
+    // ============================================
+    // Thread Color Dropdown
+    // ============================================
+
+    /**
+     * Initialize thread color dropdown - fetch colors and bind events
+     */
+    async initThreadColorDropdown() {
+        const toggleBtn = document.getElementById('threadColorBtn');
+        const dropdown = document.getElementById('threadColorDropdown');
+        const searchInput = document.getElementById('threadColorSearch');
+        const doneBtn = document.getElementById('threadColorDoneBtn');
+
+        if (!toggleBtn || !dropdown) return;
+
+        // Bind toggle button
+        toggleBtn.addEventListener('click', () => this.toggleThreadColorDropdown());
+
+        // Bind Done button
+        if (doneBtn) {
+            console.log('[MonogramController] Done button found, binding click handler');
+            doneBtn.addEventListener('click', (e) => {
+                console.log('[MonogramController] Done button clicked!');
+                e.stopPropagation();
+                e.preventDefault();
+                this.closeThreadColorDropdown();
+            });
+        } else {
+            console.log('[MonogramController] WARNING: Done button NOT found!');
+        }
+
+        // Bind search input
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => this.filterThreadColors(e.target.value));
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.thread-color-group')) {
+                this.closeThreadColorDropdown();
+            }
+        });
+
+        // Load thread colors from API
+        await this.loadThreadColors();
+    }
+
+    /**
+     * Fetch thread colors from API
+     */
+    async loadThreadColors() {
+        try {
+            console.log('[MonogramController] Loading thread colors...');
+            this.threadColors = await this.service.fetchThreadColors();
+            console.log(`[MonogramController] Loaded ${this.threadColors.length} thread colors`);
+            this.renderThreadColorOptions();
+        } catch (error) {
+            console.error('[MonogramController] Failed to load thread colors:', error);
+            this.showToast('Failed to load thread colors', 'error');
+        }
+    }
+
+    /**
+     * Toggle thread color dropdown visibility
+     */
+    toggleThreadColorDropdown() {
+        const dropdown = document.getElementById('threadColorDropdown');
+        const toggleBtn = document.getElementById('threadColorBtn');
+
+        if (!dropdown) return;
+
+        const isHidden = dropdown.hidden;
+        dropdown.hidden = !isHidden;
+        toggleBtn.classList.toggle('open', !isHidden);
+
+        // Focus search input when opening
+        if (!isHidden === false) {
+            const searchInput = document.getElementById('threadColorSearch');
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+                this.filterThreadColors('');  // Reset filter
+            }
+        }
+    }
+
+    /**
+     * Close thread color dropdown
+     */
+    closeThreadColorDropdown() {
+        console.log('[MonogramController] closeThreadColorDropdown() called');
+        const dropdown = document.getElementById('threadColorDropdown');
+        const toggleBtn = document.getElementById('threadColorBtn');
+
+        console.log('[MonogramController] dropdown element:', dropdown);
+        console.log('[MonogramController] dropdown.hidden before:', dropdown?.hidden);
+
+        if (dropdown) dropdown.hidden = true;
+        if (toggleBtn) toggleBtn.classList.remove('open');
+
+        console.log('[MonogramController] dropdown.hidden after:', dropdown?.hidden);
+    }
+
+    /**
+     * Render thread color options in dropdown
+     */
+    renderThreadColorOptions(filterText = '') {
+        const listEl = document.getElementById('threadColorList');
+        if (!listEl) return;
+
+        const filter = filterText.toLowerCase();
+        const filteredColors = this.threadColors.filter(color =>
+            color.Thread_Color.toLowerCase().includes(filter)
+        );
+
+        if (filteredColors.length === 0) {
+            listEl.innerHTML = '<div class="thread-color-option" style="color: var(--text-secondary);">No colors found</div>';
+            return;
+        }
+
+        listEl.innerHTML = filteredColors.map(color => {
+            const isSelected = this.selectedThreadColors.includes(color.Thread_Color);
+            return `
+                <div class="thread-color-option" data-color="${this.escapeHTML(color.Thread_Color)}">
+                    <input type="checkbox" id="tc_${color.Thead_ID}" ${isSelected ? 'checked' : ''}>
+                    <label for="tc_${color.Thead_ID}">${this.escapeHTML(color.Thread_Color)}</label>
+                </div>
+            `;
+        }).join('');
+
+        // Bind click events to options
+        listEl.querySelectorAll('.thread-color-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                // Don't toggle if clicking directly on checkbox (it handles itself)
+                if (e.target.type !== 'checkbox') {
+                    const checkbox = option.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                }
+                this.handleThreadColorToggle(option.dataset.color, option.querySelector('input').checked);
+            });
+        });
+    }
+
+    /**
+     * Filter thread colors by search text
+     */
+    filterThreadColors(text) {
+        this.renderThreadColorOptions(text);
+    }
+
+    /**
+     * Handle thread color checkbox toggle
+     */
+    handleThreadColorToggle(colorName, isChecked) {
+        if (isChecked) {
+            if (!this.selectedThreadColors.includes(colorName)) {
+                this.selectedThreadColors.push(colorName);
+            }
+        } else {
+            this.selectedThreadColors = this.selectedThreadColors.filter(c => c !== colorName);
+        }
+
+        this.renderSelectedThreadColorTags();
+        this.updateThreadColorButtonText();
+        this.updateAllRowThreadColorDropdowns();  // Update row dropdowns
+        this.isDirty = true;
+    }
+
+    /**
+     * Render selected thread color tags
+     */
+    renderSelectedThreadColorTags() {
+        const container = document.getElementById('selectedThreadColors');
+        if (!container) return;
+
+        container.innerHTML = this.selectedThreadColors.map(color => `
+            <span class="thread-color-tag" data-color="${this.escapeHTML(color)}">
+                ${this.escapeHTML(color)}
+                <button type="button" class="remove-tag" title="Remove">&times;</button>
+            </span>
+        `).join('');
+
+        // Bind remove buttons
+        container.querySelectorAll('.remove-tag').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tag = btn.closest('.thread-color-tag');
+                const colorName = tag.dataset.color;
+                this.handleThreadColorToggle(colorName, false);
+                this.renderThreadColorOptions();  // Update checkboxes
+            });
+        });
+    }
+
+    /**
+     * Update thread color button text
+     */
+    updateThreadColorButtonText() {
+        const btnText = document.getElementById('threadColorBtnText');
+        if (!btnText) return;
+
+        if (this.selectedThreadColors.length === 0) {
+            btnText.textContent = 'Select Thread Colors...';
+        } else if (this.selectedThreadColors.length === 1) {
+            btnText.textContent = this.selectedThreadColors[0];
+        } else {
+            btnText.textContent = `${this.selectedThreadColors.length} colors selected`;
+        }
+    }
+
+    /**
+     * Get comma-separated string of selected thread colors
+     */
+    getThreadColorString() {
+        return this.selectedThreadColors.join(', ');
+    }
+
+    /**
+     * Set selected thread colors from a comma-separated string
+     */
+    setThreadColorsFromString(colorString) {
+        if (!colorString) {
+            this.selectedThreadColors = [];
+        } else {
+            this.selectedThreadColors = colorString.split(',').map(c => c.trim()).filter(c => c);
+        }
+        this.renderSelectedThreadColorTags();
+        this.updateThreadColorButtonText();
+        this.renderThreadColorOptions();  // Update checkboxes
+        this.updateAllRowThreadColorDropdowns();  // Update row dropdowns
+    }
+
+    // ============================================
+    // Row Thread Color Dropdown
+    // ============================================
+
+    /**
+     * Create options HTML for row-level thread color dropdown
+     * Options come from the selected thread colors in the main selector
+     */
+    createRowThreadColorOptions() {
+        if (this.selectedThreadColors.length === 0) {
+            return '<option value="" disabled>Select colors above first</option>';
+        }
+        return this.selectedThreadColors.map(color =>
+            `<option value="${this.escapeHTML(color)}">${this.escapeHTML(color)}</option>`
+        ).join('');
+    }
+
+    /**
+     * Update all row thread color dropdowns when main selection changes
+     */
+    updateAllRowThreadColorDropdowns() {
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return;
+
+        const options = '<option value="">Select...</option>' + this.createRowThreadColorOptions();
+
+        tbody.querySelectorAll('.row-thread-color').forEach(select => {
+            const currentValue = select.value;
+            select.innerHTML = options;
+            // Restore value if still valid
+            if (this.selectedThreadColors.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        });
     }
 
     // ============================================
@@ -272,6 +547,7 @@ class MonogramFormController {
     createOrderModeRowHTML(rowNum) {
         const styleOptions = this.createStyleOptions();
         const sizeOptions = this.createSizeOptions();
+        const threadColorOptions = this.createRowThreadColorOptions();
 
         return `
             <td class="row-number">${rowNum}</td>
@@ -299,7 +575,10 @@ class MonogramFormController {
                 </select>
             </td>
             <td>
-                <input type="text" class="note-input" placeholder="Note">
+                <select class="row-thread-color" data-row="${rowNum}">
+                    <option value="">Select...</option>
+                    ${threadColorOptions}
+                </select>
             </td>
             <td>
                 <input type="text" class="name-input" placeholder="Name to embroider" required>
@@ -317,6 +596,7 @@ class MonogramFormController {
      */
     createManualModeRowHTML(rowNum) {
         const sizeOptions = this.createSizeOptions();
+        const threadColorOptions = this.createRowThreadColorOptions();
 
         return `
             <td class="row-number">${rowNum}</td>
@@ -338,7 +618,10 @@ class MonogramFormController {
                 </select>
             </td>
             <td>
-                <input type="text" class="note-input" placeholder="Note">
+                <select class="row-thread-color" data-row="${rowNum}">
+                    <option value="">Select...</option>
+                    ${threadColorOptions}
+                </select>
             </td>
             <td>
                 <input type="text" class="name-input" placeholder="Name to embroider" required>
@@ -677,7 +960,7 @@ class MonogramFormController {
             const descInput = row.querySelector('.description-input');
             const colorInput = row.querySelector('.color-input');
             const sizeInput = row.querySelector('.size-input');
-            const noteInput = row.querySelector('.note-input');
+            const rowThreadColorSelect = row.querySelector('.row-thread-color');
             const nameInput = row.querySelector('.name-input');
 
             rowData.push({
@@ -688,7 +971,7 @@ class MonogramFormController {
                 description: descInput?.value || '',
                 color: colorInput?.value || '',
                 size: sizeInput?.value || '',
-                note: noteInput?.value || '',
+                rowThreadColor: rowThreadColorSelect?.value || '',
                 name: nameInput?.value || ''
             });
         });
@@ -708,7 +991,7 @@ class MonogramFormController {
         const descInput = row.querySelector('.description-input');
         const colorInput = row.querySelector('.color-input');
         const sizeInput = row.querySelector('.size-input');
-        const noteInput = row.querySelector('.note-input');
+        const rowThreadColorSelect = row.querySelector('.row-thread-color');
         const nameInput = row.querySelector('.name-input');
 
         // Set values
@@ -737,7 +1020,7 @@ class MonogramFormController {
         if (descInput) descInput.value = data.description || '';
         if (colorInput) colorInput.value = data.color || '';
         if (sizeInput) sizeInput.value = data.size || '';
-        if (noteInput) noteInput.value = data.note || '';
+        if (rowThreadColorSelect) rowThreadColorSelect.value = data.rowThreadColor || '';
         if (nameInput) nameInput.value = data.name || '';
     }
 
@@ -779,7 +1062,7 @@ class MonogramFormController {
             companyName: document.getElementById('companyName').value.trim(),
             salesRepEmail: document.getElementById('salesRepEmail').value.trim(),
             fontStyle: document.getElementById('fontStyle').value.trim(),
-            threadColor: document.getElementById('threadColor').value.trim(),
+            threadColor: this.getThreadColorString(),  // Use multi-select values
             notesToProduction: document.getElementById('notesToProduction').value.trim()
         };
 
@@ -793,7 +1076,7 @@ class MonogramFormController {
             const descInput = row.querySelector('.description-input');
             const colorSelect = row.querySelector('.color-input');
             const sizeSelect = row.querySelector('.size-input');
-            const noteInput = row.querySelector('.note-input');
+            const rowThreadColorSelect = row.querySelector('.row-thread-color');
             const nameInput = row.querySelector('.name-input');
 
             const item = {
@@ -804,7 +1087,7 @@ class MonogramFormController {
                 description: descInput.value.trim(),
                 shirtColor: colorSelect.value.trim(),
                 size: sizeSelect.value.trim(),
-                note: noteInput.value.trim(),
+                rowThreadColor: rowThreadColorSelect?.value?.trim() || '',
                 monogramName: nameInput.value.trim(),
                 isCustomStyle: styleSelect.value === '__custom__'
             };
@@ -887,7 +1170,7 @@ class MonogramFormController {
         document.getElementById('companyName').value = session.CompanyName || '';
         document.getElementById('salesRepEmail').value = session.SalesRepEmail || '';
         document.getElementById('fontStyle').value = session.FontStyle || '';
-        document.getElementById('threadColor').value = session.ThreadColor || '';
+        this.setThreadColorsFromString(session.ThreadColor || '');  // Use multi-select setter
         document.getElementById('notesToProduction').value = session.NotesToProduction || '';
 
         // Clear existing rows and add new ones
@@ -904,7 +1187,7 @@ class MonogramFormController {
                 const descInput = row.querySelector('.description-input');
                 const colorSelect = row.querySelector('.color-input');
                 const sizeSelect = row.querySelector('.size-input');
-                const noteInput = row.querySelector('.note-input');
+                const rowThreadColorSelect = row.querySelector('.row-thread-color');
                 const nameInput = row.querySelector('.name-input');
 
                 if (item.IsCustomStyle) {
@@ -918,7 +1201,7 @@ class MonogramFormController {
                 descInput.value = item.Description || '';
                 colorSelect.innerHTML = `<option value="${item.ShirtColor || ''}">${item.ShirtColor || 'Select...'}</option>`;
                 sizeSelect.value = item.Size || '';
-                noteInput.value = item.Note || '';
+                if (rowThreadColorSelect) rowThreadColorSelect.value = item.RowThreadColor || '';
                 nameInput.value = item.MonogramName || '';
             });
         } else {
@@ -1002,6 +1285,9 @@ class MonogramFormController {
 
         document.getElementById('monogramForm').reset();
 
+        // Reset thread colors
+        this.setThreadColorsFromString('');
+
         // Reset to manual mode
         this.orderData = null;
         this.products = [];
@@ -1075,7 +1361,7 @@ class MonogramFormController {
                 <td>${this.escapeHTML(item.description)}</td>
                 <td>${this.escapeHTML(item.shirtColor)}</td>
                 <td>${this.escapeHTML(item.size)}</td>
-                <td>${this.escapeHTML(item.note)}</td>
+                <td>${this.escapeHTML(item.rowThreadColor)}</td>
                 <td><strong>${this.escapeHTML(item.monogramName)}</strong></td>
             </tr>
         `).join('');
