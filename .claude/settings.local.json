@@ -34,7 +34,8 @@
       "Bash(wsl cat:*)",
       "Bash(wsl.exe -e cat ~/.claude/settings.json)",
       "Skill(deploy)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(sort:*)"
     ],
     "deny": [],
     "ask": [],
