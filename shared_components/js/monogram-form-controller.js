@@ -134,11 +134,13 @@ class MonogramFormController {
     checkURLParameters() {
         const params = new URLSearchParams(window.location.search);
         const orderNumber = params.get('order');
-        const monogramID = params.get('id');
+        const loadOrder = params.get('load');  // Load existing monogram by order number
 
-        if (monogramID) {
-            this.loadExistingForm(monogramID);
+        if (loadOrder) {
+            // Load existing monogram from database
+            this.loadExistingForm(loadOrder);
         } else if (orderNumber) {
+            // Just populate order number field and do lookup
             document.getElementById('orderNumber').value = orderNumber;
             this.handleOrderLookup();
         }
@@ -1687,12 +1689,14 @@ class MonogramFormController {
 
             if (result.success) {
                 this.currentMonogramID = result.monogramID;
+                this.currentOrderNumber = result.orderNumber || formData.orderNumber;
                 this.isDirty = false;
-                this.showToast(`Saved as ${result.monogramID}`, 'success');
+                this.showToast(`Saved! Order #${this.currentOrderNumber}`, 'success');
 
-                // Update URL without reload
+                // Update URL with order number for easy sharing/bookmarking
                 const url = new URL(window.location);
-                url.searchParams.set('id', result.monogramID);
+                url.searchParams.delete('order');
+                url.searchParams.set('load', this.currentOrderNumber);
                 window.history.replaceState({}, '', url);
             } else {
                 this.showToast(result.error || 'Failed to save', 'error');
@@ -1705,15 +1709,16 @@ class MonogramFormController {
         }
     }
 
-    async loadExistingForm(monogramID) {
+    async loadExistingForm(orderNumber) {
         this.showLoading('Loading form...');
 
         try {
-            const result = await this.service.loadMonogramSession(monogramID);
+            const result = await this.service.loadMonogramSession(orderNumber);
 
             if (result.success) {
                 this.populateForm(result.session, result.items);
-                this.currentMonogramID = monogramID;
+                this.currentOrderNumber = orderNumber;
+                this.currentMonogramID = result.session.id_monogram;
                 this.isDirty = false;
                 this.showToast('Form loaded', 'success');
             } else {
@@ -1728,19 +1733,19 @@ class MonogramFormController {
     }
 
     populateForm(session, items) {
-        // Populate header fields
-        document.getElementById('orderNumber').value = session.OrderNumber || '';
-        document.getElementById('companyName').value = session.CompanyName || '';
-        document.getElementById('salesRepEmail').value = session.SalesRepEmail || '';
-        document.getElementById('fontStyle').value = session.FontStyle || '';
-        this.setThreadColorsFromString(session.ThreadColor || '');  // Use multi-select setter
-        this.setLocationsFromString(session.Location || '');  // Use multi-select setter
-        document.getElementById('notesToProduction').value = session.NotesToProduction || '';
+        // Populate header fields (using camelCase from service)
+        document.getElementById('orderNumber').value = session.orderNumber || '';
+        document.getElementById('companyName').value = session.companyName || '';
+        document.getElementById('salesRepEmail').value = session.salesRepEmail || '';
+        document.getElementById('fontStyle').value = session.fontStyle || '';
+        this.setThreadColorsFromString(session.threadColor || '');  // Use multi-select setter
+        this.setLocationsFromString(session.location || '');  // Use multi-select setter
+        document.getElementById('notesToProduction').value = session.notesToProduction || '';
 
         // Restore imported names if present
-        if (session.ImportedNames) {
+        if (session.importedNames) {
             const textarea = document.getElementById('pasteNamesInput');
-            if (textarea) textarea.value = session.ImportedNames;
+            if (textarea) textarea.value = session.importedNames;
             this.importNames();
         }
 
@@ -1830,7 +1835,7 @@ class MonogramFormController {
                         </div>
                         <div class="search-result-actions">
                             <button type="button" class="btn-secondary btn-sm"
-                                    onclick="monogramController.loadExistingForm('${session.monogramID || session.MonogramID}')">
+                                    onclick="monogramController.loadExistingForm('${session.OrderNumber || session.orderNumber}')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                         </div>

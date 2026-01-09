@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monogram Dashboard - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f9fbf8;
+            padding-top: 210px;
+        }
+
+        /* Fixed Header */
+        .dashboard-header {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        /* Contact Bar */
+        .header-contact-bar {
+            background: #2d5f3f;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .contact-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Navigation Bar */
+        .header-nav {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-image { height: 50px; width: auto; }
+
+        .main-nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .main-nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .main-nav-links a:hover { color: #2f661e; }
+
+        /* Context Bar */
+        .context-bar {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 20px 0;
+        }
+
+        .context-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .context-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a:hover { opacity: 1; }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .quick-btn-primary {
+            background: white;
+            color: #7c3aed;
+            border: none;
+        }
+
+        .quick-btn-primary:hover {
+            background: #f3f4f6;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+
+        /* Dashboard Card */
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* Filters */
+        .filters-section {
+            padding: 1.25rem;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(2, 1fr) auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 0.375rem;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-primary:hover { background: #7c3aed; }
+
+        .btn-outline {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-outline:hover { background: #f9fafb; }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        #monogramsTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #monogramsTable thead tr {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        #monogramsTable th {
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        #monogramsTable td {
+            padding: 0.875rem;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.875rem;
+        }
+
+        #monogramsTable tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .order-link {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .order-link:hover { text-decoration: underline; }
+
+        /* Badges */
+        .badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .badge-secondary { background: #e5e7eb; color: #4b5563; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 0.375rem 0.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            background: transparent;
+            color: #6b7280;
+        }
+
+        .action-btn:hover { background: #f3f4f6; color: #111827; }
+        .action-btn.edit:hover { color: #8b5cf6; }
+        .action-btn.print:hover { color: #059669; }
+        .action-btn.done:hover { color: #2563eb; }
+        .action-btn.delete:hover { color: #dc2626; }
+
+        /* Pagination */
+        .table-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Loading */
+        .loading {
+            padding: 2rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .loading i { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .filters-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 180px; }
+            .filters-grid { grid-template-columns: 1fr; }
+            .contact-info { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <header class="dashboard-header">
+        <!-- Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <span class="contact-item"><i class="fas fa-phone"></i> 253-922-5793</span>
+                    <span class="contact-item"><i class="fas fa-envelope"></i> orders@prior2.com</span>
+                </div>
+                <div class="contact-info">
+                    <span class="contact-item"><i class="fas fa-clock"></i> Mon-Fri 8am-5pm PST</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="header-nav">
+            <div class="nav-content">
+                <a href="/">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="logo-image">
+                </a>
+                <div class="main-nav-links">
+                    <a href="/staff-dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="/quote-builders/monogram-form.html"><i class="fas fa-font"></i> New Monogram</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Context Bar -->
+        <div class="context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html"><i class="fas fa-home"></i></a>
+                        <i class="fas fa-chevron-right" style="opacity: 0.5;"></i>
+                        <span>Monogram Dashboard</span>
+                    </nav>
+                    <h1 class="page-title">Monogram Orders</h1>
+                </div>
+                <div class="quick-actions">
+                    <a href="/quote-builders/monogram-form.html" class="quick-btn quick-btn-primary">
+                        <i class="fas fa-plus"></i> New Monogram
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Dashboard Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-font"></i> Monogram Orders</h2>
+                <button class="btn btn-outline" onclick="loadMonograms()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" class="filter-input"
+                               placeholder="Order # or company name..."
+                               onkeyup="filterMonograms()">
+                    </div>
+                    <div class="filter-group">
+                        <label>From Date</label>
+                        <input type="date" id="dateFrom" class="filter-input" onchange="filterMonograms()">
+                    </div>
+                    <div class="filter-group">
+                        <label>To Date</label>
+                        <input type="date" id="dateTo" class="filter-input" onchange="filterMonograms()">
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-primary" onclick="filterMonograms()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table id="monogramsTable">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Company</th>
+                            <th>Sales Rep</th>
+                            <th>Names</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monogramsTableBody">
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <i class="fas fa-spinner"></i> Loading monograms...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="table-footer">
+                <span id="resultCount">Loading...</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="/shared_components/js/monogram-dashboard.js"></script>
+</body>
+</html>

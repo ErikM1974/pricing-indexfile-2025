@@ -1,8 +1,9 @@
 # Monogram Form System Documentation
 
 **Created:** 2026-01-08
+**Updated:** 2026-01-09
 **Purpose:** Database-backed monogram/personalization tracking system for embroidery orders
-**Status:** Implementation in progress
+**Status:** Complete - Live in production
 
 ---
 
@@ -10,125 +11,101 @@
 
 This system replaces the JotForm-based monogram form with a database-backed solution that:
 1. Integrates with ShopWorks orders via ManageOrders API
-2. Stores data in Caspio tables
+2. Stores data in Caspio `Monograms` table (single table with JSON items)
 3. Generates printable PDF forms for production
-4. Allows lookup by order number or company name
+4. Provides dashboard for managing all monogram orders
 
 ---
 
-## Caspio Table Schemas
+## Architecture
 
-### IMPORTANT: Create These Tables in Caspio Admin
+### Single Table Design
 
-You must manually create these two tables in Caspio before the system will work.
+Uses ONE table (`Monograms`) with items stored as JSON in `ItemsJSON` field.
 
----
-
-### Table 1: `Monogram_Sessions`
-
-Create this table with the following fields:
-
-| Field Name | Data Type | Size | Required | Default | Notes |
-|------------|-----------|------|----------|---------|-------|
-| PK_ID | AutoNumber | - | Auto | Auto | Primary key (Caspio generates) |
-| MonogramID | Text | 20 | Yes | - | Unique ID: `MONO{MMDD}-{seq}` |
-| SessionID | Text | 50 | Yes | - | Browser session ID |
-| OrderNumber | Text | 20 | Yes | - | ShopWorks order number |
-| ShopWorksOrderNo | Number | - | No | - | Internal order_no for API |
-| ExtOrderID | Text | 20 | No | - | External quote ID |
-| CompanyName | Text | 255 | Yes | - | Customer company name |
-| SalesRepEmail | Text | 255 | No | - | Sales rep email address |
-| FontStyle | Text | 100 | No | - | Monogram font style |
-| ThreadColor | Text | 100 | No | - | Thread color for embroidery |
-| NotesToProduction | Text | 64000 | No | - | Production notes (use Memo) |
-| TotalNames | Number | - | Yes | 0 | Count of name entries |
-| Status | Text | 20 | Yes | 'Active' | Active, Printed, Completed |
-| CreatedAt | DateTime | - | Yes | Now() | Creation timestamp |
-| CreatedBy | Text | 100 | No | - | User who created |
-| LastModifiedAt | DateTime | - | No | - | Last update timestamp |
-| PrintedAt | DateTime | - | No | - | When PDF was printed |
-| SubmittedBy | Text | 100 | No | - | Who printed it |
-
-**Caspio Setup Notes:**
-- Set `MonogramID` as unique index
-- Set `OrderNumber` as searchable
-- Set `CompanyName` as searchable
-- Use "Memo" type for `NotesToProduction` (unlimited text)
+**Benefits:**
+- Simpler API (single CRUD endpoint)
+- Atomic saves (all data in one record)
+- Easy upsert by OrderNumber
 
 ---
 
-### Table 2: `Monogram_Items`
+## Caspio Table: `Monograms`
 
-Create this table with the following fields:
+| Field Name | Caspio Type | Notes |
+|------------|-------------|-------|
+| ID_Monogram | AutoNumber | Primary key |
+| OrderNumber | Number | ShopWorks order # (unique per monogram) |
+| CompanyName | Text(255) | Customer company |
+| SalesRepEmail | Text(255) | Sales rep email |
+| FontStyle | Text(255) | Font style |
+| ThreadColors | Text(255) | Comma-separated |
+| Locations | Text(255) | Comma-separated |
+| ImportedNames | Text(255) | Pasted names list |
+| NotesToProduction | Text(255) | Production notes |
+| ItemsJSON | Text(64000) | JSON array of line items |
+| TotalItems | Number | Count of items |
+| Status | Text(255) | Draft/Submitted/Printed/Completed |
+| CreatedAt | Date/Time | Created timestamp |
+| CreatedBy | Text(255) | User who created |
+| ModifiedAt | Date/Time | Last modified |
+| PrintedAt | Date/Time | When printed |
 
-| Field Name | Data Type | Size | Required | Default | Notes |
-|------------|-----------|------|----------|---------|-------|
-| PK_ID | AutoNumber | - | Auto | Auto | Primary key |
-| MonogramID | Text | 20 | Yes | - | FK to Monogram_Sessions |
-| LineNumber | Number | - | Yes | - | Row number (1-50) |
-| StyleNumber | Text | 50 | Yes | - | Product style code |
-| PartNumber | Text | 50 | No | - | ShopWorks PartNumber |
-| Description | Text | 255 | No | - | Product description |
-| ShirtColor | Text | 100 | No | - | Display color name |
-| CatalogColor | Text | 50 | No | - | API color code |
-| Size | Text | 20 | Yes | - | Size (XS, S, M, L, etc.) |
-| MonogramName | Text | 100 | Yes | - | Name to embroider |
-| Note | Text | 500 | No | - | Per-item notes |
-| IsCustomSize | Yes/No | - | No | No | True if custom size |
-| IsCustomStyle | Yes/No | - | No | No | True if manual entry |
-| AddedAt | DateTime | - | Yes | Now() | Timestamp |
+### ItemsJSON Structure
 
-**Caspio Setup Notes:**
-- Index on `MonogramID` for fast lookups
-- `MonogramID` links to `Monogram_Sessions.MonogramID`
+```json
+[
+  {
+    "lineNumber": 1,
+    "styleNumber": "PC54",
+    "description": "Core Cotton Tee",
+    "shirtColor": "Black",
+    "size": "L",
+    "rowThreadColor": "White",
+    "rowLocation": "Left Chest",
+    "monogramName": "John Smith",
+    "isCustomStyle": false
+  }
+]
+```
 
 ---
 
 ## API Endpoints
 
-### Existing (ManageOrders - No Changes Needed)
+### Base URL
+`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+
+### Monograms CRUD
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/monograms` | List all (with optional filters) |
+| GET | `/api/monograms/:orderNumber` | Get by order number |
+| POST | `/api/monograms` | Create new (or upsert if OrderNumber exists) |
+| PUT | `/api/monograms/:id_monogram` | Update by ID |
+| DELETE | `/api/monograms/:id_monogram` | Delete by ID |
+
+**Query Filters (GET /api/monograms):**
+- `?orderNumber=139465` - exact match
+- `?companyName=Puyallup` - partial match
+- `?status=Submitted` - exact match
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "monogram": { ... }       // single record
+  "monograms": [ ... ]      // array for list
+}
+```
+
+### ManageOrders (Order Data)
 
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /api/manageorders/orders/:order_no` | Get order header |
 | `GET /api/manageorders/lineitems/:order_no` | Get line items (styles, colors, sizes) |
-
-### New Endpoints (Add to caspio-pricing-proxy)
-
-#### Monogram Sessions
-
-```
-GET    /api/monogram_sessions
-       ?orderNumber=139465
-       &companyName=Puyallup
-
-GET    /api/monogram_sessions/:monogramId
-
-POST   /api/monogram_sessions
-       Body: { MonogramID, SessionID, OrderNumber, CompanyName, ... }
-
-PUT    /api/monogram_sessions/:pk_id
-       Body: { Status, NotesToProduction, ... }
-
-DELETE /api/monogram_sessions/:pk_id
-```
-
-#### Monogram Items
-
-```
-GET    /api/monogram_items?monogramId=MONO0108-1
-
-POST   /api/monogram_items
-       Body: { MonogramID, LineNumber, StyleNumber, MonogramName, ... }
-
-POST   /api/monogram_items/bulk
-       Body: { monogramId, items: [...] }
-
-PUT    /api/monogram_items/:pk_id
-       Body: { MonogramName, Size, ... }
-
-DELETE /api/monogram_items/:pk_id
-```
 
 ---
 
@@ -136,108 +113,122 @@ DELETE /api/monogram_items/:pk_id
 
 | File | Purpose |
 |------|---------|
-| `/quote-builders/monogram-form.html` | Main application UI |
+| `/quote-builders/monogram-form.html` | Main entry form |
+| `/dashboards/monogram-dashboard.html` | Management dashboard |
 | `/shared_components/js/monogram-form-service.js` | API service layer |
-| `/shared_components/js/monogram-form-controller.js` | UI logic/state |
-| `/shared_components/css/monogram-form.css` | Styling |
+| `/shared_components/js/monogram-form-controller.js` | Form UI logic |
+| `/shared_components/js/monogram-dashboard.js` | Dashboard logic |
+| `/shared_components/css/monogram-form.css` | Form styling |
+
+---
+
+## Dashboard Features
+
+**URL:** `/dashboards/monogram-dashboard.html`
+
+### KPI Cards
+| Card | Description |
+|------|-------------|
+| Total Orders | Count of all monograms |
+| Pending | Draft + Submitted status |
+| Printed Today | PrintedAt = today |
+| This Week | Created in last 7 days |
+
+### Filters
+- Search by order number or company name
+- Filter by status (Draft/Submitted/Printed/Completed)
+- Filter by date range (Created At)
+
+### Actions
+| Button | Action |
+|--------|--------|
+| Edit | Opens form with `?load=ORDER_NUMBER` |
+| Print | Opens form in print mode |
+| Mark Printed | Updates status to "Printed" |
+| Delete | Removes record (with confirmation) |
+
+---
+
+## URL Parameters
+
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `?order=139465` | Pre-fill order number and auto-lookup | New monogram |
+| `?load=139465` | Load existing monogram by order number | Edit mode |
+| `?print=true` | Open in print mode (with load) | Print from dashboard |
 
 ---
 
 ## Size Mapping
 
-ShopWorks returns sizes in numbered slots (Size01-Size06). Map them as follows:
+ShopWorks returns sizes in numbered slots (Size01-Size06):
 
 ```javascript
-// CORRECT mapping (matches 3-day-tees.js and monogram-form-service.js)
 const SIZE_SLOT_MAP = {
     Size01: 'S',
     Size02: 'M',
     Size03: 'L',
     Size04: 'XL',
     Size05: '2XL'
-    // Size06 is catch-all for extended sizes (XS, 3XL+, LT, XLT, OSFA, etc.)
+    // Size06 is catch-all for extended sizes
 };
 
-// Extended sizes (from Size06 catch-all or manual entry)
 const EXTENDED_SIZES = ['XS', '3XL', '4XL', '5XL', '6XL', 'LT', 'XLT', '2XLT', '3XLT', '4XLT', 'OSFA'];
 ```
-
-**Note:** Size06 is a catch-all - the actual size is determined by the PartNumber suffix (e.g., `PC54_3X` = 3XL).
 
 ---
 
 ## User Workflow
 
+### Creating New Monogram
 1. Open Monogram Form
 2. Enter Order Number (e.g., "139465")
 3. System fetches order from ManageOrders API
-4. Form auto-populates company name, available styles/colors/sizes
-5. User enters global settings (font, thread color, notes)
-6. User fills in name rows (select style/color/size, type name)
-7. Save to database (generates MonogramID)
+4. Form auto-populates company name, styles/colors/sizes
+5. Enter global settings (font, thread color, locations, notes)
+6. Fill in name rows (select style/color/size, type name)
+7. Click "Save as Draft" or "Submit"
 8. Print PDF for production team
+
+### Managing Orders (Dashboard)
+1. Open Monogram Dashboard
+2. View KPIs at top
+3. Use filters to find specific orders
+4. Click Edit to modify, Print to generate PDF, Mark Printed to update status
 
 ---
 
-## Recent Features (January 2026)
+## Features (January 2026)
 
 ### Bulk Name Import
-Allows pasting a list of names (one per line) to quickly populate rows.
-
-**UI Components:**
-- Textarea for pasting names
-- "Import Names" button - parses and shows count
-- "Clear" button - removes all imported names
-- Unassigned names panel - shows remaining names to assign
-
-**Workflow:**
-1. Paste names into textarea (one per line)
-2. Click "Import Names" → System parses, shows "{n} names imported"
-3. Unassigned panel appears showing all names
-4. Per row: Select name from dropdown OR type manually
-5. Selected names disappear from other row dropdowns
-6. Panel shows "All names assigned!" when done
-
-**Controller State:**
-```javascript
-this.importedNames = [];        // All parsed names
-this.usedNameIndices = new Set(); // Track which are used
-```
+Paste list of names (one per line) to quickly populate rows.
+- Import button parses and shows count
+- Unassigned panel shows remaining names
+- Names disappear from dropdown when assigned
 
 ### Auto-Fill Thread Color & Location
-When only ONE thread color or location is selected at form level, automatically fills all empty row dropdowns.
-
-**Behavior:**
-- Triggers when clicking "Done" on thread color or location multi-select
-- Only fills rows where dropdown is empty (preserves manual selections)
-- Also applies to newly added rows
-
-**Methods:**
-- `autoFillThreadColorIfSingle()` - Fills thread dropdowns if 1 color selected
-- `autoFillLocationIfSingle()` - Fills location dropdowns if 1 location selected
+When only ONE option selected at form level, auto-fills all empty row dropdowns.
 
 ### Size Quantity Limits
-Tracks available quantity per size from order line items. Prevents over-assignment.
-
-**How it works:**
-- `sizeQuantities` map tracks remaining qty per Style-Color-Size combo
-- When row is assigned, decrements the count
-- Dropdown shows "(0 left)" and disables sizes with no remaining qty
-- On row delete/change, restores the quantity
+Tracks available quantity per size. Disables sizes with 0 remaining.
 
 ### PDF Sorting
-Generated PDF sorts names table:
-1. First by Style Number
-2. Then by Size (S → M → L → XL → 2XL → 3XL...)
+Sorts names table by Style Number, then by Size.
 
-### Staff Dashboard Access
-- **Button:** "Monogram 2026" in Forms section
-- **Link:** `/quote-builders/monogram-form.html`
+---
+
+## Staff Dashboard Access
+
+| Button | Link | Style |
+|--------|------|-------|
+| Monogram 2026 | `/quote-builders/monogram-form.html` | Default |
+| Monogram Dashboard | `/dashboards/monogram-dashboard.html` | Purple gradient |
+
+Located in Forms section of staff-dashboard.html.
 
 ---
 
 ## Related Files
 
 - `/memory/MANAGEORDERS_INTEGRATION.md` - ManageOrders API docs
-- `/shared_components/js/base-quote-service.js` - Base service pattern
 - `/calculators/monogramform.html` - Old JotForm wrapper (deprecated)

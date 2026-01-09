@@ -236,113 +236,84 @@ class MonogramFormService {
     }
 
     // ============================================
-    // Monogram Session CRUD
+    // Monogram Session CRUD (Using /api/monograms)
     // ============================================
 
     /**
      * Save monogram session to database
-     * NOTE: Requires Caspio tables and API endpoints to be set up
+     * Uses single-table approach with ItemsJSON
+     * API supports upsert: POST with existing OrderNumber updates instead of error
      */
     async saveMonogramSession(sessionData, items) {
         try {
-            const monogramID = sessionData.monogramID || this.generateMonogramID();
-            const sessionID = this.generateSessionID();
+            console.log('[MonogramService] Saving monogram for order:', sessionData.orderNumber);
 
-            console.log('[MonogramService] Saving monogram session:', monogramID);
+            // Filter out empty rows and prepare items for JSON storage
+            const validItems = items.filter(item =>
+                item.monogramName && item.monogramName.trim()
+            ).map((item, index) => ({
+                lineNumber: index + 1,
+                styleNumber: item.styleNumber || '',
+                description: item.description || '',
+                shirtColor: item.shirtColor || '',
+                size: item.size || '',
+                rowThreadColor: item.rowThreadColor || '',
+                rowLocation: item.rowLocation || '',
+                monogramName: item.monogramName,
+                isCustomStyle: item.isCustomStyle || false
+            }));
 
-            // Format dates without milliseconds (Caspio requirement)
+            // Format dates for Caspio
             const now = new Date().toISOString().replace(/\.\d{3}Z$/, '');
 
-            // Prepare session data
+            // Prepare payload matching Caspio table schema
             const payload = {
-                MonogramID: monogramID,
-                SessionID: sessionID,
-                OrderNumber: sessionData.orderNumber,
-                CompanyName: sessionData.companyName,
+                OrderNumber: parseInt(sessionData.orderNumber),
+                CompanyName: sessionData.companyName || '',
                 SalesRepEmail: sessionData.salesRepEmail || '',
                 FontStyle: sessionData.fontStyle || '',
-                ThreadColor: sessionData.threadColor || '',
+                ThreadColors: sessionData.threadColor || '',
+                Locations: sessionData.location || '',
+                ImportedNames: sessionData.importedNames || '',
                 NotesToProduction: sessionData.notesToProduction || '',
-                TotalNames: items.filter(i => i.monogramName && i.monogramName.trim()).length,
-                Status: sessionData.status || 'Active',
+                ItemsJSON: JSON.stringify(validItems),
+                TotalItems: validItems.length,
+                Status: sessionData.status || 'Submitted',
                 CreatedAt: now,
-                CreatedBy: sessionData.createdBy || ''
+                CreatedBy: sessionData.createdBy || '',
+                ModifiedAt: now
             };
 
-            // Try to save to API (will fail gracefully if endpoint doesn't exist)
-            try {
-                const response = await fetch(`${this.baseURL}/api/monogram_sessions`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            console.log('[MonogramService] Payload:', payload);
 
-                if (response.ok) {
-                    // Save items
-                    await this.saveMonogramItems(monogramID, items);
-                    console.log('[MonogramService] Session saved to database');
-                } else {
-                    console.warn('[MonogramService] API endpoint not available, saving to localStorage only');
-                }
-            } catch (apiError) {
-                console.warn('[MonogramService] API not available:', apiError.message);
+            // Save to API (upsert - creates or updates based on OrderNumber)
+            const response = await fetch(`${this.baseURL}/api/monograms`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log('[MonogramService] Saved to database, ID:', result.monogram?.ID_Monogram);
+
+                // Also save to localStorage as backup
+                this.saveToLocalStorage(sessionData.orderNumber, { session: payload, items: validItems });
+
+                return {
+                    success: true,
+                    monogramID: result.monogram?.ID_Monogram,
+                    orderNumber: sessionData.orderNumber
+                };
+            } else {
+                console.error('[MonogramService] API error:', result.error);
+                throw new Error(result.error || 'Failed to save');
             }
-
-            // Always save to localStorage as backup
-            this.saveToLocalStorage(monogramID, { session: payload, items });
-
-            return {
-                success: true,
-                monogramID: monogramID,
-                sessionID: sessionID
-            };
 
         } catch (error) {
             console.error('[MonogramService] Save error:', error);
             return { success: false, error: error.message };
-        }
-    }
-
-    /**
-     * Save monogram items in bulk
-     */
-    async saveMonogramItems(monogramID, items) {
-        const now = new Date().toISOString().replace(/\.\d{3}Z$/, '');
-
-        // Filter out empty rows
-        const validItems = items.filter(item =>
-            item.monogramName && item.monogramName.trim()
-        );
-
-        // Prepare items for bulk save
-        const itemsPayload = validItems.map((item, index) => ({
-            MonogramID: monogramID,
-            LineNumber: index + 1,
-            StyleNumber: item.styleNumber || '',
-            PartNumber: item.partNumber || item.styleNumber || '',
-            Description: item.description || '',
-            ShirtColor: item.shirtColor || '',
-            CatalogColor: item.catalogColor || '',
-            Size: item.size || '',
-            MonogramName: item.monogramName,
-            Note: item.note || '',
-            IsCustomSize: item.isCustomSize || false,
-            IsCustomStyle: item.isCustomStyle || false,
-            AddedAt: now
-        }));
-
-        try {
-            const response = await fetch(`${this.baseURL}/api/monogram_items/bulk`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ monogramId: monogramID, items: itemsPayload })
-            });
-
-            if (response.ok) {
-                console.log('[MonogramService] Items saved:', validItems.length);
-            }
-        } catch (error) {
-            console.warn('[MonogramService] Bulk save not available, items saved to localStorage');
         }
     }
 
@@ -354,63 +325,135 @@ class MonogramFormService {
             const params = new URLSearchParams();
             if (criteria.orderNumber) params.append('orderNumber', criteria.orderNumber);
             if (criteria.companyName) params.append('companyName', criteria.companyName);
+            if (criteria.status) params.append('status', criteria.status);
+            if (criteria.dateFrom) params.append('dateFrom', criteria.dateFrom);
+            if (criteria.dateTo) params.append('dateTo', criteria.dateTo);
 
-            // Try API first
-            try {
-                const response = await fetch(`${this.baseURL}/api/monogram_sessions?${params}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    return { success: true, sessions: data.result || [] };
-                }
-            } catch (apiError) {
-                console.warn('[MonogramService] API search not available');
+            const response = await fetch(`${this.baseURL}/api/monograms?${params}`);
+            const data = await response.json();
+
+            if (data.success) {
+                return {
+                    success: true,
+                    sessions: data.monograms || [],
+                    count: data.count || 0
+                };
+            } else {
+                throw new Error(data.error || 'Search failed');
             }
-
-            // Fall back to localStorage search
-            const localSessions = this.searchLocalStorage(criteria);
-            return { success: true, sessions: localSessions, source: 'localStorage' };
 
         } catch (error) {
             console.error('[MonogramService] Search error:', error);
-            return { success: false, error: error.message, sessions: [] };
+            // Fall back to localStorage search
+            const localSessions = this.searchLocalStorage(criteria);
+            return { success: true, sessions: localSessions, source: 'localStorage' };
         }
     }
 
     /**
-     * Load a specific monogram session
+     * Load a specific monogram session by order number
      */
-    async loadMonogramSession(monogramID) {
+    async loadMonogramSession(orderNumber) {
         try {
-            // Try API first
-            try {
-                const response = await fetch(`${this.baseURL}/api/monogram_sessions/${monogramID}`);
-                if (response.ok) {
-                    const sessionData = await response.json();
+            console.log('[MonogramService] Loading monogram for order:', orderNumber);
 
-                    // Load items
-                    const itemsResponse = await fetch(`${this.baseURL}/api/monogram_items?monogramId=${monogramID}`);
-                    const itemsData = await itemsResponse.json();
+            const response = await fetch(`${this.baseURL}/api/monograms/${orderNumber}`);
+            const data = await response.json();
 
-                    return {
-                        success: true,
-                        session: sessionData.result,
-                        items: itemsData.result || []
-                    };
+            if (data.success && data.monogram) {
+                const monogram = data.monogram;
+
+                // Parse ItemsJSON back to array
+                let items = [];
+                try {
+                    items = JSON.parse(monogram.ItemsJSON || '[]');
+                } catch (e) {
+                    console.warn('[MonogramService] Failed to parse ItemsJSON:', e);
                 }
-            } catch (apiError) {
-                console.warn('[MonogramService] API load not available');
-            }
 
-            // Fall back to localStorage
-            const localData = this.loadFromLocalStorage(monogramID);
-            if (localData) {
-                return { success: true, ...localData, source: 'localStorage' };
+                return {
+                    success: true,
+                    session: {
+                        orderNumber: monogram.OrderNumber,
+                        companyName: monogram.CompanyName,
+                        salesRepEmail: monogram.SalesRepEmail,
+                        fontStyle: monogram.FontStyle,
+                        threadColor: monogram.ThreadColors,
+                        location: monogram.Locations,
+                        importedNames: monogram.ImportedNames,
+                        notesToProduction: monogram.NotesToProduction,
+                        status: monogram.Status,
+                        createdAt: monogram.CreatedAt,
+                        createdBy: monogram.CreatedBy,
+                        id_monogram: monogram.ID_Monogram
+                    },
+                    items: items
+                };
+            } else {
+                // Try localStorage fallback
+                const localData = this.loadFromLocalStorage(orderNumber);
+                if (localData) {
+                    return { success: true, ...localData, source: 'localStorage' };
+                }
+                return { success: false, error: 'Session not found' };
             }
-
-            return { success: false, error: 'Session not found' };
 
         } catch (error) {
             console.error('[MonogramService] Load error:', error);
+            // Try localStorage fallback
+            const localData = this.loadFromLocalStorage(orderNumber);
+            if (localData) {
+                return { success: true, ...localData, source: 'localStorage' };
+            }
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Update monogram status (e.g., mark as Printed)
+     */
+    async updateMonogramStatus(idMonogram, status) {
+        try {
+            const now = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+            const payload = {
+                Status: status,
+                ModifiedAt: now
+            };
+
+            // Add PrintedAt if marking as printed
+            if (status === 'Printed') {
+                payload.PrintedAt = now;
+            }
+
+            const response = await fetch(`${this.baseURL}/api/monograms/${idMonogram}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            return { success: data.success };
+
+        } catch (error) {
+            console.error('[MonogramService] Status update error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Delete a monogram record
+     */
+    async deleteMonogram(idMonogram) {
+        try {
+            const response = await fetch(`${this.baseURL}/api/monograms/${idMonogram}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+            return { success: data.success };
+
+        } catch (error) {
+            console.error('[MonogramService] Delete error:', error);
             return { success: false, error: error.message };
         }
     }
