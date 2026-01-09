@@ -19,6 +19,11 @@ class MonogramFormController {
         this.threadColors = [];           // All available thread colors from API
         this.selectedThreadColors = [];   // Currently selected thread color names
 
+        // Location state
+        this.locations = ['Right Chest', 'Right Sleeve', 'Left Sleeve', 'Below Logo', 'Other'];
+        this.selectedLocations = [];      // Currently selected location names
+        this.otherLocationText = '';      // Custom text for "Other" location
+
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -45,6 +50,9 @@ class MonogramFormController {
 
         // Initialize thread color dropdown
         this.initThreadColorDropdown();
+
+        // Initialize location dropdown
+        this.initLocationDropdown();
 
         // Check for URL parameters
         this.checkURLParameters();
@@ -398,6 +406,275 @@ class MonogramFormController {
     }
 
     // ============================================
+    // Location Dropdown
+    // ============================================
+
+    /**
+     * Initialize location dropdown and bind events
+     */
+    initLocationDropdown() {
+        const toggleBtn = document.getElementById('locationBtn');
+        const dropdown = document.getElementById('locationDropdown');
+        const doneBtn = document.getElementById('locationDoneBtn');
+        const otherInput = document.getElementById('locationOtherText');
+
+        if (!toggleBtn || !dropdown) return;
+
+        // Bind toggle button
+        toggleBtn.addEventListener('click', () => this.toggleLocationDropdown());
+
+        // Bind Done button
+        if (doneBtn) {
+            doneBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                this.closeLocationDropdown();
+            });
+        }
+
+        // Bind Other text input
+        if (otherInput) {
+            otherInput.addEventListener('input', (e) => {
+                this.otherLocationText = e.target.value;
+                this.updateAllRowLocationDropdowns();
+                this.isDirty = true;
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.location-group')) {
+                this.closeLocationDropdown();
+            }
+        });
+
+        // Render initial options
+        this.renderLocationOptions();
+    }
+
+    /**
+     * Toggle location dropdown visibility
+     */
+    toggleLocationDropdown() {
+        const dropdown = document.getElementById('locationDropdown');
+        const toggleBtn = document.getElementById('locationBtn');
+
+        if (!dropdown) return;
+
+        const isHidden = dropdown.hidden;
+        dropdown.hidden = !isHidden;
+        toggleBtn.classList.toggle('open', !isHidden);
+    }
+
+    /**
+     * Close location dropdown
+     */
+    closeLocationDropdown() {
+        const dropdown = document.getElementById('locationDropdown');
+        const toggleBtn = document.getElementById('locationBtn');
+
+        if (dropdown) dropdown.hidden = true;
+        if (toggleBtn) toggleBtn.classList.remove('open');
+    }
+
+    /**
+     * Render location options in dropdown
+     */
+    renderLocationOptions() {
+        const listEl = document.getElementById('locationList');
+        if (!listEl) return;
+
+        listEl.innerHTML = this.locations.map(location => {
+            const isSelected = this.selectedLocations.includes(location);
+            const id = 'loc_' + location.replace(/\s+/g, '_');
+            return `
+                <div class="location-option" data-location="${this.escapeHTML(location)}">
+                    <input type="checkbox" id="${id}" ${isSelected ? 'checked' : ''}>
+                    <label for="${id}">${this.escapeHTML(location)}</label>
+                </div>
+            `;
+        }).join('');
+
+        // Bind click events to options
+        listEl.querySelectorAll('.location-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                if (e.target.type !== 'checkbox') {
+                    const checkbox = option.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                }
+                this.handleLocationToggle(option.dataset.location, option.querySelector('input').checked);
+            });
+        });
+    }
+
+    /**
+     * Handle location checkbox toggle
+     */
+    handleLocationToggle(locationName, isChecked) {
+        if (isChecked) {
+            if (!this.selectedLocations.includes(locationName)) {
+                this.selectedLocations.push(locationName);
+            }
+        } else {
+            this.selectedLocations = this.selectedLocations.filter(l => l !== locationName);
+        }
+
+        // Show/hide Other input based on whether "Other" is selected
+        const otherInputContainer = document.getElementById('locationOtherInput');
+        if (otherInputContainer) {
+            otherInputContainer.style.display = this.selectedLocations.includes('Other') ? 'block' : 'none';
+        }
+
+        this.renderSelectedLocationTags();
+        this.updateLocationButtonText();
+        this.updateAllRowLocationDropdowns();
+        this.isDirty = true;
+    }
+
+    /**
+     * Render selected location tags
+     */
+    renderSelectedLocationTags() {
+        const container = document.getElementById('selectedLocations');
+        if (!container) return;
+
+        container.innerHTML = this.selectedLocations.map(location => {
+            // For "Other", show the custom text if available
+            const displayText = (location === 'Other' && this.otherLocationText)
+                ? `Other: ${this.otherLocationText}`
+                : location;
+            return `
+                <span class="location-tag" data-location="${this.escapeHTML(location)}">
+                    ${this.escapeHTML(displayText)}
+                    <button type="button" class="remove-tag" title="Remove">&times;</button>
+                </span>
+            `;
+        }).join('');
+
+        // Bind remove buttons
+        container.querySelectorAll('.remove-tag').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tag = btn.closest('.location-tag');
+                const locationName = tag.dataset.location;
+                this.handleLocationToggle(locationName, false);
+                this.renderLocationOptions();
+            });
+        });
+    }
+
+    /**
+     * Update location button text
+     */
+    updateLocationButtonText() {
+        const btnText = document.getElementById('locationBtnText');
+        if (!btnText) return;
+
+        if (this.selectedLocations.length === 0) {
+            btnText.textContent = 'Select Locations...';
+        } else if (this.selectedLocations.length === 1) {
+            const loc = this.selectedLocations[0];
+            btnText.textContent = (loc === 'Other' && this.otherLocationText)
+                ? `Other: ${this.otherLocationText}`
+                : loc;
+        } else {
+            btnText.textContent = `${this.selectedLocations.length} locations selected`;
+        }
+    }
+
+    /**
+     * Get comma-separated string of selected locations (for saving)
+     */
+    getLocationString() {
+        return this.selectedLocations.map(loc => {
+            if (loc === 'Other' && this.otherLocationText) {
+                return `Other: ${this.otherLocationText}`;
+            }
+            return loc;
+        }).join(', ');
+    }
+
+    /**
+     * Set selected locations from a comma-separated string
+     */
+    setLocationsFromString(locationString) {
+        if (!locationString) {
+            this.selectedLocations = [];
+            this.otherLocationText = '';
+        } else {
+            const parts = locationString.split(',').map(l => l.trim()).filter(l => l);
+            this.selectedLocations = [];
+            this.otherLocationText = '';
+
+            parts.forEach(part => {
+                if (part.startsWith('Other:')) {
+                    this.selectedLocations.push('Other');
+                    this.otherLocationText = part.replace('Other:', '').trim();
+                } else if (this.locations.includes(part)) {
+                    this.selectedLocations.push(part);
+                }
+            });
+        }
+
+        // Update Other input field
+        const otherInput = document.getElementById('locationOtherText');
+        const otherInputContainer = document.getElementById('locationOtherInput');
+        if (otherInput) otherInput.value = this.otherLocationText;
+        if (otherInputContainer) {
+            otherInputContainer.style.display = this.selectedLocations.includes('Other') ? 'block' : 'none';
+        }
+
+        this.renderSelectedLocationTags();
+        this.updateLocationButtonText();
+        this.renderLocationOptions();
+        this.updateAllRowLocationDropdowns();
+    }
+
+    // ============================================
+    // Row Location Dropdown
+    // ============================================
+
+    /**
+     * Create options HTML for row-level location dropdown
+     */
+    createRowLocationOptions() {
+        if (this.selectedLocations.length === 0) {
+            return '<option value="" disabled>Select locations above first</option>';
+        }
+        return this.selectedLocations.map(location => {
+            const displayText = (location === 'Other' && this.otherLocationText)
+                ? `Other: ${this.otherLocationText}`
+                : location;
+            const value = (location === 'Other' && this.otherLocationText)
+                ? `Other: ${this.otherLocationText}`
+                : location;
+            return `<option value="${this.escapeHTML(value)}">${this.escapeHTML(displayText)}</option>`;
+        }).join('');
+    }
+
+    /**
+     * Update all row location dropdowns when main selection changes
+     */
+    updateAllRowLocationDropdowns() {
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return;
+
+        const options = '<option value="">Select...</option>' + this.createRowLocationOptions();
+
+        tbody.querySelectorAll('.row-location').forEach(select => {
+            const currentValue = select.value;
+            select.innerHTML = options;
+            // Restore value if still valid (check if any option matches)
+            const validValues = this.selectedLocations.map(loc =>
+                (loc === 'Other' && this.otherLocationText) ? `Other: ${this.otherLocationText}` : loc
+            );
+            if (validValues.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        });
+    }
+
+    // ============================================
     // Order Lookup
     // ============================================
 
@@ -430,6 +707,8 @@ class MonogramFormController {
                         `Found: ${result.order.companyName} (${result.products.length} product${result.products.length !== 1 ? 's' : ''})`
                     );
                     this.showToast('Order loaded successfully', 'success');
+                    // Auto-hide order status after brief display
+                    setTimeout(() => this.hideOrderStatus(), 2000);
                 } else {
                     // Order found but no garments - stay in manual mode
                     this.orderLoaded = false;
@@ -480,6 +759,13 @@ class MonogramFormController {
         };
 
         badgeEl.innerHTML = `${icons[type] || ''} <span>${message}</span>`;
+    }
+
+    hideOrderStatus() {
+        const statusEl = document.getElementById('orderStatus');
+        if (statusEl) {
+            statusEl.style.display = 'none';
+        }
     }
 
     // ============================================
@@ -548,6 +834,7 @@ class MonogramFormController {
         const styleOptions = this.createStyleOptions();
         const sizeOptions = this.createSizeOptions();
         const threadColorOptions = this.createRowThreadColorOptions();
+        const locationOptions = this.createRowLocationOptions();
 
         return `
             <td class="row-number">${rowNum}</td>
@@ -574,10 +861,14 @@ class MonogramFormController {
                     ${sizeOptions}
                 </select>
             </td>
-            <td>
+            <td class="cell-thread-location">
                 <select class="row-thread-color" data-row="${rowNum}">
-                    <option value="">Select...</option>
+                    <option value="">Thread...</option>
                     ${threadColorOptions}
+                </select>
+                <select class="row-location" data-row="${rowNum}">
+                    <option value="">Location...</option>
+                    ${locationOptions}
                 </select>
             </td>
             <td>
@@ -597,6 +888,7 @@ class MonogramFormController {
     createManualModeRowHTML(rowNum) {
         const sizeOptions = this.createSizeOptions();
         const threadColorOptions = this.createRowThreadColorOptions();
+        const locationOptions = this.createRowLocationOptions();
 
         return `
             <td class="row-number">${rowNum}</td>
@@ -617,10 +909,14 @@ class MonogramFormController {
                     ${sizeOptions}
                 </select>
             </td>
-            <td>
+            <td class="cell-thread-location">
                 <select class="row-thread-color" data-row="${rowNum}">
-                    <option value="">Select...</option>
+                    <option value="">Thread...</option>
                     ${threadColorOptions}
+                </select>
+                <select class="row-location" data-row="${rowNum}">
+                    <option value="">Location...</option>
+                    ${locationOptions}
                 </select>
             </td>
             <td>
@@ -1063,6 +1359,7 @@ class MonogramFormController {
             salesRepEmail: document.getElementById('salesRepEmail').value.trim(),
             fontStyle: document.getElementById('fontStyle').value.trim(),
             threadColor: this.getThreadColorString(),  // Use multi-select values
+            location: this.getLocationString(),  // Use multi-select values
             notesToProduction: document.getElementById('notesToProduction').value.trim()
         };
 
@@ -1077,6 +1374,7 @@ class MonogramFormController {
             const colorSelect = row.querySelector('.color-input');
             const sizeSelect = row.querySelector('.size-input');
             const rowThreadColorSelect = row.querySelector('.row-thread-color');
+            const rowLocationSelect = row.querySelector('.row-location');
             const nameInput = row.querySelector('.name-input');
 
             const item = {
@@ -1088,6 +1386,7 @@ class MonogramFormController {
                 shirtColor: colorSelect.value.trim(),
                 size: sizeSelect.value.trim(),
                 rowThreadColor: rowThreadColorSelect?.value?.trim() || '',
+                rowLocation: rowLocationSelect?.value?.trim() || '',
                 monogramName: nameInput.value.trim(),
                 isCustomStyle: styleSelect.value === '__custom__'
             };
@@ -1171,6 +1470,7 @@ class MonogramFormController {
         document.getElementById('salesRepEmail').value = session.SalesRepEmail || '';
         document.getElementById('fontStyle').value = session.FontStyle || '';
         this.setThreadColorsFromString(session.ThreadColor || '');  // Use multi-select setter
+        this.setLocationsFromString(session.Location || '');  // Use multi-select setter
         document.getElementById('notesToProduction').value = session.NotesToProduction || '';
 
         // Clear existing rows and add new ones
@@ -1188,6 +1488,7 @@ class MonogramFormController {
                 const colorSelect = row.querySelector('.color-input');
                 const sizeSelect = row.querySelector('.size-input');
                 const rowThreadColorSelect = row.querySelector('.row-thread-color');
+                const rowLocationSelect = row.querySelector('.row-location');
                 const nameInput = row.querySelector('.name-input');
 
                 if (item.IsCustomStyle) {
@@ -1202,6 +1503,7 @@ class MonogramFormController {
                 colorSelect.innerHTML = `<option value="${item.ShirtColor || ''}">${item.ShirtColor || 'Select...'}</option>`;
                 sizeSelect.value = item.Size || '';
                 if (rowThreadColorSelect) rowThreadColorSelect.value = item.RowThreadColor || '';
+                if (rowLocationSelect) rowLocationSelect.value = item.RowLocation || '';
                 nameInput.value = item.MonogramName || '';
             });
         } else {
@@ -1350,21 +1652,30 @@ class MonogramFormController {
         document.getElementById('printSalesRepEmail').textContent = formData.salesRepEmail || '-';
         document.getElementById('printFontStyle').textContent = formData.fontStyle || '-';
         document.getElementById('printThreadColor').textContent = formData.threadColor || '-';
+        document.getElementById('printLocation').textContent = formData.location || '-';
         document.getElementById('printNotes').textContent = formData.notesToProduction || '-';
 
         // Populate names table
         const printTbody = document.getElementById('printNamesTableBody');
-        printTbody.innerHTML = filledItems.map((item, index) => `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${this.escapeHTML(item.styleNumber)}</td>
-                <td>${this.escapeHTML(item.description)}</td>
-                <td>${this.escapeHTML(item.shirtColor)}</td>
-                <td>${this.escapeHTML(item.size)}</td>
-                <td>${this.escapeHTML(item.rowThreadColor)}</td>
-                <td><strong>${this.escapeHTML(item.monogramName)}</strong></td>
-            </tr>
-        `).join('');
+        printTbody.innerHTML = filledItems.map((item, index) => {
+            // Combine thread color and location for stacked display
+            const threadLocationParts = [];
+            if (item.rowThreadColor) threadLocationParts.push(item.rowThreadColor);
+            if (item.rowLocation) threadLocationParts.push(item.rowLocation);
+            const threadLocationDisplay = threadLocationParts.join(' / ') || '-';
+
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${this.escapeHTML(item.styleNumber)}</td>
+                    <td>${this.escapeHTML(item.description)}</td>
+                    <td>${this.escapeHTML(item.shirtColor)}</td>
+                    <td>${this.escapeHTML(item.size)}</td>
+                    <td>${this.escapeHTML(threadLocationDisplay)}</td>
+                    <td><strong>${this.escapeHTML(item.monogramName)}</strong></td>
+                </tr>
+            `;
+        }).join('');
 
         // Trigger print
         window.print();

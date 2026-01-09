@@ -674,6 +674,179 @@ body {
 }
 
 /* ============================================
+   LOCATION SELECTOR
+   ============================================ */
+.location-group {
+    position: relative;
+}
+
+.location-selector {
+    position: relative;
+}
+
+.location-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem 0.875rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: left;
+}
+
+.location-toggle:hover {
+    border-color: var(--primary-color);
+}
+
+.location-toggle:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: var(--focus-shadow);
+}
+
+.location-toggle i {
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+}
+
+.location-toggle.open i {
+    transform: rotate(180deg);
+}
+
+.location-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.location-dropdown[hidden] {
+    display: none;
+}
+
+.location-list {
+    overflow-y: auto;
+    max-height: 200px;
+    padding: 0.25rem 0;
+}
+
+.location-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.location-option:hover {
+    background: var(--hover-bg);
+}
+
+.location-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--primary-color);
+}
+
+.location-option label {
+    flex: 1;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+.location-other-input {
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.location-other-input input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.location-other-input input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.location-actions {
+    padding: 0.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.location-actions .btn-primary {
+    padding: 0.375rem 1rem;
+}
+
+/* Selected locations tags */
+.selected-locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+}
+
+.selected-locations:empty {
+    display: none;
+}
+
+.location-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    background: #4a90a4;
+    color: white;
+    border-radius: 1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.location-tag .remove-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.location-tag .remove-tag:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+/* ============================================
    ORDER STATUS
    ============================================ */
 .order-status {
@@ -748,12 +921,25 @@ body {
 /* Column widths */
 .col-num { width: 40px; text-align: center; }
 .col-style { width: 120px; }
-.col-desc { width: 200px; }
-.col-color { width: 120px; }
+.col-desc { width: 180px; }
+.col-color { width: 110px; }
 .col-size { width: 80px; }
-.col-thread { width: 150px; }
-.col-name { min-width: 150px; }
+.col-thread-location { width: 160px; }
+.col-name { min-width: 140px; }
 .col-action { width: 40px; text-align: center; }
+
+/* Stacked Thread/Location cell */
+.cell-thread-location {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cell-thread-location select {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 0.75rem;
+}
 
 /* Table inputs */
 .names-table input,
