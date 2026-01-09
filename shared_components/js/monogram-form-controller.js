@@ -24,6 +24,10 @@ class MonogramFormController {
         this.selectedLocations = [];      // Currently selected location names
         this.otherLocationText = '';      // Custom text for "Other" location
 
+        // Imported names state (bulk paste feature)
+        this.importedNames = [];          // All names parsed from paste
+        this.usedNameIndices = new Set(); // Track which indices are used
+
         // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -53,6 +57,9 @@ class MonogramFormController {
 
         // Initialize location dropdown
         this.initLocationDropdown();
+
+        // Initialize paste names functionality
+        this.initPasteNames();
 
         // Check for URL parameters
         this.checkURLParameters();
@@ -163,6 +170,8 @@ class MonogramFormController {
                 e.stopPropagation();
                 e.preventDefault();
                 this.closeThreadColorDropdown();
+                // Auto-fill rows if only one thread color selected
+                this.autoFillThreadColorIfSingle();
             });
         } else {
             console.log('[MonogramController] WARNING: Done button NOT found!');
@@ -405,6 +414,25 @@ class MonogramFormController {
         });
     }
 
+    /**
+     * Auto-fill thread color for all empty row dropdowns if exactly one color selected
+     */
+    autoFillThreadColorIfSingle() {
+        // Only auto-fill if exactly one thread color selected
+        if (this.selectedThreadColors.length !== 1) return;
+
+        const singleColor = this.selectedThreadColors[0];
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return;
+
+        tbody.querySelectorAll('.row-thread-color').forEach(dropdown => {
+            // Only fill if empty (default value)
+            if (!dropdown.value || dropdown.value === '') {
+                dropdown.value = singleColor;
+            }
+        });
+    }
+
     // ============================================
     // Location Dropdown
     // ============================================
@@ -429,6 +457,8 @@ class MonogramFormController {
                 e.stopPropagation();
                 e.preventDefault();
                 this.closeLocationDropdown();
+                // Auto-fill rows if only one location selected
+                this.autoFillLocationIfSingle();
             });
         }
 
@@ -674,6 +704,210 @@ class MonogramFormController {
         });
     }
 
+    /**
+     * Auto-fill location for all empty row dropdowns if exactly one location selected
+     */
+    autoFillLocationIfSingle() {
+        // Only auto-fill if exactly one location selected
+        if (this.selectedLocations.length !== 1) return;
+
+        // Get the single location value (handle "Other" case)
+        let singleLocation = this.selectedLocations[0];
+        if (singleLocation === 'Other' && this.otherLocationText) {
+            singleLocation = `Other: ${this.otherLocationText}`;
+        }
+
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return;
+
+        tbody.querySelectorAll('.row-location').forEach(dropdown => {
+            // Only fill if empty (default value)
+            if (!dropdown.value || dropdown.value === '') {
+                dropdown.value = singleLocation;
+            }
+        });
+    }
+
+    // ============================================
+    // Paste Names (Bulk Import)
+    // ============================================
+
+    /**
+     * Initialize paste names functionality
+     */
+    initPasteNames() {
+        const importBtn = document.getElementById('importNamesBtn');
+        const clearBtn = document.getElementById('clearNamesBtn');
+
+        importBtn?.addEventListener('click', () => this.importNames());
+        clearBtn?.addEventListener('click', () => this.clearImportedNames());
+    }
+
+    /**
+     * Parse and import names from textarea
+     */
+    importNames() {
+        const textarea = document.getElementById('pasteNamesInput');
+        const text = textarea?.value?.trim() || '';
+
+        if (!text) {
+            this.showToast('Please paste names first', 'warning');
+            return;
+        }
+
+        // Parse: split by newline, trim whitespace, filter empty
+        this.importedNames = text
+            .split('\n')
+            .map(name => name.trim())
+            .filter(name => name.length > 0);
+
+        this.usedNameIndices.clear();
+
+        // Update UI
+        this.updateImportedCount();
+        this.updateUnassignedList();
+        this.updateAllRowNameDropdowns();
+
+        this.showToast(`Imported ${this.importedNames.length} names`, 'success');
+        this.isDirty = true;
+    }
+
+    /**
+     * Clear all imported names
+     */
+    clearImportedNames() {
+        this.importedNames = [];
+        this.usedNameIndices.clear();
+        const textarea = document.getElementById('pasteNamesInput');
+        if (textarea) textarea.value = '';
+
+        this.updateImportedCount();
+        this.updateUnassignedList();
+        this.updateAllRowNameDropdowns();
+        this.isDirty = true;
+    }
+
+    /**
+     * Update imported count display
+     */
+    updateImportedCount() {
+        const countEl = document.getElementById('importedCount');
+        if (countEl) {
+            countEl.textContent = this.importedNames.length > 0
+                ? `${this.importedNames.length} names imported`
+                : '';
+        }
+    }
+
+    /**
+     * Get available (unused) names for dropdown
+     */
+    getAvailableNames() {
+        return this.importedNames
+            .map((name, index) => ({ name, index }))
+            .filter(item => !this.usedNameIndices.has(item.index));
+    }
+
+    /**
+     * Update unassigned names list panel
+     */
+    updateUnassignedList() {
+        const panel = document.getElementById('unassignedNamesPanel');
+        const listEl = document.getElementById('unassignedNamesList');
+        const countEl = document.getElementById('unassignedCount');
+
+        if (!panel || !listEl) return;
+
+        const available = this.getAvailableNames();
+
+        if (this.importedNames.length === 0) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        panel.style.display = 'block';
+        countEl.textContent = `(${available.length} remaining)`;
+
+        if (available.length === 0) {
+            listEl.innerHTML = '<span class="all-assigned">All names assigned!</span>';
+        } else {
+            listEl.innerHTML = available.map(item =>
+                `<span class="unassigned-name-tag">${this.escapeHTML(item.name)}</span>`
+            ).join('');
+        }
+    }
+
+    /**
+     * Create dropdown options for row name selection
+     */
+    createRowNameOptions() {
+        const available = this.getAvailableNames();
+        if (available.length === 0) {
+            return '<option value="" disabled>No names available</option>';
+        }
+        return available.map(item =>
+            `<option value="${item.index}">${this.escapeHTML(item.name)}</option>`
+        ).join('');
+    }
+
+    /**
+     * Update all row name dropdowns
+     */
+    updateAllRowNameDropdowns() {
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return;
+
+        const hasImportedNames = this.importedNames.length > 0;
+
+        tbody.querySelectorAll('tr').forEach(row => {
+            const dropdown = row.querySelector('.name-dropdown');
+
+            if (dropdown) {
+                // Show/hide dropdown based on whether names are imported
+                dropdown.style.display = hasImportedNames ? 'block' : 'none';
+
+                // Rebuild options (excluding used names)
+                const currentValue = dropdown.value;
+                dropdown.innerHTML = '<option value="">Select name...</option>' + this.createRowNameOptions();
+
+                // Restore selection if still valid
+                if (currentValue && !this.usedNameIndices.has(parseInt(currentValue))) {
+                    dropdown.value = currentValue;
+                }
+            }
+        });
+    }
+
+    /**
+     * Handle name dropdown selection
+     */
+    handleNameDropdownChange(dropdown, row) {
+        const selectedIndex = dropdown.value ? parseInt(dropdown.value) : null;
+        const input = row.querySelector('.name-input');
+        const previousIndex = dropdown.dataset.previousIndex ? parseInt(dropdown.dataset.previousIndex) : null;
+
+        // Release previous selection
+        if (previousIndex !== null && !isNaN(previousIndex)) {
+            this.usedNameIndices.delete(previousIndex);
+        }
+
+        // Mark new selection as used
+        if (selectedIndex !== null && !isNaN(selectedIndex)) {
+            this.usedNameIndices.add(selectedIndex);
+            // Populate the text input with selected name
+            if (input) {
+                input.value = this.importedNames[selectedIndex];
+            }
+        }
+
+        // Store current selection for future reference
+        dropdown.dataset.previousIndex = selectedIndex !== null ? selectedIndex : '';
+
+        this.updateUnassignedList();
+        this.updateAllRowNameDropdowns();
+        this.isDirty = true;
+    }
+
     // ============================================
     // Order Lookup
     // ============================================
@@ -803,6 +1037,13 @@ class MonogramFormController {
         this.updateNameCount();
         this.updateAllSizeDropdowns();
 
+        // Show name dropdown if names are imported
+        this.updateAllRowNameDropdowns();
+
+        // Auto-fill thread color and location if single selection
+        this.autoFillThreadColorIfSingle();
+        this.autoFillLocationIfSingle();
+
         // Focus on style field
         const styleInput = row.querySelector('.style-input');
         if (styleInput) {
@@ -862,17 +1103,24 @@ class MonogramFormController {
                 </select>
             </td>
             <td class="cell-thread-location">
-                <select class="row-thread-color" data-row="${rowNum}">
-                    <option value="">Thread...</option>
-                    ${threadColorOptions}
-                </select>
-                <select class="row-location" data-row="${rowNum}">
-                    <option value="">Location...</option>
-                    ${locationOptions}
-                </select>
+                <div class="cell-content">
+                    <select class="row-thread-color" data-row="${rowNum}">
+                        <option value="">Thread...</option>
+                        ${threadColorOptions}
+                    </select>
+                    <select class="row-location" data-row="${rowNum}">
+                        <option value="">Location...</option>
+                        ${locationOptions}
+                    </select>
+                </div>
             </td>
-            <td>
-                <input type="text" class="name-input" placeholder="Name to embroider" required>
+            <td class="cell-name">
+                <div class="cell-content">
+                    <select class="name-dropdown" data-row="${rowNum}" style="display: none;">
+                        <option value="">Select name...</option>
+                    </select>
+                    <input type="text" class="name-input" placeholder="Name to embroider">
+                </div>
             </td>
             <td>
                 <button type="button" class="btn-delete-row" title="Delete row">
@@ -910,17 +1158,24 @@ class MonogramFormController {
                 </select>
             </td>
             <td class="cell-thread-location">
-                <select class="row-thread-color" data-row="${rowNum}">
-                    <option value="">Thread...</option>
-                    ${threadColorOptions}
-                </select>
-                <select class="row-location" data-row="${rowNum}">
-                    <option value="">Location...</option>
-                    ${locationOptions}
-                </select>
+                <div class="cell-content">
+                    <select class="row-thread-color" data-row="${rowNum}">
+                        <option value="">Thread...</option>
+                        ${threadColorOptions}
+                    </select>
+                    <select class="row-location" data-row="${rowNum}">
+                        <option value="">Location...</option>
+                        ${locationOptions}
+                    </select>
+                </div>
             </td>
-            <td>
-                <input type="text" class="name-input" placeholder="Name to embroider" required>
+            <td class="cell-name">
+                <div class="cell-content">
+                    <select class="name-dropdown" data-row="${rowNum}" style="display: none;">
+                        <option value="">Select name...</option>
+                    </select>
+                    <input type="text" class="name-input" placeholder="Name to embroider">
+                </div>
             </td>
             <td>
                 <button type="button" class="btn-delete-row" title="Delete row">
@@ -983,6 +1238,14 @@ class MonogramFormController {
         if (sizeSelect) {
             sizeSelect.addEventListener('change', () => {
                 this.updateAllSizeDropdowns();
+            });
+        }
+
+        // Name dropdown change - for bulk imported names
+        const nameDropdown = row.querySelector('.name-dropdown');
+        if (nameDropdown) {
+            nameDropdown.addEventListener('change', () => {
+                this.handleNameDropdownChange(nameDropdown, row);
             });
         }
     }
@@ -1360,6 +1623,7 @@ class MonogramFormController {
             fontStyle: document.getElementById('fontStyle').value.trim(),
             threadColor: this.getThreadColorString(),  // Use multi-select values
             location: this.getLocationString(),  // Use multi-select values
+            importedNames: this.importedNames.join('\n'),  // Bulk imported names
             notesToProduction: document.getElementById('notesToProduction').value.trim()
         };
 
@@ -1472,6 +1736,13 @@ class MonogramFormController {
         this.setThreadColorsFromString(session.ThreadColor || '');  // Use multi-select setter
         this.setLocationsFromString(session.Location || '');  // Use multi-select setter
         document.getElementById('notesToProduction').value = session.NotesToProduction || '';
+
+        // Restore imported names if present
+        if (session.ImportedNames) {
+            const textarea = document.getElementById('pasteNamesInput');
+            if (textarea) textarea.value = session.ImportedNames;
+            this.importNames();
+        }
 
         // Clear existing rows and add new ones
         const tbody = document.getElementById('namesTableBody');

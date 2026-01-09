@@ -179,6 +179,63 @@ const EXTENDED_SIZES = ['XS', '3XL', '4XL', '5XL', '6XL', 'LT', 'XLT', '2XLT', '
 
 ---
 
+## Recent Features (January 2026)
+
+### Bulk Name Import
+Allows pasting a list of names (one per line) to quickly populate rows.
+
+**UI Components:**
+- Textarea for pasting names
+- "Import Names" button - parses and shows count
+- "Clear" button - removes all imported names
+- Unassigned names panel - shows remaining names to assign
+
+**Workflow:**
+1. Paste names into textarea (one per line)
+2. Click "Import Names" → System parses, shows "{n} names imported"
+3. Unassigned panel appears showing all names
+4. Per row: Select name from dropdown OR type manually
+5. Selected names disappear from other row dropdowns
+6. Panel shows "All names assigned!" when done
+
+**Controller State:**
+```javascript
+this.importedNames = [];        // All parsed names
+this.usedNameIndices = new Set(); // Track which are used
+```
+
+### Auto-Fill Thread Color & Location
+When only ONE thread color or location is selected at form level, automatically fills all empty row dropdowns.
+
+**Behavior:**
+- Triggers when clicking "Done" on thread color or location multi-select
+- Only fills rows where dropdown is empty (preserves manual selections)
+- Also applies to newly added rows
+
+**Methods:**
+- `autoFillThreadColorIfSingle()` - Fills thread dropdowns if 1 color selected
+- `autoFillLocationIfSingle()` - Fills location dropdowns if 1 location selected
+
+### Size Quantity Limits
+Tracks available quantity per size from order line items. Prevents over-assignment.
+
+**How it works:**
+- `sizeQuantities` map tracks remaining qty per Style-Color-Size combo
+- When row is assigned, decrements the count
+- Dropdown shows "(0 left)" and disables sizes with no remaining qty
+- On row delete/change, restores the quantity
+
+### PDF Sorting
+Generated PDF sorts names table:
+1. First by Style Number
+2. Then by Size (S → M → L → XL → 2XL → 3XL...)
+
+### Staff Dashboard Access
+- **Button:** "Monogram 2026" in Forms section
+- **Link:** `/quote-builders/monogram-form.html`
+
+---
+
 ## Related Files
 
 - `/memory/MANAGEORDERS_INTEGRATION.md` - ManageOrders API docs
