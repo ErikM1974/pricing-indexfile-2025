@@ -35,7 +35,10 @@
       "Bash(wsl.exe -e cat ~/.claude/settings.json)",
       "Skill(deploy)",
       "Bash(git add:*)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)"
     ],
     "deny": [],
     "ask": [],
