@@ -111,6 +111,11 @@
 | YTD Sales tracking | [DAILY_SALES_ARCHIVE.md](./DAILY_SALES_ARCHIVE.md) |
 | Production turnaround estimates | [PRODUCTION_SCHEDULE_GUIDE.md](./PRODUCTION_SCHEDULE_GUIDE.md) |
 
+### Security
+| Need | Start Here |
+|------|------------|
+| Security audit & fixes | [SECURITY_AUDIT_2026-01.md](./SECURITY_AUDIT_2026-01.md) |
+
 ## Quick Reference
 
 ### Quote ID Prefixes

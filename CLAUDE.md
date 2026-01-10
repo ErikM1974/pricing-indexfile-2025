@@ -163,6 +163,16 @@ fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/health')
 localStorage.clear(); sessionStorage.clear(); location.reload(true);
 ```
 
+## Security Checklist
+
+When adding new API endpoints or rendering user data:
+- **SQL Injection**: Use `sanitizeFilterInput()` for Caspio filter parameters
+- **XSS**: Use `escapeHTML()` when rendering external/user data via innerHTML
+- **CORS**: Update `ALLOWED_ORIGINS` in server.js if adding new domains
+- **Rate Limits**: Sensitive endpoints should use `strictLimiter`
+
+See `/memory/SECURITY_AUDIT_2026-01.md` for full audit report.
+
 ## Documentation Lookup
 
 **All detailed documentation is in `/memory/` directory.**
