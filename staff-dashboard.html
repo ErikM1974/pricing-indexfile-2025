@@ -491,12 +491,9 @@
                             </div>
                             <div class="tool-buttons">
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn">AE Portal</a>
-                                <a href="/dashboards/art-hub-dashboard.html" class="tool-btn">Art Coordinator</a>
                                 <a href="/dashboards/art-hub-steve.html" class="tool-btn">Steve Portal</a>
                                 <a href="/dashboards/art-hub-ruth.html" class="tool-btn">Ruth Portal</a>
-                                <a href="/calculators/art-invoice-creator.html" class="tool-btn">Art Invoice</a>
                                 <a href="/art-invoices-dashboard.html" class="tool-btn">Art Dashboard</a>
-                                <a href="/ai-designer.html" class="tool-btn" target="_blank">AI Designer</a>
                             </div>
                         </div>
 
@@ -534,6 +531,49 @@
                                 </a>
                             </div>
                         </div>
+
+                        <!-- Recent Policies (collapsed by default) -->
+                        <div class="tool-category policies-category">
+                            <div class="tool-category-header collapsible-header" data-toggle="policies">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <span class="tool-category-title">Recent Policies</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div class="tool-buttons policies-content collapsed" id="policies-content">
+                                <div class="policy-mini-list">
+                                    <a href="/pages/policies-hub.html#sales-office" class="policy-mini-card">
+                                        <div class="policy-mini-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                        <div class="policy-mini-content">
+                                            <div class="policy-mini-title">Sales & Office Procedures</div>
+                                            <div class="policy-mini-date">Updated Oct 31, 2025</div>
+                                        </div>
+                                        <span class="policy-mini-badge">NEW</span>
+                                    </a>
+                                    <a href="/pages/policies-hub.html#customer-notification" class="policy-mini-card">
+                                        <div class="policy-mini-icon">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div class="policy-mini-content">
+                                            <div class="policy-mini-title">Customer Notification SOP</div>
+                                            <div class="policy-mini-date">Updated Sep 16, 2025</div>
+                                        </div>
+                                    </a>
+                                    <a href="/pages/policies-hub.html#ltm-decision" class="policy-mini-card">
+                                        <div class="policy-mini-icon">
+                                            <i class="fas fa-balance-scale"></i>
+                                        </div>
+                                        <div class="policy-mini-content">
+                                            <div class="policy-mini-title">LTM Order Decision Algorithm</div>
+                                            <div class="policy-mini-date">Updated Sep 09, 2025</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -545,10 +585,10 @@
                     <!-- Revenue Card -->
                     <div class="metrics-revenue-card">
                         <div class="metrics-revenue-header">
-                            <span class="metrics-revenue-title" id="revenueTitle">Revenue: Last 30 Days</span>
+                            <span class="metrics-revenue-title" id="revenueTitle">Revenue: Last 7 Days</span>
                             <div class="date-range-toggle">
-                                <button class="date-range-btn" data-days="7">7D</button>
-                                <button class="date-range-btn active" data-days="30">30D</button>
+                                <button class="date-range-btn active" data-days="7">7D</button>
+                                <button class="date-range-btn" data-days="30">30D</button>
                                 <button class="date-range-btn" data-days="60">60D</button>
                             </div>
                         </div>
@@ -641,55 +681,6 @@
                             <div class="metrics-loading">
                                 <div class="loading"></div>
                                 <span>Loading garment data...</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- =====================================================
-                     ZONE 4: SECONDARY CONTENT
-                     Recent Policies, etc.
-                     ===================================================== -->
-                <section class="zone-secondary">
-                    <!-- Recent Policies Widget -->
-                    <div class="widget-collapsible" data-widget="policies">
-                        <div class="widget-header">
-                            <h3 class="widget-title">
-                                <i class="fas fa-book"></i>
-                                Recent Policies
-                            </h3>
-                            <i class="fas fa-chevron-down widget-toggle"></i>
-                        </div>
-                        <div class="widget-content">
-                            <div class="policy-mini-list">
-                                <a href="/pages/policies-hub.html#sales-office" class="policy-mini-card">
-                                    <div class="policy-mini-icon">
-                                        <i class="fas fa-file-alt"></i>
-                                    </div>
-                                    <div class="policy-mini-content">
-                                        <div class="policy-mini-title">Sales & Office Procedures</div>
-                                        <div class="policy-mini-date">Updated Oct 31, 2025</div>
-                                    </div>
-                                    <span class="policy-mini-badge">NEW</span>
-                                </a>
-                                <a href="/pages/policies-hub.html#customer-notification" class="policy-mini-card">
-                                    <div class="policy-mini-icon">
-                                        <i class="fas fa-bell"></i>
-                                    </div>
-                                    <div class="policy-mini-content">
-                                        <div class="policy-mini-title">Customer Notification SOP</div>
-                                        <div class="policy-mini-date">Updated Sep 16, 2025</div>
-                                    </div>
-                                </a>
-                                <a href="/pages/policies-hub.html#ltm-decision" class="policy-mini-card">
-                                    <div class="policy-mini-icon">
-                                        <i class="fas fa-balance-scale"></i>
-                                    </div>
-                                    <div class="policy-mini-content">
-                                        <div class="policy-mini-title">LTM Order Decision Algorithm</div>
-                                        <div class="policy-mini-date">Updated Sep 09, 2025</div>
-                                    </div>
-                                </a>
                             </div>
                         </div>
                     </div>

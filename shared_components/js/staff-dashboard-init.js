@@ -8,7 +8,7 @@ const StaffDashboardInit = (function() {
 
     // Configuration
     const CONFIG = {
-        defaultDateRange: 30, // Default to 30 days
+        defaultDateRange: 7, // Default to 7 days
         refreshInterval: 5 * 60 * 1000, // 5 minutes
         animationDuration: 300
     };
@@ -29,6 +29,7 @@ const StaffDashboardInit = (function() {
 
         // Initialize widgets
         initWidgetToggles();
+        initPoliciesToggle();
         initDateRangeSelector();
         initDropdowns();
 
@@ -71,6 +72,34 @@ const StaffDashboardInit = (function() {
 
         // Load saved collapse states
         loadWidgetStates();
+    }
+
+    /**
+     * Initialize policies toggle in Quick Access section
+     * (Separate from main widget toggles since it's in tool-category format)
+     */
+    function initPoliciesToggle() {
+        const header = document.querySelector('.policies-category .collapsible-header');
+        const content = document.querySelector('.policies-category .policies-content');
+        const icon = document.querySelector('.policies-category .toggle-icon');
+
+        if (header && content) {
+            header.addEventListener('click', () => {
+                content.classList.toggle('collapsed');
+                icon?.classList.toggle('rotated');
+
+                // Save state to localStorage
+                const isCollapsed = content.classList.contains('collapsed');
+                localStorage.setItem('staffDashboard_policiesCollapsed', isCollapsed);
+            });
+
+            // Load saved state (default: collapsed)
+            const savedState = localStorage.getItem('staffDashboard_policiesCollapsed');
+            if (savedState === 'false') {
+                content.classList.remove('collapsed');
+                icon?.classList.add('rotated');
+            }
+        }
     }
 
     /**
