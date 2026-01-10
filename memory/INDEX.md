@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-01-08
+**Last Updated:** 2026-01-10
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -30,6 +30,7 @@
 ├── SANMAR_TO_SHOPWORKS_GUIDE.md      # Transform Sanmar→ShopWorks
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── STAFF_DASHBOARD_DATA_GUIDE.md     # Staff dashboard data processing
+├── PRODUCTION_SCHEDULE_GUIDE.md      # Production turnaround predictor
 ├── DAILY_SALES_ARCHIVE.md            # YTD sales tracking system
 ├── MONOGRAM_FORM_SYSTEM.md           # Monogram/personalization tracking
 │
@@ -108,6 +109,7 @@
 | Fix "Unable to Verify" inventory | [SAMPLE_INVENTORY_INTEGRATION_GUIDE.md](./SAMPLE_INVENTORY_INTEGRATION_GUIDE.md) |
 | Customer autocomplete | [manageorders/CUSTOMER_AUTOCOMPLETE.md](./manageorders/CUSTOMER_AUTOCOMPLETE.md) |
 | YTD Sales tracking | [DAILY_SALES_ARCHIVE.md](./DAILY_SALES_ARCHIVE.md) |
+| Production turnaround estimates | [PRODUCTION_SCHEDULE_GUIDE.md](./PRODUCTION_SCHEDULE_GUIDE.md) |
 
 ## Quick Reference
 
