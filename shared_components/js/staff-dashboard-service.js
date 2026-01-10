@@ -930,6 +930,501 @@ const StaffDashboardService = (function() {
     }
 
     // =====================================================
+    // GARMENT TRACKER CONFIGURATION AND FUNCTIONS
+    // Tracks specific premium garments sold by Nika and Taneisha
+    // =====================================================
+
+    /**
+     * Garment Tracker Configuration
+     * Tracks premium items and Richardson caps for sales incentive tracking
+     * NOTE: Bonus amounts are hidden from display but used for tooltip calculations
+     */
+    const GARMENT_TRACKER_CONFIG = {
+        // Premium items - tracked individually with bonus per item
+        premiumItems: [
+            { partNumber: 'CT104670', name: 'Carhartt Storm Defender Jacket', bonus: 5 },
+            { partNumber: 'EB550', name: 'Eddie Bauer Rain Jacket', bonus: 5 },
+            { partNumber: 'CT103828', name: 'Carhartt Duck Detroit Jacket', bonus: 5 },
+            { partNumber: 'CT102286', name: 'Carhartt Gilliam Vest', bonus: 3 },
+            { partNumber: 'NF0A52S7', name: 'North Face Dyno Backpack', bonus: 2 }
+        ],
+
+        // Richardson SanMar caps - grouped as one total
+        richardsonStyles: [
+            '112', '112FP', '112FPR', '112PFP', '112PL', '112PT', '115',
+            '168', '168P', '169', '173', '212', '220', '225', '256', '256P',
+            '312', '323FPC', '326', '336', '355', '356'
+        ],
+        richardsonBonus: 0.50, // Per cap
+
+        // Sales reps to track
+        trackedReps: ['Nika Lao', 'Taneisha Clark'],
+
+        // Order type filters (Custom Embroidery = 21, Order Type 41)
+        orderTypeIds: [21, 41],
+
+        // Date range - 2026 YTD
+        getDateRange: function() {
+            return {
+                start: '2026-01-01',
+                end: formatDate(new Date())
+            };
+        }
+    };
+
+    /**
+     * Fetch line items for a specific order
+     * @param {number} orderNo - The order number
+     * @returns {Promise<Array>} Array of line items
+     */
+    async function fetchLineItems(orderNo) {
+        const url = `${API_CONFIG.baseURL}/manageorders/lineitems/${orderNo}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch line items: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.result || [];
+    }
+
+    /**
+     * Check if a part number matches a tracked style
+     * Handles size variations like CT104670_2X, EB550_3X
+     * @param {string} partNumber - The part number from line item
+     * @param {string} trackedStyle - The base style to match
+     * @returns {boolean}
+     */
+    function matchesTrackedStyle(partNumber, trackedStyle) {
+        if (!partNumber) return false;
+        // Exact match or starts with tracked style followed by underscore (size variant)
+        return partNumber === trackedStyle ||
+               partNumber.startsWith(trackedStyle + '_');
+    }
+
+    /**
+     * Check if a part number is a Richardson SanMar cap
+     * @param {string} partNumber - The part number from line item
+     * @returns {boolean}
+     */
+    function isRichardsonStyle(partNumber) {
+        if (!partNumber) return false;
+        return GARMENT_TRACKER_CONFIG.richardsonStyles.some(style =>
+            matchesTrackedStyle(partNumber, style)
+        );
+    }
+
+    /**
+     * Calculate total quantity from size fields
+     * @param {Object} item - Line item with Size01-Size06 fields
+     * @returns {number} Total quantity
+     */
+    function calculateLineItemQuantity(item) {
+        // API returns size fields as strings, must parse to int
+        return (parseInt(item.Size01) || 0) + (parseInt(item.Size02) || 0) + (parseInt(item.Size03) || 0) +
+               (parseInt(item.Size04) || 0) + (parseInt(item.Size05) || 0) + (parseInt(item.Size06) || 0);
+    }
+
+    /**
+     * Load garment tracker data
+     * Fetches orders and line items, aggregates by rep and style
+     * @returns {Promise<Object>} Tracker data with quantities and bonus totals
+     */
+    async function loadGarmentTrackerData() {
+        const dateRange = GARMENT_TRACKER_CONFIG.getDateRange();
+        const cacheKey = 'garmentTracker_2026';
+        const cacheTTL = 30 * 60 * 1000; // 30 minutes
+
+        // Check cache first
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < cacheTTL) {
+                    console.log('[GarmentTracker] Using cached data');
+                    return data;
+                }
+            }
+        } catch (e) {
+            console.warn('[GarmentTracker] Cache read error:', e);
+        }
+
+        console.log(`[GarmentTracker] Fetching orders from ${dateRange.start} to ${dateRange.end}`);
+
+        // Step 1: Fetch all invoiced orders for 2026
+        const allOrders = await fetchOrders(dateRange.start, dateRange.end);
+
+        // Step 2: Filter to tracked reps AND order types 21 or 41
+        const repOrders = allOrders.filter(order =>
+            GARMENT_TRACKER_CONFIG.trackedReps.includes(order.CustomerServiceRep) &&
+            GARMENT_TRACKER_CONFIG.orderTypeIds.includes(order.id_OrderType)
+        );
+
+        console.log(`[GarmentTracker] Found ${repOrders.length} matching orders from ${allOrders.length} total`);
+
+        // Step 3: Initialize tracking structure
+        const trackerData = {
+            byRep: {},
+            totals: {
+                premium: {},
+                richardson: 0
+            },
+            bonusTotals: {}, // Per-rep bonus totals for tooltips
+            metadata: {
+                dateRange: dateRange,
+                ordersProcessed: 0,
+                totalOrders: repOrders.length,
+                fetchedAt: new Date().toISOString()
+            }
+        };
+
+        // Initialize rep data
+        GARMENT_TRACKER_CONFIG.trackedReps.forEach(rep => {
+            trackerData.byRep[rep] = {
+                premium: {},
+                richardson: 0
+            };
+            trackerData.bonusTotals[rep] = 0;
+            GARMENT_TRACKER_CONFIG.premiumItems.forEach(item => {
+                trackerData.byRep[rep].premium[item.partNumber] = 0;
+            });
+        });
+
+        // Initialize totals
+        GARMENT_TRACKER_CONFIG.premiumItems.forEach(item => {
+            trackerData.totals.premium[item.partNumber] = 0;
+        });
+
+        // Step 4: Fetch line items SEQUENTIALLY to avoid rate limits
+        const REQUEST_DELAY = 500; // ms between requests (increased for stricter rate limits)
+        const MAX_RETRIES = 5;
+
+        for (let i = 0; i < repOrders.length; i++) {
+            const order = repOrders[i];
+
+            // Retry loop with exponential backoff
+            let retries = 0;
+            let success = false;
+
+            while (!success && retries < MAX_RETRIES) {
+                try {
+                    const lineItems = await fetchLineItems(order.id_Order);
+                    const rep = order.CustomerServiceRep;
+
+                    lineItems.forEach(item => {
+                        const qty = calculateLineItemQuantity(item);
+                        if (qty === 0) return;
+
+                        // Check premium items
+                        GARMENT_TRACKER_CONFIG.premiumItems.forEach(premium => {
+                            if (matchesTrackedStyle(item.PartNumber, premium.partNumber)) {
+                                trackerData.byRep[rep].premium[premium.partNumber] += qty;
+                                trackerData.totals.premium[premium.partNumber] += qty;
+                                trackerData.bonusTotals[rep] += qty * premium.bonus;
+                            }
+                        });
+
+                        // Check Richardson
+                        if (isRichardsonStyle(item.PartNumber)) {
+                            trackerData.byRep[rep].richardson += qty;
+                            trackerData.totals.richardson += qty;
+                            trackerData.bonusTotals[rep] += qty * GARMENT_TRACKER_CONFIG.richardsonBonus;
+                        }
+                    });
+
+                    trackerData.metadata.ordersProcessed++;
+                    success = true;
+                } catch (e) {
+                    retries++;
+                    if (e.message.includes('429') && retries < MAX_RETRIES) {
+                        // Exponential backoff: 1s, 2s, 4s
+                        const backoff = Math.pow(2, retries) * 1000;
+                        console.warn(`[GarmentTracker] Rate limited on order ${order.id_Order}, retry ${retries} in ${backoff}ms`);
+                        await new Promise(resolve => setTimeout(resolve, backoff));
+                    } else if (retries >= MAX_RETRIES) {
+                        console.warn(`[GarmentTracker] Failed order ${order.id_Order} after ${MAX_RETRIES} retries:`, e.message);
+                    }
+                }
+            }
+
+            // Delay between requests (except after last one)
+            if (i < repOrders.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY));
+            }
+        }
+
+        console.log(`[GarmentTracker] Processed ${trackerData.metadata.ordersProcessed}/${repOrders.length} orders`);
+
+        // Cache results
+        try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+                data: trackerData,
+                timestamp: Date.now()
+            }));
+        } catch (e) {
+            console.warn('[GarmentTracker] Cache write error:', e);
+        }
+
+        return trackerData;
+    }
+
+    /**
+     * Clear garment tracker cache
+     */
+    function clearGarmentTrackerCache() {
+        try {
+            sessionStorage.removeItem('garmentTracker_2026');
+        } catch (e) {
+            console.warn('[GarmentTracker] Cache clear error:', e);
+        }
+    }
+
+    // =====================================================
+    // GARMENT TRACKER - TABLE-BASED (FAST)
+    // =====================================================
+
+    /**
+     * Load garment tracker data from Caspio table (FAST - ~1 second)
+     * Replaces the slow 44+ API call method
+     * @returns {Promise<Object>} Tracker data aggregated by rep
+     */
+    async function loadGarmentTrackerFromTable() {
+        const year = new Date().getFullYear();
+        // DateInvoiced is Date/Time field, use YEAR() function
+        const whereClause = encodeURIComponent(`YEAR(DateInvoiced)=${year}`);
+        const url = `${API_CONFIG.baseURL}/garment-tracker?q.where=${whereClause}`;
+
+        console.log(`[GarmentTracker] Loading from table for year ${year}`);
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to load garment tracker from table');
+        }
+
+        console.log(`[GarmentTracker] Loaded ${data.count} records from table`);
+
+        // Aggregate records into format widget expects
+        return aggregateFromTable(data.records);
+    }
+
+    /**
+     * Aggregate table records by rep and premium/richardson
+     * @param {Array} records - Records from garment tracker table
+     * @returns {Object} Aggregated tracker data
+     */
+    function aggregateFromTable(records) {
+        const trackerData = {
+            byRep: {},
+            totals: { premium: {}, richardson: 0 },
+            bonusTotals: {},
+            metadata: {
+                ordersProcessed: records.length,
+                totalOrders: records.length,
+                fetchedAt: new Date().toISOString(),
+                source: 'table'
+            }
+        };
+
+        // Initialize tracked reps
+        GARMENT_TRACKER_CONFIG.trackedReps.forEach(rep => {
+            trackerData.byRep[rep] = { premium: {}, richardson: 0 };
+            trackerData.bonusTotals[rep] = 0;
+            GARMENT_TRACKER_CONFIG.premiumItems.forEach(item => {
+                trackerData.byRep[rep].premium[item.partNumber] = 0;
+            });
+        });
+
+        // Initialize totals
+        GARMENT_TRACKER_CONFIG.premiumItems.forEach(item => {
+            trackerData.totals.premium[item.partNumber] = 0;
+        });
+
+        // Aggregate from table records
+        records.forEach(record => {
+            const rep = record.RepName;
+            if (!trackerData.byRep[rep]) return; // Not a tracked rep
+
+            if (record.StyleCategory === 'Premium') {
+                // Match to specific premium item
+                GARMENT_TRACKER_CONFIG.premiumItems.forEach(item => {
+                    if (matchesTrackedStyle(record.PartNumber, item.partNumber)) {
+                        trackerData.byRep[rep].premium[item.partNumber] += record.Quantity;
+                        trackerData.totals.premium[item.partNumber] += record.Quantity;
+                    }
+                });
+            } else if (record.StyleCategory === 'Richardson') {
+                trackerData.byRep[rep].richardson += record.Quantity;
+                trackerData.totals.richardson += record.Quantity;
+            }
+
+            trackerData.bonusTotals[rep] += record.BonusAmount || 0;
+        });
+
+        return trackerData;
+    }
+
+    /**
+     * Fetch existing garment tracker records to check for duplicates
+     * @returns {Promise<Array>} Array of existing records
+     */
+    async function fetchExistingGarmentRecords() {
+        const year = new Date().getFullYear();
+        const whereClause = encodeURIComponent(`YEAR(DateInvoiced)=${year}`);
+        const url = `${API_CONFIG.baseURL}/garment-tracker?q.where=${whereClause}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (!data.success) return [];
+            return data.records || [];
+        } catch (e) {
+            console.warn('[GarmentTracker] Could not fetch existing records:', e.message);
+            return [];
+        }
+    }
+
+    /**
+     * Sync orders from ManageOrders to garment tracker table
+     * Skips records that already exist (prevents duplicates on re-sync)
+     * @param {Function} progressCallback - Optional callback for progress updates
+     * @returns {Promise<number>} Number of records synced
+     */
+    async function syncGarmentTracker(progressCallback) {
+        const dateRange = GARMENT_TRACKER_CONFIG.getDateRange();
+
+        // Fetch existing records to prevent duplicates
+        progressCallback?.('Checking existing records...');
+        const existingRecords = await fetchExistingGarmentRecords();
+        const existingKeys = new Set(
+            existingRecords.map(r => `${r.OrderNumber}-${r.PartNumber}`)
+        );
+        console.log(`[GarmentTracker] Found ${existingKeys.size} existing records`);
+
+        progressCallback?.('Fetching orders...');
+        console.log(`[GarmentTracker] Syncing orders from ${dateRange.start} to ${dateRange.end}`);
+
+        // Get all invoiced orders for the year
+        const allOrders = await fetchOrders(dateRange.start, dateRange.end);
+        const repOrders = allOrders.filter(order =>
+            GARMENT_TRACKER_CONFIG.trackedReps.includes(order.CustomerServiceRep) &&
+            GARMENT_TRACKER_CONFIG.orderTypeIds.includes(order.id_OrderType)
+        );
+
+        progressCallback?.(`Processing ${repOrders.length} orders...`);
+        console.log(`[GarmentTracker] Found ${repOrders.length} orders to sync`);
+
+        let synced = 0;
+        let skipped = 0;
+        const REQUEST_DELAY = 1000; // 1 second between requests (increased for rate limits)
+        const MAX_RETRIES = 5;
+
+        for (let i = 0; i < repOrders.length; i++) {
+            const order = repOrders[i];
+
+            // Retry loop with exponential backoff
+            let retries = 0;
+            let success = false;
+
+            while (!success && retries < MAX_RETRIES) {
+                try {
+                    const lineItems = await fetchLineItems(order.id_Order);
+
+                    for (const item of lineItems) {
+                        const qty = calculateLineItemQuantity(item);
+                        if (qty === 0) continue;
+
+                        // Check premium items
+                        for (const premium of GARMENT_TRACKER_CONFIG.premiumItems) {
+                            if (matchesTrackedStyle(item.PartNumber, premium.partNumber)) {
+                                const recordKey = `${order.id_Order}-${item.PartNumber}`;
+                                if (existingKeys.has(recordKey)) {
+                                    skipped++;
+                                    continue; // Skip - already synced
+                                }
+                                await postGarmentRecord({
+                                    OrderNumber: order.id_Order,
+                                    DateInvoiced: order.date_Invoiced || '',
+                                    RepName: order.CustomerServiceRep,
+                                    CustomerName: order.Contact_Name || '',
+                                    CompanyName: order.CustomerName || '',
+                                    PartNumber: item.PartNumber,
+                                    StyleCategory: 'Premium',
+                                    Quantity: qty,
+                                    BonusAmount: qty * premium.bonus
+                                });
+                                synced++;
+                                existingKeys.add(recordKey); // Prevent duplicates within same sync
+                            }
+                        }
+
+                        // Check Richardson
+                        if (isRichardsonStyle(item.PartNumber)) {
+                            const recordKey = `${order.id_Order}-${item.PartNumber}`;
+                            if (existingKeys.has(recordKey)) {
+                                skipped++;
+                                continue; // Skip - already synced
+                            }
+                            await postGarmentRecord({
+                                OrderNumber: order.id_Order,
+                                DateInvoiced: order.date_Invoiced || '',
+                                RepName: order.CustomerServiceRep,
+                                CustomerName: order.Contact_Name || '',
+                                CompanyName: order.CustomerName || '',
+                                PartNumber: item.PartNumber,
+                                StyleCategory: 'Richardson',
+                                Quantity: qty,
+                                BonusAmount: qty * GARMENT_TRACKER_CONFIG.richardsonBonus
+                            });
+                            synced++;
+                            existingKeys.add(recordKey); // Prevent duplicates within same sync
+                        }
+                    }
+
+                    success = true;
+                    progressCallback?.(`Synced ${i + 1}/${repOrders.length} orders (${synced} new, ${skipped} skipped)`);
+                } catch (e) {
+                    retries++;
+                    if (e.message.includes('429') && retries < MAX_RETRIES) {
+                        // Exponential backoff: 2s, 4s, 8s, 16s, 32s
+                        const backoff = Math.pow(2, retries) * 1000;
+                        console.warn(`[GarmentTracker] Rate limited on order ${order.id_Order}, retry ${retries} in ${backoff}ms`);
+                        progressCallback?.(`Rate limited, waiting ${backoff/1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, backoff));
+                    } else if (retries >= MAX_RETRIES) {
+                        console.warn(`[GarmentTracker] Failed order ${order.id_Order} after ${MAX_RETRIES} retries:`, e.message);
+                    } else {
+                        console.warn(`[GarmentTracker] Error syncing order ${order.id_Order}:`, e.message);
+                        break; // Non-429 error, don't retry
+                    }
+                }
+            }
+
+            // Rate limit between orders
+            if (i < repOrders.length - 1) {
+                await new Promise(r => setTimeout(r, REQUEST_DELAY));
+            }
+        }
+
+        console.log(`[GarmentTracker] Sync complete: ${synced} new, ${skipped} skipped`);
+        return synced;
+    }
+
+    /**
+     * Post a record to the garment tracker table
+     * @param {Object} record - Record to post
+     * @returns {Promise<Object>} Response from API
+     */
+    async function postGarmentRecord(record) {
+        const response = await fetch(`${API_CONFIG.baseURL}/garment-tracker`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(record)
+        });
+        return response.json();
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -976,7 +1471,17 @@ const StaffDashboardService = (function() {
 
         // State
         isLoading: () => isLoading,
-        getLastFetchTime: () => lastFetchTime ? new Date(lastFetchTime) : null
+        getLastFetchTime: () => lastFetchTime ? new Date(lastFetchTime) : null,
+
+        // Garment Tracker (legacy - slow)
+        GARMENT_TRACKER_CONFIG,
+        loadGarmentTrackerData,
+        clearGarmentTrackerCache,
+
+        // Garment Tracker (table-based - fast)
+        loadGarmentTrackerFromTable,
+        syncGarmentTracker,
+        postGarmentRecord
     };
 })();
 

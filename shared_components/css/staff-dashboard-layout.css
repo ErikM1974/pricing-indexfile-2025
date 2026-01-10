@@ -569,12 +569,15 @@
    ===================================================== */
 .zone-metrics {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
     gap: 1rem;
 }
 
 /* Revenue Card */
 .metrics-revenue-card {
+    grid-column: 1;
+    grid-row: 1;
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
@@ -674,6 +677,8 @@
 
 /* Team Performance Card */
 .metrics-team-card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
@@ -1010,6 +1015,13 @@
 @media (max-width: 1024px) {
     .zone-metrics {
         grid-template-columns: 1fr;
+    }
+
+    .metrics-revenue-card,
+    .metrics-team-card,
+    .garment-tracker-card {
+        grid-column: 1;
+        grid-row: auto;
     }
 
     .zone-secondary {

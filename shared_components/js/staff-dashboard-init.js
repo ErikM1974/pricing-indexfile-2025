@@ -41,6 +41,9 @@ const StaffDashboardInit = (function() {
         // Load metrics from ShopWorks
         await loadMetrics();
 
+        // Load garment tracker (non-blocking, loads after main metrics)
+        loadGarmentTracker();
+
         // Set up auto-refresh
         startAutoRefresh();
 
@@ -939,6 +942,240 @@ const StaffDashboardInit = (function() {
     }
 
     // =====================================================
+    // GARMENT TRACKER
+    // Premium garment tracking for Nika and Taneisha
+    // =====================================================
+
+    /**
+     * Load and render garment tracker widget
+     * Tries table-based method first (fast), falls back to legacy if table is empty
+     */
+    async function loadGarmentTracker() {
+        const container = document.getElementById('garmentTrackerContent');
+        if (!container) return;
+
+        try {
+            // Try fast table-based load first
+            const data = await StaffDashboardService.loadGarmentTrackerFromTable();
+            console.log('[GarmentTracker] Loaded from table');
+            renderGarmentTracker(data);
+        } catch (error) {
+            console.warn('[GarmentTracker] Table load failed, showing sync prompt:', error.message);
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="error-state-icon"><i class="fas fa-cloud-download-alt"></i></div>
+                    <div class="error-state-content">
+                        <div class="error-state-title">No data synced yet</div>
+                        <div class="error-state-message">Click the Sync button to populate from orders</div>
+                        <button class="error-state-retry" onclick="StaffDashboardInit.syncGarmentTracker()">
+                            <i class="fas fa-cloud-download-alt"></i> Sync Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Render garment tracker data as a table
+     * @param {Object} data - Tracker data from loadGarmentTrackerData
+     */
+    function renderGarmentTracker(data) {
+        const container = document.getElementById('garmentTrackerContent');
+        const dateRangeEl = document.getElementById('garmentTrackerDateRange');
+
+        if (!container || !data) return;
+
+        const config = StaffDashboardService.GARMENT_TRACKER_CONFIG;
+        const reps = config.trackedReps;
+
+        // Update date range display
+        if (dateRangeEl && data.metadata?.dateRange) {
+            const dr = data.metadata.dateRange;
+            dateRangeEl.textContent = `${StaffDashboardService.formatDateForDisplay(dr.start)} - ${StaffDashboardService.formatDateForDisplay(dr.end)}`;
+        }
+
+        // Get first names for column headers
+        const getFirstName = (fullName) => fullName.split(' ')[0];
+
+        // Build table HTML
+        let html = `
+            <div class="garment-tracker-table-wrapper">
+                <table class="garment-tracker-table">
+                    <thead>
+                        <tr>
+                            <th class="garment-name-col">Style</th>
+                            ${reps.map(rep => `<th class="rep-col">${getFirstName(rep)}</th>`).join('')}
+                            <th class="total-col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Premium items rows
+        config.premiumItems.forEach(item => {
+            const totalQty = data.totals.premium[item.partNumber] || 0;
+            const hasData = totalQty > 0;
+
+            html += `
+                <tr class="${hasData ? '' : 'no-data'}" title="${item.bonus} per item">
+                    <td class="garment-name-col">
+                        <div class="garment-info">
+                            <span class="garment-style">${escapeHtml(item.partNumber)}</span>
+                            <span class="garment-name">${escapeHtml(item.name)}</span>
+                        </div>
+                    </td>
+                    ${reps.map(rep => {
+                        const qty = data.byRep[rep]?.premium[item.partNumber] || 0;
+                        return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
+                    }).join('')}
+                    <td class="total-col ${hasData ? 'has-qty' : ''}">${totalQty || '-'}</td>
+                </tr>
+            `;
+        });
+
+        // Richardson row (grouped)
+        const richardsonTotal = data.totals.richardson || 0;
+        html += `
+            <tr class="richardson-row ${richardsonTotal > 0 ? '' : 'no-data'}" title="${config.richardsonBonus} per cap">
+                <td class="garment-name-col">
+                    <div class="garment-info">
+                        <span class="garment-style">Richardson</span>
+                        <span class="garment-name">SanMar Caps (112, 168, etc.)</span>
+                    </div>
+                </td>
+                ${reps.map(rep => {
+                    const qty = data.byRep[rep]?.richardson || 0;
+                    return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
+                }).join('')}
+                <td class="total-col ${richardsonTotal > 0 ? 'has-qty' : ''}">${richardsonTotal || '-'}</td>
+            </tr>
+        `;
+
+        // Bonus totals row at bottom with progress bars toward $500 goal
+        const BONUS_GOAL = 500;
+        html += `
+            <tr class="bonus-row">
+                <td class="garment-name-col"></td>
+                ${reps.map(rep => {
+                    const bonusTotal = data.bonusTotals[rep] || 0;
+                    const percentage = Math.min((bonusTotal / BONUS_GOAL) * 100, 100);
+                    const isGoalReached = bonusTotal >= BONUS_GOAL;
+                    const goalClass = isGoalReached ? 'goal-reached' : '';
+
+                    return `<td class="rep-col bonus-cell ${goalClass}" title="$500 bonus goal - paid out on next paycheck when reached">
+                        <div class="bonus-amount">$${bonusTotal.toFixed(2)}</div>
+                        <div class="bonus-progress">
+                            <div class="bonus-progress-bar">
+                                <div class="bonus-progress-fill" style="width: ${percentage}%"></div>
+                            </div>
+                            <span class="bonus-progress-label">
+                                ${isGoalReached ? '✓ GOAL!' : Math.round(percentage) + '%'}
+                            </span>
+                        </div>
+                    </td>`;
+                }).join('')}
+                <td class="total-col"></td>
+            </tr>
+        `;
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+            <div class="garment-tracker-footer">
+                <span class="garment-tracker-meta">
+                    ${data.metadata.ordersProcessed} of ${data.metadata.totalOrders} orders processed
+                </span>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    /**
+     * Refresh garment tracker from table (manual)
+     */
+    async function refreshGarmentTracker() {
+        const btn = document.querySelector('.garment-tracker-card .refresh-btn');
+        if (btn) btn.classList.add('loading');
+
+        // Show loading state
+        const container = document.getElementById('garmentTrackerContent');
+        if (container) {
+            container.innerHTML = `
+                <div class="metrics-loading">
+                    <div class="loading"></div>
+                    <span>Refreshing from table...</span>
+                </div>
+            `;
+        }
+
+        await loadGarmentTracker();
+
+        if (btn) btn.classList.remove('loading');
+    }
+
+    /**
+     * Sync garment tracker from ManageOrders to Caspio table
+     */
+    async function syncGarmentTracker() {
+        const statusEl = document.getElementById('garmentSyncStatus');
+        const syncBtn = document.querySelector('.garment-tracker-card .sync-btn');
+        const container = document.getElementById('garmentTrackerContent');
+
+        if (syncBtn) {
+            syncBtn.disabled = true;
+            const icon = syncBtn.querySelector('i');
+            if (icon) icon.className = 'fas fa-spinner fa-spin';
+        }
+
+        if (container) {
+            container.innerHTML = `
+                <div class="metrics-loading">
+                    <div class="loading"></div>
+                    <span id="syncProgressText">Starting sync...</span>
+                </div>
+            `;
+        }
+
+        try {
+            const count = await StaffDashboardService.syncGarmentTracker((msg) => {
+                if (statusEl) statusEl.textContent = msg;
+                const progressEl = document.getElementById('syncProgressText');
+                if (progressEl) progressEl.textContent = msg;
+            });
+
+            if (statusEl) statusEl.textContent = `Synced ${count} items`;
+            console.log(`[GarmentTracker] Sync complete: ${count} items`);
+
+            // Reload from table
+            await loadGarmentTracker();
+        } catch (error) {
+            console.error('[GarmentTracker] Sync failed:', error);
+            if (statusEl) statusEl.textContent = 'Sync failed!';
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-state">
+                        <div class="error-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="error-state-content">
+                            <div class="error-state-title">Sync failed</div>
+                            <div class="error-state-message">${escapeHtml(error.message)}</div>
+                            <button class="error-state-retry" onclick="StaffDashboardInit.syncGarmentTracker()">Try again</button>
+                        </div>
+                    </div>
+                `;
+            }
+        } finally {
+            if (syncBtn) {
+                syncBtn.disabled = false;
+                const icon = syncBtn.querySelector('i');
+                if (icon) icon.className = 'fas fa-cloud-download-alt';
+            }
+        }
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -949,6 +1186,11 @@ const StaffDashboardInit = (function() {
         toggleWidget,
         refresh,
         stopAutoRefresh,
+
+        // Garment Tracker
+        loadGarmentTracker,
+        refreshGarmentTracker,
+        syncGarmentTracker,
 
         // Expose config for external use
         CONFIG

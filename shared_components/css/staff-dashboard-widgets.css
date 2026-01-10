@@ -604,6 +604,45 @@
     animation: spin 1s linear infinite;
 }
 
+.sync-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--light-bg);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    margin-right: 4px;
+}
+
+.sync-btn:hover {
+    background: var(--hover-bg);
+    color: #2e7d32;
+}
+
+.sync-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sync-btn i.fa-spin {
+    animation: spin 1s linear infinite;
+}
+
+.sync-status {
+    font-size: 0.6875rem;
+    color: var(--text-light);
+    margin-right: 8px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .last-updated {
     font-size: 0.6875rem;
     color: var(--text-light);
@@ -1053,5 +1092,267 @@
 
     .celebration-item {
         padding: 0.25rem 0.5rem;
+    }
+}
+
+/* =====================================================
+   GARMENT TRACKER WIDGET
+   Premium garment tracking table for Nika and Taneisha
+   ===================================================== */
+
+/* Card styling - left column, row 2 in zone-metrics grid */
+.garment-tracker-card {
+    grid-column: 1;
+    grid-row: 2;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.garment-tracker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.garment-tracker-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.garment-tracker-title i {
+    color: var(--wsu-crimson);
+}
+
+.garment-tracker-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.garment-tracker-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Table wrapper */
+.garment-tracker-table-wrapper {
+    overflow-x: auto;
+}
+
+/* Table styling */
+.garment-tracker-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.garment-tracker-table th,
+.garment-tracker-table td {
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.garment-tracker-table th {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    background: var(--light-bg);
+}
+
+/* Rep column headers */
+.garment-tracker-table th.rep-col {
+    /* Removed tooltip cursor - bonus now shown at bottom */
+}
+
+/* Column widths */
+.garment-name-col {
+    min-width: 200px;
+}
+
+.rep-col,
+.total-col {
+    text-align: center !important;
+    min-width: 70px;
+}
+
+.total-col {
+    font-weight: 600;
+    background: var(--light-bg);
+}
+
+/* Garment info cell */
+.garment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.garment-style {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.75rem;
+}
+
+.garment-name {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+}
+
+/* Quantity cells */
+.garment-tracker-table td.has-qty {
+    font-weight: 600;
+    color: #059669;
+}
+
+.garment-tracker-table tr.no-data td {
+    color: var(--text-light);
+}
+
+/* Richardson row highlight */
+.garment-tracker-table tr.richardson-row {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.garment-tracker-table tr.richardson-row .garment-style {
+    color: #7c3aed;
+}
+
+/* Hover on rows to show tooltip info */
+.garment-tracker-table tbody tr {
+    cursor: help;
+    transition: background 0.15s;
+}
+
+.garment-tracker-table tbody tr:hover {
+    background: var(--hover-bg);
+}
+
+/* Bonus row doesn't need help cursor - has its own tooltip */
+.garment-tracker-table tr.bonus-row {
+    cursor: default;
+}
+
+.garment-tracker-table tr.bonus-row:hover {
+    background: transparent;
+}
+
+/* Bonus totals row at bottom with $500 goal progress */
+.garment-tracker-table tr.bonus-row {
+    border-top: 2px solid var(--border-color);
+}
+
+.garment-tracker-table tr.bonus-row td {
+    border-bottom: none;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Bonus cell with progress bar */
+.garment-tracker-table td.bonus-cell {
+    padding: 0.5rem 0.375rem;
+    vertical-align: top;
+}
+
+.bonus-amount {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.bonus-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+}
+
+.bonus-progress-bar {
+    flex: 1;
+    height: 10px;
+    background: var(--border-light);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.bonus-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.bonus-progress-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 42px;
+    text-align: right;
+}
+
+/* Goal reached state - celebration! */
+.bonus-cell.goal-reached .bonus-amount {
+    color: #059669;
+}
+
+.bonus-cell.goal-reached .bonus-progress-fill {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.bonus-cell.goal-reached .bonus-progress-label {
+    color: #059669;
+}
+
+/* Footer */
+.garment-tracker-footer {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.garment-tracker-meta {
+    font-size: 0.6875rem;
+    color: var(--text-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .garment-tracker-card {
+        padding: 1rem;
+    }
+
+    .garment-tracker-table {
+        font-size: 0.75rem;
+    }
+
+    .garment-name-col {
+        min-width: 150px;
+    }
+
+    .rep-col,
+    .total-col {
+        min-width: 50px;
+    }
+
+    .garment-tracker-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }

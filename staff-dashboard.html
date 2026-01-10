@@ -590,6 +590,36 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Garment Tracker Card (spans full width below Revenue and Team Performance) -->
+                    <div class="garment-tracker-card">
+                        <div class="garment-tracker-header">
+                            <div class="garment-tracker-title-group">
+                                <h3 class="garment-tracker-title">
+                                    <i class="fas fa-tshirt"></i>
+                                    Garment Tracker
+                                </h3>
+                                <div class="garment-tracker-date" id="garmentTrackerDateRange">
+                                    Jan 1, 2026 - Today
+                                </div>
+                            </div>
+                            <div class="refresh-control">
+                                <span class="sync-status" id="garmentSyncStatus"></span>
+                                <button class="sync-btn" onclick="StaffDashboardInit.syncGarmentTracker()" title="Sync from Orders">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </button>
+                                <button class="refresh-btn" onclick="StaffDashboardInit.refreshGarmentTracker()" title="Refresh from Table">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="garment-tracker-content" id="garmentTrackerContent">
+                            <div class="metrics-loading">
+                                <div class="loading"></div>
+                                <span>Loading garment data...</span>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- =====================================================
