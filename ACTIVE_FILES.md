@@ -277,6 +277,8 @@ cap-embroidery-fix.css
 | `/shared_components/js/staff-dashboard-service.js` | ShopWorks ManageOrders API integration | ✅ Active |
 | `/shared_components/js/staff-dashboard-announcements.js` | Priority announcements with dismiss | ✅ Active |
 | `/shared_components/js/staff-dashboard-init.js` | Initialization, widget toggles, auto-refresh | ✅ Active |
+| `/shared_components/js/production-schedule-stats.js` | Precomputed turnaround stats from 819 records | ✅ Active |
+| `/shared_components/js/production-schedule-predictor.js` | Prediction engine for turnaround times | ✅ Active |
 
 ### Employee Bundle Pages
 | File | Purpose | Dependencies | Status |

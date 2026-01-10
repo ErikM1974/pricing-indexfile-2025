@@ -591,6 +591,30 @@
                         </div>
                     </div>
 
+                    <!-- Production Schedule Predictor Widget -->
+                    <div class="widget-collapsible production-widget-card" data-widget="production">
+                        <div class="widget-header">
+                            <h3 class="widget-title">
+                                <i class="fas fa-chart-line"></i>
+                                Production Turnaround
+                            </h3>
+                            <span id="production-season-badge" class="season-badge"></span>
+                            <i class="fas fa-chevron-down widget-toggle"></i>
+                        </div>
+                        <div class="widget-content">
+                            <div id="production-predictor-grid" class="production-predictor-grid">
+                                <!-- Dynamic content rendered by renderProductionSchedule() -->
+                                <div class="production-loading">Loading predictions...</div>
+                            </div>
+                            <div class="production-footer">
+                                <span class="production-meta">
+                                    <i class="fas fa-database"></i>
+                                    Based on <span id="production-record-count">4,631</span> historical completions
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Garment Tracker Card (spans full width below Revenue and Team Performance) -->
                     <div class="garment-tracker-card">
                         <div class="garment-tracker-header">
@@ -624,54 +648,9 @@
 
                 <!-- =====================================================
                      ZONE 4: SECONDARY CONTENT
-                     Production Schedule (demoted), Recent Policies
+                     Recent Policies, etc.
                      ===================================================== -->
                 <section class="zone-secondary">
-                    <!-- Production Schedule Widget (Collapsible) -->
-                    <div class="widget-collapsible collapsed" data-widget="production">
-                        <div class="widget-header">
-                            <h3 class="widget-title">
-                                <i class="fas fa-industry"></i>
-                                Production Schedule
-                            </h3>
-                            <i class="fas fa-chevron-down widget-toggle"></i>
-                        </div>
-                        <div class="widget-content">
-                            <div class="production-mini-grid">
-                                <div class="production-mini-card">
-                                    <div class="production-mini-label">DTG</div>
-                                    <div class="production-mini-status">
-                                        <i class="fas fa-check-circle"></i> Available
-                                    </div>
-                                </div>
-                                <div class="production-mini-card">
-                                    <div class="production-mini-label">Embroidery</div>
-                                    <div class="production-mini-status">
-                                        <i class="fas fa-check-circle"></i> Available
-                                    </div>
-                                </div>
-                                <div class="production-mini-card">
-                                    <div class="production-mini-label">Screen Print</div>
-                                    <div class="production-mini-status">
-                                        <i class="fas fa-check-circle"></i> Available
-                                    </div>
-                                </div>
-                                <div class="production-mini-card">
-                                    <div class="production-mini-label">Cap Emb</div>
-                                    <div class="production-mini-status">
-                                        <i class="fas fa-check-circle"></i> Available
-                                    </div>
-                                </div>
-                                <div class="production-mini-card">
-                                    <div class="production-mini-label">Transfers</div>
-                                    <div class="production-mini-status">
-                                        <i class="fas fa-check-circle"></i> Available
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Recent Policies Widget -->
                     <div class="widget-collapsible" data-widget="policies">
                         <div class="widget-header">
@@ -1020,6 +999,9 @@
     <script src="/shared_components/js/staff-dashboard-employees.js"></script>
     <script src="/shared_components/js/staff-dashboard-service.js"></script>
     <script src="/shared_components/js/staff-dashboard-announcements.js"></script>
+    <!-- Production Schedule Predictor -->
+    <script src="/shared_components/js/production-schedule-stats.js"></script>
+    <script src="/shared_components/js/production-schedule-predictor.js"></script>
     <script src="/shared_components/js/staff-dashboard-init.js"></script>
 
     <!-- Caspio Authentication Script -->

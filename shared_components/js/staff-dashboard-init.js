@@ -44,6 +44,9 @@ const StaffDashboardInit = (function() {
         // Load garment tracker (non-blocking, loads after main metrics)
         loadGarmentTracker();
 
+        // Render production schedule predictor
+        renderProductionSchedule();
+
         // Set up auto-refresh
         startAutoRefresh();
 
@@ -1176,6 +1179,92 @@ const StaffDashboardInit = (function() {
     }
 
     // =====================================================
+    // PRODUCTION SCHEDULE PREDICTOR
+    // Historical-based turnaround predictions
+    // =====================================================
+
+    /**
+     * Render production schedule predictions
+     * Uses ProductionPredictor module with precomputed stats
+     */
+    function renderProductionSchedule() {
+        const container = document.getElementById('production-predictor-grid');
+        const seasonBadge = document.getElementById('production-season-badge');
+        const recordCount = document.getElementById('production-record-count');
+
+        if (!container) return;
+
+        // Check if predictor is available
+        if (typeof ProductionPredictor === 'undefined') {
+            console.warn('ProductionPredictor not loaded');
+            container.innerHTML = '<div class="production-loading">Predictor not available</div>';
+            return;
+        }
+
+        // Get all predictions for current date
+        const predictions = ProductionPredictor.getAllPredictions();
+        const metadata = ProductionPredictor.getMetadata();
+
+        // Update record count
+        if (recordCount && metadata.totalRecords) {
+            recordCount.textContent = metadata.totalRecords;
+        }
+
+        // Update season badge
+        if (seasonBadge) {
+            const seasonText = ProductionPredictor.getSeasonText(predictions.season);
+            seasonBadge.className = `season-badge season-${predictions.season}`;
+            seasonBadge.textContent = seasonText;
+        }
+
+        // Define services to display (using Font Awesome Free icons)
+        const services = [
+            { key: 'dtg', icon: 'fa-tshirt' },
+            { key: 'embroidery', icon: 'fa-star' },
+            { key: 'capEmbroidery', icon: 'fa-hard-hat' },
+            { key: 'screenprint', icon: 'fa-print' },
+            { key: 'transfers', icon: 'fa-exchange-alt' }
+        ];
+
+        // Build cards HTML
+        let html = '';
+        services.forEach(service => {
+            const pred = predictions[service.key];
+            const name = ProductionPredictor.getServiceName(service.key);
+            const capacityClass = getCapacityClass(predictions.capacity.status);
+
+            html += `
+                <div class="production-card" title="Typically ${pred.range} days (${pred.samples} samples)">
+                    <div class="production-card-header">
+                        <i class="fas ${service.icon}"></i>
+                        <span class="production-service-name">${name}</span>
+                    </div>
+                    <div class="production-days">
+                        <span class="production-days-number">${pred.days}</span>
+                        <span class="production-days-label">days</span>
+                    </div>
+                    <div class="production-due-date">${pred.dueDateFormatted}</div>
+                    <div class="production-capacity-dot ${capacityClass}"></div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    /**
+     * Get CSS class for capacity indicator
+     */
+    function getCapacityClass(status) {
+        switch (status) {
+            case 'wide-open': return 'capacity-open';
+            case 'moderate': return 'capacity-moderate';
+            case 'busy': return 'capacity-busy';
+            default: return 'capacity-open';
+        }
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -1191,6 +1280,9 @@ const StaffDashboardInit = (function() {
         loadGarmentTracker,
         refreshGarmentTracker,
         syncGarmentTracker,
+
+        // Production Schedule
+        renderProductionSchedule,
 
         // Expose config for external use
         CONFIG

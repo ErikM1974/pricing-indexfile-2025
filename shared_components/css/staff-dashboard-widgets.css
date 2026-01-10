@@ -1356,3 +1356,184 @@
         gap: 0.5rem;
     }
 }
+
+/* =====================================================
+   PRODUCTION SCHEDULE PREDICTOR
+   Historical-based turnaround time estimates
+   ===================================================== */
+
+/* Widget header with season badge */
+.widget-collapsible[data-widget="production"] .widget-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.widget-collapsible[data-widget="production"] .widget-title {
+    flex: 1;
+}
+
+/* Season badge in header */
+.season-badge {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.season-badge.season-slow {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+}
+
+.season-badge.season-normal {
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+}
+
+.season-badge.season-busy {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+/* Predictor grid - auto-fit to adapt to container width */
+.production-predictor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Individual service card */
+.production-card {
+    background: var(--light-bg);
+    border-radius: 8px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    cursor: help;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+}
+
+.production-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.production-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.production-card-header i {
+    font-size: 1rem;
+    color: var(--wsu-crimson);
+}
+
+.production-service-name {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+}
+
+/* Days display */
+.production-days {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.production-days-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.production-days-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* Due date display */
+.production-due-date {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--wsu-crimson);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+/* Capacity indicator dot */
+.production-capacity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0.5rem auto 0;
+}
+
+.production-capacity-dot.capacity-open {
+    background: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.production-capacity-dot.capacity-moderate {
+    background: #f59e0b;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.production-capacity-dot.capacity-busy {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+/* Footer */
+.production-footer {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.production-meta {
+    font-size: 0.6875rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.production-meta i {
+    font-size: 0.625rem;
+}
+
+/* Loading state */
+.production-loading {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+/* Responsive - ensure minimum 2 columns on mobile */
+@media (max-width: 576px) {
+    .production-predictor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .production-days-number {
+        font-size: 1.25rem;
+    }
+}

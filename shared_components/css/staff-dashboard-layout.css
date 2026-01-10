@@ -678,10 +678,19 @@
 /* Team Performance Card */
 .metrics-team-card {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1;
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+/* Production Widget Card (in metrics zone) */
+.production-widget-card {
+    grid-column: 2;
+    grid-row: 2;
+    background: white;
+    border-radius: 12px;
     box-shadow: var(--shadow);
 }
 
@@ -1019,6 +1028,7 @@
 
     .metrics-revenue-card,
     .metrics-team-card,
+    .production-widget-card,
     .garment-tracker-card {
         grid-column: 1;
         grid-row: auto;
