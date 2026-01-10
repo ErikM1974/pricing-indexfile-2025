@@ -3,6 +3,39 @@
  * Common functions used across all NWCA calculators
  */
 
+// =============================================================================
+// SECURITY: HTML Escaping Utilities
+// =============================================================================
+
+/**
+ * Escape HTML special characters to prevent XSS
+ * Use this when inserting user-provided or external data into HTML
+ * @param {string} str - String to escape
+ * @returns {string} - Escaped string safe for HTML insertion
+ */
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * Create a text node safely (alternative to innerHTML for plain text)
+ * @param {string} text - Text content
+ * @returns {Text} - Text node
+ */
+function safeTextNode(text) {
+    return document.createTextNode(text || '');
+}
+
+// Make escapeHTML available globally
+window.escapeHTML = escapeHTML;
+window.safeTextNode = safeTextNode;
+
 // Common Configuration
 const NWCA_CONFIG = {
     emailjs: {

@@ -5,12 +5,45 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const stripe = require('stripe');
+const rateLimit = require('express-rate-limit');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// =============================================================================
+// SECURITY: Input Sanitization
+// =============================================================================
+
+/**
+ * Sanitize input for use in Caspio filter queries
+ * Prevents SQL injection by escaping quotes and removing dangerous characters
+ */
+function sanitizeFilterInput(input) {
+  if (input === null || input === undefined) return '';
+  const str = String(input);
+  // Remove or escape dangerous characters
+  return str
+    .replace(/'/g, "''")           // Escape single quotes (SQL standard)
+    .replace(/;/g, '')             // Remove semicolons
+    .replace(/--/g, '')            // Remove SQL comments
+    .replace(/\/\*/g, '')          // Remove block comment start
+    .replace(/\*\//g, '')          // Remove block comment end
+    .replace(/\b(DROP|DELETE|INSERT|UPDATE|UNION|SELECT)\b/gi, '') // Remove SQL keywords
+    .trim()
+    .slice(0, 500);                // Limit length
+}
+
+/**
+ * Validate that input matches expected pattern (alphanumeric + limited special chars)
+ */
+function isValidIdentifier(input) {
+  if (!input) return false;
+  // Allow alphanumeric, hyphens, underscores, dots, spaces
+  return /^[a-zA-Z0-9\-_.\s]+$/.test(input);
+}
 
 // Safety monitoring system (optional - for development only)
 let monitor = null;
@@ -30,17 +63,47 @@ if (process.env.ENABLE_MONITORING === 'true') {
   }
 }
 
+// =============================================================================
+// SECURITY: CORS Configuration
+// =============================================================================
+const ALLOWED_ORIGINS = [
+  'https://nwcustom.caspio.com',
+  'https://c2aby672.caspio.com',
+  'https://www.teamnwca.com',
+  'https://teamnwca.com',
+  /\.herokuapp\.com$/,      // Heroku apps
+  /localhost:\d+$/,         // Local development
+  /127\.0\.0\.1:\d+$/       // Local IP
+];
+
+function isOriginAllowed(origin) {
+  if (!origin) return true; // Allow same-origin requests
+  return ALLOWED_ORIGINS.some(allowed => {
+    if (allowed instanceof RegExp) {
+      return allowed.test(origin);
+    }
+    return origin === allowed || origin.endsWith(allowed);
+  });
+}
+
 // CORS middleware - MUST be before other middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+
+  if (isOriginAllowed(origin)) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
+  // If origin not allowed, don't set the header (browser will block)
+
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
+  res.header('Access-Control-Allow-Credentials', 'true');
+
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
-  
+
   next();
 });
 
@@ -78,6 +141,37 @@ if (autoRecovery) {
 
 // Compress all responses
 app.use(compression());
+
+// =============================================================================
+// SECURITY: Rate Limiting
+// =============================================================================
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Limit each IP to 200 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again after 15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Skip rate limiting for static files
+  skip: (req) => !req.path.startsWith('/api/')
+});
+
+// Apply rate limiting to API routes
+app.use('/api/', apiLimiter);
+
+// Stricter limit for sensitive endpoints
+const strictLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // 20 requests per hour
+  message: {
+    error: 'Too many requests to this endpoint, please try again later'
+  }
+});
+
+// Apply strict limiting to order submission endpoints
+app.use('/api/submit-3day-order', strictLimiter);
+app.use('/api/stripe/create-checkout-session', strictLimiter);
 
 // CRITICAL: Stripe webhook needs raw body for signature verification
 // This route MUST be defined BEFORE bodyParser.json() middleware
@@ -1383,18 +1477,23 @@ app.get('/api/cart-items', async (req, res) => {
 
 app.get('/api/cart-items/session/:sessionId', async (req, res) => {
   try {
+    // SECURITY: Sanitize input
+    const sessionId = sanitizeFilterInput(req.params.sessionId);
+
     // Get cart items for the session
-    const itemsData = await makeApiRequest(`/cart-items?filter=SessionID='${req.params.sessionId}'`);
-    
+    const itemsData = await makeApiRequest(`/cart-items?filter=SessionID='${sessionId}'`);
+
     // If no items, return empty array
     if (!itemsData || !Array.isArray(itemsData) || itemsData.length === 0) {
       return res.json([]);
     }
-    
+
     // For each item, get its sizes
     const itemsWithSizes = await Promise.all(itemsData.map(async (item) => {
       try {
-        const sizesData = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${item.CartItemID}`);
+        // CartItemID is from our own DB, but sanitize anyway for defense in depth
+        const cartItemId = sanitizeFilterInput(item.CartItemID);
+        const sizesData = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${cartItemId}`);
         
         // Reconstruct PRODUCT_TITLE from stored fields if it doesn't exist
         if (!item.PRODUCT_TITLE) {
@@ -1586,7 +1685,9 @@ app.get('/api/cart-item-sizes', async (req, res) => {
 
 app.get('/api/cart-item-sizes/cart-item/:cartItemId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${req.params.cartItemId}`);
+    // SECURITY: Sanitize input
+    const cartItemId = sanitizeFilterInput(req.params.cartItemId);
+    const data = await makeApiRequest(`/cart-item-sizes?filter=CartItemID=${cartItemId}`);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch cart item sizes' });
@@ -1632,7 +1733,9 @@ app.get('/api/customers', async (req, res) => {
 
 app.get('/api/customers/email/:email', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/customers?filter=Email='${req.params.email}'`);
+    // SECURITY: Sanitize input
+    const email = sanitizeFilterInput(req.params.email);
+    const data = await makeApiRequest(`/customers?filter=Email='${email}'`);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch customer by email' });
@@ -1762,12 +1865,16 @@ app.get('/api/base-item-costs', async (req, res) => {
 app.get('/api/inventory', async (req, res) => {
   try {
     const { styleNumber, color } = req.query;
-    
+
     if (!styleNumber || !color) {
       return res.status(400).json({ error: 'styleNumber and color parameters are required' });
     }
-    
-    const data = await makeApiRequest(`/inventory?filter=catalog_no='${styleNumber}' AND catalog_color='${color}'`);
+
+    // SECURITY: Sanitize input
+    const safeStyle = sanitizeFilterInput(styleNumber);
+    const safeColor = sanitizeFilterInput(color);
+
+    const data = await makeApiRequest(`/inventory?filter=catalog_no='${safeStyle}' AND catalog_color='${safeColor}'`);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch inventory' });
@@ -1778,12 +1885,17 @@ app.get('/api/inventory', async (req, res) => {
 app.get('/api/pricing-matrix', async (req, res) => {
   try {
     const { styleNumber, color, embType } = req.query;
-    
+
     if (!styleNumber || !color || !embType) {
       return res.status(400).json({ error: 'styleNumber, color, and embType parameters are required' });
     }
-    
-    const data = await makeApiRequest(`/pricing-matrix?filter=StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embType}'`);
+
+    // SECURITY: Sanitize input
+    const safeStyle = sanitizeFilterInput(styleNumber);
+    const safeColor = sanitizeFilterInput(color);
+    const safeEmbType = sanitizeFilterInput(embType);
+
+    const data = await makeApiRequest(`/pricing-matrix?filter=StyleNumber='${safeStyle}' AND Color='${safeColor}' AND EmbellishmentType='${safeEmbType}'`);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch pricing matrix data' });
@@ -1812,20 +1924,26 @@ app.put('/api/pricing-matrix/:id', async (req, res) => {
 app.get('/api/pricing-matrix/lookup', async (req, res) => {
   try {
     const { styleNumber, color, embellishmentType, sessionID } = req.query;
-    
+
     if (!styleNumber || !color || !embellishmentType) {
       return res.status(400).json({
         error: 'Missing required parameters',
         message: 'styleNumber, color, and embellishmentType are required query parameters'
       });
     }
-    
+
+    // SECURITY: Sanitize input
+    const safeStyle = sanitizeFilterInput(styleNumber);
+    const safeColor = sanitizeFilterInput(color);
+    const safeEmbType = sanitizeFilterInput(embellishmentType);
+    const safeSessionID = sessionID ? sanitizeFilterInput(sessionID) : null;
+
     // Build the filter based on required parameters
-    let filter = encodeURIComponent(`StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embellishmentType}'`);
-    
+    let filter = encodeURIComponent(`StyleNumber='${safeStyle}' AND Color='${safeColor}' AND EmbellishmentType='${safeEmbType}'`);
+
     // Add sessionID to filter if provided
-    if (sessionID) {
-      filter = encodeURIComponent(`StyleNumber='${styleNumber}' AND Color='${color}' AND EmbellishmentType='${embellishmentType}' AND SessionID='${sessionID}'`);
+    if (safeSessionID) {
+      filter = encodeURIComponent(`StyleNumber='${safeStyle}' AND Color='${safeColor}' AND EmbellishmentType='${safeEmbType}' AND SessionID='${safeSessionID}'`);
     }
     
     // Query the pricing matrix table with the filter
@@ -2095,11 +2213,15 @@ app.get('/api/quote_sessions', async (req, res) => {
   try {
     let endpoint = '/quote_sessions';
     if (req.query.quoteID) {
-      endpoint += `?filter=QuoteID='${req.query.quoteID}'`;
+      // SECURITY: Sanitize input
+      const safeQuoteID = sanitizeFilterInput(req.query.quoteID);
+      endpoint += `?filter=QuoteID='${safeQuoteID}'`;
     } else if (req.query.sessionID) {
-      endpoint += `?filter=SessionID='${req.query.sessionID}'`;
+      // SECURITY: Sanitize input
+      const safeSessionID = sanitizeFilterInput(req.query.sessionID);
+      endpoint += `?filter=SessionID='${safeSessionID}'`;
     }
-    
+
     const data = await makeApiRequest(endpoint);
     res.json(data);
   } catch (error) {
@@ -2121,7 +2243,9 @@ app.get('/api/quote_sessions/:id', async (req, res) => {
 
 app.get('/api/quote_sessions/session/:sessionId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/quote_sessions?filter=SessionID='${req.params.sessionId}'`);
+    // SECURITY: Sanitize input
+    const safeSessionId = sanitizeFilterInput(req.params.sessionId);
+    const data = await makeApiRequest(`/quote_sessions?filter=SessionID='${safeSessionId}'`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote session by session ID:', error);
@@ -2131,7 +2255,9 @@ app.get('/api/quote_sessions/session/:sessionId', async (req, res) => {
 
 app.get('/api/quote_sessions/quote/:quoteId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.params.quoteId}'`);
+    // SECURITY: Sanitize input
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+    const data = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote session by quote ID:', error);
@@ -2171,11 +2297,13 @@ app.post('/api/quote_sessions', async (req, res) => {
     
     // Fallback: try to get by QuoteID
     console.log('[QUOTE API] No valid PK_ID in response, trying fallback with QuoteID:', req.body.QuoteID);
-    
+
     // Wait a moment for Caspio to process
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${req.body.QuoteID}'`);
+
+    // SECURITY: Sanitize input even from body
+    const safeQuoteID = sanitizeFilterInput(req.body.QuoteID);
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteID}'`);
     console.log('[QUOTE API] Fallback query result:', sessions ? sessions.length + ' sessions found' : 'null');
     
     if (sessions && Array.isArray(sessions) && sessions.length > 0) {
@@ -2246,7 +2374,9 @@ app.get('/api/quote_items/:id', async (req, res) => {
 
 app.get('/api/quote_items/session/:sessionId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/quote_items?filter=SessionID='${req.params.sessionId}'`);
+    // SECURITY: Sanitize input
+    const safeSessionId = sanitizeFilterInput(req.params.sessionId);
+    const data = await makeApiRequest(`/quote_items?filter=SessionID='${safeSessionId}'`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote items by session ID:', error);
@@ -2285,11 +2415,13 @@ app.post('/api/quote_items', async (req, res) => {
     
     // Fallback: try to get by QuoteID and LineNumber
     console.log('[QUOTE ITEMS API] No valid PK_ID in response, trying fallback with QuoteID:', req.body.QuoteID);
-    
+
     // Wait a moment for Caspio to process
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const items = await makeApiRequest(`/quote_items?filter=QuoteID='${req.body.QuoteID}'`);
+
+    // SECURITY: Sanitize input even from body
+    const safeQuoteID = sanitizeFilterInput(req.body.QuoteID);
+    const items = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteID}'`);
     console.log('[QUOTE ITEMS API] Fallback query result:', items ? items.length + ' items found' : 'null');
     
     if (items && Array.isArray(items)) {
@@ -2363,7 +2495,9 @@ app.get('/api/quote_analytics/:id', async (req, res) => {
 
 app.get('/api/quote_analytics/session/:sessionId', async (req, res) => {
   try {
-    const data = await makeApiRequest(`/quote_analytics?filter=SessionID='${req.params.sessionId}'`);
+    // SECURITY: Sanitize input
+    const safeSessionId = sanitizeFilterInput(req.params.sessionId);
+    const data = await makeApiRequest(`/quote_analytics?filter=SessionID='${safeSessionId}'`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote analytics by session ID:', error);
