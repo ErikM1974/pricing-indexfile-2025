@@ -1,8 +1,25 @@
 # ArtRequests File Upload Guide
 
-**Last Updated:** 2026-01-11 (expanded with all 4 file fields)
+**Last Updated:** 2026-01-11 (corrected upload to multipart/form-data, verified end-to-end)
 
 Upload art files to the Caspio `ArtRequests` table using the existing file upload API.
+
+---
+
+## CRITICAL: Store File Paths, Not ExternalKeys
+
+**Existing ArtRequests records (3000+) store FILE PATHS like `/Artwork/logo.png`, not UUIDs.**
+
+The CDN_Link formula fields auto-generate URLs from these paths. To maintain consistency:
+
+```javascript
+// CORRECT - Store file path
+const filePath = `/Artwork/${result.fileName}`;
+artRequestData.File_Upload_One = filePath;  // "/Artwork/logo.png"
+
+// WRONG - Don't store ExternalKey
+artRequestData.File_Upload_One = result.externalKey;  // Breaks CDN_Link formula!
+```
 
 ---
 
@@ -13,6 +30,7 @@ Upload art files to the Caspio `ArtRequests` table using the existing file uploa
 | **Table** | `ArtRequests` |
 | **Storage** | Caspio Files API v3 |
 | **Max Size** | 20MB per file |
+| **File Path Format** | `/Artwork/{filename}` |
 
 ### File Upload Fields (4 Total)
 
@@ -26,9 +44,28 @@ The ArtRequests table supports **up to 4 file uploads** per request:
 | `File_Upload_Four` | `CDN_Link_Four` | Additional artwork/reference |
 
 **Key Concepts:**
-- Each File field stores an **ExternalKey** (UUID string), not the actual file data
+- Each File field stores a **file path** (e.g., `/Artwork/logo.png`), not the actual file data
 - The file itself is stored in Caspio's file system
-- **CDN_Link fields are auto-generated** - Caspio creates these Formula fields to provide direct URLs to the uploaded files
+- **CDN_Link fields are formula fields** - They auto-generate URLs from the file paths
+
+---
+
+## CDN_Link Formula
+
+The CDN_Link formula fields use this pattern:
+
+```sql
+CASE WHEN [@field:File_Upload_One] IS NULL THEN NULL
+ELSE 'https://cdn.caspio.com/A0E15000' + REPLACE(CAST([@field:File_Upload_One] AS VARCHAR(MAX)), ' ', '%20')
+END
+```
+
+**Example:**
+| File_Upload_One | CDN_Link (auto-generated) |
+|-----------------|---------------------------|
+| `/Artwork/logo.png` | `https://cdn.caspio.com/A0E15000/Artwork/logo.png` |
+| `/Artwork/My Logo (1).png` | `https://cdn.caspio.com/A0E15000/Artwork/My%20Logo%20(1).png` |
+| `NULL` | `NULL` |
 
 ---
 
@@ -37,15 +74,15 @@ The ArtRequests table supports **up to 4 file uploads** per request:
 ```
 ┌─────────────────┐     ┌─────────────────────┐     ┌─────────────────┐
 │  Browser picks  │ --> │  POST /api/files/   │ --> │  Caspio Files   │
-│  file (base64)  │     │  upload             │     │  API stores it  │
+│  file (FormData)│     │  upload             │     │  API stores it  │
 └─────────────────┘     └─────────────────────┘     └────────┬────────┘
-                                                             │
-                                                    Returns ExternalKey
-                                                             │
-                                                             v
+                                                            │
+                                                   Returns fileName
+                                                            │
+                                                            v
 ┌─────────────────┐     ┌─────────────────────┐     ┌─────────────────┐
-│  File viewable  │ <-- │  GET /api/files/    │ <-- │  ArtRequest     │
-│  in dashboard   │     │  {externalKey}      │     │  stores key     │
+│  File viewable  │ <-- │  CDN_Link formula   │ <-- │  ArtRequest     │
+│  via CDN URL    │     │  auto-generates URL │     │  stores path    │
 └─────────────────┘     └─────────────────────┘     └─────────────────┘
 ```
 
@@ -57,38 +94,46 @@ The ArtRequests table supports **up to 4 file uploads** per request:
 
 **Endpoint:** `POST /api/files/upload`
 
+**Format:** `multipart/form-data` (NOT JSON)
+
 **Request:**
 ```javascript
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);  // File from <input type="file">
+
 const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    fileName: 'customer-artwork.png',
-    fileData: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==',
-    description: 'Artwork for design #12345'  // Optional
-  })
+  body: formData  // No Content-Type header - browser sets it automatically with boundary
 });
 
 const result = await response.json();
-// result = { success: true, externalKey: "a1b2c3d4-e5f6-7890-abcd-ef1234567890", fileName: "customer-artwork.png" }
+// result = { success: true, externalKey: "a1b2c3d4-...", fileName: "customer-artwork.png" }
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "externalKey": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "externalKey": "971fb592-e5a1-4aac-9e27-fa9194a5e663",
   "fileName": "customer-artwork.png",
+  "originalName": "customer-artwork.png",
   "size": 12345,
   "mimeType": "image/png"
 }
 ```
 
-### Step 2: Create ArtRequest with File Reference
+### Step 2: Construct File Path (CRITICAL)
+
+```javascript
+// Use fileName from response, NOT externalKey
+const filePath = `/Artwork/${result.fileName}`;
+// filePath = "/Artwork/customer-artwork.png"
+```
+
+### Step 3: Create ArtRequest with File Path
 
 **Endpoint:** `POST /api/artrequests`
 
-**Request:**
 ```javascript
 const artRequest = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests', {
   method: 'POST',
@@ -98,24 +143,23 @@ const artRequest = await fetch('https://caspio-pricing-proxy-ab30a049961a.heroku
     Status: 'New',
     CustomerServiceRep: 'John Smith',
     Priority: 'Normal',
-    File_Upload_One: result.externalKey  // <-- Store the ExternalKey here
+    File_Upload_One: filePath  // <-- Store the FILE PATH, not externalKey!
   })
 });
 ```
 
-### Step 3: Retrieve File Later
+### Step 4: Access File via CDN
 
-**Endpoint:** `GET /api/files/{externalKey}`
+After saving, the CDN_Link formula automatically generates the URL:
 
 ```javascript
-// Get file as download
-const fileUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/${externalKey}`;
+// CDN_Link will be: https://cdn.caspio.com/A0E15000/Artwork/customer-artwork.png
 
 // Display in img tag
-<img src={fileUrl} alt="Uploaded artwork" />
+<img src={record.CDN_Link} alt="Uploaded artwork" />
 
-// Or trigger download
-window.open(fileUrl, '_blank');
+// Or use the URL pattern directly
+const cdnUrl = `https://cdn.caspio.com/A0E15000${filePath.replace(/ /g, '%20')}`;
 ```
 
 ---
@@ -161,8 +205,8 @@ window.open(fileUrl, '_blank');
       try {
         statusDiv.textContent = 'Uploading artwork...';
 
-        // Step 1: Upload the file
-        let externalKey = null;
+        // Step 1: Upload the file using FormData
+        let filePath = null;
         const fileInput = document.getElementById('artworkFile');
 
         if (fileInput.files.length > 0) {
@@ -173,18 +217,14 @@ window.open(fileUrl, '_blank');
             throw new Error('File too large. Maximum size is 20MB.');
           }
 
-          // Convert file to base64
-          const base64Data = await fileToBase64(file);
+          // Create FormData and append file
+          const formData = new FormData();
+          formData.append('file', file);
 
-          // Upload to Caspio via proxy
+          // Upload to Caspio via proxy (multipart/form-data)
           const uploadResponse = await fetch(`${API_BASE}/files/upload`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileName: file.name,
-              fileData: base64Data,
-              description: `Art request from ${document.getElementById('companyName').value}`
-            })
+            body: formData  // No Content-Type header - browser sets it automatically
           });
 
           const uploadResult = await uploadResponse.json();
@@ -193,8 +233,9 @@ window.open(fileUrl, '_blank');
             throw new Error(uploadResult.error || 'File upload failed');
           }
 
-          externalKey = uploadResult.externalKey;
-          console.log('File uploaded, ExternalKey:', externalKey);
+          // CRITICAL: Construct file path from fileName, NOT externalKey
+          filePath = `/Artwork/${uploadResult.fileName}`;
+          console.log('File uploaded, Path:', filePath);
         }
 
         // Step 2: Create the ArtRequest record
@@ -203,13 +244,12 @@ window.open(fileUrl, '_blank');
         const artRequestData = {
           CompanyName: document.getElementById('companyName').value,
           Status: 'New',
-          Priority: document.getElementById('priority').value,
-          Date_Created: new Date().toISOString()
+          Priority: document.getElementById('priority').value
         };
 
-        // Add file reference if file was uploaded
-        if (externalKey) {
-          artRequestData.File_Upload_One = externalKey;
+        // Add file path if file was uploaded
+        if (filePath) {
+          artRequestData.File_Upload_One = filePath;
         }
 
         const artResponse = await fetch(`${API_BASE}/artrequests`, {
@@ -234,16 +274,6 @@ window.open(fileUrl, '_blank');
         statusDiv.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
       }
     });
-
-    // Helper function to convert File to base64 data URL
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
   </script>
 </body>
 </html>
@@ -258,9 +288,12 @@ window.open(fileUrl, '_blank');
 | Property | Value |
 |----------|-------|
 | **URL** | `POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload` |
-| **Content-Type** | `application/json` |
-| **Body** | `{ fileName, fileData, description }` |
-| **Returns** | `{ success, externalKey, fileName, size, mimeType }` |
+| **Content-Type** | `multipart/form-data` |
+| **Body** | Form field: `file` (binary file data) |
+| **Max Size** | 20MB |
+| **Returns** | `{ success, externalKey, fileName, originalName, size, mimeType }` |
+
+**Note:** Use `fileName` from response to construct file path. The `externalKey` is for alternative retrieval only.
 
 ### Create ArtRequest
 
@@ -268,7 +301,7 @@ window.open(fileUrl, '_blank');
 |----------|-------|
 | **URL** | `POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests` |
 | **Content-Type** | `application/json` |
-| **Body** | ArtRequest fields including `File_Upload_One` |
+| **Body** | ArtRequest fields with `File_Upload_One: "/Artwork/filename.ext"` |
 
 ### Update ArtRequest (Add File to Existing)
 
@@ -276,34 +309,29 @@ window.open(fileUrl, '_blank');
 |----------|-------|
 | **URL** | `PUT https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests/{id}` |
 | **Content-Type** | `application/json` |
-| **Body** | `{ File_Upload_One: "externalKey" }` |
+| **Body** | `{ File_Upload_One: "/Artwork/filename.ext" }` |
 
-### Retrieve File
+### Retrieve File (Alternative Method)
 
 | Property | Value |
 |----------|-------|
 | **URL** | `GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/{externalKey}` |
 | **Returns** | File binary data with correct Content-Type |
 
-### Get File Metadata
-
-| Property | Value |
-|----------|-------|
-| **URL** | `GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/{externalKey}/info` |
-| **Returns** | `{ externalKey, fileName, contentType, size }` |
+**Note:** Primary access should use CDN_Link URL. ExternalKey retrieval is for edge cases.
 
 ---
 
 ## ArtRequests Table Fields
 
-### File Fields (Store ExternalKeys)
+### File Fields (Store File Paths)
 
-| Field | Type | CDN Formula |
-|-------|------|-------------|
-| `File_Upload_One` | File | `CDN_Link` |
-| `File_Upload_Two` | File | `CDN_Link_Two` |
-| `File_Upload_Three` | File | `CDN_Link_Three` |
-| `File_Upload_Four` | File | `CDN_Link_Four` |
+| Field | Type | CDN Formula | Example Value |
+|-------|------|-------------|---------------|
+| `File_Upload_One` | File | `CDN_Link` | `/Artwork/logo.png` |
+| `File_Upload_Two` | File | `CDN_Link_Two` | `/Artwork/reference.pdf` |
+| `File_Upload_Three` | File | `CDN_Link_Three` | `/Artwork/mockup.ai` |
+| `File_Upload_Four` | File | `CDN_Link_Four` | `/Artwork/notes.pdf` |
 
 ### Key Fields
 
@@ -391,23 +419,28 @@ window.open(fileUrl, '_blank');
 - File extension not in allowed list
 - Solution: Convert to supported format (e.g., convert BMP to PNG)
 
-### Error: "Invalid base64"
-- Malformed base64 data URL
-- Solution: Ensure FileReader.readAsDataURL() completed successfully
+### Error: "NO_FILE"
+- No file was provided in the upload request
+- Solution: Ensure FormData has `file` field with actual file data
 
 ### Error: "CASPIO_API_ERROR"
 - Caspio API returned an error
 - Check: Caspio account status, API limits, authentication
 
-### File Not Displaying
-- Verify ExternalKey was saved correctly
-- Test: `curl https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/{externalKey}`
+### File Not Displaying via CDN_Link
+- Verify file path was saved correctly (should start with `/Artwork/`)
+- Check for special characters in filename
+- Test CDN URL directly in browser
+
+### CDN_Link Shows Base URL Only
+- File_Upload field is NULL or empty
+- Verify file path was saved to the correct field
 
 ---
 
 ## Uploading Multiple Files
 
-To upload multiple artwork files, upload each file separately and store each ExternalKey in the corresponding field:
+To upload multiple artwork files, upload each file separately and store each path:
 
 ```javascript
 // Upload multiple files to different fields
@@ -420,26 +453,25 @@ async function uploadMultipleArtFiles(files) {
     Priority: 'Normal'
   };
 
-  // Upload each file and store ExternalKey
+  // Upload each file using FormData and store file path
   for (let i = 0; i < Math.min(files.length, 4); i++) {
-    const base64Data = await fileToBase64(files[i]);
+    const formData = new FormData();
+    formData.append('file', files[i]);
 
     const response = await fetch(`${API_BASE}/files/upload`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fileName: files[i].name,
-        fileData: base64Data
-      })
+      body: formData  // multipart/form-data
     });
 
     const result = await response.json();
     if (result.success) {
-      artRequestData[fileFields[i]] = result.externalKey;
+      // CRITICAL: Store file path, not externalKey
+      const filePath = `/Artwork/${result.fileName}`;
+      artRequestData[fileFields[i]] = filePath;
     }
   }
 
-  // Create ArtRequest with all file references
+  // Create ArtRequest with all file paths
   const artResponse = await fetch(`${API_BASE}/artrequests`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -455,32 +487,43 @@ async function uploadMultipleArtFiles(files) {
 ## Testing with cURL
 
 ```bash
-# 1. Upload a test file (1x1 transparent PNG)
+# 1. Upload a test file (multipart/form-data)
 curl -X POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fileName": "test-artwork.png",
-    "fileData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
-  }'
+  -F "file=@/path/to/your/image.png"
 
-# Response: {"success":true,"externalKey":"abc123...","fileName":"test-artwork.png"}
+# Response: {"success":true,"externalKey":"abc123...","fileName":"image.png","size":12345}
 
-# 2. Create ArtRequest with multiple file references
+# 2. Create ArtRequest with file PATH (not externalKey!)
 curl -X POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests \
   -H "Content-Type: application/json" \
   -d '{
     "CompanyName": "Test Company",
     "Status": "New",
     "Priority": "Normal",
-    "File_Upload_One": "abc123...",
-    "File_Upload_Two": "def456...",
-    "File_Upload_Three": "ghi789..."
+    "File_Upload_One": "/Artwork/image.png"
   }'
 
-# 3. Verify file retrieval
-curl -I https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/abc123...
-# Should return 200 OK with Content-Type header
+# 3. Access file via CDN (CDN_Link formula generates this automatically)
+curl -I "https://cdn.caspio.com/A0E15000/Artwork/image.png"
+# Should return 200 OK
+
+# 4. Alternative: Create test PNG and upload
+echo -n 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' | base64 -d > /tmp/test.png
+curl -X POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload \
+  -F "file=@/tmp/test.png;filename=test-artwork.png"
 ```
+
+---
+
+## Key Differences: File Path vs ExternalKey
+
+| Aspect | File Path (CORRECT) | ExternalKey (WRONG) |
+|--------|---------------------|---------------------|
+| **Format** | `/Artwork/logo.png` | `a1b2c3d4-e5f6-...` |
+| **CDN_Link Works** | Yes - formula auto-generates URL | No - formula produces invalid URL |
+| **Matches Existing Data** | Yes - 3000+ records use this | No - inconsistent |
+| **Access Method** | Direct CDN URL | Proxy API call required |
+| **Staff-Friendly** | Yes - URLs work in browser | No - requires app to retrieve |
 
 ---
 

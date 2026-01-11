@@ -30,6 +30,16 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Problem: Caspio ArtRequests file uploads stored wrong data pattern
+**Date:** 2026-01
+**Project:** caspio-pricing-proxy
+**Symptoms:** Documentation incorrectly described storing ExternalKeys in File_Upload fields
+**Root cause:** Assumed REST API pattern without checking existing data - CSV export revealed 3000+ records use file PATH pattern (`/Artwork/logo.png`), not ExternalKey UUIDs
+**Solution:** Store file paths (`/Artwork/${fileName}`) not ExternalKeys. CDN_Link formula auto-generates URLs from paths
+**Prevention:** Always check existing data patterns via CSV export before documenting API usage. Added to `ARTREQUESTS_FILE_UPLOAD_GUIDE.md` with "CRITICAL: Store File Paths, Not ExternalKeys" warning
+
+---
+
 ## Problem: OGIO brand products missing from search results
 **Date:** 2025
 **Project:** caspio-pricing-proxy
