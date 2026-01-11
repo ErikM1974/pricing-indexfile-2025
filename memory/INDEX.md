@@ -27,6 +27,7 @@
 ├── DATABASE_PATTERNS.md              # Database schema patterns
 ├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints)
 ├── MANAGEORDERS_PUSH_WEBSTORE.md     # ManageOrders PUSH API (4 endpoints)
+├── MANAGEORDERS_COMPLETE_REFERENCE.md # **MASTER** - Complete API reference (all 3 projects)
 ├── SANMAR_TO_SHOPWORKS_GUIDE.md      # Transform Sanmar→ShopWorks
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── STAFF_DASHBOARD_DATA_GUIDE.md     # Staff dashboard data processing
@@ -91,8 +92,10 @@
 | Need | Start Here |
 |------|-----------|
 | Caspio Proxy API | [CASPIO_API_CORE.md](./CASPIO_API_CORE.md) → [/api/](./api/) modules |
-| ManageOrders PULL | [MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md) → [/manageorders/](./manageorders/) |
-| ManageOrders PUSH | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |
+| **ManageOrders (Complete)** | **[MANAGEORDERS_COMPLETE_REFERENCE.md](./MANAGEORDERS_COMPLETE_REFERENCE.md)** - Single source of truth |
+| ManageOrders PULL (detail) | [MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md) → [/manageorders/](./manageorders/) |
+| ManageOrders PUSH (detail) | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |
+| **CRM/Order Entry System** | **[MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md)** - Field glossary, capabilities |
 
 ### Development Guides
 | Building | Start Here |
@@ -100,6 +103,7 @@
 | Quote Builder | [QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md) |
 | Pricing Calculator | [PRICING_CALCULATOR_GUIDE.md](./PRICING_CALCULATOR_GUIDE.md) → [/templates/](./templates/) |
 | 3-Day Tees | [3-day-tees/OVERVIEW.md](./3-day-tees/OVERVIEW.md) |
+| 3-Day Tees Order Flow | [3-day-tees/ORDER_PUSH_FLOW.md](./3-day-tees/ORDER_PUSH_FLOW.md) - Stripe→ShopWorks |
 | ShopWorks EDP | [SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md) |
 
 ### Common Tasks
