@@ -56,6 +56,7 @@
 ├── STRIPE_INTEGRATION_GUIDE.md       # Stripe payment integration
 ├── B2B_REWARDS_SYSTEM_PLAN.md        # B2B rewards system planning doc
 ├── FILE_UPLOAD_API_REQUIREMENTS.md   # File upload API specification
+├── ARTREQUESTS_FILE_UPLOAD_GUIDE.md  # ArtRequests file upload guide
 ├── PROXY_BILLING_ADDRESS_IMPLEMENTATION.md # Billing address proxy feature
 ├── CASPIO_STAFF_AUTH.md              # Caspio staff authentication
 │
@@ -145,6 +146,7 @@
 | 3-Day Tees Order Flow | [3-day-tees/ORDER_PUSH_FLOW.md](./3-day-tees/ORDER_PUSH_FLOW.md) - Stripe→ShopWorks |
 | ShopWorks EDP | [SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md) |
 | PC61 Setup Guide | [PC61_SHOPWORKS_SETUP_GUIDE.md](./PC61_SHOPWORKS_SETUP_GUIDE.md) |
+| ArtRequests File Upload | [ARTREQUESTS_FILE_UPLOAD_GUIDE.md](./ARTREQUESTS_FILE_UPLOAD_GUIDE.md) |
 
 ### Common Tasks
 | Task | File |
