@@ -81,3 +81,7 @@ shared_components/js/three-day-tees-order-service.js
 .vscode/
 .claude/settings.local.json
 .claude/settings.local.json
+.claude/settings.local.json
+scripts/parse-production-schedule.js
+.claude/settings.local.json
+.claude/settings.local.json
