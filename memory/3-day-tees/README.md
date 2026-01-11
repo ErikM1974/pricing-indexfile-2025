@@ -162,7 +162,10 @@ npm start
 ├── BUSINESS-LOGIC.md                 # Business rules, terms, fees
 ├── CODE-ORGANIZATION.md              # Architectural decisions (Tasks 6-10)
 ├── DEBUGGING-GUIDE.md                # Debug toolkit and testing procedures
-└── TEST-EXECUTION-CHECKLIST.md       # Manual testing checklist (Day 6)
+├── TEST-EXECUTION-CHECKLIST.md       # Manual testing checklist (Day 6)
+├── ORDER_PUSH_FLOW.md                # **Complete Stripe → ShopWorks order flow** (NEW)
+├── SHOPWORKS-INTEGRATION.md          # Code path reference for order submission
+└── STRIPE-*.md                       # Stripe configuration and testing guides
 ```
 
 **Main PRD:** `3-DAY-TEES-PROJECT-REQUIREMENTS.md` (root directory)
@@ -209,9 +212,28 @@ npm start
    - Terms & conditions
    - Error handling & fallbacks
 
+### Payment & Order Submission
+
+7. **[ORDER_PUSH_FLOW.md](ORDER_PUSH_FLOW.md)** - Complete order flow documentation (NEW)
+   - Stripe Checkout Session creation
+   - Webhook-based payment processing
+   - ManageOrders payload transformation
+   - How payment info gets into ShopWorks
+   - Complete 8-phase flow diagram
+   - Key code locations with line numbers
+
+8. **[SHOPWORKS-INTEGRATION.md](SHOPWORKS-INTEGRATION.md)** - Code path quick reference
+   - Critical warning about code paths
+   - Where to make changes
+   - Common mistakes to avoid
+
+9. **[STRIPE-PREREQUISITES.md](STRIPE-PREREQUISITES.md)** - Stripe setup requirements
+
+10. **[STRIPE-TESTING-GUIDE.md](STRIPE-TESTING-GUIDE.md)** - Test card numbers and testing
+
 ### Code Quality Documentation
 
-7. **[CODE-ORGANIZATION.md](CODE-ORGANIZATION.md)** - Architectural decisions
+11. **[CODE-ORGANIZATION.md](CODE-ORGANIZATION.md)** - Architectural decisions
    - External JavaScript extraction (Task 6)
    - External CSS extraction (Task 10)
    - JSDoc documentation (Task 9)

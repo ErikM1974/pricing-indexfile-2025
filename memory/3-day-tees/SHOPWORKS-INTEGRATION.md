@@ -1,8 +1,13 @@
 # 3-Day Tees - ShopWorks Integration Code Path
 
-**Last Updated:** 2025-11-30
+**Last Updated:** 2026-01-11
 **Purpose:** Critical documentation about the ACTUAL code path for 3-Day Tees order submission
 **Status:** CRITICAL - Read this before modifying order submission code!
+
+> **NEW: For complete Stripe → ShopWorks flow documentation, see [ORDER_PUSH_FLOW.md](ORDER_PUSH_FLOW.md)**
+>
+> This document covers code paths only. For the full 8-phase flow diagram, webhook handling,
+> ManageOrders payload structure, and payment info handling, see the comprehensive ORDER_PUSH_FLOW.md.
 
 ---
 
@@ -213,9 +218,11 @@ After making changes to order submission:
 
 ## 🔗 Related Documentation
 
+- **[ORDER_PUSH_FLOW.md](ORDER_PUSH_FLOW.md)** - Complete Stripe → ShopWorks flow (RECOMMENDED)
 - [API-PATTERNS.md](API-PATTERNS.md) - API integration patterns
 - [CODE-ORGANIZATION.md](CODE-ORGANIZATION.md) - File structure
 - [../../memory/MANAGEORDERS_INTEGRATION.md](../MANAGEORDERS_INTEGRATION.md) - ShopWorks PULL API (different from PUSH)
+- [../../memory/MANAGEORDERS_PUSH_INTEGRATION.md](../MANAGEORDERS_PUSH_INTEGRATION.md) - ManageOrders PUSH API reference
 
 ---
 
