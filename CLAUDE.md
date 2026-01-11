@@ -191,7 +191,7 @@ When you need detailed docs, use the Task tool with `subagent_type='Explore'` or
 - `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` - **MASTER** ShopWorks ManageOrders API (PULL + PUSH)
 - `/memory/3-day-tees/` - 3-Day Tees implementation
 
-**Do NOT add more file includes here** - use Task tool to look up docs on-demand to save memory.
+**Keep this list short** - add new docs to `/memory/INDEX.md` and topic-specific sections below.
 
 ## ManageOrders Documentation Updates
 
