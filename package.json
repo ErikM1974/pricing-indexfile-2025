@@ -4,7 +4,8 @@
   "description": "Northwest Custom Apparel Pricing Tool",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "validate-docs": "node scripts/validate-memory-docs.js"
   },
   "engines": {
     "node": "18.x"

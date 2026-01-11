@@ -38,6 +38,7 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Remove all console.logs
 - Update ACTIVE_FILES.md
 - No hardcoded URLs (use config)
+- **Run `npm run validate-docs`** if you created/moved memory files
 - **Document any ManageOrders discoveries** (see [ManageOrders Documentation Updates](#manageorders-documentation-updates))
 - Descriptive commit message
 - Tested in browser
