@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-01-11
+**Last Updated:** 2026-01-11 (added 20 previously orphaned files)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -37,6 +37,37 @@
 ├── PRODUCTION_SCHEDULE_GUIDE.md      # Production turnaround predictor
 ├── DAILY_SALES_ARCHIVE.md            # YTD sales tracking system
 ├── MONOGRAM_FORM_SYSTEM.md           # Monogram/personalization tracking
+├── SECURITY_AUDIT_2026-01.md         # Security audit findings & fixes
+├── API_AUDIT_2026-01.md              # API call audit report
+├── 2026_PRICING_MARGINS.md           # 2026 pricing margins reference
+│
+├── # Quote Builder Implementation Files
+├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
+├── EMBROIDERY_QUOTE_BUILDER.md       # Embroidery quote builder implementation
+├── SCREENPRINT_QUOTE_BUILDER.md      # Screen print quote builder implementation
+│
+├── # Calculator Implementation Files
+├── DTF_CALCULATOR_SPECIFICATION.md   # DTF calculator technical spec
+├── MANUAL_CALCULATOR_CONCEPTS.md     # Manual calculator concepts
+├── MANUAL_CALCULATOR_REFERENCE.md    # Manual calculator API reference
+├── MANUAL_CALCULATOR_TEMPLATES.md    # Manual calculator HTML templates
+│
+├── # Integration & Features
+├── STRIPE_INTEGRATION_GUIDE.md       # Stripe payment integration
+├── B2B_REWARDS_SYSTEM_PLAN.md        # B2B rewards system planning doc
+├── FILE_UPLOAD_API_REQUIREMENTS.md   # File upload API specification
+├── PROXY_BILLING_ADDRESS_IMPLEMENTATION.md # Billing address proxy feature
+├── CASPIO_STAFF_AUTH.md              # Caspio staff authentication
+│
+├── # Implementation Summaries
+├── EXACT_MATCH_SEARCH_IMPLEMENTATION_SUMMARY.md # Exact match search feature
+├── PC61_SHOPWORKS_SETUP_GUIDE.md     # PC61 product setup in ShopWorks
+├── SAMPLE_CART_PRICING.md            # Sample cart pricing formulas
+├── SAMPLE_ORDER_TESTING_GUIDE.md     # Sample order testing procedures
+│
+├── # Troubleshooting
+├── DEBUGGING_COMMUNICATION.md        # Debugging communication guide
+├── TROUBLESHOOTING_IMAGE_LOADING.md  # Image loading troubleshooting
 │
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
@@ -104,10 +135,16 @@
 | Building | Start Here |
 |----------|-----------|
 | Quote Builder | [QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md) |
+| Quote Builder Architecture | [QUOTE_BUILDER_ARCHITECTURE.md](./QUOTE_BUILDER_ARCHITECTURE.md) |
+| Embroidery Quote Builder | [EMBROIDERY_QUOTE_BUILDER.md](./EMBROIDERY_QUOTE_BUILDER.md) |
+| Screenprint Quote Builder | [SCREENPRINT_QUOTE_BUILDER.md](./SCREENPRINT_QUOTE_BUILDER.md) |
 | Pricing Calculator | [PRICING_CALCULATOR_GUIDE.md](./PRICING_CALCULATOR_GUIDE.md) → [/templates/](./templates/) |
+| DTF Calculator Spec | [DTF_CALCULATOR_SPECIFICATION.md](./DTF_CALCULATOR_SPECIFICATION.md) |
+| Manual Calculator | [MANUAL_CALCULATOR_CONCEPTS.md](./MANUAL_CALCULATOR_CONCEPTS.md) |
 | 3-Day Tees | [3-day-tees/OVERVIEW.md](./3-day-tees/OVERVIEW.md) |
 | 3-Day Tees Order Flow | [3-day-tees/ORDER_PUSH_FLOW.md](./3-day-tees/ORDER_PUSH_FLOW.md) - Stripe→ShopWorks |
 | ShopWorks EDP | [SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md) |
+| PC61 Setup Guide | [PC61_SHOPWORKS_SETUP_GUIDE.md](./PC61_SHOPWORKS_SETUP_GUIDE.md) |
 
 ### Common Tasks
 | Task | File |
@@ -118,10 +155,20 @@
 | YTD Sales tracking | [DAILY_SALES_ARCHIVE.md](./DAILY_SALES_ARCHIVE.md) |
 | Production turnaround estimates | [PRODUCTION_SCHEDULE_GUIDE.md](./PRODUCTION_SCHEDULE_GUIDE.md) |
 
-### Security
+### Security & Payments
 | Need | Start Here |
 |------|------------|
 | Security audit & fixes | [SECURITY_AUDIT_2026-01.md](./SECURITY_AUDIT_2026-01.md) |
+| API call audit | [API_AUDIT_2026-01.md](./API_AUDIT_2026-01.md) |
+| Stripe payments | [STRIPE_INTEGRATION_GUIDE.md](./STRIPE_INTEGRATION_GUIDE.md) |
+| Staff authentication | [CASPIO_STAFF_AUTH.md](./CASPIO_STAFF_AUTH.md) |
+
+### Troubleshooting
+| Issue | Reference |
+|-------|-----------|
+| Image loading issues | [TROUBLESHOOTING_IMAGE_LOADING.md](./TROUBLESHOOTING_IMAGE_LOADING.md) |
+| Debug communication | [DEBUGGING_COMMUNICATION.md](./DEBUGGING_COMMUNICATION.md) |
+| Sample order testing | [SAMPLE_ORDER_TESTING_GUIDE.md](./SAMPLE_ORDER_TESTING_GUIDE.md) |
 
 ## Quick Reference
 
