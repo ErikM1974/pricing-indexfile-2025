@@ -1,6 +1,6 @@
 # ArtRequests File Upload Guide
 
-**Last Updated:** 2026-01-11
+**Last Updated:** 2026-01-11 (expanded with all 4 file fields)
 
 Upload art files to the Caspio `ArtRequests` table using the existing file upload API.
 
@@ -11,11 +11,24 @@ Upload art files to the Caspio `ArtRequests` table using the existing file uploa
 | Component | Details |
 |-----------|---------|
 | **Table** | `ArtRequests` |
-| **File Field** | `File_Upload_One` (Caspio File type) |
 | **Storage** | Caspio Files API v3 |
 | **Max Size** | 20MB per file |
 
-**Key Concept:** The `File_Upload_One` field stores an **ExternalKey** (UUID string), not the actual file data. The file itself is stored in Caspio's file system.
+### File Upload Fields (4 Total)
+
+The ArtRequests table supports **up to 4 file uploads** per request:
+
+| File Field | CDN Formula Field | Purpose |
+|------------|-------------------|---------|
+| `File_Upload_One` | `CDN_Link` | Primary artwork file |
+| `File_Upload_Two` | `CDN_Link_Two` | Additional artwork/reference |
+| `File_Upload_Three` | `CDN_Link_Three` | Additional artwork/reference |
+| `File_Upload_Four` | `CDN_Link_Four` | Additional artwork/reference |
+
+**Key Concepts:**
+- Each File field stores an **ExternalKey** (UUID string), not the actual file data
+- The file itself is stored in Caspio's file system
+- **CDN_Link fields are auto-generated** - Caspio creates these Formula fields to provide direct URLs to the uploaded files
 
 ---
 
@@ -283,20 +296,74 @@ window.open(fileUrl, '_blank');
 
 ## ArtRequests Table Fields
 
-Common fields used when creating art requests:
+### File Fields (Store ExternalKeys)
+
+| Field | Type | CDN Formula |
+|-------|------|-------------|
+| `File_Upload_One` | File | `CDN_Link` |
+| `File_Upload_Two` | File | `CDN_Link_Two` |
+| `File_Upload_Three` | File | `CDN_Link_Three` |
+| `File_Upload_Four` | File | `CDN_Link_Four` |
+
+### Key Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `PK_ID` | AutoNumber | Primary key (auto-generated) |
-| `CompanyName` | Text | Customer company name |
-| `Status` | Text | Request status (New, In Progress, Complete) |
-| `CustomerServiceRep` | Text | Assigned CSR |
-| `Priority` | Text | Normal, Rush, Low |
-| `Order_Type` | Text | Type of order |
-| `ID_Design` | Number | Design ID reference |
-| `Date_Created` | DateTime | When request was created |
-| `Due_Date` | DateTime | Due date for completion |
-| `File_Upload_One` | File | **ExternalKey for uploaded artwork** |
+| `ID_Design` | Autonumber | **Primary Key** |
+| `Status` | Text (255) | Request status |
+| `CompanyName` | Text (255) | Customer company name |
+| `Due_Date` | Date/Time | Due date for completion |
+| `Priority` | Text (255) | Low, Med, High |
+| `CustomerServiceRep` | Text (255) | Assigned CSR |
+| `Sales_Rep` | Text (255) | Sales representative |
+| `Order_Type` | List-String | Type of order |
+| `Date_Created` | Timestamp | Auto-generated creation date |
+
+### Notes Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `NOTES` | Text (64000) | Notes to Steve |
+| `Note_Mockup` | Text (64000) | Notes to Artist |
+| `Mockup` | Yes/No | Mockup requested |
+| `Revision_Count` | Integer | Number of revisions |
+
+### Customer Reference Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id_customer` | Number | FK to New Customer Table |
+| `id_contact` | Number | FK to Contact in New Customer Table |
+| `Shopwork_customer_number` | Number | ShopWorks Customer Number |
+| `Company_ID` | Text (255) | Customer # |
+| `First_name` | Text (255) | Customer first name |
+| `Last_name` | Text (255) | Customer last name |
+| `Full_Name_Contact` | Text (255) | Contact full name |
+| `Email_Contact` | Text (255) | Contact email |
+| `Phone` | Text (255) | Phone number |
+
+### Garment Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `GarmentStyle` | Text (255) | Primary garment style |
+| `GarmentColor` | Text (255) | Primary garment color |
+| `Garment_Placement` | Text (255) | Print/embroidery placement |
+| `Garm_Style_2/3/4` | Text (255) | Additional garment styles |
+| `Garm_Color_2/3/4` | Text (255) | Additional garment colors |
+| `Swatch_1/2/3/4` | Text (255) | Color swatches |
+| `MAIN_IMAGE_URL_1/2/3/4` | Text (255) | Main image URLs |
+
+### Billing Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Prelim_Charges` | Currency | Art estimate from AE |
+| `Additional_Services` | Currency | Additional service charges |
+| `Art_Minutes` | Number | Art time in minutes |
+| `Amount_Art_Billed` | Formula | Calculated billing amount |
+| `Invoiced` | Yes/No | Invoice status |
+| `Date Steve Invoiced Art` | Date/Time | Invoice date |
 
 ---
 
@@ -338,6 +405,53 @@ Common fields used when creating art requests:
 
 ---
 
+## Uploading Multiple Files
+
+To upload multiple artwork files, upload each file separately and store each ExternalKey in the corresponding field:
+
+```javascript
+// Upload multiple files to different fields
+async function uploadMultipleArtFiles(files) {
+  const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+  const fileFields = ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'];
+  const artRequestData = {
+    CompanyName: 'Acme Corp',
+    Status: 'New',
+    Priority: 'Normal'
+  };
+
+  // Upload each file and store ExternalKey
+  for (let i = 0; i < Math.min(files.length, 4); i++) {
+    const base64Data = await fileToBase64(files[i]);
+
+    const response = await fetch(`${API_BASE}/files/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: files[i].name,
+        fileData: base64Data
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      artRequestData[fileFields[i]] = result.externalKey;
+    }
+  }
+
+  // Create ArtRequest with all file references
+  const artResponse = await fetch(`${API_BASE}/artrequests`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(artRequestData)
+  });
+
+  return artResponse.json();
+}
+```
+
+---
+
 ## Testing with cURL
 
 ```bash
@@ -351,14 +465,16 @@ curl -X POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/u
 
 # Response: {"success":true,"externalKey":"abc123...","fileName":"test-artwork.png"}
 
-# 2. Create ArtRequest with the file reference
+# 2. Create ArtRequest with multiple file references
 curl -X POST https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests \
   -H "Content-Type: application/json" \
   -d '{
     "CompanyName": "Test Company",
     "Status": "New",
     "Priority": "Normal",
-    "File_Upload_One": "abc123..."
+    "File_Upload_One": "abc123...",
+    "File_Upload_Two": "def456...",
+    "File_Upload_Three": "ghi789..."
   }'
 
 # 3. Verify file retrieval
