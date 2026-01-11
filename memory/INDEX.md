@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-01-10
+**Last Updated:** 2026-01-11
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -8,6 +8,9 @@
 ```
 /memory/
 ├── INDEX.md                           # This file - Master navigation
+├── CROSS_PROJECT_HUB.md              # **START HERE** - Entry point for all 3 projects
+├── GLOSSARY.md                        # Shared terminology across all projects
+├── LESSONS_LEARNED.md                 # Master lessons learned (all 3 projects)
 ├── CASPIO_API_CORE.md                # Core API documentation
 ├── ARCHITECTURE.md                   # System architecture patterns
 ├── PATTERNS.md                       # Code patterns and solutions

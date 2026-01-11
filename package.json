@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "validate-docs": "node scripts/validate-memory-docs.js"
+    "validate-docs": "node scripts/validate-memory-docs.js",
+    "doc-freshness": "node scripts/doc-freshness.js",
+    "quarterly-cleanup": "node scripts/quarterly-cleanup.js"
   },
   "engines": {
     "node": "18.x"

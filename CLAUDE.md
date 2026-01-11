@@ -43,6 +43,11 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Descriptive commit message
 - Tested in browser
 
+**After fixing a bug or learning something new:**
+- Add entry to [LESSONS_LEARNED.md](/memory/LESSONS_LEARNED.md) with Problem/Root Cause/Solution/Prevention
+- Update relevant memory file if it's about: ManageOrders, Caspio API, Stripe, ShopWorks
+- Tag with project: `[Pricing Index]`, `[caspio-proxy]`, `[Python Inksoft]`, `[All]`
+
 ## File Organization
 
 ```
@@ -185,10 +190,10 @@ See `/memory/SECURITY_AUDIT_2026-01.md` for full audit report.
 **All detailed documentation is in `/memory/` directory.**
 
 When you need detailed docs, use the Task tool with `subagent_type='Explore'` or read specific files:
+- `/memory/CROSS_PROJECT_HUB.md` - **START HERE** - Entry point for all 3 NWCA projects
 - `/memory/LESSONS_LEARNED.md` - Past bugs and solutions (check first when debugging!)
 - `/memory/INDEX.md` - Master navigation for all documentation
-- `/memory/CASPIO_API_CORE.md` - API documentation (63 endpoints)
-- `/memory/QUOTE_BUILDER_GUIDE.md` - Creating quote builders
+- `/memory/GLOSSARY.md` - Shared terminology across all projects
 - `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` - **MASTER** ShopWorks ManageOrders API (PULL + PUSH)
 - `/memory/3-day-tees/` - 3-Day Tees implementation
 
