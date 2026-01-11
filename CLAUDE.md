@@ -38,6 +38,7 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Remove all console.logs
 - Update ACTIVE_FILES.md
 - No hardcoded URLs (use config)
+- **Document any ManageOrders discoveries** (see [ManageOrders Documentation Updates](#manageorders-documentation-updates))
 - Descriptive commit message
 - Tested in browser
 
@@ -84,7 +85,7 @@ try {
 
 ## Project Overview
 
-### Two-Repository Architecture
+### Related Projects
 
 **This project (Pricing Index File 2025)** - Frontend
 - Quote builders, calculators, pricing pages
@@ -95,6 +96,11 @@ try {
 - Location: `../caspio-pricing-proxy` (sibling directory)
 - Port 3002 (local), Heroku (production)
 - Base URL: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+
+**Python Inksoft** - Order Transformation
+- Location: `../Python Inksoft` (sibling directory)
+- Transforms InkSoft orders to ShopWorks format
+- No direct dependency with this project
 
 ### Key System Components
 
@@ -178,13 +184,25 @@ See `/memory/SECURITY_AUDIT_2026-01.md` for full audit report.
 **All detailed documentation is in `/memory/` directory.**
 
 When you need detailed docs, use the Task tool with `subagent_type='Explore'` or read specific files:
+- `/memory/LESSONS_LEARNED.md` - Past bugs and solutions (check first when debugging!)
 - `/memory/INDEX.md` - Master navigation for all documentation
 - `/memory/CASPIO_API_CORE.md` - API documentation (63 endpoints)
 - `/memory/QUOTE_BUILDER_GUIDE.md` - Creating quote builders
-- `/memory/MANAGEORDERS_INTEGRATION.md` - ShopWorks PULL API
+- `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` - **MASTER** ShopWorks ManageOrders API (PULL + PUSH)
 - `/memory/3-day-tees/` - 3-Day Tees implementation
 
 **Do NOT add more file includes here** - use Task tool to look up docs on-demand to save memory.
+
+## ManageOrders Documentation Updates
+
+When discovering new ManageOrders patterns or issues:
+
+1. **New fields, endpoints, or implementations** → Add to `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md`
+2. **Bugs, gotchas, and workarounds** → Add to `/memory/LESSONS_LEARNED.md` under "Order Processing & ShopWorks"
+3. **CRM/Order Entry capabilities** → See `/memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md`
+4. **3-Day Tees Stripe→ShopWorks flow** → See `/memory/3-day-tees/ORDER_PUSH_FLOW.md`
+
+**These files are the single source of truth** - all three projects (Pricing Index, caspio-proxy, Python Inksoft) reference them.
 
 ---
 
