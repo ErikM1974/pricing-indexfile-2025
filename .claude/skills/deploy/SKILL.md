@@ -182,8 +182,28 @@ Summary:
 - Pushed to: GitHub (develop + main) and Heroku
 
 Main branch is now live at:
-https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
+https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/
 ```
+
+### Step 13: Ask About Lessons Learned (REQUIRED)
+
+After successful deploy, ask:
+```
+Any bugs fixed this session to log to LESSONS_LEARNED.md?
+```
+
+Use AskUserQuestion with options:
+- "Yes, log a bug fix" → Ask for details, then add entry to `/memory/LESSONS_LEARNED.md`
+- "No, nothing to log" → Done
+
+If user wants to log, collect:
+- Problem description
+- Symptoms
+- Root cause
+- Solution
+- Prevention (optional)
+
+Then add the entry at the top of LESSONS_LEARNED.md (below the header, above existing entries).
 
 ## Error Handling
 

@@ -39,7 +39,10 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
-      "Bash($today = Get-Date -Format \"yyyy.MM.dd\")"
+      "Bash($today = Get-Date -Format \"yyyy.MM.dd\")",
+      "WebFetch(domain:app.swaggerhub.com)",
+      "WebFetch(domain:api.swaggerhub.com)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": [],
