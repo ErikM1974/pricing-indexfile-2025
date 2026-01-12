@@ -232,14 +232,15 @@ function getSizeCategory(size) {
  * Uses the SanMar/ShopWorks import format endpoint
  *
  * @param {string} styleNumber - The style number (e.g., 'PC61')
+ * @param {string} color - The catalog color (e.g., 'Dark Heather Grey') - REQUIRED by API
  * @returns {Promise<string[]>} Array of available extended sizes
  */
-async function getAvailableExtendedSizes(styleNumber) {
+async function getAvailableExtendedSizes(styleNumber, color = '') {
     const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
     try {
         const response = await fetch(
-            `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`
+            `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color || '')}`
         );
 
         if (!response.ok) {

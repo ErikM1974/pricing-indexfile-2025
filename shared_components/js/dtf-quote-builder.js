@@ -385,53 +385,40 @@ class DTFQuoteBuilder {
     async selectProduct(styleNumber) {
         console.log('[DTFQuoteBuilder] Product selected:', styleNumber);
 
-        try {
-            // Fetch pricing bundle, product details, and color swatches in parallel
-            const [bundleResponse, detailsResponse, swatchResponse] = await Promise.all([
-                fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF&styleNumber=${styleNumber}`),
-                fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`),
-                fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`)
-            ]);
+        // Use the SAME row creation path as the Add button (matches DTG pattern)
+        // This ensures proper event handlers for child row creation
+        window.addNewRow();  // Global function from HTML - creates row with proper onchange handlers
 
-            const bundleData = await bundleResponse.json();
-            const productDetails = await detailsResponse.json();
-            const swatches = await swatchResponse.json();
-
-            // Get first product detail (API returns array)
-            const firstDetail = Array.isArray(productDetails) ? productDetails[0] : productDetails;
-
-            // Use PRODUCT_TITLE (like other quote builders), not PRODUCT_DESCRIPTION
-            const productTitle = firstDetail?.PRODUCT_TITLE || styleNumber;
-            const cleanedTitle = this.cleanProductTitle(productTitle, styleNumber);
-
-            // Extract garment cost (CASE_PRICE) from product details API
-            const baseCost = firstDetail?.CASE_PRICE || 0;
-
-            console.log('[DTFQuoteBuilder] Product data:', {
-                styleNumber,
-                productTitle: cleanedTitle,
-                baseCost,
-                hasDetails: !!firstDetail
-            });
-
-            // Add product row to table
-            this.addProductRow({
-                id: this.getNextRowId(),
-                styleNumber: styleNumber,
-                description: cleanedTitle,
-                colors: swatches || [],
-                baseCost: baseCost,
-                sizeUpcharges: bundleData.sizeUpcharges || {}
-            });
-
-        } catch (error) {
-            console.error('[DTFQuoteBuilder] Error loading product:', error);
-            alert('Error loading product. Please try again.');
+        // Find the new row and populate it
+        const targetRow = document.querySelector('tr.new-row');
+        if (!targetRow) {
+            console.error('[DTFQuoteBuilder] Failed to create new row');
+            return;
         }
+
+        const rowId = parseInt(targetRow.dataset.rowId);
+        const styleInput = targetRow.querySelector('.style-input');
+        if (styleInput) {
+            styleInput.value = styleNumber;
+        }
+
+        // Trigger the standard product loading flow (same as typing in style field)
+        // This calls onStyleChange() which loads product data, colors, and enables size inputs
+        await window.onStyleChange(styleInput, rowId);  // Global function from HTML
+
+        // Clear search input
+        const searchInput = document.getElementById('product-search');
+        if (searchInput) searchInput.value = '';
     }
 
     // ==================== PRODUCT TABLE ====================
 
+    /**
+     * @deprecated This method creates rows with different event handlers than addNewRow().
+     * Use selectProduct() which now calls addNewRow() + onStyleChange() instead.
+     * This ensures child rows are properly created for extended sizes (2XL, 3XL, etc.).
+     * Keeping for backward compatibility but should not be called directly.
+     */
     addProductRow(product) {
         const tbody = document.getElementById('product-tbody');
         const emptyMessage = document.getElementById('empty-table-message');
@@ -459,7 +446,7 @@ class DTFQuoteBuilder {
         const row = document.createElement('tr');
         row.id = `row-${product.id}`;
         row.dataset.productId = product.id;
-        row.dataset.styleNumber = product.styleNumber;
+        row.dataset.style = product.styleNumber;
         row.dataset.baseCost = product.baseCost;
         // Store additional data for child row inheritance
         row.dataset.colors = JSON.stringify(product.colors || []);
@@ -498,9 +485,9 @@ class DTFQuoteBuilder {
             </td>
             <td class="size-col"><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
             <td class="size-col"><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="LG" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
             <td class="size-col"><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XXL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
+            <td class="size-col"><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
             <td class="size-col extended-picker-cell">
                 <button type="button" class="btn-extended-picker" data-product-id="${product.id}" title="Click for XS, 3XL, 4XL, 5XL, 6XL" onclick="openExtendedSizePopup(${product.id})" disabled>
                     <span class="ext-qty-badge" id="ext-badge-${product.id}">+</span>
@@ -526,7 +513,7 @@ class DTFQuoteBuilder {
             sizeUpcharges: product.sizeUpcharges,
             color: '',           // Display name for UI
             catalogColor: '',    // CATALOG_COLOR for API/ShopWorks
-            quantities: { XS: 0, S: 0, M: 0, LG: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 }
+            quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0, '6XL': 0 }
         });
 
         // Setup input listeners for main row
@@ -714,7 +701,8 @@ class DTFQuoteBuilder {
 
         // Store reference to parent row
         this.currentPopupRow = document.getElementById(`row-${productId}`);
-        const styleNumber = this.currentPopupRow?.dataset?.styleNumber || '';
+        const styleNumber = this.currentPopupRow?.dataset?.style || '';
+        const catalogColor = this.currentPopupRow?.dataset?.catalogColor || '';
 
         const popup = document.getElementById('extended-size-popup');
         const backdrop = document.getElementById('size-popup-backdrop');
@@ -738,7 +726,7 @@ class DTFQuoteBuilder {
             if (!window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
                 throw new Error('ExtendedSizesConfig module not loaded');
             }
-            const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber);
+            const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber, catalogColor);
             // Filter out 2XL/XXL since DTF has a dedicated column for it
             extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
         } catch (error) {
@@ -899,6 +887,11 @@ class DTFQuoteBuilder {
         }
     }
 
+    /**
+     * @deprecated This method was used by the deprecated addProductRow() and does NOT create child rows.
+     * Rows created via selectProduct() now use addNewRow() which uses onchange="onSizeChange()"
+     * handlers that properly create child rows for extended sizes (2XL, 3XL, etc.).
+     */
     handleSizeInputChange(productId) {
         const row = document.querySelector(`tr[data-product-id="${productId}"]`);
         if (!row) return;
@@ -906,7 +899,7 @@ class DTFQuoteBuilder {
         const productData = this.products.find(p => p.id === productId);
         if (!productData) return;
 
-        // Collect quantities from main row (S, M, LG, XL, XXL)
+        // Collect quantities from main row (S, M, L, XL, 2XL)
         let rowTotal = 0;
         row.querySelectorAll('.size-input').forEach(input => {
             const size = input.dataset.size;
@@ -1082,7 +1075,7 @@ class DTFQuoteBuilder {
             let baseDisplayPrice = 0; // Price shown in unit preview (may or may not include LTM)
 
             // Only count non-extended sizes (S, M, LG, XL) - extended sizes are in child rows
-            const standardSizes = ['S', 'M', 'LG', 'XL'];
+            const standardSizes = ['S', 'M', 'L', 'XL'];
             Object.entries(product.quantities).forEach(([size, qty]) => {
                 if (qty > 0 && standardSizes.includes(size)) {
                     const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
@@ -1095,7 +1088,7 @@ class DTFQuoteBuilder {
                     productTotal += roundedPrice * qty;
 
                     // Track base unit price (S/M/LG size - no upcharge) for display
-                    if (baseUnitPrice === 0 && ['S', 'M', 'LG'].includes(size)) {
+                    if (baseUnitPrice === 0 && ['S', 'M', 'L'].includes(size)) {
                         baseUnitPrice = roundedPrice;
                         // Display price: include LTM if distributed, exclude if shown separately
                         if (this.ltmDistributed || ltmPerUnit === 0) {
@@ -1158,8 +1151,8 @@ class DTFQuoteBuilder {
                     displayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
                 }
 
-                // Display unit price on child row
-                const priceCell = document.getElementById(`row-price-${childRow.dataset.rowId}`);
+                // Display unit price on child row (use querySelector for robustness)
+                const priceCell = childRow.querySelector('.cell-price');
                 if (priceCell) priceCell.textContent = `$${displayPrice.toFixed(2)}`;
 
                 // Add to grand total
@@ -1180,7 +1173,7 @@ class DTFQuoteBuilder {
 
     getTotalQuantity() {
         // Count quantities from products array (only standard sizes - extended in child rows)
-        const standardSizes = ['S', 'M', 'LG', 'XL'];
+        const standardSizes = ['S', 'M', 'L', 'XL'];
         let total = this.products.reduce((sum, p) => {
             // Only count standard sizes to avoid double-counting child rows
             return sum + Object.entries(p.quantities)
@@ -1282,7 +1275,7 @@ class DTFQuoteBuilder {
                 sizeUpcharges: sizeUpcharges,
                 color: row.dataset.colorName || '',
                 catalogColor: row.dataset.catalogColor || '',
-                quantities: { XS: 0, S: 0, M: 0, LG: 0, XL: 0, XXL: 0, XXXL: 0, '4XL': 0, '5XL': 0, '6XL': 0 }
+                quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0, '6XL': 0 }
             };
             this.products.push(product);
         }
@@ -1367,7 +1360,7 @@ class DTFQuoteBuilder {
         // Build products summary (including child row quantities)
         const productsHTML = this.products.map(p => {
             // Get standard sizes from products array (S, M, LG, XL only)
-            const standardSizes = ['S', 'M', 'LG', 'XL'];
+            const standardSizes = ['S', 'M', 'L', 'XL'];
             const allQuantities = {};
             let totalQty = 0;
 
@@ -1471,7 +1464,7 @@ class DTFQuoteBuilder {
             // Includes child row quantities for extended sizes
             products: this.products.map(p => {
                 // Start with standard sizes from products array
-                const standardSizes = ['S', 'M', 'LG', 'XL'];
+                const standardSizes = ['S', 'M', 'L', 'XL'];
                 const allQuantities = {};
                 standardSizes.forEach(size => {
                     allQuantities[size] = p.quantities[size] || 0;
@@ -1606,8 +1599,8 @@ class DTFQuoteBuilder {
             // Build line items - separate base sizes from extended sizes
             const lineItems = [];
 
-            // Base sizes (S, M, LG, XL, XXL)
-            const baseSizes = ['S', 'M', 'LG', 'XL', 'XXL'];
+            // Base sizes (S, M, L, XL, 2XL) - matches HTML column names
+            const baseSizes = ['S', 'M', 'L', 'XL', '2XL'];
             const baseSizeQtys = {};
             let baseQty = 0;
 
@@ -1636,19 +1629,28 @@ class DTFQuoteBuilder {
                 });
             }
 
-            // Extended sizes (XS, XXXL, 4XL, 5XL, 6XL) - each gets its own row
-            const extendedSizes = ['XS', 'XXXL', '4XL', '5XL', '6XL'];
-            extendedSizes.forEach(size => {
-                const qty = parseInt(product.quantities[size]) || 0;
-                if (qty > 0) {
-                    const unitPrice = this.calculateUnitPrice(product, size);
-                    lineItems.push({
-                        description: `${size}(${qty})`,
-                        quantity: qty,
-                        unitPrice: unitPrice,
-                        total: qty * unitPrice,
-                        hasUpcharge: true
-                    });
+            // Extended sizes - query child rows from DOM using window.childRowMap
+            // Child rows are created by createChildRow() when user adds extended sizes
+            const childMap = window.childRowMap?.[product.id] || {};
+            Object.entries(childMap).forEach(([size, childRowId]) => {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) {
+                    const qtyDisplay = childRow.querySelector('.cell-qty');
+                    const priceCell = childRow.querySelector('.cell-price');
+                    const qty = parseInt(qtyDisplay?.textContent) || 0;
+                    const unitPrice = parseFloat(priceCell?.textContent?.replace('$', '')) || 0;
+
+                    if (qty > 0) {
+                        // Normalize size display (XXL→2XL, XXXL→3XL for consistency)
+                        const displaySize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
+                        lineItems.push({
+                            description: `${displaySize}(${qty})`,
+                            quantity: qty,
+                            unitPrice: unitPrice,
+                            total: qty * unitPrice,
+                            hasUpcharge: true
+                        });
+                    }
                 }
             });
 
@@ -1695,42 +1697,45 @@ class DTFQuoteBuilder {
      * Includes LTM distribution if enabled
      */
     calculateUnitPrice(product, size) {
-        // Get base transfer + labor + freight cost
-        let unitPrice = 0;
-
-        // Get the displayed unit price from the table row
+        // First try: Read displayed price from parent row DOM
         const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
         if (row) {
-            const priceCell = row.querySelector('.row-price');
-            if (priceCell) {
-                const qty = parseInt(row.querySelector('.row-qty')?.textContent || '0');
-                const total = parseFloat(priceCell.textContent.replace('$', '')) || 0;
-                if (qty > 0) {
-                    unitPrice = total / qty;
+            const priceSpan = row.querySelector('.row-price');
+            const qtySpan = row.querySelector('.row-qty');
+            if (priceSpan && qtySpan) {
+                const displayedTotal = parseFloat(priceSpan.textContent.replace('$', '')) || 0;
+                const qty = parseInt(qtySpan.textContent) || 0;
+                if (qty > 0 && displayedTotal > 0) {
+                    const baseUnitPrice = displayedTotal / qty;
+                    // For extended sizes, add the upcharge on top of base price
+                    const upcharge = product.sizeUpcharges?.[size] || 0;
+                    return Math.round((baseUnitPrice + upcharge) * 100) / 100;
                 }
             }
         }
 
-        // If we couldn't get from DOM, calculate from pricing data
-        if (unitPrice === 0 && this.currentPricingData) {
+        // Fallback: Calculate using CORRECT formula (matches updatePricing)
+        if (this.currentPricingData) {
+            const baseCost = parseFloat(product.baseCost) || 0;
+            const upcharge = product.sizeUpcharges?.[size] || 0;
             const transferCost = this.getTransferCostForProduct(product);
             const laborCost = this.currentPricingData.laborCostPerLoc || 0;
             const freightCost = this.currentPricingData.freightPerTransfer || 0;
             const margin = this.currentPricingData.marginDenom || 0.6;
 
-            unitPrice = (transferCost + laborCost + freightCost) / margin;
-
-            // Add size upcharge
-            const upcharge = product.sizeUpcharges?.[size] || 0;
-            unitPrice += upcharge;
+            // CORRECT: Include baseCost + upcharge BEFORE margin division
+            let unitPrice = (baseCost + upcharge + transferCost + laborCost + freightCost) / margin;
 
             // Add LTM if distributed
             if (this.ltmDistributed && this.currentPricingData.ltmPerUnit) {
                 unitPrice += this.currentPricingData.ltmPerUnit;
             }
+
+            // Apply rounding
+            return this.pricingCalculator?.applyRounding(unitPrice) || Math.ceil(unitPrice * 2) / 2;
         }
 
-        return Math.round(unitPrice * 100) / 100; // Round to cents
+        return 0;
     }
 
     /**

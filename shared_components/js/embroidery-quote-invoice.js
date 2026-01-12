@@ -1362,7 +1362,8 @@ class EmbroideryInvoiceGenerator {
         // Fixed size columns matching quote builder
         const sizeColumns = ['S', 'M', 'LG', 'XL', 'XXL', 'XXXL'];
         // Extended sizes that go into XXXL(Other) column
-        const extendedSizes = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL', 'XXXL'];
+        // NOTE: 2XL is NOT extended - it's an alias for XXL (double extra-large)
+        const extendedSizes = ['XS', '3XL', '4XL', '5XL', '6XL', 'XXXL'];
 
         // Track totals
         let grandTotalQty = 0;
@@ -1435,8 +1436,10 @@ class EmbroideryInvoiceGenerator {
                         if (col === 'XXXL') {
                             sizeCells += `<td class="size-cell" style="color: #4cb354; font-weight: bold;">✓</td>`;
                         } else {
-                            // Map L -> LG
-                            const qty = sizes[col] || sizes[col === 'LG' ? 'L' : null];
+                            // Map L -> LG, and 2XL -> XXL (same size)
+                            let qty = sizes[col];
+                            if (!qty && col === 'LG') qty = sizes['L'];
+                            if (!qty && col === 'XXL') qty = sizes['2XL'];
                             sizeCells += `<td class="size-cell">${qty ? qty : ''}</td>`;
                         }
                     });
@@ -1453,8 +1456,10 @@ class EmbroideryInvoiceGenerator {
                 } else {
                     // Regular row - show sizes in their columns
                     sizeColumns.forEach(col => {
-                        // Map L -> LG for compatibility
-                        const qty = sizes[col] || sizes[col === 'LG' ? 'L' : null];
+                        // Map L -> LG, and 2XL -> XXL (same size)
+                        let qty = sizes[col];
+                        if (!qty && col === 'LG') qty = sizes['L'];
+                        if (!qty && col === 'XXL') qty = sizes['2XL'];
                         sizeCells += `<td class="size-cell">${qty ? qty : ''}</td>`;
                     });
                 }
@@ -1518,7 +1523,7 @@ class EmbroideryInvoiceGenerator {
             <div class="totals-section">
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
-                    <span>$${pricingData.subtotal.toFixed(2)}</span>
+                    <span>$${pricingData.grandTotal.toFixed(2)}</span>
                 </div>
                 ${pricingData.additionalServicesTotal > 0 ? `
                 <div class="total-row">
@@ -1540,10 +1545,11 @@ class EmbroideryInvoiceGenerator {
                     <span>Less Than Minimum Fee:</span>
                     <span>$${pricingData.ltmFee.toFixed(2)}</span>
                 </div>` : ''}
+                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || (pricingData.ltmFee > 0 && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0) ? `
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
                     <span>$${pricingData.grandTotal.toFixed(2)}</span>
-                </div>
+                </div>` : ''}
                 <div class="total-row tax-row">
                     <span>WA Sales Tax (10.1%):</span>
                     <span>$${taxAmount.toFixed(2)}</span>

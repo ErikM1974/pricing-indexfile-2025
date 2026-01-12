@@ -159,9 +159,9 @@
                                 <th class="color-col">Color</th>
                                 <th class="size-col">S</th>
                                 <th class="size-col">M</th>
-                                <th class="size-col">LG</th>
+                                <th class="size-col">L</th>
                                 <th class="size-col">XL</th>
-                                <th class="size-col">XXL</th>
+                                <th class="size-col">2XL</th>
                                 <th class="size-col extended-col" style="line-height: 1.1;">XXXL<br><span style="font-size: 10px; font-weight: 400;">(Other)</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
@@ -494,7 +494,7 @@
 
         // Child row tracking (like DTG/Embroidery pattern)
         // Using var so it's accessible globally for dtf-quote-builder.js class
-        var childRowMap = {};  // { parentRowId: { 'XXL': childRowId, '3XL': childRowId } }
+        var childRowMap = {};  // { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
         window.childRowMap = childRowMap;  // Expose to JS class
 
         // Use shared ExtendedSizesConfig module (2026 consolidation)
@@ -510,8 +510,9 @@
             `;
             throw new Error('ExtendedSizesConfig module required but not loaded');
         }
-        const SIZE_TO_SUFFIX = window.ExtendedSizesConfig.SIZE_TO_SUFFIX;
-        const EXTENDED_SIZE_ORDER = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER;
+        // SIZE_TO_SUFFIX and EXTENDED_SIZE_ORDER are now accessed via
+        // window.ExtendedSizesConfig.* to avoid duplicate const declarations
+        // (extended-sizes-config.js declares them at global scope)
 
         /**
          * Add a new empty row for user to type style number
@@ -556,9 +557,9 @@
                 </td>
                 <td><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
                 <td><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="LG" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
                 <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="XXL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
                 <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
                 <td class="cell-qty" id="row-qty-${rowId}">0</td>
                 <td class="cell-price" id="row-price-${rowId}">-</td>
@@ -581,6 +582,8 @@
                 row.classList.remove('new-row');
             }, 1000);
         }
+        // Expose to window for JS class access
+        window.addNewRow = addNewRow;
 
         /**
          * Handle style number change - fetch product data
@@ -650,6 +653,8 @@
                 showToast('Error loading product', 'error');
             }
         }
+        // Expose to window for JS class access
+        window.onStyleChange = onStyleChange;
 
         /**
          * Handle keyboard navigation in cells
@@ -703,19 +708,19 @@
                 return;
             }
 
-            // Handle XXL (2XL) - auto-create child row when quantity entered
-            const xxlInput = row.querySelector('[data-size="XXL"]');
-            console.log(`[DEBUG onSizeChange] XXL input:`, xxlInput ? `value=${xxlInput.value}, disabled=${xxlInput.disabled}` : 'not found');
+            // Handle 2XL - auto-create child row when quantity entered
+            const xxlInput = row.querySelector('[data-size="2XL"]');
+            console.log(`[DEBUG onSizeChange] 2XL input:`, xxlInput ? `value=${xxlInput.value}, disabled=${xxlInput.disabled}` : 'not found');
             if (xxlInput && !xxlInput.disabled) {
                 const qty = parseInt(xxlInput.value) || 0;
-                const existingChildId = childRowMap[rowId]?.['XXL'];
-                console.log(`[DEBUG onSizeChange] XXL qty=${qty}, existingChildId=${existingChildId}`);
+                const existingChildId = childRowMap[rowId]?.['2XL'];
+                console.log(`[DEBUG onSizeChange] 2XL qty=${qty}, existingChildId=${existingChildId}`);
 
                 if (qty > 0 && !existingChildId) {
-                    // CREATE CHILD ROW for XXL
-                    console.log(`[DEBUG onSizeChange] Creating child row for XXL qty=${qty}`);
-                    createChildRow(rowId, 'XXL', qty);
-                    // Disable parent's XXL input
+                    // CREATE CHILD ROW for 2XL
+                    console.log(`[DEBUG onSizeChange] Creating child row for 2XL qty=${qty}`);
+                    createChildRow(rowId, '2XL', qty);
+                    // Disable parent's 2XL input
                     xxlInput.disabled = true;
                     xxlInput.style.background = '#f5f5f5';
                     xxlInput.style.color = '#999';
@@ -730,12 +735,12 @@
                 }
             }
 
-            // Calculate total quantity from standard sizes (S, M, LG, XL)
+            // Calculate total quantity from standard sizes (S, M, L, XL)
             let total = 0;
             row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(:disabled)').forEach(input => {
                 const size = input.dataset.size;
-                // Skip XXL - it's handled separately via child rows
-                if (size !== 'XXL') {
+                // Skip 2XL - it's handled separately via child rows
+                if (size !== '2XL') {
                     total += parseInt(input.value) || 0;
                 }
             });
@@ -880,8 +885,8 @@
 
             // Use shared counter from JS class to prevent ID collisions with parent rows
             const childRowId = dtfQuoteBuilder.getNextRowId();
-            const baseStyle = parentRow.dataset.styleNumber || '';
-            const suffix = SIZE_TO_SUFFIX[size] || '';
+            const baseStyle = parentRow.dataset.style || '';
+            const suffix = window.ExtendedSizesConfig.SIZE_TO_SUFFIX[size] || '';
             const partNumber = baseStyle + suffix;  // e.g., PC61_2X
 
             // Get parent's color info
@@ -929,12 +934,14 @@
             childRow.dataset.productName = parentRow.dataset.productName || '';
             childRow.dataset.colorManuallySet = 'false';  // Track if user manually changed color
 
-            const displaySize = size === 'XXXL' ? '3XL' : (size === 'XXL' ? '2XL' : size);
+            const displaySize = size === 'XXXL' ? '3XL' : size;  // 2XL is already correct
             const productName = parentRow.dataset.productName || '';
 
-            // Determine which column gets the qty (matching Embroidery pattern)
-            // XXL goes in column 5 (XXL position), other extended sizes go in column 6 (XXXL/Other position)
-            const isXXL = size === 'XXL';
+            // Determine which column gets the qty (matching DTG/Embroidery pattern)
+            // 2XL/XXL goes in Size05 column, other extended sizes go in Size06 column
+            const SIZE05_SIZES = ['2XL', 'XXL'];  // Both map to same suffix
+            const isSize05 = SIZE05_SIZES.includes(size);
+            const isSize06 = !isSize05;
 
             childRow.innerHTML = `
                 <td>
@@ -959,10 +966,10 @@
                 <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
                 <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
                 <td><input type="number" class="cell-input size-input" disabled style="background: #f5f5f5;"></td>
-                <td><input type="number" class="cell-input size-input extended-size-qty" data-size="XXL"
-                           ${isXXL ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, 'XXL')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
+                <td><input type="number" class="cell-input size-input extended-size-qty" data-size="2XL"
+                           ${isSize05 ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '2XL')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
                 <td><input type="number" class="cell-input size-input extended-size-qty" data-size="${size}"
-                           ${!isXXL ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
+                           ${isSize06 ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
                 <td class="cell-qty" id="row-qty-${childRowId}">${qty}</td>
                 <td class="cell-price" id="row-price-${childRowId}">-</td>
                 <td class="cell-actions">
@@ -976,12 +983,12 @@
             const existingChildren = Array.from(
                 document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`)
             );
-            const newSizeIndex = EXTENDED_SIZE_ORDER.indexOf(size);
+            const newSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(size);
             let insertAfter = parentRow;
 
             for (const existingChild of existingChildren) {
                 const existingSize = existingChild.dataset.extendedSize;
-                const existingSizeIndex = EXTENDED_SIZE_ORDER.indexOf(existingSize);
+                const existingSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(existingSize);
                 if (existingSizeIndex < newSizeIndex) {
                     insertAfter = existingChild;
                 }
@@ -1019,7 +1026,7 @@
                 if (size === 'XXL' || size === '2XL') {
                     const parentRow = document.getElementById(`row-${parentRowId}`);
                     if (parentRow) {
-                        const xxlInput = parentRow.querySelector('[data-size="XXL"]');
+                        const xxlInput = parentRow.querySelector('[data-size="2XL"]');
                         if (xxlInput) {
                             xxlInput.disabled = false;
                             xxlInput.value = '';
@@ -1137,7 +1144,7 @@
             if (parentRow) {
                 // Map size to input data-size attribute (only XXL/2XL has parent input)
                 let inputSize = normalizedSize;
-                if (normalizedSize === '2XL') inputSize = 'XXL';
+                if (normalizedSize === '2XL') inputSize = '2XL';
                 // 3XL+ only exist in popup/child rows, no parent input to check
 
                 const sizeInput = parentRow.querySelector(`[data-size="${inputSize}"]`);

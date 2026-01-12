@@ -278,6 +278,36 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 
 # Calculator & Quote Builder Sync
 
+## Problem: DTF Quote Builder PDF showed wrong prices and duplicate subtotals
+**Date:** 2026-01
+**Project:** Pricing Index
+**Symptoms:**
+1. PDF base price showed $5.26 instead of UI's $15.00
+2. Extended size upcharges applied incorrectly
+3. Two "Subtotal:" lines appeared in PDF
+
+**Root causes:**
+1. `calculateUnitPrice()` in dtf-quote-builder.js was missing `product.baseCost` in fallback formula
+2. Size upcharge was added AFTER margin division instead of BEFORE
+3. `embroidery-quote-invoice.js` had two subtotal rows - one using calculated subtotal, one using grandTotal
+
+**Fixes applied:**
+1. **Fixed calculateUnitPrice()** - Added baseCost and moved upcharge before margin division:
+   ```javascript
+   // BEFORE (wrong): unitPrice = (transferCost + laborCost + freightCost) / margin;
+   // AFTER (correct): unitPrice = (baseCost + upcharge + transferCost + laborCost + freightCost) / margin;
+   ```
+2. **Fixed duplicate subtotal** - Made second subtotal conditional (only shows when there are additional fees)
+3. **Fixed size naming** - Changed 'LG' to 'L', 'XXL' to '2XL' throughout for consistency
+
+**Files modified:**
+- `/shared_components/js/dtf-quote-builder.js` (lines 1699-1739)
+- `/shared_components/js/embroidery-quote-invoice.js` (lines 1524-1552)
+
+**Prevention:** When building PDF pricing data, always read displayed prices from DOM first. Fallback calculations must match the formula used in `updatePricing()`.
+
+---
+
 ## Problem: Calculator and quote builder show different prices
 **Date:** 2025
 **Project:** Pricing Index
@@ -299,6 +329,41 @@ Test example: PC61 Forest Green x 37 pieces should show $29.85/piece in BOTH
 - `product.style` - Style number (e.g., "PC54")
 - `product.title` - Product description (e.g., "Port & Company Core Cotton Tee")
 - `product.color` - Display color name
+
+---
+
+## Problem: Comprehensive 2XL/XXL handling issues across quote builders
+**Date:** 2026-01
+**Project:** Pricing Index
+**Symptoms:** Multiple 2XL bugs: (1) 2XL showing in BOTH XXL and XXXL columns in UI, (2) 2XL unit price missing after column fix, (3) 2XL not separated into own line item on Screen Print PDF
+**Root cause:** Inconsistent 2XL handling across codebase - some arrays included '2XL', some didn't. Key insight: `2XL` = `XXL` (same size, double extra-large).
+
+**Fixes applied:**
+
+1. **UI Column Display** - Removed '2XL' from `SIZE06_EXTENDED_SIZES` in:
+   - `/quote-builders/dtg-quote-builder.html` (line ~474)
+   - `/quote-builders/screenprint-quote-builder.html` (line ~602)
+
+2. **UI Unit Price** - Added `|| size === '2XL' || size === 'XXL'` to `isExtendedSize` check in:
+   - `/quote-builders/dtg-quote-builder.html` (line ~3389)
+   - `/quote-builders/screenprint-quote-builder.html` (line ~3538)
+
+3. **PDF Column Mapping** - In `/shared_components/js/embroidery-quote-invoice.js`:
+   - Removed '2XL' from `extendedSizes` array (line 1366)
+   - Added 2XL→XXL mapping: `if (!qty && col === 'XXL') qty = sizes['2XL'];`
+
+4. **PDF Line Items** - In `/quote-builders/screenprint-quote-builder.html` `buildScreenprintPricingData()`:
+   - Removed '2XL' from `baseSizes` (line ~3867)
+   - Added '2XL' to `extendedSizes` (line ~3895)
+
+**Prevention:** 2XL rules to remember:
+- `2XL` = `XXL` → SAME SIZE (double extra-large)
+- `2XL`/`XXL` go in **Size05 column** (XXL column in UI)
+- `3XL`+ go in **Size06 column** (XXXL/Other column in UI)
+- `SIZE06_EXTENDED_SIZES` should NOT include '2XL' (it's Size05, not Size06)
+- `baseSizes` for PDF line items should NOT include '2XL' (it has upcharge)
+- `extendedSizes` for PDF line items SHOULD include '2XL' (separate line with upcharge)
+- `isExtendedSize` pricing check must include `size === '2XL'` for child row prices
 
 ---
 
