@@ -30,6 +30,17 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Problem: DTF Quote Builder extended size upcharges always used defaults
+**Date:** 2026-01-12
+**Project:** Pricing Index
+**Symptoms:** Extended sizes (2XL, 3XL, 4XL, etc.) showed wrong upcharge prices. Console showed `getSizeUpcharge(2XL): API value=null, result=2` - always falling back to hardcoded defaults ($2, $3, $4, $5, $6)
+**Root cause:** DTF Quote Builder fetched from `/api/pricing-bundle?method=DTF` which returns **empty** `sellingPriceDisplayAddOns: {}`. DTF pricing bundle doesn't include garment-level upcharges - those come from a separate product lookup
+**Solution:** Fetch from `/api/pricing-bundle?method=BLANK&styleNumber=XXX` instead, which returns actual `sellingPriceDisplayAddOns` with size upcharges. Also fixed `getSizeUpcharge()` to use nullish coalescing (`??`) instead of `||` so `0` values aren't treated as falsy
+**Prevention:** When DTF pricing-bundle returns empty arrays/objects for product-specific data, check BLANK or method-specific product bundles. Document which endpoints return which data in API docs
+**Files:** dtf-quote-builder.html:448-451, dtf-quote-products.js:165-167, dtf-quote-builder.js:1211-1252
+
+---
+
 ## Problem: Caspio ArtRequests file uploads stored wrong data pattern
 **Date:** 2026-01
 **Project:** caspio-pricing-proxy
