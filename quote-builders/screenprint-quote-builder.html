@@ -597,9 +597,10 @@
         // Includes OSFA for beanies, bags, and other one-size-fits-all items
         // All sizes that go in Size06 column (the "Other/Catch-All" column)
         // Based on Python Inksoft/Inksoft_Size_Translation_Import.csv
+        // NOTE: 2XL and XXL are NOT here - they go in Size05 (XXL column)
         const SIZE06_EXTENDED_SIZES = [
-            // Extended large
-            'XS', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
+            // Extended large (3XL and up only - 2XL/XXL go in Size05)
+            'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
             // One-size
             'OSFA', 'OSFM',
             // Combos (for fitted caps)
@@ -613,7 +614,7 @@
             // Big
             'LB', 'XLB', '2XLB',
             // Extra small
-            'XXS', '2XS', 'XXL'
+            'XXS', '2XS'
         ];
 
         // Full extended size ordering for child row display
@@ -3533,7 +3534,8 @@
                         productSubtotal += sizePrice * qty;
 
                         // Update row price cell (for standard sizes, update parent row)
-                        const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size);
+                        // Note: 2XL/XXL are child rows but NOT in SIZE06_EXTENDED_SIZES (they go in Size05 column)
+                        const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size) || size === '2XL' || size === 'XXL';
                         if (!isExtendedSize) {
                             const priceCell = document.getElementById(`row-price-${rowId}`);
                             if (priceCell) {
@@ -3860,8 +3862,9 @@
                 const basePriceText = basePriceCell?.textContent || '$0.00';
                 const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
 
-                // Base sizes (S, M, L, XL, XXL, 2XL) - Note: L is internal, LG is display
-                const baseSizes = ['S', 'M', 'L', 'LG', 'XL', 'XXL', '2XL'];
+                // Base sizes (S, M, L, XL, XXL) - Note: L is internal, LG is display
+                // 2XL is NOT a base size - it goes in extendedSizes with its own upcharge
+                const baseSizes = ['S', 'M', 'L', 'LG', 'XL', 'XXL'];
                 const baseSizeQtys = {};
                 let baseQty = 0;
 
@@ -3888,8 +3891,8 @@
                     });
                 }
 
-                // Extended sizes - read from child row price cells
-                const extendedSizes = ['3XL', '4XL', '5XL', '6XL', 'OSFA'];
+                // Extended sizes - read from child row price cells (includes 2XL which has upcharge)
+                const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
                 extendedSizes.forEach(size => {
                     const qty = product.sizeBreakdown[size] || 0;
                     if (qty > 0) {

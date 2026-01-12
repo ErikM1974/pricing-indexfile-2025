@@ -42,7 +42,8 @@
       "Bash($today = Get-Date -Format \"yyyy.MM.dd\")",
       "WebFetch(domain:app.swaggerhub.com)",
       "WebFetch(domain:api.swaggerhub.com)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Skill(ralph-loop:ralph-loop)"
     ],
     "deny": [],
     "ask": [],
