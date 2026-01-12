@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!-- DTF Quote Builder Styles -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260107b">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260112">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
@@ -196,22 +196,17 @@
             </div>
         </div>
 
-        <!-- Right: Pricing Sidebar -->
+        <!-- Right: Pricing Sidebar (DTG Style) -->
         <div class="power-sidebar">
-            <!-- Selected Locations Panel -->
-            <div class="sidebar-panel locations-panel">
-                <div class="panel-title">
-                    <i class="fas fa-map-marker-alt"></i> Selected Locations
-                </div>
-                <div class="locations-list" id="sidebar-locations-list">
-                    <div class="no-locations">No locations selected</div>
-                </div>
-            </div>
-
             <!-- Pricing Panel -->
-            <div class="sidebar-panel pricing-panel">
-                <div class="panel-title">
+            <div class="pricing-panel">
+                <div class="pricing-title">
                     <i class="fas fa-calculator"></i> Quote Summary
+                </div>
+
+                <div class="pricing-row">
+                    <span class="label">Print Location:</span>
+                    <span class="value" id="sidebar-location">-</span>
                 </div>
 
                 <div class="pricing-row">
@@ -224,30 +219,12 @@
                     <span class="tier-badge" id="pricing-tier">10-23</span>
                 </div>
 
-                <!-- Minimum Order Warning (shown when qty < 10) -->
-                <div id="min-order-warning" class="min-order-warning" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Minimum order: 10 pieces. Pricing shown based on 10-23 tier.</span>
+                <div class="pricing-row">
+                    <span class="label">Products Subtotal:</span>
+                    <span class="value" id="subtotal">$0.00</span>
                 </div>
 
-                <div class="pricing-divider"></div>
-
-                <div class="pricing-row" id="transfer-cost-row">
-                    <span class="label">Transfer Costs:</span>
-                    <span class="value" id="transfer-cost">$0.00</span>
-                </div>
-
-                <div class="pricing-row" id="labor-cost-row">
-                    <span class="label">Labor (per piece):</span>
-                    <span class="value" id="labor-cost">$0.00</span>
-                </div>
-
-                <div class="pricing-row" id="freight-cost-row">
-                    <span class="label">Freight (per piece):</span>
-                    <span class="value" id="freight-cost">$0.00</span>
-                </div>
-
-                <div class="pricing-row ltm-row" id="ltm-row" style="display: none;">
+                <div class="pricing-row" id="ltm-row" style="display: none;">
                     <span class="label">LTM Fee (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
@@ -258,108 +235,20 @@
                     </span>
                 </div>
 
-                <div class="pricing-divider"></div>
-
-                <div class="pricing-row">
-                    <span class="label">Products Subtotal:</span>
-                    <span class="value" id="subtotal">$0.00</span>
-                </div>
-
-                <div class="pricing-row grand-total">
-                    <span class="label">GRAND TOTAL:</span>
+                <div class="pricing-row total">
+                    <span class="label">TOTAL:</span>
                     <span class="value" id="grand-total">$0.00</span>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="sidebar-actions">
-                <button class="btn-copy-quote" id="copy-quote-btn" onclick="copyQuoteToClipboard()">
-                    <i class="fas fa-copy"></i> Copy Quote
+            <!-- Action Buttons (DTG Style) -->
+            <div class="action-panel">
+                <button class="btn-action btn-primary-action" onclick="copyQuoteToClipboard()">
+                    <i class="fas fa-copy"></i> Copy Quote to Clipboard
                 </button>
-                <button class="btn-continue" id="continue-btn" disabled onclick="continueToSummary()">
-                    <i class="fas fa-arrow-right"></i> Continue to Summary
+                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
                 </button>
-                <button class="btn-save-draft" onclick="saveDraft()">
-                    <i class="fas fa-save"></i> Save Draft
-                </button>
-                <button class="btn-clear-all" onclick="clearAllProducts()">
-                    <i class="fas fa-trash-alt"></i> Clear All Products
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Summary Phase Modal -->
-    <div class="summary-modal" id="summary-modal" style="display: none;">
-        <div class="summary-modal-content">
-            <div class="summary-header">
-                <h2><i class="fas fa-file-invoice"></i> Quote Summary</h2>
-                <button class="close-modal" onclick="closeSummaryModal()">&times;</button>
-            </div>
-
-            <div class="summary-body">
-                <!-- Quote ID -->
-                <div class="quote-id-section">
-                    <span class="quote-id-label">Quote ID:</span>
-                    <span class="quote-id-value" id="quote-id">DTF----</span>
-                    <button class="btn-copy-id" onclick="copyQuoteId()" title="Copy Quote ID">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-
-                <!-- Locations Summary -->
-                <div class="summary-section">
-                    <h3><i class="fas fa-map-marker-alt"></i> Print Locations</h3>
-                    <div id="summary-locations"></div>
-                </div>
-
-                <!-- Products Summary -->
-                <div class="summary-section">
-                    <h3><i class="fas fa-tshirt"></i> Products</h3>
-                    <div id="summary-products"></div>
-                </div>
-
-                <!-- Pricing Summary -->
-                <div class="summary-section">
-                    <h3><i class="fas fa-calculator"></i> Pricing Details</h3>
-                    <div id="summary-pricing"></div>
-                </div>
-
-                <!-- Customer Info -->
-                <div class="summary-section">
-                    <h3><i class="fas fa-user"></i> Customer Information</h3>
-                    <div class="customer-form">
-                        <div class="form-row">
-                            <label for="customer-name">Customer Name</label>
-                            <input type="text" id="customer-name" placeholder="Enter customer name">
-                        </div>
-                        <div class="form-row">
-                            <label for="customer-email">Email</label>
-                            <input type="email" id="customer-email" placeholder="customer@example.com">
-                        </div>
-                        <div class="form-row">
-                            <label for="quote-notes">Notes</label>
-                            <textarea id="quote-notes" placeholder="Any special instructions or notes..."></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="summary-footer">
-                <button class="btn-back" onclick="closeSummaryModal()">
-                    <i class="fas fa-arrow-left"></i> Back to Quote
-                </button>
-                <div class="action-buttons">
-                    <button class="btn-print" onclick="printQuote()">
-                        <i class="fas fa-print"></i> Print PDF
-                    </button>
-                    <button class="btn-email" onclick="emailQuote()">
-                        <i class="fas fa-envelope"></i> Email Quote
-                    </button>
-                    <button class="btn-save" onclick="saveQuote()">
-                        <i class="fas fa-save"></i> Save Quote
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -399,7 +288,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=20260107c"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=20260112"></script>
 
     <script>
         // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
@@ -407,59 +296,7 @@
             console.log('DTF Quote Builder: Inline init complete');
         });
 
-        // Global functions for onclick handlers
-        function continueToSummary() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.showSummary();
-            }
-        }
-
-        function closeSummaryModal() {
-            document.getElementById('summary-modal').style.display = 'none';
-        }
-
-        function saveDraft() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.saveDraft();
-            }
-        }
-
-        function saveQuote() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.saveQuote();
-            }
-        }
-
-        function printQuote() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.printQuote();
-            }
-        }
-
-        function emailQuote() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.emailQuote();
-            }
-        }
-
-        function copyQuoteId() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.copyQuoteId();
-            }
-        }
-
-        function clearAllProducts() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.clearAllProducts();
-            }
-        }
-
-        function copyQuoteToClipboard() {
-            if (dtfQuoteBuilder) {
-                dtfQuoteBuilder.copyQuoteToClipboard();
-            }
-        }
-
+        // Extended size popup functions
         function openExtendedSizePopup(productId) {
             if (dtfQuoteBuilder) {
                 dtfQuoteBuilder.openExtendedSizePopup(productId);

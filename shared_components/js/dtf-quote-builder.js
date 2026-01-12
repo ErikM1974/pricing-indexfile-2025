@@ -159,13 +159,11 @@ class DTFQuoteBuilder {
     updateLocationSummary() {
         const summaryContainer = document.getElementById('selected-locations-summary');
         const badgesContainer = document.getElementById('selected-badges');
-        const sidebarList = document.getElementById('sidebar-locations-list');
+        const sidebarLocation = document.getElementById('sidebar-location');
 
         if (this.selectedLocations.length === 0) {
             if (summaryContainer) summaryContainer.style.display = 'none';
-            if (sidebarList) {
-                sidebarList.innerHTML = '<div class="no-locations">No locations selected</div>';
-            }
+            if (sidebarLocation) sidebarLocation.textContent = '-';
             return;
         }
 
@@ -178,18 +176,13 @@ class DTFQuoteBuilder {
         if (badgesContainer) badgesContainer.innerHTML = badges;
         if (summaryContainer) summaryContainer.style.display = 'flex';
 
-        // Build sidebar list
-        if (sidebarList) {
-            const listItems = this.selectedLocations.map(loc => {
+        // Update sidebar location display (simple text like DTG)
+        if (sidebarLocation) {
+            const locationNames = this.selectedLocations.map(loc => {
                 const config = this.locationConfig[loc];
-                return `
-                    <div class="location-item">
-                        <span class="location-name">${config.label}</span>
-                        <span class="location-size size-${config.size.toLowerCase()}">${config.size}</span>
-                    </div>
-                `;
-            }).join('');
-            sidebarList.innerHTML = listItems;
+                return config.label;
+            });
+            sidebarLocation.textContent = locationNames.join(' + ');
         }
     }
 
@@ -2040,3 +2033,16 @@ document.addEventListener('DOMContentLoaded', () => {
     dtfQuoteBuilder = new DTFQuoteBuilder();
     window.dtfQuoteBuilder = dtfQuoteBuilder;
 });
+
+// Global function wrappers for HTML onclick handlers
+function copyQuoteToClipboard() {
+    if (dtfQuoteBuilder) {
+        dtfQuoteBuilder.copyQuoteToClipboard();
+    }
+}
+
+function printQuote() {
+    if (dtfQuoteBuilder) {
+        dtfQuoteBuilder.printQuote();
+    }
+}
