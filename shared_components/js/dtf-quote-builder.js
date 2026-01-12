@@ -1615,6 +1615,7 @@ class DTFQuoteBuilder {
             // Extended sizes - query child rows from DOM using window.childRowMap
             // Child rows are created by createChildRow() when user adds extended sizes
             const childMap = window.childRowMap?.[product.id] || {};
+            const extendedItems = [];  // Collect extended items for sorting
             Object.entries(childMap).forEach(([size, childRowId]) => {
                 const childRow = document.getElementById(`row-${childRowId}`);
                 if (childRow) {
@@ -1626,15 +1627,29 @@ class DTFQuoteBuilder {
                     if (qty > 0) {
                         // Normalize size display (XXL→2XL, XXXL→3XL for consistency)
                         const displaySize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
-                        lineItems.push({
+                        extendedItems.push({
                             description: `${displaySize}(${qty})`,
                             quantity: qty,
                             unitPrice: unitPrice,
                             total: qty * unitPrice,
-                            hasUpcharge: true
+                            hasUpcharge: true,
+                            _sortKey: size  // Keep original size for sorting
                         });
                     }
                 }
+            });
+
+            // Sort extended items by size order (2XL before 3XL, etc.)
+            if (window.ExtendedSizesConfig?.getSizeSortIndex) {
+                extendedItems.sort((a, b) =>
+                    window.ExtendedSizesConfig.getSizeSortIndex(a._sortKey) -
+                    window.ExtendedSizesConfig.getSizeSortIndex(b._sortKey)
+                );
+            }
+            // Add sorted extended items to line items
+            extendedItems.forEach(item => {
+                delete item._sortKey;  // Remove sort key before adding
+                lineItems.push(item);
             });
 
             if (lineItems.length > 0) {
