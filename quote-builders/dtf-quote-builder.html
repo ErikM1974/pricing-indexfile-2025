@@ -557,10 +557,11 @@
                     // CREATE CHILD ROW for 2XL
                     console.log(`[DEBUG onSizeChange] Creating child row for 2XL qty=${qty}`);
                     createChildRow(rowId, '2XL', qty);
-                    // Disable parent's 2XL input
+                    // Disable parent's 2XL input and CLEAR the value
                     xxlInput.disabled = true;
                     xxlInput.style.background = '#f5f5f5';
                     xxlInput.style.color = '#999';
+                    xxlInput.value = '';  // Clear value so grayed input shows empty
                 } else if (qty > 0 && existingChildId) {
                     // Update existing child row
                     const childRow = document.getElementById(`row-${existingChildId}`);

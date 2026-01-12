@@ -1582,8 +1582,8 @@ class DTFQuoteBuilder {
             // Build line items - separate base sizes from extended sizes
             const lineItems = [];
 
-            // Base sizes (S, M, L, XL, 2XL) - matches HTML column names
-            const baseSizes = ['S', 'M', 'L', 'XL', '2XL'];
+            // Base sizes (S, M, L, XL) - 2XL is handled as child row to prevent double-counting
+            const baseSizes = ['S', 'M', 'L', 'XL'];
             const baseSizeQtys = {};
             let baseQty = 0;
 
