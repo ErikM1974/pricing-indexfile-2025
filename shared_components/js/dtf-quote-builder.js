@@ -1702,12 +1702,18 @@ class DTFQuoteBuilder {
             const baseCost = parseFloat(product.baseCost) || 0;
             const upcharge = product.sizeUpcharges?.[size] || 0;
             const transferCost = this.getTransferCostForProduct(product);
-            const laborCost = this.currentPricingData.laborCostPerLoc || 0;
-            const freightCost = this.currentPricingData.freightPerTransfer || 0;
-            const margin = this.currentPricingData.marginDenom || 0.6;
+            const laborCostPerLoc = this.currentPricingData.laborCostPerLoc || 0;
+            const freightPerTransfer = this.currentPricingData.freightPerTransfer || 0;
+            const marginDenom = this.currentPricingData.marginDenom || 0.6;
+            const locationCount = this.selectedLocations.length || 1;
 
-            // CORRECT: Include baseCost + upcharge BEFORE margin division
-            let unitPrice = (baseCost + upcharge + transferCost + laborCost + freightCost) / margin;
+            // Labor and freight are per-location (matches updatePricing)
+            const laborCost = laborCostPerLoc * locationCount;
+            const freightCost = freightPerTransfer * locationCount;
+
+            // CORRECT formula: margin only on garment, then ADD other costs
+            const garmentCost = (baseCost + upcharge) / marginDenom;
+            let unitPrice = garmentCost + transferCost + laborCost + freightCost;
 
             // Add LTM if distributed
             if (this.ltmDistributed && this.currentPricingData.ltmPerUnit) {
@@ -1728,8 +1734,9 @@ class DTFQuoteBuilder {
         if (!this.currentPricingData?.transferBreakdown) return 0;
 
         let totalTransferCost = 0;
+        // selectedLocations contains strings like "left-chest", not objects
         this.selectedLocations.forEach(loc => {
-            const locBreakdown = this.currentPricingData.transferBreakdown[loc.name];
+            const locBreakdown = this.currentPricingData.transferBreakdown[loc];
             if (locBreakdown) {
                 totalTransferCost += locBreakdown.cost || 0;
             }
