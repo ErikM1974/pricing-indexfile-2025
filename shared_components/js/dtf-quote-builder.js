@@ -957,14 +957,9 @@ class DTFQuoteBuilder {
         if (totalQty === 0) {
             document.getElementById('total-qty').textContent = '0';
             document.getElementById('pricing-tier').textContent = '--';
-            document.getElementById('transfer-cost').textContent = '--';
-            document.getElementById('labor-cost').textContent = '--';
-            document.getElementById('freight-cost').textContent = '--';
             document.getElementById('ltm-row').style.display = 'none';
             document.getElementById('subtotal').textContent = '--';
             document.getElementById('grand-total').textContent = '--';
-            const continueBtn = document.getElementById('continue-btn');
-            if (continueBtn) continueBtn.disabled = true;
             return;
         }
 
@@ -1013,11 +1008,6 @@ class DTFQuoteBuilder {
             marginDenom,
             tier
         };
-
-        // Update sidebar cost displays
-        document.getElementById('transfer-cost').textContent = `$${transferCost.toFixed(2)}/pc`;
-        document.getElementById('labor-cost').textContent = `$${laborCost.toFixed(2)}/pc`;
-        document.getElementById('freight-cost').textContent = `$${freightCost.toFixed(2)}/pc`;
 
         // LTM row with distribution toggle (matches DTG pattern)
         const ltmRow = document.getElementById('ltm-row');
