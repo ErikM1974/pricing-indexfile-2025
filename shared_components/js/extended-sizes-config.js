@@ -15,6 +15,12 @@
  */
 
 /**
+ * Cache for extended sizes API responses to prevent rate limiting
+ * Key: "styleNumber-color", Value: array of available sizes
+ */
+const extendedSizesCache = new Map();
+
+/**
  * Extended Size Sort Order
  * Controls the display order of child rows in the quote table.
  * Sizes earlier in the array appear first below the parent row.
@@ -35,7 +41,8 @@ const EXTENDED_SIZE_ORDER = [
     // Combo sizes
     'S/M', 'M/L', 'L/XL', 'X/2X', 'S/XL',
     // Plus sizes (2XL through 10XL)
-    '2XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
+    // Note: XXXL is alias for 3XL, placed immediately after for consistent sorting
+    '2XL', 'XXL', '3XL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
     // Tall sizes
     'ST', 'MT', 'XST', 'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT',
     // Big sizes
@@ -237,6 +244,13 @@ function getSizeCategory(size) {
  */
 async function getAvailableExtendedSizes(styleNumber, color = '') {
     const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const cacheKey = `${styleNumber}-${color || ''}`;
+
+    // Return cached result if available (prevents rate limiting)
+    if (extendedSizesCache.has(cacheKey)) {
+        console.log(`[ExtendedSizes] Using cached sizes for ${styleNumber}`);
+        return extendedSizesCache.get(cacheKey);
+    }
 
     try {
         const response = await fetch(
@@ -244,6 +258,13 @@ async function getAvailableExtendedSizes(styleNumber, color = '') {
         );
 
         if (!response.ok) {
+            // Handle rate limiting specifically - throw error so caller can show retry message
+            if (response.status === 429) {
+                console.warn(`[ExtendedSizes] Rate limited for ${styleNumber} - please try again`);
+                const error = new Error('RATE_LIMITED');
+                error.status = 429;
+                throw error;
+            }
             console.warn(`[ExtendedSizes] API error for ${styleNumber}:`, response.status);
             return [];
         }
@@ -278,10 +299,16 @@ async function getAvailableExtendedSizes(styleNumber, color = '') {
         // Sort by our defined order
         const sortedSizes = sortSizes(supportedSizes);
 
+        // Cache successful result
+        extendedSizesCache.set(cacheKey, sortedSizes);
         console.log(`[ExtendedSizes] ${styleNumber} available:`, sortedSizes);
         return sortedSizes;
 
     } catch (error) {
+        // Re-throw rate limit errors so caller can handle them
+        if (error.message === 'RATE_LIMITED') {
+            throw error;
+        }
         console.error(`[ExtendedSizes] Failed to fetch sizes for ${styleNumber}:`, error);
         return [];
     }

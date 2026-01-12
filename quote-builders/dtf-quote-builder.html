@@ -326,7 +326,8 @@
         // ============================================================
 
         const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-        let rowCounter = 0;
+        // REMOVED: let rowCounter = 0; - now using dtfQuoteBuilder.getNextRowId() for all rows
+        // This prevents ID collisions between parent and child rows
         const productCache = {};
 
         // Child row tracking (like DTG/Embroidery pattern)
@@ -357,7 +358,8 @@
          */
         function addNewRow() {
             const tbody = document.getElementById('product-tbody');
-            const rowId = ++rowCounter;
+            // Use shared counter from JS class to prevent ID collisions with child rows
+            const rowId = dtfQuoteBuilder.getNextRowId();
 
             const row = document.createElement('tr');
             row.id = `row-${rowId}`;
@@ -440,16 +442,18 @@
             const pickerDropdown = row.querySelector('.color-picker-dropdown');
 
             try {
-                // Fetch product details, colors, AND pricing bundle (for sizeUpcharges)
-                const [detailsResponse, colorsResponse, bundleResponse] = await Promise.all([
+                // Fetch product details, colors, AND pricing bundle
+                // NOTE: Use method=BLANK (not DTF) to get sellingPriceDisplayAddOns for size upcharges
+                // DTF pricing-bundle returns empty sellingPriceDisplayAddOns because garment data is separate
+                const [detailsResponse, colorsResponse, blankBundleResponse] = await Promise.all([
                     fetch(`${API_BASE}/api/product-details?styleNumber=${styleNumber}`),
                     fetch(`${API_BASE}/api/color-swatches?styleNumber=${styleNumber}`),
-                    fetch(`${API_BASE}/api/pricing-bundle?method=DTF&styleNumber=${styleNumber}`)
+                    fetch(`${API_BASE}/api/pricing-bundle?method=BLANK&styleNumber=${styleNumber}`)
                 ]);
 
                 const details = await detailsResponse.json();
                 const colors = await colorsResponse.json();
-                const bundleData = await bundleResponse.json();
+                const blankBundle = await blankBundleResponse.json();
 
                 const firstDetail = Array.isArray(details) ? details[0] : details;
 
@@ -462,8 +466,11 @@
                     row.dataset.style = styleNumber;
                     row.dataset.productName = cleanTitle || styleNumber;
                     row.dataset.baseCost = firstDetail.CASE_PRICE || 0;
-                    // Store sizeUpcharges for pricing calculations
-                    row.dataset.sizeUpcharges = JSON.stringify(bundleData.sizeUpcharges || {});
+                    // Store sizeUpcharges from BLANK bundle (has actual upcharge data)
+                    // sellingPriceDisplayAddOns format: { "2XL": 2.00, "3XL": 3.00, "4XL": 4.00, ... }
+                    const upcharges = blankBundle.sellingPriceDisplayAddOns || {};
+                    row.dataset.sizeUpcharges = JSON.stringify(upcharges);
+                    console.log(`[DTF] Loaded upcharges for ${styleNumber}:`, upcharges);
 
                     // Populate color picker
                     if (colors && colors.length > 0) {
@@ -821,12 +828,16 @@
             const existingChildren = Array.from(
                 document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`)
             );
-            const newSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(size);
+            // Normalize XXXL to 3XL for sorting lookup (XXXL is internal alias not in EXTENDED_SIZE_ORDER)
+            const normalizedSize = size === 'XXXL' ? '3XL' : size;
+            const newSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(normalizedSize);
             let insertAfter = parentRow;
 
             for (const existingChild of existingChildren) {
                 const existingSize = existingChild.dataset.extendedSize;
-                const existingSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(existingSize);
+                // Normalize existing size too for consistent comparison
+                const normalizedExisting = existingSize === 'XXXL' ? '3XL' : existingSize;
+                const existingSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(normalizedExisting);
                 if (existingSizeIndex < newSizeIndex) {
                     insertAfter = existingChild;
                 }

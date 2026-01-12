@@ -715,6 +715,7 @@ class DTFQuoteBuilder {
         let extendedSizes = [];
         let apiError = false;
 
+        let rateLimited = false;
         try {
             if (!window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
                 throw new Error('ExtendedSizesConfig module not loaded');
@@ -724,15 +725,21 @@ class DTFQuoteBuilder {
             extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
         } catch (error) {
             console.error('[DTFQuoteBuilder] Failed to fetch extended sizes:', error);
+            if (error.message === 'RATE_LIMITED') {
+                rateLimited = true;
+            }
             apiError = true;
         }
 
         // Show appropriate message based on result
         if (apiError) {
+            const message = rateLimited
+                ? 'Too many requests. Please wait a moment and try again.'
+                : 'Unable to load extended sizes. Please try again.';
             body.innerHTML = `
                 <div class="ext-popup-error" style="padding: 20px; text-align: center; color: #c00;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p>Unable to load extended sizes. Please try again.</p>
+                    <p>${message}</p>
                 </div>
             `;
             return;
@@ -1063,7 +1070,8 @@ class DTFQuoteBuilder {
                 if (qty > 0 && standardSizes.includes(size)) {
                     const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
                     // Use margin from API (not hardcoded 0.57)
-                    const garmentCost = (product.baseCost + upcharge) / marginDenom;
+                    // Upcharge is a selling price add-on, add AFTER margin calculation
+                    const garmentCost = product.baseCost / marginDenom + upcharge;
                     // Full unit price always includes LTM for calculation
                     const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                     // Use rounding from API
@@ -1120,8 +1128,8 @@ class DTFQuoteBuilder {
                 // Get size upcharge for this extended size (XXL/2XL, 3XL/XXXL, 4XL, 5XL, 6XL)
                 const upcharge = this.getSizeUpcharge(extendedSize, sizeUpcharges);
 
-                // Calculate unit price with upcharge
-                const garmentCost = (baseCost + upcharge) / marginDenom;
+                // Calculate unit price with upcharge (add AFTER margin, not before)
+                const garmentCost = baseCost / marginDenom + upcharge;
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                 const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
 
@@ -1202,7 +1210,13 @@ class DTFQuoteBuilder {
     }
 
     getSizeUpcharge(size, upcharges) {
-        if (!upcharges) return 0;
+        if (!upcharges || Object.keys(upcharges).length === 0) {
+            console.log(`[DTF] No upcharges provided for size ${size}, using defaults`);
+            // Fallback defaults if no API data
+            const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
+            const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
+            return defaults[normalizedSize] || 0;
+        }
 
         // Normalize size aliases (XXL -> 2XL, XXXL -> 3XL)
         const sizeAliases = {
@@ -1211,16 +1225,31 @@ class DTFQuoteBuilder {
         };
         const normalizedSize = sizeAliases[size] || size;
 
-        // Common size upcharge patterns - default values if not in upcharges
-        const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
-        const upchargeMap = {
-            '2XL': upcharges['2XL'] || upcharges['2X'] || upcharges['XXL'] || defaults['2XL'],
-            '3XL': upcharges['3XL'] || upcharges['3X'] || upcharges['XXXL'] || defaults['3XL'],
-            '4XL': upcharges['4XL'] || upcharges['4X'] || defaults['4XL'],
-            '5XL': upcharges['5XL'] || upcharges['5X'] || defaults['5XL'],
-            '6XL': upcharges['6XL'] || upcharges['6X'] || defaults['6XL']
+        // Helper to get value (uses nullish coalescing to handle 0 values correctly)
+        const getValue = (...keys) => {
+            for (const key of keys) {
+                if (upcharges[key] !== undefined && upcharges[key] !== null) {
+                    return upcharges[key];
+                }
+            }
+            return null;
         };
-        return upchargeMap[normalizedSize] || 0;
+
+        // Defaults if API doesn't have the size
+        const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
+
+        // Try API values first, then fall back to defaults
+        const upchargeMap = {
+            '2XL': getValue('2XL', '2X', 'XXL') ?? defaults['2XL'],
+            '3XL': getValue('3XL', '3X', 'XXXL') ?? defaults['3XL'],
+            '4XL': getValue('4XL', '4X') ?? defaults['4XL'],
+            '5XL': getValue('5XL', '5X') ?? defaults['5XL'],
+            '6XL': getValue('6XL', '6X') ?? defaults['6XL']
+        };
+
+        const result = upchargeMap[normalizedSize] ?? 0;
+        console.log(`[DTF] getSizeUpcharge(${size}): API value=${getValue(normalizedSize)}, result=${result}`);
+        return result;
     }
 
     // ==================== BRIDGE METHODS FOR ROW-BASED INPUT ====================
@@ -1698,16 +1727,24 @@ class DTFQuoteBuilder {
         // First try: Read displayed price from parent row DOM
         const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
         if (row) {
-            const priceSpan = row.querySelector('.row-price');
-            const qtySpan = row.querySelector('.row-qty');
+            // Fixed: Use correct CSS classes (.cell-price, .cell-qty) to match HTML structure
+            const priceSpan = row.querySelector('.cell-price');
+            const qtySpan = row.querySelector('.cell-qty');
             if (priceSpan && qtySpan) {
-                const displayedTotal = parseFloat(priceSpan.textContent.replace('$', '')) || 0;
+                // The price cell shows UNIT price (not total), so no need to divide by qty
+                const displayedUnitPrice = parseFloat(priceSpan.textContent.replace('$', '')) || 0;
                 const qty = parseInt(qtySpan.textContent) || 0;
-                if (qty > 0 && displayedTotal > 0) {
-                    const baseUnitPrice = displayedTotal / qty;
-                    // For extended sizes, add the upcharge on top of base price
-                    const upcharge = product.sizeUpcharges?.[size] || 0;
-                    return Math.round((baseUnitPrice + upcharge) * 100) / 100;
+                if (qty > 0 && displayedUnitPrice > 0) {
+                    // For base sizes (S, M, L, XL), return the displayed unit price directly
+                    // For extended sizes, the child row already has its own price with upcharge applied
+                    const standardSizes = ['S', 'M', 'L', 'XL'];
+                    if (standardSizes.includes(size)) {
+                        return displayedUnitPrice;
+                    }
+                    // For extended sizes called on parent row (shouldn't happen normally)
+                    // add the upcharge to base price
+                    const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges || {});
+                    return Math.round((displayedUnitPrice + upcharge) * 100) / 100;
                 }
             }
         }
@@ -1726,8 +1763,8 @@ class DTFQuoteBuilder {
             const laborCost = laborCostPerLoc * locationCount;
             const freightCost = freightPerTransfer * locationCount;
 
-            // CORRECT formula: margin only on garment, then ADD other costs
-            const garmentCost = (baseCost + upcharge) / marginDenom;
+            // Upcharge is a selling price add-on, add AFTER margin calculation
+            const garmentCost = baseCost / marginDenom + upcharge;
             let unitPrice = garmentCost + transferCost + laborCost + freightCost;
 
             // Add LTM if distributed

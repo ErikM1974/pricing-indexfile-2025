@@ -159,26 +159,30 @@ class DTFQuoteProducts {
         try {
             console.log('[DTFQuoteProducts] Loading product:', styleNumber);
 
-            // Fetch DTF pricing bundle which includes product info
-            const bundleUrl = `${this.apiBase}/api/pricing-bundle?method=DTF&styleNumber=${encodeURIComponent(styleNumber)}`;
-            const bundleResponse = await fetch(bundleUrl);
+            // Fetch both DTF pricing bundle AND BLANK bundle for size upcharges
+            // NOTE: DTF pricing-bundle returns empty sellingPriceDisplayAddOns
+            // BLANK pricing-bundle returns the actual size upcharges
+            const [bundleResponse, blankResponse, colorsResponse] = await Promise.all([
+                fetch(`${this.apiBase}/api/pricing-bundle?method=DTF&styleNumber=${encodeURIComponent(styleNumber)}`),
+                fetch(`${this.apiBase}/api/pricing-bundle?method=BLANK&styleNumber=${encodeURIComponent(styleNumber)}`),
+                fetch(`${this.apiBase}/api/color-swatches?styleNumber=${encodeURIComponent(styleNumber)}`)
+            ]);
 
             if (!bundleResponse.ok) {
                 throw new Error(`Failed to load product bundle: ${bundleResponse.status}`);
             }
 
             const bundleData = await bundleResponse.json();
+            const blankData = blankResponse.ok ? await blankResponse.json() : {};
 
-            // Fetch color swatches
-            const colorsResponse = await fetch(`${this.apiBase}/api/color-swatches?styleNumber=${encodeURIComponent(styleNumber)}`);
             let colors = [];
-
             if (colorsResponse.ok) {
                 const colorsData = await colorsResponse.json();
                 colors = colorsData.colors || [];
             }
 
             // Extract product info
+            // Get sizeUpcharges from BLANK bundle (has actual upcharge data)
             const product = {
                 styleNumber: styleNumber,
                 title: bundleData.product?.PRODUCT_TITLE || styleNumber,
@@ -186,7 +190,7 @@ class DTFQuoteProducts {
                 brand: bundleData.product?.brand || '',
                 colors: colors,
                 baseCost: bundleData.garmentCost || 0,
-                sizeUpcharges: this.extractSizeUpcharges(bundleData.sellingPriceDisplayAddOns),
+                sizeUpcharges: this.extractSizeUpcharges(blankData.sellingPriceDisplayAddOns),
                 availableSizes: bundleData.sizes || [],
                 pricingBundle: bundleData
             };
