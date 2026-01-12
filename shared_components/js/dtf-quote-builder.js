@@ -1540,8 +1540,214 @@ class DTFQuoteBuilder {
         alert('Draft saved to browser storage');
     }
 
+    /**
+     * Print professional PDF quote using EmbroideryInvoiceGenerator
+     * Transforms DTF product data into the format expected by the invoice generator
+     */
     printQuote() {
-        window.print();
+        // Validate we have products
+        if (this.products.length === 0 || this.getTotalQuantity() === 0) {
+            alert('Add products before printing');
+            return;
+        }
+
+        try {
+            // Build pricing data in format expected by EmbroideryInvoiceGenerator
+            const pricingData = this.buildPricingDataForInvoice();
+
+            // Customer data from form
+            const customerData = {
+                name: document.getElementById('customer-name')?.value || 'Customer',
+                company: document.getElementById('company-name')?.value || '',
+                email: document.getElementById('customer-email')?.value || '',
+                phone: document.getElementById('customer-phone')?.value || '',
+                salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+            };
+
+            // Generate and open print window
+            const invoiceGenerator = new EmbroideryInvoiceGenerator();
+            const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(invoiceHTML);
+            printWindow.document.close();
+
+            setTimeout(() => {
+                printWindow.print();
+            }, 300);
+
+        } catch (error) {
+            console.error('Print error:', error);
+            alert('Error generating PDF. Please try again.');
+        }
+    }
+
+    /**
+     * Build pricing data structure for EmbroideryInvoiceGenerator
+     * Transforms DTF products into line items with size breakdowns
+     */
+    buildPricingDataForInvoice() {
+        const totalQty = this.getTotalQuantity();
+        const grandTotal = parseFloat(document.getElementById('grand-total')?.textContent?.replace('$', '') || '0');
+        const quoteId = document.getElementById('quote-id')?.textContent || `DTF-${Date.now()}`;
+
+        // Build products array with line items
+        const products = [];
+
+        // Get pricing tier info
+        const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
+
+        // Iterate through each product row
+        this.products.forEach(product => {
+            // Skip products with no quantities
+            const productQty = Object.values(product.quantities || {}).reduce((sum, q) => sum + (parseInt(q) || 0), 0);
+            if (productQty === 0) return;
+
+            // Build line items - separate base sizes from extended sizes
+            const lineItems = [];
+
+            // Base sizes (S, M, LG, XL, XXL)
+            const baseSizes = ['S', 'M', 'LG', 'XL', 'XXL'];
+            const baseSizeQtys = {};
+            let baseQty = 0;
+
+            baseSizes.forEach(size => {
+                const qty = parseInt(product.quantities[size]) || 0;
+                if (qty > 0) {
+                    baseSizeQtys[size] = qty;
+                    baseQty += qty;
+                }
+            });
+
+            if (baseQty > 0) {
+                // Build description string like "S(2) M(3) LG(1)"
+                const desc = Object.entries(baseSizeQtys)
+                    .map(([size, qty]) => `${size}(${qty})`)
+                    .join(' ');
+
+                // Calculate unit price for base sizes
+                const unitPrice = this.calculateUnitPrice(product, 'S'); // Base price
+
+                lineItems.push({
+                    description: desc,
+                    quantity: baseQty,
+                    unitPrice: unitPrice,
+                    total: baseQty * unitPrice
+                });
+            }
+
+            // Extended sizes (XS, XXXL, 4XL, 5XL, 6XL) - each gets its own row
+            const extendedSizes = ['XS', 'XXXL', '4XL', '5XL', '6XL'];
+            extendedSizes.forEach(size => {
+                const qty = parseInt(product.quantities[size]) || 0;
+                if (qty > 0) {
+                    const unitPrice = this.calculateUnitPrice(product, size);
+                    lineItems.push({
+                        description: `${size}(${qty})`,
+                        quantity: qty,
+                        unitPrice: unitPrice,
+                        total: qty * unitPrice,
+                        hasUpcharge: true
+                    });
+                }
+            });
+
+            if (lineItems.length > 0) {
+                products.push({
+                    product: {
+                        style: product.styleNumber,
+                        title: product.description,
+                        color: product.color || ''
+                    },
+                    lineItems: lineItems
+                });
+            }
+        });
+
+        // Calculate subtotal from line items
+        let subtotal = 0;
+        products.forEach(p => {
+            p.lineItems.forEach(item => {
+                subtotal += item.total;
+            });
+        });
+
+        return {
+            quoteId: quoteId,
+            tier: tier,
+            products: products,
+            subtotal: subtotal,
+            grandTotal: grandTotal,
+            setupFees: 0,
+            additionalServicesTotal: 0,
+            // Empty logos means embroidery specs section will be skipped
+            logos: [],
+            // DTF-specific info (could be used for future DTF specs section)
+            isDTF: true,
+            selectedLocations: this.selectedLocations,
+            ltmFee: this.currentPricingData?.totalLtmFee || 0,
+            ltmDistributed: this.ltmDistributed
+        };
+    }
+
+    /**
+     * Calculate unit price for a product at a given size
+     * Includes LTM distribution if enabled
+     */
+    calculateUnitPrice(product, size) {
+        // Get base transfer + labor + freight cost
+        let unitPrice = 0;
+
+        // Get the displayed unit price from the table row
+        const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
+        if (row) {
+            const priceCell = row.querySelector('.row-price');
+            if (priceCell) {
+                const qty = parseInt(row.querySelector('.row-qty')?.textContent || '0');
+                const total = parseFloat(priceCell.textContent.replace('$', '')) || 0;
+                if (qty > 0) {
+                    unitPrice = total / qty;
+                }
+            }
+        }
+
+        // If we couldn't get from DOM, calculate from pricing data
+        if (unitPrice === 0 && this.currentPricingData) {
+            const transferCost = this.getTransferCostForProduct(product);
+            const laborCost = this.currentPricingData.laborCostPerLoc || 0;
+            const freightCost = this.currentPricingData.freightPerTransfer || 0;
+            const margin = this.currentPricingData.marginDenom || 0.6;
+
+            unitPrice = (transferCost + laborCost + freightCost) / margin;
+
+            // Add size upcharge
+            const upcharge = product.sizeUpcharges?.[size] || 0;
+            unitPrice += upcharge;
+
+            // Add LTM if distributed
+            if (this.ltmDistributed && this.currentPricingData.ltmPerUnit) {
+                unitPrice += this.currentPricingData.ltmPerUnit;
+            }
+        }
+
+        return Math.round(unitPrice * 100) / 100; // Round to cents
+    }
+
+    /**
+     * Get transfer cost for a product based on selected locations
+     */
+    getTransferCostForProduct(product) {
+        if (!this.currentPricingData?.transferBreakdown) return 0;
+
+        let totalTransferCost = 0;
+        this.selectedLocations.forEach(loc => {
+            const locBreakdown = this.currentPricingData.transferBreakdown[loc.name];
+            if (locBreakdown) {
+                totalTransferCost += locBreakdown.cost || 0;
+            }
+        });
+
+        return totalTransferCost;
     }
 
     async emailQuote() {

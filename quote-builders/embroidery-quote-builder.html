@@ -333,10 +333,13 @@
 
             </div>
 
-            <!-- Copy to Clipboard - Always Available -->
+            <!-- Action Buttons -->
             <div class="action-panel">
                 <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
                 </button>
             </div>
 
@@ -3612,6 +3615,7 @@
                             color: group.color,
                             catalogColor: group.catalogColor,
                             productName: row.dataset.productName || style,
+                            title: row.dataset.productName || style,  // For invoice PDF description column
                             sizeBreakdown: group.sizeBreakdown,
                             totalQuantity: group.totalQty,
                             isCap: isCap,  // Cap detection for pricing routing

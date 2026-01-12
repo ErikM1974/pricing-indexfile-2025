@@ -304,10 +304,13 @@
 
             </div>
 
-            <!-- Copy to Clipboard - Always Available -->
+            <!-- Action Buttons -->
             <div class="action-panel">
                 <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
                 </button>
             </div>
 
@@ -435,6 +438,7 @@
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -3793,22 +3797,182 @@
                 return;
             }
 
-            // Screen Print print functionality - coming soon
-            showToast('Print feature coming soon. Use Copy to Clipboard for now.', 'info');
-            showLoading(false);
-            return;
-
-            /* TODO: Implement screen print invoice generation
             showLoading(true);
+
             try {
-                const pricing = window.currentPricingData || {};
-                // Generate screen print invoice...
+                // Build pricing data structure for invoice generator
+                const pricingData = buildScreenprintPricingData(products);
+
+                // Generate and open print window
+                const invoiceGenerator = new EmbroideryInvoiceGenerator();
+                const customerData = {
+                    name: document.getElementById('customer-name')?.value || 'Customer',
+                    company: document.getElementById('company-name')?.value || '',
+                    email: document.getElementById('customer-email')?.value || '',
+                    phone: document.getElementById('customer-phone')?.value || '',
+                    salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+                };
+
+                // Pass LTM distribution state to invoice generator
+                pricingData.ltmDistributed = ltmDistributed;
+
+                const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(invoiceHTML);
+                printWindow.document.close();
+
+                setTimeout(() => {
+                    printWindow.print();
+                }, 300);
+
+                showToast('Opening print dialog...', 'success');
             } catch (error) {
                 console.error('Print error:', error);
                 showToast('Error generating PDF', 'error');
             }
+
             showLoading(false);
-            */
+        }
+
+        /**
+         * Build pricing data structure for EmbroideryInvoiceGenerator from Screen Print products
+         * FIXED: Read unit prices from DOM cells where they're already displayed
+         */
+        function buildScreenprintPricingData(products) {
+            const currentPricing = window.currentPricingData || {};
+            const quoteId = document.getElementById('quote-id')?.textContent || `SPC-${Date.now()}`;
+
+            // Build products array with line items for invoice
+            const invoiceProducts = [];
+
+            products.forEach(product => {
+                // Build line items from size breakdown
+                const lineItems = [];
+
+                // Find the parent row for this product to read its displayed price
+                const parentRow = document.querySelector(
+                    `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
+                );
+                const rowId = parentRow?.dataset?.rowId;
+
+                // Read base price from parent row's price cell (displayed as $25.99)
+                const basePriceCell = document.getElementById(`row-price-${rowId}`);
+                const basePriceText = basePriceCell?.textContent || '$0.00';
+                const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
+
+                // Base sizes (S, M, L, XL, XXL, 2XL) - Note: L is internal, LG is display
+                const baseSizes = ['S', 'M', 'L', 'LG', 'XL', 'XXL', '2XL'];
+                const baseSizeQtys = {};
+                let baseQty = 0;
+
+                Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+                    // Normalize L to LG for display
+                    const displaySize = size === 'L' ? 'LG' : size;
+                    if (baseSizes.includes(size) && qty > 0) {
+                        baseSizeQtys[displaySize] = qty;
+                        baseQty += qty;
+                    }
+                });
+
+                if (baseQty > 0) {
+                    // Build description like "S(2) M(3) LG(2)"
+                    const desc = Object.entries(baseSizeQtys)
+                        .map(([size, qty]) => `${size}(${qty})`)
+                        .join(' ');
+
+                    lineItems.push({
+                        description: desc,
+                        quantity: baseQty,
+                        unitPrice: baseUnitPrice,
+                        total: baseQty * baseUnitPrice
+                    });
+                }
+
+                // Extended sizes - read from child row price cells
+                const extendedSizes = ['3XL', '4XL', '5XL', '6XL', 'OSFA'];
+                extendedSizes.forEach(size => {
+                    const qty = product.sizeBreakdown[size] || 0;
+                    if (qty > 0) {
+                        // Find child row's price cell
+                        const childRowId = childRowMap[rowId]?.[size];
+                        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                        const childPriceText = childPriceCell?.textContent || '$0.00';
+                        const unitPrice = parseFloat(childPriceText.replace('$', '').replace(',', '')) || 0;
+
+                        lineItems.push({
+                            description: `${size}(${qty})`,
+                            quantity: qty,
+                            unitPrice: unitPrice,
+                            total: qty * unitPrice,
+                            hasUpcharge: true
+                        });
+                    }
+                });
+
+                if (lineItems.length > 0) {
+                    invoiceProducts.push({
+                        product: {
+                            style: product.style,
+                            title: product.productName || product.style,
+                            color: product.color
+                        },
+                        lineItems: lineItems
+                    });
+                }
+            });
+
+            // Calculate totals from line items
+            let subtotal = 0;
+            invoiceProducts.forEach(p => {
+                p.lineItems.forEach(item => {
+                    subtotal += item.total;
+                });
+            });
+
+            // Build print config description for invoice
+            const frontDesc = getLocationName(printConfig.frontLocation) + ` (${printConfig.frontColors}-color)`;
+            const backDesc = printConfig.backLocation ? getLocationName(printConfig.backLocation) + ` (${printConfig.backColors}-color)` : null;
+
+            // Calculate safety stripes total for display as separate line item
+            const locationCount = printConfig.backLocation ? 2 : 1;
+            const safetyStripesTotal = printConfig.isSafetyStripes
+                ? (currentPricing.totalQuantity * 2.00 * locationCount)
+                : 0;
+
+            return {
+                quoteId: quoteId,
+                tier: currentPricing.tier || '24-36',
+                products: invoiceProducts,
+                subtotal: subtotal,
+                grandTotal: currentPricing.grandTotal || subtotal,
+                setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
+                additionalServicesTotal: 0,
+                // Empty logos means embroidery specs section will be skipped
+                logos: [],
+                // Screenprint-specific
+                isScreenprint: true,
+                printConfig: {
+                    front: frontDesc,
+                    back: backDesc,
+                    isDarkGarment: printConfig.isDarkGarment,
+                    hasSafetyStripes: printConfig.isSafetyStripes,
+                    totalScreens: printConfig.totalScreens || 1
+                },
+                ltmFee: currentPricing.ltmFee || 0,
+                safetyStripesTotal: safetyStripesTotal,
+                totalQuantity: currentPricing.totalQuantity || 0
+            };
+        }
+
+        function getLocationName(code) {
+            const names = {
+                'LC': 'Left Chest',
+                'FF': 'Full Front',
+                'JF': 'Jumbo Front',
+                'FB': 'Full Back',
+                'JB': 'Jumbo Back'
+            };
+            return names[code] || code;
         }
 
         async function saveQuote() {

@@ -232,10 +232,13 @@
 
             </div>
 
-            <!-- Copy to Clipboard - Always Available -->
+            <!-- Action Buttons -->
             <div class="action-panel">
                 <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
                 </button>
             </div>
 
@@ -362,6 +365,7 @@
     <script src="/shared_components/js/dtg-pricing-service.js"></script>
     <script src="/shared_components/js/dtg-quote-service.js"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -3602,39 +3606,24 @@
             showLoading(true);
 
             try {
-                // Build separate logo configs for garments and caps
-                const logoConfigs = {
-                    garment: {
-                        primary: { ...primaryLogo, id: 'primary' },
-                        additional: additionalLogos
-                    },
-                    cap: {
-                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capAdditionalLogos
-                    }
-                };
-
-                // For backward compatibility, also create combined array
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos
-                ];
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                // Build pricing data structure for invoice generator
+                // DTG doesn't use logos - build from collected products and current pricing
+                const pricingData = buildDTGPricingData(products);
 
                 // Generate and open print window
                 const invoiceGenerator = new EmbroideryInvoiceGenerator();
                 const customerData = {
-                    customerName: document.getElementById('customer-name').value || 'Customer',
-                    companyName: document.getElementById('company-name').value || '',
-                    customerEmail: document.getElementById('customer-email').value || '',
-                    customerPhone: document.getElementById('customer-phone').value || '',
-                    salesRepEmail: document.getElementById('sales-rep').value
+                    name: document.getElementById('customer-name')?.value || 'Customer',
+                    company: document.getElementById('company-name')?.value || '',
+                    email: document.getElementById('customer-email')?.value || '',
+                    phone: document.getElementById('customer-phone')?.value || '',
+                    salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
                 };
 
                 // Pass LTM distribution state to invoice generator
-                pricing.ltmDistributed = ltmDistributed;
+                pricingData.ltmDistributed = ltmDistributed;
 
-                const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricing, customerData);
+                const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write(invoiceHTML);
                 printWindow.document.close();
@@ -3650,6 +3639,119 @@
             }
 
             showLoading(false);
+        }
+
+        /**
+         * Build pricing data structure for EmbroideryInvoiceGenerator from DTG products
+         * DTG doesn't have logos - uses printLocation for print specifications
+         * FIXED: Read unit prices from DOM cells where they're already displayed
+         */
+        function buildDTGPricingData(products) {
+            const currentPricing = window.currentPricingData || {};
+            const quoteId = document.getElementById('quote-id')?.textContent || `DTG-${Date.now()}`;
+
+            // Build products array with line items for invoice
+            const invoiceProducts = [];
+
+            products.forEach(product => {
+                // Build line items from size breakdown
+                const lineItems = [];
+
+                // Find the parent row for this product to read its displayed price
+                const parentRow = document.querySelector(
+                    `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
+                );
+                const rowId = parentRow?.dataset?.rowId;
+
+                // Read base price from parent row's price cell (displayed as $25.99)
+                const basePriceCell = document.getElementById(`row-price-${rowId}`);
+                const basePriceText = basePriceCell?.textContent || '$0.00';
+                const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
+
+                // Base sizes (S, M, LG, XL, XXL) - Note: L is internal, LG is display
+                const baseSizes = ['S', 'M', 'LG', 'L', 'XL', 'XXL'];
+                const baseSizeQtys = {};
+                let baseQty = 0;
+
+                Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+                    // Normalize L to LG for display
+                    const displaySize = size === 'L' ? 'LG' : size;
+                    if (baseSizes.includes(size) && qty > 0) {
+                        baseSizeQtys[displaySize] = qty;
+                        baseQty += qty;
+                    }
+                });
+
+                if (baseQty > 0) {
+                    // Build description like "S(2) M(3) LG(2)"
+                    const desc = Object.entries(baseSizeQtys)
+                        .map(([size, qty]) => `${size}(${qty})`)
+                        .join(' ');
+
+                    lineItems.push({
+                        description: desc,
+                        quantity: baseQty,
+                        unitPrice: baseUnitPrice,
+                        total: baseQty * baseUnitPrice
+                    });
+                }
+
+                // Extended sizes - read from child row price cells
+                const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
+                extendedSizes.forEach(size => {
+                    const qty = product.sizeBreakdown[size] || 0;
+                    if (qty > 0) {
+                        // Find child row's price cell
+                        const childRowId = childRowMap[rowId]?.[size];
+                        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                        const childPriceText = childPriceCell?.textContent || '$0.00';
+                        const unitPrice = parseFloat(childPriceText.replace('$', '').replace(',', '')) || 0;
+
+                        lineItems.push({
+                            description: `${size}(${qty})`,
+                            quantity: qty,
+                            unitPrice: unitPrice,
+                            total: qty * unitPrice,
+                            hasUpcharge: true
+                        });
+                    }
+                });
+
+                if (lineItems.length > 0) {
+                    invoiceProducts.push({
+                        product: {
+                            style: product.style,
+                            title: product.productName || product.style,
+                            color: product.color
+                        },
+                        lineItems: lineItems
+                    });
+                }
+            });
+
+            // Calculate totals from line items
+            let subtotal = 0;
+            invoiceProducts.forEach(p => {
+                p.lineItems.forEach(item => {
+                    subtotal += item.total;
+                });
+            });
+
+            return {
+                quoteId: quoteId,
+                tier: currentPricing.tier || '12-23',
+                products: invoiceProducts,
+                subtotal: subtotal,
+                grandTotal: currentPricing.grandTotal || subtotal,
+                setupFees: 0,
+                additionalServicesTotal: 0,
+                // Empty logos means embroidery specs section will be skipped
+                logos: [],
+                // DTG-specific: print location instead of logos
+                isDTG: true,
+                printLocation: printLocation,
+                ltmFee: currentPricing.ltmFee || 0
+            };
         }
 
         async function saveQuote() {

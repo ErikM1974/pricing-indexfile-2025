@@ -16,7 +16,23 @@ class EmbroideryInvoiceGenerator {
             'ruth@nwcustomapparel.com': 'Ruth Nhong'
         };
     }
-    
+
+    /**
+     * Get quote type info for dynamic title and filename
+     * Detects quote type from pricingData flags
+     */
+    getQuoteTypeInfo(pricingData) {
+        if (pricingData.isDTG) {
+            return { title: 'DTG QUOTE', prefix: 'DTG Quote' };
+        } else if (pricingData.isScreenprint) {
+            return { title: 'SCREEN PRINT QUOTE', prefix: 'Screen Print Quote' };
+        } else if (pricingData.isDTF) {
+            return { title: 'DTF QUOTE', prefix: 'DTF Quote' };
+        } else {
+            return { title: 'EMBROIDERY QUOTE', prefix: 'Embroidery Quote' };
+        }
+    }
+
     /**
      * Generate complete invoice HTML
      */
@@ -36,14 +52,14 @@ class EmbroideryInvoiceGenerator {
             <html>
             <head>
                 <meta charset="UTF-8">
-                <title>Embroidery Quote ${pricingData.quoteId || ''}</title>
+                <title>${this.getQuoteTypeInfo(pricingData).prefix} ${pricingData.quoteId || ''}</title>
                 <style>
                     ${this.getInvoiceStyles()}
                 </style>
             </head>
             <body>
                 <div class="invoice-container">
-                    ${this.generateHeader(pricingData.quoteId, today, expiryDate)}
+                    ${this.generateHeader(pricingData, today, expiryDate)}
                     ${this.generateCustomerSection(customerData, salesRepName)}
                     ${this.generateEmbroiderySpecs(pricingData)}
                     ${this.generateProductsTable(pricingData)}
@@ -332,17 +348,110 @@ class EmbroideryInvoiceGenerator {
                     display: none;
                 }
             }
+
+            /* Size Matrix Table */
+            .size-matrix {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 10px;
+            }
+            .size-matrix th {
+                background: #4cb354;
+                color: white;
+                padding: 5px 3px;
+                font-size: 9px;
+                text-align: center;
+                font-weight: 600;
+            }
+            .size-matrix th.part-col,
+            .size-matrix th.color-col {
+                text-align: left;
+                padding-left: 6px;
+            }
+            .size-matrix th.size-col {
+                min-width: 26px;
+                max-width: 34px;
+            }
+            .size-matrix td {
+                padding: 5px 3px;
+                border-bottom: 1px solid #e0e0e0;
+                font-size: 9px;
+                vertical-align: middle;
+            }
+            .size-matrix td.part-cell,
+            .size-matrix td.desc-cell,
+            .size-matrix td.color-cell {
+                text-align: left;
+                padding-left: 6px;
+            }
+            .size-matrix td.desc-cell {
+                font-size: 8px;
+                max-width: 180px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .size-matrix td.size-cell {
+                text-align: center;
+                font-weight: 500;
+            }
+            .size-matrix td.pcs-cell,
+            .size-matrix td.total-cell {
+                text-align: right;
+                font-weight: 600;
+                padding-right: 6px;
+            }
+            .size-matrix tr.product-row:nth-child(even) {
+                background: #fafafa;
+            }
+            .size-matrix tr.totals-row {
+                background: #f0f0f0;
+                font-weight: 600;
+                border-top: 2px solid #4cb354;
+            }
+            .size-matrix tr.totals-row td {
+                padding-top: 8px;
+                padding-bottom: 8px;
+            }
+            .size-matrix tr.extended-size-row {
+                background: #f9f9f9;
+            }
+            .size-matrix tr.extended-size-row td {
+                border-top: none;
+                padding-top: 2px;
+            }
+            .size-matrix .unit-cell {
+                font-weight: 500;
+                color: #333;
+            }
+            .price-legend {
+                font-size: 9px;
+                color: #666;
+                margin: 8px 0 15px 0;
+                padding: 6px 10px;
+                background: #f8f9fa;
+                border-radius: 3px;
+                border-left: 3px solid #4cb354;
+            }
+            @media print {
+                .size-matrix tr {
+                    page-break-inside: avoid;
+                }
+            }
         `;
     }
     
     /**
      * Generate invoice header
      */
-    generateHeader(quoteId, today, expiryDate) {
+    generateHeader(pricingData, today, expiryDate) {
+        const quoteTypeInfo = this.getQuoteTypeInfo(pricingData);
+        const quoteId = pricingData.quoteId;
+
         return `
             <div class="invoice-header">
                 <div class="company-info">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
                          alt="Northwest Custom Apparel" class="company-logo">
                     <div class="company-details">
                         2025 Freeman Road East<br>
@@ -352,9 +461,9 @@ class EmbroideryInvoiceGenerator {
                     </div>
                 </div>
                 <div class="quote-info">
-                    <div class="quote-title">EMBROIDERY QUOTE</div>
+                    <div class="quote-title">${quoteTypeInfo.title}</div>
                     <div class="quote-details">
-                        <strong>Quote #:</strong> ${quoteId || 'EMB-DRAFT'}<br>
+                        <strong>Quote #:</strong> ${quoteId || 'DRAFT'}<br>
                         <strong>Date:</strong> ${today.toLocaleDateString()}<br>
                         <strong>Valid Until:</strong> ${expiryDate.toLocaleDateString()}
                     </div>
@@ -387,10 +496,185 @@ class EmbroideryInvoiceGenerator {
     }
     
     /**
-     * Generate embroidery specifications section
-     * Supports separate garment and cap logo configurations
+     * Generate service specifications section based on quote type
+     * Dispatches to the appropriate method based on isDTG, isScreenprint, isDTF flags
      */
     generateEmbroiderySpecs(pricingData) {
+        // Dispatch based on quote type
+        if (pricingData.isDTG) {
+            return this.generateDTGSpecs(pricingData);
+        } else if (pricingData.isScreenprint) {
+            return this.generateScreenprintSpecs(pricingData);
+        } else if (pricingData.isDTF) {
+            return this.generateDTFSpecs(pricingData);
+        }
+
+        // Default: Embroidery specs
+        return this.generateEmbroideryLogoSpecs(pricingData);
+    }
+
+    /**
+     * Generate DTG print location specifications
+     */
+    generateDTGSpecs(pricingData) {
+        const printLocation = pricingData.printLocation;
+        if (!printLocation) return '';
+
+        // DTG location display names
+        const LOCATION_NAMES = {
+            'LC': 'Left Chest',
+            'FF': 'Full Front',
+            'JF': 'Jumbo Front',
+            'FB': 'Full Back',
+            'JB': 'Jumbo Back',
+            'LC_FB': 'Left Chest + Full Back',
+            'LC_JB': 'Left Chest + Jumbo Back',
+            'FF_FB': 'Full Front + Full Back',
+            'FF_JB': 'Full Front + Jumbo Back',
+            'JF_FB': 'Jumbo Front + Full Back',
+            'JF_JB': 'Jumbo Front + Jumbo Back'
+        };
+
+        let specsHTML = `
+            <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 5px;">
+                <div style="font-size: 12px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">
+                    <i class="fas fa-tshirt" style="margin-right: 5px;"></i>DTG PRINT LOCATIONS:
+                </div>
+        `;
+
+        // Show front location
+        if (printLocation.front) {
+            const frontName = LOCATION_NAMES[printLocation.front] || printLocation.front;
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Front:</strong> ${frontName}
+                </div>
+            `;
+        }
+
+        // Show back location if present
+        if (printLocation.back) {
+            const backName = LOCATION_NAMES[printLocation.back] || printLocation.back;
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Back:</strong> ${backName}
+                </div>
+            `;
+        }
+
+        specsHTML += `</div>`;
+        return specsHTML;
+    }
+
+    /**
+     * Generate Screen Print configuration specifications
+     */
+    generateScreenprintSpecs(pricingData) {
+        const printConfig = pricingData.printConfig;
+        if (!printConfig) return '';
+
+        let specsHTML = `
+            <div style="margin: 10px 0; padding: 10px; background: #fff3e0; border: 1px solid #ff9800; border-radius: 5px;">
+                <div style="font-size: 12px; font-weight: bold; color: #e65100; margin-bottom: 8px;">
+                    <i class="fas fa-palette" style="margin-right: 5px;"></i>SCREEN PRINT CONFIGURATION:
+                </div>
+        `;
+
+        // Front location with colors
+        if (printConfig.front) {
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Front:</strong> ${printConfig.front}
+                </div>
+            `;
+        }
+
+        // Back location with colors (if present)
+        if (printConfig.back) {
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Back:</strong> ${printConfig.back}
+                </div>
+            `;
+        }
+
+        // Dark garment indicator
+        if (printConfig.isDarkGarment) {
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Dark Garment:</strong> Yes <span style="color: #666;">(+white underbase)</span>
+                </div>
+            `;
+        }
+
+        // Safety stripes indicator
+        if (printConfig.hasSafetyStripes) {
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Safety Stripes:</strong> Yes <span style="color: #666;">(+$2/piece/location)</span>
+                </div>
+            `;
+        }
+
+        // Screen count and setup fee
+        if (printConfig.totalScreens && pricingData.setupFees > 0) {
+            specsHTML += `
+                <div style="font-size: 10px; color: #666; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ffcc80;">
+                    <strong>Setup:</strong> ${printConfig.totalScreens} screen${printConfig.totalScreens > 1 ? 's' : ''} × $30 = $${pricingData.setupFees.toFixed(2)}
+                </div>
+            `;
+        }
+
+        specsHTML += `</div>`;
+        return specsHTML;
+    }
+
+    /**
+     * Generate DTF transfer location specifications
+     */
+    generateDTFSpecs(pricingData) {
+        const selectedLocations = pricingData.selectedLocations;
+        if (!selectedLocations || selectedLocations.length === 0) return '';
+
+        // DTF location configuration
+        const locationConfig = {
+            'left-chest': { label: 'Left Chest', size: 'Small' },
+            'right-chest': { label: 'Right Chest', size: 'Small' },
+            'left-sleeve': { label: 'Left Sleeve', size: 'Small' },
+            'right-sleeve': { label: 'Right Sleeve', size: 'Small' },
+            'back-of-neck': { label: 'Back of Neck', size: 'Small' },
+            'center-front': { label: 'Center Front', size: 'Medium' },
+            'center-back': { label: 'Center Back', size: 'Medium' },
+            'full-front': { label: 'Full Front', size: 'Large' },
+            'full-back': { label: 'Full Back', size: 'Large' }
+        };
+
+        let specsHTML = `
+            <div style="margin: 10px 0; padding: 10px; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 5px;">
+                <div style="font-size: 12px; font-weight: bold; color: #7b1fa2; margin-bottom: 8px;">
+                    <i class="fas fa-layer-group" style="margin-right: 5px;"></i>DTF TRANSFER LOCATIONS:
+                </div>
+        `;
+
+        // List each selected location
+        selectedLocations.forEach(loc => {
+            const config = locationConfig[loc] || { label: loc, size: '' };
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    • ${config.label} <span style="color: #666;">(${config.size})</span>
+                </div>
+            `;
+        });
+
+        specsHTML += `</div>`;
+        return specsHTML;
+    }
+
+    /**
+     * Generate embroidery logo specifications (original embroidery specs)
+     * Supports separate garment and cap logo configurations
+     */
+    generateEmbroideryLogoSpecs(pricingData) {
         // Check if we have the new logoConfigs structure
         const hasLogoConfigs = pricingData.logoConfigs &&
             (pricingData.garmentLogos?.length > 0 || pricingData.capLogos?.length > 0);
@@ -548,14 +832,24 @@ class EmbroideryInvoiceGenerator {
     }
     
     /**
-     * Generate products table matching screen layout
+     * Generate products table using size matrix layout
+     * Shows products in a grid with individual columns for each size
      */
     generateProductsTable(pricingData) {
+        // Use the new size matrix table format
+        return this.generateSizeMatrixTable(pricingData);
+    }
+
+    /**
+     * Legacy: Generate products table matching screen layout (card-based)
+     * Kept for backward compatibility if needed
+     */
+    generateProductsTableLegacy(pricingData) {
         // Calculate total pieces across all products
         const totalPieces = pricingData.products.reduce((sum, pp) => {
             return sum + pp.lineItems.reduce((s, item) => s + item.quantity, 0);
         }, 0);
-        
+
         // Start with Products header section
         let tableHTML = `
             <div style="margin: 15px 0;">
@@ -563,12 +857,12 @@ class EmbroideryInvoiceGenerator {
                     👕 Products
                 </div>
         `;
-        
+
         // Process each product
         pricingData.products.forEach(pp => {
             const imageUrl = pp.product.imageUrl || '';
             const productPieces = pp.lineItems.reduce((sum, item) => sum + item.quantity, 0);
-            
+
             // Product header box
             tableHTML += `
                 <div style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 10px; margin-bottom: 10px; background: #fafafa;">
@@ -581,11 +875,11 @@ class EmbroideryInvoiceGenerator {
                         </div>
                     </div>
             `;
-            
+
             // Group line items by size category
             const regularSizes = pp.lineItems.filter(item => {
                 const desc = item.description || '';
-                return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') && 
+                return !desc.includes('2XL') && !desc.includes('3XL') && !desc.includes('4XL') &&
                        !desc.includes('5XL') && !desc.includes('6XL');
             });
             
@@ -946,7 +1240,276 @@ class EmbroideryInvoiceGenerator {
 
         return groups;
     }
-    
+
+    /**
+     * Parse size breakdown from description string
+     * Converts "S(1) M(2) L(3) XL(1)" into {S: 1, M: 2, L: 3, XL: 1}
+     * @param {string} description - Description with size(qty) format
+     * @returns {Object} Size to quantity mapping
+     */
+    parseSizeBreakdown(description) {
+        const sizes = {};
+        if (!description) return sizes;
+
+        const regex = /(\w+)\((\d+)\)/g;
+        let match;
+        while ((match = regex.exec(description)) !== null) {
+            sizes[match[1]] = parseInt(match[2]);
+        }
+        return sizes;
+    }
+
+    /**
+     * Aggregate sizes from all line items for a product
+     * Combines base sizes (S, M, L, XL) with extended sizes (2XL, 3XL)
+     * @param {Array} lineItems - Array of line items for a product
+     * @returns {Object} { sizes: {S: 1, M: 2, ...}, pricing: {S: 20.50, 2XL: 22.50, ...}, totalQty, totalAmount }
+     */
+    aggregateSizesForProduct(lineItems) {
+        const sizes = {};
+        const pricing = {};
+        let totalQty = 0;
+        let totalAmount = 0;
+
+        lineItems.forEach(item => {
+            const parsed = this.parseSizeBreakdown(item.description);
+            Object.entries(parsed).forEach(([size, qty]) => {
+                sizes[size] = (sizes[size] || 0) + qty;
+                pricing[size] = item.unitPrice; // Track price per size
+                totalQty += qty;
+            });
+            totalAmount += item.total;
+        });
+
+        return { sizes, pricing, totalQty, totalAmount };
+    }
+
+    /**
+     * Determine which size columns to show based on all products
+     * Only shows columns that have quantities
+     * @param {Array} allProducts - Array of product pricing data
+     * @returns {Array} Ordered array of size column names to display
+     */
+    determineSizeColumns(allProducts) {
+        const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', 'LT', 'XLT', '2XLT', '3XLT', 'OSFA'];
+        const usedSizes = new Set();
+
+        allProducts.forEach(pp => {
+            pp.lineItems.forEach(item => {
+                const parsed = this.parseSizeBreakdown(item.description);
+                Object.keys(parsed).forEach(size => usedSizes.add(size));
+            });
+        });
+
+        // Return only used sizes in standard order
+        return SIZE_ORDER.filter(size => usedSizes.has(size));
+    }
+
+    /**
+     * Build price legend showing different unit prices for sizes
+     * @param {Object} pricing - Size to price mapping
+     * @returns {string} HTML for price legend
+     */
+    buildPriceLegend(pricing) {
+        const prices = Object.entries(pricing);
+        if (prices.length === 0) return '';
+
+        // Group sizes by price
+        const priceGroups = {};
+        prices.forEach(([size, price]) => {
+            const priceKey = price.toFixed(2);
+            if (!priceGroups[priceKey]) {
+                priceGroups[priceKey] = [];
+            }
+            priceGroups[priceKey].push(size);
+        });
+
+        // If all same price, no legend needed
+        if (Object.keys(priceGroups).length <= 1) return '';
+
+        // Sort by price ascending
+        const sortedPrices = Object.keys(priceGroups).sort((a, b) => parseFloat(a) - parseFloat(b));
+        const basePrice = parseFloat(sortedPrices[0]);
+
+        const legendParts = sortedPrices.map(priceKey => {
+            const sizes = priceGroups[priceKey];
+            const price = parseFloat(priceKey);
+            const upcharge = price - basePrice;
+
+            if (upcharge === 0) {
+                return `<strong>${sizes.join('-')}</strong>: $${priceKey}`;
+            } else {
+                return `<strong>${sizes.join(', ')}</strong>: $${priceKey} (+$${upcharge.toFixed(0)})`;
+            }
+        });
+
+        return `<div class="price-legend">Unit Pricing: ${legendParts.join(' | ')}</div>`;
+    }
+
+    /**
+     * Generate size matrix table HTML matching on-screen quote builder format
+     * Columns: Style | Description | Color | S | M | LG | XL | XXL | XXXL(Other) | Qty | Unit $
+     * Each row shows its own values (no rowspan)
+     * Extended sizes show qty in XXXL(Other) column
+     * @param {Object} pricingData - Full pricing data object
+     * @returns {string} HTML table
+     */
+    generateSizeMatrixTable(pricingData) {
+        if (!pricingData.products || pricingData.products.length === 0) {
+            return '<div style="color: #666; font-style: italic;">No products added</div>';
+        }
+
+        // Fixed size columns matching quote builder
+        const sizeColumns = ['S', 'M', 'LG', 'XL', 'XXL', 'XXXL'];
+        // Extended sizes that go into XXXL(Other) column
+        const extendedSizes = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL', 'XXXL'];
+
+        // Track totals
+        let grandTotalQty = 0;
+        let grandTotalAmount = 0;
+
+        // Build header
+        let tableHTML = `
+            <div style="margin: 15px 0;">
+                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                    Products
+                </div>
+                <table class="size-matrix">
+                    <thead>
+                        <tr>
+                            <th class="part-col" style="width: 55px;">Style</th>
+                            <th class="desc-col" style="width: 180px;">Description</th>
+                            <th class="color-col" style="width: 90px;">Color</th>
+                            <th class="size-col" style="width: 28px;">S</th>
+                            <th class="size-col" style="width: 28px;">M</th>
+                            <th class="size-col" style="width: 28px;">LG</th>
+                            <th class="size-col" style="width: 28px;">XL</th>
+                            <th class="size-col" style="width: 28px;">XXL</th>
+                            <th class="size-col" style="width: 40px;">XXXL<br><span style="font-size: 7px; font-weight: normal;">(Other)</span></th>
+                            <th style="width: 32px; text-align: center;">Qty</th>
+                            <th style="width: 55px; text-align: right;">Unit $</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Build rows - ONE ROW PER LINE ITEM
+        pricingData.products.forEach(pp => {
+            const numLineItems = pp.lineItems.length;
+            const hasExtendedSizes = numLineItems > 1;
+
+            pp.lineItems.forEach((item, index) => {
+                const isFirstRow = index === 0;
+                const sizes = this.parseSizeBreakdown(item.description);
+
+                grandTotalQty += item.quantity;
+                grandTotalAmount += item.total;
+
+                // Determine style/description for this row
+                let rowStyle = pp.product.style || '';
+                let rowDescription = pp.product.title || '';
+                let rowColor = pp.product.color || '';
+
+                // For extended size rows, modify the style and description
+                if (!isFirstRow) {
+                    // Extended size row - find which size this is
+                    const extSize = Object.keys(sizes)[0]; // e.g., "2XL", "3XL"
+                    if (extSize) {
+                        // Update style to include suffix (e.g., PC61_2X)
+                        rowStyle = this.getExtendedSizeStyle(rowStyle, extSize);
+                        // Update description to include size
+                        rowDescription = `${rowDescription} - ${extSize}`;
+                    }
+                }
+
+                // Build size cells - base sizes in their columns, extended in XXXL(Other)
+                let sizeCells = '';
+                let xxxlContent = '';
+
+                // Check if this line item has extended sizes
+                const hasExtInThisRow = Object.keys(sizes).some(s => extendedSizes.includes(s));
+
+                if (isFirstRow && hasExtendedSizes) {
+                    // Base row with extended sizes below - show checkmark in XXXL
+                    sizeColumns.forEach(col => {
+                        if (col === 'XXXL') {
+                            sizeCells += `<td class="size-cell" style="color: #4cb354; font-weight: bold;">✓</td>`;
+                        } else {
+                            // Map L -> LG
+                            const qty = sizes[col] || sizes[col === 'LG' ? 'L' : null];
+                            sizeCells += `<td class="size-cell">${qty ? qty : ''}</td>`;
+                        }
+                    });
+                } else if (hasExtInThisRow) {
+                    // Extended size row - show qty in XXXL(Other) column
+                    const extQty = item.quantity;
+                    sizeColumns.forEach(col => {
+                        if (col === 'XXXL') {
+                            sizeCells += `<td class="size-cell">${extQty}</td>`;
+                        } else {
+                            sizeCells += `<td class="size-cell"></td>`;
+                        }
+                    });
+                } else {
+                    // Regular row - show sizes in their columns
+                    sizeColumns.forEach(col => {
+                        // Map L -> LG for compatibility
+                        const qty = sizes[col] || sizes[col === 'LG' ? 'L' : null];
+                        sizeCells += `<td class="size-cell">${qty ? qty : ''}</td>`;
+                    });
+                }
+
+                tableHTML += `
+                    <tr class="product-row${!isFirstRow ? ' extended-size-row' : ''}">
+                        <td class="part-cell">${rowStyle}</td>
+                        <td class="desc-cell">${rowDescription}</td>
+                        <td class="color-cell">${rowColor}</td>
+                        ${sizeCells}
+                        <td class="qty-cell" style="text-align: center;">${item.quantity}</td>
+                        <td class="unit-cell" style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        });
+
+        // Build totals row
+        tableHTML += `
+                <tr class="totals-row">
+                    <td colspan="3" style="text-align: right; padding-right: 10px;"><strong>TOTAL:</strong></td>
+                    <td colspan="6"></td>
+                    <td class="qty-cell" style="text-align: center;"><strong>${grandTotalQty}</strong></td>
+                    <td class="unit-cell" style="text-align: right;"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
+                </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        return tableHTML;
+    }
+
+    /**
+     * Convert base style to extended size style
+     * e.g., "PC61" + "2XL" -> "PC61_2X"
+     */
+    getExtendedSizeStyle(baseStyle, size) {
+        if (!baseStyle || !size) return baseStyle;
+
+        // Map size names to style suffixes
+        const suffixMap = {
+            '2XL': '_2X',
+            '3XL': '_3X',
+            '4XL': '_4X',
+            '5XL': '_5X',
+            '6XL': '_6X',
+            'XXXL': '_3X',
+            'XS': '' // XS typically doesn't have suffix
+        };
+
+        const suffix = suffixMap[size] || '';
+        return suffix ? `${baseStyle}${suffix}` : baseStyle;
+    }
+
     /**
      * Generate totals section
      */
@@ -966,6 +1529,16 @@ class EmbroideryInvoiceGenerator {
                 <div class="total-row">
                     <span>Setup Fees:</span>
                     <span>$${pricingData.setupFees.toFixed(2)}</span>
+                </div>` : ''}
+                ${pricingData.safetyStripesTotal > 0 ? `
+                <div class="total-row">
+                    <span>Safety Stripes Surcharge:</span>
+                    <span>$${pricingData.safetyStripesTotal.toFixed(2)}</span>
+                </div>` : ''}
+                ${pricingData.ltmFee > 0 && !pricingData.ltmDistributed ? `
+                <div class="total-row">
+                    <span>Less Than Minimum Fee:</span>
+                    <span>$${pricingData.ltmFee.toFixed(2)}</span>
                 </div>` : ''}
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>

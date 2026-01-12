@@ -289,6 +289,19 @@ Test example: PC61 Forest Green x 37 pieces should show $29.85/piece in BOTH
 
 ---
 
+## Problem: Embroidery PDF quote missing product descriptions
+**Date:** 2026-01
+**Project:** Pricing Index
+**Symptoms:** Product Description column empty on embroidery quote PDFs (J790 jacket showed empty, 112 cap showed empty)
+**Root cause:** Invoice generator expects `product.title` but embroidery builder only passed `productName`. Other builders (Screen Print, DTG, DTF) already had `title` field mapped correctly.
+**Solution:** Added `title: row.dataset.productName || style` to `collectProductsFromTable()` in embroidery-quote-builder.html (line 3618)
+**Prevention:** When building products for invoice PDFs, always include these required fields:
+- `product.style` - Style number (e.g., "PC54")
+- `product.title` - Product description (e.g., "Port & Company Core Cotton Tee")
+- `product.color` - Display color name
+
+---
+
 ## Problem: Rounding logic inconsistent
 **Date:** 2025
 **Project:** Pricing Index
