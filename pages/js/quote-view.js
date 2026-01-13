@@ -455,6 +455,19 @@ class QuoteViewPage {
                 : `${addlStitches.toLocaleString()} stitches`;
             html += `<div class="emb-detail"><span class="emb-label">Additional Logo:</span> <span class="emb-value">${addlText}</span></div>`;
         }
+        // Cap embroidery info (if present)
+        const capLocation = this.quoteData?.CapPrintLocation || '';
+        const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
+        const capDigitizing = this.quoteData?.CapDigitizingFee || 0;
+        if (capLocation || capStitches > 0) {
+            const capText = capLocation
+                ? `${this.escapeHtml(capLocation)} (${capStitches.toLocaleString()} stitches)`
+                : `${capStitches.toLocaleString()} stitches`;
+            html += `<div class="emb-detail"><span class="emb-label">Cap Location:</span> <span class="emb-value">${capText}</span></div>`;
+            if (capDigitizing > 0) {
+                html += `<div class="emb-detail"><span class="emb-label">Cap Digitizing:</span> <span class="emb-value">${this.formatCurrency(capDigitizing)}</span></div>`;
+            }
+        }
         html += `</div>`;
         return html;
     }
@@ -1480,10 +1493,17 @@ class QuoteViewPage {
             const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
             const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
             const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
+            // Cap embroidery details
+            const capLocation = this.quoteData?.CapPrintLocation || '';
+            const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
+            const capDigitizing = parseFloat(this.quoteData?.CapDigitizingFee) || 0;
 
-            // Calculate box height: base 22mm, add 6mm if additional logo exists
+            // Calculate box height: base 22mm, add 6mm for each extra row
             const hasAddlLogo = addlLocation || addlStitches > 0;
-            const boxHeight = hasAddlLogo ? 28 : 22;
+            const hasCapLogo = capLocation || capStitches > 0;
+            let boxHeight = 22;
+            if (hasAddlLogo) boxHeight += 6;
+            if (hasCapLogo) boxHeight += 6;
 
             pdf.setFillColor(248, 250, 252); // Light blue-gray background
             pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
@@ -1514,6 +1534,18 @@ class QuoteViewPage {
                     ? `Additional Logo: ${addlLocation} (${addlStitches.toLocaleString()} stitches)`
                     : `Additional Logo: ${addlStitches.toLocaleString()} stitches`;
                 pdf.text(addlText, margin + 3, yPos + 23);
+            }
+
+            // Row 4: Cap Logo (if present)
+            if (hasCapLogo) {
+                const capRowY = hasAddlLogo ? 29 : 23;
+                let capText = capLocation
+                    ? `Cap Logo: ${capLocation} (${capStitches.toLocaleString()} stitches)`
+                    : `Cap Logo: ${capStitches.toLocaleString()} stitches`;
+                if (capDigitizing > 0) {
+                    capText += ` + ${this.formatCurrency(capDigitizing)} digitizing`;
+                }
+                pdf.text(capText, margin + 3, yPos + capRowY);
             }
 
             yPos += boxHeight + 4;

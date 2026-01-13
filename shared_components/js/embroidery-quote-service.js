@@ -128,7 +128,11 @@ class EmbroideryQuoteService {
                 StitchCount: primaryLogo?.stitchCount || 8000,
                 DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
-                AdditionalStitchCount: additionalLogo?.stitchCount || 0
+                AdditionalStitchCount: additionalLogo?.stitchCount || 0,
+                // Cap embroidery details
+                CapPrintLocation: capPrimaryLogo?.position || '',
+                CapStitchCount: capPrimaryLogo?.stitchCount || 0,
+                CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0
             };
             
             // Save session
