@@ -307,6 +307,48 @@
 
             </div>
 
+            <!-- Save & Share Section -->
+            <div class="save-quote-panel" style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <div class="save-quote-title" style="font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-share-alt"></i> Save & Share
+                </div>
+                <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
+                        <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Email *</label>
+                        <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
+                        <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
+                        <input type="tel" id="customer-phone" placeholder="(555) 555-5555" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                    </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
+                        <select id="sales-rep" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white; box-sizing: border-box;">
+                            <option value="sales@nwcustomapparel.com">General Sales</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    <i class="fas fa-link"></i> Save & Get Shareable Link
+                </button>
+            </div>
+
             <!-- Action Buttons -->
             <div class="action-panel">
                 <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
@@ -315,82 +357,6 @@
                 <button class="btn-action btn-secondary-action" onclick="printQuote()">
                     <i class="fas fa-print"></i> Print Quote
                 </button>
-            </div>
-
-            <!-- Coming Soon Accordion -->
-            <div class="coming-soon-accordion">
-                <button class="coming-soon-header" onclick="toggleComingSoon()">
-                    <span class="coming-soon-title">
-                        <i class="fas fa-rocket"></i> New Features Coming Soon
-                    </span>
-                    <i class="fas fa-chevron-down coming-soon-chevron" id="coming-soon-chevron"></i>
-                </button>
-                <div class="coming-soon-content" id="coming-soon-content">
-                    <div class="coming-soon-description">
-                        <p>These features are currently in development:</p>
-                        <ul class="feature-list">
-                            <li><i class="fas fa-save"></i> Save quotes to database</li>
-                            <li><i class="fas fa-link"></i> Share quotes via link</li>
-                            <li><i class="fas fa-print"></i> Print professional PDF quotes</li>
-                            <li><i class="fas fa-user"></i> Customer info management</li>
-                        </ul>
-                        <p class="coming-soon-note">For now, use "Copy Quote to Clipboard" above to share quote details.</p>
-                    </div>
-
-                    <!-- Customer Info & Save -->
-                    <div class="customer-panel">
-                        <div class="customer-panel-header">
-                            <h4><i class="fas fa-user"></i> Customer Info</h4>
-                        </div>
-                        <div class="customer-fields">
-                            <div class="customer-field">
-                                <label>Name *</label>
-                                <input type="text" id="customer-name" placeholder="Customer name">
-                            </div>
-                            <div class="customer-field">
-                                <label>Email *</label>
-                                <input type="email" id="customer-email" placeholder="email@company.com">
-                            </div>
-                            <div class="customer-field">
-                                <label>Company</label>
-                                <input type="text" id="company-name" placeholder="Company name">
-                            </div>
-                            <div class="customer-field">
-                                <label>Phone</label>
-                                <input type="tel" id="customer-phone" placeholder="(555) 555-5555">
-                            </div>
-                            <div class="customer-field">
-                                <label>Sales Rep</label>
-                                <select id="sales-rep">
-                                    <option value="sales@nwcustomapparel.com">General Sales</option>
-                                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                                    <option value="art@nwcustomapparel.com">Steve Deland</option>
-                                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px;">
-                            <i class="fas fa-link"></i> Save & Get Shareable Link
-                        </button>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="action-panel">
-                        <button class="btn-action btn-primary-action" onclick="printQuote()">
-                            <i class="fas fa-print"></i> Print PDF
-                        </button>
-                        <div class="action-row">
-                            <button class="btn-action btn-secondary-action" onclick="copyToClipboard()">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

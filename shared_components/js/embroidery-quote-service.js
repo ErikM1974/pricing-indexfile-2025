@@ -25,7 +25,29 @@ class EmbroideryQuoteService {
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
     }
-    
+
+    /**
+     * Parse line item description into size breakdown object
+     * Example: "S(6) M(6) L(6)" → {"S": 6, "M": 6, "L": 6}
+     */
+    parseDescriptionToSizeBreakdown(description) {
+        const sizeBreakdown = {};
+        if (!description) return sizeBreakdown;
+
+        // Match any alphanumeric size pattern followed by (qty)
+        // Handles: XS, S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL, OSFA, S/M, L/XL, etc.
+        const sizeRegex = /([A-Z0-9\/]+)\((\d+)\)/gi;
+        let match;
+        while ((match = sizeRegex.exec(description)) !== null) {
+            const size = match[1].toUpperCase();
+            const qty = parseInt(match[2]);
+            if (qty > 0) {
+                sizeBreakdown[size] = qty;
+            }
+        }
+        return sizeBreakdown;
+    }
+
     /**
      * Generate unique quote ID
      */
@@ -159,7 +181,7 @@ class EmbroideryQuoteService {
                         LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
                         LineTotal: parseFloat(lineItem.total.toFixed(2)),
-                        SizeBreakdown: JSON.stringify(productPricing.product.sizeBreakdown || {}),  // Ensure it's always a valid JSON string
+                        SizeBreakdown: JSON.stringify(this.parseDescriptionToSizeBreakdown(lineItem.description)),  // Parse per-lineItem sizes from description
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
