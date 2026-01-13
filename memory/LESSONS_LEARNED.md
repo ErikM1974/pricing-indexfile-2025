@@ -30,6 +30,48 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Problem: DTF Quote Builder shareable URL - colors not saving correctly
+**Date:** 2026-01-13
+**Project:** Pricing Index
+**Symptoms:** Four separate bugs when implementing shareable quote URLs:
+1. All prices showed $0.00 on quote view
+2. Color showed "N/A" for all items
+3. Product images not loading
+4. Extended sizes with different colors all saved with parent row's color
+
+**Root causes:**
+1. **Price selector mismatch** - Parent rows use `id="row-price-${rowId}"`, child rows use `.cell-price` class. Code only tried one selector.
+2. **Color stored on row.dataset** - HTML `selectColor()` stores on `row.dataset.color`, but JS read from `product.color` (different data stores!)
+3. **Image URL on row.dataset** - HTML stores `row.dataset.swatchUrl`, JS expected `product.imageUrl`
+4. **Single color for all sizeGroups** - Code read color once from parent row, used for ALL line items including extended sizes with different colors
+
+**Solutions:**
+1. Use fallback pattern: `querySelector('.row-price') || getElementById(`row-price-${rowId}`)`
+2. Read from `parentRow?.dataset?.color || p.color`
+3. Read from `parentRow?.dataset?.swatchUrl || p.imageUrl`
+4. Each sizeGroup carries its own `color`, `catalogColor`, `imageUrl`. Extended sizes loop reads from child row's dataset.
+
+**Prevention:**
+- Always check where HTML stores data vs where JS expects it (dataset vs object)
+- Each line item (sizeGroup) should carry its own color/imageUrl, not inherit from parent
+- Use fallback patterns for selectors when parent/child rows have different structures
+- See `/memory/quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md` for full implementation guide
+
+**Files:** dtf-quote-builder.js:1598-1690, dtf-quote-service.js:185-210
+
+---
+
+## Problem: DTF Quote Builder internal size names vs display names
+**Date:** 2026-01-13
+**Project:** Pricing Index
+**Symptoms:** Child row lookup failing for 2XL and 3XL sizes
+**Root cause:** HTML creates child rows with internal names (XXL, XXXL) but display shows 2XL, 3XL. `childMap[size]` lookup failed because keys were XXL/XXXL, not 2XL/3XL.
+**Solution:** Try both: `childMap[size] || childMap[internalSize]` where `internalSize = size === '2XL' ? 'XXL' : (size === '3XL' ? 'XXXL' : size)`
+**Prevention:** Document size name mappings: 2XL=XXL, 3XL=XXXL. Always try both when looking up child rows.
+**Files:** dtf-quote-builder.js:1662-1666
+
+---
+
 ## Problem: DTF Quote Builder extended size upcharges always used defaults
 **Date:** 2026-01-12
 **Project:** Pricing Index

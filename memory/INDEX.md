@@ -97,6 +97,9 @@
 │   ├── IMPLEMENTATION_EXAMPLES.md   # Working code snippets
 │   └── TROUBLESHOOTING.md           # Common issues & solutions
 │
+├── /quote-builders/                   # Quote Builder Implementation Guides
+│   └── SHAREABLE_QUOTE_BLUEPRINT.md # **NEW** - Add shareable URLs to any builder
+│
 ├── /3-day-tees/                      # 3-Day Tees Fast Turnaround
 │   ├── README.md                    # Overview & quick start
 │   ├── OVERVIEW.md                  # Architecture (25 components)
@@ -137,6 +140,7 @@
 |----------|-----------|
 | Quote Builder | [QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md) |
 | Quote Builder Architecture | [QUOTE_BUILDER_ARCHITECTURE.md](./QUOTE_BUILDER_ARCHITECTURE.md) |
+| **Shareable Quote URLs** | **[quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md](./quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md)** - Add to any builder |
 | Embroidery Quote Builder | [EMBROIDERY_QUOTE_BUILDER.md](./EMBROIDERY_QUOTE_BUILDER.md) |
 | Screenprint Quote Builder | [SCREENPRINT_QUOTE_BUILDER.md](./SCREENPRINT_QUOTE_BUILDER.md) |
 | Pricing Calculator | [PRICING_CALCULATOR_GUIDE.md](./PRICING_CALCULATOR_GUIDE.md) → [/templates/](./templates/) |
