@@ -2535,6 +2535,155 @@ app.delete('/api/quote_analytics/:id', async (req, res) => {
   }
 });
 
+// =============================================================================
+// PUBLIC QUOTE VIEW API (No Authentication Required)
+// =============================================================================
+
+// GET quote items by quoteId
+app.get('/api/quote_items/quote/:quoteId', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+    const data = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteId}'`);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote items by quote ID:', error);
+    res.status(500).json({ error: 'Failed to fetch quote items by quote ID' });
+  }
+});
+
+// Public quote page route - serves the HTML
+app.get('/quote/:quoteId', (req, res) => {
+  // Validate quote ID format - accept multiple formats:
+  // - PREFIX + MMDD + - + sequence (e.g., DTF0112-1)
+  // - PREFIX + - + timestamp (e.g., DTF-1768263686415)
+  const quoteId = req.params.quoteId;
+  if (!quoteId || !/^[A-Z]{2,5}[-\d]+-?\d*$/.test(quoteId)) {
+    return res.status(400).send('Invalid quote ID format');
+  }
+  res.sendFile(path.join(__dirname, 'pages', 'quote-view.html'));
+});
+
+// Public API - Get quote data with view tracking
+app.get('/api/public/quote/:quoteId', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+
+    // Fetch quote session
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+    const session = sessions[0];
+
+    // Fetch quote items
+    let items = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteId}'`);
+
+    // Workaround: caspio-proxy may not be filtering properly
+    // Filter server-side to ensure only matching items are returned
+    if (items && Array.isArray(items)) {
+      items = items.filter(item => item.QuoteID === safeQuoteId);
+    }
+
+    // TODO: View tracking disabled - ViewCount/FirstViewedAt fields don't exist in Caspio yet
+    // To enable: Add these fields to quote_sessions table in Caspio, then uncomment:
+    // const now = new Date().toISOString();
+    // const currentViewCount = parseInt(session.ViewCount) || 0;
+    // const updateData = { ViewCount: currentViewCount + 1 };
+    // if (!session.FirstViewedAt) { updateData.FirstViewedAt = now; }
+    // makeApiRequest(`/quote_sessions/${session.PK_ID}`, 'PUT', updateData)
+    //   .catch(err => console.error('Error updating view tracking:', err));
+
+    // Return combined data
+    res.json({
+      session: session,
+      items: items || []
+    });
+
+  } catch (error) {
+    console.error('Error fetching public quote:', error);
+    res.status(500).json({ error: 'Failed to fetch quote' });
+  }
+});
+
+// Public API - Accept quote
+app.post('/api/public/quote/:quoteId/accept', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+    const { name, email } = req.body;
+
+    // Validate required fields
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Fetch quote session
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+    const session = sessions[0];
+
+    // Check if quote is already accepted
+    if (session.Status === 'Accepted') {
+      return res.status(400).json({ error: 'Quote has already been accepted' });
+    }
+
+    // Check if quote is expired
+    if (session.ExpiresAt) {
+      const expiresAt = new Date(session.ExpiresAt);
+      if (expiresAt < new Date()) {
+        return res.status(400).json({ error: 'Quote has expired' });
+      }
+    }
+
+    // Update quote status
+    // Note: AcceptedAt, AcceptedByName, AcceptedByEmail fields don't exist in Caspio
+    // Store acceptance info in the existing Notes JSON field instead
+    const now = new Date().toISOString();
+
+    // Parse existing Notes JSON and add acceptance info
+    let existingNotes = {};
+    try {
+      if (session.Notes) {
+        existingNotes = JSON.parse(session.Notes);
+      }
+    } catch (e) {
+      console.error('Error parsing existing notes:', e);
+    }
+
+    existingNotes.acceptedAt = now;
+    existingNotes.acceptedByName = sanitizeFilterInput(name);
+    existingNotes.acceptedByEmail = sanitizeFilterInput(email);
+
+    const updateData = {
+      Status: 'Accepted',
+      Notes: JSON.stringify(existingNotes)
+    };
+
+    await makeApiRequest(`/quote_sessions/${session.PK_ID}`, 'PUT', updateData);
+
+    console.log(`[QUOTE] Quote ${safeQuoteId} accepted by ${name} (${email})`);
+
+    res.json({
+      success: true,
+      message: 'Quote accepted successfully',
+      quoteId: safeQuoteId,
+      acceptedAt: now,
+      acceptedBy: { name, email }
+    });
+
+  } catch (error) {
+    console.error('Error accepting quote:', error);
+    res.status(500).json({ error: 'Failed to accept quote' });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
@@ -2542,4 +2691,5 @@ app.listen(PORT, () => {
   console.log('  Quote Sessions: /api/quote_sessions');
   console.log('  Quote Items: /api/quote_items');
   console.log('  Quote Analytics: /api/quote_analytics');
+  console.log('  Public Quote View: /quote/:quoteId');
 });

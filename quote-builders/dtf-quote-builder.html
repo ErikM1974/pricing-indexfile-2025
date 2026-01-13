@@ -241,6 +241,21 @@
                 </div>
             </div>
 
+            <!-- Save & Share Section -->
+            <div class="save-quote-panel">
+                <div class="save-quote-title">
+                    <i class="fas fa-share-alt"></i> Save & Share
+                </div>
+                <div class="save-quote-form">
+                    <input type="text" id="customer-name" class="quote-input" placeholder="Customer Name *">
+                    <input type="email" id="customer-email" class="quote-input" placeholder="Email *">
+                    <input type="text" id="company-name" class="quote-input" placeholder="Company (optional)">
+                </div>
+                <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()">
+                    <i class="fas fa-link"></i> Save & Get Shareable Link
+                </button>
+            </div>
+
             <!-- Action Buttons (DTG Style) -->
             <div class="action-panel">
                 <button class="btn-action btn-primary-action" onclick="copyQuoteToClipboard()">
@@ -1171,6 +1186,69 @@
         // Note: No auto-row on page load - users add products via search box
         // The addProductRow() method handles row creation when selecting from search
 
+    </script>
+
+    <!-- Save Success Modal -->
+    <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
+        <div class="save-modal-content">
+            <div class="save-modal-header">
+                <i class="fas fa-check-circle"></i>
+                <h3>Quote Saved!</h3>
+            </div>
+            <div class="save-modal-body">
+                <p>Quote ID: <strong id="saved-quote-id">---</strong></p>
+                <p>Share this link with your customer:</p>
+                <div class="url-copy-container">
+                    <input type="text" id="shareable-url" class="shareable-url-input" readonly>
+                    <button class="btn-copy-url" onclick="copyShareableUrl()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+            <div class="save-modal-footer">
+                <button class="btn-view-quote" onclick="window.open(document.getElementById('shareable-url').value, '_blank')">
+                    <i class="fas fa-external-link-alt"></i> View Quote
+                </button>
+                <button class="btn-close-modal" onclick="closeSaveModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Save modal functions
+        function showSaveModal(quoteId) {
+            const url = `${window.location.origin}/quote/${quoteId}`;
+            document.getElementById('saved-quote-id').textContent = quoteId;
+            document.getElementById('shareable-url').value = url;
+            document.getElementById('save-success-modal').style.display = 'flex';
+        }
+
+        function closeSaveModal() {
+            document.getElementById('save-success-modal').style.display = 'none';
+        }
+
+        function copyShareableUrl() {
+            const urlInput = document.getElementById('shareable-url');
+            urlInput.select();
+            document.execCommand('copy');
+
+            // Visual feedback
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('save-success-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeSaveModal();
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote - Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="/pages/css/quote-view.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="quote-page">
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading quote...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="error-state" style="display: none;">
+            <div class="error-icon">!</div>
+            <h2>Quote Not Found</h2>
+            <p id="error-message">The quote you're looking for could not be found.</p>
+            <p class="error-help">If you believe this is an error, please contact us at <a href="tel:2539225793">(253) 922-5793</a></p>
+        </div>
+
+        <!-- Quote Content -->
+        <div id="quote-content" class="quote-container" style="display: none;">
+            <!-- Header -->
+            <header class="quote-header">
+                <div class="header-left">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel"
+                         class="company-logo">
+                </div>
+                <div class="header-right">
+                    <h1 id="quote-id-header">Quote #---</h1>
+                    <div class="quote-status" id="quote-status">
+                        <span class="status-badge status-open">Open</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Quote Meta -->
+            <section class="quote-meta">
+                <div class="meta-card customer-card">
+                    <h3>Prepared For</h3>
+                    <p class="customer-name" id="customer-name">---</p>
+                    <p class="company-name" id="company-name"></p>
+                    <p class="customer-email" id="customer-email">---</p>
+                    <p class="customer-phone" id="customer-phone">---</p>
+                </div>
+                <div class="meta-card dates-card">
+                    <h3>Quote Details</h3>
+                    <div class="date-row">
+                        <span class="label">Type:</span>
+                        <span class="value" id="quote-type">---</span>
+                    </div>
+                    <div class="date-row">
+                        <span class="label">Created:</span>
+                        <span class="value" id="created-date">---</span>
+                    </div>
+                    <div class="date-row">
+                        <span class="label">Valid Until:</span>
+                        <span class="value" id="expires-date">---</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expired Banner -->
+            <div id="expired-banner" class="expired-banner" style="display: none;">
+                <span class="expired-icon">&#9888;</span>
+                <div class="expired-text">
+                    <strong>This quote has expired</strong>
+                    <p>Please contact us for updated pricing.</p>
+                </div>
+            </div>
+
+            <!-- Accepted Banner -->
+            <div id="accepted-banner" class="accepted-banner" style="display: none;">
+                <span class="accepted-icon">&#10003;</span>
+                <div class="accepted-text">
+                    <strong>Quote Accepted</strong>
+                    <p id="accepted-info">Accepted on ---</p>
+                </div>
+            </div>
+
+            <!-- DTF Transfer Specs (populated by JS for DTF quotes) -->
+            <section id="dtf-specs-section" class="dtf-specs-section" style="display: none;">
+                <h2>Transfer Specifications</h2>
+                <div id="dtf-specs-container" class="dtf-specs-container">
+                    <!-- DTF location specs will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Quote Items -->
+            <section class="quote-items">
+                <h2>Quote Details</h2>
+                <div class="items-container" id="items-container">
+                    <!-- Items will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Quote Totals -->
+            <section class="quote-totals">
+                <div class="totals-card">
+                    <div class="total-row">
+                        <span class="label">Subtotal:</span>
+                        <span class="value" id="subtotal">$0.00</span>
+                    </div>
+                    <div class="total-row" id="ltm-row" style="display: none;">
+                        <span class="label">LTM Fee:</span>
+                        <span class="value" id="ltm-fee">$0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span class="label">Total:</span>
+                        <span class="value" id="grand-total">$0.00</span>
+                    </div>
+                    <p class="total-quantity" id="total-quantity">Total items: 0</p>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="quote-actions" id="quote-actions">
+                <button class="btn btn-secondary" id="download-pdf-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    Download PDF
+                </button>
+                <button class="btn btn-primary" id="accept-quote-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                    Accept Quote
+                </button>
+            </section>
+
+            <!-- Footer -->
+            <footer class="quote-footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>Questions?</h4>
+                        <p>Contact your sales representative or call us at</p>
+                        <a href="tel:2539225793" class="phone-link">(253) 922-5793</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Terms</h4>
+                        <ul class="terms-list">
+                            <li>Quote valid for 30 days</li>
+                            <li>50% deposit to begin</li>
+                            <li>Production time begins after art approval</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; <span id="current-year"></span> Northwest Custom Apparel - Serving the Pacific Northwest Since 1977</p>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Accept Quote Modal -->
+        <div id="accept-modal" class="modal" style="display: none;">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Accept Quote</h2>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-description">By accepting this quote, you agree to the pricing and terms shown. We'll reach out to finalize details and collect a deposit.</p>
+
+                    <form id="accept-form">
+                        <div class="form-group">
+                            <label for="accept-name">Your Name *</label>
+                            <input type="text" id="accept-name" name="name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="accept-email">Your Email *</label>
+                            <input type="email" id="accept-email" name="email" required placeholder="john@company.com">
+                        </div>
+                        <div class="form-info">
+                            <p><strong>Quote Total:</strong> <span id="modal-total">$0.00</span></p>
+                            <p><strong>Valid Until:</strong> <span id="modal-expires">---</span></p>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                    <button class="btn btn-primary" id="modal-accept">
+                        <span id="accept-btn-text">Accept Quote</span>
+                        <span id="accept-btn-loading" style="display: none;">Processing...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal" style="display: none;">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content success-modal">
+                <div class="success-icon">&#10003;</div>
+                <h2>Quote Accepted!</h2>
+                <p>Thank you for accepting this quote. Our team will reach out shortly to discuss next steps and collect your deposit.</p>
+                <p class="success-contact">Questions? Call us at <a href="tel:2539225793">(253) 922-5793</a></p>
+                <button class="btn btn-primary" id="success-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/pages/js/quote-view.js"></script>
+</body>
+</html>
