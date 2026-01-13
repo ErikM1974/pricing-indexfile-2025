@@ -19,6 +19,10 @@
     --bg-sidebar: #f1f3f5;
     --text-dark: #1f2937;
     --text-muted: #6b7280;
+
+    /* Shared modal theming (for quote-share-modal.css) */
+    --builder-primary: var(--dtf-primary);
+    --builder-primary-dark: var(--dtf-primary-dark);
 }
 
 /* =============================================

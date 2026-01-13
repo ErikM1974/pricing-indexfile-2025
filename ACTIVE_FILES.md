@@ -156,6 +156,7 @@
 | `/shared_components/js/extended-sizes-config.js` | **NEW** Shared extended sizes config (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-builder-core.js` | **NEW** Core quote builder functionality (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/pricing-sidebar-component.js` | **NEW** Unified pricing sidebar (2026 consolidation) | All quote builders | ✅ Active |
+| `/shared_components/js/quote-share-modal.js` | **NEW** Shareable URL success modal (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/INTEGRATION-EXAMPLE.js` | **NEW** Integration example/docs (2026 consolidation) | Reference only | 📚 Docs |
 
 ### Public Quote View System (NEW 2026-01-12)
@@ -196,6 +197,7 @@
 | `/shared_components/css/quote-builder-unified-step1.css` | Step 1 styles | Quote builders | ✅ Active |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ✅ Active |
 | `/shared_components/css/quote-builder-step2-modern.css` | **NEW** Modern Step 2 styles (2025 refactor) | Embroidery & Cap quote builders | ✅ Active |
+| `/shared_components/css/quote-share-modal.css` | **NEW** Shareable URL modal styles (2026 consolidation) | All quote builders | ✅ Active |
 
 ### 🧮 Manual Calculator CSS Architecture
 

@@ -23,6 +23,9 @@
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
 
+    <!-- Shared Quote Share Modal (2026 consolidation) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+
     <!-- REMOVED: 1,950 lines of inline CSS moved to dtg-quote-builder-extracted.css -->
     <style>
         /* Placeholder - inline styles removed, using external CSS */
@@ -83,7 +86,7 @@
 
                         <!-- Back Location Selection (Optional) -->
                         <div class="location-group">
-                            <div style="font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px;">BACK (optional)</div>
+                            <div style="font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px;">BACK (add if needed)</div>
                             <div style="display: flex; flex-direction: column; gap: 6px;">
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="" checked onchange="updatePrintLocation()">
@@ -119,7 +122,7 @@
                         <input type="text"
                                id="product-search"
                                class="search-input"
-                               placeholder="Type style # to add (e.g., PC54, G500...)"
+                               placeholder="Search by style # (e.g., PC54, G500) or product name"
                                autocomplete="off">
                         <div id="search-suggestions" class="search-suggestions"></div>
                     </div>
@@ -138,7 +141,7 @@
                                 <th class="size-col">LG</th>
                                 <th class="size-col">XL</th>
                                 <th class="size-col">XXL</th>
-                                <th class="size-col" style="line-height: 1.1;">XXXL<br><span style="font-size: 10px; font-weight: 400;">(Other)</span></th>
+                                <th class="size-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="actions-col"></th>
@@ -215,7 +218,7 @@
                 </div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label">LTM Fee (&lt; 24 pcs):</span>
+                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -242,84 +245,46 @@
                 </button>
             </div>
 
-            <!-- Coming Soon Accordion -->
-            <div class="coming-soon-accordion">
-                <button class="coming-soon-header" onclick="toggleComingSoon()">
-                    <span class="coming-soon-title">
-                        <i class="fas fa-rocket"></i> New Features Coming Soon
-                    </span>
-                    <i class="fas fa-chevron-down coming-soon-chevron" id="coming-soon-chevron"></i>
-                </button>
-                <div class="coming-soon-content" id="coming-soon-content">
-                    <div class="coming-soon-description">
-                        <p>These features are currently in development:</p>
-                        <ul class="feature-list">
-                            <li><i class="fas fa-save"></i> Save quotes to database</li>
-                            <li><i class="fas fa-envelope"></i> Email quotes directly to customers</li>
-                            <li><i class="fas fa-print"></i> Print professional PDF quotes</li>
-                            <li><i class="fas fa-user"></i> Customer info management</li>
-                        </ul>
-                        <p class="coming-soon-note">For now, use "Copy Quote to Clipboard" above to share quote details.</p>
+            <!-- Customer Info & Save Quote -->
+            <div class="customer-panel" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-top: 16px;">
+                <div class="customer-panel-header" style="margin-bottom: 12px;">
+                    <h4 style="margin: 0; font-size: 14px; color: #333;"><i class="fas fa-user"></i> Customer Info</h4>
+                </div>
+                <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
+                        <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
                     </div>
-
-                    <!-- Hidden Customer Info (for future use) -->
-                    <div class="customer-panel coming-soon-disabled">
-                        <div class="customer-panel-header">
-                            <h4><i class="fas fa-user"></i> Customer Info</h4>
-                            <span class="coming-soon-badge">Coming Soon</span>
-                        </div>
-                        <div class="customer-fields">
-                            <div class="customer-field">
-                                <label>Name</label>
-                                <input type="text" id="customer-name" placeholder="Customer name" disabled>
-                            </div>
-                            <div class="customer-field">
-                                <label>Email</label>
-                                <input type="email" id="customer-email" placeholder="email@company.com" disabled>
-                            </div>
-                            <div class="customer-field">
-                                <label>Company</label>
-                                <input type="text" id="company-name" placeholder="Company name" disabled>
-                            </div>
-                            <div class="customer-field">
-                                <label>Phone</label>
-                                <input type="tel" id="customer-phone" placeholder="(555) 555-5555" disabled>
-                            </div>
-                            <div class="customer-field">
-                                <label>Sales Rep</label>
-                                <select id="sales-rep" disabled>
-                                    <option value="sales@nwcustomapparel.com">General Sales</option>
-                                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                                    <option value="art@nwcustomapparel.com">Steve Deland</option>
-                                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                                </select>
-                            </div>
-                        </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Email *</label>
+                        <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
                     </div>
-
-                    <!-- Hidden Action Buttons (for future use) -->
-                    <div class="action-panel coming-soon-disabled">
-                        <button class="btn-action btn-primary-action" disabled>
-                            <i class="fas fa-print"></i> Print PDF
-                            <span class="coming-soon-badge-small">Soon</span>
-                        </button>
-                        <div class="action-row">
-                            <button class="btn-action btn-secondary-action" disabled>
-                                <i class="fas fa-save"></i> Save
-                                <span class="coming-soon-badge-small">Soon</span>
-                            </button>
-                            <button class="btn-action btn-secondary-action" disabled>
-                                <i class="fas fa-envelope"></i> Email
-                                <span class="coming-soon-badge-small">Soon</span>
-                            </button>
-                        </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
+                        <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                    </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
+                        <input type="tel" id="customer-phone" placeholder="(555) 555-5555" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                    </div>
+                    <div class="customer-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
+                        <select id="sales-rep" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                            <option value="sales@nwcustomapparel.com">General Sales</option>
+                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                            <option value="art@nwcustomapparel.com">Steve Deland</option>
+                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                        </select>
                     </div>
                 </div>
+                <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    <i class="fas fa-link"></i> Save & Get Shareable Link
+                </button>
             </div>
         </div>
     </div>
@@ -364,6 +329,7 @@
     <!-- Core Dependencies -->
     <script src="/shared_components/js/dtg-pricing-service.js"></script>
     <script src="/shared_components/js/dtg-quote-service.js"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
 
@@ -1034,8 +1000,8 @@
                 // Initialize DTG pricing service
                 dtgPricingService = new DTGPricingService();
 
-                // Initialize quote service (reuse existing for save/load)
-                // quoteService = new DTGQuoteService(); // TODO: Wire up DTG quote service
+                // Initialize quote service for save/load
+                quoteService = new DTGQuoteService();
 
                 // Setup event listeners
                 setupSearchAutocomplete();
@@ -3756,18 +3722,34 @@
             };
         }
 
-        async function saveQuote() {
+        /**
+         * Save quote and get shareable link
+         * Uses DTGQuoteService and QuoteShareModal
+         */
+        async function saveAndGetLink() {
             const products = collectProductsFromTable();
             if (products.length === 0) {
                 showToast('Add products before saving', 'error');
                 return;
             }
 
-            const customerName = document.getElementById('customer-name').value;
-            if (!customerName) {
-                showToast('Enter customer name to save', 'error');
-                document.getElementById('customer-name').focus();
+            // Validate required fields
+            const customerName = document.getElementById('customer-name')?.value?.trim();
+            const customerEmail = document.getElementById('customer-email')?.value?.trim();
+
+            if (!customerName || !customerEmail) {
+                showToast('Please enter customer name and email', 'error');
+                if (!customerName) document.getElementById('customer-name')?.focus();
+                else if (!customerEmail) document.getElementById('customer-email')?.focus();
                 return;
+            }
+
+            // Get save button for loading state
+            const saveBtn = document.querySelector('.btn-save-quote');
+            const originalText = saveBtn?.innerHTML;
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
             }
 
             showLoading(true);
@@ -3780,39 +3762,57 @@
                 ];
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos);
 
-                // Build separate objects matching service signature: saveQuote(quoteData, customerData, pricingResults)
-                const customerData = {
-                    email: document.getElementById('customer-email').value || '',
-                    name: customerName,
-                    company: document.getElementById('company-name').value || '',
-                    phone: document.getElementById('customer-phone').value || '',
-                    salesRepEmail: document.getElementById('sales-rep').value,
-                    notes: ''
-                };
-
+                // Build quoteData in format expected by DTGQuoteService
                 const quoteData = {
-                    products: products,
-                    logos: allLogos
+                    customerName: customerName,
+                    customerEmail: customerEmail,
+                    companyName: document.getElementById('company-name')?.value?.trim() || '',
+                    customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
+                    salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+                    products: products.map(p => ({
+                        ...p,
+                        sizeGroups: p.sizeGroups || []
+                    })),
+                    totalQuantity: pricing.totalQuantity || products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0),
+                    subtotal: pricing.subtotal || 0,
+                    ltmFee: pricing.ltmFee || 0,
+                    total: pricing.grandTotal || pricing.total || 0,
+                    tier: pricing.tier || '',
+                    location: printLocation,
+                    locationName: getPrintLocationName(printLocation)
                 };
 
-                // Attach logos to pricing for service to access
-                pricing.logos = allLogos;
+                const result = await quoteService.saveQuote(quoteData);
 
-                const result = await quoteService.saveQuote(quoteData, customerData, pricing);
-
-                if (result && result.quoteID) {
-                    showToast(`Quote ${result.quoteID} saved!`, 'success');
-                } else if (result && result.success) {
-                    showToast('Quote saved successfully', 'success');
+                if (result && result.success && result.quoteID) {
+                    console.log('[DTG] Quote saved:', result.quoteID);
+                    // Show success modal with shareable link
+                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                        QuoteShareModal.show(result.quoteID);
+                    } else {
+                        // Fallback
+                        const url = `${window.location.origin}/quote/${result.quoteID}`;
+                        alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                    }
                 } else {
-                    showToast('Error saving quote', 'error');
+                    throw new Error(result?.error || 'Failed to save quote');
                 }
             } catch (error) {
-                console.error('Save error:', error);
-                showToast('Error saving quote', 'error');
+                console.error('[DTG] Save error:', error);
+                showToast('Error saving quote: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+                // Restore button state
+                if (saveBtn) {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }
             }
+        }
 
-            showLoading(false);
+        // Legacy function - redirects to saveAndGetLink
+        async function saveQuote() {
+            return saveAndGetLink();
         }
 
         async function emailQuote() {
@@ -3830,14 +3830,6 @@
             }
 
             showToast('Email functionality coming soon', 'info');
-        }
-
-        // Toggle Coming Soon accordion
-        function toggleComingSoon() {
-            const content = document.getElementById('coming-soon-content');
-            const chevron = document.getElementById('coming-soon-chevron');
-            content.classList.toggle('open');
-            chevron.classList.toggle('rotated');
         }
 
         async function copyToClipboard() {

@@ -1732,10 +1732,14 @@ class DTFQuoteBuilder {
             if (result.success) {
                 console.log('[DTFQuoteBuilder] Quote saved successfully:', quoteId);
                 // Show success modal with shareable link
-                if (typeof showSaveModal === 'function') {
+                // Prefer shared QuoteShareModal module (2026 consolidation)
+                if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                    QuoteShareModal.show(quoteId);
+                } else if (typeof showSaveModal === 'function') {
+                    // Fallback to inline modal if shared module not loaded
                     showSaveModal(quoteId);
                 } else {
-                    // Fallback if modal function not available
+                    // Last resort fallback
                     const url = `${window.location.origin}/quote/${quoteId}`;
                     alert(`Quote saved!\n\nQuote ID: ${quoteId}\n\nShareable Link:\n${url}`);
                 }

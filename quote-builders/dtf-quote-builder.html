@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
 </head>
@@ -62,7 +63,7 @@
             <div class="location-config-section">
                 <div class="location-header">
                     <span class="location-label"><i class="fas fa-map-marker-alt"></i> Transfer Locations</span>
-                    <span class="location-hint">Select print locations (front/back zones are mutually exclusive)</span>
+                    <span class="location-hint">Choose ONE front location and/or ONE back location. Sleeves can be added to either.</span>
                 </div>
 
                 <!-- Location Groups -->
@@ -141,7 +142,7 @@
                         <input type="text"
                                id="product-search"
                                class="search-input"
-                               placeholder="Type style # to add (e.g., PC54, G500...)"
+                               placeholder="Search by style # (e.g., PC54, G500) or product name"
                                autocomplete="off"
                                disabled>
                         <div id="search-suggestions" class="search-suggestions"></div>
@@ -162,7 +163,7 @@
                                 <th class="size-col">L</th>
                                 <th class="size-col">XL</th>
                                 <th class="size-col">2XL</th>
-                                <th class="size-col extended-col" style="line-height: 1.1;">XXXL<br><span style="font-size: 10px; font-weight: 400;">(Other)</span></th>
+                                <th class="size-col extended-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="actions-col"></th>
@@ -225,7 +226,7 @@
                 </div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label">LTM Fee (&lt; 24 pcs):</span>
+                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -291,6 +292,9 @@
 
     <!-- Exact Match Search Module -->
     <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
+
+    <!-- Shared Quote Share Modal (2026 consolidation) -->
+    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
 
     <!-- DTF Quote Builder Scripts (4 files - consolidated architecture) -->
     <!-- Shared Quote Builder Components (2026 Consolidation) -->

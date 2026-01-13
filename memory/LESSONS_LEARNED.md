@@ -30,6 +30,24 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Problem: 3 of 4 quote builders had ZERO mobile responsiveness
+**Date:** 2026-01-13
+**Project:** Pricing Index
+**Symptoms:** DTG, Embroidery, Screen Print quote builders unusable on tablets/phones. Product tables overflowed viewport, sidebars didn't stack, buttons too small for touch.
+**Root cause:** CSS was extracted from inline styles but no @media queries were added. DTF was the only builder with breakpoints.
+**Solution:** Added comprehensive responsive breakpoints to all 3 CSS files:
+- 1024px: Sidebar stacks below content, columns become full-width
+- 768px: Tables get horizontal scroll, inputs become compact
+- 480px: Single-column layout, minimum touch targets (44px)
+- Print styles: Hidden sidebar, optimized table layout
+**Prevention:** Added mobile testing requirement to QUOTE_BUILDER_GUIDE.md Final Checklist. All new quote builders must include these breakpoints.
+**Files:**
+- `/shared_components/css/dtg-quote-builder-extracted.css`
+- `/shared_components/css/embroidery-quote-builder-extracted.css`
+- `/shared_components/css/screenprint-quote-builder-extracted.css`
+
+---
+
 ## Problem: DTF Quote Builder shareable URL - colors not saving correctly
 **Date:** 2026-01-13
 **Project:** Pricing Index

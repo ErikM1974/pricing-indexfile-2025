@@ -20,6 +20,9 @@
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
 
+    <!-- Shared Quote Share Modal (2026 consolidation) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -163,7 +166,7 @@
                         <input type="text"
                                id="product-search"
                                class="search-input"
-                               placeholder="Type style # to add (e.g., PC54, G500...)"
+                               placeholder="Search by style # (e.g., PC54, G500) or product name"
                                autocomplete="off">
                         <div id="search-suggestions" class="search-suggestions"></div>
                     </div>
@@ -182,7 +185,7 @@
                                 <th class="size-col">LG</th>
                                 <th class="size-col">XL</th>
                                 <th class="size-col">XXL</th>
-                                <th class="size-col" style="line-height: 1.1;">XXXL<br><span style="font-size: 10px; font-weight: 400;">(Other)</span></th>
+                                <th class="size-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="actions-col"></th>
@@ -287,7 +290,7 @@
                 </div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label">LTM Fee (&lt; 24 pcs):</span>
+                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -334,32 +337,31 @@
                         <p class="coming-soon-note">For now, use "Copy Quote to Clipboard" above to share quote details.</p>
                     </div>
 
-                    <!-- Hidden Customer Info (for future use) -->
-                    <div class="customer-panel coming-soon-disabled">
+                    <!-- Customer Info & Save -->
+                    <div class="customer-panel">
                         <div class="customer-panel-header">
                             <h4><i class="fas fa-user"></i> Customer Info</h4>
-                            <span class="coming-soon-badge">Coming Soon</span>
                         </div>
                         <div class="customer-fields">
                             <div class="customer-field">
-                                <label>Name</label>
-                                <input type="text" id="customer-name" placeholder="Customer name" disabled>
+                                <label>Name *</label>
+                                <input type="text" id="customer-name" placeholder="Customer name">
                             </div>
                             <div class="customer-field">
-                                <label>Email</label>
-                                <input type="email" id="customer-email" placeholder="email@company.com" disabled>
+                                <label>Email *</label>
+                                <input type="email" id="customer-email" placeholder="email@company.com">
                             </div>
                             <div class="customer-field">
                                 <label>Company</label>
-                                <input type="text" id="company-name" placeholder="Company name" disabled>
+                                <input type="text" id="company-name" placeholder="Company name">
                             </div>
                             <div class="customer-field">
                                 <label>Phone</label>
-                                <input type="tel" id="customer-phone" placeholder="(555) 555-5555" disabled>
+                                <input type="tel" id="customer-phone" placeholder="(555) 555-5555">
                             </div>
                             <div class="customer-field">
                                 <label>Sales Rep</label>
-                                <select id="sales-rep" disabled>
+                                <select id="sales-rep">
                                     <option value="sales@nwcustomapparel.com">General Sales</option>
                                     <option value="adriyella@nwcustomapparel.com">Adriyella</option>
                                     <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
@@ -372,22 +374,22 @@
                                 </select>
                             </div>
                         </div>
+                        <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px;">
+                            <i class="fas fa-link"></i> Save & Get Shareable Link
+                        </button>
                     </div>
 
-                    <!-- Hidden Action Buttons (for future use) -->
-                    <div class="action-panel coming-soon-disabled">
-                        <button class="btn-action btn-primary-action" disabled>
+                    <!-- Action Buttons -->
+                    <div class="action-panel">
+                        <button class="btn-action btn-primary-action" onclick="printQuote()">
                             <i class="fas fa-print"></i> Print PDF
-                            <span class="coming-soon-badge-small">Soon</span>
                         </button>
                         <div class="action-row">
-                            <button class="btn-action btn-secondary-action" disabled>
-                                <i class="fas fa-save"></i> Save
-                                <span class="coming-soon-badge-small">Soon</span>
+                            <button class="btn-action btn-secondary-action" onclick="copyToClipboard()">
+                                <i class="fas fa-copy"></i> Copy
                             </button>
-                            <button class="btn-action btn-secondary-action" disabled>
+                            <button class="btn-action btn-secondary-action" onclick="emailQuote()">
                                 <i class="fas fa-envelope"></i> Email
-                                <span class="coming-soon-badge-small">Soon</span>
                             </button>
                         </div>
                     </div>
@@ -435,6 +437,7 @@
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
@@ -3978,21 +3981,110 @@
             return names[code] || code;
         }
 
-        async function saveQuote() {
+        /**
+         * Save quote and get shareable link
+         * Uses ScreenPrintQuoteService and QuoteShareModal
+         */
+        async function saveAndGetLink() {
             const products = collectProductsFromTable();
             if (products.length === 0) {
                 showToast('Add products before saving', 'error');
                 return;
             }
 
-            // Screen Print save functionality - coming soon
-            showToast('Save feature coming soon. Use Copy to Clipboard for now.', 'info');
-            return;
+            // Validate required fields
+            const customerName = document.getElementById('customer-name')?.value?.trim();
+            const customerEmail = document.getElementById('customer-email')?.value?.trim();
 
-            // TODO: Implement screen print quote saving with SPC prefix
-            // - Generate quote ID: SPC[MMDD]-seq
-            // - Save to database via screenprint-quote-service.js
-            // - Include printConfig (screens, colors, dark garment, safety stripes)
+            if (!customerName || !customerEmail) {
+                showToast('Please enter customer name and email', 'error');
+                if (!customerName) document.getElementById('customer-name')?.focus();
+                else if (!customerEmail) document.getElementById('customer-email')?.focus();
+                return;
+            }
+
+            // Get save button for loading state
+            const saveBtn = document.querySelector('.btn-save-quote');
+            const originalText = saveBtn?.innerHTML;
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+            }
+
+            try {
+                // Get current pricing data
+                const pricing = window.currentPricingData || {};
+
+                // Format items for quote service
+                const items = products.map(product => ({
+                    styleNumber: product.style,
+                    productName: product.description || product.style,
+                    color: product.color,
+                    colorCode: product.catalogColor || product.color,
+                    quantity: product.qty,
+                    sizeBreakdown: product.sizes || {},
+                    basePrice: product.basePrice || 0,
+                    unitPrice: product.unitPrice || 0,
+                    ltmPerUnit: product.ltmPerUnit || 0,
+                    lineTotal: product.lineTotal || (product.qty * (product.unitPrice || 0)),
+                    imageUrl: product.imageUrl || ''
+                }));
+
+                // Collect quote data
+                const quoteData = {
+                    customerName: customerName,
+                    customerEmail: customerEmail,
+                    companyName: document.getElementById('company-name')?.value?.trim() || '',
+                    customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
+                    items: items,
+                    totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
+                    subtotal: pricing.subtotal || 0,
+                    ltmFee: pricing.ltmFee || 0,
+                    setupFees: printConfig.setupFee || 0,
+                    grandTotal: pricing.grandTotal || 0,
+                    printSetup: {
+                        frontLocation: printConfig.frontLocation,
+                        frontColors: printConfig.frontColors,
+                        backLocation: printConfig.backLocation,
+                        backColors: printConfig.backColors,
+                        isDarkGarment: printConfig.isDarkGarment,
+                        isSafetyStripes: printConfig.isSafetyStripes
+                    }
+                };
+
+                // Initialize service and save
+                const service = new ScreenPrintQuoteService();
+                const result = await service.saveQuote(quoteData);
+
+                if (result.success) {
+                    console.log('[ScreenPrint] Quote saved:', result.quoteID);
+                    // Show success modal with shareable link
+                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                        QuoteShareModal.show(result.quoteID);
+                    } else {
+                        // Fallback
+                        const url = `${window.location.origin}/quote/${result.quoteID}`;
+                        alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                    }
+                } else {
+                    throw new Error(result.error || 'Failed to save quote');
+                }
+
+            } catch (error) {
+                console.error('[ScreenPrint] Save error:', error);
+                showToast('Error saving quote: ' + error.message, 'error');
+            } finally {
+                // Restore button state
+                if (saveBtn) {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }
+            }
+        }
+
+        // Legacy function - redirects to saveAndGetLink
+        async function saveQuote() {
+            return saveAndGetLink();
         }
 
         async function emailQuote() {

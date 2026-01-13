@@ -1,0 +1,243 @@
+/**
+ * Shared Quote Share Modal Styles
+ * Used by all quote builders for shareable URL functionality
+ *
+ * CSS Variables (set these in your builder's CSS):
+ *   --quote-modal-primary: Primary accent color (default: #10b981)
+ *   --quote-modal-primary-dark: Darker accent (default: #059669)
+ *
+ * Or the modal will use sensible green defaults that work with most themes.
+ */
+
+/* =============================================
+   CSS Variables with Defaults
+   ============================================= */
+:root {
+    --quote-modal-primary: var(--builder-primary, #10b981);
+    --quote-modal-primary-dark: var(--builder-primary-dark, #059669);
+    --quote-modal-secondary: var(--builder-secondary, #1e40af);
+    --quote-modal-secondary-dark: var(--builder-secondary-dark, #1e3a8a);
+}
+
+/* =============================================
+   MODAL OVERLAY
+   ============================================= */
+.quote-share-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001; /* Above other modals */
+    animation: quoteShareFadeIn 0.2s ease;
+}
+
+/* Exit animation */
+.quote-share-modal-overlay.closing {
+    animation: quoteShareFadeOut 0.2s ease forwards;
+}
+
+@keyframes quoteShareFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes quoteShareFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* =============================================
+   MODAL CONTENT
+   ============================================= */
+.quote-share-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: quoteShareSlideUp 0.3s ease;
+    overflow: hidden;
+}
+
+@keyframes quoteShareSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================
+   MODAL HEADER
+   ============================================= */
+.quote-share-modal-header {
+    background: linear-gradient(135deg, var(--quote-modal-primary), var(--quote-modal-primary-dark));
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+.quote-share-modal-header i {
+    font-size: 48px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.quote-share-modal-header h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* =============================================
+   MODAL BODY
+   ============================================= */
+.quote-share-modal-body {
+    padding: 24px;
+}
+
+.quote-share-modal-body p {
+    margin: 0 0 12px 0;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+.quote-share-modal-body p strong {
+    color: var(--quote-modal-primary-dark);
+    font-size: 16px;
+}
+
+/* =============================================
+   URL COPY CONTAINER
+   ============================================= */
+.quote-share-url-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.quote-share-url-input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: monospace;
+    background: #f8f9fa;
+    color: #1f2937;
+}
+
+.quote-share-url-input:focus {
+    outline: none;
+    border-color: var(--quote-modal-primary);
+}
+
+/* =============================================
+   COPY BUTTON
+   ============================================= */
+.quote-share-btn-copy {
+    padding: 12px 16px;
+    background: var(--quote-modal-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.quote-share-btn-copy:hover {
+    background: var(--quote-modal-primary-dark);
+}
+
+.quote-share-btn-copy.copied {
+    background: #059669;
+}
+
+/* =============================================
+   MODAL FOOTER
+   ============================================= */
+.quote-share-modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px 24px;
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+/* View Quote Button */
+.quote-share-btn-view {
+    flex: 1;
+    padding: 12px 20px;
+    background: var(--quote-modal-secondary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.quote-share-btn-view:hover {
+    background: var(--quote-modal-secondary-dark);
+    transform: translateY(-1px);
+}
+
+/* Close Button */
+.quote-share-btn-close {
+    flex: 1;
+    padding: 12px 20px;
+    background: white;
+    color: #1f2937;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quote-share-btn-close:hover {
+    background: #f3f4f6;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 480px) {
+    .quote-share-modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+
+    .quote-share-url-container {
+        flex-direction: column;
+    }
+
+    .quote-share-btn-copy {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .quote-share-modal-footer {
+        flex-direction: column;
+    }
+}

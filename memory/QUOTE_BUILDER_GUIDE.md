@@ -694,6 +694,53 @@ customer_name: name,    // Not customerName
 | LT | Laser Tumblers | ✅ Active |
 | VNL | Vinyl (Example) | 📝 Template |
 
+## 📱 Mobile Responsiveness Requirements
+
+**CRITICAL:** All quote builders MUST include these CSS breakpoints. This was discovered when 3 of 4 builders had ZERO mobile responsiveness (see LESSONS_LEARNED.md 2026-01-13).
+
+### Required Breakpoints
+```css
+/* Tablet landscape - Stack sidebar below content */
+@media (max-width: 1024px) {
+    .power-main { flex-direction: column; height: auto; }
+    .power-sidebar { width: 100%; position: static; border-left: none; }
+}
+
+/* Tablet portrait - Compact tables and inputs */
+@media (max-width: 768px) {
+    .product-table { display: block; overflow-x: auto; }
+    .size-input { width: 40px; padding: 4px 2px; }
+    .config-section { padding: 12px; }
+}
+
+/* Phone - Single column layout */
+@media (max-width: 480px) {
+    .sidebar-actions { flex-direction: column; gap: 8px; }
+    .quote-header-content { flex-direction: column; }
+    /* Minimum touch target: 44x44px */
+}
+
+/* Print optimization */
+@media print {
+    .power-sidebar { display: none; }
+    .product-table { font-size: 10px; }
+}
+```
+
+### Mobile Testing Required Before Release
+Test at these viewport widths:
+- **375px** (iPhone SE) - Smallest common phone
+- **768px** (iPad portrait) - Tablet portrait
+- **1024px** (iPad landscape) - Tablet landscape
+
+Verify:
+- [ ] Tables scroll horizontally (not overflow viewport)
+- [ ] Touch targets ≥ 44x44px
+- [ ] Sidebar stacks below content on narrow screens
+- [ ] Print preview shows clean layout without sidebar
+
+---
+
 ## 🎯 Final Checklist
 
 Before going live with your new quote builder:
@@ -711,7 +758,8 @@ Before going live with your new quote builder:
 - [ ] Error handling shows user-friendly messages
 - [ ] Added to ACTIVE_FILES.md
 - [ ] Added to server.js routing
-- [ ] Tested on mobile device
+- [ ] **Mobile breakpoints included (1024px, 768px, 480px, print)**
+- [ ] **Mobile tested (375px, 768px, 1024px widths)**
 - [ ] Tested cross-browser (Chrome, Firefox, Safari)
 
 ---

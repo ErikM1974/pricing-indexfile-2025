@@ -23,6 +23,10 @@
     --border-color: #dee2e6;
     --bg-light: #f8f9fa;
     --bg-sidebar: #f1f3f5;
+
+    /* Shared modal theming (for quote-share-modal.css) */
+    --builder-primary: var(--nwca-green);
+    --builder-primary-dark: #218838;
 }
 
 /* ============================================
@@ -1083,6 +1087,37 @@ body {
     flex: 1;
 }
 
+/* Save & Get Shareable Link Button */
+.btn-save-quote {
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--nwca-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-save-quote:hover {
+    background: #218838;
+}
+
+.btn-save-quote:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+
+.btn-save-quote i {
+    font-size: 14px;
+}
+
 /* ============================================
    SHARED: Coming Soon Accordion
    ============================================ */
@@ -1929,4 +1964,190 @@ td.size-disabled input {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   RESPONSIVE - Mobile Breakpoints
+   ============================================ */
+@media (max-width: 1024px) {
+    .power-main {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .power-sidebar {
+        width: 100%;
+        position: static;
+        border-left: none;
+        border-top: 1px solid var(--border-color, #dee2e6);
+        max-height: none;
+    }
+
+    .power-content {
+        padding: 16px;
+    }
+
+    .config-section {
+        flex-direction: column;
+    }
+
+    .location-groups {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .location-group {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .power-header {
+        padding: 8px 12px;
+    }
+
+    .power-header .logo {
+        max-width: 100px;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    .btn-header {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .product-table th.desc-col,
+    .product-table td:nth-child(2) {
+        display: none;
+    }
+
+    .product-table th,
+    .product-table td {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+
+    .size-input {
+        width: 40px;
+        padding: 4px 2px;
+    }
+
+    .search-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-input-wrapper {
+        width: 100%;
+    }
+
+    .pricing-section {
+        padding: 12px;
+    }
+
+    .config-section {
+        padding: 12px;
+    }
+
+    /* Screen print specific: ink color options */
+    .ink-color-options {
+        flex-wrap: wrap;
+    }
+
+    .location-radio {
+        font-size: 12px;
+    }
+
+    /* Extended size popup responsive */
+    .size-popup {
+        min-width: 95%;
+        max-width: 95%;
+        margin: 10px;
+    }
+
+    .size-popup-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .power-header {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .power-header .logo {
+        order: 1;
+        margin-bottom: 8px;
+    }
+
+    .header-actions {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .product-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .product-table th,
+    .product-table td {
+        padding: 4px 2px;
+        font-size: 11px;
+    }
+
+    .size-input {
+        width: 35px;
+        padding: 3px 1px;
+        font-size: 11px;
+    }
+
+    .customer-field input,
+    .customer-field textarea {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .sidebar-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .sidebar-actions button {
+        width: 100%;
+    }
+
+    /* Screen print specific: dark garment warning */
+    .warning-box {
+        padding: 8px;
+        font-size: 12px;
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+    .power-header,
+    .sidebar-actions,
+    .search-row,
+    .keyboard-hint {
+        display: none !important;
+    }
+
+    .power-main {
+        height: auto;
+        display: block;
+    }
+
+    .power-sidebar {
+        width: 100%;
+        border: none;
+    }
 }
