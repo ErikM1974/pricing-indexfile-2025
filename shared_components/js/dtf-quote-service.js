@@ -116,7 +116,7 @@ class DTFQuoteService {
         try {
             console.log('[DTFQuoteService] Saving quote:', quoteData);
 
-            const quoteID = this.generateQuoteID();
+            const quoteID = quoteData.quoteId || this.generateQuoteID();
             const sessionID = this.generateSessionID();
 
             // Calculate expiry date (30 days from now)
@@ -182,12 +182,16 @@ class DTFQuoteService {
                 // Save each size group as separate line item
                 if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
                     for (const sizeGroup of product.sizeGroups) {
+                        // Use sizeGroup color if available (for extended sizes with different colors)
+                        const itemColor = sizeGroup.color || product.color;
+                        const itemImageUrl = sizeGroup.imageUrl || product.imageUrl || '';
+
                         const itemData = {
                             QuoteID: quoteID,
                             LineNumber: lineNumber++,
                             StyleNumber: product.styleNumber,
-                            ProductName: `${product.productName} - ${product.color}`,
-                            Color: product.color,
+                            ProductName: `${product.productName} - ${itemColor}`,
+                            Color: itemColor,
                             ColorCode: product.colorCode || '',
                             EmbellishmentType: 'dtf',
                             PrintLocation: locationCodes,
@@ -200,7 +204,7 @@ class DTFQuoteService {
                             LineTotal: parseFloat(sizeGroup.total.toFixed(2)),
                             SizeBreakdown: JSON.stringify(sizeGroup.sizes),
                             PricingTier: quoteData.tierLabel,
-                            ImageURL: product.imageUrl || '',
+                            ImageURL: itemImageUrl,
                             AddedAt: this.formatDateForCaspio(new Date())
                         };
 
@@ -222,25 +226,64 @@ class DTFQuoteService {
                     }
                 } else {
                     // Fallback: save as single line item
+                    // Calculate totalQuantity from quantities object if present
+                    let totalQty = product.totalQuantity || 0;
+                    let sizeBreakdown = product.sizeQuantities || {};
+
+                    if (product.quantities && typeof product.quantities === 'object') {
+                        // Sum up all quantities from the size breakdown
+                        totalQty = Object.values(product.quantities).reduce((sum, qty) => sum + (parseInt(qty) || 0), 0);
+                        sizeBreakdown = product.quantities;
+                    }
+
+                    // Skip if no quantity
+                    if (totalQty === 0) {
+                        console.log('[DTFQuoteService] Skipping item with 0 quantity:', product.styleNumber);
+                        continue;
+                    }
+
+                    // Calculate unit price and line total
+                    const baseUnitPrice = parseFloat(product.baseCost || product.unitPrice || 0);
+                    const finalUnitPrice = parseFloat(product.unitPrice || product.finalPrice || baseUnitPrice);
+                    const lineTotal = product.subtotal || (totalQty * finalUnitPrice);
+
+                    // Construct SanMar image URL from style + color code
+                    const colorCode = product.colorCode || product.catalogColor || product.color || '';
+                    const cleanColorCode = colorCode.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+                    const imageUrl = product.imageUrl ||
+                        (product.styleNumber && cleanColorCode ?
+                            `https://cdnm.sanmar.com/imglib/mresjpg/2022/${product.styleNumber}/${product.styleNumber}_${cleanColorCode}_model_front_072022.jpg` :
+                            '');
+
+                    console.log('[DTFQuoteService] Fallback item data:', {
+                        styleNumber: product.styleNumber,
+                        color: product.color,
+                        colorCode: cleanColorCode,
+                        totalQty,
+                        finalUnitPrice,
+                        lineTotal,
+                        imageUrl
+                    });
+
                     const itemData = {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
                         StyleNumber: product.styleNumber,
-                        ProductName: `${product.productName} - ${product.color}`,
+                        ProductName: `${product.productName || product.description || ''} - ${product.color}`,
                         Color: product.color,
-                        ColorCode: product.colorCode || '',
+                        ColorCode: colorCode,
                         EmbellishmentType: 'dtf',
                         PrintLocation: locationCodes,
                         PrintLocationName: locationNames,
-                        Quantity: product.totalQuantity || 0,
+                        Quantity: totalQty,
                         HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
-                        BaseUnitPrice: parseFloat((product.baseCost || 0).toFixed(2)),
+                        BaseUnitPrice: parseFloat(baseUnitPrice.toFixed(2)),
                         LTMPerUnit: 0,
-                        FinalUnitPrice: 0,
-                        LineTotal: parseFloat((product.subtotal || 0).toFixed(2)),
-                        SizeBreakdown: JSON.stringify(product.sizeQuantities || {}),
+                        FinalUnitPrice: parseFloat(finalUnitPrice.toFixed(2)),
+                        LineTotal: parseFloat(lineTotal.toFixed(2)),
+                        SizeBreakdown: JSON.stringify(sizeBreakdown),
                         PricingTier: quoteData.tierLabel || '',
-                        ImageURL: product.imageUrl || '',
+                        ImageURL: imageUrl,
                         AddedAt: this.formatDateForCaspio(new Date())
                     };
 

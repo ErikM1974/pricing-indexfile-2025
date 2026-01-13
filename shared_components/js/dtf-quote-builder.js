@@ -1534,6 +1534,226 @@ class DTFQuoteBuilder {
         }
     }
 
+    /**
+     * Save quote and show shareable link modal
+     * Called from "Save & Get Shareable Link" button
+     */
+    async saveAndGetLink() {
+        const customerName = document.getElementById('customer-name')?.value?.trim() || '';
+        const customerEmail = document.getElementById('customer-email')?.value?.trim() || '';
+        const companyName = document.getElementById('company-name')?.value?.trim() || '';
+
+        // Validate required fields
+        if (!customerName) {
+            alert('Please enter customer name');
+            document.getElementById('customer-name')?.focus();
+            return;
+        }
+
+        if (!customerEmail) {
+            alert('Please enter customer email');
+            document.getElementById('customer-email')?.focus();
+            return;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(customerEmail)) {
+            alert('Please enter a valid email address');
+            document.getElementById('customer-email')?.focus();
+            return;
+        }
+
+        // Check if there are products
+        if (!this.products || this.products.length === 0) {
+            alert('Please add at least one product to the quote');
+            return;
+        }
+
+        const totalQty = this.getTotalQuantity();
+        if (totalQty === 0) {
+            alert('Please add quantities to your products');
+            return;
+        }
+
+        // Generate quote ID
+        const quoteId = this.generateQuoteId();
+        const grandTotal = parseFloat(document.getElementById('grand-total').textContent.replace('$', '')) || 0;
+        const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace('$', '')) || grandTotal;
+        const ltmFee = parseFloat(document.getElementById('ltm-fee')?.textContent?.replace('$', '')) || 0;
+
+        // Build quote data
+        const quoteData = {
+            quoteId: quoteId,
+            customerName,
+            customerEmail,
+            companyName,
+            notes: '',
+            selectedLocations: this.selectedLocations,
+            locationDetails: this.selectedLocations.map(loc => ({
+                code: loc,
+                label: this.locationConfig[loc]?.label,
+                size: this.locationConfig[loc]?.size
+            })),
+            products: this.products.map(p => {
+                const standardSizes = ['S', 'M', 'L', 'XL'];
+                const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+                const allQuantities = {};
+                const sizeGroups = [];
+
+                // Get parent row early - we need it for both price and color/image data
+                const parentRow = document.getElementById(`row-${p.id}`);
+                const rowId = parentRow?.dataset?.rowId || parentRow?.dataset?.productId || p.id;
+
+                // Read color from row dataset (HTML stores here) or product object (JS stores here)
+                const color = parentRow?.dataset?.color || p.color || '';
+                const catalogColor = parentRow?.dataset?.catalogColor || p.catalogColor || '';
+                // Read image from row dataset (swatchUrl) or product object
+                const imageUrl = parentRow?.dataset?.swatchUrl || p.imageUrl || '';
+
+                // Collect standard size quantities
+                standardSizes.forEach(size => {
+                    allQuantities[size] = p.quantities[size] || 0;
+                });
+
+                // Add child row quantities (extended sizes)
+                const childMap = window.childRowMap?.[p.id] || {};
+                Object.entries(childMap).forEach(([size, childRowId]) => {
+                    const childRow = document.getElementById(`row-${childRowId}`);
+                    if (childRow) {
+                        const qtyDisplay = childRow.querySelector('.cell-qty');
+                        const qty = parseInt(qtyDisplay?.textContent) || 0;
+                        const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
+                        allQuantities[normalizedSize] = qty;
+                    }
+                });
+
+                // Build sizeGroups with calculated unit prices from displayed table
+                // Standard sizes (S-XL) as one group
+                const stdQtys = {};
+                let stdTotalQty = 0;
+                standardSizes.forEach(size => {
+                    if (allQuantities[size] > 0) {
+                        stdQtys[size] = allQuantities[size];
+                        stdTotalQty += allQuantities[size];
+                    }
+                });
+
+                if (stdTotalQty > 0) {
+                    // Get unit price - try class selector first, then ID fallback (HTML uses ID)
+                    const unitPriceCell = parentRow?.querySelector('.row-price') || document.getElementById(`row-price-${rowId}`);
+                    const unitPrice = parseFloat(unitPriceCell?.textContent?.replace('$', '').replace(',', '')) || 0;
+
+                    sizeGroups.push({
+                        sizes: stdQtys,
+                        quantity: stdTotalQty,
+                        unitPrice: unitPrice,
+                        total: stdTotalQty * unitPrice,
+                        effectiveCost: p.baseCost,
+                        color: color,            // Include parent row color
+                        catalogColor: catalogColor,
+                        imageUrl: imageUrl
+                    });
+                }
+
+                // Extended sizes - each as separate group with their own unit price and color
+                extendedSizes.forEach(size => {
+                    const qty = allQuantities[size] || 0;
+                    if (qty > 0) {
+                        // Get unit price from child row's displayed "Unit $" cell
+                        // Try display size first, then internal size name (XXL=2XL, XXXL=3XL)
+                        const internalSize = size === '2XL' ? 'XXL' : (size === '3XL' ? 'XXXL' : size);
+                        const childRowId = childMap[size] || childMap[internalSize];
+                        const childRow = document.getElementById(`row-${childRowId}`);
+
+                        // Read color from CHILD row (may differ from parent if user changed it)
+                        const childColor = childRow?.dataset?.color || color;
+                        const childCatalogColor = childRow?.dataset?.catalogColor || catalogColor;
+                        const childImageUrl = childRow?.dataset?.swatchUrl || imageUrl;
+
+                        const unitPriceCell = childRow?.querySelector('.cell-price');  // HTML child rows use .cell-price
+                        const unitPrice = parseFloat(unitPriceCell?.textContent?.replace('$', '').replace(',', '')) || 0;
+
+                        sizeGroups.push({
+                            sizes: { [size]: qty },
+                            quantity: qty,
+                            unitPrice: unitPrice,
+                            total: qty * unitPrice,
+                            effectiveCost: p.baseCost + (p.sizeUpcharges?.[size] || 0),
+                            color: childColor,       // Use child row color (or parent fallback)
+                            catalogColor: childCatalogColor,
+                            imageUrl: childImageUrl
+                        });
+                    }
+                });
+
+                return {
+                    styleNumber: p.styleNumber,
+                    productName: p.description,
+                    description: p.description,
+                    color: color,               // Use row dataset value
+                    catalogColor: catalogColor, // Use row dataset value
+                    baseCost: p.baseCost,
+                    sizeUpcharges: p.sizeUpcharges,
+                    quantities: allQuantities,
+                    sizeGroups: sizeGroups,
+                    imageUrl: imageUrl          // Use row dataset value
+                };
+            }),
+            totalQuantity: totalQty,
+            subtotal: subtotal,
+            ltmFee: ltmFee,
+            total: grandTotal,
+            grandTotal: grandTotal,
+            pricingMetadata: this.currentPricingData ? {
+                tier: this.currentPricingData.tier,
+                marginDenominator: this.currentPricingData.marginDenom,
+                laborCostPerLocation: this.currentPricingData.laborCostPerLoc,
+                freightPerTransfer: this.currentPricingData.freightPerTransfer,
+                ltmPerUnit: this.currentPricingData.ltmPerUnit,
+                totalLtmFee: this.currentPricingData.totalLtmFee,
+                transferBreakdown: this.currentPricingData.transferBreakdown
+            } : null,
+            createdAt: new Date().toISOString(),
+            builderVersion: '2026.01'
+        };
+
+        // Show saving state on button
+        const saveBtn = document.querySelector('.btn-save-quote');
+        const originalText = saveBtn?.innerHTML;
+        if (saveBtn) {
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
+        }
+
+        try {
+            const result = await this.quoteService.saveQuote(quoteData);
+
+            if (result.success) {
+                console.log('[DTFQuoteBuilder] Quote saved successfully:', quoteId);
+                // Show success modal with shareable link
+                if (typeof showSaveModal === 'function') {
+                    showSaveModal(quoteId);
+                } else {
+                    // Fallback if modal function not available
+                    const url = `${window.location.origin}/quote/${quoteId}`;
+                    alert(`Quote saved!\n\nQuote ID: ${quoteId}\n\nShareable Link:\n${url}`);
+                }
+            } else {
+                throw new Error(result.error || 'Failed to save quote');
+            }
+        } catch (error) {
+            console.error('[DTFQuoteBuilder] Save error:', error);
+            alert('Error saving quote: ' + (error.message || 'Please try again.'));
+        } finally {
+            // Restore button state
+            if (saveBtn) {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+    }
+
     saveDraft() {
         const draftData = {
             locations: this.selectedLocations,
