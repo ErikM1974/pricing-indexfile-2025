@@ -133,6 +133,13 @@ class QuoteViewPage {
         document.getElementById('created-date').textContent = this.formatDate(this.quoteData.CreatedAt);
         document.getElementById('expires-date').textContent = this.formatDate(this.quoteData.ExpiresAt);
 
+        // Sales Rep (if available)
+        const salesRep = this.quoteData.SalesRepName || this.quoteData.SalesRep || '';
+        if (salesRep) {
+            document.getElementById('sales-rep').textContent = salesRep;
+            document.getElementById('sales-rep-row').style.display = 'flex';
+        }
+
         // Check expiration
         if (this.isExpired()) {
             document.getElementById('expired-banner').style.display = 'flex';
@@ -255,28 +262,50 @@ class QuoteViewPage {
                 return '';
             }
 
-            const colors = await response.json();
-            if (!Array.isArray(colors) || colors.length === 0) {
+            const data = await response.json();
+            // API returns object with numeric keys - convert to array
+            const colors = Array.isArray(data) ? data : Object.values(data);
+            if (colors.length === 0) {
                 console.warn(`[QuoteView] No color data returned for ${styleNumber}`);
                 return '';
             }
 
-            // Find matching color (try various matching strategies)
-            const colorLower = (colorName || '').toLowerCase().replace(/\s+/g, '');
-            let match = colors.find(c => {
-                const name = (c.COLOR_NAME || '').toLowerCase().replace(/\s+/g, '');
-                const catalog = (c.CATALOG_COLOR || '').toLowerCase().replace(/\s+/g, '');
-                return name === colorLower || catalog === colorLower;
-            });
+            // Normalize function for color matching
+            const normalizeColor = (str) => (str || '').toLowerCase()
+                .replace(/\s+/g, '')     // Remove spaces
+                .replace(/[\/\-]/g, ''); // Remove slashes and dashes
 
-            // Try partial match if exact match fails
+            // Normalized search color
+            const colorNorm = normalizeColor(colorName);
+
+            // First try: Exact match on normalized COLOR_NAME
+            let match = colors.find(c => normalizeColor(c.COLOR_NAME) === colorNorm);
+
+            // Second try: Exact match on normalized CATALOG_COLOR
+            if (!match) {
+                match = colors.find(c => normalizeColor(c.CATALOG_COLOR) === colorNorm);
+            }
+
+            // Third try: Partial match (substring in either direction)
             if (!match) {
                 match = colors.find(c => {
-                    const name = (c.COLOR_NAME || '').toLowerCase().replace(/\s+/g, '');
-                    const catalog = (c.CATALOG_COLOR || '').toLowerCase().replace(/\s+/g, '');
-                    return name.includes(colorLower) || colorLower.includes(name) ||
-                           catalog.includes(colorLower) || colorLower.includes(catalog);
+                    const name = normalizeColor(c.COLOR_NAME);
+                    const catalog = normalizeColor(c.CATALOG_COLOR);
+                    return name.includes(colorNorm) || colorNorm.includes(name) ||
+                           catalog.includes(colorNorm) || colorNorm.includes(catalog);
                 });
+            }
+
+            // Fourth try: Word-based match (for multi-word colors like "Atlantic Blue Chrome")
+            if (!match) {
+                const searchWords = colorNorm.match(/[a-z]+/g) || [];
+                if (searchWords.length >= 2) {
+                    match = colors.find(c => {
+                        const name = normalizeColor(c.COLOR_NAME);
+                        // Check if at least 2 words match
+                        return searchWords.filter(w => name.includes(w)).length >= 2;
+                    });
+                }
             }
 
             // Return best image (prefer FRONT_MODEL, fallback to first color)
@@ -286,7 +315,7 @@ class QuoteViewPage {
             // Cache the result
             this.imageCache[cacheKey] = imageUrl;
 
-            console.log(`[QuoteView] Fetched image for ${styleNumber} ${colorName}: ${imageUrl ? 'Found' : 'Not found'}`);
+            console.log(`[QuoteView] Fetched image for ${styleNumber} ${colorName}: ${imageUrl ? 'Found' : 'Not found'}${match ? ` (matched: ${match.COLOR_NAME})` : ''}`);
             return imageUrl;
 
         } catch (error) {
@@ -296,8 +325,9 @@ class QuoteViewPage {
     }
 
     /**
-     * Render items as product cards with size matrix tables
-     * Fetches product images from API for each product
+     * Render items as a compact table
+     * Columns: Style | Color | S | M | LG | XL | XXL | XXXL | Qty | Unit $ | Total
+     * Description removed - shown in product detail modal instead
      */
     async renderItems() {
         const container = document.getElementById('items-container');
@@ -311,22 +341,90 @@ class QuoteViewPage {
         const productGroups = this.groupItemsByProduct();
         const groups = Object.values(productGroups);
 
-        // Render cards - images will be loaded async and updated
-        container.innerHTML = groups.map((group, index) =>
-            this.renderProductCard(group, index)
-        ).join('');
+        // Store groups for modal access
+        this.productGroups = groups;
+
+        // Build embroidery info section
+        let html = this.renderEmbroideryInfo();
+
+        // Build compact table HTML (no Description column)
+        html += `
+            <div class="product-table-wrapper">
+                <table class="product-table compact">
+                    <thead>
+                        <tr>
+                            <th class="style-col">Style</th>
+                            <th class="color-col">Color</th>
+                            <th class="size-col">S</th>
+                            <th class="size-col">M</th>
+                            <th class="size-col">LG</th>
+                            <th class="size-col">XL</th>
+                            <th class="size-col">XXL</th>
+                            <th class="size-col">XXXL</th>
+                            <th class="qty-col">Qty</th>
+                            <th class="price-col">Unit $</th>
+                            <th class="total-col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Render rows for each product group
+        let rowIndex = 0;
+        groups.forEach((group, groupIndex) => {
+            const rows = this.buildProductRows(group, groupIndex);
+            rows.forEach((row, i) => {
+                html += this.renderProductRow(row, i === 0, groupIndex);
+                rowIndex++;
+            });
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Add product detail modal container
+        html += `
+            <div id="product-modal" class="product-modal hidden">
+                <div class="product-modal-backdrop" onclick="window.quoteViewPage.closeProductModal()"></div>
+                <div class="product-modal-content">
+                    <button class="product-modal-close" onclick="window.quoteViewPage.closeProductModal()">&times;</button>
+                    <div class="product-modal-body">
+                        <img id="modal-product-image" class="product-modal-image" src="" alt="">
+                        <div class="product-modal-details">
+                            <h3 id="modal-product-name"></h3>
+                            <p class="modal-style">Style: <span id="modal-style-number"></span></p>
+                            <p class="modal-color">Color: <span id="modal-color-name"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Store reference for modal access
+        window.quoteViewPage = this;
 
         // Fetch and update images for each product (async)
         for (let i = 0; i < groups.length; i++) {
             const group = groups[i];
             const imageUrl = await this.fetchProductImage(group.styleNumber, group.color);
 
+            // Store image URL for modal
+            group.imageUrl = imageUrl;
+
             if (imageUrl) {
                 const imgElement = container.querySelector(`#product-image-${i}`);
                 if (imgElement) {
                     imgElement.src = imageUrl;
+                    imgElement.onload = function() {
+                        this.style.opacity = '1';
+                    };
                     imgElement.onerror = function() {
-                        this.parentElement.innerHTML = '<div class="product-image-placeholder">No Image</div>';
+                        this.style.display = 'none';
                     };
                 }
             }
@@ -334,20 +432,213 @@ class QuoteViewPage {
     }
 
     /**
+     * Render embroidery info section (location, stitches, additionals)
+     */
+    renderEmbroideryInfo() {
+        // Get embroidery details from quote data
+        const location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation || 'Left Chest';
+        const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
+        const digitizing = this.quoteData?.DigitizingFee || 0;
+        const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
+        const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
+
+        let html = `<div class="embroidery-info">`;
+        html += `<div class="emb-detail"><span class="emb-label">Location:</span> <span class="emb-value">${this.escapeHtml(location)}</span></div>`;
+        html += `<div class="emb-detail"><span class="emb-label">Stitches:</span> <span class="emb-value">${this.escapeHtml(String(stitches))}</span></div>`;
+        if (digitizing > 0) {
+            html += `<div class="emb-detail"><span class="emb-label">Digitizing:</span> <span class="emb-value">${this.formatCurrency(digitizing)}</span></div>`;
+        }
+        // Additional Logo info (if present)
+        if (addlLocation || addlStitches > 0) {
+            const addlText = addlLocation
+                ? `${this.escapeHtml(addlLocation)} (${addlStitches.toLocaleString()} stitches)`
+                : `${addlStitches.toLocaleString()} stitches`;
+            html += `<div class="emb-detail"><span class="emb-label">Additional Logo:</span> <span class="emb-value">${addlText}</span></div>`;
+        }
+        html += `</div>`;
+        return html;
+    }
+
+    /**
+     * Open product detail modal
+     */
+    openProductModal(groupIndex) {
+        const group = this.productGroups[groupIndex];
+        if (!group) return;
+
+        const modal = document.getElementById('product-modal');
+        const modalImage = document.getElementById('modal-product-image');
+        const modalName = document.getElementById('modal-product-name');
+        const modalStyle = document.getElementById('modal-style-number');
+        const modalColor = document.getElementById('modal-color-name');
+
+        modalImage.src = group.imageUrl || '/pages/images/product-placeholder.png';
+        modalName.textContent = group.productName || 'Product';
+        modalStyle.textContent = group.styleNumber;
+        modalColor.textContent = group.color;
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Close product detail modal
+     */
+    closeProductModal() {
+        const modal = document.getElementById('product-modal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    /**
+     * Build row data for a product group
+     * Returns array of rows: standard sizes row + individual extended size rows
+     */
+    buildProductRows(productGroup, groupIndex) {
+        const rows = [];
+
+        // Parse all items to understand what sizes we have
+        const allSizes = {};
+        productGroup.items.forEach(item => {
+            const breakdown = this.parseSizeBreakdown(item.SizeBreakdown);
+            Object.entries(breakdown).forEach(([size, qty]) => {
+                if (qty > 0) {
+                    if (!allSizes[size]) {
+                        allSizes[size] = { qty: 0, price: 0, total: 0 };
+                    }
+                    allSizes[size].qty += qty;
+                    allSizes[size].price = item.FinalUnitPrice || 0;
+                    allSizes[size].total += (qty * (item.FinalUnitPrice || 0));
+                }
+            });
+        });
+
+        // Standard sizes (S, M, L, XL) - one row
+        const standardSizes = ['S', 'M', 'L', 'XL'];
+        const stdSizeData = {};
+        let stdQty = 0;
+        let stdPrice = 0;
+        let stdTotal = 0;
+
+        standardSizes.forEach(size => {
+            if (allSizes[size]) {
+                stdSizeData[size] = allSizes[size].qty;
+                stdQty += allSizes[size].qty;
+                stdPrice = allSizes[size].price; // All standard sizes same price
+                stdTotal += allSizes[size].total;
+            }
+        });
+
+        if (stdQty > 0) {
+            rows.push({
+                style: productGroup.styleNumber,
+                description: productGroup.productName,
+                color: productGroup.color,
+                sizes: stdSizeData,
+                qty: stdQty,
+                unitPrice: stdPrice,
+                lineTotal: stdTotal,
+                isFirstRow: true,
+                groupIndex: groupIndex
+            });
+        }
+
+        // Extended sizes - each gets its own row
+        const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+        extendedSizes.forEach(size => {
+            if (allSizes[size] && allSizes[size].qty > 0) {
+                const sizeData = {};
+                sizeData[size] = allSizes[size].qty;
+
+                // Determine style suffix
+                const suffix = size === '2XL' ? '_2X' : `_${size.replace('XL', 'X')}`;
+
+                rows.push({
+                    style: `${productGroup.styleNumber}${suffix}`,
+                    description: `${productGroup.productName} - ${size}`,
+                    color: productGroup.color,
+                    sizes: sizeData,
+                    qty: allSizes[size].qty,
+                    unitPrice: allSizes[size].price,
+                    lineTotal: allSizes[size].total,
+                    isFirstRow: false,
+                    groupIndex: groupIndex
+                });
+            }
+        });
+
+        return rows;
+    }
+
+    /**
+     * Render a single product row (compact - no Description column)
+     */
+    renderProductRow(row, isFirstRow, groupIndex) {
+        // Map sizes to columns: S, M, LG(L), XL, XXL(2XL), XXXL(3XL+)
+        const sCol = row.sizes['S'] || '';
+        const mCol = row.sizes['M'] || '';
+        const lgCol = row.sizes['L'] || '';
+        const xlCol = row.sizes['XL'] || '';
+        const xxlCol = row.sizes['2XL'] || '';
+        const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL'] || '';
+
+        // Style column with clickable image for first row (opens modal)
+        let styleCell;
+        if (isFirstRow) {
+            styleCell = `
+                <td class="style-col clickable" onclick="window.quoteViewPage.openProductModal(${groupIndex})">
+                    <div class="style-with-image">
+                        <img id="product-image-${groupIndex}" class="product-thumb" src="/pages/images/product-placeholder.png" alt="${this.escapeHtml(row.style)}">
+                        <span>${this.escapeHtml(row.style)}</span>
+                    </div>
+                </td>
+            `;
+        } else {
+            styleCell = `<td class="style-col ext-style">${this.escapeHtml(row.style)}</td>`;
+        }
+
+        return `
+            <tr class="${isFirstRow ? 'first-row' : 'extended-row'}">
+                ${styleCell}
+                <td class="color-col">${this.escapeHtml(row.color)}</td>
+                <td class="size-col">${sCol}</td>
+                <td class="size-col">${mCol}</td>
+                <td class="size-col">${lgCol}</td>
+                <td class="size-col">${xlCol}</td>
+                <td class="size-col">${xxlCol}</td>
+                <td class="size-col">${xxxlCol}</td>
+                <td class="qty-col">${row.qty}</td>
+                <td class="price-col">${this.formatCurrency(row.unitPrice)}</td>
+                <td class="total-col">${this.formatCurrency(row.lineTotal)}</td>
+            </tr>
+        `;
+    }
+
+    /**
      * Group items by product (StyleNumber + Color)
+     * Normalizes color names to prevent duplicates from Color vs ColorCode inconsistencies
+     * Dedupes items with same SizeBreakdown (keeps highest LineNumber - most recent)
      */
     groupItemsByProduct() {
         const groups = {};
 
         this.items.forEach(item => {
-            // Use Color or ColorCode for grouping (some quotes have data in different fields)
-            const colorForGrouping = item.Color || item.ColorCode || 'Unknown';
-            const key = `${item.StyleNumber}-${colorForGrouping}`;
+            // Get display color (prefer Color, fall back to ColorCode)
+            const displayColor = item.Color || item.ColorCode || 'Unknown';
+
+            // Normalize color for grouping key to prevent duplicates
+            // "Atlantic Blue/ Chrome" and "AtlBlChrome" should group together
+            const normalizedColor = displayColor.toLowerCase()
+                .replace(/\s+/g, '')   // Remove all spaces
+                .replace(/[\/\-]/g, ''); // Remove slashes and dashes
+
+            const key = `${item.StyleNumber}-${normalizedColor}`;
+
             if (!groups[key]) {
                 groups[key] = {
                     styleNumber: item.StyleNumber,
                     productName: this.extractProductName(item.ProductName),
-                    color: item.Color || item.ColorCode || 'N/A', // Fallback to ColorCode for display
+                    color: item.Color || item.ColorCode || 'N/A', // Keep original for display
                     colorCode: item.ColorCode || item.Color || '', // For image URL construction
                     imageUrl: item.ImageURL,
                     printLocation: item.PrintLocationName || item.PrintLocation,
@@ -356,6 +647,29 @@ class QuoteViewPage {
                 };
             }
             groups[key].items.push(item);
+        });
+
+        // Dedupe items within each group - keep only unique SizeBreakdowns
+        // If duplicates exist (from multiple pricing tiers), keep the one with highest LineNumber
+        Object.values(groups).forEach(group => {
+            const seen = new Map(); // Map<SizeBreakdown, item>
+
+            group.items.forEach(item => {
+                const sizeKey = item.SizeBreakdown || '';
+                const existingItem = seen.get(sizeKey);
+
+                // Keep item with higher LineNumber (more recent)
+                if (!existingItem || (item.LineNumber || 0) > (existingItem.LineNumber || 0)) {
+                    seen.set(sizeKey, item);
+                }
+            });
+
+            // Replace items with deduped list
+            const dedupedItems = Array.from(seen.values());
+            if (dedupedItems.length < group.items.length) {
+                console.log(`[QuoteView] Deduped ${group.styleNumber} ${group.color}: ${group.items.length} → ${dedupedItems.length} items`);
+                group.items = dedupedItems;
+            }
         });
 
         return groups;
@@ -390,6 +704,7 @@ class QuoteViewPage {
                         <img id="product-image-${index}"
                              src="${storedImageUrl || '/pages/images/product-placeholder.png'}"
                              alt="${this.escapeHtml(productGroup.styleNumber)}"
+                             onload="this.nextElementSibling.style.display='none';"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="product-image-placeholder" style="display: ${storedImageUrl ? 'none' : 'flex'};">
                             <span>Loading...</span>
@@ -434,20 +749,92 @@ class QuoteViewPage {
 
     /**
      * Render size matrix table for a product
-     * Handles both new format (multiple items with stored prices) and legacy format
+     * Handles three formats:
+     * 1. OLD FORMAT: Multiple items with IDENTICAL SizeBreakdowns (pre-fix data) - aggregate and split by tier
+     * 2. NEW FORMAT: Multiple items with UNIQUE SizeBreakdowns - render each directly
+     * 3. LEGACY FORMAT: Single item with all sizes - split by price tier
      */
     renderSizeMatrix(productGroup) {
         const rows = [];
 
-        // Check if items have valid stored prices (new format)
-        // New format: FinalUnitPrice is the selling price (e.g., $31, $33, etc.)
-        // Legacy format: FinalUnitPrice is garment cost (e.g., $3.53)
+        // Check if items have valid stored prices
         const hasValidStoredPrices = productGroup.items.some(item =>
             item.FinalUnitPrice && item.FinalUnitPrice > 10 && item.LineTotal > 0
         );
 
-        if (hasValidStoredPrices || productGroup.items.length > 1) {
-            // NEW FORMAT: Multiple items with stored prices - render each item directly
+        // Check if all items have IDENTICAL SizeBreakdowns (OLD format indicator)
+        // This happens when quotes were saved before the fix that parses per-lineItem sizes
+        const sizeBreakdowns = productGroup.items.map(item => {
+            const sb = this.parseSizeBreakdown(item.SizeBreakdown);
+            // Sort keys for consistent comparison
+            return JSON.stringify(sb, Object.keys(sb).sort());
+        });
+        const hasDuplicateSizeBreakdowns = productGroup.items.length > 1 &&
+            sizeBreakdowns.every(sb => sb === sizeBreakdowns[0]) &&
+            sizeBreakdowns[0] !== '{}';
+
+        if (hasDuplicateSizeBreakdowns) {
+            // OLD FORMAT: All items have same SizeBreakdown - aggregate and split by price tier
+            // This fixes quotes where every row incorrectly shows ALL sizes
+            console.log('[QuoteView] Detected OLD format with duplicate SizeBreakdowns - using aggregated approach');
+
+            const aggregatedBreakdown = this.parseSizeBreakdown(productGroup.items[0].SizeBreakdown);
+            const totalLineTotal = productGroup.items.reduce((sum, item) =>
+                sum + (parseFloat(item.LineTotal) || 0), 0);
+            const totalQty = productGroup.items.reduce((sum, item) =>
+                sum + (parseInt(item.Quantity) || 0), 0);
+
+            // Calculate base price from aggregated data
+            // Use average price if valid, otherwise fallback to getUnitPriceForSize
+            const avgPrice = totalQty > 0 ? totalLineTotal / totalQty : 0;
+            const basePrice = avgPrice > 10 ? avgPrice : this.getUnitPriceForSize('S');
+
+            // Split into standard and extended sizes
+            const standardSizesData = {};
+            const extendedSizesData = {};
+
+            Object.entries(aggregatedBreakdown).forEach(([size, qty]) => {
+                if (qty > 0) {
+                    if (this.extendedSizes.includes(size)) {
+                        extendedSizesData[size] = qty;
+                    } else {
+                        standardSizesData[size] = qty;
+                    }
+                }
+            });
+
+            // Standard sizes row (all at base price)
+            if (Object.keys(standardSizesData).length > 0) {
+                const stdQty = Object.values(standardSizesData).reduce((a, b) => a + b, 0);
+                const stdLabel = Object.entries(standardSizesData)
+                    .sort((a, b) => this.sizeOrder.indexOf(a[0]) - this.sizeOrder.indexOf(b[0]))
+                    .map(([s, q]) => `${s}(${q})`).join(' ');
+                rows.push({
+                    label: stdLabel,
+                    qty: stdQty,
+                    unitPrice: basePrice,
+                    total: stdQty * basePrice,
+                    isExtended: false
+                });
+            }
+
+            // Extended sizes - each separately with upcharge
+            Object.entries(extendedSizesData)
+                .sort((a, b) => this.sizeOrder.indexOf(a[0]) - this.sizeOrder.indexOf(b[0]))
+                .forEach(([size, qty]) => {
+                    const upcharge = this.sizeUpcharges[size] || 0;
+                    const extPrice = basePrice + upcharge;
+                    rows.push({
+                        label: `${size}(${qty})`,
+                        qty: qty,
+                        unitPrice: extPrice,
+                        total: qty * extPrice,
+                        isExtended: true
+                    });
+                });
+
+        } else if (hasValidStoredPrices || productGroup.items.length > 1) {
+            // NEW FORMAT: Multiple items with unique SizeBreakdowns - render each item directly
             productGroup.items.forEach(item => {
                 const sizeBreakdown = this.parseSizeBreakdown(item.SizeBreakdown);
                 const sizeLabel = Object.entries(sizeBreakdown)
@@ -1010,31 +1397,33 @@ class QuoteViewPage {
         const margin = 20;
         let yPos = margin;
 
-        // Header - green
+        // Header - green banner with company info
         pdf.setFillColor(76, 179, 84); // #4cb354
-        pdf.rect(0, 0, pageWidth, 35, 'F');
+        pdf.rect(0, 0, pageWidth, 42, 'F');
 
-        // Company name
+        // Company name and address
         pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(18);
+        pdf.setFontSize(16);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('Northwest Custom Apparel', margin, 15);
+        pdf.text('Northwest Custom Apparel', margin, 12);
 
-        pdf.setFontSize(10);
+        pdf.setFontSize(8);
         pdf.setFont('helvetica', 'normal');
-        pdf.text('(253) 922-5793 | sales@nwcustomapparel.com', margin, 22);
+        pdf.text('2025 Freeman Road East, Milton, WA 98354', margin, 19);
+        pdf.text('(253) 922-5793 | sales@nwcustomapparel.com', margin, 25);
+        pdf.text('www.nwcustomapparel.com', margin, 31);
 
-        // Quote ID
+        // Quote ID (right side)
         pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(`Quote #${this.quoteId}`, pageWidth - margin, 15, { align: 'right' });
+        pdf.text(`Quote #${this.quoteId}`, pageWidth - margin, 14, { align: 'right' });
 
-        pdf.setFontSize(10);
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'normal');
         const status = this.quoteData.Status || 'Open';
         pdf.text(status, pageWidth - margin, 22, { align: 'right' });
 
-        yPos = 45;
+        yPos = 50;
 
         // Reset text color
         pdf.setTextColor(51, 51, 51);
@@ -1060,51 +1449,183 @@ class QuoteViewPage {
         // Quote Details (right side)
         const rightCol = pageWidth - margin - 50;
         pdf.setFont('helvetica', 'bold');
-        pdf.text('QUOTE DETAILS', rightCol, 45);
+        pdf.text('QUOTE DETAILS', rightCol, 50);
 
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`Type: ${this.getQuoteType()}`, rightCol, 51);
-        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt)}`, rightCol, 57);
-        pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, rightCol, 63);
+        pdf.text(`Type: ${this.getQuoteType()}`, rightCol, 56);
+        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt)}`, rightCol, 62);
+        pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, rightCol, 68);
 
-        yPos = 80;
+        // Add Sales Rep if available
+        const salesRep = this.quoteData.SalesRepName || this.quoteData.SalesRep || '';
+        if (salesRep) {
+            pdf.text(`Sales Rep: ${salesRep}`, rightCol, 74);
+        }
+
+        yPos = Math.max(yPos, 80);
 
         // Divider
         pdf.setDrawColor(76, 179, 84);
         pdf.setLineWidth(0.5);
-        pdf.line(margin, yPos - 5, pageWidth - margin, yPos - 5);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 6;
 
-        // Items
-        pdf.setFontSize(12);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Products', margin, yPos);
-        yPos += 8;
+        // Embroidery Details Section (for embroidery quotes)
+        const quoteType = this.getQuoteType();
+        if (quoteType === 'Embroidery' || quoteType === 'Customer Supplied Embroidery') {
+            // Get embroidery details from quote data
+            const location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation || 'Left Chest';
+            const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
+            const digitizing = parseFloat(this.quoteData?.DigitizingFee) || 0;
+            const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
+            const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
+            const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
 
-        // Items table
-        this.items.forEach(item => {
-            if (yPos > 250) {
-                pdf.addPage();
-                yPos = 20;
+            // Calculate box height: base 22mm, add 6mm if additional logo exists
+            const hasAddlLogo = addlLocation || addlStitches > 0;
+            const boxHeight = hasAddlLogo ? 28 : 22;
+
+            pdf.setFillColor(248, 250, 252); // Light blue-gray background
+            pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
+
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(51, 51, 51);
+            pdf.text('EMBROIDERY DETAILS', margin + 3, yPos + 4);
+
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'normal');
+
+            // Row 1: Location and Stitch Count
+            pdf.text(`Location: ${location}`, margin + 3, yPos + 11);
+            pdf.text(`Stitch Count: ${stitches.toLocaleString()}`, margin + 70, yPos + 11);
+
+            // Row 2: Digitizing and Additional Charges
+            if (digitizing > 0) {
+                pdf.text(`Digitizing Fee: ${this.formatCurrency(digitizing)}`, margin + 3, yPos + 17);
+            }
+            if (additionalStitchCharge > 0) {
+                pdf.text(`Add'l Stitch Charge: ${this.formatCurrency(additionalStitchCharge)}`, margin + 70, yPos + 17);
             }
 
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(`${item.StyleNumber} - ${item.Color}`, margin, yPos);
-            yPos += 5;
+            // Row 3: Additional Logo (if present)
+            if (hasAddlLogo) {
+                const addlText = addlLocation
+                    ? `Additional Logo: ${addlLocation} (${addlStitches.toLocaleString()} stitches)`
+                    : `Additional Logo: ${addlStitches.toLocaleString()} stitches`;
+                pdf.text(addlText, margin + 3, yPos + 23);
+            }
 
-            pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(9);
-            const sizeInfo = this.parseSizeBreakdown(item.SizeBreakdown);
-            const sizeStr = Object.entries(sizeInfo)
-                .filter(([_, qty]) => qty > 0)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(' ') || `Qty: ${item.Quantity}`;
-            pdf.text(sizeStr, margin + 5, yPos);
+            yPos += boxHeight + 4;
+        }
 
-            const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
-            const lineTotal = item.LineTotal || (unitPrice * item.Quantity);
-            pdf.text(`${this.formatCurrency(unitPrice)} x ${item.Quantity} = ${this.formatCurrency(lineTotal)}`, pageWidth - margin - 60, yPos);
-            yPos += 8;
+        // Products Section
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(51, 51, 51);
+        pdf.text('PRODUCTS', margin, yPos);
+        yPos += 6;
+
+        // Table header - with Style/Description column
+        // Page: 215.9mm, margins: 20mm each, usable: 175.9mm
+        const colX = {
+            styleDesc: margin,       // 20mm  - Style/Description (wider)
+            color: margin + 55,      // 75mm  - Color column
+            s: margin + 80,          // 100mm - Size columns (compressed)
+            m: margin + 88,          // 108mm
+            lg: margin + 96,         // 116mm
+            xl: margin + 104,        // 124mm
+            xxl: margin + 112,       // 132mm
+            xxxl: margin + 122,      // 142mm
+            qty: margin + 132,       // 152mm - Qty column
+            price: margin + 144,     // 164mm - Unit $ column
+            total: margin + 160      // 180mm - Total column
+        };
+
+        // Light gray header - prints well in B&W
+        pdf.setFillColor(240, 240, 240);
+        pdf.rect(margin, yPos - 4, pageWidth - margin * 2, 7, 'F');
+
+        // Dark text on light background
+        pdf.setTextColor(51, 51, 51);
+        pdf.setFontSize(6.5);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Item / Description', colX.styleDesc + 2, yPos);
+        pdf.text('Color', colX.color + 2, yPos);
+        pdf.text('S', colX.s + 2, yPos);
+        pdf.text('M', colX.m + 2, yPos);
+        pdf.text('L', colX.lg + 2, yPos);
+        pdf.text('XL', colX.xl + 1, yPos);
+        pdf.text('2X', colX.xxl + 1, yPos);
+        pdf.text('3X+', colX.xxxl, yPos);
+        pdf.text('Qty', colX.qty + 1, yPos);
+        pdf.text('Unit $', colX.price - 1, yPos);
+        pdf.text('Total', colX.total, yPos);
+
+        // Bottom border for separation
+        pdf.setDrawColor(180, 180, 180);
+        pdf.setLineWidth(0.3);
+        pdf.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
+        yPos += 7;
+
+        pdf.setTextColor(51, 51, 51);
+
+        // Use same grouping/deduplication as web view
+        const productGroups = this.groupItemsByProduct();
+        const groups = Object.values(productGroups);
+
+        groups.forEach(group => {
+            const rows = this.buildProductRows(group, 0);
+            rows.forEach((row, i) => {
+                if (yPos > 250) {
+                    pdf.addPage();
+                    yPos = 20;
+                }
+
+                // Map sizes to columns
+                const sCol = row.sizes['S'] || '';
+                const mCol = row.sizes['M'] || '';
+                const lgCol = row.sizes['L'] || '';
+                const xlCol = row.sizes['XL'] || '';
+                const xxlCol = row.sizes['2XL'] || '';
+                const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL'] || '';
+
+                // Truncate description to fit
+                const truncDesc = (row.description || '').substring(0, 18);
+                const styleDesc = `${row.style} - ${truncDesc}`;
+
+                pdf.setFontSize(7);
+                if (i === 0) {
+                    pdf.setFont('helvetica', 'bold');
+                } else {
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(180, 83, 9); // Orange for extended
+                }
+
+                // Combined style/description column
+                pdf.text(styleDesc.substring(0, 28), colX.styleDesc + 2, yPos);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(51, 51, 51);
+                pdf.text(row.color.substring(0, 10), colX.color + 2, yPos);
+
+                // Size columns
+                pdf.text(String(sCol), colX.s + 3, yPos);
+                pdf.text(String(mCol), colX.m + 3, yPos);
+                pdf.text(String(lgCol), colX.lg + 3, yPos);
+                pdf.text(String(xlCol), colX.xl + 3, yPos);
+                pdf.text(String(xxlCol), colX.xxl + 3, yPos);
+                pdf.text(String(xxxlCol), colX.xxxl + 3, yPos);
+                // Qty, Price, Total - properly spaced
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(String(row.qty), colX.qty + 4, yPos);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(this.formatCurrency(row.unitPrice), colX.price, yPos);
+                pdf.setTextColor(76, 179, 84);
+                pdf.text(this.formatCurrency(row.lineTotal), colX.total, yPos);
+                pdf.setTextColor(51, 51, 51);
+
+                yPos += 6;
+            });
         });
 
         // Totals
