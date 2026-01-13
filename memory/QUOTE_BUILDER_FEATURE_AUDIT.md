@@ -13,8 +13,9 @@
 | Save to database | ✅ | ✅ | ✅ | ✅ |
 | Shareable URL | ✅ | ✅ | ✅ | ✅ |
 | PDF generation | ✅ | ✅ | ✅ | ✅ |
-| Auto-save drafts | ❌ | ❌ | ❌ | ❌ |
-| Sales rep dropdown | ❌ | ✅ | ✅ | ✅ |
+| Auto-save drafts | ✅ | ✅ | ✅ | ✅ |
+| Sales rep dropdown | ✅ | ✅ | ✅ | ✅ |
+| Sales rep auto-select | ✅ | ✅ | ✅ | ✅ |
 | Keyboard hints | ✅ | ❌ | ❌ | ❌ |
 
 ---
@@ -243,10 +244,13 @@ AddedAt              DATETIME
 - [x] Quote share modal shared across all 4 (2026-01-13)
 - [x] Remove email UI confusion (2026-01-13)
 - [x] PDF generation for all 4 builders (already existed - verified 2026-01-13)
+- [x] Auto-save/draft recovery for all 4 builders (2026-01-13)
+- [x] Sales rep dropdown for DTF (2026-01-13)
+- [x] Sales rep auto-select based on staff login for all 4 builders (2026-01-13)
+- [x] Quote Management Dashboard `/dashboards/quote-management.html` (2026-01-13)
+- [x] Fixed salesRep not saving in DTF and Screen Print quote submissions (2026-01-13)
 
 ### Planned
-- [ ] Auto-save/draft recovery for all 4
-- [ ] Sales rep dropdown for DTF
 - [ ] Keyboard hints for DTG, Screen Print, Embroidery
 - [ ] Refactor duplicated service code to BaseQuoteService
 

@@ -251,6 +251,18 @@
                     <input type="text" id="customer-name" class="quote-input" placeholder="Customer Name *">
                     <input type="email" id="customer-email" class="quote-input" placeholder="Email *">
                     <input type="text" id="company-name" class="quote-input" placeholder="Company (optional)">
+                    <input type="tel" id="customer-phone" class="quote-input" placeholder="Phone (optional)">
+                    <select id="sales-rep" class="quote-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white;">
+                        <option value="sales@nwcustomapparel.com">General Sales</option>
+                        <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                        <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                        <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                        <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                        <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                        <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                        <option value="art@nwcustomapparel.com">Steve Deland</option>
+                        <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                    </select>
                 </div>
                 <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()">
                     <i class="fas fa-link"></i> Save & Get Shareable Link
@@ -299,6 +311,13 @@
     <!-- DTF Quote Builder Scripts (4 files - consolidated architecture) -->
     <!-- Shared Quote Builder Components (2026 Consolidation) -->
     <script src="/shared_components/js/extended-sizes-config.js?v=20260107"></script>
+
+    <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
+    <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-session.js?v=20260113"></script>
+
+    <!-- Staff Authentication Helper (auto-select sales rep) -->
+    <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
 
     <!-- Invoice Generator (for professional PDF output) -->
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>

@@ -470,6 +470,13 @@
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20251219-no-monogram"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
 
+    <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
+    <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-session.js?v=20260113"></script>
+
+    <!-- Staff Authentication Helper (auto-select sales rep) -->
+    <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
     <!-- Power Quote Controller -->
     <script>
         // ============================================================
@@ -515,6 +522,11 @@
         // State
         let pricingCalculator = null;
         let quoteService = null;
+
+        // Auto-save & Draft Recovery (2026 consolidation)
+        let embPersistence = null;
+        let embSession = null;
+
         // Primary logo configuration
         let primaryLogo = {
             position: 'Left Chest',
@@ -1128,6 +1140,196 @@
         }
 
         // ============================================================
+        // AUTO-SAVE & DRAFT RECOVERY (2026 consolidation)
+        // ============================================================
+
+        function initEmbroideryPersistence() {
+            if (typeof QuotePersistence !== 'undefined') {
+                embPersistence = new QuotePersistence({
+                    prefix: 'EMB',
+                    autoSaveInterval: 30000,
+                    debug: false
+                });
+
+                // Setup auto-save callback
+                embPersistence.onAutoSave = () => {
+                    const data = getEmbroideryQuoteData();
+                    if (data && (data.products.length > 0 || data.customerName)) {
+                        embPersistence.save(data);
+                    }
+                };
+            }
+
+            if (typeof QuoteSession !== 'undefined' && embPersistence) {
+                embSession = new QuoteSession({
+                    prefix: 'EMB',
+                    persistence: embPersistence,
+                    debug: false
+                });
+            }
+        }
+
+        function getEmbroideryQuoteData() {
+            return {
+                products: collectProductsFromTable(),
+                primaryLogo: { ...primaryLogo },
+                capPrimaryLogo: typeof capPrimaryLogo !== 'undefined' ? { ...capPrimaryLogo } : null,
+                garmentAL: {
+                    enabled: document.getElementById('garment-al-toggle')?.checked || false,
+                    position: document.getElementById('garment-al-position')?.value || 'Right Chest',
+                    stitches: document.getElementById('garment-al-stitches')?.value || 8000
+                },
+                capAL: {
+                    enabled: document.getElementById('cap-al-toggle')?.checked || false,
+                    position: document.getElementById('cap-al-position')?.value || 'Cap Back',
+                    stitches: document.getElementById('cap-al-stitches')?.value || 5000
+                },
+                customerName: document.getElementById('customer-name')?.value || '',
+                customerEmail: document.getElementById('customer-email')?.value || '',
+                companyName: document.getElementById('company-name')?.value || '',
+                customerPhone: document.getElementById('customer-phone')?.value || '',
+                salesRep: document.getElementById('sales-rep')?.value || '',
+                timestamp: Date.now()
+            };
+        }
+
+        function restoreEmbroideryDraft(draft) {
+            if (!draft) return;
+
+            console.log('[Embroidery] Restoring draft:', draft);
+
+            // Restore customer info
+            if (draft.customerName) {
+                const nameEl = document.getElementById('customer-name');
+                if (nameEl) nameEl.value = draft.customerName;
+            }
+            if (draft.customerEmail) {
+                const emailEl = document.getElementById('customer-email');
+                if (emailEl) emailEl.value = draft.customerEmail;
+            }
+            if (draft.companyName) {
+                const companyEl = document.getElementById('company-name');
+                if (companyEl) companyEl.value = draft.companyName;
+            }
+            if (draft.customerPhone) {
+                const phoneEl = document.getElementById('customer-phone');
+                if (phoneEl) phoneEl.value = draft.customerPhone;
+            }
+            if (draft.salesRep) {
+                const salesRepEl = document.getElementById('sales-rep');
+                if (salesRepEl) salesRepEl.value = draft.salesRep;
+            }
+
+            // Restore primary logo configuration
+            if (draft.primaryLogo) {
+                primaryLogo = { ...primaryLogo, ...draft.primaryLogo };
+                const positionEl = document.getElementById('primary-position');
+                if (positionEl) positionEl.value = draft.primaryLogo.position || 'Left Chest';
+                const stitchesEl = document.getElementById('primary-stitches');
+                if (stitchesEl) stitchesEl.value = draft.primaryLogo.stitchCount || 8000;
+                const digitizingEl = document.getElementById('primary-digitizing');
+                if (digitizingEl) digitizingEl.checked = draft.primaryLogo.needsDigitizing || false;
+            }
+
+            // Restore cap primary logo if present
+            if (draft.capPrimaryLogo && typeof capPrimaryLogo !== 'undefined') {
+                capPrimaryLogo = { ...capPrimaryLogo, ...draft.capPrimaryLogo };
+                const capStitchesEl = document.getElementById('cap-primary-stitches');
+                if (capStitchesEl) capStitchesEl.value = draft.capPrimaryLogo.stitchCount || 8000;
+                const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+                if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
+            }
+
+            // Restore garment AL configuration
+            if (draft.garmentAL && draft.garmentAL.enabled) {
+                const garmentALToggle = document.getElementById('garment-al-toggle');
+                if (garmentALToggle) {
+                    garmentALToggle.checked = true;
+                    toggleGlobalAL('garment');
+                    const posEl = document.getElementById('garment-al-position');
+                    if (posEl) posEl.value = draft.garmentAL.position;
+                    const stitchEl = document.getElementById('garment-al-stitches');
+                    if (stitchEl) stitchEl.value = draft.garmentAL.stitches;
+                }
+            }
+
+            // Restore cap AL configuration
+            if (draft.capAL && draft.capAL.enabled) {
+                const capALToggle = document.getElementById('cap-al-toggle');
+                if (capALToggle) {
+                    capALToggle.checked = true;
+                    toggleGlobalAL('cap');
+                    const posEl = document.getElementById('cap-al-position');
+                    if (posEl) posEl.value = draft.capAL.position;
+                    const stitchEl = document.getElementById('cap-al-stitches');
+                    if (stitchEl) stitchEl.value = draft.capAL.stitches;
+                }
+            }
+
+            // Restore products
+            if (draft.products && draft.products.length > 0) {
+                // Clear any existing rows first
+                const tbody = document.getElementById('product-tbody');
+                if (tbody) tbody.innerHTML = '';
+
+                draft.products.forEach(product => {
+                    // Add product row with saved data
+                    const rowId = addNewRow();
+                    const row = document.getElementById(`row-${rowId}`);
+                    if (!row) return;
+
+                    // Set product data
+                    row.dataset.style = product.style || '';
+                    row.dataset.catalogColor = product.catalogColor || '';
+                    row.dataset.colorName = product.color || '';
+                    row.dataset.description = product.description || '';
+                    row.dataset.imageUrl = product.imageUrl || '';
+                    row.dataset.productType = product.productType || 'garment';
+
+                    // Update display cells
+                    const styleCell = row.querySelector('.cell-style');
+                    if (styleCell) styleCell.textContent = product.style || '';
+
+                    const descCell = row.querySelector('.cell-desc');
+                    if (descCell) descCell.textContent = product.description || '';
+
+                    const colorCell = row.querySelector('.cell-color');
+                    if (colorCell) {
+                        colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${product.color || ''}`;
+                    }
+
+                    // Restore size quantities
+                    if (product.sizes || product.sizeBreakdown) {
+                        const sizes = product.sizes || product.sizeBreakdown;
+                        Object.entries(sizes).forEach(([size, qty]) => {
+                            if (qty > 0) {
+                                const sizeInput = row.querySelector(`input[data-size="${size}"]`);
+                                if (sizeInput) {
+                                    sizeInput.value = qty;
+                                    updateRowQuantityTotal(rowId);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                // Check for caps to show cap logo section
+                checkForCaps();
+
+                // Recalculate pricing after restoring products
+                recalculatePricing();
+            }
+
+            showToast('Draft restored successfully', 'success');
+        }
+
+        function markEmbroideryDirty() {
+            if (embPersistence) {
+                embPersistence.markDirty();
+            }
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
 
@@ -1144,6 +1346,23 @@
                 // Initialize quote service
                 quoteService = new EmbroideryQuoteService();
 
+                // Initialize auto-save & draft recovery (2026 consolidation)
+                initEmbroideryPersistence();
+
+                // Check for draft recovery BEFORE adding initial row
+                if (embSession && embSession.shouldShowRecovery()) {
+                    embSession.showRecoveryDialog(
+                        (draft) => restoreEmbroideryDraft(draft),
+                        () => {
+                            if (embPersistence) embPersistence.clearDraft();
+                            addNewRow(); // Start fresh with empty row
+                        }
+                    );
+                } else {
+                    // No draft to recover, add initial empty row
+                    addNewRow();
+                }
+
                 // Setup event listeners
                 setupSearchAutocomplete();
                 setupKeyboardShortcuts();
@@ -1151,8 +1370,10 @@
                 setupCapPrimaryLogoHandlers();  // Cap logo handlers
                 setupLTMToggle();
 
-                // Add initial empty row
-                addNewRow();
+                // Auto-select sales rep based on logged-in staff (2026 consolidation)
+                if (typeof StaffAuthHelper !== 'undefined') {
+                    StaffAuthHelper.autoSelectSalesRep('sales-rep');
+                }
 
                 console.log('✅ Power Quote Builder ready');
                 showToast('Ready to build quotes!', 'success');
@@ -3521,6 +3742,9 @@
             } catch (error) {
                 console.error('Pricing calculation error:', error);
             }
+
+            // Mark as dirty for auto-save (2026 consolidation)
+            markEmbroideryDirty();
         }
 
         function collectProductsFromTable() {
@@ -4076,6 +4300,12 @@
 
                 if (result && result.quoteID) {
                     console.log('[Embroidery] Quote saved:', result.quoteID);
+
+                    // Clear auto-save draft on successful save (2026 consolidation)
+                    if (embPersistence) {
+                        embPersistence.clearDraft();
+                    }
+
                     // Show success modal with shareable link
                     if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
                         QuoteShareModal.show(result.quoteID);

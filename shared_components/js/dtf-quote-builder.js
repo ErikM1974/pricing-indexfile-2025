@@ -18,6 +18,11 @@ class DTFQuoteBuilder {
         this.productIndex = 0;
         this.ltmDistributed = false; // When true, LTM is distributed into unit prices
 
+        // Auto-save & Draft Recovery (2026 consolidation)
+        this.persistence = null;
+        this.session = null;
+        this.initPersistence();
+
         // Location configuration
         this.locationConfig = {
             'left-chest': { label: 'Left Chest', size: 'Small', zone: 'front' },
@@ -53,6 +58,130 @@ class DTFQuoteBuilder {
     }
 
     /**
+     * Initialize auto-save persistence and session management
+     */
+    initPersistence() {
+        if (typeof QuotePersistence !== 'undefined') {
+            this.persistence = new QuotePersistence({
+                prefix: 'DTF',
+                autoSaveInterval: 30000, // 30 seconds
+                debug: false
+            });
+
+            // Set up auto-save callback
+            this.persistence.onAutoSave = () => {
+                const data = this.getCurrentQuoteData();
+                if (data && (data.products.length > 0 || data.selectedLocations.length > 0)) {
+                    this.persistence.save(data);
+                    console.log('[DTFQuoteBuilder] Auto-saved draft');
+                }
+            };
+
+            console.log('[DTFQuoteBuilder] Persistence initialized');
+        } else {
+            console.warn('[DTFQuoteBuilder] QuotePersistence not available');
+        }
+
+        if (typeof QuoteSession !== 'undefined' && this.persistence) {
+            this.session = new QuoteSession({
+                prefix: 'DTF',
+                persistence: this.persistence,
+                debug: false
+            });
+            console.log('[DTFQuoteBuilder] Session initialized');
+        }
+    }
+
+    /**
+     * Get current quote data for auto-save
+     */
+    getCurrentQuoteData() {
+        return {
+            selectedLocations: this.selectedLocations,
+            products: this.products.map(p => ({
+                id: p.id,
+                style: p.style,
+                name: p.name,
+                color: p.color,
+                catalogColor: p.catalogColor,
+                baseCost: p.baseCost,
+                quantities: { ...p.quantities },
+                imageUrl: p.imageUrl
+            })),
+            customerName: document.getElementById('customer-name')?.value || '',
+            customerEmail: document.getElementById('customer-email')?.value || '',
+            companyName: document.getElementById('company-name')?.value || '',
+            ltmDistributed: this.ltmDistributed,
+            productIndex: this.productIndex
+        };
+    }
+
+    /**
+     * Restore draft data to the form
+     */
+    restoreDraft(draft) {
+        console.log('[DTFQuoteBuilder] Restoring draft...', draft);
+
+        // Restore customer info
+        if (draft.customerName) {
+            const nameEl = document.getElementById('customer-name');
+            if (nameEl) nameEl.value = draft.customerName;
+        }
+        if (draft.customerEmail) {
+            const emailEl = document.getElementById('customer-email');
+            if (emailEl) emailEl.value = draft.customerEmail;
+        }
+        if (draft.companyName) {
+            const companyEl = document.getElementById('company-name');
+            if (companyEl) companyEl.value = draft.companyName;
+        }
+
+        // Restore selected locations
+        if (draft.selectedLocations && draft.selectedLocations.length > 0) {
+            draft.selectedLocations.forEach(loc => {
+                const checkbox = document.querySelector(`input[value="${loc}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    if (!this.selectedLocations.includes(loc)) {
+                        this.selectedLocations.push(loc);
+                    }
+                }
+            });
+            this.updateLocationSummary();
+            this.updateSearchState();
+        }
+
+        // Restore products
+        if (draft.products && draft.products.length > 0) {
+            // Update productIndex to avoid ID collisions
+            if (draft.productIndex) {
+                this.productIndex = draft.productIndex;
+            }
+
+            // Restore each product
+            draft.products.forEach(product => {
+                this.products.push(product);
+                // Re-add the product row to the table
+                if (typeof addProductRowFromData === 'function') {
+                    addProductRowFromData(product);
+                }
+            });
+
+            // Update pricing after all products are restored
+            this.updatePricing();
+        }
+
+        // Restore LTM toggle state
+        if (draft.ltmDistributed !== undefined) {
+            this.ltmDistributed = draft.ltmDistributed;
+            const ltmToggle = document.getElementById('ltm-distribute-toggle');
+            if (ltmToggle) ltmToggle.checked = draft.ltmDistributed;
+        }
+
+        console.log('[DTFQuoteBuilder] Draft restored successfully');
+    }
+
+    /**
      * Get the next row ID - shared between parent rows and child rows
      * This prevents ID collisions between addProductRow() and createChildRow()
      */
@@ -76,6 +205,21 @@ class DTFQuoteBuilder {
         this.setupSearchListeners();
         this.setupGlobalListeners();
         this.setupLTMToggle();
+
+        // Check for draft recovery (after DOM is ready)
+        if (this.session && this.session.shouldShowRecovery()) {
+            this.session.showRecoveryDialog(
+                (draft) => this.restoreDraft(draft),
+                () => {
+                    console.log('[DTFQuoteBuilder] User chose to start fresh');
+                }
+            );
+        }
+
+        // Auto-select sales rep based on logged-in staff (2026 consolidation)
+        if (typeof StaffAuthHelper !== 'undefined') {
+            StaffAuthHelper.autoSelectSalesRep('sales-rep');
+        }
 
         // Hide loading overlay
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -154,6 +298,11 @@ class DTFQuoteBuilder {
         this.updateLocationSummary();
         this.updateSearchState();
         this.updatePricing();
+
+        // Mark dirty for auto-save
+        if (this.persistence) {
+            this.persistence.markDirty();
+        }
     }
 
     updateLocationSummary() {
@@ -508,6 +657,11 @@ class DTFQuoteBuilder {
             catalogColor: '',    // CATALOG_COLOR for API/ShopWorks
             quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0, '6XL': 0 }
         });
+
+        // Mark dirty for auto-save
+        if (this.persistence) {
+            this.persistence.markDirty();
+        }
 
         // Setup input listeners for main row
         row.querySelectorAll('.size-input').forEach(input => {
@@ -926,6 +1080,11 @@ class DTFQuoteBuilder {
 
         // Update pricing
         this.updatePricing();
+
+        // Mark dirty for auto-save
+        if (this.persistence) {
+            this.persistence.markDirty();
+        }
     }
 
     removeProductRow(productId) {
@@ -943,6 +1102,11 @@ class DTFQuoteBuilder {
         }
 
         this.updatePricing();
+
+        // Mark dirty for auto-save
+        if (this.persistence) {
+            this.persistence.markDirty();
+        }
     }
 
     // ==================== PRICING CALCULATIONS ====================
@@ -1542,6 +1706,8 @@ class DTFQuoteBuilder {
         const customerName = document.getElementById('customer-name')?.value?.trim() || '';
         const customerEmail = document.getElementById('customer-email')?.value?.trim() || '';
         const companyName = document.getElementById('company-name')?.value?.trim() || '';
+        const customerPhone = document.getElementById('customer-phone')?.value?.trim() || '';
+        const salesRep = document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com';
 
         // Validate required fields
         if (!customerName) {
@@ -1588,6 +1754,8 @@ class DTFQuoteBuilder {
             customerName,
             customerEmail,
             companyName,
+            customerPhone,
+            salesRep,
             notes: '',
             selectedLocations: this.selectedLocations,
             locationDetails: this.selectedLocations.map(loc => ({
@@ -1731,6 +1899,13 @@ class DTFQuoteBuilder {
 
             if (result.success) {
                 console.log('[DTFQuoteBuilder] Quote saved successfully:', quoteId);
+
+                // Clear draft after successful save
+                if (this.persistence) {
+                    this.persistence.clearDraft();
+                    console.log('[DTFQuoteBuilder] Draft cleared after successful save');
+                }
+
                 // Show success modal with shareable link
                 // Prefer shared QuoteShareModal module (2026 consolidation)
                 if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {

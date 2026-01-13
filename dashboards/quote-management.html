@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Quote Management - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=20260113">
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <a href="/staff-dashboard.html">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel"
+                 class="logo">
+        </a>
+        <h1>Quote Management</h1>
+        <div class="header-actions">
+            <span class="user-info" id="user-display">Loading...</span>
+            <a href="/staff-dashboard.html" class="btn-header">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>Status</label>
+                <select id="filter-status">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Accepted">Accepted</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Sales Rep</label>
+                <select id="filter-sales-rep">
+                    <option value="">All Quotes</option>
+                    <option value="mine">My Quotes</option>
+                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                    <option value="art@nwcustomapparel.com">Steve Deland</option>
+                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Date Range</label>
+                <select id="filter-date">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Search</label>
+                <input type="text" id="filter-search" placeholder="Customer name, email, or Quote ID...">
+            </div>
+
+            <button class="btn-search" onclick="applyFilters()">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-section">
+            <div class="stat-card active">
+                <div class="stat-value" id="stat-active">-</div>
+                <div class="stat-label">Active Quotes</div>
+            </div>
+            <div class="stat-card accepted">
+                <div class="stat-value" id="stat-accepted">-</div>
+                <div class="stat-label">Accepted</div>
+            </div>
+            <div class="stat-card expiring">
+                <div class="stat-value" id="stat-expiring">-</div>
+                <div class="stat-label">Expiring Soon</div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-value" id="stat-total">$0</div>
+                <div class="stat-label">Total Value</div>
+            </div>
+        </div>
+
+        <!-- Quotes Table -->
+        <div class="quotes-table-section">
+            <div class="table-header">
+                <h2>Quotes</h2>
+                <span class="table-count" id="table-count">Loading...</span>
+            </div>
+
+            <div id="table-loading" class="loading-overlay">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <div id="table-empty" class="empty-state" style="display: none;">
+                <i class="fas fa-file-invoice"></i>
+                <h3>No quotes found</h3>
+                <p>Try adjusting your filters or search terms</p>
+            </div>
+
+            <table class="quotes-table" id="quotes-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Quote ID</th>
+                        <th>Customer</th>
+                        <th>Sales Rep</th>
+                        <th>Items</th>
+                        <th style="text-align: right;">Amount</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="quotes-tbody">
+                    <!-- Rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+
+            <div class="pagination" id="pagination" style="display: none;">
+                <button id="btn-prev" onclick="prevPage()" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <span class="page-info" id="page-info">Page 1 of 1</span>
+                <button id="btn-next" onclick="nextPage()">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Authentication Helper -->
+    <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
+    <script>
+        // ============================================================
+        // QUOTE MANAGEMENT DASHBOARD
+        // Created: 2026-01-13 (Phase 5 - Quote builder feature parity)
+        // ============================================================
+
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        // State
+        let allQuotes = [];
+        let filteredQuotes = [];
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 25;
+        let currentUserEmail = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('[QuoteManagement] Initializing...');
+
+            // Get logged-in user info
+            initUserDisplay();
+
+            // Load quotes
+            await loadQuotes();
+
+            // Setup event listeners
+            setupEventListeners();
+
+            console.log('[QuoteManagement] Ready');
+        });
+
+        function initUserDisplay() {
+            const userDisplay = document.getElementById('user-display');
+
+            if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn()) {
+                const name = StaffAuthHelper.getLoggedInStaffName();
+                currentUserEmail = StaffAuthHelper.getLoggedInStaffEmail();
+                userDisplay.textContent = name || 'Staff User';
+            } else {
+                // Try sessionStorage directly
+                const name = sessionStorage.getItem('nwca_user_name');
+                currentUserEmail = sessionStorage.getItem('nwca_user_email');
+                userDisplay.textContent = name || 'Guest';
+            }
+        }
+
+        function setupEventListeners() {
+            // Enter key on search
+            document.getElementById('filter-search').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyFilters();
+                }
+            });
+        }
+
+        async function loadQuotes() {
+            showLoading(true);
+
+            try {
+                // Fetch quotes from API
+                const response = await fetch(`${API_BASE}/api/quote_sessions`);
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+
+                const data = await response.json();
+                allQuotes = data.Result || data || [];
+
+                console.log(`[QuoteManagement] Loaded ${allQuotes.length} quotes`);
+
+                // Apply initial filters
+                applyFilters();
+
+            } catch (error) {
+                console.error('[QuoteManagement] Error loading quotes:', error);
+                showError('Failed to load quotes. Please try refreshing.');
+            }
+        }
+
+        function applyFilters() {
+            // Get filter values
+            const statusFilter = document.getElementById('filter-status').value;
+            const salesRepFilter = document.getElementById('filter-sales-rep').value;
+            const dateFilter = document.getElementById('filter-date').value;
+            const searchFilter = document.getElementById('filter-search').value.toLowerCase().trim();
+
+            // Calculate date cutoff
+            let dateCutoff = null;
+            if (dateFilter !== 'all') {
+                dateCutoff = new Date();
+                dateCutoff.setDate(dateCutoff.getDate() - parseInt(dateFilter));
+            }
+
+            // Apply filters
+            filteredQuotes = allQuotes.filter(quote => {
+                // Status filter
+                if (statusFilter && quote.Status !== statusFilter) {
+                    return false;
+                }
+
+                // Sales rep filter
+                if (salesRepFilter === 'mine') {
+                    if (quote.SalesRep !== currentUserEmail) {
+                        return false;
+                    }
+                } else if (salesRepFilter && quote.SalesRep !== salesRepFilter) {
+                    return false;
+                }
+
+                // Date filter
+                if (dateCutoff) {
+                    const createdDate = new Date(quote.CreatedAt);
+                    if (createdDate < dateCutoff) {
+                        return false;
+                    }
+                }
+
+                // Search filter
+                if (searchFilter) {
+                    const searchFields = [
+                        quote.QuoteID || '',
+                        quote.CustomerName || '',
+                        quote.CustomerEmail || '',
+                        quote.CompanyName || ''
+                    ].join(' ').toLowerCase();
+
+                    if (!searchFields.includes(searchFilter)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // Sort by created date (newest first)
+            filteredQuotes.sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
+
+            // Reset to first page
+            currentPage = 1;
+
+            // Update stats
+            updateStats();
+
+            // Render table
+            renderTable();
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+            let activeCount = 0;
+            let acceptedCount = 0;
+            let expiringCount = 0;
+            let totalValue = 0;
+
+            filteredQuotes.forEach(quote => {
+                if (quote.Status === 'Active') {
+                    activeCount++;
+                    // Check if expiring within 7 days
+                    if (quote.ExpiresAt) {
+                        const expiresDate = new Date(quote.ExpiresAt);
+                        if (expiresDate <= sevenDaysFromNow) {
+                            expiringCount++;
+                        }
+                    }
+                } else if (quote.Status === 'Accepted') {
+                    acceptedCount++;
+                }
+
+                totalValue += parseFloat(quote.TotalAmount) || 0;
+            });
+
+            document.getElementById('stat-active').textContent = activeCount;
+            document.getElementById('stat-accepted').textContent = acceptedCount;
+            document.getElementById('stat-expiring').textContent = expiringCount;
+            document.getElementById('stat-total').textContent = formatCurrency(totalValue);
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('quotes-tbody');
+            const tableEl = document.getElementById('quotes-table');
+            const emptyEl = document.getElementById('table-empty');
+            const countEl = document.getElementById('table-count');
+            const paginationEl = document.getElementById('pagination');
+
+            showLoading(false);
+
+            if (filteredQuotes.length === 0) {
+                tableEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                paginationEl.style.display = 'none';
+                countEl.textContent = '0 quotes';
+                return;
+            }
+
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredQuotes.length / ITEMS_PER_PAGE);
+            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, filteredQuotes.length);
+            const pageQuotes = filteredQuotes.slice(startIdx, endIdx);
+
+            // Update count
+            countEl.textContent = `${filteredQuotes.length} quote${filteredQuotes.length !== 1 ? 's' : ''}`;
+
+            // Render rows
+            tbody.innerHTML = pageQuotes.map(quote => {
+                const statusClass = getStatusClass(quote);
+                const expiresInfo = getExpiresInfo(quote);
+
+                return `
+                    <tr onclick="viewQuote('${quote.QuoteID}')">
+                        <td><span class="quote-id">${quote.QuoteID || '-'}</span></td>
+                        <td>
+                            <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
+                            <div class="customer-email">${escapeHtml(quote.CustomerEmail || '')}</div>
+                        </td>
+                        <td>${getSalesRepName(quote.SalesRep)}</td>
+                        <td>${quote.TotalQuantity || 0}</td>
+                        <td class="quote-amount">${formatCurrency(quote.TotalAmount)}</td>
+                        <td><span class="status-badge ${statusClass}">${quote.Status || 'Unknown'}</span></td>
+                        <td>
+                            <div class="date-cell">${formatDate(quote.CreatedAt)}</div>
+                            ${expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : ''}
+                        </td>
+                        <td>
+                            <button class="action-btn" onclick="event.stopPropagation(); viewQuote('${quote.QuoteID}')" title="View Quote">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn" onclick="event.stopPropagation(); copyQuoteLink('${quote.QuoteID}')" title="Copy Link">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Show table
+            tableEl.style.display = 'table';
+            emptyEl.style.display = 'none';
+
+            // Update pagination
+            if (totalPages > 1) {
+                paginationEl.style.display = 'flex';
+                document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+                document.getElementById('btn-prev').disabled = currentPage === 1;
+                document.getElementById('btn-next').disabled = currentPage === totalPages;
+            } else {
+                paginationEl.style.display = 'none';
+            }
+        }
+
+        function getStatusClass(quote) {
+            if (quote.Status === 'Accepted') return 'accepted';
+            if (quote.Status === 'Expired') return 'expired';
+            if (quote.Status === 'Active') {
+                // Check if expiring soon
+                if (quote.ExpiresAt) {
+                    const expiresDate = new Date(quote.ExpiresAt);
+                    const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                    if (expiresDate <= sevenDaysFromNow) {
+                        return 'expiring-soon';
+                    }
+                }
+                return 'active';
+            }
+            return '';
+        }
+
+        function getExpiresInfo(quote) {
+            if (quote.Status !== 'Active' || !quote.ExpiresAt) return null;
+
+            const expiresDate = new Date(quote.ExpiresAt);
+            const now = new Date();
+            const daysUntil = Math.ceil((expiresDate - now) / (1000 * 60 * 60 * 24));
+
+            if (daysUntil <= 0) return 'Expired';
+            if (daysUntil === 1) return 'Expires tomorrow';
+            if (daysUntil <= 7) return `Expires in ${daysUntil} days`;
+            return null;
+        }
+
+        function getSalesRepName(email) {
+            const names = {
+                'sales@nwcustomapparel.com': 'General Sales',
+                'adriyella@nwcustomapparel.com': 'Adriyella',
+                'bradley@nwcustomapparel.com': 'Bradley',
+                'erik@nwcustomapparel.com': 'Erik',
+                'jim@nwcustomapparel.com': 'Jim',
+                'nika@nwcustomapparel.com': 'Nika',
+                'ruth@nwcustomapparel.com': 'Ruth',
+                'art@nwcustomapparel.com': 'Steve',
+                'taneisha@nwcustomapparel.com': 'Taneisha'
+            };
+            return names[email] || email || '-';
+        }
+
+        // Navigation
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredQuotes.length / ITEMS_PER_PAGE);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Actions
+        function viewQuote(quoteId) {
+            // Open quote view page
+            window.open(`/quote/${quoteId}`, '_blank');
+        }
+
+        function copyQuoteLink(quoteId) {
+            const url = `${window.location.origin}/quote/${quoteId}`;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(() => {
+                // Fallback
+                prompt('Copy this link:', url);
+            });
+        }
+
+        // Utilities
+        function showLoading(show) {
+            document.getElementById('table-loading').style.display = show ? 'flex' : 'none';
+            if (show) {
+                document.getElementById('quotes-table').style.display = 'none';
+                document.getElementById('table-empty').style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            showLoading(false);
+            document.getElementById('table-empty').innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                <h3>Error Loading Quotes</h3>
+                <p>${message}</p>
+            `;
+            document.getElementById('table-empty').style.display = 'block';
+        }
+
+        function showToast(message) {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 4px;
+                z-index: 9999;
+                font-size: 14px;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function formatCurrency(amount) {
+            const num = parseFloat(amount) || 0;
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

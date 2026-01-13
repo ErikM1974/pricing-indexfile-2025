@@ -440,6 +440,13 @@
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
 
+    <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
+    <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-session.js?v=20260113"></script>
+
+    <!-- Staff Authentication Helper (auto-select sales rep) -->
+    <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
     <!-- Power Quote Controller -->
     <script>
         // ============================================================
@@ -485,6 +492,10 @@
         // State
         let screenPrintPricingService = null;
         let quoteService = null;
+
+        // Auto-save & Draft Recovery (2026 consolidation)
+        let spPersistence = null;
+        let spSession = null;
 
         let products = [];
         let rowCounter = 0;
@@ -1150,6 +1161,167 @@
         }
 
         // ============================================================
+        // AUTO-SAVE & DRAFT RECOVERY (2026 consolidation)
+        // ============================================================
+
+        function initScreenPrintPersistence() {
+            if (typeof QuotePersistence !== 'undefined') {
+                spPersistence = new QuotePersistence({
+                    prefix: 'SPC',
+                    autoSaveInterval: 30000,
+                    debug: false
+                });
+
+                // Setup auto-save callback
+                spPersistence.onAutoSave = () => {
+                    const data = getScreenPrintQuoteData();
+                    if (data && (data.products.length > 0 || data.customerName)) {
+                        spPersistence.save(data);
+                    }
+                };
+            }
+
+            if (typeof QuoteSession !== 'undefined' && spPersistence) {
+                spSession = new QuoteSession({
+                    prefix: 'SPC',
+                    persistence: spPersistence,
+                    debug: false
+                });
+            }
+        }
+
+        function getScreenPrintQuoteData() {
+            return {
+                products: collectProductsFromTable(),
+                printConfig: { ...printConfig },
+                customerName: document.getElementById('customer-name')?.value || '',
+                customerEmail: document.getElementById('customer-email')?.value || '',
+                companyName: document.getElementById('company-name')?.value || '',
+                customerPhone: document.getElementById('customer-phone')?.value || '',
+                salesRep: document.getElementById('sales-rep')?.value || '',
+                timestamp: Date.now()
+            };
+        }
+
+        function restoreScreenPrintDraft(draft) {
+            if (!draft) return;
+
+            console.log('[ScreenPrint] Restoring draft:', draft);
+
+            // Restore customer info
+            if (draft.customerName) {
+                const nameEl = document.getElementById('customer-name');
+                if (nameEl) nameEl.value = draft.customerName;
+            }
+            if (draft.customerEmail) {
+                const emailEl = document.getElementById('customer-email');
+                if (emailEl) emailEl.value = draft.customerEmail;
+            }
+            if (draft.companyName) {
+                const companyEl = document.getElementById('company-name');
+                if (companyEl) companyEl.value = draft.companyName;
+            }
+            if (draft.customerPhone) {
+                const phoneEl = document.getElementById('customer-phone');
+                if (phoneEl) phoneEl.value = draft.customerPhone;
+            }
+            if (draft.salesRep) {
+                const salesRepEl = document.getElementById('sales-rep');
+                if (salesRepEl) salesRepEl.value = draft.salesRep;
+            }
+
+            // Restore print configuration
+            if (draft.printConfig) {
+                // Restore front location
+                const frontRadio = document.querySelector(`input[name="front-location"][value="${draft.printConfig.frontLocation}"]`);
+                if (frontRadio) frontRadio.checked = true;
+
+                // Restore front colors
+                const frontColorsRadio = document.querySelector(`input[name="front-colors"][value="${draft.printConfig.frontColors}"]`);
+                if (frontColorsRadio) frontColorsRadio.checked = true;
+
+                // Restore back location
+                const backRadio = document.querySelector(`input[name="back-location"][value="${draft.printConfig.backLocation || ''}"]`);
+                if (backRadio) backRadio.checked = true;
+
+                // Restore back colors
+                if (draft.printConfig.backLocation) {
+                    const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${draft.printConfig.backColors}"]`);
+                    if (backColorsRadio) backColorsRadio.checked = true;
+                }
+
+                // Restore dark garment toggle
+                const darkGarmentToggle = document.getElementById('dark-garment-toggle');
+                if (darkGarmentToggle) darkGarmentToggle.checked = draft.printConfig.isDarkGarment || false;
+
+                // Restore safety stripes toggle
+                const safetyStripesToggle = document.getElementById('safety-stripes-toggle');
+                if (safetyStripesToggle) safetyStripesToggle.checked = draft.printConfig.isSafetyStripes || false;
+
+                // Update config state
+                updatePrintConfig();
+            }
+
+            // Restore products
+            if (draft.products && draft.products.length > 0) {
+                // Clear any existing rows first
+                const tbody = document.getElementById('product-tbody');
+                if (tbody) tbody.innerHTML = '';
+
+                draft.products.forEach(product => {
+                    // Add product row with saved data
+                    const rowId = addNewRow();
+                    const row = document.getElementById(`row-${rowId}`);
+                    if (!row) return;
+
+                    // Set product data
+                    row.dataset.style = product.style || '';
+                    row.dataset.catalogColor = product.catalogColor || '';
+                    row.dataset.colorName = product.color || '';
+                    row.dataset.description = product.description || '';
+                    row.dataset.imageUrl = product.imageUrl || '';
+
+                    // Update display cells
+                    const styleCell = row.querySelector('.cell-style');
+                    if (styleCell) styleCell.textContent = product.style || '';
+
+                    const descCell = row.querySelector('.cell-desc');
+                    if (descCell) descCell.textContent = product.description || '';
+
+                    const colorCell = row.querySelector('.cell-color');
+                    if (colorCell) {
+                        colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${product.color || ''}`;
+                    }
+
+                    // Restore size quantities
+                    if (product.sizes || product.sizeBreakdown) {
+                        const sizes = product.sizes || product.sizeBreakdown;
+                        Object.entries(sizes).forEach(([size, qty]) => {
+                            if (qty > 0) {
+                                const sizeInput = row.querySelector(`input[data-size="${size}"]`);
+                                if (sizeInput) {
+                                    sizeInput.value = qty;
+                                    updateRowQuantityTotal(rowId);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                // Recalculate pricing after restoring products
+                recalculatePricing();
+            }
+
+            showToast('Draft restored successfully', 'success');
+        }
+
+        function markScreenPrintDirty() {
+            if (spPersistence) {
+                spPersistence.markDirty();
+            }
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
 
@@ -1165,6 +1337,23 @@
                 // Initialize quote service (reuse existing for save/load)
                 // quoteService = new ScreenPrintQuoteService(); // TODO: Wire up SP quote service
 
+                // Initialize auto-save & draft recovery (2026 consolidation)
+                initScreenPrintPersistence();
+
+                // Check for draft recovery BEFORE adding initial row
+                if (spSession && spSession.shouldShowRecovery()) {
+                    spSession.showRecoveryDialog(
+                        (draft) => restoreScreenPrintDraft(draft),
+                        () => {
+                            if (spPersistence) spPersistence.clearDraft();
+                            addNewRow(); // Start fresh with empty row
+                        }
+                    );
+                } else {
+                    // No draft to recover, add initial empty row
+                    addNewRow();
+                }
+
                 // Setup event listeners
                 setupSearchAutocomplete();
                 setupKeyboardShortcuts();
@@ -1173,8 +1362,10 @@
                 // Initialize print configuration
                 updatePrintConfig();
 
-                // Add initial empty row
-                addNewRow();
+                // Auto-select sales rep based on logged-in staff (2026 consolidation)
+                if (typeof StaffAuthHelper !== 'undefined') {
+                    StaffAuthHelper.autoSelectSalesRep('sales-rep');
+                }
 
                 console.log('✅ Screen Print Quote Builder ready');
                 showToast('Ready to build Screen Print quotes!', 'success');
@@ -3583,6 +3774,9 @@
                 console.error('Screen Print Pricing calculation error:', error);
                 showToast('Error calculating prices. Please try again.', 'error');
             }
+
+            // Mark as dirty for auto-save (2026 consolidation)
+            markScreenPrintDirty();
         }
 
         // Update row breakdown display for Screen Print
@@ -4033,6 +4227,7 @@
                     customerEmail: customerEmail,
                     companyName: document.getElementById('company-name')?.value?.trim() || '',
                     customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
+                    salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
                     items: items,
                     totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
                     subtotal: pricing.subtotal || 0,
@@ -4055,6 +4250,12 @@
 
                 if (result.success) {
                     console.log('[ScreenPrint] Quote saved:', result.quoteID);
+
+                    // Clear auto-save draft on successful save (2026 consolidation)
+                    if (spPersistence) {
+                        spPersistence.clearDraft();
+                    }
+
                     // Show success modal with shareable link
                     if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
                         QuoteShareModal.show(result.quoteID);
