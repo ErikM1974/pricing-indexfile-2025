@@ -4237,12 +4237,19 @@
             showLoading(true);
 
             try {
-                // Combine primary logo + all additional logos
+                // Combine ALL logos: garment primary + additional + cap primary + cap additional
                 const allLogos = [
                     { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos
+                    ...additionalLogos,
+                    { ...capPrimaryLogo, id: 'cap-primary' },
+                    ...capAdditionalLogos
                 ];
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos);
+
+                // Get sales rep NAME from dropdown selected option text
+                const salesRepSelect = document.getElementById('sales-rep');
+                const salesRepEmail = salesRepSelect?.value || 'sales@nwcustomapparel.com';
+                const salesRepName = salesRepSelect?.options[salesRepSelect.selectedIndex]?.text || '';
 
                 // Build customer data
                 const customerData = {
@@ -4250,7 +4257,8 @@
                     name: customerName,
                     company: document.getElementById('company-name')?.value?.trim() || '',
                     phone: document.getElementById('customer-phone')?.value?.trim() || '',
-                    salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+                    salesRepEmail: salesRepEmail,
+                    salesRepName: salesRepName,
                     notes: ''
                 };
 

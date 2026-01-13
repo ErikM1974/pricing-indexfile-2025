@@ -100,6 +100,11 @@ class EmbroideryQuoteService {
                 .toISOString()
                 .replace(/\.\d{3}Z$/, '');
             
+            // Extract embroidery details from logos for session-level storage
+            const primaryLogo = pricingResults.logos?.find(l => l.id === 'primary' || l.isPrimary) || pricingResults.logos?.[0];
+            const additionalLogo = pricingResults.logos?.find(l => l.id?.includes('additional') && !l.id?.includes('cap'));
+            const capPrimaryLogo = pricingResults.logos?.find(l => l.id === 'cap-primary');
+
             // Prepare session data
             const sessionData = {
                 QuoteID: quoteID,
@@ -109,13 +114,21 @@ class EmbroideryQuoteService {
                 CompanyName: customerData.company || 'Not Provided',
                 Phone: customerData.phone || '',
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
+                SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity,
                 SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
                 TotalAmount: parseFloat(pricingResults.grandTotal.toFixed(2)),
                 Status: 'Open',
+                CreatedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                 ExpiresAt: expiresAt,
-                Notes: customerData.notes || ''
+                Notes: customerData.notes || '',
+                // Embroidery details for easy access by quote view
+                PrintLocation: primaryLogo?.position || 'Left Chest',
+                StitchCount: primaryLogo?.stitchCount || 8000,
+                DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
+                AdditionalLogoLocation: additionalLogo?.position || '',
+                AdditionalStitchCount: additionalLogo?.stitchCount || 0
             };
             
             // Save session
