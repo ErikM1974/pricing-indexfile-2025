@@ -43,7 +43,10 @@
       "WebFetch(domain:app.swaggerhub.com)",
       "WebFetch(domain:api.swaggerhub.com)",
       "Bash(xargs:*)",
-      "Skill(ralph-loop:ralph-loop)"
+      "Skill(ralph-loop:ralph-loop)",
+      "Bash(pkill:*)",
+      "Bash(pgrep:*)",
+      "Bash(ss:*)"
     ],
     "deny": [],
     "ask": [],
