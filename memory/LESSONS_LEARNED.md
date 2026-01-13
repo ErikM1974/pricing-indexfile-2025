@@ -403,6 +403,124 @@ Test example: PC61 Forest Green x 37 pieces should show $29.85/piece in BOTH
 
 ---
 
+## Pattern: Customer-Facing Quote View Page & PDF Generation
+**Date:** 2026-01-13
+**Project:** Pricing Index
+**Description:** Building a professional quote view page and PDF that shows ALL data from the quote builder. Applies to all quote types (Embroidery, Screen Print, DTG, DTF).
+
+### Problem Solved
+Quote view pages and PDFs were missing critical data that sales reps entered in the quote builder (sales rep name, embroidery details, additional logos, etc.). PDF had column overlap and wasn't print-friendly.
+
+### Quote View Page Structure (`pages/quote-view.html` + `pages/js/quote-view.js`)
+
+**1. Header Section**
+- Company logo + Quote ID + Status badge
+- Status options: Open, Viewed, Accepted, Expired
+
+**2. Quote Meta Section (two-column grid)**
+- Left: Customer info (Name, Company, Email, Phone)
+- Right: Quote Details (Type, Created Date, Valid Until, **Sales Rep**)
+
+**3. Embroidery Info Section** (for embroidery quotes only)
+- Location, Stitch Count, Digitizing Fee, Additional Logo info
+- Uses `renderEmbroideryInfo()` method
+- Light green background (#e8f5e9) with green border
+
+**4. Product Table** (tabular format matching quote builder)
+- Columns: Style | Color | S | M | LG | XL | XXL | XXXL | Qty | Unit $ | Total
+- First row has clickable thumbnail → opens product modal
+- Extended sizes (2XL+) on separate rows with orange highlighting
+- Uses `groupItemsByProduct()` → `buildProductRows()` for deduplication
+
+**5. Totals Section**
+- Subtotal
+- LTM Fee (if > 0)
+- WA Sales Tax (10.1%)
+- Grand Total
+
+### PDF Generation Structure (`generatePdfContent()` in quote-view.js)
+
+**1. Header (green banner)**
+```javascript
+pdf.setFillColor(76, 179, 84); // Green #4cb354
+pdf.rect(0, 0, pageWidth, 42, 'F');
+// Company name, address, phone, website on left
+// Quote ID and status on right
+```
+
+**2. Customer Info + Quote Details** (two-column layout)
+- PREPARED FOR section (left)
+- QUOTE DETAILS section (right) - includes Sales Rep if available
+
+**3. Embroidery Details Section** (if embroidery quote)
+```javascript
+// Dynamic height: 22mm base, 28mm if additional logo exists
+const boxHeight = hasAddlLogo ? 28 : 22;
+pdf.setFillColor(248, 250, 252); // Light blue-gray
+// Row 1: Location + Stitch Count
+// Row 2: Digitizing + Add'l Stitch Charge
+// Row 3: Additional Logo (if present)
+```
+
+**4. Products Table**
+- Light gray header (#f0f0f0) - prints well in B&W
+- Column positions calculated carefully to prevent overlap:
+```javascript
+const colX = {
+    styleDesc: margin,       // 20mm  - Style + truncated description
+    color: margin + 55,      // 75mm
+    s: margin + 80,          // Size columns start at 100mm
+    m: margin + 88,
+    lg: margin + 96,
+    xl: margin + 104,
+    xxl: margin + 112,       // 2XL column
+    xxxl: margin + 122,      // 3XL+ column
+    qty: margin + 132,
+    price: margin + 144,
+    total: margin + 160
+};
+```
+
+**5. Totals Section**
+- Right-aligned, includes LTM Fee if > 0
+- Tax calculation: `grandTotal * 0.101`
+
+**6. Footer**
+- Terms: "Quote valid for 30 days. 50% deposit required."
+- Contact info
+
+### Key Data Fields to Map
+
+| Quote Builder Field | Web Location | PDF Location |
+|---------------------|--------------|--------------|
+| `SalesRepName` / `SalesRep` | Quote Details card | Quote Details section |
+| `PrintLocation` / `LogoLocation` | embroidery-info section | Embroidery Details |
+| `StitchCount` / `Stitches` | embroidery-info section | Embroidery Details |
+| `DigitizingFee` | embroidery-info section | Embroidery Details |
+| `AdditionalLogoLocation` | embroidery-info section | Embroidery Details |
+| `AdditionalStitchCount` | embroidery-info section | Embroidery Details |
+| `LTMFeeTotal` | totals-card | Totals section |
+
+### Critical Fixes Applied
+
+1. **PDF Column Overlap**: Total column was positioned BEFORE price column. Fixed by proper sequential X positions.
+2. **Print-Friendly Header**: Changed from dark blue to light gray (#f0f0f0) background.
+3. **Data Deduplication**: Items with same StyleNumber+Color grouped together, duplicates removed via `groupItemsByProduct()`.
+4. **Product Images**: API returns object not array - use `Object.values(data)` to convert.
+
+### Files to Reuse
+- `pages/quote-view.html` - Template HTML structure
+- `pages/js/quote-view.js` - All rendering and PDF logic
+- `pages/css/quote-view.css` - Styles including product table, modal
+
+### Applying to Other Quote Builders
+1. Copy the quote-view page structure
+2. Update `quoteTypes` mapping for the quote prefix
+3. Modify embroidery section for quote-type-specific details (e.g., DTF locations, Screen Print colors)
+4. Ensure quote service saves all required fields (SalesRep, location, fees)
+
+---
+
 ## Problem: Comprehensive 2XL/XXL handling issues across quote builders
 **Date:** 2026-01
 **Project:** Pricing Index
