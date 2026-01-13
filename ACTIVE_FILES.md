@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-08
-**Total Active Files:** ~268 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2)
+**Last Updated:** 2026-01-12
+**Total Active Files:** ~271 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -45,6 +45,7 @@
 | `/pages/webstore-info.html` | Webstore information | Various | ✅ Active |
 | `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
+| `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 
@@ -156,6 +157,33 @@
 | `/shared_components/js/quote-builder-core.js` | **NEW** Core quote builder functionality (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/pricing-sidebar-component.js` | **NEW** Unified pricing sidebar (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/INTEGRATION-EXAMPLE.js` | **NEW** Integration example/docs (2026 consolidation) | Reference only | 📚 Docs |
+
+### Public Quote View System (NEW 2026-01-12)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/quote-view.html` | Public customer-facing quote page | quote-view.js, quote-view.css, jsPDF | ✅ Active |
+| `/pages/js/quote-view.js` | Quote data loading, PDF generation, acceptance flow | jsPDF, html2canvas | ✅ Active |
+| `/pages/css/quote-view.css` | Professional quote styling (mobile-responsive) | Inter font | ✅ Active |
+
+**Server Routes (server.js):**
+- `GET /quote/:quoteId` - Serves public quote page
+- `GET /api/public/quote/:quoteId` - Returns quote data + tracks views
+- `POST /api/public/quote/:quoteId/accept` - Accepts quote with name/email
+- `GET /api/quote_items/quote/:quoteId` - Get items by quote ID
+
+**Features:**
+- Shareable URLs like `nwcustomapparel.com/quote/DTF0112-1`
+- View tracking (FirstViewedAt, ViewCount)
+- One-click PDF download via jsPDF
+- Quote acceptance workflow
+- Status badges (Open, Viewed, Accepted, Expired)
+
+**Database Fields Required in `quote_sessions` (Caspio):**
+- `FirstViewedAt` (DateTime) - When customer first opened
+- `ViewCount` (Integer) - Number of times viewed
+- `AcceptedAt` (DateTime) - When customer accepted
+- `AcceptedByName` (Text) - Name of person accepting
+- `AcceptedByEmail` (Text) - Email of person accepting
 
 ## 🎨 Stylesheets
 
