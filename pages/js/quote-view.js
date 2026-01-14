@@ -649,8 +649,9 @@ class QuoteViewPage {
                         allSizes[size] = { qty: 0, price: 0, total: 0 };
                     }
                     allSizes[size].qty += qty;
-                    allSizes[size].price = item.FinalUnitPrice || 0;
-                    allSizes[size].total += (qty * (item.FinalUnitPrice || 0));
+                    // Use BaseUnitPrice so LTM is shown separately in LTM-G row
+                    allSizes[size].price = item.BaseUnitPrice || item.FinalUnitPrice || 0;
+                    allSizes[size].total += (qty * (item.BaseUnitPrice || item.FinalUnitPrice || 0));
                 }
             });
         });
@@ -1005,8 +1006,9 @@ class QuoteViewPage {
                 rows.push({
                     label: sizeLabel || `Qty: ${item.Quantity}`,
                     qty: item.Quantity,
-                    unitPrice: item.FinalUnitPrice || 0,
-                    total: item.LineTotal || (item.Quantity * item.FinalUnitPrice) || 0,
+                    // Use BaseUnitPrice so LTM is shown separately in LTM-G row
+                    unitPrice: item.BaseUnitPrice || item.FinalUnitPrice || 0,
+                    total: item.LineTotal || (item.Quantity * (item.BaseUnitPrice || item.FinalUnitPrice || 0)) || 0,
                     isExtended: isExtended
                 });
             });
@@ -1093,7 +1095,8 @@ class QuoteViewPage {
             html += `<tr>`;
             html += `<td style="text-align: left;">${sizeStr}</td>`;
             html += `<td class="qty-col">${item.Quantity || 0}</td>`;
-            html += `<td class="price-col">${this.formatCurrency(item.FinalUnitPrice || item.BaseUnitPrice || 0)}</td>`;
+            // Use BaseUnitPrice so LTM is shown separately in LTM-G row
+            html += `<td class="price-col">${this.formatCurrency(item.BaseUnitPrice || item.FinalUnitPrice || 0)}</td>`;
             html += `<td class="total-col">${this.formatCurrency(item.LineTotal || 0)}</td>`;
             html += '</tr>';
         });
@@ -1111,7 +1114,8 @@ class QuoteViewPage {
 
         items.forEach(item => {
             const breakdown = this.parseSizeBreakdown(item.SizeBreakdown);
-            const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
+            // Use BaseUnitPrice so LTM is shown separately in LTM-G row
+            const unitPrice = item.BaseUnitPrice || item.FinalUnitPrice || 0;
 
             Object.entries(breakdown).forEach(([size, qty]) => {
                 if (qty > 0) {
@@ -1129,7 +1133,12 @@ class QuoteViewPage {
      * This is calculated from the session's SubtotalAmount / TotalQuantity
      */
     getBaseSellingPrice() {
-        // If we have stored FinalUnitPrice on any item, try to find the lowest (base) price
+        // Prefer BaseUnitPrice so LTM is shown separately in LTM-G row
+        const itemsWithBasePrice = this.items.filter(i => i.BaseUnitPrice && i.BaseUnitPrice > 0);
+        if (itemsWithBasePrice.length > 0) {
+            return Math.min(...itemsWithBasePrice.map(i => i.BaseUnitPrice));
+        }
+        // Fallback to FinalUnitPrice if BaseUnitPrice not available
         const itemsWithPrice = this.items.filter(i => i.FinalUnitPrice && i.FinalUnitPrice > 0);
         if (itemsWithPrice.length > 0) {
             return Math.min(...itemsWithPrice.map(i => i.FinalUnitPrice));
@@ -1173,7 +1182,11 @@ class QuoteViewPage {
      * Base selling price + size upcharge = final unit price
      */
     getEstimatedUnitPrice(item, sizeCategory = 'standard') {
-        // If FinalUnitPrice is set and > 0, use it
+        // Prefer BaseUnitPrice so LTM is shown separately in LTM-G row
+        if (item.BaseUnitPrice && item.BaseUnitPrice > 0) {
+            return item.BaseUnitPrice;
+        }
+        // Fallback to FinalUnitPrice if BaseUnitPrice not available
         if (item.FinalUnitPrice && item.FinalUnitPrice > 0) {
             return item.FinalUnitPrice;
         }

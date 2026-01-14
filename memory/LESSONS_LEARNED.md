@@ -61,6 +61,22 @@ TotalAmount: parseFloat((
 
 ---
 
+## Problem: LTM fee displayed twice in Quote View (double-display bug)
+**Date:** 2026-01-14
+**Project:** Pricing Index (Quote View)
+**Symptoms:** Quote EMB0114-7 showed inflated unit prices ($25.78 instead of $23.00) AND a separate LTM-G fee row ($50.00). Customer math didn't add up - product totals + LTM row ≠ Subtotal.
+**Root cause:** Quote items are saved with both `BaseUnitPrice` ($23) and `FinalUnitPrice` ($25.78 = base + LTM per unit). Quote View was displaying `FinalUnitPrice` (which includes LTM) but ALSO showing the LTM-G fee row separately.
+**Solution:** Changed quote-view.js to prefer `BaseUnitPrice` over `FinalUnitPrice` in all display functions:
+- `buildProductRows()` - size aggregation
+- `renderSizeMatrix()` - row data
+- `parseSizeData()` - size parsing
+- `getBaseSellingPrice()` - price lookup
+- `getEstimatedUnitPrice()` - price estimation
+**Prevention:** When items store both base and final prices, decide which to display based on whether fees are shown separately. If LTM has its own row, use BaseUnitPrice. Document the two-price pattern in code comments.
+**Files:** `/pages/js/quote-view.js` - ~10 lines changed to prefer BaseUnitPrice
+
+---
+
 ## Problem: 3 of 4 quote builders had ZERO mobile responsiveness
 **Date:** 2026-01-13
 **Project:** Pricing Index
