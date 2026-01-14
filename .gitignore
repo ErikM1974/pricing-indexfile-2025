@@ -61,6 +61,7 @@ server.log
 *-temp.*
 *-debug.*
 *.tmp
+tmpclaude-*
 .claude/settings.local.json
 temp/verify-dtg-pricing.js
 temp/DTG-Pricing-Formula-Verification.md

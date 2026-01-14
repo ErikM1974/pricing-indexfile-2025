@@ -30,6 +30,37 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Problem: TotalAmount missing Art/Rush/Sample/Discount fees
+**Date:** 2026-01-14
+**Project:** Pricing Index (Embroidery Quote Builder)
+**Symptoms:** Quote EMB0114-3 had TotalAmount of $1,484.50 but should have been $1,555.20. Art Charge ($75), Rush Fee ($50), Sample Fee ($25), and Discount (-$79.30) were shown as line items in the quote view but NOT included in TotalAmount.
+**Root cause:** In `embroidery-quote-service.js` line 121, TotalAmount was set to `pricingResults.grandTotal` which only includes subtotal + LTM + setup + AL charges. Art/Rush/Sample/Discount are entered via customerData, not calculated by the pricing engine.
+**Solution:** Updated TotalAmount calculation to include all fees:
+```javascript
+TotalAmount: parseFloat((
+    pricingResults.grandTotal +
+    (customerData.artCharge || 0) +
+    (customerData.rushFee || 0) +
+    (customerData.sampleFee || 0) -
+    (customerData.discount || 0)
+).toFixed(2)),
+```
+**Prevention:** When adding new fee fields to quote builders, ensure they are included in TotalAmount calculation. The quote-view.js uses TotalAmount for tax calculation, so missing fees means wrong tax and totals.
+**Files:** `/shared_components/js/embroidery-quote-service.js` line 121-129
+
+---
+
+## Problem: ADDL-STITCH fee row confused customers
+**Date:** 2026-01-14
+**Project:** Pricing Index (Quote View)
+**Symptoms:** Customers saw an "ADDL-STITCH" fee row in the quote products table showing extra stitch charges, but the math didn't add up because these charges were already included in the product unit prices.
+**Root cause:** Extra stitch costs are calculated in `embroidery-quote-pricing.js` and added to the unit price (`finalPrice = roundedBase + additionalStitchCost`). The ADDL-STITCH row was purely informational but appeared to be a separate charge.
+**Solution:** Removed ADDL-STITCH fee row from both web display (`renderFeeRows`) and PDF generation (`renderPdfFeeRows`) in `quote-view.js`. The extra stitch info remains visible in the embroidery details section.
+**Prevention:** When showing fee breakdowns, distinguish between informational values (already in prices) vs actual additional charges. Comment code clearly to explain what's already baked into unit prices.
+**Files:** `/pages/js/quote-view.js` lines 491-497 (web) and 1890-1894 (PDF)
+
+---
+
 ## Problem: 3 of 4 quote builders had ZERO mobile responsiveness
 **Date:** 2026-01-13
 **Project:** Pricing Index
@@ -553,6 +584,35 @@ const colX = {
 - `baseSizes` for PDF line items should NOT include '2XL' (it has upcharge)
 - `extendedSizes` for PDF line items SHOULD include '2XL' (separate line with upcharge)
 - `isExtendedSize` pricing check must include `size === '2XL'` for child row prices
+
+---
+
+## Problem: OSFA and Cap Sizes Not Rendering in Quote View
+**Date:** 2026-01-13
+**Project:** Pricing Index
+**Symptoms:** Richardson 112 caps with OSFA sizing saved correctly to database, returned by API, but NOT displayed in quote view table or PDF. Total items count was correct (40 = 28 garments + 12 caps), but product table only showed garments.
+
+**Root Cause:** `buildProductRows()` in quote-view.js only handled standard sizes (S, M, L, XL) and extended sizes (2XL-6XL). OSFA was not in either array, so caps generated zero rows.
+
+**ShopWorks Size Column System:**
+| Column | UI Header | Contains |
+|--------|-----------|----------|
+| Size01-04 | S, M, LG, XL | Standard sizes |
+| Size05 | XXL | **2XL ONLY** |
+| Size06 | XXXL | **CATCH-ALL: 3XL+, OSFA, S/M, L/XL, etc.** |
+
+**Solution:**
+1. Add OSFA and cap sizes to `extendedSizes` array: `['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA', 'S/M', 'M/L', 'L/XL', 'ONE SIZE', 'ADJ']`
+2. Update `xxxlCol` in `renderProductRow()` to check for OSFA and combo sizes
+3. Update style suffix logic for OSFA products (e.g., `112_OSFA`)
+
+**Files Modified:** `pages/js/quote-view.js` lines 560-576, 605-608
+
+**Prevention:** When building quote view pages for other quote types:
+- Always include OSFA, S/M, M/L, L/XL in the extended sizes array
+- Size06 (XXXL column) is the catch-all for ALL non-standard sizes
+- Test with cap products that use OSFA sizing
+- Reference `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` for complete size column mapping
 
 ---
 

@@ -1229,6 +1229,18 @@ class EmbroideryPricingCalculator {
         const setupFees = garmentSetupFees + capSetupFees;
         const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
+        // Calculate total additional stitch charge across all products
+        // This is the sum of (extraStitchCost × quantity) for each line item
+        let additionalStitchTotal = 0;
+        for (const product of productPricing) {
+            for (const lineItem of product.lineItems) {
+                if (lineItem.extraStitchCost && lineItem.extraStitchCost > 0) {
+                    additionalStitchTotal += lineItem.extraStitchCost * lineItem.quantity;
+                }
+            }
+        }
+        console.log(`[EmbroideryPricingCalculator] Total additional stitch charge: $${additionalStitchTotal.toFixed(2)}`);
+
         // Final totals
         const grandTotal = subtotal + ltmTotal + setupFees + additionalServicesTotal;
 
@@ -1240,6 +1252,7 @@ class EmbroideryPricingCalculator {
             capTier: capTier,  // NEW: Separate cap tier
             embroideryRate: tierEmbCost,
             additionalStitchCost: primaryAdditionalStitchCost,
+            additionalStitchTotal: additionalStitchTotal,  // Total extra stitch charge across all items
             subtotal: subtotal,
             ltmFee: ltmTotal,
             garmentLtmFee: garmentLtm,  // NEW: Separate garment LTM

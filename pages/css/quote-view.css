@@ -1108,6 +1108,56 @@ body {
     color: #92400e;
 }
 
+/* Fee line items (Additional Stitches, AL charges, Digitizing) */
+.product-table tr.fee-row {
+    background-color: #f0fdf4;
+    border-top: 1px dashed #86efac;
+}
+
+.product-table tr.fee-row:first-of-type {
+    border-top: 2px solid #4cb354;
+}
+
+.product-table tr.fee-row td {
+    font-style: italic;
+}
+
+.product-table tr.fee-row td.fee-part {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 600;
+    color: #15803d;
+    font-style: normal;
+}
+
+.product-table tr.fee-row td.fee-desc {
+    color: #166534;
+}
+
+.product-table tr.fee-row td.total-col {
+    color: #15803d;
+    font-weight: 600;
+}
+
+/* Discount row (negative fee) - red styling */
+.product-table tr.discount-row {
+    background-color: #fef2f2;
+    border-top: 1px dashed #fca5a5;
+}
+
+.product-table tr.discount-row td.fee-part {
+    color: #dc2626;
+}
+
+.product-table tr.discount-row td.fee-desc {
+    color: #b91c1c;
+}
+
+.product-table tr.discount-row td.total-col,
+.product-table tr.discount-row td.price-col {
+    color: #dc2626;
+    font-weight: 600;
+}
+
 /* Color badge in table */
 .color-badge-inline {
     display: inline-block;

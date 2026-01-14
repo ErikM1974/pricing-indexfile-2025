@@ -106,6 +106,9 @@ class QuoteViewPage {
             console.log('[QuoteView] Loaded quote data:', this.quoteData);
             console.log('[QuoteView] Loaded items:', this.items);
 
+            // Debug charge verification (2026-01-14)
+            this.debugChargeVerification();
+
             await this.renderQuote();
             this.showContent();
 
@@ -130,7 +133,7 @@ class QuoteViewPage {
 
         // Quote details
         document.getElementById('quote-type').textContent = this.getQuoteType();
-        document.getElementById('created-date').textContent = this.formatDate(this.quoteData.CreatedAt);
+        document.getElementById('created-date').textContent = this.formatDate(this.quoteData.CreatedAt_Quote);
         document.getElementById('expires-date').textContent = this.formatDate(this.quoteData.ExpiresAt);
 
         // Sales Rep (if available)
@@ -379,6 +382,9 @@ class QuoteViewPage {
             });
         });
 
+        // Render fee line items (Additional Stitches, AL charges, Digitizing)
+        html += this.renderFeeRows();
+
         html += `
                     </tbody>
                 </table>
@@ -448,6 +454,11 @@ class QuoteViewPage {
         if (digitizing > 0) {
             html += `<div class="emb-detail"><span class="emb-label">Digitizing:</span> <span class="emb-value">${this.formatCurrency(digitizing)}</span></div>`;
         }
+        // Additional Stitch Charge (extra stitches above 8k base)
+        const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
+        if (additionalStitchCharge > 0) {
+            html += `<div class="emb-detail"><span class="emb-label">Additional Stitches:</span> <span class="emb-value">${this.formatCurrency(additionalStitchCharge)}</span></div>`;
+        }
         // Additional Logo info (if present)
         if (addlLocation || addlStitches > 0) {
             const addlText = addlLocation
@@ -470,6 +481,124 @@ class QuoteViewPage {
         }
         html += `</div>`;
         return html;
+    }
+
+    /**
+     * Render fee charges as line items in the product table
+     * Part # | Description | S | M | LG | XL | XXL | XXXL | Qty | Unit $ | Total
+     * Quantity goes in XXXL column (Size06 catch-all per ShopWorks)
+     */
+    renderFeeRows() {
+        let html = '';
+
+        // NOTE: ADDL-STITCH row removed (2026-01-14)
+        // Extra stitch charges are already baked into product unit prices (see embroidery-quote-pricing.js line 662)
+        // Showing them as a separate fee row confused customers into thinking they were double-charged
+        // The extra stitch info is still shown in the embroidery details section for transparency
+
+        // 1. AL Garment Charge (Additional Logo on garments)
+        const alGarmentCharge = parseFloat(this.quoteData?.ALChargeGarment) || 0;
+        const garmentQty = parseInt(this.quoteData?.ALGarmentQty) || 0;
+        if (alGarmentCharge > 0 && garmentQty > 0) {
+            const unitPrice = parseFloat(this.quoteData?.ALGarmentUnitPrice) || (alGarmentCharge / garmentQty);
+            const desc = this.quoteData?.ALGarmentDesc || 'AL: Additional Logo';
+            html += this.renderFeeRow('AL-GARMENT', desc, garmentQty, unitPrice, alGarmentCharge);
+        }
+
+        // 3. AL Cap Charge (Additional Logo on caps)
+        const alCapCharge = parseFloat(this.quoteData?.ALChargeCap) || 0;
+        const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
+        if (alCapCharge > 0 && capQty > 0) {
+            const unitPrice = parseFloat(this.quoteData?.ALCapUnitPrice) || (alCapCharge / capQty);
+            const desc = this.quoteData?.ALCapDesc || 'AL: Cap Logo';
+            html += this.renderFeeRow('AL-CAP', desc, capQty, unitPrice, alCapCharge);
+        }
+
+        // 4. Garment Digitizing (flat fee per logo needing digitizing)
+        const garmentDigitizing = parseFloat(this.quoteData?.GarmentDigitizing) || 0;
+        if (garmentDigitizing > 0) {
+            html += this.renderFeeRow('DIGITIZE-G', 'Garment Digitizing', 1, garmentDigitizing, garmentDigitizing);
+        }
+
+        // 5. Cap Digitizing (flat fee per cap logo needing digitizing)
+        const capDigitizing = parseFloat(this.quoteData?.CapDigitizing) || 0;
+        if (capDigitizing > 0) {
+            html += this.renderFeeRow('DIGITIZE-C', 'Cap Digitizing', 1, capDigitizing, capDigitizing);
+        }
+
+        // 6. Artwork Charge (redraw fee)
+        const artCharge = parseFloat(this.quoteData?.ArtCharge) || 0;
+        if (artCharge > 0) {
+            html += this.renderFeeRow('ARTWORK', 'Art Charge / Redraw', 1, artCharge, artCharge);
+        }
+
+        // 7. Rush Fee (expedited processing)
+        const rushFee = parseFloat(this.quoteData?.RushFee) || 0;
+        if (rushFee > 0) {
+            html += this.renderFeeRow('RUSH', 'Rush Fee', 1, rushFee, rushFee);
+        }
+
+        // 8. Sample Fee
+        const sampleFee = parseFloat(this.quoteData?.SampleFee) || 0;
+        const sampleQty = parseInt(this.quoteData?.SampleQty) || 1;
+        if (sampleFee > 0) {
+            const sampleUnitPrice = sampleQty > 0 ? sampleFee / sampleQty : sampleFee;
+            html += this.renderFeeRow('SAMPLE', 'Sample Fee', sampleQty, sampleUnitPrice, sampleFee);
+        }
+
+        // 9. LTM Fee - Garments (Less Than Minimum for garments)
+        const ltmGarment = parseFloat(this.quoteData?.LTM_Garment) || 0;
+        const garmentQtyLTM = parseInt(this.quoteData?.ALGarmentQty) || parseInt(this.quoteData?.TotalQuantity) || 0;
+        if (ltmGarment > 0 && garmentQtyLTM > 0) {
+            const ltmGarmentUnit = ltmGarment / garmentQtyLTM;
+            html += this.renderFeeRow('LTM-G', 'LTM Fee: Garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
+        }
+
+        // 10. LTM Fee - Caps (Less Than Minimum for caps)
+        const ltmCap = parseFloat(this.quoteData?.LTM_Cap) || 0;
+        const capQtyLTM = parseInt(this.quoteData?.ALCapQty) || 0;
+        if (ltmCap > 0 && capQtyLTM > 0) {
+            const ltmCapUnit = ltmCap / capQtyLTM;
+            html += this.renderFeeRow('LTM-C', 'LTM Fee: Caps', capQtyLTM, ltmCapUnit, ltmCap);
+        }
+
+        // 11. Discount (negative line item)
+        const discount = parseFloat(this.quoteData?.Discount) || 0;
+        const discountReason = this.quoteData?.DiscountReason || '';
+        const discountPercent = parseFloat(this.quoteData?.DiscountPercent) || 0;
+        if (discount > 0) {
+            const discountDesc = discountPercent > 0
+                ? `Discount (${discountPercent}%)${discountReason ? ': ' + discountReason : ''}`
+                : `Discount${discountReason ? ': ' + discountReason : ''}`;
+            // Discount shows as negative
+            html += this.renderFeeRow('DISCOUNT', discountDesc, 1, -discount, -discount, true);
+        }
+
+        return html;
+    }
+
+    /**
+     * Render a single fee row
+     * Quantity goes in XXXL column (Size06 catch-all per ShopWorks standard)
+     * @param {boolean} isDiscount - If true, row styled as discount (red/negative)
+     */
+    renderFeeRow(partNum, description, qty, unitPrice, total, isDiscount = false) {
+        const rowClass = isDiscount ? 'fee-row discount-row' : 'fee-row';
+        return `
+            <tr class="${rowClass}">
+                <td class="style-col fee-part">${this.escapeHtml(partNum)}</td>
+                <td class="color-col fee-desc">${this.escapeHtml(description)}</td>
+                <td class="size-col"></td>
+                <td class="size-col"></td>
+                <td class="size-col"></td>
+                <td class="size-col"></td>
+                <td class="size-col"></td>
+                <td class="size-col">${qty}</td>
+                <td class="qty-col">${qty}</td>
+                <td class="price-col">${this.formatCurrency(unitPrice)}</td>
+                <td class="total-col">${this.formatCurrency(total)}</td>
+            </tr>
+        `;
     }
 
     /**
@@ -557,14 +686,23 @@ class QuoteViewPage {
         }
 
         // Extended sizes - each gets its own row
-        const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+        // Size05: 2XL only
+        // Size06: Everything else (3XL+, OSFA, combo sizes) - the catch-all column
+        const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA', 'S/M', 'M/L', 'L/XL', 'ONE SIZE', 'ADJ'];
         extendedSizes.forEach(size => {
             if (allSizes[size] && allSizes[size].qty > 0) {
                 const sizeData = {};
                 sizeData[size] = allSizes[size].qty;
 
-                // Determine style suffix
-                const suffix = size === '2XL' ? '_2X' : `_${size.replace('XL', 'X')}`;
+                // Determine style suffix based on size type
+                let suffix;
+                if (size === '2XL') {
+                    suffix = '_2X';
+                } else if (['OSFA', 'S/M', 'M/L', 'L/XL', 'ONE SIZE', 'ADJ'].includes(size)) {
+                    suffix = `_${size.replace('/', '-')}`;  // OSFA → _OSFA, S/M → _S-M
+                } else {
+                    suffix = `_${size.replace('XL', 'X')}`;  // 3XL → _3X
+                }
 
                 rows.push({
                     style: `${productGroup.styleNumber}${suffix}`,
@@ -593,7 +731,10 @@ class QuoteViewPage {
         const lgCol = row.sizes['L'] || '';
         const xlCol = row.sizes['XL'] || '';
         const xxlCol = row.sizes['2XL'] || '';
-        const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL'] || '';
+        // XXXL column is the catch-all (Size06): 3XL+, OSFA, combo sizes
+        const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL']
+                     || row.sizes['OSFA'] || row.sizes['S/M'] || row.sizes['M/L'] || row.sizes['L/XL']
+                     || row.sizes['ONE SIZE'] || row.sizes['ADJ'] || '';
 
         // Style column with clickable image for first row (opens modal)
         let styleCell;
@@ -1168,21 +1309,17 @@ class QuoteViewPage {
         const totalsCard = document.querySelector('.totals-card');
         let totalsHtml = '';
 
+        // Show subtotal INCLUDING LTM (since LTM is now shown as line items LTM-G/LTM-C)
+        // This makes the math cleaner: Subtotal → Tax → Total
+        const subtotalWithLtm = subtotal + ltmFee;
         totalsHtml += `
             <div class="total-row">
                 <span class="label">Subtotal:</span>
-                <span class="value">${this.formatCurrency(subtotal)}</span>
+                <span class="value">${this.formatCurrency(subtotalWithLtm)}</span>
             </div>
         `;
 
-        if (ltmFee > 0) {
-            totalsHtml += `
-                <div class="total-row">
-                    <span class="label">Less Than Minimum Fee:</span>
-                    <span class="value">${this.formatCurrency(ltmFee)}</span>
-                </div>
-            `;
-        }
+        // LTM no longer shown here - it's now a line item (LTM-G, LTM-C) in the product table
 
         // Add tax row
         totalsHtml += `
@@ -1466,7 +1603,7 @@ class QuoteViewPage {
 
         pdf.setFont('helvetica', 'normal');
         pdf.text(`Type: ${this.getQuoteType()}`, rightCol, 56);
-        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt)}`, rightCol, 62);
+        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt_Quote)}`, rightCol, 62);
         pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, rightCol, 68);
 
         // Add Sales Rep if available
@@ -1560,15 +1697,16 @@ class QuoteViewPage {
 
         // Table header - with Style/Description column
         // Page: 215.9mm, margins: 20mm each, usable: 175.9mm
+        // Updated 2026-01-13: Widened color column for multi-color combos like "White/Charcoal"
         const colX = {
             styleDesc: margin,       // 20mm  - Style/Description (wider)
-            color: margin + 55,      // 75mm  - Color column
-            s: margin + 80,          // 100mm - Size columns (compressed)
-            m: margin + 88,          // 108mm
-            lg: margin + 96,         // 116mm
-            xl: margin + 104,        // 124mm
-            xxl: margin + 112,       // 132mm
-            xxxl: margin + 122,      // 142mm
+            color: margin + 58,      // 78mm  - Color column (widened +3mm)
+            s: margin + 86,          // 106mm - Size columns (compressed slightly)
+            m: margin + 93,          // 113mm
+            lg: margin + 100,        // 120mm
+            xl: margin + 107,        // 127mm
+            xxl: margin + 114,       // 134mm
+            xxxl: margin + 123,      // 143mm
             qty: margin + 132,       // 152mm - Qty column
             price: margin + 144,     // 164mm - Unit $ column
             total: margin + 160      // 180mm - Total column
@@ -1620,10 +1758,13 @@ class QuoteViewPage {
                 const lgCol = row.sizes['L'] || '';
                 const xlCol = row.sizes['XL'] || '';
                 const xxlCol = row.sizes['2XL'] || '';
-                const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL'] || '';
+                // XXXL column is the catch-all (Size06): 3XL+, OSFA, combo sizes
+                const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL']
+                             || row.sizes['OSFA'] || row.sizes['S/M'] || row.sizes['M/L'] || row.sizes['L/XL']
+                             || row.sizes['ONE SIZE'] || row.sizes['ADJ'] || '';
 
-                // Truncate description to fit
-                const truncDesc = (row.description || '').substring(0, 18);
+                // Truncate description to fit (increased from 18 to 22 chars for long names like "Richardson Trucker Cap")
+                const truncDesc = (row.description || '').substring(0, 22);
                 const styleDesc = `${row.style} - ${truncDesc}`;
 
                 pdf.setFontSize(7);
@@ -1634,11 +1775,12 @@ class QuoteViewPage {
                     pdf.setTextColor(180, 83, 9); // Orange for extended
                 }
 
-                // Combined style/description column
-                pdf.text(styleDesc.substring(0, 28), colX.styleDesc + 2, yPos);
+                // Combined style/description column (increased from 28 to 32 chars)
+                pdf.text(styleDesc.substring(0, 32), colX.styleDesc + 2, yPos);
                 pdf.setFont('helvetica', 'normal');
                 pdf.setTextColor(51, 51, 51);
-                pdf.text(row.color.substring(0, 10), colX.color + 2, yPos);
+                // Color column (increased from 10 to 16 chars for combos like "White/Charcoal")
+                pdf.text(row.color.substring(0, 16), colX.color + 2, yPos);
 
                 // Size columns
                 pdf.text(String(sCol), colX.s + 3, yPos);
@@ -1660,6 +1802,9 @@ class QuoteViewPage {
             });
         });
 
+        // Fee line items (Additional Stitches, AL charges, Digitizing)
+        yPos = this.renderPdfFeeRows(pdf, yPos, colX);
+
         // Totals
         yPos += 5;
         pdf.setDrawColor(76, 179, 84);
@@ -1674,15 +1819,13 @@ class QuoteViewPage {
 
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
+        // Subtotal includes LTM (since LTM is now a line item LTM-G/LTM-C in the table)
+        const subtotalWithLtm = subtotal + ltmFee;
         pdf.text('Subtotal:', margin + 120, yPos);
-        pdf.text(this.formatCurrency(subtotal), margin + 155, yPos);
+        pdf.text(this.formatCurrency(subtotalWithLtm), margin + 155, yPos);
         yPos += 6;
 
-        if (ltmFee > 0) {
-            pdf.text('LTM Fee:', margin + 120, yPos);
-            pdf.text(this.formatCurrency(ltmFee), margin + 155, yPos);
-            yPos += 6;
-        }
+        // LTM no longer shown here - it's a line item in the product table
 
         pdf.text('WA Sales Tax (10.1%):', margin + 100, yPos);
         pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
@@ -1704,6 +1847,168 @@ class QuoteViewPage {
 
         pdf.setTextColor(76, 179, 84);
         pdf.text(`Northwest Custom Apparel | (253) 922-5793 | nwcustomapparel.com`, pageWidth / 2, footerY + 10, { align: 'center' });
+    }
+
+    /**
+     * Render fee line items in PDF (Additional Stitches, AL charges, Digitizing)
+     * @returns {number} Updated yPos after rendering fee rows
+     */
+    renderPdfFeeRows(pdf, yPos, colX) {
+        const pageWidth = 215.9;
+        const margin = 10;
+
+        // Check if any fees to render
+        const addlStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
+        const totalQty = parseInt(this.quoteData?.TotalQuantity) || 0;
+        const alGarmentCharge = parseFloat(this.quoteData?.ALChargeGarment) || 0;
+        const garmentQty = parseInt(this.quoteData?.ALGarmentQty) || 0;
+        const alCapCharge = parseFloat(this.quoteData?.ALChargeCap) || 0;
+        const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
+        const garmentDigitizing = parseFloat(this.quoteData?.GarmentDigitizing) || 0;
+        const capDigitizing = parseFloat(this.quoteData?.CapDigitizing) || 0;
+
+        // Check all fee types
+        const artChargePdf = parseFloat(this.quoteData?.ArtCharge) || 0;
+        const rushFeePdf = parseFloat(this.quoteData?.RushFee) || 0;
+        const sampleFeePdf = parseFloat(this.quoteData?.SampleFee) || 0;
+        const ltmGarmentPdf = parseFloat(this.quoteData?.LTM_Garment) || 0;
+        const ltmCapPdf = parseFloat(this.quoteData?.LTM_Cap) || 0;
+        const discountPdf = parseFloat(this.quoteData?.Discount) || 0;
+
+        // NOTE: addlStitchCharge removed from hasFees check (2026-01-14)
+        // Extra stitch charges are baked into product unit prices, not a separate fee
+        const hasFees = alGarmentCharge > 0 || alCapCharge > 0 ||
+                        garmentDigitizing > 0 || capDigitizing > 0 ||
+                        artChargePdf > 0 || rushFeePdf > 0 || sampleFeePdf > 0 ||
+                        ltmGarmentPdf > 0 || ltmCapPdf > 0 || discountPdf > 0;
+        if (!hasFees) return yPos;
+
+        // Add separator line before fees
+        yPos += 2;
+        pdf.setDrawColor(76, 179, 84);
+        pdf.setLineWidth(0.3);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 5;
+
+        pdf.setFontSize(7);
+
+        // NOTE: ADDL-STITCH row removed (2026-01-14)
+        // Extra stitch charges are already baked into product unit prices (see embroidery-quote-pricing.js line 662)
+        // Showing them as a separate fee row confused customers into thinking they were double-charged
+
+        // 1. AL Garment Charge
+        if (alGarmentCharge > 0 && garmentQty > 0) {
+            const unitPrice = parseFloat(this.quoteData?.ALGarmentUnitPrice) || (alGarmentCharge / garmentQty);
+            const desc = this.quoteData?.ALGarmentDesc || 'AL: Additional Logo';
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AL-GARMENT', desc, garmentQty, unitPrice, alGarmentCharge);
+        }
+
+        // 3. AL Cap Charge
+        if (alCapCharge > 0 && capQty > 0) {
+            const unitPrice = parseFloat(this.quoteData?.ALCapUnitPrice) || (alCapCharge / capQty);
+            const desc = this.quoteData?.ALCapDesc || 'AL: Cap Logo';
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AL-CAP', desc, capQty, unitPrice, alCapCharge);
+        }
+
+        // 4. Garment Digitizing
+        if (garmentDigitizing > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DIGITIZE-G', 'Garment Digitizing', 1, garmentDigitizing, garmentDigitizing);
+        }
+
+        // 5. Cap Digitizing
+        if (capDigitizing > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DIGITIZE-C', 'Cap Digitizing', 1, capDigitizing, capDigitizing);
+        }
+
+        // 6. Artwork Charge
+        const artCharge = parseFloat(this.quoteData?.ArtCharge) || 0;
+        if (artCharge > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'ARTWORK', 'Art Charge / Redraw', 1, artCharge, artCharge);
+        }
+
+        // 7. Rush Fee
+        const rushFee = parseFloat(this.quoteData?.RushFee) || 0;
+        if (rushFee > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'RUSH', 'Rush Fee', 1, rushFee, rushFee);
+        }
+
+        // 8. Sample Fee
+        const sampleFee = parseFloat(this.quoteData?.SampleFee) || 0;
+        const sampleQty = parseInt(this.quoteData?.SampleQty) || 1;
+        if (sampleFee > 0) {
+            const sampleUnitPrice = sampleQty > 0 ? sampleFee / sampleQty : sampleFee;
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'SAMPLE', 'Sample Fee', sampleQty, sampleUnitPrice, sampleFee);
+        }
+
+        // 9. LTM Fee - Garments
+        const ltmGarment = parseFloat(this.quoteData?.LTM_Garment) || 0;
+        const garmentQtyLTM = parseInt(this.quoteData?.ALGarmentQty) || totalQty || 0;
+        if (ltmGarment > 0 && garmentQtyLTM > 0) {
+            const ltmGarmentUnit = ltmGarment / garmentQtyLTM;
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-G', 'LTM Fee: Garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
+        }
+
+        // 10. LTM Fee - Caps
+        const ltmCap = parseFloat(this.quoteData?.LTM_Cap) || 0;
+        const capQtyLTM = parseInt(this.quoteData?.ALCapQty) || 0;
+        if (ltmCap > 0 && capQtyLTM > 0) {
+            const ltmCapUnit = ltmCap / capQtyLTM;
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-C', 'LTM Fee: Caps', capQtyLTM, ltmCapUnit, ltmCap);
+        }
+
+        // 11. Discount (negative line item)
+        const discount = parseFloat(this.quoteData?.Discount) || 0;
+        const discountReason = this.quoteData?.DiscountReason || '';
+        const discountPercent = parseFloat(this.quoteData?.DiscountPercent) || 0;
+        if (discount > 0) {
+            const discountDesc = discountPercent > 0
+                ? `Discount (${discountPercent}%)`
+                : 'Discount';
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DISCOUNT', discountDesc, 1, -discount, -discount, true);
+        }
+
+        return yPos;
+    }
+
+    /**
+     * Render a single fee row in PDF
+     * @param {boolean} isDiscount - If true, row styled as discount (red/negative)
+     */
+    renderPdfFeeRow(pdf, yPos, colX, partNum, description, qty, unitPrice, total, isDiscount = false) {
+        // Green italic style for fee rows, red for discounts
+        pdf.setFont('helvetica', 'bolditalic');
+        if (isDiscount) {
+            pdf.setTextColor(220, 38, 38); // Red (#dc2626)
+        } else {
+            pdf.setTextColor(21, 128, 61); // Green (#15803d)
+        }
+
+        // Part number in style column
+        pdf.text(partNum, colX.styleDesc + 2, yPos);
+
+        // Description (truncated)
+        pdf.setFont('helvetica', 'italic');
+        const truncDesc = description.substring(0, 20);
+        pdf.text(truncDesc, colX.color + 2, yPos);
+
+        // Quantity in XXXL column (Size06 catch-all)
+        pdf.text(String(qty), colX.xxxl + 3, yPos);
+
+        // Qty column
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(String(qty), colX.qty + 4, yPos);
+
+        // Unit price and total
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(this.formatCurrency(unitPrice), colX.price, yPos);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(this.formatCurrency(total), colX.total, yPos);
+
+        // Reset text color
+        pdf.setTextColor(51, 51, 51);
+        pdf.setFont('helvetica', 'normal');
+
+        return yPos + 6;
     }
 
     // Helper Methods
@@ -1791,6 +2096,106 @@ class QuoteViewPage {
         document.getElementById('loading-state').style.display = 'none';
         document.getElementById('error-message').textContent = message;
         document.getElementById('error-state').style.display = 'flex';
+    }
+
+    /**
+     * Debug method to verify all charges are accounted for correctly
+     * Called when quote data loads - check browser console for output
+     */
+    debugChargeVerification() {
+        console.group('📊 CHARGE VERIFICATION AUDIT');
+
+        const q = this.quoteData;
+
+        // 1. Core amounts from Caspio
+        console.group('1️⃣ Core Amounts (from Caspio)');
+        const subtotal = parseFloat(q?.SubtotalAmount) || 0;
+        const ltmFee = parseFloat(q?.LTMFeeTotal) || 0;
+        const totalAmount = parseFloat(q?.TotalAmount) || 0;
+        console.log('SubtotalAmount:', subtotal.toFixed(2));
+        console.log('LTMFeeTotal:', ltmFee.toFixed(2));
+        console.log('TotalAmount (grandTotal):', totalAmount.toFixed(2));
+        console.groupEnd();
+
+        // 2. Setup fees
+        console.group('2️⃣ Setup Fees');
+        const garmentDigitizing = parseFloat(q?.GarmentDigitizing) || 0;
+        const capDigitizing = parseFloat(q?.CapDigitizing) || 0;
+        const totalSetup = garmentDigitizing + capDigitizing;
+        console.log('Garment Digitizing:', garmentDigitizing.toFixed(2));
+        console.log('Cap Digitizing:', capDigitizing.toFixed(2));
+        console.log('Total Setup:', totalSetup.toFixed(2));
+        console.groupEnd();
+
+        // 3. Additional Logo charges
+        console.group('3️⃣ Additional Logo (AL) Charges');
+        const alGarment = parseFloat(q?.ALChargeGarment) || 0;
+        const alCap = parseFloat(q?.ALChargeCap) || 0;
+        const totalAL = alGarment + alCap;
+        console.log('AL Garment:', alGarment.toFixed(2));
+        console.log('AL Cap:', alCap.toFixed(2));
+        console.log('Total AL:', totalAL.toFixed(2));
+        console.groupEnd();
+
+        // 4. Extra stitch info (informational - already in unit prices)
+        console.group('4️⃣ Extra Stitches (INFORMATIONAL ONLY)');
+        const addlStitch = parseFloat(q?.AdditionalStitchCharge) || 0;
+        const stitchCount = parseFloat(q?.StitchCount) || 8000;
+        console.log('Stitch Count:', stitchCount);
+        console.log('Extra Stitch Amount:', addlStitch.toFixed(2));
+        console.log('⚠️ NOTE: Extra stitches are ALREADY baked into product unit prices');
+        console.log('⚠️ This value is NOT added separately to the total');
+        console.groupEnd();
+
+        // 5. Other fees
+        console.group('5️⃣ Other Fees');
+        const artCharge = parseFloat(q?.ArtCharge) || 0;
+        const rushFee = parseFloat(q?.RushFee) || 0;
+        const sampleFee = parseFloat(q?.SampleFee) || 0;
+        const discount = parseFloat(q?.Discount) || 0;
+        console.log('Art Charge:', artCharge.toFixed(2));
+        console.log('Rush Fee:', rushFee.toFixed(2));
+        console.log('Sample Fee:', sampleFee.toFixed(2));
+        console.log('Discount:', discount.toFixed(2));
+        console.groupEnd();
+
+        // 6. Product items calculation
+        console.group('6️⃣ Product Items');
+        let itemsTotal = 0;
+        this.items.forEach((item, i) => {
+            const lineTotal = parseFloat(item.LineTotal) || 0;
+            itemsTotal += lineTotal;
+            console.log(`  Item ${i + 1}: ${item.ProductSKU} x ${item.Quantity} @ $${item.UnitPrice} = $${lineTotal.toFixed(2)}`);
+        });
+        console.log('Items Total:', itemsTotal.toFixed(2));
+        console.groupEnd();
+
+        // 7. Verification math
+        console.group('7️⃣ VERIFICATION');
+        const expectedTotal = subtotal + ltmFee + totalSetup + totalAL + artCharge + rushFee + sampleFee - discount;
+        console.log('Formula: subtotal + LTM + setup + AL + art + rush + sample - discount');
+        console.log(`         ${subtotal.toFixed(2)} + ${ltmFee.toFixed(2)} + ${totalSetup.toFixed(2)} + ${totalAL.toFixed(2)} + ${artCharge.toFixed(2)} + ${rushFee.toFixed(2)} + ${sampleFee.toFixed(2)} - ${discount.toFixed(2)}`);
+        console.log('Expected Total:', expectedTotal.toFixed(2));
+        console.log('Actual TotalAmount:', totalAmount.toFixed(2));
+        const diff = Math.abs(expectedTotal - totalAmount);
+        if (diff < 0.01) {
+            console.log('✅ PASS: Totals match!');
+        } else {
+            console.log('❌ FAIL: Difference of $' + diff.toFixed(2));
+        }
+        console.groupEnd();
+
+        // 8. Tax calculation
+        console.group('8️⃣ Tax Calculation');
+        const taxRate = 0.101;
+        const tax = totalAmount * taxRate;
+        const grandTotalWithTax = totalAmount + tax;
+        console.log('Tax Rate:', (taxRate * 100).toFixed(1) + '%');
+        console.log('Tax Amount:', tax.toFixed(2));
+        console.log('Grand Total (with tax):', grandTotalWithTax.toFixed(2));
+        console.groupEnd();
+
+        console.groupEnd(); // End main group
     }
 }
 

@@ -118,9 +118,17 @@ class EmbroideryQuoteService {
                 TotalQuantity: pricingResults.totalQuantity,
                 SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
-                TotalAmount: parseFloat(pricingResults.grandTotal.toFixed(2)),
+                // TotalAmount includes ALL fees: grandTotal + Art + Rush + Sample - Discount
+                // (2026-01-14 fix: Art/Rush/Sample/Discount were missing from TotalAmount)
+                TotalAmount: parseFloat((
+                    pricingResults.grandTotal +
+                    (customerData.artCharge || 0) +
+                    (customerData.rushFee || 0) +
+                    (customerData.sampleFee || 0) -
+                    (customerData.discount || 0)
+                ).toFixed(2)),
                 Status: 'Open',
-                CreatedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                CreatedAt_Quote: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                 ExpiresAt: expiresAt,
                 Notes: customerData.notes || '',
                 // Embroidery details for easy access by quote view
@@ -132,7 +140,48 @@ class EmbroideryQuoteService {
                 // Cap embroidery details
                 CapPrintLocation: capPrimaryLogo?.position || '',
                 CapStitchCount: capPrimaryLogo?.stitchCount || 0,
-                CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0
+                CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0,
+                // Additional stitch charge (total across all items, for display on quote view/PDF)
+                AdditionalStitchCharge: parseFloat(pricingResults.additionalStitchTotal?.toFixed(2)) || 0,
+
+                // Fee line items for display as separate rows in product table
+                // Additional Logo charges (AL)
+                ALChargeGarment: parseFloat(pricingResults.additionalServices
+                    ?.filter(s => !s.isCap)
+                    ?.reduce((sum, s) => sum + (s.total || 0), 0)?.toFixed(2)) || 0,
+                ALChargeCap: parseFloat(pricingResults.additionalServices
+                    ?.filter(s => s.isCap)
+                    ?.reduce((sum, s) => sum + (s.total || 0), 0)?.toFixed(2)) || 0,
+                ALGarmentQty: pricingResults.garmentQuantity || 0,
+                ALCapQty: pricingResults.capQuantity || 0,
+                ALGarmentUnitPrice: pricingResults.additionalServices?.find(s => !s.isCap)?.unitPrice || 0,
+                ALCapUnitPrice: pricingResults.additionalServices?.find(s => s.isCap)?.unitPrice || 0,
+                ALGarmentDesc: pricingResults.additionalServices?.find(s => !s.isCap)?.description || '',
+                ALCapDesc: pricingResults.additionalServices?.find(s => s.isCap)?.description || '',
+                // Digitizing fees
+                GarmentDigitizing: parseFloat(pricingResults.garmentSetupFees?.toFixed(2)) || 0,
+                CapDigitizing: parseFloat(pricingResults.capSetupFees?.toFixed(2)) || 0,
+                // Extra stitch per-unit price (calculated from total / qty)
+                AdditionalStitchUnitPrice: pricingResults.totalQuantity > 0
+                    ? parseFloat((pricingResults.additionalStitchTotal / pricingResults.totalQuantity).toFixed(4)) || 0
+                    : 0,
+
+                // Extended fee line items (2026-01-14)
+                // Art Charge (artwork redraw fee)
+                ArtCharge: parseFloat(customerData.artCharge?.toFixed(2)) || 0,
+                // Rush Fee (expedited processing)
+                RushFee: parseFloat(customerData.rushFee?.toFixed(2)) || 0,
+                // Sample Fee
+                SampleFee: parseFloat(customerData.sampleFee?.toFixed(2)) || 0,
+                SampleQty: parseInt(customerData.sampleQty) || 0,
+                // LTM fees split by garment vs cap
+                // Note: pricing engine returns garmentLtmFee/capLtmFee (not ltmGarment/ltmCap)
+                LTM_Garment: parseFloat(pricingResults.garmentLtmFee?.toFixed(2)) || 0,
+                LTM_Cap: parseFloat(pricingResults.capLtmFee?.toFixed(2)) || 0,
+                // Discount (sales rep discount)
+                Discount: parseFloat(customerData.discount?.toFixed(2)) || 0,
+                DiscountPercent: parseFloat(customerData.discountPercent) || 0,
+                DiscountReason: customerData.discountReason || ''
             };
             
             // Save session
