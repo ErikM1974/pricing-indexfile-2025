@@ -49,35 +49,32 @@ class EmbroideryQuoteService {
     }
 
     /**
-     * Generate unique quote ID
+     * Generate unique quote ID using Caspio-backed sequence counter
+     * Format: EMB-2026-001 (prefix-year-sequence, zero-padded to 3 digits)
+     * Resets annually, persists across sessions/browsers
      */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Daily sequence reset
-        const storageKey = `${this.quotePrefix}_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old sequences
-        this.cleanupOldSequences(dateKey);
-        
-        return `${this.quotePrefix}${dateKey}-${sequence}`;
-    }
-    
-    /**
-     * Clean up old sequence storage
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keys = Object.keys(sessionStorage);
-        keys.forEach(key => {
-            if (key.startsWith(`${this.quotePrefix}_quote_sequence_`) && !key.includes(currentDateKey)) {
-                sessionStorage.removeItem(key);
-            }
-        });
+    async generateQuoteID() {
+        try {
+            const response = await fetch(`${this.baseURL}/api/quote-sequence/${this.quotePrefix}`);
+            if (!response.ok) throw new Error(`API returned ${response.status}`);
+
+            const { prefix, year, sequence } = await response.json();
+            return `${prefix}-${year}-${String(sequence).padStart(3, '0')}`;
+        } catch (error) {
+            // Fallback to old format if API fails (e.g., Heroku outage)
+            console.warn('[EmbroideryQuoteService] Quote sequence API failed, using fallback:', error);
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const dateKey = `${month}${day}`;
+
+            // Daily sequence from sessionStorage as fallback
+            const storageKey = `${this.quotePrefix}_quote_sequence_${dateKey}`;
+            let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
+            sessionStorage.setItem(storageKey, sequence.toString());
+
+            return `${this.quotePrefix}${dateKey}-${sequence}`;
+        }
     }
     
     /**
@@ -129,7 +126,7 @@ class EmbroideryQuoteService {
      */
     async saveQuote(quoteData, customerData, pricingResults) {
         try {
-            const quoteID = this.generateQuoteID();
+            const quoteID = await this.generateQuoteID();
             const sessionID = this.generateSessionID();
             
             // Format expiration date (30 days from now)

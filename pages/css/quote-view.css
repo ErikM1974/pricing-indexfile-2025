@@ -140,6 +140,13 @@ body {
     height: auto;
 }
 
+.logo-container {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
 .header-right {
     text-align: right;
 }
