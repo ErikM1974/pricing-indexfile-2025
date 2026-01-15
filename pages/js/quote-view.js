@@ -119,8 +119,13 @@ class QuoteViewPage {
     }
 
     async renderQuote() {
-        // Header
-        document.getElementById('quote-id-header').textContent = `Quote #${this.quoteId}`;
+        // Header - include revision if > 1
+        const revision = this.quoteData.RevisionNumber || 1;
+        let headerText = `Quote #${this.quoteId}`;
+        if (revision > 1) {
+            headerText += ` • Rev ${revision}`;
+        }
+        document.getElementById('quote-id-header').textContent = headerText;
 
         // Status
         this.renderStatus();
@@ -141,6 +146,15 @@ class QuoteViewPage {
         if (salesRep) {
             document.getElementById('sales-rep').textContent = salesRep;
             document.getElementById('sales-rep-row').style.display = 'flex';
+        }
+
+        // Revision info (if quote has been revised)
+        if (revision > 1 && this.quoteData.RevisedAt) {
+            const revisionRow = document.getElementById('revision-row');
+            if (revisionRow) {
+                document.getElementById('revised-date').textContent = this.formatDate(this.quoteData.RevisedAt);
+                revisionRow.style.display = 'flex';
+            }
         }
 
         // Check expiration

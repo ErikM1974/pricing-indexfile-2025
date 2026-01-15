@@ -387,6 +387,9 @@
                             ${expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : ''}
                         </td>
                         <td>
+                            <button class="action-btn" onclick="event.stopPropagation(); editQuote('${quote.QuoteID}')" title="Edit Quote">
+                                <i class="fas fa-edit"></i>
+                            </button>
                             <button class="action-btn" onclick="event.stopPropagation(); viewQuote('${quote.QuoteID}')" title="View Quote">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -520,6 +523,25 @@
         function viewQuote(quoteId) {
             // Open quote view page
             window.open(`/quote/${quoteId}`, '_blank');
+        }
+
+        function editQuote(quoteId) {
+            // Determine quote type from QuoteID prefix
+            const prefix = quoteId.split('-')[0];
+            let builderUrl = '/quote-builders/embroidery-quote-builder.html';
+
+            // Map prefix to quote builder (can be extended for other types)
+            if (prefix === 'EMB' || prefix === 'EMBC') {
+                builderUrl = '/quote-builders/embroidery-quote-builder.html';
+            } else if (prefix === 'DTG') {
+                builderUrl = '/quote-builders/dtg-quote-builder.html';
+            } else if (prefix === 'SPC' || prefix === 'SSC') {
+                builderUrl = '/quote-builders/screen-print-quote-builder.html';
+            }
+            // Add more quote types as they're implemented
+
+            // Open quote builder in edit mode
+            window.open(`${builderUrl}?edit=${quoteId}`, '_blank');
         }
 
         function copyQuoteLink(quoteId) {

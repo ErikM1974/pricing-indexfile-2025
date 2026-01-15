@@ -731,6 +731,277 @@ class EmbroideryQuoteService {
     }
     
     /**
+     * Load existing quote for editing
+     * Returns session data and all line items
+     */
+    async loadQuote(quoteId) {
+        try {
+            console.log('[EmbroideryQuoteService] Loading quote:', quoteId);
+
+            // Fetch session data
+            const sessionResponse = await fetch(
+                `${this.baseURL}/api/quote_sessions?QuoteID=${encodeURIComponent(quoteId)}`
+            );
+
+            if (!sessionResponse.ok) {
+                throw new Error(`Failed to load quote session: ${sessionResponse.status}`);
+            }
+
+            const sessions = await sessionResponse.json();
+            if (!sessions || sessions.length === 0) {
+                throw new Error(`Quote not found: ${quoteId}`);
+            }
+
+            const session = sessions[0];
+
+            // Fetch line items
+            const itemsResponse = await fetch(
+                `${this.baseURL}/api/quote_items?QuoteID=${encodeURIComponent(quoteId)}`
+            );
+
+            if (!itemsResponse.ok) {
+                throw new Error(`Failed to load quote items: ${itemsResponse.status}`);
+            }
+
+            const items = await itemsResponse.json();
+
+            console.log('[EmbroideryQuoteService] Loaded quote:', {
+                quoteId,
+                session: session,
+                itemCount: items?.length || 0
+            });
+
+            return {
+                success: true,
+                session: session,
+                items: items || []
+            };
+
+        } catch (error) {
+            console.error('[EmbroideryQuoteService] Load quote error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Update existing quote (save revision)
+     * Keeps same QuoteID, increments revision number
+     */
+    async updateQuote(quoteId, quoteData, customerData, pricingResults, revisionNotes = '') {
+        try {
+            console.log('[EmbroideryQuoteService] Updating quote:', quoteId);
+
+            // Get current session to find PK_ID and revision number
+            const loadResult = await this.loadQuote(quoteId);
+            if (!loadResult.success) {
+                throw new Error(`Cannot load existing quote: ${loadResult.error}`);
+            }
+
+            const existingSession = loadResult.session;
+            const currentRevision = existingSession.RevisionNumber || 1;
+            const newRevision = currentRevision + 1;
+
+            // Extract embroidery details from logos for session-level storage
+            const primaryLogo = pricingResults.logos?.find(l => l.id === 'primary' || l.isPrimary) || pricingResults.logos?.[0];
+            const additionalLogo = pricingResults.logos?.find(l => l.id?.includes('additional') && !l.id?.includes('cap'));
+            const capPrimaryLogo = pricingResults.logos?.find(l => l.id === 'cap-primary');
+
+            // Prepare updated session data
+            const sessionData = {
+                CustomerEmail: customerData.email,
+                CustomerName: customerData.name || 'Guest',
+                CompanyName: customerData.company || 'Not Provided',
+                Phone: customerData.phone || '',
+                SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
+                SalesRepName: customerData.salesRepName || '',
+                TotalQuantity: pricingResults.totalQuantity,
+                SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
+                LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
+                TotalAmount: parseFloat((
+                    pricingResults.grandTotal +
+                    (customerData.artCharge || 0) +
+                    (customerData.graphicDesignCharge || 0) +
+                    (customerData.rushFee || 0) +
+                    (customerData.sampleFee || 0) -
+                    (customerData.discount || 0)
+                ).toFixed(2)),
+                Notes: customerData.notes || '',
+                // Embroidery details
+                PrintLocation: primaryLogo?.position || 'Left Chest',
+                StitchCount: primaryLogo?.stitchCount || 8000,
+                DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
+                AdditionalLogoLocation: additionalLogo?.position || '',
+                AdditionalStitchCount: additionalLogo?.stitchCount || 0,
+                CapPrintLocation: capPrimaryLogo?.position || '',
+                CapStitchCount: capPrimaryLogo?.stitchCount || 0,
+                CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0,
+                GarmentStitchCharge: parseFloat(pricingResults.garmentStitchTotal?.toFixed(2)) || 0,
+                CapStitchCharge: parseFloat(pricingResults.capStitchTotal?.toFixed(2)) || 0,
+                AdditionalStitchCharge: parseFloat(pricingResults.additionalStitchTotal?.toFixed(2)) || 0,
+                ALChargeGarment: parseFloat(pricingResults.additionalServices
+                    ?.filter(s => !s.isCap)
+                    ?.reduce((sum, s) => sum + (s.total || 0), 0)?.toFixed(2)) || 0,
+                ALChargeCap: parseFloat(pricingResults.additionalServices
+                    ?.filter(s => s.isCap)
+                    ?.reduce((sum, s) => sum + (s.total || 0), 0)?.toFixed(2)) || 0,
+                ALGarmentQty: pricingResults.garmentQuantity || 0,
+                ALCapQty: pricingResults.capQuantity || 0,
+                ALGarmentUnitPrice: pricingResults.additionalServices?.find(s => !s.isCap)?.unitPrice || 0,
+                ALCapUnitPrice: pricingResults.additionalServices?.find(s => s.isCap)?.unitPrice || 0,
+                ALGarmentDesc: pricingResults.additionalServices?.find(s => !s.isCap)?.description || '',
+                ALCapDesc: pricingResults.additionalServices?.find(s => s.isCap)?.description || '',
+                GarmentDigitizing: parseFloat(pricingResults.garmentSetupFees?.toFixed(2)) || 0,
+                CapDigitizing: parseFloat(pricingResults.capSetupFees?.toFixed(2)) || 0,
+                AdditionalStitchUnitPrice: pricingResults.totalQuantity > 0
+                    ? parseFloat((pricingResults.additionalStitchTotal / pricingResults.totalQuantity).toFixed(4)) || 0
+                    : 0,
+                ArtCharge: parseFloat(customerData.artCharge?.toFixed(2)) || 0,
+                GraphicDesignHours: parseFloat(customerData.graphicDesignHours) || 0,
+                GraphicDesignCharge: parseFloat(customerData.graphicDesignCharge?.toFixed(2)) || 0,
+                RushFee: parseFloat(customerData.rushFee?.toFixed(2)) || 0,
+                SampleFee: parseFloat(customerData.sampleFee?.toFixed(2)) || 0,
+                SampleQty: parseInt(customerData.sampleQty) || 0,
+                LTM_Garment: parseFloat(pricingResults.garmentLtmFee?.toFixed(2)) || 0,
+                LTM_Cap: parseFloat(pricingResults.capLtmFee?.toFixed(2)) || 0,
+                Discount: parseFloat(customerData.discount?.toFixed(2)) || 0,
+                DiscountPercent: parseFloat(customerData.discountPercent) || 0,
+                DiscountReason: customerData.discountReason || '',
+                // Revision tracking (fields added to Caspio 2026-01-15)
+                RevisionNumber: newRevision,
+                RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                RevisedBy: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
+                RevisionNotes: revisionNotes
+            };
+
+            // Update session via PUT
+            const sessionResponse = await fetch(
+                `${this.baseURL}/api/quote_sessions/${existingSession.PK_ID}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                }
+            );
+
+            if (!sessionResponse.ok) {
+                const errorText = await sessionResponse.text();
+                throw new Error(`Session update failed: ${errorText}`);
+            }
+
+            // Delete existing items and save new ones
+            await this.deleteExistingItems(quoteId);
+
+            // Save line items (same logic as saveQuote)
+            let lineNumber = 1;
+            let isFirstItem = true;
+            for (const productPricing of pricingResults.products) {
+                for (const lineItem of productPricing.lineItems) {
+                    let logoSpecsData = '';
+                    if (isFirstItem) {
+                        try {
+                            const specs = {
+                                logos: pricingResults.logos.map(l => ({
+                                    pos: l.position,
+                                    stitch: l.stitchCount,
+                                    digit: l.needsDigitizing ? 1 : 0,
+                                    primary: l.isPrimary ? 1 : 0
+                                })),
+                                tier: pricingResults.tier,
+                                setup: pricingResults.setupFees
+                            };
+                            logoSpecsData = JSON.stringify(specs);
+                            if (logoSpecsData.length > 250) {
+                                logoSpecsData = JSON.stringify({
+                                    logoCount: pricingResults.logos.length,
+                                    tier: pricingResults.tier,
+                                    setup: pricingResults.setupFees
+                                });
+                            }
+                        } catch (e) {
+                            logoSpecsData = '';
+                        }
+                    }
+
+                    const itemData = {
+                        QuoteID: quoteId,
+                        LineNumber: lineNumber++,
+                        StyleNumber: productPricing.product.style,
+                        ProductName: `${productPricing.product.title} - ${productPricing.product.color}`,
+                        Color: productPricing.product.color,
+                        ColorCode: '',
+                        EmbellishmentType: 'embroidery',
+                        PrintLocation: 'Multiple Logos',
+                        PrintLocationName: pricingResults.logos.filter(l => l.isPrimary !== false).map(l => l.position).join(', '),
+                        Quantity: lineItem.quantity,
+                        HasLTM: pricingResults.ltmFee > 0 ? 'Yes' : 'No',
+                        BaseUnitPrice: parseFloat(lineItem.unitPrice.toFixed(2)),
+                        LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
+                        FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
+                        LineTotal: parseFloat(lineItem.total.toFixed(2)),
+                        SizeBreakdown: JSON.stringify(this.parseDescriptionToSizeBreakdown(lineItem.description)),
+                        PricingTier: pricingResults.tier,
+                        ImageURL: productPricing.product.imageUrl || '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: logoSpecsData
+                    };
+
+                    await fetch(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+
+                    isFirstItem = false;
+                }
+            }
+
+            // Save additional services as line items
+            if (pricingResults.additionalServices && pricingResults.additionalServices.length > 0) {
+                for (const service of pricingResults.additionalServices) {
+                    const itemData = {
+                        QuoteID: quoteId,
+                        LineNumber: lineNumber++,
+                        StyleNumber: service.partNumber,
+                        ProductName: service.description,
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: service.type === 'monogram' ? 'monogram' : 'embroidery-additional',
+                        PrintLocation: service.location || '',
+                        PrintLocationName: service.location || '',
+                        Quantity: service.quantity,
+                        HasLTM: 'No',
+                        BaseUnitPrice: parseFloat(service.unitPrice.toFixed(2)),
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: parseFloat(service.unitPrice.toFixed(2)),
+                        LineTotal: parseFloat(service.total.toFixed(2)),
+                        SizeBreakdown: JSON.stringify(service.metadata || {}),
+                        PricingTier: service.hasSubsetUpcharge ? 'Subset' : pricingResults.tier,
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: ''
+                    };
+
+                    await fetch(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+                }
+            }
+
+            console.log('[EmbroideryQuoteService] Quote updated successfully:', quoteId, 'Revision:', newRevision);
+            return { success: true, quoteID: quoteId, revision: newRevision };
+
+        } catch (error) {
+            console.error('[EmbroideryQuoteService] Update error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
      * Get sales rep name
      */
     getSalesRepName(email) {

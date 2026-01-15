@@ -659,6 +659,10 @@
         let pricingCalculator = null;
         let quoteService = null;
 
+        // Edit mode state (for revising existing quotes)
+        let editingQuoteId = null;
+        let editingRevision = null;
+
         // Auto-save & Draft Recovery (2026 consolidation)
         let embPersistence = null;
         let embSession = null;
@@ -1525,6 +1529,312 @@
         }
 
         // ============================================================
+        // EDIT MODE (Quote Revisions)
+        // ============================================================
+
+        /**
+         * Check URL for edit parameter
+         * Returns quote ID if editing, null otherwise
+         */
+        function checkForEditMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('edit');
+        }
+
+        /**
+         * Load existing quote for editing
+         * Populates all form fields with quote data
+         */
+        async function loadQuoteForEditing(quoteId) {
+            console.log('[EditMode] Loading quote for editing:', quoteId);
+            showToast('Loading quote...', 'info');
+
+            try {
+                const result = await quoteService.loadQuote(quoteId);
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load quote');
+                }
+
+                const session = result.session;
+                const items = result.items;
+
+                // Store edit mode state
+                editingQuoteId = quoteId;
+                editingRevision = session.RevisionNumber || 1;
+
+                // Update page header to show edit mode
+                updateEditModeUI(quoteId, editingRevision);
+
+                // Populate customer information
+                populateCustomerInfo(session);
+
+                // Populate logo configuration
+                populateLogoConfig(session, items);
+
+                // Populate products from line items
+                await populateProducts(items);
+
+                // Populate additional charges
+                populateAdditionalCharges(session);
+
+                // Recalculate pricing to update totals
+                recalculatePricing();
+
+                console.log('[EditMode] Quote loaded successfully');
+                showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+
+            } catch (error) {
+                console.error('[EditMode] Error loading quote:', error);
+                showToast('Error loading quote: ' + error.message, 'error');
+                // Clear edit mode and start fresh
+                editingQuoteId = null;
+                editingRevision = null;
+                addNewRow();
+            }
+        }
+
+        /**
+         * Update UI to show edit mode
+         */
+        function updateEditModeUI(quoteId, revision) {
+            // Update header subtitle
+            const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child');
+            if (headerSubtitle) {
+                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+            }
+
+            // Update save button text
+            const saveBtn = document.querySelector('.btn-save-quote');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+            }
+        }
+
+        /**
+         * Populate customer information fields
+         */
+        function populateCustomerInfo(session) {
+            const fields = {
+                'customer-name': session.CustomerName,
+                'customer-email': session.CustomerEmail,
+                'company-name': session.CompanyName,
+                'customer-phone': session.Phone
+            };
+
+            for (const [id, value] of Object.entries(fields)) {
+                const el = document.getElementById(id);
+                if (el && value) el.value = value;
+            }
+
+            // Set sales rep dropdown
+            const salesRepSelect = document.getElementById('sales-rep');
+            if (salesRepSelect && session.SalesRepEmail) {
+                for (let i = 0; i < salesRepSelect.options.length; i++) {
+                    if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                        salesRepSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Populate logo configuration from session data
+         */
+        function populateLogoConfig(session, items) {
+            // Primary logo (garment)
+            if (session.PrintLocation) {
+                const posSelect = document.getElementById('primary-position');
+                if (posSelect) posSelect.value = session.PrintLocation;
+                primaryLogo.position = session.PrintLocation;
+            }
+            if (session.StitchCount) {
+                const stitchInput = document.getElementById('primary-stitches');
+                if (stitchInput) stitchInput.value = session.StitchCount;
+                primaryLogo.stitchCount = session.StitchCount;
+            }
+            if (session.DigitizingFee > 0) {
+                const digitizingCb = document.getElementById('primary-digitizing');
+                if (digitizingCb) {
+                    digitizingCb.checked = true;
+                    // Update visual indicator
+                    const container = digitizingCb.closest('.digitizing-checkbox');
+                    if (container) container.classList.add('checked');
+                }
+                primaryLogo.needsDigitizing = true;
+            }
+
+            // Additional logo on garments
+            if (session.AdditionalLogoLocation) {
+                globalAL.garment.enabled = true;
+                globalAL.garment.position = session.AdditionalLogoLocation;
+                globalAL.garment.stitchCount = session.AdditionalStitchCount || 8000;
+
+                // Update UI
+                const alSwitch = document.getElementById('garment-al-switch');
+                if (alSwitch) alSwitch.classList.add('active');
+                const alConfig = document.getElementById('garment-al-config-new');
+                if (alConfig) alConfig.style.display = 'block';
+                const alToggle = document.getElementById('garment-al-toggle');
+                if (alToggle) alToggle.checked = true;
+
+                const posSelect = document.getElementById('garment-al-position');
+                if (posSelect) posSelect.value = session.AdditionalLogoLocation;
+                const stitchInput = document.getElementById('garment-al-stitches');
+                if (stitchInput) stitchInput.value = session.AdditionalStitchCount || 8000;
+            }
+
+            // Cap primary logo
+            if (session.CapPrintLocation) {
+                const capPosSelect = document.getElementById('cap-primary-position');
+                if (capPosSelect) capPosSelect.value = session.CapPrintLocation;
+                capPrimaryLogo.position = session.CapPrintLocation;
+            }
+            if (session.CapStitchCount) {
+                const capStitchInput = document.getElementById('cap-primary-stitches');
+                if (capStitchInput) capStitchInput.value = session.CapStitchCount;
+                capPrimaryLogo.stitchCount = session.CapStitchCount;
+            }
+            if (session.CapDigitizingFee > 0) {
+                const capDigitizingCb = document.getElementById('cap-primary-digitizing');
+                if (capDigitizingCb) {
+                    capDigitizingCb.checked = true;
+                    const container = capDigitizingCb.closest('.digitizing-checkbox');
+                    if (container) container.classList.add('checked');
+                }
+                capPrimaryLogo.needsDigitizing = true;
+            }
+        }
+
+        /**
+         * Populate products from line items
+         */
+        async function populateProducts(items) {
+            // Filter to only product items (not additional services)
+            const productItems = items.filter(item =>
+                item.EmbellishmentType === 'embroidery' &&
+                item.StyleNumber &&
+                !item.StyleNumber.startsWith('AL-')
+            );
+
+            // Group items by StyleNumber + Color to consolidate size quantities
+            const productGroups = {};
+            for (const item of productItems) {
+                const key = `${item.StyleNumber}|${item.Color}`;
+                if (!productGroups[key]) {
+                    productGroups[key] = {
+                        styleNumber: item.StyleNumber,
+                        color: item.Color,
+                        productName: item.ProductName,
+                        sizeBreakdown: {}
+                    };
+                }
+                // Merge size breakdowns
+                try {
+                    const sizes = JSON.parse(item.SizeBreakdown || '{}');
+                    for (const [size, qty] of Object.entries(sizes)) {
+                        productGroups[key].sizeBreakdown[size] =
+                            (productGroups[key].sizeBreakdown[size] || 0) + qty;
+                    }
+                } catch (e) {
+                    console.warn('[EditMode] Could not parse SizeBreakdown:', item.SizeBreakdown);
+                }
+            }
+
+            // Add each product to the table
+            for (const product of Object.values(productGroups)) {
+                await addProductFromQuote(product);
+            }
+        }
+
+        /**
+         * Add a product row from loaded quote data
+         */
+        async function addProductFromQuote(product) {
+            // Add new row
+            addNewRow();
+            const row = document.querySelector('tr.new-row');
+            if (!row) return;
+
+            const rowId = row.dataset.rowId;
+            const styleInput = row.querySelector('.style-input');
+
+            // Set style number and trigger color loading
+            styleInput.value = product.styleNumber;
+            await onStyleChange(styleInput, parseInt(rowId));
+
+            // Small delay to let colors load
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Select the color
+            const pickerDropdown = row.querySelector('.color-picker-dropdown');
+            if (pickerDropdown) {
+                const colorOption = pickerDropdown.querySelector(
+                    `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+                );
+                if (colorOption) {
+                    selectColor(parseInt(rowId), colorOption);
+                }
+            }
+
+            // Small delay for color selection to process
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Set size quantities
+            for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+                if (qty > 0) {
+                    const sizeInput = row.querySelector(`input[data-size="${size}"]`);
+                    if (sizeInput) {
+                        sizeInput.value = qty;
+                        // Trigger change event to update totals
+                        sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
+            }
+        }
+
+        /**
+         * Populate additional charges from session data
+         */
+        function populateAdditionalCharges(session) {
+            const chargeFields = {
+                'art-charge': session.ArtCharge,
+                'graphic-design-hours': session.GraphicDesignHours,
+                'rush-fee': session.RushFee,
+                'sample-fee': session.SampleFee,
+                'sample-qty': session.SampleQty
+            };
+
+            for (const [id, value] of Object.entries(chargeFields)) {
+                const el = document.getElementById(id);
+                if (el && value !== undefined && value !== null) {
+                    el.value = value;
+                }
+            }
+
+            // Handle discount
+            if (session.Discount > 0 || session.DiscountPercent > 0) {
+                if (session.DiscountPercent > 0) {
+                    document.getElementById('discount-type').value = 'percent';
+                    document.getElementById('discount-amount').value = session.DiscountPercent;
+                    document.getElementById('discount-symbol').textContent = '%';
+                } else {
+                    document.getElementById('discount-type').value = 'fixed';
+                    document.getElementById('discount-amount').value = session.Discount;
+                    document.getElementById('discount-symbol').textContent = '$';
+                }
+            }
+
+            if (session.DiscountReason) {
+                const reasonEl = document.getElementById('discount-reason');
+                if (reasonEl) reasonEl.value = session.DiscountReason;
+            }
+
+            // Update the additional charges display
+            updateAdditionalCharges();
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
 
@@ -1541,21 +1851,29 @@
                 // Initialize quote service
                 quoteService = new EmbroideryQuoteService();
 
-                // Initialize auto-save & draft recovery (2026 consolidation)
-                initEmbroideryPersistence();
-
-                // Check for draft recovery BEFORE adding initial row
-                if (embSession && embSession.shouldShowRecovery()) {
-                    embSession.showRecoveryDialog(
-                        (draft) => restoreEmbroideryDraft(draft),
-                        () => {
-                            if (embPersistence) embPersistence.clearDraft();
-                            addNewRow(); // Start fresh with empty row
-                        }
-                    );
+                // Check for edit mode (loading existing quote for revision)
+                const editQuoteId = checkForEditMode();
+                if (editQuoteId) {
+                    console.log('[Init] Edit mode detected:', editQuoteId);
+                    // Skip draft recovery and load the existing quote instead
+                    await loadQuoteForEditing(editQuoteId);
                 } else {
-                    // No draft to recover, add initial empty row
-                    addNewRow();
+                    // Initialize auto-save & draft recovery (2026 consolidation)
+                    initEmbroideryPersistence();
+
+                    // Check for draft recovery BEFORE adding initial row
+                    if (embSession && embSession.shouldShowRecovery()) {
+                        embSession.showRecoveryDialog(
+                            (draft) => restoreEmbroideryDraft(draft),
+                            () => {
+                                if (embPersistence) embPersistence.clearDraft();
+                                addNewRow(); // Start fresh with empty row
+                            }
+                        );
+                    } else {
+                        // No draft to recover, add initial empty row
+                        addNewRow();
+                    }
                 }
 
                 // Setup event listeners
@@ -4591,23 +4909,47 @@
                 // Attach logos to pricing for service to access
                 pricing.logos = allLogos;
 
-                const result = await quoteService.saveQuote(quoteData, customerData, pricing);
+                let result;
+                if (editingQuoteId) {
+                    // Edit mode: Update existing quote (save revision)
+                    console.log('[Embroidery] Updating quote:', editingQuoteId);
+                    result = await quoteService.updateQuote(editingQuoteId, quoteData, customerData, pricing);
+                } else {
+                    // New quote mode: Create new quote
+                    result = await quoteService.saveQuote(quoteData, customerData, pricing);
+                }
 
                 if (result && result.quoteID) {
-                    console.log('[Embroidery] Quote saved:', result.quoteID);
+                    const isUpdate = !!editingQuoteId;
+                    console.log(`[Embroidery] Quote ${isUpdate ? 'updated' : 'saved'}:`, result.quoteID);
 
                     // Clear auto-save draft on successful save (2026 consolidation)
                     if (embPersistence) {
                         embPersistence.clearDraft();
                     }
 
-                    // Show success modal with shareable link
-                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                        QuoteShareModal.show(result.quoteID);
+                    if (isUpdate) {
+                        // Update mode: Show revision success message
+                        const newRevision = result.revision || (editingRevision + 1);
+                        editingRevision = newRevision;
+                        updateEditModeUI(result.quoteID, newRevision);
+                        showToast(`Revision ${newRevision} saved successfully!`, 'success');
+
+                        // Show modal with link (don't pass message as baseUrl!)
+                        if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                            QuoteShareModal.show(result.quoteID);
+                        } else {
+                            const url = `${window.location.origin}/quote/${result.quoteID}`;
+                            alert(`Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${newRevision}\n\nShareable Link:\n${url}`);
+                        }
                     } else {
-                        // Fallback
-                        const url = `${window.location.origin}/quote/${result.quoteID}`;
-                        alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                        // New quote: Show success modal with shareable link
+                        if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                            QuoteShareModal.show(result.quoteID);
+                        } else {
+                            const url = `${window.location.origin}/quote/${result.quoteID}`;
+                            alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                        }
                     }
                 } else {
                     throw new Error(result?.error || 'Failed to save quote');
