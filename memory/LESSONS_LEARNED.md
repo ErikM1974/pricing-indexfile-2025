@@ -30,6 +30,32 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Problem: Quote items accumulate instead of being replaced on re-save
+**Date:** 2026-01-14
+**Project:** Pricing Index (Embroidery Quote Builder)
+**Symptoms:** Quote View showed 470+ items including products never added. Prices completely wrong. SubtotalAmount didn't match Items Total.
+**Root cause:** `saveQuote()` in quote service only POSTed new items, never deleted existing ones first. Quote ID generation uses sessionStorage which resets on page refresh, allowing same ID to be reused.
+**Solution:** Added `deleteExistingItems(quoteID)` method that:
+1. Queries existing items by QuoteID
+2. Deletes them in parallel batches (10 at a time) before inserting new ones
+**Prevention:** ANY quote save operation MUST delete existing items for that QuoteID before inserting. Use parallel batches for bulk operations. See QUOTE_BUILDER_GUIDE.md "Critical Save Pattern" section.
+**Files:** `/shared_components/js/embroidery-quote-service.js` lines 94-125, 239
+
+---
+
+## Problem: Extra stitch charges double-counted in unit price AND line item
+**Date:** 2026-01-14
+**Project:** Pricing Index (Embroidery Quote Builder)
+**Symptoms:** J790 @ 9000 stitches showed $74.25 (base $72 + $2.25 stitch) in matrix, PLUS separate AS-GARM line item. Customer pays twice.
+**Root cause:** `calculateProductPrice()` received non-zero `additionalStitchCost` parameter AND the pricing engine calculated stitch totals separately.
+**Solution:** Pass `0` to `calculateProductPrice()` - extra stitches shown ONLY as separate AS-GARM/AS-CAP line items, never embedded in unit price.
+**Files:**
+- `embroidery-quote-pricing.js` line 1040: Pass `0` instead of `primaryAdditionalStitchCost`
+- `embroidery-quote-pricing.js` line 422: Use `roundedBase` not `roundedBase + capExtraStitchCost`
+**Prevention:** Extra charges (stitches, additional logos, setup fees) should NEVER be embedded in unit price. Always show as separate fee line items with ShopWorks SKUs.
+
+---
+
 ## Decision: Additional Stitch Charges as Separate Line Item (Not Baked Into Unit Price)
 **Date:** 2026-01-14
 **Project:** Pricing Index (Embroidery Quote Builder, Quote View, PDF)
@@ -885,6 +911,28 @@ const colX = {
 {"error": "Descriptive message", "code": "ERROR_CODE"}
 ```
 **Prevention:** Never return generic 500 errors. Always include actionable message
+
+---
+
+## Pattern: Parallel batch operations for bulk API calls
+**Date:** 2026-01-14
+**Project:** Pricing Index
+**Description:** Sequential API calls (one at a time) cause UI to hang when processing many items. Discovered when deleting 470 quote items took forever.
+**Pattern:** Use `Promise.all()` with batched operations:
+```javascript
+const batchSize = 10;
+for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    await Promise.all(
+        batch.map(item =>
+            fetch(`/api/items/${item.id}`, { method: 'DELETE' })
+                .catch(err => console.warn(`Failed:`, err))
+        )
+    );
+}
+```
+**Files:** `/shared_components/js/embroidery-quote-service.js` lines 107-120
+**Benefit:** 470 items deleted in seconds instead of minutes. Batch size of 10 balances parallelism vs server load.
 
 ---
 

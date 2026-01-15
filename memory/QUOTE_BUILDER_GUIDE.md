@@ -681,6 +681,90 @@ quote_id: quoteID,      // Not quoteId or quote_ID
 customer_name: name,    // Not customerName
 ```
 
+## 🔴 CRITICAL: Quote Item Save Pattern
+
+**LESSON LEARNED 2026-01-14:** Quote items ACCUMULATE if you don't delete existing items first! This caused 470+ phantom items and completely wrong pricing.
+
+### The Problem
+When a quote is re-saved with the same QuoteID, new items are ADDED to existing items instead of REPLACING them.
+
+### The Solution: Delete Before Insert
+
+Every quote service MUST delete existing items before inserting new ones:
+
+```javascript
+/**
+ * Delete all existing items for a quote ID before saving new ones
+ */
+async deleteExistingItems(quoteID) {
+    try {
+        const response = await fetch(
+            `${this.apiBase}/quote_items?QuoteID=${encodeURIComponent(quoteID)}`
+        );
+        if (!response.ok) return;
+
+        const items = await response.json();
+        if (!items?.length) return;
+
+        console.log(`Deleting ${items.length} existing items for ${quoteID}`);
+
+        // Delete in parallel batches for performance (10 at a time)
+        const batchSize = 10;
+        for (let i = 0; i < items.length; i += batchSize) {
+            const batch = items.slice(i, i + batchSize);
+            await Promise.all(
+                batch.filter(item => item.PK_ID)
+                    .map(item => fetch(`${this.apiBase}/quote_items/${item.PK_ID}`, { method: 'DELETE' })
+                        .catch(err => console.warn(`Failed to delete ${item.PK_ID}:`, err)))
+            );
+        }
+    } catch (error) {
+        console.warn('Error deleting existing items:', error);
+    }
+}
+
+async saveQuote(quoteData) {
+    const quoteID = this.generateQuoteID();
+
+    // Save session first
+    await this.saveSession(quoteID, quoteData);
+
+    // ⚠️ CRITICAL: Delete existing items BEFORE inserting new ones
+    await this.deleteExistingItems(quoteID);
+
+    // Now save new items
+    for (const item of this.products) {
+        await this.saveItem(quoteID, item);
+    }
+}
+```
+
+### TotalAmount Must Include ALL Fees
+
+```javascript
+TotalAmount: parseFloat((
+    pricingResults.grandTotal +
+    (customerData.artCharge || 0) +         // GRT-50
+    (customerData.graphicDesignCharge || 0) + // GRT-75
+    (customerData.rushFee || 0) +
+    (customerData.sampleFee || 0) -
+    (customerData.discount || 0)
+).toFixed(2)),
+```
+
+### Fee Line Items Use ShopWorks SKUs
+
+| Fee Type | Garment | Cap | Description |
+|----------|---------|-----|-------------|
+| Additional Stitches | AS-GARM | AS-CAP | Over 8K base |
+| Additional Logo | AL-GARM | CB | Second+ logo |
+| Digitizing | DD | DD-CAP | Setup fee |
+| Less Than Minimum | LTM | LTM-CAP | Under 24 pcs |
+| Logo Mockup | GRT-50 | GRT-50 | Art review $50 |
+| Graphic Design | GRT-75 | GRT-75 | Design $75/hr |
+
+**NEVER embed extra charges in unit price** - always show as separate line items!
+
 ## 📝 Quote ID Prefixes Registry
 
 | Prefix | Type | Status |
