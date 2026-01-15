@@ -418,9 +418,8 @@ class EmbroideryPricingCalculator {
             const garmentCost = sizeBasePrice / marginDenom;
             const baseDecoratedPrice = garmentCost + embCost;  // Base with 8K stitches
             const roundedBase = this.roundCapPrice(baseDecoratedPrice);  // Round the base FIRST
-            // Step 2: Add extra stitch fees on top (no more rounding)
-            const roundedPrice = roundedBase + capExtraStitchCost;
-            const finalPrice = roundedPrice + upcharge;
+            // Step 2: Extra stitch fees shown as separate AS-CAP line item (NOT added to unit price)
+            const finalPrice = roundedBase + upcharge;
 
             console.log(`[CAP PRICING DEBUG] ${product.style} ${size}:
                 Base: $${sizeBasePrice}
@@ -429,8 +428,7 @@ class EmbroideryPricingCalculator {
                 Emb: $${embCost}
                 Base Decorated: $${baseDecoratedPrice.toFixed(2)}
                 Rounded Base: $${roundedBase}
-                ExtraStitch: $${capExtraStitchCost.toFixed(2)} (added AFTER rounding)
-                Price w/Extra: $${roundedPrice.toFixed(2)}
+                ExtraStitch: $${capExtraStitchCost.toFixed(2)} (shown as separate AS-CAP line)
                 Upcharge: $${upcharge}
                 Final: $${finalPrice}`);
 
@@ -441,11 +439,11 @@ class EmbroideryPricingCalculator {
                 basePrice: roundedBase,  // Store rounded base (8K stitches) for display - consistent with garments
                 extraStitchCost: capExtraStitchCost,
                 alCost: 0,
-                total: finalPrice * qty,
+                total: roundedBase * qty,  // CHANGED: Use base price for line total (extra stitches shown separately)
                 isCap: true
             });
 
-            lineSubtotal += finalPrice * qty;
+            lineSubtotal += roundedBase * qty;  // CHANGED: Use base price for subtotal (extra stitches shown separately)
         }
 
         return {
@@ -679,12 +677,12 @@ class EmbroideryPricingCalculator {
                 basePrice: roundedBase,  // Store the rounded base for display
                 extraStitchCost: additionalStitchCost,  // Store extra stitch cost
                 alCost: 0,  // Will be added later if AL exists
-                total: finalPrice * standardQty
+                total: roundedBase * standardQty  // CHANGED: Use base price for line total (extra stitches shown separately)
             });
-            
-            lineSubtotal += finalPrice * standardQty;
+
+            lineSubtotal += roundedBase * standardQty;  // CHANGED: Use base price for subtotal (extra stitches shown separately)
         }
-        
+
         // Calculate upcharge sizes (2XL+) using API upcharge values
         for (const [apiUpcharge, items] of Object.entries(upchargeSizeGroups)) {
             let upchargeQty = 0;
@@ -729,13 +727,13 @@ class EmbroideryPricingCalculator {
                 extraStitchCost: additionalStitchCost,  // Store extra stitch cost
                 alCost: 0,  // Will be added later if AL exists
                 upcharge: upchargeAmount,  // Store the upcharge amount
-                total: finalPrice * upchargeQty,
+                total: roundedBase * upchargeQty,  // CHANGED: Use base price for line total (extra stitches shown separately)
                 hasUpcharge: true
             });
-            
-            lineSubtotal += finalPrice * upchargeQty;
+
+            lineSubtotal += roundedBase * upchargeQty;  // CHANGED: Use base price for subtotal (extra stitches shown separately)
         }
-        
+
         return {
             product: product,
             tier: tier,
@@ -1035,8 +1033,9 @@ class EmbroideryPricingCalculator {
 
         // Calculate GARMENT products with standard EMB pricing
         // Uses garmentQuantity for tier determination (NOT combined total)
+        // NOTE: Pass 0 for additionalStitchCost - extra stitches shown as separate AS-GARM line item
         for (const product of garmentProducts) {
-            const pricing = await this.calculateProductPrice(product, garmentQuantity, primaryAdditionalStitchCost);
+            const pricing = await this.calculateProductPrice(product, garmentQuantity, 0);
             if (pricing) {
                 pricing.isCap = false;
                 productPricing.push(pricing);
@@ -1230,19 +1229,26 @@ class EmbroideryPricingCalculator {
         const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
         // Calculate total additional stitch charge across all products
-        // This is the sum of (extraStitchCost × quantity) for each line item
-        let additionalStitchTotal = 0;
+        // CHANGED 2026-01-14: Split by garment/cap per ShopWorks naming (AS-GARM, AS-CAP)
+        let garmentStitchTotal = 0;
+        let capStitchTotal = 0;
         for (const product of productPricing) {
             for (const lineItem of product.lineItems) {
                 if (lineItem.extraStitchCost && lineItem.extraStitchCost > 0) {
-                    additionalStitchTotal += lineItem.extraStitchCost * lineItem.quantity;
+                    const stitchCharge = lineItem.extraStitchCost * lineItem.quantity;
+                    if (product.isCap) {
+                        capStitchTotal += stitchCharge;
+                    } else {
+                        garmentStitchTotal += stitchCharge;
+                    }
                 }
             }
         }
-        console.log(`[EmbroideryPricingCalculator] Total additional stitch charge: $${additionalStitchTotal.toFixed(2)}`);
+        const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
+        console.log(`[EmbroideryPricingCalculator] Stitch charges - Garment: $${garmentStitchTotal.toFixed(2)}, Cap: $${capStitchTotal.toFixed(2)}, Total: $${additionalStitchTotal.toFixed(2)}`);
 
-        // Final totals
-        const grandTotal = subtotal + ltmTotal + setupFees + additionalServicesTotal;
+        // Final totals - NOW includes additionalStitchTotal as a separate line item (not baked into product prices)
+        const grandTotal = subtotal + ltmTotal + setupFees + additionalStitchTotal + additionalServicesTotal;
 
         return {
             products: productPricing,
@@ -1253,6 +1259,8 @@ class EmbroideryPricingCalculator {
             embroideryRate: tierEmbCost,
             additionalStitchCost: primaryAdditionalStitchCost,
             additionalStitchTotal: additionalStitchTotal,  // Total extra stitch charge across all items
+            garmentStitchTotal: garmentStitchTotal,  // NEW: Garment-only stitch charges (AS-GARM)
+            capStitchTotal: capStitchTotal,          // NEW: Cap-only stitch charges (AS-CAP)
             subtotal: subtotal,
             ltmFee: ltmTotal,
             garmentLtmFee: garmentLtm,  // NEW: Separate garment LTM

@@ -86,7 +86,44 @@ class EmbroideryQuoteService {
     generateSessionID() {
         return `emb_quote_builder_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
-    
+
+    /**
+     * Delete all existing items for a quote ID before saving new ones
+     * Prevents item accumulation when re-saving a quote
+     */
+    async deleteExistingItems(quoteID) {
+        try {
+            // Query existing items
+            const response = await fetch(
+                `${this.baseURL}/api/quote_items?QuoteID=${encodeURIComponent(quoteID)}`
+            );
+            if (!response.ok) return; // No items to delete
+
+            const items = await response.json();
+            if (!items || !items.length) return;
+
+            console.log(`[EmbroideryQuoteService] Deleting ${items.length} existing items for ${quoteID}`);
+
+            // Delete items in parallel batches for speed (10 at a time to avoid overwhelming server)
+            const batchSize = 10;
+            for (let i = 0; i < items.length; i += batchSize) {
+                const batch = items.slice(i, i + batchSize);
+                await Promise.all(
+                    batch
+                        .filter(item => item.PK_ID)
+                        .map(item =>
+                            fetch(`${this.baseURL}/api/quote_items/${item.PK_ID}`, {
+                                method: 'DELETE'
+                            }).catch(err => console.warn(`Failed to delete item ${item.PK_ID}:`, err))
+                        )
+                );
+            }
+        } catch (error) {
+            console.warn('[EmbroideryQuoteService] Error deleting existing items:', error);
+            // Don't throw - allow save to continue
+        }
+    }
+
     /**
      * Save complete quote to database
      */
@@ -118,11 +155,12 @@ class EmbroideryQuoteService {
                 TotalQuantity: pricingResults.totalQuantity,
                 SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
-                // TotalAmount includes ALL fees: grandTotal + Art + Rush + Sample - Discount
+                // TotalAmount includes ALL fees: grandTotal + Art + GraphicDesign + Rush + Sample - Discount
                 // (2026-01-14 fix: Art/Rush/Sample/Discount were missing from TotalAmount)
                 TotalAmount: parseFloat((
                     pricingResults.grandTotal +
                     (customerData.artCharge || 0) +
+                    (customerData.graphicDesignCharge || 0) +
                     (customerData.rushFee || 0) +
                     (customerData.sampleFee || 0) -
                     (customerData.discount || 0)
@@ -141,7 +179,10 @@ class EmbroideryQuoteService {
                 CapPrintLocation: capPrimaryLogo?.position || '',
                 CapStitchCount: capPrimaryLogo?.stitchCount || 0,
                 CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0,
-                // Additional stitch charge (total across all items, for display on quote view/PDF)
+                // Additional stitch charges - SPLIT by garment/cap per ShopWorks naming (AS-GARM, AS-CAP)
+                GarmentStitchCharge: parseFloat(pricingResults.garmentStitchTotal?.toFixed(2)) || 0,
+                CapStitchCharge: parseFloat(pricingResults.capStitchTotal?.toFixed(2)) || 0,
+                // Keep combined total for backward compatibility
                 AdditionalStitchCharge: parseFloat(pricingResults.additionalStitchTotal?.toFixed(2)) || 0,
 
                 // Fee line items for display as separate rows in product table
@@ -167,8 +208,11 @@ class EmbroideryQuoteService {
                     : 0,
 
                 // Extended fee line items (2026-01-14)
-                // Art Charge (artwork redraw fee)
+                // Art Charge - Logo Mockup & Print Review (GRT-50)
                 ArtCharge: parseFloat(customerData.artCharge?.toFixed(2)) || 0,
+                // Graphic Design Services (GRT-75) @ $75/hr
+                GraphicDesignHours: parseFloat(customerData.graphicDesignHours) || 0,
+                GraphicDesignCharge: parseFloat(customerData.graphicDesignCharge?.toFixed(2)) || 0,
                 // Rush Fee (expedited processing)
                 RushFee: parseFloat(customerData.rushFee?.toFixed(2)) || 0,
                 // Sample Fee
@@ -195,7 +239,11 @@ class EmbroideryQuoteService {
                 const errorText = await sessionResponse.text();
                 throw new Error(`Session save failed: ${errorText}`);
             }
-            
+
+            // Delete any existing items with this QuoteID before saving new ones
+            // This prevents item accumulation when re-saving a quote
+            await this.deleteExistingItems(quoteID);
+
             // Save line items for products
             let lineNumber = 1;
             let isFirstItem = true;
