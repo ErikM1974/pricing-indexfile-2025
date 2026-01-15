@@ -455,6 +455,20 @@ class QuoteViewPage {
      * Render embroidery info section (location, stitches, additionals)
      */
     renderEmbroideryInfo() {
+        // Check if this is a laser-patch order
+        const capEmbellishmentType = this.quoteData?.CapEmbellishmentType || 'embroidery';
+        const isLaserPatch = capEmbellishmentType === 'laser-patch';
+
+        // For laser-patch orders, show simplified info (no stitches)
+        if (isLaserPatch) {
+            let html = `<div class="embroidery-info">`;
+            html += `<div class="emb-detail"><span class="emb-label">Embellishment:</span> <span class="emb-value">Laser Leatherette Patch</span></div>`;
+            html += `<div class="emb-detail"><span class="emb-label">Location:</span> <span class="emb-value">Cap Front</span></div>`;
+            html += `</div>`;
+            return html;
+        }
+
+        // Standard embroidery info
         // Get embroidery details from quote data
         const location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation || 'Left Chest';
         const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
@@ -539,10 +553,17 @@ class QuoteViewPage {
             html += this.renderFeeRow('DD', 'Digitizing Setup Garments', 1, garmentDigitizing, garmentDigitizing);
         }
 
-        // 4. Digitizing Setup Cap - ShopWorks SKU: DD-CAP
+        // 4. Cap Setup Fee - DD-CAP for embroidery, GRT-50 for laser-patch
         const capDigitizing = parseFloat(this.quoteData?.CapDigitizing) || 0;
         if (capDigitizing > 0) {
-            html += this.renderFeeRow('DD-CAP', 'Digitizing Setup Cap', 1, capDigitizing, capDigitizing);
+            const capEmbellishmentType = this.quoteData?.CapEmbellishmentType || 'embroidery';
+            if (capEmbellishmentType === 'laser-patch') {
+                // Laser patch uses GRT-50 / Laser Patch Setup
+                html += this.renderFeeRow('GRT-50', 'Laser Patch Setup', 1, capDigitizing, capDigitizing);
+            } else {
+                // Standard embroidery uses DD-CAP / Digitizing Setup Cap
+                html += this.renderFeeRow('DD-CAP', 'Digitizing Setup Cap', 1, capDigitizing, capDigitizing);
+            }
         }
 
         // 5. Logo Mockup & Print Review - ShopWorks SKU: GRT-50
@@ -1656,73 +1677,95 @@ class QuoteViewPage {
         pdf.line(margin, yPos, pageWidth - margin, yPos);
         yPos += 6;
 
-        // Embroidery Details Section (for embroidery quotes)
+        // Embroidery Details Section (for embroidery and laser-patch quotes)
         const quoteType = this.getQuoteType();
-        if (quoteType === 'Embroidery' || quoteType === 'Customer Supplied Embroidery') {
-            // Get embroidery details from quote data
-            const location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation || 'Left Chest';
-            const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
-            const digitizing = parseFloat(this.quoteData?.DigitizingFee) || 0;
-            const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
-            const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
-            const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
-            // Cap embroidery details
-            const capLocation = this.quoteData?.CapPrintLocation || '';
-            const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
-            const capDigitizing = parseFloat(this.quoteData?.CapDigitizingFee) || 0;
+        if (quoteType === 'Embroidery' || quoteType === 'Customer Supplied Embroidery' || quoteType === 'Laser Patch') {
+            const isLaserPatch = quoteType === 'Laser Patch';
 
-            // Calculate box height: base 22mm, add 6mm for each extra row
-            const hasAddlLogo = addlLocation || addlStitches > 0;
-            const hasCapLogo = capLocation || capStitches > 0;
-            let boxHeight = 22;
-            if (hasAddlLogo) boxHeight += 6;
-            if (hasCapLogo) boxHeight += 6;
+            // Laser patch gets simplified details section
+            if (isLaserPatch) {
+                const boxHeight = 16;
+                pdf.setFillColor(248, 250, 252); // Light blue-gray background
+                pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
 
-            pdf.setFillColor(248, 250, 252); // Light blue-gray background
-            pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(51, 51, 51);
+                pdf.text('LASER PATCH DETAILS', margin + 3, yPos + 4);
 
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'bold');
-            pdf.setTextColor(51, 51, 51);
-            pdf.text('EMBROIDERY DETAILS', margin + 3, yPos + 4);
+                pdf.setFontSize(8);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('Embellishment: Laser Leatherette Patch', margin + 3, yPos + 11);
+                pdf.text('Location: Cap Front', margin + 70, yPos + 11);
 
-            pdf.setFontSize(8);
-            pdf.setFont('helvetica', 'normal');
+                yPos += boxHeight + 4;
+            } else {
+                // Standard embroidery details
+                // Get embroidery details from quote data
+                const location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation || 'Left Chest';
+                const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
+                const digitizing = parseFloat(this.quoteData?.DigitizingFee) || 0;
+                const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
+                const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
+                const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
+                // Cap embroidery details
+                const capLocation = this.quoteData?.CapPrintLocation || '';
+                const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
+                const capDigitizing = parseFloat(this.quoteData?.CapDigitizingFee) || 0;
 
-            // Row 1: Location and Stitch Count
-            pdf.text(`Location: ${location}`, margin + 3, yPos + 11);
-            pdf.text(`Stitch Count: ${stitches.toLocaleString()}`, margin + 70, yPos + 11);
+                // Calculate box height: base 22mm, add 6mm for each extra row
+                const hasAddlLogo = addlLocation || addlStitches > 0;
+                const hasCapLogo = capLocation || capStitches > 0;
+                let boxHeight = 22;
+                if (hasAddlLogo) boxHeight += 6;
+                if (hasCapLogo) boxHeight += 6;
 
-            // Row 2: Digitizing and Additional Charges
-            if (digitizing > 0) {
-                pdf.text(`Digitizing Fee: ${this.formatCurrency(digitizing)}`, margin + 3, yPos + 17);
-            }
-            if (additionalStitchCharge > 0) {
-                pdf.text(`Add'l Stitch Charge: ${this.formatCurrency(additionalStitchCharge)}`, margin + 70, yPos + 17);
-            }
+                pdf.setFillColor(248, 250, 252); // Light blue-gray background
+                pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
 
-            // Row 3: Additional Logo (if present)
-            if (hasAddlLogo) {
-                const addlText = addlLocation
-                    ? `Additional Logo: ${addlLocation} (${addlStitches.toLocaleString()} stitches)`
-                    : `Additional Logo: ${addlStitches.toLocaleString()} stitches`;
-                pdf.text(addlText, margin + 3, yPos + 23);
-            }
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(51, 51, 51);
+                pdf.text('EMBROIDERY DETAILS', margin + 3, yPos + 4);
 
-            // Row 4: Cap Logo (if present)
-            if (hasCapLogo) {
-                const capRowY = hasAddlLogo ? 29 : 23;
-                let capText = capLocation
-                    ? `Cap Logo: ${capLocation} (${capStitches.toLocaleString()} stitches)`
-                    : `Cap Logo: ${capStitches.toLocaleString()} stitches`;
+                pdf.setFontSize(8);
+                pdf.setFont('helvetica', 'normal');
+
+                // Row 1: Location and Stitch Count
+                pdf.text(`Location: ${location}`, margin + 3, yPos + 11);
+                pdf.text(`Stitch Count: ${stitches.toLocaleString()}`, margin + 70, yPos + 11);
+
+                // Row 2: Digitizing and Additional Charges
+                if (digitizing > 0) {
+                    pdf.text(`Digitizing Fee: ${this.formatCurrency(digitizing)}`, margin + 3, yPos + 17);
+                }
+                if (additionalStitchCharge > 0) {
+                    pdf.text(`Add'l Stitch Charge: ${this.formatCurrency(additionalStitchCharge)}`, margin + 70, yPos + 17);
+                }
+
+                // Row 3: Additional Logo (if present)
+                if (hasAddlLogo) {
+                    const addlText = addlLocation
+                        ? `Additional Logo: ${addlLocation} (${addlStitches.toLocaleString()} stitches)`
+                        : `Additional Logo: ${addlStitches.toLocaleString()} stitches`;
+                    pdf.text(addlText, margin + 3, yPos + 23);
+                }
+
+                // Row 4: Cap Logo (if present)
+                if (hasCapLogo) {
+                    const capRowY = hasAddlLogo ? 29 : 23;
+                    let capText = capLocation
+                        ? `Cap Logo: ${capLocation} (${capStitches.toLocaleString()} stitches)`
+                        : `Cap Logo: ${capStitches.toLocaleString()} stitches`;
                 if (capDigitizing > 0) {
                     capText += ` + ${this.formatCurrency(capDigitizing)} digitizing`;
                 }
                 pdf.text(capText, margin + 3, yPos + capRowY);
-            }
+                }
 
-            yPos += boxHeight + 4;
-        }
+                yPos += boxHeight + 4;
+            } // end else (standard embroidery)
+        } // end if quoteType is embroidery/laser-patch
 
         // Products Section
         pdf.setFontSize(10);
@@ -1951,9 +1994,14 @@ class QuoteViewPage {
             yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DD', 'Digitizing Setup Garments', 1, garmentDigitizing, garmentDigitizing);
         }
 
-        // 4. Digitizing Setup Cap (ShopWorks SKU: DD-CAP)
+        // 4. Cap Setup Fee - DD-CAP for embroidery, GRT-50 for laser-patch
         if (capDigitizing > 0) {
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DD-CAP', 'Digitizing Setup Cap', 1, capDigitizing, capDigitizing);
+            const capEmbellishmentType = this.quoteData?.CapEmbellishmentType || 'embroidery';
+            if (capEmbellishmentType === 'laser-patch') {
+                yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'GRT-50', 'Laser Patch Setup', 1, capDigitizing, capDigitizing);
+            } else {
+                yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DD-CAP', 'Digitizing Setup Cap', 1, capDigitizing, capDigitizing);
+            }
         }
 
         // 5. Logo Mockup & Print Review (ShopWorks SKU: GRT-50)
@@ -2055,6 +2103,12 @@ class QuoteViewPage {
     getQuoteType() {
         if (!this.quoteId) return 'Custom Quote';
         const prefix = this.quoteId.split(/[\d-]/)[0];
+
+        // Check for laser-patch cap orders (EMB prefix with laser-patch embellishment type)
+        if (prefix === 'EMB' && this.quoteData?.CapEmbellishmentType === 'laser-patch') {
+            return 'Laser Patch';
+        }
+
         return this.quoteTypes[prefix] || 'Custom Quote';
     }
 

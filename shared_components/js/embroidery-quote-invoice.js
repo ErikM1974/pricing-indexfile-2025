@@ -703,10 +703,45 @@ class EmbroideryInvoiceGenerator {
                 specsHTML += this.generateLogoListHTML(pricingData.garmentLogos, alBaseRate, 'garment');
             }
 
-            // CAP EMBROIDERY SECTION
+            // CAP EMBELLISHMENT SECTION
             if (pricingData.capLogos && pricingData.capLogos.length > 0 && pricingData.hasCaps) {
-                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2196F3; margin-bottom: 8px; margin-top: ${pricingData.hasGarments ? '12px' : '0'};">CAP EMBROIDERY:</div>`;
-                specsHTML += this.generateLogoListHTML(pricingData.capLogos, alBaseRate, 'cap');
+                // Determine embellishment type label
+                const capEmbType = pricingData.capEmbellishmentType || 'embroidery';
+                const capEmbLabel = {
+                    'embroidery': 'CAP EMBROIDERY:',
+                    '3d-puff': 'CAP 3D PUFF EMBROIDERY:',
+                    'laser-patch': 'CAP LASER LEATHERETTE PATCH:'
+                }[capEmbType] || 'CAP EMBELLISHMENT:';
+
+                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2196F3; margin-bottom: 8px; margin-top: ${pricingData.hasGarments ? '12px' : '0'};">${capEmbLabel}</div>`;
+
+                if (capEmbType === 'laser-patch') {
+                    // Patch-specific display (no stitch count)
+                    specsHTML += `
+                        <div style="font-size: 11px; margin-left: 10px; margin-bottom: 3px;">
+                            <strong>Position:</strong> Cap Front | <strong>Type:</strong> Laser Leatherette Patch
+                        </div>
+                    `;
+                    // Show patch setup fee if applicable
+                    if (pricingData.capPatchSetupFee > 0) {
+                        specsHTML += `
+                            <div style="font-size: 10px; color: #666; margin-left: 10px;">
+                                Design Setup Fee: $${pricingData.capPatchSetupFee.toFixed(2)}
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Embroidery display (flat or 3D puff)
+                    specsHTML += this.generateLogoListHTML(pricingData.capLogos, alBaseRate, 'cap');
+                    // Show 3D puff upcharge if applicable
+                    if (capEmbType === '3d-puff' && pricingData.puffUpchargePerCap > 0) {
+                        specsHTML += `
+                            <div style="font-size: 10px; color: #2196F3; margin-left: 10px; margin-top: 3px;">
+                                3D Puff Upcharge: +$${pricingData.puffUpchargePerCap.toFixed(2)} per cap
+                            </div>
+                        `;
+                    }
+                }
             }
         } else {
             // Legacy: All logos are garment logos

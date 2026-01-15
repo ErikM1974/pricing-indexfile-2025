@@ -41,6 +41,21 @@ class EmbroideryPricingCalculator {
         this.capRoundingMethod = 'HalfDollarUp'; // Caps use half-dollar rounding
         this.capAdditionalStitchRate = 1.00; // Cap default: $1.00/1K (vs Shirt $1.25/1K)
 
+        // =========================================
+        // CAP EMBELLISHMENT PRICING (2026)
+        // =========================================
+        // 3D Puff embroidery upcharge - LOADED FROM API (see initializeCapPricing)
+        // This default is a FALLBACK only - actual value comes from Caspio Embroidery_Costs table
+        // ItemType='3D-Puff', fetched via /api/pricing-bundle?method=CAP-PUFF
+        this.puffUpchargePerCap = 5.00; // Fallback if API fails
+
+        // Laser leatherette patch upcharge - LOADED FROM API (see initializeCapPricing)
+        // This default is a FALLBACK only - actual value comes from Caspio Embroidery_Costs table
+        // ItemType='Patch', fetched via /api/pricing-bundle?method=PATCH
+        // Works like 3D Puff: flat add-on per cap, quantity breaks come from base cap pricing
+        this.patchUpchargePerCap = 5.00; // Fallback if API fails
+        this.patchSetupFee = 50.00; // GRT-50 setup fee for patches
+
         // Track API status
         this.apiError = false;
         
@@ -305,6 +320,48 @@ class EmbroideryPricingCalculator {
                 this.apiStatus.criticalFailures.push('Cap AL pricing unavailable');
             }
 
+            // Fetch 3D Puff upcharge from CAP-PUFF endpoint
+            // Rule: ALWAYS pull pricing from Caspio API - never hardcode
+            try {
+                const puffResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=CAP-PUFF`);
+                const puffData = await puffResponse.json();
+
+                if (puffData && puffData.allEmbroideryCostsR) {
+                    // Find the 3D-Puff record
+                    const puffRecord = puffData.allEmbroideryCostsR.find(cost => cost.ItemType === '3D-Puff');
+                    if (puffRecord && puffRecord.EmbroideryCost) {
+                        this.puffUpchargePerCap = puffRecord.EmbroideryCost;
+                        console.log(`[EmbroideryPricingCalculator] 3D Puff upcharge loaded from API: $${this.puffUpchargePerCap}`);
+                    } else {
+                        console.warn('[EmbroideryPricingCalculator] 3D-Puff record not found in API, using default');
+                    }
+                }
+            } catch (puffError) {
+                console.error('[EmbroideryPricingCalculator] Failed to load 3D Puff pricing:', puffError);
+                // Keep the hardcoded default as fallback
+            }
+
+            // Fetch Patch upcharge from PATCH endpoint
+            // Rule: ALWAYS pull pricing from Caspio API - never hardcode
+            try {
+                const patchResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=PATCH`);
+                const patchData = await patchResponse.json();
+
+                if (patchData && patchData.allPatchCostsR) {
+                    // Find the Patch record (TierLabel='ALL' for flat pricing)
+                    const patchRecord = patchData.allPatchCostsR.find(cost => cost.ItemType === 'Patch');
+                    if (patchRecord && patchRecord.EmbroideryCost) {
+                        this.patchUpchargePerCap = patchRecord.EmbroideryCost;
+                        console.log(`[EmbroideryPricingCalculator] Patch upcharge loaded from API: $${this.patchUpchargePerCap}`);
+                    } else {
+                        console.warn('[EmbroideryPricingCalculator] Patch record not found in API, using default');
+                    }
+                }
+            } catch (patchError) {
+                console.error('[EmbroideryPricingCalculator] Failed to load Patch pricing:', patchError);
+                // Keep the hardcoded default as fallback
+            }
+
             this.capInitialized = true;
             console.log('[EmbroideryPricingCalculator] Cap pricing initialization complete');
 
@@ -313,6 +370,18 @@ class EmbroideryPricingCalculator {
             this.apiStatus.criticalFailures.push('Cap pricing unavailable');
             throw error; // Re-throw to prevent silent failure
         }
+    }
+
+    /**
+     * Get embellishment upcharges for UI display
+     * Call after cap pricing is initialized to get current API values
+     * Used to dynamically update dropdown labels with prices from Caspio
+     */
+    getEmbellishmentUpcharges() {
+        return {
+            puff: this.puffUpchargePerCap,
+            patch: this.patchUpchargePerCap
+        };
     }
 
     /**
@@ -340,26 +409,57 @@ class EmbroideryPricingCalculator {
 
     /**
      * Calculate price for a cap product
-     * Uses CAP pricing: fixed 8K stitches, HalfDollarUp rounding
+     * Supports multiple embellishment types:
+     * - 'embroidery' (default): Standard flat embroidery
+     * - '3d-puff': 3D puff embroidery (+$5/cap upcharge)
+     * - 'laser-patch': Laser leatherette patch (+$5/cap upcharge, no stitches)
+     *
+     * @param {Object} product - Product data
+     * @param {number} totalQuantity - Total cap quantity for tier determination
+     * @param {number} capStitchCount - Stitch count (for embroidery types)
+     * @param {string} embellishmentType - Type of cap embellishment
      */
-    async calculateCapProductPrice(product, totalQuantity, capStitchCount = 8000) {
+    async calculateCapProductPrice(product, totalQuantity, capStitchCount = 8000, embellishmentType = 'embroidery') {
         // Ensure cap pricing is initialized
         if (!this.capInitialized) {
             await this.initializeCapConfig();
         }
 
         const tier = this.getTier(totalQuantity);
-        const embCost = this.getCapEmbroideryCost(tier);
         const marginDenom = this.capMarginDenominator || 0.57;
 
-        // Calculate extra stitch cost for caps
+        // Determine decoration cost based on embellishment type
+        let decorationCost = 0;
+        let capExtraStitchCost = 0;
+        let puffUpcharge = 0;
+        let patchUpcharge = 0;
+
+        // All embellishment types use embroidery pricing as the base
+        // Patches and 3D Puff add a flat upcharge on top
+        const embCost = this.getCapEmbroideryCost(tier);
+        decorationCost = embCost;
+
+        // Calculate extra stitch cost for caps (embroidery and 3D puff only, not patches)
         // Base is 8000 stitches, charge extra per 1000 above that
         // CRITICAL: Caps use $1.00/1K (NOT Shirt's $1.25/1K)
         const capBaseStitches = 8000;
-        const extraCapStitches = Math.max(0, capStitchCount - capBaseStitches);
-        const capExtraStitchCost = (extraCapStitches / 1000) * (this.capAdditionalStitchRate || 1.00);
 
-        console.log(`[EmbroideryPricingCalculator] Cap product ${product.style}: tier=${tier}, embCost=$${embCost}, stitches=${capStitchCount}, extraStitchCost=$${capExtraStitchCost.toFixed(2)}`);
+        // Extra stitch cost only applies to embroidery and 3D puff (patches have no stitches)
+        if (embellishmentType !== 'laser-patch') {
+            const extraCapStitches = Math.max(0, capStitchCount - capBaseStitches);
+            capExtraStitchCost = (extraCapStitches / 1000) * (this.capAdditionalStitchRate || 1.00);
+        }
+
+        // Add embellishment-specific upcharges
+        if (embellishmentType === '3d-puff') {
+            puffUpcharge = this.puffUpchargePerCap;
+            console.log(`[EmbroideryPricingCalculator] Cap 3D PUFF ${product.style}: tier=${tier}, embCost=$${embCost}, puffUpcharge=$${puffUpcharge}, stitches=${capStitchCount}, extraStitchCost=$${capExtraStitchCost.toFixed(2)}`);
+        } else if (embellishmentType === 'laser-patch') {
+            patchUpcharge = this.patchUpchargePerCap;
+            console.log(`[EmbroideryPricingCalculator] Cap LASER-PATCH ${product.style}: tier=${tier}, embCost=$${embCost}, patchUpcharge=$${patchUpcharge}`);
+        } else {
+            console.log(`[EmbroideryPricingCalculator] Cap EMBROIDERY ${product.style}: tier=${tier}, embCost=$${embCost}, stitches=${capStitchCount}, extraStitchCost=$${capExtraStitchCost.toFixed(2)}`);
+        }
 
         // Fetch size pricing for this cap style
         const sizePricingData = await this.fetchSizePricing(product.style);
@@ -414,18 +514,23 @@ class EmbroideryPricingCalculator {
             const upcharge = priceData.sizeUpcharges[size] || 0;
 
             // Calculate decorated price using bottom-up logic (same as garments)
-            // Step 1: Calculate and ROUND the base price (garment + embroidery for 8K stitches)
+            // Step 1: Calculate and ROUND the base price (garment + decoration cost)
             const garmentCost = sizeBasePrice / marginDenom;
-            const baseDecoratedPrice = garmentCost + embCost;  // Base with 8K stitches
+            // For embroidery: decorationCost = embCost, no upcharge
+            // For 3D puff: decorationCost = embCost + puffUpcharge (flat $5 add-on)
+            // For patch: decorationCost = embCost + patchUpcharge (flat $5 add-on, no stitches)
+            const baseDecoratedPrice = garmentCost + decorationCost + puffUpcharge + patchUpcharge;
             const roundedBase = this.roundCapPrice(baseDecoratedPrice);  // Round the base FIRST
             // Step 2: Extra stitch fees shown as separate AS-CAP line item (NOT added to unit price)
             const finalPrice = roundedBase + upcharge;
 
-            console.log(`[CAP PRICING DEBUG] ${product.style} ${size}:
+            console.log(`[CAP PRICING DEBUG] ${product.style} ${size} (${embellishmentType}):
                 Base: $${sizeBasePrice}
                 Margin: ${marginDenom}
                 Garment: $${garmentCost.toFixed(2)}
-                Emb: $${embCost}
+                Decoration: $${decorationCost}
+                Puff Upcharge: $${puffUpcharge}
+                Patch Upcharge: $${patchUpcharge}
                 Base Decorated: $${baseDecoratedPrice.toFixed(2)}
                 Rounded Base: $${roundedBase}
                 ExtraStitch: $${capExtraStitchCost.toFixed(2)} (shown as separate AS-CAP line)
@@ -436,10 +541,13 @@ class EmbroideryPricingCalculator {
                 description: `${size}(${qty})`,
                 quantity: qty,
                 unitPrice: finalPrice,
-                basePrice: roundedBase,  // Store rounded base (8K stitches) for display - consistent with garments
+                basePrice: roundedBase,  // Store rounded base for display
                 extraStitchCost: capExtraStitchCost,
+                puffUpcharge: puffUpcharge,  // Track 3D puff upcharge for display
+                patchUpcharge: patchUpcharge,  // Track patch upcharge for display
+                embellishmentType: embellishmentType,  // Track embellishment type
                 alCost: 0,
-                total: roundedBase * qty,  // CHANGED: Use base price for line total (extra stitches shown separately)
+                total: roundedBase * qty,  // Use base price for line total (extra stitches shown separately)
                 isCap: true
             });
 
@@ -451,7 +559,13 @@ class EmbroideryPricingCalculator {
             tier: tier,
             lineItems: lineItems,
             subtotal: lineSubtotal,
-            isCap: true
+            isCap: true,
+            embellishmentType: embellishmentType,  // Track for display/invoice
+            puffUpcharge: puffUpcharge,  // 3D puff per-cap upcharge (if applicable)
+            patchUpcharge: patchUpcharge,  // Patch per-cap upcharge (if applicable)
+            // Patch-specific data
+            isPatch: embellishmentType === 'laser-patch',
+            patchSetupFee: embellishmentType === 'laser-patch' ? this.patchSetupFee : 0
         };
     }
 
@@ -1046,12 +1160,13 @@ class EmbroideryPricingCalculator {
 
         // Calculate CAP products with CAP pricing
         // Uses capQuantity for tier determination (NOT combined total)
-        // Get cap stitch count from logo config (default 8000)
+        // Get cap stitch count and embellishment type from logo config
         const capStitchCount = capPrimaryLogo?.stitchCount || 8000;
-        console.log(`[EmbroideryPricingCalculator] Cap stitch count from config: ${capStitchCount}`);
+        const capEmbellishmentType = capPrimaryLogo?.embellishmentType || 'embroidery';
+        console.log(`[EmbroideryPricingCalculator] Cap config: stitches=${capStitchCount}, embellishmentType=${capEmbellishmentType}`);
 
         for (const product of capProducts) {
-            const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount);
+            const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount, capEmbellishmentType);
             if (pricing) {
                 productPricing.push(pricing);
                 subtotal += pricing.subtotal;
@@ -1216,15 +1331,30 @@ class EmbroideryPricingCalculator {
             // Count garment logos needing digitizing
             if (logoConfigs.garment.primary?.needsDigitizing) garmentDigitizingCount++;
             garmentDigitizingCount += (logoConfigs.garment.additional || []).filter(l => l.needsDigitizing).length;
-            // Count cap logos needing digitizing
-            if (logoConfigs.cap.primary?.needsDigitizing) capDigitizingCount++;
-            capDigitizingCount += (logoConfigs.cap.additional || []).filter(l => l.needsDigitizing).length;
+            // Count cap logos needing digitizing (only for embroidery types, not patches)
+            if (capEmbellishmentType !== 'laser-patch') {
+                if (logoConfigs.cap.primary?.needsDigitizing) capDigitizingCount++;
+                capDigitizingCount += (logoConfigs.cap.additional || []).filter(l => l.needsDigitizing).length;
+            }
         } else {
             // Legacy: just count from logos array (all treated as garment)
             garmentDigitizingCount = logos.filter(l => l.needsDigitizing).length;
         }
         const garmentSetupFees = garmentDigitizingCount * this.digitizingFee;
-        const capSetupFees = capDigitizingCount * this.digitizingFee;
+
+        // Cap setup fees: use patch setup fee ($50 GRT-50) or digitizing fee ($100) based on embellishment type
+        let capSetupFees = 0;
+        let capPatchSetupFee = 0;
+        if (capEmbellishmentType === 'laser-patch') {
+            // Patches use $50 design setup fee (GRT-50) instead of $100 digitizing
+            const needsPatchSetup = logoConfigs?.cap?.primary?.needsSetup !== false; // Default true
+            capPatchSetupFee = needsPatchSetup ? this.patchSetupFee : 0;
+            capSetupFees = capPatchSetupFee;
+        } else {
+            // Embroidery types use $100 digitizing fee
+            capSetupFees = capDigitizingCount * this.digitizingFee;
+        }
+
         const setupFees = garmentSetupFees + capSetupFees;
         const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
@@ -1284,7 +1414,11 @@ class EmbroideryPricingCalculator {
             garmentSubtotal: garmentSubtotal,
             // Separate logo arrays for invoice/display
             garmentLogos: garmentLogos,
-            capLogos: capLogos
+            capLogos: capLogos,
+            // Cap embellishment type (2026)
+            capEmbellishmentType: capEmbellishmentType,
+            capPatchSetupFee: capPatchSetupFee,
+            puffUpchargePerCap: capEmbellishmentType === '3d-puff' ? this.puffUpchargePerCap : 0
         };
     }
     

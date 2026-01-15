@@ -196,6 +196,7 @@ When you need detailed docs, use the Task tool with `subagent_type='Explore'` or
 - `/memory/GLOSSARY.md` - Shared terminology across all projects
 - `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` - **MASTER** ShopWorks ManageOrders API (PULL + PUSH)
 - `/memory/3-day-tees/` - 3-Day Tees implementation
+- `/memory/LASER_PATCH_IMPLEMENTATION.md` - Laser leatherette patch feature (caps, GRT-50 setup fee)
 
 **Keep this list short** - add new docs to `/memory/INDEX.md` and topic-specific sections below.
 

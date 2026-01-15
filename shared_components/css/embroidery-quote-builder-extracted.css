@@ -1049,6 +1049,11 @@ body {
     background: #1e8449;
 }
 
+.product-table th.total-col {
+    width: 90px;
+    background: #145a32;
+}
+
 .product-table th.actions-col {
     width: 40px;
     background: #7f8c8d;
@@ -1301,6 +1306,14 @@ body {
     padding: 0 10px;
     color: var(--nwca-green);
     background: #e8f5e9;
+}
+
+.cell-total {
+    font-weight: 700;
+    text-align: right;
+    padding: 0 10px;
+    color: #145a32;
+    background: #c8e6c9;
 }
 
 .cell-actions {

@@ -47,7 +47,7 @@
         </a>
         <div style="text-align: center;">
             <div style="font-size: 18px; font-weight: 600;">2026 Embroidery Quote Builder</div>
-            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">👕 Garments + 🧢 Caps • One Quote</div>
+            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">👕 Garments + 🧢 Caps • Embroidery, 3D Puff & Laser Patches</div>
         </div>
         <div class="header-actions">
             <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
@@ -64,8 +64,8 @@
             <div class="logo-config-container">
                 <!-- Left Column: Logo Cards -->
                 <div class="logo-cards-column">
-                    <!-- Primary Logo Card (Garments) -->
-                    <div class="logo-card" id="garment-logo-card">
+                    <!-- Primary Logo Card (Garments) - Hidden until garments added -->
+                    <div class="logo-card" id="garment-logo-card" style="display: none;">
                         <div class="logo-card-header">
                             <div class="logo-card-icon garment">
                                 <i class="fas fa-tshirt"></i>
@@ -137,29 +137,63 @@
                             <span class="logo-card-title">Cap Front Logo</span>
                         </div>
                         <div class="logo-card-body">
-                            <div class="logo-form-row">
-                                <div class="logo-form-field">
-                                    <label>Position</label>
-                                    <select id="cap-primary-position" disabled>
-                                        <option value="CF" selected>Cap Front</option>
+                            <!-- Embellishment Type Selection -->
+                            <div class="logo-form-row" style="margin-bottom: 12px;">
+                                <div class="logo-form-field" style="flex: 1;">
+                                    <label>Embellishment Type</label>
+                                    <select id="cap-embellishment-type" onchange="handleCapEmbellishmentChange()">
+                                        <option value="embroidery" selected>Flat Embroidery</option>
+                                        <option value="3d-puff">3D Puff Embroidery (+$5/cap)</option>
+                                        <option value="laser-patch">Laser Leatherette Patch (+$5/cap)</option>
                                     </select>
                                 </div>
-                                <div class="logo-form-field">
-                                    <label>Stitches</label>
-                                    <input type="number" id="cap-primary-stitches" value="8000"
-                                           min="1000" max="50000" step="1000">
-                                </div>
-                                <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
-                                    <input type="checkbox" id="cap-primary-digitizing">
-                                    <div class="digitizing-checkbox-indicator">
-                                        <i class="fas fa-check"></i>
+                            </div>
+                            <!-- Embroidery Options (shown for embroidery and 3d-puff) -->
+                            <div id="cap-embroidery-options">
+                                <div class="logo-form-row">
+                                    <div class="logo-form-field">
+                                        <label>Position</label>
+                                        <select id="cap-primary-position" disabled>
+                                            <option value="CF" selected>Cap Front</option>
+                                        </select>
                                     </div>
-                                    <span class="digitizing-checkbox-label">Digitizing</span>
-                                    <span class="digitizing-checkbox-price">$100</span>
+                                    <div class="logo-form-field">
+                                        <label>Stitches</label>
+                                        <input type="number" id="cap-primary-stitches" value="8000"
+                                               min="1000" max="50000" step="1000">
+                                    </div>
+                                    <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
+                                        <input type="checkbox" id="cap-primary-digitizing">
+                                        <div class="digitizing-checkbox-indicator">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="digitizing-checkbox-label">Digitizing</span>
+                                        <span class="digitizing-checkbox-price">$100</span>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Additional Logo Toggle -->
-                            <div class="additional-logo-section">
+                            <!-- Patch Options (hidden by default, shown for laser-patch) -->
+                            <!-- Note: All laser patches are standard size (2-4"), no size selection needed -->
+                            <div id="cap-patch-options" style="display: none;">
+                                <div class="logo-form-row">
+                                    <div class="logo-form-field">
+                                        <label>Position</label>
+                                        <select disabled style="opacity: 0.6; cursor: not-allowed;">
+                                            <option value="CF" selected>Cap Front</option>
+                                        </select>
+                                    </div>
+                                    <div class="digitizing-checkbox checked" onclick="toggleDigitizingCheckbox(this, 'cap-patch-setup')">
+                                        <input type="checkbox" id="cap-patch-setup" checked>
+                                        <div class="digitizing-checkbox-indicator">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="digitizing-checkbox-label">Design Setup</span>
+                                        <span class="digitizing-checkbox-price">$50</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Additional Logo Toggle (hidden for patches - front only) -->
+                            <div class="additional-logo-section" id="cap-al-section">
                                 <div class="toggle-switch-container">
                                     <div class="toggle-switch" id="cap-al-switch" onclick="toggleGlobalALNew('cap')">
                                         <div class="toggle-switch-handle"></div>
@@ -191,7 +225,7 @@
                 </div>
 
                 <!-- Right Column: Artwork Services -->
-                <div class="artwork-services-column">
+                <div class="artwork-services-column" id="artwork-services">
                     <div class="artwork-services-card">
                         <div class="artwork-services-header">
                             <div class="artwork-services-icon">
@@ -266,6 +300,7 @@
                                 <th class="size-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
+                                <th class="total-col">Total</th>
                                 <th class="actions-col"></th>
                             </tr>
                         </thead>
@@ -353,7 +388,7 @@
                 </div>
 
                 <div class="pricing-row">
-                    <span class="label">Products (Base 8K):</span>
+                    <span class="label" id="products-label">Products (Base 8K):</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
 
@@ -405,7 +440,7 @@
                 </div>
 
                 <div class="pricing-row" id="setup-row" style="display: none;">
-                    <span class="label">Digitizing Setup:</span>
+                    <span class="label" id="setup-label">Digitizing Setup:</span>
                     <span class="value" id="setup-fee">$100.00</span>
                 </div>
                 <!-- Digitizing Setup breakdown for mixed quotes (ShopWorks: DD, DD-CAP) -->
@@ -414,7 +449,7 @@
                     <span class="value sub-value" id="garment-setup-fee">$100.00</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-setup-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (DD-CAP):</span>
+                    <span class="label" id="cap-setup-label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (DD-CAP):</span>
                     <span class="value sub-value" id="cap-setup-fee">$100.00</span>
                 </div>
 
@@ -680,11 +715,14 @@
         // Example entry: { id: 'al-1', position: 'Right Chest', stitchCount: 8000, needsDigitizing: false, isPrimary: false }
 
         // Cap Logo Configuration (separate from garment logos)
+        // Supports multiple embellishment types: 'embroidery', '3d-puff', 'patch'
         let capPrimaryLogo = {
             position: 'CF',  // Cap Front (always)
             stitchCount: 8000,
             needsDigitizing: false,
-            isPrimary: true
+            isPrimary: true,
+            embellishmentType: 'embroidery',  // Default: flat embroidery
+            needsSetup: true  // For patches: $50 design setup fee (GRT-50)
         };
         let capAdditionalLogos = [];
         // Example entry: { id: 'cap-al-1', position: 'CB', stitchCount: 5000, needsDigitizing: false, isPrimary: false }
@@ -751,6 +789,11 @@
             checkbox.checked = !checkbox.checked;
             element.classList.toggle('checked', checkbox.checked);
 
+            // Update capPrimaryLogo.needsSetup if this is the laser patch setup checkbox
+            if (checkboxId === 'cap-patch-setup') {
+                capPrimaryLogo.needsSetup = checkbox.checked;
+            }
+
             // Trigger pricing recalculation
             recalculatePricing();
         }
@@ -780,6 +823,89 @@
 
             updateAdditionalCharges();
             updateTaxCalculation();
+        }
+
+        // Handle cap embellishment type change (Flat Embroidery, 3D Puff, or Patch)
+        function handleCapEmbellishmentChange() {
+            const embellishmentType = document.getElementById('cap-embellishment-type').value;
+            const embroideryOptions = document.getElementById('cap-embroidery-options');
+            const patchOptions = document.getElementById('cap-patch-options');
+            const alSection = document.getElementById('cap-al-section');
+
+            // Update the capPrimaryLogo object with new embellishment type
+            capPrimaryLogo.embellishmentType = embellishmentType;
+
+            if (embellishmentType === 'laser-patch') {
+                // Show patch options, hide embroidery options
+                embroideryOptions.style.display = 'none';
+                patchOptions.style.display = 'block';
+                // Hide additional logo section - patches are front only
+                alSection.style.display = 'none';
+                // Disable AL if it was enabled
+                if (globalAL.cap.enabled) {
+                    toggleGlobalALNew('cap'); // Turn it off
+                }
+                // Hide artwork services for patches - setup fee includes artwork
+                const artworkServices = document.getElementById('artwork-services');
+                if (artworkServices) {
+                    artworkServices.style.display = 'none';
+                }
+                // For patches: no stitches needed, use setup fee instead of digitizing
+                capPrimaryLogo.stitchCount = 0;
+                capPrimaryLogo.needsDigitizing = false;
+                capPrimaryLogo.needsSetup = document.getElementById('cap-patch-setup')?.checked ?? true;
+            } else {
+                // Show embroidery options (for both flat and 3D puff)
+                embroideryOptions.style.display = 'block';
+                patchOptions.style.display = 'none';
+                // Show additional logo section for embroidery types
+                alSection.style.display = 'block';
+                // Show artwork services for embroidery
+                const artworkServices = document.getElementById('artwork-services');
+                if (artworkServices) {
+                    artworkServices.style.display = 'block';
+                }
+                // Restore stitch count from input
+                capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
+                capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
+                capPrimaryLogo.needsSetup = false; // Not applicable for embroidery
+            }
+
+            console.log(`[Cap Embellishment] Changed to: ${embellishmentType}`, capPrimaryLogo);
+
+            // Recalculate pricing with new embellishment type
+            recalculatePricing();
+        }
+
+        // Get current cap embellishment type
+        function getCapEmbellishmentType() {
+            const dropdown = document.getElementById('cap-embellishment-type');
+            return dropdown ? dropdown.value : 'embroidery';
+        }
+
+        // Update embellishment dropdown labels with prices from API
+        // Rule: ALWAYS pull pricing from Caspio API - never hardcode
+        function updateEmbellishmentDropdownLabels() {
+            if (!pricingCalculator || !pricingCalculator.capInitialized) return;
+
+            const dropdown = document.getElementById('cap-embellishment-type');
+            if (!dropdown) return;
+
+            const upcharges = pricingCalculator.getEmbellishmentUpcharges();
+
+            // Update 3D Puff option
+            const puffOption = dropdown.querySelector('option[value="3d-puff"]');
+            if (puffOption) {
+                puffOption.textContent = `3D Puff Embroidery (+$${upcharges.puff}/cap)`;
+            }
+
+            // Update Patch option
+            const patchOption = dropdown.querySelector('option[value="laser-patch"]');
+            if (patchOption) {
+                patchOption.textContent = `Laser Leatherette Patch (+$${upcharges.patch}/cap)`;
+            }
+
+            console.log('[UI] Embellishment dropdown labels updated from API:', upcharges);
         }
 
         // Extended sizes available for Size06 (Other) column
@@ -1512,8 +1638,9 @@
                     }
                 });
 
-                // Check for caps to show cap logo section
+                // Check for caps/garments to show appropriate logo sections
                 updateCapLogoSectionVisibility();
+                updateGarmentLogoSectionVisibility();
 
                 // Recalculate pricing after restoring products
                 recalculatePricing();
@@ -2080,11 +2207,24 @@
             const capCard = document.getElementById('cap-logo-card');
             if (capCard) {
                 capCard.style.display = hasCaps ? 'block' : 'none';
+                // Update dropdown labels with API prices when showing cap section
+                if (hasCaps) {
+                    updateEmbellishmentDropdownLabels();
+                }
             }
             // Legacy fallback
             const capSection = document.getElementById('cap-logo-section');
             if (capSection) {
                 capSection.style.display = hasCaps ? 'block' : 'none';
+            }
+        }
+
+        // Update garment logo section visibility based on garments in quote
+        function updateGarmentLogoSectionVisibility() {
+            const hasGarments = document.querySelectorAll('tr[data-is-cap="false"]').length > 0;
+            const garmentCard = document.getElementById('garment-logo-card');
+            if (garmentCard) {
+                garmentCard.style.display = hasGarments ? 'block' : 'none';
             }
         }
 
@@ -2338,6 +2478,7 @@
                 <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
                 <td class="cell-qty" id="row-qty-${rowId}">0</td>
                 <td class="cell-price" id="row-price-${rowId}">-</td>
+                <td class="cell-total" id="row-total-${rowId}">-</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
                         <i class="fas fa-times"></i>
@@ -2430,13 +2571,18 @@
                     } else {
                         row.dataset.isCap = 'false';
                         if (capBadge) capBadge.style.display = 'none';
+                        // Warn about mixed orders when adding garments to laser-patch quote
+                        if (getCapEmbellishmentType() === 'laser-patch') {
+                            showToast('Warning: Laser patch embellishment is for caps only. Garments will use standard embroidery pricing.', 'warning', 5000);
+                        }
                     }
 
                     // Reorder row: caps go below garments
                     reorderRowByProductType(row);
 
-                    // Update cap logo section visibility (show if caps exist, hide if not)
+                    // Update logo section visibility based on product types
                     updateCapLogoSectionVisibility();
+                    updateGarmentLogoSectionVisibility();
 
                     if (colors && colors.length > 0) {
                         // Populate custom color picker dropdown with swatches
@@ -2547,6 +2693,10 @@
             const stitchCount = logoConfig?.stitchCount || 8000;
             const stitchK = Math.round(stitchCount / 1000);
 
+            // Check if this is a cap with laser-patch embellishment
+            const capEmbellishment = isCap ? getCapEmbellishmentType() : null;
+            const isLaserPatch = isCap && capEmbellishment === 'laser-patch';
+
             // Get abbreviated position name
             const posAbbrev = POSITION_ABBREV[logoPos] || logoPos.substring(0, 2).toUpperCase();
             const posFullName = POSITION_FULL_NAMES[posAbbrev] || logoPos;
@@ -2562,9 +2712,15 @@
             const rate = isCap ? 1.00 : 1.25;
 
             // Build tooltip text with full formula (&#10; = newline in title attribute)
-            let tooltipParts = [`Position: ${posFullName}`, `Stitches: ${stitchCount.toLocaleString()}`];
+            let tooltipParts = [];
+            if (isLaserPatch) {
+                // Laser patch tooltip - no stitches
+                tooltipParts = [`Type: Laser Leatherette Patch`, `Position: Cap Front`];
+            } else {
+                tooltipParts = [`Position: ${posFullName}`, `Stitches: ${stitchCount.toLocaleString()}`];
+            }
             tooltipParts.push(`Base: $${basePrice.toFixed(2)}`);
-            if (extraStitchCost > 0) {
+            if (extraStitchCost > 0 && !isLaserPatch) {
                 tooltipParts.push(`Extra: ${extraK}K × $${rate.toFixed(2)} = $${extraStitchCost.toFixed(2)}`);
             }
             if (alCost > 0) {
@@ -2576,7 +2732,12 @@
             // Build visible breakdown with compact format
             let html = `<span class="breakdown-wrapper" title="${tooltipText}">`;
             html += `<span class="breakdown-icon">└─</span>`;
-            html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
+            // For laser patches, show "Laser Patch" instead of stitch count
+            if (isLaserPatch) {
+                html += `<span class="breakdown-pos">Laser Patch</span>`;
+            } else {
+                html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
+            }
 
             // CHANGED 2026-01-14: Show BASE price only (extra stitches and AL are separate sidebar line items)
             // Show base price with optional upcharge note
@@ -3871,6 +4032,7 @@
                 <td><input type="number" class="cell-input size-input" data-size="${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
                 <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
                 <td class="cell-price unit-price-display" id="row-price-${childRowId}">-</td>
+                <td class="cell-total" id="row-total-${childRowId}">-</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="clearExtendedSize(${parentRowId}, '${size}')" title="Remove ${displaySize}">
                         <i class="fas fa-times"></i>
@@ -4038,8 +4200,9 @@
             row.remove();
             recalculatePricing();
 
-            // Update cap logo section visibility (hide if no caps remain)
+            // Update logo section visibility (hide if no products of that type remain)
             updateCapLogoSectionVisibility();
+            updateGarmentLogoSectionVisibility();
         }
 
         // ============================================================
@@ -4137,13 +4300,23 @@
             const productList = collectProductsFromTable();
 
             if (productList.length === 0) {
+                // Even with no quantities, show setup fee if laser-patch cap is being configured
+                const capEmbType = getCapEmbellishmentType();
+                const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null;
+                const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
+                const patchSetupFee = showPatchSetup ? 50 : 0;
+
                 updatePricingDisplay({
                     totalQuantity: 0,
                     tier: '1-23',
                     subtotal: 0,
                     ltmFee: 0,
-                    setupFees: 0,
-                    grandTotal: 0
+                    setupFees: patchSetupFee,
+                    capSetupFees: patchSetupFee,
+                    garmentSetupFees: 0,
+                    hasCaps: capHasStyle,
+                    hasGarments: false,
+                    grandTotal: patchSetupFee
                 });
                 // Clear all price cells
                 document.querySelectorAll('.cell-price').forEach(cell => {
@@ -4195,12 +4368,20 @@
                                 const standardLineItem = pp.lineItems.find(li => !li.hasUpcharge);
                                 if (standardLineItem) {
                                     const priceCell = document.getElementById(`row-price-${rowId}`);
+                                    const totalCell = document.getElementById(`row-total-${rowId}`);
                                     if (priceCell) {
                                         // Use unitPriceWithLTM if LTM is distributed, otherwise unitPrice
                                         const displayPrice = ltmDistributed && standardLineItem.unitPriceWithLTM
                                             ? standardLineItem.unitPriceWithLTM
                                             : standardLineItem.unitPrice;
                                         priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                                        // Calculate and display line total
+                                        if (totalCell) {
+                                            const qty = standardLineItem.quantity || 0;
+                                            const lineTotal = displayPrice * qty;
+                                            totalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
+                                        }
                                     }
 
                                     // Update pricing breakdown in description cell
@@ -4235,12 +4416,20 @@
                                             // Only update price if child row's color matches this product's color
                                             if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
                                                 const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                                                const childTotalCell = document.getElementById(`row-total-${childRowId}`);
                                                 if (childPriceCell) {
                                                     // Use unitPriceWithLTM if LTM is distributed, otherwise unitPrice
                                                     const displayPrice = ltmDistributed && li.unitPriceWithLTM
                                                         ? li.unitPriceWithLTM
                                                         : li.unitPrice;
                                                     childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                                                    // Calculate and display line total for child row
+                                                    if (childTotalCell) {
+                                                        const qty = li.quantity || 0;
+                                                        const lineTotal = displayPrice * qty;
+                                                        childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
+                                                    }
                                                 }
                                             }
                                         }
@@ -4383,6 +4572,19 @@
             document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+
+            // Update products label based on embellishment type
+            const productsLabel = document.getElementById('products-label');
+            if (productsLabel) {
+                const capEmbType = getCapEmbellishmentType();
+                if (capEmbType === 'laser-patch' && pricing.hasCaps && !pricing.hasGarments) {
+                    // Caps-only laser patch order - show "Products (Laser Patch):"
+                    productsLabel.textContent = 'Products (Laser Patch):';
+                } else {
+                    // Default - embroidery with stitch count
+                    productsLabel.textContent = 'Products (Base 8K):';
+                }
+            }
             // Update the pre-tax subtotal (same as grand-total before tax)
             document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
@@ -4513,6 +4715,12 @@
             const setupRow = document.getElementById('setup-row');
             const garmentSetupRow = document.getElementById('garment-setup-row');
             const capSetupRow = document.getElementById('cap-setup-row');
+            const setupLabel = document.getElementById('setup-label');
+            const capSetupLabel = document.getElementById('cap-setup-label');
+
+            // Check cap embellishment type for label
+            const capEmbType = getCapEmbellishmentType();
+            const isCapLaserPatch = capEmbType === 'laser-patch';
 
             if (pricing.setupFees > 0) {
                 setupRow.style.display = 'flex';
@@ -4521,12 +4729,27 @@
                 const hasGarmentSetup = (pricing.garmentSetupFees || 0) > 0;
                 const hasCapSetup = (pricing.capSetupFees || 0) > 0;
 
+                // Update main label based on what's in quote
+                if (hasCapSetup && !hasGarmentSetup && isCapLaserPatch) {
+                    // Caps only with laser patch
+                    setupLabel.textContent = 'GRT-50 : Laser Patch Setup:';
+                } else {
+                    // Default to Digitizing Setup for embroidery
+                    setupLabel.textContent = 'Digitizing Setup:';
+                }
+
                 if (hasGarmentSetup && hasCapSetup) {
                     // Mixed quote - show breakdown
                     garmentSetupRow.style.display = 'flex';
                     capSetupRow.style.display = 'flex';
                     document.getElementById('garment-setup-fee').textContent = `$${pricing.garmentSetupFees.toFixed(2)}`;
                     document.getElementById('cap-setup-fee').textContent = `$${pricing.capSetupFees.toFixed(2)}`;
+                    // Update cap setup label for laser patch
+                    if (isCapLaserPatch) {
+                        capSetupLabel.innerHTML = '<i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (GRT-50):';
+                    } else {
+                        capSetupLabel.innerHTML = '<i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (DD-CAP):';
+                    }
                 } else {
                     // Single type - hide breakdown
                     garmentSetupRow.style.display = 'none';
@@ -4903,11 +5126,14 @@
                 // Build quote data
                 const quoteData = {
                     products: products,
-                    logos: allLogos
+                    logos: allLogos,
+                    // Cap embellishment type for laser-patch orders
+                    capEmbellishmentType: getCapEmbellishmentType()
                 };
 
-                // Attach logos to pricing for service to access
+                // Attach logos and embellishment type to pricing for service to access
                 pricing.logos = allLogos;
+                pricing.capEmbellishmentType = getCapEmbellishmentType();
 
                 let result;
                 if (editingQuoteId) {
@@ -5187,13 +5413,32 @@
                 }
             }
 
-            // Show cap embroidery section if caps in quote
+            // Show cap embellishment section if caps in quote
             if (capProducts.length > 0) {
                 lines.push('');
-                lines.push('CAP EMBROIDERY:');
+                // Show embellishment type in header
+                const embType = logoConfigs.cap.primary.embellishmentType || 'embroidery';
+                const embTypeLabel = {
+                    'embroidery': 'CAP EMBROIDERY:',
+                    '3d-puff': 'CAP 3D PUFF EMBROIDERY:',
+                    'laser-patch': 'CAP LASER LEATHERETTE PATCH:'
+                }[embType] || 'CAP EMBELLISHMENT:';
+                lines.push(embTypeLabel);
+
                 const capPosName = capPositionNames[logoConfigs.cap.primary.position] || logoConfigs.cap.primary.position;
-                lines.push(`  Front Logo: ${capPosName}, ${logoConfigs.cap.primary.stitchCount.toLocaleString()} stitches`);
-                if (logoConfigs.cap.additional.length > 0) {
+                if (embType === 'laser-patch') {
+                    // Patches don't have stitch count - standard size only (2-4")
+                    lines.push(`  Position: ${capPosName}`);
+                    lines.push(`  Patch Size: Standard (2-4")`);
+                } else {
+                    // Embroidery (flat or 3D puff) shows stitch count
+                    lines.push(`  Front Logo: ${capPosName}, ${logoConfigs.cap.primary.stitchCount.toLocaleString()} stitches`);
+                    if (embType === '3d-puff') {
+                        lines.push(`  3D Puff Upcharge: +$3.00/cap`);
+                    }
+                }
+                // Only show additional logos for embroidery (not patches)
+                if (embType !== 'laser-patch' && logoConfigs.cap.additional.length > 0) {
                     logoConfigs.cap.additional.forEach(logo => {
                         const posName = capPositionNames[logo.position] || logo.position;
                         lines.push(`  Additional: ${posName}, ${logo.stitchCount.toLocaleString()} stitches`);

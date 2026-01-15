@@ -30,6 +30,22 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Rule: ALWAYS Pull Pricing From Caspio API - Never Hardcode
+**Date:** 2026-01-15
+**Project:** [All]
+**Context:** When adding 3D Puff embroidery upcharge ($5/cap), initially hardcoded the value in JavaScript. This violates our pricing architecture.
+**The Rule:** ALL pricing values MUST come from Caspio API, never hardcoded in frontend code.
+**Why:**
+1. Single source of truth - update price in Caspio, all apps update automatically
+2. No code deploys needed for price changes
+3. Sales team can adjust pricing without developer involvement
+4. Audit trail in Caspio for price history
+**Pattern:** Store pricing in Caspio tables (Pricing_Tiers, Embroidery_Costs, etc.) → Fetch via caspio-pricing-proxy API → Use in calculators/quote builders
+**Files affected:** `embroidery-quote-pricing.js`, all pricing calculators
+**See also:** `/memory/QUOTE_BUILDER_GUIDE.md` for pricing data flow
+
+---
+
 ## Problem: Quote items accumulate instead of being replaced on re-save
 **Date:** 2026-01-14
 **Project:** Pricing Index (Embroidery Quote Builder)

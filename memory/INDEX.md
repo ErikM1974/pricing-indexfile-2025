@@ -45,6 +45,7 @@
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
 ├── EMBROIDERY_QUOTE_BUILDER.md       # Embroidery quote builder implementation
+├── LASER_PATCH_IMPLEMENTATION.md     # **NEW** Laser leatherette patch feature (caps)
 ├── SCREENPRINT_QUOTE_BUILDER.md      # Screen print quote builder implementation
 │
 ├── # Calculator Implementation Files
@@ -144,6 +145,7 @@
 | Quote Builder Architecture | [QUOTE_BUILDER_ARCHITECTURE.md](./QUOTE_BUILDER_ARCHITECTURE.md) |
 | **Shareable Quote URLs** | **[quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md](./quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md)** - Add to any builder |
 | Embroidery Quote Builder | [EMBROIDERY_QUOTE_BUILDER.md](./EMBROIDERY_QUOTE_BUILDER.md) |
+| **Laser Patch Feature** | **[LASER_PATCH_IMPLEMENTATION.md](./LASER_PATCH_IMPLEMENTATION.md)** - Caps, GRT-50 setup, bugs & fixes |
 | Screenprint Quote Builder | [SCREENPRINT_QUOTE_BUILDER.md](./SCREENPRINT_QUOTE_BUILDER.md) |
 | Pricing Calculator | [PRICING_CALCULATOR_GUIDE.md](./PRICING_CALCULATOR_GUIDE.md) → [/templates/](./templates/) |
 | DTF Calculator Spec | [DTF_CALCULATOR_SPECIFICATION.md](./DTF_CALCULATOR_SPECIFICATION.md) |

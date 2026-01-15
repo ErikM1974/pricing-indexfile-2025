@@ -46,7 +46,14 @@
       "Skill(ralph-loop:ralph-loop)",
       "Bash(pkill:*)",
       "Bash(pgrep:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "WebFetch(domain:nwcustomapparel.net)",
+      "WebFetch(domain:www.zomedesign.com)",
+      "WebFetch(domain:www.t-shirtforums.com)",
+      "WebFetch(domain:www.americanpatch.com)",
+      "WebFetch(domain:www.maggieframes.com)",
+      "WebFetch(domain:dirtcheapheadwear.com)",
+      "WebFetch(domain:localhost)"
     ],
     "deny": [],
     "ask": [],

@@ -176,6 +176,8 @@ class EmbroideryQuoteService {
                 CapPrintLocation: capPrimaryLogo?.position || '',
                 CapStitchCount: capPrimaryLogo?.stitchCount || 0,
                 CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0,
+                // Cap embellishment type: 'embroidery', '3d-puff', or 'laser-patch'
+                CapEmbellishmentType: quoteData.capEmbellishmentType || pricingResults.capEmbellishmentType || 'embroidery',
                 // Additional stitch charges - SPLIT by garment/cap per ShopWorks naming (AS-GARM, AS-CAP)
                 GarmentStitchCharge: parseFloat(pricingResults.garmentStitchTotal?.toFixed(2)) || 0,
                 CapStitchCharge: parseFloat(pricingResults.capStitchTotal?.toFixed(2)) || 0,
@@ -838,6 +840,8 @@ class EmbroideryQuoteService {
                 CapPrintLocation: capPrimaryLogo?.position || '',
                 CapStitchCount: capPrimaryLogo?.stitchCount || 0,
                 CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0,
+                // Cap embellishment type: 'embroidery', '3d-puff', or 'laser-patch'
+                CapEmbellishmentType: quoteData.capEmbellishmentType || pricingResults.capEmbellishmentType || 'embroidery',
                 GarmentStitchCharge: parseFloat(pricingResults.garmentStitchTotal?.toFixed(2)) || 0,
                 CapStitchCharge: parseFloat(pricingResults.capStitchTotal?.toFixed(2)) || 0,
                 AdditionalStitchCharge: parseFloat(pricingResults.additionalStitchTotal?.toFixed(2)) || 0,
