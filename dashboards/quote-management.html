@@ -37,8 +37,9 @@
                 <label>Status</label>
                 <select id="filter-status">
                     <option value="">All Statuses</option>
-                    <option value="Active">Active</option>
+                    <option value="Open">Open</option>
                     <option value="Accepted">Accepted</option>
+                    <option value="Lost">Lost</option>
                     <option value="Expired">Expired</option>
                 </select>
             </div>
@@ -300,14 +301,14 @@
             const now = new Date();
             const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            let activeCount = 0;
+            let openCount = 0;
             let acceptedCount = 0;
             let expiringCount = 0;
             let totalValue = 0;
 
             filteredQuotes.forEach(quote => {
-                if (quote.Status === 'Active') {
-                    activeCount++;
+                if (quote.Status === 'Open' || quote.Status === 'Active') {
+                    openCount++;
                     // Check if expiring within 7 days
                     if (quote.ExpiresAt) {
                         const expiresDate = new Date(quote.ExpiresAt);
@@ -322,7 +323,7 @@
                 totalValue += parseFloat(quote.TotalAmount) || 0;
             });
 
-            document.getElementById('stat-active').textContent = activeCount;
+            document.getElementById('stat-active').textContent = openCount;
             document.getElementById('stat-accepted').textContent = acceptedCount;
             document.getElementById('stat-expiring').textContent = expiringCount;
             document.getElementById('stat-total').textContent = formatCurrency(totalValue);
@@ -369,7 +370,18 @@
                         <td>${getSalesRepName(quote.SalesRep)}</td>
                         <td>${quote.TotalQuantity || 0}</td>
                         <td class="quote-amount">${formatCurrency(quote.TotalAmount)}</td>
-                        <td><span class="status-badge ${statusClass}">${quote.Status || 'Unknown'}</span></td>
+                        <td>
+                            <select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
+                                    data-pk-id="${quote.PK_ID}"
+                                    data-quote-id="${quote.QuoteID}"
+                                    onclick="event.stopPropagation();"
+                                    onchange="updateQuoteStatus(this)">
+                                <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
+                                <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled>Accepted</option>
+                                <option value="Lost" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>
+                                <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''} disabled>Expired</option>
+                            </select>
+                        </td>
                         <td>
                             <div class="date-cell">${formatDate(quote.CreatedAt)}</div>
                             ${expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : ''}
@@ -404,7 +416,8 @@
         function getStatusClass(quote) {
             if (quote.Status === 'Accepted') return 'accepted';
             if (quote.Status === 'Expired') return 'expired';
-            if (quote.Status === 'Active') {
+            if (quote.Status === 'Lost') return 'lost';
+            if (quote.Status === 'Open' || quote.Status === 'Active') {
                 // Check if expiring soon
                 if (quote.ExpiresAt) {
                     const expiresDate = new Date(quote.ExpiresAt);
@@ -413,13 +426,52 @@
                         return 'expiring-soon';
                     }
                 }
-                return 'active';
+                return 'open';
             }
             return '';
         }
 
+        // Update quote status via API
+        async function updateQuoteStatus(selectEl) {
+            const pkId = selectEl.dataset.pkId;
+            const quoteId = selectEl.dataset.quoteId;
+            const newStatus = selectEl.value;
+            const oldClass = selectEl.className.match(/status-\w+/)?.[0] || '';
+
+            // Update visual immediately
+            selectEl.className = selectEl.className.replace(/status-\w+/, `status-${newStatus.toLowerCase()}`);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/quote_sessions/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Status: newStatus })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+
+                // Update local data
+                const quote = allQuotes.find(q => q.PK_ID == pkId);
+                if (quote) {
+                    quote.Status = newStatus;
+                }
+
+                showToast(`Quote ${quoteId} marked as ${newStatus}`);
+                updateStats(); // Refresh stats
+
+            } catch (error) {
+                console.error('[QuoteManagement] Failed to update status:', error);
+                showToast('Failed to update status. Please try again.');
+                // Revert visual
+                selectEl.value = selectEl.querySelector('option[selected]')?.value || 'Open';
+                selectEl.className = selectEl.className.replace(/status-\w+/, oldClass);
+            }
+        }
+
         function getExpiresInfo(quote) {
-            if (quote.Status !== 'Active' || !quote.ExpiresAt) return null;
+            if ((quote.Status !== 'Active' && quote.Status !== 'Open') || !quote.ExpiresAt) return null;
 
             const expiresDate = new Date(quote.ExpiresAt);
             const now = new Date();

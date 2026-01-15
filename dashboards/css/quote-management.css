@@ -401,6 +401,59 @@ body {
     padding: 0 12px;
 }
 
+/* Status Dropdown */
+.status-dropdown {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 100px;
+}
+
+.status-dropdown:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(46,74,98,0.2);
+}
+
+.status-dropdown.status-open {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.status-dropdown.status-accepted {
+    background: #d1e7f0;
+    border-color: #17a2b8;
+    color: #0c5460;
+}
+
+.status-dropdown.status-lost {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.status-dropdown.status-expired {
+    background: #e2e3e5;
+    border-color: #6c757d;
+    color: #383d41;
+}
+
+/* Status badge for Open */
+.status-badge.open {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Status badge for Lost */
+.status-badge.lost {
+    background: #f8d7da;
+    color: #721c24;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-container {
