@@ -60,96 +60,180 @@
     <div class="power-main">
         <!-- Left: Content Area -->
         <div class="power-content">
-            <!-- Logo Configuration Section -->
-            <div class="logo-section">
-                <!-- Primary Logo -->
-                <div class="primary-logo-config">
-                    <span class="logo-section-label"><i class="fas fa-palette"></i> Primary Logo</span>
-                    <div class="logo-controls">
-                        <select id="primary-position" class="logo-select">
-                            <option value="Left Chest" selected>Left Chest</option>
-                            <option value="Right Chest">Right Chest</option>
-                            <option value="Center Chest">Center Chest</option>
-                        </select>
-                        <div class="stitch-input-group">
-                            <label>Stitches:</label>
-                            <input type="number" id="primary-stitches" value="8000"
-                                   min="1000" max="50000" step="1000">
+            <!-- 2026 Modernized Logo Configuration Section -->
+            <div class="logo-config-container">
+                <!-- Left Column: Logo Cards -->
+                <div class="logo-cards-column">
+                    <!-- Primary Logo Card (Garments) -->
+                    <div class="logo-card" id="garment-logo-card">
+                        <div class="logo-card-header">
+                            <div class="logo-card-icon garment">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <span class="logo-card-title">Primary Logo</span>
                         </div>
-                        <label class="digitizing-label">
-                            <input type="checkbox" id="primary-digitizing">
-                            Digitizing ($100)
-                        </label>
+                        <div class="logo-card-body">
+                            <div class="logo-form-row">
+                                <div class="logo-form-field">
+                                    <label>Position</label>
+                                    <select id="primary-position">
+                                        <option value="Left Chest" selected>Left Chest</option>
+                                        <option value="Right Chest">Right Chest</option>
+                                        <option value="Center Chest">Center Chest</option>
+                                    </select>
+                                </div>
+                                <div class="logo-form-field">
+                                    <label>Stitches</label>
+                                    <input type="number" id="primary-stitches" value="8000"
+                                           min="1000" max="50000" step="1000">
+                                </div>
+                                <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')">
+                                    <input type="checkbox" id="primary-digitizing">
+                                    <div class="digitizing-checkbox-indicator">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <span class="digitizing-checkbox-label">Digitizing</span>
+                                    <span class="digitizing-checkbox-price">$100</span>
+                                </div>
+                            </div>
+                            <!-- Additional Logo Toggle -->
+                            <div class="additional-logo-section">
+                                <div class="toggle-switch-container">
+                                    <div class="toggle-switch" id="garment-al-switch" onclick="toggleGlobalALNew('garment')">
+                                        <div class="toggle-switch-handle"></div>
+                                    </div>
+                                    <span class="toggle-switch-label" id="garment-al-label">Additional logo on garments</span>
+                                    <input type="checkbox" id="garment-al-toggle" style="display: none;">
+                                </div>
+                                <div class="additional-logo-config" id="garment-al-config-new">
+                                    <div class="logo-form-row">
+                                        <div class="logo-form-field">
+                                            <label>Position</label>
+                                            <select id="garment-al-position" onchange="updateGlobalAL('garment')">
+                                                <option value="Right Chest">Right Chest</option>
+                                                <option value="Left Chest">Left Chest</option>
+                                                <option value="Left Sleeve">Left Sleeve</option>
+                                                <option value="Right Sleeve">Right Sleeve</option>
+                                            </select>
+                                        </div>
+                                        <div class="logo-form-field">
+                                            <label>Stitches</label>
+                                            <input type="number" id="garment-al-stitches" value="8000"
+                                                   min="1000" max="50000" step="1000"
+                                                   onchange="updateGlobalAL('garment')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cap Logo Card (hidden by default) -->
+                    <div class="logo-card" id="cap-logo-card" style="display: none;">
+                        <div class="logo-card-header">
+                            <div class="logo-card-icon cap">
+                                <i class="fas fa-hat-cowboy"></i>
+                            </div>
+                            <span class="logo-card-title">Cap Front Logo</span>
+                        </div>
+                        <div class="logo-card-body">
+                            <div class="logo-form-row">
+                                <div class="logo-form-field">
+                                    <label>Position</label>
+                                    <select id="cap-primary-position" disabled>
+                                        <option value="CF" selected>Cap Front</option>
+                                    </select>
+                                </div>
+                                <div class="logo-form-field">
+                                    <label>Stitches</label>
+                                    <input type="number" id="cap-primary-stitches" value="8000"
+                                           min="1000" max="50000" step="1000">
+                                </div>
+                                <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
+                                    <input type="checkbox" id="cap-primary-digitizing">
+                                    <div class="digitizing-checkbox-indicator">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <span class="digitizing-checkbox-label">Digitizing</span>
+                                    <span class="digitizing-checkbox-price">$100</span>
+                                </div>
+                            </div>
+                            <!-- Additional Logo Toggle -->
+                            <div class="additional-logo-section">
+                                <div class="toggle-switch-container">
+                                    <div class="toggle-switch" id="cap-al-switch" onclick="toggleGlobalALNew('cap')">
+                                        <div class="toggle-switch-handle"></div>
+                                    </div>
+                                    <span class="toggle-switch-label" id="cap-al-label">Additional logo on caps</span>
+                                    <input type="checkbox" id="cap-al-toggle" style="display: none;">
+                                </div>
+                                <div class="additional-logo-config" id="cap-al-config-new">
+                                    <div class="logo-form-row">
+                                        <div class="logo-form-field">
+                                            <label>Position</label>
+                                            <select id="cap-al-position" onchange="updateGlobalAL('cap')">
+                                                <option value="Cap Back">Cap Back</option>
+                                                <option value="Cap Left">Cap Left</option>
+                                                <option value="Cap Right">Cap Right</option>
+                                            </select>
+                                        </div>
+                                        <div class="logo-form-field">
+                                            <label>Stitches</label>
+                                            <input type="number" id="cap-al-stitches" value="5000"
+                                                   min="1000" max="50000" step="1000"
+                                                   onchange="updateGlobalAL('cap')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Global Garment AL Toggle -->
-                <div class="al-toggle-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;">
-                    <div class="al-toggle-row" style="display: flex; align-items: center; gap: 12px;">
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="garment-al-toggle" onchange="toggleGlobalAL('garment')">
-                            <span style="font-size: 13px;">Additional logo on garments</span>
-                        </label>
-                        <div id="garment-al-config" style="display: none; align-items: center; gap: 8px;">
-                            <span style="color: #666;">→</span>
-                            <select id="garment-al-position" class="logo-select" onchange="updateGlobalAL('garment')">
-                                <option value="Right Chest">Right Chest</option>
-                                <option value="Left Chest">Left Chest</option>
-                                <option value="Left Sleeve">Left Sleeve</option>
-                                <option value="Right Sleeve">Right Sleeve</option>
-                            </select>
-                            <input type="number" id="garment-al-stitches" value="8000" min="1000" max="50000" step="1000"
-                                   style="width: 70px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;"
-                                   onchange="updateGlobalAL('garment')">
-                            <span style="font-size: 12px; color: #666;">stitches</span>
+                <!-- Right Column: Artwork Services -->
+                <div class="artwork-services-column">
+                    <div class="artwork-services-card">
+                        <div class="artwork-services-header">
+                            <div class="artwork-services-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <span class="artwork-services-title">Artwork Services</span>
+                        </div>
+                        <div class="artwork-services-body">
+                            <!-- Logo Mockup & Print Review - Checkbox Toggle -->
+                            <div class="artwork-field">
+                                <div class="artwork-checkbox-row">
+                                    <label class="artwork-toggle" onclick="toggleArtCharge()">
+                                        <input type="checkbox" id="art-charge-toggle">
+                                        <span class="artwork-toggle-indicator"></span>
+                                        <span class="artwork-toggle-label">Logo Mockup & Review</span>
+                                    </label>
+                                    <div class="artwork-field-input-wrapper" id="art-charge-wrapper" style="opacity: 0.4;">
+                                        <span class="currency-symbol">$</span>
+                                        <input type="number" id="art-charge" min="0" step="0.01" value="0" disabled
+                                               onchange="updateAdditionalCharges(); updateTaxCalculation();"
+                                               oninput="updateAdditionalCharges(); updateTaxCalculation();">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Graphic Design Services -->
+                            <div class="artwork-field">
+                                <label class="artwork-field-label">Graphic Design ($75/hr)</label>
+                                <div class="graphic-design-field">
+                                    <input type="number" id="graphic-design-hours" min="0" step="0.5" placeholder="0"
+                                           onchange="updateAdditionalCharges(); updateTaxCalculation();"
+                                           oninput="updateAdditionalCharges(); updateTaxCalculation();">
+                                    <span class="hours-label">hrs</span>
+                                    <span class="hours-total">= $<span id="graphic-design-total">0.00</span></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Cap Logo Configuration Section (hidden by default, shown when caps added) -->
-            <div id="cap-logo-section" class="logo-section cap-logo-section" style="display: none;">
-                <!-- Cap Primary Logo -->
-                <div class="primary-logo-config">
-                    <span class="logo-section-label"><i class="fas fa-hat-cowboy"></i> Cap Front Logo</span>
-                    <div class="logo-controls">
-                        <select id="cap-primary-position" class="logo-select" disabled>
-                            <option value="CF" selected>Cap Front</option>
-                        </select>
-                        <div class="stitch-input-group">
-                            <label>Stitches:</label>
-                            <input type="number" id="cap-primary-stitches" value="8000"
-                                   min="1000" max="50000" step="1000">
-                        </div>
-                        <label class="digitizing-label">
-                            <input type="checkbox" id="cap-primary-digitizing">
-                            Digitizing ($100)
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Global Cap AL Toggle -->
-                <div class="al-toggle-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;">
-                    <div class="al-toggle-row" style="display: flex; align-items: center; gap: 12px;">
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="cap-al-toggle" onchange="toggleGlobalAL('cap')">
-                            <span style="font-size: 13px;">Additional logo on caps</span>
-                        </label>
-                        <div id="cap-al-config" style="display: none; align-items: center; gap: 8px;">
-                            <span style="color: #666;">→</span>
-                            <select id="cap-al-position" class="logo-select" onchange="updateGlobalAL('cap')">
-                                <option value="Cap Back">Cap Back</option>
-                                <option value="Cap Left">Cap Left</option>
-                                <option value="Cap Right">Cap Right</option>
-                            </select>
-                            <input type="number" id="cap-al-stitches" value="5000" min="1000" max="50000" step="1000"
-                                   style="width: 70px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;"
-                                   onchange="updateGlobalAL('cap')">
-                            <span style="font-size: 12px; color: #666;">stitches</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Legacy hidden elements for backwards compatibility with existing JS -->
+            <div id="cap-logo-section" style="display: none;"></div>
 
             <!-- Product Grid Section -->
             <div class="product-grid-section">
@@ -349,28 +433,7 @@
                     </div>
                 </div>
                 <div id="charges-content" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
-                    <!-- Logo Mockup & Print Review (GRT-50) -->
-                    <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Logo Mockup & Print Review</label>
-                        <div style="position: relative;">
-                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="art-charge" min="0" step="0.01" placeholder="0.00"
-                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
-                                   style="width: 100%; padding: 8px 10px 8px 24px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                    </div>
-                    <!-- Graphic Design Services (GRT-75) @ $75/hr -->
-                    <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design Services ($75/hr)</label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <input type="number" id="graphic-design-hours" min="0" step="0.5" placeholder="0"
-                                   onchange="updateAdditionalCharges(); updateTaxCalculation();"
-                                   oninput="updateAdditionalCharges(); updateTaxCalculation();"
-                                   style="width: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; text-align: center;">
-                            <span style="font-size: 12px; color: #666;">hrs</span>
-                            <span style="font-size: 12px; color: #666; margin-left: auto;">= $<span id="graphic-design-total">0.00</span></span>
-                        </div>
-                    </div>
+                    <!-- NOTE: Logo Mockup & Graphic Design moved to Artwork Services card at top (2026 UI update) -->
                     <!-- Rush Fee -->
                     <div class="charge-field" style="margin-bottom: 10px;">
                         <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
@@ -654,6 +717,65 @@
 
             // Recalculate all product prices
             recalculatePricing();
+        }
+
+        // NEW: Toggle function for modernized toggle switch UI
+        function toggleGlobalALNew(type) {
+            const switchEl = document.getElementById(`${type}-al-switch`);
+            const labelEl = document.getElementById(`${type}-al-label`);
+            const configEl = document.getElementById(`${type}-al-config-new`);
+            const hiddenCheckbox = document.getElementById(`${type}-al-toggle`);
+
+            // Toggle the state
+            const isActive = switchEl.classList.toggle('active');
+            labelEl.classList.toggle('active', isActive);
+            configEl.classList.toggle('visible', isActive);
+
+            // Update hidden checkbox for backwards compatibility
+            hiddenCheckbox.checked = isActive;
+
+            // Update global state
+            globalAL[type].enabled = isActive;
+
+            // Recalculate pricing
+            recalculatePricing();
+        }
+
+        // NEW: Toggle function for modernized digitizing checkbox
+        function toggleDigitizingCheckbox(element, checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('checked', checkbox.checked);
+
+            // Trigger pricing recalculation
+            recalculatePricing();
+        }
+
+        // NEW: Toggle function for Logo Mockup & Print Review charge
+        function toggleArtCharge() {
+            const toggle = document.getElementById('art-charge-toggle');
+            const input = document.getElementById('art-charge');
+            const wrapper = document.getElementById('art-charge-wrapper');
+
+            // Toggle the checkbox state
+            toggle.checked = !toggle.checked;
+
+            if (toggle.checked) {
+                // Enable the input and set default $50
+                input.disabled = false;
+                wrapper.style.opacity = '1';
+                if (!input.value || parseFloat(input.value) === 0) {
+                    input.value = '50.00';
+                }
+            } else {
+                // Disable the input and zero it out
+                input.disabled = true;
+                wrapper.style.opacity = '0.4';
+                input.value = '0';
+            }
+
+            updateAdditionalCharges();
+            updateTaxCalculation();
         }
 
         // Extended sizes available for Size06 (Other) column
@@ -1451,6 +1573,9 @@
                 console.log('✅ Power Quote Builder ready');
                 showToast('Ready to build quotes!', 'success');
 
+                // Initialize additional charges display (for default $50 art charge)
+                updateAdditionalCharges();
+
             } catch (error) {
                 console.error('Failed to initialize:', error);
                 showToast('Failed to initialize. Please refresh.', 'error');
@@ -1633,6 +1758,12 @@
         // Update cap logo section visibility based on caps in quote
         function updateCapLogoSectionVisibility() {
             const hasCaps = document.querySelectorAll('tr[data-is-cap="true"]').length > 0;
+            // Use new card element (2026 modernized UI)
+            const capCard = document.getElementById('cap-logo-card');
+            if (capCard) {
+                capCard.style.display = hasCaps ? 'block' : 'none';
+            }
+            // Legacy fallback
             const capSection = document.getElementById('cap-logo-section');
             if (capSection) {
                 capSection.style.display = hasCaps ? 'block' : 'none';
