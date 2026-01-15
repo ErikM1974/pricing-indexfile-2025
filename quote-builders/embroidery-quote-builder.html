@@ -228,9 +228,14 @@
         </div>
 
         <!-- Right: Pricing Sidebar -->
-        <div class="power-sidebar">
-            <!-- Pricing Panel -->
-            <div class="pricing-panel">
+        <div class="power-sidebar" id="power-sidebar">
+            <!-- Resize handle for dragging sidebar width -->
+            <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
+
+            <!-- Scrollable content area -->
+            <div class="sidebar-scroll-container">
+                <!-- Pricing Panel -->
+                <div class="pricing-panel">
                 <div class="pricing-title">
                     <i class="fas fa-calculator"></i> Quote Summary
                 </div>
@@ -264,7 +269,7 @@
                 </div>
 
                 <div class="pricing-row">
-                    <span class="label">Products Subtotal:</span>
+                    <span class="label">Products (Base 8K):</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
 
@@ -282,13 +287,13 @@
                     <span class="label">Additional Stitches:</span>
                     <span class="value" id="additional-stitches-fee">$0.00</span>
                 </div>
-                <!-- Separate Additional Stitches rows for mixed quotes -->
+                <!-- Separate Additional Stitches rows for mixed quotes (ShopWorks: AS-GARM, AS-CAP) -->
                 <div class="pricing-row sub-breakdown" id="garment-stitches-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments:</span>
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments (AS-GARM):</span>
                     <span class="value sub-value" id="garment-stitches-fee">$0.00</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-stitches-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps:</span>
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (AS-CAP):</span>
                     <span class="value sub-value" id="cap-stitches-fee">$0.00</span>
                 </div>
 
@@ -296,7 +301,7 @@
                 <div id="cap-additional-logos-pricing"></div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
+                    <span class="label" title="Less than minimum: A fee applied to orders under 24 pieces to cover setup costs">Less than minimum <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -305,38 +310,33 @@
                         <span class="value" id="ltm-fee">$50.00</span>
                     </span>
                 </div>
-                <!-- Separate LTM rows for mixed quotes -->
+                <!-- Separate LTM rows for mixed quotes (ShopWorks: LTM, LTM-CAP) -->
                 <div class="pricing-row sub-breakdown" id="garment-ltm-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment LTM:</span>
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments (LTM):</span>
                     <span class="value sub-value" id="garment-ltm-fee">$50.00</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-ltm-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap LTM:</span>
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (LTM-CAP):</span>
                     <span class="value sub-value" id="cap-ltm-fee">$50.00</span>
                 </div>
 
                 <div class="pricing-row" id="setup-row" style="display: none;">
-                    <span class="label">Setup (Digitizing):</span>
+                    <span class="label">Digitizing Setup:</span>
                     <span class="value" id="setup-fee">$100.00</span>
                 </div>
-                <!-- Setup (Digitizing) breakdown for mixed quotes -->
+                <!-- Digitizing Setup breakdown for mixed quotes (ShopWorks: DD, DD-CAP) -->
                 <div class="pricing-row sub-breakdown" id="garment-setup-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment Digitizing:</span>
+                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments (DD):</span>
                     <span class="value sub-value" id="garment-setup-fee">$100.00</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-setup-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap Digitizing:</span>
+                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (DD-CAP):</span>
                     <span class="value sub-value" id="cap-setup-fee">$100.00</span>
-                </div>
-
-                <div class="pricing-row total">
-                    <span class="label">TOTAL:</span>
-                    <span class="value" id="grand-total">$0.00</span>
                 </div>
 
             </div>
 
-            <!-- Additional Charges Panel (Optional Fees) -->
+            <!-- Additional Charges Panel - MOVED ABOVE TOTALS per UX best practices -->
             <div class="additional-charges-panel" style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #86efac;">
                 <div class="charges-header" onclick="toggleAdditionalCharges()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                     <div style="font-size: 14px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 8px;">
@@ -345,18 +345,30 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span id="charges-badge" style="display: none; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">+$0.00</span>
-                        <i id="charges-chevron" class="fas fa-chevron-down" style="color: #666; transition: transform 0.2s;"></i>
+                        <i id="charges-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s;"></i>
                     </div>
                 </div>
-                <div id="charges-content" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
-                    <!-- Artwork/Redraw Fee -->
+                <div id="charges-content" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
+                    <!-- Logo Mockup & Print Review (GRT-50) -->
                     <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Artwork / Redraw Fee</label>
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Logo Mockup & Print Review</label>
                         <div style="position: relative;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                             <input type="number" id="art-charge" min="0" step="0.01" placeholder="0.00"
-                                   onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()"
+                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                    style="width: 100%; padding: 8px 10px 8px 24px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <!-- Graphic Design Services (GRT-75) @ $75/hr -->
+                    <div class="charge-field" style="margin-bottom: 10px;">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design Services ($75/hr)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="number" id="graphic-design-hours" min="0" step="0.5" placeholder="0"
+                                   onchange="updateAdditionalCharges(); updateTaxCalculation();"
+                                   oninput="updateAdditionalCharges(); updateTaxCalculation();"
+                                   style="width: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; text-align: center;">
+                            <span style="font-size: 12px; color: #666;">hrs</span>
+                            <span style="font-size: 12px; color: #666; margin-left: auto;">= $<span id="graphic-design-total">0.00</span></span>
                         </div>
                     </div>
                     <!-- Rush Fee -->
@@ -365,27 +377,11 @@
                         <div style="position: relative;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                             <input type="number" id="rush-fee" min="0" step="0.01" placeholder="0.00"
-                                   onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()"
+                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                    style="width: 100%; padding: 8px 10px 8px 24px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
                     </div>
-                    <!-- Sample Fee with Qty -->
-                    <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sample Fee</label>
-                        <div style="display: flex; gap: 8px;">
-                            <div style="position: relative; flex: 1;">
-                                <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                                <input type="number" id="sample-fee" min="0" step="0.01" placeholder="0.00"
-                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()"
-                                       style="width: 100%; padding: 8px 10px 8px 24px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            </div>
-                            <div style="width: 70px;">
-                                <input type="number" id="sample-qty" min="0" step="1" placeholder="Qty" value="1"
-                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()"
-                                       style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; text-align: center;">
-                            </div>
-                        </div>
-                    </div>
+                    <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
                     <!-- Discount -->
                     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fca5a5; background: #fef2f2; margin: 12px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
                         <label style="font-size: 12px; color: #b91c1c; margin-bottom: 4px; display: block; font-weight: 600;">Discount</label>
@@ -393,10 +389,10 @@
                             <div style="position: relative; flex: 1;">
                                 <span id="discount-symbol" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                                 <input type="number" id="discount-amount" min="0" step="0.01" placeholder="0.00"
-                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()"
+                                       onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                        style="width: 100%; padding: 8px 10px 8px 24px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                             </div>
-                            <select id="discount-type" onchange="updateDiscountType()"
+                            <select id="discount-type" onchange="updateDiscountType(); updateTaxCalculation();"
                                     style="width: 60px; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
                                 <option value="fixed">$</option>
                                 <option value="percent">%</option>
@@ -406,6 +402,33 @@
                                style="width: 100%; padding: 8px 10px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                     </div>
                 </div>
+            </div>
+
+            <!-- Totals Section with Tax -->
+            <div class="pricing-panel" style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <!-- Totals Section with Tax -->
+                <div class="pricing-totals-section" style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #e2e8f0;">
+                    <div class="pricing-row subtotal-row">
+                        <span class="label" style="font-weight: 600;">Subtotal:</span>
+                        <span class="value" id="pre-tax-subtotal" style="font-weight: 600;">$0.00</span>
+                    </div>
+                    <div class="pricing-row tax-toggle-row" style="margin: 10px 0;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: #475569;">
+                            <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #22c55e;">
+                            <span>Include WA Sales Tax (10.1%)</span>
+                        </label>
+                    </div>
+                    <div class="pricing-row tax-amount-row" id="tax-row">
+                        <span class="label" style="color: #64748b;">WA Sales Tax:</span>
+                        <span class="value" id="tax-amount" style="color: #64748b;">$0.00</span>
+                    </div>
+                    <div class="pricing-row grand-total-row" style="margin-top: 10px; padding-top: 10px; border-top: 2px solid #22c55e; background: linear-gradient(135deg, #f0fdf4, #dcfce7); margin: 10px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
+                        <span class="label" style="font-weight: 700; font-size: 16px; color: #166534;">TOTAL:</span>
+                        <span class="value" id="grand-total-with-tax" style="font-weight: 700; font-size: 18px; color: #166534;">$0.00</span>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Save & Share Section -->
@@ -459,6 +482,15 @@
                     <i class="fas fa-print"></i> Print Quote
                 </button>
             </div>
+            </div><!-- End sidebar-scroll-container -->
+
+            <!-- Sticky TOTAL - Hidden (totals now shown in pricing summary above) -->
+            <div class="pricing-total-sticky" style="display: none;">
+                <div class="pricing-row total">
+                    <span class="label">TOTAL:</span>
+                    <span class="value" id="grand-total">$0.00</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -511,6 +543,9 @@
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
     <script src="/shared_components/js/quote-session.js?v=20260113"></script>
+
+    <!-- Sidebar Resize Functionality -->
+    <script src="/shared_components/js/sidebar-resize.js?v=20260114"></script>
 
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
@@ -606,7 +641,7 @@
             config.style.display = checkbox.checked ? 'flex' : 'none';
 
             // Recalculate all product prices
-            recalculateAllPrices();
+            recalculatePricing();
         }
 
         // Update global AL config (position or stitch count change)
@@ -618,7 +653,7 @@
             globalAL[type].stitchCount = stitches;
 
             // Recalculate all product prices
-            recalculateAllPrices();
+            recalculatePricing();
         }
 
         // Extended sizes available for Size06 (Other) column
@@ -2094,26 +2129,17 @@
             html += `<span class="breakdown-icon">└─</span>`;
             html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
 
-            // If there are extra costs, show detailed breakdown
-            if (extraStitchCost > 0 || alCost > 0) {
+            // CHANGED 2026-01-14: Show BASE price only (extra stitches and AL are separate sidebar line items)
+            // Show base price with optional upcharge note
+            if (lineItem.hasUpcharge && lineItem.upcharge > 0) {
+                // Extended size with upcharge - show breakdown
                 html += ` <span class="breakdown-sep">|</span> `;
-                html += `<span class="breakdown-base">Base $${formatPrice(basePrice)}</span>`;
-
-                if (extraStitchCost > 0) {
-                    html += ` <span class="breakdown-plus">+</span> `;
-                    html += `<span class="breakdown-extra">Extra $${formatPrice(extraStitchCost)}</span>`;
-                }
-
-                if (alCost > 0) {
-                    html += ` <span class="breakdown-plus">+</span> `;
-                    html += `<span class="breakdown-al">AL $${formatPrice(alCost)}</span>`;
-                }
-
+                html += `<span class="breakdown-base">Base $${formatPrice(basePrice - lineItem.upcharge)} + Upcharge $${formatPrice(lineItem.upcharge)}</span>`;
                 html += ` <span class="breakdown-eq">=</span> `;
-                html += `<span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
+                html += `<span class="breakdown-total">$${formatPrice(basePrice)}/ea</span>`;
             } else {
-                // Simple format: just position, stitch count, and price
-                html += ` <span class="breakdown-sep">|</span> <span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
+                // Standard size - just show base price
+                html += ` <span class="breakdown-sep">|</span> <span class="breakdown-total">$${formatPrice(basePrice)}/ea</span>`;
             }
 
             html += `</span>`;
@@ -3234,25 +3260,10 @@
                 return;
             }
 
-            // Calculate total from ALL enabled size inputs (handles remapped columns)
-            // This works for standard, combo-only, youth-only, toddler-only, tall-only
-            let total = 0;
-            row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-                total += parseInt(input.value) || 0;
-            });
-
-            // Add quantities from child rows (extended sizes)
-            const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
-            childRows.forEach(childRow => {
-                const qtyDisplay = childRow.querySelector('.qty-display');
-                total += parseInt(qtyDisplay?.textContent) || 0;
-            });
-
-            // Update parent row quantity display
-            document.getElementById(`row-qty-${rowId}`).textContent = total;
-
-            // Handle 2XL size (has direct input) - create/update/remove child rows
-            // Note: Size06 sizes (XS, 3XL, 4XL, 5XL, 6XL) are handled by the Extended Size Picker popup
+            // IMPORTANT: Handle 2XL child row FIRST (before quantity calculation)
+            // This ensures the 2XL input is disabled before we sum enabled inputs,
+            // preventing the 2XL value from being counted twice (in parent AND child)
+            // Bug fix: 2026-01-14 - Parent row showed 16 instead of 14 for S/M/L/XL
             const xxlInput = row.querySelector('[data-size="2XL"]');
             if (xxlInput) {
                 const qty = parseInt(xxlInput.value) || 0;
@@ -3265,7 +3276,7 @@
                     } else {
                         createChildRow(rowId, '2XL', qty);
                     }
-                    // Disable the 2XL input in parent
+                    // Disable the 2XL input in parent BEFORE quantity calculation
                     xxlInput.disabled = true;
                     xxlInput.style.background = '#f5f5f5';
                     xxlInput.style.color = '#999';
@@ -3280,6 +3291,21 @@
                     xxlInput.style.color = '';
                 }
             }
+
+            // Calculate total from enabled size inputs in parent row ONLY
+            // 2XL is disabled when it has a value (child row created), so it's excluded
+            // Child rows display their own quantities separately
+            // Bug fix 2026-01-14: Parent row was incorrectly adding child quantities
+            let total = 0;
+            row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+
+            // DO NOT add child row quantities - each row displays its own quantity
+            // The sidebar/pricing calculator handles the true total separately
+
+            // Update parent row quantity display (parent sizes only)
+            document.getElementById(`row-qty-${rowId}`).textContent = total;
 
             // Recalculate pricing
             recalculatePricing();
@@ -3908,6 +3934,8 @@
             document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+            // Update the pre-tax subtotal (same as grand-total before tax)
+            document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
             // Quantity breakdown for mixed quotes
             const garmentQtyRow = document.getElementById('garment-qty-row');
@@ -4210,6 +4238,68 @@
             } else {
                 capAlContainer.innerHTML = '';
             }
+
+            // Update tax calculation at the end of pricing display
+            updateTaxCalculation();
+        }
+
+        /**
+         * Update tax calculation based on toggle state
+         * Includes Additional Charges (Art, Rush, Sample, Discount) in subtotal
+         * Called after pricing updates and when any charge input changes
+         */
+        function updateTaxCalculation() {
+            const includeTax = document.getElementById('include-tax')?.checked ?? true;
+
+            // Get base subtotal (products + LTM + digitizing + stitches + AL)
+            const baseSubtotalText = document.getElementById('grand-total')?.textContent || '$0.00';
+            const baseSubtotal = parseFloat(baseSubtotalText.replace(/[$,]/g, '')) || 0;
+
+            // Get additional charges
+            const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
+            const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
+            const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
+            const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
+            const discountValue = parseFloat(document.getElementById('discount-amount')?.value) || 0;
+            const discountType = document.getElementById('discount-type')?.value || 'fixed';
+
+            // Calculate additional charges total
+            const additionalCharges = artCharge + rushFee + (sampleFee * sampleQty);
+
+            // Calculate discount
+            let discount = 0;
+            if (discountType === 'percent') {
+                discount = (baseSubtotal + additionalCharges) * (discountValue / 100);
+            } else {
+                discount = discountValue;
+            }
+
+            // Calculate adjusted subtotal (includes additional charges and discount)
+            const adjustedSubtotal = baseSubtotal + additionalCharges - discount;
+
+            const taxRate = 0.101; // WA State sales tax
+
+            const taxRow = document.getElementById('tax-row');
+            const taxAmountEl = document.getElementById('tax-amount');
+            const grandTotalWithTax = document.getElementById('grand-total-with-tax');
+            const preTaxSubtotal = document.getElementById('pre-tax-subtotal');
+
+            if (!taxRow || !taxAmountEl || !grandTotalWithTax) return;
+
+            // Update pre-tax subtotal display to show adjusted amount
+            if (preTaxSubtotal) {
+                preTaxSubtotal.textContent = '$' + adjustedSubtotal.toFixed(2);
+            }
+
+            if (includeTax) {
+                const tax = adjustedSubtotal * taxRate;
+                taxRow.style.display = 'flex';
+                taxAmountEl.textContent = '$' + tax.toFixed(2);
+                grandTotalWithTax.textContent = '$' + (adjustedSubtotal + tax).toFixed(2);
+            } else {
+                taxRow.style.display = 'none';
+                grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
+            }
         }
 
         // ============================================================
@@ -4316,7 +4406,21 @@
                     { ...capPrimaryLogo, id: 'cap-primary' },
                     ...capAdditionalLogos
                 ];
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
+
+                // Build logoConfigs for proper garment vs cap digitizing separation
+                // Bug fix 2026-01-14: Without this, pricing engine uses legacy path that
+                // counts ALL logos as garment digitizing instead of separating them
+                const logoConfigs = {
+                    garment: {
+                        primary: { ...primaryLogo, id: 'primary' },
+                        additional: additionalLogos
+                    },
+                    cap: {
+                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
+                        additional: capAdditionalLogos
+                    }
+                };
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
 
                 // Get sales rep NAME from dropdown selected option text
                 const salesRepSelect = document.getElementById('sales-rep');
@@ -4337,6 +4441,8 @@
                     notes: '',
                     // Additional charges (2026-01-14)
                     artCharge: additionalCharges.artCharge,
+                    graphicDesignHours: additionalCharges.graphicDesignHours,
+                    graphicDesignCharge: additionalCharges.graphicDesignCharge,
                     rushFee: additionalCharges.rushFee,
                     sampleFee: additionalCharges.sampleFee,
                     sampleQty: additionalCharges.sampleQty,
@@ -4423,17 +4529,20 @@
         // ============================================
 
         /**
-         * Toggle additional charges section visibility
+         * Toggle Additional Charges panel visibility
+         * Panel is EXPANDED by default per UX best practices (charges visible before totals)
          */
         function toggleAdditionalCharges() {
             const content = document.getElementById('charges-content');
             const chevron = document.getElementById('charges-chevron');
             if (content.style.display === 'none') {
+                // Expanding - show content, chevron points UP
                 content.style.display = 'block';
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                content.style.display = 'none';
                 chevron.style.transform = 'rotate(0deg)';
+            } else {
+                // Collapsing - hide content, chevron points DOWN
+                content.style.display = 'none';
+                chevron.style.transform = 'rotate(180deg)';
             }
         }
 
@@ -4452,13 +4561,21 @@
          */
         function updateAdditionalCharges() {
             const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
+            const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+            const graphicDesignCharge = graphicDesignHours * 75; // $75/hr (GRT-75)
             const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
             const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
             const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
             const discountType = document.getElementById('discount-type')?.value || 'fixed';
 
+            // Update graphic design total display
+            const graphicDesignTotalEl = document.getElementById('graphic-design-total');
+            if (graphicDesignTotalEl) {
+                graphicDesignTotalEl.textContent = graphicDesignCharge.toFixed(2);
+            }
+
             // Calculate total additional charges (before discount)
-            const totalCharges = artCharge + rushFee + sampleFee;
+            const totalCharges = artCharge + graphicDesignCharge + rushFee + sampleFee;
 
             // Calculate discount value
             let discountValue = 0;
@@ -4507,8 +4624,14 @@
                 discountValue = discountAmount;
             }
 
+            // Graphic Design Services (GRT-75) @ $75/hr
+            const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+            const graphicDesignCharge = graphicDesignHours * 75;
+
             return {
                 artCharge: parseFloat(document.getElementById('art-charge')?.value) || 0,
+                graphicDesignHours: graphicDesignHours,
+                graphicDesignCharge: graphicDesignCharge,
                 rushFee: parseFloat(document.getElementById('rush-fee')?.value) || 0,
                 sampleFee: parseFloat(document.getElementById('sample-fee')?.value) || 0,
                 sampleQty: parseInt(document.getElementById('sample-qty')?.value) || 1,
@@ -4649,11 +4772,11 @@
 
             // Show subtotal breakdown for mixed quotes
             if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
+                lines.push(`Products (Base 8K): $${pricing.subtotal.toFixed(2)}`);
                 lines.push(`  Garments Subtotal: $${pricing.garmentSubtotal.toFixed(2)}`);
                 lines.push(`  Caps Subtotal: $${pricing.capSubtotal.toFixed(2)}`);
             } else {
-                lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
+                lines.push(`Products (Base 8K): $${pricing.subtotal.toFixed(2)}`);
             }
 
             // Show LTM (with breakdown for mixed quotes)

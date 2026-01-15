@@ -491,78 +491,87 @@ class QuoteViewPage {
     renderFeeRows() {
         let html = '';
 
-        // NOTE: ADDL-STITCH row removed (2026-01-14)
-        // Extra stitch charges are already baked into product unit prices (see embroidery-quote-pricing.js line 662)
-        // Showing them as a separate fee row confused customers into thinking they were double-charged
-        // The extra stitch info is still shown in the embroidery details section for transparency
+        // CHANGED 2026-01-14: Split stitch charges by garment/cap per ShopWorks naming standard
+        // AS-GARM = Additional Stitches in Garment Logo, AS-CAP = Additional Stitches in Cap Logo
+        const garmentStitchCharge = parseFloat(this.quoteData?.GarmentStitchCharge) || 0;
+        const capStitchCharge = parseFloat(this.quoteData?.CapStitchCharge) || 0;
 
-        // 1. AL Garment Charge (Additional Logo on garments)
+        if (garmentStitchCharge > 0) {
+            html += this.renderFeeRow('AS-GARM', 'Additional Stitches in Garment Logo', 1, garmentStitchCharge, garmentStitchCharge);
+        }
+        if (capStitchCharge > 0) {
+            html += this.renderFeeRow('AS-CAP', 'Additional Stitches in Cap Logo', 1, capStitchCharge, capStitchCharge);
+        }
+
+        // 1. AL Garment Charge (Additional Logo on garments) - ShopWorks SKU: AL-GARM
         const alGarmentCharge = parseFloat(this.quoteData?.ALChargeGarment) || 0;
         const garmentQty = parseInt(this.quoteData?.ALGarmentQty) || 0;
         if (alGarmentCharge > 0 && garmentQty > 0) {
             const unitPrice = parseFloat(this.quoteData?.ALGarmentUnitPrice) || (alGarmentCharge / garmentQty);
-            const desc = this.quoteData?.ALGarmentDesc || 'AL: Additional Logo';
-            html += this.renderFeeRow('AL-GARMENT', desc, garmentQty, unitPrice, alGarmentCharge);
+            html += this.renderFeeRow('AL-GARM', 'Additional Logo - Garments', garmentQty, unitPrice, alGarmentCharge);
         }
 
-        // 3. AL Cap Charge (Additional Logo on caps)
+        // 2. Cap Back Embroidery (Additional Logo on caps) - ShopWorks SKU: CB
         const alCapCharge = parseFloat(this.quoteData?.ALChargeCap) || 0;
         const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
         if (alCapCharge > 0 && capQty > 0) {
             const unitPrice = parseFloat(this.quoteData?.ALCapUnitPrice) || (alCapCharge / capQty);
-            const desc = this.quoteData?.ALCapDesc || 'AL: Cap Logo';
-            html += this.renderFeeRow('AL-CAP', desc, capQty, unitPrice, alCapCharge);
+            html += this.renderFeeRow('CB', 'Cap Back Embroidery', capQty, unitPrice, alCapCharge);
         }
 
-        // 4. Garment Digitizing (flat fee per logo needing digitizing)
+        // 3. Digitizing Setup Garments - ShopWorks SKU: DD
         const garmentDigitizing = parseFloat(this.quoteData?.GarmentDigitizing) || 0;
         if (garmentDigitizing > 0) {
-            html += this.renderFeeRow('DIGITIZE-G', 'Garment Digitizing', 1, garmentDigitizing, garmentDigitizing);
+            html += this.renderFeeRow('DD', 'Digitizing Setup Garments', 1, garmentDigitizing, garmentDigitizing);
         }
 
-        // 5. Cap Digitizing (flat fee per cap logo needing digitizing)
+        // 4. Digitizing Setup Cap - ShopWorks SKU: DD-CAP
         const capDigitizing = parseFloat(this.quoteData?.CapDigitizing) || 0;
         if (capDigitizing > 0) {
-            html += this.renderFeeRow('DIGITIZE-C', 'Cap Digitizing', 1, capDigitizing, capDigitizing);
+            html += this.renderFeeRow('DD-CAP', 'Digitizing Setup Cap', 1, capDigitizing, capDigitizing);
         }
 
-        // 6. Artwork Charge (redraw fee)
+        // 5. Logo Mockup & Print Review - ShopWorks SKU: GRT-50
         const artCharge = parseFloat(this.quoteData?.ArtCharge) || 0;
         if (artCharge > 0) {
-            html += this.renderFeeRow('ARTWORK', 'Art Charge / Redraw', 1, artCharge, artCharge);
+            html += this.renderFeeRow('GRT-50', 'Logo Mockup & Print Review', 1, artCharge, artCharge);
         }
 
-        // 7. Rush Fee (expedited processing)
+        // 6. Graphic Design Services - ShopWorks SKU: GRT-75 @ $75/hr
+        const graphicDesignHours = parseFloat(this.quoteData?.GraphicDesignHours) || 0;
+        const graphicDesignCharge = parseFloat(this.quoteData?.GraphicDesignCharge) || 0;
+        if (graphicDesignCharge > 0) {
+            const desc = graphicDesignHours > 0
+                ? `Graphic design services (${graphicDesignHours} hrs @ $75/hr)`
+                : 'Graphic design services';
+            html += this.renderFeeRow('GRT-75', desc, graphicDesignHours || 1, 75, graphicDesignCharge);
+        }
+
+        // 7. Rush Fee (expedited processing) - ShopWorks SKU: RUSH
         const rushFee = parseFloat(this.quoteData?.RushFee) || 0;
         if (rushFee > 0) {
             html += this.renderFeeRow('RUSH', 'Rush Fee', 1, rushFee, rushFee);
         }
 
-        // 8. Sample Fee
-        const sampleFee = parseFloat(this.quoteData?.SampleFee) || 0;
-        const sampleQty = parseInt(this.quoteData?.SampleQty) || 1;
-        if (sampleFee > 0) {
-            const sampleUnitPrice = sampleQty > 0 ? sampleFee / sampleQty : sampleFee;
-            html += this.renderFeeRow('SAMPLE', 'Sample Fee', sampleQty, sampleUnitPrice, sampleFee);
-        }
+        // NOTE: Sample Fee removed from UI per user request (2026-01-14)
 
-        // 9. LTM Fee - Garments (Less Than Minimum for garments)
+        // 8. Less than minimum fee garments - ShopWorks SKU: LTM
         const ltmGarment = parseFloat(this.quoteData?.LTM_Garment) || 0;
         const garmentQtyLTM = parseInt(this.quoteData?.ALGarmentQty) || parseInt(this.quoteData?.TotalQuantity) || 0;
         if (ltmGarment > 0 && garmentQtyLTM > 0) {
             const ltmGarmentUnit = ltmGarment / garmentQtyLTM;
-            html += this.renderFeeRow('LTM-G', 'LTM Fee: Garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
+            html += this.renderFeeRow('LTM', 'Less than minimum fee garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
         }
 
-        // 10. LTM Fee - Caps (Less Than Minimum for caps)
+        // 9. Less than minimum fee Caps - ShopWorks SKU: LTM-CAP
         const ltmCap = parseFloat(this.quoteData?.LTM_Cap) || 0;
         const capQtyLTM = parseInt(this.quoteData?.ALCapQty) || 0;
         if (ltmCap > 0 && capQtyLTM > 0) {
             const ltmCapUnit = ltmCap / capQtyLTM;
-            html += this.renderFeeRow('LTM-C', 'LTM Fee: Caps', capQtyLTM, ltmCapUnit, ltmCap);
+            html += this.renderFeeRow('LTM-CAP', 'Less than minimum fee Caps', capQtyLTM, ltmCapUnit, ltmCap);
         }
 
-        // 11. Discount (negative line item)
+        // 10. Discount (negative line item) - ShopWorks SKU: DISCOUNT
         const discount = parseFloat(this.quoteData?.Discount) || 0;
         const discountReason = this.quoteData?.DiscountReason || '';
         const discountPercent = parseFloat(this.quoteData?.DiscountPercent) || 0;
@@ -1312,8 +1321,9 @@ class QuoteViewPage {
      * Render totals section with tax
      */
     renderTotals() {
-        const subtotal = parseFloat(this.quoteData.SubtotalAmount) || 0;
-        const ltmFee = parseFloat(this.quoteData.LTMFeeTotal) || 0;
+        // Use TotalAmount as the pre-tax subtotal for display
+        // TotalAmount includes: products + LTM + digitizing + art + rush + sample - discount
+        // This ensures the displayed Subtotal matches the visible line items
         const grandTotalBeforeTax = parseFloat(this.quoteData.TotalAmount) || 0;
         const taxAmount = grandTotalBeforeTax * this.taxRate;
         const totalWithTax = grandTotalBeforeTax + taxAmount;
@@ -1322,13 +1332,12 @@ class QuoteViewPage {
         const totalsCard = document.querySelector('.totals-card');
         let totalsHtml = '';
 
-        // Show subtotal INCLUDING LTM (since LTM is now shown as line items LTM-G/LTM-C)
-        // This makes the math cleaner: Subtotal → Tax → Total
-        const subtotalWithLtm = subtotal + ltmFee;
+        // Show pre-tax total as Subtotal (all fees included)
+        // This makes the math visually add up: visible rows = Subtotal
         totalsHtml += `
             <div class="total-row">
                 <span class="label">Subtotal:</span>
-                <span class="value">${this.formatCurrency(subtotalWithLtm)}</span>
+                <span class="value">${this.formatCurrency(grandTotalBeforeTax)}</span>
             </div>
         `;
 
@@ -1824,21 +1833,18 @@ class QuoteViewPage {
         pdf.line(margin + 100, yPos, pageWidth - margin, yPos);
         yPos += 8;
 
-        const subtotal = parseFloat(this.quoteData.SubtotalAmount) || 0;
-        const ltmFee = parseFloat(this.quoteData.LTMFeeTotal) || 0;
+        // Use TotalAmount as pre-tax subtotal (includes all fees)
+        // This matches the visible line items in the PDF
         const grandTotal = parseFloat(this.quoteData.TotalAmount) || 0;
         const taxAmount = grandTotal * this.taxRate;
         const totalWithTax = grandTotal + taxAmount;
 
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        // Subtotal includes LTM (since LTM is now a line item LTM-G/LTM-C in the table)
-        const subtotalWithLtm = subtotal + ltmFee;
+        // Show pre-tax total as Subtotal (all fees included)
         pdf.text('Subtotal:', margin + 120, yPos);
-        pdf.text(this.formatCurrency(subtotalWithLtm), margin + 155, yPos);
+        pdf.text(this.formatCurrency(grandTotal), margin + 155, yPos);
         yPos += 6;
-
-        // LTM no longer shown here - it's a line item in the product table
 
         pdf.text('WA Sales Tax (10.1%):', margin + 100, yPos);
         pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
@@ -1871,7 +1877,8 @@ class QuoteViewPage {
         const margin = 10;
 
         // Check if any fees to render
-        const addlStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
+        const garmentStitchCharge = parseFloat(this.quoteData?.GarmentStitchCharge) || 0;
+        const capStitchCharge = parseFloat(this.quoteData?.CapStitchCharge) || 0;
         const totalQty = parseInt(this.quoteData?.TotalQuantity) || 0;
         const alGarmentCharge = parseFloat(this.quoteData?.ALChargeGarment) || 0;
         const garmentQty = parseInt(this.quoteData?.ALGarmentQty) || 0;
@@ -1883,16 +1890,15 @@ class QuoteViewPage {
         // Check all fee types
         const artChargePdf = parseFloat(this.quoteData?.ArtCharge) || 0;
         const rushFeePdf = parseFloat(this.quoteData?.RushFee) || 0;
-        const sampleFeePdf = parseFloat(this.quoteData?.SampleFee) || 0;
         const ltmGarmentPdf = parseFloat(this.quoteData?.LTM_Garment) || 0;
         const ltmCapPdf = parseFloat(this.quoteData?.LTM_Cap) || 0;
         const discountPdf = parseFloat(this.quoteData?.Discount) || 0;
 
-        // NOTE: addlStitchCharge removed from hasFees check (2026-01-14)
-        // Extra stitch charges are baked into product unit prices, not a separate fee
-        const hasFees = alGarmentCharge > 0 || alCapCharge > 0 ||
+        // CHANGED 2026-01-14: Added stitch charges back to hasFees, split by garment/cap
+        const hasFees = garmentStitchCharge > 0 || capStitchCharge > 0 ||
+                        alGarmentCharge > 0 || alCapCharge > 0 ||
                         garmentDigitizing > 0 || capDigitizing > 0 ||
-                        artChargePdf > 0 || rushFeePdf > 0 || sampleFeePdf > 0 ||
+                        artChargePdf > 0 || rushFeePdf > 0 ||
                         ltmGarmentPdf > 0 || ltmCapPdf > 0 || discountPdf > 0;
         if (!hasFees) return yPos;
 
@@ -1905,71 +1911,78 @@ class QuoteViewPage {
 
         pdf.setFontSize(7);
 
-        // NOTE: ADDL-STITCH row removed (2026-01-14)
-        // Extra stitch charges are already baked into product unit prices (see embroidery-quote-pricing.js line 662)
-        // Showing them as a separate fee row confused customers into thinking they were double-charged
+        // CHANGED 2026-01-14: Split stitch charges by garment/cap per ShopWorks naming standard
+        // AS-GARM = Additional Stitches in Garment Logo, AS-CAP = Additional Stitches in Cap Logo
+        if (garmentStitchCharge > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AS-GARM', 'Additional Stitches in Garment Logo', 1, garmentStitchCharge, garmentStitchCharge);
+        }
+        if (capStitchCharge > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AS-CAP', 'Additional Stitches in Cap Logo', 1, capStitchCharge, capStitchCharge);
+        }
 
-        // 1. AL Garment Charge
+        // 1. Additional Logo - Garments (ShopWorks SKU: AL-GARM)
         if (alGarmentCharge > 0 && garmentQty > 0) {
             const unitPrice = parseFloat(this.quoteData?.ALGarmentUnitPrice) || (alGarmentCharge / garmentQty);
-            const desc = this.quoteData?.ALGarmentDesc || 'AL: Additional Logo';
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AL-GARMENT', desc, garmentQty, unitPrice, alGarmentCharge);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AL-GARM', 'Additional Logo - Garments', garmentQty, unitPrice, alGarmentCharge);
         }
 
-        // 3. AL Cap Charge
+        // 2. Cap Back Embroidery (ShopWorks SKU: CB)
         if (alCapCharge > 0 && capQty > 0) {
             const unitPrice = parseFloat(this.quoteData?.ALCapUnitPrice) || (alCapCharge / capQty);
-            const desc = this.quoteData?.ALCapDesc || 'AL: Cap Logo';
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'AL-CAP', desc, capQty, unitPrice, alCapCharge);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'CB', 'Cap Back Embroidery', capQty, unitPrice, alCapCharge);
         }
 
-        // 4. Garment Digitizing
+        // 3. Digitizing Setup Garments (ShopWorks SKU: DD)
         if (garmentDigitizing > 0) {
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DIGITIZE-G', 'Garment Digitizing', 1, garmentDigitizing, garmentDigitizing);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DD', 'Digitizing Setup Garments', 1, garmentDigitizing, garmentDigitizing);
         }
 
-        // 5. Cap Digitizing
+        // 4. Digitizing Setup Cap (ShopWorks SKU: DD-CAP)
         if (capDigitizing > 0) {
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DIGITIZE-C', 'Cap Digitizing', 1, capDigitizing, capDigitizing);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DD-CAP', 'Digitizing Setup Cap', 1, capDigitizing, capDigitizing);
         }
 
-        // 6. Artwork Charge
+        // 5. Logo Mockup & Print Review (ShopWorks SKU: GRT-50)
         const artCharge = parseFloat(this.quoteData?.ArtCharge) || 0;
         if (artCharge > 0) {
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'ARTWORK', 'Art Charge / Redraw', 1, artCharge, artCharge);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'GRT-50', 'Logo Mockup & Print Review', 1, artCharge, artCharge);
         }
 
-        // 7. Rush Fee
+        // 6. Graphic Design Services (ShopWorks SKU: GRT-75) @ $75/hr
+        const graphicDesignHours = parseFloat(this.quoteData?.GraphicDesignHours) || 0;
+        const graphicDesignCharge = parseFloat(this.quoteData?.GraphicDesignCharge) || 0;
+        if (graphicDesignCharge > 0) {
+            const desc = graphicDesignHours > 0
+                ? `Graphic design services (${graphicDesignHours} hrs @ $75)`
+                : 'Graphic design services';
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'GRT-75', desc, graphicDesignHours || 1, 75, graphicDesignCharge);
+        }
+
+        // 7. Rush Fee (ShopWorks SKU: RUSH)
         const rushFee = parseFloat(this.quoteData?.RushFee) || 0;
         if (rushFee > 0) {
             yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'RUSH', 'Rush Fee', 1, rushFee, rushFee);
         }
 
-        // 8. Sample Fee
-        const sampleFee = parseFloat(this.quoteData?.SampleFee) || 0;
-        const sampleQty = parseInt(this.quoteData?.SampleQty) || 1;
-        if (sampleFee > 0) {
-            const sampleUnitPrice = sampleQty > 0 ? sampleFee / sampleQty : sampleFee;
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'SAMPLE', 'Sample Fee', sampleQty, sampleUnitPrice, sampleFee);
-        }
+        // NOTE: Sample Fee removed from UI per user request (2026-01-14)
 
-        // 9. LTM Fee - Garments
+        // 8. Less than minimum fee garments (ShopWorks SKU: LTM)
         const ltmGarment = parseFloat(this.quoteData?.LTM_Garment) || 0;
         const garmentQtyLTM = parseInt(this.quoteData?.ALGarmentQty) || totalQty || 0;
         if (ltmGarment > 0 && garmentQtyLTM > 0) {
             const ltmGarmentUnit = ltmGarment / garmentQtyLTM;
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-G', 'LTM Fee: Garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM', 'Less than minimum fee garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
         }
 
-        // 10. LTM Fee - Caps
+        // 9. Less than minimum fee Caps (ShopWorks SKU: LTM-CAP)
         const ltmCap = parseFloat(this.quoteData?.LTM_Cap) || 0;
         const capQtyLTM = parseInt(this.quoteData?.ALCapQty) || 0;
         if (ltmCap > 0 && capQtyLTM > 0) {
             const ltmCapUnit = ltmCap / capQtyLTM;
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-C', 'LTM Fee: Caps', capQtyLTM, ltmCapUnit, ltmCap);
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-CAP', 'Less than minimum fee Caps', capQtyLTM, ltmCapUnit, ltmCap);
         }
 
-        // 11. Discount (negative line item)
+        // 10. Discount (ShopWorks SKU: DISCOUNT)
         const discount = parseFloat(this.quoteData?.Discount) || 0;
         const discountReason = this.quoteData?.DiscountReason || '';
         const discountPercent = parseFloat(this.quoteData?.DiscountPercent) || 0;
@@ -2150,14 +2163,14 @@ class QuoteViewPage {
         console.log('Total AL:', totalAL.toFixed(2));
         console.groupEnd();
 
-        // 4. Extra stitch info (informational - already in unit prices)
-        console.group('4️⃣ Extra Stitches (INFORMATIONAL ONLY)');
+        // 4. Extra stitch charge (SEPARATE line item - added to total)
+        console.group('4️⃣ Extra Stitches (SEPARATE LINE ITEM)');
         const addlStitch = parseFloat(q?.AdditionalStitchCharge) || 0;
         const stitchCount = parseFloat(q?.StitchCount) || 8000;
         console.log('Stitch Count:', stitchCount);
         console.log('Extra Stitch Amount:', addlStitch.toFixed(2));
-        console.log('⚠️ NOTE: Extra stitches are ALREADY baked into product unit prices');
-        console.log('⚠️ This value is NOT added separately to the total');
+        console.log('✅ Extra stitches are a SEPARATE line item (shown as ADDL-STITCH)');
+        console.log('✅ This value IS added to the total');
         console.groupEnd();
 
         // 5. Other fees

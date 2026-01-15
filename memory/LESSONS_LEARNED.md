@@ -30,6 +30,111 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Decision: Additional Stitch Charges as Separate Line Item (Not Baked Into Unit Price)
+**Date:** 2026-01-14
+**Project:** Pricing Index (Embroidery Quote Builder, Quote View, PDF)
+**Context:** When embroidery logos exceed 8000 stitches, there's an additional charge ($1.25/1K for garments, $1.00/1K for caps). Previously, this was BOTH baked into the unit price AND shown as a separate sidebar line (informational only), causing confusion.
+**Decision:** Display base price (8K stitches) in the table, with Additional Stitches as a SEPARATE line item that is ADDED to the total. This follows B2B industry standard for transparent, itemized quotes.
+**Changes made:**
+1. `embroidery-quote-pricing.js` - Line item totals now use `basePrice` (8K) instead of `finalPrice` (with stitches); `grandTotal` now explicitly adds `additionalStitchTotal`
+2. `embroidery-quote-builder.html` - Table displays `basePrice`, sidebar label changed to "Products (Base 8K)"
+3. `quote-view.js` - Re-added ADDL-STITCH fee row (was removed when stitches were baked in)
+**Result:**
+- Table shows: "$21.00/ea" (base price only)
+- Sidebar shows: "Additional Stitches: $47.50" (clearly ADDED)
+- More transparent for B2B customers; easier to explain pricing
+
+---
+
+## Fee Line Item Naming Standardization (ShopWorks Alignment)
+**Date:** 2026-01-14
+**Project:** Pricing Index (Quote Builder, Quote View, PDF)
+**Context:** Fee line item SKUs and descriptions were inconsistent with ShopWorks naming conventions. User requested standardization for consistency.
+
+**Naming Changes:**
+| Old SKU | New SKU | Old Description | New Description |
+|---------|---------|-----------------|-----------------|
+| ADDL-STITCH | AS-GARM / AS-CAP | Additional Stitch Charge | Additional Stitches in Garment Logo / Cap Logo |
+| AL-GARMENT | AL-GARM | AL: Additional Logo | Additional Logo - Garments |
+| AL-CAP | CB | AL: Cap Logo | Cap Back Embroidery |
+| DIGITIZE-G | DD | Garment Digitizing | Digitizing Setup Garments |
+| DIGITIZE-C | DD-CAP | Cap Digitizing | Digitizing Setup Cap |
+| ARTWORK | GRT-50 | Art Charge / Redraw | Logo Mockup & Print Review |
+| LTM-G | LTM | LTM Fee: Garments | Less than minimum fee garments |
+| LTM-C | LTM-CAP | LTM Fee: Caps | Less than minimum fee Caps |
+| SAMPLE | **REMOVED** | Sample Fee | (Removed from UI) |
+
+**Files Changed:**
+1. `pages/js/quote-view.js` - `renderFeeRows()` and `renderPdfFeeRows()` updated with new SKUs/descriptions
+2. `shared_components/js/embroidery-quote-pricing.js` - Split `additionalStitchTotal` into `garmentStitchTotal` and `capStitchTotal`
+3. `shared_components/js/embroidery-quote-service.js` - Added `GarmentStitchCharge` and `CapStitchCharge` fields
+4. `quote-builders/embroidery-quote-builder.html` - Updated sidebar labels, removed Sample Fee
+
+**Prevention:** When adding new fee types, check ShopWorks for standard naming conventions first.
+
+---
+
+## Problem: Digitizing fees combined into one row instead of separate garment/cap rows
+**Date:** 2026-01-14
+**Project:** Pricing Index (Embroidery Quote Builder)
+**Symptoms:** Quote View showed one "DIGITIZE-G" row at $200 instead of two rows: "DIGITIZE-G" at $100 and "DIGITIZE-C" at $100. Quote Details header correctly showed them separately, but line items table combined them.
+**Root cause:** In `saveAndGetLink()` function, `calculateQuote()` was called WITHOUT the `logoConfigs` parameter. Without it, the pricing engine uses the legacy path that counts ALL logos as garment digitizing:
+```javascript
+// Legacy path (line 1223-1225 in embroidery-quote-pricing.js):
+garmentDigitizingCount = logos.filter(l => l.needsDigitizing).length;  // Counts ALL as garment!
+```
+Result: `GarmentDigitizing = $200`, `CapDigitizing = $0`
+**Solution:** Added `logoConfigs` parameter to `saveAndGetLink()` to match `recalculatePricing()`:
+```javascript
+const logoConfigs = {
+    garment: { primary: { ...primaryLogo, id: 'primary' }, additional: additionalLogos },
+    cap: { primary: { ...capPrimaryLogo, id: 'cap-primary' }, additional: capAdditionalLogos }
+};
+const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+```
+**Prevention:** When calling pricing functions, always check if other callers pass additional parameters. The save function should use identical parameters to the live UI calculation function.
+**Files:** `/quote-builders/embroidery-quote-builder.html` function `saveAndGetLink()` ~line 4333
+
+---
+
+## Problem: Parent row quantity includes child row quantities (confusing UX)
+**Date:** 2026-01-14
+**Project:** Pricing Index (Embroidery Quote Builder)
+**Symptoms:** PC61 parent row showed Qty: 16 but only had S(2)+M(4)+L(4)+XL(4)=14 pieces in the size columns. The 2XL and 3XL child rows also showed their own quantities (2, 2). Visually looked like 16+2+2=20, but sidebar correctly showed 18.
+**Root cause:** In `onSizeChange()` function, lines 3290-3295 intentionally added child row quantities to the parent display total. This was confusing because child rows ALSO display their own quantities, leading to visual double-counting.
+**Solution:** Removed the child row quantity addition from parent display. Now:
+- Parent shows ONLY its own sizes (S+M+L+XL = 14)
+- Child rows show their own quantities (2, 2)
+- Visual math adds up: 14 + 2 + 2 = 18 ✓
+- Pricing calculator (`collectProductsFromTable()`) still correctly sums ALL quantities for pricing
+**Code change:**
+```javascript
+// REMOVED this code block from onSizeChange():
+const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+childRows.forEach(childRow => {
+    const qtyDisplay = childRow.querySelector('.qty-display');
+    total += parseInt(qtyDisplay?.textContent) || 0;  // DELETED
+});
+```
+**Prevention:** When displaying quantities in tables with parent/child relationships, each row should show only its OWN quantity. The pricing system handles true totals separately.
+**Files:** `/quote-builders/embroidery-quote-builder.html` function `onSizeChange()` ~line 3290
+
+## Problem: Quote View Subtotal doesn't match visible line items
+**Date:** 2026-01-14
+**Project:** Pricing Index (Quote View)
+**Symptoms:** EMB0114-9 Quote View showed Subtotal $939 but visible rows summed to $1,189. Customer sees Digitizing ($200) and Artwork ($50) as line items, but they weren't included in Subtotal.
+**Root cause:** Quote View used `SubtotalAmount` field ($839 products + $100 LTM = $939) for Subtotal display. But `TotalAmount` field ($1,189) correctly includes all fees (digitizing, art, rush, sample, discount).
+**Solution:** Changed Subtotal display to use `TotalAmount` instead of calculated `SubtotalAmount + LTM`:
+```javascript
+// BEFORE:
+const subtotal = (this.quoteData.SubtotalAmount || 0) + ltmTotal;
+
+// AFTER:
+const grandTotalBeforeTax = parseFloat(this.quoteData.TotalAmount) || 0;
+```
+**Prevention:** For customer-facing displays, use `TotalAmount` (pre-tax grand total) not `SubtotalAmount` (products only). The naming is confusing - document what each field contains.
+**Files:** `/pages/js/quote-view.js` functions `renderTotals()` and PDF generation
+
 ## Problem: TotalAmount missing Art/Rush/Sample/Discount fees
 **Date:** 2026-01-14
 **Project:** Pricing Index (Embroidery Quote Builder)
