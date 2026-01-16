@@ -454,6 +454,148 @@ body {
     color: #721c24;
 }
 
+/* Checkbox Column */
+.checkbox-col {
+    width: 40px;
+    text-align: center;
+}
+
+.quote-checkbox {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+/* Table Actions */
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Bulk Delete Button */
+.btn-bulk-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-bulk-delete:hover:not(:disabled) {
+    background: #c82333;
+}
+
+.btn-bulk-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Delete Action Button */
+.action-delete {
+    color: #dc3545;
+}
+
+.action-delete:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* Delete Modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    color: #333;
+}
+
+.modal-content p {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-cancel {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.btn-confirm-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-confirm-delete:hover:not(:disabled) {
+    background: #c82333;
+}
+
+.btn-confirm-delete:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Warning text in modal */
+.warning-text {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.warning-text i {
+    margin-right: 4px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-container {
@@ -482,5 +624,29 @@ body {
 
     .dashboard-header h1 {
         display: none;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .table-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-bulk-delete {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .checkbox-col {
+        width: 32px;
+    }
+
+    .modal-content {
+        margin: 16px;
     }
 }

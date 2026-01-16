@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=20260113">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=20260116">
 </head>
 <body>
     <!-- Header -->
@@ -104,7 +104,12 @@
         <div class="quotes-table-section">
             <div class="table-header">
                 <h2>Quotes</h2>
-                <span class="table-count" id="table-count">Loading...</span>
+                <div class="table-actions">
+                    <button id="btn-bulk-delete" class="btn-bulk-delete" onclick="bulkDelete()" disabled>
+                        <i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)
+                    </button>
+                    <span class="table-count" id="table-count">Loading...</span>
+                </div>
             </div>
 
             <div id="table-loading" class="loading-overlay">
@@ -120,6 +125,9 @@
             <table class="quotes-table" id="quotes-table" style="display: none;">
                 <thead>
                     <tr>
+                        <th class="checkbox-col">
+                            <input type="checkbox" id="select-all" title="Select all" onclick="toggleSelectAll()">
+                        </th>
                         <th>Quote ID</th>
                         <th>Customer</th>
                         <th>Sales Rep</th>
@@ -143,6 +151,18 @@
                 <button id="btn-next" onclick="nextPage()">
                     Next <i class="fas fa-chevron-right"></i>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3 id="delete-modal-title">Confirm Delete</h3>
+            <p id="delete-modal-message"></p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-confirm-delete" onclick="confirmDelete()">Delete</button>
             </div>
         </div>
     </div>
@@ -362,6 +382,13 @@
 
                 return `
                     <tr onclick="viewQuote('${quote.QuoteID}')">
+                        <td class="checkbox-col" onclick="event.stopPropagation();">
+                            <input type="checkbox" class="quote-checkbox"
+                                   data-pk-id="${quote.PK_ID}"
+                                   data-quote-id="${quote.QuoteID}"
+                                   data-status="${quote.Status || 'Open'}"
+                                   onchange="updateCheckboxSelection()">
+                        </td>
                         <td><span class="quote-id">${quote.QuoteID || '-'}</span></td>
                         <td>
                             <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
@@ -395,6 +422,9 @@
                             </button>
                             <button class="action-btn" onclick="event.stopPropagation(); copyQuoteLink('${quote.QuoteID}')" title="Copy Link">
                                 <i class="fas fa-link"></i>
+                            </button>
+                            <button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${quote.QuoteID}', '${quote.Status || 'Open'}')" title="Delete Quote">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>
@@ -617,6 +647,213 @@
             div.textContent = str;
             return div.innerHTML;
         }
+
+        // ============================================================
+        // DELETE FUNCTIONALITY
+        // ============================================================
+
+        // State for delete operations
+        let selectedQuotes = new Set();
+        let pendingDeleteData = [];
+        let pendingDeleteType = null; // 'single' or 'bulk'
+
+        // Toggle select all checkbox
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.quote-checkbox');
+
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
+
+            updateCheckboxSelection();
+        }
+
+        // Update selection state when individual checkboxes change
+        function updateCheckboxSelection() {
+            const checkboxes = document.querySelectorAll('.quote-checkbox');
+            const selectAllCheckbox = document.getElementById('select-all');
+
+            selectedQuotes.clear();
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedQuotes.add({
+                        pkId: cb.dataset.pkId,
+                        quoteId: cb.dataset.quoteId,
+                        status: cb.dataset.status
+                    });
+                }
+            });
+
+            // Update select all checkbox state
+            const checkedCount = selectedQuotes.size;
+            const totalCount = checkboxes.length;
+
+            if (checkedCount === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCount === totalCount) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+
+            updateBulkDeleteButton();
+        }
+
+        // Update bulk delete button state
+        function updateBulkDeleteButton() {
+            const btn = document.getElementById('btn-bulk-delete');
+            const countSpan = document.getElementById('selected-count');
+
+            countSpan.textContent = selectedQuotes.size;
+            btn.disabled = selectedQuotes.size === 0;
+        }
+
+        // Single quote delete
+        function deleteQuote(pkId, quoteId, status) {
+            let message = `Are you sure you want to delete quote <strong>${quoteId}</strong>?`;
+
+            if (status === 'Accepted') {
+                message = `<span class="warning-text"><i class="fas fa-exclamation-triangle"></i> Warning:</span> Quote <strong>${quoteId}</strong> has been <strong>Accepted</strong>. Deleting it will remove the record permanently.<br><br>Are you sure you want to proceed?`;
+            }
+
+            showDeleteModal('Delete Quote', message, [{ pkId, quoteId, status }], 'single');
+        }
+
+        // Bulk delete selected quotes
+        function bulkDelete() {
+            if (selectedQuotes.size === 0) return;
+
+            const quotes = Array.from(selectedQuotes);
+            const acceptedQuotes = quotes.filter(q => q.status === 'Accepted');
+            const otherQuotes = quotes.filter(q => q.status !== 'Accepted');
+
+            let message = '';
+
+            if (acceptedQuotes.length > 0 && otherQuotes.length > 0) {
+                message = `<span class="warning-text"><i class="fas fa-exclamation-triangle"></i> Warning:</span> You selected <strong>${quotes.length} quotes</strong>, including <strong>${acceptedQuotes.length} Accepted</strong> quote(s).<br><br>`;
+                message += `<strong>Accepted:</strong> ${acceptedQuotes.map(q => q.quoteId).join(', ')}<br>`;
+                message += `<strong>Other:</strong> ${otherQuotes.map(q => q.quoteId).join(', ')}<br><br>`;
+                message += `Are you sure you want to delete all ${quotes.length} quotes?`;
+            } else if (acceptedQuotes.length > 0) {
+                message = `<span class="warning-text"><i class="fas fa-exclamation-triangle"></i> Warning:</span> All <strong>${acceptedQuotes.length}</strong> selected quote(s) are <strong>Accepted</strong>:<br><br>`;
+                message += `${acceptedQuotes.map(q => q.quoteId).join(', ')}<br><br>`;
+                message += `Are you sure you want to delete them permanently?`;
+            } else {
+                message = `Are you sure you want to delete <strong>${quotes.length}</strong> quote(s)?<br><br>`;
+                message += `${quotes.map(q => q.quoteId).join(', ')}`;
+            }
+
+            showDeleteModal('Delete Selected Quotes', message, quotes, 'bulk');
+        }
+
+        // Show delete confirmation modal
+        function showDeleteModal(title, message, data, type) {
+            pendingDeleteData = data;
+            pendingDeleteType = type;
+
+            document.getElementById('delete-modal-title').textContent = title;
+            document.getElementById('delete-modal-message').innerHTML = message;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+            pendingDeleteData = [];
+            pendingDeleteType = null;
+        }
+
+        // Confirm and execute delete
+        async function confirmDelete() {
+            if (pendingDeleteData.length === 0) {
+                closeDeleteModal();
+                return;
+            }
+
+            const confirmBtn = document.querySelector('.btn-confirm-delete');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const item of pendingDeleteData) {
+                try {
+                    const success = await deleteQuoteAPI(item.pkId);
+                    if (success) {
+                        successCount++;
+                        // Remove from local data
+                        allQuotes = allQuotes.filter(q => q.PK_ID != item.pkId);
+                    } else {
+                        failCount++;
+                    }
+                } catch (error) {
+                    console.error(`[QuoteManagement] Failed to delete ${item.quoteId}:`, error);
+                    failCount++;
+                }
+            }
+
+            // Reset button state
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = 'Delete';
+
+            closeDeleteModal();
+
+            // Clear selection
+            selectedQuotes.clear();
+            document.getElementById('select-all').checked = false;
+            updateBulkDeleteButton();
+
+            // Show result
+            if (failCount === 0) {
+                showToast(`Successfully deleted ${successCount} quote(s)`);
+            } else if (successCount > 0) {
+                showToast(`Deleted ${successCount} quote(s), ${failCount} failed`);
+            } else {
+                showToast(`Failed to delete quotes. Please try again.`);
+            }
+
+            // Re-apply filters to refresh table
+            applyFilters();
+        }
+
+        // API call to delete quote
+        async function deleteQuoteAPI(pkId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/quote_sessions/${pkId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('[QuoteManagement] Delete API error:', error);
+                return false;
+            }
+        }
+
+        // Close modal on outside click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('delete-modal');
+            if (e.target === modal) {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
     </script>
 </body>
 </html>
