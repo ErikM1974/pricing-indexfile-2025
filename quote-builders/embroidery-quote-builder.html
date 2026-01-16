@@ -46,10 +46,18 @@
                  class="logo">
         </a>
         <div style="text-align: center;">
-            <div style="font-size: 18px; font-weight: 600;">2026 Embroidery Quote Builder</div>
-            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">👕 Garments + 🧢 Caps • Embroidery, 3D Puff & Laser Patches</div>
+            <div style="font-size: 18px; font-weight: 600;">
+                2026 Embroidery Quote Builder
+                <span id="unsaved-indicator" class="unsaved-badge" style="display: none;">
+                    <i class="fas fa-circle"></i> Unsaved
+                </span>
+            </div>
+            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">Garments + Caps | Embroidery, 3D Puff & Laser Patches</div>
         </div>
         <div class="header-actions">
+            <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
+                <i class="fas fa-plus"></i> New Quote
+            </button>
             <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
@@ -224,8 +232,8 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Artwork Services -->
-                <div class="artwork-services-column" id="artwork-services">
+                <!-- Right Column: Artwork Services (hidden until products added) -->
+                <div class="artwork-services-column" id="artwork-services" style="display: none;">
                     <div class="artwork-services-card">
                         <div class="artwork-services-header">
                             <div class="artwork-services-icon">
@@ -305,6 +313,14 @@
                             </tr>
                         </thead>
                         <tbody id="product-tbody">
+                            <!-- Empty State Message - shown until products added -->
+                            <tr id="empty-state-row">
+                                <td colspan="13" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                                    <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                </td>
+                            </tr>
                             <!-- Product rows will be added here -->
                         </tbody>
                     </table>
@@ -316,11 +332,17 @@
                 </button>
 
                 <!-- Keyboard Hints -->
-                <div class="keyboard-hint">
-                    <kbd>Tab</kbd> Next cell &nbsp;|&nbsp;
-                    <kbd>Enter</kbd> Next row &nbsp;|&nbsp;
-                    <kbd>Ctrl+S</kbd> Save &nbsp;|&nbsp;
-                    <kbd>Ctrl+P</kbd> Print PDF
+                <!-- Keyboard Hints - Show on Hover -->
+                <div class="keyboard-hint-container">
+                    <div class="keyboard-hint-trigger">
+                        <i class="fas fa-keyboard"></i> Shortcuts
+                    </div>
+                    <div class="keyboard-hint-content">
+                        <kbd>Tab</kbd> Next cell &nbsp;|&nbsp;
+                        <kbd>Enter</kbd> Next row &nbsp;|&nbsp;
+                        <kbd>Ctrl+S</kbd> Save &nbsp;|&nbsp;
+                        <kbd>Ctrl+P</kbd> Print PDF
+                    </div>
                 </div>
 
                 <!-- Extended Size Picker Backdrop -->
@@ -464,10 +486,10 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span id="charges-badge" style="display: none; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">+$0.00</span>
-                        <i id="charges-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s;"></i>
+                        <i id="charges-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s; transform: rotate(180deg);"></i>
                     </div>
                 </div>
-                <div id="charges-content" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
+                <div id="charges-content" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
                     <!-- NOTE: Logo Mockup & Graphic Design moved to Artwork Services card at top (2026 UI update) -->
                     <!-- Rush Fee -->
                     <div class="charge-field" style="margin-bottom: 10px;">
@@ -529,46 +551,51 @@
 
             </div>
 
-            <!-- Save & Share Section -->
+            <!-- Save & Share Section (Collapsible) -->
             <div class="save-quote-panel" style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-                <div class="save-quote-title" style="font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-share-alt"></i> Save & Share
+                <div class="save-quote-header" onclick="toggleSaveShare()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                    <div class="save-quote-title" style="font-size: 14px; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-share-alt"></i> Save & Share
+                    </div>
+                    <i id="save-share-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s; transform: rotate(180deg);"></i>
                 </div>
-                <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
-                    <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
-                        <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                <div id="save-share-content" style="display: none; margin-top: 12px;">
+                    <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="customer-field">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
+                            <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-field">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Email *</label>
+                            <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-field">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
+                            <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-field">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
+                            <input type="tel" id="customer-phone" placeholder="(555) 555-5555" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-field">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
+                            <select id="sales-rep" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white; box-sizing: border-box;">
+                                <option value="sales@nwcustomapparel.com">General Sales</option>
+                                <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                                <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                                <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                <option value="art@nwcustomapparel.com">Steve Deland</option>
+                                <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Email *</label>
-                        <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                    </div>
-                    <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
-                        <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                    </div>
-                    <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
-                        <input type="tel" id="customer-phone" placeholder="(555) 555-5555" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                    </div>
-                    <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
-                        <select id="sales-rep" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white; box-sizing: border-box;">
-                            <option value="sales@nwcustomapparel.com">General Sales</option>
-                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                            <option value="art@nwcustomapparel.com">Steve Deland</option>
-                            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                        </select>
-                    </div>
+                    <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <i class="fas fa-link"></i> Save & Get Shareable Link
+                    </button>
                 </div>
-                <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                    <i class="fas fa-link"></i> Save & Get Shareable Link
-                </button>
             </div>
 
             <!-- Action Buttons -->
@@ -697,6 +724,9 @@
         // Edit mode state (for revising existing quotes)
         let editingQuoteId = null;
         let editingRevision = null;
+
+        // Unsaved changes tracking (UX improvement)
+        let hasChanges = false;
 
         // Auto-save & Draft Recovery (2026 consolidation)
         let embPersistence = null;
@@ -2025,6 +2055,15 @@
                 // Initialize additional charges display (for default $50 art charge)
                 updateAdditionalCharges();
 
+                // Auto-focus search bar for immediate typing (UX improvement)
+                const searchInput = document.getElementById('product-search');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+
+                // Setup unsaved changes tracking for form fields (UX improvement)
+                setupUnsavedChangesTracking();
+
             } catch (error) {
                 console.error('Failed to initialize:', error);
                 showToast('Failed to initialize. Please refresh.', 'error');
@@ -2221,6 +2260,8 @@
             if (capSection) {
                 capSection.style.display = hasCaps ? 'block' : 'none';
             }
+            // Also update artwork services visibility
+            updateArtworkServicesVisibility();
         }
 
         // Update garment logo section visibility based on garments in quote
@@ -2229,6 +2270,25 @@
             const garmentCard = document.getElementById('garment-logo-card');
             if (garmentCard) {
                 garmentCard.style.display = hasGarments ? 'block' : 'none';
+            }
+            // Also update artwork services visibility
+            updateArtworkServicesVisibility();
+        }
+
+        // Update artwork services visibility - show when ANY valid products exist
+        function updateArtworkServicesVisibility() {
+            // Check for rows with data-is-cap attribute (indicates a valid product was added)
+            const hasGarments = document.querySelectorAll('tr[data-is-cap="false"]').length > 0;
+            const hasCaps = document.querySelectorAll('tr[data-is-cap="true"]').length > 0;
+            const hasAnyProducts = hasGarments || hasCaps;
+            const artworkServices = document.getElementById('artwork-services');
+            if (artworkServices) {
+                artworkServices.style.display = hasAnyProducts ? 'block' : 'none';
+            }
+            // Also update empty state row visibility
+            const emptyStateRow = document.getElementById('empty-state-row');
+            if (emptyStateRow) {
+                emptyStateRow.style.display = hasAnyProducts ? 'none' : '';
             }
         }
 
@@ -2429,6 +2489,9 @@
 
             // Add product to table
             await addProductRow(styleNumber);
+
+            // Mark as having unsaved changes
+            markAsUnsaved();
         }
 
         // ============================================================
@@ -3860,6 +3923,9 @@
             const row = document.getElementById(`row-${rowId}`);
             if (!row) return;
 
+            // Mark as having unsaved changes
+            markAsUnsaved();
+
             // Skip if this is a child row (child rows don't trigger size changes)
             if (row.classList.contains('child-row')) {
                 recalculatePricing();
@@ -5158,6 +5224,9 @@
                         embPersistence.clearDraft();
                     }
 
+                    // Mark as saved (no unsaved changes)
+                    markAsSaved();
+
                     if (isUpdate) {
                         // Update mode: Show revision success message
                         const newRevision = result.revision || (editingRevision + 1);
@@ -5233,7 +5302,7 @@
 
         /**
          * Toggle Additional Charges panel visibility
-         * Panel is EXPANDED by default per UX best practices (charges visible before totals)
+         * Panel is COLLAPSED by default to reduce visual clutter
          */
         function toggleAdditionalCharges() {
             const content = document.getElementById('charges-content');
@@ -5247,6 +5316,204 @@
                 content.style.display = 'none';
                 chevron.style.transform = 'rotate(180deg)';
             }
+        }
+
+        /**
+         * Toggle Save & Share panel visibility
+         * Panel is COLLAPSED by default - user expands when ready to save
+         */
+        function toggleSaveShare() {
+            const content = document.getElementById('save-share-content');
+            const chevron = document.getElementById('save-share-chevron');
+            if (content.style.display === 'none') {
+                // Expanding - show content, chevron points UP
+                content.style.display = 'block';
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                // Collapsing - hide content, chevron points DOWN
+                content.style.display = 'none';
+                chevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // ============================================
+        // Unsaved Changes Tracking (UX Improvement)
+        // ============================================
+
+        /**
+         * Mark quote as having unsaved changes
+         * Shows pulsing "Unsaved" badge in header
+         */
+        function markAsUnsaved() {
+            hasChanges = true;
+            const indicator = document.getElementById('unsaved-indicator');
+            if (indicator) {
+                indicator.style.display = 'inline';
+            }
+        }
+
+        /**
+         * Mark quote as saved (no unsaved changes)
+         * Hides the "Unsaved" badge
+         */
+        function markAsSaved() {
+            hasChanges = false;
+            const indicator = document.getElementById('unsaved-indicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+        }
+
+        /**
+         * Check if there are unsaved changes
+         */
+        function hasUnsavedChanges() {
+            return hasChanges;
+        }
+
+        /**
+         * Setup event listeners for tracking unsaved changes
+         * Adds listeners to customer fields and additional charges
+         */
+        function setupUnsavedChangesTracking() {
+            // Customer fields
+            const customerFields = [
+                'customer-name', 'customer-email', 'company-name', 'customer-phone', 'sales-rep'
+            ];
+            customerFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', markAsUnsaved);
+                    el.addEventListener('change', markAsUnsaved);
+                }
+            });
+
+            // Additional charges fields
+            const chargeFields = [
+                'rush-fee', 'discount-amount', 'discount-reason', 'art-charge', 'graphic-design-hours'
+            ];
+            chargeFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', markAsUnsaved);
+                    el.addEventListener('change', markAsUnsaved);
+                }
+            });
+
+            // Logo configuration fields
+            const logoFields = [
+                'primary-position', 'primary-stitches', 'primary-digitizing',
+                'garment-al-position', 'garment-al-stitches',
+                'cap-primary-stitches', 'cap-al-position', 'cap-al-stitches',
+                'cap-embellishment-type'
+            ];
+            logoFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', markAsUnsaved);
+                    el.addEventListener('change', markAsUnsaved);
+                }
+            });
+        }
+
+        // ============================================
+        // New Quote Functionality (UX Improvement)
+        // ============================================
+
+        /**
+         * Confirm and start a new quote
+         * Prompts user if there are unsaved changes
+         */
+        function confirmNewQuote() {
+            if (hasUnsavedChanges()) {
+                if (confirm('You have unsaved changes. Start a new quote?')) {
+                    resetQuote();
+                }
+            } else {
+                resetQuote();
+            }
+        }
+
+        /**
+         * Reset all quote data and start fresh
+         */
+        function resetQuote() {
+            // Clear all product rows and re-add empty state
+            const tbody = document.getElementById('product-tbody');
+            tbody.innerHTML = `
+                <tr id="empty-state-row">
+                    <td colspan="13" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                        <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                    </td>
+                </tr>
+            `;
+
+            // Reset row counter
+            rowCounter = 0;
+
+            // Reset logo cards visibility
+            const garmentCard = document.getElementById('garment-logo-card');
+            const capCard = document.getElementById('cap-logo-card');
+            const artworkServices = document.getElementById('artwork-services');
+            if (garmentCard) garmentCard.style.display = 'none';
+            if (capCard) capCard.style.display = 'none';
+            if (artworkServices) artworkServices.style.display = 'none';
+
+            // Reset logo configurations to defaults
+            primaryLogo.position = 'Left Chest';
+            primaryLogo.stitches = 8000;
+            primaryLogo.digitizing = false;
+            document.getElementById('primary-position').value = 'Left Chest';
+            document.getElementById('primary-stitches').value = 8000;
+            document.getElementById('primary-digitizing').checked = false;
+
+            // Reset additional logo toggles
+            const garmentALSwitch = document.getElementById('garment-al-switch');
+            const capALSwitch = document.getElementById('cap-al-switch');
+            if (garmentALSwitch) garmentALSwitch.classList.remove('active');
+            if (capALSwitch) capALSwitch.classList.remove('active');
+            document.getElementById('garment-al-toggle').checked = false;
+            document.getElementById('cap-al-toggle').checked = false;
+
+            // Reset customer form fields
+            document.getElementById('customer-name').value = '';
+            document.getElementById('customer-email').value = '';
+            document.getElementById('company-name').value = '';
+            document.getElementById('customer-phone').value = '';
+
+            // Reset additional charges
+            document.getElementById('rush-fee').value = '';
+            document.getElementById('discount-amount').value = '';
+            document.getElementById('discount-reason').value = '';
+            document.getElementById('art-charge').value = 0;
+            document.getElementById('art-charge-toggle').checked = false;
+            document.getElementById('graphic-design-hours').value = '';
+
+            // Clear edit mode
+            editingQuoteId = null;
+            editingRevision = null;
+
+            // Clear draft storage
+            if (embPersistence) {
+                embPersistence.clearDraft();
+            }
+
+            // Recalculate pricing (will show zeros)
+            recalculateAllPricing();
+            updateAdditionalCharges();
+
+            // Mark as saved (no unsaved changes)
+            markAsSaved();
+
+            // Focus search bar for immediate typing
+            const searchInput = document.getElementById('product-search');
+            if (searchInput) {
+                searchInput.focus();
+            }
+
+            showToast('Ready for new quote', 'success');
         }
 
         /**

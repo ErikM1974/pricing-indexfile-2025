@@ -12,7 +12,7 @@ class SidebarResizer {
         this.handle = document.querySelector(handleSelector);
         this.isResizing = false;
         this.minWidth = 260;
-        this.maxWidth = 500;
+        this.maxWidth = 700;
         this.storageKey = 'sidebarWidth';
 
         if (this.sidebar && this.handle) {

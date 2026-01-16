@@ -79,6 +79,35 @@ body {
     background: rgba(255,255,255,0.3);
 }
 
+/* New Quote Button - Green accent */
+.power-header .btn-new-quote {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+}
+
+.power-header .btn-new-quote:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+/* Unsaved Changes Badge */
+.unsaved-badge {
+    font-size: 11px;
+    color: #fbbf24;
+    margin-left: 8px;
+    animation: unsaved-pulse 2s infinite;
+}
+
+.unsaved-badge i {
+    font-size: 8px;
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+@keyframes unsaved-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
 /* ============================================
    SHARED: Main Layout
    ============================================ */
@@ -145,11 +174,11 @@ body {
 
 /* Resizable handle on left edge */
 .sidebar-resize-handle {
-    width: 6px;
+    width: 8px;
     cursor: col-resize;
     background: transparent;
     position: absolute;
-    left: -3px;
+    left: -4px;
     top: 0;
     bottom: 0;
     z-index: 10;
@@ -157,31 +186,33 @@ body {
 }
 
 .sidebar-resize-handle:hover {
-    background: rgba(59, 130, 246, 0.5);
+    background: rgba(59, 130, 246, 0.15);
 }
 
 .sidebar-resize-handle.dragging {
-    background: #3b82f6;
+    background: rgba(59, 130, 246, 0.25);
 }
 
-/* Visual indicator for resize handle */
+/* Visual indicator for resize handle - always visible */
 .sidebar-resize-handle::after {
     content: '';
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 2px;
-    height: 40px;
-    background: #cbd5e1;
+    width: 3px;
+    height: 50px;
+    background: #94a3b8;
     border-radius: 2px;
-    opacity: 0;
-    transition: opacity 0.2s;
+    opacity: 0.5;
+    transition: opacity 0.2s, height 0.2s, background 0.2s;
 }
 
 .sidebar-resize-handle:hover::after,
 .sidebar-resize-handle.dragging::after {
     opacity: 1;
+    height: 80px;
+    background: #3b82f6;
 }
 
 /* ============================================
@@ -2186,6 +2217,76 @@ td.size-disabled input {
    SHARED: Keyboard Hint
    ============================================ */
 /* Keyboard hint */
+/* Keyboard Hints - Hover Reveal (UX Improvement) */
+.keyboard-hint-container {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    padding: 8px;
+    background: #f5f5f5;
+    border-top: 1px solid var(--border-color);
+}
+
+.keyboard-hint-trigger {
+    font-size: 12px;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background 0.2s, color 0.2s;
+}
+
+.keyboard-hint-trigger:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.keyboard-hint-trigger i {
+    margin-right: 4px;
+}
+
+.keyboard-hint-content {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 100;
+    margin-bottom: 8px;
+}
+
+.keyboard-hint-content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+}
+
+.keyboard-hint-container:hover .keyboard-hint-content {
+    display: block;
+}
+
+.keyboard-hint-content kbd {
+    background: #334155;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    margin-right: 2px;
+}
+
+/* Legacy support */
 .keyboard-hint {
     font-size: 11px;
     color: #999;
