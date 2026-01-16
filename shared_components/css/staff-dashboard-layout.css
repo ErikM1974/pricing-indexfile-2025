@@ -1403,6 +1403,50 @@
 }
 
 /* =====================================================
+   ASK BARNABY THEME - Forest Green/Pacific Northwest
+   Barnaby is NWCA's Sasquatch mascot
+   ===================================================== */
+.barnaby-theme {
+    background: linear-gradient(135deg, #e8f5e0 0%, #d4edda 100%);
+    border: 2px solid #4a7c23;
+}
+
+.barnaby-icon {
+    background: linear-gradient(135deg, #2d5016 0%, #3d6b1e 100%);
+    box-shadow: 0 2px 4px rgba(45, 80, 22, 0.3);
+}
+
+.barnaby-svg {
+    width: 18px;
+    height: 18px;
+    fill: white;
+}
+
+.barnaby-theme .tool-category-title {
+    color: #2d5016;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+/* Barnaby button hover - forest green instead of crimson */
+.barnaby-theme .tool-btn:hover {
+    background: #2d5016;
+    border-color: #2d5016;
+}
+
+/* Barnaby accent button - forest green filled (Quote Management) */
+.barnaby-theme .tool-btn.barnaby-accent {
+    background: linear-gradient(135deg, #2d5016 0%, #3d6b1e 100%);
+    color: white;
+    border-color: #2d5016;
+}
+
+.barnaby-theme .tool-btn.barnaby-accent:hover {
+    background: linear-gradient(135deg, #3d6b1e 0%, #4a7c23 100%);
+    border-color: #4a7c23;
+}
+
+/* =====================================================
    DARK MODE SUPPORT (Future)
    ===================================================== */
 @media (prefers-color-scheme: dark) {
