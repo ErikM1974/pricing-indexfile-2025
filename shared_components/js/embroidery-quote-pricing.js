@@ -683,6 +683,15 @@ class EmbroideryPricingCalculator {
             console.error('[CRITICAL] No size pricing data for', product.style);
             console.error('[CRITICAL] API call failed - system will likely use hardcoded fallback values!');
             console.error('[CRITICAL] Check if /api/size-pricing endpoint is working');
+
+            // Show error to user - per audit 2026-01-15
+            if (!document.getElementById('pricing-api-warning')) {
+                this.showAPIWarning(
+                    `Unable to load size pricing for style ${product.style}. ` +
+                    'Product pricing may be inaccurate. Please try refreshing the page or contact IT support.',
+                    'size-pricing'
+                );
+            }
             return null;
         }
         
@@ -1359,21 +1368,12 @@ class EmbroideryPricingCalculator {
         const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
         // Calculate total additional stitch charge across all products
-        // CHANGED 2026-01-14: Split by garment/cap per ShopWorks naming (AS-GARM, AS-CAP)
-        let garmentStitchTotal = 0;
+        // BUG FIX 2026-01-15: Previous loop was broken - it summed lineItem.extraStitchCost
+        // but we pass 0 to calculateProductPrice(), so all extraStitchCost values were 0!
+        // Fix: Use primaryAdditionalStitchCost (already calculated correctly) × garmentQuantity
+        // Caps have fixed 8K stitches - no extra stitch charge for caps
+        let garmentStitchTotal = primaryAdditionalStitchCost * garmentQuantity;
         let capStitchTotal = 0;
-        for (const product of productPricing) {
-            for (const lineItem of product.lineItems) {
-                if (lineItem.extraStitchCost && lineItem.extraStitchCost > 0) {
-                    const stitchCharge = lineItem.extraStitchCost * lineItem.quantity;
-                    if (product.isCap) {
-                        capStitchTotal += stitchCharge;
-                    } else {
-                        garmentStitchTotal += stitchCharge;
-                    }
-                }
-            }
-        }
         const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
         console.log(`[EmbroideryPricingCalculator] Stitch charges - Garment: $${garmentStitchTotal.toFixed(2)}, Cap: $${capStitchTotal.toFixed(2)}, Total: $${additionalStitchTotal.toFixed(2)}`);
 

@@ -494,11 +494,14 @@ class QuoteViewPage {
                 : `${addlStitches.toLocaleString()} stitches`;
             html += `<div class="emb-detail"><span class="emb-label">Additional Logo:</span> <span class="emb-value">${addlText}</span></div>`;
         }
-        // Cap embroidery info (if present)
+        // Cap embroidery info (only show if there are actual caps in the quote)
+        // Bug fix 2026-01-15: Previously showed cap info even for garment-only quotes
+        // because CapStitchCount defaults to 8000. Now we check ALCapQty first.
+        const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
         const capLocation = this.quoteData?.CapPrintLocation || '';
         const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
         const capDigitizing = this.quoteData?.CapDigitizingFee || 0;
-        if (capLocation || capStitches > 0) {
+        if (capQty > 0 && (capLocation || capStitches > 0)) {
             const capText = capLocation
                 ? `${this.escapeHtml(capLocation)} (${capStitches.toLocaleString()} stitches)`
                 : `${capStitches.toLocaleString()} stitches`;
@@ -521,14 +524,33 @@ class QuoteViewPage {
 
         // CHANGED 2026-01-14: Split stitch charges by garment/cap per ShopWorks naming standard
         // AS-GARM = Additional Stitches in Garment Logo, AS-CAP = Additional Stitches in Cap Logo
+        // CHANGED 2026-01-15: Display per-item breakdown instead of flat fee for transparency
         const garmentStitchCharge = parseFloat(this.quoteData?.GarmentStitchCharge) || 0;
         const capStitchCharge = parseFloat(this.quoteData?.CapStitchCharge) || 0;
+        const stitchGarmentQty = parseInt(this.quoteData?.ALGarmentQty) || 1;
+        const stitchCapQty = parseInt(this.quoteData?.ALCapQty) || 1;
 
         if (garmentStitchCharge > 0) {
-            html += this.renderFeeRow('AS-GARM', 'Additional Stitches in Garment Logo', 1, garmentStitchCharge, garmentStitchCharge);
+            // Show per-shirt breakdown: qty × unit price = total
+            const stitchUnitPrice = stitchGarmentQty > 0 ? garmentStitchCharge / stitchGarmentQty : garmentStitchCharge;
+            // Calculate extra stitch count for description (stitches above 8K base)
+            const totalStitches = parseInt(this.quoteData?.StitchCount) || 8000;
+            const extraStitchesK = Math.round((totalStitches - 8000) / 1000);
+            const stitchDesc = extraStitchesK > 0
+                ? `Additional Stitches (+${extraStitchesK}K)`
+                : 'Additional Stitches in Garment Logo';
+            html += this.renderFeeRow('AS-GARM', stitchDesc, stitchGarmentQty, stitchUnitPrice, garmentStitchCharge);
         }
         if (capStitchCharge > 0) {
-            html += this.renderFeeRow('AS-CAP', 'Additional Stitches in Cap Logo', 1, capStitchCharge, capStitchCharge);
+            // Show per-cap breakdown: qty × unit price = total
+            const capStitchUnitPrice = stitchCapQty > 0 ? capStitchCharge / stitchCapQty : capStitchCharge;
+            // Calculate extra stitch count for description (stitches above 8K base)
+            const capTotalStitches = parseInt(this.quoteData?.CapStitchCount) || 8000;
+            const capExtraStitchesK = Math.round((capTotalStitches - 8000) / 1000);
+            const capStitchDesc = capExtraStitchesK > 0
+                ? `Additional Stitches (+${capExtraStitchesK}K)`
+                : 'Additional Stitches in Cap Logo';
+            html += this.renderFeeRow('AS-CAP', capStitchDesc, stitchCapQty, capStitchUnitPrice, capStitchCharge);
         }
 
         // 1. AL Garment Charge (Additional Logo on garments) - ShopWorks SKU: AL-GARM
@@ -536,7 +558,13 @@ class QuoteViewPage {
         const garmentQty = parseInt(this.quoteData?.ALGarmentQty) || 0;
         if (alGarmentCharge > 0 && garmentQty > 0) {
             const unitPrice = parseFloat(this.quoteData?.ALGarmentUnitPrice) || (alGarmentCharge / garmentQty);
-            html += this.renderFeeRow('AL-GARM', 'Additional Logo - Garments', garmentQty, unitPrice, alGarmentCharge);
+            // Show stitch count for additional logo (from AdditionalStitchCount field)
+            const alStitchCount = parseInt(this.quoteData?.AdditionalStitchCount) || 8000;
+            const alStitchK = Math.round(alStitchCount / 1000);
+            const alDesc = alStitchK > 0
+                ? `Additional Logo (${alStitchK}K stitches)`
+                : 'Additional Logo - Garments';
+            html += this.renderFeeRow('AL-GARM', alDesc, garmentQty, unitPrice, alGarmentCharge);
         }
 
         // 2. Cap Back Embroidery (Additional Logo on caps) - ShopWorks SKU: CB
@@ -544,7 +572,13 @@ class QuoteViewPage {
         const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
         if (alCapCharge > 0 && capQty > 0) {
             const unitPrice = parseFloat(this.quoteData?.ALCapUnitPrice) || (alCapCharge / capQty);
-            html += this.renderFeeRow('CB', 'Cap Back Embroidery', capQty, unitPrice, alCapCharge);
+            // Show stitch count for cap back embroidery
+            const cbStitchCount = parseInt(this.quoteData?.CapStitchCount) || 8000;
+            const cbStitchK = Math.round(cbStitchCount / 1000);
+            const cbDesc = cbStitchK > 0
+                ? `Cap Back Embroidery (${cbStitchK}K stitches)`
+                : 'Cap Back Embroidery';
+            html += this.renderFeeRow('CB', cbDesc, capQty, unitPrice, alCapCharge);
         }
 
         // 3. Digitizing Setup Garments - ShopWorks SKU: DD
@@ -591,19 +625,17 @@ class QuoteViewPage {
         // NOTE: Sample Fee removed from UI per user request (2026-01-14)
 
         // 8. Less than minimum fee garments - ShopWorks SKU: LTM
+        // Display as flat fee (qty=1) per user request - not distributed per-piece
         const ltmGarment = parseFloat(this.quoteData?.LTM_Garment) || 0;
-        const garmentQtyLTM = parseInt(this.quoteData?.ALGarmentQty) || parseInt(this.quoteData?.TotalQuantity) || 0;
-        if (ltmGarment > 0 && garmentQtyLTM > 0) {
-            const ltmGarmentUnit = ltmGarment / garmentQtyLTM;
-            html += this.renderFeeRow('LTM', 'Less than minimum fee garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
+        if (ltmGarment > 0) {
+            html += this.renderFeeRow('LTM', 'Less than minimum fee garments', 1, ltmGarment, ltmGarment);
         }
 
         // 9. Less than minimum fee Caps - ShopWorks SKU: LTM-CAP
+        // Display as flat fee (qty=1) per user request - not distributed per-piece
         const ltmCap = parseFloat(this.quoteData?.LTM_Cap) || 0;
-        const capQtyLTM = parseInt(this.quoteData?.ALCapQty) || 0;
-        if (ltmCap > 0 && capQtyLTM > 0) {
-            const ltmCapUnit = ltmCap / capQtyLTM;
-            html += this.renderFeeRow('LTM-CAP', 'Less than minimum fee Caps', capQtyLTM, ltmCapUnit, ltmCap);
+        if (ltmCap > 0) {
+            html += this.renderFeeRow('LTM-CAP', 'Less than minimum fee Caps', 1, ltmCap, ltmCap);
         }
 
         // 10. Discount (negative line item) - ShopWorks SKU: DISCOUNT
@@ -1708,14 +1740,16 @@ class QuoteViewPage {
                 const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
                 const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
                 const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
-                // Cap embroidery details
+                // Cap embroidery details (only show if there are actual caps in the quote)
+                // Bug fix 2026-01-15: Check ALCapQty to prevent showing cap info for garment-only quotes
+                const capQtyPdf = parseInt(this.quoteData?.ALCapQty) || 0;
                 const capLocation = this.quoteData?.CapPrintLocation || '';
                 const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
                 const capDigitizing = parseFloat(this.quoteData?.CapDigitizingFee) || 0;
 
                 // Calculate box height: base 22mm, add 6mm for each extra row
                 const hasAddlLogo = addlLocation || addlStitches > 0;
-                const hasCapLogo = capLocation || capStitches > 0;
+                const hasCapLogo = capQtyPdf > 0 && (capLocation || capStitches > 0);
                 let boxHeight = 22;
                 if (hasAddlLogo) boxHeight += 6;
                 if (hasCapLogo) boxHeight += 6;
@@ -2029,19 +2063,17 @@ class QuoteViewPage {
         // NOTE: Sample Fee removed from UI per user request (2026-01-14)
 
         // 8. Less than minimum fee garments (ShopWorks SKU: LTM)
+        // Display as flat fee (qty=1) per user request - not distributed per-piece
         const ltmGarment = parseFloat(this.quoteData?.LTM_Garment) || 0;
-        const garmentQtyLTM = parseInt(this.quoteData?.ALGarmentQty) || totalQty || 0;
-        if (ltmGarment > 0 && garmentQtyLTM > 0) {
-            const ltmGarmentUnit = ltmGarment / garmentQtyLTM;
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM', 'Less than minimum fee garments', garmentQtyLTM, ltmGarmentUnit, ltmGarment);
+        if (ltmGarment > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM', 'Less than minimum fee garments', 1, ltmGarment, ltmGarment);
         }
 
         // 9. Less than minimum fee Caps (ShopWorks SKU: LTM-CAP)
+        // Display as flat fee (qty=1) per user request - not distributed per-piece
         const ltmCap = parseFloat(this.quoteData?.LTM_Cap) || 0;
-        const capQtyLTM = parseInt(this.quoteData?.ALCapQty) || 0;
-        if (ltmCap > 0 && capQtyLTM > 0) {
-            const ltmCapUnit = ltmCap / capQtyLTM;
-            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-CAP', 'Less than minimum fee Caps', capQtyLTM, ltmCapUnit, ltmCap);
+        if (ltmCap > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'LTM-CAP', 'Less than minimum fee Caps', 1, ltmCap, ltmCap);
         }
 
         // 10. Discount (ShopWorks SKU: DISCOUNT)

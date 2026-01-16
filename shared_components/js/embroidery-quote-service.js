@@ -149,9 +149,9 @@ class EmbroideryQuoteService {
                 Phone: customerData.phone || '',
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
-                TotalQuantity: pricingResults.totalQuantity,
-                SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
-                LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
+                TotalQuantity: pricingResults.totalQuantity || 0,
+                SubtotalAmount: parseFloat((pricingResults.subtotal || 0).toFixed(2)),
+                LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),
                 // TotalAmount includes ALL fees: grandTotal + Art + GraphicDesign + Rush + Sample - Discount
                 // (2026-01-14 fix: Art/Rush/Sample/Discount were missing from TotalAmount)
                 TotalAmount: parseFloat((
@@ -171,7 +171,8 @@ class EmbroideryQuoteService {
                 StitchCount: primaryLogo?.stitchCount || 8000,
                 DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
-                AdditionalStitchCount: additionalLogo?.stitchCount || 0,
+                // Get additional logo stitch count from additionalServices (not logos array)
+                AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
                 // Cap embroidery details
                 CapPrintLocation: capPrimaryLogo?.position || '',
                 CapStitchCount: capPrimaryLogo?.stitchCount || 0,
@@ -226,7 +227,7 @@ class EmbroideryQuoteService {
                 DiscountPercent: parseFloat(customerData.discountPercent) || 0,
                 DiscountReason: customerData.discountReason || ''
             };
-            
+
             // Save session
             const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
@@ -819,9 +820,9 @@ class EmbroideryQuoteService {
                 Phone: customerData.phone || '',
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
-                TotalQuantity: pricingResults.totalQuantity,
-                SubtotalAmount: parseFloat(pricingResults.subtotal.toFixed(2)),
-                LTMFeeTotal: parseFloat(pricingResults.ltmFee.toFixed(2)),
+                TotalQuantity: pricingResults.totalQuantity || 0,
+                SubtotalAmount: parseFloat((pricingResults.subtotal || 0).toFixed(2)),
+                LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),
                 TotalAmount: parseFloat((
                     pricingResults.grandTotal +
                     (customerData.artCharge || 0) +
@@ -836,7 +837,8 @@ class EmbroideryQuoteService {
                 StitchCount: primaryLogo?.stitchCount || 8000,
                 DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
-                AdditionalStitchCount: additionalLogo?.stitchCount || 0,
+                // Get additional logo stitch count from additionalServices (not logos array)
+                AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
                 CapPrintLocation: capPrimaryLogo?.position || '',
                 CapStitchCount: capPrimaryLogo?.stitchCount || 0,
                 CapDigitizingFee: capPrimaryLogo?.needsDigitizing ? 100 : 0,

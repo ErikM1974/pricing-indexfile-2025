@@ -789,8 +789,12 @@
             checkbox.checked = !checkbox.checked;
             element.classList.toggle('checked', checkbox.checked);
 
-            // Update capPrimaryLogo.needsSetup if this is the laser patch setup checkbox
-            if (checkboxId === 'cap-patch-setup') {
+            // Update the corresponding logo object based on checkbox ID
+            if (checkboxId === 'primary-digitizing') {
+                primaryLogo.needsDigitizing = checkbox.checked;
+            } else if (checkboxId === 'cap-primary-digitizing') {
+                capPrimaryLogo.needsDigitizing = checkbox.checked;
+            } else if (checkboxId === 'cap-patch-setup') {
                 capPrimaryLogo.needsSetup = checkbox.checked;
             }
 
