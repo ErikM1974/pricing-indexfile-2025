@@ -1,0 +1,763 @@
+/* =====================================================
+   COMMISSION STRUCTURE DASHBOARD STYLES
+   Matches NWCA Staff Dashboard Theme (WSU Crimson)
+   ===================================================== */
+
+/* =====================================================
+   PAGE LAYOUT
+   ===================================================== */
+.commission-page {
+    min-height: 100vh;
+    background: #f7f8f9;
+}
+
+/* Header */
+.commission-header {
+    background: #981e32;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-logo {
+    height: 50px;
+    width: auto;
+}
+
+.header-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Main Content Container */
+.commission-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* =====================================================
+   SECTION HEADERS
+   ===================================================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header i {
+    color: #981e32;
+    font-size: 1.25rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2a3033;
+    margin: 0;
+}
+
+/* =====================================================
+   RATE CARDS - Commission Types
+   ===================================================== */
+.rate-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.rate-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e5e8;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.rate-card-header {
+    margin-bottom: 1.5rem;
+}
+
+.rate-card-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #53565a;
+    margin-bottom: 0.5rem;
+}
+
+.rate-card-type {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #8d959c;
+}
+
+.rate-value {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #981e32;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.rate-period {
+    font-size: 0.875rem;
+    color: #53565a;
+    margin-bottom: 1.5rem;
+}
+
+.rate-bonus {
+    background: #fff3cd;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #856404;
+    margin-top: 1rem;
+}
+
+.rate-bonus i {
+    margin-right: 0.5rem;
+}
+
+.rate-requirement {
+    background: #e8f4fd;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #1e4a8b;
+    margin-top: 1rem;
+}
+
+.rate-requirement i {
+    margin-right: 0.5rem;
+}
+
+/* =====================================================
+   REP ASSIGNMENT CARDS
+   ===================================================== */
+.rep-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.rep-card {
+    background: white;
+    border-left: 4px solid #981e32;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.rep-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e1e5e8;
+}
+
+.rep-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2a3033;
+    margin: 0 0 0.25rem 0;
+}
+
+.rep-account-count {
+    font-size: 0.875rem;
+    color: #53565a;
+}
+
+.rep-badge {
+    background: #981e32;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.rep-baseline {
+    background: #fff3cd;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.baseline-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.baseline-row:last-child {
+    margin-bottom: 0;
+}
+
+.baseline-label {
+    font-size: 0.875rem;
+    color: #856404;
+    font-weight: 500;
+}
+
+.baseline-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #5c4503;
+}
+
+.rep-accounts-section {
+    margin-top: 1rem;
+}
+
+.accounts-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #53565a;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.accounts-header i {
+    color: #981e32;
+}
+
+.account-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.account-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f1f3;
+    font-size: 0.875rem;
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+.account-name {
+    color: #2a3033;
+}
+
+.account-revenue {
+    font-weight: 600;
+    color: #10b981;
+}
+
+/* =====================================================
+   HOW IT WORKS SECTION
+   ===================================================== */
+.how-it-works {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 3rem;
+    overflow: hidden;
+}
+
+.how-it-works-header {
+    background: #f8f9fa;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e1e5e8;
+}
+
+.how-it-works-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2a3033;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.how-it-works-header i {
+    color: #981e32;
+}
+
+.accordion {
+    border: none;
+}
+
+.accordion-item {
+    border: none;
+    border-bottom: 1px solid #e1e5e8;
+}
+
+.accordion-item:last-child {
+    border-bottom: none;
+}
+
+.accordion-header {
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    transition: background 0.2s;
+}
+
+.accordion-header:hover {
+    background: #f8f9fa;
+}
+
+.accordion-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2a3033;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.accordion-title .number {
+    background: #981e32;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.accordion-chevron {
+    color: #8d959c;
+    transition: transform 0.2s;
+}
+
+.accordion-item.open .accordion-chevron {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    display: none;
+    padding: 0 1.5rem 1.5rem 4rem;
+}
+
+.accordion-item.open .accordion-content {
+    display: block;
+}
+
+.accordion-content p {
+    color: #53565a;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+}
+
+.accordion-content p:last-child {
+    margin-bottom: 0;
+}
+
+.accordion-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0;
+}
+
+.accordion-content li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: #53565a;
+    font-size: 0.9375rem;
+}
+
+.accordion-content li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.9rem;
+    width: 6px;
+    height: 6px;
+    background: #981e32;
+    border-radius: 50%;
+}
+
+.highlight-box {
+    background: #e8f4fd;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+    margin-top: 1rem;
+}
+
+.highlight-box p {
+    margin: 0;
+    color: #1e4a8b;
+    font-weight: 500;
+}
+
+/* =====================================================
+   INFO TABLES (Inside Accordions)
+   ===================================================== */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.info-table th {
+    background: #f3f4f6;
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.info-table td {
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+}
+
+.info-table tr:last-child td {
+    border-bottom: none;
+}
+
+.info-table tr:hover {
+    background: #f9fafb;
+}
+
+/* =====================================================
+   TIMELINE BOX
+   ===================================================== */
+.timeline-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed #d1d5db;
+}
+
+.timeline-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.timeline-item:first-child {
+    padding-top: 0;
+}
+
+.timeline-label {
+    font-weight: 600;
+    color: #981e32;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.timeline-text {
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   EXAMPLE BOXES
+   ===================================================== */
+.example-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.example-header {
+    background: #981e32;
+    color: white;
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.example-content {
+    padding: 1rem;
+}
+
+.example-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.375rem 0;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.example-row:last-of-type {
+    border-bottom: none;
+}
+
+.example-row span:first-child {
+    color: #6b7280;
+}
+
+.example-row span:last-child {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.example-row.total {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 2px solid #d1d5db;
+    border-bottom: none;
+}
+
+.example-row.total span:first-child {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.example-row.total span:last-child {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 1rem;
+}
+
+.example-note {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed #d1d5db;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* =====================================================
+   EXAMPLE SCENARIOS (Optional Enhancement)
+   ===================================================== */
+.scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.scenario-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.scenario-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e1e5e8;
+}
+
+.scenario-icon {
+    width: 40px;
+    height: 40px;
+    background: #e8f4fd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+}
+
+.scenario-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2a3033;
+    margin: 0;
+}
+
+.scenario-content {
+    color: #53565a;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.scenario-calculation {
+    background: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #2a3033;
+}
+
+.scenario-result {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #d1fae5;
+    border-radius: 6px;
+    color: #065f46;
+    font-weight: 600;
+}
+
+.scenario-result.no-pay {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* =====================================================
+   FOOTER NOTE
+   ===================================================== */
+.footer-note {
+    text-align: center;
+    padding: 2rem;
+    color: #8d959c;
+    font-size: 0.875rem;
+}
+
+.footer-note i {
+    margin-right: 0.5rem;
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+   ===================================================== */
+@media (max-width: 1024px) {
+    .rate-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .rep-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scenarios-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .commission-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .header-left {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-title {
+        font-size: 1.25rem;
+    }
+
+    .commission-content {
+        padding: 1rem;
+    }
+
+    .rate-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rate-value {
+        font-size: 3rem;
+    }
+
+    .rep-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .accordion-content {
+        padding-left: 1.5rem;
+    }
+}
+
+/* =====================================================
+   PRINT STYLES
+   ===================================================== */
+@media print {
+    .commission-header {
+        background: white;
+        color: #2a3033;
+        box-shadow: none;
+        border-bottom: 2px solid #981e32;
+    }
+
+    .header-title {
+        color: #2a3033;
+    }
+
+    .back-btn {
+        display: none;
+    }
+
+    .rate-card,
+    .rep-card,
+    .how-it-works,
+    .scenario-card {
+        box-shadow: none;
+        border: 1px solid #e1e5e8;
+        break-inside: avoid;
+    }
+
+    .accordion-item.open .accordion-content {
+        display: block;
+    }
+}

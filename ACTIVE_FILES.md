@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-12
-**Total Active Files:** ~271 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System)
+**Last Updated:** 2026-01-17
+**Total Active Files:** ~273 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -299,6 +299,8 @@ cap-embroidery-fix.css
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | Art hub | Multiple | ✅ Active |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
+| `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
+| `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
 
 ### Staff Dashboard V2 Files (2025-12-31 Redesign)
 | File | Purpose | Status |
@@ -370,7 +372,7 @@ cap-embroidery-fix.css
 - **CSS Files:** ~62
 - **Active Calculators:** 15
 - **Active Quote Builders:** 5
-- **Active Dashboards:** 8 (includes new staff-dashboard-v2)
+- **Active Dashboards:** 9 (includes staff-dashboard-v2, commission-structure)
 
 ### Organization Health
 - **Files in correct folders:** 100%
