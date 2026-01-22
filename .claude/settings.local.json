@@ -54,7 +54,8 @@
       "WebFetch(domain:www.maggieframes.com)",
       "WebFetch(domain:dirtcheapheadwear.com)",
       "WebFetch(domain:localhost)",
-      "WebFetch(domain:trailhead.salesforce.com)"
+      "WebFetch(domain:trailhead.salesforce.com)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": [],

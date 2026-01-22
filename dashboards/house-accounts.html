@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>House Accounts - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Dashboard Styles -->
+    <link href="/dashboards/css/house-accounts.css" rel="stylesheet">
+</head>
+<body>
+    <div class="house-page">
+        <!-- Header -->
+        <header class="house-header">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="header-logo">
+                <h1 class="header-title">House Accounts</h1>
+            </div>
+            <div class="header-right">
+                <a href="/staff-dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="house-content">
+            <!-- Error Banner -->
+            <div class="error-banner" id="error-banner">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="error-banner-message" id="error-message"></span>
+                <button class="error-banner-close" onclick="document.getElementById('error-banner').classList.remove('show')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-value" id="stat-total">-</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-ruthie">-</div>
+                    <div class="stat-label">Ruthie</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-erik">-</div>
+                    <div class="stat-label">Erik</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-web">-</div>
+                    <div class="stat-label">Web</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-jim">-</div>
+                    <div class="stat-label">Jim</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-house">-</div>
+                    <div class="stat-label">House</div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="filter-group search-group">
+                    <label for="filter-search">Search</label>
+                    <input type="text" id="filter-search" placeholder="Search company name...">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-assignee">Assignee</label>
+                    <select id="filter-assignee">
+                        <option value="">All Assignees</option>
+                        <option value="Ruthie">Ruthie</option>
+                        <option value="Erik">Erik</option>
+                        <option value="Web">Web</option>
+                        <option value="Jim">Jim</option>
+                        <option value="House">House</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button class="clear-filters-btn" id="clear-filters-btn">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+
+            <!-- Accounts Section -->
+            <div class="accounts-section">
+                <div class="accounts-header">
+                    <h2><i class="fas fa-home"></i> Accounts</h2>
+                    <span class="accounts-count" id="accounts-count">0 accounts</span>
+                </div>
+
+                <!-- Loading Overlay -->
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                </div>
+
+                <!-- Accounts Grid -->
+                <div class="accounts-grid" id="accounts-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No Accounts Found</h3>
+                    <p>Try adjusting your filters or search criteria</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="confirm-modal">
+            <div class="modal-header">
+                <h2 id="confirm-title">Assign Account</h2>
+                <button class="modal-close" id="confirm-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Are you sure you want to assign this account?</p>
+                <div class="account-preview" id="confirm-account-preview"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="confirm-cancel">Cancel</button>
+                <button class="btn-save" id="confirm-submit">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Toast (for success messages) -->
+    <div class="celebration-toast" id="celebration-toast"></div>
+
+    <!-- Configuration -->
+    <script src="/config/app.config.js"></script>
+
+    <!-- Dashboard JavaScript -->
+    <script src="/dashboards/js/house-accounts.js"></script>
+</body>
+</html>

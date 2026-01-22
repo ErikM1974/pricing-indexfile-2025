@@ -1,21 +1,39 @@
 /**
- * Taneisha CRM Dashboard
- * Service class and controller for account management
+ * Rep CRM Dashboard (Config-Driven)
+ * Shared service class and controller for account management
+ *
+ * Usage: Set window.REP_CONFIG before loading this script
+ *
+ * window.REP_CONFIG = {
+ *     repName: 'Taneisha',
+ *     apiEndpoint: '/api/taneisha-accounts',
+ *     archiveEndpoint: '/api/taneisha/daily-sales-by-account'
+ * };
  *
  * Features:
  * - Account list with filters
- * - CRM modal for contact logging
- * - Today's Call List with sequential calling mode
- * - Gamification: streaks, bounty tracker, smart suggestions
  * - Sales sync integration
+ * - Reconcile accounts
+ * - Sales breakdown by tier
  */
 
 // ============================================================
 // SERVICE CLASS
 // ============================================================
 
-class TaneishaCRMService {
+class RepCRMService {
     constructor() {
+        // Read config from window.REP_CONFIG or use defaults
+        const config = window.REP_CONFIG || {
+            repName: 'Taneisha',
+            apiEndpoint: '/api/taneisha-accounts',
+            archiveEndpoint: '/api/taneisha/daily-sales-by-account'
+        };
+
+        this.repName = config.repName;
+        this.apiEndpoint = config.apiEndpoint;
+        this.archiveEndpoint = config.archiveEndpoint;
+
         // Use APP_CONFIG if available, otherwise fallback
         this.baseURL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API.BASE_URL)
             ? APP_CONFIG.API.BASE_URL
@@ -49,7 +67,7 @@ class TaneishaCRMService {
         if (filters.overdue) params.append('overdue', '1');
         if (filters.search) params.append('search', filters.search);
 
-        const url = `${this.baseURL}/api/taneisha-accounts${params.toString() ? '?' + params.toString() : ''}`;
+        const url = `${this.baseURL}${this.apiEndpoint}${params.toString() ? '?' + params.toString() : ''}`;
 
         const response = await fetch(url);
 
@@ -60,12 +78,6 @@ class TaneishaCRMService {
         const data = await response.json();
         this.accounts = data.Result || data.accounts || data || [];
 
-        // Debug: Log first account structure to verify field names
-        if (this.accounts.length > 0) {
-            console.log('[TaneishaCRM] Sample account fields:', Object.keys(this.accounts[0]));
-            console.log('[TaneishaCRM] First account:', this.accounts[0]);
-        }
-
         return this.accounts;
     }
 
@@ -73,7 +85,7 @@ class TaneishaCRMService {
      * Fetch a single account by ID
      */
     async fetchAccountById(id) {
-        const response = await fetch(`${this.baseURL}/api/taneisha-accounts/${id}`);
+        const response = await fetch(`${this.baseURL}${this.apiEndpoint}/${id}`);
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -86,32 +98,10 @@ class TaneishaCRMService {
     }
 
     /**
-     * Update CRM fields for an account
-     */
-    async updateCRMFields(id, crmData) {
-        const response = await fetch(`${this.baseURL}/api/taneisha-accounts/${id}/crm`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(crmData)
-        });
-
-        if (!response.ok) {
-            throw new Error(`API returned ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-    }
-
-    /**
      * Sync sales from ManageOrders (uses HYBRID pattern: Archive + Fresh = True YTD)
-     * This endpoint now automatically:
-     * 1. Fetches archived YTD totals from Caspio
-     * 2. Fetches fresh ManageOrders data (last 60 days)
-     * 3. Combines for true YTD totals
-     * 4. Archives days 55-60 before they expire
      */
     async syncSales() {
-        const response = await fetch(`${this.baseURL}/api/taneisha-accounts/sync-sales`, {
+        const response = await fetch(`${this.baseURL}${this.apiEndpoint}/sync-sales`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -130,8 +120,8 @@ class TaneishaCRMService {
      */
     async reconcileAccounts(autoAdd = false) {
         const url = autoAdd
-            ? `${this.baseURL}/api/taneisha-accounts/reconcile?autoAdd=true`
-            : `${this.baseURL}/api/taneisha-accounts/reconcile`;
+            ? `${this.baseURL}${this.apiEndpoint}/reconcile?autoAdd=true`
+            : `${this.baseURL}${this.apiEndpoint}/reconcile`;
 
         const response = await fetch(url);
 
@@ -148,17 +138,12 @@ class TaneishaCRMService {
 
     /**
      * Fetch YTD per-customer totals from Caspio archive
-     * Used to display archive status or debug YTD calculations
-     * @param {number} year - Year to fetch (defaults to current year)
-     * @returns {Promise<{year, customers, lastArchivedDate, totalRevenue, totalOrders}>}
      */
     async fetchYTDPerCustomerFromArchive(year = new Date().getFullYear()) {
-        const response = await fetch(`${this.baseURL}/api/taneisha/daily-sales-by-account/ytd?year=${year}`);
+        const response = await fetch(`${this.baseURL}${this.archiveEndpoint}/ytd?year=${year}`);
 
         if (!response.ok) {
-            // Archive table may not exist yet - return empty data
             if (response.status === 404) {
-                console.warn('[TaneishaCRM] Archive table not found - YTD will use fresh data only');
                 return { year, customers: [], lastArchivedDate: null, totalRevenue: 0, totalOrders: 0 };
             }
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -169,18 +154,14 @@ class TaneishaCRMService {
 
     /**
      * Fetch archived daily sales for a date range
-     * @param {string} startDate - Start date (YYYY-MM-DD)
-     * @param {string} endDate - End date (YYYY-MM-DD)
-     * @returns {Promise<{days, summary}>}
      */
     async fetchArchivedSalesByCustomer(startDate, endDate) {
         const response = await fetch(
-            `${this.baseURL}/api/taneisha/daily-sales-by-account?start=${startDate}&end=${endDate}`
+            `${this.baseURL}${this.archiveEndpoint}?start=${startDate}&end=${endDate}`
         );
 
         if (!response.ok) {
             if (response.status === 404) {
-                console.warn('[TaneishaCRM] Archive table not found');
                 return { days: [], summary: { customers: [], totalRevenue: 0, totalOrders: 0 } };
             }
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -190,30 +171,7 @@ class TaneishaCRMService {
     }
 
     /**
-     * Archive a single day's per-customer sales to Caspio
-     * Note: This is typically done automatically by syncSales(), but available for manual use
-     * @param {string} date - Date in YYYY-MM-DD format
-     * @param {Array} customers - Array of { customerId, customerName, revenue, orderCount }
-     * @returns {Promise<{success, date, customersArchived}>}
-     */
-    async archivePerCustomerDailySales(date, customers) {
-        const response = await fetch(`${this.baseURL}/api/taneisha/daily-sales-by-account`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date, customers })
-        });
-
-        if (!response.ok) {
-            throw new Error(`API returned ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-    }
-
-    /**
      * Get archive status info
-     * Useful for displaying how much data is archived vs fresh
-     * @returns {Promise<{year, archivedDays, lastArchivedDate, customerCount}>}
      */
     async getArchiveStatus() {
         try {
@@ -226,7 +184,6 @@ class TaneishaCRMService {
                 totalArchivedOrders: ytdData.totalOrders
             };
         } catch (error) {
-            console.warn('[TaneishaCRM] Could not get archive status:', error.message);
             return {
                 year: new Date().getFullYear(),
                 customerCount: 0,
@@ -252,13 +209,11 @@ class TaneishaCRMService {
             atRisk: 0,
             overdue: 0,
             ytdRevenue: 0,
-            // Per-tier revenue
             goldRevenue: 0,
             silverRevenue: 0,
             bronzeRevenue: 0,
             winBackRevenue: 0,
             unclassifiedRevenue: 0,
-            // Bonus (5% of Win-Back sales)
             winBackBonus: 0,
             bountyEarned: 0,
             bountyPotential: 0
@@ -270,7 +225,6 @@ class TaneishaCRMService {
         this.accounts.forEach(account => {
             stats.total++;
 
-            // Tier counts AND revenue
             const tier = (account.Account_Tier || '').toUpperCase();
             const ytdSales = parseFloat(account.YTD_Sales_2026) || 0;
 
@@ -289,31 +243,25 @@ class TaneishaCRMService {
                 stats.winBack++;
                 stats.winBackRevenue += ytdSales;
 
-                // 5% bonus on Win-Back sales (only if won back)
                 if (account.Won_Back_Date) {
                     stats.winBackBonus += ytdSales * 0.05;
                 }
 
-                // Calculate potential bounty (5% of avg annual profit)
                 const avgProfit = parseFloat(account.Avg_Annual_Profit) || 0;
                 stats.bountyPotential += avgProfit * 0.05;
 
-                // If won back, calculate earned bounty from sales since won back date
                 if (account.Won_Back_Date) {
                     stats.bountyEarned += ytdSales * 0.05;
                 }
             } else {
-                // Unclassified: empty, null, or unrecognized tier values
                 stats.unclassified++;
                 stats.unclassifiedRevenue += ytdSales;
             }
 
-            // At Risk flag
             if (account.At_Risk === true || account.At_Risk === 'true' || account.At_Risk === 1) {
                 stats.atRisk++;
             }
 
-            // Overdue check (Next_Follow_Up in the past)
             if (account.Next_Follow_Up) {
                 const followUpDate = new Date(account.Next_Follow_Up);
                 followUpDate.setHours(0, 0, 0, 0);
@@ -327,195 +275,10 @@ class TaneishaCRMService {
     }
 
     /**
-     * Get today's call list
-     * Includes: scheduled follow-ups for today, overdue, and accounts in current month
-     */
-    getTodaysCallList() {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const currentMonth = today.toLocaleString('en-US', { month: 'short' }).toLowerCase();
-
-        const callList = {
-            scheduled: [],
-            overdue: [],
-            monthMatch: [],
-            all: []
-        };
-
-        this.accounts.forEach(account => {
-            let reason = null;
-
-            // Check if scheduled for today
-            if (account.Next_Follow_Up) {
-                const followUpDate = new Date(account.Next_Follow_Up);
-                followUpDate.setHours(0, 0, 0, 0);
-
-                if (followUpDate.getTime() === today.getTime()) {
-                    reason = 'scheduled';
-                    callList.scheduled.push({ ...account, callReason: reason });
-                } else if (followUpDate < today) {
-                    reason = 'overdue';
-                    callList.overdue.push({ ...account, callReason: reason });
-                }
-            }
-
-            // Check if primary month matches current month and not already contacted
-            if (!reason && account.Primary_Month) {
-                const primaryMonth = account.Primary_Month.toLowerCase().substring(0, 3);
-                if (primaryMonth === currentMonth && !this.wasContactedThisMonth(account)) {
-                    reason = 'month';
-                    callList.monthMatch.push({ ...account, callReason: reason });
-                }
-            }
-        });
-
-        // Combine all lists with priority: scheduled > overdue > month
-        callList.all = [
-            ...callList.scheduled,
-            ...callList.overdue,
-            ...callList.monthMatch
-        ];
-
-        return callList;
-    }
-
-    /**
-     * Check if account was contacted this month
-     */
-    wasContactedThisMonth(account) {
-        if (!account.Last_Contact_Date) return false;
-
-        const contactDate = new Date(account.Last_Contact_Date);
-        const now = new Date();
-
-        return contactDate.getMonth() === now.getMonth() &&
-               contactDate.getFullYear() === now.getFullYear();
-    }
-
-    /**
-     * Get smart suggestions for calling
-     */
-    getSmartSuggestions(limit = 5) {
-        const suggestions = [];
-        const today = new Date();
-
-        this.accounts.forEach(account => {
-            let score = 0;
-            let reason = '';
-
-            // At Risk accounts get highest priority
-            if (account.At_Risk === true || account.At_Risk === 'true' || account.At_Risk === 1) {
-                score += 100;
-                reason = 'At Risk';
-            }
-
-            // Days since last contact
-            if (account.Last_Contact_Date) {
-                const lastContact = new Date(account.Last_Contact_Date);
-                const daysSince = Math.floor((today - lastContact) / (1000 * 60 * 60 * 24));
-                if (daysSince >= 30) {
-                    score += Math.min(daysSince, 90); // Cap at 90 days
-                    if (!reason) reason = `${daysSince} days ago`;
-                }
-            } else {
-                score += 50; // Never contacted
-                if (!reason) reason = 'Never contacted';
-            }
-
-            // Account value
-            const avgProfit = parseFloat(account.Avg_Annual_Profit) || 0;
-            if (avgProfit >= 5000) {
-                score += 30;
-                if (!reason) reason = `$${(avgProfit / 1000).toFixed(1)}K value`;
-            }
-
-            // Priority tier bonus
-            const priority = (account.Priority_Tier || '').toUpperCase();
-            if (priority === 'A') score += 20;
-            else if (priority === 'B') score += 10;
-
-            if (score > 0) {
-                suggestions.push({
-                    account,
-                    score,
-                    reason,
-                    priority: score >= 100 ? 'high' : score >= 50 ? 'medium' : 'low'
-                });
-            }
-        });
-
-        // Sort by score descending and limit
-        return suggestions
-            .sort((a, b) => b.score - a.score)
-            .slice(0, limit);
-    }
-
-    /**
-     * Get call streak data
-     */
-    getStreakData() {
-        // This would typically come from the backend
-        // For now, we'll calculate from accounts' Last_Contact_Date
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        let callsToday = 0;
-        let callsThisWeek = 0;
-        let streakDays = 0;
-
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay());
-
-        // Count calls for streak calculation
-        const callsByDay = {};
-
-        this.accounts.forEach(account => {
-            if (account.Last_Contact_Date) {
-                const contactDate = new Date(account.Last_Contact_Date);
-                contactDate.setHours(0, 0, 0, 0);
-
-                const dateKey = contactDate.toISOString().split('T')[0];
-                callsByDay[dateKey] = (callsByDay[dateKey] || 0) + 1;
-
-                if (contactDate.getTime() === today.getTime()) {
-                    callsToday++;
-                }
-
-                if (contactDate >= startOfWeek) {
-                    callsThisWeek++;
-                }
-            }
-        });
-
-        // Calculate streak (consecutive days with 5+ calls)
-        let checkDate = new Date(today);
-        while (true) {
-            const dateKey = checkDate.toISOString().split('T')[0];
-            if (callsByDay[dateKey] && callsByDay[dateKey] >= 5) {
-                streakDays++;
-                checkDate.setDate(checkDate.getDate() - 1);
-            } else {
-                break;
-            }
-        }
-
-        return {
-            streakDays,
-            callsToday,
-            callsThisWeek
-        };
-    }
-
-    /**
      * Filter accounts client-side
      */
     filterAccounts(filters) {
         return this.accounts.filter(account => {
-            // Search filter
             if (filters.search) {
                 const searchTerm = filters.search.toLowerCase();
                 const companyName = (account.CompanyName || '').toLowerCase();
@@ -524,22 +287,28 @@ class TaneishaCRMService {
                 }
             }
 
-            // Tier filter
             if (filters.accountTier) {
                 const tier = (account.Account_Tier || '').toUpperCase();
-                if (!tier.includes(filters.accountTier.toUpperCase())) {
+                // Extract tier keyword from filter (e.g., "GOLD '26-TANEISHA" → "GOLD", "Win Back '26 TANEISHA" → "WIN BACK")
+                const filterTier = filters.accountTier.toUpperCase();
+                let tierKeyword = '';
+                if (filterTier.includes('GOLD')) tierKeyword = 'GOLD';
+                else if (filterTier.includes('SILVER')) tierKeyword = 'SILVER';
+                else if (filterTier.includes('BRONZE')) tierKeyword = 'BRONZE';
+                else if (filterTier.includes('WIN BACK')) tierKeyword = 'WIN BACK';
+                else tierKeyword = filterTier; // Fallback to full value
+
+                if (!tier.includes(tierKeyword)) {
                     return false;
                 }
             }
 
-            // Priority filter
             if (filters.priorityTier) {
                 if (account.Priority_Tier !== filters.priorityTier) {
                     return false;
                 }
             }
 
-            // Month filter
             if (filters.month) {
                 const primaryMonth = (account.Primary_Month || '').toLowerCase();
                 if (!primaryMonth.startsWith(filters.month.toLowerCase())) {
@@ -547,7 +316,6 @@ class TaneishaCRMService {
                 }
             }
 
-            // Trend filter
             if (filters.trend) {
                 const trend = (account.Trend || '').toLowerCase();
                 if (!trend.includes(filters.trend.toLowerCase())) {
@@ -555,14 +323,12 @@ class TaneishaCRMService {
                 }
             }
 
-            // At Risk filter
             if (filters.atRisk) {
                 if (account.At_Risk !== true && account.At_Risk !== 'true' && account.At_Risk !== 1) {
                     return false;
                 }
             }
 
-            // Product filters
             if (filters.products && filters.products.length > 0) {
                 const hasProduct = filters.products.some(product => {
                     const field = `Buys_${product}`;
@@ -612,17 +378,15 @@ class TaneishaCRMService {
 // CONTROLLER CLASS
 // ============================================================
 
-class TaneishaCRMController {
+class RepCRMController {
     constructor() {
-        this.service = new TaneishaCRMService();
+        this.service = new RepCRMService();
 
         // DOM elements
         this.elements = {};
 
         // State
         this.filteredAccounts = [];
-        this.callingModeAccounts = [];
-        this.callingModeIndex = 0;
         this.searchDebounceTimer = null;
 
         // Bind methods
@@ -640,8 +404,6 @@ class TaneishaCRMController {
         try {
             await this.loadAccounts();
             this.updateStats();
-            this.updateCallList();
-            this.updateGamification();
             this.renderAccounts();
         } catch (error) {
             this.showError('Unable to load accounts. Please refresh the page or contact support.');
@@ -678,13 +440,6 @@ class TaneishaCRMController {
             unclassifiedRevenue: document.getElementById('unclassified-revenue'),
             unclassifiedCount: document.getElementById('unclassified-count'),
 
-            // Call list
-            callListCount: document.getElementById('call-list-count'),
-            callListScheduled: document.getElementById('call-list-scheduled'),
-            callListOverdue: document.getElementById('call-list-overdue'),
-            callListMonth: document.getElementById('call-list-month'),
-            startCallingBtn: document.getElementById('start-calling-btn'),
-
             // Filters
             searchInput: document.getElementById('filter-search'),
             tierSelect: document.getElementById('filter-tier'),
@@ -704,41 +459,6 @@ class TaneishaCRMController {
             accountsCount: document.getElementById('accounts-count'),
             loadingOverlay: document.getElementById('loading-overlay'),
             emptyState: document.getElementById('empty-state'),
-
-            // Gamification
-            streakNumber: document.getElementById('streak-number'),
-            streakCalls: document.getElementById('streak-calls'),
-            bountyEarned: document.getElementById('bounty-earned'),
-            bountyPotential: document.getElementById('bounty-potential'),
-            bountyWonBack: document.getElementById('bounty-won-back'),
-            bountyProgress: document.getElementById('bounty-progress'),
-            suggestionsList: document.getElementById('suggestions-list'),
-
-            // Modal
-            modalOverlay: document.getElementById('crm-modal-overlay'),
-            modalCompanyName: document.getElementById('modal-company-name'),
-            modalTierBadge: document.getElementById('modal-tier-badge'),
-            modalProductTags: document.getElementById('modal-product-tags'),
-            formContactDate: document.getElementById('form-contact-date'),
-            formContactStatus: document.getElementById('form-contact-status'),
-            formContactNotes: document.getElementById('form-contact-notes'),
-            formFollowUpDate: document.getElementById('form-follow-up-date'),
-            formFollowUpType: document.getElementById('form-follow-up-type'),
-            formWonBackDate: document.getElementById('form-won-back-date'),
-            wonBackGroup: document.getElementById('won-back-group'),
-            saveBtn: document.getElementById('save-btn'),
-            cancelBtn: document.getElementById('cancel-btn'),
-            modalClose: document.getElementById('modal-close'),
-
-            // Calling mode
-            callingModeOverlay: document.getElementById('calling-mode-overlay'),
-            callingModeProgress: document.getElementById('calling-mode-progress'),
-            callingModeCompany: document.getElementById('calling-mode-company'),
-            callingModeContact: document.getElementById('calling-mode-contact'),
-            callingModePhone: document.getElementById('calling-mode-phone'),
-            callingModeLogBtn: document.getElementById('calling-mode-log'),
-            callingModeSkipBtn: document.getElementById('calling-mode-skip'),
-            callingModeExitBtn: document.getElementById('calling-mode-exit'),
 
             // Sync
             syncBtn: document.getElementById('sync-btn'),
@@ -807,50 +527,6 @@ class TaneishaCRMController {
             this.elements.quickCallMonth.addEventListener('click', () => this.toggleQuickFilter('callMonth'));
         }
 
-        // Start calling
-        if (this.elements.startCallingBtn) {
-            this.elements.startCallingBtn.addEventListener('click', () => this.startCallingMode());
-        }
-
-        // Modal events
-        if (this.elements.modalClose) {
-            this.elements.modalClose.addEventListener('click', () => this.closeModal());
-        }
-        if (this.elements.cancelBtn) {
-            this.elements.cancelBtn.addEventListener('click', () => this.closeModal());
-        }
-        if (this.elements.saveBtn) {
-            this.elements.saveBtn.addEventListener('click', () => this.saveCRMData());
-        }
-        if (this.elements.modalOverlay) {
-            this.elements.modalOverlay.addEventListener('click', (e) => {
-                if (e.target === this.elements.modalOverlay) {
-                    this.closeModal();
-                }
-            });
-        }
-
-        // Contact status change (show/hide Won Back Date)
-        if (this.elements.formContactStatus) {
-            this.elements.formContactStatus.addEventListener('change', (e) => {
-                const showWonBack = e.target.value === 'Won Back';
-                if (this.elements.wonBackGroup) {
-                    this.elements.wonBackGroup.style.display = showWonBack ? 'block' : 'none';
-                }
-            });
-        }
-
-        // Calling mode events
-        if (this.elements.callingModeLogBtn) {
-            this.elements.callingModeLogBtn.addEventListener('click', () => this.logCallAndAdvance());
-        }
-        if (this.elements.callingModeSkipBtn) {
-            this.elements.callingModeSkipBtn.addEventListener('click', () => this.skipToNextCall());
-        }
-        if (this.elements.callingModeExitBtn) {
-            this.elements.callingModeExitBtn.addEventListener('click', () => this.exitCallingMode());
-        }
-
         // Sync button
         if (this.elements.syncBtn) {
             this.elements.syncBtn.addEventListener('click', () => this.syncSales());
@@ -880,9 +556,7 @@ class TaneishaCRMController {
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                this.closeModal();
                 this.closeReconcileModal();
-                this.exitCallingMode();
             }
         });
     }
@@ -946,24 +620,20 @@ class TaneishaCRMController {
      * Clear all filters
      */
     clearFilters() {
-        // Reset filter values
         if (this.elements.searchInput) this.elements.searchInput.value = '';
         if (this.elements.tierSelect) this.elements.tierSelect.value = '';
         if (this.elements.prioritySelect) this.elements.prioritySelect.value = '';
         if (this.elements.monthSelect) this.elements.monthSelect.value = '';
         if (this.elements.trendSelect) this.elements.trendSelect.value = '';
 
-        // Clear product toggles
         this.elements.productToggles.forEach(toggle => {
             toggle.classList.remove('active');
         });
 
-        // Clear quick action states
         document.querySelectorAll('.quick-action-btn').forEach(btn => {
             btn.classList.remove('active');
         });
 
-        // Reset service filters
         this.service.filters = {
             search: '',
             accountTier: '',
@@ -995,13 +665,11 @@ class TaneishaCRMController {
 
         const isActive = button.classList.toggle('active');
 
-        // Update filter state
         if (filterType === 'atRisk') {
             this.service.filters.atRisk = isActive;
         } else if (filterType === 'overdue') {
             this.service.filters.overdue = isActive;
         } else if (filterType === 'callMonth') {
-            // Filter by current month
             if (isActive) {
                 const currentMonth = new Date().toLocaleString('en-US', { month: 'short' }).toLowerCase();
                 this.service.filters.month = currentMonth;
@@ -1062,87 +730,6 @@ class TaneishaCRMController {
             this.elements.unclassifiedRevenue.textContent = this.formatCurrency(stats.unclassifiedRevenue);
             this.elements.unclassifiedCount.textContent = `${stats.unclassified} account${stats.unclassified !== 1 ? 's' : ''}`;
         }
-    }
-
-    /**
-     * Update call list panel
-     */
-    updateCallList() {
-        const callList = this.service.getTodaysCallList();
-
-        if (this.elements.callListCount) {
-            this.elements.callListCount.textContent = callList.all.length;
-        }
-        if (this.elements.callListScheduled) {
-            this.elements.callListScheduled.textContent = callList.scheduled.length;
-        }
-        if (this.elements.callListOverdue) {
-            this.elements.callListOverdue.textContent = callList.overdue.length;
-        }
-        if (this.elements.callListMonth) {
-            this.elements.callListMonth.textContent = callList.monthMatch.length;
-        }
-
-        // Store for calling mode
-        this.callingModeAccounts = callList.all;
-    }
-
-    /**
-     * Update gamification sidebar
-     */
-    updateGamification() {
-        // Update streak
-        const streakData = this.service.getStreakData();
-        if (this.elements.streakNumber) {
-            this.elements.streakNumber.textContent = streakData.streakDays;
-        }
-        if (this.elements.streakCalls) {
-            this.elements.streakCalls.textContent = `${streakData.callsThisWeek} calls this week`;
-        }
-
-        // Update bounty tracker
-        const stats = this.service.calculateStats();
-        if (this.elements.bountyEarned) {
-            this.elements.bountyEarned.textContent = this.formatCurrency(stats.bountyEarned);
-        }
-        if (this.elements.bountyPotential) {
-            this.elements.bountyPotential.textContent = this.formatCurrency(stats.bountyPotential);
-        }
-        if (this.elements.bountyProgress) {
-            const percentage = stats.bountyPotential > 0
-                ? (stats.bountyEarned / stats.bountyPotential) * 100
-                : 0;
-            this.elements.bountyProgress.style.width = `${Math.min(percentage, 100)}%`;
-        }
-
-        // Update smart suggestions
-        this.updateSmartSuggestions();
-    }
-
-    /**
-     * Update smart suggestions list
-     */
-    updateSmartSuggestions() {
-        if (!this.elements.suggestionsList) return;
-
-        const suggestions = this.service.getSmartSuggestions(5);
-
-        this.elements.suggestionsList.innerHTML = suggestions.map(suggestion => `
-            <div class="suggestion-item" data-id="${suggestion.account.PK_ID}">
-                <div class="suggestion-priority ${suggestion.priority}"></div>
-                <div class="suggestion-info">
-                    <div class="suggestion-company">${this.escapeHtml(suggestion.account.CompanyName)}</div>
-                    <div class="suggestion-reason">${this.escapeHtml(suggestion.reason)}</div>
-                </div>
-            </div>
-        `).join('');
-
-        // Add click handlers
-        this.elements.suggestionsList.querySelectorAll('.suggestion-item').forEach(item => {
-            item.addEventListener('click', () => {
-                this.openModal(item.dataset.id);
-            });
-        });
     }
 
     /**
@@ -1264,13 +851,6 @@ class TaneishaCRMController {
                 </div>
             `;
         }).join('');
-
-        // Add click handlers to cards
-        this.elements.accountsGrid.querySelectorAll('.account-card').forEach(card => {
-            card.addEventListener('click', () => {
-                this.openModal(card.dataset.id);
-            });
-        });
     }
 
     /**
@@ -1286,253 +866,6 @@ class TaneishaCRMController {
         today.setHours(0, 0, 0, 0);
 
         return followUpDate < today;
-    }
-
-    /**
-     * Open CRM modal for an account
-     */
-    async openModal(accountId) {
-        try {
-            const account = await this.service.fetchAccountById(accountId);
-
-            if (!account) {
-                this.showError('Account not found.');
-                return;
-            }
-
-            // Populate modal
-            if (this.elements.modalCompanyName) {
-                this.elements.modalCompanyName.textContent = account.CompanyName;
-            }
-
-            // Update tier badge
-            if (this.elements.modalTierBadge) {
-                const tierInfo = this.service.getTierInfo(account.Account_Tier);
-                if (tierInfo.label) {
-                    this.elements.modalTierBadge.className = `tier-badge ${tierInfo.class}`;
-                    this.elements.modalTierBadge.textContent = tierInfo.label;
-                    this.elements.modalTierBadge.style.display = 'inline-flex';
-                } else {
-                    this.elements.modalTierBadge.style.display = 'none';
-                }
-            }
-
-            // Update product tags
-            if (this.elements.modalProductTags) {
-                const products = [];
-                if (account.Buys_Carhartt) products.push('Carhartt');
-                if (account.Buys_Jackets) products.push('Jackets');
-                if (account.Buys_Caps) products.push('Caps');
-
-                this.elements.modalProductTags.innerHTML = products.map(p =>
-                    `<span class="product-tag active">${p}</span>`
-                ).join('');
-            }
-
-            // Populate form fields
-            if (this.elements.formContactDate) {
-                this.elements.formContactDate.value = new Date().toISOString().split('T')[0];
-            }
-            if (this.elements.formContactStatus) {
-                this.elements.formContactStatus.value = account.Contact_Status || '';
-            }
-            if (this.elements.formContactNotes) {
-                this.elements.formContactNotes.value = account.Contact_Notes || '';
-            }
-            if (this.elements.formFollowUpDate) {
-                this.elements.formFollowUpDate.value = account.Next_Follow_Up
-                    ? account.Next_Follow_Up.split('T')[0]
-                    : '';
-            }
-            if (this.elements.formFollowUpType) {
-                this.elements.formFollowUpType.value = account.Follow_Up_Type || '';
-            }
-            if (this.elements.formWonBackDate) {
-                this.elements.formWonBackDate.value = account.Won_Back_Date
-                    ? account.Won_Back_Date.split('T')[0]
-                    : '';
-            }
-
-            // Show/hide Won Back date field
-            if (this.elements.wonBackGroup) {
-                this.elements.wonBackGroup.style.display =
-                    account.Contact_Status === 'Won Back' ? 'block' : 'none';
-            }
-
-            // Store account ID for save
-            if (this.elements.saveBtn) {
-                this.elements.saveBtn.dataset.accountId = accountId;
-            }
-
-            // Show modal
-            if (this.elements.modalOverlay) {
-                this.elements.modalOverlay.classList.add('active');
-            }
-
-        } catch (error) {
-            this.showError('Unable to load account details. Please try again.');
-        }
-    }
-
-    /**
-     * Close CRM modal
-     */
-    closeModal() {
-        if (this.elements.modalOverlay) {
-            this.elements.modalOverlay.classList.remove('active');
-        }
-    }
-
-    /**
-     * Save CRM data from modal
-     */
-    async saveCRMData() {
-        const accountId = this.elements.saveBtn?.dataset.accountId;
-        if (!accountId) return;
-
-        const crmData = {
-            Last_Contact_Date: this.elements.formContactDate?.value || null,
-            Contact_Status: this.elements.formContactStatus?.value || null,
-            Contact_Notes: this.elements.formContactNotes?.value || null,
-            Next_Follow_Up: this.elements.formFollowUpDate?.value || null,
-            Follow_Up_Type: this.elements.formFollowUpType?.value || null
-        };
-
-        // Add Won Back Date if status is "Won Back"
-        if (crmData.Contact_Status === 'Won Back' && this.elements.formWonBackDate?.value) {
-            crmData.Won_Back_Date = this.elements.formWonBackDate.value;
-        }
-
-        // Disable save button
-        if (this.elements.saveBtn) {
-            this.elements.saveBtn.disabled = true;
-            this.elements.saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
-        }
-
-        try {
-            await this.service.updateCRMFields(accountId, crmData);
-
-            // Close modal
-            this.closeModal();
-
-            // Show success celebration if Won Back
-            if (crmData.Contact_Status === 'Won Back') {
-                this.showCelebration(`You won back ${this.service.selectedAccount.CompanyName}!`, 'winback');
-            }
-
-            // Reload accounts to refresh data
-            await this.loadAccounts();
-            this.updateStats();
-            this.updateCallList();
-            this.updateGamification();
-            this.applyFilters();
-
-        } catch (error) {
-            this.showError('Failed to save. Please try again.');
-        } finally {
-            if (this.elements.saveBtn) {
-                this.elements.saveBtn.disabled = false;
-                this.elements.saveBtn.innerHTML = 'Save';
-            }
-        }
-    }
-
-    /**
-     * Start sequential calling mode
-     */
-    startCallingMode() {
-        if (this.callingModeAccounts.length === 0) {
-            this.showError('No accounts to call today.');
-            return;
-        }
-
-        this.callingModeIndex = 0;
-        this.showCallingModeAccount();
-
-        if (this.elements.callingModeOverlay) {
-            this.elements.callingModeOverlay.classList.add('active');
-        }
-    }
-
-    /**
-     * Show current account in calling mode
-     */
-    showCallingModeAccount() {
-        const account = this.callingModeAccounts[this.callingModeIndex];
-        if (!account) {
-            this.exitCallingMode();
-            return;
-        }
-
-        if (this.elements.callingModeProgress) {
-            this.elements.callingModeProgress.textContent =
-                `${this.callingModeIndex + 1} of ${this.callingModeAccounts.length}`;
-        }
-        if (this.elements.callingModeCompany) {
-            this.elements.callingModeCompany.textContent = account.CompanyName;
-        }
-        if (this.elements.callingModeContact) {
-            this.elements.callingModeContact.textContent = account.Main_Contact_Name || 'No contact name';
-        }
-        if (this.elements.callingModePhone) {
-            const phone = account.Main_Contact_Phone || 'No phone';
-            this.elements.callingModePhone.innerHTML = account.Main_Contact_Phone
-                ? `<a href="tel:${this.escapeHtml(phone)}">${this.escapeHtml(phone)}</a>`
-                : phone;
-        }
-    }
-
-    /**
-     * Log call and advance to next account
-     */
-    async logCallAndAdvance() {
-        const account = this.callingModeAccounts[this.callingModeIndex];
-        if (!account) return;
-
-        // Quick log as "Called"
-        const crmData = {
-            Last_Contact_Date: new Date().toISOString().split('T')[0],
-            Contact_Status: 'Called'
-        };
-
-        try {
-            await this.service.updateCRMFields(account.PK_ID, crmData);
-        } catch (error) {
-            // Continue even on error
-        }
-
-        this.skipToNextCall();
-    }
-
-    /**
-     * Skip to next account without logging
-     */
-    skipToNextCall() {
-        this.callingModeIndex++;
-
-        if (this.callingModeIndex >= this.callingModeAccounts.length) {
-            this.exitCallingMode();
-            this.showCelebration('All calls completed for today!', 'calls');
-        } else {
-            this.showCallingModeAccount();
-        }
-    }
-
-    /**
-     * Exit calling mode
-     */
-    exitCallingMode() {
-        if (this.elements.callingModeOverlay) {
-            this.elements.callingModeOverlay.classList.remove('active');
-        }
-
-        // Refresh data
-        this.loadAccounts().then(() => {
-            this.updateStats();
-            this.updateCallList();
-            this.updateGamification();
-            this.applyFilters();
-        });
     }
 
     /**
@@ -1564,7 +897,6 @@ class TaneishaCRMController {
             // Reload accounts
             await this.loadAccounts();
             this.updateStats();
-            this.updateGamification();
             this.applyFilters();
 
         } catch (error) {
@@ -1585,7 +917,6 @@ class TaneishaCRMController {
      * Open reconcile modal and fetch missing customers
      */
     async openReconcileModal() {
-        // Show modal with loading state
         if (this.elements.reconcileModalOverlay) {
             this.elements.reconcileModalOverlay.classList.add('active');
         }
@@ -1621,7 +952,6 @@ class TaneishaCRMController {
      * Display reconcile results in the modal
      */
     displayReconcileResults(result) {
-        // Hide loading
         if (this.elements.reconcileLoading) {
             this.elements.reconcileLoading.style.display = 'none';
         }
@@ -1632,7 +962,6 @@ class TaneishaCRMController {
         const missingCustomers = result.missingCustomers || [];
 
         if (missingCustomers.length === 0) {
-            // Show empty state
             if (this.elements.reconcileEmpty) {
                 this.elements.reconcileEmpty.style.display = 'block';
             }
@@ -1651,7 +980,6 @@ class TaneishaCRMController {
             return;
         }
 
-        // Show results
         if (this.elements.reconcileEmpty) {
             this.elements.reconcileEmpty.style.display = 'none';
         }
@@ -1659,7 +987,6 @@ class TaneishaCRMController {
             this.elements.reconcileSummary.style.display = 'flex';
         }
 
-        // Update summary
         if (this.elements.reconcileSummary) {
             const totalSales = missingCustomers.reduce((sum, c) => sum + (parseFloat(c.totalSales) || 0), 0);
             const totalOrders = missingCustomers.reduce((sum, c) => sum + (parseInt(c.orderCount) || 0), 0);
@@ -1680,7 +1007,6 @@ class TaneishaCRMController {
             `;
         }
 
-        // Populate table
         if (this.elements.reconcileTableBody) {
             this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'block';
             this.elements.reconcileTableBody.innerHTML = missingCustomers.map(customer => `
@@ -1693,7 +1019,6 @@ class TaneishaCRMController {
             `).join('');
         }
 
-        // Show footer with Add All button
         if (this.elements.reconcileFooter) {
             this.elements.reconcileFooter.style.display = 'flex';
         }
@@ -1716,11 +1041,9 @@ class TaneishaCRMController {
         try {
             const result = await this.service.reconcileAccounts(true);
 
-            // Show success message
             const addedCount = result.addedCount || result.missingCustomers?.length || 0;
             this.showCelebration(`Added ${addedCount} customers to your account list!`, 'winback');
 
-            // Close modal and reload accounts
             this.closeReconcileModal();
             await this.loadAccounts();
             this.updateStats();
@@ -1758,10 +1081,8 @@ class TaneishaCRMController {
         toast.textContent = message;
         document.body.appendChild(toast);
 
-        // Trigger animation
         setTimeout(() => toast.classList.add('show'), 10);
 
-        // Remove after delay
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
@@ -1808,7 +1129,7 @@ class TaneishaCRMController {
     }
 
     /**
-     * Format days as human-readable duration (e.g., "3y 2m 16d")
+     * Format days as human-readable duration
      */
     formatDuration(totalDays) {
         const days = parseInt(totalDays) || 0;
@@ -1844,6 +1165,6 @@ class TaneishaCRMController {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.crmController = new TaneishaCRMController();
+    window.crmController = new RepCRMController();
     window.crmController.init();
 });

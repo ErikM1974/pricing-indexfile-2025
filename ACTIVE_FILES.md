@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-21
-**Total Active Files:** ~278 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Taneisha CRM Dashboard)
+**Last Updated:** 2026-01-22
+**Total Active Files:** ~285 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -301,11 +301,19 @@ cap-embroidery-fix.css
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
 | `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
-| `/dashboards/taneisha-crm.html` | **NEW** Taneisha's Account CRM dashboard | taneisha-crm.js, taneisha-crm.css | ✅ Active |
-| `/dashboards/taneisha-calendar.html` | **NEW** Follow-up calendar for CRM | taneisha-calendar.js, taneisha-crm.css | ✅ Active |
-| `/dashboards/css/taneisha-crm.css` | **NEW** CRM dashboard styles (WSU Crimson theme) | - | ✅ Active |
-| `/dashboards/js/taneisha-crm.js` | **NEW** CRM service class and controller | APP_CONFIG | ✅ Active |
-| `/dashboards/js/taneisha-calendar.js` | **NEW** Calendar rendering logic | APP_CONFIG | ✅ Active |
+| `/dashboards/taneisha-crm.html` | Taneisha's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
+| `/dashboards/taneisha-calendar.html` | Follow-up calendar for Taneisha | rep-calendar.js, rep-crm.css | ✅ Active |
+| `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
+| `/dashboards/nika-calendar.html` | **NEW** Follow-up calendar for Nika | rep-calendar.js, rep-crm.css | ✅ Active |
+| `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |
+| `/dashboards/js/rep-crm.js` | **SHARED** CRM service/controller (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
+| `/dashboards/js/rep-calendar.js` | **SHARED** Calendar logic (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
+| `/dashboards/house-accounts.html` | **NEW** House Account assignment dashboard | house-accounts.js, house-accounts.css | ✅ Active |
+| `/dashboards/css/house-accounts.css` | **NEW** House Accounts dashboard styles | - | ✅ Active |
+| `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
+| `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
+| `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
+| `/dashboards/js/taneisha-calendar.js` | ⚠️ DEPRECATED - use rep-calendar.js | - | ⚠️ Legacy |
 
 ### Staff Dashboard V2 Files (2025-12-31 Redesign)
 | File | Purpose | Status |
@@ -377,7 +385,7 @@ cap-embroidery-fix.css
 - **CSS Files:** ~62
 - **Active Calculators:** 15
 - **Active Quote Builders:** 5
-- **Active Dashboards:** 11 (includes staff-dashboard-v2, commission-structure, taneisha-crm, taneisha-calendar)
+- **Active Dashboards:** 12 (includes staff-dashboard-v2, commission-structure, taneisha-crm, nika-crm, house-accounts)
 
 ### Organization Health
 - **Files in correct folders:** 100%

@@ -1,20 +1,39 @@
 /**
- * Taneisha CRM Calendar
+ * Rep CRM Calendar (Config-Driven)
  * Calendar view for follow-up scheduling
+ *
+ * Usage: Set window.REP_CONFIG before loading this script
+ *
+ * window.REP_CONFIG = {
+ *     repName: 'Taneisha',
+ *     apiEndpoint: '/api/taneisha-accounts',
+ *     archiveEndpoint: '/api/taneisha/daily-sales-by-account'
+ * };
  *
  * Features:
  * - Monthly calendar view
  * - Follow-up dots with priority colors
  * - Day detail panel
- * - Click to open CRM modal
+ * - Call This Month side panel
  */
 
 // ============================================================
 // CALENDAR CLASS
 // ============================================================
 
-class TaneishaCalendar {
+class RepCalendar {
     constructor() {
+        // Read config from window.REP_CONFIG or use defaults
+        const config = window.REP_CONFIG || {
+            repName: 'Taneisha',
+            apiEndpoint: '/api/taneisha-accounts',
+            archiveEndpoint: '/api/taneisha/daily-sales-by-account'
+        };
+
+        this.repName = config.repName;
+        this.apiEndpoint = config.apiEndpoint;
+        this.archiveEndpoint = config.archiveEndpoint;
+
         // Use APP_CONFIG if available, otherwise fallback
         this.baseURL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API.BASE_URL)
             ? APP_CONFIG.API.BASE_URL
@@ -58,10 +77,6 @@ class TaneishaCalendar {
             prevBtn: document.getElementById('calendar-prev'),
             nextBtn: document.getElementById('calendar-next'),
             todayBtn: document.getElementById('calendar-today'),
-            dayDetailPanel: document.getElementById('day-detail-panel'),
-            dayDetailDate: document.getElementById('day-detail-date'),
-            dayDetailContent: document.getElementById('day-detail-content'),
-            dayDetailClose: document.getElementById('day-detail-close'),
             errorBanner: document.getElementById('error-banner'),
             errorMessage: document.getElementById('error-message'),
 
@@ -83,23 +98,7 @@ class TaneishaCalendar {
             callThisMonthPanel: document.getElementById('call-this-month-panel'),
             callThisMonthCount: document.getElementById('call-this-month-count'),
             callThisMonthSubtitle: document.getElementById('call-this-month-subtitle'),
-            callThisMonthContent: document.getElementById('call-this-month-content'),
-
-            // Modal elements
-            modalOverlay: document.getElementById('crm-modal-overlay'),
-            modalCompanyName: document.getElementById('modal-company-name'),
-            modalTierBadge: document.getElementById('modal-tier-badge'),
-            modalProductTags: document.getElementById('modal-product-tags'),
-            formContactDate: document.getElementById('form-contact-date'),
-            formContactStatus: document.getElementById('form-contact-status'),
-            formContactNotes: document.getElementById('form-contact-notes'),
-            formFollowUpDate: document.getElementById('form-follow-up-date'),
-            formFollowUpType: document.getElementById('form-follow-up-type'),
-            formWonBackDate: document.getElementById('form-won-back-date'),
-            wonBackGroup: document.getElementById('won-back-group'),
-            saveBtn: document.getElementById('save-btn'),
-            cancelBtn: document.getElementById('cancel-btn'),
-            modalClose: document.getElementById('modal-close')
+            callThisMonthContent: document.getElementById('call-this-month-content')
         };
     }
 
@@ -118,11 +117,6 @@ class TaneishaCalendar {
             this.elements.todayBtn.addEventListener('click', () => this.goToToday());
         }
 
-        // Day detail panel
-        if (this.elements.dayDetailClose) {
-            this.elements.dayDetailClose.addEventListener('click', () => this.closeDayDetail());
-        }
-
         // Tier filter tabs
         if (this.elements.tierFilterTabs) {
             this.elements.tierFilterTabs.addEventListener('click', (e) => {
@@ -133,39 +127,10 @@ class TaneishaCalendar {
             });
         }
 
-        // Modal events
-        if (this.elements.modalClose) {
-            this.elements.modalClose.addEventListener('click', () => this.closeModal());
-        }
-        if (this.elements.cancelBtn) {
-            this.elements.cancelBtn.addEventListener('click', () => this.closeModal());
-        }
-        if (this.elements.saveBtn) {
-            this.elements.saveBtn.addEventListener('click', () => this.saveCRMData());
-        }
-        if (this.elements.modalOverlay) {
-            this.elements.modalOverlay.addEventListener('click', (e) => {
-                if (e.target === this.elements.modalOverlay) {
-                    this.closeModal();
-                }
-            });
-        }
-
-        // Contact status change
-        if (this.elements.formContactStatus) {
-            this.elements.formContactStatus.addEventListener('change', (e) => {
-                const showWonBack = e.target.value === 'Won Back';
-                if (this.elements.wonBackGroup) {
-                    this.elements.wonBackGroup.style.display = showWonBack ? 'block' : 'none';
-                }
-            });
-        }
-
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeDayDetail();
-                this.closeModal();
             }
             if (e.key === 'ArrowLeft') {
                 this.navigateMonth(-1);
@@ -180,7 +145,7 @@ class TaneishaCalendar {
      * Load accounts from API
      */
     async loadAccounts() {
-        const response = await fetch(`${this.baseURL}/api/taneisha-accounts`);
+        const response = await fetch(`${this.baseURL}${this.apiEndpoint}`);
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}`);
@@ -312,7 +277,7 @@ class TaneishaCalendar {
                 const bRisk = b.At_Risk ? 1 : 0;
                 if (bRisk !== aRisk) return bRisk - aRisk;
 
-                // Priority A→E
+                // Priority A->E
                 const priorityOrder = { A: 1, B: 2, C: 3, D: 4, E: 5 };
                 const aPri = priorityOrder[a.Priority_Tier] || 5;
                 const bPri = priorityOrder[b.Priority_Tier] || 5;
@@ -384,75 +349,10 @@ class TaneishaCalendar {
                                 <span class="call-item-priority">Priority ${priority}</span>
                                 ${account.At_Risk ? '<span class="call-item-risk">At Risk</span>' : ''}
                             </div>
-                            <button class="schedule-btn" data-id="${account.ID_Customer}">
-                                <i class="fas fa-calendar-plus"></i> Schedule
-                            </button>
                         </div>
                     `;
                 }).join('');
-
-                // Bind schedule button events
-                this.elements.callThisMonthContent.querySelectorAll('.schedule-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.openScheduleModal(btn.dataset.id);
-                    });
-                });
-
-                // Bind click on item to open CRM modal
-                this.elements.callThisMonthContent.querySelectorAll('.call-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        this.openModal(item.dataset.id);
-                    });
-                });
             }
-        }
-    }
-
-    /**
-     * Open schedule modal for quick follow-up scheduling
-     */
-    openScheduleModal(accountId) {
-        const account = this.accounts.find(a => String(a.ID_Customer) === String(accountId));
-        if (!account) return;
-
-        // For now, open the full CRM modal with focus on follow-up date
-        this.openModal(accountId);
-
-        // After modal opens, focus on the follow-up date field
-        setTimeout(() => {
-            if (this.elements.formFollowUpDate) {
-                this.elements.formFollowUpDate.focus();
-            }
-        }, 100);
-    }
-
-    /**
-     * Quick schedule follow-up
-     */
-    async scheduleFollowUp(accountId, date, type = 'Call') {
-        try {
-            const response = await fetch(`${this.baseURL}/api/taneisha-accounts/${accountId}/crm`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    Next_Follow_Up: date,
-                    Follow_Up_Type: type
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`API returned ${response.status}`);
-            }
-
-            // Reload data and refresh
-            await this.loadAccounts();
-            this.applyTierFilter();
-            this.renderCalendar();
-            this.renderCallThisMonth();
-
-        } catch (error) {
-            this.showError('Failed to schedule follow-up. Please try again.');
         }
     }
 
@@ -693,13 +593,6 @@ class TaneishaCalendar {
                         </div>
                     `;
                 }).join('');
-
-                // Add click handlers
-                this.elements.selectedDayContent.querySelectorAll('.selected-day-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        this.openModal(item.dataset.id);
-                    });
-                });
             }
         }
 
@@ -707,68 +600,12 @@ class TaneishaCalendar {
         if (this.elements.selectedDayDetail) {
             this.elements.selectedDayDetail.style.display = 'block';
         }
-
-        // Also update the side panel (legacy)
-        if (this.elements.dayDetailDate) {
-            this.elements.dayDetailDate.textContent = dateStr;
-        }
-
-        if (this.elements.dayDetailContent) {
-            if (followUps.length === 0) {
-                this.elements.dayDetailContent.innerHTML = `
-                    <div class="empty-state" style="padding: 2rem; text-align: center;">
-                        <i class="fas fa-calendar-day" style="font-size: 2rem; color: #d1d5db; margin-bottom: 1rem;"></i>
-                        <p style="color: #6b7280;">No follow-ups scheduled for this day</p>
-                    </div>
-                `;
-            } else {
-                this.elements.dayDetailContent.innerHTML = followUps.map(account => {
-                    const priority = (account.Priority_Tier || 'd').toLowerCase();
-                    const followUpType = account.Follow_Up_Type || 'Call';
-
-                    return `
-                        <div class="day-detail-item priority-${priority}" data-id="${account.ID_Customer}">
-                            <div class="day-detail-company">${this.escapeHtml(account.CompanyName || account.Company_Name)}</div>
-                            <div class="day-detail-contact">
-                                <i class="fas fa-user"></i> ${this.escapeHtml(account.Main_Contact_Name || 'No contact')}
-                            </div>
-                            ${account.Main_Contact_Phone ? `
-                                <div class="day-detail-phone">
-                                    <a href="tel:${this.escapeHtml(account.Main_Contact_Phone)}">
-                                        <i class="fas fa-phone"></i> ${this.escapeHtml(account.Main_Contact_Phone)}
-                                    </a>
-                                </div>
-                            ` : ''}
-                            <div class="day-detail-type">
-                                <i class="fas fa-${this.getFollowUpIcon(followUpType)}"></i>
-                                ${followUpType}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                // Add click handlers
-                this.elements.dayDetailContent.querySelectorAll('.day-detail-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        this.openModal(item.dataset.id);
-                    });
-                });
-            }
-        }
-
-        // Open side panel (legacy)
-        if (this.elements.dayDetailPanel) {
-            this.elements.dayDetailPanel.classList.add('open');
-        }
     }
 
     /**
      * Close day detail panel
      */
     closeDayDetail() {
-        if (this.elements.dayDetailPanel) {
-            this.elements.dayDetailPanel.classList.remove('open');
-        }
         if (this.elements.selectedDayDetail) {
             this.elements.selectedDayDetail.style.display = 'none';
         }
@@ -786,171 +623,6 @@ class TaneishaCalendar {
             'Quote': 'file-invoice-dollar'
         };
         return icons[type] || 'calendar-check';
-    }
-
-    /**
-     * Open CRM modal for an account
-     */
-    async openModal(accountId) {
-        try {
-            const response = await fetch(`${this.baseURL}/api/taneisha-accounts/${accountId}`);
-
-            if (!response.ok) {
-                throw new Error(`API returned ${response.status}`);
-            }
-
-            const data = await response.json();
-            const account = data.Result ? data.Result[0] : data;
-
-            if (!account) {
-                this.showError('Account not found.');
-                return;
-            }
-
-            this.selectedAccount = account;
-
-            // Populate modal
-            if (this.elements.modalCompanyName) {
-                this.elements.modalCompanyName.textContent = account.CompanyName || account.Company_Name;
-            }
-
-            // Update tier badge
-            if (this.elements.modalTierBadge) {
-                const tierInfo = this.getTierInfo(account.Account_Tier);
-                if (tierInfo.label) {
-                    this.elements.modalTierBadge.className = `tier-badge ${tierInfo.class}`;
-                    this.elements.modalTierBadge.textContent = tierInfo.label;
-                    this.elements.modalTierBadge.style.display = 'inline-flex';
-                } else {
-                    this.elements.modalTierBadge.style.display = 'none';
-                }
-            }
-
-            // Update product tags
-            if (this.elements.modalProductTags) {
-                const products = [];
-                if (account.Buys_Carhartt) products.push('Carhartt');
-                if (account.Buys_Jackets) products.push('Jackets');
-                if (account.Buys_Caps) products.push('Caps');
-
-                this.elements.modalProductTags.innerHTML = products.map(p =>
-                    `<span class="product-tag active">${p}</span>`
-                ).join('');
-            }
-
-            // Populate form fields
-            if (this.elements.formContactDate) {
-                this.elements.formContactDate.value = new Date().toISOString().split('T')[0];
-            }
-            if (this.elements.formContactStatus) {
-                this.elements.formContactStatus.value = account.Contact_Status || '';
-            }
-            if (this.elements.formContactNotes) {
-                this.elements.formContactNotes.value = account.Contact_Notes || '';
-            }
-            if (this.elements.formFollowUpDate) {
-                this.elements.formFollowUpDate.value = account.Next_Follow_Up
-                    ? account.Next_Follow_Up.split('T')[0]
-                    : '';
-            }
-            if (this.elements.formFollowUpType) {
-                this.elements.formFollowUpType.value = account.Follow_Up_Type || '';
-            }
-            if (this.elements.formWonBackDate) {
-                this.elements.formWonBackDate.value = account.Won_Back_Date
-                    ? account.Won_Back_Date.split('T')[0]
-                    : '';
-            }
-
-            // Show/hide Won Back date field
-            if (this.elements.wonBackGroup) {
-                this.elements.wonBackGroup.style.display =
-                    account.Contact_Status === 'Won Back' ? 'block' : 'none';
-            }
-
-            // Store account ID for save
-            if (this.elements.saveBtn) {
-                this.elements.saveBtn.dataset.accountId = accountId;
-            }
-
-            // Show modal
-            if (this.elements.modalOverlay) {
-                this.elements.modalOverlay.classList.add('active');
-            }
-
-        } catch (error) {
-            this.showError('Unable to load account details. Please try again.');
-        }
-    }
-
-    /**
-     * Close CRM modal
-     */
-    closeModal() {
-        if (this.elements.modalOverlay) {
-            this.elements.modalOverlay.classList.remove('active');
-        }
-    }
-
-    /**
-     * Save CRM data from modal
-     */
-    async saveCRMData() {
-        const accountId = this.elements.saveBtn?.dataset.accountId;
-        if (!accountId) return;
-
-        const crmData = {
-            Last_Contact_Date: this.elements.formContactDate?.value || null,
-            Contact_Status: this.elements.formContactStatus?.value || null,
-            Contact_Notes: this.elements.formContactNotes?.value || null,
-            Next_Follow_Up: this.elements.formFollowUpDate?.value || null,
-            Follow_Up_Type: this.elements.formFollowUpType?.value || null
-        };
-
-        // Add Won Back Date if status is "Won Back"
-        if (crmData.Contact_Status === 'Won Back' && this.elements.formWonBackDate?.value) {
-            crmData.Won_Back_Date = this.elements.formWonBackDate.value;
-        }
-
-        // Disable save button
-        if (this.elements.saveBtn) {
-            this.elements.saveBtn.disabled = true;
-            this.elements.saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
-        }
-
-        try {
-            const response = await fetch(`${this.baseURL}/api/taneisha-accounts/${accountId}/crm`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(crmData)
-            });
-
-            if (!response.ok) {
-                throw new Error(`API returned ${response.status}`);
-            }
-
-            // Close modal
-            this.closeModal();
-
-            // Reload data and refresh calendar
-            await this.loadAccounts();
-            this.applyTierFilter();
-            this.renderCalendar();
-            this.renderCallThisMonth();
-
-            // Refresh day detail if open
-            if (this.selectedDate) {
-                this.showDayDetail(this.selectedDate);
-            }
-
-        } catch (error) {
-            this.showError('Failed to save. Please try again.');
-        } finally {
-            if (this.elements.saveBtn) {
-                this.elements.saveBtn.disabled = false;
-                this.elements.saveBtn.innerHTML = 'Save';
-            }
-        }
     }
 
     /**
@@ -1039,6 +711,6 @@ class TaneishaCalendar {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.calendarController = new TaneishaCalendar();
+    window.calendarController = new RepCalendar();
     window.calendarController.init();
 });
