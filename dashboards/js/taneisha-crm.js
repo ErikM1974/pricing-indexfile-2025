@@ -103,7 +103,12 @@ class TaneishaCRMService {
     }
 
     /**
-     * Sync sales from ManageOrders
+     * Sync sales from ManageOrders (uses HYBRID pattern: Archive + Fresh = True YTD)
+     * This endpoint now automatically:
+     * 1. Fetches archived YTD totals from Caspio
+     * 2. Fetches fresh ManageOrders data (last 60 days)
+     * 3. Combines for true YTD totals
+     * 4. Archives days 55-60 before they expire
      */
     async syncSales() {
         const response = await fetch(`${this.baseURL}/api/taneisha-accounts/sync-sales`, {
@@ -119,16 +124,142 @@ class TaneishaCRMService {
     }
 
     /**
+     * Reconcile accounts - Find customers with orders not in account list
+     * @param {boolean} autoAdd - If true, automatically add missing customers
+     * @returns {Promise<Object>} - { missingCount, missingCustomers, totalSales, ... }
+     */
+    async reconcileAccounts(autoAdd = false) {
+        const url = autoAdd
+            ? `${this.baseURL}/api/taneisha-accounts/reconcile?autoAdd=true`
+            : `${this.baseURL}/api/taneisha-accounts/reconcile`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    // ============================================================
+    // ARCHIVE FUNCTIONS (YTD tracking beyond ManageOrders 60-day limit)
+    // ============================================================
+
+    /**
+     * Fetch YTD per-customer totals from Caspio archive
+     * Used to display archive status or debug YTD calculations
+     * @param {number} year - Year to fetch (defaults to current year)
+     * @returns {Promise<{year, customers, lastArchivedDate, totalRevenue, totalOrders}>}
+     */
+    async fetchYTDPerCustomerFromArchive(year = new Date().getFullYear()) {
+        const response = await fetch(`${this.baseURL}/api/taneisha/daily-sales-by-account/ytd?year=${year}`);
+
+        if (!response.ok) {
+            // Archive table may not exist yet - return empty data
+            if (response.status === 404) {
+                console.warn('[TaneishaCRM] Archive table not found - YTD will use fresh data only');
+                return { year, customers: [], lastArchivedDate: null, totalRevenue: 0, totalOrders: 0 };
+            }
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Fetch archived daily sales for a date range
+     * @param {string} startDate - Start date (YYYY-MM-DD)
+     * @param {string} endDate - End date (YYYY-MM-DD)
+     * @returns {Promise<{days, summary}>}
+     */
+    async fetchArchivedSalesByCustomer(startDate, endDate) {
+        const response = await fetch(
+            `${this.baseURL}/api/taneisha/daily-sales-by-account?start=${startDate}&end=${endDate}`
+        );
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.warn('[TaneishaCRM] Archive table not found');
+                return { days: [], summary: { customers: [], totalRevenue: 0, totalOrders: 0 } };
+            }
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Archive a single day's per-customer sales to Caspio
+     * Note: This is typically done automatically by syncSales(), but available for manual use
+     * @param {string} date - Date in YYYY-MM-DD format
+     * @param {Array} customers - Array of { customerId, customerName, revenue, orderCount }
+     * @returns {Promise<{success, date, customersArchived}>}
+     */
+    async archivePerCustomerDailySales(date, customers) {
+        const response = await fetch(`${this.baseURL}/api/taneisha/daily-sales-by-account`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date, customers })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Get archive status info
+     * Useful for displaying how much data is archived vs fresh
+     * @returns {Promise<{year, archivedDays, lastArchivedDate, customerCount}>}
+     */
+    async getArchiveStatus() {
+        try {
+            const ytdData = await this.fetchYTDPerCustomerFromArchive();
+            return {
+                year: ytdData.year,
+                customerCount: ytdData.customers?.length || 0,
+                lastArchivedDate: ytdData.lastArchivedDate,
+                totalArchivedRevenue: ytdData.totalRevenue,
+                totalArchivedOrders: ytdData.totalOrders
+            };
+        } catch (error) {
+            console.warn('[TaneishaCRM] Could not get archive status:', error.message);
+            return {
+                year: new Date().getFullYear(),
+                customerCount: 0,
+                lastArchivedDate: null,
+                totalArchivedRevenue: 0,
+                totalArchivedOrders: 0,
+                error: error.message
+            };
+        }
+    }
+
+    /**
      * Calculate stats from loaded accounts
      */
     calculateStats() {
         const stats = {
             total: 0,
             goldTier: 0,
+            silverTier: 0,
+            bronzeTier: 0,
             winBack: 0,
+            unclassified: 0,
             atRisk: 0,
             overdue: 0,
             ytdRevenue: 0,
+            // Per-tier revenue
+            goldRevenue: 0,
+            silverRevenue: 0,
+            bronzeRevenue: 0,
+            winBackRevenue: 0,
+            unclassifiedRevenue: 0,
+            // Bonus (5% of Win-Back sales)
+            winBackBonus: 0,
             bountyEarned: 0,
             bountyPotential: 0
         };
@@ -139,20 +270,42 @@ class TaneishaCRMService {
         this.accounts.forEach(account => {
             stats.total++;
 
-            // Tier counts
+            // Tier counts AND revenue
             const tier = (account.Account_Tier || '').toUpperCase();
-            if (tier.includes('GOLD')) stats.goldTier++;
-            if (tier.includes('WIN BACK')) {
+            const ytdSales = parseFloat(account.YTD_Sales_2026) || 0;
+
+            stats.ytdRevenue += ytdSales;
+
+            if (tier.includes('GOLD')) {
+                stats.goldTier++;
+                stats.goldRevenue += ytdSales;
+            } else if (tier.includes('SILVER')) {
+                stats.silverTier++;
+                stats.silverRevenue += ytdSales;
+            } else if (tier.includes('BRONZE')) {
+                stats.bronzeTier++;
+                stats.bronzeRevenue += ytdSales;
+            } else if (tier.includes('WIN BACK')) {
                 stats.winBack++;
-                // Calculate potential bounty (10% of avg annual profit)
+                stats.winBackRevenue += ytdSales;
+
+                // 5% bonus on Win-Back sales (only if won back)
+                if (account.Won_Back_Date) {
+                    stats.winBackBonus += ytdSales * 0.05;
+                }
+
+                // Calculate potential bounty (5% of avg annual profit)
                 const avgProfit = parseFloat(account.Avg_Annual_Profit) || 0;
-                stats.bountyPotential += avgProfit * 0.10;
+                stats.bountyPotential += avgProfit * 0.05;
 
                 // If won back, calculate earned bounty from sales since won back date
                 if (account.Won_Back_Date) {
-                    const ytdSales = parseFloat(account.YTD_Sales_2026) || 0;
-                    stats.bountyEarned += ytdSales * 0.10;
+                    stats.bountyEarned += ytdSales * 0.05;
                 }
+            } else {
+                // Unclassified: empty, null, or unrecognized tier values
+                stats.unclassified++;
+                stats.unclassifiedRevenue += ytdSales;
             }
 
             // At Risk flag
@@ -168,9 +321,6 @@ class TaneishaCRMService {
                     stats.overdue++;
                 }
             }
-
-            // YTD Revenue
-            stats.ytdRevenue += parseFloat(account.YTD_Sales_2026) || 0;
         });
 
         return stats;
@@ -514,6 +664,20 @@ class TaneishaCRMController {
             statAtRisk: document.getElementById('stat-at-risk'),
             statOverdue: document.getElementById('stat-overdue'),
 
+            // Sales Breakdown by Tier
+            ytdTotal: document.getElementById('ytd-total'),
+            goldRevenue: document.getElementById('gold-revenue'),
+            goldCount: document.getElementById('gold-count'),
+            silverRevenue: document.getElementById('silver-revenue'),
+            silverCount: document.getElementById('silver-count'),
+            bronzeRevenue: document.getElementById('bronze-revenue'),
+            bronzeCount: document.getElementById('bronze-count'),
+            winbackRevenue: document.getElementById('winback-revenue'),
+            winbackCount: document.getElementById('winback-count'),
+            winbackBonus: document.getElementById('winback-bonus'),
+            unclassifiedRevenue: document.getElementById('unclassified-revenue'),
+            unclassifiedCount: document.getElementById('unclassified-count'),
+
             // Call list
             callListCount: document.getElementById('call-list-count'),
             callListScheduled: document.getElementById('call-list-scheduled'),
@@ -579,7 +743,20 @@ class TaneishaCRMController {
             // Sync
             syncBtn: document.getElementById('sync-btn'),
             syncStatus: document.getElementById('sync-status'),
-            lastSynced: document.getElementById('last-synced')
+            lastSynced: document.getElementById('last-synced'),
+
+            // Reconcile
+            reconcileBtn: document.getElementById('reconcile-btn'),
+            reconcileModalOverlay: document.getElementById('reconcile-modal-overlay'),
+            reconcileModalClose: document.getElementById('reconcile-modal-close'),
+            reconcileLoading: document.getElementById('reconcile-loading'),
+            reconcileResults: document.getElementById('reconcile-results'),
+            reconcileSummary: document.getElementById('reconcile-summary'),
+            reconcileTableBody: document.getElementById('reconcile-table-body'),
+            reconcileEmpty: document.getElementById('reconcile-empty'),
+            reconcileFooter: document.getElementById('reconcile-footer'),
+            reconcileCancel: document.getElementById('reconcile-cancel'),
+            reconcileAddAll: document.getElementById('reconcile-add-all')
         };
     }
 
@@ -679,10 +856,32 @@ class TaneishaCRMController {
             this.elements.syncBtn.addEventListener('click', () => this.syncSales());
         }
 
+        // Reconcile button and modal
+        if (this.elements.reconcileBtn) {
+            this.elements.reconcileBtn.addEventListener('click', () => this.openReconcileModal());
+        }
+        if (this.elements.reconcileModalClose) {
+            this.elements.reconcileModalClose.addEventListener('click', () => this.closeReconcileModal());
+        }
+        if (this.elements.reconcileCancel) {
+            this.elements.reconcileCancel.addEventListener('click', () => this.closeReconcileModal());
+        }
+        if (this.elements.reconcileAddAll) {
+            this.elements.reconcileAddAll.addEventListener('click', () => this.addAllMissingCustomers());
+        }
+        if (this.elements.reconcileModalOverlay) {
+            this.elements.reconcileModalOverlay.addEventListener('click', (e) => {
+                if (e.target === this.elements.reconcileModalOverlay) {
+                    this.closeReconcileModal();
+                }
+            });
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeModal();
+                this.closeReconcileModal();
                 this.exitCallingMode();
             }
         });
@@ -834,6 +1033,34 @@ class TaneishaCRMController {
         }
         if (this.elements.statOverdue) {
             this.elements.statOverdue.textContent = stats.overdue;
+        }
+
+        // Sales Breakdown by Tier
+        if (this.elements.ytdTotal) {
+            this.elements.ytdTotal.textContent = this.formatCurrency(stats.ytdRevenue);
+        }
+        if (this.elements.goldRevenue) {
+            this.elements.goldRevenue.textContent = this.formatCurrency(stats.goldRevenue);
+            this.elements.goldCount.textContent = `${stats.goldTier} account${stats.goldTier !== 1 ? 's' : ''}`;
+        }
+        if (this.elements.silverRevenue) {
+            this.elements.silverRevenue.textContent = this.formatCurrency(stats.silverRevenue);
+            this.elements.silverCount.textContent = `${stats.silverTier} account${stats.silverTier !== 1 ? 's' : ''}`;
+        }
+        if (this.elements.bronzeRevenue) {
+            this.elements.bronzeRevenue.textContent = this.formatCurrency(stats.bronzeRevenue);
+            this.elements.bronzeCount.textContent = `${stats.bronzeTier} account${stats.bronzeTier !== 1 ? 's' : ''}`;
+        }
+        if (this.elements.winbackRevenue) {
+            this.elements.winbackRevenue.textContent = this.formatCurrency(stats.winBackRevenue);
+            this.elements.winbackCount.textContent = `${stats.winBack} account${stats.winBack !== 1 ? 's' : ''}`;
+        }
+        if (this.elements.winbackBonus) {
+            this.elements.winbackBonus.textContent = this.formatCurrency(stats.winBackBonus);
+        }
+        if (this.elements.unclassifiedRevenue) {
+            this.elements.unclassifiedRevenue.textContent = this.formatCurrency(stats.unclassifiedRevenue);
+            this.elements.unclassifiedCount.textContent = `${stats.unclassified} account${stats.unclassified !== 1 ? 's' : ''}`;
         }
     }
 
@@ -1351,6 +1578,174 @@ class TaneishaCRMController {
                 this.elements.syncBtn.disabled = false;
                 this.elements.syncBtn.innerHTML = '<i class="fas fa-sync"></i> Sync Sales';
             }
+        }
+    }
+
+    /**
+     * Open reconcile modal and fetch missing customers
+     */
+    async openReconcileModal() {
+        // Show modal with loading state
+        if (this.elements.reconcileModalOverlay) {
+            this.elements.reconcileModalOverlay.classList.add('active');
+        }
+        if (this.elements.reconcileLoading) {
+            this.elements.reconcileLoading.style.display = 'flex';
+        }
+        if (this.elements.reconcileResults) {
+            this.elements.reconcileResults.style.display = 'none';
+        }
+        if (this.elements.reconcileFooter) {
+            this.elements.reconcileFooter.style.display = 'none';
+        }
+
+        try {
+            const result = await this.service.reconcileAccounts(false);
+            this.displayReconcileResults(result);
+        } catch (error) {
+            this.showError('Failed to check for missing customers. Please try again.');
+            this.closeReconcileModal();
+        }
+    }
+
+    /**
+     * Close reconcile modal
+     */
+    closeReconcileModal() {
+        if (this.elements.reconcileModalOverlay) {
+            this.elements.reconcileModalOverlay.classList.remove('active');
+        }
+    }
+
+    /**
+     * Display reconcile results in the modal
+     */
+    displayReconcileResults(result) {
+        // Hide loading
+        if (this.elements.reconcileLoading) {
+            this.elements.reconcileLoading.style.display = 'none';
+        }
+        if (this.elements.reconcileResults) {
+            this.elements.reconcileResults.style.display = 'block';
+        }
+
+        const missingCustomers = result.missingCustomers || [];
+
+        if (missingCustomers.length === 0) {
+            // Show empty state
+            if (this.elements.reconcileEmpty) {
+                this.elements.reconcileEmpty.style.display = 'block';
+            }
+            if (this.elements.reconcileSummary) {
+                this.elements.reconcileSummary.style.display = 'none';
+            }
+            if (this.elements.reconcileTableBody) {
+                this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'none';
+            }
+            if (this.elements.reconcileFooter) {
+                this.elements.reconcileFooter.style.display = 'flex';
+            }
+            if (this.elements.reconcileAddAll) {
+                this.elements.reconcileAddAll.style.display = 'none';
+            }
+            return;
+        }
+
+        // Show results
+        if (this.elements.reconcileEmpty) {
+            this.elements.reconcileEmpty.style.display = 'none';
+        }
+        if (this.elements.reconcileSummary) {
+            this.elements.reconcileSummary.style.display = 'flex';
+        }
+
+        // Update summary
+        if (this.elements.reconcileSummary) {
+            const totalSales = missingCustomers.reduce((sum, c) => sum + (parseFloat(c.totalSales) || 0), 0);
+            const totalOrders = missingCustomers.reduce((sum, c) => sum + (parseInt(c.orderCount) || 0), 0);
+
+            this.elements.reconcileSummary.innerHTML = `
+                <div class="reconcile-summary-stat">
+                    <div class="stat-value">${missingCustomers.length}</div>
+                    <div class="stat-label">Missing Customers</div>
+                </div>
+                <div class="reconcile-summary-stat">
+                    <div class="stat-value">${totalOrders}</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="reconcile-summary-stat">
+                    <div class="stat-value">${this.formatCurrency(totalSales)}</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+            `;
+        }
+
+        // Populate table
+        if (this.elements.reconcileTableBody) {
+            this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'block';
+            this.elements.reconcileTableBody.innerHTML = missingCustomers.map(customer => `
+                <tr>
+                    <td class="company-name">${this.escapeHtml(customer.companyName || customer.CustomerName || 'Unknown')}</td>
+                    <td class="order-count">${customer.orderCount || 0}</td>
+                    <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
+                    <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Show footer with Add All button
+        if (this.elements.reconcileFooter) {
+            this.elements.reconcileFooter.style.display = 'flex';
+        }
+        if (this.elements.reconcileAddAll) {
+            this.elements.reconcileAddAll.style.display = 'inline-flex';
+            this.elements.reconcileAddAll.disabled = false;
+            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus"></i> Add All ${missingCustomers.length} Missing`;
+        }
+    }
+
+    /**
+     * Add all missing customers to the account list
+     */
+    async addAllMissingCustomers() {
+        if (this.elements.reconcileAddAll) {
+            this.elements.reconcileAddAll.disabled = true;
+            this.elements.reconcileAddAll.innerHTML = '<span class="loading-spinner"></span> Adding...';
+        }
+
+        try {
+            const result = await this.service.reconcileAccounts(true);
+
+            // Show success message
+            const addedCount = result.addedCount || result.missingCustomers?.length || 0;
+            this.showCelebration(`Added ${addedCount} customers to your account list!`, 'winback');
+
+            // Close modal and reload accounts
+            this.closeReconcileModal();
+            await this.loadAccounts();
+            this.updateStats();
+            this.applyFilters();
+
+        } catch (error) {
+            this.showError('Failed to add missing customers. Please try again.');
+        } finally {
+            if (this.elements.reconcileAddAll) {
+                this.elements.reconcileAddAll.disabled = false;
+                this.elements.reconcileAddAll.innerHTML = '<i class="fas fa-plus"></i> Add All Missing';
+            }
+        }
+    }
+
+    /**
+     * Format date for display
+     */
+    formatDate(dateStr) {
+        if (!dateStr) return '-';
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } catch {
+            return dateStr;
         }
     }
 

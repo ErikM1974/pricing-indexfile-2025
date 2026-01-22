@@ -100,6 +100,46 @@
                 </div>
             </div>
 
+            <!-- Sales Breakdown by Tier -->
+            <div class="sales-breakdown-section">
+                <h3 class="section-title"><i class="fas fa-chart-pie"></i> 2026 YTD Sales by Tier</h3>
+                <div class="sales-total">
+                    <span class="total-label">Total YTD</span>
+                    <span class="total-value" id="ytd-total">$0</span>
+                </div>
+                <div class="tier-breakdown-grid">
+                    <div class="tier-card gold">
+                        <div class="tier-name">Gold</div>
+                        <div class="tier-revenue" id="gold-revenue">$0</div>
+                        <div class="tier-count" id="gold-count">0 accounts</div>
+                    </div>
+                    <div class="tier-card silver">
+                        <div class="tier-name">Silver</div>
+                        <div class="tier-revenue" id="silver-revenue">$0</div>
+                        <div class="tier-count" id="silver-count">0 accounts</div>
+                    </div>
+                    <div class="tier-card bronze">
+                        <div class="tier-name">Bronze</div>
+                        <div class="tier-revenue" id="bronze-revenue">$0</div>
+                        <div class="tier-count" id="bronze-count">0 accounts</div>
+                    </div>
+                    <div class="tier-card win-back">
+                        <div class="tier-name">Win-Back</div>
+                        <div class="tier-revenue" id="winback-revenue">$0</div>
+                        <div class="tier-count" id="winback-count">0 accounts</div>
+                        <div class="bonus-line">
+                            <span>5% Bonus:</span>
+                            <span class="bonus-value" id="winback-bonus">$0</span>
+                        </div>
+                    </div>
+                    <div class="tier-card unclassified">
+                        <div class="tier-name">Unclassified</div>
+                        <div class="tier-revenue" id="unclassified-revenue">$0</div>
+                        <div class="tier-count" id="unclassified-count">0 accounts</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Main Layout -->
             <div class="crm-layout">
                 <!-- Accounts Section -->
@@ -179,6 +219,9 @@
                             <h2><i class="fas fa-building"></i> Accounts</h2>
                             <div class="accounts-meta">
                                 <span class="accounts-count" id="accounts-count">0 accounts</span>
+                                <button class="reconcile-btn" id="reconcile-btn" title="Find missing customers from ManageOrders">
+                                    <i class="fas fa-user-plus"></i> Reconcile
+                                </button>
                                 <button class="sync-btn" id="sync-btn" title="Sync sales from ManageOrders">
                                     <i class="fas fa-sync"></i> Sync Sales
                                 </button>
@@ -320,6 +363,55 @@
                 <div class="modal-footer">
                     <button class="btn-cancel" id="cancel-btn">Cancel</button>
                     <button class="btn-save" id="save-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reconcile Modal -->
+        <div class="modal-overlay" id="reconcile-modal-overlay">
+            <div class="reconcile-modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <h2><i class="fas fa-user-plus"></i> Reconcile Accounts</h2>
+                        <p class="modal-subtitle">Customers with orders not yet in your account list</p>
+                    </div>
+                    <button class="modal-close" id="reconcile-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="reconcile-modal-body">
+                    <div class="reconcile-loading" id="reconcile-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Checking for missing customers...</p>
+                    </div>
+                    <div class="reconcile-results" id="reconcile-results" style="display: none;">
+                        <div class="reconcile-summary" id="reconcile-summary"></div>
+                        <div class="reconcile-table-wrapper">
+                            <table class="reconcile-table" id="reconcile-table">
+                                <thead>
+                                    <tr>
+                                        <th>Company Name</th>
+                                        <th>Orders</th>
+                                        <th>Total Sales</th>
+                                        <th>Last Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reconcile-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="reconcile-empty" id="reconcile-empty" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>All Synced!</h3>
+                            <p>All customers with orders are already in your account list.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="reconcile-footer" style="display: none;">
+                    <button class="btn-cancel" id="reconcile-cancel">Close</button>
+                    <button class="btn-save" id="reconcile-add-all">
+                        <i class="fas fa-plus"></i> Add All Missing
+                    </button>
                 </div>
             </div>
         </div>

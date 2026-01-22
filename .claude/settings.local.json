@@ -53,7 +53,8 @@
       "WebFetch(domain:www.americanpatch.com)",
       "WebFetch(domain:www.maggieframes.com)",
       "WebFetch(domain:dirtcheapheadwear.com)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:trailhead.salesforce.com)"
     ],
     "deny": [],
     "ask": [],

@@ -21,9 +21,11 @@ class TaneishaCalendar {
             : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
         this.accounts = [];
+        this.filteredAccounts = [];
         this.followUpsByDate = {};
         this.currentDate = new Date();
         this.selectedDate = null;
+        this.activeTierFilter = 'all';
 
         // DOM elements
         this.elements = {};
@@ -38,7 +40,9 @@ class TaneishaCalendar {
 
         try {
             await this.loadAccounts();
+            this.applyTierFilter();
             this.renderCalendar();
+            this.renderCallThisMonth();
         } catch (error) {
             this.showError('Unable to load calendar data. Please refresh the page.');
         }
@@ -65,6 +69,21 @@ class TaneishaCalendar {
             statTotal: document.getElementById('stat-total'),
             statScheduled: document.getElementById('stat-scheduled'),
             statOverdue: document.getElementById('stat-overdue'),
+
+            // Tier filter tabs
+            tierFilterTabs: document.getElementById('tier-filter-tabs'),
+
+            // Selected day detail (inline below calendar)
+            selectedDayDetail: document.getElementById('selected-day-detail'),
+            selectedDayDate: document.getElementById('selected-day-date'),
+            selectedDayCount: document.getElementById('selected-day-count'),
+            selectedDayContent: document.getElementById('selected-day-content'),
+
+            // Call This Month panel
+            callThisMonthPanel: document.getElementById('call-this-month-panel'),
+            callThisMonthCount: document.getElementById('call-this-month-count'),
+            callThisMonthSubtitle: document.getElementById('call-this-month-subtitle'),
+            callThisMonthContent: document.getElementById('call-this-month-content'),
 
             // Modal elements
             modalOverlay: document.getElementById('crm-modal-overlay'),
@@ -102,6 +121,16 @@ class TaneishaCalendar {
         // Day detail panel
         if (this.elements.dayDetailClose) {
             this.elements.dayDetailClose.addEventListener('click', () => this.closeDayDetail());
+        }
+
+        // Tier filter tabs
+        if (this.elements.tierFilterTabs) {
+            this.elements.tierFilterTabs.addEventListener('click', (e) => {
+                const tab = e.target.closest('.tier-tab');
+                if (tab) {
+                    this.setTierFilter(tab.dataset.tier);
+                }
+            });
         }
 
         // Modal events
@@ -194,6 +223,237 @@ class TaneishaCalendar {
                 return aPriority - bPriority;
             });
         });
+    }
+
+    /**
+     * Set tier filter and refresh view
+     */
+    setTierFilter(tier) {
+        this.activeTierFilter = tier;
+
+        // Update tab active states
+        if (this.elements.tierFilterTabs) {
+            this.elements.tierFilterTabs.querySelectorAll('.tier-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tier === tier);
+            });
+        }
+
+        this.applyTierFilter();
+        this.renderCalendar();
+
+        // Hide selected day detail when filter changes
+        if (this.elements.selectedDayDetail) {
+            this.elements.selectedDayDetail.style.display = 'none';
+        }
+        this.selectedDate = null;
+    }
+
+    /**
+     * Apply tier filter to accounts
+     */
+    applyTierFilter() {
+        if (this.activeTierFilter === 'all') {
+            this.filteredAccounts = [...this.accounts];
+        } else {
+            this.filteredAccounts = this.accounts.filter(account => {
+                const tier = (account.Account_Tier || '').toLowerCase().replace(' ', '-');
+                return tier.includes(this.activeTierFilter);
+            });
+        }
+
+        // Rebuild followUpsByDate with filtered accounts
+        this.followUpsByDate = {};
+        this.filteredAccounts.forEach(account => {
+            if (account.Next_Follow_Up) {
+                const dateKey = account.Next_Follow_Up.split('T')[0];
+                if (!this.followUpsByDate[dateKey]) {
+                    this.followUpsByDate[dateKey] = [];
+                }
+                this.followUpsByDate[dateKey].push(account);
+            }
+        });
+
+        // Sort by priority
+        Object.keys(this.followUpsByDate).forEach(dateKey => {
+            this.followUpsByDate[dateKey].sort((a, b) => {
+                const priorityOrder = { 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5 };
+                const aPriority = priorityOrder[a.Priority_Tier] || 5;
+                const bPriority = priorityOrder[b.Priority_Tier] || 5;
+                return aPriority - bPriority;
+            });
+        });
+
+        this.updateStats();
+    }
+
+    /**
+     * Check if account has a scheduled follow-up
+     */
+    hasScheduledFollowUp(account) {
+        return account.Next_Follow_Up && account.Next_Follow_Up.trim() !== '';
+    }
+
+    /**
+     * Get accounts to call this month
+     */
+    getCallThisMonthAccounts() {
+        const currentMonth = new Date().toLocaleString('en-US', { month: 'long' }).toLowerCase();
+        const monthAbbrev = currentMonth.substring(0, 3);
+
+        return this.accounts
+            .filter(account => {
+                const primaryMonth = (account.Primary_Month || '').toLowerCase();
+                return primaryMonth.startsWith(monthAbbrev);
+            })
+            .filter(account => !this.hasScheduledFollowUp(account))
+            .sort((a, b) => {
+                // At Risk first
+                const aRisk = a.At_Risk ? 1 : 0;
+                const bRisk = b.At_Risk ? 1 : 0;
+                if (bRisk !== aRisk) return bRisk - aRisk;
+
+                // Priority A→E
+                const priorityOrder = { A: 1, B: 2, C: 3, D: 4, E: 5 };
+                const aPri = priorityOrder[a.Priority_Tier] || 5;
+                const bPri = priorityOrder[b.Priority_Tier] || 5;
+                if (aPri !== bPri) return aPri - bPri;
+
+                // Days since last order (most stale first)
+                return (b.Days_Since_Last_Order || 0) - (a.Days_Since_Last_Order || 0);
+            });
+    }
+
+    /**
+     * Render Call This Month panel
+     */
+    renderCallThisMonth() {
+        const accounts = this.getCallThisMonthAccounts();
+        const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
+
+        // Update count
+        if (this.elements.callThisMonthCount) {
+            this.elements.callThisMonthCount.textContent = accounts.length;
+        }
+
+        // Update subtitle
+        if (this.elements.callThisMonthSubtitle) {
+            this.elements.callThisMonthSubtitle.textContent = `Primary_Month = ${currentMonth}`;
+        }
+
+        // Render content
+        if (this.elements.callThisMonthContent) {
+            if (accounts.length === 0) {
+                this.elements.callThisMonthContent.innerHTML = `
+                    <div class="panel-empty">
+                        <i class="fas fa-check-circle"></i>
+                        <p>All accounts scheduled!</p>
+                    </div>
+                `;
+            } else {
+                this.elements.callThisMonthContent.innerHTML = accounts.map(account => {
+                    const tierInfo = this.getTierInfo(account.Account_Tier);
+                    const priority = (account.Priority_Tier || 'D').toUpperCase();
+                    const priorityClass = `priority-${priority.toLowerCase()}`;
+                    const daysSince = account.Days_Since_Last_Order || 0;
+
+                    return `
+                        <div class="call-item ${priorityClass}" data-id="${account.ID_Customer}">
+                            <div class="call-item-header">
+                                <span class="priority-indicator ${priorityClass}"></span>
+                                <span class="call-item-company">${this.escapeHtml(account.CompanyName || account.Company_Name || 'Unknown Company')}</span>
+                                ${tierInfo.label ? `<span class="tier-badge small ${tierInfo.class}">${tierInfo.label}</span>` : ''}
+                            </div>
+                            <div class="call-item-contact">
+                                <i class="fas fa-user"></i>
+                                <span>${this.escapeHtml(account.Main_Contact_Name || 'No contact')}</span>
+                                ${account.Main_Contact_Phone ? `<a href="tel:${account.Main_Contact_Phone}" class="call-item-phone"><i class="fas fa-phone"></i> ${this.escapeHtml(account.Main_Contact_Phone)}</a>` : ''}
+                            </div>
+                            <div class="call-item-stats">
+                                <span class="stat"><i class="fas fa-dollar-sign"></i> ${this.formatCurrency(account.YTD_Sales_2026 || 0)} YTD</span>
+                                <span class="stat"><i class="fas fa-box"></i> ${account.Order_Count_2026 || 0} orders</span>
+                            </div>
+                            <div class="call-item-timing">
+                                <span><i class="fas fa-calendar-alt"></i> Primary: ${account.Primary_Month || 'N/A'}</span>
+                                <span>Last: ${daysSince > 0 ? `${daysSince}d ago` : 'N/A'}</span>
+                            </div>
+                            <div class="call-item-products">
+                                ${this.getProductTags(account)}
+                            </div>
+                            <div class="call-item-meta">
+                                ${account.Trend ? `<span class="trend-badge ${(account.Trend || '').toLowerCase()}">${account.Trend}</span>` : ''}
+                                <span class="call-item-priority">Priority ${priority}</span>
+                                ${account.At_Risk ? '<span class="call-item-risk">At Risk</span>' : ''}
+                            </div>
+                            <button class="schedule-btn" data-id="${account.ID_Customer}">
+                                <i class="fas fa-calendar-plus"></i> Schedule
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                // Bind schedule button events
+                this.elements.callThisMonthContent.querySelectorAll('.schedule-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.openScheduleModal(btn.dataset.id);
+                    });
+                });
+
+                // Bind click on item to open CRM modal
+                this.elements.callThisMonthContent.querySelectorAll('.call-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.openModal(item.dataset.id);
+                    });
+                });
+            }
+        }
+    }
+
+    /**
+     * Open schedule modal for quick follow-up scheduling
+     */
+    openScheduleModal(accountId) {
+        const account = this.accounts.find(a => String(a.ID_Customer) === String(accountId));
+        if (!account) return;
+
+        // For now, open the full CRM modal with focus on follow-up date
+        this.openModal(accountId);
+
+        // After modal opens, focus on the follow-up date field
+        setTimeout(() => {
+            if (this.elements.formFollowUpDate) {
+                this.elements.formFollowUpDate.focus();
+            }
+        }, 100);
+    }
+
+    /**
+     * Quick schedule follow-up
+     */
+    async scheduleFollowUp(accountId, date, type = 'Call') {
+        try {
+            const response = await fetch(`${this.baseURL}/api/taneisha-accounts/${accountId}/crm`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Next_Follow_Up: date,
+                    Follow_Up_Type: type
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API returned ${response.status}`);
+            }
+
+            // Reload data and refresh
+            await this.loadAccounts();
+            this.applyTierFilter();
+            this.renderCalendar();
+            this.renderCallThisMonth();
+
+        } catch (error) {
+            this.showError('Failed to schedule follow-up. Please try again.');
+        }
     }
 
     /**
@@ -344,7 +604,7 @@ class TaneishaCalendar {
                 const priority = (account.Priority_Tier || 'd').toLowerCase();
                 html += `
                     <div class="calendar-followup-item priority-${priority}">
-                        ${this.escapeHtml(account.Company_Name)}
+                        ${this.escapeHtml(account.CompanyName || account.Company_Name)}
                     </div>
                 `;
             });
@@ -362,7 +622,7 @@ class TaneishaCalendar {
     }
 
     /**
-     * Show day detail panel
+     * Show day detail panel (inline below calendar)
      */
     showDayDetail(dateKey) {
         this.selectedDate = dateKey;
@@ -377,6 +637,78 @@ class TaneishaCalendar {
             year: 'numeric'
         });
 
+        // Update inline selected day detail section
+        if (this.elements.selectedDayDate) {
+            this.elements.selectedDayDate.textContent = dateStr;
+        }
+
+        if (this.elements.selectedDayCount) {
+            this.elements.selectedDayCount.textContent = `${followUps.length} scheduled`;
+        }
+
+        if (this.elements.selectedDayContent) {
+            if (followUps.length === 0) {
+                this.elements.selectedDayContent.innerHTML = `
+                    <div class="empty-state" style="padding: 1.5rem; text-align: center;">
+                        <i class="fas fa-calendar-day" style="font-size: 1.5rem; color: #d1d5db; margin-bottom: 0.5rem;"></i>
+                        <p style="color: #6b7280; margin: 0;">No follow-ups scheduled for this day</p>
+                    </div>
+                `;
+            } else {
+                this.elements.selectedDayContent.innerHTML = followUps.map(account => {
+                    const priority = (account.Priority_Tier || 'd').toLowerCase();
+                    const followUpType = account.Follow_Up_Type || 'Call';
+                    const tierInfo = this.getTierInfo(account.Account_Tier);
+
+                    return `
+                        <div class="selected-day-item priority-${priority}" data-id="${account.ID_Customer}">
+                            <div class="selected-day-item-header">
+                                <span class="priority-indicator priority-${priority}"></span>
+                                <span class="selected-day-company">${this.escapeHtml(account.CompanyName || account.Company_Name)}</span>
+                                ${tierInfo.label ? `<span class="tier-badge small ${tierInfo.class}">${tierInfo.label}</span>` : ''}
+                            </div>
+                            <div class="selected-day-info">
+                                <div class="selected-day-contact">
+                                    <i class="fas fa-user"></i> ${this.escapeHtml(account.Main_Contact_Name || 'No contact')}
+                                </div>
+                                ${account.Main_Contact_Phone ? `
+                                    <div class="selected-day-phone">
+                                        <a href="tel:${this.escapeHtml(account.Main_Contact_Phone)}">
+                                            <i class="fas fa-phone"></i> ${this.escapeHtml(account.Main_Contact_Phone)}
+                                        </a>
+                                    </div>
+                                ` : ''}
+                                ${account.Main_Contact_Email ? `
+                                    <div class="selected-day-email">
+                                        <a href="mailto:${this.escapeHtml(account.Main_Contact_Email)}">
+                                            <i class="fas fa-envelope"></i> ${this.escapeHtml(account.Main_Contact_Email)}
+                                        </a>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="selected-day-type">
+                                <i class="fas fa-${this.getFollowUpIcon(followUpType)}"></i>
+                                ${followUpType}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Add click handlers
+                this.elements.selectedDayContent.querySelectorAll('.selected-day-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.openModal(item.dataset.id);
+                    });
+                });
+            }
+        }
+
+        // Show inline detail section
+        if (this.elements.selectedDayDetail) {
+            this.elements.selectedDayDetail.style.display = 'block';
+        }
+
+        // Also update the side panel (legacy)
         if (this.elements.dayDetailDate) {
             this.elements.dayDetailDate.textContent = dateStr;
         }
@@ -395,15 +727,15 @@ class TaneishaCalendar {
                     const followUpType = account.Follow_Up_Type || 'Call';
 
                     return `
-                        <div class="day-detail-item priority-${priority}" data-id="${account.PK_ID}">
-                            <div class="day-detail-company">${this.escapeHtml(account.Company_Name)}</div>
+                        <div class="day-detail-item priority-${priority}" data-id="${account.ID_Customer}">
+                            <div class="day-detail-company">${this.escapeHtml(account.CompanyName || account.Company_Name)}</div>
                             <div class="day-detail-contact">
-                                <i class="fas fa-user"></i> ${this.escapeHtml(account.Contact_Name || 'No contact')}
+                                <i class="fas fa-user"></i> ${this.escapeHtml(account.Main_Contact_Name || 'No contact')}
                             </div>
-                            ${account.Contact_Phone ? `
+                            ${account.Main_Contact_Phone ? `
                                 <div class="day-detail-phone">
-                                    <a href="tel:${this.escapeHtml(account.Contact_Phone)}">
-                                        <i class="fas fa-phone"></i> ${this.escapeHtml(account.Contact_Phone)}
+                                    <a href="tel:${this.escapeHtml(account.Main_Contact_Phone)}">
+                                        <i class="fas fa-phone"></i> ${this.escapeHtml(account.Main_Contact_Phone)}
                                     </a>
                                 </div>
                             ` : ''}
@@ -424,7 +756,7 @@ class TaneishaCalendar {
             }
         }
 
-        // Open panel
+        // Open side panel (legacy)
         if (this.elements.dayDetailPanel) {
             this.elements.dayDetailPanel.classList.add('open');
         }
@@ -436,6 +768,9 @@ class TaneishaCalendar {
     closeDayDetail() {
         if (this.elements.dayDetailPanel) {
             this.elements.dayDetailPanel.classList.remove('open');
+        }
+        if (this.elements.selectedDayDetail) {
+            this.elements.selectedDayDetail.style.display = 'none';
         }
         this.selectedDate = null;
     }
@@ -476,7 +811,7 @@ class TaneishaCalendar {
 
             // Populate modal
             if (this.elements.modalCompanyName) {
-                this.elements.modalCompanyName.textContent = account.Company_Name;
+                this.elements.modalCompanyName.textContent = account.CompanyName || account.Company_Name;
             }
 
             // Update tier badge
@@ -599,7 +934,9 @@ class TaneishaCalendar {
 
             // Reload data and refresh calendar
             await this.loadAccounts();
+            this.applyTierFilter();
             this.renderCalendar();
+            this.renderCallThisMonth();
 
             // Refresh day detail if open
             if (this.selectedDate) {
@@ -652,6 +989,36 @@ class TaneishaCalendar {
         if (this.elements.errorBanner) {
             this.elements.errorBanner.classList.remove('show');
         }
+    }
+
+    /**
+     * Format currency for display
+     */
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+
+    /**
+     * Get product tags HTML for an account
+     */
+    getProductTags(account) {
+        const products = [];
+        if (account.Buys_Caps) products.push('Caps');
+        if (account.Buys_Jackets) products.push('Jackets');
+        if (account.Buys_Carhartt) products.push('Carhartt');
+        if (account.Buys_Polos) products.push('Polos');
+        if (account.Buys_TShirts) products.push('T-Shirts');
+        if (account.Buys_Hoodies) products.push('Hoodies');
+        if (account.Buys_Safety) products.push('Safety');
+
+        if (products.length === 0) {
+            return '<span class="no-products">No product history</span>';
+        }
+        return products.map(p => `<span class="product-chip">${p}</span>`).join('');
     }
 
     /**

@@ -41,6 +41,8 @@
 ├── SECURITY_AUDIT_2026-01.md         # Security audit findings & fixes
 ├── API_AUDIT_2026-01.md              # API call audit report
 ├── 2026_PRICING_MARGINS.md           # 2026 pricing margins reference
+├── REP_ACCOUNT_MANAGEMENT.md         # Rep account sync, reconcile, audit APIs
+├── NIKA_DASHBOARD_BUILD_GUIDE.md     # Build guide for Nika's CRM dashboard
 │
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
@@ -155,6 +157,12 @@
 | ShopWorks EDP | [SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md) |
 | PC61 Setup Guide | [PC61_SHOPWORKS_SETUP_GUIDE.md](./PC61_SHOPWORKS_SETUP_GUIDE.md) |
 | ArtRequests File Upload | [ARTREQUESTS_FILE_UPLOAD_GUIDE.md](./ARTREQUESTS_FILE_UPLOAD_GUIDE.md) |
+
+### Rep CRM Dashboards
+| Guide | Description |
+|-------|-------------|
+| **Nika Dashboard Build** | [NIKA_DASHBOARD_BUILD_GUIDE.md](./NIKA_DASHBOARD_BUILD_GUIDE.md) - Copy from Taneisha's CRM |
+| Rep Account Management | [REP_ACCOUNT_MANAGEMENT.md](./REP_ACCOUNT_MANAGEMENT.md) - Backend API docs |
 
 ### Common Tasks
 | Task | File |
