@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Follow-Up Calendar - Taneisha's CRM - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Page Styles -->
+    <link href="/dashboards/css/taneisha-crm.css" rel="stylesheet">
+</head>
+<body>
+    <div class="crm-page">
+        <!-- Header -->
+        <header class="crm-header">
+            <div class="header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="header-logo">
+                </a>
+                <h1 class="header-title">Follow-Up Calendar</h1>
+            </div>
+            <div class="header-right">
+                <div class="view-toggle">
+                    <a href="/dashboards/taneisha-crm.html">CRM List</a>
+                    <a href="/dashboards/taneisha-calendar.html" class="active">Calendar</a>
+                </div>
+                <a href="/staff-dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="crm-content">
+            <!-- Error Banner -->
+            <div class="error-banner" id="error-banner">
+                <i class="fas fa-exclamation-circle"></i>
+                <span class="error-banner-message" id="error-message"></span>
+                <button class="error-banner-close" onclick="window.calendarController.hideError()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Accounts</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #3b82f6;">
+                    <div class="stat-value" id="stat-scheduled">0</div>
+                    <div class="stat-label">Scheduled Follow-Ups</div>
+                </div>
+                <div class="stat-card overdue">
+                    <div class="stat-value" id="stat-overdue">0</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
+            </div>
+
+            <!-- Calendar Container -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" id="calendar-prev" title="Previous Month">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h2 class="calendar-month-title" id="calendar-month-title">January 2026</h2>
+                        <button class="calendar-nav-btn" id="calendar-next" title="Next Month">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <button class="calendar-nav-btn" id="calendar-today">
+                        <i class="fas fa-calendar-day"></i> Today
+                    </button>
+                </div>
+
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- Calendar will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.8125rem; color: #6b7280;">
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <div style="width: 12px; height: 4px; background: #dc2626; border-radius: 2px;"></div>
+                    Priority A
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <div style="width: 12px; height: 4px; background: #ea580c; border-radius: 2px;"></div>
+                    Priority B
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <div style="width: 12px; height: 4px; background: #facc15; border-radius: 2px;"></div>
+                    Priority C
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <div style="width: 12px; height: 4px; background: #9ca3af; border-radius: 2px;"></div>
+                    Priority D/E
+                </div>
+            </div>
+        </main>
+
+        <!-- Day Detail Panel -->
+        <div class="day-detail-panel" id="day-detail-panel">
+            <div class="day-detail-header">
+                <h3 id="day-detail-date">January 21, 2026</h3>
+                <button class="day-detail-close" id="day-detail-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="day-detail-content" id="day-detail-content">
+                <!-- Follow-ups for selected day will be rendered here -->
+            </div>
+        </div>
+
+        <!-- CRM Modal -->
+        <div class="modal-overlay" id="crm-modal-overlay">
+            <div class="crm-modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <h2 id="modal-company-name">Company Name</h2>
+                        <span class="tier-badge" id="modal-tier-badge" style="display: none;"></span>
+                        <div class="product-tags" id="modal-product-tags"></div>
+                    </div>
+                    <button class="modal-close" id="modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-contact-date">Last Contact Date</label>
+                            <input type="date" id="form-contact-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-contact-status">Contact Status</label>
+                            <select id="form-contact-status">
+                                <option value="">Select status...</option>
+                                <option value="Called">Called</option>
+                                <option value="Emailed">Emailed</option>
+                                <option value="Left Voicemail">Left Voicemail</option>
+                                <option value="No Response">No Response</option>
+                                <option value="Won Back">Won Back</option>
+                                <option value="Not Interested">Not Interested</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="form-contact-notes">Contact Notes</label>
+                            <textarea id="form-contact-notes" placeholder="Notes about the conversation..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-follow-up-date">Next Follow-Up</label>
+                            <input type="date" id="form-follow-up-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-follow-up-type">Follow-Up Type</label>
+                            <select id="form-follow-up-type">
+                                <option value="">Select type...</option>
+                                <option value="Call">Call</option>
+                                <option value="Email">Email</option>
+                                <option value="Visit">Visit</option>
+                                <option value="Quote">Quote</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" id="won-back-group" style="display: none;">
+                        <div class="form-group">
+                            <label for="form-won-back-date">Won Back Date</label>
+                            <input type="date" id="form-won-back-date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancel-btn">Cancel</button>
+                    <button class="btn-save" id="save-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Config & Scripts -->
+    <script src="/config/app.config.js"></script>
+    <script src="/dashboards/js/taneisha-calendar.js"></script>
+</body>
+</html>

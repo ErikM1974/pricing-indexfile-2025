@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Taneisha's Account CRM - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Page Styles -->
+    <link href="/dashboards/css/taneisha-crm.css" rel="stylesheet">
+</head>
+<body>
+    <div class="crm-page">
+        <!-- Header -->
+        <header class="crm-header">
+            <div class="header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="header-logo">
+                </a>
+                <h1 class="header-title">Taneisha's Account CRM</h1>
+            </div>
+            <div class="header-right">
+                <div class="view-toggle">
+                    <a href="/dashboards/taneisha-crm.html" class="active">CRM List</a>
+                    <a href="/dashboards/taneisha-calendar.html">Calendar</a>
+                </div>
+                <button class="quick-action-btn" id="quick-at-risk">
+                    <i class="fas fa-exclamation-triangle"></i> At Risk
+                </button>
+                <button class="quick-action-btn" id="quick-overdue">
+                    <i class="fas fa-clock"></i> Overdue
+                </button>
+                <button class="quick-action-btn" id="quick-call-month">
+                    <i class="fas fa-calendar-check"></i> Call This Month
+                </button>
+                <a href="/staff-dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="crm-content">
+            <!-- Error Banner -->
+            <div class="error-banner" id="error-banner">
+                <i class="fas fa-exclamation-circle"></i>
+                <span class="error-banner-message" id="error-message"></span>
+                <button class="error-banner-close" onclick="window.crmController.hideError()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Today's Call List Panel -->
+            <div class="call-list-panel">
+                <div class="call-list-info">
+                    <i class="fas fa-phone call-list-icon"></i>
+                    <div class="call-list-text">
+                        <h3>TODAY'S CALL LIST</h3>
+                        <p><span id="call-list-count">0</span> accounts to contact today</p>
+                    </div>
+                    <div class="call-list-details">
+                        <span><i class="fas fa-calendar-day"></i> <span id="call-list-scheduled">0</span> scheduled</span>
+                        <span><i class="fas fa-clock"></i> <span id="call-list-overdue">0</span> overdue</span>
+                        <span><i class="fas fa-calendar"></i> <span id="call-list-month">0</span> in month</span>
+                    </div>
+                </div>
+                <button class="start-calling-btn" id="start-calling-btn">
+                    <i class="fas fa-phone-alt"></i> Start Calling
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Accounts</div>
+                </div>
+                <div class="stat-card gold-tier">
+                    <div class="stat-value" id="stat-gold">0</div>
+                    <div class="stat-label">Gold Tier</div>
+                </div>
+                <div class="stat-card win-back">
+                    <div class="stat-value" id="stat-win-back">0</div>
+                    <div class="stat-label">Win Back</div>
+                </div>
+                <div class="stat-card at-risk">
+                    <div class="stat-value" id="stat-at-risk">0</div>
+                    <div class="stat-label">At Risk</div>
+                </div>
+                <div class="stat-card overdue">
+                    <div class="stat-value" id="stat-overdue">0</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
+            </div>
+
+            <!-- Main Layout -->
+            <div class="crm-layout">
+                <!-- Accounts Section -->
+                <div class="accounts-main">
+                    <!-- Filters -->
+                    <div class="filters-section">
+                        <div class="filter-group search-group">
+                            <label>Search</label>
+                            <input type="text" id="filter-search" placeholder="Search company name...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Account Tier</label>
+                            <select id="filter-tier">
+                                <option value="">All Tiers</option>
+                                <option value="GOLD '26-TANEISHA">Gold</option>
+                                <option value="SILVER '26-TANEISHA">Silver</option>
+                                <option value="BRONZE '26-TANEISHA">Bronze</option>
+                                <option value="Win Back '26 TANEISHA">Win Back</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Priority</label>
+                            <select id="filter-priority">
+                                <option value="">All Priorities</option>
+                                <option value="A">A - Highest</option>
+                                <option value="B">B - High</option>
+                                <option value="C">C - Medium</option>
+                                <option value="D">D - Low</option>
+                                <option value="E">E - Lowest</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Best Month</label>
+                            <select id="filter-month">
+                                <option value="">All Months</option>
+                                <option value="jan">January</option>
+                                <option value="feb">February</option>
+                                <option value="mar">March</option>
+                                <option value="apr">April</option>
+                                <option value="may">May</option>
+                                <option value="jun">June</option>
+                                <option value="jul">July</option>
+                                <option value="aug">August</option>
+                                <option value="sep">September</option>
+                                <option value="oct">October</option>
+                                <option value="nov">November</option>
+                                <option value="dec">December</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Trend</label>
+                            <select id="filter-trend">
+                                <option value="">All Trends</option>
+                                <option value="Active 2025">Active 2025</option>
+                                <option value="Growing">Growing</option>
+                                <option value="Declining">Declining</option>
+                                <option value="Stable">Stable</option>
+                                <option value="Dormant">Dormant</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Products</label>
+                            <div class="product-toggles">
+                                <button class="product-toggle" data-product="Carhartt">Carhartt</button>
+                                <button class="product-toggle" data-product="Jackets">Jackets</button>
+                                <button class="product-toggle" data-product="Caps">Caps</button>
+                            </div>
+                        </div>
+                        <button class="clear-filters-btn" id="clear-filters-btn">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+
+                    <!-- Accounts Grid -->
+                    <div class="accounts-section">
+                        <div class="accounts-header">
+                            <h2><i class="fas fa-building"></i> Accounts</h2>
+                            <div class="accounts-meta">
+                                <span class="accounts-count" id="accounts-count">0 accounts</span>
+                                <button class="sync-btn" id="sync-btn" title="Sync sales from ManageOrders">
+                                    <i class="fas fa-sync"></i> Sync Sales
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="loading-overlay" id="loading-overlay">
+                            <div class="loading-spinner"></div>
+                        </div>
+
+                        <div class="empty-state" id="empty-state" style="display: none;">
+                            <i class="fas fa-search"></i>
+                            <h3>No accounts found</h3>
+                            <p>Try adjusting your filters or search terms</p>
+                        </div>
+
+                        <div class="accounts-grid" id="accounts-grid">
+                            <!-- Account cards will be rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="sync-status" id="sync-status" style="display: none;">
+                        <span id="last-synced"></span>
+                    </div>
+                </div>
+
+                <!-- Gamification Sidebar -->
+                <div class="gamification-sidebar">
+                    <!-- Call Streak Card -->
+                    <div class="sidebar-card streak-card">
+                        <div class="sidebar-card-header">
+                            <i class="fas fa-fire"></i> CALL STREAK
+                        </div>
+                        <div class="sidebar-card-content">
+                            <div class="streak-number" id="streak-number">0</div>
+                            <div class="streak-label">day streak!</div>
+                            <div class="streak-sub" id="streak-calls">0 calls this week</div>
+                        </div>
+                    </div>
+
+                    <!-- Win-Back Bounty Card -->
+                    <div class="sidebar-card bounty-card">
+                        <div class="sidebar-card-header">
+                            <i class="fas fa-dollar-sign"></i> WIN-BACK BOUNTY
+                        </div>
+                        <div class="sidebar-card-content">
+                            <div class="bounty-stats">
+                                <div class="bounty-stat">
+                                    <span class="bounty-stat-label">Earned</span>
+                                    <span class="bounty-stat-value" id="bounty-earned">$0</span>
+                                </div>
+                                <div class="bounty-stat">
+                                    <span class="bounty-stat-label">Potential</span>
+                                    <span class="bounty-stat-value potential" id="bounty-potential">$0</span>
+                                </div>
+                            </div>
+                            <div class="bounty-progress">
+                                <div class="bounty-progress-bar" id="bounty-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Smart Suggestions Card -->
+                    <div class="sidebar-card suggestions-card">
+                        <div class="sidebar-card-header">
+                            <i class="fas fa-lightbulb"></i> SMART SUGGESTIONS
+                        </div>
+                        <div class="sidebar-card-content">
+                            <div class="suggestion-list" id="suggestions-list">
+                                <!-- Suggestions will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- CRM Modal -->
+        <div class="modal-overlay" id="crm-modal-overlay">
+            <div class="crm-modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <h2 id="modal-company-name">Company Name</h2>
+                        <span class="tier-badge" id="modal-tier-badge" style="display: none;"></span>
+                        <div class="product-tags" id="modal-product-tags"></div>
+                    </div>
+                    <button class="modal-close" id="modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-contact-date">Last Contact Date</label>
+                            <input type="date" id="form-contact-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-contact-status">Contact Status</label>
+                            <select id="form-contact-status">
+                                <option value="">Select status...</option>
+                                <option value="Called">Called</option>
+                                <option value="Emailed">Emailed</option>
+                                <option value="Left Voicemail">Left Voicemail</option>
+                                <option value="No Response">No Response</option>
+                                <option value="Won Back">Won Back</option>
+                                <option value="Not Interested">Not Interested</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="form-contact-notes">Contact Notes</label>
+                            <textarea id="form-contact-notes" placeholder="Notes about the conversation..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="form-follow-up-date">Next Follow-Up</label>
+                            <input type="date" id="form-follow-up-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-follow-up-type">Follow-Up Type</label>
+                            <select id="form-follow-up-type">
+                                <option value="">Select type...</option>
+                                <option value="Call">Call</option>
+                                <option value="Email">Email</option>
+                                <option value="Visit">Visit</option>
+                                <option value="Quote">Quote</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row" id="won-back-group" style="display: none;">
+                        <div class="form-group">
+                            <label for="form-won-back-date">Won Back Date</label>
+                            <input type="date" id="form-won-back-date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="cancel-btn">Cancel</button>
+                    <button class="btn-save" id="save-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sequential Calling Mode Overlay -->
+        <div class="calling-mode-overlay" id="calling-mode-overlay">
+            <div class="calling-mode-header">
+                <h2>CALLING MODE</h2>
+                <div class="calling-mode-progress" id="calling-mode-progress">1 of 12</div>
+            </div>
+            <div class="calling-mode-card">
+                <div class="calling-mode-company" id="calling-mode-company">Company Name</div>
+                <div class="calling-mode-contact" id="calling-mode-contact">Contact Name</div>
+                <div class="calling-mode-phone" id="calling-mode-phone">
+                    <a href="tel:555-555-5555">555-555-5555</a>
+                </div>
+                <div class="calling-mode-actions">
+                    <button class="calling-mode-btn log-call" id="calling-mode-log">
+                        <i class="fas fa-check"></i> Log Call & Next
+                    </button>
+                    <button class="calling-mode-btn skip" id="calling-mode-skip">
+                        Skip
+                    </button>
+                </div>
+            </div>
+            <button class="calling-mode-btn exit" id="calling-mode-exit">
+                <i class="fas fa-times"></i> Exit Calling Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- Config & Scripts -->
+    <script src="/config/app.config.js"></script>
+    <script src="/dashboards/js/taneisha-crm.js"></script>
+</body>
+</html>

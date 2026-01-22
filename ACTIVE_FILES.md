@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-17
-**Total Active Files:** ~273 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard)
+**Last Updated:** 2026-01-21
+**Total Active Files:** ~278 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Taneisha CRM Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -301,6 +301,11 @@ cap-embroidery-fix.css
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
 | `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
+| `/dashboards/taneisha-crm.html` | **NEW** Taneisha's Account CRM dashboard | taneisha-crm.js, taneisha-crm.css | ✅ Active |
+| `/dashboards/taneisha-calendar.html` | **NEW** Follow-up calendar for CRM | taneisha-calendar.js, taneisha-crm.css | ✅ Active |
+| `/dashboards/css/taneisha-crm.css` | **NEW** CRM dashboard styles (WSU Crimson theme) | - | ✅ Active |
+| `/dashboards/js/taneisha-crm.js` | **NEW** CRM service class and controller | APP_CONFIG | ✅ Active |
+| `/dashboards/js/taneisha-calendar.js` | **NEW** Calendar rendering logic | APP_CONFIG | ✅ Active |
 
 ### Staff Dashboard V2 Files (2025-12-31 Redesign)
 | File | Purpose | Status |
@@ -372,7 +377,7 @@ cap-embroidery-fix.css
 - **CSS Files:** ~62
 - **Active Calculators:** 15
 - **Active Quote Builders:** 5
-- **Active Dashboards:** 9 (includes staff-dashboard-v2, commission-structure)
+- **Active Dashboards:** 11 (includes staff-dashboard-v2, commission-structure, taneisha-crm, taneisha-calendar)
 
 ### Organization Health
 - **Files in correct folders:** 100%
