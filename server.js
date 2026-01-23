@@ -467,7 +467,7 @@ app.get('/crm-logout', (req, res) => {
     if (err) {
       console.error('[CRM Auth] Error destroying session:', err);
     }
-    res.redirect('/dashboards/staff-dashboard.html');
+    res.redirect('/crm-login');
   });
 });
 
