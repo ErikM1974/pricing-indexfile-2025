@@ -23,9 +23,10 @@
 class RepCRMService {
     constructor() {
         // Read config from window.REP_CONFIG or use defaults
+        // Note: apiEndpoint uses /api/crm-proxy/* for session-protected access
         const config = window.REP_CONFIG || {
             repName: 'Taneisha',
-            apiEndpoint: '/api/taneisha-accounts',
+            apiEndpoint: '/api/crm-proxy/taneisha-accounts',
             archiveEndpoint: '/api/taneisha/daily-sales-by-account'
         };
 
@@ -33,10 +34,9 @@ class RepCRMService {
         this.apiEndpoint = config.apiEndpoint;
         this.archiveEndpoint = config.archiveEndpoint;
 
-        // Use APP_CONFIG if available, otherwise fallback
-        this.baseURL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API.BASE_URL)
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Use same-origin proxy for security (session validated on each request)
+        // The proxy at /api/crm-proxy/* forwards to caspio-pricing-proxy with auth
+        this.baseURL = '';
 
         this.accounts = [];
         this.selectedAccount = null;

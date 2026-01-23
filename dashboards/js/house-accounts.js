@@ -16,10 +16,9 @@
 
 class HouseAccountsService {
     constructor() {
-        // Use APP_CONFIG if available, otherwise fallback
-        this.baseURL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Use same-origin proxy for security (session validated on each request)
+        // The proxy at /api/crm-proxy/* forwards to caspio-pricing-proxy with auth
+        this.baseURL = '';
 
         this.accounts = [];
         this.stats = null;
@@ -38,7 +37,7 @@ class HouseAccountsService {
         if (filters.assignedTo) params.append('assignedTo', filters.assignedTo);
         if (filters.search) params.append('search', filters.search);
 
-        const url = `${this.baseURL}/api/house-accounts${params.toString() ? '?' + params.toString() : ''}`;
+        const url = `${this.baseURL}/api/crm-proxy/house-accounts${params.toString() ? '?' + params.toString() : ''}`;
 
         const response = await fetch(url);
 
@@ -56,7 +55,7 @@ class HouseAccountsService {
      * Fetch stats for House accounts
      */
     async fetchStats() {
-        const response = await fetch(`${this.baseURL}/api/house-accounts/stats`);
+        const response = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/stats`);
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -75,8 +74,8 @@ class HouseAccountsService {
      */
     async assignToRep(account, repName) {
         const endpoint = repName === 'Taneisha'
-            ? '/api/taneisha-accounts'
-            : '/api/nika-accounts';
+            ? '/api/crm-proxy/taneisha-accounts'
+            : '/api/crm-proxy/nika-accounts';
 
         // 1. Create in rep's table with Win-Back tier
         const createResponse = await fetch(`${this.baseURL}${endpoint}`, {
@@ -95,7 +94,7 @@ class HouseAccountsService {
         }
 
         // 2. Delete from House table
-        const deleteResponse = await fetch(`${this.baseURL}/api/house-accounts/${account.ID_Customer}`, {
+        const deleteResponse = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/${account.ID_Customer}`, {
             method: 'DELETE'
         });
 
@@ -136,8 +135,8 @@ class HouseAccountsService {
      */
     async reconcileAccounts(autoAdd = false) {
         const url = autoAdd
-            ? `${this.baseURL}/api/house-accounts/reconcile?autoAdd=true`
-            : `${this.baseURL}/api/house-accounts/reconcile`;
+            ? `${this.baseURL}/api/crm-proxy/house-accounts/reconcile?autoAdd=true`
+            : `${this.baseURL}/api/crm-proxy/house-accounts/reconcile`;
 
         const response = await fetch(url);
 

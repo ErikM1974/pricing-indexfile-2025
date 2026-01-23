@@ -542,6 +542,63 @@ app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res)
   res.sendFile(path.join(__dirname, 'dashboards', 'house-accounts.html'));
 });
 
+// =============================================================================
+// CRM API PROXY ROUTES
+// These routes protect the CRM API by validating session/role before forwarding
+// to caspio-pricing-proxy with a server-side secret. The API never exposed to browser.
+// =============================================================================
+
+const CRM_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const CRM_API_SECRET = process.env.CRM_API_SECRET;
+
+// Generic CRM proxy handler factory
+function createCrmProxy(endpoint, allowedRoles) {
+  return [
+    requireCrmRole(allowedRoles),
+    async (req, res) => {
+      try {
+        // Build the target URL (preserve path after the endpoint prefix)
+        const targetPath = req.originalUrl.replace(`/api/crm-proxy/${endpoint}`, '');
+        const targetUrl = `${CRM_API_BASE}/api/${endpoint}${targetPath}`;
+
+        // Forward the request with the secret header
+        const fetchOptions = {
+          method: req.method,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CRM-API-Secret': CRM_API_SECRET
+          }
+        };
+
+        // Include body for POST/PUT requests
+        if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+          fetchOptions.body = JSON.stringify(req.body);
+        }
+
+        const response = await fetch(targetUrl, fetchOptions);
+        const data = await response.json();
+
+        // Forward the response status and data
+        res.status(response.status).json(data);
+      } catch (error) {
+        console.error(`[CRM Proxy] Error proxying to ${endpoint}:`, error.message);
+        res.status(500).json({ error: 'Proxy error', message: error.message });
+      }
+    }
+  ];
+}
+
+// Taneisha accounts proxy - requires 'taneisha' role
+app.all('/api/crm-proxy/taneisha-accounts*', ...createCrmProxy('taneisha-accounts', ['taneisha']));
+
+// Nika accounts proxy - requires 'nika' role
+app.all('/api/crm-proxy/nika-accounts*', ...createCrmProxy('nika-accounts', ['nika']));
+
+// House accounts proxy - requires 'house' role
+app.all('/api/crm-proxy/house-accounts*', ...createCrmProxy('house-accounts', ['house']));
+
+console.log('✓ CRM API proxy routes loaded (session-protected)');
+
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
