@@ -449,16 +449,16 @@ app.post('/crm-auth', (req, res) => {
 
   if (!correctPassword) {
     console.error('[CRM Auth] CRM_PASSWORD environment variable not set');
-    return res.redirect('/crm-login?error=config&redirect=' + encodeURIComponent(redirect || '/dashboards/staff-dashboard.html'));
+    return res.redirect('/crm-login?error=config');
   }
 
   if (password === correctPassword) {
     req.session.crmAuthenticated = true;
-    const redirectUrl = redirect || '/dashboards/staff-dashboard.html';
+    const redirectUrl = redirect || '/';
     return res.redirect(redirectUrl);
   }
 
-  res.redirect('/crm-login?error=invalid&redirect=' + encodeURIComponent(redirect || '/dashboards/staff-dashboard.html'));
+  res.redirect('/crm-login?error=invalid' + (redirect ? '&redirect=' + encodeURIComponent(redirect) : ''));
 });
 
 // Logout endpoint
