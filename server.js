@@ -447,10 +447,6 @@ app.post('/crm-auth', (req, res) => {
   const { password, redirect } = req.body;
   const correctPassword = process.env.CRM_PASSWORD;
 
-  console.log('[CRM Auth] Body received:', req.body);
-  console.log('[CRM Auth] Password received:', password ? `"${password}"` : 'undefined');
-  console.log('[CRM Auth] Expected password:', correctPassword ? `"${correctPassword}"` : 'undefined');
-
   if (!correctPassword) {
     console.error('[CRM Auth] CRM_PASSWORD environment variable not set');
     return res.redirect('/crm-login?error=config&redirect=' + encodeURIComponent(redirect || '/dashboards/staff-dashboard.html'));
@@ -458,12 +454,10 @@ app.post('/crm-auth', (req, res) => {
 
   if (password === correctPassword) {
     req.session.crmAuthenticated = true;
-    console.log('[CRM Auth] Authentication successful, session:', req.session);
     const redirectUrl = redirect || '/dashboards/staff-dashboard.html';
     return res.redirect(redirectUrl);
   }
 
-  console.log('[CRM Auth] Password mismatch');
   res.redirect('/crm-login?error=invalid&redirect=' + encodeURIComponent(redirect || '/dashboards/staff-dashboard.html'));
 });
 
