@@ -53,6 +53,18 @@ class RepCRMService {
     }
 
     /**
+     * Handle 401 unauthorized - redirect to login
+     */
+    handleAuthError(response) {
+        if (response.status === 401) {
+            // Session expired - redirect to login with return URL
+            window.location.href = '/dashboards/staff-login.html?redirect=' + encodeURIComponent(window.location.pathname);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Fetch all accounts with optional filters
      */
     async fetchAccounts(filters = {}) {
@@ -68,7 +80,9 @@ class RepCRMService {
 
         const url = `${this.baseURL}${this.apiEndpoint}${params.toString() ? '?' + params.toString() : ''}`;
 
-        const response = await fetch(url);
+        const response = await fetch(url, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return [];
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -84,7 +98,9 @@ class RepCRMService {
      * Fetch a single account by ID
      */
     async fetchAccountById(id) {
-        const response = await fetch(`${this.baseURL}${this.apiEndpoint}/${id}`);
+        const response = await fetch(`${this.baseURL}${this.apiEndpoint}/${id}`, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return null;
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -102,8 +118,11 @@ class RepCRMService {
     async syncSales() {
         const response = await fetch(`${this.baseURL}${this.apiEndpoint}/sync-sales`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
         });
+
+        if (this.handleAuthError(response)) return null;
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -120,7 +139,9 @@ class RepCRMService {
      * Fetch YTD per-customer totals from Caspio archive
      */
     async fetchYTDPerCustomerFromArchive(year = new Date().getFullYear()) {
-        const response = await fetch(`${this.baseURL}${this.archiveEndpoint}/ytd?year=${year}`);
+        const response = await fetch(`${this.baseURL}${this.archiveEndpoint}/ytd?year=${year}`, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return { year, customers: [], lastArchivedDate: null, totalRevenue: 0, totalOrders: 0 };
 
         if (!response.ok) {
             if (response.status === 404) {
@@ -137,8 +158,11 @@ class RepCRMService {
      */
     async fetchArchivedSalesByCustomer(startDate, endDate) {
         const response = await fetch(
-            `${this.baseURL}${this.archiveEndpoint}?start=${startDate}&end=${endDate}`
+            `${this.baseURL}${this.archiveEndpoint}?start=${startDate}&end=${endDate}`,
+            { credentials: 'same-origin' }
         );
+
+        if (this.handleAuthError(response)) return { days: [], summary: { customers: [], totalRevenue: 0, totalOrders: 0 } };
 
         if (!response.ok) {
             if (response.status === 404) {

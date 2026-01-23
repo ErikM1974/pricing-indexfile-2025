@@ -29,6 +29,18 @@ class HouseAccountsService {
     }
 
     /**
+     * Handle 401 unauthorized - redirect to login
+     */
+    handleAuthError(response) {
+        if (response.status === 401) {
+            // Session expired - redirect to login with return URL
+            window.location.href = '/dashboards/staff-login.html?redirect=' + encodeURIComponent(window.location.pathname);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Fetch all House accounts with optional filters
      */
     async fetchAccounts(filters = {}) {
@@ -39,7 +51,9 @@ class HouseAccountsService {
 
         const url = `${this.baseURL}/api/crm-proxy/house-accounts${params.toString() ? '?' + params.toString() : ''}`;
 
-        const response = await fetch(url);
+        const response = await fetch(url, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return [];
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -55,7 +69,9 @@ class HouseAccountsService {
      * Fetch stats for House accounts
      */
     async fetchStats() {
-        const response = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/stats`);
+        const response = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/stats`, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return null;
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -81,12 +97,15 @@ class HouseAccountsService {
         const createResponse = await fetch(`${this.baseURL}${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 ID_Customer: account.ID_Customer,
                 CompanyName: account.CompanyName,
                 Account_Tier: `Win Back '26 ${repName.toUpperCase()}`
             })
         });
+
+        if (this.handleAuthError(createResponse)) return false;
 
         if (!createResponse.ok) {
             const errorText = await createResponse.text();
@@ -95,8 +114,11 @@ class HouseAccountsService {
 
         // 2. Delete from House table
         const deleteResponse = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/${account.ID_Customer}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'same-origin'
         });
+
+        if (this.handleAuthError(deleteResponse)) return false;
 
         if (!deleteResponse.ok) {
             throw new Error(`Failed to remove account from House table: ${deleteResponse.status}`);
@@ -138,7 +160,9 @@ class HouseAccountsService {
             ? `${this.baseURL}/api/crm-proxy/house-accounts/reconcile?autoAdd=true`
             : `${this.baseURL}/api/crm-proxy/house-accounts/reconcile`;
 
-        const response = await fetch(url);
+        const response = await fetch(url, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return null;
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);

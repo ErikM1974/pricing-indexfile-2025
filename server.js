@@ -176,8 +176,18 @@ const CRM_PERMISSIONS = {
 // Role-based middleware factory - replaces old password-based requireCrmAuth
 function requireCrmRole(allowedRoles) {
   return (req, res, next) => {
+    // Check if this is an API request (return JSON) vs page request (redirect/HTML)
+    const isApiRequest = req.originalUrl.startsWith('/api/');
+
     if (!req.session?.crmUser) {
-      // Not logged in - redirect to Caspio login via staff-login page
+      if (isApiRequest) {
+        // Return JSON error for API requests - lets frontend handle redirect
+        return res.status(401).json({
+          error: 'Unauthorized',
+          message: 'Session expired. Please log in again.'
+        });
+      }
+      // Redirect HTML page requests to Caspio login via staff-login page
       return res.redirect('/dashboards/staff-login.html?redirect=' + encodeURIComponent(req.originalUrl));
     }
 
@@ -185,6 +195,14 @@ function requireCrmRole(allowedRoles) {
     const hasAccess = allowedRoles.some(role => userPerms.includes(role));
 
     if (!hasAccess) {
+      if (isApiRequest) {
+        // Return JSON error for API requests
+        return res.status(403).json({
+          error: 'Forbidden',
+          message: 'You do not have permission to access this resource.'
+        });
+      }
+      // Return HTML for page requests
       return res.status(403).send(`
         <!DOCTYPE html>
         <html>
