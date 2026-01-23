@@ -163,12 +163,59 @@ app.use(session({
   }
 }));
 
-// CRM Authentication middleware
-function requireCrmAuth(req, res, next) {
-  if (req.session && req.session.crmAuthenticated) {
-    return next();
-  }
-  res.redirect('/crm-login?redirect=' + encodeURIComponent(req.originalUrl));
+// =============================================================================
+// CRM ROLE-BASED ACCESS CONTROL
+// =============================================================================
+// Role permissions configuration - Erik has full access, others restricted to their dashboards
+const CRM_PERMISSIONS = {
+  'Erik': ['taneisha', 'nika', 'house'],  // Full admin access
+  'Taneisha': ['taneisha'],                // Own dashboard only
+  'Nika': ['nika']                         // Own dashboard only
+};
+
+// Role-based middleware factory - replaces old password-based requireCrmAuth
+function requireCrmRole(allowedRoles) {
+  return (req, res, next) => {
+    if (!req.session?.crmUser) {
+      // Not logged in - redirect to Caspio login via staff-login page
+      return res.redirect('/dashboards/staff-login.html?redirect=' + encodeURIComponent(req.originalUrl));
+    }
+
+    const userPerms = req.session.crmUser.permissions || [];
+    const hasAccess = allowedRoles.some(role => userPerms.includes(role));
+
+    if (!hasAccess) {
+      return res.status(403).send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Access Denied</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                   display: flex; align-items: center; justify-content: center; min-height: 100vh;
+                   background: #f5f5f5; margin: 0; }
+            .container { text-align: center; background: white; padding: 3rem; border-radius: 12px;
+                        box-shadow: 0 4px 24px rgba(0,0,0,0.1); max-width: 400px; }
+            h1 { color: #dc2626; margin-bottom: 1rem; }
+            p { color: #666; margin-bottom: 1.5rem; }
+            a { display: inline-block; padding: 0.75rem 1.5rem; background: #3a7c52; color: white;
+                text-decoration: none; border-radius: 8px; font-weight: 500; }
+            a:hover { background: #1a472a; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Access Denied</h1>
+            <p>You don't have permission to view this dashboard, ${req.session.crmUser.firstName || 'User'}.</p>
+            <a href="/staff-dashboard.html">Return to Staff Dashboard</a>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+
+    next();
+  };
 }
 
 // =============================================================================
@@ -435,50 +482,63 @@ app.get('/product.html', (req, res) => {
 // Removed duplicate routes - these pages are now served from /pages/ directory (see lines 342-347)
 
 // =============================================================================
-// CRM DASHBOARD AUTHENTICATION ROUTES
+// CRM DASHBOARD AUTHENTICATION ROUTES (Caspio-based)
 // =============================================================================
-// Login page
-app.get('/crm-login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'crm-login.html'));
-});
 
-// Authentication endpoint
-app.post('/crm-auth', (req, res) => {
-  const { password, redirect } = req.body;
-  const correctPassword = process.env.CRM_PASSWORD;
+// Endpoint to establish CRM session after Caspio login
+// Called from staff-login.html after user authenticates with Caspio
+app.post('/api/crm-session', express.json(), (req, res) => {
+  const { name, email } = req.body;
 
-  if (!correctPassword) {
-    console.error('[CRM Auth] CRM_PASSWORD environment variable not set');
-    return res.redirect('/crm-login?error=config');
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
   }
 
-  if (password === correctPassword) {
-    req.session.crmAuthenticated = true;
-    const redirectUrl = redirect || '/';
-    return res.redirect(redirectUrl);
+  // Extract first name and look up permissions
+  const firstName = name.split(' ')[0];
+  const permissions = CRM_PERMISSIONS[firstName];
+
+  if (!permissions) {
+    // User authenticated with Caspio but not authorized for CRM dashboards
+    return res.status(403).json({
+      error: 'User not authorized for CRM access',
+      message: `${firstName} does not have permission to access CRM dashboards.`
+    });
   }
 
-  res.redirect('/crm-login?error=invalid' + (redirect ? '&redirect=' + encodeURIComponent(redirect) : ''));
-});
+  // Store CRM user info in session
+  req.session.crmUser = {
+    name: name,
+    email: email || '',
+    firstName: firstName,
+    permissions: permissions
+  };
 
-// Logout endpoint
-app.get('/crm-logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('[CRM Auth] Error destroying session:', err);
-    }
-    res.redirect('/crm-login');
+  res.json({
+    success: true,
+    permissions: permissions,
+    firstName: firstName
   });
 });
 
+// Logout endpoint - clears CRM session
+app.get('/crm-logout', (req, res) => {
+  if (req.session) {
+    // Clear only CRM-related session data (preserve Caspio session)
+    delete req.session.crmUser;
+  }
+  res.redirect('/dashboards/staff-login.html');
+});
+
 // Protected CRM dashboard routes (MUST be before static middleware)
-app.get('/dashboards/taneisha-crm.html', requireCrmAuth, (req, res) => {
+// Each dashboard requires specific role permission via Caspio authentication
+app.get('/dashboards/taneisha-crm.html', requireCrmRole(['taneisha']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'taneisha-crm.html'));
 });
-app.get('/dashboards/nika-crm.html', requireCrmAuth, (req, res) => {
+app.get('/dashboards/nika-crm.html', requireCrmRole(['nika']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'nika-crm.html'));
 });
-app.get('/dashboards/house-accounts.html', requireCrmAuth, (req, res) => {
+app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'house-accounts.html'));
 });
 

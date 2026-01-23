@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-01-22
+**Last Updated:** 2026-01-23
 **Total Active Files:** ~285 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -46,7 +46,6 @@
 | `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
-| `/pages/crm-login.html` | CRM dashboard login page (password protection) | dashboard-styles.css | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 
@@ -335,6 +334,14 @@ cap-embroidery-fix.css
 | `/employee-bundles/wcttr-bundle.html` | WCTTR (West Coast Truck and Trailer Repair) employee bundle labels | Caspio datapage | ✅ Active |
 
 ## 🗑️ Recently Removed (For Reference)
+
+### CRM Role-Based Access Control (2026-01-23)
+**Context:** Replaced shared password login with Caspio-based role permissions
+- `/pages/crm-login.html` (255 lines) → Deleted (replaced by Caspio auth)
+- CRM dashboards now use role-based access via Express session
+- **Erik:** Full access (taneisha, nika, house)
+- **Taneisha:** Own dashboard only
+- **Nika:** Own dashboard only
 
 ### Richardson Simplification (2026-01-02)
 **Context:** Richardson quote builder simplified to real-time pricing lookup (81% code reduction)

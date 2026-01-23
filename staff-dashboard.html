@@ -540,7 +540,7 @@
                             </div>
                         </div>
 
-                        <!-- CRM -->
+                        <!-- CRM (Role-based access via Caspio authentication) -->
                         <div class="tool-category">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
@@ -549,13 +549,13 @@
                                 <span class="tool-category-title">CRM</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/dashboards/taneisha-crm.html" class="tool-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-color: #7c3aed;">
+                                <a href="/dashboards/taneisha-crm.html" onclick="navigateToCRM(event, '/dashboards/taneisha-crm.html')" class="tool-btn crm-link" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-color: #7c3aed;">
                                     <i class="fas fa-user-tie"></i> Taneisha's Accounts
                                 </a>
-                                <a href="/dashboards/nika-crm.html" class="tool-btn" style="background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border-color: #0891b2;">
+                                <a href="/dashboards/nika-crm.html" onclick="navigateToCRM(event, '/dashboards/nika-crm.html')" class="tool-btn crm-link" style="background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border-color: #0891b2;">
                                     <i class="fas fa-user-tie"></i> Nika's Accounts
                                 </a>
-                                <a href="/dashboards/house-accounts.html" class="tool-btn" style="background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border-color: #4b5563;">
+                                <a href="/dashboards/house-accounts.html" onclick="navigateToCRM(event, '/dashboards/house-accounts.html')" class="tool-btn crm-link" style="background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border-color: #4b5563;">
                                     <i class="fas fa-home"></i> House Accounts
                                 </a>
                             </div>
@@ -1101,6 +1101,55 @@
             }
 
             console.log('[Auth] Dashboard loaded for:', firstName);
+        }
+
+        // CRM Session Management - establish session before navigating to CRM dashboards
+        async function navigateToCRM(event, targetUrl) {
+            event.preventDefault();
+
+            // Get user info from sessionStorage (set during initializePortal)
+            const userName = sessionStorage.getItem('nwca_user_name');
+            const userEmail = sessionStorage.getItem('nwca_user_email');
+
+            if (!userName) {
+                // Not logged in, let server handle redirect
+                window.location.href = targetUrl;
+                return;
+            }
+
+            try {
+                // Show loading state on clicked link
+                const link = event.currentTarget;
+                const originalText = link.innerHTML;
+                link.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                link.style.pointerEvents = 'none';
+
+                // Establish CRM session with backend
+                const response = await fetch('/api/crm-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: userName, email: userEmail })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    console.log('[CRM] Session established for:', data.firstName, 'with permissions:', data.permissions);
+                    window.location.href = targetUrl;
+                } else if (response.status === 403) {
+                    // User not authorized for CRM
+                    link.innerHTML = originalText;
+                    link.style.pointerEvents = '';
+                    alert(data.message || 'You do not have permission to access this dashboard.');
+                } else {
+                    // Other error - let server handle it
+                    window.location.href = targetUrl;
+                }
+            } catch (error) {
+                console.error('[CRM] Error establishing session:', error);
+                // On error, let server handle the redirect
+                window.location.href = targetUrl;
+            }
         }
 
         function redirectToLogin() {
