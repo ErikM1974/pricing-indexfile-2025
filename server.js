@@ -146,6 +146,11 @@ app.use(compression());
 // =============================================================================
 // SESSION MANAGEMENT (for CRM dashboard authentication)
 // =============================================================================
+// Trust Heroku's load balancer for secure cookies
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
@@ -153,6 +158,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true,
+    sameSite: 'lax', // Required for cross-site cookie handling
     maxAge: null // Session cookie - expires when browser closes
   }
 }));
