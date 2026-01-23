@@ -26,19 +26,20 @@
                 <h1 class="header-title">Taneisha's Account CRM</h1>
             </div>
             <div class="header-right">
-                <div class="view-toggle">
-                    <a href="/dashboards/taneisha-crm.html" class="active">CRM List</a>
-                    <a href="/dashboards/taneisha-calendar.html">Calendar</a>
+                <div class="user-welcome" id="userWelcome" style="display: none;">
+                    <span class="welcome-text">Welcome,</span>
+                    <span class="user-name" id="userName"></span>
                 </div>
-                <button class="quick-action-btn" id="quick-at-risk">
-                    <i class="fas fa-exclamation-triangle"></i> At Risk
-                </button>
-                <button class="quick-action-btn" id="quick-overdue">
-                    <i class="fas fa-clock"></i> Overdue
-                </button>
-                <button class="quick-action-btn" id="quick-call-month">
-                    <i class="fas fa-calendar-check"></i> Call This Month
-                </button>
+                <div class="header-stats">
+                    <button class="header-stat" id="header-total">
+                        <span class="header-stat-value">0</span>
+                        <span class="header-stat-label">Total</span>
+                    </button>
+                    <button class="header-stat at-risk" id="header-at-risk">
+                        <span class="header-stat-value">0</span>
+                        <span class="header-stat-label">At Risk</span>
+                    </button>
+                </div>
                 <a href="/crm-logout" class="back-btn" title="Logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
@@ -58,30 +59,6 @@
                 <button class="error-banner-close" onclick="window.crmController.hideError()">
                     <i class="fas fa-times"></i>
                 </button>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-total">0</div>
-                    <div class="stat-label">Total Accounts</div>
-                </div>
-                <div class="stat-card gold-tier">
-                    <div class="stat-value" id="stat-gold">0</div>
-                    <div class="stat-label">Gold Tier</div>
-                </div>
-                <div class="stat-card win-back">
-                    <div class="stat-value" id="stat-win-back">0</div>
-                    <div class="stat-label">Win Back</div>
-                </div>
-                <div class="stat-card at-risk">
-                    <div class="stat-value" id="stat-at-risk">0</div>
-                    <div class="stat-label">At Risk</div>
-                </div>
-                <div class="stat-card overdue">
-                    <div class="stat-value" id="stat-overdue">0</div>
-                    <div class="stat-label">Overdue</div>
-                </div>
             </div>
 
             <!-- Sales Breakdown by Tier -->
@@ -203,9 +180,6 @@
                             <h2><i class="fas fa-building"></i> Accounts</h2>
                             <div class="accounts-meta">
                                 <span class="accounts-count" id="accounts-count">0 accounts</span>
-                                <button class="reconcile-btn" id="reconcile-btn" title="Find missing customers from ManageOrders">
-                                    <i class="fas fa-user-plus"></i> Reconcile
-                                </button>
                                 <button class="sync-btn" id="sync-btn" title="Sync sales from ManageOrders">
                                     <i class="fas fa-sync"></i> Sync Sales
                                 </button>
@@ -234,51 +208,23 @@
             </div>
         </main>
 
-        <!-- Reconcile Modal -->
-        <div class="modal-overlay" id="reconcile-modal-overlay">
-            <div class="reconcile-modal">
+        <!-- Account Detail Modal -->
+        <div class="modal-overlay" id="account-detail-modal-overlay">
+            <div class="account-detail-modal">
                 <div class="modal-header">
                     <div class="modal-title">
-                        <h2><i class="fas fa-user-plus"></i> Reconcile Accounts</h2>
-                        <p class="modal-subtitle">Customers with orders not yet in your account list</p>
+                        <h2 id="account-detail-company"></h2>
+                        <div class="account-detail-badges" id="account-detail-badges"></div>
                     </div>
-                    <button class="modal-close" id="reconcile-modal-close">
+                    <button class="modal-close" id="account-detail-modal-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="reconcile-modal-body">
-                    <div class="reconcile-loading" id="reconcile-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Checking for missing customers...</p>
-                    </div>
-                    <div class="reconcile-results" id="reconcile-results" style="display: none;">
-                        <div class="reconcile-summary" id="reconcile-summary"></div>
-                        <div class="reconcile-table-wrapper">
-                            <table class="reconcile-table" id="reconcile-table">
-                                <thead>
-                                    <tr>
-                                        <th>Company Name</th>
-                                        <th>Orders</th>
-                                        <th>Total Sales</th>
-                                        <th>Last Order</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reconcile-table-body">
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="reconcile-empty" id="reconcile-empty" style="display: none;">
-                            <i class="fas fa-check-circle"></i>
-                            <h3>All Synced!</h3>
-                            <p>All customers with orders are already in your account list.</p>
-                        </div>
-                    </div>
+                <div class="account-detail-modal-body" id="account-detail-body">
+                    <!-- Content populated by JavaScript -->
                 </div>
-                <div class="modal-footer" id="reconcile-footer" style="display: none;">
-                    <button class="btn-cancel" id="reconcile-cancel">Close</button>
-                    <button class="btn-save" id="reconcile-add-all">
-                        <i class="fas fa-plus"></i> Add All Missing
-                    </button>
+                <div class="modal-footer">
+                    <button class="btn-cancel" id="account-detail-close">Close</button>
                 </div>
             </div>
         </div>

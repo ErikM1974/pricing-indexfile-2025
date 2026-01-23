@@ -679,6 +679,218 @@ body {
 }
 
 /* =====================================================
+   ACCOUNTS META & RECONCILE BUTTON
+   ===================================================== */
+.accounts-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reconcile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reconcile-btn:hover {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+.reconcile-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   RECONCILE MODAL
+   ===================================================== */
+.reconcile-modal {
+    background: var(--card-dark);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--card-border);
+}
+
+.reconcile-modal .modal-header .modal-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.reconcile-modal .modal-header .modal-title h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reconcile-modal .modal-header .modal-title h2 i {
+    color: var(--success);
+}
+
+.reconcile-modal .modal-subtitle {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.reconcile-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+/* Loading state */
+.reconcile-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+}
+
+.reconcile-loading p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Summary stats */
+.reconcile-summary {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.reconcile-summary-stat {
+    flex: 1;
+    padding: 1rem;
+    background: var(--bg-darker);
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--card-border);
+}
+
+.reconcile-summary-stat .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.reconcile-summary-stat .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Table */
+.reconcile-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+}
+
+.reconcile-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.reconcile-table thead {
+    background: var(--bg-darker);
+}
+
+.reconcile-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--card-border);
+    white-space: nowrap;
+}
+
+.reconcile-table td {
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.reconcile-table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.reconcile-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.reconcile-table .company-name {
+    font-weight: 500;
+}
+
+.reconcile-table .unknown-company {
+    color: var(--warning);
+    font-style: italic;
+}
+
+.reconcile-table .rep-name {
+    color: var(--text-secondary);
+}
+
+.reconcile-table .order-count,
+.reconcile-table .sales-amount {
+    text-align: right;
+}
+
+.reconcile-table .sales-amount {
+    color: var(--success);
+    font-weight: 500;
+}
+
+.reconcile-table .last-order {
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* Empty state */
+.reconcile-empty {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.reconcile-empty i {
+    font-size: 3rem;
+    color: var(--success);
+    margin-bottom: 1rem;
+}
+
+.reconcile-empty h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.reconcile-empty p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+/* =====================================================
    RESPONSIVE DESIGN
    ===================================================== */
 @media (max-width: 1200px) {

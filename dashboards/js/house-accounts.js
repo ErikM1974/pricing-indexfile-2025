@@ -131,6 +131,24 @@ class HouseAccountsService {
     }
 
     /**
+     * Reconcile accounts - Find customers with orders not in any account list
+     * @param {boolean} autoAdd - If true, automatically add missing customers to House
+     */
+    async reconcileAccounts(autoAdd = false) {
+        const url = autoAdd
+            ? `${this.baseURL}/api/house-accounts/reconcile?autoAdd=true`
+            : `${this.baseURL}/api/house-accounts/reconcile`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
      * Calculate stats from loaded accounts
      */
     calculateLocalStats() {
@@ -217,6 +235,19 @@ class HouseAccountsController {
             loadingOverlay: document.getElementById('loading-overlay'),
             emptyState: document.getElementById('empty-state'),
 
+            // Reconcile
+            reconcileBtn: document.getElementById('reconcile-btn'),
+            reconcileModalOverlay: document.getElementById('reconcile-modal-overlay'),
+            reconcileModalClose: document.getElementById('reconcile-modal-close'),
+            reconcileLoading: document.getElementById('reconcile-loading'),
+            reconcileResults: document.getElementById('reconcile-results'),
+            reconcileSummary: document.getElementById('reconcile-summary'),
+            reconcileTableBody: document.getElementById('reconcile-table-body'),
+            reconcileEmpty: document.getElementById('reconcile-empty'),
+            reconcileFooter: document.getElementById('reconcile-footer'),
+            reconcileCancel: document.getElementById('reconcile-cancel'),
+            reconcileAddAll: document.getElementById('reconcile-add-all'),
+
             // Confirmation Modal
             confirmModal: document.getElementById('confirm-modal'),
             confirmTitle: document.getElementById('confirm-title'),
@@ -250,6 +281,27 @@ class HouseAccountsController {
             this.elements.clearFiltersBtn.addEventListener('click', () => this.clearFilters());
         }
 
+        // Reconcile button and modal
+        if (this.elements.reconcileBtn) {
+            this.elements.reconcileBtn.addEventListener('click', () => this.openReconcileModal());
+        }
+        if (this.elements.reconcileModalClose) {
+            this.elements.reconcileModalClose.addEventListener('click', () => this.closeReconcileModal());
+        }
+        if (this.elements.reconcileCancel) {
+            this.elements.reconcileCancel.addEventListener('click', () => this.closeReconcileModal());
+        }
+        if (this.elements.reconcileAddAll) {
+            this.elements.reconcileAddAll.addEventListener('click', () => this.addAllMissingCustomers());
+        }
+        if (this.elements.reconcileModalOverlay) {
+            this.elements.reconcileModalOverlay.addEventListener('click', (e) => {
+                if (e.target === this.elements.reconcileModalOverlay) {
+                    this.closeReconcileModal();
+                }
+            });
+        }
+
         // Confirmation modal
         if (this.elements.confirmClose) {
             this.elements.confirmClose.addEventListener('click', () => this.closeConfirmModal());
@@ -271,6 +323,7 @@ class HouseAccountsController {
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                this.closeReconcileModal();
                 this.closeConfirmModal();
             }
         });
@@ -565,6 +618,168 @@ class HouseAccountsController {
         if (this.elements.loadingOverlay) {
             this.elements.loadingOverlay.classList.toggle('show', show);
         }
+    }
+
+    // ============================================================
+    // RECONCILE MODAL METHODS
+    // ============================================================
+
+    /**
+     * Open reconcile modal and fetch unassigned customers
+     */
+    async openReconcileModal() {
+        if (this.elements.reconcileModalOverlay) {
+            this.elements.reconcileModalOverlay.classList.add('active');
+        }
+        if (this.elements.reconcileLoading) {
+            this.elements.reconcileLoading.style.display = 'flex';
+        }
+        if (this.elements.reconcileResults) {
+            this.elements.reconcileResults.style.display = 'none';
+        }
+        if (this.elements.reconcileFooter) {
+            this.elements.reconcileFooter.style.display = 'none';
+        }
+
+        try {
+            const result = await this.service.reconcileAccounts(false);
+            this.displayReconcileResults(result);
+        } catch (error) {
+            this.showError('Failed to check for unassigned customers. Please try again.');
+            this.closeReconcileModal();
+        }
+    }
+
+    /**
+     * Close reconcile modal
+     */
+    closeReconcileModal() {
+        if (this.elements.reconcileModalOverlay) {
+            this.elements.reconcileModalOverlay.classList.remove('active');
+        }
+    }
+
+    /**
+     * Display reconcile results in the modal
+     */
+    displayReconcileResults(result) {
+        if (this.elements.reconcileLoading) {
+            this.elements.reconcileLoading.style.display = 'none';
+        }
+        if (this.elements.reconcileResults) {
+            this.elements.reconcileResults.style.display = 'block';
+        }
+
+        const missingCustomers = result.missingCustomers || [];
+
+        if (missingCustomers.length === 0) {
+            if (this.elements.reconcileEmpty) {
+                this.elements.reconcileEmpty.style.display = 'block';
+            }
+            if (this.elements.reconcileSummary) {
+                this.elements.reconcileSummary.style.display = 'none';
+            }
+            if (this.elements.reconcileTableBody) {
+                this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'none';
+            }
+            if (this.elements.reconcileFooter) {
+                this.elements.reconcileFooter.style.display = 'flex';
+            }
+            if (this.elements.reconcileAddAll) {
+                this.elements.reconcileAddAll.style.display = 'none';
+            }
+            return;
+        }
+
+        if (this.elements.reconcileEmpty) {
+            this.elements.reconcileEmpty.style.display = 'none';
+        }
+        if (this.elements.reconcileSummary) {
+            this.elements.reconcileSummary.style.display = 'flex';
+        }
+
+        if (this.elements.reconcileSummary) {
+            const totalSales = missingCustomers.reduce((sum, c) => sum + (parseFloat(c.totalSales) || 0), 0);
+            const totalOrders = missingCustomers.reduce((sum, c) => sum + (parseInt(c.orderCount) || 0), 0);
+
+            this.elements.reconcileSummary.innerHTML = `
+                <div class="reconcile-summary-stat">
+                    <div class="stat-value">${missingCustomers.length}</div>
+                    <div class="stat-label">Unassigned Customers</div>
+                </div>
+                <div class="reconcile-summary-stat">
+                    <div class="stat-value">${totalOrders}</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="reconcile-summary-stat">
+                    <div class="stat-value">${this.formatCurrency(totalSales)}</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+            `;
+        }
+
+        if (this.elements.reconcileTableBody) {
+            this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'block';
+            this.elements.reconcileTableBody.innerHTML = missingCustomers.map(customer => `
+                <tr>
+                    <td class="company-name ${!customer.companyName || customer.companyName.startsWith('ID:') ? 'unknown-company' : ''}">
+                        ${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}
+                    </td>
+                    <td class="rep-name">${this.escapeHtml(customer.rep || '-')}</td>
+                    <td class="order-count">${customer.orderCount || 0}</td>
+                    <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
+                    <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
+                </tr>
+            `).join('');
+        }
+
+        if (this.elements.reconcileFooter) {
+            this.elements.reconcileFooter.style.display = 'flex';
+        }
+        if (this.elements.reconcileAddAll) {
+            this.elements.reconcileAddAll.style.display = 'inline-flex';
+            this.elements.reconcileAddAll.disabled = false;
+            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus"></i> Add All ${missingCustomers.length} to House`;
+        }
+    }
+
+    /**
+     * Add all missing customers to House Accounts
+     */
+    async addAllMissingCustomers() {
+        if (this.elements.reconcileAddAll) {
+            this.elements.reconcileAddAll.disabled = true;
+            this.elements.reconcileAddAll.innerHTML = '<span class="loading-spinner"></span> Adding...';
+        }
+
+        try {
+            const result = await this.service.reconcileAccounts(true);
+
+            const addedCount = result.addedCount || 0;
+            this.showToast(`Added ${addedCount} customers to House Accounts!`);
+
+            this.closeReconcileModal();
+            await this.loadData();
+
+        } catch (error) {
+            this.showError('Failed to add customers. Please try again.');
+        } finally {
+            if (this.elements.reconcileAddAll) {
+                this.elements.reconcileAddAll.disabled = false;
+                this.elements.reconcileAddAll.innerHTML = '<i class="fas fa-plus"></i> Add All to House';
+            }
+        }
+    }
+
+    /**
+     * Format currency
+     */
+    formatCurrency(amount) {
+        const num = parseFloat(amount) || 0;
+        return '$' + num.toLocaleString('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
     }
 
     /**

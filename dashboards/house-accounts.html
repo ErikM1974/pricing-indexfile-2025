@@ -99,7 +99,12 @@
             <div class="accounts-section">
                 <div class="accounts-header">
                     <h2><i class="fas fa-home"></i> Accounts</h2>
-                    <span class="accounts-count" id="accounts-count">0 accounts</span>
+                    <div class="accounts-meta">
+                        <span class="accounts-count" id="accounts-count">0 accounts</span>
+                        <button class="reconcile-btn" id="reconcile-btn" title="Find customers with orders not in any account list">
+                            <i class="fas fa-user-plus"></i> Find Unassigned
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Loading Overlay -->
@@ -120,6 +125,56 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Reconcile Modal -->
+    <div class="modal-overlay" id="reconcile-modal-overlay">
+        <div class="reconcile-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-user-plus"></i> Find Unassigned Customers</h2>
+                    <p class="modal-subtitle">Customers with orders not in any rep's account list</p>
+                </div>
+                <button class="modal-close" id="reconcile-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="reconcile-modal-body">
+                <div class="reconcile-loading" id="reconcile-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Checking for unassigned customers...</p>
+                </div>
+                <div class="reconcile-results" id="reconcile-results" style="display: none;">
+                    <div class="reconcile-summary" id="reconcile-summary"></div>
+                    <div class="reconcile-table-wrapper">
+                        <table class="reconcile-table" id="reconcile-table">
+                            <thead>
+                                <tr>
+                                    <th>Company / ID</th>
+                                    <th>Rep</th>
+                                    <th>Orders</th>
+                                    <th>Total Sales</th>
+                                    <th>Last Order</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reconcile-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="reconcile-empty" id="reconcile-empty" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>All Synced!</h3>
+                        <p>All customers with recent orders are already in an account list.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="reconcile-footer" style="display: none;">
+                <button class="btn-cancel" id="reconcile-cancel">Close</button>
+                <button class="btn-save" id="reconcile-add-all">
+                    <i class="fas fa-plus"></i> Add All to House
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Confirmation Modal -->

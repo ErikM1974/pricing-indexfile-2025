@@ -13,7 +13,6 @@
  * Features:
  * - Account list with filters
  * - Sales sync integration
- * - Reconcile accounts
  * - Sales breakdown by tier
  */
 
@@ -105,25 +104,6 @@ class RepCRMService {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
-
-        if (!response.ok) {
-            throw new Error(`API returned ${response.status}: ${response.statusText}`);
-        }
-
-        return await response.json();
-    }
-
-    /**
-     * Reconcile accounts - Find customers with orders not in account list
-     * @param {boolean} autoAdd - If true, automatically add missing customers
-     * @returns {Promise<Object>} - { missingCount, missingCustomers, totalSales, ... }
-     */
-    async reconcileAccounts(autoAdd = false) {
-        const url = autoAdd
-            ? `${this.baseURL}${this.apiEndpoint}/reconcile?autoAdd=true`
-            : `${this.baseURL}${this.apiEndpoint}/reconcile`;
-
-        const response = await fetch(url);
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -291,15 +271,25 @@ class RepCRMService {
                 const tier = (account.Account_Tier || '').toUpperCase();
                 // Extract tier keyword from filter (e.g., "GOLD '26-TANEISHA" → "GOLD", "Win Back '26 TANEISHA" → "WIN BACK")
                 const filterTier = filters.accountTier.toUpperCase();
-                let tierKeyword = '';
-                if (filterTier.includes('GOLD')) tierKeyword = 'GOLD';
-                else if (filterTier.includes('SILVER')) tierKeyword = 'SILVER';
-                else if (filterTier.includes('BRONZE')) tierKeyword = 'BRONZE';
-                else if (filterTier.includes('WIN BACK')) tierKeyword = 'WIN BACK';
-                else tierKeyword = filterTier; // Fallback to full value
 
-                if (!tier.includes(tierKeyword)) {
-                    return false;
+                // Handle unclassified filter - accounts with no tier or empty tier
+                if (filterTier === 'UNCLASSIFIED') {
+                    const hasKnownTier = tier.includes('GOLD') || tier.includes('SILVER') ||
+                                         tier.includes('BRONZE') || tier.includes('WIN BACK');
+                    if (hasKnownTier) {
+                        return false;
+                    }
+                } else {
+                    let tierKeyword = '';
+                    if (filterTier.includes('GOLD')) tierKeyword = 'GOLD';
+                    else if (filterTier.includes('SILVER')) tierKeyword = 'SILVER';
+                    else if (filterTier.includes('BRONZE')) tierKeyword = 'BRONZE';
+                    else if (filterTier.includes('WIN BACK')) tierKeyword = 'WIN BACK';
+                    else tierKeyword = filterTier; // Fallback to full value
+
+                    if (!tier.includes(tierKeyword)) {
+                        return false;
+                    }
                 }
             }
 
@@ -400,6 +390,7 @@ class RepCRMController {
     async init() {
         this.cacheElements();
         this.bindEvents();
+        this.displayWelcomeMessage();
 
         try {
             await this.loadAccounts();
@@ -407,6 +398,22 @@ class RepCRMController {
             this.renderAccounts();
         } catch (error) {
             this.showError('Unable to load accounts. Please refresh the page or contact support.');
+        }
+    }
+
+    /**
+     * Display welcome message from session storage
+     */
+    displayWelcomeMessage() {
+        const userName = sessionStorage.getItem('nwca_user_name');
+        if (userName) {
+            const firstName = userName.split(' ')[0];
+            const userNameEl = document.getElementById('userName');
+            const userWelcomeEl = document.getElementById('userWelcome');
+            if (userNameEl && userWelcomeEl) {
+                userNameEl.textContent = firstName;
+                userWelcomeEl.style.display = 'flex';
+            }
         }
     }
 
@@ -419,12 +426,9 @@ class RepCRMController {
             errorBanner: document.getElementById('error-banner'),
             errorMessage: document.getElementById('error-message'),
 
-            // Stats
-            statTotal: document.getElementById('stat-total'),
-            statGold: document.getElementById('stat-gold'),
-            statWinBack: document.getElementById('stat-win-back'),
-            statAtRisk: document.getElementById('stat-at-risk'),
-            statOverdue: document.getElementById('stat-overdue'),
+            // Header Stats
+            headerTotal: document.getElementById('header-total'),
+            headerAtRisk: document.getElementById('header-at-risk'),
 
             // Sales Breakdown by Tier
             ytdTotal: document.getElementById('ytd-total'),
@@ -449,11 +453,6 @@ class RepCRMController {
             productToggles: document.querySelectorAll('.product-toggle'),
             clearFiltersBtn: document.getElementById('clear-filters-btn'),
 
-            // Quick actions
-            quickAtRisk: document.getElementById('quick-at-risk'),
-            quickOverdue: document.getElementById('quick-overdue'),
-            quickCallMonth: document.getElementById('quick-call-month'),
-
             // Accounts
             accountsGrid: document.getElementById('accounts-grid'),
             accountsCount: document.getElementById('accounts-count'),
@@ -465,18 +464,13 @@ class RepCRMController {
             syncStatus: document.getElementById('sync-status'),
             lastSynced: document.getElementById('last-synced'),
 
-            // Reconcile
-            reconcileBtn: document.getElementById('reconcile-btn'),
-            reconcileModalOverlay: document.getElementById('reconcile-modal-overlay'),
-            reconcileModalClose: document.getElementById('reconcile-modal-close'),
-            reconcileLoading: document.getElementById('reconcile-loading'),
-            reconcileResults: document.getElementById('reconcile-results'),
-            reconcileSummary: document.getElementById('reconcile-summary'),
-            reconcileTableBody: document.getElementById('reconcile-table-body'),
-            reconcileEmpty: document.getElementById('reconcile-empty'),
-            reconcileFooter: document.getElementById('reconcile-footer'),
-            reconcileCancel: document.getElementById('reconcile-cancel'),
-            reconcileAddAll: document.getElementById('reconcile-add-all')
+            // Account Detail Modal
+            accountDetailModalOverlay: document.getElementById('account-detail-modal-overlay'),
+            accountDetailModalClose: document.getElementById('account-detail-modal-close'),
+            accountDetailClose: document.getElementById('account-detail-close'),
+            accountDetailCompany: document.getElementById('account-detail-company'),
+            accountDetailBadges: document.getElementById('account-detail-badges'),
+            accountDetailBody: document.getElementById('account-detail-body')
         };
     }
 
@@ -516,39 +510,42 @@ class RepCRMController {
             this.elements.clearFiltersBtn.addEventListener('click', () => this.clearFilters());
         }
 
-        // Quick action buttons
-        if (this.elements.quickAtRisk) {
-            this.elements.quickAtRisk.addEventListener('click', () => this.toggleQuickFilter('atRisk'));
+        // Header stat clicks
+        if (this.elements.headerTotal) {
+            this.elements.headerTotal.addEventListener('click', () => this.clearFilters());
         }
-        if (this.elements.quickOverdue) {
-            this.elements.quickOverdue.addEventListener('click', () => this.toggleQuickFilter('overdue'));
+        if (this.elements.headerAtRisk) {
+            this.elements.headerAtRisk.addEventListener('click', () => this.toggleAtRiskFilter());
         }
-        if (this.elements.quickCallMonth) {
-            this.elements.quickCallMonth.addEventListener('click', () => this.toggleQuickFilter('callMonth'));
-        }
+
+        // Tier card clicks
+        document.querySelectorAll('.tier-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const tierClass = [...card.classList].find(c =>
+                    ['gold', 'silver', 'bronze', 'win-back', 'unclassified'].includes(c)
+                );
+                if (tierClass) {
+                    this.toggleTierFilter(tierClass);
+                }
+            });
+        });
 
         // Sync button
         if (this.elements.syncBtn) {
             this.elements.syncBtn.addEventListener('click', () => this.syncSales());
         }
 
-        // Reconcile button and modal
-        if (this.elements.reconcileBtn) {
-            this.elements.reconcileBtn.addEventListener('click', () => this.openReconcileModal());
+        // Account Detail Modal
+        if (this.elements.accountDetailModalClose) {
+            this.elements.accountDetailModalClose.addEventListener('click', () => this.closeAccountDetailModal());
         }
-        if (this.elements.reconcileModalClose) {
-            this.elements.reconcileModalClose.addEventListener('click', () => this.closeReconcileModal());
+        if (this.elements.accountDetailClose) {
+            this.elements.accountDetailClose.addEventListener('click', () => this.closeAccountDetailModal());
         }
-        if (this.elements.reconcileCancel) {
-            this.elements.reconcileCancel.addEventListener('click', () => this.closeReconcileModal());
-        }
-        if (this.elements.reconcileAddAll) {
-            this.elements.reconcileAddAll.addEventListener('click', () => this.addAllMissingCustomers());
-        }
-        if (this.elements.reconcileModalOverlay) {
-            this.elements.reconcileModalOverlay.addEventListener('click', (e) => {
-                if (e.target === this.elements.reconcileModalOverlay) {
-                    this.closeReconcileModal();
+        if (this.elements.accountDetailModalOverlay) {
+            this.elements.accountDetailModalOverlay.addEventListener('click', (e) => {
+                if (e.target === this.elements.accountDetailModalOverlay) {
+                    this.closeAccountDetailModal();
                 }
             });
         }
@@ -556,7 +553,7 @@ class RepCRMController {
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                this.closeReconcileModal();
+                this.closeAccountDetailModal();
             }
         });
     }
@@ -630,9 +627,15 @@ class RepCRMController {
             toggle.classList.remove('active');
         });
 
-        document.querySelectorAll('.quick-action-btn').forEach(btn => {
-            btn.classList.remove('active');
+        // Clear tier card active states
+        document.querySelectorAll('.tier-card').forEach(card => {
+            card.classList.remove('active');
         });
+
+        // Clear header at-risk active state
+        if (this.elements.headerAtRisk) {
+            this.elements.headerAtRisk.classList.remove('active');
+        }
 
         this.service.filters = {
             search: '',
@@ -651,33 +654,59 @@ class RepCRMController {
     }
 
     /**
-     * Toggle quick filter buttons
+     * Toggle tier filter via tier card click
      */
-    toggleQuickFilter(filterType) {
-        const buttons = {
-            atRisk: this.elements.quickAtRisk,
-            overdue: this.elements.quickOverdue,
-            callMonth: this.elements.quickCallMonth
+    toggleTierFilter(tier) {
+        // Map CSS class to filter value
+        const tierMap = {
+            'gold': 'GOLD',
+            'silver': 'SILVER',
+            'bronze': 'BRONZE',
+            'win-back': 'WIN BACK',
+            'unclassified': 'UNCLASSIFIED'
         };
 
-        const button = buttons[filterType];
-        if (!button) return;
+        const filterValue = tierMap[tier];
+        const currentFilter = this.service.filters.accountTier.toUpperCase();
 
-        const isActive = button.classList.toggle('active');
-
-        if (filterType === 'atRisk') {
-            this.service.filters.atRisk = isActive;
-        } else if (filterType === 'overdue') {
-            this.service.filters.overdue = isActive;
-        } else if (filterType === 'callMonth') {
-            if (isActive) {
-                const currentMonth = new Date().toLocaleString('en-US', { month: 'short' }).toLowerCase();
-                this.service.filters.month = currentMonth;
-            } else {
-                this.service.filters.month = '';
-            }
+        // Toggle: if same tier, clear; otherwise set new tier
+        if (currentFilter === filterValue || currentFilter.includes(filterValue)) {
+            this.service.filters.accountTier = '';
+        } else {
+            this.service.filters.accountTier = filterValue;
         }
 
+        // Also update the tier dropdown to stay in sync (only for known tiers)
+        if (this.elements.tierSelect && tier !== 'unclassified') {
+            const options = this.elements.tierSelect.options;
+            let foundIndex = 0;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value.toUpperCase().includes(filterValue)) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+            this.elements.tierSelect.selectedIndex = this.service.filters.accountTier ? foundIndex : 0;
+        } else if (this.elements.tierSelect && tier === 'unclassified') {
+            // Clear dropdown for unclassified since it's not in dropdown
+            this.elements.tierSelect.selectedIndex = 0;
+        }
+
+        // Update UI active states
+        document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('active'));
+        if (this.service.filters.accountTier) {
+            document.querySelector(`.tier-card.${tier}`)?.classList.add('active');
+        }
+
+        this.applyFilters();
+    }
+
+    /**
+     * Toggle at-risk filter via header stat click
+     */
+    toggleAtRiskFilter() {
+        this.service.filters.atRisk = !this.service.filters.atRisk;
+        this.elements.headerAtRisk?.classList.toggle('active', this.service.filters.atRisk);
         this.applyFilters();
     }
 
@@ -687,20 +716,12 @@ class RepCRMController {
     updateStats() {
         const stats = this.service.calculateStats();
 
-        if (this.elements.statTotal) {
-            this.elements.statTotal.textContent = stats.total;
+        // Update header stats
+        if (this.elements.headerTotal) {
+            this.elements.headerTotal.querySelector('.header-stat-value').textContent = stats.total;
         }
-        if (this.elements.statGold) {
-            this.elements.statGold.textContent = stats.goldTier;
-        }
-        if (this.elements.statWinBack) {
-            this.elements.statWinBack.textContent = stats.winBack;
-        }
-        if (this.elements.statAtRisk) {
-            this.elements.statAtRisk.textContent = stats.atRisk;
-        }
-        if (this.elements.statOverdue) {
-            this.elements.statOverdue.textContent = stats.overdue;
+        if (this.elements.headerAtRisk) {
+            this.elements.headerAtRisk.querySelector('.header-stat-value').textContent = stats.atRisk;
         }
 
         // Sales Breakdown by Tier
@@ -851,6 +872,20 @@ class RepCRMController {
                 </div>
             `;
         }).join('');
+
+        // Add click handlers to account cards
+        this.elements.accountsGrid.querySelectorAll('.account-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Don't open modal if clicking on email/phone links
+                if (e.target.closest('a')) return;
+
+                const accountId = card.dataset.id;
+                const account = this.filteredAccounts.find(a => String(a.PK_ID) === String(accountId));
+                if (account) {
+                    this.openAccountDetailModal(account);
+                }
+            });
+        });
     }
 
     /**
@@ -909,152 +944,6 @@ class RepCRMController {
             if (this.elements.syncBtn) {
                 this.elements.syncBtn.disabled = false;
                 this.elements.syncBtn.innerHTML = '<i class="fas fa-sync"></i> Sync Sales';
-            }
-        }
-    }
-
-    /**
-     * Open reconcile modal and fetch missing customers
-     */
-    async openReconcileModal() {
-        if (this.elements.reconcileModalOverlay) {
-            this.elements.reconcileModalOverlay.classList.add('active');
-        }
-        if (this.elements.reconcileLoading) {
-            this.elements.reconcileLoading.style.display = 'flex';
-        }
-        if (this.elements.reconcileResults) {
-            this.elements.reconcileResults.style.display = 'none';
-        }
-        if (this.elements.reconcileFooter) {
-            this.elements.reconcileFooter.style.display = 'none';
-        }
-
-        try {
-            const result = await this.service.reconcileAccounts(false);
-            this.displayReconcileResults(result);
-        } catch (error) {
-            this.showError('Failed to check for missing customers. Please try again.');
-            this.closeReconcileModal();
-        }
-    }
-
-    /**
-     * Close reconcile modal
-     */
-    closeReconcileModal() {
-        if (this.elements.reconcileModalOverlay) {
-            this.elements.reconcileModalOverlay.classList.remove('active');
-        }
-    }
-
-    /**
-     * Display reconcile results in the modal
-     */
-    displayReconcileResults(result) {
-        if (this.elements.reconcileLoading) {
-            this.elements.reconcileLoading.style.display = 'none';
-        }
-        if (this.elements.reconcileResults) {
-            this.elements.reconcileResults.style.display = 'block';
-        }
-
-        const missingCustomers = result.missingCustomers || [];
-
-        if (missingCustomers.length === 0) {
-            if (this.elements.reconcileEmpty) {
-                this.elements.reconcileEmpty.style.display = 'block';
-            }
-            if (this.elements.reconcileSummary) {
-                this.elements.reconcileSummary.style.display = 'none';
-            }
-            if (this.elements.reconcileTableBody) {
-                this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'none';
-            }
-            if (this.elements.reconcileFooter) {
-                this.elements.reconcileFooter.style.display = 'flex';
-            }
-            if (this.elements.reconcileAddAll) {
-                this.elements.reconcileAddAll.style.display = 'none';
-            }
-            return;
-        }
-
-        if (this.elements.reconcileEmpty) {
-            this.elements.reconcileEmpty.style.display = 'none';
-        }
-        if (this.elements.reconcileSummary) {
-            this.elements.reconcileSummary.style.display = 'flex';
-        }
-
-        if (this.elements.reconcileSummary) {
-            const totalSales = missingCustomers.reduce((sum, c) => sum + (parseFloat(c.totalSales) || 0), 0);
-            const totalOrders = missingCustomers.reduce((sum, c) => sum + (parseInt(c.orderCount) || 0), 0);
-
-            this.elements.reconcileSummary.innerHTML = `
-                <div class="reconcile-summary-stat">
-                    <div class="stat-value">${missingCustomers.length}</div>
-                    <div class="stat-label">Missing Customers</div>
-                </div>
-                <div class="reconcile-summary-stat">
-                    <div class="stat-value">${totalOrders}</div>
-                    <div class="stat-label">Total Orders</div>
-                </div>
-                <div class="reconcile-summary-stat">
-                    <div class="stat-value">${this.formatCurrency(totalSales)}</div>
-                    <div class="stat-label">Total Sales</div>
-                </div>
-            `;
-        }
-
-        if (this.elements.reconcileTableBody) {
-            this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'block';
-            this.elements.reconcileTableBody.innerHTML = missingCustomers.map(customer => `
-                <tr>
-                    <td class="company-name">${this.escapeHtml(customer.companyName || customer.CustomerName || 'Unknown')}</td>
-                    <td class="order-count">${customer.orderCount || 0}</td>
-                    <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
-                    <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
-                </tr>
-            `).join('');
-        }
-
-        if (this.elements.reconcileFooter) {
-            this.elements.reconcileFooter.style.display = 'flex';
-        }
-        if (this.elements.reconcileAddAll) {
-            this.elements.reconcileAddAll.style.display = 'inline-flex';
-            this.elements.reconcileAddAll.disabled = false;
-            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus"></i> Add All ${missingCustomers.length} Missing`;
-        }
-    }
-
-    /**
-     * Add all missing customers to the account list
-     */
-    async addAllMissingCustomers() {
-        if (this.elements.reconcileAddAll) {
-            this.elements.reconcileAddAll.disabled = true;
-            this.elements.reconcileAddAll.innerHTML = '<span class="loading-spinner"></span> Adding...';
-        }
-
-        try {
-            const result = await this.service.reconcileAccounts(true);
-
-            const addedCount = result.addedCount || result.missingCustomers?.length || 0;
-            this.showCelebration(`Added ${addedCount} customers to your account list!`, 'winback');
-
-            this.closeReconcileModal();
-            await this.loadAccounts();
-            this.updateStats();
-            this.applyFilters();
-
-        } catch (error) {
-            this.showError('Failed to add missing customers. Please try again.');
-        } finally {
-            if (this.elements.reconcileAddAll) {
-                this.elements.reconcileAddAll.disabled = false;
-                this.elements.reconcileAddAll.innerHTML = '<i class="fas fa-plus"></i> Add All Missing';
             }
         }
     }
@@ -1155,6 +1044,539 @@ class RepCRMController {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // ============================================================
+    // ACCOUNT DETAIL MODAL METHODS
+    // ============================================================
+
+    /**
+     * Open account detail modal
+     */
+    openAccountDetailModal(account) {
+        if (!this.elements.accountDetailModalOverlay) return;
+
+        // Set company name
+        if (this.elements.accountDetailCompany) {
+            this.elements.accountDetailCompany.textContent = account.CompanyName || 'Unknown Company';
+        }
+
+        // Set badges
+        if (this.elements.accountDetailBadges) {
+            this.elements.accountDetailBadges.innerHTML = this.renderAccountDetailBadges(account);
+        }
+
+        // Set body content
+        if (this.elements.accountDetailBody) {
+            this.elements.accountDetailBody.innerHTML = this.renderAccountDetailContent(account);
+        }
+
+        // Show modal
+        this.elements.accountDetailModalOverlay.classList.add('active');
+    }
+
+    /**
+     * Close account detail modal
+     */
+    closeAccountDetailModal() {
+        if (this.elements.accountDetailModalOverlay) {
+            this.elements.accountDetailModalOverlay.classList.remove('active');
+        }
+    }
+
+    /**
+     * Render account detail badges (tier, status)
+     */
+    renderAccountDetailBadges(account) {
+        const tierInfo = this.service.getTierInfo(account.Account_Tier);
+        const isAtRisk = account.At_Risk === true || account.At_Risk === 'true' || account.At_Risk === 1;
+        const isOverdue = this.isOverdue(account);
+        const healthClass = this.service.getHealthClass(account.Health_Score);
+        const healthScore = Math.round(parseFloat(account.Health_Score) || 0);
+
+        let badges = '';
+
+        if (tierInfo.label) {
+            badges += `<span class="tier-badge ${tierInfo.class}">${tierInfo.label}</span>`;
+        }
+
+        if (isAtRisk) {
+            badges += '<span class="status-badge at-risk"><i class="fas fa-exclamation-triangle"></i> At Risk</span>';
+        }
+
+        if (isOverdue) {
+            badges += '<span class="status-badge overdue"><i class="fas fa-clock"></i> Overdue</span>';
+        }
+
+        if (account.Trend) {
+            const trendClass = (account.Trend || '').toLowerCase().includes('growing') ? 'growing' :
+                              (account.Trend || '').toLowerCase().includes('declining') ? 'declining' : 'stable';
+            badges += `<span class="trend-badge ${trendClass}">${this.escapeHtml(account.Trend)}</span>`;
+        }
+
+        // Health score gauge
+        if (healthScore > 0) {
+            badges += `
+                <div class="health-gauge">
+                    <div class="health-gauge-bar">
+                        <div class="health-gauge-fill ${healthClass}" style="width: ${healthScore}%"></div>
+                    </div>
+                    <span class="health-gauge-value ${healthClass}">${healthScore}</span>
+                </div>
+            `;
+        }
+
+        return badges;
+    }
+
+    /**
+     * Render account detail modal content
+     */
+    renderAccountDetailContent(account) {
+        let html = '';
+
+        // Section 2: Contact Information
+        html += this.renderContactSection(account);
+
+        // Section 3: Financial Summary
+        html += this.renderFinancialSection(account);
+
+        // Section 4: Year-over-Year Comparison
+        html += this.renderYoYSection(account);
+
+        // Section 5: Top Products
+        html += this.renderTopProductsSection(account);
+
+        // Section 6: Product Categories
+        html += this.renderProductCategoriesSection(account);
+
+        // Section 7: Order Types
+        html += this.renderOrderTypesSection(account);
+
+        // Section 8: Activity & Timing
+        html += this.renderActivitySection(account);
+
+        // Section 9: Monthly Activity
+        html += this.renderMonthlyActivitySection(account);
+
+        // Section 10: Notes & Follow-up
+        html += this.renderNotesSection(account);
+
+        return html;
+    }
+
+    /**
+     * Render contact information section
+     */
+    renderContactSection(account) {
+        const contactName = account.Main_Contact_Name;
+        const email = account.Main_Contact_Email;
+        const phone = account.Main_Contact_Phone;
+        const lastContact = account.Last_Contact;
+        const contactStatus = account.Contact_Status;
+
+        if (!contactName && !email && !phone) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-user"></i> Contact Information</h4>
+                <div class="contact-detail-grid">
+                    ${contactName ? `
+                        <div class="contact-detail-item">
+                            <i class="fas fa-user"></i>
+                            <span>${this.escapeHtml(contactName)}</span>
+                        </div>
+                    ` : ''}
+                    ${email ? `
+                        <div class="contact-detail-item">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:${this.escapeHtml(email)}">${this.escapeHtml(email)}</a>
+                        </div>
+                    ` : ''}
+                    ${phone ? `
+                        <div class="contact-detail-item">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:${this.escapeHtml(phone)}">${this.escapeHtml(phone)}</a>
+                        </div>
+                    ` : ''}
+                    ${lastContact ? `
+                        <div class="contact-detail-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Last Contact: ${this.formatDate(lastContact)}</span>
+                        </div>
+                    ` : ''}
+                    ${contactStatus ? `
+                        <div class="contact-detail-item">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Status: ${this.escapeHtml(contactStatus)}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render financial summary section
+     */
+    renderFinancialSection(account) {
+        const totalRevenue = parseFloat(account.Total_Revenue) || 0;
+        const totalProfit = parseFloat(account.Total_Profit) || 0;
+        const marginPct = parseFloat(account.Margin_Pct) || 0;
+        const avgOrderValue = parseFloat(account.Avg_Order_Value) || 0;
+        const ordersPerYear = parseFloat(account.Orders_Per_Year) || 0;
+        const yearsActive = parseFloat(account.Years_Active) || 0;
+
+        if (!totalRevenue && !totalProfit && !avgOrderValue) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-chart-bar"></i> Financial Summary</h4>
+                <div class="data-grid">
+                    <div class="data-grid-item">
+                        <div class="data-grid-value currency">${this.formatCurrency(totalRevenue)}</div>
+                        <div class="data-grid-label">Total Revenue</div>
+                    </div>
+                    <div class="data-grid-item">
+                        <div class="data-grid-value currency">${this.formatCurrency(totalProfit)}</div>
+                        <div class="data-grid-label">Total Profit</div>
+                    </div>
+                    <div class="data-grid-item">
+                        <div class="data-grid-value">${marginPct.toFixed(1)}%</div>
+                        <div class="data-grid-label">Margin</div>
+                    </div>
+                    <div class="data-grid-item">
+                        <div class="data-grid-value currency">${this.formatCurrency(avgOrderValue)}</div>
+                        <div class="data-grid-label">Avg Order Value</div>
+                    </div>
+                    <div class="data-grid-item">
+                        <div class="data-grid-value">${ordersPerYear.toFixed(1)}</div>
+                        <div class="data-grid-label">Orders/Year</div>
+                    </div>
+                    <div class="data-grid-item">
+                        <div class="data-grid-value">${yearsActive.toFixed(1)}</div>
+                        <div class="data-grid-label">Years Active</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render year-over-year comparison section
+     */
+    renderYoYSection(account) {
+        const revenue2024 = parseFloat(account.Revenue_2024) || 0;
+        const revenue2025 = parseFloat(account.Revenue_2025) || 0;
+        const profit2024 = parseFloat(account.Profit_2024) || 0;
+        const profit2025 = parseFloat(account.Profit_2025) || 0;
+        const yoyGrowth = parseFloat(account.YoY_Growth_Pct) || 0;
+
+        if (!revenue2024 && !revenue2025) {
+            return '';
+        }
+
+        const growthClass = yoyGrowth >= 0 ? 'positive' : 'negative';
+        const growthSign = yoyGrowth >= 0 ? '+' : '';
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-chart-line"></i> Year-over-Year Comparison</h4>
+                <div class="yoy-comparison">
+                    <div class="yoy-card">
+                        <div class="yoy-card-header">
+                            <span class="yoy-card-year">2024</span>
+                        </div>
+                        <div class="yoy-card-values">
+                            <div class="yoy-stat">
+                                <div class="yoy-stat-value">${this.formatCurrency(revenue2024)}</div>
+                                <div class="yoy-stat-label">Revenue</div>
+                            </div>
+                            <div class="yoy-stat">
+                                <div class="yoy-stat-value">${this.formatCurrency(profit2024)}</div>
+                                <div class="yoy-stat-label">Profit</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="yoy-card">
+                        <div class="yoy-card-header">
+                            <span class="yoy-card-year">2025</span>
+                            <span class="yoy-card-growth ${growthClass}">${growthSign}${yoyGrowth.toFixed(1)}%</span>
+                        </div>
+                        <div class="yoy-card-values">
+                            <div class="yoy-stat">
+                                <div class="yoy-stat-value">${this.formatCurrency(revenue2025)}</div>
+                                <div class="yoy-stat-label">Revenue</div>
+                            </div>
+                            <div class="yoy-stat">
+                                <div class="yoy-stat-value">${this.formatCurrency(profit2025)}</div>
+                                <div class="yoy-stat-label">Profit</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render top products section
+     */
+    renderTopProductsSection(account) {
+        const products = [
+            account.Top_Product_1,
+            account.Top_Product_2,
+            account.Top_Product_3
+        ].filter(p => p);
+
+        if (products.length === 0) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-tshirt"></i> Top Products</h4>
+                <div class="top-products-list">
+                    ${products.map((product, i) => `
+                        <div class="top-product-item">
+                            <span class="top-product-rank">${i + 1}</span>
+                            <span class="top-product-name">${this.escapeHtml(product)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render product categories section
+     */
+    renderProductCategoriesSection(account) {
+        const categories = [
+            { key: 'Buys_Caps', label: 'Caps' },
+            { key: 'Buys_Jackets', label: 'Jackets' },
+            { key: 'Buys_Carhartt', label: 'Carhartt' },
+            { key: 'Buys_Polos', label: 'Polos' },
+            { key: 'Buys_TShirts', label: 'T-Shirts' },
+            { key: 'Buys_Hoodies', label: 'Hoodies' },
+            { key: 'Buys_Safety', label: 'Safety' }
+        ];
+
+        const hasAny = categories.some(c => this.isTruthy(account[c.key]));
+        if (!hasAny) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-tags"></i> Product Categories</h4>
+                <div class="checkmark-grid">
+                    ${categories.map(cat => {
+                        const isActive = this.isTruthy(account[cat.key]);
+                        return `
+                            <div class="checkmark-item ${isActive ? 'active' : ''}">
+                                <i class="fas ${isActive ? 'fa-check' : 'fa-times'}"></i>
+                                <span>${cat.label}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render order types section
+     */
+    renderOrderTypesSection(account) {
+        const orderTypes = [
+            { key: 'Uses_Inksoft', label: 'InkSoft' },
+            { key: 'Uses_Custom_Embroidery', label: 'Custom Embroidery' },
+            { key: 'Uses_Digital_Printing', label: 'Digital Printing' },
+            { key: 'Uses_CAP_Order', label: 'CAP Order' },
+            { key: 'Uses_DS_Embroidery', label: 'DS Embroidery' },
+            { key: 'Uses_Transfers', label: 'Transfers' },
+            { key: 'Uses_Screen_Print_Subcontract', label: 'Screen Print' },
+            { key: 'Uses_HOT_TICKET', label: 'Hot Ticket' },
+            { key: 'Uses_Laser_Ad_Specialties', label: 'Laser/Ad Spec' },
+            { key: 'Uses_Blank_Goods', label: 'Blank Goods' }
+        ];
+
+        const hasAny = orderTypes.some(t => this.isTruthy(account[t.key]));
+        const primaryType = account.Primary_Order_Type;
+
+        if (!hasAny && !primaryType) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-clipboard-list"></i> Order Types</h4>
+                ${primaryType ? `<p style="margin: 0 0 0.75rem; color: var(--text-secondary);"><strong>Primary:</strong> ${this.escapeHtml(primaryType)}</p>` : ''}
+                <div class="checkmark-grid">
+                    ${orderTypes.map(type => {
+                        const isActive = this.isTruthy(account[type.key]);
+                        return `
+                            <div class="checkmark-item ${isActive ? 'active' : ''}">
+                                <i class="fas ${isActive ? 'fa-check' : 'fa-times'}"></i>
+                                <span>${type.label}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render activity & timing section
+     */
+    renderActivitySection(account) {
+        const firstOrder = account.First_Order;
+        const lastOrder = account.Last_Order;
+        const daysSinceLast = parseInt(account.Days_Since_Last_Order) || 0;
+        const avgDaysBetween = parseFloat(account.Avg_Days_Between_Orders) || 0;
+        const predictedNext = account.Predicted_Next_Order;
+        const orderFrequency = account.Order_Frequency;
+
+        if (!firstOrder && !lastOrder && !daysSinceLast) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-history"></i> Activity & Timing</h4>
+                <div class="data-grid">
+                    ${firstOrder ? `
+                        <div class="data-grid-item">
+                            <div class="data-grid-value">${this.formatDate(firstOrder)}</div>
+                            <div class="data-grid-label">First Order</div>
+                        </div>
+                    ` : ''}
+                    ${lastOrder ? `
+                        <div class="data-grid-item">
+                            <div class="data-grid-value">${this.formatDate(lastOrder)}</div>
+                            <div class="data-grid-label">Last Order</div>
+                        </div>
+                    ` : ''}
+                    ${daysSinceLast ? `
+                        <div class="data-grid-item">
+                            <div class="data-grid-value">${daysSinceLast}</div>
+                            <div class="data-grid-label">Days Since Last</div>
+                        </div>
+                    ` : ''}
+                    ${avgDaysBetween ? `
+                        <div class="data-grid-item">
+                            <div class="data-grid-value">${Math.round(avgDaysBetween)}</div>
+                            <div class="data-grid-label">Avg Days Between</div>
+                        </div>
+                    ` : ''}
+                    ${predictedNext ? `
+                        <div class="data-grid-item">
+                            <div class="data-grid-value">${this.formatDate(predictedNext)}</div>
+                            <div class="data-grid-label">Predicted Next</div>
+                        </div>
+                    ` : ''}
+                    ${orderFrequency ? `
+                        <div class="data-grid-item">
+                            <div class="data-grid-value">${this.escapeHtml(orderFrequency)}</div>
+                            <div class="data-grid-label">Frequency</div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render monthly activity section
+     */
+    renderMonthlyActivitySection(account) {
+        const months = [
+            { key: 'Jan_Active', label: 'Jan' },
+            { key: 'Feb_Active', label: 'Feb' },
+            { key: 'Mar_Active', label: 'Mar' },
+            { key: 'Apr_Active', label: 'Apr' },
+            { key: 'May_Active', label: 'May' },
+            { key: 'Jun_Active', label: 'Jun' },
+            { key: 'Jul_Active', label: 'Jul' },
+            { key: 'Aug_Active', label: 'Aug' },
+            { key: 'Sep_Active', label: 'Sep' },
+            { key: 'Oct_Active', label: 'Oct' },
+            { key: 'Nov_Active', label: 'Nov' },
+            { key: 'Dec_Active', label: 'Dec' }
+        ];
+
+        const primaryMonth = (account.Primary_Month || '').toLowerCase().substring(0, 3);
+        const hasAny = months.some(m => this.isTruthy(account[m.key]));
+
+        if (!hasAny && !primaryMonth) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-calendar-alt"></i> Monthly Activity</h4>
+                <div class="monthly-activity-grid">
+                    ${months.map(month => {
+                        const isActive = this.isTruthy(account[month.key]);
+                        const isPrimary = primaryMonth === month.label.toLowerCase();
+                        let classes = 'month-box';
+                        if (isPrimary) classes += ' primary';
+                        else if (isActive) classes += ' active';
+                        return `<div class="${classes}">${month.label}</div>`;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render notes & follow-up section
+     */
+    renderNotesSection(account) {
+        const notes = account.Contact_Notes;
+        const nextFollowUp = account.Next_Follow_Up;
+        const followUpType = account.Follow_Up_Type;
+        const wonBackDate = account.Won_Back_Date;
+
+        if (!notes && !nextFollowUp && !wonBackDate) {
+            return '';
+        }
+
+        return `
+            <div class="account-detail-section">
+                <h4 class="account-detail-section-title"><i class="fas fa-sticky-note"></i> Notes & Follow-up</h4>
+                ${notes ? `<div class="notes-content">${this.escapeHtml(notes)}</div>` : ''}
+                ${(nextFollowUp || wonBackDate) ? `
+                    <div class="follow-up-info">
+                        ${nextFollowUp ? `
+                            <div class="follow-up-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Next Follow-up: ${this.formatDate(nextFollowUp)}${followUpType ? ` (${this.escapeHtml(followUpType)})` : ''}</span>
+                            </div>
+                        ` : ''}
+                        ${wonBackDate ? `
+                            <div class="follow-up-item won-back">
+                                <i class="fas fa-trophy"></i>
+                                <span>Won Back: ${this.formatDate(wonBackDate)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Helper to check if a value is truthy (handles 'true', 1, true)
+     */
+    isTruthy(value) {
+        return value === true || value === 'true' || value === 1 || value === '1';
     }
 }
 
