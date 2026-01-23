@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const stripe = require('stripe');
 const rateLimit = require('express-rate-limit');
+const session = require('express-session');
 
 // Load environment variables
 dotenv.config();
@@ -141,6 +142,28 @@ if (autoRecovery) {
 
 // Compress all responses
 app.use(compression());
+
+// =============================================================================
+// SESSION MANAGEMENT (for CRM dashboard authentication)
+// =============================================================================
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    httpOnly: true,
+    maxAge: null // Session cookie - expires when browser closes
+  }
+}));
+
+// CRM Authentication middleware
+function requireCrmAuth(req, res, next) {
+  if (req.session && req.session.crmAuthenticated) {
+    return next();
+  }
+  res.redirect('/crm-login?redirect=' + encodeURIComponent(req.originalUrl));
+}
 
 // =============================================================================
 // SECURITY: Rate Limiting
@@ -404,6 +427,54 @@ app.get('/product.html', (req, res) => {
 });
 
 // Removed duplicate routes - these pages are now served from /pages/ directory (see lines 342-347)
+
+// =============================================================================
+// CRM DASHBOARD AUTHENTICATION ROUTES
+// =============================================================================
+// Login page
+app.get('/crm-login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'crm-login.html'));
+});
+
+// Authentication endpoint
+app.post('/crm-auth', (req, res) => {
+  const { password, redirect } = req.body;
+  const correctPassword = process.env.CRM_PASSWORD;
+
+  if (!correctPassword) {
+    console.error('[CRM Auth] CRM_PASSWORD environment variable not set');
+    return res.redirect('/crm-login?error=config&redirect=' + encodeURIComponent(redirect || '/dashboards/staff-dashboard.html'));
+  }
+
+  if (password === correctPassword) {
+    req.session.crmAuthenticated = true;
+    const redirectUrl = redirect || '/dashboards/staff-dashboard.html';
+    return res.redirect(redirectUrl);
+  }
+
+  res.redirect('/crm-login?error=invalid&redirect=' + encodeURIComponent(redirect || '/dashboards/staff-dashboard.html'));
+});
+
+// Logout endpoint
+app.get('/crm-logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('[CRM Auth] Error destroying session:', err);
+    }
+    res.redirect('/dashboards/staff-dashboard.html');
+  });
+});
+
+// Protected CRM dashboard routes (MUST be before static middleware)
+app.get('/dashboards/taneisha-crm.html', requireCrmAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'taneisha-crm.html'));
+});
+app.get('/dashboards/nika-crm.html', requireCrmAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'nika-crm.html'));
+});
+app.get('/dashboards/house-accounts.html', requireCrmAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'house-accounts.html'));
+});
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));

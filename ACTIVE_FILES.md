@@ -46,6 +46,7 @@
 | `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
+| `/pages/crm-login.html` | CRM dashboard login page (password protection) | dashboard-styles.css | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 
