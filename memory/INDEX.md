@@ -63,6 +63,7 @@
 ├── ARTREQUESTS_FILE_UPLOAD_GUIDE.md  # ArtRequests file upload guide
 ├── PROXY_BILLING_ADDRESS_IMPLEMENTATION.md # Billing address proxy feature
 ├── CASPIO_STAFF_AUTH.md              # Caspio staff authentication
+├── CRM_DASHBOARD_AUTH.md             # CRM role-based auth (Express sessions)
 │
 ├── # Implementation Summaries
 ├── EXACT_MATCH_SEARCH_IMPLEMENTATION_SUMMARY.md # Exact match search feature
@@ -180,6 +181,7 @@
 | API call audit | [API_AUDIT_2026-01.md](./API_AUDIT_2026-01.md) |
 | Stripe payments | [STRIPE_INTEGRATION_GUIDE.md](./STRIPE_INTEGRATION_GUIDE.md) |
 | Staff authentication | [CASPIO_STAFF_AUTH.md](./CASPIO_STAFF_AUTH.md) |
+| CRM dashboard auth | [CRM_DASHBOARD_AUTH.md](./CRM_DASHBOARD_AUTH.md) |
 
 ### Troubleshooting
 | Issue | Reference |

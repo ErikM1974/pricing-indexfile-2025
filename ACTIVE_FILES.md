@@ -281,6 +281,7 @@ cap-embroidery-fix.css
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |
+| `/memory/CRM_DASHBOARD_AUTH.md` | CRM dashboard role-based auth (sessions + API proxy) | ✅ Active |
 
 ### Implementation Documentation
 | File | Purpose | Status |
