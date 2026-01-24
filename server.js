@@ -615,6 +615,9 @@ app.all('/api/crm-proxy/nika-accounts*', ...createCrmProxy('nika-accounts', ['ni
 // House accounts proxy - requires 'house' role
 app.all('/api/crm-proxy/house-accounts*', ...createCrmProxy('house-accounts', ['house']));
 
+// Sales Reps 2026 proxy - requires 'house' role (admin can view/edit all reps)
+app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', ['house']));
+
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 
 // Serve specific directories as static

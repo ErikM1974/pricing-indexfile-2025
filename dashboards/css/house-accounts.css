@@ -135,12 +135,18 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     border: 1px solid var(--card-border);
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    cursor: pointer;
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card.active {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.15);
 }
 
 .stat-card.total {
@@ -326,13 +332,19 @@ body {
     color: var(--text-secondary);
 }
 
+/* Rep-specific badge colors */
+.current-assignee.ruthie { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.current-assignee.erik { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.current-assignee.web { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.current-assignee.jim { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.current-assignee.house { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+
 .account-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     font-size: 0.8125rem;
     color: var(--text-muted);
-    margin-bottom: 0.75rem;
 }
 
 .account-meta i {
@@ -522,7 +534,8 @@ body {
     display: flex;
 }
 
-.confirm-modal {
+.confirm-modal,
+.modal-content {
     background: var(--card-dark);
     border-radius: 12px;
     width: 100%;
@@ -558,8 +571,19 @@ body {
     transition: color 0.2s;
 }
 
-.modal-close:hover {
+.modal-close:hover,
+.close-btn:hover {
     color: var(--text-primary);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s;
 }
 
 .modal-body {
@@ -719,7 +743,7 @@ body {
     background: var(--card-dark);
     border-radius: 12px;
     width: 100%;
-    max-width: 800px;
+    max-width: 1100px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
@@ -731,6 +755,32 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+}
+
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.refresh-btn {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    padding: 0.375rem 0.625rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.refresh-btn.spinning i {
+    animation: spin 0.8s linear infinite;
 }
 
 .reconcile-modal .modal-header .modal-title h2 {
@@ -888,6 +938,222 @@ body {
 .reconcile-empty p {
     margin: 0;
     color: var(--text-muted);
+}
+
+/* ShopWorks Status Indicators */
+.sw-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.sw-status i {
+    font-size: 0.75rem;
+}
+
+.sw-match {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.sw-mismatch {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.sw-not-found {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* Tier column */
+.reconcile-table .tier-name {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Action button in reconcile table */
+.btn-assign-row {
+    padding: 0.375rem 0.625rem;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    transition: background 0.2s;
+}
+
+.btn-assign-row:hover {
+    background: #2563eb;
+}
+
+/* Assign dropdown in reconcile table */
+.assign-dropdown {
+    padding: 0.375rem 0.5rem;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    min-width: 110px;
+}
+
+.assign-dropdown:hover {
+    background: #2563eb;
+}
+
+.assign-dropdown option {
+    background: var(--card-dark);
+    color: var(--text-primary);
+}
+
+/* Customer ID display in table */
+.reconcile-table .customer-id {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.125rem;
+}
+
+/* Assignment Modal with Tier Selection */
+.assign-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.assign-customer-info {
+    background: var(--bg-darker);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.assign-customer-info .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.375rem 0;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.assign-customer-info .info-row:last-child {
+    border-bottom: none;
+}
+
+.assign-customer-info .info-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.assign-customer-info .info-value {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.assign-rep-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-assign-rep {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--card-border);
+    background: transparent;
+    color: var(--text-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-assign-rep:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--accent-blue);
+}
+
+.btn-assign-rep.selected {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+}
+
+.btn-assign-rep.taneisha:hover,
+.btn-assign-rep.taneisha.selected {
+    background: var(--taneisha-color);
+    border-color: var(--taneisha-color);
+}
+
+.btn-assign-rep.nika:hover,
+.btn-assign-rep.nika.selected {
+    background: var(--nika-color);
+    border-color: var(--nika-color);
+}
+
+.btn-assign-rep.house:hover,
+.btn-assign-rep.house.selected {
+    background: var(--text-muted);
+    border-color: var(--text-muted);
+}
+
+/* Tier Dropdown */
+.tier-select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tier-select-group label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.tier-select {
+    padding: 0.75rem 1rem;
+    background: var(--bg-darker);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.tier-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+/* Sync checkbox */
+.sync-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+}
+
+.sync-checkbox-group input[type="checkbox"] {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: var(--accent-blue);
+}
+
+.sync-checkbox-group label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
 }
 
 /* =====================================================

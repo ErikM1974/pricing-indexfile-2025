@@ -501,6 +501,37 @@ class HouseAccountsController {
                 this.closeConfirmModal();
             }
         });
+
+        // Stat card click handlers for filtering
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', () => this.filterByStatCard(card));
+        });
+    }
+
+    /**
+     * Filter accounts by clicking a stat card
+     * @param {HTMLElement} card - The clicked stat card
+     */
+    filterByStatCard(card) {
+        const label = card.querySelector('.stat-label')?.textContent?.trim();
+
+        // Remove active state from all cards
+        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+
+        if (label === 'Total') {
+            // Show all accounts
+            this.clearFilters();
+        } else {
+            // Highlight clicked card
+            card.classList.add('active');
+
+            // Set assignee filter to match the label
+            if (this.elements.assigneeSelect) {
+                this.elements.assigneeSelect.value = label;
+            }
+            this.service.filters.assignedTo = label;
+            this.applyFilters();
+        }
     }
 
     /**
@@ -541,7 +572,19 @@ class HouseAccountsController {
      * Handle filter dropdown changes
      */
     handleFilterChange() {
-        this.service.filters.assignedTo = this.elements.assigneeSelect?.value || '';
+        const selectedAssignee = this.elements.assigneeSelect?.value || '';
+        this.service.filters.assignedTo = selectedAssignee;
+
+        // Sync stat card active state with dropdown
+        document.querySelectorAll('.stat-card').forEach(card => {
+            const label = card.querySelector('.stat-label')?.textContent?.trim();
+            if (selectedAssignee && label === selectedAssignee) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
         this.applyFilters();
     }
 
@@ -560,6 +603,9 @@ class HouseAccountsController {
     clearFilters() {
         if (this.elements.searchInput) this.elements.searchInput.value = '';
         if (this.elements.assigneeSelect) this.elements.assigneeSelect.value = '';
+
+        // Remove active state from all stat cards
+        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
 
         this.service.filters = {
             search: '',
@@ -632,7 +678,9 @@ class HouseAccountsController {
         this.elements.accountsGrid.innerHTML = this.filteredAccounts.map(account => {
             const assignee = account.Assigned_To || 'Unassigned';
             const dateAdded = this.formatDate(account.Date_Added || account.PK_ID);
-            const notes = account.Notes || '';
+
+            // Get CSS class for assignee badge (first word, lowercase)
+            const assigneeClass = (assignee || '').toLowerCase().split(' ')[0] || 'house';
 
             return `
                 <div class="account-card" data-id="${account.ID_Customer}">
@@ -641,7 +689,7 @@ class HouseAccountsController {
                             <div>
                                 <h3 class="company-name">${this.escapeHtml(account.CompanyName)}</h3>
                             </div>
-                            <span class="current-assignee">
+                            <span class="current-assignee ${assigneeClass}">
                                 <i class="fas fa-user"></i>&nbsp;${this.escapeHtml(assignee)}
                             </span>
                         </div>
@@ -653,22 +701,6 @@ class HouseAccountsController {
                             ${account.ID_Customer ? `
                                 <span><i class="fas fa-hashtag"></i> ID: ${account.ID_Customer}</span>
                             ` : ''}
-                        </div>
-
-                        ${notes ? `
-                            <div class="account-notes">
-                                <div class="account-notes-label">Notes</div>
-                                ${this.escapeHtml(notes)}
-                            </div>
-                        ` : ''}
-
-                        <div class="assign-buttons">
-                            <button class="assign-btn taneisha" onclick="houseController.promptAssign('${account.ID_Customer}', 'Taneisha')">
-                                <i class="fas fa-user-plus"></i> Taneisha
-                            </button>
-                            <button class="assign-btn nika" onclick="houseController.promptAssign('${account.ID_Customer}', 'Nika')">
-                                <i class="fas fa-user-plus"></i> Nika
-                            </button>
                         </div>
                     </div>
                 </div>

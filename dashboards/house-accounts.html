@@ -135,9 +135,14 @@
                     <h2><i class="fas fa-user-plus"></i> Find Unassigned Customers</h2>
                     <p class="modal-subtitle">Customers with orders not in any rep's account list</p>
                 </div>
-                <button class="modal-close" id="reconcile-modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="modal-header-actions">
+                    <button class="refresh-btn" id="reconcile-refresh-btn" title="Refresh data from Caspio">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="modal-close" id="reconcile-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
             <div class="reconcile-modal-body">
                 <div class="reconcile-loading" id="reconcile-loading">
@@ -151,10 +156,13 @@
                             <thead>
                                 <tr>
                                     <th>Company / ID</th>
-                                    <th>Rep</th>
+                                    <th>Order Rep</th>
+                                    <th>ShopWorks Rep</th>
+                                    <th>Tier</th>
                                     <th>Orders</th>
                                     <th>Total Sales</th>
                                     <th>Last Order</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="reconcile-table-body">
