@@ -1024,6 +1024,82 @@ body {
     margin-top: 0.125rem;
 }
 
+/* Expandable Order Details Rows */
+.reconcile-table .expand-col {
+    width: 30px;
+    text-align: center;
+}
+
+.reconcile-table .expand-toggle {
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+.reconcile-table .customer-row {
+    cursor: pointer;
+}
+
+.reconcile-table .customer-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.reconcile-table .customer-row:hover .expand-toggle {
+    color: var(--text-primary);
+}
+
+.order-details-row {
+    background: var(--bg-darker);
+}
+
+.order-details-row td {
+    padding: 0 !important;
+}
+
+.order-list {
+    padding: 12px 20px 12px 50px;
+}
+
+.order-list-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.order-item {
+    display: flex;
+    gap: 20px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 0.85rem;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-number {
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--accent-color);
+    min-width: 80px;
+}
+
+.order-amount {
+    color: var(--success);
+    min-width: 80px;
+}
+
+.order-date {
+    color: var(--text-muted);
+}
+
+.order-rep {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
 /* Assignment Modal with Tier Selection */
 .assign-modal-content {
     display: flex;

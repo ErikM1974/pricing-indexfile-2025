@@ -1425,6 +1425,53 @@ const StaffDashboardService = (function() {
     }
 
     // =====================================================
+    // REP CRM ACCOUNT TOTALS
+    // Fetches YTD sales from each rep's CRM account table
+    // =====================================================
+
+    /**
+     * Fetch CRM account totals for main sales reps
+     * Returns { repName: { totalSales, accountCount } }
+     * Used to show "Account Sales" alongside "Orders Processed" in Team Performance
+     */
+    async function fetchRepCRMTotals() {
+        const repEndpoints = {
+            'Nika Lao': '/api/crm-proxy/nika-accounts',
+            'Taneisha Clark': '/api/crm-proxy/taneisha-accounts'
+        };
+
+        const totals = {};
+
+        for (const [repName, endpoint] of Object.entries(repEndpoints)) {
+            try {
+                const response = await fetch(endpoint, { credentials: 'same-origin' });
+                if (!response.ok) {
+                    console.warn(`Could not fetch CRM for ${repName}: ${response.status}`);
+                    totals[repName] = { totalSales: null, accountCount: 0 };
+                    continue;
+                }
+
+                const data = await response.json();
+                // API returns { success: true, count: X, accounts: [...] }
+                const accounts = data.accounts || [];
+                const totalSales = accounts.reduce((sum, acc) =>
+                    sum + (parseFloat(acc.YTD_Sales_2026) || 0), 0);
+
+                totals[repName] = {
+                    totalSales,
+                    accountCount: accounts.length
+                };
+                console.log(`[CRM Totals] ${repName}: $${totalSales.toFixed(2)} from ${accounts.length} accounts`);
+            } catch (error) {
+                console.warn(`Could not fetch CRM for ${repName}:`, error.message);
+                totals[repName] = { totalSales: null, accountCount: 0 };
+            }
+        }
+
+        return totals;
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -1450,6 +1497,9 @@ const StaffDashboardService = (function() {
         // Per-Rep Daily Sales Archive (Team YTD tracking)
         archivePerRepDailySales,
         fetchYTDPerRepFromArchive,
+
+        // Rep CRM Account Totals
+        fetchRepCRMTotals,
 
         // Date range utilities
         getYTD2026Range,

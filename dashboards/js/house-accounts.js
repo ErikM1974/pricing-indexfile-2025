@@ -1003,8 +1003,20 @@ class HouseAccountsController {
                     ? this.escapeHtml(customer.shopWorksTier.replace(/'26|'26-|'26 -/g, '').trim())
                     : '-';
 
+                // Build order details row (expandable)
+                const ordersHtml = (customer.orders && customer.orders.length > 0)
+                    ? customer.orders.map(order => `
+                        <div class="order-item">
+                            <span class="order-number">#${this.escapeHtml(order.orderNumber || 'N/A')}</span>
+                            <span class="order-amount">${this.formatCurrency(order.amount || 0)}</span>
+                            <span class="order-date">${this.formatDate(order.date)}</span>
+                        </div>
+                    `).join('')
+                    : '<div class="order-item">No order details available</div>';
+
                 return `
-                <tr data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}">
+                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" onclick="window.houseController.toggleOrderDetails(this, event)">
+                    <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
                     <td class="company-name ${!customer.companyName || customer.companyName.startsWith('ID:') ? 'unknown-company' : ''}">
                         ${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}
                         <div class="customer-id">(ID: ${customer.ID_Customer})</div>
@@ -1016,7 +1028,7 @@ class HouseAccountsController {
                     <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
                     <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
                     <td class="actions">
-                        <select class="assign-dropdown" onchange="window.houseController.quickAssign(${customer.ID_Customer}, this.value)">
+                        <select class="assign-dropdown" onchange="window.houseController.quickAssign(${customer.ID_Customer}, this.value)" onclick="event.stopPropagation()">
                             <option value="">Assign to...</option>
                             <option value="Taneisha Clark">Taneisha Clark</option>
                             <option value="Nika Lao">Nika Lao</option>
@@ -1025,6 +1037,14 @@ class HouseAccountsController {
                             <option value="Erik Mickelson">Erik Mickelson</option>
                             <option value="Jim Mickelson">Jim Mickelson</option>
                         </select>
+                    </td>
+                </tr>
+                <tr class="order-details-row" style="display: none;">
+                    <td colspan="9">
+                        <div class="order-list">
+                            <div class="order-list-header">Orders for this customer:</div>
+                            ${ordersHtml}
+                        </div>
                     </td>
                 </tr>
             `;
@@ -1173,6 +1193,31 @@ class HouseAccountsController {
     }
 
     /**
+     * Toggle order details row expansion
+     * @param {HTMLElement} row - The customer row that was clicked
+     * @param {Event} event - The click event
+     */
+    toggleOrderDetails(row, event) {
+        // Don't toggle if clicking on dropdown or other interactive elements
+        if (event.target.closest('.assign-dropdown') || event.target.closest('select')) {
+            return;
+        }
+
+        const detailsRow = row.nextElementSibling;
+        const icon = row.querySelector('.expand-toggle i');
+
+        if (detailsRow && detailsRow.classList.contains('order-details-row')) {
+            const isHidden = detailsRow.style.display === 'none';
+            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+
+            if (icon) {
+                icon.classList.toggle('fa-chevron-right', !isHidden);
+                icon.classList.toggle('fa-chevron-down', isHidden);
+            }
+        }
+    }
+
+    /**
      * Quick assign a customer from dropdown in reconcile table
      * @param {number} customerId - The customer ID to assign
      * @param {string} repName - The rep to assign to
@@ -1220,6 +1265,9 @@ class HouseAccountsController {
                 throw new Error(`API error: ${response.status} - ${errorText}`);
             }
 
+            // Log assignment to history for audit trail
+            await this.logAssignmentHistory(customer, repName);
+
             this.showToast(`${customer.companyName || `ID: ${customerId}`} assigned to ${repName}!`);
 
             // Remove from table locally instead of re-fetching from ManageOrders
@@ -1229,6 +1277,40 @@ class HouseAccountsController {
         } catch (error) {
             console.error('Quick assign error:', error);
             this.showError(`Failed to assign customer: ${error.message}`);
+        }
+    }
+
+    /**
+     * Log assignment to history table for audit trail
+     * @param {Object} customer - The customer data
+     * @param {string} newRep - The rep being assigned to
+     */
+    async logAssignmentHistory(customer, newRep) {
+        try {
+            const previousRep = customer.shopWorksRep || 'Unassigned';
+            const orderNumbers = (customer.orders || [])
+                .map(o => o.orderNumber)
+                .filter(n => n && n !== 'N/A')
+                .join(', ');
+
+            await fetch('/api/crm-proxy/assignment-history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    customerId: customer.ID_Customer,
+                    customerName: customer.companyName || `ID: ${customer.ID_Customer}`,
+                    previousRep: previousRep,
+                    newRep: newRep,
+                    actionType: previousRep === 'Unassigned' ? 'ASSIGNED' : 'REASSIGNED',
+                    changedBy: 'Erik',
+                    changeSource: 'RECONCILE',
+                    relatedOrders: orderNumbers
+                })
+            });
+        } catch (error) {
+            // Log error but don't block the assignment
+            console.warn('Failed to log assignment history:', error);
         }
     }
 

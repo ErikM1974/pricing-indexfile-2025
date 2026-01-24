@@ -253,10 +253,27 @@ const StaffDashboardInit = (function() {
             // Uses Caspio archive for older data + ManageOrders for recent days
             const teamDataYTD = await loadTeamPerformanceYTDHybrid();
 
+            // Fetch CRM account totals for Nika and Taneisha (for dual metrics display)
+            // This shows "Account Sales" alongside "Orders Processed"
+            try {
+                const crmTotals = await StaffDashboardService.fetchRepCRMTotals();
+                // Merge CRM data into team performance data
+                teamDataYTD.reps.forEach(rep => {
+                    const crmData = crmTotals[rep.name];
+                    if (crmData) {
+                        rep.accountSales = crmData.totalSales;
+                        rep.accountCount = crmData.accountCount;
+                    }
+                });
+            } catch (crmError) {
+                console.warn('Could not fetch CRM totals:', crmError.message);
+                // Continue without CRM data - will just show "Orders Processed"
+            }
+
             // Render revenue (uses metrics.yoy for the selected period)
             renderRevenueCard(metrics.yoy, metrics.revenue, metrics.period);
 
-            // Render team with YTD data (no YoY comparison)
+            // Render team with YTD data (includes CRM account sales if available)
             renderTeamPerformanceYTD(teamDataYTD);
 
             // Update data source badge
@@ -577,6 +594,30 @@ const StaffDashboardInit = (function() {
 
             // No YoY display for YTD view - clean slate for 2026
 
+            // Build account sales display if CRM data is available
+            // Show gap button if processed > accounts (there's a discrepancy)
+            const processedAmount = parseFloat(rep.revenue) || 0;
+            const accountsAmount = rep.accountSales || 0;
+            const hasGap = rep.accountSales !== null && rep.accountSales !== undefined && processedAmount > accountsAmount;
+            const gapButtonHtml = hasGap
+                ? `<button class="gap-details-btn" onclick="showGapReport('${escapeHtml(rep.name)}')" title="View orders causing the gap">
+                       <i class="fas fa-info-circle"></i>
+                   </button>`
+                : '';
+
+            const accountSalesHtml = (rep.accountSales !== null && rep.accountSales !== undefined)
+                ? `<div class="rep-account-sales-group">
+                       <div class="rep-account-sales">${StaffDashboardService.formatCurrency(rep.accountSales)}</div>
+                       <div class="rep-account-sales-label">accounts</div>
+                       ${gapButtonHtml}
+                   </div>`
+                : '';
+
+            // If we have account sales, show "processed" label under orders total
+            const revenueLabel = accountSalesHtml
+                ? `<div class="rep-revenue-label">processed</div>`
+                : '';
+
             return `
             <div class="rep-card">
                 <div class="rep-info">
@@ -590,7 +631,11 @@ const StaffDashboardInit = (function() {
                     <div class="rep-progress-bar" style="width: ${rep.percentage}%"></div>
                 </div>
                 <div class="rep-stats">
-                    <div class="rep-revenue">${rep.formattedRevenue}</div>
+                    <div class="rep-revenue-group">
+                        <div class="rep-revenue">${rep.formattedRevenue}</div>
+                        ${revenueLabel}
+                    </div>
+                    ${accountSalesHtml}
                     <div class="rep-orders">${rep.orders} orders</div>
                 </div>
             </div>
@@ -1294,6 +1339,172 @@ const StaffDashboardInit = (function() {
     }
 
     // =====================================================
+    // GAP REPORT - Show orders causing discrepancy
+    // =====================================================
+
+    /**
+     * Show gap report modal for a specific rep
+     * @param {string} repName - The rep name (e.g., "Nika Lao")
+     */
+    async function showGapReport(repName) {
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('gapReportModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'gapReportModal';
+            modal.className = 'gap-report-modal-overlay';
+            modal.innerHTML = `
+                <div class="gap-report-modal">
+                    <div class="gap-report-header">
+                        <h2><i class="fas fa-info-circle"></i> Gap Details</h2>
+                        <button class="gap-report-close" onclick="closeGapReport()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="gap-report-body" id="gapReportBody">
+                        <div class="gap-report-loading">
+                            <div class="loading"></div>
+                            <p>Loading gap details...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeGapReport();
+            });
+        }
+
+        // Show modal
+        modal.classList.add('show');
+        const body = document.getElementById('gapReportBody');
+
+        // Determine endpoint based on rep name
+        let endpoint;
+        if (repName === 'Nika Lao') {
+            endpoint = '/api/crm-proxy/nika-accounts/gap-report';
+        } else if (repName === 'Taneisha Clark') {
+            endpoint = '/api/crm-proxy/taneisha-accounts/gap-report';
+        } else {
+            body.innerHTML = `<div class="gap-report-error">Gap report not available for ${escapeHtml(repName)}</div>`;
+            return;
+        }
+
+        try {
+            const response = await fetch(endpoint, { credentials: 'same-origin' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+
+            if (!data.success) throw new Error(data.error || 'Unknown error');
+
+            if (data.customers.length === 0) {
+                body.innerHTML = `
+                    <div class="gap-report-empty">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>No Gap!</h3>
+                        <p>All orders by ${escapeHtml(repName)} are for customers in their account list.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render gap report
+            body.innerHTML = `
+                <div class="gap-report-subtitle">Orders by ${escapeHtml(repName)} for customers NOT in their account list</div>
+                <div class="gap-report-summary">
+                    <div class="gap-stat">
+                        <div class="gap-stat-value">${StaffDashboardService.formatCurrency(data.gapAmount)}</div>
+                        <div class="gap-stat-label">Gap Amount</div>
+                    </div>
+                    <div class="gap-stat">
+                        <div class="gap-stat-value">${data.gapOrderCount}</div>
+                        <div class="gap-stat-label">Orders</div>
+                    </div>
+                    <div class="gap-stat">
+                        <div class="gap-stat-value">${data.gapCustomerCount}</div>
+                        <div class="gap-stat-label">Customers</div>
+                    </div>
+                </div>
+                <div class="gap-report-table-wrapper">
+                    <table class="gap-report-table">
+                        <thead>
+                            <tr>
+                                <th class="expand-col"></th>
+                                <th>Company</th>
+                                <th>Orders</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.customers.map(cust => `
+                                <tr class="gap-customer-row" onclick="toggleGapOrders(this)">
+                                    <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
+                                    <td>
+                                        <div class="gap-company-name">${escapeHtml(cust.companyName)}</div>
+                                        <div class="gap-customer-id">ID: ${cust.ID_Customer}</div>
+                                    </td>
+                                    <td>${cust.orderCount}</td>
+                                    <td>${StaffDashboardService.formatCurrency(cust.totalSales)}</td>
+                                </tr>
+                                <tr class="gap-orders-row" style="display: none;">
+                                    <td colspan="4">
+                                        <div class="gap-order-list">
+                                            ${cust.orders.map(order => `
+                                                <div class="gap-order-item">
+                                                    <span class="gap-order-number">#${escapeHtml(String(order.orderNumber))}</span>
+                                                    <span class="gap-order-amount">${StaffDashboardService.formatCurrency(order.amount)}</span>
+                                                    <span class="gap-order-date">${escapeHtml(order.date)}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="gap-report-footer">
+                    <p><i class="fas fa-info-circle"></i> To fix: Add customer to rep's CRM OR change order rep in ShopWorks</p>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Gap report error:', error);
+            body.innerHTML = `
+                <div class="gap-report-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Failed to load gap report: ${escapeHtml(error.message)}</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Close the gap report modal
+     */
+    function closeGapReport() {
+        const modal = document.getElementById('gapReportModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    /**
+     * Toggle order details row in gap report
+     */
+    function toggleGapOrders(row) {
+        const detailsRow = row.nextElementSibling;
+        const icon = row.querySelector('.expand-toggle i');
+        if (detailsRow && detailsRow.classList.contains('gap-orders-row')) {
+            const isHidden = detailsRow.style.display === 'none';
+            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+            if (icon) {
+                icon.classList.toggle('fa-chevron-right', !isHidden);
+                icon.classList.toggle('fa-chevron-down', isHidden);
+            }
+        }
+    }
+
+    // =====================================================
     // PUBLIC API
     // =====================================================
 
@@ -1313,6 +1524,11 @@ const StaffDashboardInit = (function() {
         // Production Schedule
         renderProductionSchedule,
 
+        // Gap Report
+        showGapReport,
+        closeGapReport,
+        toggleGapOrders,
+
         // Expose config for external use
         CONFIG
     };
@@ -1326,4 +1542,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Export for use
 if (typeof window !== 'undefined') {
     window.StaffDashboardInit = StaffDashboardInit;
+
+    // Global functions for onclick handlers
+    window.showGapReport = (repName) => StaffDashboardInit.showGapReport(repName);
+    window.closeGapReport = () => StaffDashboardInit.closeGapReport();
+    window.toggleGapOrders = (row) => StaffDashboardInit.toggleGapOrders(row);
 }

@@ -835,6 +835,310 @@
     color: var(--text-light);
 }
 
+/* Dual Metrics Display (Orders Processed vs Account Sales) */
+.rep-stats {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    text-align: right;
+    min-width: 80px;
+}
+
+.rep-revenue-group,
+.rep-account-sales-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.rep-revenue-label,
+.rep-account-sales-label {
+    font-size: 0.6rem;
+    color: var(--text-muted, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.rep-account-sales {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent-color, #10b981);
+}
+
+/* Gap Details Button */
+.gap-details-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted, #6b7280);
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    margin-left: 4px;
+    transition: all 0.2s ease;
+}
+
+.gap-details-btn:hover {
+    color: var(--accent-color, #10b981);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+/* Gap Report Modal */
+.gap-report-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.gap-report-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gap-report-modal {
+    background: var(--card-bg, #1e293b);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.gap-report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color, #334155);
+    background: var(--card-header-bg, #0f172a);
+}
+
+.gap-report-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary, #f1f5f9);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gap-report-header h2 i {
+    color: var(--accent-color, #10b981);
+}
+
+.gap-report-close {
+    background: none;
+    border: none;
+    color: var(--text-muted, #6b7280);
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1.1rem;
+    border-radius: 4px;
+}
+
+.gap-report-close:hover {
+    color: var(--text-primary, #f1f5f9);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.gap-report-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.gap-report-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted, #6b7280);
+    margin-bottom: 1rem;
+}
+
+.gap-report-summary {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color, #334155);
+}
+
+.gap-stat {
+    text-align: center;
+}
+
+.gap-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color, #10b981);
+}
+
+.gap-stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-muted, #6b7280);
+}
+
+.gap-report-table-wrapper {
+    overflow-x: auto;
+}
+
+.gap-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.gap-report-table th {
+    text-align: left;
+    padding: 0.5rem;
+    font-weight: 600;
+    color: var(--text-muted, #6b7280);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color, #334155);
+}
+
+.gap-report-table th.expand-col {
+    width: 30px;
+}
+
+.gap-customer-row {
+    cursor: pointer;
+}
+
+.gap-customer-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.gap-customer-row td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--border-color, #334155);
+    color: var(--text-primary, #f1f5f9);
+}
+
+.expand-toggle {
+    color: var(--text-muted, #6b7280);
+}
+
+.gap-company-name {
+    font-weight: 500;
+}
+
+.gap-customer-id {
+    font-size: 0.75rem;
+    color: var(--text-muted, #6b7280);
+}
+
+.gap-orders-row {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.gap-orders-row td {
+    padding: 0;
+}
+
+.gap-order-list {
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+}
+
+.gap-order-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border-color, #334155);
+}
+
+.gap-order-item:last-child {
+    border-bottom: none;
+}
+
+.gap-order-number {
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--accent-color, #10b981);
+    min-width: 70px;
+}
+
+.gap-order-amount {
+    color: var(--success, #22c55e);
+    min-width: 70px;
+}
+
+.gap-order-date {
+    color: var(--text-muted, #6b7280);
+}
+
+.gap-report-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color, #334155);
+    font-size: 0.8rem;
+    color: var(--text-muted, #6b7280);
+}
+
+.gap-report-footer i {
+    margin-right: 4px;
+}
+
+.gap-report-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--text-muted, #6b7280);
+}
+
+.gap-report-loading .loading {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 1rem;
+}
+
+.gap-report-empty {
+    text-align: center;
+    padding: 3rem;
+}
+
+.gap-report-empty i {
+    font-size: 3rem;
+    color: var(--success, #22c55e);
+    margin-bottom: 1rem;
+}
+
+.gap-report-empty h3 {
+    margin: 0;
+    color: var(--text-primary, #f1f5f9);
+}
+
+.gap-report-empty p {
+    color: var(--text-muted, #6b7280);
+    margin-top: 0.5rem;
+}
+
+.gap-report-error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--error, #ef4444);
+}
+
+.gap-report-error i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
 /* Loading State for Metrics */
 .metrics-loading {
     display: flex;

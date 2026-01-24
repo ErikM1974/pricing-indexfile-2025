@@ -443,6 +443,64 @@ If a user's permissions change in `CRM_PERMISSIONS`, they must log out and back 
 
 ---
 
+## Available CRM API Endpoints (caspio-pricing-proxy)
+
+These endpoints are available via the CRM proxy. Call them from frontend as `/api/crm-proxy/[endpoint]`.
+
+### Taneisha Accounts (`/api/taneisha-accounts/*`)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/taneisha-accounts` | GET | List all accounts (supports filters) |
+| `/taneisha-accounts/:id` | GET | Single account by ID_Customer |
+| `/taneisha-accounts` | POST | Create new account |
+| `/taneisha-accounts/:id` | PUT | Update account |
+| `/taneisha-accounts/:id` | DELETE | Delete account |
+| `/taneisha-accounts/reconcile` | GET | Compare CRM vs ManageOrders (60-day orders) |
+| `/taneisha-accounts/gap-report` | GET | **NEW** - Orders by Taneisha for customers NOT in CRM |
+
+### Nika Accounts (`/api/nika-accounts/*`)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/nika-accounts` | GET | List all accounts (supports filters) |
+| `/nika-accounts/:id` | GET | Single account by ID_Customer |
+| `/nika-accounts` | POST | Create new account |
+| `/nika-accounts/:id` | PUT | Update account |
+| `/nika-accounts/:id` | DELETE | Delete account |
+| `/nika-accounts/reconcile` | GET | Compare CRM vs ManageOrders (60-day orders) |
+| `/nika-accounts/gap-report` | GET | **NEW** - Orders by Nika for customers NOT in CRM |
+
+### Gap Report Response Format
+```json
+{
+  "success": true,
+  "rep": "Nika Lao",
+  "gapAmount": 19092.05,
+  "gapOrderCount": 32,
+  "gapCustomerCount": 24,
+  "customers": [
+    {
+      "ID_Customer": 11430,
+      "companyName": "Pierce County Emergency Management",
+      "orders": [
+        { "orderNumber": 139436, "amount": 3364, "date": "2025-12-15" }
+      ],
+      "totalSales": 6728,
+      "orderCount": 2
+    }
+  ]
+}
+```
+
+### Assignment History (`/api/assignment-history/*`) - PUBLIC (no auth required)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/assignment-history` | GET | Query history by customerId |
+| `/assignment-history` | POST | Log assignment change |
+| `/assignment-history/recent` | GET | Recent activity |
+| `/assignment-history/stats` | GET | Statistics by action type, source, rep |
+
+---
+
 ## Related Files Summary
 
 ### This Project (Pricing Index)
@@ -484,4 +542,4 @@ If a user's permissions change in `CRM_PERMISSIONS`, they must log out and back 
 
 ---
 
-*Last updated: 2026-01-23*
+*Last updated: 2026-01-24*
