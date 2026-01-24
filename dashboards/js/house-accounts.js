@@ -1190,12 +1190,83 @@ class HouseAccountsController {
 
             this.showToast(`${customer.companyName || `ID: ${customerId}`} assigned to ${repName}!`);
 
-            // Refresh the reconcile modal
-            await this.openReconcileModal();
+            // Remove from table locally instead of re-fetching from ManageOrders
+            // This avoids rate limiting (3 API calls per refresh)
+            this.removeCustomerFromReconcileTable(customerId);
 
         } catch (error) {
             console.error('Quick assign error:', error);
             this.showError(`Failed to assign customer: ${error.message}`);
+        }
+    }
+
+    /**
+     * Remove a customer row from the reconcile table after assignment
+     * Avoids re-fetching data from ManageOrders (prevents rate limiting)
+     * @param {number} customerId - The customer ID to remove
+     */
+    removeCustomerFromReconcileTable(customerId) {
+        // Remove from cached data
+        if (this.missingCustomersCache) {
+            this.missingCustomersCache = this.missingCustomersCache.filter(
+                c => c.ID_Customer !== customerId
+            );
+        }
+
+        // Remove row from DOM
+        const row = document.querySelector(`tr[data-customer-id="${customerId}"]`);
+        if (row) {
+            row.remove();
+        }
+
+        // Update summary stats
+        this.updateReconcileSummary();
+
+        // If no more customers, show empty state
+        if (this.missingCustomersCache && this.missingCustomersCache.length === 0) {
+            if (this.elements.reconcileEmpty) {
+                this.elements.reconcileEmpty.style.display = 'block';
+            }
+            if (this.elements.reconcileSummary) {
+                this.elements.reconcileSummary.style.display = 'none';
+            }
+            if (this.elements.reconcileTableBody) {
+                this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'none';
+            }
+            if (this.elements.reconcileAddAll) {
+                this.elements.reconcileAddAll.style.display = 'none';
+            }
+        }
+    }
+
+    /**
+     * Update the reconcile summary stats after removing a customer
+     */
+    updateReconcileSummary() {
+        if (!this.elements.reconcileSummary || !this.missingCustomersCache) return;
+
+        const customers = this.missingCustomersCache;
+        const totalSales = customers.reduce((sum, c) => sum + (parseFloat(c.totalSales) || 0), 0);
+        const totalOrders = customers.reduce((sum, c) => sum + (parseInt(c.orderCount) || 0), 0);
+
+        this.elements.reconcileSummary.innerHTML = `
+            <div class="reconcile-summary-stat">
+                <div class="stat-value">${customers.length}</div>
+                <div class="stat-label">Unassigned Customers</div>
+            </div>
+            <div class="reconcile-summary-stat">
+                <div class="stat-value">${totalOrders}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="reconcile-summary-stat">
+                <div class="stat-value">${this.formatCurrency(totalSales)}</div>
+                <div class="stat-label">Total Sales</div>
+            </div>
+        `;
+
+        // Update "Add All" button count
+        if (this.elements.reconcileAddAll && customers.length > 0) {
+            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus"></i> Add All ${customers.length} to House`;
         }
     }
 
@@ -1363,8 +1434,9 @@ class HouseAccountsController {
             this.showToast(`${account.CompanyName} assigned to ${repName}!`);
             this.closeAssignModal();
 
-            // Refresh reconcile data
-            await this.openReconcileModal();
+            // Remove from table locally instead of re-fetching from ManageOrders
+            // This avoids rate limiting (3 API calls per refresh)
+            this.removeCustomerFromReconcileTable(customer.ID_Customer);
 
         } catch (error) {
             console.error('Assignment error:', error);
