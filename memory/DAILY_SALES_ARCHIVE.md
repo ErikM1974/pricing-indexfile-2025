@@ -9,12 +9,13 @@
 
 ## Overview
 
-Two separate archive systems exist for different purposes:
+Three separate archive systems exist for different purposes:
 
 | Archive | Table | Purpose | Triggered By |
 |---------|-------|---------|--------------|
 | **Company-wide** | `DailySalesArchive` | $3M sales goal banner | Dashboard load (days 55-60) |
 | **By-rep breakdown** | `NW_Daily_Sales_By_Rep` | Team Performance YTD | Heroku Scheduler (daily) |
+| **Garment tracker** | `GarmentTrackerArchive` | Quarterly garment bonuses | Heroku Scheduler (daily) |
 
 ---
 
@@ -231,3 +232,124 @@ Archive populated with January 2026 data:
 | Taneisha Clark | $85,050.43 | 233 |
 | Others | $5,026.50 | 18 |
 | **Total** | **$233,482.19** | **650** |
+
+---
+
+## Garment Tracker Archive (GarmentTrackerArchive)
+
+### Purpose
+
+Track quarterly garment sales (Richardson caps + premium items) by rep for bonus calculations and historical reporting. Unlike daily sales which aggregates by date, this stores order-level detail for individual garment items.
+
+### What Qualifies
+
+**Richardson Caps** ($0.50 bonus each):
+- Styles: 110, 112, 111, 115, 172, 212, 220, 256, 312, 325, 326, 435, 511, 514, 514J, 840, 842, 870
+
+**Premium Items** ($2-$5 bonus each):
+| Part Number | Item | Bonus |
+|-------------|------|-------|
+| CT104670 | Carhartt Firm Duck Vest | $5 |
+| EB550 | Eddie Bauer Down Jacket | $5 |
+| CT103828 | Carhartt Thermal Hoodie | $3 |
+| CT102286 | Carhartt Acrylic Beanie | $2 |
+| NF0A52S7 | North Face High Loft Beanie | $2 |
+
+### Caspio Table
+
+**Table Name:** `GarmentTrackerArchive`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| PK_ID | Autonumber | Primary key |
+| OrderNumber | Number | ShopWorks order number |
+| DateInvoiced | Date/Time | Invoice date |
+| Quarter | Text | Quarter string (e.g., "2026-Q1") |
+| Year | Number | Year (e.g., 2026) |
+| RepName | Text | Sales rep name |
+| PartNumber | Text | Part/style number |
+| StyleCategory | Text | "Premium", "Richardson", or "Other" |
+| Quantity | Number | Item quantity |
+| BonusAmount | Currency | Calculated bonus |
+| ArchivedAt | Timestamp | Auto-set by Caspio |
+| CompositeKey | Formula (Unique) | `OrderNumber + '_' + PartNumber` |
+
+**Composite Key Formula:**
+```
+Convert(nvarchar(20), [@field:OrderNumber]) + '_' + [@field:PartNumber]
+```
+
+### API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/garment-tracker/archive?year=&quarter=&rep=` | Query archived data |
+| GET | `/api/garment-tracker/archive/summary?year=` | Aggregated summary by rep/quarter |
+| POST | `/api/garment-tracker/archive-from-live` | Copy from live GarmentTracker table |
+| POST | `/api/garment-tracker/archive-range` | Archive from ManageOrders (within 60 days) |
+| POST | `/api/garment-tracker/import` | Manual import for >60 day corrections |
+
+**Backend file:** `caspio-pricing-proxy/src/routes/garment-tracker.js`
+
+### Archiving Script
+
+**File:** `caspio-pricing-proxy/scripts/archive-garment-tracker.js`
+
+**Modes:**
+```bash
+# Archive yesterday's garment data
+npm run archive-garment-tracker
+
+# Archive date range from ManageOrders (within 60 days)
+npm run archive-garment-tracker -- --start 2026-01-01 --end 2026-01-31
+
+# Archive from current live GarmentTracker table
+npm run archive-garment-tracker -- --from-live
+```
+
+**Heroku Scheduler:** Run daily at 6 AM Pacific (14:00 UTC):
+```
+npm run archive-garment-tracker
+```
+
+### Live Table vs Archive Table
+
+| Table | Purpose | Retention |
+|-------|---------|-----------|
+| `GarmentTracker` | Current quarter dashboard display | Cleared quarterly |
+| `GarmentTrackerArchive` | Historical records | Permanent |
+
+The live `GarmentTracker` table is populated by `staff-dashboard-init.js:loadGarmentTracker()` and shows current quarter data. The archive preserves this data permanently.
+
+### Data Flow
+
+```
+ManageOrders (60-day limit)
+        ↓
+   Dashboard loads
+        ↓
+GarmentTracker (live, current quarter)
+        ↓
+  Archive script (daily)
+        ↓
+GarmentTrackerArchive (permanent)
+```
+
+### Initial Backfill (2026-01-25)
+
+Archive populated with January 2026 data:
+
+| Rep | Items | Bonus | Orders | Premium | Richardson |
+|-----|-------|-------|--------|---------|------------|
+| Nika Lao | 41 | $126.50 | 5 | 24 | 17 |
+| Taneisha Clark | 186 | $124.50 | 5 | 7 | 179 |
+| **Total** | **227** | **$251.00** | **10** | **31** | **196** |
+
+### Quarterly Reporting
+
+To get quarterly summary by rep:
+```bash
+curl "https://caspio-pricing-proxy.../api/garment-tracker/archive/summary?year=2026"
+```
+
+Response includes per-rep totals: quantity, bonus amount, order count, premium vs Richardson breakdown.
