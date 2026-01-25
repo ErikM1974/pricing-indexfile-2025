@@ -131,6 +131,26 @@ class RepCRMService {
         return await response.json();
     }
 
+    /**
+     * Sync ownership from Sales_Reps_2026 (ShopWorks source of truth)
+     * This ensures the CRM table has the correct customer assignments
+     */
+    async syncOwnership() {
+        const response = await fetch(`${this.baseURL}${this.apiEndpoint}/sync-ownership`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        });
+
+        if (this.handleAuthError(response)) return null;
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
     // ============================================================
     // ARCHIVE FUNCTIONS (YTD tracking beyond ManageOrders 60-day limit)
     // ============================================================
@@ -485,6 +505,7 @@ class RepCRMController {
 
             // Sync
             syncBtn: document.getElementById('sync-btn'),
+            syncOwnershipBtn: document.getElementById('sync-ownership-btn'),
             syncStatus: document.getElementById('sync-status'),
             lastSynced: document.getElementById('last-synced'),
 
@@ -557,6 +578,11 @@ class RepCRMController {
         // Sync button
         if (this.elements.syncBtn) {
             this.elements.syncBtn.addEventListener('click', () => this.syncSales());
+        }
+
+        // Sync ownership button (sync from ShopWorks)
+        if (this.elements.syncOwnershipBtn) {
+            this.elements.syncOwnershipBtn.addEventListener('click', () => this.syncOwnership());
         }
 
         // Account Detail Modal
@@ -973,6 +999,56 @@ class RepCRMController {
     }
 
     /**
+     * Sync ownership from ShopWorks (Sales_Reps_2026 table)
+     * This ensures the account list matches current ShopWorks assignments
+     */
+    async syncOwnership() {
+        const btn = this.elements.syncOwnershipBtn;
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Syncing...';
+        }
+
+        try {
+            const result = await this.service.syncOwnership();
+
+            if (result && result.success) {
+                const { added, removed, unchanged } = result.summary;
+                let message = `Ownership sync complete: ${added} added, ${removed} removed, ${unchanged} unchanged`;
+
+                // Show detailed changes if any
+                if (result.details.added.length > 0 || result.details.removed.length > 0) {
+                    const addedNames = result.details.added.slice(0, 3).map(c => c.name).join(', ');
+                    const removedNames = result.details.removed.slice(0, 3).map(c => c.name).join(', ');
+
+                    if (addedNames) message += `\n\nAdded: ${addedNames}${result.details.added.length > 3 ? '...' : ''}`;
+                    if (removedNames) message += `\n\nRemoved: ${removedNames}${result.details.removed.length > 3 ? '...' : ''}`;
+                }
+
+                this.showSuccess(message);
+
+                // Reload accounts if there were changes
+                if (added > 0 || removed > 0) {
+                    await this.loadAccounts();
+                    this.updateStats();
+                    this.applyFilters();
+                }
+            } else {
+                this.showError('Sync returned unexpected result');
+            }
+
+        } catch (error) {
+            console.error('Ownership sync error:', error);
+            this.showError('Ownership sync failed. Please try again later.');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sync from ShopWorks';
+            }
+        }
+    }
+
+    /**
      * Format date for display
      */
     formatDate(dateStr) {
@@ -1019,6 +1095,14 @@ class RepCRMController {
         if (this.elements.errorBanner) {
             this.elements.errorBanner.classList.remove('show');
         }
+    }
+
+    /**
+     * Show success message (using alert for now, can be enhanced with toast)
+     */
+    showSuccess(message) {
+        // Use alert for simplicity - can be replaced with a toast component later
+        alert(message);
     }
 
     /**
