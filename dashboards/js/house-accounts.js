@@ -82,6 +82,23 @@ class HouseAccountsService {
     }
 
     /**
+     * Fetch YTD sales for House accounts
+     * Returns sales grouped by Assigned_To (Ruthie, Erik, Web, Jim, House)
+     */
+    async fetchSales() {
+        const response = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/sales`, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return null;
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        this.sales = await response.json();
+        return this.sales;
+    }
+
+    /**
      * Assign a House account to a rep (moves record)
      * 1. POST to rep's table to create account
      * 2. DELETE from House table
@@ -590,10 +607,11 @@ class HouseAccountsController {
         this.showLoading(true);
 
         try {
-            // Load accounts and stats in parallel
+            // Load accounts, stats, and sales in parallel
             await Promise.all([
                 this.service.fetchAccounts(),
-                this.service.fetchStats()
+                this.service.fetchStats(),
+                this.service.fetchSales()
             ]);
 
             this.filteredAccounts = [...this.service.accounts];
@@ -667,32 +685,49 @@ class HouseAccountsController {
     }
 
     /**
-     * Update stats display
+     * Update stats display - shows YTD sales amounts with account counts
      */
     updateStats() {
         const stats = this.service.stats || this.service.calculateLocalStats();
+        const sales = this.service.sales || { totalRevenue: 0, byAssignee: {} };
 
+        // Helper to format sales amount
+        const formatSales = (amount) => {
+            const num = parseFloat(amount) || 0;
+            if (num >= 1000) {
+                return '$' + (num / 1000).toFixed(1) + 'k';
+            }
+            return '$' + num.toFixed(0);
+        };
+
+        // Update total - show total sales
         if (this.elements.statTotal) {
-            this.elements.statTotal.textContent = stats.total || 0;
+            this.elements.statTotal.textContent = formatSales(sales.totalRevenue || 0);
         }
 
-        // Update assignee stats
+        // Update assignee stats - show sales amount
         const byAssignee = stats.byAssignee || {};
+        const salesByAssignee = sales.byAssignee || {};
 
         if (this.elements.statRuthie) {
-            this.elements.statRuthie.textContent = byAssignee['Ruthie'] || 0;
+            const ruthieSales = salesByAssignee['Ruthie']?.revenue || 0;
+            this.elements.statRuthie.textContent = formatSales(ruthieSales);
         }
         if (this.elements.statErik) {
-            this.elements.statErik.textContent = byAssignee['Erik'] || 0;
+            const erikSales = salesByAssignee['Erik']?.revenue || 0;
+            this.elements.statErik.textContent = formatSales(erikSales);
         }
         if (this.elements.statWeb) {
-            this.elements.statWeb.textContent = byAssignee['Web'] || 0;
+            const webSales = salesByAssignee['Web']?.revenue || 0;
+            this.elements.statWeb.textContent = formatSales(webSales);
         }
         if (this.elements.statJim) {
-            this.elements.statJim.textContent = byAssignee['Jim'] || 0;
+            const jimSales = salesByAssignee['Jim']?.revenue || 0;
+            this.elements.statJim.textContent = formatSales(jimSales);
         }
         if (this.elements.statHouse) {
-            this.elements.statHouse.textContent = byAssignee['House'] || 0;
+            const houseSales = salesByAssignee['House']?.revenue || 0;
+            this.elements.statHouse.textContent = formatSales(houseSales);
         }
     }
 
