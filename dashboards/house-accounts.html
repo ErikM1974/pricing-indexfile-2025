@@ -101,6 +101,9 @@
                     <h2><i class="fas fa-home"></i> Accounts</h2>
                     <div class="accounts-meta">
                         <span class="accounts-count" id="accounts-count">0 accounts</span>
+                        <button class="gap-report-btn" id="gap-report-btn" title="View all authority conflicts - orders written by wrong rep">
+                            <i class="fas fa-exchange-alt"></i> Gap Report
+                        </button>
                         <button class="reconcile-btn" id="reconcile-btn" title="Find customers with orders not in any account list">
                             <i class="fas fa-user-plus"></i> Find Unassigned
                         </button>
@@ -210,6 +213,38 @@
 
     <!-- Celebration Toast (for success messages) -->
     <div class="celebration-toast" id="celebration-toast"></div>
+
+    <!-- Gap Report Modal -->
+    <div class="modal-overlay" id="gap-report-modal-overlay">
+        <div class="gap-report-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-exchange-alt"></i> Full Reconciliation Report</h2>
+                    <p class="modal-subtitle">Orders where rep doesn't match customer's CRM owner</p>
+                </div>
+                <div class="modal-header-actions">
+                    <button class="refresh-btn" id="gap-report-refresh-btn" title="Refresh report">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="modal-close" id="gap-report-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="gap-report-modal-body">
+                <div class="gap-report-loading" id="gap-report-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing order authority conflicts...</p>
+                </div>
+                <div class="gap-report-content" id="gap-report-content" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="gap-report-close">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Configuration -->
     <script src="/config/app.config.js"></script>

@@ -1287,3 +1287,360 @@ body {
         flex-direction: column;
     }
 }
+
+/* =====================================================
+   GAP REPORT BUTTON & MODAL
+   ===================================================== */
+.gap-report-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gap-report-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.gap-report-modal {
+    background: var(--card-dark);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--card-border);
+}
+
+.gap-report-modal .modal-header .modal-title h2 i {
+    color: var(--accent-blue);
+}
+
+.gap-report-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.gap-report-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+    color: var(--text-secondary);
+}
+
+/* Gap Report Summary */
+.gap-report-summary {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.gap-stat {
+    flex: 1;
+    padding: 1rem;
+    background: var(--bg-darker);
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--card-border);
+}
+
+.gap-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.gap-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Gap Report Empty State */
+.gap-report-empty {
+    text-align: center;
+    padding: 3rem;
+}
+
+.gap-report-empty i {
+    font-size: 3rem;
+    color: var(--success);
+    margin-bottom: 1rem;
+}
+
+.gap-report-empty h3 {
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+}
+
+.gap-report-empty p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+/* Rep Section */
+.gap-rep-section {
+    margin-bottom: 1rem;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.gap-rep-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-darker);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.gap-rep-header:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.gap-rep-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.gap-rep-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.gap-rep-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.gap-rep-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.gap-conflict-count {
+    font-weight: 500;
+    color: var(--warning);
+}
+
+.gap-conflict-amount {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.gap-rep-conflicts {
+    padding: 1rem;
+}
+
+/* Conflict Groups */
+.gap-conflict-group {
+    margin-bottom: 1.5rem;
+}
+
+.gap-conflict-group:last-child {
+    margin-bottom: 0;
+}
+
+.gap-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.gap-group-header.outbound {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.gap-group-header.inbound {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+}
+
+.gap-group-hint {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+/* Conflicts Table */
+.gap-conflicts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.gap-conflicts-table th {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.gap-conflicts-table td {
+    padding: 0.75rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--card-border);
+    vertical-align: top;
+}
+
+.gap-conflict-row {
+    cursor: pointer;
+}
+
+.gap-conflict-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.gap-company {
+    font-weight: 500;
+}
+
+.gap-customer-id {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.gap-owner,
+.gap-writers {
+    color: var(--text-secondary);
+}
+
+.gap-amount {
+    font-weight: 600;
+    color: var(--success);
+}
+
+.gap-fix {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.gap-fix em {
+    color: var(--text-muted);
+    font-style: normal;
+}
+
+/* Gap Orders Row */
+.gap-orders-row {
+    background: var(--bg-darker);
+}
+
+.gap-orders-row td {
+    padding: 0 !important;
+}
+
+.gap-order-list {
+    padding: 12px 20px 12px 50px;
+}
+
+.gap-order-list-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.gap-order-item {
+    display: flex;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 0.8rem;
+    align-items: center;
+}
+
+.gap-order-item:last-child {
+    border-bottom: none;
+}
+
+.gap-order-number {
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--accent-blue);
+    min-width: 70px;
+}
+
+.gap-order-amount {
+    color: var(--success);
+    min-width: 70px;
+}
+
+.gap-order-date {
+    color: var(--text-muted);
+    min-width: 90px;
+}
+
+.gap-order-writer {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+/* Gap Report Footer */
+.gap-report-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.gap-report-footer i {
+    margin-right: 0.5rem;
+    color: var(--accent-blue);
+}
+
+/* Expand Toggle for Gap Report */
+.gap-conflicts-table .expand-col {
+    width: 30px;
+    text-align: center;
+}
+
+.gap-conflicts-table .expand-toggle {
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.gap-conflicts-table .expand-toggle:hover {
+    color: var(--text-primary);
+}

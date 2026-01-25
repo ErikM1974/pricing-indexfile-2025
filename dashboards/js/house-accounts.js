@@ -172,6 +172,24 @@ class HouseAccountsService {
     }
 
     /**
+     * Fetch full reconciliation report - all authority conflicts across all reps
+     * @returns {Object} - Report data with conflicts grouped by rep
+     */
+    async fetchFullReconciliation() {
+        const url = `${this.baseURL}/api/crm-proxy/house-accounts/full-reconciliation`;
+
+        const response = await fetch(url, { credentials: 'same-origin' });
+
+        if (this.handleAuthError(response)) return null;
+
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
      * Calculate stats from loaded accounts
      */
     calculateLocalStats() {
@@ -429,7 +447,16 @@ class HouseAccountsController {
             confirmSubmit: document.getElementById('confirm-submit'),
 
             // Toast
-            celebrationToast: document.getElementById('celebration-toast')
+            celebrationToast: document.getElementById('celebration-toast'),
+
+            // Gap Report Modal
+            gapReportBtn: document.getElementById('gap-report-btn'),
+            gapReportModalOverlay: document.getElementById('gap-report-modal-overlay'),
+            gapReportModalClose: document.getElementById('gap-report-modal-close'),
+            gapReportRefreshBtn: document.getElementById('gap-report-refresh-btn'),
+            gapReportLoading: document.getElementById('gap-report-loading'),
+            gapReportContent: document.getElementById('gap-report-content'),
+            gapReportClose: document.getElementById('gap-report-close')
         };
     }
 
@@ -494,11 +521,33 @@ class HouseAccountsController {
             });
         }
 
+        // Gap Report button and modal
+        if (this.elements.gapReportBtn) {
+            this.elements.gapReportBtn.addEventListener('click', () => this.openGapReportModal());
+        }
+        if (this.elements.gapReportModalClose) {
+            this.elements.gapReportModalClose.addEventListener('click', () => this.closeGapReportModal());
+        }
+        if (this.elements.gapReportRefreshBtn) {
+            this.elements.gapReportRefreshBtn.addEventListener('click', () => this.refreshGapReport());
+        }
+        if (this.elements.gapReportClose) {
+            this.elements.gapReportClose.addEventListener('click', () => this.closeGapReportModal());
+        }
+        if (this.elements.gapReportModalOverlay) {
+            this.elements.gapReportModalOverlay.addEventListener('click', (e) => {
+                if (e.target === this.elements.gapReportModalOverlay) {
+                    this.closeGapReportModal();
+                }
+            });
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeReconcileModal();
                 this.closeConfirmModal();
+                this.closeGapReportModal();
             }
         });
 
@@ -1085,6 +1134,278 @@ class HouseAccountsController {
             if (this.elements.reconcileAddAll) {
                 this.elements.reconcileAddAll.disabled = false;
                 this.elements.reconcileAddAll.innerHTML = '<i class="fas fa-plus"></i> Add All to House';
+            }
+        }
+    }
+
+    // ============================================================
+    // GAP REPORT MODAL METHODS
+    // ============================================================
+
+    /**
+     * Open gap report modal and fetch full reconciliation data
+     */
+    async openGapReportModal() {
+        if (this.elements.gapReportModalOverlay) {
+            this.elements.gapReportModalOverlay.classList.add('active');
+        }
+        if (this.elements.gapReportLoading) {
+            this.elements.gapReportLoading.style.display = 'flex';
+        }
+        if (this.elements.gapReportContent) {
+            this.elements.gapReportContent.style.display = 'none';
+        }
+
+        try {
+            const result = await this.service.fetchFullReconciliation();
+            this.displayGapReport(result);
+        } catch (error) {
+            console.error('Gap report error:', error);
+            this.showError('Failed to load gap report. Please try again.');
+            this.closeGapReportModal();
+        }
+    }
+
+    /**
+     * Close gap report modal
+     */
+    closeGapReportModal() {
+        if (this.elements.gapReportModalOverlay) {
+            this.elements.gapReportModalOverlay.classList.remove('active');
+        }
+    }
+
+    /**
+     * Refresh gap report data
+     */
+    async refreshGapReport() {
+        if (this.elements.gapReportRefreshBtn) {
+            this.elements.gapReportRefreshBtn.classList.add('spinning');
+            this.elements.gapReportRefreshBtn.disabled = true;
+        }
+
+        try {
+            await this.openGapReportModal();
+        } finally {
+            if (this.elements.gapReportRefreshBtn) {
+                this.elements.gapReportRefreshBtn.classList.remove('spinning');
+                this.elements.gapReportRefreshBtn.disabled = false;
+            }
+        }
+    }
+
+    /**
+     * Display gap report results
+     * @param {Object} result - Full reconciliation data from API
+     */
+    displayGapReport(result) {
+        if (this.elements.gapReportLoading) {
+            this.elements.gapReportLoading.style.display = 'none';
+        }
+        if (this.elements.gapReportContent) {
+            this.elements.gapReportContent.style.display = 'block';
+        }
+
+        const reps = result.reps || [];
+        const totalConflicts = reps.reduce((sum, r) => sum + r.conflictCount, 0);
+        const totalAmount = reps.reduce((sum, r) => sum + r.totalAmount, 0);
+
+        if (totalConflicts === 0) {
+            this.elements.gapReportContent.innerHTML = `
+                <div class="gap-report-empty">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>No Authority Conflicts!</h3>
+                    <p>All orders match their CRM owners. Great job keeping things in sync!</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Build report HTML
+        let html = `
+            <div class="gap-report-summary">
+                <div class="gap-stat">
+                    <div class="gap-stat-value">${totalConflicts}</div>
+                    <div class="gap-stat-label">Total Conflicts</div>
+                </div>
+                <div class="gap-stat">
+                    <div class="gap-stat-value">${this.formatCurrency(totalAmount)}</div>
+                    <div class="gap-stat-label">Total Amount</div>
+                </div>
+                <div class="gap-stat">
+                    <div class="gap-stat-value">${result.ordersPeriod || '60 days'}</div>
+                    <div class="gap-stat-label">Period</div>
+                </div>
+            </div>
+        `;
+
+        // Render each rep's conflicts
+        reps.forEach(rep => {
+            if (rep.conflictCount === 0) return;
+
+            const repInitials = rep.rep.split(' ').map(n => n[0]).join('');
+
+            html += `
+                <div class="gap-rep-section">
+                    <div class="gap-rep-header" onclick="window.houseController.toggleGapRepSection(this)">
+                        <div class="gap-rep-info">
+                            <span class="gap-rep-avatar">${repInitials}</span>
+                            <span class="gap-rep-name">${this.escapeHtml(rep.rep)}</span>
+                        </div>
+                        <div class="gap-rep-stats">
+                            <span class="gap-conflict-count">${rep.conflictCount} conflicts</span>
+                            <span class="gap-conflict-amount">${this.formatCurrency(rep.totalAmount)}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="gap-rep-conflicts" style="display: block;">
+                        ${rep.outboundCount > 0 ? `
+                            <div class="gap-conflict-group">
+                                <div class="gap-group-header outbound">
+                                    <i class="fas fa-arrow-right"></i>
+                                    Outbound: ${rep.outboundCount} customers (${this.formatCurrency(rep.outboundAmount)})
+                                    <span class="gap-group-hint">Orders BY ${rep.rep.split(' ')[0]} for customers NOT in their CRM</span>
+                                </div>
+                                ${this.renderGapConflicts(rep.conflicts.filter(c => c.conflictType === 'outbound'), rep.rep)}
+                            </div>
+                        ` : ''}
+                        ${rep.inboundCount > 0 ? `
+                            <div class="gap-conflict-group">
+                                <div class="gap-group-header inbound">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Inbound: ${rep.inboundCount} customers (${this.formatCurrency(rep.inboundAmount)})
+                                    <span class="gap-group-hint">Orders by OTHER reps for customers IN ${rep.rep.split(' ')[0]}'s CRM</span>
+                                </div>
+                                ${this.renderGapConflicts(rep.conflicts.filter(c => c.conflictType === 'inbound'), rep.rep)}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `
+            <div class="gap-report-footer">
+                <i class="fas fa-info-circle"></i>
+                To fix: Change order rep in ShopWorks OR add/move customer in CRM.
+                Report generated: ${new Date(result.generatedAt).toLocaleString()}
+            </div>
+        `;
+
+        this.elements.gapReportContent.innerHTML = html;
+    }
+
+    /**
+     * Render gap conflicts table for a rep
+     */
+    renderGapConflicts(conflicts, repName) {
+        if (!conflicts || conflicts.length === 0) return '';
+
+        return `
+            <table class="gap-conflicts-table">
+                <thead>
+                    <tr>
+                        <th class="expand-col"></th>
+                        <th>Customer</th>
+                        <th>CRM Owner</th>
+                        <th>Order Writer(s)</th>
+                        <th>Orders</th>
+                        <th>Amount</th>
+                        <th>Fix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${conflicts.map(c => this.renderGapConflictRow(c, repName)).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    /**
+     * Render a single conflict row
+     */
+    renderGapConflictRow(conflict, repName) {
+        const isOutbound = conflict.conflictType === 'outbound';
+        const writers = conflict.repNames && conflict.repNames.length > 0
+            ? conflict.repNames.join(', ')
+            : repName;
+
+        // Build fix instruction based on conflict type
+        let fixInstruction;
+        if (isOutbound) {
+            fixInstruction = conflict.owner
+                ? `Add to ${repName.split(' ')[0]}'s CRM<br><em>OR</em> change orders to "${conflict.owner}"`
+                : `Add to ${repName.split(' ')[0]}'s CRM<br><em>OR</em> assign customer in ShopWorks`;
+        } else {
+            fixInstruction = `Change orders from "${writers}" to "${repName}" in ShopWorks`;
+        }
+
+        // Build orders list
+        const ordersHtml = (conflict.orders || []).map(o => `
+            <div class="gap-order-item">
+                <span class="gap-order-number">#${this.escapeHtml(o.orderNumber || 'N/A')}</span>
+                <span class="gap-order-amount">${this.formatCurrency(o.amount || 0)}</span>
+                <span class="gap-order-date">${this.formatDate(o.date)}</span>
+                ${o.writer ? `<span class="gap-order-writer">by ${this.escapeHtml(o.writer)}</span>` : ''}
+            </div>
+        `).join('');
+
+        return `
+            <tr class="gap-conflict-row" onclick="window.houseController.toggleGapOrderDetails(this)">
+                <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
+                <td class="gap-company">
+                    ${this.escapeHtml(conflict.companyName || `ID: ${conflict.ID_Customer}`)}
+                    <div class="gap-customer-id">ID: ${conflict.ID_Customer}</div>
+                </td>
+                <td class="gap-owner">${this.escapeHtml(conflict.owner || 'Unassigned')}</td>
+                <td class="gap-writers">${this.escapeHtml(writers)}</td>
+                <td class="gap-order-count">${conflict.orderCount || 0}</td>
+                <td class="gap-amount">${this.formatCurrency(conflict.totalSales || 0)}</td>
+                <td class="gap-fix">${fixInstruction}</td>
+            </tr>
+            <tr class="gap-orders-row" style="display: none;">
+                <td colspan="7">
+                    <div class="gap-order-list">
+                        <div class="gap-order-list-header">Orders to fix:</div>
+                        ${ordersHtml}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    /**
+     * Toggle gap report rep section expansion
+     */
+    toggleGapRepSection(header) {
+        const conflictsDiv = header.nextElementSibling;
+        const icon = header.querySelector('.fa-chevron-down, .fa-chevron-up');
+
+        if (conflictsDiv) {
+            const isHidden = conflictsDiv.style.display === 'none';
+            conflictsDiv.style.display = isHidden ? 'block' : 'none';
+
+            if (icon) {
+                icon.classList.toggle('fa-chevron-down', !isHidden);
+                icon.classList.toggle('fa-chevron-up', isHidden);
+            }
+        }
+    }
+
+    /**
+     * Toggle gap order details row
+     */
+    toggleGapOrderDetails(row) {
+        const detailsRow = row.nextElementSibling;
+        const icon = row.querySelector('.expand-toggle i');
+
+        if (detailsRow && detailsRow.classList.contains('gap-orders-row')) {
+            const isHidden = detailsRow.style.display === 'none';
+            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+
+            if (icon) {
+                icon.classList.toggle('fa-chevron-right', !isHidden);
+                icon.classList.toggle('fa-chevron-down', isHidden);
             }
         }
     }
