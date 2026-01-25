@@ -64,6 +64,7 @@
 ├── PROXY_BILLING_ADDRESS_IMPLEMENTATION.md # Billing address proxy feature
 ├── CASPIO_STAFF_AUTH.md              # Caspio staff authentication
 ├── CRM_DASHBOARD_AUTH.md             # CRM role-based auth (Express sessions)
+├── CRM_DASHBOARD_RECONCILIATION.md   # Gap Report, authority conflicts, dashboard metrics
 │
 ├── # Implementation Summaries
 ├── EXACT_MATCH_SEARCH_IMPLEMENTATION_SUMMARY.md # Exact match search feature

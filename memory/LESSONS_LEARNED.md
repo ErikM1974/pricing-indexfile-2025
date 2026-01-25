@@ -30,6 +30,26 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: Chunk Boundary Overlap Causes Double-Counting
+**Date:** 2026-01-25
+**Project:** [caspio-proxy]
+**Problem:** Sync-sales endpoints showed YTD totals ~10% higher than ManageOrders. Some accounts had exactly DOUBLE the correct amount.
+**Root Cause:** Orders were fetched in 20-day chunks to avoid API timeouts, but chunk boundaries overlapped. Orders invoiced on boundary dates (e.g., Jan 5) appeared in multiple chunks and were counted twice.
+**Solution:** Added deduplication by `id_Order` before aggregation:
+```javascript
+const seenOrderIds = new Set();
+const uniqueOrders = allOrders.filter(order => {
+    if (seenOrderIds.has(order.id_Order)) return false;
+    seenOrderIds.add(order.id_Order);
+    return true;
+});
+```
+**Prevention:** When fetching data in chunks, ALWAYS deduplicate by unique ID before processing. Chunk boundary dates are inherently risky.
+**Files fixed:** `nika-accounts.js`, `taneisha-accounts.js`, `house-accounts.js`
+**See also:** `/memory/CRM_DASHBOARD_RECONCILIATION.md`
+
+---
+
 ## Rule: ALWAYS Pull Pricing From Caspio API - Never Hardcode
 **Date:** 2026-01-15
 **Project:** [All]
