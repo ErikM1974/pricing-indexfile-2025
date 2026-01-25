@@ -884,6 +884,26 @@
     background: rgba(16, 185, 129, 0.1);
 }
 
+/* Outbound gap: orders BY rep for non-CRM customers */
+.gap-details-btn.gap-outbound {
+    color: var(--warning, #f59e0b);
+}
+
+.gap-details-btn.gap-outbound:hover {
+    color: var(--warning, #f59e0b);
+    background: rgba(245, 158, 11, 0.1);
+}
+
+/* Inbound gap: orders by OTHER reps for CRM customers */
+.gap-details-btn.gap-inbound {
+    color: var(--info, #3b82f6);
+}
+
+.gap-details-btn.gap-inbound:hover {
+    color: var(--info, #3b82f6);
+    background: rgba(59, 130, 246, 0.1);
+}
+
 /* Gap Report Modal */
 .gap-report-modal-overlay {
     position: fixed;
@@ -1078,6 +1098,19 @@
 
 .gap-order-date {
     color: var(--text-muted, #6b7280);
+}
+
+.gap-order-rep {
+    color: var(--info, #3b82f6);
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 4px;
+}
+
+.gap-rep-names {
+    font-size: 0.8rem;
+    color: var(--info, #3b82f6);
 }
 
 .gap-report-footer {

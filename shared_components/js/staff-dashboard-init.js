@@ -595,17 +595,29 @@ const StaffDashboardInit = (function() {
             // No YoY display for YTD view - clean slate for 2026
 
             // Build account sales display if CRM data is available
-            // Show gap button if processed > accounts (there's a discrepancy)
+            // Two types of gaps:
+            // 1. Processed > Accounts: Rep wrote orders for customers NOT in their CRM
+            // 2. Accounts > Processed: OTHER reps wrote orders for customers IN their CRM
             const processedAmount = parseFloat(rep.revenue) || 0;
             const accountsAmount = rep.accountSales || 0;
-            const hasGap = rep.accountSales !== null && rep.accountSales !== undefined && processedAmount > accountsAmount;
-            const gapButtonHtml = hasGap
-                ? `<button class="gap-details-btn" onclick="showGapReport('${escapeHtml(rep.name)}')" title="View orders causing the gap">
-                       <i class="fas fa-info-circle"></i>
-                   </button>`
-                : '';
+            const hasCrmData = rep.accountSales !== null && rep.accountSales !== undefined;
+            const hasGap = hasCrmData && processedAmount > accountsAmount;
+            const hasReverseGap = hasCrmData && accountsAmount > processedAmount;
 
-            const accountSalesHtml = (rep.accountSales !== null && rep.accountSales !== undefined)
+            let gapButtonHtml = '';
+            if (hasGap) {
+                // Orders BY this rep for customers NOT in their CRM
+                gapButtonHtml = `<button class="gap-details-btn gap-outbound" onclick="showGapReport('${escapeHtml(rep.name)}', 'outbound')" title="Orders you wrote for non-CRM customers">
+                       <i class="fas fa-arrow-right"></i>
+                   </button>`;
+            } else if (hasReverseGap) {
+                // Orders by OTHER reps for customers IN this rep's CRM
+                gapButtonHtml = `<button class="gap-details-btn gap-inbound" onclick="showGapReport('${escapeHtml(rep.name)}', 'inbound')" title="Orders other reps wrote for your customers">
+                       <i class="fas fa-arrow-left"></i>
+                   </button>`;
+            }
+
+            const accountSalesHtml = hasCrmData
                 ? `<div class="rep-account-sales-group">
                        <div class="rep-account-sales">${StaffDashboardService.formatCurrency(rep.accountSales)}</div>
                        <div class="rep-account-sales-label">accounts</div>
@@ -1345,8 +1357,9 @@ const StaffDashboardInit = (function() {
     /**
      * Show gap report modal for a specific rep
      * @param {string} repName - The rep name (e.g., "Nika Lao")
+     * @param {string} gapType - 'outbound' (orders BY rep for non-CRM) or 'inbound' (orders by OTHERS for CRM)
      */
-    async function showGapReport(repName) {
+    async function showGapReport(repName, gapType = 'outbound') {
         // Create modal if it doesn't exist
         let modal = document.getElementById('gapReportModal');
         if (!modal) {
@@ -1356,7 +1369,7 @@ const StaffDashboardInit = (function() {
             modal.innerHTML = `
                 <div class="gap-report-modal">
                     <div class="gap-report-header">
-                        <h2><i class="fas fa-info-circle"></i> Gap Details</h2>
+                        <h2 id="gapReportTitle"><i class="fas fa-info-circle"></i> Gap Details</h2>
                         <button class="gap-report-close" onclick="closeGapReport()">
                             <i class="fas fa-times"></i>
                         </button>
@@ -1377,20 +1390,30 @@ const StaffDashboardInit = (function() {
             });
         }
 
-        // Show modal
+        // Show modal and set loading state
         modal.classList.add('show');
         const body = document.getElementById('gapReportBody');
+        const title = document.getElementById('gapReportTitle');
+        body.innerHTML = `<div class="gap-report-loading"><div class="loading"></div><p>Loading gap details...</p></div>`;
 
-        // Determine endpoint based on rep name
+        // Determine endpoint and labels based on gap type
+        const isInbound = gapType === 'inbound';
         let endpoint;
-        if (repName === 'Nika Lao') {
-            endpoint = '/api/crm-proxy/nika-accounts/gap-report';
-        } else if (repName === 'Taneisha Clark') {
-            endpoint = '/api/crm-proxy/taneisha-accounts/gap-report';
+        const repFirstName = repName.split(' ')[0].toLowerCase();
+
+        if (repName === 'Nika Lao' || repName === 'Taneisha Clark') {
+            endpoint = isInbound
+                ? `/api/crm-proxy/${repFirstName}-accounts/reverse-gap-report`
+                : `/api/crm-proxy/${repFirstName}-accounts/gap-report`;
         } else {
             body.innerHTML = `<div class="gap-report-error">Gap report not available for ${escapeHtml(repName)}</div>`;
             return;
         }
+
+        // Update title based on gap type
+        title.innerHTML = isInbound
+            ? `<i class="fas fa-arrow-left"></i> Orders From Other Reps`
+            : `<i class="fas fa-arrow-right"></i> Orders to Non-CRM Customers`;
 
         try {
             const response = await fetch(endpoint, { credentials: 'same-origin' });
@@ -1399,31 +1422,58 @@ const StaffDashboardInit = (function() {
 
             if (!data.success) throw new Error(data.error || 'Unknown error');
 
+            // Get the appropriate data fields based on gap type
+            const gapAmount = isInbound ? data.reverseGapAmount : data.gapAmount;
+            const gapOrderCount = isInbound ? data.reverseGapOrderCount : data.gapOrderCount;
+            const gapCustomerCount = isInbound ? data.reverseGapCustomerCount : data.gapCustomerCount;
+
             if (data.customers.length === 0) {
                 body.innerHTML = `
                     <div class="gap-report-empty">
                         <i class="fas fa-check-circle"></i>
                         <h3>No Gap!</h3>
-                        <p>All orders by ${escapeHtml(repName)} are for customers in their account list.</p>
+                        <p>${isInbound
+                            ? `No orders by other reps for ${escapeHtml(repName)}'s customers.`
+                            : `All orders by ${escapeHtml(repName)} are for customers in their account list.`
+                        }</p>
                     </div>
                 `;
                 return;
             }
 
+            // Set subtitle based on gap type
+            const subtitle = isInbound
+                ? `Orders by <strong>other reps</strong> for customers in ${escapeHtml(repName)}'s CRM`
+                : `Orders by ${escapeHtml(repName)} for customers <strong>NOT</strong> in their CRM`;
+
+            const footerText = isInbound
+                ? `To fix: Change order rep in ShopWorks to ${escapeHtml(repName)} OR remove customer from CRM`
+                : `To fix: Add customer to ${escapeHtml(repName)}'s CRM OR change order rep in ShopWorks`;
+
+            // Build order items - include rep name for inbound reports
+            const buildOrderItems = (orders) => orders.map(order => `
+                <div class="gap-order-item">
+                    <span class="gap-order-number">#${escapeHtml(String(order.orderNumber))}</span>
+                    <span class="gap-order-amount">${StaffDashboardService.formatCurrency(order.amount)}</span>
+                    <span class="gap-order-date">${escapeHtml(order.date)}</span>
+                    ${isInbound && order.rep ? `<span class="gap-order-rep">${escapeHtml(order.rep)}</span>` : ''}
+                </div>
+            `).join('');
+
             // Render gap report
             body.innerHTML = `
-                <div class="gap-report-subtitle">Orders by ${escapeHtml(repName)} for customers NOT in their account list</div>
+                <div class="gap-report-subtitle">${subtitle}</div>
                 <div class="gap-report-summary">
                     <div class="gap-stat">
-                        <div class="gap-stat-value">${StaffDashboardService.formatCurrency(data.gapAmount)}</div>
+                        <div class="gap-stat-value">${StaffDashboardService.formatCurrency(gapAmount)}</div>
                         <div class="gap-stat-label">Gap Amount</div>
                     </div>
                     <div class="gap-stat">
-                        <div class="gap-stat-value">${data.gapOrderCount}</div>
+                        <div class="gap-stat-value">${gapOrderCount}</div>
                         <div class="gap-stat-label">Orders</div>
                     </div>
                     <div class="gap-stat">
-                        <div class="gap-stat-value">${data.gapCustomerCount}</div>
+                        <div class="gap-stat-value">${gapCustomerCount}</div>
                         <div class="gap-stat-label">Customers</div>
                     </div>
                 </div>
@@ -1433,6 +1483,7 @@ const StaffDashboardInit = (function() {
                             <tr>
                                 <th class="expand-col"></th>
                                 <th>Company</th>
+                                ${isInbound ? '<th>Other Reps</th>' : ''}
                                 <th>Orders</th>
                                 <th>Total</th>
                             </tr>
@@ -1445,19 +1496,14 @@ const StaffDashboardInit = (function() {
                                         <div class="gap-company-name">${escapeHtml(cust.companyName)}</div>
                                         <div class="gap-customer-id">ID: ${cust.ID_Customer}</div>
                                     </td>
+                                    ${isInbound ? `<td class="gap-rep-names">${(cust.repNames || []).map(r => escapeHtml(r)).join(', ')}</td>` : ''}
                                     <td>${cust.orderCount}</td>
                                     <td>${StaffDashboardService.formatCurrency(cust.totalSales)}</td>
                                 </tr>
                                 <tr class="gap-orders-row" style="display: none;">
-                                    <td colspan="4">
+                                    <td colspan="${isInbound ? 5 : 4}">
                                         <div class="gap-order-list">
-                                            ${cust.orders.map(order => `
-                                                <div class="gap-order-item">
-                                                    <span class="gap-order-number">#${escapeHtml(String(order.orderNumber))}</span>
-                                                    <span class="gap-order-amount">${StaffDashboardService.formatCurrency(order.amount)}</span>
-                                                    <span class="gap-order-date">${escapeHtml(order.date)}</span>
-                                                </div>
-                                            `).join('')}
+                                            ${buildOrderItems(cust.orders)}
                                         </div>
                                     </td>
                                 </tr>
@@ -1466,7 +1512,7 @@ const StaffDashboardInit = (function() {
                     </table>
                 </div>
                 <div class="gap-report-footer">
-                    <p><i class="fas fa-info-circle"></i> To fix: Add customer to rep's CRM OR change order rep in ShopWorks</p>
+                    <p><i class="fas fa-info-circle"></i> ${footerText}</p>
                 </div>
             `;
         } catch (error) {
@@ -1544,7 +1590,7 @@ if (typeof window !== 'undefined') {
     window.StaffDashboardInit = StaffDashboardInit;
 
     // Global functions for onclick handlers
-    window.showGapReport = (repName) => StaffDashboardInit.showGapReport(repName);
+    window.showGapReport = (repName, gapType) => StaffDashboardInit.showGapReport(repName, gapType);
     window.closeGapReport = () => StaffDashboardInit.closeGapReport();
     window.toggleGapOrders = (row) => StaffDashboardInit.toggleGapOrders(row);
 }
