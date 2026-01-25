@@ -253,27 +253,10 @@ const StaffDashboardInit = (function() {
             // Uses Caspio archive for older data + ManageOrders for recent days
             const teamDataYTD = await loadTeamPerformanceYTDHybrid();
 
-            // Fetch CRM account totals for Nika and Taneisha (for dual metrics display)
-            // This shows "Account Sales" alongside "Orders Processed"
-            try {
-                const crmTotals = await StaffDashboardService.fetchRepCRMTotals();
-                // Merge CRM data into team performance data
-                teamDataYTD.reps.forEach(rep => {
-                    const crmData = crmTotals[rep.name];
-                    if (crmData) {
-                        rep.accountSales = crmData.totalSales;
-                        rep.accountCount = crmData.accountCount;
-                    }
-                });
-            } catch (crmError) {
-                console.warn('Could not fetch CRM totals:', crmError.message);
-                // Continue without CRM data - will just show "Orders Processed"
-            }
-
             // Render revenue (uses metrics.yoy for the selected period)
             renderRevenueCard(metrics.yoy, metrics.revenue, metrics.period);
 
-            // Render team with YTD data (includes CRM account sales if available)
+            // Render team with YTD data (simple view - just processed totals)
             renderTeamPerformanceYTD(teamDataYTD);
 
             // Update data source badge
@@ -593,42 +576,7 @@ const StaffDashboardInit = (function() {
                 : '';
 
             // No YoY display for YTD view - clean slate for 2026
-
-            // Build account sales display if CRM data is available
-            // Two types of gaps:
-            // 1. Processed > Accounts: Rep wrote orders for customers NOT in their CRM
-            // 2. Accounts > Processed: OTHER reps wrote orders for customers IN their CRM
-            const processedAmount = parseFloat(rep.revenue) || 0;
-            const accountsAmount = rep.accountSales || 0;
-            const hasCrmData = rep.accountSales !== null && rep.accountSales !== undefined;
-            const hasGap = hasCrmData && processedAmount > accountsAmount;
-            const hasReverseGap = hasCrmData && accountsAmount > processedAmount;
-
-            let gapButtonHtml = '';
-            if (hasGap) {
-                // Orders BY this rep for customers NOT in their CRM
-                gapButtonHtml = `<button class="gap-details-btn gap-outbound" onclick="showGapReport('${escapeHtml(rep.name)}', 'outbound')" title="Orders you wrote for non-CRM customers">
-                       <i class="fas fa-arrow-right"></i>
-                   </button>`;
-            } else if (hasReverseGap) {
-                // Orders by OTHER reps for customers IN this rep's CRM
-                gapButtonHtml = `<button class="gap-details-btn gap-inbound" onclick="showGapReport('${escapeHtml(rep.name)}', 'inbound')" title="Orders other reps wrote for your customers">
-                       <i class="fas fa-arrow-left"></i>
-                   </button>`;
-            }
-
-            const accountSalesHtml = hasCrmData
-                ? `<div class="rep-account-sales-group">
-                       <div class="rep-account-sales">${StaffDashboardService.formatCurrency(rep.accountSales)}</div>
-                       <div class="rep-account-sales-label">accounts</div>
-                       ${gapButtonHtml}
-                   </div>`
-                : '';
-
-            // If we have account sales, show "processed" label under orders total
-            const revenueLabel = accountSalesHtml
-                ? `<div class="rep-revenue-label">processed</div>`
-                : '';
+            // Simple view: just show revenue and order count (no CRM comparison - that's in House Accounts)
 
             return `
             <div class="rep-card">
@@ -643,11 +591,7 @@ const StaffDashboardInit = (function() {
                     <div class="rep-progress-bar" style="width: ${rep.percentage}%"></div>
                 </div>
                 <div class="rep-stats">
-                    <div class="rep-revenue-group">
-                        <div class="rep-revenue">${rep.formattedRevenue}</div>
-                        ${revenueLabel}
-                    </div>
-                    ${accountSalesHtml}
+                    <div class="rep-revenue">${rep.formattedRevenue}</div>
                     <div class="rep-orders">${rep.orders} orders</div>
                 </div>
             </div>
