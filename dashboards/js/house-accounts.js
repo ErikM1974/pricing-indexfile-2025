@@ -473,7 +473,11 @@ class HouseAccountsController {
             gapReportRefreshBtn: document.getElementById('gap-report-refresh-btn'),
             gapReportLoading: document.getElementById('gap-report-loading'),
             gapReportContent: document.getElementById('gap-report-content'),
-            gapReportClose: document.getElementById('gap-report-close')
+            gapReportClose: document.getElementById('gap-report-close'),
+
+            // Sync Controls (Erik's Control Center)
+            syncAllBtn: document.getElementById('sync-all-btn'),
+            syncHouseBtn: document.getElementById('sync-house-btn')
         };
     }
 
@@ -572,6 +576,14 @@ class HouseAccountsController {
         document.querySelectorAll('.stat-card').forEach(card => {
             card.addEventListener('click', () => this.filterByStatCard(card));
         });
+
+        // Sync controls (Erik's Control Center)
+        if (this.elements.syncAllBtn) {
+            this.elements.syncAllBtn.addEventListener('click', () => this.syncAllCRM());
+        }
+        if (this.elements.syncHouseBtn) {
+            this.elements.syncHouseBtn.addEventListener('click', () => this.syncHouseOnly());
+        }
     }
 
     /**
@@ -907,6 +919,131 @@ class HouseAccountsController {
     showLoading(show) {
         if (this.elements.loadingOverlay) {
             this.elements.loadingOverlay.classList.toggle('show', show);
+        }
+    }
+
+    // ============================================================
+    // SYNC CONTROLS (Erik's Control Center)
+    // ============================================================
+
+    /**
+     * Sync all CRM dashboards (Nika, Taneisha, House)
+     * Runs ownership sync first, then sales sync
+     */
+    async syncAllCRM() {
+        const btn = this.elements.syncAllBtn;
+        if (!btn) return;
+
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Syncing All...';
+
+        try {
+            const results = { success: [], failed: [] };
+
+            // Phase 1: Ownership sync for Nika and Taneisha
+            this.showToast('Syncing account ownership...');
+
+            const ownershipEndpoints = [
+                { name: 'Nika Ownership', url: '/api/crm-proxy/nika-accounts/sync-ownership' },
+                { name: 'Taneisha Ownership', url: '/api/crm-proxy/taneisha-accounts/sync-ownership' }
+            ];
+
+            for (const endpoint of ownershipEndpoints) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                    if (response.ok) {
+                        results.success.push(endpoint.name);
+                    } else {
+                        results.failed.push(endpoint.name);
+                    }
+                } catch (e) {
+                    results.failed.push(endpoint.name);
+                }
+            }
+
+            // Phase 2: Sales sync for all dashboards
+            btn.innerHTML = '<span class="loading-spinner"></span> Syncing Sales...';
+            this.showToast('Syncing sales data...');
+
+            const salesEndpoints = [
+                { name: 'Nika Sales', url: '/api/crm-proxy/nika-accounts/sync-sales' },
+                { name: 'Taneisha Sales', url: '/api/crm-proxy/taneisha-accounts/sync-sales' },
+                { name: 'House Sales', url: '/api/crm-proxy/house-accounts/sync-sales' }
+            ];
+
+            for (const endpoint of salesEndpoints) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                    if (response.ok) {
+                        results.success.push(endpoint.name);
+                    } else {
+                        results.failed.push(endpoint.name);
+                    }
+                } catch (e) {
+                    results.failed.push(endpoint.name);
+                }
+            }
+
+            // Show results
+            if (results.failed.length === 0) {
+                this.showToast(`All CRM dashboards synced! (${results.success.length} operations)`);
+            } else {
+                this.showError(`Sync completed with errors: ${results.failed.join(', ')}`);
+            }
+
+            // Reload House dashboard data
+            await this.loadData();
+
+        } catch (error) {
+            console.error('Sync all CRM error:', error);
+            this.showError('Failed to sync CRM dashboards. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+    /**
+     * Quick sync House accounts only
+     */
+    async syncHouseOnly() {
+        const btn = this.elements.syncHouseBtn;
+        if (!btn) return;
+
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Syncing...';
+
+        try {
+            const response = await fetch('/api/crm-proxy/house-accounts/sync-sales', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.showToast(`House accounts synced! YTD: $${(result.totalYtd || 0).toLocaleString()}`);
+                await this.loadData();
+            } else {
+                throw new Error('Sync failed');
+            }
+
+        } catch (error) {
+            console.error('Sync House error:', error);
+            this.showError('Failed to sync House accounts. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
     }
 
