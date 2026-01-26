@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-01-23
+**Last Updated:** 2026-01-26
 **Total Active Files:** ~285 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -321,6 +321,7 @@ cap-embroidery-fix.css
 |------|---------|--------|
 | `/shared_components/css/staff-dashboard-layout.css` | 4-zone grid layout, responsive | ✅ Active |
 | `/shared_components/css/staff-dashboard-widgets.css` | Metrics cards, team performance, skeletons | ✅ Active |
+| `/shared_components/css/staff-dashboard-dark.css` | **NEW** Dark mode theme (matches House Accounts) | ✅ Active |
 | `/shared_components/js/staff-dashboard-service.js` | ShopWorks ManageOrders API integration | ✅ Active |
 | `/shared_components/js/staff-dashboard-announcements.js` | Priority announcements with dismiss | ✅ Active |
 | `/shared_components/js/staff-dashboard-init.js` | Initialization, widget toggles, auto-refresh | ✅ Active |

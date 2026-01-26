@@ -1,0 +1,1781 @@
+/* =====================================================
+   STAFF DASHBOARD - DARK MODE THEME
+   Matches House Accounts, Nika CRM, Taneisha CRM dashboards
+   ===================================================== */
+
+/* =====================================================
+   DARK MODE CSS VARIABLES
+   ===================================================== */
+:root {
+    /* Dark Mode Base - matches house-accounts.css */
+    --bg-dark: #1a2332;
+    --bg-darker: #141c27;
+    --card-dark: #243447;
+    --card-border: #2d4a5e;
+
+    /* Text Colors - Dark Mode */
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-light: #64748b;
+
+    /* Action Colors */
+    --accent-blue: #3b82f6;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --danger: #ef4444;
+
+    /* Override light mode variables */
+    --light-bg: #1e293b;
+    --card-bg: #243447;
+    --white: #1a2332;
+    --border-color: #2d4a5e;
+    --border-light: #334155;
+    --hover-bg: #334155;
+
+    /* WSU Colors - Muted for dark mode */
+    --wsu-crimson: #3b82f6;
+    --wsu-dark-crimson: #2563eb;
+
+    /* Shadows - Dark mode adjusted */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* =====================================================
+   BODY & PAGE BACKGROUND
+   ===================================================== */
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   LOADING OVERLAY - DARK MODE
+   ===================================================== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-darker);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+
+.loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--card-border);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =====================================================
+   HIDDEN CASPIO CONTAINER
+   ===================================================== */
+.caspio-hidden-container {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* =====================================================
+   SIGN OUT LINK - DARK MODE
+   ===================================================== */
+.sign-out-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.sign-out-link span {
+    color: #ffffff;
+}
+
+.sign-out-link i {
+    color: #ffffff;
+}
+
+.sign-out-link:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #f87171;
+}
+
+.sign-out-link:hover span,
+.sign-out-link:hover i {
+    color: #f87171;
+}
+
+/* =====================================================
+   USER WELCOME BADGE - DARK MODE
+   ===================================================== */
+.user-welcome {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    border-radius: 8px;
+    color: #4ade80;
+    font-size: 0.875rem;
+}
+
+.welcome-text {
+    font-weight: 400;
+    color: #86efac;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* =====================================================
+   PRICE ALERT BANNER - WORKS IN DARK MODE
+   ===================================================== */
+.price-alert-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: #ffffff !important;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 100;
+    text-align: center;
+}
+
+.price-alert-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #ffffff !important;
+    max-width: calc(100% - 80px);
+    margin: 0 auto;
+}
+
+.price-alert-content span,
+.price-alert-content strong {
+    color: #ffffff !important;
+}
+
+.price-alert-content i {
+    font-size: 1.2rem;
+    color: #ffffff !important;
+}
+
+.price-alert-close {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #ffffff !important;
+    cursor: pointer;
+    padding: 4px 8px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.price-alert-close:hover {
+    opacity: 1;
+}
+
+.price-alert-close i {
+    color: #ffffff !important;
+}
+
+.price-alert-banner.hidden {
+    display: none;
+}
+
+/* =====================================================
+   SIDEBAR - DARK NAVY THEME
+   ===================================================== */
+.sidebar {
+    background: var(--bg-darker);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.sidebar-header {
+    border-bottom: 1px solid var(--card-border);
+}
+
+.nav-section-header {
+    color: var(--text-primary);
+}
+
+.nav-section-header:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.nav-section:not(.collapsed) .nav-section-header {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.nav-section-content .nav-link {
+    color: var(--text-secondary);
+}
+
+.nav-section-content .nav-link:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   MAIN CONTENT & HEADER - DARK MODE
+   ===================================================== */
+.main-content {
+    background: var(--bg-dark);
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg-darker);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.top-header h1,
+.top-header .page-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* =====================================================
+   CARDS & ZONES - DARK MODE
+   ===================================================== */
+.card,
+.zone-quick-access,
+.metrics-revenue-card,
+.metrics-team-card,
+.garment-tracker-card,
+.widget-collapsible,
+.production-widget-card {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+}
+
+.card-header,
+.zone-header {
+    border-bottom-color: var(--card-border);
+}
+
+.card-title,
+.zone-title {
+    color: var(--text-primary);
+}
+
+.zone-title i {
+    color: var(--accent-blue);
+}
+
+/* =====================================================
+   QUICK ACCESS TOOLS - DARK MODE
+   ===================================================== */
+.tool-category {
+    background: var(--bg-darker);
+    border-color: var(--card-border);
+}
+
+.tool-category-icon {
+    background: var(--card-dark);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tool-category-icon i {
+    color: var(--accent-blue);
+}
+
+.tool-category-title {
+    color: var(--text-primary);
+}
+
+.tool-btn {
+    background: var(--card-dark);
+    border-color: var(--card-border);
+    color: var(--text-primary);
+}
+
+.tool-btn:hover {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+}
+
+/* Tool dropdown dark mode */
+.tool-dropdown-btn {
+    background: var(--accent-blue);
+    border: 1px solid var(--accent-blue);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-dropdown-btn:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.tool-dropdown-btn span {
+    color: #ffffff;
+}
+
+.tool-dropdown-btn i {
+    color: #ffffff;
+}
+
+.tool-dropdown-menu {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.tool-dropdown-item {
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    display: block;
+    text-decoration: none;
+}
+
+.tool-dropdown-item:hover {
+    background: var(--hover-bg);
+    color: var(--accent-blue);
+}
+
+/* Barnaby theme adjustments for dark mode */
+.barnaby-theme {
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.2) 0%, rgba(61, 107, 30, 0.3) 100%);
+    border-color: #4a7c23;
+}
+
+.barnaby-theme .tool-category-title {
+    color: #86efac;
+}
+
+/* =====================================================
+   METRICS CARDS - DARK MODE
+   ===================================================== */
+.metrics-revenue-title {
+    color: var(--text-secondary);
+}
+
+.metrics-revenue-value {
+    color: var(--text-primary);
+}
+
+.metrics-date-range {
+    color: var(--text-secondary);
+}
+
+.metrics-comparison-badge.positive {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.metrics-comparison-badge.negative {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.metrics-comparison-label {
+    color: var(--text-muted);
+}
+
+/* Date range toggle dark mode */
+.date-range-toggle {
+    background: var(--bg-darker);
+}
+
+.date-range-btn {
+    color: var(--text-secondary);
+}
+
+.date-range-btn.active {
+    background: var(--card-dark);
+    color: var(--text-primary);
+}
+
+.date-range-btn:hover:not(.active) {
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   TEAM PERFORMANCE - DARK MODE
+   ===================================================== */
+.metrics-team-header {
+    border-bottom-color: var(--card-border);
+}
+
+.metrics-team-title {
+    color: var(--text-primary);
+}
+
+.metrics-team-title i {
+    color: var(--accent-blue);
+}
+
+.rep-card {
+    background: var(--bg-darker);
+}
+
+.rep-card:hover {
+    background: var(--hover-bg);
+}
+
+.rep-avatar {
+    background: var(--accent-blue);
+}
+
+.rep-name {
+    color: var(--text-primary);
+}
+
+.rep-subtitle {
+    color: var(--text-muted);
+}
+
+.rep-progress {
+    background: var(--card-border);
+}
+
+.rep-progress-bar {
+    background: linear-gradient(90deg, var(--accent-blue), #60a5fa);
+}
+
+.rep-revenue {
+    color: var(--text-primary);
+}
+
+.rep-orders {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   WIDGET HEADERS - DARK MODE
+   ===================================================== */
+.widget-header {
+    background: var(--bg-darker);
+}
+
+.widget-header:hover {
+    background: var(--hover-bg);
+}
+
+.widget-title {
+    color: var(--text-primary);
+}
+
+.widget-title i {
+    color: var(--accent-blue);
+}
+
+.widget-toggle {
+    color: var(--text-secondary);
+}
+
+.widget-content {
+    background: var(--card-dark);
+}
+
+/* =====================================================
+   PRODUCTION SCHEDULE - DARK MODE
+   ===================================================== */
+.production-card {
+    background: var(--bg-darker);
+}
+
+.production-card:hover {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+}
+
+.production-card-header i {
+    color: var(--accent-blue);
+}
+
+.production-service-name {
+    color: var(--text-secondary);
+}
+
+.production-days-number {
+    color: var(--text-primary);
+}
+
+.production-days-label {
+    color: var(--text-secondary);
+}
+
+.production-due-date {
+    color: var(--accent-blue);
+}
+
+.production-footer {
+    border-top-color: var(--card-border);
+}
+
+.production-meta {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   GARMENT TRACKER - DARK MODE
+   ===================================================== */
+.garment-tracker-header {
+    border-bottom-color: var(--card-border);
+}
+
+.garment-tracker-title {
+    color: var(--text-primary);
+}
+
+.garment-tracker-title i {
+    color: var(--accent-blue);
+}
+
+.garment-tracker-date {
+    color: var(--text-secondary);
+}
+
+.garment-tracker-table th {
+    background: var(--bg-darker);
+    color: var(--text-secondary);
+    border-bottom-color: var(--card-border);
+}
+
+.garment-tracker-table td {
+    color: var(--text-primary);
+    border-bottom-color: var(--card-border);
+}
+
+.garment-tracker-table tbody tr:hover {
+    background: var(--hover-bg);
+}
+
+.garment-style {
+    color: var(--text-primary);
+}
+
+.garment-name {
+    color: var(--text-secondary);
+}
+
+.garment-tracker-table td.has-qty {
+    color: #34d399;
+}
+
+.total-col {
+    background: var(--bg-darker);
+}
+
+.garment-tracker-footer {
+    border-top-color: var(--card-border);
+}
+
+.garment-tracker-meta {
+    color: var(--text-muted);
+}
+
+.bonus-amount {
+    color: var(--text-primary);
+}
+
+.bonus-progress-bar {
+    background: var(--card-border);
+}
+
+.bonus-progress-fill {
+    background: linear-gradient(90deg, var(--accent-blue), #60a5fa);
+}
+
+.bonus-progress-label {
+    color: var(--text-secondary);
+}
+
+/* =====================================================
+   ANNOUNCEMENTS - DARK MODE
+   ===================================================== */
+.announcements-hero {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.25) 100%);
+    border-left-color: var(--warning);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.announcement-icon {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.announcement-icon i {
+    color: var(--warning);
+}
+
+.announcement-title {
+    color: #fbbf24;
+}
+
+.announcement-preview {
+    color: var(--text-secondary);
+}
+
+.btn-dismiss {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
+.btn-dismiss:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-view-all {
+    color: #fbbf24;
+}
+
+.announcements-list {
+    background: var(--card-dark);
+}
+
+.announcement-item {
+    border-bottom-color: var(--card-border);
+}
+
+.announcement-item:hover {
+    background: var(--hover-bg);
+}
+
+.announcement-item-title {
+    color: var(--text-primary);
+}
+
+.announcement-item-date {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   POLICIES SECTION - DARK MODE
+   ===================================================== */
+.policy-mini-card {
+    background: var(--bg-darker);
+}
+
+.policy-mini-card:hover {
+    background: var(--hover-bg);
+}
+
+.policy-mini-icon {
+    background: var(--card-dark);
+}
+
+.policy-mini-icon i {
+    color: var(--accent-blue);
+}
+
+.policy-mini-title {
+    color: var(--text-primary);
+}
+
+.policy-mini-date {
+    color: var(--text-muted);
+}
+
+.policy-mini-badge {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+/* =====================================================
+   CELEBRATIONS WIDGET - DARK MODE
+   ===================================================== */
+.celebration-item {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.celebration-item:hover {
+    background: rgba(245, 158, 11, 0.25);
+}
+
+.celebration-item.staff-directory-btn {
+    background: rgba(99, 102, 241, 0.15);
+}
+
+.celebration-item.staff-directory-btn:hover {
+    background: rgba(99, 102, 241, 0.25);
+}
+
+.celebration-count {
+    background: var(--card-dark);
+    color: var(--text-primary);
+}
+
+.celebration-label {
+    color: var(--text-secondary);
+}
+
+.celebration-dropdown {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.celebration-dropdown-header {
+    background: var(--bg-darker);
+    color: var(--text-primary);
+}
+
+.celebration-dropdown-header i {
+    color: var(--accent-blue);
+}
+
+.celebration-entry:hover {
+    background: var(--hover-bg);
+}
+
+.celebration-entry.today {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.celebration-name {
+    color: var(--text-primary);
+}
+
+.celebration-date {
+    color: var(--text-secondary);
+}
+
+.celebration-empty {
+    color: var(--text-muted);
+}
+
+.celebration-view-all {
+    border-top-color: var(--card-border);
+    color: var(--accent-blue);
+}
+
+.celebration-view-all:hover {
+    background: var(--hover-bg);
+}
+
+/* =====================================================
+   STAFF DIRECTORY MODAL - DARK MODE
+   ===================================================== */
+.staff-modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.staff-modal {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+}
+
+.staff-modal-header {
+    background: var(--bg-darker);
+    border-bottom-color: var(--card-border);
+}
+
+.staff-modal-header h2 {
+    color: var(--text-primary);
+}
+
+.staff-modal-header h2 i {
+    color: var(--accent-blue);
+}
+
+.staff-modal-close {
+    background: var(--card-dark);
+    color: var(--text-secondary);
+}
+
+.staff-modal-close:hover {
+    background: var(--hover-bg);
+    color: var(--error);
+}
+
+.staff-modal-filters {
+    background: var(--bg-darker);
+}
+
+.staff-filter-btn {
+    background: var(--card-dark);
+    border-color: var(--card-border);
+    color: var(--text-secondary);
+}
+
+.staff-filter-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.staff-filter-btn.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+}
+
+.staff-table th {
+    background: var(--bg-darker);
+    color: var(--text-secondary);
+    border-bottom-color: var(--card-border);
+}
+
+.staff-table td {
+    color: var(--text-primary);
+    border-bottom-color: var(--card-border);
+}
+
+.staff-table tr:hover {
+    background: var(--hover-bg);
+}
+
+.status-badge.status-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.status-badge.status-leaving {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.status-badge.status-former {
+    background: rgba(107, 114, 128, 0.15);
+    color: #9ca3af;
+}
+
+.empty-message {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   MANUAL PRICING MODAL - COMPLETE STYLES
+   (Previously inline, now extracted to external CSS)
+   ===================================================== */
+#manualPricingModal.modal {
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#manualPricingModal .modal-content {
+    background-color: var(--card-dark);
+    padding: 0;
+    border: 1px solid var(--card-border);
+    width: 90%;
+    max-width: 560px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: modalSlideIn 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#manualPricingModal .modal-header {
+    padding: 28px 32px;
+    background-color: var(--accent-blue);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+#manualPricingModal .modal-header-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+#manualPricingModal .modal-header-content > i {
+    font-size: 28px;
+    margin-top: 2px;
+}
+
+#manualPricingModal .modal-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#manualPricingModal .modal-header h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+#manualPricingModal .modal-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+#manualPricingModal .modal-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    transition: opacity 0.2s;
+}
+
+#manualPricingModal .modal-close:hover {
+    opacity: 0.8;
+}
+
+#manualPricingModal .modal-body {
+    padding: 36px 32px;
+    background: var(--card-dark);
+}
+
+#manualPricingModal .modal-description {
+    margin: 0 0 28px 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+#manualPricingModal .modal-input-group {
+    margin-bottom: 32px;
+}
+
+#manualPricingModal .modal-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 15px;
+}
+
+#manualPricingModal .modal-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    background: var(--bg-darker);
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    color: var(--text-primary);
+}
+
+#manualPricingModal .modal-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+#manualPricingModal .modal-input::placeholder {
+    color: var(--text-muted);
+}
+
+#manualPricingModal .modal-error {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    color: #f87171;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#manualPricingModal .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+#manualPricingModal .modal-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#manualPricingModal .modal-btn-cancel {
+    background: var(--bg-darker);
+    color: var(--text-secondary);
+}
+
+#manualPricingModal .modal-btn-cancel:hover {
+    background: var(--hover-bg);
+}
+
+#manualPricingModal .modal-btn-primary {
+    background: var(--accent-blue);
+    color: white;
+}
+
+#manualPricingModal .modal-btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+    #manualPricingModal .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    #manualPricingModal .modal-header,
+    #manualPricingModal .modal-body {
+        padding: 24px 20px;
+    }
+    #manualPricingModal .modal-actions {
+        flex-direction: column;
+    }
+    #manualPricingModal .modal-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =====================================================
+   REFRESH & SYNC BUTTONS - DARK MODE
+   ===================================================== */
+.refresh-btn,
+.sync-btn {
+    background: var(--bg-darker);
+    color: var(--text-secondary);
+}
+
+.refresh-btn:hover {
+    background: var(--hover-bg);
+    color: var(--accent-blue);
+}
+
+.sync-btn:hover {
+    background: var(--hover-bg);
+    color: #34d399;
+}
+
+.sync-status {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   SKELETON LOADERS - DARK MODE
+   ===================================================== */
+.skeleton {
+    background: linear-gradient(90deg, var(--card-border) 25%, var(--hover-bg) 50%, var(--card-border) 75%);
+    background-size: 200% 100%;
+}
+
+/* =====================================================
+   LOADING STATES - DARK MODE
+   ===================================================== */
+.loading {
+    border-color: var(--card-border);
+    border-top-color: var(--accent-blue);
+}
+
+.metrics-loading {
+    color: var(--text-secondary);
+}
+
+/* =====================================================
+   ERROR STATES - DARK MODE
+   ===================================================== */
+.error-state {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.error-state-title {
+    color: #f87171;
+}
+
+.error-state-message {
+    color: var(--text-secondary);
+}
+
+.error-state-retry {
+    color: var(--accent-blue);
+}
+
+/* =====================================================
+   EMPTY STATES - DARK MODE
+   ===================================================== */
+.empty-state-icon {
+    background: var(--bg-darker);
+}
+
+.empty-state-icon i {
+    color: var(--text-muted);
+}
+
+.empty-state-title {
+    color: var(--text-primary);
+}
+
+.empty-state-message {
+    color: var(--text-secondary);
+}
+
+/* =====================================================
+   DATA SOURCE BADGES - DARK MODE
+   ===================================================== */
+.data-source-badge {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34d399;
+}
+
+.data-source-badge.loading {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+}
+
+.data-source-badge.error {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.data-freshness {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   PARTIAL DATA NOTICE - DARK MODE
+   ===================================================== */
+.partial-data-notice {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+}
+
+.partial-data-notice i {
+    color: var(--warning);
+}
+
+/* =====================================================
+   FORM CONTROLS - DARK MODE
+   ===================================================== */
+.form-control {
+    background: var(--bg-darker);
+    border-color: var(--card-border);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.form-label {
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   BUTTONS - DARK MODE
+   ===================================================== */
+.btn-primary {
+    background: var(--accent-blue);
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.btn-secondary {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--hover-bg);
+}
+
+.btn-outline {
+    background: transparent;
+    border-color: var(--card-border);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+/* =====================================================
+   TABLES - DARK MODE
+   ===================================================== */
+.table-container {
+    border-color: var(--card-border);
+}
+
+th {
+    background: var(--bg-darker);
+    color: var(--text-secondary);
+    border-bottom-color: var(--card-border);
+}
+
+td {
+    color: var(--text-primary);
+    border-bottom-color: var(--card-border);
+}
+
+tr:hover {
+    background: var(--hover-bg);
+}
+
+/* =====================================================
+   BADGES - DARK MODE
+   ===================================================== */
+.badge-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+}
+
+/* =====================================================
+   ALERTS - DARK MODE
+   ===================================================== */
+.alert-success {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34d399;
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+}
+
+/* =====================================================
+   TOOLTIPS - DARK MODE
+   ===================================================== */
+.tooltip-text {
+    background: var(--card-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--card-border);
+}
+
+/* =====================================================
+   PROGRESS BARS - DARK MODE
+   ===================================================== */
+.progress {
+    background: var(--card-border);
+}
+
+.progress-bar {
+    background: var(--accent-blue);
+}
+
+/* =====================================================
+   TABS - DARK MODE
+   ===================================================== */
+.tabs {
+    border-bottom-color: var(--card-border);
+}
+
+.tab {
+    color: var(--text-secondary);
+}
+
+.tab:hover {
+    color: var(--text-primary);
+}
+
+.tab.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+}
+
+/* =====================================================
+   STAT CARDS - DARK MODE
+   ===================================================== */
+.stat-card {
+    background: var(--card-dark);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+}
+
+.stat-value {
+    color: var(--text-primary);
+}
+
+.stat-change.positive {
+    color: #34d399;
+}
+
+.stat-change.negative {
+    color: #f87171;
+}
+
+/* =====================================================
+   MODALS - DARK MODE
+   ===================================================== */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.modal {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+}
+
+.modal-header {
+    background: var(--bg-darker);
+    border-bottom-color: var(--card-border);
+}
+
+.modal-title {
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    background: var(--bg-darker);
+    border-top-color: var(--card-border);
+}
+
+/* =====================================================
+   FOCUS STATES - DARK MODE
+   ===================================================== */
+:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+/* =====================================================
+   SCROLLBAR - DARK MODE
+   ===================================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* =====================================================
+   GAP REPORT MODAL - DARK MODE
+   (Used in Team Performance widget)
+   ===================================================== */
+.gap-report-modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.gap-report-modal {
+    background: var(--card-dark);
+    border: 1px solid var(--card-border);
+}
+
+.gap-report-header {
+    background: var(--bg-darker);
+    border-bottom-color: var(--card-border);
+}
+
+.gap-report-header h2 {
+    color: var(--text-primary);
+}
+
+.gap-report-header h2 i {
+    color: var(--accent-blue);
+}
+
+.gap-report-close {
+    color: var(--text-muted);
+}
+
+.gap-report-close:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.gap-report-subtitle {
+    color: var(--text-muted);
+}
+
+.gap-report-summary {
+    border-bottom-color: var(--card-border);
+}
+
+.gap-stat {
+    background: var(--bg-darker);
+    border: 1px solid var(--card-border);
+}
+
+.gap-stat-value {
+    color: var(--accent-blue);
+}
+
+.gap-stat-label {
+    color: var(--text-muted);
+}
+
+.gap-report-table th {
+    color: var(--text-muted);
+    border-bottom-color: var(--card-border);
+}
+
+.gap-customer-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.gap-customer-row td {
+    border-bottom-color: var(--card-border);
+    color: var(--text-primary);
+}
+
+.gap-company-name {
+    color: var(--text-primary);
+}
+
+.gap-customer-id {
+    color: var(--text-muted);
+}
+
+.gap-orders-row {
+    background: var(--bg-darker);
+}
+
+.gap-order-list {
+    border-top-color: var(--card-border);
+}
+
+.gap-order-number {
+    color: var(--accent-blue);
+}
+
+.gap-order-amount {
+    color: #34d399;
+}
+
+.gap-order-date {
+    color: var(--text-muted);
+}
+
+.gap-order-rep {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.gap-report-footer {
+    border-top-color: var(--card-border);
+    color: var(--text-muted);
+}
+
+.gap-report-empty i {
+    color: #34d399;
+}
+
+.gap-report-empty h3 {
+    color: var(--text-primary);
+}
+
+.gap-report-empty p {
+    color: var(--text-muted);
+}
+
+.gap-report-error {
+    color: #f87171;
+}
+
+/* =====================================================
+   TIPS WIDGET - DARK MODE
+   ===================================================== */
+.tips-widget {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+    border-left-color: var(--success);
+}
+
+.tips-title {
+    color: #34d399;
+}
+
+.tips-content {
+    color: var(--text-secondary);
+}
+
+.tips-content a {
+    color: #34d399;
+}
+
+/* =====================================================
+   CELEBRATIONS - DARK MODE ADJUSTMENTS
+   ===================================================== */
+.celebrations-widget .celebration-item.birthday {
+    background: rgba(236, 72, 153, 0.15);
+}
+
+.celebrations-widget .celebration-item.anniversary {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.celebration-info {
+    color: var(--text-primary);
+}
+
+.celebration-detail {
+    color: var(--text-secondary);
+}
+
+/* =====================================================
+   METRICS MINI CARDS - DARK MODE
+   ===================================================== */
+.metrics-mini-card {
+    background: var(--bg-darker);
+}
+
+.metrics-mini-value {
+    color: var(--text-primary);
+}
+
+.metrics-mini-label {
+    color: var(--text-secondary);
+}
+
+.metrics-mini-change.positive {
+    color: #34d399;
+}
+
+.metrics-mini-change.negative {
+    color: #f87171;
+}
+
+/* =====================================================
+   ORDER TYPE BREAKDOWN - DARK MODE
+   ===================================================== */
+.order-type-item {
+    background: var(--bg-darker);
+}
+
+.order-type-name {
+    color: var(--text-primary);
+}
+
+.order-type-count {
+    color: var(--text-muted);
+}
+
+.order-type-revenue {
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   LEADERBOARD PODIUM - DARK MODE
+   ===================================================== */
+.podium-avatar {
+    background: var(--accent-blue);
+}
+
+.podium-name {
+    color: var(--text-primary);
+}
+
+.podium-revenue {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .podium-position {
+        background: var(--bg-darker);
+    }
+}
+
+/* =====================================================
+   CHART COMPONENTS - DARK MODE
+   ===================================================== */
+.chart-legend-item {
+    color: var(--text-secondary);
+}
+
+/* =====================================================
+   HEADER DIVIDER - DARK MODE
+   ===================================================== */
+.header-divider {
+    background: var(--card-border);
+}
+
+/* =====================================================
+   LOGIN LINK - DARK MODE
+   ===================================================== */
+.login-link {
+    background: var(--bg-darker);
+    color: var(--text-secondary);
+}
+
+.login-link:hover {
+    background: var(--hover-bg);
+    color: var(--accent-blue);
+}
+
+/* =====================================================
+   TOOL CATEGORY SECTIONS - DARK MODE
+   ===================================================== */
+.tool-section {
+    background: var(--card-dark);
+    border-color: var(--card-border);
+}
+
+.tool-section-title {
+    color: var(--text-primary);
+}
+
+.tool-section-title i {
+    color: var(--accent-blue);
+}
+
+/* =====================================================
+   ZONE SPECIFIC OVERRIDES - DARK MODE
+   ===================================================== */
+.zone-announcements {
+    background: var(--card-dark);
+}
+
+.zone-metrics {
+    background: var(--card-dark);
+}
+
+.zone-team {
+    background: var(--card-dark);
+}
+
+/* =====================================================
+   PARTIAL DATA BADGE - DARK MODE
+   ===================================================== */
+.partial-data-badge {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+/* =====================================================
+   SYNC STATUS - DARK MODE
+   ===================================================== */
+.last-updated {
+    color: var(--text-muted);
+}
