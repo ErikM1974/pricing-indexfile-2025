@@ -68,7 +68,9 @@
       "Bash(tasklist:*)",
       "Bash(for id in 13511 11742 6941 8068 11668 13529)",
       "Bash(do echo \"ID $id:\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(set CRM_API_SECRET=206dc8820a9c75478d701635fc241f734ca15fa2884eaf5d7ed53b41162863c6:*)",
+      "Bash(CRM_API_SECRET=\"206dc8820a9c75478d701635fc241f734ca15fa2884eaf5d7ed53b41162863c6\" node:*)"
     ],
     "deny": [],
     "ask": [],

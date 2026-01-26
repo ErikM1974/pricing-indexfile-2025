@@ -479,8 +479,8 @@ const StaffDashboardInit = (function() {
         }
 
         container.innerHTML = teamData.reps.map(rep => {
-            // Build subtitle for "Other" group
-            const otherSubtitle = rep.name === 'Other' && rep.firstNamesDisplay
+            // Build subtitle for "House" group (shows contributor names)
+            const houseSubtitle = rep.name === 'House' && rep.firstNamesDisplay
                 ? `<div class="rep-subtitle">${escapeHtml(rep.firstNamesDisplay)}</div>`
                 : '';
 
@@ -497,8 +497,8 @@ const StaffDashboardInit = (function() {
             } else if (rep.name === 'Taneisha Clark') {
                 // Taneisha started Aug 2025 - show when YoY will be available
                 yoyDisplay = `<div class="rep-yoy new">🚀 YoY coming Sept '26</div>`;
-            } else if (rep.name !== 'Other' && rep.name !== 'House') {
-                // Other new reps - generic message
+            } else if (rep.name !== 'House') {
+                // Other new reps (not House) - generic message
                 yoyDisplay = `<div class="rep-yoy new">🚀 New in 2025</div>`;
             }
 
@@ -508,7 +508,7 @@ const StaffDashboardInit = (function() {
                     <div class="rep-avatar">${rep.initials}</div>
                     <div class="rep-name-group">
                         <span class="rep-name">${escapeHtml(rep.name)}</span>
-                        ${otherSubtitle}
+                        ${houseSubtitle}
                         ${yoyDisplay}
                     </div>
                 </div>
@@ -570,8 +570,8 @@ const StaffDashboardInit = (function() {
         }
 
         container.innerHTML = teamData.reps.map(rep => {
-            // Build subtitle for "Other" group
-            const otherSubtitle = rep.name === 'Other' && rep.firstNamesDisplay
+            // Build subtitle for "House" group (shows contributor names)
+            const houseSubtitle = rep.name === 'House' && rep.firstNamesDisplay
                 ? `<div class="rep-subtitle">${escapeHtml(rep.firstNamesDisplay)}</div>`
                 : '';
 
@@ -584,7 +584,7 @@ const StaffDashboardInit = (function() {
                     <div class="rep-avatar">${rep.initials}</div>
                     <div class="rep-name-group">
                         <span class="rep-name">${escapeHtml(rep.name)}</span>
-                        ${otherSubtitle}
+                        ${houseSubtitle}
                     </div>
                 </div>
                 <div class="rep-progress">
@@ -844,7 +844,7 @@ const StaffDashboardInit = (function() {
                 const repTotals = {};
                 for (const order of orders) {
                     // Use CustomerServiceRep field (same as processTeamPerformanceYTD)
-                    const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Other';
+                    const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Unassigned';
                     if (!repTotals[repName]) {
                         repTotals[repName] = { revenue: 0, orderCount: 0 };
                     }
@@ -902,7 +902,7 @@ const StaffDashboardInit = (function() {
 
                 // Aggregate by rep
                 for (const order of liveOrders) {
-                    const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Other';
+                    const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Unassigned';
                     if (!liveRepTotals[repName]) {
                         liveRepTotals[repName] = { revenue: 0, orders: 0 };
                     }
@@ -911,21 +911,30 @@ const StaffDashboardInit = (function() {
                 }
             }
 
-            // 3. Merge archived + live totals
+            // 3. Merge archived + live totals (normalize names to consolidate variations)
             const mergedTotals = {};
 
-            // Add archived data
+            // Add archived data (normalize names to consolidate Ruth/House variations)
             for (const rep of (archived.reps || [])) {
-                mergedTotals[rep.name] = {
-                    revenue: rep.totalRevenue || 0,
-                    orders: rep.totalOrders || 0
-                };
+                const normalizedName = StaffDashboardService.normalizeRepName(rep.name);
+                if (!mergedTotals[normalizedName]) {
+                    mergedTotals[normalizedName] = { revenue: 0, orders: 0, firstNames: new Set() };
+                }
+                mergedTotals[normalizedName].revenue += rep.totalRevenue || 0;
+                mergedTotals[normalizedName].orders += rep.totalOrders || 0;
+                // Track original first names for House group subtitle
+                if (normalizedName === 'House' && rep.name) {
+                    const firstName = rep.name.trim().split(' ')[0];
+                    if (firstName && firstName !== 'House') {
+                        mergedTotals[normalizedName].firstNames.add(firstName);
+                    }
+                }
             }
 
-            // Add live data
+            // Add live data (already normalized via normalizeRepName above)
             for (const [name, data] of Object.entries(liveRepTotals)) {
                 if (!mergedTotals[name]) {
-                    mergedTotals[name] = { revenue: 0, orders: 0 };
+                    mergedTotals[name] = { revenue: 0, orders: 0, firstNames: new Set() };
                 }
                 mergedTotals[name].revenue += data.revenue;
                 mergedTotals[name].orders += data.orders;
@@ -939,7 +948,8 @@ const StaffDashboardInit = (function() {
                     revenue: data.revenue,
                     orders: data.orders,
                     initials: StaffDashboardService.getInitials(name),
-                    formattedRevenue: StaffDashboardService.formatCurrency(data.revenue)
+                    formattedRevenue: StaffDashboardService.formatCurrency(data.revenue),
+                    firstNamesDisplay: data.firstNames?.size > 0 ? Array.from(data.firstNames).join(', ') : null
                 }))
                 .sort((a, b) => b.revenue - a.revenue);
 

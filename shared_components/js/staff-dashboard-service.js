@@ -151,14 +151,17 @@ const StaffDashboardService = (function() {
     const REP_NAME_ALIASES = {
         'ruth nhoung': 'Ruthie Nhoung',
         'ruthie nhoung': 'Ruthie Nhoung',
+        'ruth nhong': 'Ruthie Nhoung',   // Email system spelling
         'ruth': 'Ruthie Nhoung',
-        'house': 'House'
+        'ruthie': 'Ruthie Nhoung',
+        'house': 'House',
+        'unknown': 'Unassigned'          // Catch unknown rep entries
     };
 
     /**
-     * Low-volume reps to group under "Other"
+     * Reps to group under "House" for simplified Team Performance display
      */
-    const OTHER_REPS = [
+    const HOUSE_REPS = [
         'jim mickelson',
         'dyonii quitugua',
         'erik mickelson',
@@ -172,18 +175,18 @@ const StaffDashboardService = (function() {
         if (!name) return 'Unassigned';
         // Normalize whitespace and case
         const cleaned = name.trim().replace(/\s+/g, ' ').toLowerCase();
-        // Check if this rep should be grouped under "Other"
-        if (OTHER_REPS.includes(cleaned)) return 'Other';
+        // Check if this rep should be grouped under "House"
+        if (HOUSE_REPS.includes(cleaned)) return 'House';
         return REP_NAME_ALIASES[cleaned] || name.trim();
     }
 
     /**
-     * Check if a rep name is in the "Other" group
+     * Check if a rep name is in the "House" group
      */
-    function isOtherRep(name) {
+    function isHouseRep(name) {
         if (!name) return false;
         const cleaned = name.trim().replace(/\s+/g, ' ').toLowerCase();
-        return OTHER_REPS.includes(cleaned);
+        return HOUSE_REPS.includes(cleaned);
     }
 
     // =====================================================
@@ -538,8 +541,8 @@ const StaffDashboardService = (function() {
             repMetrics[rep].revenue += subtotal;
             repMetrics[rep].orders += 1;
 
-            // Track first names for "Other" group
-            if (rep === 'Other' && originalName) {
+            // Track first names for "House" group
+            if (rep === 'House' && originalName) {
                 const firstName = originalName.trim().split(' ')[0];
                 if (firstName) repMetrics[rep].firstNames.add(firstName);
             }
@@ -621,8 +624,8 @@ const StaffDashboardService = (function() {
             repMetrics[rep].revenue += subtotal;
             repMetrics[rep].orders += 1;
 
-            // Track first names for "Other" group
-            if (rep === 'Other' && originalName) {
+            // Track first names for "House" group
+            if (rep === 'House' && originalName) {
                 const firstName = originalName.trim().split(' ')[0];
                 if (firstName) repMetrics[rep].firstNames.add(firstName);
             }
