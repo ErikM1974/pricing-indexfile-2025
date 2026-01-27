@@ -239,6 +239,12 @@ class DTFQuoteBuilder {
             loadingOverlay.style.display = 'none';
         }
 
+        // Auto-focus search bar for immediate typing (UX improvement)
+        const searchInput = document.getElementById('product-search');
+        if (searchInput) {
+            searchInput.focus();
+        }
+
         console.log('[DTFQuoteBuilder] Ready');
     }
 
@@ -589,15 +595,14 @@ class DTFQuoteBuilder {
     }
 
     updateSearchState() {
-        const searchInput = document.getElementById('product-search');
         const searchHint = document.getElementById('search-hint');
 
+        // Search is always enabled - user can add products before selecting locations
+        // Pricing will show "-" until locations are selected
         if (this.selectedLocations.length > 0) {
-            if (searchInput) searchInput.disabled = false;
             if (searchHint) searchHint.textContent = 'Type to search (e.g., PC54, G500)';
         } else {
-            if (searchInput) searchInput.disabled = true;
-            if (searchHint) searchHint.textContent = 'Select at least one location to add products';
+            if (searchHint) searchHint.textContent = 'Select locations above to see pricing (products can be added now)';
         }
     }
 

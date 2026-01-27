@@ -196,6 +196,14 @@
                             </tr>
                         </thead>
                         <tbody id="product-tbody">
+                            <!-- Empty State Message - shown until products added -->
+                            <tr id="empty-state-row">
+                                <td colspan="12" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                                    <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                </td>
+                            </tr>
                             <!-- Product rows will be added here -->
                         </tbody>
                     </table>
@@ -1571,19 +1579,17 @@
                     // Initialize auto-save & draft recovery (2026 consolidation)
                     initScreenPrintPersistence();
 
-                    // Check for draft recovery BEFORE adding initial row
+                    // Check for draft recovery
                     if (spSession && spSession.shouldShowRecovery()) {
                         spSession.showRecoveryDialog(
                             (draft) => restoreScreenPrintDraft(draft),
                             () => {
                                 if (spPersistence) spPersistence.clearDraft();
-                                addNewRow(); // Start fresh with empty row
+                                // No auto-row - user starts with empty state
                             }
                         );
-                    } else {
-                        // No draft to recover, add initial empty row
-                        addNewRow();
                     }
+                    // No auto-row - empty state message guides user to search
                 }
 
                 // Setup event listeners (needed for both modes)
@@ -1597,6 +1603,12 @@
                 // Auto-select sales rep based on logged-in staff (2026 consolidation)
                 if (typeof StaffAuthHelper !== 'undefined') {
                     StaffAuthHelper.autoSelectSalesRep('sales-rep');
+                }
+
+                // Auto-focus search bar for immediate typing (UX improvement)
+                const searchInput = document.getElementById('product-search');
+                if (searchInput) {
+                    searchInput.focus();
                 }
 
                 console.log('✅ Screen Print Quote Builder ready');
@@ -1996,6 +2008,10 @@
         function addNewRow() {
             const tbody = document.getElementById('product-tbody');
             const rowId = ++rowCounter;
+
+            // Hide empty state message when adding first row
+            const emptyStateRow = document.getElementById('empty-state-row');
+            if (emptyStateRow) emptyStateRow.style.display = 'none';
 
             const row = document.createElement('tr');
             row.id = `row-${rowId}`;

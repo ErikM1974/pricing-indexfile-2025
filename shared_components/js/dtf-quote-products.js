@@ -48,11 +48,13 @@ class DTFQuoteProducts {
             onClose: options.onClose || null,
             filterFunction: (item) => {
                 // Filter out caps (caps can't have DTF transfers)
+                // Use shared ProductCategoryFilter for comprehensive cap detection
+                if (typeof ProductCategoryFilter !== 'undefined') {
+                    return !ProductCategoryFilter.isStructuredCap(item);
+                }
+                // Fallback if utility not loaded (shouldn't happen)
                 const label = (item.label || '').toUpperCase();
-                const isCap = label.includes('CAP') ||
-                             label.includes('HAT') ||
-                             label.includes('BEANIE');
-                return !isCap;
+                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));
             }
         });
 
@@ -107,13 +109,14 @@ class DTFQuoteProducts {
 
             const suggestions = await response.json();
 
-            // Filter out caps
+            // Filter out caps using shared utility
             const filteredSuggestions = suggestions.filter(item => {
+                if (typeof ProductCategoryFilter !== 'undefined') {
+                    return !ProductCategoryFilter.isStructuredCap(item);
+                }
+                // Fallback
                 const label = (item.label || '').toUpperCase();
-                const isCap = label.includes('CAP') ||
-                             label.includes('HAT') ||
-                             label.includes('BEANIE');
-                return !isCap;
+                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));
             });
 
             // Transform to product format

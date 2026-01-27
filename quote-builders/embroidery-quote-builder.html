@@ -2025,19 +2025,17 @@
                     // Initialize auto-save & draft recovery (2026 consolidation)
                     initEmbroideryPersistence();
 
-                    // Check for draft recovery BEFORE adding initial row
+                    // Check for draft recovery
                     if (embSession && embSession.shouldShowRecovery()) {
                         embSession.showRecoveryDialog(
                             (draft) => restoreEmbroideryDraft(draft),
                             () => {
                                 if (embPersistence) embPersistence.clearDraft();
-                                addNewRow(); // Start fresh with empty row
+                                // No auto-row - user starts with empty state
                             }
                         );
-                    } else {
-                        // No draft to recover, add initial empty row
-                        addNewRow();
                     }
+                    // No auto-row - empty state message guides user to search
                 }
 
                 // Setup event listeners
@@ -2504,6 +2502,10 @@
         function addNewRow() {
             const tbody = document.getElementById('product-tbody');
             const rowId = ++rowCounter;
+
+            // Hide empty state message when adding first row
+            const emptyStateRow = document.getElementById('empty-state-row');
+            if (emptyStateRow) emptyStateRow.style.display = 'none';
 
             const row = document.createElement('tr');
             row.id = `row-${rowId}`;
