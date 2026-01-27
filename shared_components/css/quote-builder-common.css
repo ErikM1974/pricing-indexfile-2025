@@ -5,6 +5,44 @@
  */
 
 /* ============================================
+   CSS VARIABLES - STANDARDIZED
+   Added 2026-01-27 for quote builder consistency
+   ============================================ */
+:root {
+    /* Z-Index Hierarchy (standardized across all builders) */
+    --z-table-header: 10;
+    --z-dropdown: 100;
+    --z-sidebar: 200;
+    --z-color-picker: 500;
+    --z-search-suggestions: 500;
+    --z-modal-backdrop: 900;
+    --z-modal: 1000;
+    --z-size-popup: 1100;
+    --z-toast: 2000;
+    --z-loading: 3000;
+
+    /* Common Colors (neutrals - same across all builders) */
+    --color-bg-light: #f8f9fa;
+    --color-bg-lighter: #f0f7ff;
+    --color-text-muted: #666;
+    --color-text-light: #888;
+    --color-border: #ddd;
+    --color-border-light: #e5e7eb;
+    --color-disabled-bg: #f5f5f5;
+
+    /* Table Header Colors */
+    --color-header-dark: #2c3e50;
+    --color-header-qty: #1a5276;
+    --color-header-price: #1e8449;
+    --color-header-actions: #7f8c8d;
+
+    /* Standard Green (all quote builders) */
+    --builder-primary: #4cb354;
+    --builder-primary-dark: #3d9244;
+    --builder-primary-light: #6fcf7b;
+}
+
+/* ============================================
    LOADING OVERLAY
    ============================================ */
 
@@ -898,3 +936,80 @@ textarea:disabled {
         display: block !important;
     }
 }
+
+/* ============================================
+   FORM INPUT UTILITY CLASSES
+   Added 2026-01-27 - Reduces inline styles by ~100
+   ============================================ */
+
+/* Standard quote builder input field */
+.quote-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.quote-input:focus {
+    outline: none;
+    border-color: var(--builder-primary, #4cb354);
+    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.15);
+}
+
+.quote-input:disabled {
+    background: var(--color-disabled-bg, #f5f5f5);
+    cursor: not-allowed;
+}
+
+.quote-input::placeholder {
+    color: var(--color-text-light, #888);
+}
+
+/* Form label styling */
+.form-label {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-muted, #666);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: #dc3545;
+}
+
+/* Panel/card container */
+.panel {
+    background: var(--color-bg-light, #f8f9fa);
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.panel-bordered {
+    background: var(--color-bg-light, #f8f9fa);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-light, #e5e7eb);
+}
+
+/* Dividers */
+.divider {
+    border: none;
+    border-top: 1px solid var(--color-border-light, #e5e7eb);
+    margin: 12px 0;
+}
+
+.divider-dashed {
+    border: none;
+    border-top: 1px dashed var(--color-border-light, #e5e7eb);
+    margin: 12px 0;
+}
+
+/* Gap utilities (Bootstrap-compatible) */
+.gap-1 { gap: 0.25rem !important; }
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 1rem !important; }
+.gap-4 { gap: 1.5rem !important; }

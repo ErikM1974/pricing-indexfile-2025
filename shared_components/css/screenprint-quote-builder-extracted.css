@@ -25,8 +25,9 @@
     --bg-sidebar: #f1f3f5;
 
     /* Shared modal theming (for quote-share-modal.css) */
-    --builder-primary: var(--nwca-green);
-    --builder-primary-dark: #218838;
+    /* Standardized to #4cb354 across all quote builders - 2026-01-27 */
+    --builder-primary: #4cb354;
+    --builder-primary-dark: #3d9244;
 }
 
 /* ============================================
@@ -1395,9 +1396,7 @@ body {
 }
 
 /* Cap badge indicator */
-.desc-cell {
-    position: relative;
-}
+/* NOTE: .desc-cell styles consolidated into single rule below */
 
 .cap-badge {
     display: inline-flex;
@@ -1418,8 +1417,9 @@ body {
     font-size: 10px;
 }
 
-/* Pricing breakdown line in description cell */
+/* Description Cell (consolidated) - contains badge positioning + pricing breakdown layout */
 .desc-cell {
+    position: relative;  /* For cap badge positioning */
     display: flex;
     flex-direction: column;
     gap: 2px;

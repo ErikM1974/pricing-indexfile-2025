@@ -1,7 +1,7 @@
 /**
  * DTF Quote Builder - Excel-Style Layout
  * Blue header (#003f7f) to match other quote builders
- * Green accent (#10b981) for DTF transfers buttons
+ * Green accent (#4cb354) for DTF transfers buttons (standardized to match DTG)
  * Two-column layout with sidebar
  */
 
@@ -9,11 +9,11 @@
    CSS VARIABLES
    ============================================= */
 :root {
-    --dtf-primary: #10b981;
-    --dtf-primary-dark: #059669;
-    --dtf-primary-light: #34d399;
-    --dtf-primary-50: #d1fae5;
-    --dtf-primary-100: #a7f3d0;
+    --dtf-primary: #4cb354;
+    --dtf-primary-dark: #3d9244;
+    --dtf-primary-light: #6fcf7b;
+    --dtf-primary-50: #e8f5e9;
+    --dtf-primary-100: #c8e6c9;
     --dtf-header-bg: #003f7f;  /* Standardized to NWCA blue (matches DTG, Screen Print, Embroidery) */
     --border-color: #dee2e6;
     --bg-light: #f8f9fa;
@@ -982,27 +982,7 @@ body {
     font-size: 14px;
 }
 
-/* Clear All Products Button */
-.btn-clear-all {
-    width: 100%;
-    padding: 10px 20px;
-    background: white;
-    color: #dc2626;
-    border: 1px solid #dc2626;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-clear-all:hover {
-    background: #dc2626;
-    color: white;
-}
+/* NOTE: .btn-clear-all moved to CLEAR ALL PRODUCTS BUTTON section below (line ~1578) */
 
 /* =============================================
    ACTION PANEL (DTG-style buttons)

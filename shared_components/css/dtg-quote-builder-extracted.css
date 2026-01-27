@@ -1485,9 +1485,7 @@ body {
 /* ============================================
    DTG-SPECIFIC: Cap Badge Indicator
    ============================================ */
-.desc-cell {
-    position: relative;
-}
+/* NOTE: .desc-cell styles consolidated into single rule below */
 
 .cap-badge {
     display: inline-flex;
@@ -1509,9 +1507,11 @@ body {
 }
 
 /* ============================================
-   DTG-SPECIFIC: Pricing Breakdown in Description Cell
+   DTG-SPECIFIC: Description Cell (consolidated)
+   Contains: position for badges, flexbox layout for pricing breakdown
    ============================================ */
 .desc-cell {
+    position: relative;  /* For cap badge positioning */
     display: flex;
     flex-direction: column;
     gap: 2px;
