@@ -1384,6 +1384,13 @@ class DTFQuoteBuilder {
             document.getElementById('ltm-row').style.display = 'none';
             document.getElementById('subtotal').textContent = '--';
             document.getElementById('grand-total').textContent = '--';
+            // Clear all price and total cells
+            document.querySelectorAll('.cell-price').forEach(cell => {
+                cell.textContent = '-';
+            });
+            document.querySelectorAll('.cell-total').forEach(cell => {
+                cell.textContent = '-';
+            });
             return;
         }
 
@@ -1529,6 +1536,16 @@ class DTFQuoteBuilder {
             const priceSpan = row.querySelector('.row-price') || document.getElementById(`row-price-${rowId}`);
             if (priceSpan) priceSpan.textContent = `$${baseDisplayPrice.toFixed(2)}`;
 
+            // Update row total (all standard sizes for this product)
+            const totalCell = row.querySelector('.cell-total') || document.getElementById(`row-total-${rowId}`);
+            if (totalCell) {
+                // productTotal includes all standard sizes for this product with rounded prices
+                const rowQty = Object.entries(product.quantities)
+                    .filter(([size]) => ['S', 'M', 'L', 'XL'].includes(size))
+                    .reduce((sum, [, qty]) => sum + (qty || 0), 0);
+                totalCell.textContent = rowQty > 0 ? `$${productTotal.toFixed(2)}` : '-';
+            }
+
             grandTotal += productTotal;
         });
 
@@ -1562,6 +1579,13 @@ class DTFQuoteBuilder {
                 // Display unit price on child row (use querySelector for robustness)
                 const priceCell = childRow.querySelector('.cell-price');
                 if (priceCell) priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                // Update child row total (qty × price)
+                const childTotalCell = childRow.querySelector('.cell-total');
+                if (childTotalCell) {
+                    const childTotal = displayPrice * qty;
+                    childTotalCell.textContent = qty > 0 ? `$${childTotal.toFixed(2)}` : '-';
+                }
 
                 // Add to grand total
                 grandTotal += roundedPrice * qty;

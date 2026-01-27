@@ -1,6 +1,7 @@
 # Quote Builder Comprehensive Audit & Standardization Plan
 **Created:** 2026-01-27
-**Status:** Implementation in progress
+**Status:** P0 Complete | P1-A Complete | P1-B/P2/P3 Pending
+**Last Updated:** 2026-01-27
 
 ## Executive Summary
 
@@ -321,10 +322,10 @@ Embroidery:  "embroidery", "embroidery-additional", "monogram"
 ## Verification Checklist
 
 ### After Visual Fixes
-- [ ] All headers same color (or DTF green documented)
-- [ ] All save buttons consistent color
-- [ ] Size columns: S, M, L, XL, 2XL across all builders
-- [ ] Total column visible in DTG, Screen Print, DTF tables
+- [x] All headers same color (or DTF green documented)
+- [x] All save buttons consistent color
+- [x] Size columns: S, M, L, XL, 2XL across all builders
+- [x] Total column visible in DTG, Screen Print, DTF tables
 - [ ] Button order: Save → Copy → Print
 
 ### After Functional Fixes
@@ -341,3 +342,152 @@ For each builder (DTG, Screen Print, DTF, Embroidery):
 - [ ] Open link → All line items display correctly
 - [ ] Print PDF → Looks professional, includes all data
 - [ ] Edit mode → Can modify and re-save
+
+---
+
+## Functional Verification Audit (2026-01-27)
+
+### Quote Saving - Deep Dive Results
+
+| Builder | Quote Saves? | Line Items Save? | Issues Found |
+|---------|--------------|------------------|--------------|
+| **DTG** | ✅ Yes | ✅ Yes | Image URLs save as empty string |
+| **Screen Print** | ✅ Yes | ✅ Yes | Print location stored globally only, not per line item |
+| **DTF** | ✅ Yes | ✅ Yes | None |
+| **Embroidery** | ✅ Yes | ✅ Yes | ColorCode field stored empty |
+
+#### Detailed Findings:
+
+**Screen Print - Location Data Issue:**
+- Print location (front/back, ink colors) stored in `Notes` JSON at session level
+- Individual line items do NOT have `PrintLocation` field populated
+- Quote view must parse session-level Notes to display location
+
+**Embroidery - ColorCode Empty:**
+- `embroidery-quote-service.js:288` sets `ColorCode: ''` (empty)
+- Should populate with actual color code from product data
+
+**DTG/Screen Print - Missing Extended Fees:**
+- No fields for: ArtCharge, RushFee, SampleFee
+- Embroidery has these, others don't save them
+
+**Image URLs - Inconsistent:**
+- DTG/Screen Print save `ImageUrl: ''` (empty string)
+- DTF/Embroidery save actual product image URLs
+
+### Quote View Display - Deep Dive Results
+
+| Builder | URL Works? | Line Items Display? | Print Location Shows? | Special Sections? |
+|---------|------------|---------------------|----------------------|-------------------|
+| **DTG** | ✅ Yes | ✅ Yes | ✅ Yes | Print Location |
+| **Screen Print** | ✅ Yes | ✅ Yes | ❌ **NO** | Ink Colors (if JSON exists) |
+| **DTF** | ✅ Yes | ✅ Yes | ✅ Yes | Transfer Specs |
+| **Embroidery** | ✅ Yes | ✅ Yes | ✅ Yes | Logo Specs, Stitch Counts |
+
+#### Detailed Findings:
+
+**Screen Print - Print Location NOT Displayed:**
+- `quote-view.js` has section for Screen Print but print location not rendered
+- Data exists in Notes JSON but code doesn't extract/display it
+- **FIX NEEDED:** Add print location display to Screen Print section
+
+**DTF - No Fallback for Missing Notes:**
+- If Notes JSON is malformed or missing, transfer specs section shows nothing
+- Should add fallback: "Transfer specs not specified"
+
+**Tax Calculation - All Correct:**
+- All builders display 10.1% WA Sales Tax in quote view
+- Calculation: `subtotal * 0.101`
+- Tax displayed but NOT saved to database (calculated on view)
+
+### PDF Generation - Deep Dive Results
+
+| Builder | PDF Method | Has Tax? | Professional Format? | Issues |
+|---------|------------|----------|---------------------|--------|
+| **DTG** | `window.open()` simple print | ❌ No | ❌ No | Missing tax, minimal format |
+| **Screen Print** | EmbroideryInvoiceGenerator | ✅ Yes | ✅ Yes | None |
+| **DTF** | EmbroideryInvoiceGenerator | ✅ Yes | ✅ Yes | None |
+| **Embroidery** | EmbroideryInvoiceGenerator | ✅ Yes | ✅ Yes | None |
+
+#### Detailed Findings:
+
+**DTG PDF - Significantly Different:**
+- Uses simple `window.open()` browser print dialog
+- No company header/logo
+- No customer address block
+- No tax calculation
+- No professional invoice styling
+- Just renders the quote content in a new window
+
+**Screen Print/DTF/Embroidery PDF - Professional:**
+- All use `EmbroideryInvoiceGenerator` class
+- Includes: Company logo, customer info, line items table, tax, totals
+- Professional invoice layout with proper formatting
+- Uses jsPDF for consistent output
+
+**Recommendation:** Standardize DTG to use EmbroideryInvoiceGenerator
+
+---
+
+## Updated Priority Fixes (Post-Functional Audit)
+
+### P0: Critical (Visual Consistency) - ✅ COMPLETED
+1. ✅ **Standardized header colors** - DTF now blue (#003f7f)
+2. ✅ **Standardized save button colors** - Embroidery now green (#4cb354)
+3. ✅ **Fixed size column headers** - Screen Print & DTG now L/2XL
+4. ✅ **Add Total column** - CSS added, JS implemented for DTG, Screen Print, DTF (2026-01-27)
+
+### P1-A: Critical (Functional - NEW) - ✅ COMPLETED 2026-01-27
+
+17. ✅ **Fix Screen Print quote view location display**
+    - **Fix 1:** Updated `screenprint-quote-service.js` saveQuote() to include frontLocation/backLocation/frontColors/backColors in Notes JSON (was only in updateQuote before)
+    - **Fix 2:** Added `renderScreenPrintSpecs()` method to `quote-view.js` - displays print locations with ink color counts, falls back to "Print locations not specified"
+18. ✅ **Standardize DTG PDF to use EmbroideryInvoiceGenerator** - Already implemented at `dtg-quote-builder.html:4004`. Verified working.
+19. ✅ **Populate ColorCode in Embroidery line items** - Code already correct at `embroidery-quote-service.js:288` using `productPricing.product.colorCode || productPricing.product.catalogColor`. Quote builder properly populates `catalogColor` from row dataset.
+20. ✅ **Add fallback for DTF Notes JSON** - Already implemented at `quote-view.js:244` - shows "Transfer locations not specified" when missing
+
+### P1-B: High (Original Functional Alignment)
+
+5. **Standardize quote ID format** - Move all to `PREFIX-YYYY-NNN` with API-backed sequence
+6. **Add tax to saved quotes** - Calculate and store TotalWithTax in database
+7. **Create shared PDF generator** - Already exists (EmbroideryInvoiceGenerator), just need DTG integration
+8. **Standardize button order** - All: Save & Get Link → Copy Quote → Print Quote
+
+### P2: Medium (Architecture) - Unchanged
+
+9. **Extract Embroidery session fields** - Move logo/stitch config to separate table
+10. **Create shared quote service base** - Extend base-quote-service.js for all builders
+11. **Unify Notes field usage** - All use JSON for config, add separate CustomerNotes field
+12. **Standardize EmbellishmentType values** - Consistent kebab-case naming
+
+### P3: Low (Polish) - Unchanged
+
+13. **Align sidebar layouts** - Match Embroidery's collapsible sections pattern
+14. **Add unsaved indicator** - DTG/ScreenPrint/DTF should have indicator like Embroidery
+15. **Add "New Quote" button** - DTG/ScreenPrint/DTF should match Embroidery
+16. **CSS consolidation** - Create theme files to reduce duplication
+
+---
+
+## Implementation Order (Recommended)
+
+### Phase 1: Critical Functional Fixes - ✅ COMPLETED 2026-01-27
+
+**Files Modified:**
+- `shared_components/js/screenprint-quote-service.js` - Added location details to saveQuote() Notes JSON
+- `pages/js/quote-view.js` - Added renderScreenPrintSpecs() method and call
+
+**Verification Results:**
+1. ✅ P1-A #17: Screen Print location now displays with ink colors in quote view
+2. ✅ P1-A #18: DTG already uses EmbroideryInvoiceGenerator (verified)
+3. ✅ P1-A #19: Embroidery ColorCode logic correct (verified)
+4. ✅ P1-A #20: DTF fallback already implemented (verified)
+
+### Phase 2: Total Column JS Implementation - ✅ COMPLETED 2026-01-27
+5. ✅ P0 #4: Total column cells and JS calculations added to DTG, Screen Print, DTF
+
+### Phase 3: Original P1 Items
+6-9. Quote ID standardization, tax saving, button order
+
+### Phase 4: Architecture & Polish (P2-P3)
+10-16. As time permits

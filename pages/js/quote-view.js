@@ -172,6 +172,9 @@ class QuoteViewPage {
         // Render DTF specs section if applicable
         this.renderDTFSpecs();
 
+        // Render Screen Print specs section if applicable
+        this.renderScreenPrintSpecs();
+
         // Items - render as product cards with size matrix (async for image fetching)
         await this.renderItems();
 
@@ -205,8 +208,15 @@ class QuoteViewPage {
 
     /**
      * Render DTF transfer location specifications
+     * Only displays for DTF quotes, shows "Not specified" if no location data
      */
     renderDTFSpecs() {
+        // Only show for DTF quotes
+        const prefix = this.quoteId?.split(/[\d-]/)[0] || '';
+        if (prefix !== 'DTF') {
+            return;
+        }
+
         // Parse Notes JSON to get location info
         let notes = {};
         try {
@@ -219,10 +229,6 @@ class QuoteViewPage {
         const locationCodes = notes.locationCodes || '';
         const locationNames = notes.locationNames || '';
 
-        if (!locationCodes && !locationNames) {
-            return; // No location data to display
-        }
-
         // Get the DTF specs section from HTML
         const specsSection = document.getElementById('dtf-specs-section');
         const specsContainer = document.getElementById('dtf-specs-container');
@@ -232,9 +238,13 @@ class QuoteViewPage {
             return;
         }
 
-        // Show the section and populate it
+        // Show the section and populate it (with fallback for missing location data)
         specsSection.style.display = 'block';
-        specsContainer.innerHTML = this.renderLocationList(locationCodes, locationNames, notes);
+        if (!locationCodes && !locationNames) {
+            specsContainer.innerHTML = '<div class="dtf-location-item">• Transfer locations not specified</div>';
+        } else {
+            specsContainer.innerHTML = this.renderLocationList(locationCodes, locationNames, notes);
+        }
     }
 
     renderLocationList(locationCodes, locationNames, notes) {
@@ -254,6 +264,88 @@ class QuoteViewPage {
         }
 
         return '';
+    }
+
+    /**
+     * Render Screen Print specifications section
+     * Shows print locations and ink colors per location
+     * Only displays for Screen Print quotes (SP prefix)
+     */
+    renderScreenPrintSpecs() {
+        // Only show for Screen Print quotes
+        const prefix = this.quoteId?.split(/[\d-]/)[0] || '';
+        if (prefix !== 'SP' && prefix !== 'SPC') {
+            return;
+        }
+
+        // Parse Notes JSON to get print setup info
+        let notes = {};
+        try {
+            notes = this.quoteData.Notes ? JSON.parse(this.quoteData.Notes) : {};
+        } catch (e) {
+            console.warn('[QuoteView] Could not parse Screen Print Notes JSON:', e);
+        }
+
+        // Get the DTF specs section (reusing the same HTML element)
+        // Note: We're repurposing the DTF specs section for Screen Print
+        const specsSection = document.getElementById('dtf-specs-section');
+        const specsContainer = document.getElementById('dtf-specs-container');
+
+        if (!specsSection || !specsContainer) {
+            console.warn('[QuoteView] Specs section not found in HTML');
+            return;
+        }
+
+        // Build content based on available location data
+        let html = '';
+
+        // Check for front location
+        if (notes.frontLocation) {
+            const frontLabel = this.formatLocationCode(notes.frontLocation);
+            const frontColors = notes.frontColors || 1;
+            html += `<div class="dtf-location-item">• ${frontLabel} <span class="dtf-location-size">(${frontColors} color${frontColors !== 1 ? 's' : ''})</span></div>`;
+        }
+
+        // Check for back location
+        if (notes.backLocation) {
+            const backLabel = this.formatLocationCode(notes.backLocation);
+            const backColors = notes.backColors || 1;
+            html += `<div class="dtf-location-item">• ${backLabel} <span class="dtf-location-size">(${backColors} color${backColors !== 1 ? 's' : ''})</span></div>`;
+        }
+
+        // Fallback to locations array if no front/back
+        if (!html && notes.locations && notes.locations.length > 0) {
+            html = notes.locations.map(loc => {
+                const label = this.formatLocationCode(loc);
+                return `<div class="dtf-location-item">• ${label}</div>`;
+            }).join('');
+        }
+
+        // Try to get from first item's PrintLocationName as last resort
+        if (!html && this.items?.length > 0 && this.items[0]?.PrintLocationName) {
+            const locationName = this.items[0].PrintLocationName;
+            if (locationName && locationName !== 'Primary Location') {
+                html = `<div class="dtf-location-item">• ${this.escapeHtml(locationName)}</div>`;
+            }
+        }
+
+        // Show setup fees info if available
+        const isDark = notes.isDarkGarment;
+        const hasSafety = notes.hasSafetyStripes;
+        if (isDark || hasSafety) {
+            html += '<div class="dtf-location-item" style="margin-top: 8px; font-size: 12px; color: #666;">';
+            if (isDark) html += '• Dark garment (includes underbase)';
+            if (hasSafety) html += '• Safety stripes included';
+            html += '</div>';
+        }
+
+        // Show the section with fallback message if no location data
+        specsSection.style.display = 'block';
+        if (!html) {
+            specsContainer.innerHTML = '<div class="dtf-location-item">• Print locations not specified</div>';
+        } else {
+            specsContainer.innerHTML = html;
+        }
     }
 
     /**
@@ -478,11 +570,22 @@ class QuoteViewPage {
         // DTG stores location in Notes JSON as 'locationName' or in items as 'PrintLocationName'
         let location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation;
 
-        // Try to get from Notes JSON (DTG/DTF quotes)
+        // Try to get from Notes JSON (DTG/DTF/Screen Print quotes)
         if (!location && this.quoteData?.Notes) {
             try {
                 const notes = JSON.parse(this.quoteData.Notes);
+                // DTG format
                 location = notes.locationName || notes.locationNames || null;
+                // Screen Print format - has locations array or frontLocation/backLocation
+                if (!location && notes.locations && notes.locations.length > 0) {
+                    location = this.formatScreenPrintLocations(notes.locations);
+                }
+                if (!location && (notes.frontLocation || notes.backLocation)) {
+                    const parts = [];
+                    if (notes.frontLocation) parts.push(this.formatLocationCode(notes.frontLocation));
+                    if (notes.backLocation) parts.push(this.formatLocationCode(notes.backLocation));
+                    location = parts.join(' + ');
+                }
             } catch (e) { /* ignore parse errors */ }
         }
 
@@ -2229,6 +2332,38 @@ class QuoteViewPage {
             return `(${cleaned.substr(0, 3)}) ${cleaned.substr(3, 3)}-${cleaned.substr(6)}`;
         }
         return phone;
+    }
+
+    /**
+     * Format Screen Print locations array to readable string
+     * @param {Array} locations - Array of location codes like ['FF', 'FB']
+     * @returns {string} Formatted location string
+     */
+    formatScreenPrintLocations(locations) {
+        if (!locations || locations.length === 0) return null;
+        return locations.map(loc => this.formatLocationCode(loc)).join(' + ');
+    }
+
+    /**
+     * Convert location code to readable name
+     * @param {string} code - Location code like 'FF', 'LC'
+     * @returns {string} Human-readable location name
+     */
+    formatLocationCode(code) {
+        const locationNames = {
+            'LC': 'Left Chest',
+            'RC': 'Right Chest',
+            'FF': 'Full Front',
+            'FB': 'Full Back',
+            'JF': 'Jumbo Front',
+            'JB': 'Jumbo Back',
+            'CF': 'Center Front',
+            'CB': 'Center Back',
+            'LS': 'Left Sleeve',
+            'RS': 'Right Sleeve',
+            'BN': 'Back of Neck'
+        };
+        return locationNames[code] || code;
     }
 
     parseSizeBreakdown(breakdown) {

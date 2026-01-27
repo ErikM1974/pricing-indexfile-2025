@@ -441,6 +441,7 @@
                 <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
                 <td class="cell-qty" id="row-qty-${rowId}">0</td>
                 <td class="cell-price" id="row-price-${rowId}">-</td>
+                <td class="cell-total" id="row-total-${rowId}">-</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
                         <i class="fas fa-times"></i>
@@ -856,6 +857,7 @@
                            ${isSize06 ? `value="${qty}" min="0" placeholder="${qty}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"` : 'disabled style="background: #f5f5f5;"'}></td>
                 <td class="cell-qty" id="row-qty-${childRowId}">${qty}</td>
                 <td class="cell-price" id="row-price-${childRowId}">-</td>
+                <td class="cell-total" id="row-total-${childRowId}">-</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="removeChildRow(${parentRowId}, '${size}')" title="Remove ${displaySize}">
                         <i class="fas fa-times"></i>

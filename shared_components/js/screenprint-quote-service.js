@@ -74,10 +74,17 @@ class ScreenPrintQuoteService {
             const totalAmount = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
             
             // Prepare print setup details for Notes field
+            // Include full location details (frontLocation, backLocation, colors) for quote-view.js display
             const printSetup = {
                 locations: quoteData.printLocations || [],
                 primaryColors: quoteData.primaryColors || 1,
-                additionalColors: quoteData.additionalColors || {}
+                additionalColors: quoteData.additionalColors || {},
+                frontLocation: quoteData.frontLocation || '',
+                backLocation: quoteData.backLocation || '',
+                frontColors: quoteData.frontColors || 0,
+                backColors: quoteData.backColors || 0,
+                isDarkGarment: quoteData.isDarkGarment || false,
+                hasSafetyStripes: quoteData.hasSafetyStripes || false
             };
             
             // Create session record
