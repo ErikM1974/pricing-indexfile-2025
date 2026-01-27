@@ -18,6 +18,10 @@ class DTFQuoteBuilder {
         this.productIndex = 0;
         this.ltmDistributed = false; // When true, LTM is distributed into unit prices
 
+        // Edit mode state
+        this.editingQuoteId = null;
+        this.editingRevision = null;
+
         // Auto-save & Draft Recovery (2026 consolidation)
         this.persistence = null;
         this.session = null;
@@ -206,14 +210,22 @@ class DTFQuoteBuilder {
         this.setupGlobalListeners();
         this.setupLTMToggle();
 
-        // Check for draft recovery (after DOM is ready)
-        if (this.session && this.session.shouldShowRecovery()) {
-            this.session.showRecoveryDialog(
-                (draft) => this.restoreDraft(draft),
-                () => {
-                    console.log('[DTFQuoteBuilder] User chose to start fresh');
-                }
-            );
+        // Check for edit mode (loading existing quote for revision)
+        const editQuoteId = this.checkForEditMode();
+        if (editQuoteId) {
+            console.log('[DTFQuoteBuilder] Edit mode detected:', editQuoteId);
+            // Skip draft recovery and load the existing quote instead
+            await this.loadQuoteForEditing(editQuoteId);
+        } else {
+            // Check for draft recovery (after DOM is ready)
+            if (this.session && this.session.shouldShowRecovery()) {
+                this.session.showRecoveryDialog(
+                    (draft) => this.restoreDraft(draft),
+                    () => {
+                        console.log('[DTFQuoteBuilder] User chose to start fresh');
+                    }
+                );
+            }
         }
 
         // Auto-select sales rep based on logged-in staff (2026 consolidation)
@@ -243,6 +255,247 @@ class DTFQuoteBuilder {
             console.error('[DTFQuoteBuilder] Failed to load pricing:', error);
             this.showError('Unable to load pricing data. Please refresh the page or try again later.');
             throw error; // Re-throw to prevent silently continuing
+        }
+    }
+
+    // ==================== EDIT MODE FUNCTIONS ====================
+
+    /**
+     * Check URL for edit parameter
+     * Returns quote ID if editing, null otherwise
+     */
+    checkForEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('edit');
+    }
+
+    /**
+     * Update UI to show edit mode
+     */
+    updateEditModeUI(quoteId, revision) {
+        // Update header subtitle
+        const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child, .dtf-header div[style*="text-align: center"] div:last-child');
+        if (headerSubtitle) {
+            headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+        }
+
+        // Update save button text
+        const saveBtn = document.querySelector('.btn-save-quote');
+        if (saveBtn) {
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+        }
+    }
+
+    /**
+     * Populate customer information fields
+     */
+    populateCustomerInfo(session) {
+        const fields = {
+            'customer-name': session.CustomerName,
+            'customer-email': session.CustomerEmail,
+            'company-name': session.CompanyName,
+            'customer-phone': session.Phone
+        };
+
+        for (const [id, value] of Object.entries(fields)) {
+            const el = document.getElementById(id);
+            if (el && value) el.value = value;
+        }
+
+        // Set sales rep dropdown
+        const salesRepSelect = document.getElementById('sales-rep');
+        if (salesRepSelect && session.SalesRepEmail) {
+            for (let i = 0; i < salesRepSelect.options.length; i++) {
+                if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                    salesRepSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Populate selected locations from session Notes
+     */
+    populateLocationsFromSession(session) {
+        try {
+            const notes = JSON.parse(session.Notes || '{}');
+            if (notes.locations && Array.isArray(notes.locations)) {
+                notes.locations.forEach(loc => {
+                    const checkbox = document.querySelector(`input[value="${loc}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        if (!this.selectedLocations.includes(loc)) {
+                            this.selectedLocations.push(loc);
+                        }
+                    }
+                });
+                this.updateLocationSummary();
+                this.updateSearchState();
+            }
+        } catch (e) {
+            console.warn('[EditMode] Could not parse locations from notes:', e);
+        }
+    }
+
+    /**
+     * Populate products from line items
+     */
+    async populateProductsFromItems(items) {
+        // Filter to only DTF product items
+        const productItems = items.filter(item =>
+            item.EmbellishmentType === 'dtf' &&
+            item.StyleNumber
+        );
+
+        // Group items by StyleNumber + Color to consolidate size quantities
+        const productGroups = {};
+        for (const item of productItems) {
+            const key = `${item.StyleNumber}|${item.Color}`;
+            if (!productGroups[key]) {
+                productGroups[key] = {
+                    styleNumber: item.StyleNumber,
+                    color: item.Color,
+                    productName: item.ProductName,
+                    imageUrl: item.ImageURL || '',
+                    sizeBreakdown: {}
+                };
+            }
+            // Merge size breakdowns
+            try {
+                const sizes = JSON.parse(item.SizeBreakdown || '{}');
+                for (const [size, qty] of Object.entries(sizes)) {
+                    productGroups[key].sizeBreakdown[size] =
+                        (productGroups[key].sizeBreakdown[size] || 0) + qty;
+                }
+            } catch (e) {
+                console.warn('[EditMode] Could not parse SizeBreakdown:', item.SizeBreakdown);
+            }
+        }
+
+        // Add each product to the table
+        for (const product of Object.values(productGroups)) {
+            await this.addProductFromQuote(product);
+        }
+    }
+
+    /**
+     * Add a product row from loaded quote data
+     */
+    async addProductFromQuote(product) {
+        // Add new row using the global function from the HTML
+        if (typeof addNewRow === 'function') {
+            addNewRow();
+        } else {
+            console.error('[EditMode] addNewRow function not found');
+            return;
+        }
+
+        const row = document.querySelector('tr.new-row');
+        if (!row) return;
+
+        const rowId = row.dataset.rowId || row.dataset.productId;
+        const styleInput = row.querySelector('.style-input');
+
+        // Set style number and trigger product loading
+        styleInput.value = product.styleNumber;
+
+        // Trigger the style change handler from the HTML
+        if (typeof onStyleChange === 'function') {
+            await onStyleChange(styleInput, parseInt(rowId));
+        }
+
+        // Small delay to let colors load
+        await new Promise(resolve => setTimeout(resolve, 150));
+
+        // Select the color
+        const pickerDropdown = row.querySelector('.color-picker-dropdown');
+        if (pickerDropdown) {
+            const colorOption = pickerDropdown.querySelector(
+                `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+            ) || Array.from(pickerDropdown.querySelectorAll('.color-option')).find(opt =>
+                opt.textContent.includes(product.color)
+            );
+            if (colorOption && typeof selectColor === 'function') {
+                selectColor(parseInt(rowId), colorOption);
+            }
+        }
+
+        // Small delay for color selection to process
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Set size quantities
+        for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+            if (qty > 0) {
+                const normalizedSize = size === 'XXL' ? '2XL' : size;
+
+                if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
+                    const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
+                                     row.querySelector(`input[data-size="${size}"]`);
+                    if (sizeInput) {
+                        sizeInput.value = qty;
+                        sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } else {
+                    console.log(`[EditMode] Extended size ${normalizedSize}: ${qty} - user needs to re-enter in popup`);
+                }
+            }
+        }
+    }
+
+    /**
+     * Load existing quote for editing
+     * Populates all form fields with quote data
+     */
+    async loadQuoteForEditing(quoteId) {
+        console.log('[EditMode] Loading quote for editing:', quoteId);
+
+        // Show loading toast
+        if (typeof showToast === 'function') {
+            showToast('Loading quote...', 'info');
+        }
+
+        try {
+            const result = await this.quoteService.loadQuote(quoteId);
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to load quote');
+            }
+
+            const session = result.session;
+            const items = result.items;
+
+            // Store edit mode state
+            this.editingQuoteId = quoteId;
+            this.editingRevision = session.RevisionNumber || 1;
+
+            // Update page header to show edit mode
+            this.updateEditModeUI(quoteId, this.editingRevision);
+
+            // Populate customer information
+            this.populateCustomerInfo(session);
+
+            // Populate selected locations
+            this.populateLocationsFromSession(session);
+
+            // Populate products from line items
+            await this.populateProductsFromItems(items);
+
+            // Recalculate pricing to update totals
+            this.updatePricing();
+
+            console.log('[EditMode] Quote loaded successfully');
+            if (typeof showToast === 'function') {
+                showToast(`Editing ${quoteId} (Rev ${this.editingRevision})`, 'success');
+            }
+
+        } catch (error) {
+            console.error('[EditMode] Error loading quote:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error loading quote: ' + error.message, 'error');
+            }
+            // Clear edit mode
+            this.editingQuoteId = null;
+            this.editingRevision = null;
         }
     }
 
@@ -1895,10 +2148,27 @@ class DTFQuoteBuilder {
         }
 
         try {
-            const result = await this.quoteService.saveQuote(quoteData);
+            let result;
+            let finalQuoteId = quoteId;
+
+            if (this.editingQuoteId) {
+                // Update existing quote
+                console.log('[DTFQuoteBuilder] Updating existing quote:', this.editingQuoteId);
+                quoteData.quoteId = this.editingQuoteId;
+                finalQuoteId = this.editingQuoteId;
+                result = await this.quoteService.updateQuote(this.editingQuoteId, quoteData);
+                if (result && result.success) {
+                    // Update revision number
+                    this.editingRevision = result.revision;
+                    this.updateEditModeUI(this.editingQuoteId, this.editingRevision);
+                }
+            } else {
+                // Create new quote
+                result = await this.quoteService.saveQuote(quoteData);
+            }
 
             if (result.success) {
-                console.log('[DTFQuoteBuilder] Quote saved successfully:', quoteId);
+                console.log('[DTFQuoteBuilder] Quote saved successfully:', finalQuoteId);
 
                 // Clear draft after successful save
                 if (this.persistence) {
@@ -1909,14 +2179,17 @@ class DTFQuoteBuilder {
                 // Show success modal with shareable link
                 // Prefer shared QuoteShareModal module (2026 consolidation)
                 if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                    QuoteShareModal.show(quoteId);
+                    QuoteShareModal.show(finalQuoteId, this.editingQuoteId ? `Updated to Rev ${this.editingRevision}` : null);
                 } else if (typeof showSaveModal === 'function') {
                     // Fallback to inline modal if shared module not loaded
-                    showSaveModal(quoteId);
+                    showSaveModal(finalQuoteId);
                 } else {
                     // Last resort fallback
-                    const url = `${window.location.origin}/quote/${quoteId}`;
-                    alert(`Quote saved!\n\nQuote ID: ${quoteId}\n\nShareable Link:\n${url}`);
+                    const url = `${window.location.origin}/quote/${finalQuoteId}`;
+                    const message = this.editingQuoteId
+                        ? `Quote updated!\n\nQuote ID: ${finalQuoteId}\nRevision: ${this.editingRevision}\n\nShareable Link:\n${url}`
+                        : `Quote saved!\n\nQuote ID: ${finalQuoteId}\n\nShareable Link:\n${url}`;
+                    alert(message);
                 }
             } else {
                 throw new Error(result.error || 'Failed to save quote');

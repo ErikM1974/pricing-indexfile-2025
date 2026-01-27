@@ -534,13 +534,176 @@ class DTFQuoteService {
             const items = await itemsResponse.json();
 
             return {
+                success: true,
                 session: session,
                 items: items || []
             };
 
         } catch (error) {
             console.error('[DTFQuoteService] Error loading quote:', error);
-            throw error;
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Update existing quote (save revision)
+     * Keeps same QuoteID, increments revision number
+     */
+    async updateQuote(quoteID, quoteData) {
+        try {
+            console.log('[DTFQuoteService] Updating quote:', quoteID);
+
+            // Get current session to find PK_ID and revision number
+            const loadResult = await this.loadQuote(quoteID);
+            if (!loadResult.success) {
+                throw new Error(`Cannot load existing quote: ${loadResult.error}`);
+            }
+
+            const existingSession = loadResult.session;
+            const currentRevision = existingSession.RevisionNumber || 1;
+            const newRevision = currentRevision + 1;
+
+            // Calculate expiry date (30 days from now)
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+
+            // Format locations for storage
+            const locationCodes = this.formatLocationCodes(quoteData.selectedLocations || []);
+            const locationNames = this.formatLocationNames(quoteData.selectedLocations || []);
+
+            // Prepare updated session data
+            const sessionData = {
+                CustomerEmail: quoteData.customerEmail,
+                CustomerName: quoteData.customerName || 'Guest',
+                CompanyName: quoteData.companyName || '',
+                Phone: quoteData.customerPhone || '',
+                SalesRepEmail: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                TotalQuantity: parseInt(quoteData.totalQuantity),
+                SubtotalAmount: parseFloat(quoteData.subtotal.toFixed(2)),
+                LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
+                TotalAmount: parseFloat(quoteData.total.toFixed(2)),
+                ExpiresAt: this.formatDateForCaspio(expiryDate),
+                Notes: JSON.stringify({
+                    locations: quoteData.selectedLocations,
+                    locationCodes: locationCodes,
+                    locationNames: locationNames,
+                    locationCount: quoteData.selectedLocations?.length || 0,
+                    transferBreakdown: quoteData.transferBreakdown,
+                    productCount: quoteData.products.length,
+                    tier: quoteData.tierLabel,
+                    projectName: quoteData.projectName || '',
+                    specialNotes: quoteData.specialNotes || '',
+                    salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                    marginDenominator: quoteData.marginDenominator,
+                    laborPerLocation: quoteData.laborCostPerLocation,
+                    freightPerLocation: quoteData.freightPerTransfer
+                }),
+                RevisionNumber: newRevision,
+                RevisedAt: this.formatDateForCaspio(new Date()),
+                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com'
+            };
+
+            // Update session via PUT
+            const sessionResponse = await fetch(
+                `${this.baseURL}/quote_sessions/${existingSession.PK_ID}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                }
+            );
+
+            if (!sessionResponse.ok) {
+                const errorText = await sessionResponse.text();
+                throw new Error(`Session update failed: ${errorText}`);
+            }
+
+            // Delete existing items
+            await this.deleteExistingItems(quoteID);
+
+            // Save new items
+            let lineNumber = 1;
+            for (const product of quoteData.products) {
+                if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
+                    for (const sizeGroup of product.sizeGroups) {
+                        const itemColor = sizeGroup.color || product.color;
+                        const itemImageUrl = sizeGroup.imageUrl || product.imageUrl || '';
+
+                        const itemData = {
+                            QuoteID: quoteID,
+                            LineNumber: lineNumber++,
+                            StyleNumber: product.styleNumber,
+                            ProductName: `${product.productName} - ${itemColor}`,
+                            Color: itemColor,
+                            ColorCode: product.colorCode || '',
+                            EmbellishmentType: 'dtf',
+                            PrintLocation: locationCodes,
+                            PrintLocationName: locationNames,
+                            Quantity: parseInt(sizeGroup.quantity),
+                            HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
+                            BaseUnitPrice: parseFloat((sizeGroup.effectiveCost || 0).toFixed(2)),
+                            LTMPerUnit: parseFloat((sizeGroup.pricing?.ltmPerUnit || 0).toFixed(2)),
+                            FinalUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
+                            LineTotal: parseFloat(sizeGroup.total.toFixed(2)),
+                            SizeBreakdown: JSON.stringify(sizeGroup.sizes),
+                            PricingTier: quoteData.tierLabel,
+                            ImageURL: itemImageUrl,
+                            AddedAt: this.formatDateForCaspio(new Date())
+                        };
+
+                        await fetch(`${this.baseURL}/quote_items`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(itemData)
+                        });
+                    }
+                }
+            }
+
+            console.log('[DTFQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
+
+            return {
+                success: true,
+                quoteID: quoteID,
+                revision: newRevision
+            };
+
+        } catch (error) {
+            console.error('[DTFQuoteService] Error updating quote:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Delete existing quote items for a quote ID
+     */
+    async deleteExistingItems(quoteID) {
+        try {
+            // Fetch existing items
+            const itemsResponse = await fetch(`${this.baseURL}/quote_items?QuoteID=${quoteID}`);
+            if (!itemsResponse.ok) return;
+
+            const items = await itemsResponse.json();
+            if (!items || items.length === 0) return;
+
+            // Delete each item
+            for (const item of items) {
+                if (item.PK_ID) {
+                    await fetch(`${this.baseURL}/quote_items/${item.PK_ID}`, {
+                        method: 'DELETE'
+                    });
+                }
+            }
+
+            console.log('[DTFQuoteService] Deleted', items.length, 'existing items');
+        } catch (error) {
+            console.warn('[DTFQuoteService] Error deleting items:', error);
         }
     }
 

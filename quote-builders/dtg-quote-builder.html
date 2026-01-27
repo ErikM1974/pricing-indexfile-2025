@@ -395,6 +395,10 @@
         let productCache = {}; // Cache product data for quick lookup
         let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
 
+        // Edit mode state
+        let editingQuoteId = null;
+        let editingRevision = null;
+
         // DTG Print Location Configuration
         let printLocation = {
             front: 'LC',  // LC, FF, JF
@@ -999,6 +1003,241 @@
         }
 
         // ============================================================
+        // EDIT MODE FUNCTIONS
+        // ============================================================
+
+        /**
+         * Check URL for edit parameter
+         * Returns quote ID if editing, null otherwise
+         */
+        function checkForEditMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('edit');
+        }
+
+        /**
+         * Update UI to show edit mode
+         */
+        function updateEditModeUI(quoteId, revision) {
+            // Update header subtitle
+            const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child');
+            if (headerSubtitle) {
+                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+            }
+
+            // Update save button text
+            const saveBtn = document.querySelector('.btn-save-quote');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+            }
+        }
+
+        /**
+         * Populate customer information fields
+         */
+        function populateCustomerInfo(session) {
+            const fields = {
+                'customer-name': session.CustomerName,
+                'customer-email': session.CustomerEmail,
+                'company-name': session.CompanyName,
+                'customer-phone': session.Phone
+            };
+
+            for (const [id, value] of Object.entries(fields)) {
+                const el = document.getElementById(id);
+                if (el && value) el.value = value;
+            }
+
+            // Set sales rep dropdown
+            const salesRepSelect = document.getElementById('sales-rep');
+            if (salesRepSelect && session.SalesRepEmail) {
+                for (let i = 0; i < salesRepSelect.options.length; i++) {
+                    if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                        salesRepSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Populate print location from session Notes
+         */
+        function populatePrintLocation(session) {
+            try {
+                const notes = JSON.parse(session.Notes || '{}');
+                if (notes.location) {
+                    // Location format could be 'LC', 'FF_FB', etc.
+                    const parts = notes.location.split('_');
+                    const frontLoc = parts[0] || 'LC';
+                    const backLoc = parts[1] || '';
+
+                    // Set front location radio
+                    const frontRadio = document.querySelector(`input[name="front-location"][value="${frontLoc}"]`);
+                    if (frontRadio) frontRadio.checked = true;
+
+                    // Set back location radio
+                    const backRadio = document.querySelector(`input[name="back-location"][value="${backLoc}"]`);
+                    if (backRadio) backRadio.checked = true;
+
+                    // Trigger update
+                    updatePrintLocation();
+                }
+            } catch (e) {
+                console.warn('[EditMode] Could not parse location from notes:', e);
+            }
+        }
+
+        /**
+         * Populate products from line items
+         */
+        async function populateProducts(items) {
+            // Filter to only DTG product items
+            const productItems = items.filter(item =>
+                item.EmbellishmentType === 'dtg' &&
+                item.StyleNumber
+            );
+
+            // Group items by StyleNumber + Color to consolidate size quantities
+            const productGroups = {};
+            for (const item of productItems) {
+                const key = `${item.StyleNumber}|${item.Color}`;
+                if (!productGroups[key]) {
+                    productGroups[key] = {
+                        styleNumber: item.StyleNumber,
+                        color: item.Color,
+                        productName: item.ProductName,
+                        imageUrl: item.ImageURL || '',
+                        sizeBreakdown: {}
+                    };
+                }
+                // Merge size breakdowns
+                try {
+                    const sizes = JSON.parse(item.SizeBreakdown || '{}');
+                    for (const [size, qty] of Object.entries(sizes)) {
+                        productGroups[key].sizeBreakdown[size] =
+                            (productGroups[key].sizeBreakdown[size] || 0) + qty;
+                    }
+                } catch (e) {
+                    console.warn('[EditMode] Could not parse SizeBreakdown:', item.SizeBreakdown);
+                }
+            }
+
+            // Add each product to the table
+            for (const product of Object.values(productGroups)) {
+                await addProductFromQuote(product);
+            }
+        }
+
+        /**
+         * Add a product row from loaded quote data
+         */
+        async function addProductFromQuote(product) {
+            // Add new row
+            addNewRow();
+            const row = document.querySelector('tr.new-row');
+            if (!row) return;
+
+            const rowId = row.dataset.rowId;
+            const styleInput = row.querySelector('.style-input');
+
+            // Set style number and trigger product loading
+            styleInput.value = product.styleNumber;
+            await onStyleChange(styleInput, parseInt(rowId));
+
+            // Small delay to let colors load
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            // Select the color
+            const pickerDropdown = row.querySelector('.color-picker-dropdown');
+            if (pickerDropdown) {
+                // Try to find color option by name or catalog color
+                const colorOption = pickerDropdown.querySelector(
+                    `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+                ) || Array.from(pickerDropdown.querySelectorAll('.color-option')).find(opt =>
+                    opt.textContent.includes(product.color)
+                );
+                if (colorOption) {
+                    selectColor(parseInt(rowId), colorOption);
+                }
+            }
+
+            // Small delay for color selection to process
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Set size quantities
+            for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+                if (qty > 0) {
+                    // Normalize size name (XXL -> 2XL, etc.)
+                    const normalizedSize = size === 'XXL' ? '2XL' : size;
+
+                    // Standard sizes go directly in the row
+                    if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
+                        const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
+                                         row.querySelector(`input[data-size="${size}"]`);
+                        if (sizeInput) {
+                            sizeInput.value = qty;
+                            sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    } else {
+                        // Extended sizes - need to open popup and set them
+                        // For now, store them and they'll be handled when extended size popup opens
+                        console.log(`[EditMode] Extended size ${normalizedSize}: ${qty} - user needs to re-enter in popup`);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Load existing quote for editing
+         * Populates all form fields with quote data
+         */
+        async function loadQuoteForEditing(quoteId) {
+            console.log('[EditMode] Loading quote for editing:', quoteId);
+            showToast('Loading quote...', 'info');
+
+            try {
+                const result = await quoteService.loadQuote(quoteId);
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load quote');
+                }
+
+                const session = result.session;
+                const items = result.items;
+
+                // Store edit mode state
+                editingQuoteId = quoteId;
+                editingRevision = session.RevisionNumber || 1;
+
+                // Update page header to show edit mode
+                updateEditModeUI(quoteId, editingRevision);
+
+                // Populate customer information
+                populateCustomerInfo(session);
+
+                // Populate print location
+                populatePrintLocation(session);
+
+                // Populate products from line items
+                await populateProducts(items);
+
+                // Recalculate pricing to update totals
+                recalculateAllPrices();
+
+                console.log('[EditMode] Quote loaded successfully');
+                showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+
+            } catch (error) {
+                console.error('[EditMode] Error loading quote:', error);
+                showToast('Error loading quote: ' + error.message, 'error');
+                // Clear edit mode and start fresh
+                editingQuoteId = null;
+                editingRevision = null;
+                addNewRow();
+            }
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
 
@@ -1014,27 +1253,40 @@
                 // Initialize quote service for save/load
                 quoteService = new DTGQuoteService();
 
-                // Initialize auto-save persistence (2026 consolidation)
-                initDTGPersistence();
+                // Check for edit mode (loading existing quote for revision)
+                const editQuoteId = checkForEditMode();
+                if (editQuoteId) {
+                    console.log('[Init] Edit mode detected:', editQuoteId);
+                    // Skip draft recovery and load the existing quote instead
+                    await loadQuoteForEditing(editQuoteId);
+                } else {
+                    // Initialize auto-save persistence (2026 consolidation)
+                    initDTGPersistence();
 
-                // Setup event listeners
+                    // Setup event listeners
+                    setupSearchAutocomplete();
+                    setupKeyboardShortcuts();
+                    setupLTMToggle();
+
+                    // Check for draft recovery before adding initial row
+                    if (dtgSession && dtgSession.shouldShowRecovery()) {
+                        dtgSession.showRecoveryDialog(
+                            (draft) => restoreDTGDraft(draft),
+                            () => {
+                                console.log('[DTG] User chose to start fresh');
+                                addNewRow(); // Add initial empty row
+                            }
+                        );
+                    } else {
+                        // Add initial empty row
+                        addNewRow();
+                    }
+                }
+
+                // Setup event listeners (needed for both modes)
                 setupSearchAutocomplete();
                 setupKeyboardShortcuts();
                 setupLTMToggle();
-
-                // Check for draft recovery before adding initial row
-                if (dtgSession && dtgSession.shouldShowRecovery()) {
-                    dtgSession.showRecoveryDialog(
-                        (draft) => restoreDTGDraft(draft),
-                        () => {
-                            console.log('[DTG] User chose to start fresh');
-                            addNewRow(); // Add initial empty row
-                        }
-                    );
-                } else {
-                    // Add initial empty row
-                    addNewRow();
-                }
 
                 // Auto-select sales rep based on logged-in staff (2026 consolidation)
                 if (typeof StaffAuthHelper !== 'undefined') {
@@ -3909,34 +4161,184 @@
             showLoading(true);
 
             try {
-                // Combine primary logo + all additional logos
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos
-                ];
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos);
+                // Force recalculate pricing before save to ensure data is fresh
+                await recalculatePricing();
+
+                // Calculate pricing for DTG products
+                const pricing = {
+                    totalQuantity: products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0),
+                    subtotal: products.reduce((sum, p) => sum + (p.lineTotal || 0), 0),
+                    ltmFee: window.currentPricingData?.ltmFee || 0,
+                    grandTotal: window.currentPricingData?.grandTotal || 0,
+                    tier: window.currentPricingData?.tier || ''
+                };
 
                 // Build quoteData in format expected by DTGQuoteService
+                // Transform collected products to match service expectations
+                const transformedProducts = products.map(p => {
+                    // Find pricing data for this product from currentPricingData
+                    const pricingInfo = window.currentPricingData?.products?.find(
+                        pp => pp.product.style === p.style && pp.product.catalogColor === p.catalogColor
+                    );
+
+                    // Calculate LTM per unit
+                    const ltmPerUnit = pricing.ltmFee > 0 && pricing.totalQuantity > 0
+                        ? pricing.ltmFee / pricing.totalQuantity
+                        : 0;
+                    const tierLabel = pricingInfo?.tier?.TierLabel || pricing.tier || '24-47';
+
+                    // Build sizeGroups - ALWAYS build, with fallback to UI prices
+                    let sizeGroups = [];
+
+                    // Group standard and extended sizes separately for pricing
+                    const standardSizes = {};
+                    const extendedSizes = {};
+
+                    Object.entries(p.sizeBreakdown || {}).forEach(([size, qty]) => {
+                        if (SIZE06_EXTENDED_SIZES.includes(size) || size === '2XL' || size === 'XXL') {
+                            extendedSizes[size] = qty;
+                        } else {
+                            standardSizes[size] = qty;
+                        }
+                    });
+
+                    // Find the parent row to read UI-displayed prices as fallback
+                    const parentRow = document.querySelector(
+                        `tr[data-style="${p.style}"][data-catalog-color="${p.catalogColor}"]:not(.child-row)`
+                    );
+                    const rowId = parentRow?.dataset?.rowId || p.rowId;
+
+                    // Create sizeGroup for standard sizes
+                    if (Object.keys(standardSizes).length > 0) {
+                        const standardQty = Object.values(standardSizes).reduce((a, b) => a + b, 0);
+                        const firstSize = Object.keys(standardSizes)[0];
+
+                        // Try pricingInfo first, fall back to UI-displayed price
+                        let basePrice = pricingInfo?.prices?.[firstSize]?.[tierLabel] || 0;
+
+                        if (basePrice === 0 && rowId) {
+                            // Fallback: read from UI price cell
+                            const priceCell = document.getElementById(`row-price-${rowId}`);
+                            const priceText = priceCell?.textContent?.replace('$', '').trim();
+                            // Handle "-" placeholder (means no price calculated yet)
+                            if (priceText && priceText !== '-') {
+                                const displayedPrice = parseFloat(priceText) || 0;
+                                // If LTM is distributed in display, subtract it to get base price
+                                basePrice = ltmDistributed ? displayedPrice - ltmPerUnit : displayedPrice;
+                            }
+                        }
+
+                        const unitPrice = basePrice + (ltmDistributed ? ltmPerUnit : 0);
+
+                        sizeGroups.push({
+                            quantity: standardQty,
+                            basePrice: basePrice,
+                            ltmPerUnit: ltmDistributed ? ltmPerUnit : 0,
+                            unitPrice: unitPrice,
+                            total: basePrice * standardQty,
+                            sizes: standardSizes
+                        });
+                    }
+
+                    // Create sizeGroup for each extended size (different pricing)
+                    Object.entries(extendedSizes).forEach(([size, qty]) => {
+                        // Try pricingInfo first
+                        let basePrice = pricingInfo?.prices?.[size]?.[tierLabel] || 0;
+
+                        if (basePrice === 0 && rowId) {
+                            // Fallback: find child row price for this extended size
+                            const childRowId = childRowMap[rowId]?.[size];
+                            if (childRowId) {
+                                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                                const priceText = childPriceCell?.textContent?.replace('$', '').trim();
+                                // Handle "-" placeholder (means no price calculated yet)
+                                if (priceText && priceText !== '-') {
+                                    const displayedPrice = parseFloat(priceText) || 0;
+                                    basePrice = ltmDistributed ? displayedPrice - ltmPerUnit : displayedPrice;
+                                }
+                            }
+                        }
+
+                        const unitPrice = basePrice + (ltmDistributed ? ltmPerUnit : 0);
+
+                        sizeGroups.push({
+                            quantity: qty,
+                            basePrice: basePrice,
+                            ltmPerUnit: ltmDistributed ? ltmPerUnit : 0,
+                            unitPrice: unitPrice,
+                            total: basePrice * qty,
+                            sizes: { [size]: qty }
+                        });
+                    });
+
+                    // Debug logging for quote save issues
+                    if (sizeGroups.length === 0) {
+                        console.warn('[DTG Save] No sizeGroups created for product:', p.style, p.catalogColor);
+                        console.warn('[DTG Save] sizeBreakdown:', p.sizeBreakdown);
+                        console.warn('[DTG Save] pricingInfo found:', !!pricingInfo);
+                    } else {
+                        console.log('[DTG Save] Product sizeGroups:', p.style, sizeGroups);
+                    }
+
+                    return {
+                        styleNumber: p.style,
+                        color: p.color,
+                        colorCode: p.catalogColor,
+                        productName: p.productName,
+                        totalQuantity: p.totalQty,
+                        sizeQuantities: p.sizeBreakdown,
+                        sizeGroups: sizeGroups,
+                        imageUrl: ''
+                    };
+                });
+
+                // Validate pricing before save - warn if all prices are $0
+                const hasValidPricing = transformedProducts.some(p =>
+                    p.sizeGroups?.some(sg => sg.basePrice > 0)
+                );
+                if (!hasValidPricing) {
+                    console.error('[DTG Save] WARNING: All products have $0 pricing!');
+                    console.error('[DTG Save] currentPricingData:', window.currentPricingData);
+                    showToast('Pricing not loaded. Please wait for prices to load and try again.', 'error');
+                    showLoading(false);
+                    if (saveBtn) {
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                    }
+                    return;
+                }
+
                 const quoteData = {
                     customerName: customerName,
                     customerEmail: customerEmail,
                     companyName: document.getElementById('company-name')?.value?.trim() || '',
                     customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
                     salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
-                    products: products.map(p => ({
-                        ...p,
-                        sizeGroups: p.sizeGroups || []
-                    })),
-                    totalQuantity: pricing.totalQuantity || products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0),
+                    products: transformedProducts,
+                    totalQuantity: pricing.totalQuantity || products.reduce((sum, p) => sum + (p.totalQty || 0), 0),
                     subtotal: pricing.subtotal || 0,
                     ltmFee: pricing.ltmFee || 0,
                     total: pricing.grandTotal || pricing.total || 0,
                     tier: pricing.tier || '',
                     location: printLocation,
-                    locationName: getPrintLocationName(printLocation)
+                    locationName: LOCATION_NAMES[printLocation.combined] || printLocation.combined
                 };
 
-                const result = await quoteService.saveQuote(quoteData);
+                let result;
+                if (editingQuoteId) {
+                    // Update existing quote
+                    console.log('[DTG] Updating existing quote:', editingQuoteId);
+                    result = await quoteService.updateQuote(editingQuoteId, quoteData);
+                    if (result && result.success) {
+                        result.quoteID = editingQuoteId;
+                        // Update revision number
+                        editingRevision = result.revision;
+                        updateEditModeUI(editingQuoteId, editingRevision);
+                    }
+                } else {
+                    // Create new quote
+                    result = await quoteService.saveQuote(quoteData);
+                }
 
                 if (result && result.success && result.quoteID) {
                     console.log('[DTG] Quote saved:', result.quoteID);
@@ -3949,11 +4351,14 @@
 
                     // Show success modal with shareable link
                     if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                        QuoteShareModal.show(result.quoteID);
+                        QuoteShareModal.show(result.quoteID, editingQuoteId ? `Updated to Rev ${editingRevision}` : null);
                     } else {
                         // Fallback
                         const url = `${window.location.origin}/quote/${result.quoteID}`;
-                        alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                        const message = editingQuoteId
+                            ? `Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${editingRevision}\n\nShareable Link:\n${url}`
+                            : `Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`;
+                        alert(message);
                     }
                 } else {
                     throw new Error(result?.error || 'Failed to save quote');
@@ -4001,29 +4406,16 @@
             }
 
             try {
-                // Combine all logos for backward compat
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos,
-                    { ...capPrimaryLogo, id: 'cap-primary' },
-                    ...capAdditionalLogos
-                ];
-
-                // Build separate logo configs for cap vs garment
-                const logoConfigs = {
-                    garment: {
-                        primary: { ...primaryLogo, id: 'primary' },
-                        additional: additionalLogos
-                    },
-                    cap: {
-                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capAdditionalLogos
-                    }
+                // Get current pricing data
+                const pricing = {
+                    totalQuantity: window.currentPricingData?.totalQuantity || products.reduce((sum, p) => sum + (p.totalQty || 0), 0),
+                    subtotal: window.currentPricingData?.subtotal || 0,
+                    ltmFee: window.currentPricingData?.ltmFee || 0,
+                    grandTotal: window.currentPricingData?.grandTotal || 0,
+                    tier: window.currentPricingData?.tier || ''
                 };
 
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
-
-                const text = generateQuoteText(products, pricing, logoConfigs);
+                const text = generateQuoteText(products, pricing);
                 await navigator.clipboard.writeText(text);
 
                 showToast('Quote copied to clipboard!', 'success');
@@ -4033,119 +4425,38 @@
             }
         }
 
-        function generateQuoteText(products, pricing, logoConfigs) {
-            // Cap position name mapping
-            const capPositionNames = {
-                'CF': 'Cap Front',
-                'CB': 'Cap Back',
-                'CL': 'Left Side',
-                'CR': 'Right Side'
-            };
+        function generateQuoteText(products, pricing) {
+            const locationName = LOCATION_NAMES[printLocation.combined] || printLocation.combined;
 
             const lines = [
-                'NORTHWEST CUSTOM APPAREL - EMBROIDERY QUOTE',
+                'NORTHWEST CUSTOM APPAREL - DTG PRINT QUOTE',
                 '================================================',
                 `Date: ${new Date().toLocaleDateString()}`,
                 `Customer: ${document.getElementById('customer-name').value || 'N/A'}`,
                 `Company: ${document.getElementById('company-name').value || 'N/A'}`,
+                '',
+                `Print Location: ${locationName}`,
+                '',
+                'PRODUCTS:',
+                '------------------------------------------------'
             ];
 
-            // Separate caps from garments
-            const capProducts = products.filter(p => p.isCap === true);
-            const garmentProducts = products.filter(p => p.isCap !== true);
-
-            // Show garment embroidery section if garments in quote
-            if (garmentProducts.length > 0) {
-                lines.push('');
-                lines.push('GARMENT EMBROIDERY:');
-                lines.push(`  Primary: ${logoConfigs.garment.primary.position}, ${logoConfigs.garment.primary.stitchCount.toLocaleString()} stitches`);
-                if (logoConfigs.garment.additional.length > 0) {
-                    logoConfigs.garment.additional.forEach(logo => {
-                        lines.push(`  Additional: ${logo.position}, ${logo.stitchCount.toLocaleString()} stitches`);
-                    });
-                }
-            }
-
-            // Show cap embroidery section if caps in quote
-            if (capProducts.length > 0) {
-                lines.push('');
-                lines.push('CAP EMBROIDERY:');
-                const capPosName = capPositionNames[logoConfigs.cap.primary.position] || logoConfigs.cap.primary.position;
-                lines.push(`  Front Logo: ${capPosName}, ${logoConfigs.cap.primary.stitchCount.toLocaleString()} stitches`);
-                if (logoConfigs.cap.additional.length > 0) {
-                    logoConfigs.cap.additional.forEach(logo => {
-                        const posName = capPositionNames[logo.position] || logo.position;
-                        lines.push(`  Additional: ${posName}, ${logo.stitchCount.toLocaleString()} stitches`);
-                    });
-                }
-            }
-
-            // Show garment products if any
-            if (garmentProducts.length > 0) {
-                lines.push('');
-                lines.push('GARMENTS:');
-                lines.push('------------------------------------------------');
-                garmentProducts.forEach(p => {
-                    const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
-                    lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQuantity}`);
-                });
-            }
-
-            // Show cap products if any
-            if (capProducts.length > 0) {
-                lines.push('');
-                lines.push('CAPS:');
-                lines.push('------------------------------------------------');
-                capProducts.forEach(p => {
-                    const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
-                    lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQuantity}`);
-                });
-            }
+            products.forEach(p => {
+                const sizes = Object.entries(p.sizeBreakdown || {}).map(([s, q]) => `${s}:${q}`).join(' ');
+                lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQty}`);
+            });
 
             lines.push('');
             lines.push('------------------------------------------------');
             lines.push(`Total Pieces: ${pricing.totalQuantity}`);
-            // Show quantity breakdown for mixed quotes
-            if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`  Garments: ${pricing.garmentQuantity}`);
-                lines.push(`  Caps: ${pricing.capQuantity}`);
-            }
+            lines.push(`Tier: ${pricing.tier}`);
+            lines.push(`Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
 
-            // Show tier (with breakdown for mixed quotes)
-            if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`Pricing Tier: Mixed`);
-                lines.push(`  Garment Tier: ${pricing.garmentTier}`);
-                lines.push(`  Cap Tier: ${pricing.capTier}`);
-            } else if (pricing.hasCaps) {
-                lines.push(`Tier: ${pricing.capTier}`);
-            } else {
-                lines.push(`Tier: ${pricing.garmentTier || pricing.tier}`);
-            }
-
-            // Show subtotal breakdown for mixed quotes
-            if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
-                lines.push(`  Garments Subtotal: $${pricing.garmentSubtotal.toFixed(2)}`);
-                lines.push(`  Caps Subtotal: $${pricing.capSubtotal.toFixed(2)}`);
-            } else {
-                lines.push(`Products Subtotal: $${pricing.subtotal.toFixed(2)}`);
-            }
-
-            // Show LTM (with breakdown for mixed quotes)
             if (pricing.ltmFee > 0) {
-                const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
-                const hasCapLtm = (pricing.capLtmFee || 0) > 0;
-
-                if (hasGarmentLtm && hasCapLtm) {
-                    lines.push(`LTM Fee (< 24 pcs): $${pricing.ltmFee.toFixed(2)}`);
-                    lines.push(`  Garment LTM: $${pricing.garmentLtmFee.toFixed(2)}`);
-                    lines.push(`  Cap LTM: $${pricing.capLtmFee.toFixed(2)}`);
-                } else {
-                    lines.push(`LTM Fee: $${pricing.ltmFee.toFixed(2)}`);
-                }
+                lines.push(`LTM Fee (< 24 pcs): $${pricing.ltmFee.toFixed(2)}`);
             }
-            if (pricing.setupFees > 0) lines.push(`Setup: $${pricing.setupFees.toFixed(2)}`);
-            lines.push(`TOTAL: $${pricing.grandTotal.toFixed(2)}`);
+
+            lines.push(`TOTAL: $${(pricing.grandTotal || 0).toFixed(2)}`);
             lines.push('');
             lines.push('Northwest Custom Apparel | 253-922-5793');
 

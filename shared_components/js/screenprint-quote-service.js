@@ -239,55 +239,189 @@ class ScreenPrintQuoteService {
     async loadQuote(quoteID) {
         try {
             // Get session data
-            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions?quoteID=${quoteID}`);
+            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions?QuoteID=${quoteID}`);
             if (!sessionResponse.ok) {
                 throw new Error('Quote not found');
             }
-            
+
             const sessions = await sessionResponse.json();
             if (!sessions || sessions.length === 0) {
                 throw new Error('Quote not found');
             }
-            
+
             const session = sessions[0];
-            
+
             // Get items
-            const itemsResponse = await fetch(`${this.baseURL}/api/quote_items?quoteID=${quoteID}`);
+            const itemsResponse = await fetch(`${this.baseURL}/api/quote_items?QuoteID=${quoteID}`);
             const items = await itemsResponse.json();
-            
+
             return {
+                success: true,
                 session: session,
                 items: items || []
             };
-            
+
         } catch (error) {
             console.error('[ScreenPrintQuoteService] Error loading quote:', error);
-            throw error;
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
 
     /**
-     * Update existing quote
+     * Update existing quote (save revision)
+     * Keeps same QuoteID, increments revision number
      */
-    async updateQuote(quoteID, updates) {
+    async updateQuote(quoteID, quoteData) {
         try {
-            const response = await fetch(`${this.baseURL}/api/quote_sessions/${quoteID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updates)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to update quote');
+            console.log('[ScreenPrintQuoteService] Updating quote:', quoteID);
+
+            // Get current session to find PK_ID and revision number
+            const loadResult = await this.loadQuote(quoteID);
+            if (!loadResult.success) {
+                throw new Error(`Cannot load existing quote: ${loadResult.error}`);
             }
-            
-            return { success: true };
-            
+
+            const existingSession = loadResult.session;
+            const currentRevision = existingSession.RevisionNumber || 1;
+            const newRevision = currentRevision + 1;
+
+            // Format expiration date (30 days from now)
+            const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .replace(/\.\d{3}Z$/, '');
+
+            // Calculate totals
+            const subtotal = quoteData.subtotal || quoteData.items.reduce((sum, item) => sum + item.total, 0);
+            const ltmFeeTotal = quoteData.ltmFee || 0;
+            const setupFees = this.calculateSetupFees(quoteData);
+            const totalAmount = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
+
+            // Prepare print setup details for Notes field
+            const printSetup = {
+                locations: quoteData.printLocations || [],
+                primaryColors: quoteData.primaryColors || 1,
+                additionalColors: quoteData.additionalColors || {},
+                frontLocation: quoteData.frontLocation,
+                backLocation: quoteData.backLocation,
+                frontColors: quoteData.frontColors,
+                backColors: quoteData.backColors,
+                isDarkGarment: quoteData.isDarkGarment,
+                hasSafetyStripes: quoteData.hasSafetyStripes
+            };
+
+            // Prepare updated session data
+            const sessionData = {
+                CustomerEmail: quoteData.customerEmail || '',
+                CustomerName: quoteData.customerName || 'Guest',
+                CompanyName: quoteData.companyName || '',
+                Phone: quoteData.customerPhone || '',
+                SalesRepEmail: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                TotalQuantity: parseInt(quoteData.totalQuantity),
+                SubtotalAmount: parseFloat(subtotal.toFixed(2)),
+                LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),
+                TotalAmount: parseFloat(totalAmount.toFixed(2)),
+                ExpiresAt: expiresAt,
+                Notes: JSON.stringify(printSetup),
+                RevisionNumber: newRevision,
+                RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com'
+            };
+
+            // Update session via PUT
+            const sessionResponse = await fetch(
+                `${this.baseURL}/api/quote_sessions/${existingSession.PK_ID}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                }
+            );
+
+            if (!sessionResponse.ok) {
+                const errorText = await sessionResponse.text();
+                throw new Error(`Session update failed: ${errorText}`);
+            }
+
+            // Delete existing items
+            await this.deleteExistingItems(quoteID);
+
+            // Save new line items
+            const itemPromises = quoteData.items.map(async (item, index) => {
+                const itemData = {
+                    QuoteID: quoteID,
+                    LineNumber: index + 1,
+                    StyleNumber: item.styleNumber || 'CUSTOM',
+                    ProductName: item.productName || 'Screen Print Item',
+                    Color: item.color || '',
+                    ColorCode: item.colorCode || '',
+                    EmbellishmentType: 'screenprint',
+                    PrintLocation: item.locations ? item.locations.join(', ') : 'Primary',
+                    PrintLocationName: this.formatLocationDisplay(item),
+                    Quantity: parseInt(item.quantity),
+                    HasLTM: (quoteData.ltmFee && quoteData.ltmFee > 0) ? 'Yes' : 'No',
+                    BaseUnitPrice: parseFloat(item.basePrice || 0),
+                    LTMPerUnit: parseFloat(item.ltmPerUnit || 0),
+                    FinalUnitPrice: parseFloat(item.unitPrice || 0),
+                    LineTotal: parseFloat(item.lineTotal || 0),
+                    SizeBreakdown: JSON.stringify(item.sizeBreakdown || {}),
+                    PricingTier: this.getPricingTier(quoteData.totalQuantity),
+                    ImageURL: item.imageUrl || '',
+                    AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                };
+
+                return fetch(`${this.baseURL}/api/quote_items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(itemData)
+                });
+            });
+
+            await Promise.all(itemPromises);
+
+            console.log('[ScreenPrintQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
+
+            return {
+                success: true,
+                quoteID: quoteID,
+                revision: newRevision
+            };
+
         } catch (error) {
             console.error('[ScreenPrintQuoteService] Error updating quote:', error);
-            return { success: false, error: error.message };
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Delete existing quote items for a quote ID
+     */
+    async deleteExistingItems(quoteID) {
+        try {
+            // Fetch existing items
+            const itemsResponse = await fetch(`${this.baseURL}/api/quote_items?QuoteID=${quoteID}`);
+            if (!itemsResponse.ok) return;
+
+            const items = await itemsResponse.json();
+            if (!items || items.length === 0) return;
+
+            // Delete each item
+            for (const item of items) {
+                if (item.PK_ID) {
+                    await fetch(`${this.baseURL}/api/quote_items/${item.PK_ID}`, {
+                        method: 'DELETE'
+                    });
+                }
+            }
+
+            console.log('[ScreenPrintQuoteService] Deleted', items.length, 'existing items');
+        } catch (error) {
+            console.warn('[ScreenPrintQuoteService] Error deleting items:', error);
         }
     }
 

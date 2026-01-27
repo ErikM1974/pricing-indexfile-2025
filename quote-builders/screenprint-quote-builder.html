@@ -468,6 +468,10 @@
         let productCache = {}; // Cache product data for quick lookup
         let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
 
+        // Edit mode state
+        let editingQuoteId = null;
+        let editingRevision = null;
+
         // Screen Print Location Configuration
         // Screen Print Configuration State
         let printConfig = {
@@ -1288,6 +1292,256 @@
         }
 
         // ============================================================
+        // EDIT MODE FUNCTIONS
+        // ============================================================
+
+        /**
+         * Check URL for edit parameter
+         * Returns quote ID if editing, null otherwise
+         */
+        function checkForEditMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('edit');
+        }
+
+        /**
+         * Update UI to show edit mode
+         */
+        function updateEditModeUI(quoteId, revision) {
+            // Update header subtitle
+            const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child');
+            if (headerSubtitle) {
+                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+            }
+
+            // Update save button text
+            const saveBtn = document.querySelector('.btn-save-quote');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+            }
+        }
+
+        /**
+         * Populate customer information fields
+         */
+        function populateCustomerInfo(session) {
+            const fields = {
+                'customer-name': session.CustomerName,
+                'customer-email': session.CustomerEmail,
+                'company-name': session.CompanyName,
+                'customer-phone': session.Phone
+            };
+
+            for (const [id, value] of Object.entries(fields)) {
+                const el = document.getElementById(id);
+                if (el && value) el.value = value;
+            }
+
+            // Set sales rep dropdown
+            const salesRepSelect = document.getElementById('sales-rep');
+            if (salesRepSelect && session.SalesRepEmail) {
+                for (let i = 0; i < salesRepSelect.options.length; i++) {
+                    if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                        salesRepSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Populate print configuration from session Notes
+         */
+        function populatePrintConfigFromSession(session) {
+            try {
+                const notes = JSON.parse(session.Notes || '{}');
+
+                // Set front location
+                if (notes.frontLocation) {
+                    const frontRadio = document.querySelector(`input[name="front-location"][value="${notes.frontLocation}"]`);
+                    if (frontRadio) frontRadio.checked = true;
+                }
+
+                // Set front colors
+                if (notes.frontColors) {
+                    const frontColorsRadio = document.querySelector(`input[name="front-colors"][value="${notes.frontColors}"]`);
+                    if (frontColorsRadio) frontColorsRadio.checked = true;
+                }
+
+                // Set back location
+                if (notes.backLocation) {
+                    const backRadio = document.querySelector(`input[name="back-location"][value="${notes.backLocation}"]`);
+                    if (backRadio) backRadio.checked = true;
+                }
+
+                // Set back colors
+                if (notes.backColors) {
+                    const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${notes.backColors}"]`);
+                    if (backColorsRadio) backColorsRadio.checked = true;
+                }
+
+                // Set dark garment toggle
+                if (notes.isDarkGarment) {
+                    document.getElementById('dark-garment-toggle').checked = true;
+                }
+
+                // Set safety stripes toggle
+                if (notes.hasSafetyStripes) {
+                    document.getElementById('safety-stripes-toggle').checked = true;
+                }
+
+                // Trigger update to recalculate screens and fees
+                updatePrintConfig();
+            } catch (e) {
+                console.warn('[EditMode] Could not parse print config from notes:', e);
+            }
+        }
+
+        /**
+         * Populate products from line items
+         */
+        async function populateProducts(items) {
+            // Filter to only screen print product items
+            const productItems = items.filter(item =>
+                item.EmbellishmentType === 'screenprint' &&
+                item.StyleNumber
+            );
+
+            // Group items by StyleNumber + Color to consolidate size quantities
+            const productGroups = {};
+            for (const item of productItems) {
+                const key = `${item.StyleNumber}|${item.Color}`;
+                if (!productGroups[key]) {
+                    productGroups[key] = {
+                        styleNumber: item.StyleNumber,
+                        color: item.Color,
+                        productName: item.ProductName,
+                        imageUrl: item.ImageURL || '',
+                        sizeBreakdown: {}
+                    };
+                }
+                // Merge size breakdowns
+                try {
+                    const sizes = JSON.parse(item.SizeBreakdown || '{}');
+                    for (const [size, qty] of Object.entries(sizes)) {
+                        productGroups[key].sizeBreakdown[size] =
+                            (productGroups[key].sizeBreakdown[size] || 0) + qty;
+                    }
+                } catch (e) {
+                    console.warn('[EditMode] Could not parse SizeBreakdown:', item.SizeBreakdown);
+                }
+            }
+
+            // Add each product to the table
+            for (const product of Object.values(productGroups)) {
+                await addProductFromQuote(product);
+            }
+        }
+
+        /**
+         * Add a product row from loaded quote data
+         */
+        async function addProductFromQuote(product) {
+            // Add new row
+            addNewRow();
+            const row = document.querySelector('tr.new-row');
+            if (!row) return;
+
+            const rowId = row.dataset.rowId;
+            const styleInput = row.querySelector('.style-input');
+
+            // Set style number and trigger product loading
+            styleInput.value = product.styleNumber;
+            await onStyleChange(styleInput, parseInt(rowId));
+
+            // Small delay to let colors load
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            // Select the color
+            const pickerDropdown = row.querySelector('.color-picker-dropdown');
+            if (pickerDropdown) {
+                const colorOption = pickerDropdown.querySelector(
+                    `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+                ) || Array.from(pickerDropdown.querySelectorAll('.color-option')).find(opt =>
+                    opt.textContent.includes(product.color)
+                );
+                if (colorOption) {
+                    selectColor(parseInt(rowId), colorOption);
+                }
+            }
+
+            // Small delay for color selection to process
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Set size quantities
+            for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+                if (qty > 0) {
+                    const normalizedSize = size === 'XXL' ? '2XL' : size;
+
+                    if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
+                        const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
+                                         row.querySelector(`input[data-size="${size}"]`);
+                        if (sizeInput) {
+                            sizeInput.value = qty;
+                            sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    } else {
+                        console.log(`[EditMode] Extended size ${normalizedSize}: ${qty} - user needs to re-enter in popup`);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Load existing quote for editing
+         * Populates all form fields with quote data
+         */
+        async function loadQuoteForEditing(quoteId) {
+            console.log('[EditMode] Loading quote for editing:', quoteId);
+            showToast('Loading quote...', 'info');
+
+            try {
+                const result = await quoteService.loadQuote(quoteId);
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load quote');
+                }
+
+                const session = result.session;
+                const items = result.items;
+
+                // Store edit mode state
+                editingQuoteId = quoteId;
+                editingRevision = session.RevisionNumber || 1;
+
+                // Update page header to show edit mode
+                updateEditModeUI(quoteId, editingRevision);
+
+                // Populate customer information
+                populateCustomerInfo(session);
+
+                // Populate print configuration
+                populatePrintConfigFromSession(session);
+
+                // Populate products from line items
+                await populateProducts(items);
+
+                // Recalculate pricing to update totals
+                recalculatePricing();
+
+                console.log('[EditMode] Quote loaded successfully');
+                showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+
+            } catch (error) {
+                console.error('[EditMode] Error loading quote:', error);
+                showToast('Error loading quote: ' + error.message, 'error');
+                // Clear edit mode and start fresh
+                editingQuoteId = null;
+                editingRevision = null;
+                addNewRow();
+            }
+        }
+
+        // ============================================================
         // INITIALIZATION
         // ============================================================
 
@@ -1300,27 +1554,35 @@
                 // Initialize Screen Print pricing service
                 screenPrintPricingService = new ScreenPrintPricingService();
 
-                // Initialize quote service (reuse existing for save/load)
-                // quoteService = new ScreenPrintQuoteService(); // TODO: Wire up SP quote service
+                // Initialize quote service for save/load
+                quoteService = new ScreenPrintQuoteService();
 
-                // Initialize auto-save & draft recovery (2026 consolidation)
-                initScreenPrintPersistence();
-
-                // Check for draft recovery BEFORE adding initial row
-                if (spSession && spSession.shouldShowRecovery()) {
-                    spSession.showRecoveryDialog(
-                        (draft) => restoreScreenPrintDraft(draft),
-                        () => {
-                            if (spPersistence) spPersistence.clearDraft();
-                            addNewRow(); // Start fresh with empty row
-                        }
-                    );
+                // Check for edit mode (loading existing quote for revision)
+                const editQuoteId = checkForEditMode();
+                if (editQuoteId) {
+                    console.log('[Init] Edit mode detected:', editQuoteId);
+                    // Skip draft recovery and load the existing quote instead
+                    await loadQuoteForEditing(editQuoteId);
                 } else {
-                    // No draft to recover, add initial empty row
-                    addNewRow();
+                    // Initialize auto-save & draft recovery (2026 consolidation)
+                    initScreenPrintPersistence();
+
+                    // Check for draft recovery BEFORE adding initial row
+                    if (spSession && spSession.shouldShowRecovery()) {
+                        spSession.showRecoveryDialog(
+                            (draft) => restoreScreenPrintDraft(draft),
+                            () => {
+                                if (spPersistence) spPersistence.clearDraft();
+                                addNewRow(); // Start fresh with empty row
+                            }
+                        );
+                    } else {
+                        // No draft to recover, add initial empty row
+                        addNewRow();
+                    }
                 }
 
-                // Setup event listeners
+                // Setup event listeners (needed for both modes)
                 setupSearchAutocomplete();
                 setupKeyboardShortcuts();
                 setupLTMToggle();
@@ -4200,6 +4462,12 @@
                     ltmFee: pricing.ltmFee || 0,
                     setupFees: printConfig.setupFee || 0,
                     grandTotal: pricing.grandTotal || 0,
+                    frontLocation: printConfig.frontLocation,
+                    frontColors: printConfig.frontColors,
+                    backLocation: printConfig.backLocation,
+                    backColors: printConfig.backColors,
+                    isDarkGarment: printConfig.isDarkGarment,
+                    hasSafetyStripes: printConfig.isSafetyStripes,
                     printSetup: {
                         frontLocation: printConfig.frontLocation,
                         frontColors: printConfig.frontColors,
@@ -4210,9 +4478,21 @@
                     }
                 };
 
-                // Initialize service and save
-                const service = new ScreenPrintQuoteService();
-                const result = await service.saveQuote(quoteData);
+                let result;
+                if (editingQuoteId) {
+                    // Update existing quote
+                    console.log('[ScreenPrint] Updating existing quote:', editingQuoteId);
+                    result = await quoteService.updateQuote(editingQuoteId, quoteData);
+                    if (result && result.success) {
+                        result.quoteID = editingQuoteId;
+                        // Update revision number
+                        editingRevision = result.revision;
+                        updateEditModeUI(editingQuoteId, editingRevision);
+                    }
+                } else {
+                    // Create new quote
+                    result = await quoteService.saveQuote(quoteData);
+                }
 
                 if (result.success) {
                     console.log('[ScreenPrint] Quote saved:', result.quoteID);
@@ -4224,11 +4504,14 @@
 
                     // Show success modal with shareable link
                     if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                        QuoteShareModal.show(result.quoteID);
+                        QuoteShareModal.show(result.quoteID, editingQuoteId ? `Updated to Rev ${editingRevision}` : null);
                     } else {
                         // Fallback
                         const url = `${window.location.origin}/quote/${result.quoteID}`;
-                        alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                        const message = editingQuoteId
+                            ? `Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${editingRevision}\n\nShareable Link:\n${url}`
+                            : `Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`;
+                        alert(message);
                     }
                 } else {
                     throw new Error(result.error || 'Failed to save quote');

@@ -453,8 +453,14 @@ class QuoteViewPage {
 
     /**
      * Render embroidery info section (location, stitches, additionals)
+     * Only shows stitch counts for embroidery quote types (EMB, EMBC, RICH, CAP)
+     * Print quotes (DTG, DTF, SPC, SSC) show location only
      */
     renderEmbroideryInfo() {
+        // Determine quote type from prefix
+        const prefix = this.quoteId?.split(/[\d-]/)[0] || '';
+        const isEmbroideryQuote = ['EMB', 'EMBC', 'RICH', 'CAP'].includes(prefix);
+
         // Check if this is a laser-patch order
         const capEmbellishmentType = this.quoteData?.CapEmbellishmentType || 'embroidery';
         const isLaserPatch = capEmbellishmentType === 'laser-patch';
@@ -468,48 +474,70 @@ class QuoteViewPage {
             return html;
         }
 
-        // Standard embroidery info
-        // Get embroidery details from quote data
-        const location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation || 'Left Chest';
-        const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
-        const digitizing = this.quoteData?.DigitizingFee || 0;
-        const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
-        const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
+        // Get location (common to all quote types)
+        // DTG stores location in Notes JSON as 'locationName' or in items as 'PrintLocationName'
+        let location = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation;
+
+        // Try to get from Notes JSON (DTG/DTF quotes)
+        if (!location && this.quoteData?.Notes) {
+            try {
+                const notes = JSON.parse(this.quoteData.Notes);
+                location = notes.locationName || notes.locationNames || null;
+            } catch (e) { /* ignore parse errors */ }
+        }
+
+        // Try to get from first item's PrintLocationName
+        if (!location && this.items?.length > 0) {
+            location = this.items[0]?.PrintLocationName;
+        }
+
+        // Final fallback
+        location = location || 'Left Chest';
 
         let html = `<div class="embroidery-info">`;
         html += `<div class="emb-detail"><span class="emb-label">Location:</span> <span class="emb-value">${this.escapeHtml(location)}</span></div>`;
-        html += `<div class="emb-detail"><span class="emb-label">Stitches:</span> <span class="emb-value">${this.escapeHtml(String(stitches))}</span></div>`;
-        if (digitizing > 0) {
-            html += `<div class="emb-detail"><span class="emb-label">Digitizing:</span> <span class="emb-value">${this.formatCurrency(digitizing)}</span></div>`;
-        }
-        // Additional Stitch Charge (extra stitches above 8k base)
-        const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
-        if (additionalStitchCharge > 0) {
-            html += `<div class="emb-detail"><span class="emb-label">Additional Stitches:</span> <span class="emb-value">${this.formatCurrency(additionalStitchCharge)}</span></div>`;
-        }
-        // Additional Logo info (if present)
-        if (addlLocation || addlStitches > 0) {
-            const addlText = addlLocation
-                ? `${this.escapeHtml(addlLocation)} (${addlStitches.toLocaleString()} stitches)`
-                : `${addlStitches.toLocaleString()} stitches`;
-            html += `<div class="emb-detail"><span class="emb-label">Additional Logo:</span> <span class="emb-value">${addlText}</span></div>`;
-        }
-        // Cap embroidery info (only show if there are actual caps in the quote)
-        // Bug fix 2026-01-15: Previously showed cap info even for garment-only quotes
-        // because CapStitchCount defaults to 8000. Now we check ALCapQty first.
-        const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
-        const capLocation = this.quoteData?.CapPrintLocation || '';
-        const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
-        const capDigitizing = this.quoteData?.CapDigitizingFee || 0;
-        if (capQty > 0 && (capLocation || capStitches > 0)) {
-            const capText = capLocation
-                ? `${this.escapeHtml(capLocation)} (${capStitches.toLocaleString()} stitches)`
-                : `${capStitches.toLocaleString()} stitches`;
-            html += `<div class="emb-detail"><span class="emb-label">Cap Location:</span> <span class="emb-value">${capText}</span></div>`;
-            if (capDigitizing > 0) {
-                html += `<div class="emb-detail"><span class="emb-label">Cap Digitizing:</span> <span class="emb-value">${this.formatCurrency(capDigitizing)}</span></div>`;
+
+        // Only show stitches and embroidery-specific fields for embroidery quotes
+        if (isEmbroideryQuote) {
+            const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
+            const digitizing = this.quoteData?.DigitizingFee || 0;
+            const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
+            const addlStitches = parseInt(this.quoteData?.AdditionalStitchCount) || 0;
+
+            html += `<div class="emb-detail"><span class="emb-label">Stitches:</span> <span class="emb-value">${this.escapeHtml(String(stitches))}</span></div>`;
+            if (digitizing > 0) {
+                html += `<div class="emb-detail"><span class="emb-label">Digitizing:</span> <span class="emb-value">${this.formatCurrency(digitizing)}</span></div>`;
+            }
+            // Additional Stitch Charge (extra stitches above 8k base)
+            const additionalStitchCharge = parseFloat(this.quoteData?.AdditionalStitchCharge) || 0;
+            if (additionalStitchCharge > 0) {
+                html += `<div class="emb-detail"><span class="emb-label">Additional Stitches:</span> <span class="emb-value">${this.formatCurrency(additionalStitchCharge)}</span></div>`;
+            }
+            // Additional Logo info (if present)
+            if (addlLocation || addlStitches > 0) {
+                const addlText = addlLocation
+                    ? `${this.escapeHtml(addlLocation)} (${addlStitches.toLocaleString()} stitches)`
+                    : `${addlStitches.toLocaleString()} stitches`;
+                html += `<div class="emb-detail"><span class="emb-label">Additional Logo:</span> <span class="emb-value">${addlText}</span></div>`;
+            }
+            // Cap embroidery info (only show if there are actual caps in the quote)
+            // Bug fix 2026-01-15: Previously showed cap info even for garment-only quotes
+            // because CapStitchCount defaults to 8000. Now we check ALCapQty first.
+            const capQty = parseInt(this.quoteData?.ALCapQty) || 0;
+            const capLocation = this.quoteData?.CapPrintLocation || '';
+            const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
+            const capDigitizing = this.quoteData?.CapDigitizingFee || 0;
+            if (capQty > 0 && (capLocation || capStitches > 0)) {
+                const capText = capLocation
+                    ? `${this.escapeHtml(capLocation)} (${capStitches.toLocaleString()} stitches)`
+                    : `${capStitches.toLocaleString()} stitches`;
+                html += `<div class="emb-detail"><span class="emb-label">Cap Location:</span> <span class="emb-value">${capText}</span></div>`;
+                if (capDigitizing > 0) {
+                    html += `<div class="emb-detail"><span class="emb-label">Cap Digitizing:</span> <span class="emb-value">${this.formatCurrency(capDigitizing)}</span></div>`;
+                }
             }
         }
+
         html += `</div>`;
         return html;
     }
@@ -1800,6 +1828,39 @@ class QuoteViewPage {
                 yPos += boxHeight + 4;
             } // end else (standard embroidery)
         } // end if quoteType is embroidery/laser-patch
+
+        // Print Details Section (for DTG, DTF, Screen Print quotes)
+        const printQuoteTypes = ['Direct-to-Garment', 'Direct-to-Film', 'Screen Print', 'Contract Screen Print'];
+        if (printQuoteTypes.includes(quoteType)) {
+            // Get location using same logic as web view (Notes JSON or items)
+            let printLocation = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation;
+            if (!printLocation && this.quoteData?.Notes) {
+                try {
+                    const notes = JSON.parse(this.quoteData.Notes);
+                    printLocation = notes.locationName || notes.locationNames || null;
+                } catch (e) { /* ignore parse errors */ }
+            }
+            if (!printLocation && this.items?.length > 0) {
+                printLocation = this.items[0]?.PrintLocationName;
+            }
+            printLocation = printLocation || 'Left Chest';
+
+            // Render box with print details
+            const boxHeight = 16;
+            pdf.setFillColor(248, 250, 252); // Light blue-gray background
+            pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
+
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(51, 51, 51);
+            pdf.text('PRINT DETAILS', margin + 3, yPos + 4);
+
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(`Location: ${printLocation}`, margin + 3, yPos + 11);
+
+            yPos += boxHeight + 4;
+        }
 
         // Products Section
         pdf.setFontSize(10);
