@@ -1,6 +1,7 @@
 /**
  * DTF Quote Builder - Excel-Style Layout
- * Green theme (#10b981) for DTF transfers
+ * Blue header (#003f7f) to match other quote builders
+ * Green accent (#10b981) for DTF transfers buttons
  * Two-column layout with sidebar
  */
 
@@ -13,7 +14,7 @@
     --dtf-primary-light: #34d399;
     --dtf-primary-50: #d1fae5;
     --dtf-primary-100: #a7f3d0;
-    --dtf-header-bg: #065f46;
+    --dtf-header-bg: #003f7f;  /* Standardized to NWCA blue (matches DTG, Screen Print, Embroidery) */
     --border-color: #dee2e6;
     --bg-light: #f8f9fa;
     --bg-sidebar: #f1f3f5;

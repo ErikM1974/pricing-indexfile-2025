@@ -25,8 +25,8 @@
     --bg-sidebar: #f1f3f5;
 
     /* Shared modal theming (for quote-share-modal.css) */
-    --builder-primary: #e67e22;
-    --builder-primary-dark: #d35400;
+    --builder-primary: #4cb354;   /* Standardized to green (matches DTG, Screen Print) */
+    --builder-primary-dark: #3d9244;
 }
 
 /* ============================================

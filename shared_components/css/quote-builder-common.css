@@ -586,6 +586,7 @@ textarea:disabled {
 
 /* Display */
 .d-none { display: none !important; }
+.hidden { display: none !important; }  /* Alias for JavaScript toggling */
 .d-block { display: block !important; }
 .d-inline { display: inline !important; }
 .d-inline-block { display: inline-block !important; }
@@ -630,6 +631,30 @@ textarea:disabled {
 .shadow-sm { box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075) !important; }
 .shadow { box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important; }
 .shadow-lg { box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important; }
+
+/* ============================================
+   PRODUCT TABLE: TOTAL COLUMN
+   ============================================
+   Added 2026-01-27 for quote builder standardization
+   All builders should show per-row totals (Qty × Unit $)
+*/
+.product-table th.total-col {
+    width: 90px;
+    background: #145a32;  /* Darker green for total header */
+}
+
+.cell-total {
+    font-weight: 700;
+    text-align: right;
+    padding: 0 10px;
+    color: #145a32;
+    background: #e8f5e9;  /* Light green background */
+}
+
+/* Child row totals slightly lighter */
+.child-row .cell-total {
+    background: #f1f8e9;
+}
 
 /* ============================================
    ANIMATIONS
