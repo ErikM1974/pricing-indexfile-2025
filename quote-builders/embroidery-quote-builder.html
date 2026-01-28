@@ -326,6 +326,29 @@
                             </tr>
                             <!-- Product rows will be added here -->
                         </tbody>
+                        <!-- Fee Summary Section (auto-populated by JS) -->
+                        <tbody id="fees-tbody" class="fee-summary-section">
+                            <!-- Garment LTM Row -->
+                            <tr id="garment-ltm-table-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-tshirt"></i> Garment LTM Fee (&lt; 24 pcs)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price">$50.00</td>
+                                <td class="cell-total" id="garment-ltm-table-total">$50.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Cap LTM Row -->
+                            <tr id="cap-ltm-table-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-hat-cowboy"></i> Cap LTM Fee (&lt; 24 pcs)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price">$50.00</td>
+                                <td class="cell-total" id="cap-ltm-table-total">$50.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -4699,11 +4722,16 @@
                 capSubtotalRow.style.display = 'none';
             }
 
-            // LTM display - always shown as separate line item
+            // LTM display (sidebar)
             const ltmRow = document.getElementById('ltm-row');
             const ltmFeeEl = document.getElementById('ltm-fee');
             const garmentLtmRow = document.getElementById('garment-ltm-row');
             const capLtmRow = document.getElementById('cap-ltm-row');
+            // LTM display (table)
+            const garmentLtmTableRow = document.getElementById('garment-ltm-table-row');
+            const capLtmTableRow = document.getElementById('cap-ltm-table-row');
+            const garmentLtmTableTotal = document.getElementById('garment-ltm-table-total');
+            const capLtmTableTotal = document.getElementById('cap-ltm-table-total');
 
             if (pricing.ltmFee > 0) {
                 const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
@@ -4711,28 +4739,54 @@
 
                 if (hasGarmentLtm && hasCapLtm) {
                     // Mixed quote with both LTMs - show separate breakdown rows
-                    ltmRow.style.display = 'flex';  // Keep header visible
+                    ltmRow.style.display = 'flex';
                     garmentLtmRow.style.display = 'flex';
                     capLtmRow.style.display = 'flex';
 
                     // Update main LTM row to show combined total
                     ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
 
-                    // Update breakdown rows
+                    // Update breakdown rows (sidebar)
                     document.getElementById('garment-ltm-fee').textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
                     document.getElementById('cap-ltm-fee').textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+
+                    // Update table rows (show both)
+                    if (garmentLtmTableRow) {
+                        garmentLtmTableRow.style.display = 'table-row';
+                        if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
+                    }
+                    if (capLtmTableRow) {
+                        capLtmTableRow.style.display = 'table-row';
+                        if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+                    }
                 } else {
                     // Single type LTM - show main row, hide breakdown
                     ltmRow.style.display = 'flex';
                     garmentLtmRow.style.display = 'none';
                     capLtmRow.style.display = 'none';
                     ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
+
+                    // Update table rows (show only the one that applies)
+                    if (hasGarmentLtm && garmentLtmTableRow) {
+                        garmentLtmTableRow.style.display = 'table-row';
+                        if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
+                    } else if (garmentLtmTableRow) {
+                        garmentLtmTableRow.style.display = 'none';
+                    }
+                    if (hasCapLtm && capLtmTableRow) {
+                        capLtmTableRow.style.display = 'table-row';
+                        if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+                    } else if (capLtmTableRow) {
+                        capLtmTableRow.style.display = 'none';
+                    }
                 }
             } else {
                 // No LTM fee (qty >= 24) - hide all LTM rows
                 ltmRow.style.display = 'none';
                 garmentLtmRow.style.display = 'none';
                 capLtmRow.style.display = 'none';
+                if (garmentLtmTableRow) garmentLtmTableRow.style.display = 'none';
+                if (capLtmTableRow) capLtmTableRow.style.display = 'none';
             }
 
             // Setup (Digitizing) row - with garment/cap breakdown

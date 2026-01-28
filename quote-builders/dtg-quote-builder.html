@@ -170,6 +170,18 @@
                             </tr>
                             <!-- Product rows will be added here -->
                         </tbody>
+                        <!-- Fee Summary Section (auto-populated by JS) -->
+                        <tbody id="fees-tbody" class="fee-summary-section">
+                            <tr id="ltm-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="9" class="fee-label">
+                                    <i class="fas fa-info-circle"></i> LTM Fee (&lt; 24 pcs)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price">$50.00</td>
+                                <td class="cell-total" id="ltm-row-total">$50.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -4121,17 +4133,26 @@
             const pricingTierEl = document.getElementById('pricing-tier');
             pricingTierEl.textContent = pricing.tier || '12-23';
 
-            // LTM display
+            // LTM display (sidebar)
             const ltmRow = document.getElementById('ltm-row');
             const ltmFeeEl = document.getElementById('ltm-fee');
+            // LTM display (table)
+            const ltmTableRow = document.getElementById('ltm-fee-row');
+            const ltmTableTotal = document.getElementById('ltm-row-total');
 
             if (pricing.ltmFee > 0) {
-                // Show LTM as separate line item
+                // Show LTM in sidebar
                 ltmRow.style.display = 'flex';
                 ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
+                // Show LTM in product table
+                if (ltmTableRow) {
+                    ltmTableRow.style.display = 'table-row';
+                    if (ltmTableTotal) ltmTableTotal.textContent = `$${pricing.ltmFee.toFixed(2)}`;
+                }
             } else {
-                // No LTM fee (qty >= 24) - hide LTM row
+                // No LTM fee (qty >= 24) - hide LTM rows
                 ltmRow.style.display = 'none';
+                if (ltmTableRow) ltmTableRow.style.display = 'none';
             }
 
             // Update tax calculation with new subtotal

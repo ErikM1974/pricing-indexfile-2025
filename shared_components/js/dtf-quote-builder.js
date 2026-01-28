@@ -1438,15 +1438,26 @@ class DTFQuoteBuilder {
             tier
         };
 
-        // LTM row - always shown as separate line item
+        // LTM display (sidebar)
         const ltmRow = document.getElementById('ltm-row');
         const ltmFeeEl = document.getElementById('ltm-fee');
+        // LTM display (table)
+        const ltmTableRow = document.getElementById('ltm-fee-row');
+        const ltmTableTotal = document.getElementById('ltm-row-total');
 
         if (totalLtmFee > 0 && totalQty > 0) {
+            // Show LTM in sidebar
             ltmRow.style.display = 'flex';
             ltmFeeEl.textContent = `$${totalLtmFee.toFixed(2)}`;
+            // Show LTM in product table
+            if (ltmTableRow) {
+                ltmTableRow.style.display = 'table-row';
+                if (ltmTableTotal) ltmTableTotal.textContent = `$${totalLtmFee.toFixed(2)}`;
+            }
         } else {
+            // Hide LTM rows
             ltmRow.style.display = 'none';
+            if (ltmTableRow) ltmTableRow.style.display = 'none';
         }
 
         // Calculate subtotal and grand total
