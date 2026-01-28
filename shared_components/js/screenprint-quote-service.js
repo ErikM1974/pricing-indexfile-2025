@@ -102,7 +102,6 @@ class ScreenPrintQuoteService {
                 TotalQuantity: parseInt(quoteData.totalQuantity),
                 SubtotalAmount: parseFloat(subtotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),
-                SalesTaxAmount: salesTax,
                 TotalAmount: totalAmount,
                 Status: 'Open',
                 ExpiresAt: expiresAt,

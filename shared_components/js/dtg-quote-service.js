@@ -100,7 +100,6 @@ class DTGQuoteService {
                 TotalQuantity: parseInt(quoteData.totalQuantity),
                 SubtotalAmount: subtotal,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                SalesTaxAmount: salesTax,
                 TotalAmount: totalWithTax,
                 Status: 'Open',
                 ExpiresAt: this.formatDateForCaspio(expiryDate),

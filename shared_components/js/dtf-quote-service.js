@@ -144,7 +144,6 @@ class DTFQuoteService {
                 TotalQuantity: parseInt(quoteData.totalQuantity),
                 SubtotalAmount: subtotal,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                SalesTaxAmount: salesTax,
                 TotalAmount: totalWithTax,
                 Status: 'Open',
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
@@ -604,7 +603,6 @@ class DTFQuoteService {
                 TotalQuantity: parseInt(quoteData.totalQuantity),
                 SubtotalAmount: subtotal,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                SalesTaxAmount: salesTax,
                 TotalAmount: totalWithTax,
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
