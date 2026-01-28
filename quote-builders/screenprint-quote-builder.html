@@ -3631,10 +3631,23 @@
                     } else {
                         createChildRow(rowId, '2XL', qty);
                     }
-                    // Disable the 2XL input in parent
+                    // Disable the 2XL input in parent and clear value
                     xxlInput.disabled = true;
+                    xxlInput.value = '';  // Clear to prevent visual confusion
                     xxlInput.style.background = '#f5f5f5';
                     xxlInput.style.color = '#999';
+
+                    // Recalculate parent row qty display (without the now-disabled 2XL)
+                    let newTotal = 0;
+                    row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+                        newTotal += parseInt(input.value) || 0;
+                    });
+                    // Add child row quantities
+                    document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`).forEach(childRow => {
+                        const qtyDisplay = childRow.querySelector('.qty-display');
+                        newTotal += parseInt(qtyDisplay?.textContent) || 0;
+                    });
+                    document.getElementById(`row-qty-${rowId}`).textContent = newTotal;
                 } else {
                     // Remove child row if it exists
                     if (existingChildId) {
