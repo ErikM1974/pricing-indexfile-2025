@@ -1372,6 +1372,56 @@ body {
     to { transform: rotate(360deg); }
 }
 
+/* Sync Status Indicator */
+.sync-status {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--card-border);
+    font-size: 0.8rem;
+}
+
+.sync-status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sync-status-item .rep-name {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.sync-status-item .sync-time {
+    color: var(--text-muted);
+}
+
+.sync-status-item .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.sync-status-item .status-badge.fresh {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.sync-status-item .status-badge.stale {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.sync-status-item .status-badge.critical {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
 .gap-report-modal {
     background: var(--card-dark);
     border-radius: 12px;

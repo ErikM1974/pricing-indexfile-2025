@@ -42,8 +42,9 @@ class HouseAccountsService {
 
     /**
      * Fetch all House accounts with optional filters
+     * Includes retry logic for 429 rate limit errors
      */
-    async fetchAccounts(filters = {}) {
+    async fetchAccounts(filters = {}, retries = 3) {
         const params = new URLSearchParams();
 
         if (filters.assignedTo) params.append('assignedTo', filters.assignedTo);
@@ -54,6 +55,14 @@ class HouseAccountsService {
         const response = await fetch(url, { credentials: 'same-origin' });
 
         if (this.handleAuthError(response)) return [];
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000; // 5s, 10s, 15s
+            console.warn(`Rate limited (429), retrying in ${waitTime / 1000}s... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.fetchAccounts(filters, retries - 1);
+        }
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -67,11 +76,20 @@ class HouseAccountsService {
 
     /**
      * Fetch stats for House accounts
+     * Includes retry logic for 429 rate limit errors
      */
-    async fetchStats() {
+    async fetchStats(retries = 3) {
         const response = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/stats`, { credentials: 'same-origin' });
 
         if (this.handleAuthError(response)) return null;
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`Rate limited (429) on stats, retrying in ${waitTime / 1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.fetchStats(retries - 1);
+        }
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -84,11 +102,20 @@ class HouseAccountsService {
     /**
      * Fetch YTD sales for House accounts
      * Returns sales grouped by Assigned_To (Ruthie, Erik, Web, Jim, House)
+     * Includes retry logic for 429 rate limit errors
      */
-    async fetchSales() {
+    async fetchSales(retries = 3) {
         const response = await fetch(`${this.baseURL}/api/crm-proxy/house-accounts/sales`, { credentials: 'same-origin' });
 
         if (this.handleAuthError(response)) return null;
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`Rate limited (429) on sales, retrying in ${waitTime / 1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.fetchSales(retries - 1);
+        }
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -407,6 +434,8 @@ class HouseAccountsController {
 
         try {
             await this.loadData();
+            // Load sync status indicator
+            await this.loadSyncStatus();
         } catch (error) {
             this.showError('Unable to load House accounts. Please refresh the page or contact support.');
         }
@@ -1000,8 +1029,19 @@ class HouseAccountsController {
                 this.showError(`Sync completed with errors: ${results.failed.join(', ')}`);
             }
 
+            // Wait for Caspio rate limit window to reset before fetching data
+            // Sync operations make many Caspio API calls - need longer delay to avoid 429
+            this.showToast('Waiting for data to settle (10s)...');
+            await new Promise(resolve => setTimeout(resolve, 10000));
+
             // Reload House dashboard data
             await this.loadData();
+
+            // Force "Just now" status - don't wait for Caspio API eventual consistency
+            this.renderSyncStatus({
+                nika: { lastSync: new Date(), status: 'fresh' },
+                taneisha: { lastSync: new Date(), status: 'fresh' }
+            });
 
         } catch (error) {
             console.error('Sync all CRM error:', error);
@@ -1034,6 +1074,7 @@ class HouseAccountsController {
                 const result = await response.json();
                 this.showToast(`House accounts synced! YTD: $${(result.totalYtd || 0).toLocaleString()}`);
                 await this.loadData();
+                await this.loadSyncStatus();
             } else {
                 throw new Error('Sync failed');
             }
@@ -1044,6 +1085,116 @@ class HouseAccountsController {
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
+        }
+    }
+
+    // ============================================================
+    // SYNC STATUS INDICATOR
+    // ============================================================
+
+    /**
+     * Fetch last sync dates for all CRM dashboards
+     * Queries each rep's accounts to find the most recent Last_Sync_Date
+     */
+    async fetchSyncStatus() {
+        const status = {
+            nika: { lastSync: null, status: 'unknown' },
+            taneisha: { lastSync: null, status: 'unknown' }
+        };
+
+        // Fetch accounts sorted by Last_Sync_Date DESC to get most recently synced first
+        // House excluded - table doesn't have Last_Sync_Date field
+        const endpoints = [
+            { key: 'nika', url: '/api/crm-proxy/nika-accounts?orderBy=Last_Sync_Date&orderDir=DESC' },
+            { key: 'taneisha', url: '/api/crm-proxy/taneisha-accounts?orderBy=Last_Sync_Date&orderDir=DESC' }
+        ];
+
+        // Fetch in parallel
+        await Promise.all(endpoints.map(async ({ key, url }) => {
+            try {
+                const response = await fetch(url, { credentials: 'same-origin' });
+                if (response.ok) {
+                    const data = await response.json();
+                    const accounts = data.Result || data.accounts || [];
+
+                    // Find the most recent Last_Sync_Date
+                    let latestSync = null;
+                    accounts.forEach(acc => {
+                        const syncDate = acc.Last_Sync_Date ? new Date(acc.Last_Sync_Date) : null;
+                        if (syncDate && (!latestSync || syncDate > latestSync)) {
+                            latestSync = syncDate;
+                        }
+                    });
+
+                    if (latestSync) {
+                        const hoursSince = (Date.now() - latestSync.getTime()) / (1000 * 60 * 60);
+                        status[key] = {
+                            lastSync: latestSync,
+                            hoursSince: hoursSince,
+                            status: hoursSince < 12 ? 'fresh' : (hoursSince < 24 ? 'stale' : 'critical')
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn(`Could not fetch sync status for ${key}:`, e.message);
+            }
+        }));
+
+        return status;
+    }
+
+    /**
+     * Render sync status badges in the UI
+     */
+    renderSyncStatus(status) {
+        const container = document.getElementById('sync-status');
+        if (!container) return;
+
+        const formatTime = (date) => {
+            if (!date) return 'Never';
+            const hours = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60));
+            if (hours < 1) return 'Just now';
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        };
+
+        const getIcon = (status) => {
+            switch (status) {
+                case 'fresh': return '<i class="fas fa-check"></i>';
+                case 'stale': return '<i class="fas fa-exclamation"></i>';
+                case 'critical': return '<i class="fas fa-times"></i>';
+                default: return '<i class="fas fa-question"></i>';
+            }
+        };
+
+        // Only show Nika and Taneisha - House_Accounts table doesn't have Last_Sync_Date field
+        const reps = [
+            { key: 'nika', name: 'Nika' },
+            { key: 'taneisha', name: 'Taneisha' }
+        ];
+
+        container.innerHTML = reps.map(({ key, name }) => {
+            const s = status[key];
+            return `
+                <div class="sync-status-item">
+                    <span class="rep-name">${name}:</span>
+                    <span class="sync-time">${formatTime(s.lastSync)}</span>
+                    <span class="status-badge ${s.status}" title="${s.status === 'fresh' ? 'Synced recently' : s.status === 'stale' ? 'Getting stale' : 'Needs sync'}">${getIcon(s.status)}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    /**
+     * Load and display sync status
+     */
+    async loadSyncStatus() {
+        try {
+            const status = await this.fetchSyncStatus();
+            this.renderSyncStatus(status);
+        } catch (e) {
+            console.warn('Could not load sync status:', e.message);
         }
     }
 

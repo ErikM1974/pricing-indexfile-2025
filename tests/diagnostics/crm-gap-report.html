@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Gap Report - Sales Discrepancy Investigation</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1d23;
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #4fc3f7; margin-bottom: 10px; }
+        h2 { color: #81c784; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        h3 { color: #ffb74d; margin: 15px 0 8px; }
+        .subtitle { color: #888; margin-bottom: 20px; }
+        .card {
+            background: #252830;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4fc3f7;
+        }
+        .card.nika { border-left-color: #81c784; }
+        .card.taneisha { border-left-color: #ce93d8; }
+        .card.error { border-left-color: #ef5350; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .summary-item {
+            background: #1a1d23;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .summary-item .label { color: #888; font-size: 12px; text-transform: uppercase; }
+        .summary-item .value { font-size: 24px; font-weight: bold; margin-top: 5px; }
+        .summary-item .value.green { color: #81c784; }
+        .summary-item .value.red { color: #ef5350; }
+        .summary-item .value.blue { color: #4fc3f7; }
+        .summary-item .value.orange { color: #ffb74d; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #1a1d23; color: #4fc3f7; font-weight: 600; }
+        tr:hover { background: #2a2d35; }
+        .amount { text-align: right; font-family: monospace; }
+        .count { text-align: center; color: #888; }
+        button {
+            background: #4fc3f7;
+            color: #1a1d23;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover { background: #29b6f6; }
+        button:disabled { background: #555; color: #888; cursor: not-allowed; }
+        .loading { color: #ffb74d; }
+        .error-msg { color: #ef5350; background: #2a1a1a; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .success { color: #81c784; }
+        pre { background: #1a1d23; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+        .status-log { max-height: 200px; overflow-y: auto; margin-top: 10px; }
+        .match { color: #81c784; }
+        .mismatch { color: #ef5350; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CRM Gap Report</h1>
+        <p class="subtitle">Investigating discrepancy between Team Performance and CRM dashboards</p>
+
+        <div class="card">
+            <h2>Run Investigation</h2>
+            <p>This tool compares orders from ManageOrders (Team Performance source) with CRM account data to find customers whose sales appear in Team Performance but not in CRM totals.</p>
+            <br>
+            <button id="runNika" onclick="runInvestigation('nika')">Investigate Nika's Gap</button>
+            <button id="runTaneisha" onclick="runInvestigation('taneisha')">Investigate Taneisha's Gap</button>
+            <button id="runBoth" onclick="runBothInvestigations()">Run Both</button>
+            <div id="status" class="status-log"></div>
+        </div>
+
+        <div id="nikaResults"></div>
+        <div id="taneishaResults"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+
+        const REP_CONFIG = {
+            nika: {
+                name: 'Nika Lao',
+                displayName: 'Nika',
+                crmEndpoint: '/api/crm-proxy/nika-accounts',
+                expectedTeamTotal: 152610,
+                expectedCrmTotal: 147197
+            },
+            taneisha: {
+                name: 'Taneisha Clark',
+                displayName: 'Taneisha',
+                crmEndpoint: '/api/crm-proxy/taneisha-accounts',
+                expectedTeamTotal: 91207,
+                expectedCrmTotal: 89112
+            }
+        };
+
+        function log(message, isError = false) {
+            const status = document.getElementById('status');
+            const time = new Date().toLocaleTimeString();
+            const className = isError ? 'error-msg' : '';
+            status.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            status.scrollTop = status.scrollHeight;
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        async function fetchManageOrders(repName) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const startDate = `${year}-01-01`;
+            const endDate = today.toISOString().split('T')[0];
+
+            log(`Fetching ManageOrders for ${repName} (${startDate} to ${endDate})...`);
+
+            const url = `${API_BASE}/manageorders/orders?date_Invoiced_start=${startDate}&date_Invoiced_end=${endDate}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`ManageOrders API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const allOrders = data.result || [];
+
+            // Filter to this rep's orders
+            const repOrders = allOrders.filter(order =>
+                order.CustomerServiceRep === repName
+            );
+
+            log(`Found ${repOrders.length} orders for ${repName} (out of ${allOrders.length} total)`);
+            return repOrders;
+        }
+
+        async function fetchCrmAccounts(endpoint) {
+            log(`Fetching CRM accounts from ${endpoint}...`);
+
+            const response = await fetch(endpoint, {
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('CRM access denied. Please log in to the CRM first at /dashboards/nika-crm.html or /dashboards/taneisha-crm.html');
+                }
+                throw new Error(`CRM API failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const accounts = data.Result || data.accounts || data || [];
+
+            log(`Found ${accounts.length} CRM accounts`);
+            return accounts;
+        }
+
+        function analyzeGap(orders, crmAccounts, config) {
+            // Build set of CRM customer IDs
+            const crmCustomerIds = new Set();
+            const crmCustomerMap = new Map();
+
+            crmAccounts.forEach(account => {
+                const id = account.ID_Customer || account.id_Customer || account.CustomerID;
+                if (id) {
+                    crmCustomerIds.add(String(id));
+                    crmCustomerMap.set(String(id), account);
+                }
+            });
+
+            log(`CRM has ${crmCustomerIds.size} unique customer IDs`);
+
+            // Analyze orders
+            let totalRevenue = 0;
+            let matchedRevenue = 0;
+            let missingRevenue = 0;
+
+            const missingCustomers = new Map();
+            const matchedCustomers = new Map();
+
+            orders.forEach(order => {
+                const customerId = String(order.id_Customer || order.ID_Customer || '');
+                const customerName = order.CompanyName || order.CustomerName || 'Unknown';
+                const subtotal = parseFloat(order.cur_SubTotal) || 0;
+
+                totalRevenue += subtotal;
+
+                if (crmCustomerIds.has(customerId)) {
+                    matchedRevenue += subtotal;
+                    if (!matchedCustomers.has(customerId)) {
+                        matchedCustomers.set(customerId, {
+                            name: customerName,
+                            revenue: 0,
+                            orders: 0,
+                            crmYtd: parseFloat(crmCustomerMap.get(customerId)?.YTD_Sales_2026) || 0
+                        });
+                    }
+                    const mc = matchedCustomers.get(customerId);
+                    mc.revenue += subtotal;
+                    mc.orders++;
+                } else {
+                    missingRevenue += subtotal;
+                    if (!missingCustomers.has(customerId)) {
+                        missingCustomers.set(customerId, {
+                            id: customerId,
+                            name: customerName,
+                            revenue: 0,
+                            orders: 0
+                        });
+                    }
+                    const mc = missingCustomers.get(customerId);
+                    mc.revenue += subtotal;
+                    mc.orders++;
+                }
+            });
+
+            // Calculate CRM total from YTD_Sales_2026 field
+            let crmTotal = 0;
+            crmAccounts.forEach(account => {
+                crmTotal += parseFloat(account.YTD_Sales_2026) || 0;
+            });
+
+            return {
+                repName: config.displayName,
+                totalOrders: orders.length,
+                totalRevenue,
+                matchedRevenue,
+                missingRevenue,
+                crmTotal,
+                crmAccountCount: crmAccounts.length,
+                matchedCustomerCount: matchedCustomers.size,
+                missingCustomerCount: missingCustomers.size,
+                missingCustomers: Array.from(missingCustomers.values())
+                    .sort((a, b) => b.revenue - a.revenue),
+                matchedCustomers: Array.from(matchedCustomers.values())
+                    .sort((a, b) => b.revenue - a.revenue),
+                expectedTeamTotal: config.expectedTeamTotal,
+                expectedCrmTotal: config.expectedCrmTotal
+            };
+        }
+
+        function renderResults(analysis, containerId) {
+            const container = document.getElementById(containerId);
+            const cardClass = containerId === 'nikaResults' ? 'nika' : 'taneisha';
+
+            const gap = analysis.totalRevenue - analysis.crmTotal;
+            const expectedGap = analysis.expectedTeamTotal - analysis.expectedCrmTotal;
+
+            let html = `
+                <div class="card ${cardClass}">
+                    <h2>${analysis.repName}'s Gap Analysis</h2>
+
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="label">ManageOrders Total</div>
+                            <div class="value blue">${formatCurrency(analysis.totalRevenue)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">CRM YTD Total</div>
+                            <div class="value green">${formatCurrency(analysis.crmTotal)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Calculated Gap</div>
+                            <div class="value orange">${formatCurrency(gap)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Missing Customer Revenue</div>
+                            <div class="value red">${formatCurrency(analysis.missingRevenue)}</div>
+                        </div>
+                    </div>
+
+                    <h3>Verification</h3>
+                    <table>
+                        <tr>
+                            <td>Expected Team Performance (from screenshot)</td>
+                            <td class="amount">${formatCurrency(analysis.expectedTeamTotal)}</td>
+                            <td class="${Math.abs(analysis.totalRevenue - analysis.expectedTeamTotal) < 100 ? 'match' : 'mismatch'}">
+                                ${Math.abs(analysis.totalRevenue - analysis.expectedTeamTotal) < 100 ? 'MATCHES' : 'DIFFERS by ' + formatCurrency(Math.abs(analysis.totalRevenue - analysis.expectedTeamTotal))}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expected CRM YTD (from screenshot)</td>
+                            <td class="amount">${formatCurrency(analysis.expectedCrmTotal)}</td>
+                            <td class="${Math.abs(analysis.crmTotal - analysis.expectedCrmTotal) < 100 ? 'match' : 'mismatch'}">
+                                ${Math.abs(analysis.crmTotal - analysis.expectedCrmTotal) < 100 ? 'MATCHES' : 'DIFFERS by ' + formatCurrency(Math.abs(analysis.crmTotal - analysis.expectedCrmTotal))}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expected Gap</td>
+                            <td class="amount">${formatCurrency(expectedGap)}</td>
+                            <td></td>
+                        </tr>
+                    </table>
+
+                    <h3>Missing Customers (${analysis.missingCustomerCount} customers not in CRM)</h3>
+                    <p>These customers have orders in ManageOrders but are NOT in ${analysis.repName}'s CRM account list:</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Customer ID</th>
+                                <th>Company Name</th>
+                                <th class="amount">Revenue</th>
+                                <th class="count">Orders</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            if (analysis.missingCustomers.length === 0) {
+                html += `<tr><td colspan="4" style="text-align:center;color:#888;">No missing customers found</td></tr>`;
+            } else {
+                analysis.missingCustomers.slice(0, 50).forEach(customer => {
+                    html += `
+                        <tr>
+                            <td>${customer.id || 'N/A'}</td>
+                            <td>${customer.name}</td>
+                            <td class="amount">${formatCurrency(customer.revenue)}</td>
+                            <td class="count">${customer.orders}</td>
+                        </tr>
+                    `;
+                });
+
+                if (analysis.missingCustomers.length > 50) {
+                    html += `<tr><td colspan="4" style="text-align:center;color:#888;">...and ${analysis.missingCustomers.length - 50} more</td></tr>`;
+                }
+            }
+
+            html += `
+                        </tbody>
+                        <tfoot>
+                            <tr style="font-weight:bold;background:#1a1d23;">
+                                <td colspan="2">TOTAL MISSING</td>
+                                <td class="amount">${formatCurrency(analysis.missingRevenue)}</td>
+                                <td class="count">${analysis.missingCustomers.reduce((sum, c) => sum + c.orders, 0)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        async function runInvestigation(rep) {
+            const config = REP_CONFIG[rep];
+            const containerId = rep === 'nika' ? 'nikaResults' : 'taneishaResults';
+
+            document.getElementById(containerId).innerHTML = '<div class="card loading">Running investigation...</div>';
+
+            try {
+                log(`Starting investigation for ${config.displayName}...`);
+
+                const orders = await fetchManageOrders(config.name);
+                const crmAccounts = await fetchCrmAccounts(config.crmEndpoint);
+
+                log(`Analyzing gap...`);
+                const analysis = analyzeGap(orders, crmAccounts, config);
+
+                log(`Analysis complete for ${config.displayName}. Gap: ${formatCurrency(analysis.missingRevenue)}`, false);
+
+                renderResults(analysis, containerId);
+
+            } catch (error) {
+                log(`ERROR: ${error.message}`, true);
+                document.getElementById(containerId).innerHTML = `
+                    <div class="card error">
+                        <h2>Error investigating ${config.displayName}</h2>
+                        <div class="error-msg">${error.message}</div>
+                        <p>Make sure you're logged in to the CRM system first.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function runBothInvestigations() {
+            document.getElementById('status').innerHTML = '';
+            await runInvestigation('nika');
+            await runInvestigation('taneisha');
+        }
+    </script>
+</body>
+</html>

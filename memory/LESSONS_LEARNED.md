@@ -402,6 +402,23 @@ TotalAmount: parseFloat((
 
 # Order Processing & ShopWorks
 
+## Problem: CRM YTD Total Doesn't Match Team Performance
+**Date:** 2026-01-28
+**Project:** [Pricing Index]
+**Symptoms:** Team Performance widget shows higher sales ($152,610) than CRM dashboard YTD ($147,197) for same rep
+**Root Cause:** Two different metrics measured:
+- **Team Performance** = orders WRITTEN BY rep (`CustomerServiceRep` on ORDER)
+- **CRM YTD_Sales_2026** = sales FOR ASSIGNED accounts (customer in rep's CRM list)
+Plus, CRM sync may be stale if not run recently.
+**Solution:**
+1. Run diagnostic: `node tests/diagnostics/analyze-gap.js`
+2. Trigger sync: `POST /api/[rep]-accounts/sync-sales` with `X-CRM-API-Secret` header
+3. Check for customers not in CRM account list - reassign if needed
+**Prevention:** Document the metric distinction clearly (done in CRM_DASHBOARD_RECONCILIATION.md). Consider auto-sync scheduling.
+**Files:** `tests/diagnostics/analyze-gap.js`, `memory/CRM_DASHBOARD_RECONCILIATION.md`
+
+---
+
 ## Problem: 3-Day Tees orders not processing correctly
 **Date:** 2024-11
 **Project:** Pricing Index + caspio-pricing-proxy

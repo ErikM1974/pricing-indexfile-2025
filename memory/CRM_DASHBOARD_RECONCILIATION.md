@@ -2,7 +2,7 @@
 
 **Purpose:** Documents the dashboard sales reconciliation system, gap reports, and how to diagnose/fix authority conflicts between rep assignments and order data.
 
-**Last Updated:** 2026-01-25
+**Last Updated:** 2026-01-28
 
 **Related:**
 - [CRM_DASHBOARD_AUTH.md](./CRM_DASHBOARD_AUTH.md) - Authentication system
@@ -277,3 +277,133 @@ const uniqueOrders = allOrders.filter(order => {
 After running sync-sales:
 - Before fix: $153,866.46 (wrong)
 - After fix: $143,405.26 (correct, matches ManageOrders)
+
+---
+
+## Troubleshooting: CRM YTD vs Team Performance Gap
+
+### When to Use This Guide
+Use when **Team Performance shows higher sales than CRM YTD** for a rep.
+
+### Understanding the Gap
+
+| Source | Metric | What It Counts |
+|--------|--------|----------------|
+| Team Performance | Orders written | `CustomerServiceRep` on ORDER = rep name |
+| CRM YTD_Sales_2026 | Assigned accounts | Customer in rep's CRM account list |
+
+**Gap = Orders written for customers NOT in rep's CRM**
+
+### Step-by-Step Diagnosis
+
+#### 1. Run Diagnostic Script
+```bash
+cd "c:/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025"
+node tests/diagnostics/analyze-gap.js
+```
+
+This script:
+- Fetches all 2026 orders from ManageOrders
+- Fetches CRM accounts for Nika and Taneisha
+- Cross-references to find missing customers
+- Shows exactly which customers/revenue are missing from CRM
+
+#### 2. Check Output
+```
+CUSTOMER BREAKDOWN
+--------------------------------------------------
+Total customers with orders:          88
+Customers IN CRM:                     87 ($150,219)
+Customers NOT IN CRM:                 1 ($629)
+
+MISSING CUSTOMERS (not in CRM - explains the gap)
+--------------------------------------------------
+   1. ID:12914    The Highlands at Silverdale    $629 (1 orders)
+```
+
+#### 3. Determine Cause
+
+| Finding | Cause | Fix |
+|---------|-------|-----|
+| **Missing customers > 0** | Rep wrote orders for unassigned customers | Add customer to CRM OR reassign order |
+| **CRM sync discrepancy** | `YTD_Sales_2026` field is stale | Run sync endpoint |
+| **Both totals match** | No issue! | N/A |
+
+### Fix: Trigger CRM Sync
+
+```bash
+# Nika
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/nika-accounts/sync-sales" \
+  -H "X-CRM-API-Secret: $CRM_API_SECRET"
+
+# Taneisha
+curl -X POST "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/taneisha-accounts/sync-sales" \
+  -H "X-CRM-API-Secret: $CRM_API_SECRET"
+```
+
+Response shows sync results:
+```json
+{
+  "success": true,
+  "message": "Hybrid sales sync completed",
+  "accountsUpdated": 87,
+  "errors": 0
+}
+```
+
+### Fix: Customer Assignment Issues
+
+If a customer is missing from the rep's CRM:
+
+1. **Option A - Reassign customer to rep:**
+   - Go to ShopWorks → Customer record
+   - Change `CustomerServiceRep` field to the rep
+   - Wait for sync to Sales_Reps_2026 table (~1 hour)
+   - Run `/api/[rep]-accounts/sync-ownership`
+
+2. **Option B - Change order's rep:**
+   - Go to ShopWorks → Order record
+   - Change `CustomerServiceRep` on the ORDER
+   - Change reflects immediately in ManageOrders API
+
+### Diagnostic Script Location
+
+| File | Purpose |
+|------|---------|
+| `tests/diagnostics/analyze-gap.js` | Node.js script - full analysis |
+| `tests/diagnostics/crm-gap-report.html` | Browser UI version (requires CRM login) |
+
+### Common Scenarios
+
+**Scenario 1: Sync is stale**
+- Gap exists but no missing customers
+- Fix: Run sync-sales endpoint
+- Verify: Re-run diagnostic, gap should be $0
+
+**Scenario 2: Rep wrote order for wrong customer**
+- Order was entered with wrong CustomerServiceRep
+- Fix: Change order's rep in ShopWorks
+- Verify: ManageOrders total for rep decreases
+
+**Scenario 3: Customer should be assigned to rep**
+- Customer is missing from CRM account list
+- Fix: Assign customer to rep in ShopWorks
+- Verify: Customer appears in CRM after sync-ownership
+
+---
+
+## Automatic Sync Schedule (Heroku Scheduler)
+
+CRM data syncs automatically daily at **6:00 AM Pacific (2:00 PM UTC)**.
+
+| Job | npm Command | What It Syncs |
+|-----|-------------|---------------|
+| Archive Daily Sales | `npm run archive-daily-sales` | Yesterday's sales → NW_Daily_Sales_By_Rep |
+| Archive Garment Tracker | `npm run archive-garment-tracker` | Garment data → GarmentTrackerArchive |
+| Sync CRM Dashboards | `npm run sync-crm-dashboards` | Ownership + YTD sales for Nika, Taneisha, House |
+
+**Scripts Location:** `caspio-pricing-proxy/scripts/`
+
+**To check status:** Heroku Dashboard → caspio-pricing-proxy → Resources → Heroku Scheduler
+
+**Note:** `sync-crm-dashboards` handles both ownership AND sales sync, so the `sync-all-sales` script is available but not scheduled separately.
