@@ -48,6 +48,30 @@ const uniqueOrders = allOrders.filter(order => {
 **Files fixed:** `nika-accounts.js`, `taneisha-accounts.js`, `house-accounts.js`
 **See also:** `/memory/CRM_DASHBOARD_RECONCILIATION.md`
 
+## Pattern: Rate Limit Handling with Exponential Backoff
+**Date:** 2026-01-28
+**Project:** [Pricing Index]
+**Problem:** Rep CRM dashboards (Nika, Taneisha) failed to load when API returned 429 (rate limited). Users saw generic errors with no recovery.
+**Root Cause:** No retry logic in `rep-crm.js` - all API calls were single-shot.
+**Solution:** Added linear exponential backoff (5s → 10s → 15s) on 429 responses:
+```javascript
+async fetchAccounts(filters = {}, retries = 3) {
+    const response = await fetch(url, { credentials: 'same-origin' });
+
+    // Retry on rate limit with exponential backoff
+    if (response.status === 429 && retries > 0) {
+        const waitTime = (4 - retries) * 5000; // 5s, 10s, 15s
+        console.warn(`[RepCRM] Rate limited (429), retrying in ${waitTime/1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        return this.fetchAccounts(filters, retries - 1);
+    }
+    // ... rest of function
+}
+```
+**Prevention:** All API fetch functions should include retry logic for 429 responses. Copy pattern from `house-accounts.js` or `rep-crm.js`.
+**Files with pattern:** `house-accounts.js`, `rep-crm.js`, `ApiService.js`
+**Rate limits:** Server: 200 req/15min, ManageOrders backend: 30 req/min
+
 ---
 
 ## Rule: ALWAYS Pull Pricing From Caspio API - Never Hardcode
