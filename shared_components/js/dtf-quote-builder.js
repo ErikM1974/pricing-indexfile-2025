@@ -314,6 +314,64 @@ class DTFQuoteBuilder {
     }
 
     /**
+     * Populate additional charges from saved session (2026 fee refactor)
+     */
+    populateAdditionalCharges(session) {
+        // Art charge
+        const artChargeToggle = document.getElementById('art-charge-toggle');
+        const artChargeInput = document.getElementById('art-charge');
+        const artChargeWrapper = document.getElementById('art-charge-wrapper');
+        if (session.ArtCharge > 0 && artChargeToggle && artChargeInput) {
+            artChargeToggle.checked = true;
+            artChargeInput.disabled = false;
+            artChargeInput.value = session.ArtCharge;
+            if (artChargeWrapper) artChargeWrapper.style.opacity = '1';
+        }
+
+        // Graphic design hours
+        const designHoursInput = document.getElementById('graphic-design-hours');
+        if (session.GraphicDesignHours > 0 && designHoursInput) {
+            designHoursInput.value = session.GraphicDesignHours;
+            // Update the calculated total display
+            const designTotalEl = document.getElementById('graphic-design-total');
+            if (designTotalEl) {
+                designTotalEl.textContent = (session.GraphicDesignHours * 75).toFixed(2);
+            }
+        }
+
+        // Rush fee
+        const rushFeeInput = document.getElementById('rush-fee');
+        if (session.RushFee > 0 && rushFeeInput) {
+            rushFeeInput.value = session.RushFee;
+        }
+
+        // Discount
+        const discountAmountInput = document.getElementById('discount-amount');
+        const discountTypeSelect = document.getElementById('discount-type');
+        const discountReasonInput = document.getElementById('discount-reason');
+        if ((session.Discount > 0 || session.DiscountPercent > 0) && discountAmountInput) {
+            if (session.DiscountPercent > 0) {
+                if (discountTypeSelect) discountTypeSelect.value = 'percent';
+                discountAmountInput.value = session.DiscountPercent;
+            } else {
+                if (discountTypeSelect) discountTypeSelect.value = 'fixed';
+                discountAmountInput.value = session.Discount;
+            }
+            if (discountReasonInput && session.DiscountReason) {
+                discountReasonInput.value = session.DiscountReason;
+            }
+        }
+
+        // Update UI displays
+        if (typeof updateAdditionalCharges === 'function') {
+            updateAdditionalCharges();
+        }
+        if (typeof updateFeeTableRows === 'function') {
+            updateFeeTableRows();
+        }
+    }
+
+    /**
      * Populate selected locations from session Notes
      */
     populateLocationsFromSession(session) {
@@ -472,6 +530,9 @@ class DTFQuoteBuilder {
 
             // Populate customer information
             this.populateCustomerInfo(session);
+
+            // Populate additional charges (2026 fee refactor)
+            this.populateAdditionalCharges(session);
 
             // Populate selected locations
             this.populateLocationsFromSession(session);
@@ -2157,7 +2218,24 @@ class DTFQuoteBuilder {
                 transferBreakdown: this.currentPricingData.transferBreakdown
             } : null,
             createdAt: new Date().toISOString(),
-            builderVersion: '2026.01'
+            builderVersion: '2026.01',
+            // Additional charges (2026 fee refactor)
+            artCharge: document.getElementById('art-charge-toggle')?.checked
+                ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0,
+            graphicDesignHours: parseFloat(document.getElementById('graphic-design-hours')?.value || 0),
+            graphicDesignCharge: parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75,
+            rushFee: parseFloat(document.getElementById('rush-fee')?.value || 0),
+            discount: (() => {
+                const amount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+                const type = document.getElementById('discount-type')?.value || 'fixed';
+                if (type === 'percent') {
+                    return (subtotal * amount / 100);
+                }
+                return amount;
+            })(),
+            discountPercent: document.getElementById('discount-type')?.value === 'percent'
+                ? parseFloat(document.getElementById('discount-amount')?.value || 0) : 0,
+            discountReason: document.getElementById('discount-reason')?.value || ''
         };
 
         // Show saving state on button
@@ -2394,6 +2472,28 @@ class DTFQuoteBuilder {
             });
         });
 
+        // Get art charge if enabled
+        const artChargeToggle = document.getElementById('art-charge-toggle');
+        const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+
+        // Get graphic design fee
+        const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+        const graphicDesignFee = designHours * 75;
+
+        // Get rush fee
+        const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+
+        // Get discount
+        const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+        const discountType = document.getElementById('discount-type')?.value || 'fixed';
+        const discountReason = document.getElementById('discount-reason')?.value || '';
+        let discount = 0;
+        if (discountType === 'percent') {
+            discount = subtotal * (discountAmount / 100);
+        } else {
+            discount = discountAmount;
+        }
+
         return {
             quoteId: quoteId,
             tier: tier,
@@ -2408,7 +2508,16 @@ class DTFQuoteBuilder {
             isDTF: true,
             selectedLocations: this.selectedLocations,
             ltmFee: this.currentPricingData?.totalLtmFee || 0,
-            ltmDistributed: false  // LTM always shown as separate line item
+            ltmDistributed: false,  // LTM always shown as separate line item
+            // Artwork services
+            artCharge: artCharge,
+            graphicDesignFee: graphicDesignFee,
+            graphicDesignHours: designHours,
+            // Rush and discount
+            rushFee: rushFee,
+            discount: discount,
+            discountType: discountType,
+            discountReason: discountReason
         };
     }
 

@@ -348,6 +348,66 @@
                                 <td class="cell-total" id="cap-ltm-table-total">$50.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
+                            <!-- Setup/Digitizing Fee Row -->
+                            <tr id="setup-fee-table-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-cog"></i> Digitizing/Setup Fee
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="setup-fee-unit">$0.00</td>
+                                <td class="cell-total" id="setup-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Additional Stitches Fee Row -->
+                            <tr id="stitches-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-layer-group"></i> Additional Stitches Fee
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="stitches-fee-unit">$0.00</td>
+                                <td class="cell-total" id="stitches-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Art Charge Row -->
+                            <tr id="art-charge-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-palette"></i> Logo Mockup & Review
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="art-charge-unit">$0.00</td>
+                                <td class="cell-total" id="art-charge-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Graphic Design Row -->
+                            <tr id="graphic-design-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="graphic-design-unit">$0.00</td>
+                                <td class="cell-total" id="graphic-design-total-row">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Rush Fee Row -->
+                            <tr id="rush-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-bolt"></i> Rush Fee
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="rush-fee-unit">$0.00</td>
+                                <td class="cell-total" id="rush-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Discount Row -->
+                            <tr id="discount-row" class="fee-row discount-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-tag"></i> Discount <span id="discount-reason-label"></span>
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="discount-unit">-$0.00</td>
+                                <td class="cell-total" id="discount-total">-$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -450,50 +510,9 @@
                     <span class="value sub-value" id="cap-subtotal">$0.00</span>
                 </div>
 
-                <div class="pricing-row" id="additional-stitches-row" style="display: none;">
-                    <span class="label">Additional Stitches:</span>
-                    <span class="value" id="additional-stitches-fee">$0.00</span>
-                </div>
-                <!-- Separate Additional Stitches rows for mixed quotes (ShopWorks: AS-GARM, AS-CAP) -->
-                <div class="pricing-row sub-breakdown" id="garment-stitches-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments (AS-GARM):</span>
-                    <span class="value sub-value" id="garment-stitches-fee">$0.00</span>
-                </div>
-                <div class="pricing-row sub-breakdown" id="cap-stitches-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (AS-CAP):</span>
-                    <span class="value sub-value" id="cap-stitches-fee">$0.00</span>
-                </div>
-
+                <!-- Fee displays moved to table rows (2026 UI refactor) -->
                 <div id="additional-logos-pricing"></div>
                 <div id="cap-additional-logos-pricing"></div>
-
-                <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label" title="Less than minimum: A fee applied to orders under 24 pieces to cover setup costs">Less than minimum <i class="fas fa-info-circle" style="font-size: 11px; color: #666; cursor: help;"></i> (&lt; 24 pcs):</span>
-                    <span class="value" id="ltm-fee">$50.00</span>
-                </div>
-                <!-- Separate LTM rows for mixed quotes (ShopWorks: LTM, LTM-CAP) -->
-                <div class="pricing-row sub-breakdown" id="garment-ltm-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments (LTM):</span>
-                    <span class="value sub-value" id="garment-ltm-fee">$50.00</span>
-                </div>
-                <div class="pricing-row sub-breakdown" id="cap-ltm-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (LTM-CAP):</span>
-                    <span class="value sub-value" id="cap-ltm-fee">$50.00</span>
-                </div>
-
-                <div class="pricing-row" id="setup-row" style="display: none;">
-                    <span class="label" id="setup-label">Digitizing Setup:</span>
-                    <span class="value" id="setup-fee">$100.00</span>
-                </div>
-                <!-- Digitizing Setup breakdown for mixed quotes (ShopWorks: DD, DD-CAP) -->
-                <div class="pricing-row sub-breakdown" id="garment-setup-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments (DD):</span>
-                    <span class="value sub-value" id="garment-setup-fee">$100.00</span>
-                </div>
-                <div class="pricing-row sub-breakdown" id="cap-setup-row" style="display: none;">
-                    <span class="label" id="cap-setup-label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (DD-CAP):</span>
-                    <span class="value sub-value" id="cap-setup-fee">$100.00</span>
-                </div>
 
             </div>
 
@@ -4723,12 +4742,7 @@
                 capSubtotalRow.style.display = 'none';
             }
 
-            // LTM display (sidebar)
-            const ltmRow = document.getElementById('ltm-row');
-            const ltmFeeEl = document.getElementById('ltm-fee');
-            const garmentLtmRow = document.getElementById('garment-ltm-row');
-            const capLtmRow = document.getElementById('cap-ltm-row');
-            // LTM display (table)
+            // LTM display (table rows only - sidebar removed in 2026 refactor)
             const garmentLtmTableRow = document.getElementById('garment-ltm-table-row');
             const capLtmTableRow = document.getElementById('cap-ltm-table-row');
             const garmentLtmTableTotal = document.getElementById('garment-ltm-table-total');
@@ -4738,113 +4752,60 @@
                 const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
                 const hasCapLtm = (pricing.capLtmFee || 0) > 0;
 
-                if (hasGarmentLtm && hasCapLtm) {
-                    // Mixed quote with both LTMs - show separate breakdown rows
-                    ltmRow.style.display = 'flex';
-                    garmentLtmRow.style.display = 'flex';
-                    capLtmRow.style.display = 'flex';
-
-                    // Update main LTM row to show combined total
-                    ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
-
-                    // Update breakdown rows (sidebar)
-                    document.getElementById('garment-ltm-fee').textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
-                    document.getElementById('cap-ltm-fee').textContent = `$${pricing.capLtmFee.toFixed(2)}`;
-
-                    // Update table rows (show both)
-                    if (garmentLtmTableRow) {
-                        garmentLtmTableRow.style.display = 'table-row';
-                        if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
-                    }
-                    if (capLtmTableRow) {
-                        capLtmTableRow.style.display = 'table-row';
-                        if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
-                    }
-                } else {
-                    // Single type LTM - show main row, hide breakdown
-                    ltmRow.style.display = 'flex';
-                    garmentLtmRow.style.display = 'none';
-                    capLtmRow.style.display = 'none';
-                    ltmFeeEl.textContent = `$${pricing.ltmFee.toFixed(2)}`;
-
-                    // Update table rows (show only the one that applies)
-                    if (hasGarmentLtm && garmentLtmTableRow) {
-                        garmentLtmTableRow.style.display = 'table-row';
-                        if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
-                    } else if (garmentLtmTableRow) {
-                        garmentLtmTableRow.style.display = 'none';
-                    }
-                    if (hasCapLtm && capLtmTableRow) {
-                        capLtmTableRow.style.display = 'table-row';
-                        if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
-                    } else if (capLtmTableRow) {
-                        capLtmTableRow.style.display = 'none';
-                    }
+                // Update table rows based on what applies
+                if (hasGarmentLtm && garmentLtmTableRow) {
+                    garmentLtmTableRow.style.display = 'table-row';
+                    if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
+                } else if (garmentLtmTableRow) {
+                    garmentLtmTableRow.style.display = 'none';
+                }
+                if (hasCapLtm && capLtmTableRow) {
+                    capLtmTableRow.style.display = 'table-row';
+                    if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+                } else if (capLtmTableRow) {
+                    capLtmTableRow.style.display = 'none';
                 }
             } else {
                 // No LTM fee (qty >= 24) - hide all LTM rows
-                ltmRow.style.display = 'none';
-                garmentLtmRow.style.display = 'none';
-                capLtmRow.style.display = 'none';
                 if (garmentLtmTableRow) garmentLtmTableRow.style.display = 'none';
                 if (capLtmTableRow) capLtmTableRow.style.display = 'none';
             }
 
-            // Setup (Digitizing) row - with garment/cap breakdown
-            const setupRow = document.getElementById('setup-row');
-            const garmentSetupRow = document.getElementById('garment-setup-row');
-            const capSetupRow = document.getElementById('cap-setup-row');
-            const setupLabel = document.getElementById('setup-label');
-            const capSetupLabel = document.getElementById('cap-setup-label');
+            // Setup (Digitizing) row - table row only (sidebar removed in 2026 refactor)
+            const setupFeeTableRow = document.getElementById('setup-fee-table-row');
+            const setupFeeUnit = document.getElementById('setup-fee-unit');
+            const setupFeeTotal = document.getElementById('setup-fee-total');
 
             // Check cap embellishment type for label
             const capEmbType = getCapEmbellishmentType();
             const isCapLaserPatch = capEmbType === 'laser-patch';
 
             if (pricing.setupFees > 0) {
-                setupRow.style.display = 'flex';
-                document.getElementById('setup-fee').textContent = `$${pricing.setupFees.toFixed(2)}`;
-
-                const hasGarmentSetup = (pricing.garmentSetupFees || 0) > 0;
-                const hasCapSetup = (pricing.capSetupFees || 0) > 0;
-
-                // Update main label based on what's in quote
-                if (hasCapSetup && !hasGarmentSetup && isCapLaserPatch) {
-                    // Caps only with laser patch
-                    setupLabel.textContent = 'GRT-50 : Laser Patch Setup:';
-                } else {
-                    // Default to Digitizing Setup for embroidery
-                    setupLabel.textContent = 'Digitizing Setup:';
-                }
-
-                if (hasGarmentSetup && hasCapSetup) {
-                    // Mixed quote - show breakdown
-                    garmentSetupRow.style.display = 'flex';
-                    capSetupRow.style.display = 'flex';
-                    document.getElementById('garment-setup-fee').textContent = `$${pricing.garmentSetupFees.toFixed(2)}`;
-                    document.getElementById('cap-setup-fee').textContent = `$${pricing.capSetupFees.toFixed(2)}`;
-                    // Update cap setup label for laser patch
-                    if (isCapLaserPatch) {
-                        capSetupLabel.innerHTML = '<i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (GRT-50):';
-                    } else {
-                        capSetupLabel.innerHTML = '<i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps (DD-CAP):';
+                if (setupFeeTableRow) {
+                    setupFeeTableRow.style.display = 'table-row';
+                    // Update label based on what's in quote
+                    const hasCapSetup = (pricing.capSetupFees || 0) > 0;
+                    const hasGarmentSetup = (pricing.garmentSetupFees || 0) > 0;
+                    const setupLabel = setupFeeTableRow.querySelector('.fee-label');
+                    if (setupLabel) {
+                        if (hasCapSetup && !hasGarmentSetup && isCapLaserPatch) {
+                            setupLabel.innerHTML = '<i class="fas fa-cog"></i> GRT-50 : Laser Patch Setup';
+                        } else {
+                            setupLabel.innerHTML = '<i class="fas fa-cog"></i> Digitizing/Setup Fee';
+                        }
                     }
-                } else {
-                    // Single type - hide breakdown
-                    garmentSetupRow.style.display = 'none';
-                    capSetupRow.style.display = 'none';
+                    if (setupFeeUnit) setupFeeUnit.textContent = `$${pricing.setupFees.toFixed(2)}`;
+                    if (setupFeeTotal) setupFeeTotal.textContent = `$${pricing.setupFees.toFixed(2)}`;
                 }
             } else {
-                setupRow.style.display = 'none';
-                garmentSetupRow.style.display = 'none';
-                capSetupRow.style.display = 'none';
+                if (setupFeeTableRow) setupFeeTableRow.style.display = 'none';
             }
 
-            // Additional Stitches - separate garment vs cap calculations
+            // Additional Stitches - table row only (sidebar removed in 2026 refactor)
             // Garments use $1.25/K rate, Caps use $1.00/K rate
-            const asRow = document.getElementById('additional-stitches-row');
-            const garmentStitchesRow = document.getElementById('garment-stitches-row');
-            const capStitchesRow = document.getElementById('cap-stitches-row');
+            const stitchesFeeRow = document.getElementById('stitches-fee-row');
+            const stitchesFeeUnit = document.getElementById('stitches-fee-unit');
+            const stitchesFeeTotal = document.getElementById('stitches-fee-total');
 
             // Get logo configs (garment primary logo from top, cap logo from cap section)
             const garmentStitches = parseInt(document.getElementById('primary-stitches').value) || 8000;
@@ -4862,40 +4823,13 @@
             const capStitchFee = capExtraK * 1.00 * capQty;
 
             const totalStitchFee = garmentStitchFee + capStitchFee;
-            const hasGarmentStitches = garmentExtraK > 0 && garmentQty > 0;
-            const hasCapStitches = capExtraK > 0 && capQty > 0;
 
-            if (totalStitchFee > 0) {
-                asRow.style.display = 'flex';
-
-                if (hasGarmentStitches && hasCapStitches) {
-                    // Mixed quote - show total and breakdown rows
-                    document.getElementById('additional-stitches-fee').textContent = `$${totalStitchFee.toFixed(2)}`;
-
-                    garmentStitchesRow.style.display = 'flex';
-                    document.getElementById('garment-stitches-fee').textContent =
-                        `+${garmentExtraK}K × ${garmentQty} × $1.25 = $${garmentStitchFee.toFixed(2)}`;
-
-                    capStitchesRow.style.display = 'flex';
-                    document.getElementById('cap-stitches-fee').textContent =
-                        `+${capExtraK}K × ${capQty} × $1.00 = $${capStitchFee.toFixed(2)}`;
-                } else if (hasGarmentStitches) {
-                    // Garments only - single line with formula
-                    document.getElementById('additional-stitches-fee').textContent =
-                        `+${garmentExtraK}K × ${garmentQty} = $${garmentStitchFee.toFixed(2)}`;
-                    garmentStitchesRow.style.display = 'none';
-                    capStitchesRow.style.display = 'none';
-                } else if (hasCapStitches) {
-                    // Caps only - single line with formula
-                    document.getElementById('additional-stitches-fee').textContent =
-                        `+${capExtraK}K × ${capQty} = $${capStitchFee.toFixed(2)}`;
-                    garmentStitchesRow.style.display = 'none';
-                    capStitchesRow.style.display = 'none';
-                }
-            } else {
-                asRow.style.display = 'none';
-                garmentStitchesRow.style.display = 'none';
-                capStitchesRow.style.display = 'none';
+            if (totalStitchFee > 0 && stitchesFeeRow) {
+                stitchesFeeRow.style.display = 'table-row';
+                if (stitchesFeeUnit) stitchesFeeUnit.textContent = `$${totalStitchFee.toFixed(2)}`;
+                if (stitchesFeeTotal) stitchesFeeTotal.textContent = `$${totalStitchFee.toFixed(2)}`;
+            } else if (stitchesFeeRow) {
+                stitchesFeeRow.style.display = 'none';
             }
 
             // Additional Logos pricing section (GARMENTS) - reads from globalAL state
@@ -5098,6 +5032,15 @@
 
                 // LTM always shown as separate line item
                 pricing.ltmDistributed = false;
+
+                // Add additional charges to pricing data for PDF (2026 fee refactor)
+                const additionalCharges = getAdditionalCharges();
+                pricing.artCharge = additionalCharges.artCharge || 0;
+                pricing.graphicDesignHours = additionalCharges.graphicDesignHours || 0;
+                pricing.graphicDesignCharge = additionalCharges.graphicDesignCharge || 0;
+                pricing.rushFee = additionalCharges.rushFee || 0;
+                pricing.discount = additionalCharges.discount || 0;
+                pricing.discountReason = additionalCharges.discountReason || '';
 
                 const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricing, customerData);
                 const printWindow = window.open('', '_blank');
@@ -5580,6 +5523,81 @@
                 badge.style.background = netAdditional >= 0 ? '#22c55e' : '#dc2626';
             } else {
                 badge.style.display = 'none';
+            }
+
+            // Update fee table rows (2026 refactor)
+            updateFeeTableRows();
+        }
+
+        /**
+         * Update fee table rows based on current input values
+         * Shows/hides rows in the products table based on fee values
+         */
+        function updateFeeTableRows() {
+            // Art charge row
+            const artChargeRow = document.getElementById('art-charge-row');
+            const artChargeToggle = document.getElementById('art-charge-toggle');
+            const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+            if (artChargeRow) {
+                if (artChargeToggle?.checked && artCharge > 0) {
+                    artChargeRow.style.display = 'table-row';
+                    document.getElementById('art-charge-unit').textContent = '$' + artCharge.toFixed(2);
+                    document.getElementById('art-charge-total').textContent = '$' + artCharge.toFixed(2);
+                } else {
+                    artChargeRow.style.display = 'none';
+                }
+            }
+
+            // Graphic design row
+            const graphicDesignRow = document.getElementById('graphic-design-row');
+            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+            const designTotal = designHours * 75;
+            if (graphicDesignRow) {
+                if (designHours > 0) {
+                    graphicDesignRow.style.display = 'table-row';
+                    document.getElementById('design-hours-label').textContent = designHours;
+                    document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
+                    document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
+                } else {
+                    graphicDesignRow.style.display = 'none';
+                }
+            }
+
+            // Rush fee row
+            const rushFeeRow = document.getElementById('rush-fee-row');
+            const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+            if (rushFeeRow) {
+                if (rushFee > 0) {
+                    rushFeeRow.style.display = 'table-row';
+                    document.getElementById('rush-fee-unit').textContent = '$' + rushFee.toFixed(2);
+                    document.getElementById('rush-fee-total').textContent = '$' + rushFee.toFixed(2);
+                } else {
+                    rushFeeRow.style.display = 'none';
+                }
+            }
+
+            // Discount row
+            const discountRow = document.getElementById('discount-row');
+            const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+            const discountType = document.getElementById('discount-type')?.value || 'fixed';
+            const discountReason = document.getElementById('discount-reason')?.value || '';
+            if (discountRow) {
+                if (discountAmount > 0) {
+                    discountRow.style.display = 'table-row';
+                    let actualDiscount = discountAmount;
+                    if (discountType === 'percent') {
+                        const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
+                        actualDiscount = subtotal * (discountAmount / 100);
+                    }
+                    const reasonLabel = document.getElementById('discount-reason-label');
+                    if (reasonLabel) {
+                        reasonLabel.textContent = discountReason ? `(${discountReason})` : '';
+                    }
+                    document.getElementById('discount-unit').textContent = '-$' + actualDiscount.toFixed(2);
+                    document.getElementById('discount-total').textContent = '-$' + actualDiscount.toFixed(2);
+                } else {
+                    discountRow.style.display = 'none';
+                }
             }
         }
 

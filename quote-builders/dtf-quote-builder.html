@@ -199,6 +199,42 @@
                                 <td class="cell-total" id="ltm-row-total">$50.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
+                            <tr id="art-charge-row" class="fee-row" style="display: none;">
+                                <td colspan="9" class="fee-label">
+                                    <i class="fas fa-palette"></i> Art Charge (Logo Mockup & Review)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="art-charge-unit">$0.00</td>
+                                <td class="cell-total" id="art-charge-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="graphic-design-row" class="fee-row" style="display: none;">
+                                <td colspan="9" class="fee-label">
+                                    <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="graphic-design-unit">$0.00</td>
+                                <td class="cell-total" id="graphic-design-total-row">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="rush-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="9" class="fee-label">
+                                    <i class="fas fa-bolt"></i> Rush Fee
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="rush-fee-unit">$0.00</td>
+                                <td class="cell-total" id="rush-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="discount-row" class="fee-row" style="display: none;">
+                                <td colspan="9" class="fee-label">
+                                    <i class="fas fa-tag"></i> Discount <span id="discount-reason-label"></span>
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="discount-unit">-$0.00</td>
+                                <td class="cell-total" id="discount-total">-$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -257,11 +293,6 @@
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
 
-                <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #666; cursor: help;"></i> (&lt; 24 pcs):</span>
-                    <span class="value" id="ltm-fee">$50.00</span>
-                </div>
-
                 <!-- Tax Section -->
                 <div class="pricing-totals-section">
                     <div class="pricing-row">
@@ -281,6 +312,42 @@
                     <div class="pricing-row grand-total-row">
                         <span class="label">TOTAL:</span>
                         <span class="value" id="grand-total-with-tax">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Artwork Services Panel -->
+            <div class="additional-charges-panel">
+                <div class="charges-header" onclick="toggleArtworkServices()">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-palette"></i>
+                        <span>Artwork Services</span>
+                        <span id="artwork-badge" class="charges-badge hidden">$0.00</span>
+                    </div>
+                    <i id="artwork-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
+                </div>
+                <div id="artwork-content" class="charges-content hidden">
+                    <div class="charge-field">
+                        <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                            <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()">
+                            <span>Logo Mockup & Review</span>
+                        </label>
+                        <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
+                            <span class="prefix">$</span>
+                            <input type="number" id="art-charge" class="quote-input"
+                                   min="0" step="0.01" value="0" disabled
+                                   onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                        </div>
+                    </div>
+                    <div class="charge-field">
+                        <label class="quote-label">Graphic Design ($75/hr)</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
+                                   min="0" step="0.5" placeholder="0"
+                                   onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                            <span class="text-muted">hrs</span>
+                            <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -509,6 +576,16 @@
             // Get base subtotal from pricing
             let subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
 
+            // Add art charge if enabled
+            const artChargeToggle = document.getElementById('art-charge-toggle');
+            const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+            subtotal += artCharge;
+
+            // Add graphic design fee
+            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+            const designFee = designHours * 75;
+            subtotal += designFee;
+
             // Add rush fee if present
             const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
             subtotal += rushFee;
@@ -569,6 +646,9 @@
                 badge.classList.add('hidden');
             }
 
+            // Update fee table rows
+            updateFeeTableRows();
+
             // Recalculate tax with new charges
             updateTaxCalculation();
         }
@@ -580,6 +660,138 @@
                 prefix.textContent = discountType === 'percent' ? '%' : '$';
             }
             updateAdditionalCharges();
+        }
+
+        // ============================================
+        // ARTWORK SERVICES FUNCTIONS
+        // ============================================
+
+        function toggleArtworkServices() {
+            const content = document.getElementById('artwork-content');
+            const chevron = document.getElementById('artwork-chevron');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function toggleArtCharge() {
+            const toggle = document.getElementById('art-charge-toggle');
+            const input = document.getElementById('art-charge');
+            const wrapper = document.getElementById('art-charge-wrapper');
+
+            if (toggle.checked) {
+                input.disabled = false;
+                wrapper.style.opacity = '1';
+                if (parseFloat(input.value) === 0) {
+                    input.value = '50.00';
+                }
+            } else {
+                input.disabled = true;
+                wrapper.style.opacity = '0.4';
+                input.value = '0';
+            }
+            updateArtworkCharges();
+        }
+
+        function updateArtworkCharges() {
+            const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+            const designTotal = designHours * 75;
+
+            // Update graphic design total display
+            const designTotalEl = document.getElementById('graphic-design-total');
+            if (designTotalEl) {
+                designTotalEl.textContent = designTotal.toFixed(2);
+            }
+
+            // Update artwork badge
+            const badge = document.getElementById('artwork-badge');
+            const totalArtwork = artCharge + designTotal;
+            if (totalArtwork > 0) {
+                badge.textContent = '+$' + totalArtwork.toFixed(2);
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            // Update table rows
+            updateFeeTableRows();
+
+            // Recalculate tax
+            updateTaxCalculation();
+        }
+
+        function updateFeeTableRows() {
+            // Art charge row
+            const artChargeRow = document.getElementById('art-charge-row');
+            const artChargeToggle = document.getElementById('art-charge-toggle');
+            const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+            if (artChargeRow) {
+                if (artChargeToggle?.checked && artCharge > 0) {
+                    artChargeRow.style.display = 'table-row';
+                    document.getElementById('art-charge-unit').textContent = '$' + artCharge.toFixed(2);
+                    document.getElementById('art-charge-total').textContent = '$' + artCharge.toFixed(2);
+                } else {
+                    artChargeRow.style.display = 'none';
+                }
+            }
+
+            // Graphic design row
+            const graphicDesignRow = document.getElementById('graphic-design-row');
+            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+            const designTotal = designHours * 75;
+            if (graphicDesignRow) {
+                if (designHours > 0) {
+                    graphicDesignRow.style.display = 'table-row';
+                    document.getElementById('design-hours-label').textContent = designHours;
+                    document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
+                    document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
+                } else {
+                    graphicDesignRow.style.display = 'none';
+                }
+            }
+
+            // Rush fee row
+            const rushFeeRow = document.getElementById('rush-fee-row');
+            const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+            if (rushFeeRow) {
+                if (rushFee > 0) {
+                    rushFeeRow.style.display = 'table-row';
+                    document.getElementById('rush-fee-unit').textContent = '$' + rushFee.toFixed(2);
+                    document.getElementById('rush-fee-total').textContent = '$' + rushFee.toFixed(2);
+                } else {
+                    rushFeeRow.style.display = 'none';
+                }
+            }
+
+            // Discount row
+            const discountRow = document.getElementById('discount-row');
+            const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+            const discountType = document.getElementById('discount-type')?.value || 'fixed';
+            const discountReason = document.getElementById('discount-reason')?.value || '';
+            if (discountRow) {
+                if (discountAmount > 0) {
+                    discountRow.style.display = 'table-row';
+                    let actualDiscount = discountAmount;
+                    if (discountType === 'percent') {
+                        const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
+                        actualDiscount = subtotal * (discountAmount / 100);
+                    }
+                    const reasonLabel = document.getElementById('discount-reason-label');
+                    if (reasonLabel) {
+                        reasonLabel.textContent = discountReason ? `(${discountReason})` : '';
+                    }
+                    document.getElementById('discount-unit').textContent = '-$' + actualDiscount.toFixed(2);
+                    document.getElementById('discount-total').textContent = '-$' + actualDiscount.toFixed(2);
+                } else {
+                    discountRow.style.display = 'none';
+                }
+            }
         }
 
         function toggleSaveShare() {

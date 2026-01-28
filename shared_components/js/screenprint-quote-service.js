@@ -106,9 +106,17 @@ class ScreenPrintQuoteService {
                 TotalAmount: totalAmount,
                 Status: 'Open',
                 ExpiresAt: expiresAt,
-                Notes: JSON.stringify(printSetup)
+                Notes: JSON.stringify(printSetup),
+                // Additional charges (2026 fee refactor)
+                ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
+                GraphicDesignHours: parseFloat(quoteData.graphicDesignHours) || 0,
+                GraphicDesignCharge: parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0,
+                RushFee: parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0,
+                Discount: parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0,
+                DiscountPercent: parseFloat(quoteData.discountPercent) || 0,
+                DiscountReason: quoteData.discountReason || ''
             };
-            
+
             // Save session
             const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
@@ -339,7 +347,15 @@ class ScreenPrintQuoteService {
                 Notes: JSON.stringify(printSetup),
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
-                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com'
+                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                // Additional charges (2026 fee refactor)
+                ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
+                GraphicDesignHours: parseFloat(quoteData.graphicDesignHours) || 0,
+                GraphicDesignCharge: parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0,
+                RushFee: parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0,
+                Discount: parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0,
+                DiscountPercent: parseFloat(quoteData.discountPercent) || 0,
+                DiscountReason: quoteData.discountReason || ''
             };
 
             // Update session via PUT

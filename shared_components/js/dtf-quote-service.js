@@ -162,7 +162,15 @@ class DTFQuoteService {
                     marginDenominator: quoteData.marginDenominator,
                     laborPerLocation: quoteData.laborCostPerLocation,
                     freightPerLocation: quoteData.freightPerTransfer
-                })
+                }),
+                // Additional charges (2026 fee refactor)
+                ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
+                GraphicDesignHours: parseFloat(quoteData.graphicDesignHours) || 0,
+                GraphicDesignCharge: parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0,
+                RushFee: parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0,
+                Discount: parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0,
+                DiscountPercent: parseFloat(quoteData.discountPercent) || 0,
+                DiscountReason: quoteData.discountReason || ''
             };
 
             // Save session
