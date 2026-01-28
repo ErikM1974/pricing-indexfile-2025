@@ -74,6 +74,29 @@ async fetchAccounts(filters = {}, retries = 3) {
 
 ---
 
+## Bug: Quote URL Save/Load Lost Additional Fees (Art Charge, Rush, Discount)
+**Date:** 2026-01-28
+**Project:** [Pricing Index] (All 4 Quote Builders)
+**Problem:** When user saved a quote with fees (art charge $50, rush fee $25, discount 10%) and shared the URL, loading that quote showed all fees as $0. The fees were never saved to the database.
+**Root Cause:** Only Embroidery quote service was saving fee fields to `quote_sessions` table. DTG, Screen Print, and DTF services didn't include these fields in `sessionData` object. Additionally, no `populateAdditionalCharges()` function existed to restore fees when loading.
+**Solution:**
+1. Updated all quote services (`dtg-quote-service.js`, `screenprint-quote-service.js`, `dtf-quote-service.js`) to save fee fields:
+   - `ArtCharge`, `GraphicDesignHours`, `GraphicDesignCharge`
+   - `RushFee`, `Discount`, `DiscountPercent`, `DiscountReason`
+2. Added `populateAdditionalCharges(session)` function to all 4 quote builders
+3. Called `populateAdditionalCharges()` in `loadQuoteForEditing()` after `populateCustomerInfo()`
+**Prevention:** When adding new fee fields to quote builders:
+1. Add column to Caspio `quote_sessions` table (if not exists)
+2. Add field to ALL quote service `sessionData` objects (save AND update methods)
+3. Add restore logic in `populateAdditionalCharges()` for ALL builders
+4. Test save/load round-trip for each quote type
+**Files:**
+- `shared_components/js/dtg-quote-service.js`, `screenprint-quote-service.js`, `dtf-quote-service.js`
+- `quote-builders/dtg-quote-builder.html`, `screenprint-quote-builder.html`, `dtf-quote-builder.html`
+**Database:** All columns already existed in `quote_sessions` - just weren't being used by all services.
+
+---
+
 ## Rule: ALWAYS Pull Pricing From Caspio API - Never Hardcode
 **Date:** 2026-01-15
 **Project:** [All]
