@@ -66,8 +66,9 @@ class RepCRMService {
 
     /**
      * Fetch all accounts with optional filters
+     * Includes retry logic with exponential backoff for rate limiting (429)
      */
-    async fetchAccounts(filters = {}) {
+    async fetchAccounts(filters = {}, retries = 3) {
         const params = new URLSearchParams();
 
         if (filters.accountTier) params.append('accountTier', filters.accountTier);
@@ -83,6 +84,14 @@ class RepCRMService {
         const response = await fetch(url, { credentials: 'same-origin' });
 
         if (this.handleAuthError(response)) return [];
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`[RepCRM] Rate limited (429), retrying in ${waitTime / 1000}s... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.fetchAccounts(filters, retries - 1);
+        }
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -114,8 +123,9 @@ class RepCRMService {
 
     /**
      * Sync sales from ManageOrders (uses HYBRID pattern: Archive + Fresh = True YTD)
+     * Includes retry logic with exponential backoff for rate limiting (429)
      */
-    async syncSales() {
+    async syncSales(retries = 3) {
         const response = await fetch(`${this.baseURL}${this.apiEndpoint}/sync-sales`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -123,6 +133,14 @@ class RepCRMService {
         });
 
         if (this.handleAuthError(response)) return null;
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`[RepCRM] Sync rate limited (429), retrying in ${waitTime / 1000}s... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.syncSales(retries - 1);
+        }
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -134,8 +152,9 @@ class RepCRMService {
     /**
      * Sync ownership from Sales_Reps_2026 (ShopWorks source of truth)
      * This ensures the CRM table has the correct customer assignments
+     * Includes retry logic with exponential backoff for rate limiting (429)
      */
-    async syncOwnership() {
+    async syncOwnership(retries = 3) {
         const response = await fetch(`${this.baseURL}${this.apiEndpoint}/sync-ownership`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -143,6 +162,14 @@ class RepCRMService {
         });
 
         if (this.handleAuthError(response)) return null;
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`[RepCRM] Ownership sync rate limited (429), retrying in ${waitTime / 1000}s... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.syncOwnership(retries - 1);
+        }
 
         if (!response.ok) {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
@@ -157,11 +184,20 @@ class RepCRMService {
 
     /**
      * Fetch YTD per-customer totals from Caspio archive
+     * Includes retry logic with exponential backoff for rate limiting (429)
      */
-    async fetchYTDPerCustomerFromArchive(year = new Date().getFullYear()) {
+    async fetchYTDPerCustomerFromArchive(year = new Date().getFullYear(), retries = 3) {
         const response = await fetch(`${this.baseURL}${this.archiveEndpoint}/ytd?year=${year}`, { credentials: 'same-origin' });
 
         if (this.handleAuthError(response)) return { year, customers: [], lastArchivedDate: null, totalRevenue: 0, totalOrders: 0 };
+
+        // Retry on rate limit with exponential backoff (5s, 10s, 15s)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`[RepCRM] Archive fetch rate limited (429), retrying in ${waitTime / 1000}s... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.fetchYTDPerCustomerFromArchive(year, retries - 1);
+        }
 
         if (!response.ok) {
             if (response.status === 404) {
