@@ -940,6 +940,23 @@ const StaffDashboardInit = (function() {
                 mergedTotals[name].orders += data.orders;
             }
 
+            // 3.5 Override Nika and Taneisha with CRM totals for exact match with their dashboards
+            try {
+                const crmTotals = await StaffDashboardService.fetchRepCRMTotals();
+                for (const [repName, data] of Object.entries(crmTotals)) {
+                    if (data.totalSales !== null) {
+                        if (!mergedTotals[repName]) {
+                            mergedTotals[repName] = { revenue: 0, orders: 0, firstNames: new Set() };
+                        }
+                        // Keep order count from hybrid, but use CRM revenue for exact match
+                        mergedTotals[repName].revenue = data.totalSales;
+                        console.log(`[TeamPerformance] Using CRM total for ${repName}: $${data.totalSales.toFixed(2)}`);
+                    }
+                }
+            } catch (e) {
+                console.warn('[TeamPerformance] Could not fetch CRM totals, using hybrid values:', e.message);
+            }
+
             // 4. Format for display (same structure as processTeamPerformanceYTD)
             const reps = Object.entries(mergedTotals)
                 .filter(([name]) => name !== 'Unassigned')

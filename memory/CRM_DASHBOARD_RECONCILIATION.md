@@ -11,25 +11,25 @@
 
 ---
 
-## Dashboard Metrics Distinction (CRITICAL)
+## Dashboard Metrics Alignment (Updated 2026-01-28)
 
-The most common confusion: **Team Performance and CRM YTD show DIFFERENT numbers by design.**
+**Team Performance and CRM YTD now show the SAME numbers** for Nika and Taneisha.
 
-| Dashboard | What It Shows | Filter Logic |
-|-----------|---------------|--------------|
-| **Team Performance** | Orders **WRITTEN BY** rep | `CustomerServiceRep` field on the ORDER |
-| **CRM YTD_Sales_2026** | Orders **FOR** rep's customers | Customer must be in rep's CRM account list |
+| Dashboard | What It Shows | Data Source |
+|-----------|---------------|-------------|
+| **Team Performance** | Revenue for rep's assigned customers | `fetchRepCRMTotals()` → CRM accounts |
+| **CRM YTD_Sales_2026** | Revenue for rep's assigned customers | CRM account list with YTD_Sales_2026 |
 
-**Why They Differ:**
+**Change Made:**
+`staff-dashboard-init.js` → `loadTeamPerformanceYTDHybrid()` now calls `fetchRepCRMTotals()` to override Nika and Taneisha's totals with CRM data. This ensures both dashboards show identical numbers.
 
-The gap between these numbers represents "inbound" orders - orders written by OTHER reps for the customer's assigned accounts.
+**Workflow:**
+1. Gap Analysis identifies mismatches (order writer ≠ CRM assignment)
+2. User fixes the order in ShopWorks to match the CRM owner
+3. User resyncs the CRM dashboard
+4. Both Team Performance and CRM dashboards reflect the corrected data
 
-**Example:**
-- Taneisha's CRM YTD: $98,039 (all orders for her customers)
-- Team Performance: $85,050 (orders she personally wrote)
-- Gap: $12,989 = orders written by other reps for Taneisha's customers
-
-This is **expected behavior**, not a bug.
+**House/Other Reps:** Still use hybrid calculation (archive + ManageOrders) - unchanged.
 
 ---
 
