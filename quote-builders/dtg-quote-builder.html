@@ -17,6 +17,9 @@
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- App Configuration (centralized API URLs, settings) -->
+    <script src="/config/app.config.js"></script>
+
     <!-- DTG Quote Builder Styles (External CSS - Extracted January 2026) -->
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder-extracted.css?v=20260106">
 
@@ -139,6 +142,13 @@
                     </div>
                 </div>
 
+                <!-- Minimum Order Warning Banner -->
+                <div id="min-order-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Minimum Order: 24 pieces</strong> -
+                    Orders under 24 pieces require Less Than Minimum Fee.
+                </div>
+
                 <!-- Excel-Style Product Table -->
                 <div class="product-table-wrapper">
                     <table class="product-table" id="product-table">
@@ -174,7 +184,7 @@
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <tr id="ltm-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="9" class="fee-label">
-                                    <i class="fas fa-info-circle"></i> LTM Fee (&lt; 24 pcs)
+                                    <i class="fas fa-info-circle"></i> Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price">$50.00</td>
@@ -510,7 +520,8 @@
         // DTG POWER QUOTE - Excel-Style Quote Builder
         // ============================================================
 
-        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Use centralized config (fallback to hardcoded URL for backwards compatibility)
+        const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
         // Auto-save & Draft Recovery (2026 consolidation)
         let dtgPersistence = null;
@@ -5081,7 +5092,7 @@
             lines.push(`Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
 
             if (pricing.ltmFee > 0) {
-                lines.push(`LTM Fee (< 24 pcs): $${pricing.ltmFee.toFixed(2)}`);
+                lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
             }
 
             lines.push(`TOTAL: $${(pricing.grandTotal || 0).toFixed(2)}`);

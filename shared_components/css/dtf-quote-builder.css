@@ -871,22 +871,25 @@ body {
 }
 
 /* Minimum order warning (qty < 10) */
-.min-order-warning {
-    background: #fef3c7;
-    border: 1px solid #f59e0b;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin: 8px 12px;
+#min-order-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    color: #856404;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
-    color: #92400e;
 }
 
-.min-order-warning i {
-    color: #f59e0b;
-    font-size: 14px;
+#min-order-warning i {
+    color: #ffc107;
+    font-size: 1.2em;
+}
+
+#min-order-warning strong {
+    margin-right: 4px;
 }
 
 /* Total Row (DTG Style) */

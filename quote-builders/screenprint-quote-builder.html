@@ -29,6 +29,9 @@
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- App Configuration (centralized API URLs, settings) -->
+    <script src="/config/app.config.js"></script>
+
     <!-- REMOVED: 1,864 lines of inline CSS moved to screenprint-quote-builder-extracted.css -->
     <style>
         /* Placeholder - inline styles removed, using external CSS */
@@ -183,6 +186,13 @@
                     </div>
                 </div>
 
+                <!-- Minimum Order Warning Banner -->
+                <div id="min-order-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Minimum Order: 24 pieces</strong> -
+                    Orders under 24 pieces require Less Than Minimum Fee.
+                </div>
+
                 <!-- Excel-Style Product Table -->
                 <div class="product-table-wrapper">
                     <table class="product-table" id="product-table">
@@ -227,7 +237,7 @@
                             </tr>
                             <tr id="ltm-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="9" class="fee-label">
-                                    <i class="fas fa-info-circle"></i> LTM Fee (&lt; 24 pcs)
+                                    <i class="fas fa-info-circle"></i> Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price">$50.00</td>
@@ -589,7 +599,8 @@
         // SCREEN PRINT QUOTE BUILDER - Excel-Style Quote Builder
         // ============================================================
 
-        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Use centralized config (fallback to hardcoded URL for backwards compatibility)
+        const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
         // NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
         // SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
@@ -4246,8 +4257,14 @@
             // Determine tier based on total quantity
             const tier = getScreenPrintTier(totalQty);
 
-            // Calculate LTM fee for orders under 24 pieces
-            const ltmFee = totalQty < 24 ? 50 : 0;
+            // Calculate Small Batch Fee based on quantity tier (min order is 24 pieces)
+            let ltmFee = 0;
+            if (totalQty <= 36) {
+                ltmFee = 75;  // 24-36 tier
+            } else if (totalQty <= 71) {
+                ltmFee = 50;  // 37-71 tier
+            }
+            // 72+ pieces: no fee
             const perUnitLTM = ltmFee > 0 ? Math.floor(ltmFee / totalQty * 100) / 100 : 0;
 
             // Safety stripes: $2 per piece per location
@@ -4355,7 +4372,7 @@
                     const parentTotalCell = document.getElementById(`row-total-${rowId}`);
                     if (parentTotalCell) {
                         // productSubtotal includes all sizes for this product (LTM shown separately)
-                        parentTotalCell.textContent = product.totalQuantity > 0 ? `$${productSubtotal.toFixed(2)}` : '-';
+                        parentTotalCell.textContent = product.totalQty > 0 ? `$${productSubtotal.toFixed(2)}` : '-';
                     }
 
                     // Update pricing breakdown for the row
@@ -4518,8 +4535,15 @@
             updateSidebarPrintConfig();
 
             // Basic pricing info
-            document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
+            const totalQty = pricing.totalQuantity || 0;
+            document.getElementById('total-qty').textContent = totalQty;
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
+
+            // Minimum order warning banner (show when qty > 0 but < 24)
+            const minWarning = document.getElementById('min-order-warning');
+            if (minWarning) {
+                minWarning.style.display = (totalQty > 0 && totalQty < 24) ? 'flex' : 'none';
+            }
 
             // Update pre-tax subtotal for tax calculation (grand total before tax)
             document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
@@ -5314,7 +5338,7 @@
             lines.push(`Products Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
             lines.push(`Setup Fee (${printConfig.totalScreens} screens): $${(pricing.setupFees || 0).toFixed(2)}`);
             if (pricing.ltmFee > 0) {
-                lines.push(`LTM Fee (< 24 pcs): $${pricing.ltmFee.toFixed(2)}`);
+                lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
             }
             lines.push(`TOTAL: $${(pricing.grandTotal || 0).toFixed(2)}`);
             lines.push('');

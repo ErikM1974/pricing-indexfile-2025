@@ -89,7 +89,7 @@ class DTGQuoteBuilder {
         this.aggregateQuantity = document.getElementById('aggregate-quantity');
         this.tierDisplay = document.getElementById('tier-display');
         this.currentTier = document.getElementById('current-tier');
-        this.ltmWarning = document.getElementById('ltm-warning');
+        this.ltmWarning = document.getElementById('min-order-warning');
         this.backToLocationBtn = document.getElementById('back-to-location');
         this.continueToReviewBtn = document.getElementById('continue-to-review');
         
@@ -715,10 +715,8 @@ class DTGQuoteBuilder {
         this.tierDisplay.style.display = 'block';
         
         // Show LTM warning if applicable
-        if (totalQty < 24) {
-            this.ltmWarning.style.display = 'block';
-        } else {
-            this.ltmWarning.style.display = 'none';
+        if (this.ltmWarning) {
+            this.ltmWarning.style.display = (totalQty > 0 && totalQty < 24) ? 'flex' : 'none';
         }
     }
     

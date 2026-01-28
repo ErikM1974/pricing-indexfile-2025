@@ -117,12 +117,33 @@ body {
     padding: 15px 20px;
 }
 
+/* Compact spacing for print location section */
+.logo-section.print-location-section {
+    padding: 10px 20px;
+}
+
+/* Reduce options box spacing (dark garment warning) */
+.options-box-warning {
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+
+/* Reduce location card padding */
+.location-group-card {
+    padding: 10px;
+}
+
+/* Tighter gap between location cards */
+.print-location-controls.d-flex {
+    gap: 16px !important;
+}
+
 .primary-logo-config {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 8px;
 }
 
 .logo-section-label {
@@ -1692,6 +1713,30 @@ td.size-disabled input {
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* ============================================
+   SHARED: Minimum Order Warning Banner
+   ============================================ */
+#min-order-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#min-order-warning i {
+    color: #ffc107;
+    font-size: 1.2em;
+}
+
+#min-order-warning strong {
+    margin-right: 4px;
 }
 
 /* ============================================

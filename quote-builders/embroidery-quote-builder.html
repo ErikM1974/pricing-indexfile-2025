@@ -29,6 +29,9 @@
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- App Configuration (centralized API URLs, settings) -->
+    <script src="/config/app.config.js"></script>
+
     <!-- REMOVED: 1,799 lines of inline CSS moved to embroidery-quote-builder-extracted.css -->
     <style>
         /* Placeholder - inline styles removed, using external CSS */
@@ -295,6 +298,13 @@
                     </div>
                 </div>
 
+                <!-- Minimum Order Warning Banner -->
+                <div id="min-order-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Minimum Order: 24 pieces</strong> -
+                    Orders under 24 pieces require Less Than Minimum Fee.
+                </div>
+
                 <!-- Excel-Style Product Table -->
                 <div class="product-table-wrapper">
                     <table class="product-table" id="product-table">
@@ -331,7 +341,7 @@
                             <!-- Garment LTM Row -->
                             <tr id="garment-ltm-table-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-tshirt"></i> Garment LTM Fee (&lt; 24 pcs)
+                                    <i class="fas fa-tshirt"></i> Garment Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price">$50.00</td>
@@ -341,7 +351,7 @@
                             <!-- Cap LTM Row -->
                             <tr id="cap-ltm-table-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-hat-cowboy"></i> Cap LTM Fee (&lt; 24 pcs)
+                                    <i class="fas fa-hat-cowboy"></i> Cap Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price">$50.00</td>
@@ -720,7 +730,8 @@
         // EMBROIDERY POWER QUOTE - Excel-Style Quote Builder
         // ============================================================
 
-        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Use centralized config (fallback to hardcoded URL for backwards compatibility)
+        const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
         // NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
         // SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
@@ -4659,9 +4670,16 @@
             // Store for toggle reference
             window.currentPricingData = pricing;
 
-            document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
+            const totalQty = pricing.totalQuantity || 0;
+            document.getElementById('total-qty').textContent = totalQty;
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+
+            // Minimum order warning banner (show when qty > 0 but < 24)
+            const minWarning = document.getElementById('min-order-warning');
+            if (minWarning) {
+                minWarning.style.display = (totalQty > 0 && totalQty < 24) ? 'flex' : 'none';
+            }
 
             // Update products label based on embellishment type
             const productsLabel = document.getElementById('products-label');
@@ -5801,11 +5819,11 @@
                 const hasCapLtm = (pricing.capLtmFee || 0) > 0;
 
                 if (hasGarmentLtm && hasCapLtm) {
-                    lines.push(`LTM Fee (< 24 pcs): $${pricing.ltmFee.toFixed(2)}`);
-                    lines.push(`  Garment LTM: $${pricing.garmentLtmFee.toFixed(2)}`);
-                    lines.push(`  Cap LTM: $${pricing.capLtmFee.toFixed(2)}`);
+                    lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
+                    lines.push(`  Garment: $${pricing.garmentLtmFee.toFixed(2)}`);
+                    lines.push(`  Cap: $${pricing.capLtmFee.toFixed(2)}`);
                 } else {
-                    lines.push(`LTM Fee: $${pricing.ltmFee.toFixed(2)}`);
+                    lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
                 }
             }
             if (pricing.setupFees > 0) lines.push(`Setup: $${pricing.setupFees.toFixed(2)}`);
