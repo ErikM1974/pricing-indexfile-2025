@@ -49,10 +49,18 @@
                  class="logo">
         </a>
         <div style="text-align: center;">
-            <div style="font-size: 18px; font-weight: 600;">2026 DTG Quote Builder</div>
+            <div style="font-size: 18px; font-weight: 600;">
+                2026 DTG Quote Builder
+                <span id="unsaved-indicator" class="unsaved-badge" style="display: none;">
+                    <i class="fas fa-circle"></i> Unsaved
+                </span>
+            </div>
             <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">Direct-to-Garment Printing</div>
         </div>
         <div class="header-actions">
+            <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
+                <i class="fas fa-plus"></i> New Quote
+            </button>
             <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
@@ -410,6 +418,9 @@
         // Edit mode state
         let editingQuoteId = null;
         let editingRevision = null;
+
+        // Unsaved changes tracking
+        let hasChanges = false;
 
         // DTG Print Location Configuration
         let printLocation = {
@@ -1247,6 +1258,106 @@
                 editingRevision = null;
                 addNewRow();
             }
+        }
+
+        // ============================================
+        // Unsaved Changes Tracking (UX Improvement)
+        // ============================================
+
+        function markAsUnsaved() {
+            hasChanges = true;
+            const indicator = document.getElementById('unsaved-indicator');
+            if (indicator) {
+                indicator.style.display = 'inline';
+            }
+        }
+
+        function markAsSaved() {
+            hasChanges = false;
+            const indicator = document.getElementById('unsaved-indicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+        }
+
+        function hasUnsavedChanges() {
+            return hasChanges;
+        }
+
+        // ============================================
+        // New Quote Functionality (UX Improvement)
+        // ============================================
+
+        function confirmNewQuote() {
+            if (hasUnsavedChanges()) {
+                if (confirm('You have unsaved changes. Start a new quote?')) {
+                    resetQuote();
+                }
+            } else {
+                resetQuote();
+            }
+        }
+
+        function resetQuote() {
+            // Clear all product rows and re-add empty state
+            const tbody = document.getElementById('product-tbody');
+            tbody.innerHTML = `
+                <tr id="empty-state-row">
+                    <td colspan="12" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                        <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500)</div>
+                    </td>
+                </tr>
+            `;
+
+            // Reset row counter and product cache
+            rowCounter = 0;
+            products = [];
+            productCache = {};
+            childRowMap = {};
+
+            // Reset print location to defaults
+            printLocation = { front: 'LC', back: '', combined: 'LC' };
+            document.querySelector('input[name="front-location"][value="LC"]').checked = true;
+            document.querySelectorAll('input[name="back-location"]').forEach(r => r.checked = false);
+
+            // Reset customer form fields
+            document.getElementById('customer-name').value = '';
+            document.getElementById('customer-email').value = '';
+            document.getElementById('company-name').value = '';
+            document.getElementById('customer-phone').value = '';
+
+            // Reset additional charges
+            const rushFee = document.getElementById('rush-fee');
+            const discountAmount = document.getElementById('discount-amount');
+            const discountReason = document.getElementById('discount-reason');
+            if (rushFee) rushFee.value = '';
+            if (discountAmount) discountAmount.value = '';
+            if (discountReason) discountReason.value = '';
+
+            // Clear edit mode
+            editingQuoteId = null;
+            editingRevision = null;
+
+            // Clear draft storage
+            if (dtgPersistence) {
+                dtgPersistence.clearDraft();
+            }
+
+            // Mark as saved (no unsaved changes)
+            markAsSaved();
+
+            // Update totals display
+            updateGrandTotal();
+
+            // Focus search bar for immediate typing
+            const searchInput = document.getElementById('product-search');
+            if (searchInput) {
+                searchInput.focus();
+            }
+
+            showToast('Started new quote', 'success');
         }
 
         // ============================================================

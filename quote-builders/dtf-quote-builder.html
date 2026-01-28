@@ -45,10 +45,18 @@
                  class="logo">
         </a>
         <div style="text-align: center;">
-            <div style="font-size: 18px; font-weight: 600;">2026 DTF Quote Builder</div>
+            <div style="font-size: 18px; font-weight: 600;">
+                2026 DTF Quote Builder
+                <span id="unsaved-indicator" class="unsaved-badge" style="display: none;">
+                    <i class="fas fa-circle"></i> Unsaved
+                </span>
+            </div>
             <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px;">Direct-to-Film Transfers</div>
         </div>
         <div class="header-actions">
+            <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
+                <i class="fas fa-plus"></i> New Quote
+            </button>
             <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
@@ -365,6 +373,19 @@
         function focusProductSearch() {
             if (dtfQuoteBuilder) {
                 dtfQuoteBuilder.focusProductSearch();
+            }
+        }
+
+        // ============================================
+        // New Quote Functionality (UX Improvement)
+        // ============================================
+
+        /**
+         * Wrapper function for header button - calls class method
+         */
+        function confirmNewQuote() {
+            if (dtfQuoteBuilder) {
+                dtfQuoteBuilder.confirmNewQuote();
             }
         }
 

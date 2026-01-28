@@ -1394,10 +1394,9 @@ class EmbroideryInvoiceGenerator {
             return '<div style="color: #666; font-style: italic;">No products added</div>';
         }
 
-        // Fixed size columns matching quote builder
-        const sizeColumns = ['S', 'M', 'LG', 'XL', 'XXL', 'XXXL'];
-        // Extended sizes that go into XXXL(Other) column
-        // NOTE: 2XL is NOT extended - it's an alias for XXL (double extra-large)
+        // Fixed size columns matching quote builder (standardized labels)
+        const sizeColumns = ['S', 'M', 'L', 'XL', '2XL', '3XL+'];
+        // Extended sizes that go into 3XL+ (Other) column
         const extendedSizes = ['XS', '3XL', '4XL', '5XL', '6XL', 'XXXL'];
 
         // Track totals
@@ -1418,10 +1417,10 @@ class EmbroideryInvoiceGenerator {
                             <th class="color-col" style="width: 90px;">Color</th>
                             <th class="size-col" style="width: 28px;">S</th>
                             <th class="size-col" style="width: 28px;">M</th>
-                            <th class="size-col" style="width: 28px;">LG</th>
+                            <th class="size-col" style="width: 28px;">L</th>
                             <th class="size-col" style="width: 28px;">XL</th>
-                            <th class="size-col" style="width: 28px;">XXL</th>
-                            <th class="size-col" style="width: 40px;">XXXL<br><span style="font-size: 7px; font-weight: normal;">(Other)</span></th>
+                            <th class="size-col" style="width: 28px;">2XL</th>
+                            <th class="size-col" style="width: 40px;">3XL+<br><span style="font-size: 7px; font-weight: normal;">(Other)</span></th>
                             <th style="width: 32px; text-align: center;">Qty</th>
                             <th style="width: 55px; text-align: right;">Unit $</th>
                         </tr>
@@ -1466,23 +1465,23 @@ class EmbroideryInvoiceGenerator {
                 const hasExtInThisRow = Object.keys(sizes).some(s => extendedSizes.includes(s));
 
                 if (isFirstRow && hasExtendedSizes) {
-                    // Base row with extended sizes below - show checkmark in XXXL
+                    // Base row with extended sizes below - show checkmark in 3XL+
                     sizeColumns.forEach(col => {
-                        if (col === 'XXXL') {
+                        if (col === '3XL+') {
                             sizeCells += `<td class="size-cell" style="color: #4cb354; font-weight: bold;">✓</td>`;
                         } else {
-                            // Map L -> LG, and 2XL -> XXL (same size)
+                            // Map legacy formats: LG -> L, XXL -> 2XL
                             let qty = sizes[col];
-                            if (!qty && col === 'LG') qty = sizes['L'];
-                            if (!qty && col === 'XXL') qty = sizes['2XL'];
+                            if (!qty && col === 'L') qty = sizes['LG'];
+                            if (!qty && col === '2XL') qty = sizes['XXL'];
                             sizeCells += `<td class="size-cell">${qty ? qty : ''}</td>`;
                         }
                     });
                 } else if (hasExtInThisRow) {
-                    // Extended size row - show qty in XXXL(Other) column
+                    // Extended size row - show qty in 3XL+ (Other) column
                     const extQty = item.quantity;
                     sizeColumns.forEach(col => {
-                        if (col === 'XXXL') {
+                        if (col === '3XL+') {
                             sizeCells += `<td class="size-cell">${extQty}</td>`;
                         } else {
                             sizeCells += `<td class="size-cell"></td>`;
@@ -1491,10 +1490,10 @@ class EmbroideryInvoiceGenerator {
                 } else {
                     // Regular row - show sizes in their columns
                     sizeColumns.forEach(col => {
-                        // Map L -> LG, and 2XL -> XXL (same size)
+                        // Map legacy formats: LG -> L, XXL -> 2XL
                         let qty = sizes[col];
-                        if (!qty && col === 'LG') qty = sizes['L'];
-                        if (!qty && col === 'XXL') qty = sizes['2XL'];
+                        if (!qty && col === 'L') qty = sizes['LG'];
+                        if (!qty && col === '2XL') qty = sizes['XXL'];
                         sizeCells += `<td class="size-cell">${qty ? qty : ''}</td>`;
                     });
                 }

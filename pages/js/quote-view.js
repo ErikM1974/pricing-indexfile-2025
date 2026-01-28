@@ -466,10 +466,10 @@ class QuoteViewPage {
                             <th class="color-col">Color</th>
                             <th class="size-col">S</th>
                             <th class="size-col">M</th>
-                            <th class="size-col">LG</th>
+                            <th class="size-col">L</th>
                             <th class="size-col">XL</th>
-                            <th class="size-col">XXL</th>
-                            <th class="size-col">XXXL</th>
+                            <th class="size-col">2XL</th>
+                            <th class="size-col">3XL</th>
                             <th class="qty-col">Qty</th>
                             <th class="price-col">Unit $</th>
                             <th class="total-col">Total</th>
@@ -1935,21 +1935,35 @@ class QuoteViewPage {
         // Print Details Section (for DTG, DTF, Screen Print quotes)
         const printQuoteTypes = ['Direct-to-Garment', 'Direct-to-Film', 'Screen Print', 'Contract Screen Print'];
         if (printQuoteTypes.includes(quoteType)) {
+            // Parse Notes JSON for detailed config
+            let notes = {};
+            try {
+                notes = this.quoteData?.Notes ? JSON.parse(this.quoteData.Notes) : {};
+            } catch (e) { /* ignore parse errors */ }
+
             // Get location using same logic as web view (Notes JSON or items)
             let printLocation = this.quoteData?.PrintLocation || this.quoteData?.LogoLocation;
-            if (!printLocation && this.quoteData?.Notes) {
-                try {
-                    const notes = JSON.parse(this.quoteData.Notes);
-                    printLocation = notes.locationName || notes.locationNames || null;
-                } catch (e) { /* ignore parse errors */ }
+            if (!printLocation) {
+                printLocation = notes.locationName || notes.locationNames || null;
             }
             if (!printLocation && this.items?.length > 0) {
                 printLocation = this.items[0]?.PrintLocationName;
             }
             printLocation = printLocation || 'Left Chest';
 
+            // Check if this is Screen Print with detailed config
+            const isScreenPrint = quoteType === 'Screen Print' || quoteType === 'Contract Screen Print';
+            const hasFrontLocation = notes.frontLocation;
+            const hasBackLocation = notes.backLocation;
+
+            // Calculate box height based on content
+            let boxHeight = 16;
+            if (isScreenPrint && (hasFrontLocation || hasBackLocation)) {
+                boxHeight = 26;
+                if (notes.isDarkGarment || notes.hasSafetyStripes) boxHeight += 6;
+            }
+
             // Render box with print details
-            const boxHeight = 16;
             pdf.setFillColor(248, 250, 252); // Light blue-gray background
             pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
 
@@ -1960,7 +1974,55 @@ class QuoteViewPage {
 
             pdf.setFontSize(8);
             pdf.setFont('helvetica', 'normal');
-            pdf.text(`Location: ${printLocation}`, margin + 3, yPos + 11);
+
+            if (isScreenPrint && (hasFrontLocation || hasBackLocation)) {
+                // Screen Print with detailed front/back config
+                let detailY = yPos + 11;
+
+                if (hasFrontLocation) {
+                    const frontLabel = this.formatLocationCode(notes.frontLocation);
+                    const frontColors = notes.frontColors || 1;
+                    pdf.text(`Front: ${frontLabel} (${frontColors} color${frontColors !== 1 ? 's' : ''})`, margin + 3, detailY);
+                    detailY += 5;
+                }
+
+                if (hasBackLocation) {
+                    const backLabel = this.formatLocationCode(notes.backLocation);
+                    const backColors = notes.backColors || 1;
+                    pdf.text(`Back: ${backLabel} (${backColors} color${backColors !== 1 ? 's' : ''})`, margin + 3, detailY);
+                    detailY += 5;
+                }
+
+                // Dark garment and safety stripes
+                let extras = [];
+                if (notes.isDarkGarment) extras.push('Dark garment (+underbase)');
+                if (notes.hasSafetyStripes) extras.push('Safety stripes');
+                if (extras.length > 0) {
+                    pdf.setFontSize(7);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(extras.join(' • '), margin + 3, detailY);
+                }
+            } else if (quoteType === 'Direct-to-Film' && notes.selectedLocations?.length > 0) {
+                // DTF with transfer locations
+                const locationLabels = notes.selectedLocations.map(loc => {
+                    const config = {
+                        'left-chest': 'Left Chest (S)',
+                        'right-chest': 'Right Chest (S)',
+                        'center-front': 'Center Front (M)',
+                        'center-back': 'Center Back (M)',
+                        'full-front': 'Full Front (L)',
+                        'full-back': 'Full Back (L)',
+                        'left-sleeve': 'Left Sleeve (S)',
+                        'right-sleeve': 'Right Sleeve (S)',
+                        'back-of-neck': 'Back of Neck (S)'
+                    };
+                    return config[loc] || loc;
+                });
+                pdf.text(`Locations: ${locationLabels.join(', ')}`, margin + 3, yPos + 11);
+            } else {
+                // Basic location display
+                pdf.text(`Location: ${printLocation}`, margin + 3, yPos + 11);
+            }
 
             yPos += boxHeight + 4;
         }
@@ -2270,9 +2332,9 @@ class QuoteViewPage {
         // Part number in style column
         pdf.text(partNum, colX.styleDesc + 2, yPos);
 
-        // Description (truncated)
+        // Description (truncated to 40 chars for readability)
         pdf.setFont('helvetica', 'italic');
-        const truncDesc = description.substring(0, 20);
+        const truncDesc = description.substring(0, 40);
         pdf.text(truncDesc, colX.color + 2, yPos);
 
         // Quantity in XXXL column (Size06 catch-all)

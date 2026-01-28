@@ -22,6 +22,9 @@ class DTFQuoteBuilder {
         this.editingQuoteId = null;
         this.editingRevision = null;
 
+        // Unsaved changes tracking
+        this.hasChanges = false;
+
         // Auto-save & Draft Recovery (2026 consolidation)
         this.persistence = null;
         this.session = null;
@@ -2772,6 +2775,109 @@ class DTFQuoteBuilder {
             document.body.removeChild(textArea);
             this.showToast('Quote copied to clipboard!', 'success');
         });
+    }
+
+    // ============================================
+    // Unsaved Changes Tracking (UX Improvement)
+    // ============================================
+
+    markAsUnsaved() {
+        this.hasChanges = true;
+        const indicator = document.getElementById('unsaved-indicator');
+        if (indicator) {
+            indicator.style.display = 'inline';
+        }
+    }
+
+    markAsSaved() {
+        this.hasChanges = false;
+        const indicator = document.getElementById('unsaved-indicator');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+    }
+
+    hasUnsavedChanges() {
+        return this.hasChanges;
+    }
+
+    // ============================================
+    // New Quote Functionality (UX Improvement)
+    // ============================================
+
+    confirmNewQuote() {
+        if (this.hasUnsavedChanges()) {
+            if (confirm('You have unsaved changes. Start a new quote?')) {
+                this.resetQuote();
+            }
+        } else {
+            this.resetQuote();
+        }
+    }
+
+    resetQuote() {
+        // Clear all product rows and re-add empty state
+        const tbody = document.getElementById('product-tbody');
+        tbody.innerHTML = `
+            <tr id="empty-state-row">
+                <td colspan="12" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                    <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500)</div>
+                </td>
+            </tr>
+        `;
+
+        // Reset state
+        this.products = [];
+        this.productIndex = 0;
+        this.selectedLocations = [];
+        this.ltmDistributed = false;
+        this.editingQuoteId = null;
+        this.editingRevision = null;
+
+        // Reset location checkboxes
+        document.querySelectorAll('.location-checkbox').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Reset customer form fields
+        const customerName = document.getElementById('customer-name');
+        const customerEmail = document.getElementById('customer-email');
+        const companyName = document.getElementById('company-name');
+        const customerPhone = document.getElementById('customer-phone');
+        if (customerName) customerName.value = '';
+        if (customerEmail) customerEmail.value = '';
+        if (companyName) companyName.value = '';
+        if (customerPhone) customerPhone.value = '';
+
+        // Reset additional charges
+        const rushFee = document.getElementById('rush-fee');
+        const discountAmount = document.getElementById('discount-amount');
+        const discountReason = document.getElementById('discount-reason');
+        if (rushFee) rushFee.value = '';
+        if (discountAmount) discountAmount.value = '';
+        if (discountReason) discountReason.value = '';
+
+        // Clear draft storage
+        if (this.persistence) {
+            this.persistence.clearDraft();
+        }
+
+        // Mark as saved (no unsaved changes)
+        this.markAsSaved();
+
+        // Update sidebar
+        this.updateSearchState();
+        this.updateSidebar();
+
+        // Focus search bar for immediate typing
+        const searchInput = document.getElementById('product-search');
+        if (searchInput) {
+            searchInput.focus();
+        }
+
+        this.showToast('Started new quote', 'success');
     }
 }
 
