@@ -259,6 +259,12 @@ body {
     border-color: #e5e7eb;
 }
 
+/* Focus indicator for accessibility (WCAG 2.4.7) */
+.location-checkbox input:focus-visible + .checkbox-label {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
 /* Selected Locations Summary */
 .selected-locations-summary {
     margin-top: 12px;

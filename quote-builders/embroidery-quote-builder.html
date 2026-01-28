@@ -445,7 +445,7 @@
                 <div id="cap-additional-logos-pricing"></div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label" title="Less than minimum: A fee applied to orders under 24 pieces to cover setup costs">Less than minimum <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
+                    <span class="label" title="Less than minimum: A fee applied to orders under 24 pieces to cover setup costs">Less than minimum <i class="fas fa-info-circle" style="font-size: 11px; color: #666; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -4286,6 +4286,16 @@
 
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', function(e) {
+                // Escape = Close popups
+                if (e.key === 'Escape') {
+                    const sizePopup = document.getElementById('extended-size-popup');
+                    if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                        e.preventDefault();
+                        closeExtendedSizePopup();
+                        return;
+                    }
+                }
+
                 // Ctrl+S = Save
                 if (e.ctrlKey && e.key === 's') {
                     e.preventDefault();

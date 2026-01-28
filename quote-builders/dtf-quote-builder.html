@@ -214,7 +214,9 @@
         </div>
 
         <!-- Right: Pricing Sidebar (DTG Style) -->
-        <div class="power-sidebar">
+        <div class="power-sidebar" id="power-sidebar">
+            <!-- Resize handle for dragging sidebar width -->
+            <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
             <!-- Pricing Panel -->
             <div class="pricing-panel">
                 <div class="pricing-title">
@@ -242,7 +244,7 @@
                 </div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
+                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #666; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -335,6 +337,9 @@
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
 
+    <!-- Sidebar Resize (2026 UX improvement) -->
+    <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>
+
     <!-- Invoice Generator (for professional PDF output) -->
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
 
@@ -349,6 +354,31 @@
         // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DTF Quote Builder: Inline init complete');
+
+            // Setup keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Escape = Close popups
+                if (e.key === 'Escape') {
+                    const sizePopup = document.getElementById('extended-size-popup');
+                    if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                        e.preventDefault();
+                        closeExtendedSizePopup();
+                        return;
+                    }
+                }
+
+                // Ctrl+S = Save
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    if (dtfQuoteBuilder) dtfQuoteBuilder.saveQuote();
+                }
+
+                // Ctrl+P = Print
+                if (e.ctrlKey && e.key === 'p') {
+                    e.preventDefault();
+                    if (dtfQuoteBuilder) dtfQuoteBuilder.printQuote();
+                }
+            });
         });
 
         // Extended size popup functions

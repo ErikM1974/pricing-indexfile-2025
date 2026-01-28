@@ -199,6 +199,13 @@ body {
     accent-color: var(--nwca-green);
 }
 
+/* Focus indicator for accessibility (WCAG 2.4.7) */
+.location-radio input[type="radio"]:focus-visible,
+.location-radio input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--nwca-green, #2563eb);
+    outline-offset: 2px;
+}
+
 .location-radio span {
     font-size: 13px;
     color: #333;
@@ -242,6 +249,12 @@ body {
     background: #2563eb;
     border-color: #2563eb;
     color: white;
+}
+
+/* Focus indicator for accessibility (WCAG 2.4.7) */
+.ink-btn input[type="radio"]:focus-visible + span {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
 }
 
 /* Additional Logos Section */

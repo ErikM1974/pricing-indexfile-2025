@@ -77,41 +77,41 @@
                     <span class="logo-section-label"><i class="fas fa-tshirt"></i> Print Configuration</span>
 
                     <!-- Global Options Row -->
-                    <div style="display: flex; gap: 20px; margin-bottom: 16px; padding: 12px; background: #fff8e6; border-radius: 8px; border: 1px solid #ffd666;">
-                        <label class="location-radio" style="display: flex; align-items: center; gap: 8px;">
+                    <div class="options-box-warning">
+                        <label class="location-radio d-flex align-items-center gap-2">
                             <input type="checkbox" id="dark-garment-toggle" onchange="updatePrintConfig()">
-                            <span><strong>Dark Garment</strong> <span style="color: #888; font-size: 11px;">(adds white underbase to all locations)</span></span>
+                            <span><strong>Dark Garment</strong> <span class="hint-text">(adds white underbase to all locations)</span></span>
                         </label>
-                        <label class="location-radio" style="display: flex; align-items: center; gap: 8px;">
+                        <label class="location-radio d-flex align-items-center gap-2">
                             <input type="checkbox" id="safety-stripes-toggle" onchange="updatePrintConfig()">
-                            <span><strong>Safety Stripes</strong> <span style="color: #888; font-size: 11px;">(+$2.00/piece/location)</span></span>
+                            <span><strong>Safety Stripes</strong> <span class="hint-text">(+$2.00/piece/location)</span></span>
                         </label>
                     </div>
 
-                    <div class="print-location-controls" style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+                    <div class="print-location-controls d-flex gap-6 align-items-start flex-wrap">
                         <!-- Front Location with Ink Colors -->
-                        <div class="location-group" style="background: #f8f9fa; padding: 16px; border-radius: 8px; border: 1px solid #dee2e6;">
-                            <div style="font-size: 12px; font-weight: 600; color: #333; margin-bottom: 10px;">
+                        <div class="location-group location-group-card">
+                            <div class="section-label">
                                 <i class="fas fa-check-circle" style="color: #28a745;"></i> FRONT LOCATION
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+                            <div class="d-flex flex-column gap-2 mb-3">
                                 <label class="location-radio">
                                     <input type="radio" name="front-location" value="LC" checked onchange="updatePrintConfig()">
-                                    <span>Left Chest <span style="color: #888; font-size: 11px;">(4" x 4")</span></span>
+                                    <span>Left Chest <span class="hint-text">(4" x 4")</span></span>
                                 </label>
                                 <label class="location-radio">
                                     <input type="radio" name="front-location" value="FF" onchange="updatePrintConfig()">
-                                    <span>Full Front <span style="color: #888; font-size: 11px;">(12" x 16")</span></span>
+                                    <span>Full Front <span class="hint-text">(12" x 16")</span></span>
                                 </label>
                                 <label class="location-radio">
                                     <input type="radio" name="front-location" value="JF" onchange="updatePrintConfig()">
-                                    <span>Jumbo Front <span style="color: #888; font-size: 11px;">(16" x 20")</span></span>
+                                    <span>Jumbo Front <span class="hint-text">(16" x 20")</span></span>
                                 </label>
                             </div>
                             <!-- Ink Colors for Front -->
-                            <div style="border-top: 1px solid #dee2e6; padding-top: 10px;">
-                                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">INK COLORS</div>
-                                <div class="ink-color-selector" style="display: flex; gap: 4px;">
+                            <div class="border-top" style="padding-top: 10px;">
+                                <div class="hint-text mb-2">INK COLORS</div>
+                                <div class="ink-color-selector d-flex gap-1">
                                     <label class="ink-btn"><input type="radio" name="front-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="front-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="front-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
@@ -119,14 +119,14 @@
                                     <label class="ink-btn"><input type="radio" name="front-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
                                     <label class="ink-btn"><input type="radio" name="front-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
                                 </div>
-                                <div id="front-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
+                                <div id="front-setup-display" class="hint-text mt-2">1 screen × $30 = $30.00</div>
                             </div>
                         </div>
 
                         <!-- Back Location with Ink Colors (Optional) -->
-                        <div class="location-group" id="back-location-group" style="background: #f8f9fa; padding: 16px; border-radius: 8px; border: 1px solid #dee2e6;">
-                            <div style="font-size: 12px; font-weight: 600; color: #333; margin-bottom: 10px;">
-                                <i class="fas fa-plus-circle" id="back-icon" style="color: #888;"></i> BACK LOCATION <span style="font-weight: 400; color: #888;">(optional)</span>
+                        <div class="location-group location-group-card" id="back-location-group">
+                            <div class="section-label">
+                                <i class="fas fa-plus-circle" id="back-icon" style="color: #666;"></i> BACK LOCATION <span style="font-weight: 400; color: #666;">(optional)</span>
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
                                 <label class="location-radio">
@@ -135,11 +135,11 @@
                                 </label>
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="FB" onchange="updatePrintConfig()">
-                                    <span>Full Back <span style="color: #888; font-size: 11px;">(12" x 16")</span></span>
+                                    <span>Full Back <span style="color: #666; font-size: 11px;">(12" x 16")</span></span>
                                 </label>
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="JB" onchange="updatePrintConfig()">
-                                    <span>Jumbo Back <span style="color: #888; font-size: 11px;">(16" x 20")</span></span>
+                                    <span>Jumbo Back <span style="color: #666; font-size: 11px;">(16" x 20")</span></span>
                                 </label>
                             </div>
                             <!-- Ink Colors for Back (hidden when None) -->
@@ -162,7 +162,7 @@
                             <div style="font-size: 11px; color: #666; margin-bottom: 4px;">SETUP FEE</div>
                             <div id="total-screens-display" style="font-size: 12px; color: #666; margin-bottom: 4px;">1 screen total</div>
                             <div id="setup-fee-display" style="font-size: 20px; font-weight: 700; color: #2e7d32;">$30.00</div>
-                            <div id="dark-garment-note" style="font-size: 10px; color: #888; margin-top: 4px; display: none;">Includes white underbase</div>
+                            <div id="dark-garment-note" style="font-size: 10px; color: #666; margin-top: 4px; display: none;">Includes white underbase</div>
                         </div>
                     </div>
                 </div>
@@ -254,7 +254,9 @@
         </div>
 
         <!-- Right: Pricing Sidebar -->
-        <div class="power-sidebar">
+        <div class="power-sidebar" id="power-sidebar">
+            <!-- Resize handle for dragging sidebar width -->
+            <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
             <!-- Pricing Panel -->
             <div class="pricing-panel">
                 <div class="pricing-title">
@@ -310,7 +312,7 @@
                 </div>
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
-                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #888; cursor: help;"></i> (&lt; 24 pcs):</span>
+                    <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #666; cursor: help;"></i> (&lt; 24 pcs):</span>
                     <span class="ltm-value-group">
                         <button class="ltm-distribute-btn" id="ltm-distribute-btn"
                                 title="Click to hide/show LTM as separate line">
@@ -328,30 +330,30 @@
             </div>
 
             <!-- Save & Share Section -->
-            <div class="save-quote-panel" style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-                <div class="save-quote-title" style="font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <div class="save-quote-panel bg-light rounded" style="padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <div class="save-quote-title d-flex align-items-center gap-2 mb-3" style="font-size: 14px; font-weight: 600; color: #334155;">
                     <i class="fas fa-share-alt"></i> Save & Share
                 </div>
-                <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="customer-fields d-flex flex-column gap-3">
                     <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
-                        <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        <label class="quote-label">Name *</label>
+                        <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
                     </div>
                     <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Email *</label>
-                        <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        <label class="quote-label">Email *</label>
+                        <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input">
                     </div>
                     <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
-                        <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        <label class="quote-label">Company</label>
+                        <input type="text" id="company-name" placeholder="Company name" class="quote-input">
                     </div>
                     <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
-                        <input type="tel" id="customer-phone" placeholder="(555) 555-5555" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        <label class="quote-label">Phone</label>
+                        <input type="tel" id="customer-phone" placeholder="(555) 555-5555" class="quote-input">
                     </div>
                     <div class="customer-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
-                        <select id="sales-rep" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white; box-sizing: border-box;">
+                        <label class="quote-label">Sales Rep</label>
+                        <select id="sales-rep" class="quote-input" style="background: white;">
                             <option value="sales@nwcustomapparel.com">General Sales</option>
                             <option value="adriyella@nwcustomapparel.com">Adriyella</option>
                             <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
@@ -432,6 +434,9 @@
 
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
+    <!-- Sidebar Resize (2026 UX improvement) -->
+    <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -3889,6 +3894,16 @@
 
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', function(e) {
+                // Escape = Close popups
+                if (e.key === 'Escape') {
+                    const sizePopup = document.getElementById('extended-size-popup');
+                    if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                        e.preventDefault();
+                        closeExtendedSizePopup();
+                        return;
+                    }
+                }
+
                 // Ctrl+S = Save
                 if (e.ctrlKey && e.key === 's') {
                     e.preventDefault();

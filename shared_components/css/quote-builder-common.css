@@ -634,8 +634,92 @@ textarea:disabled {
 .justify-content-center { justify-content: center !important; }
 .justify-content-between { justify-content: space-between !important; }
 .align-items-center { align-items: center !important; }
+.align-items-start { align-items: flex-start !important; }
 .flex-column { flex-direction: column !important; }
 .flex-wrap { flex-wrap: wrap !important; }
+
+/* Gap utilities (2026 addition) */
+.gap-1 { gap: 4px !important; }
+.gap-2 { gap: 8px !important; }
+.gap-3 { gap: 12px !important; }
+.gap-4 { gap: 16px !important; }
+.gap-5 { gap: 20px !important; }
+.gap-6 { gap: 24px !important; }
+
+/* ============================================
+   QUOTE-SPECIFIC COMPONENT CLASSES (2026)
+   ============================================ */
+
+/* Location group card (screen print, DTG) */
+.location-group-card {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+/* Warning/option box (yellow) */
+.options-box-warning {
+    display: flex;
+    gap: 20px;
+    padding: 12px;
+    margin-bottom: 16px;
+    background: #fff8e6;
+    border-radius: 8px;
+    border: 1px solid #ffd666;
+}
+
+/* Success/summary box (green) */
+.summary-box-success {
+    background: #e8f5e9;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #a5d6a7;
+}
+
+/* Section label (small, bold) */
+.section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Hint text (small, muted) */
+.hint-text {
+    font-size: 11px;
+    color: #666;
+}
+
+/* Large amount display (for totals) */
+.amount-display-lg {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+/* Quote input field */
+.quote-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.quote-input:focus {
+    border-color: #4169E1;
+    outline: none;
+}
+
+/* Quote field label */
+.quote-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    display: block;
+}
 
 /* Colors */
 .text-primary { color: #003f7f !important; }
