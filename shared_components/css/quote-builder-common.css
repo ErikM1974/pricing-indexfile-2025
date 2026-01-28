@@ -721,6 +721,192 @@ textarea:disabled {
     display: block;
 }
 
+/* ============================================
+   SIDEBAR SCROLL CONTAINER (2026 Standardization)
+   ============================================ */
+.sidebar-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* ============================================
+   ADDITIONAL CHARGES PANEL (Collapsible)
+   ============================================ */
+.additional-charges-panel {
+    background: #f0fdf4;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #86efac;
+}
+
+.charges-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    color: #166534;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.charges-header:hover {
+    color: #14532d;
+}
+
+.charges-badge {
+    background: #22c55e;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.charges-content {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #86efac;
+}
+
+.charge-field {
+    margin-bottom: 12px;
+}
+
+.charge-field:last-child {
+    margin-bottom: 0;
+}
+
+/* Discount field with pink tint */
+.discount-field {
+    background: #fef2f2;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #fca5a5;
+}
+
+/* Input with $ prefix */
+.input-with-prefix {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-prefix .prefix {
+    position: absolute;
+    left: 10px;
+    color: #666;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.input-with-prefix .quote-input {
+    padding-left: 22px;
+}
+
+/* ============================================
+   TAX SECTION STYLES
+   ============================================ */
+.pricing-totals-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.tax-toggle-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.tax-toggle-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #22c55e;
+}
+
+.grand-total-row {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    margin: 12px -16px -12px -16px;
+    padding: 12px 16px !important;
+    border-top: 2px solid #22c55e;
+    border-radius: 0 0 8px 8px;
+}
+
+.grand-total-row .label {
+    font-weight: 700 !important;
+    font-size: 14px;
+}
+
+.grand-total-row .value {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #166534 !important;
+}
+
+/* ============================================
+   COLLAPSIBLE SECTION STYLES
+   ============================================ */
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.collapsible-header:hover {
+    opacity: 0.8;
+}
+
+.collapsible-chevron {
+    transition: transform 0.2s ease;
+}
+
+.collapsible-chevron.collapsed {
+    transform: rotate(-90deg);
+}
+
+.collapsible-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.collapsible-content.hidden {
+    display: none;
+}
+
+/* ============================================
+   SAVE & SHARE PANEL (Collapsible)
+   ============================================ */
+.save-quote-panel-collapsible {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.save-quote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.save-quote-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* Colors */
 .text-primary { color: #003f7f !important; }
 .text-success { color: #28a745 !important; }

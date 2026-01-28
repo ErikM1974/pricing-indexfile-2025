@@ -217,6 +217,8 @@
         <div class="power-sidebar" id="power-sidebar">
             <!-- Resize handle for dragging sidebar width -->
             <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
+            <!-- Scrollable content container -->
+            <div class="sidebar-scroll-container">
             <!-- Pricing Panel -->
             <div class="pricing-panel">
                 <div class="pricing-title">
@@ -245,47 +247,122 @@
 
                 <div class="pricing-row" id="ltm-row" style="display: none;">
                     <span class="label" title="Low-to-Minimum: A fee applied to orders under 24 pieces to cover setup costs">LTM Fee <i class="fas fa-info-circle" style="font-size: 11px; color: #666; cursor: help;"></i> (&lt; 24 pcs):</span>
-                    <span class="ltm-value-group">
-                        <button class="ltm-distribute-btn" id="ltm-distribute-btn"
-                                title="Click to hide/show LTM as separate line">
-                            <span class="btn-text">Hide LTM</span>
-                        </button>
-                        <span class="value" id="ltm-fee">$50.00</span>
-                    </span>
+                    <span class="value" id="ltm-fee">$50.00</span>
                 </div>
 
-                <div class="pricing-row total">
-                    <span class="label">TOTAL:</span>
-                    <span class="value" id="grand-total">$0.00</span>
+                <!-- Tax Section -->
+                <div class="pricing-totals-section">
+                    <div class="pricing-row">
+                        <span class="label" style="font-weight: 600;">Subtotal:</span>
+                        <span class="value" id="pre-tax-subtotal">$0.00</span>
+                    </div>
+                    <div class="pricing-row" id="tax-toggle-row">
+                        <label class="d-flex align-items-center gap-2">
+                            <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
+                            <span>Include WA Sales Tax (10.1%)</span>
+                        </label>
+                    </div>
+                    <div class="pricing-row" id="tax-row">
+                        <span class="label text-muted">WA Sales Tax:</span>
+                        <span class="value" id="tax-amount">$0.00</span>
+                    </div>
+                    <div class="pricing-row grand-total-row">
+                        <span class="label">TOTAL:</span>
+                        <span class="value" id="grand-total-with-tax">$0.00</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Save & Share Section -->
-            <div class="save-quote-panel">
-                <div class="save-quote-title">
-                    <i class="fas fa-share-alt"></i> Save & Share
+            <!-- Additional Charges Panel -->
+            <div class="additional-charges-panel">
+                <div class="charges-header" onclick="toggleAdditionalCharges()">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Additional Charges</span>
+                        <span id="charges-badge" class="charges-badge hidden">$0.00</span>
+                    </div>
+                    <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
                 </div>
-                <div class="save-quote-form">
-                    <input type="text" id="customer-name" class="quote-input" placeholder="Customer Name *">
-                    <input type="email" id="customer-email" class="quote-input" placeholder="Email *">
-                    <input type="text" id="company-name" class="quote-input" placeholder="Company (optional)">
-                    <input type="tel" id="customer-phone" class="quote-input" placeholder="Phone (optional)">
-                    <select id="sales-rep" class="quote-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white;">
-                        <option value="sales@nwcustomapparel.com">General Sales</option>
-                        <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                        <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                        <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                        <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                        <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                        <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                        <option value="art@nwcustomapparel.com">Steve Deland</option>
-                        <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                    </select>
+                <div id="charges-content" class="charges-content hidden">
+                    <div class="charge-field">
+                        <label class="quote-label">Rush Fee</label>
+                        <div class="input-with-prefix">
+                            <span class="prefix">$</span>
+                            <input type="number" id="rush-fee" class="quote-input"
+                                   min="0" step="0.01" placeholder="0.00"
+                                   onchange="updateAdditionalCharges()">
+                        </div>
+                    </div>
+                    <div class="charge-field discount-field">
+                        <label class="quote-label">Discount</label>
+                        <div class="d-flex gap-2">
+                            <div class="input-with-prefix flex-1">
+                                <span class="prefix">$</span>
+                                <input type="number" id="discount-amount" class="quote-input"
+                                       min="0" step="0.01" placeholder="0.00"
+                                       onchange="updateAdditionalCharges()">
+                            </div>
+                            <select id="discount-type" class="quote-input" style="width: auto;"
+                                    onchange="updateDiscountType()">
+                                <option value="fixed">$</option>
+                                <option value="percent">%</option>
+                            </select>
+                        </div>
+                        <input type="text" id="discount-reason" class="quote-input mt-2"
+                               placeholder="Reason (optional)">
+                    </div>
                 </div>
-                <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()">
-                    <i class="fas fa-link"></i> Save & Get Shareable Link
-                </button>
             </div>
+
+            <!-- Save & Share Section (Collapsible) -->
+            <div class="save-quote-panel-collapsible">
+                <div class="save-quote-header" onclick="toggleSaveShare()">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Save & Share</span>
+                    </div>
+                    <i id="save-share-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
+                </div>
+                <div id="save-share-content" class="save-share-content">
+                    <div class="customer-fields d-flex flex-column gap-3">
+                        <div class="customer-field">
+                            <label class="quote-label">Name *</label>
+                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">Email *</label>
+                            <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">Company</label>
+                            <input type="text" id="company-name" placeholder="Company name" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">Phone</label>
+                            <input type="tel" id="customer-phone" placeholder="(555) 555-5555" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">Sales Rep</label>
+                            <select id="sales-rep" class="quote-input" style="background: white;">
+                                <option value="sales@nwcustomapparel.com">General Sales</option>
+                                <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                                <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                                <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                <option value="art@nwcustomapparel.com">Steve Deland</option>
+                                <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <i class="fas fa-link"></i> Save & Get Shareable Link
+                    </button>
+                </div>
+            </div>
+
+            </div><!-- End sidebar-scroll-container -->
 
             <!-- Action Buttons (DTG Style) -->
             <div class="action-panel">
@@ -403,6 +480,106 @@
         function focusProductSearch() {
             if (dtfQuoteBuilder) {
                 dtfQuoteBuilder.focusProductSearch();
+            }
+        }
+
+        // ============================================
+        // TAX CALCULATION & ADDITIONAL CHARGES
+        // ============================================
+
+        function updateTaxCalculation() {
+            const includeTax = document.getElementById('include-tax')?.checked;
+            const subtotalEl = document.getElementById('pre-tax-subtotal');
+            const taxRowEl = document.getElementById('tax-row');
+            const taxAmountEl = document.getElementById('tax-amount');
+            const grandTotalEl = document.getElementById('grand-total-with-tax');
+
+            // Get base subtotal from pricing
+            let subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
+
+            // Add rush fee if present
+            const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+            subtotal += rushFee;
+
+            // Subtract discount if present
+            const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+            const discountType = document.getElementById('discount-type')?.value || 'fixed';
+            let discount = 0;
+            if (discountType === 'percent') {
+                discount = subtotal * (discountAmount / 100);
+            } else {
+                discount = discountAmount;
+            }
+            subtotal = Math.max(0, subtotal - discount);
+
+            // Update the pre-tax subtotal display to show adjusted amount
+            if (subtotalEl) {
+                subtotalEl.textContent = '$' + subtotal.toFixed(2);
+            }
+
+            const taxRate = 0.101; // 10.1% WA sales tax
+
+            if (includeTax) {
+                const tax = subtotal * taxRate;
+                const total = subtotal + tax;
+                taxRowEl.style.display = 'flex';
+                taxAmountEl.textContent = '$' + tax.toFixed(2);
+                grandTotalEl.textContent = '$' + total.toFixed(2);
+            } else {
+                taxRowEl.style.display = 'none';
+                grandTotalEl.textContent = '$' + subtotal.toFixed(2);
+            }
+        }
+
+        function toggleAdditionalCharges() {
+            const content = document.getElementById('charges-content');
+            const chevron = document.getElementById('charges-chevron');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function updateAdditionalCharges() {
+            const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+            const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+            const badge = document.getElementById('charges-badge');
+
+            const netCharges = rushFee - discountAmount;
+            if (netCharges !== 0) {
+                badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            // Recalculate tax with new charges
+            updateTaxCalculation();
+        }
+
+        function updateDiscountType() {
+            const prefix = document.querySelector('#discount-amount')?.previousElementSibling;
+            const discountType = document.getElementById('discount-type')?.value;
+            if (prefix) {
+                prefix.textContent = discountType === 'percent' ? '%' : '$';
+            }
+            updateAdditionalCharges();
+        }
+
+        function toggleSaveShare() {
+            const content = document.getElementById('save-share-content');
+            const chevron = document.getElementById('save-share-chevron');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
             }
         }
 

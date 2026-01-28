@@ -16,7 +16,6 @@ class DTFQuoteBuilder {
         this.products = [];
         this.pricingData = null;
         this.productIndex = 0;
-        this.ltmDistributed = false; // When true, LTM is distributed into unit prices
 
         // Edit mode state
         this.editingQuoteId = null;
@@ -118,7 +117,6 @@ class DTFQuoteBuilder {
             customerName: document.getElementById('customer-name')?.value || '',
             customerEmail: document.getElementById('customer-email')?.value || '',
             companyName: document.getElementById('company-name')?.value || '',
-            ltmDistributed: this.ltmDistributed,
             productIndex: this.productIndex
         };
     }
@@ -178,13 +176,6 @@ class DTFQuoteBuilder {
             this.updatePricing();
         }
 
-        // Restore LTM toggle state
-        if (draft.ltmDistributed !== undefined) {
-            this.ltmDistributed = draft.ltmDistributed;
-            const ltmToggle = document.getElementById('ltm-distribute-toggle');
-            if (ltmToggle) ltmToggle.checked = draft.ltmDistributed;
-        }
-
         console.log('[DTFQuoteBuilder] Draft restored successfully');
     }
 
@@ -211,7 +202,6 @@ class DTFQuoteBuilder {
         this.setupLocationListeners();
         this.setupSearchListeners();
         this.setupGlobalListeners();
-        this.setupLTMToggle();
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = this.checkForEditMode();
@@ -1448,37 +1438,15 @@ class DTFQuoteBuilder {
             tier
         };
 
-        // LTM row with distribution toggle (matches DTG pattern)
+        // LTM row - always shown as separate line item
         const ltmRow = document.getElementById('ltm-row');
         const ltmFeeEl = document.getElementById('ltm-fee');
-        const ltmBtn = document.getElementById('ltm-distribute-btn');
 
         if (totalLtmFee > 0 && totalQty > 0) {
             ltmRow.style.display = 'flex';
-
-            if (this.ltmDistributed) {
-                // Distributed state - LTM built into unit prices
-                ltmFeeEl.textContent = `(+$${ltmPerUnit.toFixed(2)}/ea)`;
-                ltmFeeEl.classList.add('distributed');
-                if (ltmBtn) {
-                    ltmBtn.classList.add('active');
-                    ltmBtn.querySelector('.btn-text').textContent = 'Show LTM';
-                }
-            } else {
-                // Standard state - LTM shown as flat fee
-                ltmFeeEl.textContent = `$${totalLtmFee.toFixed(2)}`;
-                ltmFeeEl.classList.remove('distributed');
-                if (ltmBtn) {
-                    ltmBtn.classList.remove('active');
-                    ltmBtn.querySelector('.btn-text').textContent = 'Hide LTM';
-                }
-            }
+            ltmFeeEl.textContent = `$${totalLtmFee.toFixed(2)}`;
         } else {
             ltmRow.style.display = 'none';
-            // Reset distributed state when LTM no longer applies
-            if (this.ltmDistributed) {
-                this.ltmDistributed = false;
-            }
         }
 
         // Calculate subtotal and grand total
@@ -1513,8 +1481,8 @@ class DTFQuoteBuilder {
                     // Track base unit price (S/M/LG size - no upcharge) for display
                     if (baseUnitPrice === 0 && ['S', 'M', 'L'].includes(size)) {
                         baseUnitPrice = roundedPrice;
-                        // Display price: include LTM if distributed, exclude if shown separately
-                        if (this.ltmDistributed || ltmPerUnit === 0) {
+                        // Display price without LTM (LTM shown as separate line item)
+                        if (ltmPerUnit === 0) {
                             baseDisplayPrice = roundedPrice;
                         } else {
                             const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
@@ -1529,8 +1497,8 @@ class DTFQuoteBuilder {
                 const garmentCost = product.baseCost / marginDenom;
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                 baseUnitPrice = this.pricingCalculator.applyRounding(unitPrice);
-                // Display price based on distribution state
-                if (this.ltmDistributed || ltmPerUnit === 0) {
+                // Display price without LTM (LTM shown as separate line item)
+                if (ltmPerUnit === 0) {
                     baseDisplayPrice = baseUnitPrice;
                 } else {
                     const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
@@ -1575,9 +1543,9 @@ class DTFQuoteBuilder {
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                 const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
 
-                // Calculate display price (with or without LTM based on distribution state)
+                // Calculate display price without LTM (LTM shown as separate line item)
                 let displayPrice;
-                if (this.ltmDistributed || ltmPerUnit === 0) {
+                if (ltmPerUnit === 0) {
                     displayPrice = roundedPrice;
                 } else {
                     const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
@@ -1602,7 +1570,17 @@ class DTFQuoteBuilder {
 
         // Update subtotal and grand total
         document.getElementById('subtotal').textContent = `$${grandTotal.toFixed(2)}`;
-        document.getElementById('grand-total').textContent = `$${grandTotal.toFixed(2)}`;
+
+        // Update pre-tax subtotal for tax calculation
+        const preTaxSubtotal = document.getElementById('pre-tax-subtotal');
+        if (preTaxSubtotal) {
+            preTaxSubtotal.textContent = `$${grandTotal.toFixed(2)}`;
+        }
+
+        // Update tax calculation if the function exists
+        if (typeof updateTaxCalculation === 'function') {
+            updateTaxCalculation();
+        }
 
         // Enable/disable continue button
         const continueBtn = document.getElementById('continue-btn');
@@ -2419,7 +2397,7 @@ class DTFQuoteBuilder {
             isDTF: true,
             selectedLocations: this.selectedLocations,
             ltmFee: this.currentPricingData?.totalLtmFee || 0,
-            ltmDistributed: this.ltmDistributed
+            ltmDistributed: false  // LTM always shown as separate line item
         };
     }
 
@@ -2469,12 +2447,8 @@ class DTFQuoteBuilder {
 
             // Upcharge is a selling price add-on, add AFTER margin calculation
             const garmentCost = baseCost / marginDenom + upcharge;
-            let unitPrice = garmentCost + transferCost + laborCost + freightCost;
-
-            // Add LTM if distributed
-            if (this.ltmDistributed && this.currentPricingData.ltmPerUnit) {
-                unitPrice += this.currentPricingData.ltmPerUnit;
-            }
+            const unitPrice = garmentCost + transferCost + laborCost + freightCost;
+            // Note: LTM is always shown as separate line item, not added to unit price
 
             // Apply rounding
             return this.pricingCalculator?.applyRounding(unitPrice) || Math.ceil(unitPrice * 2) / 2;
@@ -2562,28 +2536,6 @@ class DTFQuoteBuilder {
         } else if (searchInput && searchInput.disabled) {
             this.showToast('Select a location first', 'warning');
         }
-    }
-
-    /**
-     * Setup LTM distribution toggle (matches DTG pattern)
-     * When distributed, $50 LTM is built into unit prices instead of shown as separate line
-     */
-    setupLTMToggle() {
-        const btn = document.getElementById('ltm-distribute-btn');
-        if (!btn) return;
-
-        btn.addEventListener('click', () => {
-            this.ltmDistributed = !this.ltmDistributed;
-
-            if (this.ltmDistributed) {
-                this.showToast('LTM fee distributed into unit prices', 'success');
-            } else {
-                this.showToast('LTM fee shown as separate line', 'info');
-            }
-
-            // Re-render pricing with new distribution state
-            this.updatePricing();
-        });
     }
 
     /**
@@ -2832,7 +2784,6 @@ class DTFQuoteBuilder {
         this.products = [];
         this.productIndex = 0;
         this.selectedLocations = [];
-        this.ltmDistributed = false;
         this.editingQuoteId = null;
         this.editingRevision = null;
 
