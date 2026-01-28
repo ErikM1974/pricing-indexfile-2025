@@ -7,6 +7,7 @@ class ScreenPrintQuoteService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.quotePrefix = 'SP';
+        this.taxRate = 0.101; // 10.1% WA sales tax
         console.log('[ScreenPrintQuoteService] Initialized');
     }
 
@@ -71,7 +72,10 @@ class ScreenPrintQuoteService {
             // Use LTM fee from quoteData (already calculated correctly by quote builder)
             const ltmFeeTotal = quoteData.ltmFee || 0;
             const setupFees = this.calculateSetupFees(quoteData);
-            const totalAmount = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
+            const preTexTotal = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
+            // Calculate tax
+            const salesTax = parseFloat((preTexTotal * this.taxRate).toFixed(2));
+            const totalAmount = parseFloat((preTexTotal + salesTax).toFixed(2));
             
             // Prepare print setup details for Notes field
             // Include full location details (frontLocation, backLocation, colors) for quote-view.js display
@@ -98,7 +102,8 @@ class ScreenPrintQuoteService {
                 TotalQuantity: parseInt(quoteData.totalQuantity),
                 SubtotalAmount: parseFloat(subtotal.toFixed(2)),
                 LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),
-                TotalAmount: parseFloat(totalAmount.toFixed(2)),
+                SalesTaxAmount: salesTax,
+                TotalAmount: totalAmount,
                 Status: 'Open',
                 ExpiresAt: expiresAt,
                 Notes: JSON.stringify(printSetup)

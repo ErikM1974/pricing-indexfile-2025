@@ -8,12 +8,13 @@ class DTGQuoteService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
         this.quotePrefix = 'DTG';
-        
+        this.taxRate = 0.101; // 10.1% WA sales tax
+
         // Initialize EmailJS (will be configured when template is created)
         if (typeof emailjs !== 'undefined') {
             emailjs.init('4qSbDO-SQs19TbP80');
         }
-        
+
         console.log('[DTGQuoteService] Service initialized');
     }
     
@@ -83,6 +84,11 @@ class DTGQuoteService {
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + 30);
             
+            // Calculate tax
+            const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
+            const salesTax = parseFloat((subtotal * this.taxRate).toFixed(2));
+            const totalWithTax = parseFloat((quoteData.total + salesTax).toFixed(2));
+
             // Prepare session data
             const sessionData = {
                 QuoteID: quoteID,
@@ -92,9 +98,10 @@ class DTGQuoteService {
                 CompanyName: quoteData.companyName || '',
                 Phone: quoteData.customerPhone || '',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: parseFloat(quoteData.subtotal.toFixed(2)),
+                SubtotalAmount: subtotal,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: parseFloat(quoteData.total.toFixed(2)),
+                SalesTaxAmount: salesTax,
+                TotalAmount: totalWithTax,
                 Status: 'Open',
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({

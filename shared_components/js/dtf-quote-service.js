@@ -15,6 +15,7 @@ class DTFQuoteService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
         this.quotePrefix = 'DTF';
+        this.taxRate = 0.101; // 10.1% WA sales tax
 
         // Initialize EmailJS
         if (typeof emailjs !== 'undefined') {
@@ -127,6 +128,11 @@ class DTFQuoteService {
             const locationCodes = this.formatLocationCodes(quoteData.selectedLocations || []);
             const locationNames = this.formatLocationNames(quoteData.selectedLocations || []);
 
+            // Calculate tax
+            const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
+            const salesTax = parseFloat((quoteData.total * this.taxRate).toFixed(2));
+            const totalWithTax = parseFloat((quoteData.total + salesTax).toFixed(2));
+
             // Prepare session data
             const sessionData = {
                 QuoteID: quoteID,
@@ -136,9 +142,10 @@ class DTFQuoteService {
                 CompanyName: quoteData.companyName || '',
                 Phone: quoteData.customerPhone || '',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: parseFloat(quoteData.subtotal.toFixed(2)),
+                SubtotalAmount: subtotal,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: parseFloat(quoteData.total.toFixed(2)),
+                SalesTaxAmount: salesTax,
+                TotalAmount: totalWithTax,
                 Status: 'Open',
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
@@ -574,6 +581,11 @@ class DTFQuoteService {
             const locationCodes = this.formatLocationCodes(quoteData.selectedLocations || []);
             const locationNames = this.formatLocationNames(quoteData.selectedLocations || []);
 
+            // Calculate tax
+            const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
+            const salesTax = parseFloat((quoteData.total * this.taxRate).toFixed(2));
+            const totalWithTax = parseFloat((quoteData.total + salesTax).toFixed(2));
+
             // Prepare updated session data
             const sessionData = {
                 CustomerEmail: quoteData.customerEmail,
@@ -582,9 +594,10 @@ class DTFQuoteService {
                 Phone: quoteData.customerPhone || '',
                 SalesRepEmail: quoteData.salesRep || 'sales@nwcustomapparel.com',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: parseFloat(quoteData.subtotal.toFixed(2)),
+                SubtotalAmount: subtotal,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: parseFloat(quoteData.total.toFixed(2)),
+                SalesTaxAmount: salesTax,
+                TotalAmount: totalWithTax,
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
                     locations: quoteData.selectedLocations,
