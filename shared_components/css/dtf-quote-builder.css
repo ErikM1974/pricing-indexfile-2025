@@ -1756,20 +1756,20 @@ body {
 }
 
 .ltm-distribute-btn:hover {
-    border-color: var(--nwca-green);
-    color: var(--nwca-green);
+    border-color: var(--dtf-primary);
+    color: var(--dtf-primary);
     background: #f0fdf4;
 }
 
 .ltm-distribute-btn.active {
-    background: var(--nwca-green);
-    border-color: var(--nwca-green);
+    background: var(--dtf-primary);
+    border-color: var(--dtf-primary);
     color: white;
 }
 
 /* Distributed value style - shows per-unit amount */
 #ltm-fee.distributed {
-    color: var(--nwca-green);
+    color: var(--dtf-primary);
     font-style: italic;
     font-size: 12px;
 }
