@@ -1570,3 +1570,178 @@ input[type="radio"] {
     min-height: 18px;
     accent-color: var(--builder-primary, #4cb354);
 }
+
+/* ============================================
+   PRODUCT THUMBNAIL IN TABLE
+   Shows small product image on line items
+   Click to open modal with larger view
+   Added 2026-01-29
+   ============================================ */
+
+.thumbnail-col {
+    width: 60px;
+    text-align: center;
+    padding: 4px !important;
+}
+
+.product-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: contain;
+    background: #f8f9fa;
+    border: 1px solid var(--builder-border, #e2e8f0);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-thumbnail:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-thumbnail:focus {
+    outline: 2px solid var(--builder-primary, #4cb354);
+    outline-offset: 2px;
+}
+
+/* Placeholder for missing images */
+.product-thumbnail.no-image {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-thumbnail.no-image::after {
+    content: 'No Image';
+    font-size: 8px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ============================================
+   PRODUCT IMAGE MODAL
+   Larger view with product details
+   ============================================ */
+
+.product-image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-modal, 1000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image-modal.hidden {
+    display: none;
+}
+
+.product-image-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+.product-image-modal-content {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: productModalSlideIn 0.2s ease;
+}
+
+@keyframes productModalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.product-image-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.product-image-modal-close:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.product-image-modal-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    background: #f8f9fa;
+}
+
+.product-image-modal-details {
+    text-align: center;
+}
+
+.product-image-modal-details h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.product-image-modal-details p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.product-image-modal-details p span {
+    color: #334155;
+    font-weight: 500;
+}
+
+/* Mobile responsive for thumbnail modal */
+@media (max-width: 768px) {
+    .thumbnail-col {
+        width: 50px;
+    }
+
+    .product-thumbnail {
+        width: 40px;
+        height: 40px;
+    }
+
+    .product-image-modal-content {
+        max-width: 95%;
+        margin: 10px;
+        padding: 16px;
+    }
+
+    .product-image-modal-image {
+        max-height: 250px;
+    }
+}
