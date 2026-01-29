@@ -2544,9 +2544,9 @@ class DTFQuoteBuilder {
         // First try: Read displayed price from parent row DOM
         const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
         if (row) {
-            // Fixed: Use correct CSS classes (.cell-price, .cell-qty) to match HTML structure
-            const priceSpan = row.querySelector('.cell-price');
-            const qtySpan = row.querySelector('.cell-qty');
+            // Read from DOM: .row-price and .row-qty spans (see HTML template ~line 967-968)
+            const priceSpan = row.querySelector('.row-price');
+            const qtySpan = row.querySelector('.row-qty');
             if (priceSpan && qtySpan) {
                 // The price cell shows UNIT price (not total), so no need to divide by qty
                 const displayedUnitPrice = parseFloat(priceSpan.textContent.replace('$', '')) || 0;
