@@ -7,6 +7,7 @@
 /* ============================================
    CSS VARIABLES - STANDARDIZED
    Added 2026-01-27 for quote builder consistency
+   Updated 2026-01-29 for cross-builder standardization
    ============================================ */
 :root {
     /* Z-Index Hierarchy (standardized across all builders) */
@@ -21,7 +22,41 @@
     --z-toast: 2000;
     --z-loading: 3000;
 
-    /* Common Colors (neutrals - same across all builders) */
+    /* ============================================
+       BRAND COLORS
+       ============================================ */
+    /* Standard Green (all quote builders) */
+    --builder-primary: #4cb354;
+    --builder-primary-dark: #3d9244;
+    --builder-primary-light: #6fcf7b;
+
+    /* NWCA Blue (headers) */
+    --builder-header-bg: #003f7f;
+
+    /* ============================================
+       SEMANTIC COLORS
+       ============================================ */
+    --builder-error: #dc2626;
+    --builder-success: #059669;
+    --builder-warning: #d97706;
+    --builder-info: #2563eb;
+
+    /* ============================================
+       TEXT COLORS
+       ============================================ */
+    --builder-text-dark: #1f2937;
+    --builder-text-muted: #6b7280;
+    --builder-text-light: #9ca3af;
+
+    /* ============================================
+       BORDER COLORS
+       ============================================ */
+    --builder-border: #e5e7eb;
+    --builder-border-dark: #d1d5db;
+
+    /* ============================================
+       LEGACY NEUTRAL COLORS (for backwards compatibility)
+       ============================================ */
     --color-bg-light: #f8f9fa;
     --color-bg-lighter: #f0f7ff;
     --color-text-muted: #666;
@@ -35,11 +70,6 @@
     --color-header-qty: #1a5276;
     --color-header-price: #1e8449;
     --color-header-actions: #7f8c8d;
-
-    /* Standard Green (all quote builders) */
-    --builder-primary: #4cb354;
-    --builder-primary-dark: #3d9244;
-    --builder-primary-light: #6fcf7b;
 }
 
 /* ============================================

@@ -475,7 +475,7 @@
     <div id="extended-size-popup" class="size-popup hidden">
         <div class="size-popup-header">
             <h4><i class="fas fa-ruler"></i> Extended Sizes</h4>
-            <button class="close-popup" onclick="closeExtendedSizePopup()">&times;</button>
+            <button class="close-popup" onclick="closeExtendedSizePopup()" aria-label="Close extended sizes popup">&times;</button>
         </div>
         <div class="size-popup-body" id="size-popup-body">
             <!-- Dynamic content will be inserted here -->
@@ -914,17 +914,17 @@
                         <div class="color-picker-dropdown hidden" id="color-dropdown-${rowId}"></div>
                     </div>
                 </td>
-                <td><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
+                <td><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size Small"></td>
+                <td><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size Medium"></td>
+                <td><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size Large"></td>
+                <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size Extra Large"></td>
+                <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size 2XL"></td>
+                <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)" aria-label="Open extended sizes picker for 3XL and larger"></td>
                 <td class="cell-qty" id="row-qty-${rowId}">0</td>
                 <td class="cell-price" id="row-price-${rowId}">-</td>
                 <td class="cell-total" id="row-total-${rowId}">-</td>
                 <td class="cell-actions">
-                    <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
+                    <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row" aria-label="Delete product row">
                         <i class="fas fa-times"></i>
                     </button>
                 </td>
@@ -1340,7 +1340,7 @@
                 <td class="cell-price" id="row-price-${childRowId}">-</td>
                 <td class="cell-total" id="row-total-${childRowId}">-</td>
                 <td class="cell-actions">
-                    <button class="btn-delete-row" onclick="removeChildRow(${parentRowId}, '${size}')" title="Remove ${displaySize}">
+                    <button class="btn-delete-row" onclick="removeChildRow(${parentRowId}, '${size}')" title="Remove ${displaySize}" aria-label="Remove extended size ${displaySize}">
                         <i class="fas fa-times"></i>
                     </button>
                 </td>
@@ -1716,7 +1716,7 @@
                 <button class="btn-view-quote" onclick="window.open(document.getElementById('shareable-url').value, '_blank')">
                     <i class="fas fa-external-link-alt"></i> View Quote
                 </button>
-                <button class="btn-close-modal" onclick="closeSaveModal()">
+                <button class="btn-close-modal" onclick="closeSaveModal()" aria-label="Close save confirmation">
                     Close
                 </button>
             </div>

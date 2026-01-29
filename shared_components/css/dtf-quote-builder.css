@@ -7,23 +7,30 @@
 
 /* =============================================
    CSS VARIABLES
+   Uses unified --builder-* variables from quote-builder-common.css
+   Updated 2026-01-29 for cross-builder standardization
    ============================================= */
 :root {
-    --dtf-primary: #4cb354;
-    --dtf-primary-dark: #3d9244;
-    --dtf-primary-light: #6fcf7b;
+    /* DTF-specific aliases pointing to standardized variables */
+    --dtf-primary: var(--builder-primary, #4cb354);
+    --dtf-primary-dark: var(--builder-primary-dark, #3d9244);
+    --dtf-primary-light: var(--builder-primary-light, #6fcf7b);
     --dtf-primary-50: #e8f5e9;
     --dtf-primary-100: #c8e6c9;
-    --dtf-header-bg: #003f7f;  /* Standardized to NWCA blue (matches DTG, Screen Print, Embroidery) */
-    --border-color: #dee2e6;
+    --dtf-header-bg: var(--builder-header-bg, #003f7f);
+
+    /* Semantic colors (from quote-builder-common.css) */
+    --dtf-error: var(--builder-error, #dc2626);
+    --dtf-success: var(--builder-success, #059669);
+    --dtf-warning: var(--builder-warning, #d97706);
+    --dtf-info: var(--builder-info, #2563eb);
+
+    /* Legacy variables for backwards compatibility */
+    --border-color: var(--builder-border, #dee2e6);
     --bg-light: #f8f9fa;
     --bg-sidebar: #f1f3f5;
-    --text-dark: #1f2937;
-    --text-muted: #6b7280;
-
-    /* Shared modal theming (for quote-share-modal.css) */
-    --builder-primary: var(--dtf-primary);
-    --builder-primary-dark: var(--dtf-primary-dark);
+    --text-dark: var(--builder-text-dark, #1f2937);
+    --text-muted: var(--builder-text-muted, #6b7280);
 }
 
 /* =============================================
@@ -77,7 +84,7 @@ body {
    ERROR BANNER
    ============================================= */
 .error-banner {
-    background: #dc2626;
+    background: var(--dtf-error);
     color: white;
     padding: 12px 20px;
     text-align: center;
@@ -448,17 +455,6 @@ body {
 
 .product-table th.style-col {
     width: 90px;
-}
-
-/* ShopWorks SKU pattern display */
-.sku-pattern {
-    font-size: 10px;
-    color: #9ca3af;
-    margin-top: 2px;
-}
-
-.sku-pattern small {
-    font-style: italic;
 }
 
 .product-table th.desc-col {
@@ -992,50 +988,6 @@ body {
 }
 
 /* NOTE: .btn-clear-all moved to CLEAR ALL PRODUCTS BUTTON section below (line ~1578) */
-
-/* =============================================
-   ACTION PANEL (DTG-style buttons)
-   ============================================= */
-.action-panel {
-    padding: 15px 20px;
-    background: #2c3e50;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.btn-action {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-}
-
-.btn-primary-action {
-    background: #4cb354;
-    color: white;
-}
-
-.btn-primary-action:hover {
-    background: #218838;
-}
-
-.btn-secondary-action {
-    background: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.btn-secondary-action:hover {
-    background: rgba(255,255,255,0.2);
-}
 
 /* =============================================
    EXTENDED SIZES PICKER (XXXL Other Column)
@@ -1627,7 +1579,7 @@ body {
 }
 
 .dtf-toast-success {
-    background: #059669;
+    background: var(--dtf-success);
 }
 
 .dtf-toast-success i {
@@ -1635,7 +1587,7 @@ body {
 }
 
 .dtf-toast-error {
-    background: #dc2626;
+    background: var(--dtf-error);
 }
 
 .dtf-toast-error i {
@@ -1643,7 +1595,7 @@ body {
 }
 
 .dtf-toast-warning {
-    background: #d97706;
+    background: var(--dtf-warning);
 }
 
 .dtf-toast-warning i {
@@ -1651,7 +1603,7 @@ body {
 }
 
 .dtf-toast-info {
-    background: #2563eb;
+    background: var(--dtf-info);
 }
 
 .dtf-toast-info i {
