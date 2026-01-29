@@ -1359,3 +1359,214 @@ textarea:disabled {
 .fee-row .cell-total {
     font-size: 15px;
 }
+
+/* ============================================
+   UX OPTIMIZATION 2026 - Data Entry Improvements
+   Added 2026-01-29 for consistent, efficient data entry
+   ============================================ */
+
+/* ============================================
+   PHASE 1: INPUT FIELD IMPROVEMENTS
+   44px minimum touch target for accessibility
+   ============================================ */
+
+/* Standardized input fields with proper touch targets */
+.builder-input,
+input[type="text"]:not(.size-input):not(.desc-input),
+input[type="number"]:not(.size-input),
+input[type="search"] {
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--builder-border, #e5e7eb);
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+/* Clear focus state - green glow */
+.builder-input:focus,
+input[type="text"]:not(.size-input):not(.desc-input):focus,
+input[type="number"]:not(.size-input):focus,
+input[type="search"]:focus {
+    outline: none;
+    border-color: var(--builder-primary, #4cb354);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+}
+
+/* Hover state for discoverability */
+.builder-input:hover:not(:focus),
+input[type="text"]:not(.size-input):not(.desc-input):hover:not(:focus),
+input[type="number"]:not(.size-input):hover:not(:focus),
+input[type="search"]:hover:not(:focus) {
+    border-color: var(--builder-border-dark, #d1d5db);
+}
+
+/* ============================================
+   PHASE 3: FOCUS NAVIGATION
+   Consistent focus indicators for keyboard users
+   ============================================ */
+
+/* Focus visible for keyboard users only */
+*:focus-visible {
+    outline: 2px solid var(--builder-primary, #4cb354) !important;
+    outline-offset: 2px !important;
+}
+
+/* Remove outline for mouse users */
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Tab order visual indicator */
+.tab-active,
+tr:focus-within {
+    background-color: rgba(76, 179, 84, 0.03);
+}
+
+/* ============================================
+   PHASE 4: STICKY SIDEBAR
+   Keep summary visible while scrolling
+   ============================================ */
+
+/* Sticky summary sidebar */
+.quote-summary,
+.pricing-summary,
+#quote-summary,
+.sidebar-content {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+/* ============================================
+   PHASE 5: VISUAL CONSISTENCY
+   Standardized headers and section labels
+   ============================================ */
+
+/* Price column headers - consistent green */
+.price-header,
+th.price,
+th[class*="price"] {
+    background-color: var(--builder-primary, #4cb354) !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 10px 8px;
+}
+
+/* Section headers - consistent styling */
+.section-header,
+.config-header,
+.panel-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--builder-text-dark, #1f2937);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--builder-border, #e5e7eb);
+}
+
+/* ============================================
+   PHASE 6: BUTTON CONSISTENCY
+   44px touch targets, consistent styling
+   ============================================ */
+
+/* Primary action buttons */
+.btn-primary,
+.save-btn,
+.calculate-btn,
+button[type="submit"] {
+    min-height: 44px;
+    min-width: 120px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    background-color: var(--builder-primary, #4cb354);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover,
+.save-btn:hover,
+.calculate-btn:hover,
+button[type="submit"]:hover {
+    background-color: var(--builder-primary-dark, #3d9244);
+}
+
+.btn-primary:active,
+.save-btn:active,
+.calculate-btn:active,
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* Secondary/outline buttons */
+.btn-secondary,
+.btn-outline {
+    min-height: 44px;
+    padding: 12px 24px;
+    background: white;
+    border: 1px solid var(--builder-border-dark, #d1d5db);
+    border-radius: 6px;
+    color: var(--builder-text-dark, #1f2937);
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-secondary:hover,
+.btn-outline:hover {
+    border-color: var(--builder-primary, #4cb354);
+    background-color: rgba(76, 179, 84, 0.03);
+}
+
+/* ============================================
+   PHASE 7: CONFIGURATION UI STYLING
+   Consistent checkbox/radio appearance
+   ============================================ */
+
+/* Checkbox/Radio option cards */
+.config-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--builder-border, #e5e7eb);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.config-option:hover {
+    border-color: var(--builder-primary, #4cb354);
+    background-color: rgba(76, 179, 84, 0.03);
+}
+
+.config-option.selected,
+.config-option:has(input:checked) {
+    border-color: var(--builder-primary, #4cb354);
+    background-color: rgba(76, 179, 84, 0.08);
+}
+
+.config-option input[type="checkbox"],
+.config-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--builder-primary, #4cb354);
+    cursor: pointer;
+}
+
+/* Larger checkboxes and radios globally */
+input[type="checkbox"],
+input[type="radio"] {
+    min-width: 18px;
+    min-height: 18px;
+    accent-color: var(--builder-primary, #4cb354);
+}
