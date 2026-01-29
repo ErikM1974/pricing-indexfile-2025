@@ -140,8 +140,10 @@ class DTGQuoteService {
             const sessionResult = await sessionResponse.json();
             console.log('[DTGQuoteService] Session saved:', sessionResult);
             
-            // Save items
+            // Save items - track failures
             let lineNumber = 1;
+            let failedItems = 0;
+            let totalItems = 0;
             for (const product of quoteData.products) {
                 // If product has sizeGroups (from pricing calculation), save each group separately
                 if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
@@ -176,10 +178,11 @@ class DTGQuoteService {
                             body: JSON.stringify(itemData)
                         });
                         
+                        totalItems++;
                         if (!itemResponse.ok) {
                             const errorText = await itemResponse.text();
                             console.error('[DTGQuoteService] Item save failed:', errorText);
-                            // Continue saving other items even if one fails
+                            failedItems++;
                         } else {
                             const itemResult = await itemResponse.json();
                             console.log('[DTGQuoteService] Item saved:', itemResult);
@@ -217,22 +220,28 @@ class DTGQuoteService {
                         body: JSON.stringify(itemData)
                     });
                     
+                    totalItems++;
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('[DTGQuoteService] Item save failed:', errorText);
+                        failedItems++;
                     } else {
                         const itemResult = await itemResponse.json();
                         console.log('[DTGQuoteService] Item saved (no sizeGroups):', itemResult);
                     }
                 }
             }
-            
-            console.log('[DTGQuoteService] Quote saved successfully:', quoteID);
-            
+
+            console.log('[DTGQuoteService] Quote saved:', quoteID,
+                failedItems > 0 ? `(${failedItems} items failed)` : '');
+
             return {
                 success: true,
                 quoteID: quoteID,
-                expiryDate: expiryDate
+                expiryDate: expiryDate,
+                partialSave: failedItems > 0,
+                failedItems: failedItems,
+                warning: failedItems > 0 ? `${failedItems} of ${totalItems} items failed to save. Please verify your quote.` : null
             };
             
         } catch (error) {

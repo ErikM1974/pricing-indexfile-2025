@@ -244,8 +244,10 @@ class EmbroideryQuoteService {
             // This prevents item accumulation when re-saving a quote
             await this.deleteExistingItems(quoteID);
 
-            // Save line items for products
+            // Save line items for products - track failures
             let lineNumber = 1;
+            let failedItems = 0;
+            let totalItems = 0;
             let isFirstItem = true;
             for (const productPricing of pricingResults.products) {
                 for (const lineItem of productPricing.lineItems) {
@@ -308,13 +310,14 @@ class EmbroideryQuoteService {
                         body: JSON.stringify(itemData)
                     });
                     
+                    totalItems++;
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('Item save failed for line', lineNumber - 1, 'Error:', errorText);
                         console.error('Failed item data:', itemData);
-                        // Don't throw - allow partial success
+                        failedItems++;
                     }
-                    
+
                     isFirstItem = false;  // Only store logo specs in the first item
                 }
             }
@@ -351,17 +354,26 @@ class EmbroideryQuoteService {
                         body: JSON.stringify(itemData)
                     });
                     
+                    totalItems++;
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('Additional service save failed for line', lineNumber - 1, 'Error:', errorText);
                         console.error('Failed service data:', itemData);
-                        // Don't throw - allow partial success
+                        failedItems++;
                     }
                 }
             }
-            
-            console.log('[EmbroideryQuoteService] Quote saved successfully:', quoteID);
-            return { success: true, quoteID: quoteID };
+
+            console.log('[EmbroideryQuoteService] Quote saved:', quoteID,
+                failedItems > 0 ? `(${failedItems} items failed)` : '');
+
+            return {
+                success: true,
+                quoteID: quoteID,
+                partialSave: failedItems > 0,
+                failedItems: failedItems,
+                warning: failedItems > 0 ? `${failedItems} of ${totalItems} items failed to save. Please verify your quote.` : null
+            };
             
         } catch (error) {
             console.error('[EmbroideryQuoteService] Save error:', error);
@@ -900,8 +912,10 @@ class EmbroideryQuoteService {
             // Delete existing items and save new ones
             await this.deleteExistingItems(quoteId);
 
-            // Save line items (same logic as saveQuote)
+            // Save line items (same logic as saveQuote) - track failures
             let lineNumber = 1;
+            let failedItems = 0;
+            let totalItems = 0;
             let isFirstItem = true;
             for (const productPricing of pricingResults.products) {
                 for (const lineItem of productPricing.lineItems) {
@@ -954,11 +968,17 @@ class EmbroideryQuoteService {
                         LogoSpecs: logoSpecsData
                     };
 
-                    await fetch(`${this.baseURL}/api/quote_items`, {
+                    totalItems++;
+                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
                     });
+
+                    if (!itemResponse.ok) {
+                        console.error('[EmbroideryQuoteService] Item save failed for line', lineNumber - 1);
+                        failedItems++;
+                    }
 
                     isFirstItem = false;
                 }
@@ -990,16 +1010,31 @@ class EmbroideryQuoteService {
                         LogoSpecs: ''
                     };
 
-                    await fetch(`${this.baseURL}/api/quote_items`, {
+                    totalItems++;
+                    const serviceResponse = await fetch(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
                     });
+
+                    if (!serviceResponse.ok) {
+                        console.error('[EmbroideryQuoteService] Service save failed for line', lineNumber - 1);
+                        failedItems++;
+                    }
                 }
             }
 
-            console.log('[EmbroideryQuoteService] Quote updated successfully:', quoteId, 'Revision:', newRevision);
-            return { success: true, quoteID: quoteId, revision: newRevision };
+            console.log('[EmbroideryQuoteService] Quote updated:', quoteId, 'Revision:', newRevision,
+                failedItems > 0 ? `(${failedItems} items failed)` : '');
+
+            return {
+                success: true,
+                quoteID: quoteId,
+                revision: newRevision,
+                partialSave: failedItems > 0,
+                failedItems: failedItems,
+                warning: failedItems > 0 ? `${failedItems} of ${totalItems} items failed to save. Please verify your quote.` : null
+            };
 
         } catch (error) {
             console.error('[EmbroideryQuoteService] Update error:', error);

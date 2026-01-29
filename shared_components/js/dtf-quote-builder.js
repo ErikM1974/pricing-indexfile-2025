@@ -1440,9 +1440,13 @@ class DTFQuoteBuilder {
         if (totalQty === 0) {
             document.getElementById('total-qty').textContent = '0';
             document.getElementById('pricing-tier').textContent = '--';
-            document.getElementById('ltm-row').style.display = 'none';
+            // Hide LTM table row (sidebar ltm-row doesn't exist in DTF)
+            const ltmTableRow = document.getElementById('ltm-fee-row');
+            if (ltmTableRow) ltmTableRow.style.display = 'none';
             document.getElementById('subtotal').textContent = '--';
-            document.getElementById('grand-total').textContent = '--';
+            // DTF uses grand-total-with-tax instead of grand-total
+            const grandTotalEl = document.getElementById('grand-total-with-tax');
+            if (grandTotalEl) grandTotalEl.textContent = '--';
             // Clear all price and total cells
             document.querySelectorAll('.cell-price').forEach(cell => {
                 cell.textContent = '-';
@@ -1499,25 +1503,18 @@ class DTFQuoteBuilder {
             tier
         };
 
-        // LTM display (sidebar)
-        const ltmRow = document.getElementById('ltm-row');
-        const ltmFeeEl = document.getElementById('ltm-fee');
-        // LTM display (table)
+        // LTM display - DTF only uses table row (no sidebar ltm-row/ltm-fee elements)
         const ltmTableRow = document.getElementById('ltm-fee-row');
         const ltmTableTotal = document.getElementById('ltm-row-total');
 
         if (totalLtmFee > 0 && totalQty > 0) {
-            // Show LTM in sidebar
-            ltmRow.style.display = 'flex';
-            ltmFeeEl.textContent = `$${totalLtmFee.toFixed(2)}`;
             // Show LTM in product table
             if (ltmTableRow) {
                 ltmTableRow.style.display = 'table-row';
                 if (ltmTableTotal) ltmTableTotal.textContent = `$${totalLtmFee.toFixed(2)}`;
             }
         } else {
-            // Hide LTM rows
-            ltmRow.style.display = 'none';
+            // Hide LTM row
             if (ltmTableRow) ltmTableRow.style.display = 'none';
         }
 
@@ -1917,7 +1914,8 @@ class DTFQuoteBuilder {
         // Build pricing summary
         const totalQty = this.getTotalQuantity();
         const tier = this.getTierForQuantity(totalQty);
-        const grandTotal = parseFloat(document.getElementById('grand-total').textContent.replace('$', ''));
+        // DTF uses grand-total-with-tax (not grand-total)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
 
         document.getElementById('summary-pricing').innerHTML = `
             <div class="summary-pricing-row">
@@ -1956,7 +1954,8 @@ class DTFQuoteBuilder {
         }
 
         const totalQty = this.getTotalQuantity();
-        const grandTotal = parseFloat(document.getElementById('grand-total').textContent.replace('$', ''));
+        // DTF uses grand-total-with-tax (not grand-total)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
 
         // Build complete quote data with all pricing metadata
         const quoteData = {
@@ -2079,9 +2078,10 @@ class DTFQuoteBuilder {
 
         // Generate quote ID
         const quoteId = this.generateQuoteId();
-        const grandTotal = parseFloat(document.getElementById('grand-total').textContent.replace('$', '')) || 0;
+        // DTF uses grand-total-with-tax (not grand-total), and ltm-row-total (not ltm-fee)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '')) || 0;
         const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace('$', '')) || grandTotal;
-        const ltmFee = parseFloat(document.getElementById('ltm-fee')?.textContent?.replace('$', '')) || 0;
+        const ltmFee = parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace('$', '')) || 0;
 
         // Build quote data
         const quoteData = {
@@ -2364,7 +2364,8 @@ class DTFQuoteBuilder {
      */
     buildPricingDataForInvoice() {
         const totalQty = this.getTotalQuantity();
-        const grandTotal = parseFloat(document.getElementById('grand-total')?.textContent?.replace('$', '') || '0');
+        // DTF uses grand-total-with-tax (not grand-total)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
         const quoteId = document.getElementById('quote-id')?.textContent || `DTF-${Date.now()}`;
 
         // Build products array with line items
@@ -2610,7 +2611,8 @@ class DTFQuoteBuilder {
         }
 
         const totalQty = this.getTotalQuantity();
-        const grandTotal = parseFloat(document.getElementById('grand-total').textContent.replace('$', ''));
+        // DTF uses grand-total-with-tax (not grand-total)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
 
         // Build email data
         const emailData = {
@@ -2748,7 +2750,8 @@ class DTFQuoteBuilder {
      */
     generateQuoteText() {
         const totalQty = this.getTotalQuantity();
-        const grandTotal = parseFloat(document.getElementById('grand-total').textContent.replace('$', ''));
+        // DTF uses grand-total-with-tax (not grand-total)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
         const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
 
         let text = '';

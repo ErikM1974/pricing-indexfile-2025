@@ -18,7 +18,8 @@
    ============================================ */
 :root {
     --nwca-blue: #003f7f;
-    --nwca-green: #28a745;
+    /* Standardized green: #4cb354 matches --builder-primary (2026-01-29) */
+    --nwca-green: #4cb354;
     --nwca-red: #dc3545;
     --border-color: #dee2e6;
     --bg-light: #f8f9fa;

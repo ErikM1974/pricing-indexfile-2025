@@ -169,21 +169,27 @@ class ScreenPrintQuoteService {
                 if (!itemResponse.ok) {
                     const errorText = await itemResponse.text();
                     console.error('[ScreenPrintQuoteService] Item save failed:', errorText);
-                    // Don't throw - allow partial success
+                    // Return false but continue - we'll track failures below
+                    return false;
                 }
-                
-                return itemResponse.ok;
+
+                return true;
             });
-            
-            await Promise.all(itemPromises);
-            
-            console.log('[ScreenPrintQuoteService] Quote saved successfully:', quoteID);
-            
+
+            const itemResults = await Promise.all(itemPromises);
+            const failedCount = itemResults.filter(r => !r).length;
+
+            console.log('[ScreenPrintQuoteService] Quote saved:', quoteID,
+                failedCount > 0 ? `(${failedCount} items failed)` : '');
+
             return {
                 success: true,
                 quoteID: quoteID,
                 sessionID: sessionID,
-                totalAmount: totalAmount
+                totalAmount: totalAmount,
+                partialSave: failedCount > 0,
+                failedItems: failedCount,
+                warning: failedCount > 0 ? `${failedCount} of ${itemResults.length} items failed to save. Please verify your quote.` : null
             };
             
         } catch (error) {

@@ -190,8 +190,10 @@ class DTFQuoteService {
             const sessionResult = await sessionResponse.json();
             console.log('[DTFQuoteService] Session saved:', sessionResult);
 
-            // Save items
+            // Save items - track failures
             let lineNumber = 1;
+            let failedItems = 0;
+            let totalItems = 0;
             for (const product of quoteData.products) {
                 // Save each size group as separate line item
                 if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
@@ -230,9 +232,11 @@ class DTFQuoteService {
                             body: JSON.stringify(itemData)
                         });
 
+                        totalItems++;
                         if (!itemResponse.ok) {
                             const errorText = await itemResponse.text();
                             console.error('[DTFQuoteService] Item save failed:', errorText);
+                            failedItems++;
                         } else {
                             const itemResult = await itemResponse.json();
                             console.log('[DTFQuoteService] Item saved:', itemResult);
@@ -309,9 +313,11 @@ class DTFQuoteService {
                         body: JSON.stringify(itemData)
                     });
 
+                    totalItems++;
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('[DTFQuoteService] Item save failed:', errorText);
+                        failedItems++;
                     } else {
                         const itemResult = await itemResponse.json();
                         console.log('[DTFQuoteService] Item saved (fallback):', itemResult);
@@ -319,12 +325,16 @@ class DTFQuoteService {
                 }
             }
 
-            console.log('[DTFQuoteService] Quote saved successfully:', quoteID);
+            console.log('[DTFQuoteService] Quote saved:', quoteID,
+                failedItems > 0 ? `(${failedItems} items failed)` : '');
 
             return {
                 success: true,
                 quoteID: quoteID,
-                expiryDate: expiryDate
+                expiryDate: expiryDate,
+                partialSave: failedItems > 0,
+                failedItems: failedItems,
+                warning: failedItems > 0 ? `${failedItems} of ${totalItems} items failed to save. Please verify your quote.` : null
             };
 
         } catch (error) {
