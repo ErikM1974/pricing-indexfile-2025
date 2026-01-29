@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
+    <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -174,6 +175,7 @@
                         <thead>
                             <tr>
                                 <th class="style-col">Style</th>
+                                <th class="thumbnail-col"></th>
                                 <th class="desc-col">Description</th>
                                 <th class="color-col">Color</th>
                                 <th class="size-col">S</th>
@@ -191,7 +193,7 @@
                         <tbody id="product-tbody">
                             <!-- Empty State Message - shown until products added -->
                             <tr id="empty-state-row">
-                                <td colspan="13" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                                <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
                                     <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
                                     <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
                                     <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
@@ -202,7 +204,7 @@
                         <!-- Fee Summary Section (auto-populated by JS) -->
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <tr id="ltm-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="9" class="fee-label">
+                                <td colspan="10" class="fee-label">
                                     <i class="fas fa-info-circle"></i> Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
@@ -211,7 +213,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <tr id="art-charge-row" class="fee-row" style="display: none;">
-                                <td colspan="9" class="fee-label">
+                                <td colspan="10" class="fee-label">
                                     <i class="fas fa-palette"></i> Art Charge (Logo Mockup & Review)
                                 </td>
                                 <td class="cell-qty">1</td>
@@ -220,7 +222,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <tr id="graphic-design-row" class="fee-row" style="display: none;">
-                                <td colspan="9" class="fee-label">
+                                <td colspan="10" class="fee-label">
                                     <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
                                 </td>
                                 <td class="cell-qty">1</td>
@@ -229,7 +231,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <tr id="rush-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="9" class="fee-label">
+                                <td colspan="10" class="fee-label">
                                     <i class="fas fa-bolt"></i> Rush Fee
                                 </td>
                                 <td class="cell-qty">1</td>
@@ -238,7 +240,7 @@
                                 <td class="cell-actions"></td>
                             </tr>
                             <tr id="discount-row" class="fee-row" style="display: none;">
-                                <td colspan="9" class="fee-label">
+                                <td colspan="10" class="fee-label">
                                     <i class="fas fa-tag"></i> Discount <span id="discount-reason-label"></span>
                                 </td>
                                 <td class="cell-qty">1</td>
@@ -895,6 +897,11 @@
                            onchange="onStyleChange(this, ${rowId})"
                            onkeydown="handleCellKeydown(event, this)">
                 </td>
+                <td class="thumbnail-col">
+                    <div class="product-thumbnail no-image" id="thumb-${rowId}"
+                         title="Select a color to see product image"
+                         style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;"></div>
+                </td>
                 <td class="desc-cell">
                     <div class="desc-row">
                         <input type="text" class="cell-input desc-input"
@@ -966,15 +973,19 @@
                 // Fetch product details, colors, AND pricing bundle
                 // NOTE: Use method=BLANK (not DTF) to get sellingPriceDisplayAddOns for size upcharges
                 // DTF pricing-bundle returns empty sellingPriceDisplayAddOns because garment data is separate
+                // NOTE: Changed to /api/product-colors (same as DTG/Screen Print/Embroidery) which returns MAIN_IMAGE_URL
                 const [detailsResponse, colorsResponse, blankBundleResponse] = await Promise.all([
                     fetch(`${API_BASE}/api/product-details?styleNumber=${styleNumber}`),
-                    fetch(`${API_BASE}/api/color-swatches?styleNumber=${styleNumber}`),
+                    fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`),
                     fetch(`${API_BASE}/api/pricing-bundle?method=BLANK&styleNumber=${styleNumber}`)
                 ]);
 
                 const details = await detailsResponse.json();
-                const colors = await colorsResponse.json();
+                const colorsData = await colorsResponse.json();
                 const blankBundle = await blankBundleResponse.json();
+
+                // product-colors returns { colors: [...] } wrapper
+                const colors = colorsData.colors || [];
 
                 const firstDetail = Array.isArray(details) ? details[0] : details;
 
@@ -993,13 +1004,15 @@
                     row.dataset.sizeUpcharges = JSON.stringify(upcharges);
                     console.log(`[DTF] Loaded upcharges for ${styleNumber}:`, upcharges);
 
-                    // Populate color picker
+                    // Populate color picker (now includes MAIN_IMAGE_URL from product-colors API)
                     if (colors && colors.length > 0) {
                         pickerDropdown.innerHTML = colors.map(c => `
                             <div class="color-picker-option"
                                  data-color-name="${escapeHtml(c.COLOR_NAME)}"
                                  data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
                                  data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
+                                 data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
+                                 data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
                                  onclick="selectColor(${rowId}, this)">
                                 <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
                                 <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
@@ -1137,6 +1150,8 @@
             const catalogColor = optionEl.dataset.catalogColor;
             const swatchUrl = optionEl.dataset.swatchUrl || '';
             const hex = optionEl.dataset.hex || '#ccc';
+            const imageUrl = optionEl.dataset.imageUrl || '';
+            const style = row.dataset.style;
 
             // Update display
             const pickerSelected = row.querySelector('.color-picker-selected');
@@ -1160,6 +1175,10 @@
             row.dataset.catalogColor = catalogColor;
             row.dataset.swatchUrl = swatchUrl;
             row.dataset.hex = hex;
+            row.dataset.imageUrl = imageUrl;
+
+            // Update product thumbnail
+            updateProductThumbnail(rowId, imageUrl, row.dataset.productName, style, colorName);
 
             // Close dropdown
             row.querySelector('.color-picker-dropdown').classList.add('hidden');
@@ -1673,6 +1692,29 @@
             if (!str) return '';
             return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, colorName) {
+            const thumbContainer = document.getElementById(`thumb-${rowId}`);
+            if (!thumbContainer) return;
+
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = productName || styleNumber;
+                img.className = 'product-thumbnail';
+                img.id = `thumb-${rowId}`;
+                img.onclick = () => {
+                    if (window.productThumbnailModal) {
+                        productThumbnailModal.open(imageUrl, productName, styleNumber, colorName);
+                    }
+                };
+                img.onerror = () => {
+                    img.classList.add('no-image');
+                    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                };
+                thumbContainer.replaceWith(img);
+            }
         }
 
         function getSwatchStyle(color) {
