@@ -622,6 +622,10 @@
             document.getElementById('location-display').textContent = displayName;
             document.getElementById('location-code').textContent = `Code: ${printLocation.combined}`;
 
+            // Update sidebar display
+            const sidebarLocation = document.getElementById('sidebar-location');
+            if (sidebarLocation) sidebarLocation.textContent = displayName;
+
             // Recalculate all product prices with new location
             recalculateAllPrices();
         }
