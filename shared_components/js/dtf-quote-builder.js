@@ -141,19 +141,17 @@ class DTFQuoteBuilder {
             if (companyEl) companyEl.value = draft.companyName;
         }
 
-        // Restore selected locations
+        // Restore selected locations (radio buttons for front/back, checkboxes for sleeves)
         if (draft.selectedLocations && draft.selectedLocations.length > 0) {
             draft.selectedLocations.forEach(loc => {
-                const checkbox = document.querySelector(`input[value="${loc}"]`);
-                if (checkbox) {
-                    checkbox.checked = true;
-                    if (!this.selectedLocations.includes(loc)) {
-                        this.selectedLocations.push(loc);
-                    }
+                // Find the input (works for both radio and checkbox)
+                const input = document.querySelector(`input[value="${loc}"]`);
+                if (input) {
+                    input.checked = true;
                 }
             });
-            this.updateLocationSummary();
-            this.updateSearchState();
+            // Sync state from UI (handles both radio and checkbox inputs)
+            this.updateSelectedLocations();
         }
 
         // Restore products
@@ -396,16 +394,14 @@ class DTFQuoteBuilder {
             const notes = JSON.parse(session.Notes || '{}');
             if (notes.locations && Array.isArray(notes.locations)) {
                 notes.locations.forEach(loc => {
-                    const checkbox = document.querySelector(`input[value="${loc}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        if (!this.selectedLocations.includes(loc)) {
-                            this.selectedLocations.push(loc);
-                        }
+                    // Find the input (works for both radio and checkbox)
+                    const input = document.querySelector(`input[value="${loc}"]`);
+                    if (input) {
+                        input.checked = true;
                     }
                 });
-                this.updateLocationSummary();
-                this.updateSearchState();
+                // Sync state from UI
+                this.updateSelectedLocations();
             }
         } catch (e) {
             console.warn('[EditMode] Could not parse locations from notes:', e);
@@ -579,50 +575,43 @@ class DTFQuoteBuilder {
     // ==================== LOCATION MANAGEMENT ====================
 
     setupLocationListeners() {
-        const checkboxes = document.querySelectorAll('input[name="location"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => this.handleLocationChange(e));
+        // Front radio buttons
+        document.querySelectorAll('input[name="front-location"]').forEach(radio => {
+            radio.addEventListener('change', () => this.updateSelectedLocations());
+        });
+
+        // Back radio buttons
+        document.querySelectorAll('input[name="back-location"]').forEach(radio => {
+            radio.addEventListener('change', () => this.updateSelectedLocations());
+        });
+
+        // Sleeve checkboxes
+        document.querySelectorAll('input[name="sleeve-location"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => this.updateSelectedLocations());
         });
     }
 
-    handleLocationChange(event) {
-        const checkbox = event.target;
-        const locationCode = checkbox.value;
-        const zone = checkbox.dataset.zone;
-        const isChecked = checkbox.checked;
+    updateSelectedLocations() {
+        this.selectedLocations = [];
 
-        console.log(`[Location] ${locationCode} ${isChecked ? 'checked' : 'unchecked'} (zone: ${zone})`);
-
-        if (isChecked) {
-            // For front and back zones, uncheck others in same zone
-            if (zone === 'front' || zone === 'back') {
-                const sameZoneLocations = this.conflictZones[zone];
-                sameZoneLocations.forEach(loc => {
-                    if (loc !== locationCode) {
-                        const otherCheckbox = document.querySelector(`input[value="${loc}"]`);
-                        if (otherCheckbox && otherCheckbox.checked) {
-                            otherCheckbox.checked = false;
-                            // Remove from selected locations
-                            const index = this.selectedLocations.indexOf(loc);
-                            if (index > -1) {
-                                this.selectedLocations.splice(index, 1);
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Add to selected locations
-            if (!this.selectedLocations.includes(locationCode)) {
-                this.selectedLocations.push(locationCode);
-            }
-        } else {
-            // Remove from selected locations
-            const index = this.selectedLocations.indexOf(locationCode);
-            if (index > -1) {
-                this.selectedLocations.splice(index, 1);
-            }
+        // Get front selection (radio)
+        const frontRadio = document.querySelector('input[name="front-location"]:checked');
+        if (frontRadio && frontRadio.value) {
+            this.selectedLocations.push(frontRadio.value);
         }
+
+        // Get back selection (radio)
+        const backRadio = document.querySelector('input[name="back-location"]:checked');
+        if (backRadio && backRadio.value) {
+            this.selectedLocations.push(backRadio.value);
+        }
+
+        // Get sleeve selections (checkboxes)
+        document.querySelectorAll('input[name="sleeve-location"]:checked').forEach(checkbox => {
+            this.selectedLocations.push(checkbox.value);
+        });
+
+        console.log('[Location] Selected:', this.selectedLocations);
 
         // Update UI
         this.updateLocationSummary();
@@ -636,33 +625,25 @@ class DTFQuoteBuilder {
     }
 
     updateLocationSummary() {
-        const summaryContainer = document.getElementById('selected-locations-summary');
-        const badgesContainer = document.getElementById('selected-badges');
+        const locationDisplay = document.getElementById('location-display');
         const sidebarLocation = document.getElementById('sidebar-location');
 
         if (this.selectedLocations.length === 0) {
-            if (summaryContainer) summaryContainer.style.display = 'none';
+            if (locationDisplay) locationDisplay.textContent = 'None selected';
             if (sidebarLocation) sidebarLocation.textContent = '-';
             return;
         }
 
-        // Build badges for top summary
-        const badges = this.selectedLocations.map(loc => {
+        // Build location names list
+        const locationNames = this.selectedLocations.map(loc => {
             const config = this.locationConfig[loc];
-            return `<span class="selected-badge size-${config.size.toLowerCase()}">${config.label}</span>`;
-        }).join('');
+            return config ? config.label : loc;
+        });
 
-        if (badgesContainer) badgesContainer.innerHTML = badges;
-        if (summaryContainer) summaryContainer.style.display = 'flex';
+        const displayText = locationNames.join(' + ');
 
-        // Update sidebar location display (simple text like DTG)
-        if (sidebarLocation) {
-            const locationNames = this.selectedLocations.map(loc => {
-                const config = this.locationConfig[loc];
-                return config.label;
-            });
-            sidebarLocation.textContent = locationNames.join(' + ');
-        }
+        if (locationDisplay) locationDisplay.textContent = displayText;
+        if (sidebarLocation) sidebarLocation.textContent = displayText;
     }
 
     updateSearchState() {

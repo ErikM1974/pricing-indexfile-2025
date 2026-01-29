@@ -79,70 +79,71 @@
                     <span class="location-hint">Choose ONE front location and/or ONE back location. Sleeves can be added to either.</span>
                 </div>
 
-                <!-- Location Groups -->
-                <div class="location-groups">
-                    <!-- Small (5" x 5") -->
-                    <div class="location-group">
-                        <span class="size-badge size-small">Small (5"x5")</span>
-                        <div class="location-checkboxes">
-                            <label class="location-checkbox" data-zone="front">
-                                <input type="checkbox" name="location" value="left-chest" data-size="Small" data-zone="front">
-                                <span class="checkbox-label">Left Chest</span>
-                            </label>
-                            <label class="location-checkbox" data-zone="front">
-                                <input type="checkbox" name="location" value="right-chest" data-size="Small" data-zone="front">
-                                <span class="checkbox-label">Right Chest</span>
-                            </label>
-                            <label class="location-checkbox" data-zone="sleeves">
-                                <input type="checkbox" name="location" value="left-sleeve" data-size="Small" data-zone="sleeves">
-                                <span class="checkbox-label">Left Sleeve</span>
-                            </label>
-                            <label class="location-checkbox" data-zone="sleeves">
-                                <input type="checkbox" name="location" value="right-sleeve" data-size="Small" data-zone="sleeves">
-                                <span class="checkbox-label">Right Sleeve</span>
-                            </label>
-                            <label class="location-checkbox" data-zone="back">
-                                <input type="checkbox" name="location" value="back-of-neck" data-size="Small" data-zone="back">
-                                <span class="checkbox-label">Back of Neck</span>
-                            </label>
-                        </div>
+                <!-- Location Columns (Radio-based like DTG) -->
+                <div class="location-columns">
+                    <!-- FRONT Column (Radio) -->
+                    <div class="location-column">
+                        <div class="column-header">FRONT (pick one)</div>
+                        <label class="location-radio">
+                            <input type="radio" name="front-location" value="" checked>
+                            <span>None</span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="front-location" value="left-chest" data-size="Small">
+                            <span>Left Chest <small>(5"x5")</small></span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="front-location" value="right-chest" data-size="Small">
+                            <span>Right Chest <small>(5"x5")</small></span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="front-location" value="center-front" data-size="Medium">
+                            <span>Center Front <small>(9"x12")</small></span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="front-location" value="full-front" data-size="Large">
+                            <span>Full Front <small>(12"x16.5")</small></span>
+                        </label>
                     </div>
 
-                    <!-- Medium (9" x 12") -->
-                    <div class="location-group">
-                        <span class="size-badge size-medium">Medium (9"x12")</span>
-                        <div class="location-checkboxes">
-                            <label class="location-checkbox" data-zone="front">
-                                <input type="checkbox" name="location" value="center-front" data-size="Medium" data-zone="front">
-                                <span class="checkbox-label">Center Front</span>
-                            </label>
-                            <label class="location-checkbox" data-zone="back">
-                                <input type="checkbox" name="location" value="center-back" data-size="Medium" data-zone="back">
-                                <span class="checkbox-label">Center Back</span>
-                            </label>
-                        </div>
+                    <!-- BACK Column (Radio) -->
+                    <div class="location-column">
+                        <div class="column-header">BACK (optional)</div>
+                        <label class="location-radio">
+                            <input type="radio" name="back-location" value="" checked>
+                            <span>None</span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="back-location" value="back-of-neck" data-size="Small">
+                            <span>Back of Neck <small>(5"x5")</small></span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="back-location" value="center-back" data-size="Medium">
+                            <span>Center Back <small>(9"x12")</small></span>
+                        </label>
+                        <label class="location-radio">
+                            <input type="radio" name="back-location" value="full-back" data-size="Large">
+                            <span>Full Back <small>(12"x16.5")</small></span>
+                        </label>
                     </div>
 
-                    <!-- Large (12" x 16.5") -->
-                    <div class="location-group">
-                        <span class="size-badge size-large">Large (12"x16.5")</span>
-                        <div class="location-checkboxes">
-                            <label class="location-checkbox" data-zone="front">
-                                <input type="checkbox" name="location" value="full-front" data-size="Large" data-zone="front">
-                                <span class="checkbox-label">Full Front</span>
-                            </label>
-                            <label class="location-checkbox" data-zone="back">
-                                <input type="checkbox" name="location" value="full-back" data-size="Large" data-zone="back">
-                                <span class="checkbox-label">Full Back</span>
-                            </label>
-                        </div>
+                    <!-- SLEEVES Column (Checkboxes) -->
+                    <div class="location-column">
+                        <div class="column-header">SLEEVES (add-on)</div>
+                        <label class="location-checkbox">
+                            <input type="checkbox" name="sleeve-location" value="left-sleeve" data-size="Small">
+                            <span>Left Sleeve <small>(5"x5")</small></span>
+                        </label>
+                        <label class="location-checkbox">
+                            <input type="checkbox" name="sleeve-location" value="right-sleeve" data-size="Small">
+                            <span>Right Sleeve <small>(5"x5")</small></span>
+                        </label>
                     </div>
                 </div>
 
                 <!-- Selected Locations Summary -->
-                <div class="selected-locations-summary" id="selected-locations-summary" style="display: none;">
-                    <span class="summary-label">Selected:</span>
-                    <div class="selected-badges" id="selected-badges"></div>
+                <div class="location-summary" id="location-summary">
+                    <strong>Selected:</strong> <span id="location-display">None selected</span>
                 </div>
             </div>
 

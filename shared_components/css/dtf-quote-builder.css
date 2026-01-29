@@ -187,6 +187,83 @@ body {
     color: var(--text-muted);
 }
 
+/* Radio/Checkbox Column Layout (DTG-style) */
+.location-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 12px 0;
+}
+
+.location-column {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.column-header {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #495057;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.location-radio,
+.location-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.location-radio:hover,
+.location-checkbox:hover {
+    color: var(--dtf-primary-dark);
+}
+
+.location-radio input,
+.location-checkbox input {
+    margin-right: 10px;
+    accent-color: var(--dtf-primary);
+    width: 16px;
+    height: 16px;
+}
+
+.location-radio small,
+.location-checkbox small {
+    color: #6c757d;
+    margin-left: 4px;
+    font-size: 12px;
+}
+
+.location-radio input:checked + span,
+.location-checkbox input:checked + span {
+    color: var(--dtf-primary-dark);
+    font-weight: 600;
+}
+
+.location-summary {
+    background: #e7f3ff;
+    border-radius: 6px;
+    padding: 10px 16px;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.location-summary strong {
+    color: #1e40af;
+}
+
+#location-display {
+    color: #1e3a5f;
+}
+
+/* Legacy styles kept for backwards compatibility */
 .location-groups {
     display: flex;
     gap: 20px;
@@ -228,31 +305,17 @@ body {
     gap: 8px;
 }
 
-.location-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: #f8f9fa;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s;
+/* Responsive: Stack columns on smaller screens */
+@media (max-width: 900px) {
+    .location-columns {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
-.location-checkbox:hover {
-    background: var(--dtf-primary-50);
-    border-color: var(--dtf-primary);
-}
-
-.location-checkbox input {
-    accent-color: var(--dtf-primary);
-}
-
-.location-checkbox input:checked + .checkbox-label {
-    color: var(--dtf-primary-dark);
-    font-weight: 600;
+@media (max-width: 600px) {
+    .location-columns {
+        grid-template-columns: 1fr;
+    }
 }
 
 .location-checkbox.disabled {
@@ -1439,6 +1502,10 @@ body {
 
     .location-groups {
         flex-direction: column;
+    }
+
+    .location-columns {
+        grid-template-columns: 1fr;
     }
 }
 
