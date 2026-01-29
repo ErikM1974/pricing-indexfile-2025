@@ -5,9 +5,21 @@
 
 class MonogramFormService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Use centralized config (CLAUDE.md Rule #7)
+        this.baseURL = this.getApiBaseUrl();
         this.prefix = 'MONO';
         this.storagePrefix = 'monogram';
+    }
+
+    /**
+     * Get API base URL from config or fallback
+     */
+    getApiBaseUrl() {
+        if (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) {
+            return window.APP_CONFIG.API.BASE_URL;
+        }
+        console.warn('[MonogramService] APP_CONFIG not loaded, using fallback URL');
+        return 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     }
 
     // ============================================
@@ -319,6 +331,7 @@ class MonogramFormService {
 
     /**
      * Search for existing monogram sessions
+     * CLAUDE.md Rule #4: Never silently fall back to cached data without notifying user
      */
     async searchMonogramSessions(criteria) {
         try {
@@ -336,7 +349,8 @@ class MonogramFormService {
                 return {
                     success: true,
                     sessions: data.monograms || [],
-                    count: data.count || 0
+                    count: data.count || 0,
+                    source: 'database'
                 };
             } else {
                 throw new Error(data.error || 'Search failed');
@@ -344,14 +358,21 @@ class MonogramFormService {
 
         } catch (error) {
             console.error('[MonogramService] Search error:', error);
-            // Fall back to localStorage search
+            // Fall back to localStorage search but WARN user (CLAUDE.md Rule #4)
             const localSessions = this.searchLocalStorage(criteria);
-            return { success: true, sessions: localSessions, source: 'localStorage' };
+            return {
+                success: true,
+                sessions: localSessions,
+                source: 'localStorage',
+                warning: 'Unable to search database. Showing local cache only - results may be incomplete.',
+                apiError: error.message
+            };
         }
     }
 
     /**
      * Load a specific monogram session by order number
+     * CLAUDE.md Rule #4: Never silently fall back to cached data without notifying user
      */
     async loadMonogramSession(orderNumber) {
         try {
@@ -387,25 +408,39 @@ class MonogramFormService {
                         createdBy: monogram.CreatedBy,
                         id_monogram: monogram.ID_Monogram
                     },
-                    items: items
+                    items: items,
+                    source: 'database'
                 };
             } else {
-                // Try localStorage fallback
+                // Not found in database - check localStorage but mark as cached
                 const localData = this.loadFromLocalStorage(orderNumber);
                 if (localData) {
-                    return { success: true, ...localData, source: 'localStorage' };
+                    console.warn('[MonogramService] Session not in database, using localStorage cache');
+                    return {
+                        success: true,
+                        ...localData,
+                        source: 'localStorage',
+                        warning: 'Loaded from local cache - data may be outdated. Session not found in database.'
+                    };
                 }
                 return { success: false, error: 'Session not found' };
             }
 
         } catch (error) {
             console.error('[MonogramService] Load error:', error);
-            // Try localStorage fallback
+            // API failed - try localStorage but ALWAYS inform user (CLAUDE.md Rule #4)
             const localData = this.loadFromLocalStorage(orderNumber);
             if (localData) {
-                return { success: true, ...localData, source: 'localStorage' };
+                console.warn('[MonogramService] API failed, using localStorage cache');
+                return {
+                    success: true,
+                    ...localData,
+                    source: 'localStorage',
+                    warning: 'Unable to connect to server. Showing cached data which may be outdated.',
+                    apiError: error.message
+                };
             }
-            return { success: false, error: error.message };
+            return { success: false, error: `Failed to load: ${error.message}` };
         }
     }
 

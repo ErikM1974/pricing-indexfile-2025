@@ -333,6 +333,8 @@ cap-embroidery-fix.css
 | `/dashboards/house-accounts.html` | **NEW** House Account assignment dashboard | house-accounts.js, house-accounts.css | ✅ Active |
 | `/dashboards/css/house-accounts.css` | **NEW** House Accounts dashboard styles | - | ✅ Active |
 | `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
+| `/dashboards/monogram-dashboard.html` | Monogram orders dashboard | monogram-dashboard.css, monogram-dashboard.js | ✅ Active |
+| `/dashboards/css/monogram-dashboard.css` | **NEW** Monogram dashboard styles (extracted from inline, NWCA green theme) | CSS variables | ✅ Active |
 | `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-calendar.js` | ⚠️ DEPRECATED - use rep-calendar.js | - | ⚠️ Legacy |

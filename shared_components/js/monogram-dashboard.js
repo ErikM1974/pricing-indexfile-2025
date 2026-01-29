@@ -3,12 +3,19 @@
  * Manages the monogram orders dashboard - listing, filtering, and actions
  */
 
-// API Configuration
-const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+// API Configuration - Use centralized config (CLAUDE.md Rule #7)
+function getApiBaseUrl() {
+    if (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) {
+        return window.APP_CONFIG.API.BASE_URL;
+    }
+    console.warn('[MonogramDashboard] APP_CONFIG not loaded, using fallback URL');
+    return 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+}
 
 // State
 let allMonograms = [];
 let filteredMonograms = [];
+let uniqueSalesReps = [];
 
 /**
  * Initialize dashboard on page load
@@ -23,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadMonograms() {
     const tbody = document.getElementById('monogramsTableBody');
     const resultCount = document.getElementById('resultCount');
+    const apiUrl = getApiBaseUrl();
 
     tbody.innerHTML = `
         <tr>
@@ -33,13 +41,15 @@ async function loadMonograms() {
     `;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/monograms`);
+        const response = await fetch(`${apiUrl}/api/monograms`);
         const data = await response.json();
 
         if (data.success && data.monograms) {
             allMonograms = data.monograms;
             // Sort by CreatedAt descending (newest first)
             allMonograms.sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
+            // Populate sales rep filter dropdown
+            populateSalesRepFilter();
             filterMonograms();
         } else {
             throw new Error(data.error || 'Failed to load monograms');
@@ -62,10 +72,53 @@ async function loadMonograms() {
 }
 
 /**
+ * Populate sales rep filter dropdown with unique reps
+ */
+function populateSalesRepFilter() {
+    const select = document.getElementById('salesRepFilter');
+    if (!select) return;
+
+    // Extract unique sales reps from loaded data
+    const repsSet = new Set();
+    allMonograms.forEach(m => {
+        if (m.SalesRepEmail) {
+            repsSet.add(m.SalesRepEmail);
+        }
+    });
+
+    // Sort alphabetically
+    uniqueSalesReps = Array.from(repsSet).sort((a, b) => {
+        const nameA = formatSalesRep(a).toLowerCase();
+        const nameB = formatSalesRep(b).toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
+
+    // Build options HTML
+    let optionsHTML = '<option value="">All Reps</option>';
+    uniqueSalesReps.forEach(email => {
+        const displayName = formatSalesRep(email);
+        optionsHTML += `<option value="${escapeHTML(email)}">${escapeHTML(displayName)}</option>`;
+    });
+
+    select.innerHTML = optionsHTML;
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
  * Filter monograms based on search and filter inputs
  */
 function filterMonograms() {
     const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
+    const salesRepFilter = document.getElementById('salesRepFilter')?.value || '';
     const dateFrom = document.getElementById('dateFrom').value;
     const dateTo = document.getElementById('dateTo').value;
 
@@ -75,6 +128,11 @@ function filterMonograms() {
             const orderMatch = m.OrderNumber && m.OrderNumber.toString().includes(searchValue);
             const companyMatch = m.CompanyName && m.CompanyName.toLowerCase().includes(searchValue);
             if (!orderMatch && !companyMatch) return false;
+        }
+
+        // Sales rep filter
+        if (salesRepFilter) {
+            if (m.SalesRepEmail !== salesRepFilter) return false;
         }
 
         // Date from filter
@@ -207,8 +265,10 @@ function printMonogram(orderNumber) {
 async function deleteMonogram(idMonogram, orderNumber) {
     if (!confirm(`Delete monogram for Order #${orderNumber}?\n\nThis cannot be undone.`)) return;
 
+    const apiUrl = getApiBaseUrl();
+
     try {
-        const response = await fetch(`${API_BASE_URL}/api/monograms/${idMonogram}`, {
+        const response = await fetch(`${apiUrl}/api/monograms/${idMonogram}`, {
             method: 'DELETE'
         });
 
@@ -228,6 +288,7 @@ async function deleteMonogram(idMonogram, orderNumber) {
 
 /**
  * Show toast notification
+ * Uses CSS classes from monogram-dashboard.css
  */
 function showToast(message, type = 'info') {
     // Create toast if not exists
@@ -235,40 +296,21 @@ function showToast(message, type = 'info') {
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'toast';
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 24px;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            z-index: 10000;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-        `;
+        toast.className = 'toast';
         document.body.appendChild(toast);
     }
 
-    // Set color based on type
-    const colors = {
-        success: '#059669',
-        error: '#dc2626',
-        info: '#2563eb'
-    };
-    toast.style.background = colors[type] || colors.info;
+    // Set type class for color
+    toast.className = `toast ${type}`;
     toast.textContent = message;
 
-    // Show toast
+    // Show toast with CSS transition
     setTimeout(() => {
-        toast.style.transform = 'translateY(0)';
-        toast.style.opacity = '1';
+        toast.classList.add('show');
     }, 10);
 
     // Hide after 3 seconds
     setTimeout(() => {
-        toast.style.transform = 'translateY(100px)';
-        toast.style.opacity = '0';
+        toast.classList.remove('show');
     }, 3000);
 }

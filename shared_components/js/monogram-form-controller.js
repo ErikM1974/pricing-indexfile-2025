@@ -1720,7 +1720,15 @@ class MonogramFormController {
                 this.currentOrderNumber = orderNumber;
                 this.currentMonogramID = result.session.id_monogram;
                 this.isDirty = false;
-                this.showToast('Form loaded', 'success');
+
+                // CLAUDE.md Rule #4: Show warning if loaded from cache
+                if (result.warning) {
+                    console.warn('[MonogramController] Cache warning:', result.warning);
+                    this.showCacheWarningBanner(result.warning);
+                    this.showToast('Loaded from cache - see warning', 'warning');
+                } else {
+                    this.showToast('Form loaded', 'success');
+                }
             } else {
                 this.showToast(result.error || 'Form not found', 'error');
             }
@@ -1729,6 +1737,47 @@ class MonogramFormController {
             this.showToast('Failed to load form', 'error');
         } finally {
             this.hideLoading();
+        }
+    }
+
+    /**
+     * Show a warning banner when data is loaded from cache
+     * CLAUDE.md Rule #4: Never silently fall back to cached data
+     */
+    showCacheWarningBanner(message) {
+        // Remove existing warning banner if present
+        const existingBanner = document.getElementById('cacheWarningBanner');
+        if (existingBanner) existingBanner.remove();
+
+        // Create warning banner
+        const banner = document.createElement('div');
+        banner.id = 'cacheWarningBanner';
+        banner.style.cssText = `
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #92400e;
+        `;
+        banner.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size: 1.25rem;"></i>
+            <div>
+                <strong>Warning:</strong> ${this.escapeHTML(message)}
+                <button onclick="this.parentElement.parentElement.remove()"
+                        style="margin-left: 12px; background: none; border: none; color: #92400e; cursor: pointer; font-weight: bold;">
+                    Dismiss
+                </button>
+            </div>
+        `;
+
+        // Insert after page header
+        const pageHeader = document.querySelector('.page-header');
+        if (pageHeader && pageHeader.nextSibling) {
+            pageHeader.parentNode.insertBefore(banner, pageHeader.nextSibling);
         }
     }
 
