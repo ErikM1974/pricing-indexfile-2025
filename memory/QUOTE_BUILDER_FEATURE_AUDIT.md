@@ -1,6 +1,6 @@
 # Quote Builder Feature Parity Audit
 
-**Date:** 2026-01-13
+**Date:** 2026-01-29
 **Purpose:** Document feature gaps, inconsistencies, and architecture across all four quote builders
 **Status:** Living document - update as features are added
 
@@ -16,6 +16,7 @@
 | Auto-save drafts | ✅ | ✅ | ✅ | ✅ |
 | Sales rep dropdown | ✅ | ✅ | ✅ | ✅ |
 | Sales rep auto-select | ✅ | ✅ | ✅ | ✅ |
+| Customer Lookup | ✅ | ✅ | ✅ | ✅ |
 | Keyboard hints | ✅ | ❌ | ❌ | ❌ |
 
 ---
@@ -76,13 +77,16 @@
 
 | Field | DTF | DTG | Screen Print | Embroidery |
 |-------|-----|-----|--------------|------------|
+| Customer Lookup (autocomplete) | ✅ | ✅ | ✅ | ✅ |
 | Name (required) | ✅ | ✅ | ✅ | ✅ |
 | Email (required) | ✅ | ✅ | ✅ | ✅ |
 | Company | ✅ | ✅ | ✅ | ✅ |
-| Phone | ✅ | ✅ | ✅ | ✅ |
+| Phone | ❌ Removed | ❌ Removed | ❌ Removed | ❌ Removed |
 | Sales rep dropdown | ❌ Auto-assigns | ✅ | ✅ | ✅ |
 | Project name | ❌ | ✅ | ❌ | ❌ |
 | Special notes | ❌ | ✅ | ❌ | ❌ |
+
+**Note (2026-01-29):** Phone field removed from all 4 builders because it was never stored in the database. Customer Lookup autocomplete added to search existing customers and auto-fill name, email, company. See [CUSTOMER_LOOKUP_SYSTEM.md](./CUSTOMER_LOOKUP_SYSTEM.md).
 
 ### UI/UX Patterns
 
@@ -249,6 +253,8 @@ AddedAt              DATETIME
 - [x] Sales rep auto-select based on staff login for all 4 builders (2026-01-13)
 - [x] Quote Management Dashboard `/dashboards/quote-management.html` (2026-01-13)
 - [x] Fixed salesRep not saving in DTF and Screen Print quote submissions (2026-01-13)
+- [x] Customer Lookup autocomplete for all 4 builders (2026-01-29)
+- [x] Removed Phone field from all 4 builders - not stored in DB (2026-01-29)
 
 ### Planned
 - [ ] Keyboard hints for DTG, Screen Print, Embroidery
@@ -280,3 +286,4 @@ When modifying any quote builder, verify:
 - `/memory/QUOTE_BUILDER_GUIDE.md` - How to build new quote builders
 - `/memory/LESSONS_LEARNED.md` - Past bugs and solutions
 - `/memory/quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md` - Shareable URL implementation
+- `/memory/CUSTOMER_LOOKUP_SYSTEM.md` - Customer autocomplete system

@@ -30,6 +30,24 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: Phone Field in Quote Builders Wasn't Stored Anywhere
+**Date:** 2026-01-29
+**Project:** [Pricing Index]
+**Problem:** All 4 quote builders had a Phone field in the customer info form, but it was never saved to the database. Users entered phone numbers that were silently discarded.
+**Root Cause:** The `quote_sessions` Caspio table and `Company_Contacts_Merge_ODBC` table don't have a Phone column. The quote service files never included Phone in the data payload.
+**Solution:** Removed the Phone field from all 4 quote builder HTML forms:
+- `dtf-quote-builder.html`
+- `dtg-quote-builder.html`
+- `screenprint-quote-builder.html`
+- `embroidery-quote-builder.html`
+**Prevention:** Before adding form fields to quote builders:
+1. Verify the field exists in `quote_sessions` Caspio table
+2. Verify the quote service includes the field in save/update payloads
+3. Test that the field persists after save and reload
+**See also:** `/memory/CUSTOMER_LOOKUP_SYSTEM.md`
+
+---
+
 ## Bug: Chunk Boundary Overlap Causes Double-Counting
 **Date:** 2026-01-25
 **Project:** [caspio-proxy]

@@ -1,0 +1,260 @@
+/**
+ * Customer Lookup Autocomplete Styles
+ * Used by quote builders for customer search functionality
+ */
+
+/* Container for lookup field */
+.customer-lookup-container {
+    position: relative;
+    width: 100%;
+}
+
+/* Search input styling */
+.customer-lookup-input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.customer-lookup-input:focus {
+    outline: none;
+    border-color: #4cb354;
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+}
+
+.customer-lookup-input::placeholder {
+    color: #999;
+}
+
+/* Search icon */
+.customer-lookup-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* Clear button */
+.customer-lookup-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.customer-lookup-container:hover .customer-lookup-clear,
+.customer-lookup-input:focus + .customer-lookup-clear {
+    opacity: 1;
+}
+
+.customer-lookup-clear:hover {
+    color: #666;
+}
+
+/* Dropdown container */
+.customer-lookup-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: none;
+}
+
+/* Individual result item */
+.customer-lookup-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.15s;
+}
+
+.customer-lookup-item:last-child {
+    border-bottom: none;
+}
+
+.customer-lookup-item:hover,
+.customer-lookup-item.highlighted {
+    background-color: #f5f9f5;
+}
+
+/* Company name (primary text) */
+.customer-lookup-company {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+/* Contact details row */
+.customer-lookup-details {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Contact name */
+.customer-lookup-name {
+    color: #555;
+}
+
+/* Email */
+.customer-lookup-email {
+    color: #888;
+}
+
+.customer-lookup-email::before {
+    content: '\2022';
+    margin-right: 8px;
+    color: #ccc;
+}
+
+/* Loading state */
+.customer-lookup-loading {
+    padding: 12px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+}
+
+.customer-lookup-loading::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ddd;
+    border-top-color: #4cb354;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    animation: customer-lookup-spin 0.8s linear infinite;
+}
+
+@keyframes customer-lookup-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* No results state */
+.customer-lookup-no-results {
+    padding: 16px 12px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+}
+
+/* Manual entry hint */
+.customer-lookup-hint {
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+}
+
+/* Divider line between lookup and manual entry */
+.customer-lookup-divider {
+    display: flex;
+    align-items: center;
+    margin: 12px 0;
+    color: #aaa;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.customer-lookup-divider::before,
+.customer-lookup-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #ddd;
+}
+
+.customer-lookup-divider::before {
+    margin-right: 8px;
+}
+
+.customer-lookup-divider::after {
+    margin-left: 8px;
+}
+
+/* Selected customer badge */
+.customer-lookup-selected {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 16px;
+    font-size: 12px;
+    color: #2e7d32;
+    margin-bottom: 8px;
+}
+
+.customer-lookup-selected-remove {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 2px;
+    line-height: 1;
+    font-size: 14px;
+}
+
+.customer-lookup-selected-remove:hover {
+    color: #c62828;
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+    .customer-lookup-dropdown {
+        background: #2d2d2d;
+        border-color: #444;
+    }
+
+    .customer-lookup-item {
+        border-bottom-color: #3d3d3d;
+    }
+
+    .customer-lookup-item:hover,
+    .customer-lookup-item.highlighted {
+        background-color: #3d3d3d;
+    }
+
+    .customer-lookup-company {
+        color: #eee;
+    }
+
+    .customer-lookup-details {
+        color: #aaa;
+    }
+
+    .customer-lookup-name {
+        color: #ccc;
+    }
+}

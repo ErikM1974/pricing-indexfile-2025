@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-01-11 (added 20 previously orphaned files)
+**Last Updated:** 2026-01-29 (added Customer Lookup System documentation)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -43,6 +43,7 @@
 ├── 2026_PRICING_MARGINS.md           # 2026 pricing margins reference
 ├── REP_ACCOUNT_MANAGEMENT.md         # Rep account sync, reconcile, audit APIs
 ├── NIKA_DASHBOARD_BUILD_GUIDE.md     # Build guide for Nika's CRM dashboard
+├── CUSTOMER_LOOKUP_SYSTEM.md         # **NEW** Customer autocomplete for quote builders
 │
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
@@ -144,6 +145,7 @@
 ### Development Guides
 | Building | Start Here |
 |----------|-----------|
+| **Customer Lookup System** | **[CUSTOMER_LOOKUP_SYSTEM.md](./CUSTOMER_LOOKUP_SYSTEM.md)** - Autocomplete for quote builders |
 | Quote Builder | [QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md) |
 | **Quote Builder Feature Audit** | **[QUOTE_BUILDER_FEATURE_AUDIT.md](./QUOTE_BUILDER_FEATURE_AUDIT.md)** - Feature parity across all 4 |
 | Quote Builder Architecture | [QUOTE_BUILDER_ARCHITECTURE.md](./QUOTE_BUILDER_ARCHITECTURE.md) |

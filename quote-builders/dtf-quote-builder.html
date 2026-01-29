@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
     <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
 </head>
@@ -414,6 +415,12 @@
                 </div>
                 <div id="save-share-content" class="save-share-content">
                     <div class="customer-fields d-flex flex-column gap-3">
+                        <!-- Customer Lookup -->
+                        <div class="customer-field customer-lookup-container">
+                            <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> Find Customer</label>
+                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
+                        </div>
+                        <div class="customer-lookup-divider">or enter manually</div>
                         <div class="customer-field">
                             <label class="quote-label">Name *</label>
                             <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
@@ -425,10 +432,6 @@
                         <div class="customer-field">
                             <label class="quote-label">Company</label>
                             <input type="text" id="company-name" placeholder="Company name" class="quote-input">
-                        </div>
-                        <div class="customer-field">
-                            <label class="quote-label">Phone</label>
-                            <input type="tel" id="customer-phone" placeholder="(555) 555-5555" class="quote-input">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">Sales Rep</label>
@@ -502,6 +505,9 @@
 
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
+    <!-- Customer Lookup Autocomplete -->
+    <script src="/shared_components/js/customer-lookup-service.js?v=20260129"></script>
 
     <!-- Sidebar Resize (2026 UX improvement) -->
     <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>

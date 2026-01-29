@@ -226,6 +226,24 @@ class DTFQuoteBuilder {
             StaffAuthHelper.autoSelectSalesRep('sales-rep');
         }
 
+        // Initialize customer lookup autocomplete
+        if (typeof CustomerLookupService !== 'undefined') {
+            const customerLookup = new CustomerLookupService();
+            customerLookup.bindToInput('customer-lookup', {
+                onSelect: (contact) => {
+                    document.getElementById('customer-name').value = contact.ct_NameFull || '';
+                    document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+                    document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                    this.showToast('Customer info loaded', 'success');
+                },
+                onClear: () => {
+                    document.getElementById('customer-name').value = '';
+                    document.getElementById('customer-email').value = '';
+                    document.getElementById('company-name').value = '';
+                }
+            });
+        }
+
         // Hide loading overlay
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
@@ -292,8 +310,7 @@ class DTFQuoteBuilder {
         const fields = {
             'customer-name': session.CustomerName,
             'customer-email': session.CustomerEmail,
-            'company-name': session.CompanyName,
-            'customer-phone': session.Phone
+            'company-name': session.CompanyName
         };
 
         for (const [id, value] of Object.entries(fields)) {
@@ -2040,7 +2057,6 @@ class DTFQuoteBuilder {
         const customerName = document.getElementById('customer-name')?.value?.trim() || '';
         const customerEmail = document.getElementById('customer-email')?.value?.trim() || '';
         const companyName = document.getElementById('company-name')?.value?.trim() || '';
-        const customerPhone = document.getElementById('customer-phone')?.value?.trim() || '';
         const salesRep = document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com';
 
         // Validate required fields
@@ -2089,7 +2105,6 @@ class DTFQuoteBuilder {
             customerName,
             customerEmail,
             companyName,
-            customerPhone,
             salesRep,
             notes: '',
             selectedLocations: this.selectedLocations,
@@ -2336,7 +2351,6 @@ class DTFQuoteBuilder {
                 name: document.getElementById('customer-name')?.value || 'Customer',
                 company: document.getElementById('company-name')?.value || '',
                 email: document.getElementById('customer-email')?.value || '',
-                phone: document.getElementById('customer-phone')?.value || '',
                 salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
             };
 
@@ -2919,11 +2933,11 @@ class DTFQuoteBuilder {
         const customerName = document.getElementById('customer-name');
         const customerEmail = document.getElementById('customer-email');
         const companyName = document.getElementById('company-name');
-        const customerPhone = document.getElementById('customer-phone');
+        const customerLookup = document.getElementById('customer-lookup');
         if (customerName) customerName.value = '';
         if (customerEmail) customerEmail.value = '';
         if (companyName) companyName.value = '';
-        if (customerPhone) customerPhone.value = '';
+        if (customerLookup) customerLookup.value = '';
 
         // Reset additional charges
         const rushFee = document.getElementById('rush-fee');

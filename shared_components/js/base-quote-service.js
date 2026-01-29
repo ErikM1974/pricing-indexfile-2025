@@ -91,7 +91,6 @@ class BaseQuoteService {
                 CustomerEmail: quoteData.customerEmail || '',
                 CustomerName: quoteData.customerName || 'Guest',
                 CompanyName: quoteData.companyName || 'Not Provided',
-                Phone: quoteData.customerPhone || '',
                 TotalQuantity: parseInt(quoteData.totalQuantity || 0),
                 SubtotalAmount: parseFloat((quoteData.subtotal || 0).toFixed(2)),
                 LTMFeeTotal: parseFloat((quoteData.ltmFeeTotal || 0).toFixed(2)),

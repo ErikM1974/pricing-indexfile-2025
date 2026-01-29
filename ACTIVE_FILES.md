@@ -158,7 +158,28 @@
 | `/shared_components/js/quote-builder-core.js` | **NEW** Core quote builder functionality (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/pricing-sidebar-component.js` | **NEW** Unified pricing sidebar (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-share-modal.js` | **NEW** Shareable URL success modal (2026 consolidation) | All quote builders | ✅ Active |
+| `/shared_components/js/customer-lookup-service.js` | **NEW** Customer autocomplete search (2026-01-29) | All quote builders | ✅ Active |
 | `/shared_components/js/INTEGRATION-EXAMPLE.js` | **NEW** Integration example/docs (2026 consolidation) | Reference only | 📚 Docs |
+
+### Customer Lookup System (NEW 2026-01-29)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/customer-lookup-service.js` | Customer autocomplete from Caspio Company_Contacts_Merge_ODBC | caspio-proxy API | ✅ Active |
+| `/shared_components/css/customer-lookup.css` | Autocomplete dropdown styling | - | ✅ Active |
+
+**Backend (caspio-pricing-proxy):**
+- `GET /api/company-contacts/search?q=<term>` - Search contacts by company, name, or email
+- `GET /api/company-contacts/:id` - Get single contact
+- `POST /api/company-contacts` - Create new contact
+- `PUT /api/company-contacts/:id` - Update contact
+- `POST /api/company-contacts/sync` - Sync contacts from ManageOrders (Heroku Scheduler)
+
+**Features:**
+- Autocomplete search with 3+ character minimum
+- Active customers only (Customersts_Active = 1)
+- Results sorted by most recent order
+- Auto-fills name, email, company fields in quote builders
+- Phone field removed from all quote builders (not in Caspio table)
 
 ### Public Quote View System (NEW 2026-01-12)
 | File | Purpose | Dependencies | Status |

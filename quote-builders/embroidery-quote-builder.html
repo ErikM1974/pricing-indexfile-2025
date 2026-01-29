@@ -26,6 +26,9 @@
     <!-- Shared Quote Share Modal (2026 consolidation) -->
     <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
 
+    <!-- Customer Lookup Autocomplete -->
+    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
+
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -610,6 +613,12 @@
                 </div>
                 <div id="save-share-content" style="display: none; margin-top: 12px;">
                     <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Customer Lookup -->
+                        <div class="customer-field customer-lookup-container">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;"><i class="fas fa-search" style="margin-right: 4px;"></i> Find Customer</label>
+                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-lookup-divider">or enter manually</div>
                         <div class="customer-field">
                             <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
                             <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
@@ -621,10 +630,6 @@
                         <div class="customer-field">
                             <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
                             <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                        <div class="customer-field">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
-                            <input type="tel" id="customer-phone" placeholder="(555) 555-5555" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
                         <div class="customer-field">
                             <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
@@ -723,6 +728,9 @@
 
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
+    <!-- Customer Lookup Autocomplete -->
+    <script src="/shared_components/js/customer-lookup-service.js?v=20260129"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -1591,7 +1599,6 @@
                 customerName: document.getElementById('customer-name')?.value || '',
                 customerEmail: document.getElementById('customer-email')?.value || '',
                 companyName: document.getElementById('company-name')?.value || '',
-                customerPhone: document.getElementById('customer-phone')?.value || '',
                 salesRep: document.getElementById('sales-rep')?.value || '',
                 timestamp: Date.now()
             };
@@ -1614,10 +1621,6 @@
             if (draft.companyName) {
                 const companyEl = document.getElementById('company-name');
                 if (companyEl) companyEl.value = draft.companyName;
-            }
-            if (draft.customerPhone) {
-                const phoneEl = document.getElementById('customer-phone');
-                if (phoneEl) phoneEl.value = draft.customerPhone;
             }
             if (draft.salesRep) {
                 const salesRepEl = document.getElementById('sales-rep');
@@ -1823,8 +1826,7 @@
             const fields = {
                 'customer-name': session.CustomerName,
                 'customer-email': session.CustomerEmail,
-                'company-name': session.CompanyName,
-                'customer-phone': session.Phone
+                'company-name': session.CompanyName
             };
 
             for (const [id, value] of Object.entries(fields)) {
@@ -2089,6 +2091,24 @@
                 // Auto-select sales rep based on logged-in staff (2026 consolidation)
                 if (typeof StaffAuthHelper !== 'undefined') {
                     StaffAuthHelper.autoSelectSalesRep('sales-rep');
+                }
+
+                // Initialize customer lookup autocomplete
+                if (typeof CustomerLookupService !== 'undefined') {
+                    const customerLookup = new CustomerLookupService();
+                    customerLookup.bindToInput('customer-lookup', {
+                        onSelect: (contact) => {
+                            document.getElementById('customer-name').value = contact.ct_NameFull || '';
+                            document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+                            document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                            showToast('Customer info loaded', 'success');
+                        },
+                        onClear: () => {
+                            document.getElementById('customer-name').value = '';
+                            document.getElementById('customer-email').value = '';
+                            document.getElementById('company-name').value = '';
+                        }
+                    });
                 }
 
                 console.log('✅ Power Quote Builder ready');
@@ -5044,7 +5064,6 @@
                     customerName: document.getElementById('customer-name').value || 'Customer',
                     companyName: document.getElementById('company-name').value || '',
                     customerEmail: document.getElementById('customer-email').value || '',
-                    customerPhone: document.getElementById('customer-phone').value || '',
                     salesRepEmail: document.getElementById('sales-rep').value
                 };
 
@@ -5147,7 +5166,6 @@
                     email: customerEmail,
                     name: customerName,
                     company: document.getElementById('company-name')?.value?.trim() || '',
-                    phone: document.getElementById('customer-phone')?.value?.trim() || '',
                     salesRepEmail: salesRepEmail,
                     salesRepName: salesRepName,
                     notes: '',
@@ -5348,7 +5366,7 @@
         function setupUnsavedChangesTracking() {
             // Customer fields
             const customerFields = [
-                'customer-name', 'customer-email', 'company-name', 'customer-phone', 'sales-rep'
+                'customer-name', 'customer-email', 'company-name', 'customer-lookup', 'sales-rep'
             ];
             customerFields.forEach(id => {
                 const el = document.getElementById(id);
@@ -5451,7 +5469,7 @@
             document.getElementById('customer-name').value = '';
             document.getElementById('customer-email').value = '';
             document.getElementById('company-name').value = '';
-            document.getElementById('customer-phone').value = '';
+            document.getElementById('customer-lookup').value = '';
 
             // Reset additional charges
             document.getElementById('rush-fee').value = '';

@@ -146,7 +146,6 @@ class EmbroideryQuoteService {
                 CustomerEmail: customerData.email,
                 CustomerName: customerData.name || 'Guest',
                 CompanyName: customerData.company || 'Not Provided',
-                Phone: customerData.phone || '',
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity || 0,
@@ -406,8 +405,7 @@ class EmbroideryQuoteService {
                 // Customer information - ALWAYS provide these even if empty
                 customerName: customerData.name || '',
                 customerCompany: customerData.company || '',
-                customerPhone: customerData.phone || '',
-                
+
                 // Project details - ALWAYS provide these
                 projectName: customerData.project || '',
                 salesRepName: salesRep.name || 'General Sales',
@@ -829,7 +827,6 @@ class EmbroideryQuoteService {
                 CustomerEmail: customerData.email,
                 CustomerName: customerData.name || 'Guest',
                 CompanyName: customerData.company || 'Not Provided',
-                Phone: customerData.phone || '',
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity || 0,

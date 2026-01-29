@@ -26,6 +26,9 @@
     <!-- Shared Quote Share Modal (2026 consolidation) -->
     <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
 
+    <!-- Customer Lookup Autocomplete -->
+    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
+
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -487,6 +490,12 @@
                 </div>
                 <div id="save-share-content" class="save-share-content">
                     <div class="customer-fields d-flex flex-column gap-3">
+                        <!-- Customer Lookup -->
+                        <div class="customer-field customer-lookup-container">
+                            <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> Find Customer</label>
+                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
+                        </div>
+                        <div class="customer-lookup-divider">or enter manually</div>
                         <div class="customer-field">
                             <label class="quote-label">Name *</label>
                             <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
@@ -498,10 +507,6 @@
                         <div class="customer-field">
                             <label class="quote-label">Company</label>
                             <input type="text" id="company-name" placeholder="Company name" class="quote-input">
-                        </div>
-                        <div class="customer-field">
-                            <label class="quote-label">Phone</label>
-                            <input type="tel" id="customer-phone" placeholder="(555) 555-5555" class="quote-input">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">Sales Rep</label>
@@ -589,6 +594,9 @@
 
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
+    <!-- Customer Lookup Autocomplete -->
+    <script src="/shared_components/js/customer-lookup-service.js?v=20260129"></script>
 
     <!-- Sidebar Resize (2026 UX improvement) -->
     <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>
@@ -1346,7 +1354,6 @@
                 customerName: document.getElementById('customer-name')?.value || '',
                 customerEmail: document.getElementById('customer-email')?.value || '',
                 companyName: document.getElementById('company-name')?.value || '',
-                customerPhone: document.getElementById('customer-phone')?.value || '',
                 salesRep: document.getElementById('sales-rep')?.value || '',
                 timestamp: Date.now()
             };
@@ -1369,10 +1376,6 @@
             if (draft.companyName) {
                 const companyEl = document.getElementById('company-name');
                 if (companyEl) companyEl.value = draft.companyName;
-            }
-            if (draft.customerPhone) {
-                const phoneEl = document.getElementById('customer-phone');
-                if (phoneEl) phoneEl.value = draft.customerPhone;
             }
             if (draft.salesRep) {
                 const salesRepEl = document.getElementById('sales-rep');
@@ -1507,8 +1510,7 @@
             const fields = {
                 'customer-name': session.CustomerName,
                 'customer-email': session.CustomerEmail,
-                'company-name': session.CompanyName,
-                'customer-phone': session.Phone
+                'company-name': session.CompanyName
             };
 
             for (const [id, value] of Object.entries(fields)) {
@@ -1864,7 +1866,7 @@
             document.getElementById('customer-name').value = '';
             document.getElementById('customer-email').value = '';
             document.getElementById('company-name').value = '';
-            document.getElementById('customer-phone').value = '';
+            document.getElementById('customer-lookup').value = '';
 
             // Reset additional charges
             const rushFee = document.getElementById('rush-fee');
@@ -1961,6 +1963,26 @@
                 // Auto-select sales rep based on logged-in staff (2026 consolidation)
                 if (typeof StaffAuthHelper !== 'undefined') {
                     StaffAuthHelper.autoSelectSalesRep('sales-rep');
+                }
+
+                // Initialize customer lookup autocomplete
+                if (typeof CustomerLookupService !== 'undefined') {
+                    const customerLookup = new CustomerLookupService();
+                    customerLookup.bindToInput('customer-lookup', {
+                        onSelect: (contact) => {
+                            // Auto-fill customer fields
+                            document.getElementById('customer-name').value = contact.ct_NameFull || '';
+                            document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+                            document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                            showToast('Customer info loaded', 'success');
+                        },
+                        onClear: () => {
+                            // Clear customer fields when lookup cleared
+                            document.getElementById('customer-name').value = '';
+                            document.getElementById('customer-email').value = '';
+                            document.getElementById('company-name').value = '';
+                        }
+                    });
                 }
 
                 // Auto-focus search bar for immediate typing (UX improvement)
@@ -4892,7 +4914,6 @@
                     name: document.getElementById('customer-name')?.value || 'Customer',
                     company: document.getElementById('company-name')?.value || '',
                     email: document.getElementById('customer-email')?.value || '',
-                    phone: document.getElementById('customer-phone')?.value || '',
                     salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
                 };
 
@@ -5149,7 +5170,6 @@
                     customerName: customerName,
                     customerEmail: customerEmail,
                     companyName: document.getElementById('company-name')?.value?.trim() || '',
-                    customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
                     salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
                     items: items,
                     totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
