@@ -126,7 +126,7 @@
                                     <div class="logo-form-row">
                                         <div class="logo-form-field">
                                             <label>Position</label>
-                                            <select id="garment-al-position" onchange="updateGlobalAL('garment')">
+                                            <select id="garment-al-position-select" onchange="updateGlobalAL('garment')">
                                                 <option value="Right Chest">Right Chest</option>
                                                 <option value="Left Chest">Left Chest</option>
                                                 <option value="Left Sleeve">Left Sleeve</option>
@@ -139,6 +139,14 @@
                                                    min="1000" max="50000" step="1000"
                                                    onchange="updateGlobalAL('garment')">
                                         </div>
+                                    </div>
+                                    <div class="logo-form-row digitizing-row">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="garment-al-digitizing-checkbox"
+                                                   onchange="updateGlobalAL('garment')">
+                                            <span>Digitizing</span>
+                                            <span class="digitizing-price">$100</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -222,7 +230,7 @@
                                     <div class="logo-form-row">
                                         <div class="logo-form-field">
                                             <label>Position</label>
-                                            <select id="cap-al-position" onchange="updateGlobalAL('cap')">
+                                            <select id="cap-al-position-select" onchange="updateGlobalAL('cap')">
                                                 <option value="Cap Back">Cap Back</option>
                                                 <option value="Cap Left">Cap Left</option>
                                                 <option value="Cap Right">Cap Right</option>
@@ -234,6 +242,14 @@
                                                    min="1000" max="50000" step="1000"
                                                    onchange="updateGlobalAL('cap')">
                                         </div>
+                                    </div>
+                                    <div class="logo-form-row digitizing-row">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="cap-al-digitizing-checkbox"
+                                                   onchange="updateGlobalAL('cap')">
+                                            <span>Digitizing</span>
+                                            <span class="digitizing-price">$100</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -337,9 +353,49 @@
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-layer-group"></i> Additional Stitches Fee
                                 </td>
-                                <td class="cell-qty">1</td>
+                                <td class="cell-qty" id="stitches-fee-qty">1</td>
                                 <td class="cell-price" id="stitches-fee-unit">$0.00</td>
                                 <td class="cell-total" id="stitches-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Garment Additional Logo Fee Row -->
+                            <tr id="garment-al-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-plus-circle"></i> Additional Logo: <span id="garment-al-position">--</span>
+                                </td>
+                                <td class="cell-qty" id="garment-al-qty">1</td>
+                                <td class="cell-price" id="garment-al-unit">$0.00</td>
+                                <td class="cell-total" id="garment-al-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Garment Additional Logo Digitizing Row -->
+                            <tr id="garment-al-digitizing-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-cog"></i> AL Digitizing: <span id="garment-al-digitizing-position">--</span>
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="garment-al-digitizing-unit">$100.00</td>
+                                <td class="cell-total" id="garment-al-digitizing-total">$100.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Cap Additional Logo Fee Row -->
+                            <tr id="cap-al-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-hat-cowboy"></i> Cap Additional Logo: <span id="cap-al-position">--</span>
+                                </td>
+                                <td class="cell-qty" id="cap-al-qty">1</td>
+                                <td class="cell-price" id="cap-al-unit">$0.00</td>
+                                <td class="cell-total" id="cap-al-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Cap Additional Logo Digitizing Row -->
+                            <tr id="cap-al-digitizing-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-cog"></i> Cap AL Digitizing: <span id="cap-al-digitizing-position">--</span>
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="cap-al-digitizing-unit">$100.00</td>
+                                <td class="cell-total" id="cap-al-digitizing-total">$100.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Art Charge Row -->
@@ -843,8 +899,8 @@
         let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
         // Global AL config (applies to all products of type when enabled)
         let globalAL = {
-            garment: { enabled: false, position: 'Right Chest', stitchCount: 8000 },
-            cap: { enabled: false, position: 'Cap Back', stitchCount: 5000 }
+            garment: { enabled: false, position: 'Right Chest', stitchCount: 8000, needsDigitizing: false },
+            cap: { enabled: false, position: 'Cap Back', stitchCount: 5000, needsDigitizing: false }
         };
 
         // Toggle global AL on/off
@@ -859,13 +915,15 @@
             recalculatePricing();
         }
 
-        // Update global AL config (position or stitch count change)
+        // Update global AL config (position, stitch count, or digitizing change)
         function updateGlobalAL(type) {
-            const position = document.getElementById(`${type}-al-position`).value;
-            const stitches = parseInt(document.getElementById(`${type}-al-stitches`).value) || (type === 'cap' ? 5000 : 8000);
+            const positionSelect = document.getElementById(`${type}-al-position-select`);
+            const stitchesInput = document.getElementById(`${type}-al-stitches`);
+            const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
 
-            globalAL[type].position = position;
-            globalAL[type].stitchCount = stitches;
+            if (positionSelect) globalAL[type].position = positionSelect.value;
+            if (stitchesInput) globalAL[type].stitchCount = parseInt(stitchesInput.value) || (type === 'cap' ? 5000 : 8000);
+            if (digitizingCheckbox) globalAL[type].needsDigitizing = digitizingCheckbox.checked;
 
             // Recalculate all product prices
             recalculatePricing();
@@ -1583,13 +1641,15 @@
                 capPrimaryLogo: typeof capPrimaryLogo !== 'undefined' ? { ...capPrimaryLogo } : null,
                 garmentAL: {
                     enabled: document.getElementById('garment-al-toggle')?.checked || false,
-                    position: document.getElementById('garment-al-position')?.value || 'Right Chest',
-                    stitches: document.getElementById('garment-al-stitches')?.value || 8000
+                    position: document.getElementById('garment-al-position-select')?.value || 'Right Chest',
+                    stitches: document.getElementById('garment-al-stitches')?.value || 8000,
+                    needsDigitizing: document.getElementById('garment-al-digitizing-checkbox')?.checked || false
                 },
                 capAL: {
                     enabled: document.getElementById('cap-al-toggle')?.checked || false,
-                    position: document.getElementById('cap-al-position')?.value || 'Cap Back',
-                    stitches: document.getElementById('cap-al-stitches')?.value || 5000
+                    position: document.getElementById('cap-al-position-select')?.value || 'Cap Back',
+                    stitches: document.getElementById('cap-al-stitches')?.value || 5000,
+                    needsDigitizing: document.getElementById('cap-al-digitizing-checkbox')?.checked || false
                 },
                 customerName: document.getElementById('customer-name')?.value || '',
                 customerEmail: document.getElementById('customer-email')?.value || '',
@@ -1648,10 +1708,12 @@
                 if (garmentALToggle) {
                     garmentALToggle.checked = true;
                     toggleGlobalAL('garment');
-                    const posEl = document.getElementById('garment-al-position');
+                    const posEl = document.getElementById('garment-al-position-select');
                     if (posEl) posEl.value = draft.garmentAL.position;
                     const stitchEl = document.getElementById('garment-al-stitches');
                     if (stitchEl) stitchEl.value = draft.garmentAL.stitches;
+                    const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                    if (digitizingEl) digitizingEl.checked = draft.garmentAL.needsDigitizing || false;
                 }
             }
 
@@ -1661,10 +1723,12 @@
                 if (capALToggle) {
                     capALToggle.checked = true;
                     toggleGlobalAL('cap');
-                    const posEl = document.getElementById('cap-al-position');
+                    const posEl = document.getElementById('cap-al-position-select');
                     if (posEl) posEl.value = draft.capAL.position;
                     const stitchEl = document.getElementById('cap-al-stitches');
                     if (stitchEl) stitchEl.value = draft.capAL.stitches;
+                    const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
+                    if (digitizingEl) digitizingEl.checked = draft.capAL.needsDigitizing || false;
                 }
             }
 
@@ -1881,10 +1945,13 @@
                 const alToggle = document.getElementById('garment-al-toggle');
                 if (alToggle) alToggle.checked = true;
 
-                const posSelect = document.getElementById('garment-al-position');
+                const posSelect = document.getElementById('garment-al-position-select');
                 if (posSelect) posSelect.value = session.AdditionalLogoLocation;
                 const stitchInput = document.getElementById('garment-al-stitches');
                 if (stitchInput) stitchInput.value = session.AdditionalStitchCount || 8000;
+                // Update globalAL state
+                globalAL.garment.position = session.AdditionalLogoLocation;
+                globalAL.garment.stitchCount = session.AdditionalStitchCount || 8000;
             }
 
             // Cap primary logo
@@ -4914,6 +4981,7 @@
             // Additional Stitches - table row only (sidebar removed in 2026 refactor)
             // Garments use $1.25/K rate, Caps use $1.00/K rate
             const stitchesFeeRow = document.getElementById('stitches-fee-row');
+            const stitchesFeeQty = document.getElementById('stitches-fee-qty');
             const stitchesFeeUnit = document.getElementById('stitches-fee-unit');
             const stitchesFeeTotal = document.getElementById('stitches-fee-total');
 
@@ -4928,15 +4996,24 @@
             const garmentStitchFee = garmentExtraK * 1.25 * garmentQty;
 
             // Calculate cap extra stitches (rate: $1.00/K)
-            const capExtraK = Math.max(0, (capStitches - 8000) / 1000);
+            // Skip for laser patches - they don't use stitches
+            const capEmbType = getCapEmbellishmentType();
             const capQty = pricing.capQuantity || 0;
-            const capStitchFee = capExtraK * 1.00 * capQty;
+            let capStitchFee = 0;
+            if (capEmbType !== 'laser-patch') {
+                const capExtraK = Math.max(0, (capStitches - 8000) / 1000);
+                capStitchFee = capExtraK * 1.00 * capQty;
+            }
 
             const totalStitchFee = garmentStitchFee + capStitchFee;
 
             if (totalStitchFee > 0 && stitchesFeeRow) {
                 stitchesFeeRow.style.display = 'table-row';
-                if (stitchesFeeUnit) stitchesFeeUnit.textContent = `$${totalStitchFee.toFixed(2)}`;
+                // Show per-piece breakdown: qty × unit = total
+                const stitchQty = garmentQty + capQty;
+                const stitchUnitPrice = stitchQty > 0 ? totalStitchFee / stitchQty : 0;
+                if (stitchesFeeQty) stitchesFeeQty.textContent = stitchQty;
+                if (stitchesFeeUnit) stitchesFeeUnit.textContent = `$${stitchUnitPrice.toFixed(2)}`;
                 if (stitchesFeeTotal) stitchesFeeTotal.textContent = `$${totalStitchFee.toFixed(2)}`;
             } else if (stitchesFeeRow) {
                 stitchesFeeRow.style.display = 'none';
@@ -5012,7 +5089,7 @@
                 const logo = globalAL.cap;
                 // Cap AL base is 5000 stitches (from API, not 8000 like garments)
                 const logoExtraStitches = Math.max(0, logo.stitchCount - capAlBaseStitches);
-                const logoExtraK = Math.ceil(logoExtraStitches / 1000); // Round up per 1K
+                const logoExtraK = logoExtraStitches / 1000; // No rounding, consistent with garment AL
                 // Cap AL rate is $1.00/1K from API (not $1.25 like garments)
                 const stitchCost = logoExtraK * capAlStitchRate;
                 const capAlUnitPrice = capAlBaseRate + stitchCost;
@@ -5032,6 +5109,103 @@
                 `;
             } else {
                 capAlContainer.innerHTML = '';
+            }
+
+            // ============================================
+            // Additional Logo Fee Table Rows (Garments)
+            // ============================================
+            const garmentAlFeeRow = document.getElementById('garment-al-fee-row');
+            const garmentAlQty = document.getElementById('garment-al-qty');
+            const garmentAlUnit = document.getElementById('garment-al-unit');
+            const garmentAlTotal = document.getElementById('garment-al-total');
+            const garmentAlPositionLabel = document.querySelector('#garment-al-fee-row #garment-al-position');
+
+            if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
+                // Calculate AL pricing (reuse same logic as sidebar)
+                const tier = pricing.garmentTier || pricing.tier || '1-23';
+                let alBaseRate = 13.50;
+                if (pricingCalculator.alTiers && pricingCalculator.alTiers[tier]) {
+                    alBaseRate = pricingCalculator.alTiers[tier].embCost;
+                }
+                const alConfig = pricingCalculator.alTiers && pricingCalculator.alTiers[tier];
+                const alBaseStitches = alConfig?.baseStitchCount || 8000;
+                const alStitchRate = alConfig?.additionalStitchRate || 1.25;
+
+                const logo = globalAL.garment;
+                const logoExtraStitches = Math.max(0, logo.stitchCount - alBaseStitches);
+                const logoExtraK = logoExtraStitches / 1000;
+                const stitchCost = logoExtraK * alStitchRate;
+                const alUnitPrice = alBaseRate + stitchCost;
+                const alTotal = alUnitPrice * pricing.garmentQuantity;
+
+                // Update fee table row
+                if (garmentAlFeeRow) garmentAlFeeRow.style.display = 'table-row';
+                if (garmentAlQty) garmentAlQty.textContent = pricing.garmentQuantity;
+                if (garmentAlUnit) garmentAlUnit.textContent = `$${alUnitPrice.toFixed(2)}`;
+                if (garmentAlTotal) garmentAlTotal.textContent = `$${alTotal.toFixed(2)}`;
+                if (garmentAlPositionLabel) garmentAlPositionLabel.textContent = logo.position || 'Right Chest';
+            } else {
+                if (garmentAlFeeRow) garmentAlFeeRow.style.display = 'none';
+            }
+
+            // Garment AL Digitizing Row
+            const garmentAlDigitizingRow = document.getElementById('garment-al-digitizing-row');
+            const garmentAlDigitizingPosition = document.getElementById('garment-al-digitizing-position');
+            const garmentAlDigitizingCheckbox = document.getElementById('garment-al-digitizing-checkbox');
+
+            if (globalAL.garment.enabled && globalAL.garment.needsDigitizing && pricing.garmentQuantity > 0) {
+                if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'table-row';
+                if (garmentAlDigitizingPosition) garmentAlDigitizingPosition.textContent = globalAL.garment.position || 'Right Chest';
+            } else {
+                if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'none';
+            }
+
+            // ============================================
+            // Additional Logo Fee Table Rows (Caps)
+            // ============================================
+            const capAlFeeRow = document.getElementById('cap-al-fee-row');
+            const capAlQtyEl = document.getElementById('cap-al-qty');
+            const capAlUnitEl = document.getElementById('cap-al-unit');
+            const capAlTotalEl = document.getElementById('cap-al-total');
+            const capAlPositionLabel = document.querySelector('#cap-al-fee-row #cap-al-position');
+
+            if (globalAL.cap.enabled && pricing.capQuantity > 0) {
+                // Calculate Cap AL pricing (reuse same logic as sidebar)
+                const capTier = pricing.capTier || '1-23';
+                let capAlBaseRate = 6.75;
+                if (pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier]) {
+                    capAlBaseRate = pricingCalculator.capAlTiers[capTier].embCost;
+                }
+                const capAlConfig = pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier];
+                const capAlBaseStitches = capAlConfig?.baseStitchCount || 5000;
+                const capAlStitchRate = capAlConfig?.additionalStitchRate || 1.00;
+
+                const capLogo = globalAL.cap;
+                const capLogoExtraStitches = Math.max(0, capLogo.stitchCount - capAlBaseStitches);
+                const capLogoExtraK = capLogoExtraStitches / 1000; // No rounding, consistent with garment AL
+                const capStitchCost = capLogoExtraK * capAlStitchRate;
+                const capAlUnitPrice = capAlBaseRate + capStitchCost;
+                const capAlTotalPrice = capAlUnitPrice * pricing.capQuantity;
+
+                // Update fee table row
+                if (capAlFeeRow) capAlFeeRow.style.display = 'table-row';
+                if (capAlQtyEl) capAlQtyEl.textContent = pricing.capQuantity;
+                if (capAlUnitEl) capAlUnitEl.textContent = `$${capAlUnitPrice.toFixed(2)}`;
+                if (capAlTotalEl) capAlTotalEl.textContent = `$${capAlTotalPrice.toFixed(2)}`;
+                if (capAlPositionLabel) capAlPositionLabel.textContent = capLogo.position || 'Cap Back';
+            } else {
+                if (capAlFeeRow) capAlFeeRow.style.display = 'none';
+            }
+
+            // Cap AL Digitizing Row
+            const capAlDigitizingRow = document.getElementById('cap-al-digitizing-row');
+            const capAlDigitizingPosition = document.getElementById('cap-al-digitizing-position');
+
+            if (globalAL.cap.enabled && globalAL.cap.needsDigitizing && pricing.capQuantity > 0) {
+                if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'table-row';
+                if (capAlDigitizingPosition) capAlDigitizingPosition.textContent = globalAL.cap.position || 'Cap Back';
+            } else {
+                if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
             }
 
             // Update tax calculation at the end of pricing display
@@ -5463,8 +5637,8 @@
             // Logo configuration fields
             const logoFields = [
                 'primary-position', 'primary-stitches', 'primary-digitizing',
-                'garment-al-position', 'garment-al-stitches',
-                'cap-primary-stitches', 'cap-al-position', 'cap-al-stitches',
+                'garment-al-position-select', 'garment-al-stitches', 'garment-al-digitizing-checkbox',
+                'cap-primary-stitches', 'cap-al-position-select', 'cap-al-stitches', 'cap-al-digitizing-checkbox',
                 'cap-embellishment-type'
             ];
             logoFields.forEach(id => {
@@ -5939,7 +6113,8 @@
                     // Embroidery (flat or 3D puff) shows stitch count
                     lines.push(`  Front Logo: ${capPosName}, ${logoConfigs.cap.primary.stitchCount.toLocaleString()} stitches`);
                     if (embType === '3d-puff') {
-                        lines.push(`  3D Puff Upcharge: +$3.00/cap`);
+                        const upcharges = pricingCalculator.getEmbellishmentUpcharges();
+                        lines.push(`  3D Puff Upcharge: +$${upcharges.puff.toFixed(2)}/cap`);
                     }
                 }
                 // Only show additional logos for embroidery (not patches)
