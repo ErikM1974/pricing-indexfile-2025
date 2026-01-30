@@ -484,9 +484,25 @@
                                 <option value="fixed">$</option>
                             </select>
                         </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <select id="discount-reason-preset" class="quote-input" style="flex: 1;"
+                                    onchange="handleDiscountReasonPresetChange()">
+                                <option value="" selected>No reason</option>
+                                <option value="Repeat customer">Repeat customer</option>
+                                <option value="Bulk order">Bulk order</option>
+                                <option value="Non-profit/Church/School">Non-profit/Church/School</option>
+                                <option value="Price match">Price match</option>
+                                <option value="Sample order">Sample order</option>
+                                <option value="Sales promotion">Sales promotion</option>
+                                <option value="Customer service">Customer service</option>
+                                <option value="Quote revision">Quote revision</option>
+                                <option value="custom">Custom...</option>
+                            </select>
+                        </div>
                         <input type="text" id="discount-reason" class="quote-input mt-2"
-                               placeholder="Reason (optional)"
-                               oninput="updateFeeTableRows()">
+                               placeholder="Enter custom reason..."
+                               oninput="updateFeeTableRows()"
+                               style="display: none;">
                     </div>
                 </div>
             </div>
@@ -1600,8 +1616,25 @@
                     if (discountTypeSelect) discountTypeSelect.value = 'fixed';
                     discountAmountInput.value = session.Discount;
                 }
-                if (discountReasonInput && session.DiscountReason) {
-                    discountReasonInput.value = session.DiscountReason;
+                // Restore discount reason with preset detection
+                if (session.DiscountReason) {
+                    const reasonPreset = document.getElementById('discount-reason-preset');
+                    if (reasonPreset && discountReasonInput) {
+                        const presetValues = Array.from(reasonPreset.options)
+                            .map(opt => opt.value)
+                            .filter(v => v !== 'custom');
+                        if (presetValues.includes(session.DiscountReason)) {
+                            // Exact match to preset
+                            reasonPreset.value = session.DiscountReason;
+                            discountReasonInput.style.display = 'none';
+                            discountReasonInput.value = session.DiscountReason;
+                        } else {
+                            // Custom reason
+                            reasonPreset.value = 'custom';
+                            discountReasonInput.style.display = 'block';
+                            discountReasonInput.value = session.DiscountReason;
+                        }
+                    }
                 }
                 // Update UI to show correct input/preset based on type
                 if (typeof updateDiscountType === 'function') {
@@ -4839,6 +4872,27 @@
                 // Use preset value
                 if (inputWrapper) inputWrapper.style.display = 'none';
                 if (amountInput) amountInput.value = preset;
+            }
+            updateFeeTableRows();
+        }
+
+        function handleDiscountReasonPresetChange() {
+            const preset = document.getElementById('discount-reason-preset')?.value;
+            const customInput = document.getElementById('discount-reason');
+
+            if (preset === 'custom') {
+                // Show custom input and focus it
+                if (customInput) {
+                    customInput.style.display = 'block';
+                    customInput.value = '';
+                    customInput.focus();
+                }
+            } else {
+                // Hide custom input and use preset value
+                if (customInput) {
+                    customInput.style.display = 'none';
+                    customInput.value = preset;
+                }
             }
             updateFeeTableRows();
         }
