@@ -389,12 +389,21 @@
                     <div class="charge-field discount-field">
                         <label class="quote-label">Discount</label>
                         <div class="d-flex gap-2">
-                            <div class="input-with-prefix flex-1">
+                            <div class="input-with-prefix flex-1" id="discount-input-wrapper">
                                 <span class="prefix" id="discount-prefix">$</span>
                                 <input type="number" id="discount-amount" class="quote-input"
                                        min="0" step="0.01" placeholder="0.00"
                                        onchange="updateAdditionalCharges()">
                             </div>
+                            <select id="discount-preset" class="quote-input" style="flex: 1; display: none;"
+                                    onchange="handleDiscountPresetChange()">
+                                <option value="5">5%</option>
+                                <option value="10" selected>10%</option>
+                                <option value="15">15%</option>
+                                <option value="20">20%</option>
+                                <option value="25">25%</option>
+                                <option value="custom">Custom...</option>
+                            </select>
                             <select id="discount-type" class="quote-input" style="width: auto;"
                                     onchange="updateDiscountType()">
                                 <option value="fixed">$</option>
@@ -674,13 +683,47 @@
         }
 
         function updateDiscountType() {
-            const prefix = document.getElementById('discount-prefix');
             const discountType = document.getElementById('discount-type')?.value;
-            if (prefix) {
-                // Hide prefix for % (already shown in dropdown), show $ for fixed
-                prefix.textContent = discountType === 'percent' ? '' : '$';
+            const prefix = document.getElementById('discount-prefix');
+            const inputWrapper = document.getElementById('discount-input-wrapper');
+            const presetDropdown = document.getElementById('discount-preset');
+            const amountInput = document.getElementById('discount-amount');
+
+            if (discountType === 'percent') {
+                // Show preset dropdown, hide number input
+                if (inputWrapper) inputWrapper.style.display = 'none';
+                if (presetDropdown) presetDropdown.style.display = 'block';
+                // Set amount from preset (unless custom is selected)
+                if (presetDropdown && presetDropdown.value !== 'custom') {
+                    if (amountInput) amountInput.value = presetDropdown.value;
+                }
+            } else {
+                // Show number input, hide preset dropdown
+                if (inputWrapper) inputWrapper.style.display = 'flex';
+                if (presetDropdown) presetDropdown.style.display = 'none';
+                if (prefix) prefix.textContent = '$';
             }
+
             updateAdditionalCharges();
+        }
+
+        function handleDiscountPresetChange() {
+            const preset = document.getElementById('discount-preset')?.value;
+            const inputWrapper = document.getElementById('discount-input-wrapper');
+            const amountInput = document.getElementById('discount-amount');
+            const prefix = document.getElementById('discount-prefix');
+
+            if (preset === 'custom') {
+                // Show number input for custom entry
+                if (inputWrapper) inputWrapper.style.display = 'flex';
+                if (prefix) prefix.textContent = '%';
+                if (amountInput) amountInput.focus();
+            } else {
+                // Use preset value
+                if (inputWrapper) inputWrapper.style.display = 'none';
+                if (amountInput) amountInput.value = preset;
+            }
+            updateFeeTableRows();
         }
 
         // ============================================
@@ -800,8 +843,17 @@
                     discountRow.style.display = 'table-row';
                     let actualDiscount = discountAmount;
                     if (discountType === 'percent') {
-                        const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
-                        actualDiscount = subtotal * (discountAmount / 100);
+                        // Calculate discountable subtotal (products + additional services)
+                        const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
+                        const artCharge = document.getElementById('art-charge-toggle')?.checked
+                            ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+                        const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
+                        const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+                        const ltmFee = document.getElementById('ltm-fee-row')?.style.display !== 'none'
+                            ? parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+
+                        const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + ltmFee;
+                        actualDiscount = discountableSubtotal * (discountAmount / 100);
                     }
                     const reasonLabel = document.getElementById('discount-reason-label');
                     if (reasonLabel) {

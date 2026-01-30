@@ -559,12 +559,21 @@
                     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fca5a5; background: #fef2f2; margin: 12px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
                         <label style="font-size: 12px; color: #b91c1c; margin-bottom: 4px; display: block; font-weight: 600;">Discount</label>
                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                            <div style="position: relative; flex: 1;">
+                            <div id="discount-input-wrapper" style="position: relative; flex: 1;">
                                 <span id="discount-symbol" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                                 <input type="number" id="discount-amount" min="0" step="0.01" placeholder="0.00"
                                        onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                        style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                             </div>
+                            <select id="discount-preset" onchange="handleDiscountPresetChange()"
+                                    style="flex: 1; display: none; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
+                                <option value="5">5%</option>
+                                <option value="10" selected>10%</option>
+                                <option value="15">15%</option>
+                                <option value="20">20%</option>
+                                <option value="25">25%</option>
+                                <option value="custom">Custom...</option>
+                            </select>
                             <select id="discount-type" onchange="updateDiscountType(); updateTaxCalculation();"
                                     style="width: 60px; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
                                 <option value="fixed">$</option>
@@ -2027,14 +2036,35 @@
 
             // Handle discount
             if (session.Discount > 0 || session.DiscountPercent > 0) {
+                const discountPreset = document.getElementById('discount-preset');
                 if (session.DiscountPercent > 0) {
                     document.getElementById('discount-type').value = 'percent';
                     document.getElementById('discount-amount').value = session.DiscountPercent;
-                    document.getElementById('discount-symbol').textContent = '%';
+                    // Set preset dropdown based on value
+                    if (discountPreset) {
+                        const presetValues = ['5', '10', '15', '20', '25'];
+                        const percentStr = String(session.DiscountPercent);
+                        if (presetValues.includes(percentStr)) {
+                            discountPreset.value = percentStr;
+                        } else {
+                            discountPreset.value = 'custom';
+                        }
+                    }
                 } else {
                     document.getElementById('discount-type').value = 'fixed';
                     document.getElementById('discount-amount').value = session.Discount;
                     document.getElementById('discount-symbol').textContent = '$';
+                }
+                // Update UI to show correct input/preset based on type
+                if (typeof updateDiscountType === 'function') {
+                    updateDiscountType();
+                }
+                // If custom percentage, ensure input wrapper is visible
+                if (session.DiscountPercent > 0 && discountPreset && discountPreset.value === 'custom') {
+                    const inputWrapper = document.getElementById('discount-input-wrapper');
+                    const symbol = document.getElementById('discount-symbol');
+                    if (inputWrapper) inputWrapper.style.display = 'block';
+                    if (symbol) symbol.textContent = '%';
                 }
             }
 
@@ -5553,11 +5583,47 @@
          * Update discount symbol when type changes ($ vs %)
          */
         function updateDiscountType() {
-            const type = document.getElementById('discount-type').value;
+            const discountType = document.getElementById('discount-type')?.value;
             const symbol = document.getElementById('discount-symbol');
-            // Hide prefix for % (already shown in dropdown), show $ for fixed
-            symbol.textContent = type === 'percent' ? '' : '$';
+            const inputWrapper = document.getElementById('discount-input-wrapper');
+            const presetDropdown = document.getElementById('discount-preset');
+            const amountInput = document.getElementById('discount-amount');
+
+            if (discountType === 'percent') {
+                // Show preset dropdown, hide number input
+                if (inputWrapper) inputWrapper.style.display = 'none';
+                if (presetDropdown) presetDropdown.style.display = 'block';
+                // Set amount from preset (unless custom is selected)
+                if (presetDropdown && presetDropdown.value !== 'custom') {
+                    if (amountInput) amountInput.value = presetDropdown.value;
+                }
+            } else {
+                // Show number input, hide preset dropdown
+                if (inputWrapper) inputWrapper.style.display = 'block';
+                if (presetDropdown) presetDropdown.style.display = 'none';
+                if (symbol) symbol.textContent = '$';
+            }
+
             updateAdditionalCharges();
+        }
+
+        function handleDiscountPresetChange() {
+            const preset = document.getElementById('discount-preset')?.value;
+            const inputWrapper = document.getElementById('discount-input-wrapper');
+            const amountInput = document.getElementById('discount-amount');
+            const symbol = document.getElementById('discount-symbol');
+
+            if (preset === 'custom') {
+                // Show number input for custom entry
+                if (inputWrapper) inputWrapper.style.display = 'block';
+                if (symbol) symbol.textContent = '%';
+                if (amountInput) amountInput.focus();
+            } else {
+                // Use preset value
+                if (inputWrapper) inputWrapper.style.display = 'none';
+                if (amountInput) amountInput.value = preset;
+            }
+            updateFeeTableRows();
         }
 
         /**
@@ -5668,8 +5734,19 @@
                     discountRow.style.display = 'table-row';
                     let actualDiscount = discountAmount;
                     if (discountType === 'percent') {
-                        const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
-                        actualDiscount = subtotal * (discountAmount / 100);
+                        // Calculate discountable subtotal (products + additional services)
+                        const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
+                        const artCharge = document.getElementById('art-charge-toggle')?.checked
+                            ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+                        const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
+                        const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+                        const garmentLtmFee = document.getElementById('garment-ltm-table-row')?.style.display !== 'none'
+                            ? parseFloat(document.getElementById('garment-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+                        const capLtmFee = document.getElementById('cap-ltm-table-row')?.style.display !== 'none'
+                            ? parseFloat(document.getElementById('cap-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+
+                        const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + garmentLtmFee + capLtmFee;
+                        actualDiscount = discountableSubtotal * (discountAmount / 100);
                     }
                     const reasonLabel = document.getElementById('discount-reason-label');
                     if (reasonLabel) {
@@ -5703,9 +5780,20 @@
             let discountPercent = 0;
             if (discountType === 'percent') {
                 discountPercent = discountAmount;
+                // Calculate discountable subtotal (products + additional services)
                 const subtotalText = document.getElementById('subtotal')?.textContent || '$0.00';
-                const subtotal = parseFloat(subtotalText.replace(/[$,]/g, '')) || 0;
-                discountValue = subtotal * (discountAmount / 100);
+                const productsSubtotal = parseFloat(subtotalText.replace(/[$,]/g, '')) || 0;
+                const artCharge = document.getElementById('art-charge-toggle')?.checked
+                    ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
+                const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+                const garmentLtmFee = document.getElementById('garment-ltm-table-row')?.style.display !== 'none'
+                    ? parseFloat(document.getElementById('garment-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+                const capLtmFee = document.getElementById('cap-ltm-table-row')?.style.display !== 'none'
+                    ? parseFloat(document.getElementById('cap-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+
+                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + garmentLtmFee + capLtmFee;
+                discountValue = discountableSubtotal * (discountAmount / 100);
             } else {
                 discountValue = discountAmount;
             }
