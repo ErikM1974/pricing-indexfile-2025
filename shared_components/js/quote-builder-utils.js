@@ -223,6 +223,119 @@ function updateAdditionalCharges() {
 }
 
 // ============================================
+// PANEL TOGGLE FUNCTIONS
+// ============================================
+
+/**
+ * Toggle Additional Charges panel expand/collapse
+ * Element IDs: charges-content, charges-chevron (consistent across all builders)
+ */
+function toggleAdditionalCharges() {
+    const content = document.getElementById('charges-content');
+    const chevron = document.getElementById('charges-chevron');
+    if (!content || !chevron) return;
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        content.style.display = '';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
+ * Toggle Artwork Services panel expand/collapse
+ * Element IDs: artwork-content, artwork-chevron (consistent across all builders)
+ */
+function toggleArtworkServices() {
+    const content = document.getElementById('artwork-content');
+    const chevron = document.getElementById('artwork-chevron');
+    if (!content || !chevron) return;
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        content.style.display = '';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
+ * Toggle art charge checkbox and show/hide amount input
+ * Handles the art-charge-toggle checkbox and art-charge input
+ */
+function toggleArtCharge() {
+    const toggle = document.getElementById('art-charge-toggle');
+    const input = document.getElementById('art-charge');
+    const wrapper = document.getElementById('art-charge-wrapper');
+
+    if (!toggle || !input) return;
+
+    if (toggle.checked) {
+        input.disabled = false;
+        if (wrapper) wrapper.style.opacity = '1';
+        input.style.opacity = '1';
+        // Set default value if currently 0
+        if (parseFloat(input.value) === 0) {
+            input.value = '50.00';
+        }
+    } else {
+        input.disabled = true;
+        if (wrapper) wrapper.style.opacity = '0.4';
+        input.style.opacity = '0.5';
+        input.value = '0';
+    }
+
+    updateArtworkCharges();
+}
+
+/**
+ * Update artwork charges (art charge + design fee) - called on input change
+ * Updates graphic design total display and artwork badge
+ */
+function updateArtworkCharges() {
+    const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designTotal = designHours * 75;
+
+    // Update graphic design total display (if element exists)
+    const designTotalEl = document.getElementById('graphic-design-total');
+    if (designTotalEl) {
+        designTotalEl.textContent = designTotal.toFixed(2);
+    }
+
+    // Update artwork badge (if element exists)
+    const badge = document.getElementById('artwork-badge');
+    if (badge) {
+        const totalArtwork = artCharge + designTotal;
+        if (totalArtwork > 0) {
+            badge.textContent = '+$' + totalArtwork.toFixed(2);
+            badge.classList.remove('hidden');
+            badge.style.display = 'inline'; // For embroidery compatibility
+        } else {
+            badge.classList.add('hidden');
+            badge.style.display = 'none'; // For embroidery compatibility
+        }
+    }
+
+    // Update fee table rows
+    if (typeof updateFeeTableRows === 'function') {
+        updateFeeTableRows();
+    }
+
+    // Recalculate tax (all builders do this)
+    if (typeof updateTaxCalculation === 'function') {
+        updateTaxCalculation();
+    }
+}
+
+// ============================================
 // URL SHARING
 // ============================================
 

@@ -191,7 +191,7 @@
                                     <i class="fas fa-info-circle"></i> Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
-                                <td class="cell-price">$50.00</td>
+                                <td class="cell-price" id="ltm-row-unit">$50.00</td>
                                 <td class="cell-total" id="ltm-row-total">$50.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
@@ -4412,12 +4412,14 @@
 
             // LTM display (table only - sidebar removed)
             const ltmTableRow = document.getElementById('ltm-fee-row');
+            const ltmTableUnit = document.getElementById('ltm-row-unit');
             const ltmTableTotal = document.getElementById('ltm-row-total');
 
             if (pricing.ltmFee > 0) {
                 // Show LTM in product table
                 if (ltmTableRow) {
                     ltmTableRow.style.display = 'table-row';
+                    if (ltmTableUnit) ltmTableUnit.textContent = `$${pricing.ltmFee.toFixed(2)}`;
                     if (ltmTableTotal) ltmTableTotal.textContent = `$${pricing.ltmFee.toFixed(2)}`;
                 }
             } else {
@@ -4498,20 +4500,8 @@
 
         // ============================================================
         // SIDEBAR: ADDITIONAL CHARGES PANEL
+        // toggleAdditionalCharges() moved to quote-builder-utils.js
         // ============================================================
-
-        function toggleAdditionalCharges() {
-            const content = document.getElementById('charges-content');
-            const chevron = document.getElementById('charges-chevron');
-
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
 
         function updateAdditionalCharges() {
             const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
@@ -4601,67 +4591,9 @@
 
         // ============================================================
         // ARTWORK SERVICES FUNCTIONS
+        // toggleArtworkServices(), toggleArtCharge(), updateArtworkCharges()
+        // moved to quote-builder-utils.js
         // ============================================================
-
-        function toggleArtworkServices() {
-            const content = document.getElementById('artwork-content');
-            const chevron = document.getElementById('artwork-chevron');
-
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        function toggleArtCharge() {
-            const toggle = document.getElementById('art-charge-toggle');
-            const input = document.getElementById('art-charge');
-            const wrapper = document.getElementById('art-charge-wrapper');
-
-            if (toggle.checked) {
-                input.disabled = false;
-                wrapper.style.opacity = '1';
-                if (parseFloat(input.value) === 0) {
-                    input.value = '50.00';
-                }
-            } else {
-                input.disabled = true;
-                wrapper.style.opacity = '0.4';
-                input.value = '0';
-            }
-            updateArtworkCharges();
-        }
-
-        function updateArtworkCharges() {
-            const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
-            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-            const designTotal = designHours * 75;
-
-            // Update graphic design total display
-            const designTotalEl = document.getElementById('graphic-design-total');
-            if (designTotalEl) {
-                designTotalEl.textContent = designTotal.toFixed(2);
-            }
-
-            // Update artwork badge
-            const badge = document.getElementById('artwork-badge');
-            const totalArtwork = artCharge + designTotal;
-            if (totalArtwork > 0) {
-                badge.textContent = '+$' + totalArtwork.toFixed(2);
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-
-            // Update table rows
-            updateFeeTableRows();
-
-            // Recalculate tax
-            updateTaxCalculation();
-        }
 
         function updateFeeTableRows() {
             // Art charge row

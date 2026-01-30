@@ -1503,12 +1503,14 @@ class DTFQuoteBuilder {
 
         // LTM display - DTF only uses table row (no sidebar ltm-row/ltm-fee elements)
         const ltmTableRow = document.getElementById('ltm-fee-row');
+        const ltmTableUnit = document.getElementById('ltm-row-unit');
         const ltmTableTotal = document.getElementById('ltm-row-total');
 
         if (totalLtmFee > 0 && totalQty > 0) {
             // Show LTM in product table
             if (ltmTableRow) {
                 ltmTableRow.style.display = 'table-row';
+                if (ltmTableUnit) ltmTableUnit.textContent = `$${totalLtmFee.toFixed(2)}`;
                 if (ltmTableTotal) ltmTableTotal.textContent = `$${totalLtmFee.toFixed(2)}`;
             }
         } else {

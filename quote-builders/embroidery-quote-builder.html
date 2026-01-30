@@ -308,7 +308,7 @@
                                     <i class="fas fa-tshirt"></i> Garment Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
-                                <td class="cell-price">$50.00</td>
+                                <td class="cell-price" id="garment-ltm-unit">$50.00</td>
                                 <td class="cell-total" id="garment-ltm-table-total">$50.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
@@ -318,7 +318,7 @@
                                     <i class="fas fa-hat-cowboy"></i> Cap Less Than Minimum Fee
                                 </td>
                                 <td class="cell-qty">1</td>
-                                <td class="cell-price">$50.00</td>
+                                <td class="cell-price" id="cap-ltm-unit">$50.00</td>
                                 <td class="cell-total" id="cap-ltm-table-total">$50.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
@@ -912,75 +912,8 @@
             recalculatePricing();
         }
 
-        // Toggle function for Logo Mockup & Print Review charge (uses onchange, not onclick)
-        function toggleArtCharge() {
-            const toggle = document.getElementById('art-charge-toggle');
-            const input = document.getElementById('art-charge');
-            const wrapper = document.getElementById('art-charge-wrapper');
-
-            if (toggle.checked) {
-                // Enable the input and set default $50
-                input.disabled = false;
-                wrapper.style.opacity = '1';
-                if (!input.value || parseFloat(input.value) === 0) {
-                    input.value = '50.00';
-                }
-            } else {
-                // Disable the input and zero it out
-                input.disabled = true;
-                wrapper.style.opacity = '0.4';
-                input.value = '0';
-            }
-
-            updateArtworkCharges();
-        }
-
-        // Toggle Artwork Services panel visibility
-        function toggleArtworkServices() {
-            const content = document.getElementById('artwork-content');
-            const chevron = document.getElementById('artwork-chevron');
-
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                content.style.display = 'block';
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                content.style.display = 'none';
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        // Update artwork charges (badge, graphic design total, and trigger recalculation)
-        function updateArtworkCharges() {
-            const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
-            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-            const designTotal = designHours * 75;
-
-            // Update graphic design total display
-            const designTotalEl = document.getElementById('graphic-design-total');
-            if (designTotalEl) {
-                designTotalEl.textContent = designTotal.toFixed(2);
-            }
-
-            // Update artwork badge
-            const badge = document.getElementById('artwork-badge');
-            const totalArtwork = artCharge + designTotal;
-            if (badge) {
-                if (totalArtwork > 0) {
-                    badge.textContent = '+$' + totalArtwork.toFixed(2);
-                    badge.classList.remove('hidden');
-                    badge.style.display = 'inline';
-                } else {
-                    badge.classList.add('hidden');
-                    badge.style.display = 'none';
-                }
-            }
-
-            // Trigger full recalculation
-            updateAdditionalCharges();
-            updateTaxCalculation();
-        }
+        // toggleArtCharge(), toggleArtworkServices(), updateArtworkCharges()
+        // moved to quote-builder-utils.js
 
         // Handle cap embellishment type change (Flat Embroidery, 3D Puff, or Patch)
         function handleCapEmbellishmentChange() {
@@ -4918,7 +4851,9 @@
             // LTM display (table rows only - sidebar removed in 2026 refactor)
             const garmentLtmTableRow = document.getElementById('garment-ltm-table-row');
             const capLtmTableRow = document.getElementById('cap-ltm-table-row');
+            const garmentLtmUnit = document.getElementById('garment-ltm-unit');
             const garmentLtmTableTotal = document.getElementById('garment-ltm-table-total');
+            const capLtmUnit = document.getElementById('cap-ltm-unit');
             const capLtmTableTotal = document.getElementById('cap-ltm-table-total');
 
             if (pricing.ltmFee > 0) {
@@ -4928,12 +4863,14 @@
                 // Update table rows based on what applies
                 if (hasGarmentLtm && garmentLtmTableRow) {
                     garmentLtmTableRow.style.display = 'table-row';
+                    if (garmentLtmUnit) garmentLtmUnit.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
                     if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
                 } else if (garmentLtmTableRow) {
                     garmentLtmTableRow.style.display = 'none';
                 }
                 if (hasCapLtm && capLtmTableRow) {
                     capLtmTableRow.style.display = 'table-row';
+                    if (capLtmUnit) capLtmUnit.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
                     if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
                 } else if (capLtmTableRow) {
                     capLtmTableRow.style.display = 'none';
