@@ -832,7 +832,7 @@ textarea:disabled {
 }
 
 .input-with-prefix .quote-input {
-    padding-left: 22px;
+    padding-left: 30px !important;
 }
 
 /* ============================================
