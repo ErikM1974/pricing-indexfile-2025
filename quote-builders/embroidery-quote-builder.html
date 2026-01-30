@@ -241,46 +241,6 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Artwork Services (hidden until products added) -->
-                <div class="artwork-services-column" id="artwork-services" style="display: none;">
-                    <div class="artwork-services-card">
-                        <div class="artwork-services-header">
-                            <div class="artwork-services-icon">
-                                <i class="fas fa-palette"></i>
-                            </div>
-                            <span class="artwork-services-title">Artwork Services</span>
-                        </div>
-                        <div class="artwork-services-body">
-                            <!-- Logo Mockup & Print Review - Checkbox Toggle -->
-                            <div class="artwork-field">
-                                <div class="artwork-checkbox-row">
-                                    <label class="artwork-toggle" onclick="toggleArtCharge()">
-                                        <input type="checkbox" id="art-charge-toggle">
-                                        <span class="artwork-toggle-indicator"></span>
-                                        <span class="artwork-toggle-label">Logo Mockup & Review</span>
-                                    </label>
-                                    <div class="artwork-field-input-wrapper" id="art-charge-wrapper" style="opacity: 0.4;">
-                                        <span class="currency-symbol">$</span>
-                                        <input type="number" id="art-charge" min="0" step="0.01" value="0" disabled
-                                               onchange="updateAdditionalCharges(); updateTaxCalculation();"
-                                               oninput="updateAdditionalCharges(); updateTaxCalculation();">
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Graphic Design Services -->
-                            <div class="artwork-field">
-                                <label class="artwork-field-label">Graphic Design ($75/hr)</label>
-                                <div class="graphic-design-field">
-                                    <input type="number" id="graphic-design-hours" min="0" step="0.5" placeholder="0"
-                                           onchange="updateAdditionalCharges(); updateTaxCalculation();"
-                                           oninput="updateAdditionalCharges(); updateTaxCalculation();">
-                                    <span class="hours-label">hrs</span>
-                                    <span class="hours-total">= $<span id="graphic-design-total">0.00</span></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Legacy hidden elements for backwards compatibility with existing JS -->
@@ -530,6 +490,44 @@
 
             </div>
 
+            <!-- Artwork Services Panel -->
+            <div class="additional-charges-panel" style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #86efac;">
+                <div class="charges-header" onclick="toggleArtworkServices()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                    <div style="font-size: 14px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-palette"></i>
+                        <span>Artwork Services</span>
+                        <span id="artwork-badge" class="charges-badge hidden" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">$0.00</span>
+                    </div>
+                    <i id="artwork-chevron" class="fas fa-chevron-down" style="color: #666; transition: transform 0.2s;"></i>
+                </div>
+                <div id="artwork-content" class="charges-content hidden" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
+                    <!-- Logo Mockup & Review -->
+                    <div class="charge-field" style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333;">
+                            <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span>Logo Mockup & Review</span>
+                        </label>
+                        <div id="art-charge-wrapper" style="position: relative; opacity: 0.4; margin-top: 6px;">
+                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
+                            <input type="number" id="art-charge" min="0" step="0.01" value="0" disabled
+                                   onchange="updateArtworkCharges()" oninput="updateArtworkCharges()"
+                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <!-- Graphic Design -->
+                    <div class="charge-field">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design ($75/hr)</label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="number" id="graphic-design-hours" min="0" step="0.5" placeholder="0"
+                                   onchange="updateArtworkCharges()" oninput="updateArtworkCharges()"
+                                   style="width: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <span style="color: #666; font-size: 13px;">hrs</span>
+                            <span style="color: #666; font-size: 13px;">= $<span id="graphic-design-total">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Additional Charges Panel - MOVED ABOVE TOTALS per UX best practices -->
             <div class="additional-charges-panel" style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #86efac;">
                 <div class="charges-header" onclick="toggleAdditionalCharges()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
@@ -543,7 +541,7 @@
                     </div>
                 </div>
                 <div id="charges-content" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
-                    <!-- NOTE: Logo Mockup & Graphic Design moved to Artwork Services card at top (2026 UI update) -->
+                    <!-- NOTE: Logo Mockup & Graphic Design now in Artwork Services panel above -->
                     <!-- Rush Fee -->
                     <div class="charge-field" style="margin-bottom: 10px;">
                         <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
@@ -559,16 +557,17 @@
                     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fca5a5; background: #fef2f2; margin: 12px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
                         <label style="font-size: 12px; color: #b91c1c; margin-bottom: 4px; display: block; font-weight: 600;">Discount</label>
                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                            <div id="discount-input-wrapper" style="position: relative; flex: 1;">
+                            <div id="discount-input-wrapper" style="position: relative; flex: 1; display: none;">
                                 <span id="discount-symbol" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                                <input type="number" id="discount-amount" min="0" step="0.01" placeholder="0.00"
+                                <input type="number" id="discount-amount" min="0" step="0.01" placeholder="0.00" value="0"
                                        onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                        style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                             </div>
                             <select id="discount-preset" onchange="handleDiscountPresetChange()"
-                                    style="flex: 1; display: none; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
+                                    style="flex: 1; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
+                                <option value="0" selected>None</option>
                                 <option value="5">5%</option>
-                                <option value="10" selected>10%</option>
+                                <option value="10">10%</option>
                                 <option value="15">15%</option>
                                 <option value="20">20%</option>
                                 <option value="25">25%</option>
@@ -576,8 +575,8 @@
                             </select>
                             <select id="discount-type" onchange="updateDiscountType(); updateTaxCalculation();"
                                     style="width: 60px; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
-                                <option value="fixed">$</option>
                                 <option value="percent">%</option>
+                                <option value="fixed">$</option>
                             </select>
                         </div>
                         <input type="text" id="discount-reason" placeholder="Reason (optional)"
@@ -899,14 +898,11 @@
             recalculatePricing();
         }
 
-        // NEW: Toggle function for Logo Mockup & Print Review charge
+        // Toggle function for Logo Mockup & Print Review charge (uses onchange, not onclick)
         function toggleArtCharge() {
             const toggle = document.getElementById('art-charge-toggle');
             const input = document.getElementById('art-charge');
             const wrapper = document.getElementById('art-charge-wrapper');
-
-            // Toggle the checkbox state
-            toggle.checked = !toggle.checked;
 
             if (toggle.checked) {
                 // Enable the input and set default $50
@@ -922,6 +918,52 @@
                 input.value = '0';
             }
 
+            updateArtworkCharges();
+        }
+
+        // Toggle Artwork Services panel visibility
+        function toggleArtworkServices() {
+            const content = document.getElementById('artwork-content');
+            const chevron = document.getElementById('artwork-chevron');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                content.style.display = 'block';
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                content.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Update artwork charges (badge, graphic design total, and trigger recalculation)
+        function updateArtworkCharges() {
+            const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+            const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+            const designTotal = designHours * 75;
+
+            // Update graphic design total display
+            const designTotalEl = document.getElementById('graphic-design-total');
+            if (designTotalEl) {
+                designTotalEl.textContent = designTotal.toFixed(2);
+            }
+
+            // Update artwork badge
+            const badge = document.getElementById('artwork-badge');
+            const totalArtwork = artCharge + designTotal;
+            if (badge) {
+                if (totalArtwork > 0) {
+                    badge.textContent = '+$' + totalArtwork.toFixed(2);
+                    badge.classList.remove('hidden');
+                    badge.style.display = 'inline';
+                } else {
+                    badge.classList.add('hidden');
+                    badge.style.display = 'none';
+                }
+            }
+
+            // Trigger full recalculation
             updateAdditionalCharges();
             updateTaxCalculation();
         }
@@ -946,11 +988,7 @@
                 if (globalAL.cap.enabled) {
                     toggleGlobalALNew('cap'); // Turn it off
                 }
-                // Hide artwork services for patches - setup fee includes artwork
-                const artworkServices = document.getElementById('artwork-services');
-                if (artworkServices) {
-                    artworkServices.style.display = 'none';
-                }
+                // Note: Artwork services panel is now in sidebar (always visible)
                 // For patches: no stitches needed, use setup fee instead of digitizing
                 capPrimaryLogo.stitchCount = 0;
                 capPrimaryLogo.needsDigitizing = false;
@@ -961,11 +999,7 @@
                 patchOptions.style.display = 'none';
                 // Show additional logo section for embroidery types
                 alSection.style.display = 'block';
-                // Show artwork services for embroidery
-                const artworkServices = document.getElementById('artwork-services');
-                if (artworkServices) {
-                    artworkServices.style.display = 'block';
-                }
+                // Note: Artwork services panel is now in sidebar (always visible)
                 // Restore stitch count from input
                 capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
                 capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
@@ -2034,6 +2068,19 @@
                 }
             }
 
+            // Restore art charge toggle state
+            const artChargeToggle = document.getElementById('art-charge-toggle');
+            if (artChargeToggle && session.ArtCharge > 0) {
+                artChargeToggle.checked = true;
+                const wrapper = document.getElementById('art-charge-wrapper');
+                const input = document.getElementById('art-charge');
+                if (wrapper) wrapper.style.opacity = '1';
+                if (input) input.disabled = false;
+            }
+
+            // Update artwork charges display (badge and graphic design total)
+            updateArtworkCharges();
+
             // Handle discount
             if (session.Discount > 0 || session.DiscountPercent > 0) {
                 const discountPreset = document.getElementById('discount-preset');
@@ -2372,17 +2419,14 @@
             updateArtworkServicesVisibility();
         }
 
-        // Update artwork services visibility - show when ANY valid products exist
+        // Update empty state row visibility based on products
         function updateArtworkServicesVisibility() {
             // Check for rows with data-is-cap attribute (indicates a valid product was added)
             const hasGarments = document.querySelectorAll('tr[data-is-cap="false"]').length > 0;
             const hasCaps = document.querySelectorAll('tr[data-is-cap="true"]').length > 0;
             const hasAnyProducts = hasGarments || hasCaps;
-            const artworkServices = document.getElementById('artwork-services');
-            if (artworkServices) {
-                artworkServices.style.display = hasAnyProducts ? 'block' : 'none';
-            }
-            // Also update empty state row visibility
+            // Artwork Services panel is now in sidebar (always visible)
+            // Just update empty state row visibility
             const emptyStateRow = document.getElementById('empty-state-row');
             if (emptyStateRow) {
                 emptyStateRow.style.display = hasAnyProducts ? 'none' : '';
@@ -5519,10 +5563,9 @@
             // Reset logo cards visibility
             const garmentCard = document.getElementById('garment-logo-card');
             const capCard = document.getElementById('cap-logo-card');
-            const artworkServices = document.getElementById('artwork-services');
             if (garmentCard) garmentCard.style.display = 'none';
             if (capCard) capCard.style.display = 'none';
-            if (artworkServices) artworkServices.style.display = 'none';
+            // Note: Artwork services panel is now in sidebar (always visible, no reset needed)
 
             // Reset logo configurations to defaults
             primaryLogo.position = 'Left Chest';
@@ -5551,8 +5594,17 @@
             document.getElementById('discount-amount').value = '';
             document.getElementById('discount-reason').value = '';
             document.getElementById('art-charge').value = 0;
+            document.getElementById('art-charge').disabled = true;
             document.getElementById('art-charge-toggle').checked = false;
+            const artChargeWrapper = document.getElementById('art-charge-wrapper');
+            if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
             document.getElementById('graphic-design-hours').value = '';
+            // Reset artwork badge
+            const artworkBadge = document.getElementById('artwork-badge');
+            if (artworkBadge) {
+                artworkBadge.classList.add('hidden');
+                artworkBadge.style.display = 'none';
+            }
 
             // Clear edit mode
             editingQuoteId = null;
