@@ -158,6 +158,15 @@ catalogColor: product.CATALOG_COLOR
 
 ### Quote Builder Sync Rule (CRITICAL)
 
+**Shared Utilities (2026-01-30 consolidation):**
+Common utility functions are now in `/shared_components/js/quote-builder-utils.js`:
+- `escapeHtml()` - XSS protection for HTML output
+- `formatPrice()` - Price display formatting
+- `showToast()` - Toast notifications (fixed in DTF - was broken)
+- `copyShareableUrl()` - Share modal URL copy
+- `handleCellKeydown()` - Table keyboard navigation
+- `getDiscountValues()` - Discount calculation helpers
+
 **When modifying ANY quote builder, check if the change applies to all 4:**
 - `quote-builders/dtg-quote-builder.html`
 - `quote-builders/dtf-quote-builder.html`
@@ -166,21 +175,22 @@ catalogColor: product.CATALOG_COLOR
 
 **Changes that MUST be synced across all builders:**
 - CSS styling (colors, spacing, layout, input padding)
-- Common JS functions: `updateDiscountType()`, `updateFeeTableRows()`, `updateAdditionalCharges()`, `showToast()`, `escapeHtml()`, `formatPrice()`, keyboard navigation
 - Table structure changes (columns, child rows, thumbnails)
 - Fee/charges panel updates
 - Customer info panel changes
-- Toast/notification behavior
 - Modal styling
+- If modifying a function in `quote-builder-utils.js`, it affects ALL builders automatically
 
 **Method-specific (do NOT sync):**
-- Pricing logic (each method has unique pricing)
-- Location selection (DTG: dropdown, DTF: radio grid, Screenprint: checkboxes)
+- Pricing logic (each method has unique pricing formula)
+- Location selection UI (DTG: dropdown, DTF: radio grid, Screenprint: checkboxes)
 - Logo/artwork configuration (Embroidery has digitizing, etc.)
 - Method-specific services (`*-pricing-service.js`, `*-quote-service.js`)
+- `updateDiscountType()`, `updateAdditionalCharges()`, `updateFeeTableRows()` - these call builder-specific functions
 
 **After making quote builder changes, always ask:**
 > "Does this change apply to the other 3 quote builders?"
+> "Should this be moved to quote-builder-utils.js?"
 
 ## Development Commands
 

@@ -734,6 +734,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Core Dependencies -->
+    <script src="/shared_components/js/quote-builder-utils.js?v=20260130"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
@@ -2845,16 +2846,7 @@
             }
         }
 
-        // Helper function to escape HTML for safe attribute values
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
+        // escapeHtml() is now provided by quote-builder-utils.js
 
         /**
          * Update product thumbnail when color is selected
@@ -2921,13 +2913,7 @@
             'CF': 'Cap Front', 'CB': 'Cap Back', 'CL': 'Cap Left Side', 'CR': 'Cap Right Side'
         };
 
-        /**
-         * Format price - remove unnecessary decimals ($23.00 -> $23, $25.50 stays)
-         */
-        function formatPrice(price) {
-            if (price % 1 === 0) return price.toFixed(0);
-            return price.toFixed(2);
-        }
+        // formatPrice() is now provided by quote-builder-utils.js
 
         /**
          * Build pricing breakdown HTML for a product row
@@ -6113,27 +6099,7 @@
             }
         }
 
-        function showToast(message, type = 'info', duration = 3000) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-
-            // Select icon based on type
-            const icons = {
-                success: 'check',
-                error: 'exclamation-circle',
-                warning: 'exclamation-triangle',
-                info: 'info-circle'
-            };
-            const icon = icons[type] || 'info-circle';
-
-            toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, duration);
-        }
+        // showToast() is now provided by quote-builder-utils.js
     </script>
 </body>
 </html>

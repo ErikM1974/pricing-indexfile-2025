@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-29
-**Total Active Files:** ~286 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
+**Last Updated:** 2026-01-30
+**Total Active Files:** ~287 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -146,6 +146,7 @@
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
 | `/shared_components/js/quote-builder-base.js` | Base functionality | All quote builders | ✅ Active |
+| `/shared_components/js/quote-builder-utils.js` | **NEW** Shared utilities: escapeHtml, formatPrice, showToast, etc. (2026-01-30 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-formatter.js` | Format quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-persistence.js` | Save/load quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-session.js` | Session management | All quote builders | ✅ Active |
