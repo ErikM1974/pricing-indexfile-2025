@@ -38,6 +38,7 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Remove all console.logs
 - Update ACTIVE_FILES.md
 - No hardcoded URLs (use config)
+- **Quote builder change?** → Check if same change needed in other 3 builders
 - **Run `npm run validate-docs`** if you created/moved memory files
 - **Document any ManageOrders discoveries** (see [ManageOrders Documentation Updates](#manageorders-documentation-updates))
 - Descriptive commit message
@@ -154,6 +155,32 @@ catalogColor: product.CATALOG_COLOR
 ### Sample Cart Pricing Formula
 - **Formula**: `(baseCost / 0.6) + sizeUpcharge`
 - **Rounding**: Half-dollar ceiling (`Math.ceil(price * 2) / 2`)
+
+### Quote Builder Sync Rule (CRITICAL)
+
+**When modifying ANY quote builder, check if the change applies to all 4:**
+- `quote-builders/dtg-quote-builder.html`
+- `quote-builders/dtf-quote-builder.html`
+- `quote-builders/embroidery-quote-builder.html`
+- `quote-builders/screenprint-quote-builder.html`
+
+**Changes that MUST be synced across all builders:**
+- CSS styling (colors, spacing, layout, input padding)
+- Common JS functions: `updateDiscountType()`, `updateFeeTableRows()`, `updateAdditionalCharges()`, `showToast()`, `escapeHtml()`, `formatPrice()`, keyboard navigation
+- Table structure changes (columns, child rows, thumbnails)
+- Fee/charges panel updates
+- Customer info panel changes
+- Toast/notification behavior
+- Modal styling
+
+**Method-specific (do NOT sync):**
+- Pricing logic (each method has unique pricing)
+- Location selection (DTG: dropdown, DTF: radio grid, Screenprint: checkboxes)
+- Logo/artwork configuration (Embroidery has digitizing, etc.)
+- Method-specific services (`*-pricing-service.js`, `*-quote-service.js`)
+
+**After making quote builder changes, always ask:**
+> "Does this change apply to the other 3 quote builders?"
 
 ## Development Commands
 
