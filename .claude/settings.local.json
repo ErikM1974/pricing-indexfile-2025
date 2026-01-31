@@ -73,7 +73,8 @@
       "Bash(CRM_API_SECRET=\"206dc8820a9c75478d701635fc241f734ca15fa2884eaf5d7ed53b41162863c6\" node:*)",
       "Bash(del \"C:\\\\Users\\\\erik\\\\.claude\\\\plans\\\\melodic-sprouting-admaker.md\")",
       "Bash(heroku login:*)",
-      "Bash(heroku auth:whoami:*)"
+      "Bash(heroku auth:whoami:*)",
+      "Bash(heroku git:remote:*)"
     ],
     "deny": [],
     "ask": [],

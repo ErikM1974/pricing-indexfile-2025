@@ -26,7 +26,7 @@
 
 class ExactMatchSearch {
     constructor(config = {}) {
-        this.apiBase = config.apiBase || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        this.apiBase = config.apiBase || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.onExactMatch = config.onExactMatch || null; // Callback for exact matches
         this.onSuggestions = config.onSuggestions || null; // Callback for suggestion list
         this.onError = config.onError || null; // Callback for errors

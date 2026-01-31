@@ -361,7 +361,7 @@
                             <!-- Garment Additional Logo Fee Row -->
                             <tr id="garment-al-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-plus-circle"></i> Additional Logo: <span id="garment-al-position">--</span>
+                                    <i class="fas fa-plus-circle"></i> Additional Logo: <span id="garment-al-position-label">--</span>
                                 </td>
                                 <td class="cell-qty" id="garment-al-qty">1</td>
                                 <td class="cell-price" id="garment-al-unit">$0.00</td>
@@ -381,7 +381,7 @@
                             <!-- Cap Additional Logo Fee Row -->
                             <tr id="cap-al-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-hat-cowboy"></i> Cap Additional Logo: <span id="cap-al-position">--</span>
+                                    <i class="fas fa-hat-cowboy"></i> Cap Additional Logo: <span id="cap-al-position-label">--</span>
                                 </td>
                                 <td class="cell-qty" id="cap-al-qty">1</td>
                                 <td class="cell-price" id="cap-al-unit">$0.00</td>
@@ -2164,6 +2164,39 @@
 
             showLoading(true);
 
+            // ALWAYS set up search first - independent of pricing calculator
+            // This ensures search works even if pricing API fails
+            setupSearchAutocomplete();
+            setupKeyboardShortcuts();
+            setupPrimaryLogoHandlers();
+            setupCapPrimaryLogoHandlers();  // Cap logo handlers
+
+            // Auto-select sales rep based on logged-in staff (2026 consolidation)
+            if (typeof StaffAuthHelper !== 'undefined') {
+                StaffAuthHelper.autoSelectSalesRep('sales-rep');
+            }
+
+            // Initialize customer lookup autocomplete
+            if (typeof CustomerLookupService !== 'undefined') {
+                const customerLookup = new CustomerLookupService();
+                customerLookup.bindToInput('customer-lookup', {
+                    onSelect: (contact) => {
+                        document.getElementById('customer-name').value = contact.ct_NameFull || '';
+                        document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+                        document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                        showToast('Customer info loaded', 'success');
+                    },
+                    onClear: () => {
+                        document.getElementById('customer-name').value = '';
+                        document.getElementById('customer-email').value = '';
+                        document.getElementById('company-name').value = '';
+                    }
+                });
+            }
+
+            // Setup unsaved changes tracking for form fields (UX improvement)
+            setupUnsavedChangesTracking();
+
             try {
                 // Initialize pricing calculator
                 pricingCalculator = new EmbroideryPricingCalculator();
@@ -2195,53 +2228,21 @@
                     // No auto-row - empty state message guides user to search
                 }
 
-                // Setup event listeners
-                setupSearchAutocomplete();
-                setupKeyboardShortcuts();
-                setupPrimaryLogoHandlers();
-                setupCapPrimaryLogoHandlers();  // Cap logo handlers
-
-                // Auto-select sales rep based on logged-in staff (2026 consolidation)
-                if (typeof StaffAuthHelper !== 'undefined') {
-                    StaffAuthHelper.autoSelectSalesRep('sales-rep');
-                }
-
-                // Initialize customer lookup autocomplete
-                if (typeof CustomerLookupService !== 'undefined') {
-                    const customerLookup = new CustomerLookupService();
-                    customerLookup.bindToInput('customer-lookup', {
-                        onSelect: (contact) => {
-                            document.getElementById('customer-name').value = contact.ct_NameFull || '';
-                            document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
-                            document.getElementById('company-name').value = contact.CustomerCompanyName || '';
-                            showToast('Customer info loaded', 'success');
-                        },
-                        onClear: () => {
-                            document.getElementById('customer-name').value = '';
-                            document.getElementById('customer-email').value = '';
-                            document.getElementById('company-name').value = '';
-                        }
-                    });
-                }
-
                 console.log('✅ Power Quote Builder ready');
                 showToast('Ready to build quotes!', 'success');
 
                 // Initialize additional charges display (for default $50 art charge)
                 updateAdditionalCharges();
 
-                // Auto-focus search bar for immediate typing (UX improvement)
-                const searchInput = document.getElementById('product-search');
-                if (searchInput) {
-                    searchInput.focus();
-                }
-
-                // Setup unsaved changes tracking for form fields (UX improvement)
-                setupUnsavedChangesTracking();
-
             } catch (error) {
-                console.error('Failed to initialize:', error);
-                showToast('Failed to initialize. Please refresh.', 'error');
+                console.error('Failed to initialize pricing:', error);
+                showToast('Pricing unavailable. Search still works.', 'warning');
+            }
+
+            // Auto-focus search bar for immediate typing (UX improvement)
+            const searchInput = document.getElementById('product-search');
+            if (searchInput) {
+                searchInput.focus();
             }
 
             showLoading(false);
@@ -4658,39 +4659,44 @@
                             // Update child row prices - match by BOTH size AND color
                             // A child row price only updates if its color matches this product's color
                             pp.lineItems.forEach(li => {
-                                const description = li.description;
-                                // Match ALL extended sizes in description (handles grouped sizes like "3XL(2) 4XL(3)" or "3T(5)")
-                                // Uses SIZE06_EXTENDED_SIZES for comprehensive matching including toddler, youth, tall, pants (4-digit), etc.
-                                const extendedSizeRegex = new RegExp(
-                                    '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
-                                    'g'
-                                );
-                                const sizeMatches = description.match(extendedSizeRegex);
-                                if (sizeMatches) {
-                                    sizeMatches.forEach(size => {
-                                        const childRowId = childRowMap[rowId]?.[size];
-                                        if (childRowId) {
-                                            const childRow = document.getElementById(`row-${childRowId}`);
-                                            // Only update price if child row's color matches this product's color
-                                            if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
-                                                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                                                const childTotalCell = document.getElementById(`row-total-${childRowId}`);
-                                                if (childPriceCell) {
-                                                    // Display base unit price (LTM shown as separate line item)
-                                                    const displayPrice = li.unitPrice;
-                                                    childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                                // First, try to get size from lineItem.size property (garments have this)
+                                // If not available, fall back to parsing description (caps use "3XL(2)" format)
+                                let sizesToCheck = [];
+                                if (li.size) {
+                                    sizesToCheck = [li.size];
+                                } else {
+                                    // Match ALL extended sizes in description (handles caps with "3XL(2)" format)
+                                    const description = li.description || '';
+                                    const extendedSizeRegex = new RegExp(
+                                        '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
+                                        'g'
+                                    );
+                                    sizesToCheck = description.match(extendedSizeRegex) || [];
+                                }
 
-                                                    // Calculate and display line total for child row
-                                                    if (childTotalCell) {
-                                                        const qty = li.quantity || 0;
-                                                        const lineTotal = displayPrice * qty;
-                                                        childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
-                                                    }
+                                sizesToCheck.forEach(size => {
+                                    const childRowId = childRowMap[rowId]?.[size];
+                                    if (childRowId) {
+                                        const childRow = document.getElementById(`row-${childRowId}`);
+                                        // Only update price if child row's color matches this product's color
+                                        if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
+                                            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                                            const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+                                            if (childPriceCell) {
+                                                // Display base unit price (LTM shown as separate line item)
+                                                const displayPrice = li.unitPrice;
+                                                childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                                                // Calculate and display line total for child row
+                                                if (childTotalCell) {
+                                                    const qty = li.quantity || 0;
+                                                    const lineTotal = displayPrice * qty;
+                                                    childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
                                                 }
                                             }
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             });
                         }
                     });
@@ -4997,7 +5003,7 @@
 
             // Calculate cap extra stitches (rate: $1.00/K)
             // Skip for laser patches - they don't use stitches
-            const capEmbType = getCapEmbellishmentType();
+            // Note: capEmbType already declared above at line 4958
             const capQty = pricing.capQuantity || 0;
             let capStitchFee = 0;
             if (capEmbType !== 'laser-patch') {
@@ -5118,7 +5124,7 @@
             const garmentAlQty = document.getElementById('garment-al-qty');
             const garmentAlUnit = document.getElementById('garment-al-unit');
             const garmentAlTotal = document.getElementById('garment-al-total');
-            const garmentAlPositionLabel = document.querySelector('#garment-al-fee-row #garment-al-position');
+            const garmentAlPositionLabel = document.getElementById('garment-al-position-label');
 
             if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
                 // Calculate AL pricing (reuse same logic as sidebar)
@@ -5167,7 +5173,7 @@
             const capAlQtyEl = document.getElementById('cap-al-qty');
             const capAlUnitEl = document.getElementById('cap-al-unit');
             const capAlTotalEl = document.getElementById('cap-al-total');
-            const capAlPositionLabel = document.querySelector('#cap-al-fee-row #cap-al-position');
+            const capAlPositionLabel = document.getElementById('cap-al-position-label');
 
             if (globalAL.cap.enabled && pricing.capQuantity > 0) {
                 // Calculate Cap AL pricing (reuse same logic as sidebar)
