@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-01-30
+**Last Updated:** 2026-01-31
 **Total Active Files:** ~287 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -161,6 +161,7 @@
 | `/shared_components/js/quote-share-modal.js` | **NEW** Shareable URL success modal (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/customer-lookup-service.js` | **NEW** Customer autocomplete search (2026-01-29) | All quote builders | ✅ Active |
 | `/shared_components/js/product-thumbnail-modal.js` | **NEW** Product image thumbnail + click-to-enlarge modal (2026-01-29) | DTG, Screen Print, Embroidery builders | ✅ Active |
+| `/shared_components/js/shopworks-import-parser.js` | **NEW** ShopWorks order text parser (2026-01-31) | Embroidery quote builder | ✅ Active |
 | `/shared_components/js/INTEGRATION-EXAMPLE.js` | **NEW** Integration example/docs (2026 consolidation) | Reference only | 📚 Docs |
 
 ### Customer Lookup System (NEW 2026-01-29)
@@ -168,6 +169,21 @@
 |------|---------|--------------|--------|
 | `/shared_components/js/customer-lookup-service.js` | Customer autocomplete from Caspio Company_Contacts_Merge_ODBC | caspio-proxy API | ✅ Active |
 | `/shared_components/css/customer-lookup.css` | Autocomplete dropdown styling | - | ✅ Active |
+
+**Backend (caspio-pricing-proxy):**
+
+### ShopWorks Import System (NEW 2026-01-31)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/shopworks-import-parser.js` | Parse ShopWorks order text into structured data | - | ✅ Active |
+| `/shared_components/css/shopworks-import.css` | Import modal and preview styling | - | ✅ Active |
+
+**Features:**
+- "Paste from ShopWorks" button in quote builders
+- Parses customer info, products, sizes, quantities
+- Detects service items: digitizing (DD), additional logo (AL), DECG, monograms
+- Auto-populates customer, sales rep, and product rows
+- Preview before import with summary
 
 **Backend (caspio-pricing-proxy):**
 - `GET /api/company-contacts/search?q=<term>` - Search contacts by company, name, or email

@@ -467,6 +467,36 @@ TotalAmount: parseFloat((
 
 # Order Processing & ShopWorks
 
+## Problem: ShopWorks Import Email Not Extracted for CRM Lookup
+**Date:** 2026-01-31
+**Project:** [Pricing Index]
+**Symptoms:** ShopWorks import populated the ID Lookup field with email for CRM search, but the field was empty or had truncated email. CRM auto-lookup didn't trigger.
+**Root Cause:** The parser's `_parseOrderInfo()` method only triggered when a section contained "Ordered by:" or "Order Information" header. If the pasted ShopWorks text used a different format or the customer email appeared in a different section, it wasn't extracted.
+**Solution:** Added fallback email extraction in `_extractEmailFallback()` method:
+1. Find all emails in the full text using regex
+2. Filter out salesperson email and common system emails (noreply, support@, etc.)
+3. Look for emails near customer-related keywords ("ordered by", "contact", "customer", "bill to", "ship to")
+4. Return the first suitable candidate email
+5. Added debug logging to console for troubleshooting: `[ShopWorksImportParser] Extracted customer email: xxx@example.com`
+**Prevention:** When parsing structured text, always add fallback extraction methods. Don't rely solely on section headers that may vary between formats.
+**Files:** `shared_components/js/shopworks-import-parser.js` v1.5.0 (lines 147-207)
+
+---
+
+## Problem: ShopWorks Import Showed 20 Pieces Instead of 24 After "Fix"
+**Date:** 2026-01-31
+**Project:** [Pricing Index]
+**Symptoms:** ShopWorks import originally showed 22 pieces (missing 2). After v1.4.0 fix, it showed 20 pieces (missing 4) - worse than before.
+**Root Cause:** `_normalizeSize()` was changed to return `null` for ANY size containing `(Other)`, which broke items without a part number size suffix. The `(Other)` placeholder is only relevant when a size suffix IS extracted (e.g., `ST253_2X` has suffix, so its `XXL (Other):1` in size section is a placeholder). For items WITHOUT a suffix (e.g., base `ST253`), the size section has the real sizes.
+**Solution:**
+1. `_normalizeSize()` now cleans `(Other)` text but doesn't filter - returns the base size
+2. The `item.sizes = {}` clear in `_parseItemBlock()` only happens when a suffix IS extracted
+3. Added `'XS': 'XS'` to SIZE_MAP for XS size recognition
+**Prevention:** When fixing parser bugs, trace through BOTH code paths (with suffix AND without suffix) to ensure the fix doesn't break the other case. The `(Other)` filtering should be contextual, not unconditional.
+**Files:** `shared_components/js/shopworks-import-parser.js` v1.4.1
+
+---
+
 ## Problem: CRM YTD Total Doesn't Match Team Performance
 **Date:** 2026-01-28
 **Project:** [Pricing Index]
@@ -644,6 +674,32 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 ---
 
 # Calculator & Quote Builder Sync
+
+## Problem: Programmatically Checking Checkbox Doesn't Trigger Line Items
+**Date:** 2026-01-31
+**Project:** [Pricing Index]
+**Symptoms:** ShopWorks import feature checked the "Digitizing" and "Additional Logo" checkboxes visually, but line items never appeared in Quote Summary. No $100 digitizing fee or $50 additional location fee.
+**Root Cause:** Setting `checkbox.checked = true` only updates the DOM, not the JavaScript state that drives pricing. Each checkbox has a change handler that:
+1. Updates a global state variable (e.g., `primaryLogo.needsDigitizing = true`)
+2. Calls a pricing recalculation function (e.g., `recalculatePricing()`)
+When programmatically setting `checked = true`, neither action happens.
+**Solution:** After setting checkbox.checked, replicate both actions from the native handler:
+```javascript
+// BAD - Only updates DOM, no line item appears
+digitizingCheckbox.checked = true;
+updateArtworkCharges();  // Wrong function!
+
+// GOOD - Matches native change handler behavior
+digitizingCheckbox.checked = true;
+primaryLogo.needsDigitizing = true;  // State update
+recalculatePricing();  // Pricing trigger
+```
+**Prevention:** Before setting ANY checkbox programmatically in quote builders:
+1. Search for its `addEventListener('change'` handler
+2. Replicate both the state update AND the pricing function call
+**Files affected:** `quote-builders/embroidery-quote-builder.html` (lines 6500-6555)
+
+---
 
 ## Problem: DTF Quote Builder PDF showed wrong prices and duplicate subtotals
 **Date:** 2026-01

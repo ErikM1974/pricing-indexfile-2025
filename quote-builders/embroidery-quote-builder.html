@@ -29,6 +29,9 @@
     <!-- Customer Lookup Autocomplete -->
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
 
+    <!-- ShopWorks Import Modal -->
+    <link rel="stylesheet" href="/shared_components/css/shopworks-import.css?v=20260131">
+
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -275,6 +278,9 @@
                                autocomplete="off">
                         <div id="search-suggestions" class="search-suggestions"></div>
                     </div>
+                    <button class="btn-import-shopworks" onclick="openShopWorksImportModal()" title="Import order from ShopWorks text">
+                        <i class="fas fa-paste"></i> Paste from ShopWorks
+                    </button>
                 </div>
 
                 <!-- Minimum Order Warning Banner -->
@@ -786,6 +792,55 @@
         </div>
     </div>
 
+    <!-- ShopWorks Import Modal -->
+    <div class="shopworks-import-modal" id="shopworks-import-modal">
+        <div class="shopworks-import-content">
+            <div class="shopworks-import-header">
+                <h3><i class="fas fa-file-import"></i> Import from ShopWorks</h3>
+                <button class="shopworks-import-close" onclick="closeShopWorksImportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="shopworks-import-body">
+                <p class="shopworks-import-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Paste the order text from ShopWorks ManageOrders below
+                </p>
+                <textarea id="shopworks-paste-area" class="shopworks-paste-area"
+                    placeholder="Paste ShopWorks order text here...
+
+Example format:
+**************************************************************************
+Order #:134707
+Salesperson:Nika Lao
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:5281
+Company:Absher Construction Company
+..."></textarea>
+
+                <!-- Import Preview (shown after parsing) -->
+                <div class="shopworks-import-preview" id="shopworks-import-preview">
+                    <h4><i class="fas fa-check-circle"></i> Import Preview</h4>
+                    <div class="preview-grid" id="preview-grid"></div>
+                    <div class="preview-products" id="preview-products"></div>
+                    <div class="preview-services" id="preview-services"></div>
+                    <div class="preview-warnings" id="preview-warnings" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="shopworks-import-footer">
+                <button class="btn-cancel-import" onclick="closeShopWorksImportModal()">Cancel</button>
+                <button class="btn-parse-import" id="btn-parse-import" onclick="parseAndPreviewShopWorks()">
+                    <i class="fas fa-search"></i> Preview Import
+                </button>
+                <button class="btn-parse-import" id="btn-confirm-import" onclick="confirmShopWorksImport()" style="display: none;">
+                    <i class="fas fa-check"></i> Import Items
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
@@ -814,6 +869,9 @@
 
     <!-- Product Thumbnail Modal (click to enlarge) -->
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
+
+    <!-- ShopWorks Import Parser -->
+    <script src="/shared_components/js/shopworks-import-parser.js?v=20260131"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -2179,6 +2237,7 @@
             // Initialize customer lookup autocomplete
             if (typeof CustomerLookupService !== 'undefined') {
                 const customerLookup = new CustomerLookupService();
+                window.customerLookupInstance = customerLookup;  // Store for ShopWorks import
                 customerLookup.bindToInput('customer-lookup', {
                     onSelect: (contact) => {
                         document.getElementById('customer-name').value = contact.ct_NameFull || '';
@@ -4637,7 +4696,10 @@
 
                                         // Calculate and display line total
                                         if (totalCell) {
-                                            const qty = standardLineItem.quantity || 0;
+                                            // Use parent row's displayed qty (excludes child rows)
+                                            // standardLineItem.quantity includes child sizes, which is wrong for parent display
+                                            const parentQtyCell = document.getElementById(`row-qty-${rowId}`);
+                                            const qty = parseInt(parentQtyCell?.textContent) || 0;
                                             const lineTotal = displayPrice * qty;
                                             totalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
                                         }
@@ -4689,7 +4751,10 @@
 
                                                 // Calculate and display line total for child row
                                                 if (childTotalCell) {
-                                                    const qty = li.quantity || 0;
+                                                    // Extract quantity for THIS size from description
+                                                    // Format: "M(3) L(2) XL(1) XS(1)" - parse qty in parentheses after size
+                                                    const sizeQtyMatch = (li.description || '').match(new RegExp(size + '\\((\\d+)\\)'));
+                                                    const qty = sizeQtyMatch ? parseInt(sizeQtyMatch[1]) : (li.quantity || 0);
                                                     const lineTotal = displayPrice * qty;
                                                     childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
                                                 }
@@ -6218,6 +6283,540 @@
         }
 
         // showToast() is now provided by quote-builder-utils.js
+
+        // ============================================================
+        // SHOPWORKS IMPORT FUNCTIONS
+        // ============================================================
+
+        // Store parsed data for confirmation
+        let pendingShopWorksImport = null;
+
+        /**
+         * Open the ShopWorks import modal
+         */
+        function openShopWorksImportModal() {
+            const modal = document.getElementById('shopworks-import-modal');
+            modal.classList.add('active');
+
+            // Reset state
+            document.getElementById('shopworks-paste-area').value = '';
+            document.getElementById('shopworks-import-preview').classList.remove('active');
+            document.getElementById('btn-parse-import').style.display = '';
+            document.getElementById('btn-confirm-import').style.display = 'none';
+            pendingShopWorksImport = null;
+
+            // Focus textarea
+            setTimeout(() => {
+                document.getElementById('shopworks-paste-area').focus();
+            }, 100);
+        }
+
+        /**
+         * Close the ShopWorks import modal
+         */
+        function closeShopWorksImportModal() {
+            const modal = document.getElementById('shopworks-import-modal');
+            modal.classList.remove('active');
+            pendingShopWorksImport = null;
+        }
+
+        /**
+         * Parse pasted text and show preview
+         */
+        function parseAndPreviewShopWorks() {
+            const text = document.getElementById('shopworks-paste-area').value.trim();
+
+            if (!text) {
+                showToast('Please paste ShopWorks order text first', 'warning');
+                return;
+            }
+
+            try {
+                const parser = new ShopWorksImportParser();
+                const result = parser.parse(text);
+
+                console.log('[ShopWorks Import] Parsed items:', result.products.length, result.products);
+
+                // Consolidate products by partNumber + color (merges size-split SKUs like ST253, ST253_2X into one row)
+                result.products = parser.consolidateProducts(result.products);
+                pendingShopWorksImport = result;
+
+                console.log('[ShopWorks Import] After consolidation:', result.products.length, 'products');
+                result.products.forEach((p, i) => {
+                    const totalQty = Object.values(p.sizes).reduce((sum, q) => sum + q, 0);
+                    console.log(`  [${i + 1}] ${p.partNumber} ${p.color}: ${totalQty} pcs`, p.sizes);
+                });
+
+                // Show preview
+                renderImportPreview(result);
+
+                // Show confirm button, hide parse button
+                document.getElementById('btn-parse-import').style.display = 'none';
+                document.getElementById('btn-confirm-import').style.display = '';
+
+            } catch (error) {
+                console.error('Failed to parse ShopWorks text:', error);
+                showToast('Failed to parse order text. Check format.', 'error');
+            }
+        }
+
+        /**
+         * Render the import preview
+         */
+        function renderImportPreview(data) {
+            const preview = document.getElementById('shopworks-import-preview');
+            const grid = document.getElementById('preview-grid');
+            const products = document.getElementById('preview-products');
+            const services = document.getElementById('preview-services');
+            const warnings = document.getElementById('preview-warnings');
+
+            // Customer & order info grid
+            grid.innerHTML = `
+                <div class="preview-item">
+                    <div class="preview-item-label">Order #</div>
+                    <div class="preview-item-value">${escapeHtml(data.orderId || 'N/A')}</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-item-label">Company</div>
+                    <div class="preview-item-value">${escapeHtml(data.customer.company || 'N/A')}</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-item-label">Contact</div>
+                    <div class="preview-item-value">${escapeHtml(data.customer.contactName || 'N/A')}</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-item-label">Sales Rep</div>
+                    <div class="preview-item-value">${escapeHtml(data.salesRep.name || 'N/A')}</div>
+                </div>
+            `;
+
+            // Products list
+            let productsHtml = '';
+            if (data.products.length > 0) {
+                productsHtml = '<h5>Products (' + data.products.length + ')</h5><div class="preview-products-list">';
+                for (const product of data.products) {
+                    const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
+                    productsHtml += `
+                        <div class="preview-product-item">
+                            <span class="preview-product-style">${escapeHtml(product.partNumber)}</span>
+                            <span class="preview-product-desc">${escapeHtml(product.description || '')}</span>
+                            <span class="preview-product-qty">Qty: ${totalQty}</span>
+                        </div>
+                    `;
+                }
+                productsHtml += '</div>';
+            }
+
+            // DECG items
+            if (data.decgItems.length > 0) {
+                productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Items (' + data.decgItems.length + ')</h5><div class="preview-products-list">';
+                for (const decg of data.decgItems) {
+                    productsHtml += `
+                        <div class="preview-product-item">
+                            <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
+                            <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')}</span>
+                            <span class="preview-product-qty">Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+                productsHtml += '</div>';
+            }
+            products.innerHTML = productsHtml;
+
+            // Services badges
+            let servicesHtml = '';
+            if (data.services.digitizing) {
+                servicesHtml += '<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing</span>';
+            }
+            if (data.services.patchSetup) {
+                servicesHtml += '<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($50)</span>';
+            }
+            if (data.services.additionalLogo) {
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-plus-circle"></i> Additional Logo: ${escapeHtml(data.services.additionalLogo.position)}</span>`;
+            }
+            if (data.services.monograms.length > 0) {
+                const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-font"></i> Monograms: ${totalNames} names</span>`;
+            }
+            if (data.services.rush) {
+                servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
+            }
+            if (data.services.artCharges) {
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-palette"></i> Art Charge: $${data.services.artCharges.amount.toFixed(2)}</span>`;
+            }
+            if (data.services.graphicDesign) {
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-pencil-ruler"></i> Design: ${data.services.graphicDesign.hours} hrs</span>`;
+            }
+
+            if (servicesHtml) {
+                services.innerHTML = '<h5>Services</h5><div class="preview-services-list">' + servicesHtml + '</div>';
+            } else {
+                services.innerHTML = '';
+            }
+
+            // Warnings
+            if (data.warnings.length > 0 || data.notes.length > 0) {
+                let warningsHtml = '<h5><i class="fas fa-exclamation-triangle"></i> Notes & Warnings</h5><ul>';
+                for (const warning of data.warnings) {
+                    warningsHtml += `<li>${escapeHtml(warning)}</li>`;
+                }
+                for (const note of data.notes) {
+                    warningsHtml += `<li>${escapeHtml(note)}</li>`;
+                }
+                warningsHtml += '</ul>';
+                warnings.innerHTML = warningsHtml;
+                warnings.style.display = '';
+            } else {
+                warnings.style.display = 'none';
+            }
+
+            preview.classList.add('active');
+        }
+
+        /**
+         * Confirm and execute the import
+         */
+        async function confirmShopWorksImport() {
+            if (!pendingShopWorksImport) {
+                showToast('No import data available', 'error');
+                return;
+            }
+
+            const data = pendingShopWorksImport;
+            const btn = document.getElementById('btn-confirm-import');
+
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Importing...';
+
+            try {
+                // 1. Populate customer info
+                if (data.customer.contactName) {
+                    document.getElementById('customer-name').value = data.customer.contactName;
+                }
+                if (data.customer.email) {
+                    document.getElementById('customer-email').value = data.customer.email;
+                }
+                if (data.customer.company) {
+                    document.getElementById('company-name').value = data.customer.company;
+                }
+
+                // Also populate customer lookup search field for easy CRM lookup
+                console.log('[ShopWorks Import] Customer data:', data.customer);
+                const customerLookupInput = document.getElementById('customer-lookup');
+                if (customerLookupInput && data.customer.email) {
+                    customerLookupInput.value = data.customer.email;
+
+                    // Direct API call to find customer by email (bypass debounced dropdown)
+                    // This avoids timing issues with modal close/blur events
+                    if (window.customerLookupInstance) {
+                        try {
+                            console.log('[ShopWorks Import] Searching CRM for:', data.customer.email);
+                            const results = await window.customerLookupInstance.search(data.customer.email);
+                            console.log('[ShopWorks Import] CRM results:', results);
+
+                            if (results.length > 0) {
+                                // Auto-populate from first CRM match
+                                const contact = results[0];
+                                document.getElementById('customer-name').value = contact.ct_NameFull || data.customer.contactName || '';
+                                document.getElementById('customer-email').value = contact.ContactNumbersEmail || data.customer.email || '';
+                                document.getElementById('company-name').value = contact.CustomerCompanyName || data.customer.company || '';
+                                showToast('Customer info loaded from CRM', 'success');
+                            } else {
+                                // Show that lookup ran but found nothing - not an error
+                                console.log('[ShopWorks Import] No CRM match for:', data.customer.email);
+                                showToast('Customer not found in CRM - using imported values', 'info');
+                            }
+                        } catch (err) {
+                            console.warn('[ShopWorks Import] CRM lookup failed:', err);
+                            showToast('CRM lookup failed - using imported values', 'warning');
+                        }
+                    }
+
+                    // Auto-expand the save/share panel so user can see the populated field
+                    const saveShareContent = document.getElementById('save-share-content');
+                    const saveShareHeader = document.querySelector('.save-share-section .section-header');
+                    if (saveShareContent && saveShareContent.style.display === 'none') {
+                        saveShareContent.style.display = 'block';
+                        if (saveShareHeader) {
+                            const icon = saveShareHeader.querySelector('.toggle-icon');
+                            if (icon) icon.classList.add('expanded');
+                        }
+                    }
+                }
+
+                // 2. Select sales rep by email
+                if (data.salesRep.email) {
+                    selectSalesRepByEmail(data.salesRep.email);
+                }
+
+                // 3. Handle digitizing checkbox
+                if (data.services.digitizing) {
+                    const digitizingCheckbox = document.getElementById('primary-digitizing');
+                    if (digitizingCheckbox) {
+                        digitizingCheckbox.checked = true;
+                        // Update the visual state
+                        const wrapper = digitizingCheckbox.closest('.digitizing-checkbox');
+                        if (wrapper) wrapper.classList.add('checked');
+                        // Update state and trigger pricing (matching native change handler at line 2340-2341)
+                        primaryLogo.needsDigitizing = true;
+                        recalculatePricing();
+                    }
+                }
+
+                // 4. Handle patch setup
+                if (data.services.patchSetup) {
+                    const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+                    if (patchSetupCheckbox) {
+                        patchSetupCheckbox.checked = true;
+                        const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
+                        if (wrapper) wrapper.classList.add('checked');
+                    }
+                }
+
+                // 5. Handle additional logo
+                if (data.services.additionalLogo) {
+                    // Show garment logo card first if not visible
+                    const garmentLogoCard = document.getElementById('garment-logo-card');
+                    if (garmentLogoCard) garmentLogoCard.style.display = '';
+
+                    // Enable additional logo
+                    const alToggle = document.getElementById('garment-al-toggle');
+                    const alSwitch = document.getElementById('garment-al-switch');
+                    if (alToggle && alSwitch) {
+                        alToggle.checked = true;
+                        alSwitch.classList.add('active');
+                        const alConfig = document.getElementById('garment-al-config-new');
+                        if (alConfig) alConfig.style.display = '';
+
+                        // Set position
+                        const posSelect = document.getElementById('garment-al-position-select');
+                        if (posSelect && data.services.additionalLogo.position) {
+                            // Try to match the position
+                            let matched = false;
+                            for (const opt of posSelect.options) {
+                                if (opt.value.toLowerCase().includes(data.services.additionalLogo.position.toLowerCase().split(' ')[0])) {
+                                    posSelect.value = opt.value;
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            // Default to Right Chest if no match (primary logo is usually Left Chest)
+                            if (!matched) {
+                                posSelect.value = 'Right Chest';
+                            }
+                        }
+
+                        // Update global state and trigger pricing recalculation
+                        globalAL.garment.enabled = true;
+                        globalAL.garment.position = posSelect ? posSelect.value : 'Right Chest';
+                        recalculatePricing();
+                    }
+                }
+
+                // 6. Handle art charges
+                if (data.services.artCharges) {
+                    const artToggle = document.getElementById('art-charge-toggle');
+                    const artInput = document.getElementById('art-charge');
+                    if (artToggle && artInput) {
+                        artToggle.checked = true;
+                        artInput.disabled = false;
+                        artInput.value = data.services.artCharges.amount.toFixed(2);
+                        updateArtworkCharges();
+                    }
+                }
+
+                // 7. Handle graphic design hours
+                if (data.services.graphicDesign) {
+                    const designHoursInput = document.getElementById('graphic-design-hours');
+                    if (designHoursInput) {
+                        designHoursInput.value = data.services.graphicDesign.hours;
+                        updateArtworkCharges();
+                    }
+                }
+
+                // 8. Import products
+                let productsImported = 0;
+                for (const product of data.products) {
+                    try {
+                        await importProductRow(product);
+                        productsImported++;
+                    } catch (err) {
+                        console.warn(`Failed to import product ${product.partNumber}:`, err);
+                    }
+                }
+
+                // 9. Import DECG items (as notes for now - full DECG row support coming later)
+                if (data.decgItems.length > 0) {
+                    // Add note about customer-supplied items
+                    const notesEl = document.getElementById('notes');
+                    if (notesEl) {
+                        const decgNote = data.decgItems.map(d =>
+                            `DECG: ${d.quantity}x ${d.description || 'Customer garment'} @ $${d.calculatedUnitPrice.toFixed(2)}`
+                        ).join('\n');
+                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + decgNote;
+                    }
+                    showToast(`${data.decgItems.length} customer-supplied items added as notes`, 'info');
+                }
+
+                // 10. Handle monogram charges (add to additional charges)
+                if (data.services.monograms.length > 0) {
+                    const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+                    const monogramTotal = totalNames * 12.50;
+                    const additionalChargesInput = document.getElementById('additional-charges');
+                    if (additionalChargesInput) {
+                        const existing = additionalChargesInput.value.trim();
+                        const newEntry = `Monograms (${totalNames} names): $${monogramTotal.toFixed(2)}`;
+                        additionalChargesInput.value = existing ? existing + '\n' + newEntry : newEntry;
+                        updateAdditionalCharges();
+                    }
+                }
+
+                // Recalculate pricing
+                recalculatePricing();
+                markAsUnsaved();
+
+                // Close modal and show success
+                closeShopWorksImportModal();
+
+                const summary = [];
+                if (productsImported > 0) summary.push(`${productsImported} products`);
+                if (data.services.digitizing) summary.push('digitizing');
+                if (data.services.additionalLogo) summary.push('additional logo');
+
+                showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
+
+            } catch (error) {
+                console.error('Import failed:', error);
+                showToast('Import failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
+            }
+        }
+
+        /**
+         * Select sales rep by email address
+         */
+        function selectSalesRepByEmail(email) {
+            const select = document.getElementById('sales-rep');
+            if (!select || !email) return;
+
+            const lowerEmail = email.toLowerCase();
+            for (const option of select.options) {
+                if (option.value.toLowerCase() === lowerEmail) {
+                    select.value = option.value;
+                    return;
+                }
+            }
+        }
+
+        /**
+         * Import a single product row from ShopWorks data
+         */
+        async function importProductRow(product) {
+            const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
+            console.log(`[ShopWorks Import] Importing product: ${product.partNumber} ${product.color} (${totalQty} pcs)`, product.sizes);
+
+            // Add a new row
+            addNewRow();
+            const row = document.querySelector('tr.new-row');
+            if (!row) throw new Error('Failed to create row');
+
+            const rowId = parseInt(row.dataset.rowId);
+            const styleInput = row.querySelector('.style-input');
+
+            // 1. Set the style number and trigger load
+            styleInput.value = product.partNumber;
+            await onStyleChange(styleInput, rowId);
+
+            // 2. Wait for colors to populate dropdown
+            await new Promise(resolve => setTimeout(resolve, 600));
+
+            // 3. SELECT COLOR (this enables size inputs!)
+            if (product.color) {
+                const pickerDropdown = row.querySelector('.color-picker-dropdown');
+                if (pickerDropdown) {
+                    // Try exact match first on COLOR_NAME or CATALOG_COLOR
+                    let colorOption = pickerDropdown.querySelector(
+                        `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+                    );
+
+                    // Fallback: partial/fuzzy match for abbreviated colors
+                    // e.g., "Athletic Hthr" should match "Athletic Heather"
+                    if (!colorOption) {
+                        const options = pickerDropdown.querySelectorAll('.color-picker-option');
+                        const searchColor = product.color.toLowerCase().replace(/\s+/g, '');
+                        for (const opt of options) {
+                            const optColorName = (opt.dataset.colorName || '').toLowerCase().replace(/\s+/g, '');
+                            const optCatalogColor = (opt.dataset.catalogColor || '').toLowerCase().replace(/\s+/g, '');
+                            // Check COLOR_NAME or CATALOG_COLOR for fuzzy match
+                            if (optColorName.includes(searchColor) ||
+                                searchColor.includes(optColorName.split(/\s/)[0]) ||
+                                optColorName.startsWith(searchColor.substring(0, 5)) ||
+                                optCatalogColor.includes(searchColor) ||
+                                searchColor.includes(optCatalogColor)) {
+                                colorOption = opt;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (colorOption) {
+                        selectColor(rowId, colorOption);
+                        // Wait for detectAndAdjustSizeUI to complete
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    } else {
+                        console.warn(`[ShopWorks Import] Color "${product.color}" not found for ${product.partNumber}`);
+                    }
+                }
+            }
+
+            // 4. Set sizes (inputs should now be enabled from selectColor)
+            // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
+            // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
+            const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
+
+            for (const [size, qty] of Object.entries(product.sizes)) {
+                if (qty > 0) {
+                    // Map imported size to our internal format
+                    let internalSize = size;
+                    if (size === 'LG') internalSize = 'L';
+                    if (size === 'XXL' || size === '2X') internalSize = '2XL';
+                    if (size === 'XXXL' || size === '3X') internalSize = '3XL';
+
+                    // Check if this is an extended size that needs a child row
+                    // These sizes are readonly/disabled in the parent row and must use child rows
+                    const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
+                    const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
+                                          (sizeInput && sizeInput.disabled);
+
+                    console.log(`[ShopWorks Import] Size ${internalSize}: qty=${qty}, input=${sizeInput ? 'found' : 'missing'}, disabled=${sizeInput?.disabled}, needsChildRow=${needsChildRow}`);
+
+                    if (needsChildRow) {
+                        // Use the existing extended size function to create child row
+                        createOrUpdateExtendedChildRow(rowId, internalSize, qty);
+
+                        // For 2XL: Also set parent row's 2XL input so onSizeChange doesn't remove the child row
+                        // onSizeChange checks parent input value and removes child row if value=0
+                        if (internalSize === '2XL') {
+                            const parentXxlInput = row.querySelector('[data-size="2XL"]');
+                            if (parentXxlInput) {
+                                parentXxlInput.value = qty;
+                            }
+                        }
+                    } else if (sizeInput) {
+                        // Standard size - set directly on parent row
+                        sizeInput.value = qty;
+                    } else {
+                        console.warn(`[ShopWorks Import] No input found for size ${internalSize}`);
+                    }
+                }
+            }
+
+            // 5. Trigger size change to recalculate
+            onSizeChange(rowId);
+        }
     </script>
 </body>
 </html>

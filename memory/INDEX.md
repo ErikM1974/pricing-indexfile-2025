@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-01-29 (added Customer Lookup System documentation)
+**Last Updated:** 2026-01-31 (added ShopWorks Import feature)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -43,7 +43,8 @@
 ├── 2026_PRICING_MARGINS.md           # 2026 pricing margins reference
 ├── REP_ACCOUNT_MANAGEMENT.md         # Rep account sync, reconcile, audit APIs
 ├── NIKA_DASHBOARD_BUILD_GUIDE.md     # Build guide for Nika's CRM dashboard
-├── CUSTOMER_LOOKUP_SYSTEM.md         # **NEW** Customer autocomplete for quote builders
+├── CUSTOMER_LOOKUP_SYSTEM.md         # Customer autocomplete for quote builders
+├── SHOPWORKS_IMPORT_PLAN.md          # ShopWorks order text import for quote builders (IMPLEMENTED 2026-01-31)
 │
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
