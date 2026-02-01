@@ -21,6 +21,12 @@ class EmbroideryPricingCalculator {
         this.additionalStitchRate = 1.25; // per 1000 stitches over 8000
         this.baseStitchCount = 8000; // base included stitches for standard positions
         this.fbBaseStitchCount = 25000; // base included stitches for Full Back position
+        // TODO: Add FB pricing to Caspio Service_Codes table:
+        //   - ServiceCode: FB
+        //   - PricingMethod: STITCH_BASED (not tiered)
+        //   - StitchRate: 1.25 (per 1K stitches)
+        //   - StitchBase: 25000 (minimum)
+        //   - Then fetch from /api/service-codes instead of hardcoding here
         this.stitchIncrement = 1000; // rounding increment
         
         // Cache for size pricing data
