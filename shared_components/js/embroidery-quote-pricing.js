@@ -1141,14 +1141,21 @@ class EmbroideryPricingCalculator {
 
         // Calculate additional stitch cost for PRIMARY logos only (GARMENTS ONLY)
         // Caps have fixed 8K stitches - no extra stitch charge
-        // Full Back uses 25K base, other positions use 8K base
+        // Full Back: ALL stitches charged at $1.25/1K (min 25K = $31.25)
+        // Other positions: excess over 8K base charged at $1.25/1K
         let primaryAdditionalStitchCost = 0;
+        let primaryFullBackStitchCost = 0; // Separate tracking for Full Back (ALL stitches)
         if (garmentProducts.length > 0) {
             garmentPrimaryLogos.forEach(logo => {
-                // Use 25K base for Full Back, 8K for other positions
-                const baseStitches = logo.position === 'Full Back' ? this.fbBaseStitchCount : this.baseStitchCount;
-                const extraStitches = Math.max(0, logo.stitchCount - baseStitches);
-                primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
+                if (logo.position === 'Full Back') {
+                    // Full Back: charge for ALL stitches (min 25K)
+                    const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount);
+                    primaryFullBackStitchCost += (fbStitchCount / 1000) * this.additionalStitchRate;
+                } else {
+                    // Other positions: charge for excess over 8K base
+                    const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
+                    primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
+                }
             });
         }
 
@@ -1253,16 +1260,45 @@ class EmbroideryPricingCalculator {
                     if (logo) {
                         const quantity = assignment.quantity || 0;
                         if (quantity > 0) {
-                            // Calculate additional logo price (NO margin division)
-                            // Use different base stitch count and rate for caps vs garments
-                            // Full Back uses 25K base, other positions use 8K/5K base
                             const isFullBack = logo.position === 'Full Back';
-                            const baseStitches = isFullBack ? this.fbBaseStitchCount :
-                                                 (isCap ? 5000 : this.baseStitchCount);
+
+                            // FULL BACK: Special pricing - $1.25 per 1,000 stitches (all stitches, min 25K)
+                            // No tier cost, no base included - pure stitch-based pricing
+                            if (isFullBack) {
+                                const fbStitchRate = this.additionalStitchRate; // $1.25/1K
+                                const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount); // Min 25K
+                                const unitPrice = (fbStitchCount / 1000) * fbStitchRate;
+                                const total = unitPrice * quantity;
+
+                                console.log(`🔍 [DEBUG] Full Back Calculation:`);
+                                console.log(`   - Stitch Count: ${fbStitchCount} (min 25K)`);
+                                console.log(`   - Rate: $${fbStitchRate}/1K`);
+                                console.log(`   - Unit Price: $${unitPrice.toFixed(2)}`);
+
+                                const partNumber = `FB-${fbStitchCount}`;
+
+                                additionalServices.push({
+                                    type: 'additional_logo',
+                                    description: `FB Full Back (${fbStitchCount/1000}K stitches)`,
+                                    partNumber: partNumber,
+                                    quantity: quantity,
+                                    unitPrice: unitPrice,
+                                    total: total,
+                                    productStyle: product.style,
+                                    logoPosition: logo.position,
+                                    stitchCount: fbStitchCount,
+                                    logoId: logo.id
+                                });
+                                continue; // Skip normal AL processing
+                            }
+
+                            // STANDARD AL: Calculate additional logo price (NO margin division)
+                            // Use different base stitch count and rate for caps vs garments
+                            const baseStitches = isCap ? 5000 : this.baseStitchCount;
                             const stitchRate = isCap ? this.capAdditionalStitchRate : this.additionalStitchRate;
                             const extraStitches = Math.max(0, logo.stitchCount - baseStitches);
                             const stitchCost = (extraStitches / 1000) * stitchRate;
-                            
+
                             // Use AL tier cost from API - ERROR if not available
                             // Use appropriate tier for caps vs garments
                             const alTier = isCap ? capTier : garmentTier;
@@ -1306,13 +1342,13 @@ class EmbroideryPricingCalculator {
                             console.log(`   - Extra Stitches: ${extraStitches}`);
                             console.log(`   - Stitch Cost: $${stitchCost}`);
                             console.log(`   - Raw Total: $${alTierCost + stitchCost}`);
-                            
+
                             // Direct tier cost + stitch cost (NO subset upcharge - simplified pricing)
                             // AL pricing uses raw price - no rounding applied
                             const unitPrice = alTierCost + stitchCost;
                             console.log(`   - Final Unit Price: $${unitPrice} (AL pricing - no rounding)`);
                             const total = unitPrice * quantity;
-                            
+
                             // Generate part number
                             const partNumber = logo.stitchCount === 8000 ? 'AL' : `AL-${logo.stitchCount}`;
                             
@@ -1379,7 +1415,8 @@ class EmbroideryPricingCalculator {
         // but we pass 0 to calculateProductPrice(), so all extraStitchCost values were 0!
         // Fix: Use primaryAdditionalStitchCost (already calculated correctly) × garmentQuantity
         // Caps have fixed 8K stitches - no extra stitch charge for caps
-        let garmentStitchTotal = primaryAdditionalStitchCost * garmentQuantity;
+        // Full Back: ALL stitches charged at $1.25/1K (separate from excess stitch charges)
+        let garmentStitchTotal = (primaryAdditionalStitchCost + primaryFullBackStitchCost) * garmentQuantity;
         let capStitchTotal = 0;
         const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
         console.log(`[EmbroideryPricingCalculator] Stitch charges - Garment: $${garmentStitchTotal.toFixed(2)}, Cap: $${capStitchTotal.toFixed(2)}, Total: $${additionalStitchTotal.toFixed(2)}`);
@@ -1394,7 +1431,8 @@ class EmbroideryPricingCalculator {
             garmentTier: garmentTier,  // NEW: Separate garment tier
             capTier: capTier,  // NEW: Separate cap tier
             embroideryRate: tierEmbCost,
-            additionalStitchCost: primaryAdditionalStitchCost,
+            additionalStitchCost: primaryAdditionalStitchCost + primaryFullBackStitchCost,
+            fullBackStitchCost: primaryFullBackStitchCost, // Full Back: ALL stitches at $1.25/1K
             additionalStitchTotal: additionalStitchTotal,  // Total extra stitch charge across all items
             garmentStitchTotal: garmentStitchTotal,  // NEW: Garment-only stitch charges (AS-GARM)
             capStitchTotal: capStitchTotal,          // NEW: Cap-only stitch charges (AS-CAP)
