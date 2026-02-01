@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-01-31 (added ShopWorks Import feature)
+**Last Updated:** 2026-02-01 (added Service_Codes Caspio table design)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -45,6 +45,7 @@
 ├── NIKA_DASHBOARD_BUILD_GUIDE.md     # Build guide for Nika's CRM dashboard
 ├── CUSTOMER_LOOKUP_SYSTEM.md         # Customer autocomplete for quote builders
 ├── SHOPWORKS_IMPORT_PLAN.md          # ShopWorks order text import for quote builders (IMPLEMENTED 2026-01-31)
+├── SERVICE_CODES_TABLE.md            # **NEW** Caspio Service_Codes table design (2026-02-01)
 │
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
@@ -138,6 +139,7 @@
 | Need | Start Here |
 |------|-----------|
 | Caspio Proxy API | [CASPIO_API_CORE.md](./CASPIO_API_CORE.md) → [/api/](./api/) modules |
+| **Service Codes (Caspio)** | **[SERVICE_CODES_TABLE.md](./SERVICE_CODES_TABLE.md)** - DD, AL, FB, DECG pricing table |
 | **ManageOrders (Complete)** | **[MANAGEORDERS_COMPLETE_REFERENCE.md](./MANAGEORDERS_COMPLETE_REFERENCE.md)** - Single source of truth |
 | ManageOrders PULL (detail) | [MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md) → [/manageorders/](./manageorders/) |
 | ManageOrders PUSH (detail) | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |

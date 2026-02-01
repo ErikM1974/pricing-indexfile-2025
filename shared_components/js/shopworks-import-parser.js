@@ -6,14 +6,23 @@
  * - Sales rep info
  * - Products (SanMar and custom)
  * - Service items (digitizing, additional logo, monograms, etc.)
- * - Customer-supplied garments (DECG)
+ * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.5.0 - Improved email extraction with fallback regex
- * @date 2026-01-31
+ * @version 1.7.0 - Fetches pricing from Caspio Service_Codes API
+ * @date 2026-02-01
  */
 
 class ShopWorksImportParser {
     constructor() {
+        // API endpoint for service codes
+        this.API_BASE_URL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        // Track if service codes have been loaded from API
+        this.serviceCodesLoaded = false;
+        this.serviceCodesData = [];
+
         // Size mapping from ShopWorks to quote builder format
         this.SIZE_MAP = {
             'XS': 'XS',
@@ -48,7 +57,7 @@ class ShopWorksImportParser {
             '4XLT': '4XLT'
         };
 
-        // DECG (Customer-Supplied Garments) pricing tiers
+        // DECG (Customer-Supplied Garments) pricing tiers - FALLBACK if API unavailable
         this.DECG_TIERS = {
             '1-2': 45.00,
             '3-5': 40.00,
@@ -59,12 +68,57 @@ class ShopWorksImportParser {
             '144+': 15.00
         };
 
+        // DECC (Customer-Supplied Caps) pricing tiers - FALLBACK if API unavailable
+        this.DECC_TIERS = {
+            '1-2': 36.00,
+            '3-5': 32.00,
+            '6-11': 30.00,
+            '12-23': 25.00,
+            '24-71': 24.00,
+            '72-143': 20.00,
+            '144+': 12.00
+        };
+
+        // Service code aliases for typo handling (kept in code per Erik's decision)
+        this.SERVICE_CODE_ALIASES = {
+            'AONOGRAM': 'MONOGRAM',    // Common typo
+            'NNAME': 'NAME',           // Common typo
+            'NNAMES': 'NAME',          // Common typo
+            'EJB': 'FB',               // Legacy code for Embroidered Jacket Back
+            'FLAG': 'AL',              // Legacy code
+            'SETUP': 'GRT-50',         // Shorthand for setup fee
+            'SETUP FEE': 'GRT-50',
+            'DESIGN PREP': 'GRT-75',   // Shorthand for design/graphic fee
+            'EXCESS STITCH': 'ART'     // Maps to art charge
+        };
+
+        // Invalid part numbers to skip
+        this.INVALID_PARTS = [
+            'WEIGHT', 'GIFT CODE', 'DISCOUNT', 'FREIGHT', 'TEST',
+            'SPSU', 'SHIPPING', 'TAX', 'TOTAL'
+        ];
+
+        // Non-SanMar product patterns (require manual pricing)
+        this.NON_SANMAR_PATTERNS = [
+            /^MCK\d{5}/,      // Cutter & Buck
+            /^MQK\d{5}/,      // Unknown vendor polos
+            /^470CB$/,        // Specific cap
+            /^PTS\d+$/,       // Richardson fitted caps
+            /^110$/,          // Richardson R-Flex
+            /^112P$/,         // Richardson Printed
+            /^511$/,          // Acrylic-Wool cap
+            /^J26\d{3}$/,     // Safety jackets
+            /^7007$/,         // Safety vest
+            /^8001$/,         // Safety bomber
+            /^STK-/           // Stickers (non-apparel)
+        ];
+
         this.CAP_DISCOUNT = 0.20;           // -20% for caps
         this.HEAVYWEIGHT_SURCHARGE = 10.00;  // +$10 for heavyweight
         this.LTM_THRESHOLD = 24;             // Less Than Minimum threshold
-        this.LTM_FEE = 50.00;                // LTM fee amount
+        this.LTM_FEE = 50.00;                // LTM fee amount (fallback)
 
-        // Monogram/Names pricing
+        // Monogram/Names pricing (fallback)
         this.MONOGRAM_PRICE = 12.50;
 
         // Known service item patterns
@@ -74,6 +128,123 @@ class ShopWorksImportParser {
 
         // Part number suffixes to strip
         this.SIZE_SUFFIXES = ['_2X', '_3X', '_4X', '_5X', '_6X', '_XS', '_LT', '_XLT', '_2XLT', '_3XLT', '_4XLT', '_OSFA', '_S/M', '_L/XL'];
+    }
+
+    /**
+     * Load service codes from Caspio API
+     * Call this before parsing to get current pricing
+     * @returns {Promise<boolean>} True if loaded successfully
+     */
+    async loadServiceCodes() {
+        if (this.serviceCodesLoaded) {
+            console.log('[ShopWorksImportParser] Service codes already loaded');
+            return true;
+        }
+
+        try {
+            const response = await fetch(`${this.API_BASE_URL}/api/service-codes`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success && Array.isArray(data.data)) {
+                this.serviceCodesData = data.data;
+                this._buildPricingTables();
+                this.serviceCodesLoaded = true;
+                console.log(`[ShopWorksImportParser] Loaded ${data.data.length} service codes from API`);
+                return true;
+            }
+        } catch (error) {
+            console.warn('[ShopWorksImportParser] Failed to load service codes from API, using fallback:', error.message);
+        }
+
+        return false;
+    }
+
+    /**
+     * Build pricing lookup tables from API data
+     * @private
+     */
+    _buildPricingTables() {
+        // Build DECG tiers from API data
+        const decgRecords = this.serviceCodesData.filter(sc => sc.ServiceCode === 'DECG');
+        if (decgRecords.length > 0) {
+            this.DECG_TIERS = {};
+            for (const record of decgRecords) {
+                if (record.TierLabel) {
+                    this.DECG_TIERS[record.TierLabel] = record.SellPrice;
+                }
+            }
+            console.log('[ShopWorksImportParser] Built DECG tiers from API:', Object.keys(this.DECG_TIERS).length);
+        }
+
+        // Build DECC tiers from API data
+        const deccRecords = this.serviceCodesData.filter(sc => sc.ServiceCode === 'DECC');
+        if (deccRecords.length > 0) {
+            this.DECC_TIERS = {};
+            for (const record of deccRecords) {
+                if (record.TierLabel) {
+                    this.DECC_TIERS[record.TierLabel] = record.SellPrice;
+                }
+            }
+            console.log('[ShopWorksImportParser] Built DECC tiers from API:', Object.keys(this.DECC_TIERS).length);
+        }
+
+        // Get Monogram price from API
+        const monogramRecord = this.serviceCodesData.find(sc =>
+            sc.ServiceCode === 'Monogram' || sc.ServiceCode === 'Name'
+        );
+        if (monogramRecord && monogramRecord.SellPrice) {
+            this.MONOGRAM_PRICE = monogramRecord.SellPrice;
+            console.log('[ShopWorksImportParser] Monogram price from API:', this.MONOGRAM_PRICE);
+        }
+
+        // Get LTM fee from API
+        const ltmRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'LTM');
+        if (ltmRecord && ltmRecord.SellPrice) {
+            this.LTM_FEE = ltmRecord.SellPrice;
+            console.log('[ShopWorksImportParser] LTM fee from API:', this.LTM_FEE);
+        }
+    }
+
+    /**
+     * Get service code data by code name
+     * @param {string} code - Service code (e.g., 'DGT-001', 'AL', 'DECG')
+     * @returns {Array} Matching service code records
+     */
+    getServiceCode(code) {
+        if (!this.serviceCodesLoaded || !code) return [];
+        return this.serviceCodesData.filter(sc =>
+            sc.ServiceCode && sc.ServiceCode.toUpperCase() === code.toUpperCase()
+        );
+    }
+
+    /**
+     * Get tier pricing for a tiered service code
+     * @param {string} code - Service code (e.g., 'AL', 'DECG', 'DECC')
+     * @param {number} quantity - Quantity to price
+     * @returns {Object|null} Matching tier record or null
+     */
+    getTierPricing(code, quantity) {
+        const tiers = this.getServiceCode(code).filter(sc => sc.PricingMethod === 'TIERED');
+        if (tiers.length === 0) return null;
+
+        for (const tier of tiers) {
+            const label = tier.TierLabel;
+            if (!label) continue;
+
+            if (label.endsWith('+')) {
+                const min = parseInt(label.replace('+', ''));
+                if (quantity >= min) return tier;
+            } else if (label.includes('-')) {
+                const [min, max] = label.split('-').map(n => parseInt(n));
+                if (quantity >= min && quantity <= max) return tier;
+            }
+        }
+
+        // Fallback to highest tier
+        return tiers[tiers.length - 1];
     }
 
     /**
@@ -109,7 +280,8 @@ class ShopWorksImportParser {
             },
             notes: [],              // Comment rows
             warnings: [],           // Import warnings
-            rawItems: []            // All parsed items for debugging
+            rawItems: [],           // All parsed items for debugging
+            pricingSource: this.serviceCodesLoaded ? 'caspio' : 'fallback'
         };
 
         // Split into sections by the asterisk divider
@@ -375,6 +547,11 @@ class ShopWorksImportParser {
             case 'digitizing':
                 result.services.digitizing = true;
                 result.services.digitizingCount++;
+                // Store digitizing code for proper fee lookup
+                if (!result.services.digitizingCodes) {
+                    result.services.digitizingCodes = [];
+                }
+                result.services.digitizingCodes.push(item.partNumber.toUpperCase());
                 break;
 
             case 'patch-setup':
@@ -390,9 +567,46 @@ class ShopWorksImportParser {
                 };
                 break;
 
+            case 'fb':
+                // Full Back embroidery - treated as additional logo with specific position
+                if (!result.services.additionalLogos) {
+                    result.services.additionalLogos = [];
+                }
+                result.services.additionalLogos.push({
+                    position: 'Full Back',
+                    type: 'fb',
+                    quantity: item.quantity,
+                    description: item.description
+                });
+                break;
+
+            case 'cb':
+                // Cap Back embroidery - treated as additional logo
+                if (!result.services.additionalLogos) {
+                    result.services.additionalLogos = [];
+                }
+                result.services.additionalLogos.push({
+                    position: 'Cap Back',
+                    type: 'cb',
+                    quantity: item.quantity,
+                    description: item.description
+                });
+                break;
+
             case 'al':
                 // Additional Logo - parse position from description
                 const position = this._parseALPosition(item.description);
+                // Support multiple additional logos
+                if (!result.services.additionalLogos) {
+                    result.services.additionalLogos = [];
+                }
+                result.services.additionalLogos.push({
+                    position: position,
+                    type: 'al',
+                    quantity: item.quantity,
+                    description: item.description
+                });
+                // Keep backward compatibility with single additionalLogo
                 result.services.additionalLogo = {
                     position: position,
                     quantity: item.quantity,
@@ -423,19 +637,47 @@ class ShopWorksImportParser {
                 };
                 break;
 
+            case 'ltm':
+                // Less Than Minimum fee
+                result.services.ltmFee = {
+                    amount: item.unitPrice * item.quantity || this.LTM_FEE,
+                    description: item.description
+                };
+                break;
+
             case 'decg':
                 // Customer-supplied garment
-                const isCap = this._isCapFromDescription(item.description);
+                const isCapDecg = this._isCapFromDescription(item.description);
                 const isHeavyweight = this._isHeavyweightFromDescription(item.description);
-                const decgPricing = this.calculateDECGPrice(item.quantity, isCap, isHeavyweight);
+                const decgPricing = this.calculateDECGPrice(item.quantity, isCapDecg, isHeavyweight);
 
                 result.decgItems.push({
                     ...item,
-                    isCap: isCap,
+                    serviceType: 'decg',
+                    isCap: isCapDecg,
                     isHeavyweight: isHeavyweight,
                     calculatedUnitPrice: decgPricing.unitPrice,
                     ltmFee: decgPricing.ltmFee
                 });
+                break;
+
+            case 'decc':
+                // Customer-supplied caps (DECC/SECC)
+                const deccPricing = this.calculateDECCPrice(item.quantity);
+
+                result.decgItems.push({
+                    ...item,
+                    serviceType: 'decc',
+                    isCap: true,
+                    isHeavyweight: false,
+                    calculatedUnitPrice: deccPricing.unitPrice,
+                    ltmFee: deccPricing.ltmFee
+                });
+                break;
+
+            case 'invalid':
+                // Invalid/skipped items - add to warnings
+                result.warnings.push(`Skipped invalid item: ${item.partNumber}`);
                 break;
 
             case 'comment':
@@ -447,33 +689,66 @@ class ShopWorksImportParser {
 
             case 'product':
             default:
-                // Regular product - try SanMar lookup
-                // Part number already cleaned in _parseItemBlock if it had a size suffix
-                // Still call cleanPartNumber for any edge cases, but it's likely already clean
+                // Regular product - check if non-SanMar first
                 const cleanedPartNumber = this.cleanPartNumber(item.partNumber);
-                result.products.push({
-                    ...item,
-                    originalPartNumber: item.partNumber,
-                    partNumber: cleanedPartNumber,
-                    needsLookup: true
-                });
+                const isNonSanMar = this._isNonSanMarProduct(cleanedPartNumber);
+
+                if (isNonSanMar) {
+                    // Non-SanMar product - requires manual pricing
+                    result.customProducts.push({
+                        ...item,
+                        originalPartNumber: item.partNumber,
+                        partNumber: cleanedPartNumber,
+                        needsManualPricing: true,
+                        reason: 'Non-SanMar product'
+                    });
+                } else {
+                    // Regular product - try SanMar lookup
+                    result.products.push({
+                        ...item,
+                        originalPartNumber: item.partNumber,
+                        partNumber: cleanedPartNumber,
+                        needsLookup: true
+                    });
+                }
                 break;
         }
     }
 
     /**
+     * Check if a part number matches non-SanMar patterns
+     * @param {string} partNumber - Cleaned part number
+     * @returns {boolean} True if this is a known non-SanMar product
+     */
+    _isNonSanMarProduct(partNumber) {
+        if (!partNumber) return false;
+        const pn = partNumber.toUpperCase();
+        return this.NON_SANMAR_PATTERNS.some(pattern => pattern.test(pn));
+    }
+
+    /**
      * Classify a part number by type
      * @param {string} partNumber - The part number to classify
-     * @returns {string} Type: 'product', 'digitizing', 'decg', 'al', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'comment'
+     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'invalid', 'comment'
      */
     classifyPartNumber(partNumber) {
         if (!partNumber || partNumber.trim() === '') {
             return 'comment';
         }
 
-        const pn = partNumber.toUpperCase().trim();
+        let pn = partNumber.toUpperCase().trim();
 
-        // Digitizing/Setup fees
+        // Check for invalid part numbers first
+        if (this.INVALID_PARTS.includes(pn) || /^\d+\.\d{2}\s*$/.test(pn)) {
+            return 'invalid';
+        }
+
+        // Apply aliases (typo correction)
+        if (this.SERVICE_CODE_ALIASES[pn]) {
+            pn = this.SERVICE_CODE_ALIASES[pn];
+        }
+
+        // Digitizing/Setup fees (DD or any DGT-XXX code)
         if (pn === 'DD' || pn.startsWith('DGT-')) {
             return 'digitizing';
         }
@@ -488,7 +763,17 @@ class ShopWorksImportParser {
             return 'graphic-design';
         }
 
-        // Additional Logo
+        // Full Back embroidery (large back design)
+        if (pn === 'FB') {
+            return 'fb';
+        }
+
+        // Cap Back embroidery
+        if (pn === 'CB') {
+            return 'cb';
+        }
+
+        // Additional Logo (standard positions)
         if (pn === 'AL') {
             return 'al';
         }
@@ -498,7 +783,12 @@ class ShopWorksImportParser {
             return 'decg';
         }
 
-        // Monogram/Names
+        // Customer-supplied caps
+        if (pn === 'DECC' || pn === 'SECC') {
+            return 'decc';
+        }
+
+        // Monogram/Names (includes typo variants via aliases)
         if (pn === 'MONOGRAM' || pn === 'NAME' || pn === 'NAMES') {
             return 'monogram';
         }
@@ -511,6 +801,11 @@ class ShopWorksImportParser {
         // Art charges
         if (pn === 'ART' || pn === 'ART-CHARGE') {
             return 'art';
+        }
+
+        // LTM (Less Than Minimum) fee
+        if (pn === 'LTM') {
+            return 'ltm';
         }
 
         // Everything else is a product
@@ -567,24 +862,38 @@ class ShopWorksImportParser {
     }
 
     /**
-     * Parse Additional Logo position from description
+     * Parse Additional Logo position from description or part number
+     * @param {string} description - Item description
+     * @param {string} partNumber - Optional part number for direct position codes
+     * @returns {string} Position name
      */
-    _parseALPosition(description) {
+    _parseALPosition(description, partNumber = null) {
+        // Check part number for direct position codes
+        if (partNumber) {
+            const pn = partNumber.toUpperCase().trim();
+            if (pn === 'FB' || pn === 'EJB') return 'Full Back';
+            if (pn === 'CB') return 'Cap Back';
+            if (pn === 'FLAG') return 'Left Chest';  // Default for FLAG
+        }
+
         if (!description) return 'Additional Location';
 
         const desc = description.toLowerCase();
 
-        // Common positions
+        // Common positions - check most specific first
+        if (desc.includes('full back')) return 'Full Back';
         if (desc.includes('left sleeve')) return 'Left Sleeve';
         if (desc.includes('right sleeve')) return 'Right Sleeve';
         if (desc.includes('left chest')) return 'Left Chest';
         if (desc.includes('right chest')) return 'Right Chest';
         if (desc.includes('back yoke')) return 'Back Yoke';
         if (desc.includes('center back')) return 'Center Back';
+        if (desc.includes('jacket back')) return 'Full Back';
         if (desc.includes('back')) return 'Back';
         if (desc.includes('cap back')) return 'Cap Back';
         if (desc.includes('cap left')) return 'Cap Left';
         if (desc.includes('cap right')) return 'Cap Right';
+        if (desc.includes('front')) return 'Front';
 
         return 'Additional Location';
     }
@@ -669,6 +978,36 @@ class ShopWorksImportParser {
     }
 
     /**
+     * Calculate DECC (customer-supplied cap) pricing based on quantity
+     * Uses DECC_TIERS which are ~20% lower than DECG
+     * @param {number} quantity - Number of caps
+     * @returns {Object} { unitPrice, ltmFee }
+     */
+    calculateDECCPrice(quantity) {
+        // Get tier price from DECC tiers
+        let basePrice = 0;
+        if (quantity >= 144) basePrice = this.DECC_TIERS['144+'];
+        else if (quantity >= 72) basePrice = this.DECC_TIERS['72-143'];
+        else if (quantity >= 24) basePrice = this.DECC_TIERS['24-71'];
+        else if (quantity >= 12) basePrice = this.DECC_TIERS['12-23'];
+        else if (quantity >= 6) basePrice = this.DECC_TIERS['6-11'];
+        else if (quantity >= 3) basePrice = this.DECC_TIERS['3-5'];
+        else basePrice = this.DECC_TIERS['1-2'];
+
+        // Calculate LTM fee
+        let ltmFee = 0;
+        if (quantity < this.LTM_THRESHOLD) {
+            ltmFee = this.LTM_FEE;
+        }
+
+        return {
+            unitPrice: basePrice,
+            ltmFee: ltmFee,
+            totalPerPiece: basePrice + (ltmFee / quantity)
+        };
+    }
+
+    /**
      * Consolidate products by partNumber + color, merging size quantities
      * This handles ShopWorks orders that split the same product into multiple items by size SKU
      * (e.g., ST253, ST253_2X, ST253_3X all become one ST253 row)
@@ -720,22 +1059,37 @@ class ShopWorksImportParser {
         const totalProducts = parseResult.products.length;
         const totalDecg = parseResult.decgItems.length;
         const totalMonograms = parseResult.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+        const totalAdditionalLogos = parseResult.services.additionalLogos?.length || 0;
 
         const services = [];
-        if (parseResult.services.digitizing) services.push('Digitizing');
-        if (parseResult.services.patchSetup) services.push('Patch Setup');
-        if (parseResult.services.additionalLogo) services.push('Additional Logo');
+        if (parseResult.services.digitizing) {
+            const codes = parseResult.services.digitizingCodes || [];
+            services.push(`Digitizing (${codes.join(', ') || 'DD'})`);
+        }
+        if (parseResult.services.patchSetup) services.push('Patch Setup ($50)');
+        if (parseResult.services.graphicDesign) {
+            services.push(`Graphic Design ($${parseResult.services.graphicDesign.amount})`);
+        }
+        if (totalAdditionalLogos > 0) {
+            const positions = parseResult.services.additionalLogos.map(al => al.position);
+            services.push(`Additional Logo: ${positions.join(', ')}`);
+        }
         if (parseResult.services.rush) services.push('Rush Fee');
         if (parseResult.services.artCharges) services.push('Art Charges');
-        if (parseResult.services.graphicDesign) services.push('Graphic Design');
+        if (parseResult.services.ltmFee) services.push('LTM Fee');
         if (totalMonograms > 0) services.push(`Monograms (${totalMonograms})`);
+
+        // Separate DECG and DECC counts
+        const decgGarments = parseResult.decgItems.filter(d => d.serviceType === 'decg').length;
+        const deccCaps = parseResult.decgItems.filter(d => d.serviceType === 'decc').length;
 
         return {
             orderId: parseResult.orderId,
             customer: parseResult.customer.company || parseResult.customer.contactName,
             salesRep: parseResult.salesRep.name,
             productCount: totalProducts,
-            decgCount: totalDecg,
+            decgCount: decgGarments,
+            deccCount: deccCaps,
             customProductCount: parseResult.customProducts.length,
             services: services,
             noteCount: parseResult.notes.length,
@@ -752,4 +1106,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.5.0');
+console.log('[ShopWorksImportParser] Module loaded v1.7.0 - Caspio API integration');

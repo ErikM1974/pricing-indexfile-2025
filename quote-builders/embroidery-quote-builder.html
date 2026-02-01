@@ -871,7 +871,7 @@ Company:Absher Construction Company
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
 
     <!-- ShopWorks Import Parser -->
-    <script src="/shared_components/js/shopworks-import-parser.js?v=20260131"></script>
+    <script src="/shared_components/js/shopworks-import-parser.js?v=20260201"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -6323,7 +6323,7 @@ Company:Absher Construction Company
         /**
          * Parse pasted text and show preview
          */
-        function parseAndPreviewShopWorks() {
+        async function parseAndPreviewShopWorks() {
             const text = document.getElementById('shopworks-paste-area').value.trim();
 
             if (!text) {
@@ -6333,6 +6333,10 @@ Company:Absher Construction Company
 
             try {
                 const parser = new ShopWorksImportParser();
+
+                // Load service codes from Caspio API for current pricing
+                await parser.loadServiceCodes();
+
                 const result = parser.parse(text);
 
                 console.log('[ShopWorks Import] Parsed items:', result.products.length, result.products);
@@ -6371,6 +6375,8 @@ Company:Absher Construction Company
             const warnings = document.getElementById('preview-warnings');
 
             // Customer & order info grid
+            const pricingIcon = data.pricingSource === 'caspio' ? '✓' : '⚠';
+            const pricingColor = data.pricingSource === 'caspio' ? '#28a745' : '#ffc107';
             grid.innerHTML = `
                 <div class="preview-item">
                     <div class="preview-item-label">Order #</div>
@@ -6387,6 +6393,10 @@ Company:Absher Construction Company
                 <div class="preview-item">
                     <div class="preview-item-label">Sales Rep</div>
                     <div class="preview-item-value">${escapeHtml(data.salesRep.name || 'N/A')}</div>
+                </div>
+                <div class="preview-item">
+                    <div class="preview-item-label">Pricing</div>
+                    <div class="preview-item-value" style="color: ${pricingColor};">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>
                 </div>
             `;
 
@@ -6407,15 +6417,52 @@ Company:Absher Construction Company
                 productsHtml += '</div>';
             }
 
-            // DECG items
+            // DECG/DECC items (customer-supplied garments and caps)
             if (data.decgItems.length > 0) {
-                productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Items (' + data.decgItems.length + ')</h5><div class="preview-products-list">';
-                for (const decg of data.decgItems) {
+                const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
+                const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
+
+                if (decgGarments.length > 0) {
+                    productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Garments (' + decgGarments.length + ')</h5><div class="preview-products-list">';
+                    for (const decg of decgGarments) {
+                        const ltmNote = decg.ltmFee > 0 ? ' + LTM' : '';
+                        productsHtml += `
+                            <div class="preview-product-item">
+                                <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
+                                <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')}</span>
+                                <span class="preview-product-qty">Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
+                            </div>
+                        `;
+                    }
+                    productsHtml += '</div>';
+                }
+
+                if (deccCaps.length > 0) {
+                    productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Caps (' + deccCaps.length + ')</h5><div class="preview-products-list">';
+                    for (const decc of deccCaps) {
+                        const ltmNote = decc.ltmFee > 0 ? ' + LTM' : '';
+                        productsHtml += `
+                            <div class="preview-product-item">
+                                <span class="preview-product-style" style="background: #dbeafe; color: #1e40af;">DECC</span>
+                                <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')}</span>
+                                <span class="preview-product-qty">Qty: ${decc.quantity} @ $${decc.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
+                            </div>
+                        `;
+                    }
+                    productsHtml += '</div>';
+                }
+            }
+
+            // Non-SanMar products (require manual pricing)
+            if (data.customProducts && data.customProducts.length > 0) {
+                productsHtml += '<h5 style="margin-top: 12px; color: #c2410c;">Non-SanMar Products - Manual Pricing Required (' + data.customProducts.length + ')</h5><div class="preview-products-list">';
+                for (const product of data.customProducts) {
+                    const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;
                     productsHtml += `
-                        <div class="preview-product-item">
-                            <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
-                            <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')}</span>
-                            <span class="preview-product-qty">Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}</span>
+                        <div class="preview-product-item" style="border-left: 3px solid #c2410c;">
+                            <span class="preview-product-style" style="background: #fed7aa; color: #c2410c;">${escapeHtml(product.partNumber)}</span>
+                            <span class="preview-product-desc">${escapeHtml(product.description || product.color || 'Unknown')}</span>
+                            <span class="preview-product-qty" style="color: #c2410c;">Qty: ${totalQty} - MANUAL</span>
                         </div>
                     `;
                 }
@@ -6426,14 +6473,25 @@ Company:Absher Construction Company
             // Services badges
             let servicesHtml = '';
             if (data.services.digitizing) {
-                servicesHtml += '<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing</span>';
+                const codes = data.services.digitizingCodes || ['DD'];
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing (${codes.join(', ')})</span>`;
             }
             if (data.services.patchSetup) {
                 servicesHtml += '<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($50)</span>';
             }
-            if (data.services.additionalLogo) {
-                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-plus-circle"></i> Additional Logo: ${escapeHtml(data.services.additionalLogo.position)}</span>`;
+
+            // Handle new additionalLogos array
+            const additionalLogos = data.services.additionalLogos || [];
+            if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
+                additionalLogos.push(data.services.additionalLogo);
             }
+            for (const al of additionalLogos) {
+                const typeLabel = al.type === 'fb' ? 'Full Back' :
+                                 al.type === 'cb' ? 'Cap Back' :
+                                 al.position || 'Additional Logo';
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-plus-circle"></i> ${escapeHtml(typeLabel)}</span>`;
+            }
+
             if (data.services.monograms.length > 0) {
                 const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
                 servicesHtml += `<span class="preview-service-badge"><i class="fas fa-font"></i> Monograms: ${totalNames} names</span>`;
@@ -6446,6 +6504,9 @@ Company:Absher Construction Company
             }
             if (data.services.graphicDesign) {
                 servicesHtml += `<span class="preview-service-badge"><i class="fas fa-pencil-ruler"></i> Design: ${data.services.graphicDesign.hours} hrs</span>`;
+            }
+            if (data.services.ltmFee) {
+                servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-exclamation-circle"></i> LTM Fee: $${data.services.ltmFee.amount.toFixed(2)}</span>`;
             }
 
             if (servicesHtml) {
@@ -6574,44 +6635,75 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 5. Handle additional logo
-                if (data.services.additionalLogo) {
+                // 5. Handle additional logos (supports new additionalLogos array and legacy additionalLogo)
+                const additionalLogos = data.services.additionalLogos || [];
+                // Add legacy single additionalLogo if exists and not already in array
+                if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
+                    additionalLogos.push(data.services.additionalLogo);
+                }
+
+                if (additionalLogos.length > 0) {
                     // Show garment logo card first if not visible
                     const garmentLogoCard = document.getElementById('garment-logo-card');
                     if (garmentLogoCard) garmentLogoCard.style.display = '';
 
-                    // Enable additional logo
-                    const alToggle = document.getElementById('garment-al-toggle');
-                    const alSwitch = document.getElementById('garment-al-switch');
-                    if (alToggle && alSwitch) {
-                        alToggle.checked = true;
-                        alSwitch.classList.add('active');
-                        const alConfig = document.getElementById('garment-al-config-new');
-                        if (alConfig) alConfig.style.display = '';
+                    // Process each additional logo position
+                    const positionsImported = [];
+                    for (const al of additionalLogos) {
+                        const position = al.position || 'Additional Location';
+                        const alType = al.type || 'al';  // al, fb, or cb
 
-                        // Set position
-                        const posSelect = document.getElementById('garment-al-position-select');
-                        if (posSelect && data.services.additionalLogo.position) {
-                            // Try to match the position
-                            let matched = false;
-                            for (const opt of posSelect.options) {
-                                if (opt.value.toLowerCase().includes(data.services.additionalLogo.position.toLowerCase().split(' ')[0])) {
-                                    posSelect.value = opt.value;
-                                    matched = true;
-                                    break;
+                        // For now, enable first AL and set position
+                        // Full support for multiple ALs would require UI changes
+                        if (positionsImported.length === 0) {
+                            const alToggle = document.getElementById('garment-al-toggle');
+                            const alSwitch = document.getElementById('garment-al-switch');
+                            if (alToggle && alSwitch) {
+                                alToggle.checked = true;
+                                alSwitch.classList.add('active');
+                                const alConfig = document.getElementById('garment-al-config-new');
+                                if (alConfig) alConfig.style.display = '';
+
+                                // Set position - handle special positions
+                                const posSelect = document.getElementById('garment-al-position-select');
+                                if (posSelect) {
+                                    let matched = false;
+                                    // Map FB/CB types to positions
+                                    const searchPosition = alType === 'fb' ? 'Back' :
+                                                          alType === 'cb' ? 'Cap' :
+                                                          position.split(' ')[0];
+
+                                    for (const opt of posSelect.options) {
+                                        if (opt.value.toLowerCase().includes(searchPosition.toLowerCase())) {
+                                            posSelect.value = opt.value;
+                                            matched = true;
+                                            break;
+                                        }
+                                    }
+                                    // Default to Right Chest if no match
+                                    if (!matched) {
+                                        posSelect.value = 'Right Chest';
+                                    }
                                 }
-                            }
-                            // Default to Right Chest if no match (primary logo is usually Left Chest)
-                            if (!matched) {
-                                posSelect.value = 'Right Chest';
+
+                                // Update global state
+                                globalAL.garment.enabled = true;
+                                globalAL.garment.position = posSelect ? posSelect.value : 'Right Chest';
                             }
                         }
-
-                        // Update global state and trigger pricing recalculation
-                        globalAL.garment.enabled = true;
-                        globalAL.garment.position = posSelect ? posSelect.value : 'Right Chest';
-                        recalculatePricing();
+                        positionsImported.push(position);
                     }
+
+                    // If multiple logos imported, add note about additional positions
+                    if (positionsImported.length > 1) {
+                        const notesEl = document.getElementById('notes');
+                        if (notesEl) {
+                            const alNote = `Additional logo positions: ${positionsImported.join(', ')}`;
+                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + alNote;
+                        }
+                    }
+
+                    recalculatePricing();
                 }
 
                 // 6. Handle art charges
@@ -6646,17 +6738,55 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 9. Import DECG items (as notes for now - full DECG row support coming later)
+                // 9. Import DECG/DECC items (customer-supplied garments and caps)
                 if (data.decgItems.length > 0) {
-                    // Add note about customer-supplied items
+                    // Separate DECG (garments) from DECC (caps)
+                    const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
+                    const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
+
                     const notesEl = document.getElementById('notes');
                     if (notesEl) {
-                        const decgNote = data.decgItems.map(d =>
-                            `DECG: ${d.quantity}x ${d.description || 'Customer garment'} @ $${d.calculatedUnitPrice.toFixed(2)}`
-                        ).join('\n');
-                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + decgNote;
+                        const decgNotes = [];
+
+                        // Add DECG notes
+                        if (decgGarments.length > 0) {
+                            decgGarments.forEach(d => {
+                                const ltmNote = d.ltmFee > 0 ? ` (+ $${d.ltmFee.toFixed(2)} LTM)` : '';
+                                decgNotes.push(`DECG: ${d.quantity}x ${d.description || 'Customer garment'} @ $${d.calculatedUnitPrice.toFixed(2)}/ea${ltmNote}`);
+                            });
+                        }
+
+                        // Add DECC notes
+                        if (deccCaps.length > 0) {
+                            deccCaps.forEach(d => {
+                                const ltmNote = d.ltmFee > 0 ? ` (+ $${d.ltmFee.toFixed(2)} LTM)` : '';
+                                decgNotes.push(`DECC (Cap): ${d.quantity}x ${d.description || 'Customer cap'} @ $${d.calculatedUnitPrice.toFixed(2)}/ea${ltmNote}`);
+                            });
+                        }
+
+                        if (decgNotes.length > 0) {
+                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + decgNotes.join('\n');
+                        }
                     }
-                    showToast(`${data.decgItems.length} customer-supplied items added as notes`, 'info');
+
+                    // Also calculate total DECG/DECC charges and add to additional charges
+                    let totalDecgCharges = 0;
+                    data.decgItems.forEach(d => {
+                        totalDecgCharges += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
+                    });
+
+                    if (totalDecgCharges > 0) {
+                        const additionalChargesInput = document.getElementById('additional-charges');
+                        if (additionalChargesInput) {
+                            const existing = additionalChargesInput.value.trim();
+                            const newEntry = `Customer-supplied decoration (${decgGarments.length} garments, ${deccCaps.length} caps): $${totalDecgCharges.toFixed(2)}`;
+                            additionalChargesInput.value = existing ? existing + '\n' + newEntry : newEntry;
+                            updateAdditionalCharges();
+                        }
+                    }
+
+                    const totalItems = decgGarments.length + deccCaps.length;
+                    showToast(`${totalItems} customer-supplied items imported`, 'info');
                 }
 
                 // 10. Handle monogram charges (add to additional charges)
@@ -6672,6 +6802,39 @@ Company:Absher Construction Company
                     }
                 }
 
+                // 11. Handle LTM fee
+                if (data.services.ltmFee) {
+                    const additionalChargesInput = document.getElementById('additional-charges');
+                    if (additionalChargesInput) {
+                        const existing = additionalChargesInput.value.trim();
+                        const newEntry = `Less Than Minimum Fee: $${data.services.ltmFee.amount.toFixed(2)}`;
+                        additionalChargesInput.value = existing ? existing + '\n' + newEntry : newEntry;
+                        updateAdditionalCharges();
+                    }
+                }
+
+                // 12. Handle non-SanMar products (customProducts - need manual pricing)
+                let customProductsImported = 0;
+                if (data.customProducts && data.customProducts.length > 0) {
+                    const notesEl = document.getElementById('notes');
+                    const customNotes = [];
+
+                    for (const product of data.customProducts) {
+                        const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;
+                        customNotes.push(`NON-SANMAR: ${product.partNumber} - ${product.description || product.color || 'Unknown'} (${totalQty} pcs) - NEEDS MANUAL PRICING`);
+                        customProductsImported++;
+                    }
+
+                    if (notesEl && customNotes.length > 0) {
+                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                            '--- NON-SANMAR PRODUCTS (Manual Pricing Required) ---\n' +
+                            customNotes.join('\n');
+                    }
+
+                    // Show prominent warning
+                    showToast(`${customProductsImported} non-SanMar products need manual pricing`, 'warning', 8000);
+                }
+
                 // Recalculate pricing
                 recalculatePricing();
                 markAsUnsaved();
@@ -6681,8 +6844,10 @@ Company:Absher Construction Company
 
                 const summary = [];
                 if (productsImported > 0) summary.push(`${productsImported} products`);
+                if (customProductsImported > 0) summary.push(`${customProductsImported} need manual pricing`);
                 if (data.services.digitizing) summary.push('digitizing');
-                if (data.services.additionalLogo) summary.push('additional logo');
+                if (additionalLogos.length > 0) summary.push(`${additionalLogos.length} additional logo(s)`);
+                if (data.decgItems.length > 0) summary.push('customer-supplied items');
 
                 showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
 
