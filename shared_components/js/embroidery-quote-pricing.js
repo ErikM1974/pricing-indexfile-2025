@@ -18,15 +18,11 @@ class EmbroideryPricingCalculator {
         this.marginDenominator = 0.57; // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
         this.ltmFee = 50.00;
         this.digitizingFee = 100.00;
-        this.additionalStitchRate = 1.25; // per 1000 stitches over 8000
-        this.baseStitchCount = 8000; // base included stitches for standard positions
-        this.fbBaseStitchCount = 25000; // base included stitches for Full Back position
-        // TODO: Add FB pricing to Caspio Service_Codes table:
-        //   - ServiceCode: FB
-        //   - PricingMethod: STITCH_BASED (not tiered)
-        //   - StitchRate: 1.25 (per 1K stitches)
-        //   - StitchBase: 25000 (minimum)
-        //   - Then fetch from /api/service-codes instead of hardcoding here
+        this.additionalStitchRate = 1.25; // per 1000 stitches over 8000 (overridden by API)
+        this.baseStitchCount = 8000; // base included stitches for standard positions (overridden by API)
+        this.fbBaseStitchCount = 25000; // base included stitches for Full Back position (overridden by API)
+        this.fbStitchRate = 1.25; // Full Back stitch rate per 1K (overridden by API)
+        this.monogramPrice = 12.50; // Monogram/Name price (overridden by API)
         this.stitchIncrement = 1000; // rounding increment
         
         // Cache for size pricing data
@@ -194,6 +190,9 @@ class EmbroideryPricingCalculator {
                 );
             }
             
+            // Load service codes from database (replaces hardcoded pricing values)
+            await this.loadServiceCodes();
+
             this.initialized = true;
             console.log('[EmbroideryPricingCalculator] Initialization complete');
             
@@ -242,6 +241,103 @@ class EmbroideryPricingCalculator {
         } catch (error) {
             console.warn('[EmbroideryPricingCalculator] Could not fetch rounding rules, using default CeilDollar');
             this.roundingMethod = 'CeilDollar'; // Default for embroidery
+        }
+    }
+
+    // =========================================
+    // SERVICE CODES - Database-driven pricing values
+    // =========================================
+
+    /**
+     * Load service codes from API (replaces hardcoded pricing values)
+     * Service codes include: FB stitch settings, LTM fee, monogram price, stitch rates, etc.
+     * This is called at the end of initialization to override default values with database values.
+     */
+    async loadServiceCodes() {
+        try {
+            console.log('[EmbroideryPricingCalculator] Loading service codes from API...');
+            const response = await fetch(`${this.baseURL}/api/service-codes`);
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                const codes = data.data;
+                console.log(`[EmbroideryPricingCalculator] Loaded ${codes.length} service codes from database`);
+
+                // FB (Full Back) - stitch-based pricing
+                const fb = codes.find(c => c.ServiceCode === 'FB' && c.PricingMethod === 'STITCH_BASED');
+                if (fb) {
+                    this.fbBaseStitchCount = fb.StitchBase || 25000;
+                    // FB stitch rate from SellPrice (per 1K stitches)
+                    if (fb.SellPrice) {
+                        this.fbStitchRate = fb.SellPrice;
+                    }
+                    console.log(`  - FB: StitchBase=${this.fbBaseStitchCount}, Rate=$${fb.SellPrice}/1K`);
+                }
+
+                // LTM (Less Than Minimum) fee
+                const ltm = codes.find(c => c.ServiceCode === 'LTM');
+                if (ltm && ltm.SellPrice) {
+                    this.ltmFee = ltm.SellPrice;
+                    console.log(`  - LTM Fee: $${this.ltmFee}`);
+                }
+
+                // GRT-50 (Patch Setup Fee)
+                const grt50 = codes.find(c => c.ServiceCode === 'GRT-50');
+                if (grt50 && grt50.SellPrice) {
+                    this.patchSetupFee = grt50.SellPrice;
+                    console.log(`  - Patch Setup Fee (GRT-50): $${this.patchSetupFee}`);
+                }
+
+                // Monogram pricing
+                const monogram = codes.find(c => c.ServiceCode === 'Monogram');
+                if (monogram && monogram.SellPrice) {
+                    this.monogramPrice = monogram.SellPrice;
+                    console.log(`  - Monogram Price: $${this.monogramPrice}`);
+                }
+
+                // CONFIG: Garment stitch rate
+                const stitchRate = codes.find(c => c.ServiceCode === 'STITCH-RATE');
+                if (stitchRate) {
+                    if (stitchRate.SellPrice) {
+                        this.additionalStitchRate = stitchRate.SellPrice;
+                    }
+                    if (stitchRate.StitchBase) {
+                        this.baseStitchCount = stitchRate.StitchBase;
+                    }
+                    console.log(`  - Garment Stitch Rate: $${this.additionalStitchRate}/1K, Base: ${this.baseStitchCount}`);
+                }
+
+                // CONFIG: Cap stitch rate
+                const capStitchRate = codes.find(c => c.ServiceCode === 'CAP-STITCH-RATE');
+                if (capStitchRate) {
+                    if (capStitchRate.SellPrice) {
+                        this.capAdditionalStitchRate = capStitchRate.SellPrice;
+                    }
+                    if (capStitchRate.StitchBase) {
+                        this.capStitchCount = capStitchRate.StitchBase;
+                    }
+                    console.log(`  - Cap Stitch Rate: $${this.capAdditionalStitchRate}/1K, Base: ${this.capStitchCount}`);
+                }
+
+                // CONFIG: 3D Puff upcharge
+                const puffUpcharge = codes.find(c => c.ServiceCode === 'PUFF-UPCHARGE');
+                if (puffUpcharge && puffUpcharge.SellPrice) {
+                    this.puffUpchargePerCap = puffUpcharge.SellPrice;
+                    console.log(`  - Puff Upcharge: $${this.puffUpchargePerCap}/cap`);
+                }
+
+                // CONFIG: Patch upcharge
+                const patchUpcharge = codes.find(c => c.ServiceCode === 'PATCH-UPCHARGE');
+                if (patchUpcharge && patchUpcharge.SellPrice) {
+                    this.patchUpchargePerCap = patchUpcharge.SellPrice;
+                    console.log(`  - Patch Upcharge: $${this.patchUpchargePerCap}/cap`);
+                }
+
+                console.log('[EmbroideryPricingCalculator] Service codes applied successfully');
+            }
+        } catch (error) {
+            console.warn('[EmbroideryPricingCalculator] Failed to load service codes, using defaults:', error.message);
+            // Non-critical - continue with hardcoded defaults
         }
     }
 
