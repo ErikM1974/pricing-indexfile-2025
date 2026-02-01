@@ -96,10 +96,11 @@
                             <div class="logo-form-row">
                                 <div class="logo-form-field">
                                     <label>Position</label>
-                                    <select id="primary-position">
+                                    <select id="primary-position" onchange="onPrimaryPositionChange()">
                                         <option value="Left Chest" selected>Left Chest</option>
                                         <option value="Right Chest">Right Chest</option>
                                         <option value="Center Chest">Center Chest</option>
+                                        <option value="Full Back">Full Back (25K min)</option>
                                     </select>
                                 </div>
                                 <div class="logo-form-field">
@@ -134,6 +135,7 @@
                                                 <option value="Left Chest">Left Chest</option>
                                                 <option value="Left Sleeve">Left Sleeve</option>
                                                 <option value="Right Sleeve">Right Sleeve</option>
+                                                <option value="Full Back">Full Back (25K min)</option>
                                             </select>
                                         </div>
                                         <div class="logo-form-field">
@@ -402,6 +404,36 @@
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="cap-al-digitizing-unit">$100.00</td>
                                 <td class="cell-total" id="cap-al-digitizing-total">$100.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Monogram/Names Fee Row -->
+                            <tr id="monogram-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-font"></i> Monograms/Names (<span id="monogram-count-label">0</span>)
+                                </td>
+                                <td class="cell-qty" id="monogram-qty">1</td>
+                                <td class="cell-price" id="monogram-unit">$12.50</td>
+                                <td class="cell-total" id="monogram-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- DECG (Customer-Supplied Garments) Fee Row -->
+                            <tr id="decg-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-tshirt"></i> Customer-Supplied Garments
+                                </td>
+                                <td class="cell-qty" id="decg-qty">0</td>
+                                <td class="cell-price" id="decg-unit">$0.00</td>
+                                <td class="cell-total" id="decg-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- DECC (Customer-Supplied Caps) Fee Row -->
+                            <tr id="decc-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-hard-hat"></i> Customer-Supplied Caps
+                                </td>
+                                <td class="cell-qty" id="decc-qty">0</td>
+                                <td class="cell-price" id="decc-unit">$0.00</td>
+                                <td class="cell-total" id="decc-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Art Charge Row -->
@@ -973,11 +1005,41 @@ Company:Absher Construction Company
             recalculatePricing();
         }
 
+        // Handle primary logo position change (for Full Back 25K minimum)
+        function onPrimaryPositionChange() {
+            const posSelect = document.getElementById('primary-position');
+            const stitchInput = document.getElementById('primary-stitches');
+
+            if (posSelect.value === 'Full Back') {
+                // Set minimum 25K for Full Back
+                if (parseInt(stitchInput.value) < 25000) {
+                    stitchInput.value = 25000;
+                }
+                stitchInput.min = 25000;
+                showToast('Full Back requires minimum 25,000 stitches', 'info');
+            } else {
+                // Reset to normal minimum
+                stitchInput.min = 1000;
+            }
+            recalculatePricing();
+        }
+
         // Update global AL config (position, stitch count, or digitizing change)
         function updateGlobalAL(type) {
             const positionSelect = document.getElementById(`${type}-al-position-select`);
             const stitchesInput = document.getElementById(`${type}-al-stitches`);
             const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
+
+            // Full Back requires minimum 25K stitches
+            if (positionSelect && positionSelect.value === 'Full Back') {
+                if (parseInt(stitchesInput.value) < 25000) {
+                    stitchesInput.value = 25000;
+                    showToast('Full Back requires minimum 25,000 stitches', 'info');
+                }
+                stitchesInput.min = 25000;
+            } else if (stitchesInput) {
+                stitchesInput.min = 1000;
+            }
 
             if (positionSelect) globalAL[type].position = positionSelect.value;
             if (stitchesInput) globalAL[type].stitchCount = parseInt(stitchesInput.value) || (type === 'cap' ? 5000 : 8000);
@@ -6739,11 +6801,46 @@ Company:Absher Construction Company
                 }
 
                 // 9. Import DECG/DECC items (customer-supplied garments and caps)
-                if (data.decgItems.length > 0) {
+                if (data.decgItems && data.decgItems.length > 0) {
                     // Separate DECG (garments) from DECC (caps)
                     const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
                     const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
 
+                    // Populate DECG fee row (customer-supplied garments)
+                    if (decgGarments.length > 0) {
+                        const decgRow = document.getElementById('decg-fee-row');
+                        if (decgRow) {
+                            decgRow.style.display = '';
+                            let totalQty = 0, totalCharge = 0;
+                            decgGarments.forEach(d => {
+                                totalQty += d.quantity;
+                                totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
+                            });
+                            const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
+                            document.getElementById('decg-qty').textContent = totalQty;
+                            document.getElementById('decg-unit').textContent = `$${avgUnitPrice.toFixed(2)}`;
+                            document.getElementById('decg-total').textContent = `$${totalCharge.toFixed(2)}`;
+                        }
+                    }
+
+                    // Populate DECC fee row (customer-supplied caps)
+                    if (deccCaps.length > 0) {
+                        const deccRow = document.getElementById('decc-fee-row');
+                        if (deccRow) {
+                            deccRow.style.display = '';
+                            let totalQty = 0, totalCharge = 0;
+                            deccCaps.forEach(d => {
+                                totalQty += d.quantity;
+                                totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
+                            });
+                            const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
+                            document.getElementById('decc-qty').textContent = totalQty;
+                            document.getElementById('decc-unit').textContent = `$${avgUnitPrice.toFixed(2)}`;
+                            document.getElementById('decc-total').textContent = `$${totalCharge.toFixed(2)}`;
+                        }
+                    }
+
+                    // Add details to notes
                     const notesEl = document.getElementById('notes');
                     if (notesEl) {
                         const decgNotes = [];
@@ -6765,41 +6862,50 @@ Company:Absher Construction Company
                         }
 
                         if (decgNotes.length > 0) {
-                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + decgNotes.join('\n');
+                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + '--- Customer Items ---\n' + decgNotes.join('\n');
                         }
                     }
 
-                    // Also calculate total DECG/DECC charges and add to additional charges
-                    let totalDecgCharges = 0;
-                    data.decgItems.forEach(d => {
-                        totalDecgCharges += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
-                    });
-
-                    if (totalDecgCharges > 0) {
-                        const additionalChargesInput = document.getElementById('additional-charges');
-                        if (additionalChargesInput) {
-                            const existing = additionalChargesInput.value.trim();
-                            const newEntry = `Customer-supplied decoration (${decgGarments.length} garments, ${deccCaps.length} caps): $${totalDecgCharges.toFixed(2)}`;
-                            additionalChargesInput.value = existing ? existing + '\n' + newEntry : newEntry;
-                            updateAdditionalCharges();
-                        }
-                    }
-
-                    const totalItems = decgGarments.length + deccCaps.length;
-                    showToast(`${totalItems} customer-supplied items imported`, 'info');
+                    const totalItems = decgGarments.reduce((sum, d) => sum + d.quantity, 0) +
+                                       deccCaps.reduce((sum, d) => sum + d.quantity, 0);
+                    showToast(`${totalItems} customer-supplied items imported`, 'success');
                 }
 
-                // 10. Handle monogram charges (add to additional charges)
+                // 10. Handle monogram charges - populate fee row
                 if (data.services.monograms.length > 0) {
                     const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
-                    const monogramTotal = totalNames * 12.50;
-                    const additionalChargesInput = document.getElementById('additional-charges');
-                    if (additionalChargesInput) {
-                        const existing = additionalChargesInput.value.trim();
-                        const newEntry = `Monograms (${totalNames} names): $${monogramTotal.toFixed(2)}`;
-                        additionalChargesInput.value = existing ? existing + '\n' + newEntry : newEntry;
-                        updateAdditionalCharges();
+                    const unitPrice = 12.50; // From Service_Codes API
+                    const totalPrice = totalNames * unitPrice;
+
+                    // Show fee row
+                    const monogramRow = document.getElementById('monogram-fee-row');
+                    if (monogramRow) {
+                        monogramRow.style.display = '';
+                        const countLabel = document.getElementById('monogram-count-label');
+                        const qtyCell = document.getElementById('monogram-qty');
+                        const unitCell = document.getElementById('monogram-unit');
+                        const totalCell = document.getElementById('monogram-total');
+
+                        if (countLabel) countLabel.textContent = totalNames;
+                        if (qtyCell) qtyCell.textContent = totalNames;
+                        if (unitCell) unitCell.textContent = `$${unitPrice.toFixed(2)}`;
+                        if (totalCell) totalCell.textContent = `$${totalPrice.toFixed(2)}`;
                     }
+
+                    // Also add name details to notes
+                    const nameDetails = data.services.monograms
+                        .filter(m => m.description)
+                        .map(m => m.description)
+                        .join('\n');
+                    if (nameDetails) {
+                        const notesEl = document.getElementById('notes');
+                        if (notesEl) {
+                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                                            '--- Names/Monograms ---\n' + nameDetails;
+                        }
+                    }
+
+                    showToast(`${totalNames} monogram/name entries imported`, 'success');
                 }
 
                 // 11. Handle LTM fee
@@ -6942,6 +7048,25 @@ Company:Absher Construction Company
             // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
             const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
 
+            // Detect if this is a cap product for size mapping
+            const isCapRow = row.dataset.isCap === 'true' ||
+                             isCapProduct(product.partNumber, product.description || '');
+
+            // Cap size mapping: ShopWorks uses S, M, L but caps have S/M, M/L, L/XL, OSFA
+            const CAP_SIZE_MAP = {
+                'S': 'S/M',
+                'M': 'M/L',
+                'L': 'L/XL',
+                'XL': 'L/XL',
+                'S/M': 'S/M',
+                'M/L': 'M/L',
+                'L/XL': 'L/XL',
+                'SM/MD': 'S/M',
+                'LG/XL': 'L/XL',
+                'OSFA': 'OSFA',
+                'ONE SIZE': 'OSFA'
+            };
+
             for (const [size, qty] of Object.entries(product.sizes)) {
                 if (qty > 0) {
                     // Map imported size to our internal format
@@ -6950,13 +7075,20 @@ Company:Absher Construction Company
                     if (size === 'XXL' || size === '2X') internalSize = '2XL';
                     if (size === 'XXXL' || size === '3X') internalSize = '3XL';
 
+                    // Apply cap size mapping if this is a cap
+                    if (isCapRow && CAP_SIZE_MAP[internalSize.toUpperCase()]) {
+                        const capSize = CAP_SIZE_MAP[internalSize.toUpperCase()];
+                        console.log(`[ShopWorks Import] Cap size mapping: ${internalSize} → ${capSize}`);
+                        internalSize = capSize;
+                    }
+
                     // Check if this is an extended size that needs a child row
                     // These sizes are readonly/disabled in the parent row and must use child rows
                     const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
                     const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
                                           (sizeInput && sizeInput.disabled);
 
-                    console.log(`[ShopWorks Import] Size ${internalSize}: qty=${qty}, input=${sizeInput ? 'found' : 'missing'}, disabled=${sizeInput?.disabled}, needsChildRow=${needsChildRow}`);
+                    console.log(`[ShopWorks Import] Size ${internalSize}: qty=${qty}, input=${sizeInput ? 'found' : 'missing'}, disabled=${sizeInput?.disabled}, needsChildRow=${needsChildRow}${isCapRow ? ' (CAP)' : ''}`);
 
                     if (needsChildRow) {
                         // Use the existing extended size function to create child row

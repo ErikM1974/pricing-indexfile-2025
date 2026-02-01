@@ -19,7 +19,8 @@ class EmbroideryPricingCalculator {
         this.ltmFee = 50.00;
         this.digitizingFee = 100.00;
         this.additionalStitchRate = 1.25; // per 1000 stitches over 8000
-        this.baseStitchCount = 8000; // base included stitches
+        this.baseStitchCount = 8000; // base included stitches for standard positions
+        this.fbBaseStitchCount = 25000; // base included stitches for Full Back position
         this.stitchIncrement = 1000; // rounding increment
         
         // Cache for size pricing data
@@ -1140,10 +1141,13 @@ class EmbroideryPricingCalculator {
 
         // Calculate additional stitch cost for PRIMARY logos only (GARMENTS ONLY)
         // Caps have fixed 8K stitches - no extra stitch charge
+        // Full Back uses 25K base, other positions use 8K base
         let primaryAdditionalStitchCost = 0;
         if (garmentProducts.length > 0) {
             garmentPrimaryLogos.forEach(logo => {
-                const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
+                // Use 25K base for Full Back, 8K for other positions
+                const baseStitches = logo.position === 'Full Back' ? this.fbBaseStitchCount : this.baseStitchCount;
+                const extraStitches = Math.max(0, logo.stitchCount - baseStitches);
                 primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
             });
         }
@@ -1251,7 +1255,10 @@ class EmbroideryPricingCalculator {
                         if (quantity > 0) {
                             // Calculate additional logo price (NO margin division)
                             // Use different base stitch count and rate for caps vs garments
-                            const baseStitches = isCap ? 5000 : this.baseStitchCount;
+                            // Full Back uses 25K base, other positions use 8K/5K base
+                            const isFullBack = logo.position === 'Full Back';
+                            const baseStitches = isFullBack ? this.fbBaseStitchCount :
+                                                 (isCap ? 5000 : this.baseStitchCount);
                             const stitchRate = isCap ? this.capAdditionalStitchRate : this.additionalStitchRate;
                             const extraStitches = Math.max(0, logo.stitchCount - baseStitches);
                             const stitchCost = (extraStitches / 1000) * stitchRate;
