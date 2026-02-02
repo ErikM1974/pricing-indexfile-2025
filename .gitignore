@@ -94,7 +94,10 @@ _ul
 .claude/settings.local.json
 memory/CSV_ORDER_VALIDATION.md
 memory/EMBROIDERY_PRICING_RULES.md
-tests/validation/2025-orders-validation-report.json
-tests/validation/known-vendors.js
-tests/validation/validate-2025-orders.js
+# Test reports (generated output - don't commit)
+tests/reports/
+
+# Large validation data files (generated)
+tests/validation/*.json
+tests/validation/*.csv
 ACTIVE_FILES.md
