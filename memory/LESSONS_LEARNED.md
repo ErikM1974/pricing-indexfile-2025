@@ -131,6 +131,80 @@ async fetchAccounts(filters = {}, retries = 3) {
 
 ---
 
+## Pattern: Mixed Quote Tier Separation (Caps vs Garments)
+**Date:** 2026-02-01
+**Project:** [Pricing Index]
+**Context:** Embroidery quotes with both caps and garments require SEPARATE tier calculations.
+
+**The Rule:** Caps and garments CANNOT be combined for quantity discounts. Each product type gets its own tier.
+
+**Example - 18 caps + 30 shirts:**
+```javascript
+// WRONG - Combined quantities
+totalQty = 18 + 30;  // 48 -> 48-71 tier for everything
+
+// CORRECT - Separate tiers
+garmentTier = getTier(30);  // 24-47 tier
+capTier = getTier(18);      // 1-23 tier (plus LTM!)
+```
+
+**Why Separate:**
+- Different embroidery methods (flat vs structured cap embroidery)
+- Different base stitch counts (garments: 8K, cap AL: 5K)
+- Different stitch rates (garments: $1.25/1K, caps: $1.00/1K)
+- Industry standard practice
+- Different LTM application (each type under 24 gets separate $50 fee)
+
+**LTM Implications:**
+- 18 caps alone: $50 cap LTM
+- 30 shirts alone: No LTM (24-47 tier)
+- Both together: Still $50 cap LTM (caps < 24)
+
+**Files:**
+- `embroidery-quote-pricing.js` lines 1203-1211 (tier separation)
+- `embroidery-quote-pricing.js` lines 1305-1332 (LTM separation)
+
+**See also:** `/memory/EMBROIDERY_PRICING_RULES.md` for complete mixed quote documentation
+
+---
+
+## Pattern: Two Embroidery Pricing Systems (Both Use Service_Codes API)
+**Date:** 2026-02-01
+**Project:** [Pricing Index]
+**Context:** Pricing audit revealed two independent pricing systems that must stay in sync.
+
+**The Two Systems:**
+| System | Purpose | File | API Source |
+|--------|---------|------|------------|
+| **Quote Builder** | Build new quotes from scratch (manual entry) | `embroidery-quote-pricing.js` | `/api/pricing-bundle`, `/api/service-codes` |
+| **ShopWorks Import** | Import existing ShopWorks orders | `shopworks-import-parser.js` | `/api/service-codes` |
+
+**Service_Codes API (38 records):**
+Both systems fetch from the same `Service_Codes` Caspio table via `/api/service-codes`:
+- **CONFIG values:** STITCH-RATE, CAP-STITCH-RATE, CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, PUFF-UPCHARGE, PATCH-UPCHARGE
+- **Fees:** LTM, GRT-50, GRT-75, RUSH, ART, SEG, DD
+- **Embroidery:** AL (4 tiers), CB (4 tiers), FB (stitch-based), Monogram, Name
+- **Decoration:** DECG (7 tiers), DECC (7 tiers)
+
+**How They Load Data:**
+- `embroidery-quote-pricing.js`: Calls `loadServiceCodes()` during `initializeConfig()` - loads FB, LTM, GRT-50, Monogram, STITCH-RATE, CAP-STITCH-RATE, PUFF-UPCHARGE, PATCH-UPCHARGE
+- `shopworks-import-parser.js`: Calls `loadServiceCodes()` + `_buildPricingTables()` - loads DECG/DECC tiers, Monogram, LTM, CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, GRT-75
+
+**Prevention:**
+1. When adding new pricing values, add to BOTH systems if applicable
+2. Add to `Service_Codes` Caspio table first (via `/api/service-codes/seed` or POST)
+3. Update the loader in each JS file to fetch the new value
+4. Keep fallback defaults in constructors (only used if API fails)
+
+**Files:**
+- `shared_components/js/embroidery-quote-pricing.js` (lines 256-341)
+- `shared_components/js/shopworks-import-parser.js` (lines 142-236)
+- `caspio-pricing-proxy/src/routes/service-codes.js` (seed data lines 280-337)
+
+**See also:** `/memory/SERVICE_CODES_TABLE.md` for complete table schema
+
+---
+
 ## Problem: Quote items accumulate instead of being replaced on re-save
 **Date:** 2026-01-14
 **Project:** Pricing Index (Embroidery Quote Builder)
@@ -579,6 +653,26 @@ Plus, CRM sync may be stale if not run recently.
 
 # Multi-SKU Products & Sizes
 
+## Bug: Tall-Only Products Missing from PDF and Quote Link
+**Date:** 2026-02-01
+**Project:** [Pricing Index]
+**Symptoms:** Quote EMB-2026-036 with TLCS410 (tall-only product with 2XLT sizes):
+- Pricing calculation showed correct $100.00 for 2 × $50
+- PDF was missing the product row (or sizes not displayed)
+- Quote link reload didn't show the sizes
+**Root Causes:**
+1. **PDF Invoice:** `embroidery-quote-invoice.js:1400` - The `extendedSizes` array only had `['XS', '3XL', '4XL', '5XL', '6XL', 'XXXL']` but was **missing tall sizes** (LT, XLT, 2XLT, etc.). When generating the PDF, tall sizes weren't recognized as extended sizes, causing the row to render with empty size cells.
+2. **Quote Link Loading:** `embroidery-quote-builder.html:addProductFromQuote()` - Function only populated standard size inputs (`input[data-size="${size}"]`). For extended/tall sizes, no input existed in the parent row, so quantities were silently discarded instead of creating child rows.
+**Solution:**
+1. Updated `extendedSizes` array in `embroidery-quote-invoice.js` to include all non-standard sizes: tall, youth, toddler, big, combos, one-size
+2. Modified `addProductFromQuote()` to call `createChildRow()` for extended sizes (matching ShopWorks import behavior)
+**Prevention:**
+- When adding new size types, check ALL places that handle sizes: invoice generation, quote loading, ShopWorks import
+- Test tall-only products specifically (TLCS410 is a good test case)
+- The `SIZE06_EXTENDED_SIZES` constant in the quote builder is the source of truth for extended sizes
+
+---
+
 ## Problem: PC54 2XL size mapping wrong
 **Date:** 2025
 **Project:** All
@@ -610,6 +704,47 @@ Plus, CRM sync may be stale if not run recently.
 **Root cause:** ShopWorks Size Translation Table has inconsistent data
 **Solution:** Bypass it - hardcode size modifiers in Python tool
 **Prevention:** `SIZE_MODIFIERS` dict in `transform.py` is the source of truth, not ShopWorks
+
+---
+
+## Bug: "Fixing" Code With Non-Existent Fields Breaks Everything
+**Date:** 2026-02-02
+**Project:** [Pricing Index]
+**Problem:** After attempting to fix tall size display in PDF/quote-view, the system broke completely. Console showed `Item 1: undefined x 2 @ $undefined = $100.00`. Sizes weren't saved to database.
+**Root Cause:** Made incorrect assumption about data structure. Changed code to use `lineItem.size` which DOESN'T EXIST in the lineItems from `calculateProductPrice()`. There are TWO different lineItem formats in the codebase:
+1. **`calculateProductPrice()`** (USED): `{ description: "2XLT(2)", quantity: 2 }` - NO `size` field
+2. **`generateLineItems()`** (NEVER CALLED - dead code): `{ description: "Brand Style Color", size: "2XLT" }` - HAS `size` field
+The "fix" changed code from parsing sizes from `description` (which worked) to reading `lineItem.size` (undefined).
+**Solution:** Reverted to parsing sizes from `item.description` using `parseSizeBreakdown()` which correctly extracts "2XLT(2)" → `{"2XLT": 2}`.
+**Prevention:**
+1. **ALWAYS trace actual data flow** before making changes - don't assume field names based on dead code
+2. **Search for where functions are CALLED**, not just where they're defined
+3. **Check if code is actually used** - `generateLineItems()` was never called anywhere
+4. **Test with actual data** before claiming a fix works
+**Files:**
+- `shared_components/js/embroidery-quote-invoice.js` - REVERTED to parse from description
+- `shared_components/js/embroidery-quote-service.js` - REVERTED to parse from description
+- `pages/js/quote-view.js` - Extended sizes array update was CORRECT (kept)
+
+---
+
+## Bug: Tall-Only Products (TLCS410) Not Saved to quote_items
+**Date:** 2026-02-02
+**Project:** [Pricing Index]
+**Problem:** Quote EMB-2026-035 showed correct subtotal ($177) but TLCS410 product row was missing from PDF and database. The product was silently dropped.
+**Root Cause:** `calculateProductPrice()` in `embroidery-quote-pricing.js` returns `null` when it can't find a base price. For tall-only products (no S/M/L/XL sizes), the function:
+1. Tries standard sizes S/M/L/XL → all fail (tall-only has none)
+2. Fallback looks for `price > 0` in `priceData.basePrices` → may fail if API doesn't have tall sizes
+3. Returns `null`, product dropped from `pricingResults.products` array, never saved to database
+**Solution:** Added two additional fallbacks in `embroidery-quote-pricing.js` (lines 880-905):
+1. Try product's actual ordered sizes (e.g., '2XLT') from `product.sizeBreakdown`
+2. Last resort: use highest available price from API response
+Same fix applied to `calculateCapProductPrice()` (lines 646-667).
+**Prevention:** When calculating prices for non-standard products:
+1. Always have fallback for products without standard sizes
+2. Check product's actual ordered sizes before returning null
+3. Log warnings when using fallback pricing
+**Files:** `shared_components/js/embroidery-quote-pricing.js`
 
 ---
 

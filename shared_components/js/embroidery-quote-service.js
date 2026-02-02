@@ -126,6 +126,17 @@ class EmbroideryQuoteService {
      */
     async saveQuote(quoteData, customerData, pricingResults) {
         try {
+            // BUG DIAGNOSTIC 2026-02-01: Log products to identify missing items
+            console.log('[EmbroideryQuoteService] Products to save:', pricingResults.products?.length || 0);
+            if (!pricingResults.products || pricingResults.products.length === 0) {
+                console.warn('[EmbroideryQuoteService] WARNING: No products in pricingResults!');
+                console.warn('[EmbroideryQuoteService] pricingResults keys:', Object.keys(pricingResults));
+            } else {
+                pricingResults.products.forEach((pp, i) => {
+                    console.log(`[EmbroideryQuoteService] Product ${i + 1}: ${pp.product?.style || 'NO STYLE'} - ${pp.lineItems?.length || 0} line items`);
+                });
+            }
+
             const quoteID = await this.generateQuoteID();
             const sessionID = this.generateSessionID();
             
@@ -296,7 +307,7 @@ class EmbroideryQuoteService {
                         LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
                         LineTotal: parseFloat(lineItem.total.toFixed(2)),
-                        SizeBreakdown: JSON.stringify(this.parseDescriptionToSizeBreakdown(lineItem.description)),  // Parse per-lineItem sizes from description
+                        SizeBreakdown: JSON.stringify(this.parseDescriptionToSizeBreakdown(lineItem.description)),  // Parse sizes from description
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),

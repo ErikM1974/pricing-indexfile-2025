@@ -1397,7 +1397,25 @@ class EmbroideryInvoiceGenerator {
         // Fixed size columns matching quote builder (standardized labels)
         const sizeColumns = ['S', 'M', 'L', 'XL', '2XL', '3XL+'];
         // Extended sizes that go into 3XL+ (Other) column
-        const extendedSizes = ['XS', '3XL', '4XL', '5XL', '6XL', 'XXXL'];
+        // Must include ALL non-standard sizes: tall, youth, toddler, big, combos, one-size
+        const extendedSizes = [
+            // Extended large
+            'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', 'XXXL',
+            // Tall sizes (CRITICAL for tall-only products like TLCS410)
+            'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT', 'XST',
+            // One-size
+            'OSFA', 'OSFM',
+            // Combos (for fitted caps)
+            'S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X', 'S/XL',
+            // Youth
+            'YXS', 'YS', 'YM', 'YL', 'YXL',
+            // Toddler
+            '2T', '3T', '4T', '5T', '5/6T', '6T',
+            // Big
+            'LB', 'XLB', '2XLB',
+            // Extra small
+            'XXS', '2XS', 'XXL'
+        ];
 
         // Track totals
         let grandTotalQty = 0;
@@ -1435,6 +1453,7 @@ class EmbroideryInvoiceGenerator {
 
             pp.lineItems.forEach((item, index) => {
                 const isFirstRow = index === 0;
+                // Parse size from description (e.g., "2XLT(2)" → {2XLT: 2})
                 const sizes = this.parseSizeBreakdown(item.description);
 
                 grandTotalQty += item.quantity;
@@ -1448,7 +1467,7 @@ class EmbroideryInvoiceGenerator {
                 // For extended size rows, modify the style and description
                 if (!isFirstRow) {
                     // Extended size row - find which size this is
-                    const extSize = Object.keys(sizes)[0]; // e.g., "2XL", "3XL"
+                    const extSize = Object.keys(sizes)[0]; // e.g., "2XL", "3XL", "2XLT"
                     if (extSize) {
                         // Update style to include suffix (e.g., PC61_2X)
                         rowStyle = this.getExtendedSizeStyle(rowStyle, extSize);
@@ -1459,7 +1478,6 @@ class EmbroideryInvoiceGenerator {
 
                 // Build size cells - base sizes in their columns, extended in XXXL(Other)
                 let sizeCells = '';
-                let xxxlContent = '';
 
                 // Check if this line item has extended sizes
                 const hasExtInThisRow = Object.keys(sizes).some(s => extendedSizes.includes(s));

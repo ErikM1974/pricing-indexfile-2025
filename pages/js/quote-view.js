@@ -895,8 +895,25 @@ class QuoteViewPage {
 
         // Extended sizes - each gets its own row
         // Size05: 2XL only
-        // Size06: Everything else (3XL+, OSFA, combo sizes) - the catch-all column
-        const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA', 'S/M', 'M/L', 'L/XL', 'ONE SIZE', 'ADJ'];
+        // Size06: Everything else (3XL+, OSFA, combo sizes, tall sizes) - the catch-all column
+        const extendedSizes = [
+            // Extended large
+            '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', 'XXXL',
+            // Tall sizes (CRITICAL for tall-only products like TLCS410)
+            'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT', 'XST',
+            // One-size
+            'OSFA', 'OSFM', 'ONE SIZE', 'ADJ',
+            // Combos (for fitted caps)
+            'S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X', 'S/XL',
+            // Youth
+            'YXS', 'YS', 'YM', 'YL', 'YXL',
+            // Toddler
+            '2T', '3T', '4T', '5T', '5/6T', '6T',
+            // Big
+            'LB', 'XLB', '2XLB',
+            // Extra small
+            'XXS', '2XS', 'XS'
+        ];
         extendedSizes.forEach(size => {
             if (allSizes[size] && allSizes[size].qty > 0) {
                 const sizeData = {};
@@ -939,8 +956,10 @@ class QuoteViewPage {
         const lgCol = row.sizes['L'] || '';
         const xlCol = row.sizes['XL'] || '';
         const xxlCol = row.sizes['2XL'] || '';
-        // XXXL column is the catch-all (Size06): 3XL+, OSFA, combo sizes
+        // XXXL column is the catch-all (Size06): 3XL+, tall sizes, OSFA, combo sizes
         const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL']
+                     || row.sizes['LT'] || row.sizes['XLT'] || row.sizes['2XLT'] || row.sizes['3XLT']
+                     || row.sizes['4XLT'] || row.sizes['5XLT'] || row.sizes['6XLT']
                      || row.sizes['OSFA'] || row.sizes['S/M'] || row.sizes['M/L'] || row.sizes['L/XL']
                      || row.sizes['ONE SIZE'] || row.sizes['ADJ'] || '';
 
