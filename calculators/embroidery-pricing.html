@@ -620,6 +620,37 @@
             font-weight: 700;
         }
 
+        /* LTM Column Highlighting (1-7 pieces) - Subtle but clear */
+        .pricing-table th.ltm-column,
+        .pricing-table td.ltm-column {
+            background-color: #fefbf3;
+            border-left: 2px solid #e5d9c3;
+            border-right: 2px solid #e5d9c3;
+        }
+
+        .pricing-table thead th.ltm-column {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-left: 2px solid #e5d9c3;
+            border-right: 2px solid #e5d9c3;
+        }
+
+        .ltm-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.3px;
+        }
+
+        .ltm-price-note {
+            display: none;
+        }
+
         /* Order Information Section */
         .order-info-section {
             background: white;
@@ -1194,7 +1225,7 @@
                 <thead>
                     <tr>
                         <th>Size Range</th>
-                        <th>1-7 pieces*</th>
+                        <th class="ltm-column">1-7 pieces <span class="ltm-badge">+$50 FEE</span></th>
                         <th>8-23 pieces</th>
                         <th>24-47 pieces</th>
                         <th>48-71 pieces</th>
@@ -1205,7 +1236,7 @@
                     <!-- Pricing rows will be dynamically generated -->
                 </tbody>
             </table>
-            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee</p>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee for orders of 1-7 pieces</p>
 
             <!-- LTM Quick Calculator -->
             <div class="ltm-calculator" id="ltmCalculator">
@@ -1274,7 +1305,7 @@
                 <thead>
                     <tr>
                         <th>Quantity</th>
-                        <th>1-7 pieces*</th>
+                        <th class="ltm-column">1-7 pieces <span class="ltm-badge">+$50 FEE</span></th>
                         <th>8-23 pieces</th>
                         <th>24-47 pieces</th>
                         <th>48-71 pieces</th>
@@ -1284,7 +1315,7 @@
                 <tbody>
                     <tr>
                         <td class="tier-label">Base Price<br><small>(8,000 stitches)</small></td>
-                        <td id="emb-al-1-7" class="price-cell loading">Loading...</td>
+                        <td id="emb-al-1-7" class="price-cell ltm-column loading">Loading...</td>
                         <td id="emb-al-8-23" class="price-cell loading">Loading...</td>
                         <td id="emb-al-24-47" class="price-cell loading">Loading...</td>
                         <td id="emb-al-48-71" class="price-cell loading">Loading...</td>
@@ -1292,7 +1323,7 @@
                     </tr>
                 </tbody>
             </table>
-            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee</p>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee for orders of 1-7 pieces</p>
 
             <div class="additional-logo-notes">
                 <p><strong>Note:</strong> Additional logos up to 8,000 stitches. Add $1.25 per 1,000 stitches over base.</p>
@@ -2169,7 +2200,7 @@
             const baseRow = document.createElement('tr');
             baseRow.innerHTML = `
                 <td class="size-cell">${baseSizeDisplay}</td>
-                <td class="price-cell">${basePrices.tier0 ? '$' + basePrices.tier0.toFixed(2) : '-'}</td>
+                <td class="price-cell ltm-column">${basePrices.tier0 ? '$' + basePrices.tier0.toFixed(2) : '-'}</td>
                 <td class="price-cell">${basePrices.tier1 ? '$' + basePrices.tier1.toFixed(2) : '-'}</td>
                 <td class="price-cell">$${basePrices.tier2.toFixed(2)}</td>
                 <td class="price-cell">$${basePrices.tier3.toFixed(2)}</td>
@@ -2221,7 +2252,7 @@
                     const extendedRow = document.createElement('tr');
                     extendedRow.innerHTML = `
                         <td class="size-cell">${size}</td>
-                        <td class="price-cell">${price0 ? '$' + price0.toFixed(2) : '-'}</td>
+                        <td class="price-cell ltm-column">${price0 ? '$' + price0.toFixed(2) : '-'}</td>
                         <td class="price-cell">${price1 ? '$' + price1.toFixed(2) : '-'}</td>
                         <td class="price-cell">$${price2.toFixed(2)}</td>
                         <td class="price-cell">$${price3.toFixed(2)}</td>

@@ -506,6 +506,37 @@
             margin-top: 4px;
         }
 
+        /* LTM Column Highlighting (1-7 pieces) - Subtle but clear */
+        .pricing-table th.ltm-column,
+        .pricing-table td.ltm-column {
+            background-color: #fefbf3;
+            border-left: 2px solid #e5d9c3;
+            border-right: 2px solid #e5d9c3;
+        }
+
+        .pricing-table thead th.ltm-column {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-left: 2px solid #e5d9c3;
+            border-right: 2px solid #e5d9c3;
+        }
+
+        .ltm-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.3px;
+        }
+
+        .ltm-price-note {
+            display: none;
+        }
+
         /* Order Information */
         .order-info-section {
             background: white;
@@ -1158,17 +1189,11 @@
                 <p class="pricing-subtitle">Includes one front logo at 8,000 stitches</p>
             </div>
             
-            <!-- LTM Notice for orders 1-7 pieces -->
-            <div class="info-box warning" style="margin-bottom: 20px;">
-                <i class="fas fa-exclamation-circle"></i>
-                <strong>*Orders of 1-7 pieces:</strong> Prices shown do not include the $50 Less Than Minimum Fee. This fee will be added to your order total.
-            </div>
-            
             <table class="pricing-table">
                 <thead>
                     <tr>
                         <th>Size Range</th>
-                        <th>1-7 pieces*</th>
+                        <th class="ltm-column">1-7 pieces <span class="ltm-badge">+$50 FEE</span></th>
                         <th>8-23 pieces</th>
                         <th>24-47 pieces</th>
                         <th>48-71 pieces</th>
@@ -1179,6 +1204,7 @@
                     <!-- Pricing rows will be dynamically generated -->
                 </tbody>
             </table>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee for orders of 1-7 pieces</p>
 
             <!-- LTM Quick Calculator -->
             <div class="ltm-calculator" id="ltmCalculator">
@@ -1233,12 +1259,12 @@
         <h3 class="additional-logo-title">
             <i class="fas fa-plus-circle"></i> Additional Logo Pricing
         </h3>
-        
+
         <table class="pricing-table additional-logo-table">
             <thead>
                 <tr>
                     <th>Size</th>
-                    <th>1-7 pieces*</th>
+                    <th class="ltm-column">1-7 pieces <span class="ltm-badge">+$50 FEE</span></th>
                     <th>8-23 pieces</th>
                     <th>24-47 pieces</th>
                     <th>48-71 pieces</th>
@@ -1248,7 +1274,7 @@
             <tbody>
                 <tr>
                     <td class="tier-label">Base Price<br><small>(5,000 stitches)</small></td>
-                    <td id="cap-al-1-7" class="price-cell loading">Loading...</td>
+                    <td id="cap-al-1-7" class="price-cell ltm-column loading">Loading...</td>
                     <td id="cap-al-8-23" class="price-cell loading">Loading...</td>
                     <td id="cap-al-24-47" class="price-cell loading">Loading...</td>
                     <td id="cap-al-48-71" class="price-cell loading">Loading...</td>
@@ -1256,7 +1282,8 @@
                 </tr>
             </tbody>
         </table>
-        
+        <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee for orders of 1-7 pieces</p>
+
         <div class="additional-logo-notes">
             <p><strong>Note:</strong> Additional logos up to 5,000 stitches. Add $1.00 per 1,000 stitches over base.</p>
             <p><small>Preferred locations: Cap Back, Left Side, Right Side</small></p>
@@ -1844,7 +1871,7 @@
 
                 row.innerHTML = `
                     <td>${sizeDisplay}</td>
-                    <td><span class="price">$${price1_7.toFixed(2)}</span></td>
+                    <td class="ltm-column"><span class="price">$${price1_7.toFixed(2)}</span></td>
                     <td><span class="price">$${price8_23.toFixed(2)}</span></td>
                     <td><span class="price">$${price24.toFixed(2)}</span></td>
                     <td><span class="price">$${price48.toFixed(2)}</span></td>
