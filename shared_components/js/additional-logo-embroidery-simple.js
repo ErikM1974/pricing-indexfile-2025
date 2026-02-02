@@ -11,8 +11,10 @@
     const API_ENDPOINT = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=EMB-AL';
 
     // Fallback pricing (used only if API fails)
+    // 2026-02 RESTRUCTURE: New tiers 1-7 and 8-23
     const FALLBACK_PRICING = {
-        '1-23': 12.50,
+        '1-7': 13.50,
+        '8-23': 13.50,
         '24-47': 11.50,
         '48-71': 9.50,
         '72+': 8.50
@@ -107,7 +109,9 @@
         const { pricing, config } = data;
 
         // Update table cells
-        updateCell('emb-al-1-23', pricing['1-23']);
+        // 2026-02 RESTRUCTURE: New tiers 1-7 and 8-23
+        updateCell('emb-al-1-7', pricing['1-7']);
+        updateCell('emb-al-8-23', pricing['8-23']);
         updateCell('emb-al-24-47', pricing['24-47']);
         updateCell('emb-al-48-71', pricing['48-71']);
         updateCell('emb-al-72', pricing['72+']);

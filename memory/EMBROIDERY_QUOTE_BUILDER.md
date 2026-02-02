@@ -640,7 +640,7 @@ Available sizes: 70+ waist/inseam combinations
 | **AL Stitch Rate** | $1.25/1K | $1.00/1K |
 | **Rounding Method** | CeilDollar | HalfDollarUp |
 | **Tier Calculation** | Based on garment qty only | Based on cap qty only |
-| **LTM Fee** | $50 when qty < 24 | $50 when qty < 24 (separate) |
+| **LTM Fee** | $50 when qty <= 7 | $50 when qty <= 7 (separate) |
 
 ### Cap Detection Logic
 
@@ -667,12 +667,12 @@ CAP, HAT, BEANIE, SNAPBACK, TRUCKER, RICHARDSON
 When a quote contains both caps and garments:
 
 1. **Separate Tier Calculation**
-   - 20 shirts = 1-23 tier for garments
+   - 20 shirts = 8-23 tier for garments
    - 50 caps = 48-71 tier for caps
    - They do NOT combine for tier discounts
 
 2. **Separate LTM Fees**
-   - 12 shirts + 12 caps = TWO $50 LTM fees = $100 total
+   - 5 shirts + 5 caps = TWO $50 LTM fees = $100 total (both <= 7)
    - Each product type evaluated independently
 
 3. **Separate Logo Configurations**
@@ -685,7 +685,8 @@ When a quote contains both caps and garments:
 
 | Tier | Shirt | Cap | AL (Garment) | AL-CAP |
 |------|-------|-----|--------------|--------|
-| 1-23 | $16.00 | $13.00 | $13.50 | $6.75 |
+| 1-7 | $16.00 | $13.00 | $13.50 | $6.75 |
+| 8-23 | $16.00 | $13.00 | $13.50 | $6.75 |
 | 24-47 | $14.00 | $13.00 | $12.50 | $5.75 |
 | 48-71 | $13.00 | $11.00 | $10.50 | $5.50 |
 | 72+ | $12.00 | $9.50 | $9.50 | $5.25 |
@@ -693,7 +694,7 @@ When a quote contains both caps and garments:
 **Additional Configuration:**
 - Margin Denominator: 0.57 (43% margin)
 - Digitizing Fee: $100 per logo
-- LTM Fee: $50 per product type when qty < 24
+- LTM Fee: $50 per product type when qty <= 7
 
 ### Testing Cap Products
 

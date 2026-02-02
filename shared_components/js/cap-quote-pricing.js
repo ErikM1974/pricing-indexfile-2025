@@ -144,7 +144,7 @@ class CapQuotePricingCalculator {
                 setupFees: setupFees,
                 grandTotal: grandTotal,
                 tier: this.getTierLabel(totalQuantity),
-                hasLTM: totalQuantity < 24
+                hasLTM: totalQuantity <= 7  // 2026-02 restructure: LTM only for 1-7
             };
             
             console.log('[CapQuotePricingCalculator] ✅ Pricing calculation complete');
@@ -450,37 +450,50 @@ class CapQuotePricingCalculator {
      * Get tier data for quantity
      */
     getTierData(quantity, pricingSource) {
-        const tier = pricingSource.tiersR.find(tier => 
+        const tier = pricingSource.tiersR.find(tier =>
             quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity
         );
-        
-        // Handle missing 1-23 tier by creating synthetic tier data (should not be needed after API fix)
-        if (!tier && quantity < 24) {
-            console.log('[CapQuotePricingCalculator] Creating synthetic 1-23 tier (API should provide this now)');
+
+        // Handle missing tier by creating synthetic tier data (should not be needed after API fix)
+        // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
+        if (!tier && quantity <= 7) {
+            console.log('[CapQuotePricingCalculator] Creating synthetic 1-7 tier (API should provide this now)');
             return {
-                TierLabel: '1-23',
+                TierLabel: '1-7',
                 MinQuantity: 1,
+                MaxQuantity: 7,
+                MarginDenominator: this.getMarginDenominatorFromAPI(quantity),
+                TargetMargin: 0,
+                LTM_Fee: 50
+            };
+        }
+        if (!tier && quantity <= 23) {
+            console.log('[CapQuotePricingCalculator] Creating synthetic 8-23 tier (API should provide this now)');
+            return {
+                TierLabel: '8-23',
+                MinQuantity: 8,
                 MaxQuantity: 23,
                 MarginDenominator: this.getMarginDenominatorFromAPI(quantity),
                 TargetMargin: 0,
-                LTM_Fee: this.getLTMFeeFromAPI(quantity)
+                LTM_Fee: 0
             };
         }
-        
+
         return tier;
     }
     
     /**
      * Get LTM fee from API data based on quantity
+     * 2026-02 RESTRUCTURE: LTM only applies to 1-7 tier
      */
     getLTMFeeFromAPI(quantity) {
         if (!this.pricingData.primary?.tiersR) {
             console.warn('[CapQuotePricingCalculator] No tier data available for LTM fee');
-            return quantity < 24 ? 50 : 0; // Fallback
+            return quantity <= 7 ? 50 : 0; // 2026-02 fallback: only 1-7 gets LTM
         }
-        
+
         const tier = this.pricingData.primary.tiersR.find(t => {
-            // Parse tier label (e.g., "1-23", "24-47", "72+")
+            // Parse tier label (e.g., "1-7", "8-23", "24-47", "48-71", "72+")
             if (t.TierLabel.includes('+')) {
                 const min = parseInt(t.TierLabel.replace('+', ''));
                 return quantity >= min;
@@ -516,9 +529,9 @@ class CapQuotePricingCalculator {
             console.warn('[CapQuotePricingCalculator] No tier data available for margin denominator');
             return 0.57; // 2026 margin fallback
         }
-        
+
         const tier = this.pricingData.primary.tiersR.find(t => {
-            // Parse tier label (e.g., "1-23", "24-47", "72+")
+            // Parse tier label (e.g., "1-7", "8-23", "24-47", "48-71", "72+")
             if (t.TierLabel.includes('+')) {
                 const min = parseInt(t.TierLabel.replace('+', ''));
                 return quantity >= min;
@@ -544,11 +557,13 @@ class CapQuotePricingCalculator {
     
     /**
      * Get tier label for quantity
+     * 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
      */
     getTierLabel(quantity) {
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
         return '72+';
     }
     

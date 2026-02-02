@@ -917,11 +917,13 @@ class CapProductLineManager {
     updateTierIndicator(totalQty) {
         const tierIndicator = document.getElementById('tier-indicator');
         if (tierIndicator) {
+            // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
             let tierText = '';
             if (totalQty > 0) {
-                if (totalQty < 24) tierText = '(1-23 tier + LTM fee)';
-                else if (totalQty < 48) tierText = '(24-47 tier)';
-                else if (totalQty < 72) tierText = '(48-71 tier)';
+                if (totalQty <= 7) tierText = '(1-7 tier + Setup fee)';
+                else if (totalQty <= 23) tierText = '(8-23 tier)';
+                else if (totalQty <= 47) tierText = '(24-47 tier)';
+                else if (totalQty <= 71) tierText = '(48-71 tier)';
                 else tierText = '(72+ tier)';
             }
             tierIndicator.textContent = tierText;

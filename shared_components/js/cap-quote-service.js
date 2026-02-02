@@ -130,9 +130,10 @@ class CapQuoteService {
                 .replace(/\.\d{3}Z$/, '');
             
             // Calculate totals
+            // 2026-02 RESTRUCTURE: LTM only applies to 1-7 tier
             const totalQuantity = quoteData.products.reduce((sum, p) => sum + p.totalQuantity, 0);
             const subtotal = quoteData.products.reduce((sum, p) => sum + p.lineTotal, 0);
-            const ltmFeeTotal = totalQuantity < 24 ? 50.00 : 0;
+            const ltmFeeTotal = totalQuantity <= 7 ? 50.00 : 0;
             const setupFees = quoteData.logos.reduce((sum, logo) => sum + (logo.needsDigitizing ? 100 : 0), 0);
             const grandTotal = subtotal + ltmFeeTotal + setupFees;
             
@@ -312,9 +313,10 @@ class CapQuoteService {
         
         let notes = logoNotes.join(', ');
         
+        // 2026-02 RESTRUCTURE: LTM only applies to 1-7 tier
         const totalQuantity = quoteData.products.reduce((sum, p) => sum + p.totalQuantity, 0);
-        if (totalQuantity < 24) {
-            notes += ' *Includes small batch pricing for orders under 24 pieces';
+        if (totalQuantity <= 7) {
+            notes += ' *Includes $50 setup fee for orders of 1-7 pieces';
         }
         
         if (quoteData.customerInfo.notes) {
@@ -333,11 +335,13 @@ class CapQuoteService {
     
     /**
      * Get pricing tier label for quantity
+     * 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
      */
     getPricingTier(quantity) {
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
         return '72+';
     }
 }

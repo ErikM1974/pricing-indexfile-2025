@@ -63,11 +63,13 @@ class BaseQuoteService {
     /**
      * Get pricing tier based on quantity
      * Can be overridden by specific calculators
+     * 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
      */
     getPricingTier(quantity) {
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
         return '72+';
     }
 

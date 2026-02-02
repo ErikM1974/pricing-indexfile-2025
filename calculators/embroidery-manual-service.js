@@ -49,12 +49,14 @@ class EmbroideryManualQuoteService {
 
     /**
      * Get pricing tier based on quantity (using live API data)
+     * 2026-02 RESTRUCTURE: New 5-tier system with 1-7 (LTM) and 8-23 (no LTM)
      */
     getPricingTier(quantity) {
-        // This should match the live tier data from the API
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        // This matches the live tier data from the API (2026 restructure)
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
         return '72+';
     }
 
@@ -326,11 +328,13 @@ class EmbroideryManualQuoteService {
 
     /**
      * Fallback method for base cost if API data is not available
+     * 2026-02 RESTRUCTURE: New 5-tier system
      */
     getBaseCost8k(tier) {
-        // Fallback base costs if API data is not provided
+        // Fallback base costs if API data is not provided (2026 pricing)
         const defaultCosts = {
-            '1-23': 10.50,
+            '1-7': 10.50,    // LTM tier - $50 setup fee applies
+            '8-23': 10.50,   // No LTM, but $4 surcharge baked in
             '24-47': 9.50,
             '48-71': 8.75,
             '72+': 8.00

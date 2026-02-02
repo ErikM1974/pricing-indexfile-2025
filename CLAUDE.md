@@ -49,6 +49,29 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Update relevant memory file if it's about: ManageOrders, Caspio API, Stripe, ShopWorks
 - Tag with project: `[Pricing Index]`, `[caspio-proxy]`, `[Python Inksoft]`, `[All]`
 
+## Documentation Triggers (Auto-Ask)
+
+Claude should **proactively ask** about documentation when these occur:
+
+### Pricing Changes
+After modifying pricing logic, ask:
+> "This pricing change may need documentation. Update PRICING_TIERS_MASTER_REFERENCE.md or [METHOD]_PRICING_RULES.md?"
+
+### Bug Fixes > 15 minutes
+After fixing any non-trivial bug, ask:
+> "Log this fix to LESSONS_LEARNED.md? (Problem/Root Cause/Solution)"
+
+### New Feature Complete
+After implementing a new feature, ask:
+> "Document this feature? Options: Add to existing doc, Create new memory file, Skip"
+
+### API/Integration Changes
+After modifying API endpoints or integrations, ask:
+> "Update API documentation in /memory/api/?"
+
+### Rule: Don't Ask Twice
+If user says "skip" or "no" for a documentation prompt, don't ask again for the same change.
+
 ## File Organization
 
 ```
@@ -153,7 +176,7 @@ catalogColor: product.CATALOG_COLOR
 **Critical:** PC54_2X uses **Size05** (NOT Size06!)
 
 ### Sample Cart Pricing Formula
-- **Formula**: `(baseCost / 0.6) + sizeUpcharge`
+- **Formula**: `(baseCost / 0.57) + sizeUpcharge` (2026 margin: 43%)
 - **Rounding**: Half-dollar ceiling (`Math.ceil(price * 2) / 2`)
 
 ### Quote Builder Sync Rule (CRITICAL)
@@ -191,6 +214,13 @@ Common utility functions are now in `/shared_components/js/quote-builder-utils.j
 **After making quote builder changes, always ask:**
 > "Does this change apply to the other 3 quote builders?"
 > "Should this be moved to quote-builder-utils.js?"
+
+### Embroidery Tier Structure (Feb 2026)
+
+**IMPORTANT:** Embroidery uses a 5-tier structure with LTM only for tiny orders:
+- Tiers: 1-7, 8-23, 24-47, 48-71, 72+
+- LTM threshold: `qty <= 7` (NOT `< 24` like DTG/DTF)
+- See `/memory/EMBROIDERY_PRICING_2026.md` for details
 
 ## Development Commands
 

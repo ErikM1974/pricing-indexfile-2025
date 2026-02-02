@@ -7,7 +7,11 @@
     "start": "node server.js",
     "validate-docs": "node scripts/validate-memory-docs.js",
     "doc-freshness": "node scripts/doc-freshness.js",
-    "quarterly-cleanup": "node scripts/quarterly-cleanup.js"
+    "quarterly-cleanup": "node scripts/quarterly-cleanup.js",
+    "test:emb-calibrate": "node tests/validation/validate-2025-embroidery-pricing.js --calibrate",
+    "test:emb-pricing": "node tests/validation/validate-2025-embroidery-pricing.js",
+    "test:emb-pricing-verbose": "node tests/validation/validate-2025-embroidery-pricing.js --verbose",
+    "test:emb-ltm": "node tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis"
   },
   "engines": {
     "node": "18.x"

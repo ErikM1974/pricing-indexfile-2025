@@ -12,12 +12,12 @@
 
 | Column | Data Type | Primary Key | Description |
 |--------|-----------|-------------|-------------|
-| **ServiceCode** | Text (20) | Yes | Unique identifier for the service (e.g., "AL-1-23", "DGT-001") |
+| **ServiceCode** | Text (20) | Yes | Unique identifier for the service (e.g., "AL-1-7", "DGT-001") |
 | **ServiceType** | Text (30) | No | Category of service: `DIGITIZING`, `EMBROIDERY`, `DECORATION`, `FEE`, `RUSH` |
-| **DisplayName** | Text (50) | No | Human-readable name shown in UI (e.g., "Applique 1-23 pcs") |
+| **DisplayName** | Text (50) | No | Human-readable name shown in UI (e.g., "Applique 1-7 pcs") |
 | **Category** | Text (20) | No | Grouping for UI display: `Digitizing`, `Apparel Left Chest`, `Flat Back`, `Cap Back`, `Decoration`, `Fees` |
 | **PricingMethod** | Text (15) | No | How price is calculated: `FLAT`, `PER_PIECE`, `PER_THOUSAND`, `TIERED` |
-| **TierLabel** | Text (15) | No | Quantity range label (e.g., "1-23", "24-47", "72+") |
+| **TierLabel** | Text (15) | No | Quantity range label (e.g., "1-7", "8-23", "24-47", "72+") |
 | **UnitCost** | Number | No | Internal cost (for margin calculations) |
 | **SellPrice** | Number | No | Customer-facing price |
 | **PerUnit** | Text (15) | No | Unit description: `each`, `per 1000 stitches`, `per location`, `per order` |
@@ -38,11 +38,12 @@
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
 | DD | DIGITIZING | Digitizing | Digitizing | FLAT | - | 0 | 0 | per order | digitizing | - | NULL | TRUE |
 
-### Apparel Left Chest (AL) - Standard Embroidery Tiers
+### Apparel Left Chest (AL) - Standard Embroidery Tiers (5-Tier, Feb 2026)
 
 | ServiceCode | ServiceType | DisplayName | Category | PricingMethod | TierLabel | UnitCost | SellPrice | PerUnit | QuoteBuilderField | Position | StitchBase | IsActive |
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
-| AL-1-23 | EMBROIDERY | Apparel Left Chest 1-23 pcs | Apparel Left Chest | TIERED | 1-23 | 6.75 | 13.50 | each | leftChest | LC | 8000 | TRUE |
+| AL-1-7 | EMBROIDERY | Apparel Left Chest 1-7 pcs | Apparel Left Chest | TIERED | 1-7 | 6.75 | 13.50 | each | leftChest | LC | 8000 | TRUE |
+| AL-8-23 | EMBROIDERY | Apparel Left Chest 8-23 pcs | Apparel Left Chest | TIERED | 8-23 | 6.75 | 13.50 | each | leftChest | LC | 8000 | TRUE |
 | AL-24-47 | EMBROIDERY | Apparel Left Chest 24-47 pcs | Apparel Left Chest | TIERED | 24-47 | 6.25 | 12.50 | each | leftChest | LC | 8000 | TRUE |
 | AL-48-71 | EMBROIDERY | Apparel Left Chest 48-71 pcs | Apparel Left Chest | TIERED | 48-71 | 5.25 | 10.50 | each | leftChest | LC | 8000 | TRUE |
 | AL-72+ | EMBROIDERY | Apparel Left Chest 72+ pcs | Apparel Left Chest | TIERED | 72+ | 4.75 | 9.50 | each | leftChest | LC | 8000 | TRUE |
@@ -61,11 +62,12 @@
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
 | FB | EMBROIDERY | Full Back (Stitch-Based) | Full Back | STITCH_BASED | ALL | 0.625 | 1.25 | per 1000 stitches | fullBack | FB | 25000 | TRUE |
 
-### Cap Back (CB) - Uses Same Tiers as Cap AL
+### Cap Back (CB) - Uses Same Tiers as Cap AL (5-Tier, Feb 2026)
 
 | ServiceCode | ServiceType | DisplayName | Category | PricingMethod | TierLabel | UnitCost | SellPrice | PerUnit | QuoteBuilderField | Position | StitchBase | IsActive |
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
-| CB-1-23 | EMBROIDERY | Cap Back 1-23 pcs | Cap Back | TIERED | 1-23 | 3.40 | 6.75 | each | capBack | CB | 8000 | TRUE |
+| CB-1-7 | EMBROIDERY | Cap Back 1-7 pcs | Cap Back | TIERED | 1-7 | 3.40 | 6.75 | each | capBack | CB | 8000 | TRUE |
+| CB-8-23 | EMBROIDERY | Cap Back 8-23 pcs | Cap Back | TIERED | 8-23 | 3.40 | 6.75 | each | capBack | CB | 8000 | TRUE |
 | CB-24-47 | EMBROIDERY | Cap Back 24-47 pcs | Cap Back | TIERED | 24-47 | 2.90 | 5.75 | each | capBack | CB | 8000 | TRUE |
 | CB-48-71 | EMBROIDERY | Cap Back 48-71 pcs | Cap Back | TIERED | 48-71 | 2.75 | 5.50 | each | capBack | CB | 8000 | TRUE |
 | CB-72+ | EMBROIDERY | Cap Back 72+ pcs | Cap Back | TIERED | 72+ | 2.65 | 5.25 | each | capBack | CB | 8000 | TRUE |
@@ -231,12 +233,12 @@ ORDER BY
   "success": true,
   "data": [
     {
-      "ServiceCode": "AL-1-23",
+      "ServiceCode": "AL-1-7",
       "ServiceType": "EMBROIDERY",
-      "DisplayName": "Apparel Left Chest 1-23 pcs",
+      "DisplayName": "Apparel Left Chest 1-7 pcs",
       "Category": "Apparel Left Chest",
       "PricingMethod": "TIERED",
-      "TierLabel": "1-23",
+      "TierLabel": "1-7",
       "UnitCost": 6.75,
       "SellPrice": 13.50,
       "PerUnit": "each",

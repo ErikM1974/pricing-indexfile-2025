@@ -973,7 +973,7 @@
                     <div class="info-boxes">
                         <div class="info-box primary">
                             <i class="fas fa-check-circle"></i>
-                            <strong>Includes a Left Chest Embroidered Logo.</strong> Minimum order 24 pieces. Orders under 24 pieces incur a $50.00 LTM (Less Than Minimum) fee.
+                            <strong>Includes a Left Chest Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Setup Fee. Orders of 8+ pieces: Setup included in price.
                         </div>
                         
                         <div class="info-box warning">
@@ -995,6 +995,8 @@
                 <thead>
                     <tr>
                         <th>Size Range</th>
+                        <th>1-7 pieces*</th>
+                        <th>8-23 pieces</th>
                         <th>24-47 pieces</th>
                         <th>48-71 pieces</th>
                         <th>72+ pieces</th>
@@ -1004,6 +1006,7 @@
                     <!-- Pricing rows will be dynamically generated -->
                 </tbody>
             </table>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Setup Fee</p>
 
         <!-- Additional Logo Pricing Table -->
         <div class="additional-logo-pricing-section">
@@ -1015,7 +1018,8 @@
                 <thead>
                     <tr>
                         <th>Quantity</th>
-                        <th>1-23 pieces</th>
+                        <th>1-7 pieces*</th>
+                        <th>8-23 pieces</th>
                         <th>24-47 pieces</th>
                         <th>48-71 pieces</th>
                         <th>72+ pieces</th>
@@ -1024,13 +1028,15 @@
                 <tbody>
                     <tr>
                         <td class="tier-label">Base Price<br><small>(8,000 stitches)</small></td>
-                        <td id="emb-al-1-23" class="price-cell loading">Loading...</td>
+                        <td id="emb-al-1-7" class="price-cell loading">Loading...</td>
+                        <td id="emb-al-8-23" class="price-cell loading">Loading...</td>
                         <td id="emb-al-24-47" class="price-cell loading">Loading...</td>
                         <td id="emb-al-48-71" class="price-cell loading">Loading...</td>
                         <td id="emb-al-72" class="price-cell loading">Loading...</td>
                     </tr>
                 </tbody>
             </table>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Setup Fee</p>
             
             <div class="additional-logo-notes">
                 <p><strong>Note:</strong> Additional logos up to 8,000 stitches. Add $1.25 per 1,000 stitches over base.</p>
@@ -1050,17 +1056,17 @@
                     </div>
                     <div class="order-info-content">
                         <div class="order-info-label">Minimum Order</div>
-                        <div class="order-info-text">24 pieces required for standard pricing</div>
+                        <div class="order-info-text">8+ pieces for standard pricing (setup included)</div>
                     </div>
                 </div>
-                
+
                 <div class="order-info-item">
                     <div class="order-info-icon">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div class="order-info-content">
-                        <div class="order-info-label">Orders Under 24</div>
-                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
+                        <div class="order-info-label">Orders of 1-7 pieces</div>
+                        <div class="order-info-text">$50 Setup Fee applies</div>
                     </div>
                 </div>
                 
@@ -1778,9 +1784,11 @@
             // The service returns prices in two formats:
             // pricingData.pricing['24-47']['S'] or pricingData.prices['S']['24-47']
             let basePrices = {
-                tier1: null,
-                tier2: null,
-                tier3: null
+                tier0: null,  // 1-7 pieces
+                tier1: null,  // 8-23 pieces
+                tier2: null,  // 24-47 pieces
+                tier3: null,  // 48-71 pieces
+                tier4: null   // 72+ pieces
             };
             
             // Get sizes with sortOrder from API data for determining base size
@@ -1808,55 +1816,50 @@
             // Try to get calculated prices from the service
             if (pricingData.pricing) {
                 // Format: pricingData.pricing['24-47']['S']
-                if (pricingData.pricing['24-47']) {
-                    // Use the first base size (could be OSFA, S, SM, etc.)
-                    const tier1Prices = pricingData.pricing['24-47'];
-                    basePrices.tier1 = tier1Prices[baseSizeToUse] || tier1Prices['S'] || tier1Prices['SM'] || tier1Prices['OSFA'] || Object.values(tier1Prices).find(p => typeof p === 'number');
-                }
-                if (pricingData.pricing['48-71']) {
-                    const tier2Prices = pricingData.pricing['48-71'];
-                    basePrices.tier2 = tier2Prices[baseSizeToUse] || tier2Prices['S'] || tier2Prices['SM'] || tier2Prices['OSFA'] || Object.values(tier2Prices).find(p => typeof p === 'number');
-                }
-                if (pricingData.pricing['72+']) {
-                    const tier3Prices = pricingData.pricing['72+'];
-                    basePrices.tier3 = tier3Prices[baseSizeToUse] || tier3Prices['S'] || tier3Prices['SM'] || tier3Prices['OSFA'] || Object.values(tier3Prices).find(p => typeof p === 'number');
-                }
+                // Helper to get price from tier
+                const getPriceFromTier = (tierKey) => {
+                    if (!pricingData.pricing[tierKey]) return null;
+                    const tierPrices = pricingData.pricing[tierKey];
+                    return tierPrices[baseSizeToUse] || tierPrices['S'] || tierPrices['SM'] || tierPrices['OSFA'] || Object.values(tierPrices).find(p => typeof p === 'number');
+                };
+
+                basePrices.tier0 = getPriceFromTier('1-7');
+                basePrices.tier1 = getPriceFromTier('8-23');
+                basePrices.tier2 = getPriceFromTier('24-47');
+                basePrices.tier3 = getPriceFromTier('48-71');
+                basePrices.tier4 = getPriceFromTier('72+');
             } else if (pricingData.prices) {
                 // Alternative format: pricingData.prices['S']['24-47']
                 // Find the first available size (use base size from API, or fallback to S, SM, OSFA, or any)
                 const availableSizes = Object.keys(pricingData.prices);
-                const baseSize = availableSizes.find(s => s === baseSizeToUse) || 
-                                availableSizes.find(s => s === 'S') || 
-                                availableSizes.find(s => s === 'SM') || 
-                                availableSizes.find(s => s === 'OSFA') || 
+                const baseSize = availableSizes.find(s => s === baseSizeToUse) ||
+                                availableSizes.find(s => s === 'S') ||
+                                availableSizes.find(s => s === 'SM') ||
+                                availableSizes.find(s => s === 'OSFA') ||
                                 availableSizes[0];
-                
+
                 if (baseSize && pricingData.prices[baseSize]) {
-                    if (pricingData.prices[baseSize]['24-47']) {
-                        basePrices.tier1 = pricingData.prices[baseSize]['24-47'];
-                    }
-                    if (pricingData.prices[baseSize]['48-71']) {
-                        basePrices.tier2 = pricingData.prices[baseSize]['48-71'];
-                    }
-                    if (pricingData.prices[baseSize]['72+']) {
-                        basePrices.tier3 = pricingData.prices[baseSize]['72+'];
-                    }
+                    basePrices.tier0 = pricingData.prices[baseSize]['1-7'] || null;
+                    basePrices.tier1 = pricingData.prices[baseSize]['8-23'] || null;
+                    basePrices.tier2 = pricingData.prices[baseSize]['24-47'] || null;
+                    basePrices.tier3 = pricingData.prices[baseSize]['48-71'] || null;
+                    basePrices.tier4 = pricingData.prices[baseSize]['72+'] || null;
                 }
             }
             
             console.log('💰 Calculated base prices:', basePrices);
             
-            // Check if we have valid pricing data
-            if (!basePrices.tier1 || !basePrices.tier2 || !basePrices.tier3) {
+            // Check if we have valid pricing data (tier2, tier3, tier4 are required; tier0 and tier1 may be missing from older API responses)
+            if (!basePrices.tier2 || !basePrices.tier3 || !basePrices.tier4) {
                 console.error('❌ Invalid pricing data - missing base prices');
                 showApiError('Pricing data is incomplete. Please contact support at 253-922-5793.');
-                
+
                 // Show pricing unavailable in table
                 const pricingTable = document.querySelector('.pricing-table');
                 const tbody = pricingTable.querySelector('tbody');
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 30px; color: #666;">
+                        <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
                             <i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>
                             Pricing currently unavailable. Please contact sales for a quote.
                         </td>
@@ -1904,9 +1907,11 @@
             const baseRow = document.createElement('tr');
             baseRow.innerHTML = `
                 <td class="size-cell">${baseSizeDisplay}</td>
-                <td class="price-cell">$${basePrices.tier1.toFixed(2)}</td>
+                <td class="price-cell">${basePrices.tier0 ? '$' + basePrices.tier0.toFixed(2) : '-'}</td>
+                <td class="price-cell">${basePrices.tier1 ? '$' + basePrices.tier1.toFixed(2) : '-'}</td>
                 <td class="price-cell">$${basePrices.tier2.toFixed(2)}</td>
                 <td class="price-cell">$${basePrices.tier3.toFixed(2)}</td>
+                <td class="price-cell">$${basePrices.tier4.toFixed(2)}</td>
             `;
             tbody.appendChild(baseRow);
             
@@ -1925,32 +1930,40 @@
                 const relativeUpcharge = absoluteUpcharge - minUpcharge;
 
                 if (relativeUpcharge > 0) {
-                    let price1, price2, price3;
+                    let price0, price1, price2, price3, price4;
 
                     // Try to get calculated prices for this specific size first
                     if (pricingData.pricing) {
                         // Format: pricingData.pricing['24-47']['2XL'] or ['XXL']
-                        price1 = pricingData.pricing['24-47']?.[size] || (basePrices.tier1 + relativeUpcharge);
-                        price2 = pricingData.pricing['48-71']?.[size] || (basePrices.tier2 + relativeUpcharge);
-                        price3 = pricingData.pricing['72+']?.[size] || (basePrices.tier3 + relativeUpcharge);
+                        price0 = pricingData.pricing['1-7']?.[size] || (basePrices.tier0 ? basePrices.tier0 + relativeUpcharge : null);
+                        price1 = pricingData.pricing['8-23']?.[size] || (basePrices.tier1 ? basePrices.tier1 + relativeUpcharge : null);
+                        price2 = pricingData.pricing['24-47']?.[size] || (basePrices.tier2 + relativeUpcharge);
+                        price3 = pricingData.pricing['48-71']?.[size] || (basePrices.tier3 + relativeUpcharge);
+                        price4 = pricingData.pricing['72+']?.[size] || (basePrices.tier4 + relativeUpcharge);
                     } else if (pricingData.prices && pricingData.prices[size]) {
                         // Alternative format: pricingData.prices['2XL']['24-47']
-                        price1 = pricingData.prices[size]?.['24-47'] || (basePrices.tier1 + relativeUpcharge);
-                        price2 = pricingData.prices[size]?.['48-71'] || (basePrices.tier2 + relativeUpcharge);
-                        price3 = pricingData.prices[size]?.['72+'] || (basePrices.tier3 + relativeUpcharge);
+                        price0 = pricingData.prices[size]?.['1-7'] || (basePrices.tier0 ? basePrices.tier0 + relativeUpcharge : null);
+                        price1 = pricingData.prices[size]?.['8-23'] || (basePrices.tier1 ? basePrices.tier1 + relativeUpcharge : null);
+                        price2 = pricingData.prices[size]?.['24-47'] || (basePrices.tier2 + relativeUpcharge);
+                        price3 = pricingData.prices[size]?.['48-71'] || (basePrices.tier3 + relativeUpcharge);
+                        price4 = pricingData.prices[size]?.['72+'] || (basePrices.tier4 + relativeUpcharge);
                     } else {
                         // Fall back to base price + relative upcharge
-                        price1 = basePrices.tier1 + relativeUpcharge;
+                        price0 = basePrices.tier0 ? basePrices.tier0 + relativeUpcharge : null;
+                        price1 = basePrices.tier1 ? basePrices.tier1 + relativeUpcharge : null;
                         price2 = basePrices.tier2 + relativeUpcharge;
                         price3 = basePrices.tier3 + relativeUpcharge;
+                        price4 = basePrices.tier4 + relativeUpcharge;
                     }
-                    
+
                     const extendedRow = document.createElement('tr');
                     extendedRow.innerHTML = `
                         <td class="size-cell">${size}</td>
-                        <td class="price-cell">$${price1.toFixed(2)}</td>
+                        <td class="price-cell">${price0 ? '$' + price0.toFixed(2) : '-'}</td>
+                        <td class="price-cell">${price1 ? '$' + price1.toFixed(2) : '-'}</td>
                         <td class="price-cell">$${price2.toFixed(2)}</td>
                         <td class="price-cell">$${price3.toFixed(2)}</td>
+                        <td class="price-cell">$${price4.toFixed(2)}</td>
                     `;
                     tbody.appendChild(extendedRow);
                 }

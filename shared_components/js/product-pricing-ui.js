@@ -38,11 +38,13 @@ const NWCAProductPricingUI = (function() {
     };
 
     // Configuration (example)
+    // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
     const config = {
         ltmFee: 50.00, // Standard LTM fee amount
-        ltmThreshold: 24, // Default LTM quantity threshold (e.g., less than 24 pieces)
+        ltmThreshold: 8, // 2026-02: LTM threshold changed from 24 to 8
         pricingTiers: [ // Example structure, actual tiers come from pricing data
-            { minQty: 1, maxQty: 23, label: "1-23" },
+            { minQty: 1, maxQty: 7, label: "1-7" },
+            { minQty: 8, maxQty: 23, label: "8-23" },
             { minQty: 24, maxQty: 47, label: "24-47" },
             { minQty: 48, maxQty: 71, label: "48-71" },
             { minQty: 72, maxQty: Infinity, label: "72+" }

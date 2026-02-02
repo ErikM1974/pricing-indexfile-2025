@@ -8,11 +8,13 @@ class EmbroideryPricingCalculator {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         
         // Default fallback values (will be replaced by API data)
+        // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM, +$4 surcharge baked in)
         this.tiers = {
-            '1-23': { embCost: 12.00, hasLTM: true },
-            '24-47': { embCost: 12.00, hasLTM: false },
-            '48-71': { embCost: 11.00, hasLTM: false },
-            '72+': { embCost: 10.00, hasLTM: false }
+            '1-7': { embCost: 18.00, hasLTM: true },
+            '8-23': { embCost: 18.00, hasLTM: false },
+            '24-47': { embCost: 14.00, hasLTM: false },
+            '48-71': { embCost: 13.00, hasLTM: false },
+            '72+': { embCost: 12.00, hasLTM: false }
         };
         
         this.marginDenominator = 0.57; // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
@@ -184,7 +186,7 @@ class EmbroideryPricingCalculator {
                             console.log(`🔍 [DEBUG] AL Tier ${cost.TierLabel}: EmbroideryCost = $${cost.EmbroideryCost}, BaseStitchCount = ${cost.BaseStitchCount}, AdditionalStitchRate = $${cost.AdditionalStitchRate}`);
                             this.alTiers[cost.TierLabel] = {
                                 embCost: cost.EmbroideryCost,
-                                hasLTM: cost.TierLabel === '1-23',
+                                hasLTM: cost.TierLabel === '1-7',
                                 baseStitchCount: cost.BaseStitchCount || 8000,
                                 additionalStitchRate: cost.AdditionalStitchRate || 1.25
                             };
@@ -409,7 +411,7 @@ class EmbroideryPricingCalculator {
                     if (cost.StitchCount === 8000) {
                         this.capTiers[cost.TierLabel] = {
                             embCost: cost.EmbroideryCost,
-                            hasLTM: cost.TierLabel === '1-23'
+                            hasLTM: cost.TierLabel === '1-7'
                         };
                         // Store cap-specific additional stitch rate (from first Cap record)
                         // Caps use $1.00/1K (NOT Shirt's $1.25/1K)
@@ -790,11 +792,13 @@ class EmbroideryPricingCalculator {
 
     /**
      * Get tier based on total quantity
+     * 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
      */
     getTier(totalQuantity) {
-        if (totalQuantity < 24) return '1-23';
-        if (totalQuantity < 48) return '24-47';
-        if (totalQuantity < 72) return '48-71';
+        if (totalQuantity <= 7) return '1-7';
+        if (totalQuantity <= 23) return '8-23';
+        if (totalQuantity <= 47) return '24-47';
+        if (totalQuantity <= 71) return '48-71';
         return '72+';
     }
     
@@ -1300,8 +1304,8 @@ class EmbroideryPricingCalculator {
 
         // CRITICAL: Separate tiers for caps and garments
         // Caps and garments CANNOT be combined for quantity discounts
-        const garmentTier = garmentQuantity > 0 ? this.getTier(garmentQuantity) : '1-23';
-        const capTier = capQuantity > 0 ? this.getTier(capQuantity) : '1-23';
+        const garmentTier = garmentQuantity > 0 ? this.getTier(garmentQuantity) : '1-7';
+        const capTier = capQuantity > 0 ? this.getTier(capQuantity) : '1-7';
         const tierEmbCost = this.getEmbroideryCost(garmentTier);
 
         console.log(`[EmbroideryPricingCalculator] Separate tiers: garments=${garmentTier} (${garmentQuantity} pcs), caps=${capTier} (${capQuantity} pcs)`);
@@ -1393,13 +1397,13 @@ class EmbroideryPricingCalculator {
         }
         
         // Apply LTM separately for caps and garments
-        // Each product type has its own LTM if qty < 24
+        // Each product type has its own LTM if qty <= 7 (2026 5-tier restructure)
         let ltmTotal = 0;
         let garmentLtm = 0;
         let capLtm = 0;
 
-        // Garment LTM: apply if garments exist and qty < 24
-        if (garmentQuantity > 0 && garmentQuantity < 24) {
+        // Garment LTM: apply if garments exist and qty <= 7 (2026-02 restructure)
+        if (garmentQuantity > 0 && garmentQuantity <= 7) {
             garmentLtm = this.ltmFee;
             const garmentLtmPerUnit = garmentLtm / garmentQuantity;
             productPricing.filter(pp => !pp.isCap).forEach(pp => {
@@ -1410,8 +1414,8 @@ class EmbroideryPricingCalculator {
             });
         }
 
-        // Cap LTM: apply if caps exist and qty < 24
-        if (capQuantity > 0 && capQuantity < 24) {
+        // Cap LTM: apply if caps exist and qty <= 7 (2026-02 restructure)
+        if (capQuantity > 0 && capQuantity <= 7) {
             capLtm = this.ltmFee;
             const capLtmPerUnit = capLtm / capQuantity;
             productPricing.filter(pp => pp.isCap).forEach(pp => {

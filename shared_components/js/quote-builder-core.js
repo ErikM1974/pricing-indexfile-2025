@@ -496,10 +496,12 @@ class QuoteBuilderCore {
      */
     getTierLabel(quantity) {
         // Default tiers - builders should override this
+        // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
         if (quantity >= 72) return '72+';
         if (quantity >= 48) return '48-71';
         if (quantity >= 24) return '24-47';
-        return '1-23';
+        if (quantity >= 8) return '8-23';
+        return '1-7';
     }
 
     /**

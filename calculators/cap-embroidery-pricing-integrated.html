@@ -942,7 +942,7 @@
                     <div class="info-boxes">
                         <div class="info-box primary">
                             <i class="fas fa-check-circle"></i>
-                            <strong>Includes a Front Embroidered Logo.</strong> Minimum order 24 pieces. Orders under 24 pieces incur a $50.00 LTM (Less Than Minimum) fee.
+                            <strong>Includes a Front Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Setup Fee. Orders of 8+ pieces: Setup included in price.
                         </div>
                         
                         <div class="info-box warning">
@@ -961,17 +961,18 @@
                 <p class="pricing-subtitle">Includes one front logo at 8,000 stitches</p>
             </div>
             
-            <!-- LTM Notice for orders under 24 -->
+            <!-- LTM Notice for orders 1-7 pieces -->
             <div class="info-box warning" style="margin-bottom: 20px;">
                 <i class="fas fa-exclamation-circle"></i>
-                <strong>Orders under 24 pieces:</strong> A $50.00 Less Than Minimum (LTM) fee will be distributed across all pieces.
-                <br>For example: 12 pieces = $50 ÷ 12 = $4.17 added per cap.
+                <strong>*Orders of 1-7 pieces:</strong> Prices shown do not include the $50 Setup Fee. This fee will be added to your order total.
             </div>
             
             <table class="pricing-table">
                 <thead>
                     <tr>
                         <th>Size Range</th>
+                        <th>1-7 pieces*</th>
+                        <th>8-23 pieces</th>
                         <th>24-47 pieces</th>
                         <th>48-71 pieces</th>
                         <th>72+ pieces</th>
@@ -992,8 +993,9 @@
         <table class="pricing-table additional-logo-table">
             <thead>
                 <tr>
-                    <th>Quantity</th>
-                    <th>1-23 pieces</th>
+                    <th>Size</th>
+                    <th>1-7 pieces*</th>
+                    <th>8-23 pieces</th>
                     <th>24-47 pieces</th>
                     <th>48-71 pieces</th>
                     <th>72+ pieces</th>
@@ -1002,7 +1004,8 @@
             <tbody>
                 <tr>
                     <td class="tier-label">Base Price<br><small>(5,000 stitches)</small></td>
-                    <td id="cap-al-1-23" class="price-cell loading">Loading...</td>
+                    <td id="cap-al-1-7" class="price-cell loading">Loading...</td>
+                    <td id="cap-al-8-23" class="price-cell loading">Loading...</td>
                     <td id="cap-al-24-47" class="price-cell loading">Loading...</td>
                     <td id="cap-al-48-71" class="price-cell loading">Loading...</td>
                     <td id="cap-al-72" class="price-cell loading">Loading...</td>
@@ -1029,17 +1032,17 @@
                     </div>
                     <div class="order-info-content">
                         <div class="order-info-label">Minimum Order</div>
-                        <div class="order-info-text">24 pieces required for standard pricing</div>
+                        <div class="order-info-text">No minimum order required</div>
                     </div>
                 </div>
-                
+
                 <div class="order-info-item">
                     <div class="order-info-icon">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div class="order-info-content">
-                        <div class="order-info-label">Orders Under 24</div>
-                        <div class="order-info-text">$50 Less Than Minimum (LTM) fee applies</div>
+                        <div class="order-info-label">Orders of 1-7 pieces</div>
+                        <div class="order-info-text">$50 Setup Fee applies</div>
                     </div>
                 </div>
                 
@@ -1488,7 +1491,8 @@
             if (quantity >= 72) return '72+';
             if (quantity >= 48) return '48-71';
             if (quantity >= 24) return '24-47';
-            return '1-23';
+            if (quantity >= 8) return '8-23';
+            return '1-7';
         }
         
         // Get embroidery price for tier (8000 stitches, no extra stitches)
@@ -1520,7 +1524,14 @@
                 return parseFloat(embroideryDataAny.EmbroideryCost);
             }
 
-            // NO FALLBACKS - API data is required for accurate pricing
+            // For 1-7 and 8-23 tiers, fall back to 24-47 tier price (same embroidery cost, different quantity breaks)
+            // This handles backward compatibility when API doesn't have new tier data yet
+            if (tier === '1-7' || tier === '8-23') {
+                console.log(`⚠️ No embroidery cost for ${tier}, falling back to 24-47 tier`);
+                return getEmbroideryPriceForTier('24-47');
+            }
+
+            // NO FALLBACKS for other tiers - API data is required for accurate pricing
             console.error(`❌ No embroidery cost found for tier ${tier} in API data`);
             showApiError(`No embroidery pricing available for tier ${tier}. Please contact support.`);
             return 0; // Return 0 to prevent calculation with bad data
@@ -1564,28 +1575,32 @@
             // Generate rows for each size
             currentSizes.forEach(size => {
                 const row = document.createElement('tr');
-                
+
                 // Get upcharge for this size
                 const upcharge = window.currentSizeUpcharges?.[size] || 0;
-                
-                // Calculate prices for each tier (24+ only, no LTM in table)
+
+                // Calculate prices for each tier (all 5 tiers)
+                const price1_7 = calculateCapPrice(baseCapPrice, 1, upcharge);
+                const price8_23 = calculateCapPrice(baseCapPrice, 8, upcharge);
                 const price24 = calculateCapPrice(baseCapPrice, 24, upcharge);
                 const price48 = calculateCapPrice(baseCapPrice, 48, upcharge);
                 const price72 = calculateCapPrice(baseCapPrice, 72, upcharge);
-                
+
                 // Build row HTML
                 let sizeDisplay = size;
                 if (upcharge > 0) {
                     sizeDisplay += ` <span class="size-note">(+$${upcharge.toFixed(2)} upcharge)</span>`;
                 }
-                
+
                 row.innerHTML = `
                     <td>${sizeDisplay}</td>
+                    <td><span class="price">$${price1_7.toFixed(2)}</span></td>
+                    <td><span class="price">$${price8_23.toFixed(2)}</span></td>
                     <td><span class="price">$${price24.toFixed(2)}</span></td>
                     <td><span class="price">$${price48.toFixed(2)}</span></td>
                     <td><span class="price">$${price72.toFixed(2)}</span></td>
                 `;
-                
+
                 tbody.appendChild(row);
             });
             

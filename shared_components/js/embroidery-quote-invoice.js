@@ -689,11 +689,12 @@ class EmbroideryInvoiceGenerator {
         `;
 
         // Determine AL base rate from tier
-        const tier = pricingData.tier || '1-23';
-        let alBaseRate = 12.50;
+        const tier = pricingData.tier || '1-7';
+        let alBaseRate = 13.50; // 2026-02 base rate
         if (tier.includes('72')) alBaseRate = 8.50;
         else if (tier.includes('48')) alBaseRate = 9.50;
         else if (tier.includes('24')) alBaseRate = 11.50;
+        else if (tier === '8-23') alBaseRate = 13.50;
 
         // Handle new separate logo configs
         if (hasLogoConfigs) {
@@ -927,11 +928,12 @@ class EmbroideryInvoiceGenerator {
             
             // Build dynamic AL breakdown from logos
             const additionalLogos = (pricingData.logos || []).filter(l => l.isPrimary === false);
-            const tier = pricingData.tier || '1-23';
-            let alBaseRate = 12.50;
+            const tier = pricingData.tier || '1-7';
+            let alBaseRate = 13.50; // 2026-02 base rate
             if (tier.includes('72')) alBaseRate = 8.50;
             else if (tier.includes('48')) alBaseRate = 9.50;
             else if (tier.includes('24')) alBaseRate = 11.50;
+            else if (tier === '8-23') alBaseRate = 13.50;
 
             // Calculate primary logo additional stitches cost
             const primaryLogo = (pricingData.logos || []).find(l => l.isPrimary !== false);

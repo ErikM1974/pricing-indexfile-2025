@@ -75,11 +75,13 @@ class CapEmbroideryPricingService {
     async generateManualPricingData(manualCost) {
         console.log('[CapEmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
 
-        // Default tiers - 2026 margin (43%)
+        // Default tiers - 2026 margin (43%) - All 5 tiers to match flat embroidery
         const defaultTiers = [
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57 }
+            { TierLabel: '1-7', MinQuantity: 1, MaxQuantity: 7, MarginDenominator: 0.57, LTM_Fee: 50 },
+            { TierLabel: '8-23', MinQuantity: 8, MaxQuantity: 23, MarginDenominator: 0.57, LTM_Fee: 0 },
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57, LTM_Fee: 0 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57, LTM_Fee: 0 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57, LTM_Fee: 0 }
         ];
 
         // Fetch current cap embroidery costs from API (throws error if fails - no silent fallback)

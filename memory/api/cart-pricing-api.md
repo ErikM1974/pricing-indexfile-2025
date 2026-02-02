@@ -106,7 +106,10 @@ Pricing calculations for various decoration methods including DTG, embroidery, a
 
 ### Business Rules
 - Tiered pricing based on quantity breaks
-- Less Than Minimum (LTM) fee applies when quantity < 24
+- Less Than Minimum (LTM) fee thresholds vary by method:
+  - **Embroidery**: qty ≤ 7 (5-tier system as of Feb 2026)
+  - **DTG/DTF**: qty < 24
+  - **Screen Print**: Dual LTM (24-36: $75, 37-72: $50)
 - Different pricing for contract vs retail
 - Size upcharges for 2XL and above
 

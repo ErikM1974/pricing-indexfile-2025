@@ -74,7 +74,9 @@
       "Bash(del \"C:\\\\Users\\\\erik\\\\.claude\\\\plans\\\\melodic-sprouting-admaker.md\")",
       "Bash(heroku login:*)",
       "Bash(heroku auth:whoami:*)",
-      "Bash(heroku git:remote:*)"
+      "Bash(heroku git:remote:*)",
+      "Bash(if not exist \"tests\\\\reports\" mkdir testsreports)",
+      "Bash(iconv:*)"
     ],
     "deny": [],
     "ask": [],

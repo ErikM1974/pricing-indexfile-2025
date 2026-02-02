@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Apply LTM fee if applicable
-        if (matchedPrice !== null && matchedTier && quantity < 24) {
+        // 2026-02 RESTRUCTURE: LTM only applies to 1-7 tier
+        if (matchedPrice !== null && matchedTier && quantity <= 7) {
             const ltmFee = matchedTier.LTM_Fee || 50.00; // Default to $50 if not specified
             const ltmFeePerItem = ltmFee / quantity;
             matchedPrice += ltmFeePerItem; // Add LTM fee per item to the price

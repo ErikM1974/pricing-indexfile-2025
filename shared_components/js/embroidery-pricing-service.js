@@ -78,10 +78,13 @@ class EmbroideryPricingService {
         console.log('[EmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
 
         // Default tiers matching API structure - 2026 margin (43%)
+        // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
         const defaultTiers = [
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57 }
+            { TierLabel: '1-7', MinQuantity: 1, MaxQuantity: 7, MarginDenominator: 0.57, LTM_Fee: 50 },
+            { TierLabel: '8-23', MinQuantity: 8, MaxQuantity: 23, MarginDenominator: 0.57, LTM_Fee: 0 },
+            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57, LTM_Fee: 0 },
+            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57, LTM_Fee: 0 },
+            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57, LTM_Fee: 0 }
         ];
 
         // Fetch current embroidery costs from API (throws error if fails - no silent fallback)

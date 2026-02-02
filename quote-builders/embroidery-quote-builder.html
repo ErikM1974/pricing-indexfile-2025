@@ -553,16 +553,16 @@
 
                 <div class="pricing-row">
                     <span class="label">Pricing Tier:</span>
-                    <span class="tier-badge" id="pricing-tier">1-23</span>
+                    <span class="tier-badge" id="pricing-tier">1-7</span>
                 </div>
                 <!-- Tier breakdown for mixed quotes -->
                 <div class="pricing-row sub-breakdown" id="garment-tier-row" style="display: none;">
                     <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment Tier:</span>
-                    <span class="tier-badge small" id="garment-tier">1-23</span>
+                    <span class="tier-badge small" id="garment-tier">1-7</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-tier-row" style="display: none;">
                     <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap Tier:</span>
-                    <span class="tier-badge small" id="cap-tier">1-23</span>
+                    <span class="tier-badge small" id="cap-tier">1-7</span>
                 </div>
 
                 <div class="pricing-row">
@@ -4717,7 +4717,7 @@ Company:Absher Construction Company
 
                 updatePricingDisplay({
                     totalQuantity: 0,
-                    tier: '1-23',
+                    tier: '1-7',
                     subtotal: 0,
                     ltmFee: 0,
                     setupFees: patchSetupFee,
@@ -5047,16 +5047,16 @@ Company:Absher Construction Company
                 pricingTierEl.textContent = 'Mixed';
                 garmentTierRow.style.display = 'flex';
                 capTierRow.style.display = 'flex';
-                document.getElementById('garment-tier').textContent = pricing.garmentTier || '1-23';
-                document.getElementById('cap-tier').textContent = pricing.capTier || '1-23';
+                document.getElementById('garment-tier').textContent = pricing.garmentTier || '1-7';
+                document.getElementById('cap-tier').textContent = pricing.capTier || '1-7';
             } else if (pricing.hasCaps) {
                 // Caps only
-                pricingTierEl.textContent = pricing.capTier || '1-23';
+                pricingTierEl.textContent = pricing.capTier || '1-7';
                 garmentTierRow.style.display = 'none';
                 capTierRow.style.display = 'none';
             } else {
                 // Garments only or no products
-                pricingTierEl.textContent = pricing.garmentTier || pricing.tier || '1-23';
+                pricingTierEl.textContent = pricing.garmentTier || pricing.tier || '1-7';
                 garmentTierRow.style.display = 'none';
                 capTierRow.style.display = 'none';
             }
@@ -5194,7 +5194,7 @@ Company:Absher Construction Company
             const alContainer = document.getElementById('additional-logos-pricing');
             if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
                 // Calculate AL pricing based on garment tier (fetch from API)
-                const tier = pricing.garmentTier || pricing.tier || '1-23';
+                const tier = pricing.garmentTier || pricing.tier || '1-7';
                 let alBaseRate = 13.50; // 2026 fallback
                 if (pricingCalculator.alTiers && pricingCalculator.alTiers[tier]) {
                     alBaseRate = pricingCalculator.alTiers[tier].embCost;
@@ -5239,8 +5239,8 @@ Company:Absher Construction Company
             const capAlContainer = document.getElementById('cap-additional-logos-pricing');
             if (globalAL.cap.enabled && pricing.capQuantity > 0) {
                 // Get cap AL pricing based on CAP tier (not combined tier)
-                const capTier = pricing.capTier || '1-23';
-                let capAlBaseRate = 6.75; // 2026 fallback (AL-CAP tier 1-23)
+                const capTier = pricing.capTier || '1-7';
+                let capAlBaseRate = 6.75; // 2026 fallback (AL-CAP tier 1-7)
                 if (pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier]) {
                     capAlBaseRate = pricingCalculator.capAlTiers[capTier].embCost;
                 } else {
@@ -5293,7 +5293,7 @@ Company:Absher Construction Company
 
             if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
                 // Calculate AL pricing (reuse same logic as sidebar)
-                const tier = pricing.garmentTier || pricing.tier || '1-23';
+                const tier = pricing.garmentTier || pricing.tier || '1-7';
                 let alBaseRate = 13.50;
                 if (pricingCalculator.alTiers && pricingCalculator.alTiers[tier]) {
                     alBaseRate = pricingCalculator.alTiers[tier].embCost;
@@ -5342,7 +5342,7 @@ Company:Absher Construction Company
 
             if (globalAL.cap.enabled && pricing.capQuantity > 0) {
                 // Calculate Cap AL pricing (reuse same logic as sidebar)
-                const capTier = pricing.capTier || '1-23';
+                const capTier = pricing.capTier || '1-7';
                 let capAlBaseRate = 6.75;
                 if (pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier]) {
                     capAlBaseRate = pricingCalculator.capAlTiers[capTier].embCost;

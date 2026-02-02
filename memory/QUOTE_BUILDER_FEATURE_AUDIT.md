@@ -70,7 +70,7 @@
 | Location multiplier | ✅ Labor × locations | ❌ Single location | ❌ | ❌ |
 | Size upcharges | ✅ From API | ✅ From config | ✅ From API | ✅ From API |
 | Setup fees | ❌ | ❌ | $30/screen | $100/logo digitizing |
-| LTM fee | $50 if < 24 | $50 if < 24 | $50 if < 24 | $50/type if < 24 |
+| LTM fee | $50 if < 24 | $50 if < 24 | $50 if < 24 | $50/type if <= 7 |
 | Rounding | Half-dollar ceiling | Half-dollar ceiling | Half-dollar ceiling | Half-dollar (caps differ) |
 
 ### Customer Information Fields

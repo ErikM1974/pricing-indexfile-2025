@@ -18,6 +18,7 @@ Add new entries at the top of the relevant category.
 6. [Development Environment](#development-environment)
 7. [Security](#security)
 8. [Best Practices](#best-practices)
+9. [Business Insights](#business-insights)
 
 ---
 
@@ -29,6 +30,60 @@ Add new entries at the top of the relevant category.
 ---
 
 # API & Data Flow
+
+## Bug: Manual Calculator Used Old 4-Tier Tiers While Quote Builder Used New 5-Tier
+**Date:** 2026-02-02
+**Project:** [Pricing Index]
+**Problem:** The embroidery manual pricing calculator (`embroidery-manual-service.js`) still showed the old 4-tier structure (1-23, 24-47, 48-71, 72+) while the quote builder and integrated calculator had been updated to the new 5-tier structure (1-7, 8-23, 24-47, 48-71, 72+).
+**Root Cause:** When the Feb 2026 tier restructure was implemented, the manual calculator service was missed. It had hardcoded tier labels and fallback pricing that weren't updated.
+**Solution:** Updated `embroidery-manual-service.js` and related files:
+1. Updated `getTierLabel()` function with new 5-tier boundaries
+2. Updated `defaultTiers` array with new tier labels
+3. Updated fallback pricing in `FALLBACK_PRICING` object
+4. Updated LTM threshold from `< 24` to `<= 7`
+**Prevention:**
+- When changing pricing tiers, search ALL files for tier-related strings: `'1-23'|"1-23"|< 24|getTier|getTierLabel|LTM`
+- Created master reference document `/memory/PRICING_TIERS_MASTER_REFERENCE.md` with all tier structures
+- Added verification checklist for tier changes
+**Files:**
+- `calculators/embroidery-manual-service.js`
+- `calculators/cap-embroidery-manual-service.js`
+- `calculators/cap-embroidery-manual-pricing.html`
+- `calculators/embroidery-manual-pricing.html` (if exists)
+**See also:** `/memory/PRICING_TIERS_MASTER_REFERENCE.md`
+
+---
+
+## Embroidery Pricing Restructure 2026-02
+**Date:** 2026-02-02
+**Project:** [Pricing Index]
+**Change:** Updated embroidery pricing tier structure from 4 tiers to 5 tiers.
+**Old Tiers:** 1-23 (LTM), 24-47, 48-71, 72+
+**New Tiers:** 1-7 (LTM $50), 8-23 (no LTM, +$4 surcharge baked in), 24-47, 48-71, 72+
+**Files Modified:**
+- `shared_components/js/embroidery-quote-pricing.js` - Core `getTier()` and LTM logic
+- `shared_components/js/cap-quote-pricing.js` - `getTierLabel()` and LTM logic
+- `shared_components/js/embroidery-pricing-service.js` - Default tiers
+- `shared_components/js/additional-logo-embroidery-simple.js` - Fallback pricing
+- `shared_components/js/additional-logo-cap-simple.js` - Fallback pricing
+- `shared_components/js/base-quote-service.js` - Base tier function
+- `shared_components/js/cap-quote-service.js` - Cap tier function
+- `shared_components/js/quote-builder-core.js` - Core tier function
+- `shared_components/js/embroidery-quote-invoice.js` - Invoice tier fallbacks
+- `shared_components/js/embroidery-quote-products.js` - Products display
+- `shared_components/js/cap-quote-products.js` - Cap products display
+- `shared_components/js/product-pricing-ui.js` - UI tier config
+- `quote-builders/embroidery-quote-builder.html` - Default badges and fallbacks
+- `calculators/embroidery-pricing.html` - Table headers and info text
+**Key Changes:**
+1. LTM/Setup fee now only applies to 1-7 pieces (was 1-23)
+2. 8-23 tier has no LTM but +$4/piece surcharge baked into EmbroideryCost
+3. All boundary checks changed from `< 24` to `<= 7` for LTM
+4. HTML displays updated with new tier columns and messaging
+**Prevention:** When changing pricing tiers, search ALL files for tier-related strings and functions. Use grep: `'1-23'|"1-23"|< 24|getTier|getTierLabel|LTM`
+**See also:** `/memory/EMBROIDERY_PRICING_2026.md`
+
+---
 
 ## Bug: Phone Field in Quote Builders Wasn't Stored Anywhere
 **Date:** 2026-01-29
@@ -1242,6 +1297,37 @@ for (let i = 0; i < items.length; i += batchSize) {
 ```
 **Files:** `/shared_components/js/embroidery-quote-service.js` lines 107-120
 **Benefit:** 470 items deleted in seconds instead of minutes. Batch size of 10 balances parallelism vs server load.
+
+---
+
+# Business Insights
+
+## Insight: LTM Fee Revenue Opportunity - $43K Annually
+**Date:** 2026-02-02
+**Project:** [Pricing Index]
+**Analysis:** Ran LTM (Less Than Minimum) analysis on 2025 embroidery order data using `npm run test:emb-ltm`.
+
+**Key Findings:**
+| Metric | Value |
+|--------|-------|
+| Total 2025 Orders | 1,310 |
+| LTM Orders (<24 pieces) | 862 (65.8%) |
+| Non-LTM Orders (≥24 pieces) | 448 (34.2%) |
+
+**LTM Order Breakdown:**
+- 1-5 pieces: 382 orders (44.3% of LTM)
+- 6-11 pieces: 241 orders (28.0% of LTM)
+- 12-17 pieces: 156 orders (18.1% of LTM)
+- 18-23 pieces: 83 orders (9.6% of LTM)
+
+**Revenue Projection (if 100% collection):** $43,100/year ($50 × 862 orders)
+**Conservative Estimate (70-80% collection):** $30,170 - $34,480/year
+
+**Takeaway:** Nearly two-thirds of embroidery orders are under the 24-piece minimum. Consistent LTM fee enforcement could add $30K-$43K annually.
+
+**Files:**
+- Analysis script: `tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis`
+- Report: `tests/reports/ltm-analysis.json`
 
 ---
 

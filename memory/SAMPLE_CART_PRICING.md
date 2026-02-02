@@ -1,6 +1,6 @@
 # Sample Cart Pricing Guide
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2026-02-02
 **Purpose:** Comprehensive guide for blank sample product pricing
 
 ## Overview
@@ -23,11 +23,11 @@ The sample cart allows customers to request blank apparel samples (no decoration
 const baseCost = sizeData.price;  // From API: sizes array
 ```
 
-### Step 2: Apply 40% Margin
+### Step 2: Apply 43% Margin (2026)
 ```javascript
-const priceWithMargin = baseCost / 0.6;
-// 0.6 = 60% of retail price
-// Example: $6.00 ÷ 0.6 = $10.00
+const priceWithMargin = baseCost / 0.57;
+// 0.57 = 57% of retail price (43% margin)
+// Example: $6.00 ÷ 0.57 = $10.53
 ```
 
 ### Step 3: Round to Half-Dollar
@@ -127,7 +127,7 @@ GET /api/pricing-bundle?method=BLANK&styleNumber={styleNumber}
 - ✅ Semantically correct for blank products (no decoration)
 - ✅ Already includes all size variations
 - ✅ Already includes all upcharges
-- ✅ Uses correct pricing rules from Caspio (MarginDenominator: 0.6, HalfDollarCeil_Final)
+- ✅ Uses correct pricing rules from Caspio (MarginDenominator: 0.57, HalfDollarCeil_Final)
 - ✅ Consistent with quote builders architecture
 
 ## Complete Pricing Examples

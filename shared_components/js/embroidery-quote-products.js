@@ -862,13 +862,15 @@ class ProductLineManager {
     updateTierIndicator(total) {
         const indicator = document.getElementById('tier-indicator');
         if (!indicator) return;
-        
+
+        // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
         let tier = '';
-        if (total < 24) tier = '1-23 (LTM applies)';
-        else if (total < 48) tier = '24-47';
-        else if (total < 72) tier = '48-71';
+        if (total <= 7) tier = '1-7 (Setup fee applies)';
+        else if (total <= 23) tier = '8-23';
+        else if (total <= 47) tier = '24-47';
+        else if (total <= 71) tier = '48-71';
         else tier = '72+';
-        
+
         indicator.textContent = `Tier: ${tier}`;
     }
     

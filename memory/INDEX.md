@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-02-01 (added CSV_ORDER_VALIDATION.md for 2025 order analysis)
+**Last Updated:** 2026-02-02 (added QUOTE_BUILDER_WORKFLOWS.md - Text import, PDF, shareable URLs)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -17,6 +17,7 @@
 ├── QUOTE_BUILDER_GUIDE.md            # Quote builder development guide
 ├── QUOTE_BUILDER_FEATURE_AUDIT.md    # Feature parity across all 4 builders
 ├── QUOTE_BUILDER_BEST_PRACTICES.md   # Copy-paste code patterns
+├── QUOTE_BUILDER_WORKFLOWS.md        # **NEW** Text import, PDF, shareable URLs (2026-02-02)
 ├── QUOTE_BUILDER_API_INTEGRATION.md  # API endpoints for quote builders
 ├── QUOTE_BUILDER_LINE_ITEMS.md       # Parent/child row patterns
 ├── QUOTE_BUILDER_TEMPLATE.md         # HTML row structure templates
@@ -48,10 +49,14 @@
 ├── SERVICE_CODES_TABLE.md            # **NEW** Caspio Service_Codes table design (2026-02-01)
 ├── CSV_ORDER_VALIDATION.md           # **NEW** 2025 embroidery order validation (line item classification)
 │
+├── # Pricing References
+├── PRICING_TIERS_MASTER_REFERENCE.md # **MASTER** All pricing tiers across all methods (2026-02-02)
+├── EMBROIDERY_PRICING_RULES.md       # Complete embroidery pricing formulas reference
+├── EMBROIDERY_PRICING_2026.md        # Feb 2026 embroidery tier restructure
+│
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
 ├── EMBROIDERY_QUOTE_BUILDER.md       # Embroidery quote builder implementation
-├── EMBROIDERY_PRICING_RULES.md       # **NEW** Complete embroidery pricing formulas reference
 ├── LASER_PATCH_IMPLEMENTATION.md     # Laser leatherette patch feature (caps)
 ├── SCREENPRINT_QUOTE_BUILDER.md      # Screen print quote builder implementation
 │
@@ -147,6 +152,14 @@
 | ManageOrders PUSH (detail) | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |
 | **CRM/Order Entry System** | **[MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md)** - Field glossary, capabilities |
 
+### Pricing References
+| Need | Start Here |
+|------|-----------|
+| **All Pricing Tiers** | **[PRICING_TIERS_MASTER_REFERENCE.md](./PRICING_TIERS_MASTER_REFERENCE.md)** - All methods, all tiers, LTM thresholds |
+| Embroidery Pricing | [EMBROIDERY_PRICING_RULES.md](./EMBROIDERY_PRICING_RULES.md) - Formulas, FB, AL, caps |
+| 2026 Tier Restructure | [EMBROIDERY_PRICING_2026.md](./EMBROIDERY_PRICING_2026.md) - 5-tier details |
+| 2026 Pricing Margins | [2026_PRICING_MARGINS.md](./2026_PRICING_MARGINS.md) - Margin denominators |
+
 ### Development Guides
 | Building | Start Here |
 |----------|-----------|
@@ -154,6 +167,7 @@
 | Quote Builder | [QUOTE_BUILDER_BEST_PRACTICES.md](./QUOTE_BUILDER_BEST_PRACTICES.md) |
 | **Quote Builder Feature Audit** | **[QUOTE_BUILDER_FEATURE_AUDIT.md](./QUOTE_BUILDER_FEATURE_AUDIT.md)** - Feature parity across all 4 |
 | Quote Builder Architecture | [QUOTE_BUILDER_ARCHITECTURE.md](./QUOTE_BUILDER_ARCHITECTURE.md) |
+| **Quote Builder Workflows** | **[QUOTE_BUILDER_WORKFLOWS.md](./QUOTE_BUILDER_WORKFLOWS.md)** - Text import, PDF, shareable URLs |
 | **Shareable Quote URLs** | **[quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md](./quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md)** - Add to any builder |
 | Embroidery Quote Builder | [EMBROIDERY_QUOTE_BUILDER.md](./EMBROIDERY_QUOTE_BUILDER.md) |
 | **Embroidery Pricing Rules** | **[EMBROIDERY_PRICING_RULES.md](./EMBROIDERY_PRICING_RULES.md)** - Complete pricing formulas, FB, AL, caps |
