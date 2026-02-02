@@ -850,6 +850,12 @@ class QuoteViewPage {
         const allSizes = {};
         productGroup.items.forEach(item => {
             const breakdown = this.parseSizeBreakdown(item.SizeBreakdown);
+            // Calculate per-unit price from stored LineTotal when available (ensures unit × qty = total)
+            const unitPrice = item.BaseUnitPrice || item.FinalUnitPrice || 0;
+            const perUnitTotal = (item.LineTotal && item.Quantity > 0)
+                ? item.LineTotal / item.Quantity
+                : unitPrice;
+
             Object.entries(breakdown).forEach(([size, qty]) => {
                 if (qty > 0) {
                     if (!allSizes[size]) {
@@ -857,8 +863,9 @@ class QuoteViewPage {
                     }
                     allSizes[size].qty += qty;
                     // Use BaseUnitPrice so LTM is shown separately in LTM-G row
-                    allSizes[size].price = item.BaseUnitPrice || item.FinalUnitPrice || 0;
-                    allSizes[size].total += (qty * (item.BaseUnitPrice || item.FinalUnitPrice || 0));
+                    allSizes[size].price = unitPrice;
+                    // Use proportional LineTotal to ensure unit × qty = total
+                    allSizes[size].total += (qty * perUnitTotal);
                 }
             });
         });

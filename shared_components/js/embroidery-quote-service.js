@@ -303,7 +303,9 @@ class EmbroideryQuoteService {
                         PrintLocationName: pricingResults.logos.map(l => l.position).join(' + '),
                         Quantity: lineItem.quantity,
                         HasLTM: pricingResults.ltmFee > 0 ? 'Yes' : 'No',
-                        BaseUnitPrice: parseFloat(lineItem.unitPrice.toFixed(2)),
+                        // Use basePrice (not unitPrice) so BaseUnitPrice × Quantity = LineTotal
+                        // unitPrice includes extra stitch cost, basePrice is the base price used for total
+                        BaseUnitPrice: parseFloat((lineItem.basePrice || lineItem.unitPrice).toFixed(2)),
                         LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
                         LineTotal: parseFloat(lineItem.total.toFixed(2)),
@@ -702,7 +704,7 @@ class EmbroideryQuoteService {
         html += '</ul>';
         
         if (pricingResults.ltmFee > 0) {
-            html += '<p style="color: #dc3545;"><em>*Includes small batch pricing for orders under 24 pieces</em></p>';
+            html += '<p style="color: #dc3545;"><em>*Includes $50 Less Than Minimum fee for orders of 7 or fewer pieces</em></p>';
         }
         
         // Products section
@@ -965,7 +967,9 @@ class EmbroideryQuoteService {
                         PrintLocationName: pricingResults.logos.map(l => l.position).join(' + '),
                         Quantity: lineItem.quantity,
                         HasLTM: pricingResults.ltmFee > 0 ? 'Yes' : 'No',
-                        BaseUnitPrice: parseFloat(lineItem.unitPrice.toFixed(2)),
+                        // Use basePrice (not unitPrice) so BaseUnitPrice × Quantity = LineTotal
+                        // unitPrice includes extra stitch cost, basePrice is the base price used for total
+                        BaseUnitPrice: parseFloat((lineItem.basePrice || lineItem.unitPrice).toFixed(2)),
                         LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
                         LineTotal: parseFloat(lineItem.total.toFixed(2)),
