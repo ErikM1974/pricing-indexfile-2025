@@ -13,12 +13,12 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
         const feesConfig = window.NWCA_APP_CONFIG?.FEES || {};
         if (embellishmentType === 'cap-embroidery') {
             return {
-                threshold: feesConfig.LTM_CAP_MINIMUM_QUANTITY || 24,
+                threshold: feesConfig.LTM_CAP_MINIMUM_QUANTITY || 8, // 2026-02: qty <= 7
                 feeAmount: feesConfig.LTM_CAP_FEE_AMOUNT || 50.00
             };
         }
         return {
-            threshold: feesConfig.LTM_GENERAL_THRESHOLD || 24,
+            threshold: feesConfig.LTM_GENERAL_THRESHOLD || 8, // 2026-02: qty <= 7
             feeAmount: feesConfig.LTM_GENERAL_FEE_AMOUNT || 50.00
         };
     }
@@ -31,8 +31,10 @@ console.log("[PRICE-RECALC:LOAD] Cart price recalculator loaded");
     function getPricingTierForQuantity(quantity) {
         if (quantity <= 0) {
             return "N/A";
-        } else if (quantity >= 1 && quantity <= 23) {
-            return "1-23";
+        } else if (quantity >= 1 && quantity <= 7) {
+            return "1-7";  // 2026-02: LTM tier
+        } else if (quantity >= 8 && quantity <= 23) {
+            return "8-23"; // 2026-02: No LTM, +$4 surcharge baked in
         } else if (quantity >= 24 && quantity <= 47) {
             return "24-47";
         } else if (quantity >= 48 && quantity <= 71) {

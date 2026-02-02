@@ -8,9 +8,9 @@ window.NWCA_APP_CONFIG = window.NWCA_APP_CONFIG || {};
     "use strict";
 
     CONFIG.FEES = {
-        LTM_CAP_MINIMUM_QUANTITY: 24,
+        LTM_CAP_MINIMUM_QUANTITY: 8,     // 2026-02: LTM applies to qty <= 7 (threshold 8)
         LTM_CAP_FEE_AMOUNT: 50.00,
-        LTM_GENERAL_THRESHOLD: 24,       // General LTM threshold for most products
+        LTM_GENERAL_THRESHOLD: 8,        // 2026-02: LTM applies to qty <= 7 (threshold 8)
         LTM_GENERAL_FEE_AMOUNT: 50.00    // General LTM fee amount
     };
 

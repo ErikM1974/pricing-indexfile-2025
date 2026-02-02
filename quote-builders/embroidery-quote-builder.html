@@ -290,8 +290,8 @@
                 <!-- Minimum Order Warning Banner -->
                 <div id="min-order-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Minimum Order: 24 pieces</strong> -
-                    Orders under 24 pieces require Less Than Minimum Fee.
+                    <strong>Small Order Notice</strong> -
+                    Orders of 7 or fewer pieces include a $50 Less Than Minimum Fee.
                 </div>
 
                 <!-- Excel-Style Product Table -->
@@ -5001,10 +5001,10 @@ Company:Absher Construction Company
             document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
-            // Minimum order warning banner (show when qty > 0 but < 24)
+            // Minimum order warning banner (show when qty > 0 but <= 7)
             const minWarning = document.getElementById('min-order-warning');
             if (minWarning) {
-                minWarning.style.display = (totalQty > 0 && totalQty < 24) ? 'flex' : 'none';
+                minWarning.style.display = (totalQty > 0 && totalQty <= 7) ? 'flex' : 'none';
             }
 
             // Update products label based on embellishment type
@@ -5114,7 +5114,7 @@ Company:Absher Construction Company
                     capLtmTableRow.style.display = 'none';
                 }
             } else {
-                // No LTM fee (qty >= 24) - hide all LTM rows
+                // No LTM fee (qty > 7) - hide all LTM rows
                 if (garmentLtmTableRow) garmentLtmTableRow.style.display = 'none';
                 if (capLtmTableRow) capLtmTableRow.style.display = 'none';
             }
