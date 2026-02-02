@@ -793,6 +793,203 @@
                 font-size: 14px;
             }
         }
+
+        /* LTM Quick Calculator Component */
+        .ltm-calculator {
+            background: linear-gradient(135deg, #f8fdf8 0%, #eef7ee 100%);
+            border: 1px solid #c8e6c9;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.08);
+        }
+
+        .ltm-calculator-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ltm-calculator-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .ltm-calculator-header h4 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ltm-calculator-header span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .ltm-calculator-body {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .ltm-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ltm-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ltm-input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ltm-input-group select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            min-width: 140px;
+        }
+
+        .ltm-input-group select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .ltm-input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+        }
+
+        .ltm-result-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .ltm-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed #e0e0e0;
+        }
+
+        .ltm-breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .ltm-breakdown-row.subtotal {
+            color: var(--text-secondary);
+        }
+
+        .ltm-breakdown-row.fee {
+            color: #b45309;
+            font-weight: 500;
+        }
+
+        .ltm-breakdown-row.fee i {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .ltm-breakdown-row.total {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 6px;
+        }
+
+        .ltm-per-piece {
+            text-align: center;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ltm-per-piece-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 4px;
+        }
+
+        .ltm-per-piece-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .ltm-upsell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        .ltm-upsell i {
+            color: #f59e0b;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .ltm-upsell strong {
+            color: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ltm-calculator-body {
+                grid-template-columns: 1fr;
+            }
+
+            .ltm-calculator {
+                padding: 20px;
+            }
+
+            .ltm-per-piece-value {
+                font-size: 28px;
+            }
+        }
     </style>
     <!-- Additional Logo Calculator -->
     <link rel="stylesheet" href="/shared_components/css/additional-logo-pricing-table.css">
@@ -942,7 +1139,7 @@
                     <div class="info-boxes">
                         <div class="info-box primary">
                             <i class="fas fa-check-circle"></i>
-                            <strong>Includes a Front Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Setup Fee. Orders of 8+ pieces: Setup included in price.
+                            <strong>Includes a Front Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Less Than Minimum Fee. Orders of 8+ pieces: No additional fee.
                         </div>
                         
                         <div class="info-box warning">
@@ -964,7 +1161,7 @@
             <!-- LTM Notice for orders 1-7 pieces -->
             <div class="info-box warning" style="margin-bottom: 20px;">
                 <i class="fas fa-exclamation-circle"></i>
-                <strong>*Orders of 1-7 pieces:</strong> Prices shown do not include the $50 Setup Fee. This fee will be added to your order total.
+                <strong>*Orders of 1-7 pieces:</strong> Prices shown do not include the $50 Less Than Minimum Fee. This fee will be added to your order total.
             </div>
             
             <table class="pricing-table">
@@ -983,6 +1180,53 @@
                 </tbody>
             </table>
 
+            <!-- LTM Quick Calculator -->
+            <div class="ltm-calculator" id="ltmCalculator">
+                <div class="ltm-calculator-header">
+                    <i class="fas fa-calculator"></i>
+                    <h4>Small Order Calculator <span>(1-7 caps)</span></h4>
+                </div>
+                <div class="ltm-calculator-body">
+                    <div class="ltm-input-section">
+                        <div class="ltm-input-group">
+                            <label for="ltmQuantity">Quantity</label>
+                            <select id="ltmQuantity">
+                                <option value="1">1 cap</option>
+                                <option value="2">2 caps</option>
+                                <option value="3" selected>3 caps</option>
+                                <option value="4">4 caps</option>
+                                <option value="5">5 caps</option>
+                                <option value="6">6 caps</option>
+                                <option value="7">7 caps</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ltm-result-section">
+                        <div class="ltm-breakdown">
+                            <div class="ltm-breakdown-row subtotal">
+                                <span><span id="ltmQtyDisplay">3</span> × $<span id="ltmUnitPrice">29.00</span></span>
+                                <span>$<span id="ltmSubtotal">87.00</span></span>
+                            </div>
+                            <div class="ltm-breakdown-row fee">
+                                <span><i class="fas fa-plus"></i>Less Than Minimum Fee</span>
+                                <span>$50.00</span>
+                            </div>
+                            <div class="ltm-breakdown-row total">
+                                <span>Total</span>
+                                <span>$<span id="ltmTotal">137.00</span></span>
+                            </div>
+                        </div>
+                        <div class="ltm-per-piece">
+                            <div class="ltm-per-piece-label">True Cost Per Cap</div>
+                            <div class="ltm-per-piece-value">$<span id="ltmPerPiece">45.67</span></div>
+                        </div>
+                        <div class="ltm-upsell">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Order <strong><span id="ltmPiecesNeeded">5</span> more</strong> to eliminate the $50 fee and pay just <strong>$<span id="ltmTier2Price">29.00</span>/cap</strong>!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
     <!-- Additional Logo Pricing Table -->
     <div class="additional-logo-pricing-section">
@@ -1042,7 +1286,7 @@
                     </div>
                     <div class="order-info-content">
                         <div class="order-info-label">Orders of 1-7 pieces</div>
-                        <div class="order-info-text">$50 Setup Fee applies</div>
+                        <div class="order-info-text">$50 Less Than Minimum Fee applies</div>
                     </div>
                 </div>
                 
@@ -1323,7 +1567,10 @@
                 
                 // Calculate and display cap prices
                 updateCapPricing();
-                
+
+                // Update LTM calculator with real pricing
+                updateLTMCapPricing();
+
                 // Update breadcrumb
                 const productsBreadcrumb = document.getElementById('products-breadcrumb');
                 if (productsBreadcrumb) {
@@ -1369,6 +1616,9 @@
 
                 // Update pricing display
                 updateCapPricing();
+
+                // Update LTM calculator with real pricing
+                updateLTMCapPricing();
 
                 // Show product sections
                 showProduct();
@@ -1964,6 +2214,83 @@
             errorMessage.textContent = message;
             notification.style.display = 'flex';
         }
+
+        // ============================================
+        // LTM Quick Calculator for Caps
+        // ============================================
+
+        // Store pricing data for LTM calculator
+        let ltmCapPricingData = {
+            unitPrice: 29.00,    // Default cap price (1-7 tier)
+            tier2Price: 29.00   // 8-23 tier price for upsell message
+        };
+
+        // Initialize LTM calculator when page loads
+        function initLTMCalculator() {
+            const qtySelect = document.getElementById('ltmQuantity');
+
+            if (qtySelect) {
+                qtySelect.addEventListener('change', updateLTMCalculator);
+                updateLTMCalculator(); // Initial calculation
+            }
+        }
+
+        // Update LTM calculator with real cap pricing from the pricing table
+        function updateLTMCapPricing() {
+            // Get price from first row of pricing table (OSFA or first size)
+            const priceCell = document.querySelector('.pricing-table tbody tr td:nth-child(2) .price');
+            const tier2Cell = document.querySelector('.pricing-table tbody tr td:nth-child(3) .price');
+
+            if (priceCell) {
+                const priceText = priceCell.textContent.replace('$', '');
+                const price = parseFloat(priceText);
+                if (!isNaN(price)) {
+                    ltmCapPricingData.unitPrice = price;
+                }
+            }
+
+            if (tier2Cell) {
+                const tier2Text = tier2Cell.textContent.replace('$', '');
+                const tier2Price = parseFloat(tier2Text);
+                if (!isNaN(tier2Price)) {
+                    ltmCapPricingData.tier2Price = tier2Price;
+                }
+            }
+
+            console.log('🧢 LTM Calculator pricing updated:', ltmCapPricingData);
+            updateLTMCalculator();
+        }
+
+        // Calculate and update LTM display
+        function updateLTMCalculator() {
+            const qty = parseInt(document.getElementById('ltmQuantity')?.value || 3);
+            const unitPrice = ltmCapPricingData.unitPrice;
+
+            const LTM_FEE = 50;
+            const subtotal = qty * unitPrice;
+            const total = subtotal + LTM_FEE;
+            const perPiece = total / qty;
+            const piecesNeeded = 8 - qty;
+
+            // Update display elements
+            const elements = {
+                ltmQtyDisplay: qty,
+                ltmUnitPrice: unitPrice.toFixed(2),
+                ltmSubtotal: subtotal.toFixed(2),
+                ltmTotal: total.toFixed(2),
+                ltmPerPiece: perPiece.toFixed(2),
+                ltmPiecesNeeded: piecesNeeded,
+                ltmTier2Price: ltmCapPricingData.tier2Price.toFixed(2)
+            };
+
+            Object.entries(elements).forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            });
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', initLTMCalculator);
     </script>
     <!-- Additional Logo Calculator Script -->
     <script src="/shared_components/js/additional-logo-cap-simple.js"></script>

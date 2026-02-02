@@ -814,6 +814,205 @@
     </style>
     <!-- Additional Logo Calculator -->
     <link rel="stylesheet" href="/shared_components/css/additional-logo-pricing-table.css">
+
+    <!-- LTM Calculator Styles -->
+    <style>
+        /* LTM Quick Calculator Component */
+        .ltm-calculator {
+            background: linear-gradient(135deg, #f8fdf8 0%, #eef7ee 100%);
+            border: 1px solid #c8e6c9;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.08);
+        }
+
+        .ltm-calculator-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ltm-calculator-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .ltm-calculator-header h4 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ltm-calculator-header span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .ltm-calculator-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .ltm-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ltm-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ltm-input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ltm-input-group select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .ltm-input-group select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .ltm-input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+        }
+
+        .ltm-result-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .ltm-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed #e0e0e0;
+        }
+
+        .ltm-breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .ltm-breakdown-row.subtotal {
+            color: var(--text-secondary);
+        }
+
+        .ltm-breakdown-row.fee {
+            color: #b45309;
+            font-weight: 500;
+        }
+
+        .ltm-breakdown-row.fee i {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .ltm-breakdown-row.total {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 6px;
+        }
+
+        .ltm-per-piece {
+            text-align: center;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ltm-per-piece-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 4px;
+        }
+
+        .ltm-per-piece-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .ltm-upsell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        .ltm-upsell i {
+            color: #f59e0b;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .ltm-upsell strong {
+            color: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ltm-calculator-body {
+                grid-template-columns: 1fr;
+            }
+
+            .ltm-calculator {
+                padding: 20px;
+            }
+
+            .ltm-per-piece-value {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 <body class="pricing-calculator-page">
 
@@ -973,7 +1172,7 @@
                     <div class="info-boxes">
                         <div class="info-box primary">
                             <i class="fas fa-check-circle"></i>
-                            <strong>Includes a Left Chest Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Setup Fee. Orders of 8+ pieces: Setup included in price.
+                            <strong>Includes a Left Chest Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Less Than Minimum Fee. Orders of 8+ pieces: No additional fee.
                         </div>
                         
                         <div class="info-box warning">
@@ -1006,7 +1205,64 @@
                     <!-- Pricing rows will be dynamically generated -->
                 </tbody>
             </table>
-            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Setup Fee</p>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee</p>
+
+            <!-- LTM Quick Calculator -->
+            <div class="ltm-calculator" id="ltmCalculator">
+                <div class="ltm-calculator-header">
+                    <i class="fas fa-calculator"></i>
+                    <h4>Small Order Calculator <span>(1-7 pieces)</span></h4>
+                </div>
+                <div class="ltm-calculator-body">
+                    <div class="ltm-input-section">
+                        <div class="ltm-input-group">
+                            <label for="ltmQuantity">Quantity</label>
+                            <select id="ltmQuantity">
+                                <option value="1">1 piece</option>
+                                <option value="2">2 pieces</option>
+                                <option value="3" selected>3 pieces</option>
+                                <option value="4">4 pieces</option>
+                                <option value="5">5 pieces</option>
+                                <option value="6">6 pieces</option>
+                                <option value="7">7 pieces</option>
+                            </select>
+                        </div>
+                        <div class="ltm-input-group">
+                            <label for="ltmSize">Size</label>
+                            <select id="ltmSize">
+                                <option value="base">S, M, L, XL</option>
+                                <option value="2XL">2XL</option>
+                                <option value="3XL">3XL</option>
+                                <option value="4XL">4XL</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ltm-result-section">
+                        <div class="ltm-breakdown">
+                            <div class="ltm-breakdown-row subtotal">
+                                <span><span id="ltmQtyDisplay">3</span> × $<span id="ltmUnitPrice">74.00</span></span>
+                                <span>$<span id="ltmSubtotal">222.00</span></span>
+                            </div>
+                            <div class="ltm-breakdown-row fee">
+                                <span><i class="fas fa-plus"></i>Less Than Minimum Fee</span>
+                                <span>$50.00</span>
+                            </div>
+                            <div class="ltm-breakdown-row total">
+                                <span>Total</span>
+                                <span>$<span id="ltmTotal">272.00</span></span>
+                            </div>
+                        </div>
+                        <div class="ltm-per-piece">
+                            <div class="ltm-per-piece-label">True Cost Per Piece</div>
+                            <div class="ltm-per-piece-value">$<span id="ltmPerPiece">90.67</span></div>
+                        </div>
+                        <div class="ltm-upsell">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Order <strong><span id="ltmPiecesNeeded">5</span> more</strong> to eliminate the $50 fee and pay just <strong>$<span id="ltmTier2Price">74.00</span>/piece</strong>!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         <!-- Additional Logo Pricing Table -->
         <div class="additional-logo-pricing-section">
@@ -1036,8 +1292,8 @@
                     </tr>
                 </tbody>
             </table>
-            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Setup Fee</p>
-            
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee</p>
+
             <div class="additional-logo-notes">
                 <p><strong>Note:</strong> Additional logos up to 8,000 stitches. Add $1.25 per 1,000 stitches over base.</p>
                 <p><small>Preferred locations: Right Chest, Left Sleeve, Right Sleeve</small></p>
@@ -1066,7 +1322,7 @@
                     </div>
                     <div class="order-info-content">
                         <div class="order-info-label">Orders of 1-7 pieces</div>
-                        <div class="order-info-text">$50 Setup Fee applies</div>
+                        <div class="order-info-text">$50 Less Than Minimum Fee applies</div>
                     </div>
                 </div>
                 
@@ -1352,7 +1608,10 @@
                 }
                 
                 updatePricing(pricingData);
-                
+
+                // Update LTM calculator with real pricing data
+                updateLTMPricingData(pricingData);
+
                 // Update breadcrumb to pass style back to product page
                 const productsBreadcrumb = document.getElementById('products-breadcrumb');
                 if (productsBreadcrumb) {
@@ -1396,6 +1655,9 @@
 
                 // Update pricing display
                 updatePricing(pricingData);
+
+                // Update LTM calculator with real pricing data
+                updateLTMPricingData(pricingData);
 
                 // Show product sections
                 showProduct();
@@ -2022,6 +2284,94 @@
             pricingSection.style.display = 'none';
             orderInfoSection.style.display = 'none';
         }
+
+        // ============================================
+        // LTM Quick Calculator
+        // ============================================
+
+        // Store pricing data for LTM calculator
+        let ltmPricingData = {
+            base: 74.00,    // Default S-XL price
+            '2XL': 76.00,
+            '3XL': 77.00,
+            '4XL': 78.00,
+            tier2Base: 74.00 // 8-23 tier price for upsell message
+        };
+
+        // Initialize LTM calculator when page loads
+        function initLTMCalculator() {
+            const qtySelect = document.getElementById('ltmQuantity');
+            const sizeSelect = document.getElementById('ltmSize');
+
+            if (qtySelect && sizeSelect) {
+                qtySelect.addEventListener('change', updateLTMCalculator);
+                sizeSelect.addEventListener('change', updateLTMCalculator);
+                updateLTMCalculator(); // Initial calculation
+            }
+        }
+
+        // Update LTM calculator prices from loaded pricing data
+        function updateLTMPricingData(pricingData) {
+            if (!pricingData || !pricingData.pricing) return;
+
+            // Get 1-7 tier prices for different sizes
+            const tier1_7 = pricingData.pricing['1-7'];
+            const tier8_23 = pricingData.pricing['8-23'];
+
+            if (tier1_7) {
+                // Find base price (S, M, L, or XL)
+                const basePrice = tier1_7['S'] || tier1_7['M'] || tier1_7['L'] || tier1_7['XL'] || tier1_7['SM'] || tier1_7['OSFA'];
+                if (basePrice) ltmPricingData.base = basePrice;
+
+                // Get extended size prices
+                if (tier1_7['2XL'] || tier1_7['XXL']) ltmPricingData['2XL'] = tier1_7['2XL'] || tier1_7['XXL'];
+                if (tier1_7['3XL'] || tier1_7['XXXL']) ltmPricingData['3XL'] = tier1_7['3XL'] || tier1_7['XXXL'];
+                if (tier1_7['4XL'] || tier1_7['XXXXL']) ltmPricingData['4XL'] = tier1_7['4XL'] || tier1_7['XXXXL'];
+            }
+
+            if (tier8_23) {
+                // Get 8-23 tier base price for upsell
+                const tier2BasePrice = tier8_23['S'] || tier8_23['M'] || tier8_23['L'] || tier8_23['XL'] || tier8_23['SM'] || tier8_23['OSFA'];
+                if (tier2BasePrice) ltmPricingData.tier2Base = tier2BasePrice;
+            }
+
+            console.log('📊 LTM Calculator pricing updated:', ltmPricingData);
+            updateLTMCalculator();
+        }
+
+        // Calculate and update LTM display
+        function updateLTMCalculator() {
+            const qty = parseInt(document.getElementById('ltmQuantity')?.value || 3);
+            const sizeKey = document.getElementById('ltmSize')?.value || 'base';
+
+            // Get unit price based on size selection
+            const unitPrice = sizeKey === 'base' ? ltmPricingData.base : (ltmPricingData[sizeKey] || ltmPricingData.base);
+
+            const LTM_FEE = 50;
+            const subtotal = qty * unitPrice;
+            const total = subtotal + LTM_FEE;
+            const perPiece = total / qty;
+            const piecesNeeded = 8 - qty;
+
+            // Update display elements
+            const elements = {
+                ltmQtyDisplay: qty,
+                ltmUnitPrice: unitPrice.toFixed(2),
+                ltmSubtotal: subtotal.toFixed(2),
+                ltmTotal: total.toFixed(2),
+                ltmPerPiece: perPiece.toFixed(2),
+                ltmPiecesNeeded: piecesNeeded,
+                ltmTier2Price: ltmPricingData.tier2Base.toFixed(2)
+            };
+
+            Object.entries(elements).forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            });
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', initLTMCalculator);
     </script>
     <!-- Additional Logo Calculator Script -->
     <script src="/shared_components/js/additional-logo-embroidery-simple.js"></script>

@@ -76,7 +76,10 @@
       "Bash(heroku auth:whoami:*)",
       "Bash(heroku git:remote:*)",
       "Bash(if not exist \"tests\\\\reports\" mkdir testsreports)",
-      "Bash(iconv:*)"
+      "Bash(iconv:*)",
+      "WebFetch(domain:www.customink.com)",
+      "WebFetch(domain:www.printful.com)",
+      "WebFetch(domain:www.printrenegades.com)"
     ],
     "deny": [],
     "ask": [],
