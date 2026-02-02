@@ -136,6 +136,7 @@
                                                 <option value="Left Sleeve">Left Sleeve</option>
                                                 <option value="Right Sleeve">Right Sleeve</option>
                                                 <option value="Full Back">Full Back (25K min)</option>
+                                                <option value="Additional Location">Additional Location</option>
                                             </select>
                                         </div>
                                         <div class="logo-form-field">
@@ -239,6 +240,7 @@
                                                 <option value="Cap Back">Cap Back</option>
                                                 <option value="Cap Left">Cap Left</option>
                                                 <option value="Cap Right">Cap Right</option>
+                                                <option value="Additional Location">Additional Location</option>
                                             </select>
                                         </div>
                                         <div class="logo-form-field">
@@ -2170,17 +2172,42 @@ Company:Absher Construction Company
             // Small delay for color selection to process
             await new Promise(resolve => setTimeout(resolve, 50));
 
-            // Set size quantities
+            // Set size quantities - handle both standard sizes and extended/tall sizes
+            // Extended sizes need child rows (same as ShopWorks import)
+            const rowIdNum = parseInt(rowId);
+
             for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
-                if (qty > 0) {
+                if (qty <= 0) continue;
+
+                // Check if this is an extended/tall size that needs a child row
+                // SIZE06_EXTENDED_SIZES is defined at module level and includes tall sizes
+                const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size.toUpperCase()) ||
+                                       SIZE06_EXTENDED_SIZES.includes(size);
+
+                if (isExtendedSize) {
+                    // Create child row for extended size (same pattern as ShopWorks import)
+                    console.log(`[addProductFromQuote] Creating child row for extended size: ${size} qty=${qty}`);
+                    createChildRow(rowIdNum, size, qty);
+                } else if (size === '2XL') {
+                    // 2XL goes in Size05 column but still needs a child row
+                    console.log(`[addProductFromQuote] Creating child row for 2XL qty=${qty}`);
+                    createChildRow(rowIdNum, '2XL', qty);
+                } else {
+                    // Standard size - find existing input
                     const sizeInput = row.querySelector(`input[data-size="${size}"]`);
-                    if (sizeInput) {
+                    if (sizeInput && !sizeInput.disabled) {
                         sizeInput.value = qty;
                         // Trigger change event to update totals
                         sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    } else {
+                        console.warn(`[addProductFromQuote] No input found for size ${size}, creating child row`);
+                        createChildRow(rowIdNum, size, qty);
                     }
                 }
             }
+
+            // Trigger pricing recalculation after all sizes are set
+            onSizeChange(rowIdNum);
         }
 
         /**
@@ -4888,6 +4915,8 @@ Company:Absher Construction Company
                 // Collect extended sizes from CHILD ROWS - GROUP BY COLOR
                 // Child rows may have different colors than parent
                 const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+                // BUG DIAGNOSTIC 2026-02-01: Log child row collection for tall-only products
+                console.log(`[collectProducts] Parent ${style} rowId=${rowId}, found ${childRows.length} child rows`);
                 childRows.forEach(childRow => {
                     const size = childRow.dataset.extendedSize;
                     const childColor = childRow.dataset.color;
@@ -4950,6 +4979,15 @@ Company:Absher Construction Company
                 if (a.isCap === b.isCap) return 0;
                 return a.isCap ? 1 : -1; // Garments first, caps last
             });
+
+            // BUG DIAGNOSTIC 2026-02-01: Log final products collected
+            console.log(`[collectProducts] Final products: ${products.length}`, products.map(p => ({
+                style: p.style,
+                color: p.color,
+                qty: p.totalQuantity,
+                sizes: Object.keys(p.sizeBreakdown).join(','),
+                isCap: p.isCap
+            })));
 
             return products;
         }
@@ -5530,7 +5568,19 @@ Company:Absher Construction Company
                         additional: capAdditionalLogos
                     }
                 };
+
+                // BUG DIAGNOSTIC 2026-02-01: Log products collected before pricing
+                console.log('[Embroidery] Products collected:', products.length, products.map(p => `${p.style}:${p.totalQuantity}`));
+
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+
+                // BUG DIAGNOSTIC 2026-02-01: Log pricing results
+                console.log('[Embroidery] Pricing products:', pricing.products?.length || 0);
+                if (pricing.products && pricing.products.length > 0) {
+                    pricing.products.forEach((pp, i) => {
+                        console.log(`[Embroidery] Pricing product ${i + 1}: ${pp.product?.style} - ${pp.lineItems?.length || 0} line items, subtotal: $${pp.subtotal?.toFixed(2)}`);
+                    });
+                }
 
                 // Get sales rep NAME from dropdown selected option text
                 const salesRepSelect = document.getElementById('sales-rep');

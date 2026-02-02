@@ -8,7 +8,7 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.7.0 - Fetches pricing from Caspio Service_Codes API
+ * @version 1.8.0 - Loads CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, GRT-75 from API
  * @date 2026-02-01
  */
 
@@ -80,16 +80,20 @@ class ShopWorksImportParser {
         };
 
         // Service code aliases for typo handling (kept in code per Erik's decision)
+        // Must stay in sync with caspio-pricing-proxy/src/routes/service-codes.js
         this.SERVICE_CODE_ALIASES = {
             'AONOGRAM': 'MONOGRAM',    // Common typo
             'NNAME': 'NAME',           // Common typo
             'NNAMES': 'NAME',          // Common typo
+            'NAMES': 'MONOGRAM',       // Plural "names" = monogramming
             'EJB': 'FB',               // Legacy code for Embroidered Jacket Back
             'FLAG': 'AL',              // Legacy code
             'SETUP': 'GRT-50',         // Shorthand for setup fee
-            'SETUP FEE': 'GRT-50',
+            'SETUP FEE': 'DD',         // Maps to digitizing setup
             'DESIGN PREP': 'GRT-75',   // Shorthand for design/graphic fee
-            'EXCESS STITCH': 'ART'     // Maps to art charge
+            'EXCESS STITCH': 'AS-GARM', // Additional stitches (garment)
+            'SECC': 'DECC',            // Typo for DECC (customer-supplied caps)
+            'SEW': 'SEG'               // Alias Sew → SEG (sewing)
         };
 
         // Invalid part numbers to skip
@@ -113,10 +117,11 @@ class ShopWorksImportParser {
             /^STK-/           // Stickers (non-apparel)
         ];
 
-        this.CAP_DISCOUNT = 0.20;           // -20% for caps
-        this.HEAVYWEIGHT_SURCHARGE = 10.00;  // +$10 for heavyweight
+        this.CAP_DISCOUNT = 0.20;           // -20% for caps (loaded from API if available)
+        this.HEAVYWEIGHT_SURCHARGE = 10.00;  // +$10 for heavyweight (loaded from API if available)
         this.LTM_THRESHOLD = 24;             // Less Than Minimum threshold
         this.LTM_FEE = 50.00;                // LTM fee amount (fallback)
+        this.GRT75_RATE = 75.00;             // GRT-75 hourly rate (loaded from API if available)
 
         // Monogram/Names pricing (fallback)
         this.MONOGRAM_PRICE = 12.50;
@@ -205,6 +210,27 @@ class ShopWorksImportParser {
         if (ltmRecord && ltmRecord.SellPrice) {
             this.LTM_FEE = ltmRecord.SellPrice;
             console.log('[ShopWorksImportParser] LTM fee from API:', this.LTM_FEE);
+        }
+
+        // Get CAP_DISCOUNT from API (2026-02-01 pricing audit)
+        const capDiscountRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'CAP-DISCOUNT');
+        if (capDiscountRecord && capDiscountRecord.SellPrice) {
+            this.CAP_DISCOUNT = capDiscountRecord.SellPrice;
+            console.log('[ShopWorksImportParser] CAP_DISCOUNT from API:', this.CAP_DISCOUNT);
+        }
+
+        // Get HEAVYWEIGHT_SURCHARGE from API (2026-02-01 pricing audit)
+        const heavyRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'HEAVYWEIGHT-SURCHARGE');
+        if (heavyRecord && heavyRecord.SellPrice) {
+            this.HEAVYWEIGHT_SURCHARGE = heavyRecord.SellPrice;
+            console.log('[ShopWorksImportParser] HEAVYWEIGHT_SURCHARGE from API:', this.HEAVYWEIGHT_SURCHARGE);
+        }
+
+        // Get GRT-75 rate from API (2026-02-01 pricing audit)
+        const grt75Record = this.serviceCodesData.find(sc => sc.ServiceCode === 'GRT-75');
+        if (grt75Record && grt75Record.SellPrice) {
+            this.GRT75_RATE = grt75Record.SellPrice;
+            console.log('[ShopWorksImportParser] GRT75_RATE from API:', this.GRT75_RATE);
         }
     }
 
@@ -559,11 +585,11 @@ class ShopWorksImportParser {
                 break;
 
             case 'graphic-design':
-                // GRT-75 is $75/hr, parse hours from quantity or description
+                // GRT-75 rate from API (fallback to $75/hr)
                 const hours = item.quantity || 1;
                 result.services.graphicDesign = {
                     hours: hours,
-                    amount: hours * 75
+                    amount: hours * (this.GRT75_RATE || 75)
                 };
                 break;
 
@@ -672,6 +698,47 @@ class ShopWorksImportParser {
                     isHeavyweight: false,
                     calculatedUnitPrice: deccPricing.unitPrice,
                     ltmFee: deccPricing.ltmFee
+                });
+                break;
+
+            case 'sewing':
+                // Sewing service (SEG - Sew Emblems to Garments) - manual pricing
+                if (!result.services.sewing) {
+                    result.services.sewing = [];
+                }
+                result.services.sewing.push({
+                    quantity: item.quantity,
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0,
+                    needsManualPricing: true
+                });
+                break;
+
+            case 'cs':
+                // Cap Side logo - same pricing as Cap Back
+                if (!result.services.additionalLogos) {
+                    result.services.additionalLogos = [];
+                }
+                result.services.additionalLogos.push({
+                    position: 'Cap Side',
+                    type: 'cs',
+                    quantity: item.quantity,
+                    description: item.description
+                });
+                break;
+
+            case 'additional-stitches':
+                // Additional stitches (AS-Garm or AS-CAP) - manual pricing
+                if (!result.services.additionalStitches) {
+                    result.services.additionalStitches = [];
+                }
+                const stitchType = item.partNumber.toUpperCase().includes('CAP') ? 'cap' : 'garment';
+                result.services.additionalStitches.push({
+                    type: stitchType,
+                    quantity: item.quantity,
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0,
+                    needsManualPricing: true
                 });
                 break;
 
@@ -806,6 +873,21 @@ class ShopWorksImportParser {
         // LTM (Less Than Minimum) fee
         if (pn === 'LTM') {
             return 'ltm';
+        }
+
+        // Sewing services (SEG = Sew Emblems to Garments)
+        if (pn === 'SEG') {
+            return 'sewing';
+        }
+
+        // Cap Side logo (same pricing as Cap Back)
+        if (pn === 'CS') {
+            return 'cs';
+        }
+
+        // Additional stitches (garment or cap) - manual pricing
+        if (pn === 'AS-GARM' || pn === 'AS-CAP') {
+            return 'additional-stitches';
         }
 
         // Everything else is a product
@@ -1106,4 +1188,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.7.0 - Caspio API integration');
+console.log('[ShopWorksImportParser] Module loaded v1.8.0 - API pricing for CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, GRT-75');

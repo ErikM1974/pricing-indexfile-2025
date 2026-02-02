@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-01-31
-**Total Active Files:** ~287 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard)
+**Last Updated:** 2026-02-01
+**Total Active Files:** ~288 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -316,7 +316,8 @@ cap-embroidery-fix.css
 | File | Purpose | Status |
 |------|---------|--------|
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
-| `/memory/SCREENPRINT_QUOTE_BUILDER.md` | **NEW** Screen Print Quote Builder 2026 documentation | ✅ Active |
+| `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
+| `/memory/EMBROIDERY_PRICING_RULES.md` | **NEW** Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |
@@ -510,6 +511,21 @@ cap-embroidery-fix.css
 5. **Additional Locations** (2 tests) - Multi-location pricing
 6. **Color Count** (2 tests) - 1-6 color validation
 7. **Complex Scenarios** (2 tests) - Combined features testing
+
+### Order Validation Tests (2026-02)
+| File | Purpose | Status |
+|------|---------|--------|
+| `/tests/validation/validate-2025-orders.js` | Validate 2025 embroidery orders against pricing system | ✅ Active |
+| `/tests/validation/known-vendors.js` | Non-SanMar vendor identification patterns (Carhartt infant, Rabbit Skins added 2026-02-01) | ✅ Active |
+| `/tests/validation/2025-orders-validation-report.json` | Generated validation report (not in git) | 📊 Output |
+| `/tests/validation/2025-oddballs-recommendations.csv` | **NEW** CSV export of 110 oddball items with recommendations | 📊 Output |
+
+**Run:** `node tests/validation/validate-2025-orders.js`
+
+**Purpose:** Analyzes 6,222 embroidery line items from 2025 to determine:
+- Which orders can be priced via the quote builder (service codes + SanMar products)
+- Which need manual lookup (non-SanMar vendors)
+- Which are oddballs (typos, free-text, comments)
 
 ## 🔄 Update Protocol
 

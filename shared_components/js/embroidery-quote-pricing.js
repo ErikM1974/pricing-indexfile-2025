@@ -41,7 +41,9 @@ class EmbroideryPricingCalculator {
         this.capAlTiers = {};        // Cap AL pricing (from CAP-AL endpoint)
         this.capInitialized = false; // Track cap pricing loaded
         this.capStitchCount = 8000;  // Fixed 8000 for caps
-        this.capRoundingMethod = 'HalfDollarUp'; // Caps use half-dollar rounding
+        // Default cap rounding - will be overridden by API in initializeCapConfig()
+        // See lines 388-391 where rulesR.RoundingMethod is loaded from CAP pricing bundle
+        this.capRoundingMethod = 'HalfDollarUp'; // Fallback: Caps use half-dollar rounding
         this.capAdditionalStitchRate = 1.00; // Cap default: $1.00/1K (vs Shirt $1.25/1K)
 
         // =========================================
@@ -61,7 +63,7 @@ class EmbroideryPricingCalculator {
 
         // Track API status
         this.apiError = false;
-        
+
         // Detailed API status tracking
         this.apiStatus = {
             mainPricing: false,      // Main embroidery pricing loaded
@@ -72,7 +74,11 @@ class EmbroideryPricingCalculator {
             criticalFailures: [],    // List of critical failures
             warnings: []             // List of non-critical warnings
         };
-        
+
+        // Promise caching for deduplication - prevents multiple concurrent API calls
+        this._initializePromise = null;
+        this._capInitializePromise = null;
+
         // Fetch configuration from API
         this.initialized = false;
         this.initializeConfig();
@@ -80,8 +86,25 @@ class EmbroideryPricingCalculator {
     
     /**
      * Initialize configuration from API
+     * PERF FIX 2026-02-01: Added promise caching to prevent duplicate API calls
+     * when initializeConfig() is called multiple times during page load
      */
     async initializeConfig() {
+        // Return cached promise if already initializing (prevents duplicate calls)
+        if (this._initializePromise) {
+            return this._initializePromise;
+        }
+
+        // Create and cache the initialization promise
+        this._initializePromise = this._doInitializeConfig();
+        return this._initializePromise;
+    }
+
+    /**
+     * Internal initialization implementation
+     * @private
+     */
+    async _doInitializeConfig() {
         try {
             console.log('[EmbroideryPricingCalculator] Fetching configuration from API...');
             
@@ -264,7 +287,9 @@ class EmbroideryPricingCalculator {
                 console.log(`[EmbroideryPricingCalculator] Loaded ${codes.length} service codes from database`);
 
                 // FB (Full Back) - stitch-based pricing
-                const fb = codes.find(c => c.ServiceCode === 'FB' && c.PricingMethod === 'STITCH_BASED');
+                // BUG FIX 2026-02-01: Removed PricingMethod filter - API may return null
+                // FB pricing is determined by ServiceCode alone; PricingMethod is metadata only
+                const fb = codes.find(c => c.ServiceCode === 'FB');
                 if (fb) {
                     this.fbBaseStitchCount = fb.StitchBase || 25000;
                     // FB stitch rate from SellPrice (per 1K stitches)
@@ -348,12 +373,28 @@ class EmbroideryPricingCalculator {
     /**
      * Initialize cap pricing configuration from CAP API endpoint
      * Called on-demand when a cap product is detected
+     * PERF FIX 2026-02-01: Added promise caching to prevent duplicate API calls
      */
     async initializeCapConfig() {
         if (this.capInitialized) {
             return; // Already loaded
         }
 
+        // Return cached promise if already initializing (prevents duplicate calls)
+        if (this._capInitializePromise) {
+            return this._capInitializePromise;
+        }
+
+        // Create and cache the initialization promise
+        this._capInitializePromise = this._doInitializeCapConfig();
+        return this._capInitializePromise;
+    }
+
+    /**
+     * Internal cap initialization implementation
+     * @private
+     */
+    async _doInitializeCapConfig() {
         console.log('[EmbroideryPricingCalculator] Initializing cap pricing configuration...');
 
         try {
@@ -406,8 +447,9 @@ class EmbroideryPricingCalculator {
                 if (alData && alData.allEmbroideryCostsR) {
                     this.capAlTiers = {};
                     alData.allEmbroideryCostsR.forEach(cost => {
-                        // Match AL-CAP (not 'AL') - API returns ItemType='AL-CAP' for cap additional logos
-                        if (cost.ItemType === 'AL-CAP') {
+                        // BUG FIX 2026-02-01: Accept both 'AL-CAP' and 'AL' ItemTypes
+                        // API may return either depending on how CAP-AL endpoint is configured
+                        if (cost.ItemType === 'AL-CAP' || cost.ItemType === 'AL') {
                             this.capAlTiers[cost.TierLabel] = {
                                 embCost: cost.EmbroideryCost,
                                 baseStitchCount: cost.BaseStitchCount || 5000,
@@ -598,6 +640,30 @@ class EmbroideryPricingCalculator {
 
             if (availablePrices.length > 0) {
                 standardBasePrice = availablePrices[0][1];
+            }
+        }
+
+        // FIX 2026-02-02: For caps without standard sizes, try product's actual sizes
+        if (standardBasePrice === 0 && product.sizeBreakdown) {
+            console.warn(`[EmbroideryPricingCalculator] Trying cap's ordered sizes for ${product.style}`);
+
+            for (const orderedSize of Object.keys(product.sizeBreakdown)) {
+                const sizePrice = priceData.basePrices[orderedSize];
+                if (sizePrice && sizePrice > 0) {
+                    standardBasePrice = sizePrice;
+                    console.log(`[EmbroideryPricingCalculator] Found cap price from ordered size ${orderedSize}: $${standardBasePrice}`);
+                    break;
+                }
+            }
+        }
+
+        // FIX 2026-02-02: Last resort - use highest available price
+        if (standardBasePrice === 0 && priceData.basePrices) {
+            const allSizes = Object.entries(priceData.basePrices);
+            if (allSizes.length > 0) {
+                allSizes.sort((a, b) => a[1] - b[1]);
+                standardBasePrice = allSizes[allSizes.length - 1][1];
+                console.warn(`[EmbroideryPricingCalculator] Cap last resort: using price $${standardBasePrice}`);
             }
         }
 
@@ -833,6 +899,36 @@ class EmbroideryPricingCalculator {
                 baseSize = availableSizes[0][0];
                 standardBasePrice = availableSizes[0][1];
                 console.log(`[EmbroideryPricingCalculator] Using ${baseSize} as base size with price $${standardBasePrice}`);
+            }
+        }
+
+        // FIX 2026-02-02: For tall-only products, try to find price from product's actual sizes
+        // This handles cases where API returns pricing keyed by the ordered size (e.g., '2XLT')
+        if (standardBasePrice === 0 && product.sizeBreakdown) {
+            console.warn(`[EmbroideryPricingCalculator] Trying product's ordered sizes for ${product.style}`);
+
+            for (const orderedSize of Object.keys(product.sizeBreakdown)) {
+                const sizePrice = priceData.basePrices[orderedSize];
+                if (sizePrice && sizePrice > 0) {
+                    baseSize = orderedSize;
+                    standardBasePrice = sizePrice;
+                    console.log(`[EmbroideryPricingCalculator] Found price from ordered size ${orderedSize}: $${standardBasePrice}`);
+                    break;
+                }
+            }
+        }
+
+        // FIX 2026-02-02: Last resort - use highest available price if all else fails
+        // Better to use this than to drop the product entirely
+        if (standardBasePrice === 0 && priceData.basePrices) {
+            const allSizes = Object.entries(priceData.basePrices);
+            if (allSizes.length > 0) {
+                // Sort by price ascending
+                allSizes.sort((a, b) => a[1] - b[1]);
+                // Use the highest-priced size as base (more accurate for tall products)
+                baseSize = allSizes[allSizes.length - 1][0];
+                standardBasePrice = allSizes[allSizes.length - 1][1];
+                console.warn(`[EmbroideryPricingCalculator] Last resort: using ${baseSize} with price $${standardBasePrice}`);
             }
         }
 

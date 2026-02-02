@@ -30,15 +30,13 @@
 
 ## Service Code Data
 
-### Digitizing Services (DD, DGT)
+### Digitizing Services (DD)
+
+**Note (2026-02-01):** Digitizing is a FLAT $100 fee handled manually per order. The tiered DGT-001 through DGT-004 codes are obsolete and no longer used.
 
 | ServiceCode | ServiceType | DisplayName | Category | PricingMethod | TierLabel | UnitCost | SellPrice | PerUnit | QuoteBuilderField | Position | StitchBase | IsActive |
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
-| DD | DIGITIZING | Digitizing (Legacy) | Digitizing | FLAT | - | 0 | 0 | per order | digitizing | - | NULL | TRUE |
-| DGT-001 | DIGITIZING | Small Design (<5K stitches) | Digitizing | FLAT | - | 25 | 50 | per design | digitizing | - | 5000 | TRUE |
-| DGT-002 | DIGITIZING | Medium Design (5K-10K stitches) | Digitizing | FLAT | - | 35 | 75 | per design | digitizing | - | 10000 | TRUE |
-| DGT-003 | DIGITIZING | Large Design (10K-15K stitches) | Digitizing | FLAT | - | 50 | 100 | per design | digitizing | - | 15000 | TRUE |
-| DGT-004 | DIGITIZING | Extra Large Design (15K+ stitches) | Digitizing | FLAT | - | 75 | 150 | per design | digitizing | - | 20000 | TRUE |
+| DD | DIGITIZING | Digitizing | Digitizing | FLAT | - | 0 | 0 | per order | digitizing | - | NULL | TRUE |
 
 ### Apparel Left Chest (AL) - Standard Embroidery Tiers
 
@@ -49,16 +47,19 @@
 | AL-48-71 | EMBROIDERY | Apparel Left Chest 48-71 pcs | Apparel Left Chest | TIERED | 48-71 | 5.25 | 10.50 | each | leftChest | LC | 8000 | TRUE |
 | AL-72+ | EMBROIDERY | Apparel Left Chest 72+ pcs | Apparel Left Chest | TIERED | 72+ | 4.75 | 9.50 | each | leftChest | LC | 8000 | TRUE |
 
-### Flat Back (FB) - Full Back Embroidery Tiers
+### Full Back (FB) - Stitch-Based Pricing
+
+**Note (2026-02-01):** FB uses STITCH-BASED pricing, NOT tiers. ALL stitches charged at $1.25/1K, minimum 25K stitches = $31.25 minimum.
+
+**CRITICAL - Special Handling in Code:**
+1. FB pricing is determined by `ServiceCode === 'FB'` only - do NOT filter by `PricingMethod`
+2. The API may return `PricingMethod: null` in some cases, so filtering by `STITCH_BASED` can miss the record
+3. Unlike other positions (LC, RC, etc.) where only EXCESS stitches over 8K are charged, FB charges for ALL stitches
+4. See `/memory/EMBROIDERY_PRICING_RULES.md` for complete Full Back pricing formula
 
 | ServiceCode | ServiceType | DisplayName | Category | PricingMethod | TierLabel | UnitCost | SellPrice | PerUnit | QuoteBuilderField | Position | StitchBase | IsActive |
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
-| FB-1-11 | EMBROIDERY | Flat Back 1-11 pcs | Flat Back | TIERED | 1-11 | TBD | TBD | each | flatBack | FB | 15000 | TRUE |
-| FB-12-23 | EMBROIDERY | Flat Back 12-23 pcs | Flat Back | TIERED | 12-23 | TBD | TBD | each | flatBack | FB | 15000 | TRUE |
-| FB-24-47 | EMBROIDERY | Flat Back 24-47 pcs | Flat Back | TIERED | 24-47 | TBD | TBD | each | flatBack | FB | 15000 | TRUE |
-| FB-48+ | EMBROIDERY | Flat Back 48+ pcs | Flat Back | TIERED | 48+ | TBD | TBD | each | flatBack | FB | 15000 | TRUE |
-
-**Note:** FB pricing needs research - different tier structure than AL (1-11, 12-23, 24-47, 48+ vs AL's 1-23, 24-47, 48-71, 72+).
+| FB | EMBROIDERY | Full Back (Stitch-Based) | Full Back | STITCH_BASED | ALL | 0.625 | 1.25 | per 1000 stitches | fullBack | FB | 25000 | TRUE |
 
 ### Cap Back (CB) - Uses Same Tiers as Cap AL
 
@@ -100,13 +101,27 @@
 | DECC-72-143 | DECORATION | Cap Decoration 72-143 pcs | Decoration Caps | TIERED | 72-143 | 10.00 | 20.00 | each | decorationCap | CAP | 8000 | TRUE |
 | DECC-144+ | DECORATION | Cap Decoration 144+ pcs | Decoration Caps | TIERED | 144+ | 6.00 | 12.00 | each | decorationCap | CAP | 8000 | TRUE |
 
-### Fees (GRT, RUSH)
+### Fees (GRT, RUSH, LTM, ART, SEG)
 
 | ServiceCode | ServiceType | DisplayName | Category | PricingMethod | TierLabel | UnitCost | SellPrice | PerUnit | QuoteBuilderField | Position | StitchBase | IsActive |
 |-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
 | GRT-50 | FEE | Setup Fee (Standard) | Fees | FLAT | - | 25.00 | 50.00 | per order | setupFee | - | NULL | TRUE |
 | GRT-75 | FEE | Design Prep Fee | Fees | FLAT | - | 37.50 | 75.00 | per hour | designPrepFee | - | NULL | TRUE |
 | RUSH | RUSH | Rush Order Fee | Fees | FLAT | - | 0 | 50.00 | per order | rushFee | - | NULL | TRUE |
+| LTM | FEE | Less Than Minimum Fee | Fees | FLAT | - | 25.00 | 50.00 | per order | ltmFee | - | NULL | TRUE |
+| ART | FEE | Art Charge | Fees | FLAT | - | 0 | 0 | varies | artCharge | - | NULL | TRUE |
+| SEG | FEE | Sew Emblems to Garments | Fees | FLAT | - | 2.50 | 5.00 | per emblem | sewingFee | - | NULL | TRUE |
+
+### Configuration Values (CONFIG)
+
+| ServiceCode | ServiceType | DisplayName | Category | PricingMethod | TierLabel | UnitCost | SellPrice | PerUnit | QuoteBuilderField | Position | StitchBase | IsActive |
+|-------------|-------------|-------------|----------|---------------|-----------|----------|-----------|---------|-------------------|----------|------------|----------|
+| STITCH-RATE | CONFIG | Garment Stitch Rate | Config | CONFIG | - | 0.625 | 1.25 | per 1000 stitches | additionalStitchRate | - | 8000 | TRUE |
+| CAP-STITCH-RATE | CONFIG | Cap Stitch Rate | Config | CONFIG | - | 0.50 | 1.00 | per 1000 stitches | capAdditionalStitchRate | - | 5000 | TRUE |
+| PUFF-UPCHARGE | CONFIG | 3D Puff Upcharge | Config | CONFIG | - | 2.50 | 5.00 | per cap | puffUpchargePerCap | - | NULL | TRUE |
+| PATCH-UPCHARGE | CONFIG | Laser Patch Upcharge | Config | CONFIG | - | 2.50 | 5.00 | per cap | patchUpchargePerCap | - | NULL | TRUE |
+| CAP-DISCOUNT | CONFIG | Cap Discount Percentage | Config | CONFIG | - | 0 | 0.20 | multiplier | capDiscount | - | NULL | TRUE |
+| HEAVYWEIGHT-SURCHARGE | CONFIG | Heavyweight Garment Surcharge | Config | CONFIG | - | 5.00 | 10.00 | per garment | heavyweightSurcharge | - | NULL | TRUE |
 
 ---
 
@@ -118,11 +133,16 @@ For handling common typos and legacy code references. These should be implemente
 |---------------------|---------|-------|
 | Aonogram | Monogram | Common typo (A key near M on keyboard) |
 | Nname | Name | Common typo (double N) |
-| Names | Name | Plural form used inconsistently |
+| Nnames | Name | Common typo (double N, plural) |
+| Names | Monogram | Plural "names" = monogramming |
 | EJB | FB | Legacy code for Flat Back (Embroidered Jacket Back) |
 | Flag | AL | Legacy code for Apparel Left (chest) position |
 | Setup | GRT-50 | Common shorthand for setup fee |
+| Setup Fee | DD | Maps to digitizing setup |
 | Design Prep | GRT-75 | Common shorthand for design prep/graphic design fee |
+| Excess Stitch | AS-GARM | Additional stitches (garment) |
+| SECC | DECC | Typo for DECC (customer-supplied caps) |
+| SEW | SEG | Alias for sewing |
 
 ### Implementation Example
 
@@ -272,3 +292,4 @@ ORDER BY
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-02-01 | Initial documentation created with complete schema and sample data | Claude |
+| 2026-02-01 | Pricing audit: Updated FB to stitch-based pricing, removed obsolete DGT-001 through DGT-004 (digitizing is $100 flat), added SEG, CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, updated alias table | Claude |

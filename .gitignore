@@ -92,3 +92,9 @@ _ul
 .claude/settings.local.json
 .claude/settings.local.json
 .claude/settings.local.json
+memory/CSV_ORDER_VALIDATION.md
+memory/EMBROIDERY_PRICING_RULES.md
+tests/validation/2025-orders-validation-report.json
+tests/validation/known-vendors.js
+tests/validation/validate-2025-orders.js
+ACTIVE_FILES.md

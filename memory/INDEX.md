@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-02-01 (added Service_Codes Caspio table design)
+**Last Updated:** 2026-02-01 (added CSV_ORDER_VALIDATION.md for 2025 order analysis)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -46,11 +46,13 @@
 ├── CUSTOMER_LOOKUP_SYSTEM.md         # Customer autocomplete for quote builders
 ├── SHOPWORKS_IMPORT_PLAN.md          # ShopWorks order text import for quote builders (IMPLEMENTED 2026-01-31)
 ├── SERVICE_CODES_TABLE.md            # **NEW** Caspio Service_Codes table design (2026-02-01)
+├── CSV_ORDER_VALIDATION.md           # **NEW** 2025 embroidery order validation (line item classification)
 │
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture
 ├── EMBROIDERY_QUOTE_BUILDER.md       # Embroidery quote builder implementation
-├── LASER_PATCH_IMPLEMENTATION.md     # **NEW** Laser leatherette patch feature (caps)
+├── EMBROIDERY_PRICING_RULES.md       # **NEW** Complete embroidery pricing formulas reference
+├── LASER_PATCH_IMPLEMENTATION.md     # Laser leatherette patch feature (caps)
 ├── SCREENPRINT_QUOTE_BUILDER.md      # Screen print quote builder implementation
 │
 ├── # Calculator Implementation Files
@@ -154,6 +156,7 @@
 | Quote Builder Architecture | [QUOTE_BUILDER_ARCHITECTURE.md](./QUOTE_BUILDER_ARCHITECTURE.md) |
 | **Shareable Quote URLs** | **[quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md](./quote-builders/SHAREABLE_QUOTE_BLUEPRINT.md)** - Add to any builder |
 | Embroidery Quote Builder | [EMBROIDERY_QUOTE_BUILDER.md](./EMBROIDERY_QUOTE_BUILDER.md) |
+| **Embroidery Pricing Rules** | **[EMBROIDERY_PRICING_RULES.md](./EMBROIDERY_PRICING_RULES.md)** - Complete pricing formulas, FB, AL, caps |
 | **Laser Patch Feature** | **[LASER_PATCH_IMPLEMENTATION.md](./LASER_PATCH_IMPLEMENTATION.md)** - Caps, GRT-50 setup, bugs & fixes |
 | Screenprint Quote Builder | [SCREENPRINT_QUOTE_BUILDER.md](./SCREENPRINT_QUOTE_BUILDER.md) |
 | Pricing Calculator | [PRICING_CALCULATOR_GUIDE.md](./PRICING_CALCULATOR_GUIDE.md) → [/templates/](./templates/) |
