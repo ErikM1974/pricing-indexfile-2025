@@ -4,34 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Customer Supplied Embroidery Calculator - Northwest Custom Apparel</title>
+    <title>Customer Supplied Embroidery Pricing - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Shared Calculator Styles -->
     <link href="../../shared_components/css/calculator-base.css" rel="stylesheet">
     <!-- Customer Embroidery-Specific Styles -->
     <link href="embroidery-customer-styles.css" rel="stylesheet">
-    
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- Base Quote Service -->
-    <script src="../../shared_components/js/base-quote-service.js"></script>
-    <!-- Calculator Utilities -->
-    <script src="../../shared_components/js/calculator-utilities.js"></script>
-    <!-- Customer Embroidery Quote Service -->
-    <script src="embroidery-customer-quote-service.js"></script>
-    <!-- Customer Embroidery Calculator Class -->
-    <script src="embroidery-customer-calculator.js"></script>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
                      alt="Northwest Custom Apparel" class="logo">
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Dashboard</a>
@@ -40,9 +28,9 @@
                 </nav>
             </div>
             <div class="header-right">
-                <button class="help-btn" onclick="printQuote()">
+                <button class="help-btn" onclick="window.print()">
                     <i class="fas fa-print"></i>
-                    Print Quote
+                    Print Page
                 </button>
             </div>
         </div>
@@ -52,212 +40,186 @@
     <main class="main-container">
         <h1 class="calculator-title">
             <i class="fas fa-hand-holding"></i>
-            Customer Supplied Embroidery Calculator
+            Customer Supplied Embroidery Pricing 2026
         </h1>
+        <p class="subtitle">Quick reference for embroidery on customer-provided items</p>
 
-        <!-- Product Showcase Section -->
-        <div class="product-showcase">
-            <div class="product-showcase-inner">
-                <div class="product-showcase-image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094659" 
-                         alt="Customer Supplied Embroidery Services" 
-                         title="Professional Embroidery on Your Items">
+        <!-- LTM Warning Banner -->
+        <div class="ltm-banner">
+            <i class="fas fa-info-circle"></i>
+            <strong>Less Than Minimum (LTM):</strong> Orders of 1-7 pieces include a $50 LTM fee
+        </div>
+
+        <!-- Pricing Matrices Grid -->
+        <div class="matrices-grid">
+            <!-- Garments Matrix -->
+            <div class="matrix-card">
+                <div class="matrix-header garment-header">
+                    <i class="fas fa-tshirt"></i>
+                    <h2>Garments</h2>
+                    <span class="upcharge-badge">+$1.25/1K above 8K</span>
                 </div>
-                <div class="product-showcase-content">
-                    <h3><i class="fas fa-star"></i> Embroidery on Customer-Supplied Items</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Bring your own garments and let us add professional embroidery that elevates your brand. 
-                        Perfect for teams with existing uniforms, special event apparel, or when you have specific 
-                        items you want customized. We handle your items with care and deliver exceptional results.
-                    </p>
-                    <div class="product-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Bring your own items</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Professional handling</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Volume discounts</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Quick turnaround</span>
-                        </div>
+                <div class="matrix-scroll">
+                    <table class="pricing-matrix" id="garmentsMatrix">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-col">1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th class="best-col">72+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Caps Matrix -->
+            <div class="matrix-card">
+                <div class="matrix-header cap-header">
+                    <i class="fas fa-hat-cowboy"></i>
+                    <h2>Caps</h2>
+                    <span class="upcharge-badge">+$1.00/1K above 8K</span>
+                </div>
+                <div class="matrix-scroll">
+                    <table class="pricing-matrix" id="capsMatrix">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-col">1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th class="best-col">72+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Back Matrix -->
+        <div class="matrix-card full-width">
+            <div class="matrix-header fullback-header">
+                <i class="fas fa-expand-arrows-alt"></i>
+                <h2>Full Back Embroidery</h2>
+                <span class="upcharge-badge">Min 8 pieces, Min 25K stitches</span>
+            </div>
+            <div class="fullback-rates">
+                <div class="rate-item">
+                    <span class="tier-label">8-23 pcs</span>
+                    <span class="rate">$1.40/1K</span>
+                </div>
+                <div class="rate-item">
+                    <span class="tier-label">24-47 pcs</span>
+                    <span class="rate">$1.30/1K</span>
+                </div>
+                <div class="rate-item">
+                    <span class="tier-label">48-71 pcs</span>
+                    <span class="rate">$1.25/1K</span>
+                </div>
+                <div class="rate-item">
+                    <span class="tier-label best-tier">72+ pcs</span>
+                    <span class="rate">$1.20/1K</span>
+                </div>
+            </div>
+            <div class="matrix-scroll">
+                <table class="pricing-matrix" id="fullBackMatrix">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th>8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th class="best-col">72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Calculator -->
+        <div class="quick-calc-card">
+            <div class="quick-calc-header">
+                <i class="fas fa-calculator"></i>
+                <h2>Quick Calculator</h2>
+            </div>
+            <div class="quick-calc-body">
+                <div class="calc-inputs">
+                    <div class="input-group">
+                        <label for="itemType">Item Type</label>
+                        <select id="itemType" class="calc-select">
+                            <option value="garment">Garment</option>
+                            <option value="cap">Cap</option>
+                            <option value="fullback">Full Back</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" class="calc-input" placeholder="e.g. 24" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="stitches">Stitch Count</label>
+                        <input type="number" id="stitches" class="calc-input" placeholder="e.g. 8000" min="1000" step="1000" value="8000">
+                    </div>
+                    <div class="input-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="heavyweight">
+                            Heavy/Difficult Item (+$10)
+                        </label>
+                    </div>
+                </div>
+                <div class="calc-results">
+                    <div class="result-row" id="baseRow" style="display: none;">
+                        <span id="baseLabel">Base (8K):</span>
+                        <span id="basePrice" class="result-value">$0.00</span>
+                    </div>
+                    <div class="result-row" id="extraStitchRow" style="display: none;">
+                        <span id="extraStitchLabel">+0K:</span>
+                        <span id="extraStitchPrice" class="result-value extra-stitch-value">+$0.00</span>
+                    </div>
+                    <div class="result-row" id="heavyweightRow" style="display: none;">
+                        <span>Heavyweight:</span>
+                        <span id="heavyweightPrice" class="result-value">+$10.00</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Unit Price:</span>
+                        <span id="unitPrice" class="result-value">$0.00</span>
+                    </div>
+                    <div class="result-row" id="ltmRow" style="display: none;">
+                        <span>LTM Fee:</span>
+                        <span id="ltmFee" class="result-value ltm-value">+$50.00</span>
+                    </div>
+                    <div class="result-row" id="errorRow" style="display: none;">
+                        <span id="errorMessage" class="error-message"></span>
+                    </div>
+                    <div class="result-row total-row">
+                        <span>Total:</span>
+                        <span id="totalPrice" class="result-value total-value">$0.00</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="calculator-grid">
-            <!-- Input Section -->
-            <div class="card">
-                <h2 class="card-title">Quote Details</h2>
-                
-                <div class="form-group">
-                    <label>1. Select Item Type</label>
-                    <div class="selector-group">
-                        <button class="selector-btn active" data-item-type="flats">Flats (Jackets, etc.)</button>
-                        <button class="selector-btn" data-item-type="caps">Caps (-20% Price)</button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="quantity">2. Enter Quantity</label>
-                    <input type="number" 
-                           id="quantity" 
-                           class="form-control" 
-                           placeholder="Enter quantity"
-                           min="1">
-                </div>
-
-                <div class="switch-container" id="heavyweight-container">
-                    <label for="isHeavyweight">Heavy/Difficult Item? (Add $10.00)</label>
-                    <label class="switch">
-                        <input type="checkbox" id="isHeavyweight">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <!-- Add-on Order Toggle -->
-                <div class="addon-toggle-container">
-                    <label for="isAddon" style="font-weight: 600; color: var(--primary-color);">
-                        <i class="fas fa-plus-circle"></i>
-                        This is an add-on to an existing order
-                    </label>
-                    <label class="switch">
-                        <input type="checkbox" id="isAddon">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <!-- Add-on Order Details -->
-                <div class="addon-section hidden" id="addonSection">
-                    <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--primary-color);">
-                        <i class="fas fa-info-circle"></i>
-                        Main Order Details
-                    </h4>
-                    
-                    <div class="addon-grid">
-                        <div class="form-group">
-                            <label for="mainOrderQty">Items purchasing from us</label>
-                            <input type="number" 
-                                   id="mainOrderQty" 
-                                   class="form-control" 
-                                   placeholder="e.g. 24"
-                                   min="1">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mainOrderValue">Main order value ($)</label>
-                            <input type="number" 
-                                   id="mainOrderValue" 
-                                   class="form-control" 
-                                   placeholder="e.g. 1200.00"
-                                   min="0"
-                                   step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="addon-summary">
-                        <div class="addon-summary-item">
-                            <span>Items from NWCA:</span>
-                            <span id="summaryMainQty">0</span>
-                        </div>
-                        <div class="addon-summary-item">
-                            <span>Customer supplied:</span>
-                            <span id="summaryAddonQty">0</span>
-                        </div>
-                        <div class="addon-summary-item" style="font-weight: 600; border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.25rem;">
-                            <span>Total quantity:</span>
-                            <span id="summaryTotalQty">0</span>
-                        </div>
-                    </div>
-                    
-                    <div id="discountIndicator" class="discount-indicator" style="display: none;">
-                        <i class="fas fa-tag"></i>
-                        <span id="discountText">Calculating discount...</span>
-                    </div>
-                </div>
-
-                <!-- Program Account Toggle -->
-                <div class="program-account-container">
-                    <label for="isProgramAccount" style="font-weight: 600; color: #7c3aed;">
-                        <i class="fas fa-shield-alt"></i>
-                        Program Account (Police, Fire, Schools)
-                        <span class="program-badge" id="programBadge" style="display: none;">
-                            <i class="fas fa-check"></i>
-                            25% Discount Applied
-                        </span>
-                    </label>
-                    <label class="switch">
-                        <input type="checkbox" id="isProgramAccount">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-            </div>
-
-            <!-- Results Section -->
-            <div class="card">
-                <div class="results-section">
-                    <div class="results-header">
-                        <h3 class="card-title">Your Quote</h3>
-                        <div class="price-display prompt" id="priceDisplay">Enter Quantity</div>
-                        <div class="price-label">Price per Item</div>
-                    </div>
-                    
-                    <div class="summary-section">
-                        <div id="ltmWarning" class="ltm-warning" style="display: none;">
-                            <i class="fas fa-info-circle"></i>
-                            <span id="ltmMessage"></span>
-                        </div>
-                        
-                        <div class="summary-item">
-                            <span>Base Price:</span>
-                            <span id="basePrice">$0.00</span>
-                        </div>
-                        
-                        <div class="summary-item" id="capDiscountRow" style="display: none;">
-                            <span>Cap Discount (20%):</span>
-                            <span id="capDiscount">-$0.00</span>
-                        </div>
-                        
-                        <div class="summary-item" id="heavyweightRow" style="display: none;">
-                            <span>Heavyweight Surcharge:</span>
-                            <span id="heavyweightCharge">+$10.00</span>
-                        </div>
-                        
-                        <div class="summary-item" id="ltmRow" style="display: none;">
-                            <span>Less Than Minimum Fee:</span>
-                            <span id="ltmCharge">+$0.00</span>
-                        </div>
-                        
-                        <div class="summary-item" id="addonDiscountRow" style="display: none;">
-                            <span id="addonDiscountLabel">Add-on Discount:</span>
-                            <span id="addonDiscount">-$0.00</span>
-                        </div>
-                        
-                        <div class="summary-item" id="programDiscountRow" style="display: none;">
-                            <span>Program Account Discount (25%):</span>
-                            <span id="programDiscount">-$0.00</span>
-                        </div>
-                        
-                        <div class="summary-item total">
-                            <span>Total Order Cost:</span>
-                            <span id="totalDisplay">$0.00</span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" id="emailQuoteBtn" style="width: 100%; margin-top: 1.5rem; display: none;">
-                        <i class="fas fa-envelope"></i>
-                        Email This Quote
-                    </button>
-                </div>
-            </div>
+        <!-- Notes Section -->
+        <div class="notes-card">
+            <h3><i class="fas fa-clipboard-list"></i> Notes</h3>
+            <ul>
+                <li><strong>Heavyweight Surcharge:</strong> +$10/piece (Carhartt jackets, bags, canvas items, leather, difficult materials)</li>
+                <li><strong>LTM Fee:</strong> $50 flat fee for orders of 1-7 pieces (added to order total, not per piece)</li>
+                <li><strong>Full Back:</strong> Minimum 8 pieces, minimum 25,000 stitches - runs on 8-head machines</li>
+                <li><strong>Base Prices:</strong> Based on 8,000 stitch count - add upcharge for additional stitches</li>
+            </ul>
         </div>
 
         <!-- Notice Section -->
@@ -267,141 +229,19 @@
                 Important Notice: Customer Supplied Garments
             </h2>
             <p>
-                Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments during 
-                the production process in either our screening or embroidery departments. Should one or all of your 
-                items be damaged while in our facility, Northwest Custom Apparel WILL NOT reimburse you for the value 
+                Northwest Custom Apparel is not responsible for the damage of ANY customer supplied garments during
+                the production process in either our screening or embroidery departments. Should one or all of your
+                items be damaged while in our facility, Northwest Custom Apparel WILL NOT reimburse you for the value
                 of the garments or replace them.
             </p>
             <p>
-                Please note that we try very hard to take extreme care when dealing with customer supplied goods. 
-                It is a very rare occurrence that goods are damaged in our facility. Due to the nature of the high 
+                Please note that we try very hard to take extreme care when dealing with customer supplied goods.
+                It is a very rare occurrence that goods are damaged in our facility. Due to the nature of the high
                 end equipment used in production there is a chance for machine or human error.
             </p>
         </div>
     </main>
 
-    <!-- Email Modal -->
-    <div class="modal-overlay" id="emailModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3 class="modal-title">Send Quote</h3>
-                <button class="modal-close" onclick="closeEmailModal()">×</button>
-            </div>
-            <form id="quoteForm">
-                <div class="modal-body">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="customerName">Customer Name *</label>
-                            <input type="text" class="form-control" id="customerName" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="companyName">Company Name</label>
-                            <input type="text" class="form-control" id="companyName">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="customerEmail">Customer Email *</label>
-                            <input type="email" class="form-control" id="customerEmail" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="customerPhone">Phone Number</label>
-                            <input type="tel" class="form-control" id="customerPhone">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label for="projectName">Project/Order Name</label>
-                        <input type="text" class="form-control" id="projectName" placeholder="e.g., Police Department Uniforms">
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label for="salesRep">Sales Representative *</label>
-                        <select class="form-control" id="salesRep" required>
-                            <option value="sales@nwcustomapparel.com" selected>General Sales</option>
-                            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                            <option value="taylar@nwcustomapparel.com">Taylar Hanson</option>
-                            <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                            <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                            <option value="art@nwcustomapparel.com">Steve Deland</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label for="notes">Notes</label>
-                        <textarea class="form-control" id="notes" rows="3" placeholder="Special instructions or additional information..."></textarea>
-                    </div>
-                    
-                    <div class="quote-preview">
-                        <h4>Quote Preview</h4>
-                        <div id="quotePreview"></div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="sendEmailBtn">
-                        <i class="fas fa-paper-plane"></i>
-                        Send Quote
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div class="modal-overlay" id="successModal">
-        <div class="modal-container" style="max-width: 500px;">
-            <div class="modal-header" style="background: #10b981;">
-                <h3 class="modal-title">Quote Sent Successfully!</h3>
-                <button class="modal-close" onclick="closeSuccessModal()">×</button>
-            </div>
-            <div class="modal-body" style="text-align: center; padding: 2.5rem;">
-                <div style="margin-bottom: 2rem;">
-                    <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem; display: block;"></i>
-                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                        Your quote has been sent successfully!
-                    </p>
-                </div>
-                
-                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
-                    <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary); font-size: 0.875rem;">Your Quote ID:</p>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
-                        <h2 id="successQuoteID" style="margin: 0; font-size: 2rem; color: var(--primary-color); letter-spacing: 0.05em;">EMBC-0000-0</h2>
-                        <button class="btn btn-secondary" onclick="copyQuoteID()" style="padding: 0.5rem 1rem;">
-                            <i class="fas fa-copy"></i>
-                            Copy
-                        </button>
-                    </div>
-                </div>
-                
-                <div style="background: #e8f4fd; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; font-size: 0.875rem; color: #1e40af;">
-                    <i class="fas fa-info-circle"></i>
-                    Please save this Quote ID for your records. You'll need it to reference this quote.
-                </div>
-                
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button class="btn btn-primary" onclick="printQuote()">
-                        <i class="fas fa-print"></i>
-                        Print Quote
-                    </button>
-                    <button class="btn btn-secondary" onclick="closeSuccessModal()">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Initialize calculator when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            window.customerEmbroideryCalculator = new CustomerEmbroideryCalculator();
-        });
-    </script>
+    <script src="embroidery-customer-calculator.js"></script>
 </body>
 </html>

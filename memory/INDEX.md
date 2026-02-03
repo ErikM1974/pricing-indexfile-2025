@@ -53,6 +53,7 @@
 ├── PRICING_TIERS_MASTER_REFERENCE.md # **MASTER** All pricing tiers across all methods (2026-02-02)
 ├── EMBROIDERY_PRICING_RULES.md       # Complete embroidery pricing formulas reference
 ├── EMBROIDERY_PRICING_2026.md        # Feb 2026 embroidery tier restructure
+├── DECG_PRICING_2026.md              # Customer-supplied embroidery pricing (DECG)
 │
 ├── # Quote Builder Implementation Files
 ├── QUOTE_BUILDER_ARCHITECTURE.md     # Quote builder system architecture

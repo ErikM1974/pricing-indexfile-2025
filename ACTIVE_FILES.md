@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-02-01
+**Last Updated:** 2026-02-02
 **Total Active Files:** ~288 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -123,6 +123,22 @@
 | `/calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html` | BCA bundle (Oct 2025 promo - archived) | breast-cancer-bundle-service.js | 📦 Archived |
 | `/calculators/safety-stripe-creator.html` | Safety stripes | safety-stripe-calculator.js | ✅ Active |
 | `/calculators/art-invoice-creator.html` | Art invoices | art-invoice-service-v2.js | ✅ Active |
+
+### Customer Supplied Embroidery (DECG)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/embroidery-customer/index.html` | DECG pricing matrix reference page | embroidery-customer-calculator.js | ✅ Active |
+| `/calculators/embroidery-customer/embroidery-customer-calculator.js` | Matrix builder + quick calculator | API /api/decg-pricing | ✅ Active |
+| `/calculators/embroidery-customer/embroidery-customer-styles.css` | Matrix layout styles | - | ✅ Active |
+
+**DECG Pricing (2026 Feb redesign):**
+- Garments: $28-$20/pc (1-7 to 72+ tier) + $1.25/1K above 8K stitches
+- Caps: $22.50-$16/pc (1-7 to 72+ tier) + $1.00/1K above 8K stitches
+- Full Back: $1.40-$1.20/1K (8-23 to 72+ tier, **MIN 8 PIECES**, min 25K stitches)
+- LTM Fee: $50 for 1-7 pieces (garments/caps only, not full back)
+- Heavyweight Surcharge: +$10/piece (Carhartt jackets, bags, canvas, leather)
+- **Caspio Records:** 14 records created (DECG-Garmt, DECG-Cap, DECG-FB)
+- **Docs:** `/memory/DECG_PRICING_2026.md`
 
 ## 🔧 Services & Components
 
@@ -318,6 +334,7 @@ cap-embroidery-fix.css
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_RULES.md` | **NEW** Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
+| `/memory/DECG_PRICING_2026.md` | **NEW** Customer Supplied Embroidery (DECG) pricing reference | ✅ Active |
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |

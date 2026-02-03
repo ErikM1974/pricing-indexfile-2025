@@ -1,180 +1,446 @@
 /* ============================================ */
-/* CUSTOMER EMBROIDERY CALCULATOR SPECIFIC     */
+/* CUSTOMER EMBROIDERY PRICING - MATRIX LAYOUT */
 /* ============================================ */
 
-/* Product Showcase Section */
-.product-showcase {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 2rem;
+/* Page subtitle */
+.subtitle {
+    text-align: center;
+    color: var(--text-secondary, #666);
+    margin-top: -1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+/* API Error Banner */
+.api-error-banner {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #991b1b;
+    font-size: 1rem;
+}
+
+.api-error-banner i {
+    color: #ef4444;
+    font-size: 1.25rem;
+}
+
+/* LTM Warning Banner */
+.ltm-banner {
+    background: linear-gradient(135deg, #fdf6e3 0%, #faf0d4 100%);
+    border: 1px solid #d4a84b;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+}
+
+.ltm-banner i {
+    color: #c99a3d;
+    font-size: 1.25rem;
+}
+
+/* Matrices Grid */
+.matrices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Matrix Card */
+.matrix-card {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }
 
-.product-showcase::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+.matrix-card.full-width {
+    grid-column: 1 / -1;
 }
 
-.product-showcase-inner {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 2rem;
-    align-items: center;
-}
-
-.product-showcase-image {
-    text-align: center;
-}
-
-.product-showcase-image img {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-}
-
-.product-showcase-image img:hover {
-    transform: scale(1.02) rotate(1deg);
-    box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
-}
-
-.product-showcase-content h3 {
-    color: var(--primary-color);
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+/* Matrix Header */
+.matrix-header {
+    padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-}
-
-.product-features {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
-    margin-top: 1rem;
+    color: white;
 }
 
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.matrix-header i {
+    font-size: 1.5rem;
+}
+
+.matrix-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    flex-grow: 1;
+}
+
+.garment-header {
+    background: linear-gradient(135deg, #5a9a6b 0%, #4a8759 100%);
+}
+
+.cap-header {
+    background: linear-gradient(135deg, #5b7fa6 0%, #4a6d8c 100%);
+}
+
+.fullback-header {
+    background: linear-gradient(135deg, #7a6b8a 0%, #635573 100%);
+}
+
+.upcharge-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Matrix Scroll Container */
+.matrix-scroll {
+    overflow-x: auto;
+    padding: 0 0 1rem 0;
+}
+
+/* Pricing Matrix Table */
+.pricing-matrix {
+    width: 100%;
+    border-collapse: collapse;
     font-size: 0.9rem;
-    color: var(--text-secondary);
 }
 
-.feature-item i {
-    color: var(--primary-color);
-    font-size: 0.8rem;
+.pricing-matrix th,
+.pricing-matrix td {
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-@media (max-width: 768px) {
-    .product-showcase-inner {
-        grid-template-columns: 1fr;
-    }
-    
-    .product-features {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Program account section */
-.program-account-container {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border: 1px solid #f59e0b;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
-
-.program-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #f59e0b;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
+.pricing-matrix th {
+    background: #f9fafb;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    color: #374151;
+    position: sticky;
+    top: 0;
 }
 
-/* Customer supplied specific */
-.customer-supplied-note {
-    background: #e8f4ea;
-    border-left: 4px solid var(--primary-green);
-    padding: 1rem;
-    margin: 1rem 0;
-    border-radius: 0 8px 8px 0;
+.pricing-matrix tbody tr:hover {
+    background: #f3f4f6;
 }
 
-.customer-supplied-note h4 {
-    color: var(--primary-green);
-    margin-bottom: 0.5rem;
+.pricing-matrix .stitch-col {
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+    padding-left: 1rem;
 }
 
-/* Addon order styling */
-.addon-order-container {
-    background: #f0f9ff;
-    border: 1px solid #0ea5e9;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
+/* LTM Column Highlighting */
+.pricing-matrix th.ltm-col,
+.pricing-matrix td.ltm-col {
+    background: #fdf6e3;
+    color: #8b6914;
 }
 
-.addon-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #0ea5e9;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
+.pricing-matrix tbody tr:hover td.ltm-col {
+    background: #faf0d4;
+}
+
+/* Best Price Column Highlighting */
+.pricing-matrix th.best-col,
+.pricing-matrix td.best-col {
+    background: #e8f5e9;
+    color: #2e7d52;
     font-weight: 600;
 }
 
-/* Discount display */
-.discount-display {
-    background: var(--success-bg);
-    color: var(--success-text);
-    padding: 0.75rem;
-    border-radius: 6px;
+.pricing-matrix tbody tr:hover td.best-col {
+    background: #c8e6c9;
+}
+
+/* Full Back Rates Display */
+.fullback-rates {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.discount-amount {
-    font-size: 1.125rem;
+.rate-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    min-width: 80px;
+}
+
+.tier-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.tier-label.ltm-tier {
+    color: #8b6914;
+    background: #fdf6e3;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+}
+
+.tier-label.best-tier {
+    color: #2e7d52;
+    background: #e8f5e9;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+}
+
+.rate {
+    font-size: 1.1rem;
     font-weight: 700;
+    color: #111827;
 }
 
-/* No garment cost note */
-.no-garment-note {
-    background: #f0f9ff;
-    border: 1px solid #0284c7;
-    color: #075985;
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1rem 0;
+/* Quick Calculator Card */
+.quick-calc-card {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.quick-calc-header {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    color: white;
+    padding: 1rem 1.5rem;
     display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.quick-calc-header i {
+    font-size: 1.25rem;
+}
+
+.quick-calc-header h2 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.quick-calc-body {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    padding: 1.5rem;
     align-items: start;
+}
+
+.calc-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.input-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.calc-select,
+.calc-input {
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.calc-select:focus,
+.calc-input:focus {
+    outline: none;
+    border-color: #5a9a6b;
+    box-shadow: 0 0 0 3px rgba(90, 154, 107, 0.15);
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 1.5rem;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: #5a9a6b;
+}
+
+.calc-results {
+    background: #f9fafb;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    min-width: 200px;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.result-row:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.result-value {
+    font-weight: 600;
+    color: #111827;
+}
+
+.result-value.ltm-value {
+    color: #c99a3d;
+}
+
+.result-value.extra-stitch-value {
+    color: #6366f1;
+}
+
+.error-message {
+    color: #dc2626;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.result-value.total-value {
+    font-size: 1.25rem;
+    color: #5a9a6b;
+}
+
+.total-row {
+    font-weight: 600;
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    border-top: 2px solid #d1d5db;
+}
+
+/* Notes Card */
+.notes-card {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.notes-card h3 {
+    margin: 0 0 1rem 0;
+    color: #374151;
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 
-.no-garment-note i {
-    flex-shrink: 0;
-    margin-top: 2px;
+.notes-card h3 i {
+    color: #5a9a6b;
+}
+
+.notes-card ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.notes-card li {
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.notes-card li:last-child {
+    margin-bottom: 0;
+}
+
+/* Notice Section - using existing styles from calculator-base.css */
+
+/* Responsive */
+@media (max-width: 768px) {
+    .matrices-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-calc-body {
+        grid-template-columns: 1fr;
+    }
+
+    .calc-results {
+        min-width: auto;
+    }
+
+    .fullback-rates {
+        justify-content: center;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .quick-calc-card {
+        display: none;
+    }
+
+    .header {
+        display: none;
+    }
+
+    .matrix-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+
+    .ltm-banner {
+        border: 1px solid #d4a84b;
+    }
+
+    .pricing-matrix th.ltm-col,
+    .pricing-matrix td.ltm-col {
+        background: #fff3cd !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .pricing-matrix th.best-col,
+    .pricing-matrix td.best-col {
+        background: #d1e7dd !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }
