@@ -410,37 +410,146 @@
     }
 }
 
-/* Print Styles */
+/* ============================================ */
+/* PRINT-ONLY ELEMENTS (hidden on screen)      */
+/* ============================================ */
+.print-header,
+.print-footer {
+    display: none;
+}
+
+/* ============================================ */
+/* PRINT STYLES                                 */
+/* ============================================ */
 @media print {
-    .quick-calc-card {
+    /* Page setup */
+    @page {
+        size: Letter portrait;
+        margin: 0.5in;
+    }
+
+    /* Force colors to print */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* === HIDE ELEMENTS === */
+    .header,                    /* Navigation header */
+    .quick-calc-card,           /* Interactive calculator */
+    .matrix-card.full-width,    /* Full back section */
+    .notes-card,                /* Notes section */
+    .notice-section,            /* Liability notice */
+    .ltm-banner,                /* LTM info banner */
+    button {
+        display: none !important;
+    }
+
+    /* === SHOW PRINT HEADER === */
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20pt;
+        border-bottom: 2px solid #1e3a5f;
+        padding-bottom: 10pt;
+    }
+
+    .print-logo {
+        height: 50pt;
+        margin-bottom: 8pt;
+    }
+
+    .print-header h1 {
+        font-size: 18pt;
+        color: #1e3a5f;
+        margin: 0 0 4pt 0;
+    }
+
+    .print-contact {
+        font-size: 10pt;
+        color: #666;
+        margin: 0;
+    }
+
+    /* === SHOW PRINT FOOTER === */
+    .print-footer {
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 8pt;
+        color: #999;
+        padding-top: 5pt;
+        border-top: 1px solid #eee;
+    }
+
+    /* === CLEAN UP LAYOUT === */
+    body {
+        font-family: Arial, sans-serif;
+        background: white !important;
+    }
+
+    .main-container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .calculator-title,
+    .subtitle {
         display: none;
     }
 
-    .header {
-        display: none;
+    /* Side-by-side tables for one page */
+    .matrices-grid {
+        display: flex !important;
+        gap: 15pt;
     }
 
     .matrix-card {
-        break-inside: avoid;
+        flex: 1;
         box-shadow: none;
         border: 1px solid #ccc;
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 
-    .ltm-banner {
-        border: 1px solid #d4a84b;
+    .matrix-header {
+        padding: 8pt 12pt;
+    }
+
+    .matrix-header h2 {
+        font-size: 11pt;
+    }
+
+    .matrix-header i {
+        font-size: 12pt;
+    }
+
+    .upcharge-badge {
+        font-size: 7pt;
+        padding: 2pt 6pt;
+    }
+
+    /* === TABLE STYLING === */
+    .pricing-matrix {
+        font-size: 8pt;
+    }
+
+    .pricing-matrix th,
+    .pricing-matrix td {
+        padding: 3pt 4pt;
+        border: 1px solid #ddd;
     }
 
     .pricing-matrix th.ltm-col,
     .pricing-matrix td.ltm-col {
         background: #fff3cd !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
     }
 
     .pricing-matrix th.best-col,
     .pricing-matrix td.best-col {
         background: #d1e7dd !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
     }
 }
