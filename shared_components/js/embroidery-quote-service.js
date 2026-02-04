@@ -359,18 +359,60 @@ class EmbroideryQuoteService {
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                         LogoSpecs: ''  // Additional services don't need logo specs
                     };
-                    
+
                     const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
                     });
-                    
+
                     totalItems++;
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('Additional service save failed for line', lineNumber - 1, 'Error:', errorText);
                         console.error('Failed service data:', itemData);
+                        failedItems++;
+                    }
+                }
+            }
+
+            // Save DECG/DECC (Customer-Supplied items) as line items
+            if (pricingResults.decgItems && pricingResults.decgItems.length > 0) {
+                for (const decgItem of pricingResults.decgItems) {
+                    const isDECC = decgItem.type === 'DECC';
+                    const itemData = {
+                        QuoteID: quoteID,
+                        LineNumber: lineNumber++,
+                        StyleNumber: decgItem.type,  // DECG or DECC
+                        ProductName: isDECC ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments',
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: 'customer-supplied',
+                        PrintLocation: '',
+                        PrintLocationName: '',
+                        Quantity: decgItem.quantity,
+                        HasLTM: 'No',
+                        BaseUnitPrice: parseFloat(decgItem.unitPrice.toFixed(2)),
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: parseFloat(decgItem.unitPrice.toFixed(2)),
+                        LineTotal: parseFloat(decgItem.total.toFixed(2)),
+                        SizeBreakdown: JSON.stringify({ type: decgItem.type }),
+                        PricingTier: pricingResults.tier || '',
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: ''
+                    };
+
+                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+
+                    totalItems++;
+                    if (!itemResponse.ok) {
+                        const errorText = await itemResponse.text();
+                        console.error('DECG/DECC item save failed for line', lineNumber - 1, 'Error:', errorText);
                         failedItems++;
                     }
                 }
@@ -1031,6 +1073,47 @@ class EmbroideryQuoteService {
 
                     if (!serviceResponse.ok) {
                         console.error('[EmbroideryQuoteService] Service save failed for line', lineNumber - 1);
+                        failedItems++;
+                    }
+                }
+            }
+
+            // Save DECG/DECC (Customer-Supplied items) as line items
+            if (pricingResults.decgItems && pricingResults.decgItems.length > 0) {
+                for (const decgItem of pricingResults.decgItems) {
+                    const isDECC = decgItem.type === 'DECC';
+                    const itemData = {
+                        QuoteID: quoteId,
+                        LineNumber: lineNumber++,
+                        StyleNumber: decgItem.type,  // DECG or DECC
+                        ProductName: isDECC ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments',
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: 'customer-supplied',
+                        PrintLocation: '',
+                        PrintLocationName: '',
+                        Quantity: decgItem.quantity,
+                        HasLTM: 'No',
+                        BaseUnitPrice: parseFloat(decgItem.unitPrice.toFixed(2)),
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: parseFloat(decgItem.unitPrice.toFixed(2)),
+                        LineTotal: parseFloat(decgItem.total.toFixed(2)),
+                        SizeBreakdown: JSON.stringify({ type: decgItem.type }),
+                        PricingTier: pricingResults.tier || '',
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: ''
+                    };
+
+                    totalItems++;
+                    const decgResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+
+                    if (!decgResponse.ok) {
+                        console.error('[EmbroideryQuoteService] DECG/DECC item save failed for line', lineNumber - 1);
                         failedItems++;
                     }
                 }

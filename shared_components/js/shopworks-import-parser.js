@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.8.0 - Loads CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, GRT-75 from API
- * @date 2026-02-01
+ * @version 1.9.0 - DECG/DECC pricing now uses /api/decg-pricing endpoint
+ * @date 2026-02-03
  */
 
 class ShopWorksImportParser {
@@ -22,6 +22,10 @@ class ShopWorksImportParser {
         // Track if service codes have been loaded from API
         this.serviceCodesLoaded = false;
         this.serviceCodesData = [];
+
+        // DECG pricing from /api/decg-pricing (new 2026-02 API)
+        this.decgApiPricing = null;
+        this.decgApiLoaded = false;
 
         // Size mapping from ShopWorks to quote builder format
         this.SIZE_MAP = {
@@ -81,6 +85,7 @@ class ShopWorksImportParser {
 
         // Service code aliases for typo handling (kept in code per Erik's decision)
         // Must stay in sync with caspio-pricing-proxy/src/routes/service-codes.js
+        // Updated 2026-02-03: Added COLOR CHG from order classification analysis
         this.SERVICE_CODE_ALIASES = {
             'AONOGRAM': 'MONOGRAM',    // Common typo
             'NNAME': 'NAME',           // Common typo
@@ -93,7 +98,8 @@ class ShopWorksImportParser {
             'DESIGN PREP': 'GRT-75',   // Shorthand for design/graphic fee
             'EXCESS STITCH': 'AS-GARM', // Additional stitches (garment)
             'SECC': 'DECC',            // Typo for DECC (customer-supplied caps)
-            'SEW': 'SEG'               // Alias Sew → SEG (sewing)
+            'SEW': 'SEG',              // Alias Sew → SEG (sewing)
+            'COLOR CHG': 'COLOR CHANGE' // Typo for color change service
         };
 
         // Invalid part numbers to skip
@@ -138,6 +144,7 @@ class ShopWorksImportParser {
     /**
      * Load service codes from Caspio API
      * Call this before parsing to get current pricing
+     * Also loads DECG pricing from dedicated endpoint
      * @returns {Promise<boolean>} True if loaded successfully
      */
     async loadServiceCodes() {
@@ -146,6 +153,26 @@ class ShopWorksImportParser {
             return true;
         }
 
+        // Load both service codes and DECG pricing in parallel
+        const results = await Promise.allSettled([
+            this._loadServiceCodesInternal(),
+            this.loadDECGPricing()
+        ]);
+
+        // Check if service codes loaded
+        const serviceCodesOk = results[0].status === 'fulfilled' && results[0].value === true;
+        const decgPricingOk = results[1].status === 'fulfilled' && results[1].value === true;
+
+        console.log(`[ShopWorksImportParser] Loading complete - Service codes: ${serviceCodesOk ? 'OK' : 'FALLBACK'}, DECG pricing: ${decgPricingOk ? 'OK' : 'FALLBACK'}`);
+
+        return serviceCodesOk;
+    }
+
+    /**
+     * Internal helper to load service codes
+     * @private
+     */
+    async _loadServiceCodesInternal() {
         try {
             const response = await fetch(`${this.API_BASE_URL}/api/service-codes`);
             if (!response.ok) {
@@ -232,6 +259,70 @@ class ShopWorksImportParser {
             this.GRT75_RATE = grt75Record.SellPrice;
             console.log('[ShopWorksImportParser] GRT75_RATE from API:', this.GRT75_RATE);
         }
+    }
+
+    /**
+     * Load DECG/DECC pricing from dedicated /api/decg-pricing endpoint
+     * This provides accurate tier-based pricing matching the DECG calculator
+     * @returns {Promise<boolean>} True if loaded successfully
+     */
+    async loadDECGPricing() {
+        if (this.decgApiLoaded) {
+            console.log('[ShopWorksImportParser] DECG API pricing already loaded');
+            return true;
+        }
+
+        try {
+            const response = await fetch(`${this.API_BASE_URL}/api/decg-pricing`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            this.decgApiPricing = data;
+            this.decgApiLoaded = true;
+
+            // Update internal tier tables from API data for consistency
+            if (data.garments && data.garments.basePrices) {
+                this.DECG_TIERS_API = data.garments.basePrices;
+                this.DECG_UPCHARGE = data.garments.perThousandUpcharge || 1.25;
+                this.DECG_LTM_FEE = data.garments.ltmFee || 50.00;
+                this.DECG_LTM_THRESHOLD = data.garments.ltmThreshold || 7;
+                console.log('[ShopWorksImportParser] DECG garment tiers from API:', Object.keys(this.DECG_TIERS_API).length);
+            }
+
+            if (data.caps && data.caps.basePrices) {
+                this.DECC_TIERS_API = data.caps.basePrices;
+                this.DECC_UPCHARGE = data.caps.perThousandUpcharge || 1.00;
+                this.DECC_LTM_FEE = data.caps.ltmFee || 50.00;
+                this.DECC_LTM_THRESHOLD = data.caps.ltmThreshold || 7;
+                console.log('[ShopWorksImportParser] DECC cap tiers from API:', Object.keys(this.DECC_TIERS_API).length);
+            }
+
+            if (data.heavyweightSurcharge) {
+                this.HEAVYWEIGHT_SURCHARGE = data.heavyweightSurcharge;
+            }
+
+            console.log('[ShopWorksImportParser] DECG API pricing loaded successfully');
+            return true;
+        } catch (error) {
+            console.warn('[ShopWorksImportParser] Failed to load DECG API pricing, using fallback:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Get DECG tier label from quantity (embroidery tier structure)
+     * Tiers: 1-7 (LTM), 8-23, 24-47, 48-71, 72+
+     * @param {number} quantity - Number of pieces
+     * @returns {string} Tier label
+     */
+    getDECGTier(quantity) {
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
+        return '72+';
     }
 
     /**
@@ -672,32 +763,46 @@ class ShopWorksImportParser {
                 break;
 
             case 'decg':
-                // Customer-supplied garment
+                // Customer-supplied garment - uses DECG API pricing with stitch count
                 const isCapDecg = this._isCapFromDescription(item.description);
                 const isHeavyweight = this._isHeavyweightFromDescription(item.description);
-                const decgPricing = this.calculateDECGPrice(item.quantity, isCapDecg, isHeavyweight);
+                // Default to 8K stitches - user can update via modal after import
+                const decgStitchCount = 8000;
+                const decgPricing = this.calculateDECGPrice(item.quantity, isCapDecg, isHeavyweight, decgStitchCount);
 
                 result.decgItems.push({
                     ...item,
                     serviceType: 'decg',
                     isCap: isCapDecg,
                     isHeavyweight: isHeavyweight,
+                    stitchCount: decgStitchCount,
                     calculatedUnitPrice: decgPricing.unitPrice,
-                    ltmFee: decgPricing.ltmFee
+                    ltmFee: decgPricing.ltmFee,
+                    tier: decgPricing.tier,
+                    pricingSource: decgPricing.pricingSource,
+                    breakdown: decgPricing.breakdown,
+                    needsStitchCountConfirmation: true  // Flag for post-import modal
                 });
                 break;
 
             case 'decc':
-                // Customer-supplied caps (DECC/SECC)
-                const deccPricing = this.calculateDECCPrice(item.quantity);
+                // Customer-supplied caps (DECC/SECC) - uses DECG API pricing (caps table)
+                // Default to 8K stitches - user can update via modal after import
+                const deccStitchCount = 8000;
+                const deccPricing = this.calculateDECCPrice(item.quantity, deccStitchCount);
 
                 result.decgItems.push({
                     ...item,
                     serviceType: 'decc',
                     isCap: true,
                     isHeavyweight: false,
+                    stitchCount: deccStitchCount,
                     calculatedUnitPrice: deccPricing.unitPrice,
-                    ltmFee: deccPricing.ltmFee
+                    ltmFee: deccPricing.ltmFee,
+                    tier: deccPricing.tier,
+                    pricingSource: deccPricing.pricingSource,
+                    breakdown: deccPricing.breakdown,
+                    needsStitchCountConfirmation: true  // Flag for post-import modal
                 });
                 break;
 
@@ -1019,73 +1124,142 @@ class ShopWorksImportParser {
     }
 
     /**
-     * Calculate DECG pricing based on quantity and modifiers
+     * Calculate DECG pricing based on quantity, stitch count, and modifiers
+     * Uses /api/decg-pricing tiers (2026 embroidery structure: 1-7, 8-23, 24-47, 48-71, 72+)
+     *
      * @param {number} quantity - Number of garments
-     * @param {boolean} isCap - Is this a cap?
+     * @param {boolean} isCap - Is this a cap? (ignored, use calculateDECCPrice for caps)
      * @param {boolean} isHeavyweight - Is this a heavyweight garment?
-     * @returns {Object} { unitPrice, ltmFee }
+     * @param {number} stitchCount - Stitch count (default 8000)
+     * @returns {Object} { unitPrice, ltmFee, tier, stitchCount, pricingSource }
      */
-    calculateDECGPrice(quantity, isCap = false, isHeavyweight = false) {
-        // Get base tier price
+    calculateDECGPrice(quantity, isCap = false, isHeavyweight = false, stitchCount = 8000) {
+        const tier = this.getDECGTier(quantity);
+
+        // Use API pricing if available, otherwise fall back to legacy tiers
         let basePrice = 0;
-        if (quantity >= 144) basePrice = this.DECG_TIERS['144+'];
-        else if (quantity >= 72) basePrice = this.DECG_TIERS['72-143'];
-        else if (quantity >= 24) basePrice = this.DECG_TIERS['24-71'];
-        else if (quantity >= 12) basePrice = this.DECG_TIERS['12-23'];
-        else if (quantity >= 6) basePrice = this.DECG_TIERS['6-11'];
-        else if (quantity >= 3) basePrice = this.DECG_TIERS['3-5'];
-        else basePrice = this.DECG_TIERS['1-2'];
-
-        // Apply cap discount
-        if (isCap) {
-            basePrice = basePrice * (1 - this.CAP_DISCOUNT);
-        }
-
-        // Apply heavyweight surcharge
-        if (isHeavyweight && !isCap) {
-            basePrice += this.HEAVYWEIGHT_SURCHARGE;
-        }
-
-        // Calculate LTM fee
+        let upchargeRate = this.DECG_UPCHARGE || 1.25;
         let ltmFee = 0;
-        if (quantity < this.LTM_THRESHOLD) {
-            ltmFee = this.LTM_FEE;
+        let ltmThreshold = this.DECG_LTM_THRESHOLD || 7;
+        let ltmFeeAmount = this.DECG_LTM_FEE || 50.00;
+        let pricingSource = 'fallback';
+
+        if (this.decgApiLoaded && this.DECG_TIERS_API && this.DECG_TIERS_API[tier] !== undefined) {
+            // Use API pricing (new 2026 tiers)
+            basePrice = this.DECG_TIERS_API[tier];
+            pricingSource = 'decg-api';
+        } else {
+            // Fallback to legacy tiers (old structure, less accurate)
+            if (quantity >= 144) basePrice = this.DECG_TIERS['144+'] || 15.00;
+            else if (quantity >= 72) basePrice = this.DECG_TIERS['72-143'] || 25.00;
+            else if (quantity >= 24) basePrice = this.DECG_TIERS['24-71'] || 30.00;
+            else if (quantity >= 12) basePrice = this.DECG_TIERS['12-23'] || 32.00;
+            else if (quantity >= 6) basePrice = this.DECG_TIERS['6-11'] || 38.00;
+            else if (quantity >= 3) basePrice = this.DECG_TIERS['3-5'] || 40.00;
+            else basePrice = this.DECG_TIERS['1-2'] || 45.00;
+            pricingSource = 'fallback-legacy';
         }
+
+        // Calculate extra stitch charge (above 8K base)
+        const baseStitches = 8000;
+        const extraK = Math.max(0, (stitchCount - baseStitches) / 1000);
+        const extraCharge = extraK * upchargeRate;
+
+        // Unit price = base + extra stitches
+        let unitPrice = basePrice + extraCharge;
+
+        // Apply heavyweight surcharge (not for caps)
+        if (isHeavyweight && !isCap) {
+            unitPrice += this.HEAVYWEIGHT_SURCHARGE || 10.00;
+        }
+
+        // Calculate LTM fee (embroidery uses ≤7 threshold)
+        if (quantity <= ltmThreshold) {
+            ltmFee = ltmFeeAmount;
+        }
+
+        console.log(`[ShopWorksImportParser] DECG calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}, source=${pricingSource}`);
 
         return {
-            unitPrice: basePrice,
+            unitPrice: parseFloat(unitPrice.toFixed(2)),
             ltmFee: ltmFee,
-            totalPerPiece: basePrice + (ltmFee / quantity)
+            tier: tier,
+            stitchCount: stitchCount,
+            totalPerPiece: parseFloat((unitPrice + (ltmFee / quantity)).toFixed(2)),
+            pricingSource: pricingSource,
+            breakdown: {
+                basePrice: basePrice,
+                extraStitches: extraK * 1000,
+                upchargeRate: upchargeRate,
+                extraCharge: parseFloat(extraCharge.toFixed(2)),
+                heavyweightSurcharge: (isHeavyweight && !isCap) ? (this.HEAVYWEIGHT_SURCHARGE || 10.00) : 0
+            }
         };
     }
 
     /**
-     * Calculate DECC (customer-supplied cap) pricing based on quantity
-     * Uses DECC_TIERS which are ~20% lower than DECG
+     * Calculate DECC (customer-supplied cap) pricing based on quantity and stitch count
+     * Uses /api/decg-pricing caps tiers (2026 structure: 1-7, 8-23, 24-47, 48-71, 72+)
+     *
      * @param {number} quantity - Number of caps
-     * @returns {Object} { unitPrice, ltmFee }
+     * @param {number} stitchCount - Stitch count (default 8000)
+     * @returns {Object} { unitPrice, ltmFee, tier, stitchCount, pricingSource }
      */
-    calculateDECCPrice(quantity) {
-        // Get tier price from DECC tiers
-        let basePrice = 0;
-        if (quantity >= 144) basePrice = this.DECC_TIERS['144+'];
-        else if (quantity >= 72) basePrice = this.DECC_TIERS['72-143'];
-        else if (quantity >= 24) basePrice = this.DECC_TIERS['24-71'];
-        else if (quantity >= 12) basePrice = this.DECC_TIERS['12-23'];
-        else if (quantity >= 6) basePrice = this.DECC_TIERS['6-11'];
-        else if (quantity >= 3) basePrice = this.DECC_TIERS['3-5'];
-        else basePrice = this.DECC_TIERS['1-2'];
+    calculateDECCPrice(quantity, stitchCount = 8000) {
+        const tier = this.getDECGTier(quantity);
 
-        // Calculate LTM fee
+        // Use API pricing if available, otherwise fall back to legacy tiers
+        let basePrice = 0;
+        let upchargeRate = this.DECC_UPCHARGE || 1.00;
         let ltmFee = 0;
-        if (quantity < this.LTM_THRESHOLD) {
-            ltmFee = this.LTM_FEE;
+        let ltmThreshold = this.DECC_LTM_THRESHOLD || 7;
+        let ltmFeeAmount = this.DECC_LTM_FEE || 50.00;
+        let pricingSource = 'fallback';
+
+        if (this.decgApiLoaded && this.DECC_TIERS_API && this.DECC_TIERS_API[tier] !== undefined) {
+            // Use API pricing (new 2026 tiers)
+            basePrice = this.DECC_TIERS_API[tier];
+            pricingSource = 'decg-api';
+        } else {
+            // Fallback to legacy tiers
+            if (quantity >= 144) basePrice = this.DECC_TIERS['144+'] || 12.00;
+            else if (quantity >= 72) basePrice = this.DECC_TIERS['72-143'] || 20.00;
+            else if (quantity >= 24) basePrice = this.DECC_TIERS['24-71'] || 24.00;
+            else if (quantity >= 12) basePrice = this.DECC_TIERS['12-23'] || 25.00;
+            else if (quantity >= 6) basePrice = this.DECC_TIERS['6-11'] || 30.00;
+            else if (quantity >= 3) basePrice = this.DECC_TIERS['3-5'] || 32.00;
+            else basePrice = this.DECC_TIERS['1-2'] || 36.00;
+            pricingSource = 'fallback-legacy';
         }
 
+        // Calculate extra stitch charge (above 8K base)
+        const baseStitches = 8000;
+        const extraK = Math.max(0, (stitchCount - baseStitches) / 1000);
+        const extraCharge = extraK * upchargeRate;
+
+        // Unit price = base + extra stitches
+        const unitPrice = basePrice + extraCharge;
+
+        // Calculate LTM fee (embroidery uses ≤7 threshold)
+        if (quantity <= ltmThreshold) {
+            ltmFee = ltmFeeAmount;
+        }
+
+        console.log(`[ShopWorksImportParser] DECC calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}, source=${pricingSource}`);
+
         return {
-            unitPrice: basePrice,
+            unitPrice: parseFloat(unitPrice.toFixed(2)),
             ltmFee: ltmFee,
-            totalPerPiece: basePrice + (ltmFee / quantity)
+            tier: tier,
+            stitchCount: stitchCount,
+            totalPerPiece: parseFloat((unitPrice + (ltmFee / quantity)).toFixed(2)),
+            pricingSource: pricingSource,
+            breakdown: {
+                basePrice: basePrice,
+                extraStitches: extraK * 1000,
+                upchargeRate: upchargeRate,
+                extraCharge: parseFloat(extraCharge.toFixed(2))
+            }
         };
     }
 
@@ -1188,4 +1362,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.8.0 - API pricing for CAP-DISCOUNT, HEAVYWEIGHT-SURCHARGE, GRT-75');
+console.log('[ShopWorksImportParser] Module loaded v1.9.0 - DECG/DECC pricing via /api/decg-pricing');

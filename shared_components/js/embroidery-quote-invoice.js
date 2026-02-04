@@ -1448,8 +1448,36 @@ class EmbroideryInvoiceGenerator {
                     <tbody>
         `;
 
-        // Build rows - ONE ROW PER LINE ITEM
+        // Build rows - ONE ROW PER LINE ITEM (includes service products)
         pricingData.products.forEach(pp => {
+            // Handle SERVICE PRODUCTS (DECG, DECC, AL, MONOGRAM, etc.) - 2026-02 refactor
+            if (pp.product?.isService || pp.isService) {
+                const serviceType = pp.product?.style || pp.style || 'SERVICE';
+                const description = pp.product?.title || pp.title || serviceType;
+                const position = pp.product?.position || pp.position || '';
+                const isCap = pp.product?.isCap || pp.isCap || false;
+                const quantity = pp.product?.totalQuantity || pp.totalQuantity || 0;
+                const unitPrice = pp.lineItems?.[0]?.unitPrice || pp.unitPrice || 0;
+                const total = pp.lineItems?.[0]?.total || (quantity * unitPrice) || 0;
+
+                grandTotalQty += quantity;
+                grandTotalAmount += total;
+
+                // Service row - spans size columns with description
+                tableHTML += `
+                    <tr class="product-row service-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
+                        <td class="part-cell" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">${serviceType}</td>
+                        <td class="desc-cell" colspan="2">${description}${position ? ' - ' + position : ''}</td>
+                        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 8px; font-style: italic;">
+                            Service item
+                        </td>
+                        <td class="qty-cell" style="text-align: center;">${quantity}</td>
+                        <td class="unit-cell" style="text-align: right;">$${unitPrice.toFixed(2)}</td>
+                    </tr>
+                `;
+                return; // Skip regular product processing
+            }
+
             const numLineItems = pp.lineItems.length;
             const hasExtendedSizes = numLineItems > 1;
 

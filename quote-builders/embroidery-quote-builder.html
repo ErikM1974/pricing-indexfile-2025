@@ -358,27 +358,16 @@
                                 <td class="cell-total" id="setup-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <!-- Additional Stitches Fee Row -->
-                            <tr id="stitches-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="10" class="fee-label">
-                                    <i class="fas fa-layer-group"></i> Additional Stitches Fee
-                                </td>
-                                <td class="cell-qty" id="stitches-fee-qty">1</td>
-                                <td class="cell-price" id="stitches-fee-unit">$0.00</td>
-                                <td class="cell-total" id="stitches-fee-total">$0.00</td>
-                                <td class="cell-actions"></td>
-                            </tr>
-                            <!-- Garment Additional Logo Fee Row -->
-                            <tr id="garment-al-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="10" class="fee-label">
-                                    <i class="fas fa-plus-circle"></i> Additional Logo: <span id="garment-al-position-label">--</span>
-                                </td>
-                                <td class="cell-qty" id="garment-al-qty">1</td>
-                                <td class="cell-price" id="garment-al-unit">$0.00</td>
-                                <td class="cell-total" id="garment-al-total">$0.00</td>
-                                <td class="cell-actions"></td>
-                            </tr>
-                            <!-- Garment Additional Logo Digitizing Row -->
+                            <!-- NOTE: Service items (DECG, DECC, AL, MONOGRAM) now appear as product rows via createServiceProductRow() -->
+                            <!-- The following were REMOVED in 2026-02 refactor:
+                                 - stitches-fee-row (AS-GARM/AS-CAP) - now service product row
+                                 - garment-al-fee-row (AL) - now service product row
+                                 - cap-al-fee-row (AL cap) - now service product row
+                                 - monogram-fee-row (MONOGRAM) - now service product row
+                                 - decg-fee-row (DECG) - now service product row
+                                 - decc-fee-row (DECC) - now service product row
+                            -->
+                            <!-- Garment Additional Logo Digitizing Row - KEEP (setup fee) -->
                             <tr id="garment-al-digitizing-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cog"></i> AL Digitizing: <span id="garment-al-digitizing-position">--</span>
@@ -388,17 +377,7 @@
                                 <td class="cell-total" id="garment-al-digitizing-total">$100.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <!-- Cap Additional Logo Fee Row -->
-                            <tr id="cap-al-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="10" class="fee-label">
-                                    <i class="fas fa-hat-cowboy"></i> Cap Additional Logo: <span id="cap-al-position-label">--</span>
-                                </td>
-                                <td class="cell-qty" id="cap-al-qty">1</td>
-                                <td class="cell-price" id="cap-al-unit">$0.00</td>
-                                <td class="cell-total" id="cap-al-total">$0.00</td>
-                                <td class="cell-actions"></td>
-                            </tr>
-                            <!-- Cap Additional Logo Digitizing Row -->
+                            <!-- Cap Additional Logo Digitizing Row - KEEP (setup fee) -->
                             <tr id="cap-al-digitizing-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cog"></i> Cap AL Digitizing: <span id="cap-al-digitizing-position">--</span>
@@ -406,36 +385,6 @@
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="cap-al-digitizing-unit">$100.00</td>
                                 <td class="cell-total" id="cap-al-digitizing-total">$100.00</td>
-                                <td class="cell-actions"></td>
-                            </tr>
-                            <!-- Monogram/Names Fee Row -->
-                            <tr id="monogram-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="10" class="fee-label">
-                                    <i class="fas fa-font"></i> Monograms/Names (<span id="monogram-count-label">0</span>)
-                                </td>
-                                <td class="cell-qty" id="monogram-qty">1</td>
-                                <td class="cell-price" id="monogram-unit">$12.50</td>
-                                <td class="cell-total" id="monogram-total">$0.00</td>
-                                <td class="cell-actions"></td>
-                            </tr>
-                            <!-- DECG (Customer-Supplied Garments) Fee Row -->
-                            <tr id="decg-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="10" class="fee-label">
-                                    <i class="fas fa-tshirt"></i> Customer-Supplied Garments
-                                </td>
-                                <td class="cell-qty" id="decg-qty">0</td>
-                                <td class="cell-price" id="decg-unit">$0.00</td>
-                                <td class="cell-total" id="decg-total">$0.00</td>
-                                <td class="cell-actions"></td>
-                            </tr>
-                            <!-- DECC (Customer-Supplied Caps) Fee Row -->
-                            <tr id="decc-fee-row" class="fee-row" style="display: none;">
-                                <td colspan="10" class="fee-label">
-                                    <i class="fas fa-hard-hat"></i> Customer-Supplied Caps
-                                </td>
-                                <td class="cell-qty" id="decc-qty">0</td>
-                                <td class="cell-price" id="decc-unit">$0.00</td>
-                                <td class="cell-total" id="decc-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Art Charge Row -->
@@ -875,6 +824,100 @@ Company:Absher Construction Company
         </div>
     </div>
 
+    <!-- DECG Stitch Count Modal (shown after import with customer-supplied items) -->
+    <div class="shopworks-import-modal" id="decg-stitch-modal">
+        <div class="shopworks-import-content" style="max-width: 500px;">
+            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <h3><i class="fas fa-ruler"></i> Confirm Stitch Counts</h3>
+                <button class="shopworks-import-close" onclick="closeDECGStitchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="shopworks-import-body">
+                <p class="shopworks-import-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Enter the stitch count for each customer-supplied item to calculate accurate pricing
+                </p>
+                <div id="decg-stitch-items" class="decg-stitch-items">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+            <div class="shopworks-import-footer">
+                <button class="btn-cancel-import" onclick="closeDECGStitchModal()">Skip (Use 8K Default)</button>
+                <button class="btn-parse-import" id="btn-confirm-stitches" onclick="confirmDECGStitches()">
+                    <i class="fas fa-calculator"></i> Recalculate Prices
+                </button>
+            </div>
+        </div>
+    </div>
+    <style>
+        /* DECG Stitch Count Modal Styles */
+        .decg-stitch-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .decg-stitch-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .decg-stitch-item .item-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .decg-stitch-item .badge-decg {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .decg-stitch-item .badge-decc {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .decg-stitch-item .item-info {
+            flex: 1;
+        }
+        .decg-stitch-item .item-desc {
+            font-size: 13px;
+            color: #334155;
+            margin-bottom: 2px;
+        }
+        .decg-stitch-item .item-qty {
+            font-size: 11px;
+            color: #64748b;
+        }
+        .decg-stitch-item .stitch-input-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .decg-stitch-item input[type="number"] {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: right;
+        }
+        .decg-stitch-item .stitch-unit {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .decg-stitch-item .item-price {
+            min-width: 70px;
+            text-align: right;
+            font-weight: 600;
+            color: #059669;
+        }
+    </style>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
@@ -905,7 +948,7 @@ Company:Absher Construction Company
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
 
     <!-- ShopWorks Import Parser -->
-    <script src="/shared_components/js/shopworks-import-parser.js?v=20260201"></script>
+    <script src="/shared_components/js/shopworks-import-parser.js?v=20260203-decg-api"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -2100,13 +2143,26 @@ Company:Absher Construction Company
 
         /**
          * Populate products from line items
+         * Handles regular products AND service items (DECG, DECC, MONOGRAM)
          */
         async function populateProducts(items) {
-            // Filter to only product items (not additional services)
+            // Service items to create as service product rows (2026-02 refactor)
+            const SERVICE_STYLE_NUMBERS = ['DECG', 'DECC', 'AL', 'FB', 'CB', 'CS', 'MONOGRAM', 'AS-GARM', 'AS-CAP'];
+
+            // Separate service items from regular products
+            const serviceItems = items.filter(item =>
+                SERVICE_STYLE_NUMBERS.includes(item.StyleNumber) ||
+                item.EmbellishmentType === 'customer-supplied' ||
+                item.EmbellishmentType === 'monogram' ||
+                item.EmbellishmentType === 'embroidery-additional'
+            );
+
+            // Filter to only regular product items
             const productItems = items.filter(item =>
                 item.EmbellishmentType === 'embroidery' &&
                 item.StyleNumber &&
-                !item.StyleNumber.startsWith('AL-')
+                !item.StyleNumber.startsWith('AL-') &&
+                !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber)
             );
 
             // Group items by StyleNumber + Color to consolidate size quantities
@@ -2133,9 +2189,33 @@ Company:Absher Construction Company
                 }
             }
 
-            // Add each product to the table
+            // Add each regular product to the table
             for (const product of Object.values(productGroups)) {
                 await addProductFromQuote(product);
+            }
+
+            // Add service items as service product rows (2026-02 refactor)
+            for (const serviceItem of serviceItems) {
+                const serviceType = serviceItem.StyleNumber;
+                const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP';
+
+                // Parse metadata from SizeBreakdown if available
+                let stitchCount = 8000;
+                try {
+                    const meta = JSON.parse(serviceItem.SizeBreakdown || '{}');
+                    stitchCount = meta.stitchCount || 8000;
+                } catch (e) { /* ignore */ }
+
+                createServiceProductRow(serviceType, {
+                    quantity: serviceItem.Quantity,
+                    unitPrice: serviceItem.BaseUnitPrice || serviceItem.FinalUnitPrice,
+                    total: serviceItem.LineTotal,
+                    stitchCount: stitchCount,
+                    position: serviceItem.PrintLocationName || '',
+                    isCap: isCap
+                });
+
+                console.log(`[EditMode] Created service row: ${serviceType}, qty=${serviceItem.Quantity}`);
             }
         }
 
@@ -2887,6 +2967,147 @@ Company:Absher Construction Company
             styleInput.value = styleNumber;
 
             await onStyleChange(styleInput, parseInt(rowId));
+        }
+
+        /**
+         * Create a service product row (DECG, DECC, AL, FB, CB, MONOGRAM, etc.)
+         * These appear as line items in the product table, not as fee rows
+         * @param {string} serviceType - Service code: DECG, DECC, AL, FB, CB, CS, MONOGRAM, AS-GARM, AS-CAP
+         * @param {Object} data - Service data: { quantity, stitchCount, position, unitPrice, total, isCap }
+         * @returns {HTMLElement} The created row element
+         */
+        function createServiceProductRow(serviceType, data) {
+            const tbody = document.getElementById('product-tbody');
+            const rowId = ++rowCounter;
+
+            // Hide empty state message
+            const emptyStateRow = document.getElementById('empty-state-row');
+            if (emptyStateRow) emptyStateRow.style.display = 'none';
+
+            // Service type metadata
+            const SERVICE_META = {
+                'DECG': { description: 'Customer-Supplied Garments', icon: 'fa-tshirt', isCap: false },
+                'DECC': { description: 'Customer-Supplied Caps', icon: 'fa-hard-hat', isCap: true },
+                'AL': { description: 'Additional Logo', icon: 'fa-plus-circle', isCap: false },
+                'FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
+                'CB': { description: 'Cap Back Embroidery', icon: 'fa-hat-cowboy', isCap: true },
+                'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
+                'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+                'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
+                'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true }
+            };
+
+            const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
+            const isCap = data.isCap !== undefined ? data.isCap : meta.isCap;
+            const quantity = data.quantity || 0;
+            const unitPrice = data.unitPrice || 0;
+            const total = data.total || (quantity * unitPrice);
+            const stitchCount = data.stitchCount || 8000;
+            const position = data.position || '';
+
+            // Description with position info
+            let displayDescription = meta.description;
+            if (position) {
+                displayDescription += `: ${position}`;
+            }
+            if (stitchCount && serviceType !== 'MONOGRAM') {
+                displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
+            }
+
+            const row = document.createElement('tr');
+            row.id = `row-${rowId}`;
+            row.className = 'service-product-row';
+            row.dataset.rowId = rowId;
+            row.dataset.productType = 'service';
+            row.dataset.serviceType = serviceType.toLowerCase();
+            row.dataset.style = serviceType;
+            row.dataset.isCap = isCap.toString();
+            row.dataset.stitchCount = stitchCount.toString();
+            row.dataset.position = position;
+            row.dataset.unitPrice = unitPrice.toString();
+
+            row.innerHTML = `
+                <td>
+                    <span class="service-style-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;">
+                        <i class="fas ${meta.icon}"></i>
+                        ${serviceType}
+                    </span>
+                </td>
+                <td class="thumbnail-col">
+                    <div class="service-icon" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: ${isCap ? '#eff6ff' : '#fffbeb'}; border-radius: 6px;">
+                        <i class="fas ${meta.icon}" style="font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};"></i>
+                    </div>
+                </td>
+                <td class="desc-cell">
+                    <div class="desc-row">
+                        <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
+                        ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy"></i> Cap</span>' : ''}
+                    </div>
+                </td>
+                <td>
+                    <span style="color: #64748b; font-size: 12px;">N/A</span>
+                </td>
+                <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 11px; font-style: italic;">
+                    Service item - no size breakdown
+                </td>
+                <td class="cell-qty">
+                    <input type="number" class="cell-input service-qty" min="0" value="${quantity}"
+                           onchange="onServiceQtyChange(${rowId})" onkeydown="handleCellKeydown(event, this)"
+                           style="width: 60px; text-align: center;">
+                </td>
+                <td class="cell-price" id="row-price-${rowId}">$${unitPrice.toFixed(2)}</td>
+                <td class="cell-total" id="row-total-${rowId}">$${total.toFixed(2)}</td>
+                <td class="cell-actions">
+                    <button class="btn-delete-row" onclick="deleteServiceRow(${rowId})" title="Delete service">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+
+            // Insert service rows after all regular product rows but before fee rows
+            // Find the fees-tbody or append to product-tbody
+            const feesTbody = document.getElementById('fees-tbody');
+            if (feesTbody && feesTbody.previousElementSibling) {
+                // Insert at end of product-tbody, just before fees-tbody
+                tbody.appendChild(row);
+            } else {
+                tbody.appendChild(row);
+            }
+
+            return row;
+        }
+
+        /**
+         * Handle quantity change for service product rows
+         */
+        function onServiceQtyChange(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row || row.dataset.productType !== 'service') return;
+
+            const qtyInput = row.querySelector('.service-qty');
+            const quantity = parseInt(qtyInput?.value) || 0;
+            const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+            const total = quantity * unitPrice;
+
+            // Update total display
+            const totalCell = document.getElementById(`row-total-${rowId}`);
+            if (totalCell) totalCell.textContent = `$${total.toFixed(2)}`;
+
+            // Trigger recalculation
+            recalculatePricing();
+            markAsUnsaved();
+        }
+
+        /**
+         * Delete a service product row
+         */
+        function deleteServiceRow(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (row) {
+                row.remove();
+                recalculatePricing();
+                markAsUnsaved();
+            }
         }
 
         async function onStyleChange(input, rowId) {
@@ -4709,26 +4930,44 @@ Company:Absher Construction Company
             const productList = collectProductsFromTable();
 
             if (productList.length === 0) {
-                // Even with no quantities, show setup fee if laser-patch cap is being configured
+                // Even with no SanMar products, check for DECG/DECC service product rows
+                const decgItems = collectDECGItems();
+                let customerSuppliedTotal = 0;
+                let totalQty = 0;
+                let hasGarments = false;
+                let hasCaps = false;
+
+                decgItems.forEach(item => {
+                    customerSuppliedTotal += item.total;
+                    totalQty += item.quantity;
+                    if (item.type === 'DECG') hasGarments = true;
+                    if (item.type === 'DECC') hasCaps = true;
+                });
+
+                // Check for laser-patch cap setup fee
                 const capEmbType = getCapEmbellishmentType();
-                const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null;
+                const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
                 const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
                 const patchSetupFee = showPatchSetup ? 50 : 0;
 
+                // Determine tier based on total quantity
+                const tier = totalQty <= 7 ? '1-7' : totalQty <= 23 ? '8-23' : totalQty <= 47 ? '24-47' : totalQty <= 71 ? '48-71' : '72+';
+
                 updatePricingDisplay({
-                    totalQuantity: 0,
-                    tier: '1-7',
-                    subtotal: 0,
-                    ltmFee: 0,
+                    totalQuantity: totalQty,
+                    tier: tier,
+                    subtotal: customerSuppliedTotal,
+                    ltmFee: 0,  // LTM already included in DECG row total calculation
                     setupFees: patchSetupFee,
                     capSetupFees: patchSetupFee,
                     garmentSetupFees: 0,
-                    hasCaps: capHasStyle,
-                    hasGarments: false,
-                    grandTotal: patchSetupFee
+                    hasCaps: hasCaps || capHasStyle,
+                    hasGarments: hasGarments || customerSuppliedTotal > 0,
+                    grandTotal: customerSuppliedTotal + patchSetupFee
                 });
-                // Clear all price cells
-                document.querySelectorAll('.cell-price').forEach(cell => {
+
+                // Clear product price cells (not service rows)
+                document.querySelectorAll('tr[data-style]:not(.service-product-row) .cell-price').forEach(cell => {
                     cell.textContent = '-';
                 });
                 return;
@@ -4873,6 +5112,39 @@ Company:Absher Construction Company
             rows.forEach(row => {
                 const rowId = parseInt(row.id.replace('row-', ''));
                 const style = row.dataset.style;
+
+                // Handle SERVICE product rows (DECG, DECC, AL, MONOGRAM, etc.)
+                if (row.dataset.productType === 'service') {
+                    const qtyInput = row.querySelector('.service-qty');
+                    const quantity = parseInt(qtyInput?.value) || 0;
+
+                    if (quantity > 0) {
+                        const serviceType = row.dataset.serviceType;
+                        const isCap = row.dataset.isCap === 'true';
+                        const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
+                        const position = row.dataset.position || '';
+                        const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+
+                        products.push({
+                            style: style,
+                            isService: true,
+                            serviceType: serviceType,
+                            position: position,
+                            stitchCount: stitchCount,
+                            totalQuantity: quantity,
+                            sizeBreakdown: { 'SVC': quantity }, // Use SVC as pseudo-size for services
+                            isCap: isCap,
+                            rowId: rowId,
+                            unitPrice: unitPrice,
+                            color: '',
+                            catalogColor: '',
+                            productName: row.querySelector('.service-description')?.textContent || style,
+                            title: row.querySelector('.service-description')?.textContent || style
+                        });
+                    }
+                    return; // Skip normal product processing for service rows
+                }
+
                 const parentColor = row.dataset.color;
                 const parentCatalogColor = row.dataset.catalogColor || '';
 
@@ -5149,14 +5421,10 @@ Company:Absher Construction Company
                 if (setupFeeTableRow) setupFeeTableRow.style.display = 'none';
             }
 
-            // Additional Stitches - table row only (sidebar removed in 2026 refactor)
-            // Garments use $1.25/K rate, Caps use $1.00/K rate
-            const stitchesFeeRow = document.getElementById('stitches-fee-row');
-            const stitchesFeeQty = document.getElementById('stitches-fee-qty');
-            const stitchesFeeUnit = document.getElementById('stitches-fee-unit');
-            const stitchesFeeTotal = document.getElementById('stitches-fee-total');
-
-            // Get logo configs (garment primary logo from top, cap logo from cap section)
+            // Additional Stitches calculation (2026-02 refactor: now included in pricing calculation)
+            // Extra stitch costs are calculated in the pricing engine and included in unit prices
+            // Fee rows removed - additional stitches handled via service product rows when needed
+            // Kept calculation for sidebar display reference
             const garmentStitches = parseInt(document.getElementById('primary-stitches').value) || 8000;
             const capStitchesInput = document.getElementById('cap-primary-stitches');
             const capStitches = capStitchesInput ? (parseInt(capStitchesInput.value) || 8000) : 8000;
@@ -5168,7 +5436,6 @@ Company:Absher Construction Company
 
             // Calculate cap extra stitches (rate: $1.00/K)
             // Skip for laser patches - they don't use stitches
-            // Note: capEmbType already declared above at line 4958
             const capQty = pricing.capQuantity || 0;
             let capStitchFee = 0;
             if (capEmbType !== 'laser-patch') {
@@ -5177,18 +5444,6 @@ Company:Absher Construction Company
             }
 
             const totalStitchFee = garmentStitchFee + capStitchFee;
-
-            if (totalStitchFee > 0 && stitchesFeeRow) {
-                stitchesFeeRow.style.display = 'table-row';
-                // Show per-piece breakdown: qty × unit = total
-                const stitchQty = garmentQty + capQty;
-                const stitchUnitPrice = stitchQty > 0 ? totalStitchFee / stitchQty : 0;
-                if (stitchesFeeQty) stitchesFeeQty.textContent = stitchQty;
-                if (stitchesFeeUnit) stitchesFeeUnit.textContent = `$${stitchUnitPrice.toFixed(2)}`;
-                if (stitchesFeeTotal) stitchesFeeTotal.textContent = `$${totalStitchFee.toFixed(2)}`;
-            } else if (stitchesFeeRow) {
-                stitchesFeeRow.style.display = 'none';
-            }
 
             // Additional Logos pricing section (GARMENTS) - reads from globalAL state
             const alContainer = document.getElementById('additional-logos-pricing');
@@ -5283,41 +5538,10 @@ Company:Absher Construction Company
             }
 
             // ============================================
-            // Additional Logo Fee Table Rows (Garments)
+            // Additional Logo Digitizing Fee Rows (Garments)
+            // NOTE: AL service charges now appear as product rows via createServiceProductRow()
+            // Only the digitizing FEE stays in the fee table
             // ============================================
-            const garmentAlFeeRow = document.getElementById('garment-al-fee-row');
-            const garmentAlQty = document.getElementById('garment-al-qty');
-            const garmentAlUnit = document.getElementById('garment-al-unit');
-            const garmentAlTotal = document.getElementById('garment-al-total');
-            const garmentAlPositionLabel = document.getElementById('garment-al-position-label');
-
-            if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
-                // Calculate AL pricing (reuse same logic as sidebar)
-                const tier = pricing.garmentTier || pricing.tier || '1-7';
-                let alBaseRate = 13.50;
-                if (pricingCalculator.alTiers && pricingCalculator.alTiers[tier]) {
-                    alBaseRate = pricingCalculator.alTiers[tier].embCost;
-                }
-                const alConfig = pricingCalculator.alTiers && pricingCalculator.alTiers[tier];
-                const alBaseStitches = alConfig?.baseStitchCount || 8000;
-                const alStitchRate = alConfig?.additionalStitchRate || 1.25;
-
-                const logo = globalAL.garment;
-                const logoExtraStitches = Math.max(0, logo.stitchCount - alBaseStitches);
-                const logoExtraK = logoExtraStitches / 1000;
-                const stitchCost = logoExtraK * alStitchRate;
-                const alUnitPrice = alBaseRate + stitchCost;
-                const alTotal = alUnitPrice * pricing.garmentQuantity;
-
-                // Update fee table row
-                if (garmentAlFeeRow) garmentAlFeeRow.style.display = 'table-row';
-                if (garmentAlQty) garmentAlQty.textContent = pricing.garmentQuantity;
-                if (garmentAlUnit) garmentAlUnit.textContent = `$${alUnitPrice.toFixed(2)}`;
-                if (garmentAlTotal) garmentAlTotal.textContent = `$${alTotal.toFixed(2)}`;
-                if (garmentAlPositionLabel) garmentAlPositionLabel.textContent = logo.position || 'Right Chest';
-            } else {
-                if (garmentAlFeeRow) garmentAlFeeRow.style.display = 'none';
-            }
 
             // Garment AL Digitizing Row
             const garmentAlDigitizingRow = document.getElementById('garment-al-digitizing-row');
@@ -5332,41 +5556,10 @@ Company:Absher Construction Company
             }
 
             // ============================================
-            // Additional Logo Fee Table Rows (Caps)
+            // Additional Logo Digitizing Fee Rows (Caps)
+            // NOTE: AL service charges now appear as product rows via createServiceProductRow()
+            // Only the digitizing FEE stays in the fee table
             // ============================================
-            const capAlFeeRow = document.getElementById('cap-al-fee-row');
-            const capAlQtyEl = document.getElementById('cap-al-qty');
-            const capAlUnitEl = document.getElementById('cap-al-unit');
-            const capAlTotalEl = document.getElementById('cap-al-total');
-            const capAlPositionLabel = document.getElementById('cap-al-position-label');
-
-            if (globalAL.cap.enabled && pricing.capQuantity > 0) {
-                // Calculate Cap AL pricing (reuse same logic as sidebar)
-                const capTier = pricing.capTier || '1-7';
-                let capAlBaseRate = 6.75;
-                if (pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier]) {
-                    capAlBaseRate = pricingCalculator.capAlTiers[capTier].embCost;
-                }
-                const capAlConfig = pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier];
-                const capAlBaseStitches = capAlConfig?.baseStitchCount || 5000;
-                const capAlStitchRate = capAlConfig?.additionalStitchRate || 1.00;
-
-                const capLogo = globalAL.cap;
-                const capLogoExtraStitches = Math.max(0, capLogo.stitchCount - capAlBaseStitches);
-                const capLogoExtraK = capLogoExtraStitches / 1000; // No rounding, consistent with garment AL
-                const capStitchCost = capLogoExtraK * capAlStitchRate;
-                const capAlUnitPrice = capAlBaseRate + capStitchCost;
-                const capAlTotalPrice = capAlUnitPrice * pricing.capQuantity;
-
-                // Update fee table row
-                if (capAlFeeRow) capAlFeeRow.style.display = 'table-row';
-                if (capAlQtyEl) capAlQtyEl.textContent = pricing.capQuantity;
-                if (capAlUnitEl) capAlUnitEl.textContent = `$${capAlUnitPrice.toFixed(2)}`;
-                if (capAlTotalEl) capAlTotalEl.textContent = `$${capAlTotalPrice.toFixed(2)}`;
-                if (capAlPositionLabel) capAlPositionLabel.textContent = capLogo.position || 'Cap Back';
-            } else {
-                if (capAlFeeRow) capAlFeeRow.style.display = 'none';
-            }
 
             // Cap AL Digitizing Row
             const capAlDigitizingRow = document.getElementById('cap-al-digitizing-row');
@@ -5496,6 +5689,14 @@ Company:Absher Construction Company
                 pricing.discount = additionalCharges.discount || 0;
                 pricing.discountReason = additionalCharges.discountReason || '';
 
+                // Add DECG/DECC (Customer-Supplied items) for PDF
+                pricing.decgQty = additionalCharges.decgQty || 0;
+                pricing.decgUnit = additionalCharges.decgUnit || 0;
+                pricing.decgTotal = additionalCharges.decgTotal || 0;
+                pricing.deccQty = additionalCharges.deccQty || 0;
+                pricing.deccUnit = additionalCharges.deccUnit || 0;
+                pricing.deccTotal = additionalCharges.deccTotal || 0;
+
                 const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricing, customerData);
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write(invoiceHTML);
@@ -5610,17 +5811,24 @@ Company:Absher Construction Company
                     discountReason: additionalCharges.discountReason
                 };
 
+                // Collect DECG/DECC items (Customer-Supplied Garments/Caps)
+                const decgItems = collectDECGItems();
+
                 // Build quote data
                 const quoteData = {
                     products: products,
                     logos: allLogos,
                     // Cap embellishment type for laser-patch orders
-                    capEmbellishmentType: getCapEmbellishmentType()
+                    capEmbellishmentType: getCapEmbellishmentType(),
+                    // DECG/DECC items for shareable URLs
+                    decgItems: decgItems
                 };
 
                 // Attach logos and embellishment type to pricing for service to access
                 pricing.logos = allLogos;
                 pricing.capEmbellishmentType = getCapEmbellishmentType();
+                // Attach DECG items to pricing for service to access
+                pricing.decgItems = decgItems;
 
                 let result;
                 if (editingQuoteId) {
@@ -6189,6 +6397,12 @@ Company:Absher Construction Company
             const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
             const graphicDesignCharge = graphicDesignHours * 75;
 
+            // DECG/DECC data now collected from service product rows (not fee rows)
+            // Use collectDECGItems() which reads from product table
+            const decgItems = collectDECGItems();
+            const decgItem = decgItems.find(i => i.type === 'DECG');
+            const deccItem = decgItems.find(i => i.type === 'DECC');
+
             return {
                 artCharge: parseFloat(document.getElementById('art-charge')?.value) || 0,
                 graphicDesignHours: graphicDesignHours,
@@ -6198,8 +6412,50 @@ Company:Absher Construction Company
                 sampleQty: parseInt(document.getElementById('sample-qty')?.value) || 1,
                 discount: discountValue,
                 discountPercent: discountPercent,
-                discountReason: document.getElementById('discount-reason')?.value?.trim() || ''
+                discountReason: document.getElementById('discount-reason')?.value?.trim() || '',
+                // DECG/DECC (Customer-Supplied items) for PDF and shareable URLs - from service product rows
+                decgQty: decgItem?.quantity || 0,
+                decgUnit: decgItem?.unitPrice || 0,
+                decgTotal: decgItem?.total || 0,
+                deccQty: deccItem?.quantity || 0,
+                deccUnit: deccItem?.unitPrice || 0,
+                deccTotal: deccItem?.total || 0
             };
+        }
+
+        /**
+         * Collect DECG (Customer-Supplied Garments) and DECC (Customer-Supplied Caps) data
+         * Now reads from service product rows in the product table
+         * Used for shareable URLs and PDF generation
+         * @returns {Array} Array of DECG/DECC items with type, quantity, unitPrice, total, stitchCount
+         */
+        function collectDECGItems() {
+            const items = [];
+
+            // Find service product rows for DECG and DECC
+            const serviceRows = document.querySelectorAll('#product-tbody tr.service-product-row');
+            serviceRows.forEach(row => {
+                const serviceType = row.dataset.serviceType?.toUpperCase();
+                if (serviceType === 'DECG' || serviceType === 'DECC') {
+                    const qtyInput = row.querySelector('.service-qty');
+                    const qty = parseInt(qtyInput?.value) || 0;
+                    const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+                    const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
+
+                    if (qty > 0) {
+                        items.push({
+                            type: serviceType,
+                            quantity: qty,
+                            unitPrice: unitPrice,
+                            total: qty * unitPrice,
+                            stitchCount: stitchCount,
+                            rowId: row.dataset.rowId
+                        });
+                    }
+                }
+            });
+
+            return items;
         }
 
         async function copyToClipboard() {
@@ -6403,6 +6659,202 @@ Company:Absher Construction Company
         // Store parsed data for confirmation
         let pendingShopWorksImport = null;
 
+        // Store DECG/DECC items for stitch count modal
+        let pendingDECGItems = null;
+
+        // ============================================================
+        // DECG STITCH COUNT MODAL FUNCTIONS
+        // ============================================================
+
+        /**
+         * Open the DECG stitch count modal to confirm stitch counts
+         * @param {Array} decgItems - Array of DECG/DECC items from import
+         */
+        function openDECGStitchModal(decgItems) {
+            if (!decgItems || decgItems.length === 0) return;
+
+            const modal = document.getElementById('decg-stitch-modal');
+            const itemsContainer = document.getElementById('decg-stitch-items');
+
+            // Build the items list HTML
+            let html = '';
+            decgItems.forEach((item, index) => {
+                const isDecc = item.serviceType === 'decc';
+                const badgeClass = isDecc ? 'badge-decc' : 'badge-decg';
+                const badgeText = isDecc ? 'DECC' : 'DECG';
+                const desc = item.description || (isDecc ? 'Customer cap' : 'Customer garment');
+                const currentPrice = item.calculatedUnitPrice || 0;
+
+                html += `
+                    <div class="decg-stitch-item" data-index="${index}">
+                        <span class="item-badge ${badgeClass}">${badgeText}</span>
+                        <div class="item-info">
+                            <div class="item-desc">${escapeHtml(desc)}</div>
+                            <div class="item-qty">Qty: ${item.quantity} | Tier: ${item.tier || 'N/A'}</div>
+                        </div>
+                        <div class="stitch-input-group">
+                            <input type="number"
+                                   id="decg-stitch-${index}"
+                                   value="${item.stitchCount || 8000}"
+                                   min="1000"
+                                   max="200000"
+                                   step="1000"
+                                   onchange="updateDECGPreviewPrice(${index})">
+                            <span class="stitch-unit">stitches</span>
+                        </div>
+                        <div class="item-price" id="decg-price-${index}">$${currentPrice.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            itemsContainer.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        /**
+         * Close the DECG stitch count modal
+         */
+        function closeDECGStitchModal() {
+            const modal = document.getElementById('decg-stitch-modal');
+            modal.classList.remove('active');
+        }
+
+        /**
+         * Update the preview price when stitch count changes
+         * @param {number} index - Index of the DECG item
+         */
+        async function updateDECGPreviewPrice(index) {
+            if (!pendingDECGItems || !pendingDECGItems[index]) return;
+
+            const input = document.getElementById(`decg-stitch-${index}`);
+            const priceEl = document.getElementById(`decg-price-${index}`);
+            const stitchCount = parseInt(input.value) || 8000;
+
+            const item = pendingDECGItems[index];
+            const isDecc = item.serviceType === 'decc';
+
+            try {
+                // Use EmbroideryPricingService to calculate new price
+                const pricingService = new window.EmbroideryPricingService();
+                const pricing = await pricingService.calculateDECGPrice(
+                    item.quantity,
+                    stitchCount,
+                    isDecc ? 'cap' : 'garment'
+                );
+
+                priceEl.textContent = `$${pricing.unitPrice.toFixed(2)}`;
+                priceEl.style.color = '#059669';
+
+                // Update the pending item with new stitch count
+                pendingDECGItems[index].stitchCount = stitchCount;
+                pendingDECGItems[index].previewPrice = pricing.unitPrice;
+            } catch (error) {
+                console.error('Failed to calculate DECG price:', error);
+                priceEl.textContent = 'Error';
+                priceEl.style.color = '#dc2626';
+            }
+        }
+
+        /**
+         * Confirm stitch counts and recalculate DECG/DECC pricing
+         */
+        async function confirmDECGStitches() {
+            if (!pendingDECGItems || pendingDECGItems.length === 0) {
+                closeDECGStitchModal();
+                return;
+            }
+
+            const btn = document.getElementById('btn-confirm-stitches');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Calculating...';
+
+            try {
+                const pricingService = new window.EmbroideryPricingService();
+                let totalUpdated = 0;
+
+                // Recalculate each item with the entered stitch count
+                // Find matching service product rows in the product table
+                const serviceRows = document.querySelectorAll('#product-tbody tr.service-product-row');
+                const decgRows = Array.from(serviceRows).filter(r => r.dataset.serviceType === 'decg');
+                const deccRows = Array.from(serviceRows).filter(r => r.dataset.serviceType === 'decc');
+
+                for (let i = 0; i < pendingDECGItems.length; i++) {
+                    const item = pendingDECGItems[i];
+                    const input = document.getElementById(`decg-stitch-${i}`);
+                    const stitchCount = parseInt(input.value) || 8000;
+                    const isDecc = item.serviceType === 'decc';
+
+                    const pricing = await pricingService.calculateDECGPrice(
+                        item.quantity,
+                        stitchCount,
+                        isDecc ? 'cap' : 'garment'
+                    );
+
+                    // Find the matching service product row
+                    const targetRows = isDecc ? deccRows : decgRows;
+                    const serviceRow = targetRows[0]; // Use first matching row (usually only one DECG or DECC row)
+
+                    if (serviceRow) {
+                        const rowId = serviceRow.dataset.rowId;
+
+                        // Update row data attributes
+                        serviceRow.dataset.stitchCount = stitchCount.toString();
+                        serviceRow.dataset.unitPrice = pricing.unitPrice.toString();
+
+                        // Update the description to show new stitch count
+                        const descEl = serviceRow.querySelector('.service-description');
+                        if (descEl) {
+                            const baseDesc = isDecc ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments';
+                            descEl.textContent = `${baseDesc} (${(stitchCount / 1000).toFixed(0)}K stitches)`;
+                        }
+
+                        // Calculate total including LTM
+                        const lineTotal = (pricing.unitPrice * item.quantity) + pricing.ltmFee;
+
+                        // Update price and total cells
+                        const priceCell = document.getElementById(`row-price-${rowId}`);
+                        const totalCell = document.getElementById(`row-total-${rowId}`);
+                        if (priceCell) priceCell.textContent = `$${pricing.unitPrice.toFixed(2)}`;
+                        if (totalCell) totalCell.textContent = `$${lineTotal.toFixed(2)}`;
+
+                        // Update quantity input if needed
+                        const qtyInput = serviceRow.querySelector('.service-qty');
+                        if (qtyInput) qtyInput.value = item.quantity;
+                    }
+
+                    // Update notes with new stitch count
+                    const notesEl = document.getElementById('notes');
+                    if (notesEl && stitchCount !== 8000) {
+                        const stitchNote = `${isDecc ? 'DECC' : 'DECG'}: ${stitchCount.toLocaleString()} stitches @ $${pricing.unitPrice.toFixed(2)}/ea`;
+                        // Append to notes if not already there
+                        if (!notesEl.value.includes(stitchNote)) {
+                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + stitchNote;
+                        }
+                    }
+
+                    totalUpdated++;
+                }
+
+                // Recalculate overall pricing
+                recalculatePricing();
+                markAsUnsaved();
+
+                closeDECGStitchModal();
+                showToast(`Updated pricing for ${totalUpdated} customer-supplied items`, 'success');
+
+            } catch (error) {
+                console.error('Failed to update DECG pricing:', error);
+                showToast('Failed to update pricing: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-calculator"></i> Recalculate Prices';
+            }
+        }
+
+        // ============================================================
+        // SHOPWORKS IMPORT MODAL FUNCTIONS
+        // ============================================================
+
         /**
          * Open the ShopWorks import modal
          */
@@ -6452,6 +6904,7 @@ Company:Absher Construction Company
                 const result = parser.parse(text);
 
                 console.log('[ShopWorks Import] Parsed items:', result.products.length, result.products);
+                console.log('[ShopWorks Import] DECG items:', result.decgItems?.length || 0, result.decgItems);
 
                 // Consolidate products by partNumber + color (merges size-split SKUs like ST253, ST253_2X into one row)
                 result.products = parser.consolidateProducts(result.products);
@@ -6537,12 +6990,15 @@ Company:Absher Construction Company
                 if (decgGarments.length > 0) {
                     productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Garments (' + decgGarments.length + ')</h5><div class="preview-products-list">';
                     for (const decg of decgGarments) {
-                        const ltmNote = decg.ltmFee > 0 ? ' + LTM' : '';
+                        const ltmNote = decg.ltmFee > 0 ? ` + $${decg.ltmFee} LTM` : '';
+                        const tierNote = decg.tier ? ` (Tier ${decg.tier})` : '';
+                        const stitchNote = `${(decg.stitchCount || 8000).toLocaleString()} stitches`;
+                        const sourceIcon = decg.pricingSource === 'decg-api' ? '✓' : '⚠';
                         productsHtml += `
                             <div class="preview-product-item">
                                 <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
-                                <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')}</span>
-                                <span class="preview-product-qty">Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
+                                <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')} <small style="color:#64748b;">${stitchNote}${tierNote}</small></span>
+                                <span class="preview-product-qty">${sourceIcon} Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
                             </div>
                         `;
                     }
@@ -6552,17 +7008,23 @@ Company:Absher Construction Company
                 if (deccCaps.length > 0) {
                     productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Caps (' + deccCaps.length + ')</h5><div class="preview-products-list">';
                     for (const decc of deccCaps) {
-                        const ltmNote = decc.ltmFee > 0 ? ' + LTM' : '';
+                        const ltmNote = decc.ltmFee > 0 ? ` + $${decc.ltmFee} LTM` : '';
+                        const tierNote = decc.tier ? ` (Tier ${decc.tier})` : '';
+                        const stitchNote = `${(decc.stitchCount || 8000).toLocaleString()} stitches`;
+                        const sourceIcon = decc.pricingSource === 'decg-api' ? '✓' : '⚠';
                         productsHtml += `
                             <div class="preview-product-item">
                                 <span class="preview-product-style" style="background: #dbeafe; color: #1e40af;">DECC</span>
-                                <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')}</span>
-                                <span class="preview-product-qty">Qty: ${decc.quantity} @ $${decc.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
+                                <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')} <small style="color:#64748b;">${stitchNote}${tierNote}</small></span>
+                                <span class="preview-product-qty">${sourceIcon} Qty: ${decc.quantity} @ $${decc.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
                             </div>
                         `;
                     }
                     productsHtml += '</div>';
                 }
+
+                // Add note about stitch count confirmation
+                productsHtml += '<p style="font-size: 11px; color: #64748b; margin-top: 8px; font-style: italic;"><i class="fas fa-info-circle"></i> After import, you\'ll be prompted to confirm stitch counts for accurate pricing</p>';
             }
 
             // Non-SanMar products (require manual pricing)
@@ -6850,70 +7312,60 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 9. Import DECG/DECC items (customer-supplied garments and caps)
+                // 9. Import DECG/DECC items as SERVICE PRODUCT ROWS (2026-02 refactor)
+                // These now appear in the product table, not as fee rows
+                console.log('[confirmShopWorksImport] Section 9 - data.decgItems:', data.decgItems);
                 if (data.decgItems && data.decgItems.length > 0) {
                     // Separate DECG (garments) from DECC (caps)
                     const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
                     const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
+                    console.log('[confirmShopWorksImport] After filter - DECG garments:', decgGarments.length, 'DECC caps:', deccCaps.length);
 
-                    // Populate DECG fee row (customer-supplied garments)
+                    // Create DECG SERVICE PRODUCT ROW (customer-supplied garments)
                     if (decgGarments.length > 0) {
-                        const decgRow = document.getElementById('decg-fee-row');
-                        if (decgRow) {
-                            decgRow.style.display = '';
-                            let totalQty = 0, totalCharge = 0;
-                            decgGarments.forEach(d => {
-                                totalQty += d.quantity;
-                                totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
-                            });
-                            const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
-                            document.getElementById('decg-qty').textContent = totalQty;
-                            document.getElementById('decg-unit').textContent = `$${avgUnitPrice.toFixed(2)}`;
-                            document.getElementById('decg-total').textContent = `$${totalCharge.toFixed(2)}`;
-                        }
+                        console.log('[confirmShopWorksImport] Creating DECG service product row');
+                        // Aggregate all DECG items into one row
+                        let totalQty = 0, totalCharge = 0;
+                        let avgStitchCount = 0;
+                        decgGarments.forEach(d => {
+                            totalQty += d.quantity;
+                            totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
+                            avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+                        });
+                        const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
+                        avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
+
+                        createServiceProductRow('DECG', {
+                            quantity: totalQty,
+                            stitchCount: avgStitchCount,
+                            unitPrice: avgUnitPrice,
+                            total: totalCharge,
+                            isCap: false
+                        });
+                        console.log('[confirmShopWorksImport] DECG row created - qty:', totalQty, 'total:', totalCharge);
                     }
 
-                    // Populate DECC fee row (customer-supplied caps)
+                    // Create DECC SERVICE PRODUCT ROW (customer-supplied caps)
                     if (deccCaps.length > 0) {
-                        const deccRow = document.getElementById('decc-fee-row');
-                        if (deccRow) {
-                            deccRow.style.display = '';
-                            let totalQty = 0, totalCharge = 0;
-                            deccCaps.forEach(d => {
-                                totalQty += d.quantity;
-                                totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
-                            });
-                            const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
-                            document.getElementById('decc-qty').textContent = totalQty;
-                            document.getElementById('decc-unit').textContent = `$${avgUnitPrice.toFixed(2)}`;
-                            document.getElementById('decc-total').textContent = `$${totalCharge.toFixed(2)}`;
-                        }
-                    }
+                        console.log('[confirmShopWorksImport] Creating DECC service product row');
+                        let totalQty = 0, totalCharge = 0;
+                        let avgStitchCount = 0;
+                        deccCaps.forEach(d => {
+                            totalQty += d.quantity;
+                            totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
+                            avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+                        });
+                        const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
+                        avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
 
-                    // Add details to notes
-                    const notesEl = document.getElementById('notes');
-                    if (notesEl) {
-                        const decgNotes = [];
-
-                        // Add DECG notes
-                        if (decgGarments.length > 0) {
-                            decgGarments.forEach(d => {
-                                const ltmNote = d.ltmFee > 0 ? ` (+ $${d.ltmFee.toFixed(2)} LTM)` : '';
-                                decgNotes.push(`DECG: ${d.quantity}x ${d.description || 'Customer garment'} @ $${d.calculatedUnitPrice.toFixed(2)}/ea${ltmNote}`);
-                            });
-                        }
-
-                        // Add DECC notes
-                        if (deccCaps.length > 0) {
-                            deccCaps.forEach(d => {
-                                const ltmNote = d.ltmFee > 0 ? ` (+ $${d.ltmFee.toFixed(2)} LTM)` : '';
-                                decgNotes.push(`DECC (Cap): ${d.quantity}x ${d.description || 'Customer cap'} @ $${d.calculatedUnitPrice.toFixed(2)}/ea${ltmNote}`);
-                            });
-                        }
-
-                        if (decgNotes.length > 0) {
-                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + '--- Customer Items ---\n' + decgNotes.join('\n');
-                        }
+                        createServiceProductRow('DECC', {
+                            quantity: totalQty,
+                            stitchCount: avgStitchCount,
+                            unitPrice: avgUnitPrice,
+                            total: totalCharge,
+                            isCap: true
+                        });
+                        console.log('[confirmShopWorksImport] DECC row created - qty:', totalQty, 'total:', totalCharge);
                     }
 
                     const totalItems = decgGarments.reduce((sum, d) => sum + d.quantity, 0) +
@@ -6921,26 +7373,20 @@ Company:Absher Construction Company
                     showToast(`${totalItems} customer-supplied items imported`, 'success');
                 }
 
-                // 10. Handle monogram charges - populate fee row
+                // 10. Handle monogram charges - CREATE SERVICE PRODUCT ROW (2026-02 refactor)
                 if (data.services.monograms.length > 0) {
                     const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
                     const unitPrice = 12.50; // From Service_Codes API
                     const totalPrice = totalNames * unitPrice;
 
-                    // Show fee row
-                    const monogramRow = document.getElementById('monogram-fee-row');
-                    if (monogramRow) {
-                        monogramRow.style.display = '';
-                        const countLabel = document.getElementById('monogram-count-label');
-                        const qtyCell = document.getElementById('monogram-qty');
-                        const unitCell = document.getElementById('monogram-unit');
-                        const totalCell = document.getElementById('monogram-total');
-
-                        if (countLabel) countLabel.textContent = totalNames;
-                        if (qtyCell) qtyCell.textContent = totalNames;
-                        if (unitCell) unitCell.textContent = `$${unitPrice.toFixed(2)}`;
-                        if (totalCell) totalCell.textContent = `$${totalPrice.toFixed(2)}`;
-                    }
+                    // Create MONOGRAM service product row (instead of fee row)
+                    createServiceProductRow('MONOGRAM', {
+                        quantity: totalNames,
+                        unitPrice: unitPrice,
+                        total: totalPrice,
+                        isCap: false
+                    });
+                    console.log('[confirmShopWorksImport] MONOGRAM row created - qty:', totalNames, 'total:', totalPrice);
 
                     // Also add name details to notes
                     const nameDetails = data.services.monograms
@@ -7006,6 +7452,14 @@ Company:Absher Construction Company
                 if (data.decgItems.length > 0) summary.push('customer-supplied items');
 
                 showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
+
+                // If DECG/DECC items were imported, show stitch count confirmation modal
+                if (data.decgItems && data.decgItems.length > 0) {
+                    // Store the imported items for the stitch count modal
+                    pendingDECGItems = data.decgItems;
+                    // Small delay to let the import toast appear first
+                    setTimeout(() => openDECGStitchModal(pendingDECGItems), 500);
+                }
 
             } catch (error) {
                 console.error('Import failed:', error);
