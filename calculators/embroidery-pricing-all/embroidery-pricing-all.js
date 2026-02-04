@@ -57,6 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAlCalculator();
         setupDecgCalculator();
 
+        // Auto-select tab from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        if (tabParam && ['al-cemb', 'decg'].includes(tabParam)) {
+            switchTab(tabParam);
+        }
+
     } catch (error) {
         console.error('Failed to initialize pricing page:', error);
         showError('Unable to load pricing data. Please refresh the page.');
