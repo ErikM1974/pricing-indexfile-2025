@@ -1609,13 +1609,18 @@ app.get('/cart', (req, res) => {
 
 // Removed duplicate route - inventory-details.html is now served from /pages/ directory (see line 307)
 
-// Serve pricing pages
+// Comprehensive embroidery pricing page (unified AL/CEMB + DECG page)
+app.get('/calculators/embroidery-pricing-all', (req, res) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html'));
+});
+
+// Serve pricing pages - redirect old embroidery routes to new unified page
 app.get('/pricing/embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html'));
 });
 
 app.get('/pricing/cap-embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'cap-embroidery-pricing-integrated.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html'));
 });
 
 app.get('/pricing/dtg', (req, res) => {
