@@ -132,6 +132,12 @@ body {
     font-size: 0.95rem;
 }
 
+.page-header .version-info {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
 /* Tab Navigation */
 .tab-navigation {
     display: flex;
