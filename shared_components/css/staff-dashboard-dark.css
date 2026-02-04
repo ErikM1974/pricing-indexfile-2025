@@ -420,6 +420,24 @@ body {
     color: #86efac;
 }
 
+/* Contract theme - pink/rose for contract orders */
+.contract-theme {
+    background: linear-gradient(135deg, rgba(219, 39, 119, 0.12) 0%, rgba(236, 72, 153, 0.18) 100%);
+    border-color: rgba(236, 72, 153, 0.4);
+}
+
+.contract-theme .tool-category-icon {
+    background: rgba(236, 72, 153, 0.2);
+}
+
+.contract-theme .tool-category-icon i {
+    color: #f472b6;
+}
+
+.contract-theme .tool-category-title {
+    color: #fbcfe8;
+}
+
 /* =====================================================
    METRICS CARDS - DARK MODE
    ===================================================== */

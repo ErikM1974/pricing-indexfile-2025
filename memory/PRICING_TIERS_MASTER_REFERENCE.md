@@ -55,6 +55,9 @@ const hasLTM = quantity < 24;
 | `/api/pricing-bundle?method=EMB-AL` | Garment additional logo tiers |
 | `/api/pricing-bundle?method=CAP-AL` | Cap additional logo tiers |
 | `/api/service-codes` | LTM fee, stitch rates, setup fees |
+| `/api/contract-pricing` | Contract embroidery (CTR-Garmt, CTR-Cap, CTR-FB) |
+| `/api/al-pricing` | AL retail pricing for embroidery pricing page |
+| `/api/decg-pricing` | DECG retail pricing for embroidery pricing page |
 
 ### Implementation Files
 
@@ -65,6 +68,7 @@ const hasLTM = quantity < 24;
 | `shared_components/js/embroidery-pricing-service.js` | Default tiers, API integration |
 | `calculators/embroidery-pricing.html` | Pricing calculator UI |
 | `calculators/embroidery-manual-service.js` | Manual calculator service |
+| `calculators/embroidery-pricing-all/` | **3-tab unified pricing page** (Contract, AL Retail, DECG Retail) |
 | `quote-builders/embroidery-quote-builder.html` | Quote builder UI |
 
 ### getTierLabel() Pattern
@@ -481,6 +485,8 @@ When changing tier logic, verify these files are updated:
 
 | Date | Change |
 |------|--------|
+| 2026-02-04 | Added `/api/contract-pricing`, `/api/al-pricing`, `/api/decg-pricing` endpoints |
+| 2026-02-04 | Added embroidery-pricing-all/ 3-tab page to Implementation Files |
 | 2026-02-02 | Initial document created. Consolidated all pricing tier documentation. |
 | 2026-02-02 | Embroidery restructured from 4-tier to 5-tier (1-7, 8-23, 24-47, 48-71, 72+) |
 

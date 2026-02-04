@@ -746,6 +746,11 @@ app.get('/cap-embroidery-quote-builder.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'quote-builders', 'cap-embroidery-quote-builder.html'));
 });
 
+// Serve the cap embroidery pricing calculator (alias for integrated version)
+app.get('/calculators/cap-embroidery-pricing.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'cap-embroidery-pricing-integrated.html'));
+});
+
 // Serve the DTG quote builder
 app.get('/dtg-quote-builder.html', (req, res) => {
   console.log('Serving dtg-quote-builder.html page');
@@ -1609,13 +1614,22 @@ app.get('/cart', (req, res) => {
 
 // Removed duplicate route - inventory-details.html is now served from /pages/ directory (see line 307)
 
-// Serve pricing pages
-app.get('/pricing/embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing.html'));
+// Comprehensive embroidery pricing page (unified AL/CEMB + DECG page)
+app.get('/calculators/embroidery-pricing-all', (req, res) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html'));
 });
 
-app.get('/pricing/cap-embroidery', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'cap-embroidery-pricing-integrated.html'));
+// Serve pricing pages - serve original embroidery calculators
+app.get('/pricing/embroidery', (req, res, next) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing.html'), (err) => {
+    if (err) next(err);
+  });
+});
+
+app.get('/pricing/cap-embroidery', (req, res, next) => {
+  res.sendFile(path.join(__dirname, 'calculators', 'cap-embroidery-pricing-integrated.html'), (err) => {
+    if (err) next(err);
+  });
 });
 
 app.get('/pricing/dtg', (req, res) => {
