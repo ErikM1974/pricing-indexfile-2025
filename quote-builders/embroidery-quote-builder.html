@@ -948,7 +948,7 @@ Company:Absher Construction Company
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
 
     <!-- ShopWorks Import Parser -->
-    <script src="/shared_components/js/shopworks-import-parser.js?v=20260203-decg-api"></script>
+    <script src="/shared_components/js/shopworks-import-parser.js?v=20260204-decg-error"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -7089,10 +7089,24 @@ Company:Absher Construction Company
                 services.innerHTML = '';
             }
 
-            // Warnings
+            // Warnings - highlight DECG API failures prominently (CLAUDE.md rule #4)
             if (data.warnings.length > 0 || data.notes.length > 0) {
-                let warningsHtml = '<h5><i class="fas fa-exclamation-triangle"></i> Notes & Warnings</h5><ul>';
+                let warningsHtml = '<h5><i class="fas fa-exclamation-triangle"></i> Notes & Warnings</h5>';
+
+                // Show DECG API failure as prominent error banner
+                if (data.decgApiFailed) {
+                    warningsHtml += `
+                        <div style="background: #fef2f2; border: 1px solid #ef4444; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; color: #b91c1c;">
+                            <strong><i class="fas fa-exclamation-circle"></i> DECG API Error:</strong> Unable to load current pricing from server.
+                            Prices shown are <em>fallback estimates</em> and may be incorrect.
+                            <strong>Verify DECG prices manually before sending quote.</strong>
+                        </div>`;
+                }
+
+                warningsHtml += '<ul>';
                 for (const warning of data.warnings) {
+                    // Skip the DECG warning since we displayed it prominently above
+                    if (warning.includes('DECG API unavailable')) continue;
                     warningsHtml += `<li>${escapeHtml(warning)}</li>`;
                 }
                 for (const note of data.notes) {
@@ -7452,6 +7466,13 @@ Company:Absher Construction Company
                 if (data.decgItems.length > 0) summary.push('customer-supplied items');
 
                 showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
+
+                // Show warning if DECG items used fallback pricing (CLAUDE.md rule #4)
+                if (data.decgApiFailed && data.decgItems.length > 0) {
+                    setTimeout(() => {
+                        showToast('⚠️ DECG prices are fallback estimates - verify before sending quote', 'warning', 8000);
+                    }, 1500);
+                }
 
                 // If DECG/DECC items were imported, show stitch count confirmation modal
                 if (data.decgItems && data.decgItems.length > 0) {

@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.9.0 - DECG/DECC pricing now uses /api/decg-pricing endpoint
- * @date 2026-02-03
+ * @version 1.9.1 - Added visible error handling for DECG API failures (CLAUDE.md rule #4)
+ * @date 2026-02-04
  */
 
 class ShopWorksImportParser {
@@ -26,6 +26,7 @@ class ShopWorksImportParser {
         // DECG pricing from /api/decg-pricing (new 2026-02 API)
         this.decgApiPricing = null;
         this.decgApiLoaded = false;
+        this.decgApiFailed = false;  // Track if API call failed (for error display)
 
         // Size mapping from ShopWorks to quote builder format
         this.SIZE_MAP = {
@@ -304,11 +305,21 @@ class ShopWorksImportParser {
             }
 
             console.log('[ShopWorksImportParser] DECG API pricing loaded successfully');
+            this.decgApiFailed = false;
             return true;
         } catch (error) {
             console.warn('[ShopWorksImportParser] Failed to load DECG API pricing, using fallback:', error.message);
+            this.decgApiFailed = true;  // Track failure for error display
             return false;
         }
+    }
+
+    /**
+     * Check if DECG API failed and fallback pricing is being used
+     * @returns {boolean} True if DECG API failed
+     */
+    isDECGApiUsingFallback() {
+        return this.decgApiFailed || !this.decgApiLoaded;
     }
 
     /**
@@ -429,6 +440,12 @@ class ShopWorksImportParser {
         // Debug logging for email extraction
         console.log('[ShopWorksImportParser] Extracted customer email:', result.customer.email || 'NOT FOUND');
         console.log('[ShopWorksImportParser] Extracted customer name:', result.customer.contactName || 'NOT FOUND');
+
+        // Add warning if DECG API failed and order has DECG items (per CLAUDE.md rule #4)
+        if (this.isDECGApiUsingFallback() && result.decgItems.length > 0) {
+            result.warnings.push('DECG API unavailable - using fallback pricing. Verify DECG prices before sending quote.');
+            result.decgApiFailed = true;
+        }
 
         return result;
     }
@@ -1362,4 +1379,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.9.0 - DECG/DECC pricing via /api/decg-pricing');
+console.log('[ShopWorksImportParser] Module loaded v1.9.1 - DECG/DECC pricing via /api/decg-pricing (+ visible error handling)');
