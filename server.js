@@ -1616,22 +1616,14 @@ app.get('/calculators/embroidery-pricing-all', (req, res) => {
 
 // Serve pricing pages - redirect old embroidery routes to new unified page
 app.get('/pricing/embroidery', (req, res, next) => {
-  const filePath = path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error('Error serving /pricing/embroidery:', err.message, 'Path:', filePath);
-      next(err);
-    }
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html'), (err) => {
+    if (err) next(err);
   });
 });
 
 app.get('/pricing/cap-embroidery', (req, res, next) => {
-  const filePath = path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html');
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error('Error serving /pricing/cap-embroidery:', err.message, 'Path:', filePath);
-      next(err);
-    }
+  res.sendFile(path.join(__dirname, 'calculators', 'embroidery-pricing-all', 'index.html'), (err) => {
+    if (err) next(err);
   });
 });
 
