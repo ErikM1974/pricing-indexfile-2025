@@ -4,7 +4,25 @@
 **Database:** Caspio
 **Status:** Pending Creation
 **Created:** 2026-02-01
+**Updated:** 2026-02-03
 **Purpose:** Centralized lookup table for all embroidery service codes, pricing tiers, and fee structures used by the Embroidery Quote Builder and ShopWorks import functionality.
+
+## Important: Embroidery Pricing Consolidation (Feb 2026)
+
+**Source of Truth for Embroidery Pricing:** `Embroidery_Costs` table, NOT `Service_Codes` table!
+
+The Service_Codes table is used for:
+1. ShopWorks import alias resolution
+2. Service type identification
+3. Legacy code compatibility
+
+Actual pricing calculations should use:
+- **AL/CEMB:** `/api/al-pricing` endpoint → `Embroidery_Costs` table (ItemType: AL, AL-CAP, CB, CS, FB)
+- **DECG:** `/api/decg-pricing` endpoint → `Embroidery_Costs` table (ItemType: DECG-Garmt, DECG-Cap, DECG-FB)
+
+**CEMB (Contract Embroidery)** uses the SAME pricing as **AL (Additional Logo)** - both pull from AL records.
+
+See: `/calculators/embroidery-pricing-all/` for the unified pricing page.
 
 ---
 
@@ -127,43 +145,101 @@
 
 ---
 
+## Service Codes Pending Addition (Feb 2026)
+
+**Source:** Analysis of 20,380 order line items (Jan 2025 - Feb 2026)
+**Status:** Awaiting Caspio entry
+
+The following service codes were identified from historical orders but are not yet in the Service_Codes table:
+
+### Screen Print Services
+
+| ServiceCode | Uses | Description | ShopWorks Match | Notes |
+|-------------|------|-------------|-----------------|-------|
+| CDP | 108 | Customer Digital Print | Yes | Customer-supplied digital print application |
+| SPSU | 76 | Screen Print Set Up | Yes | Setup fee for screen printing jobs |
+| SPRESET | 9 | Screen Print Reset | No | Color/screen reset between runs |
+
+### Embroidery Services (Additional Positions)
+
+| ServiceCode | Uses | Description | ShopWorks Match | Notes |
+|-------------|------|-------------|-----------------|-------|
+| CS | 8 | Cap Side Embroidery | Yes (as DECS) | Same pricing as Cap Back (CB) |
+| EJB | 2 | Embroider Jacket Back | Yes | **Parser aliases to FB** (Full Back) |
+| SECC | 3 | Sew Customer Emblems to Caps | Yes | **Parser aliases to DECC** |
+
+### Transfer/Heat Press Services
+
+| ServiceCode | Uses | Description | ShopWorks Match | Notes |
+|-------------|------|-------------|-----------------|-------|
+| Transfer | 3 | Heat Press Transfer | Yes | Apply customer-supplied transfers |
+
+### Fees and Charges
+
+| ServiceCode | Uses | Description | ShopWorks Match | Notes |
+|-------------|------|-------------|-----------------|-------|
+| Shipping | 25 | Shipping Charge | No | Shipping cost pass-through |
+| Freight | 14 | Freight Charge | No | Freight cost pass-through |
+
+### Personalization Services
+
+| ServiceCode | Uses | Description | ShopWorks Match | Notes |
+|-------------|------|-------------|-----------------|-------|
+| Name/Number | 10 | Combined Personalization | No | Sports jerseys: name + number combo |
+| emblem | 17 | Embroidered Emblem | No | Pre-made emblem application |
+
+### Implementation Priority
+
+**High (≥50 uses):** CDP (108), SPSU (76)
+**Medium (10-49 uses):** Shipping (25), emblem (17), Freight (14), Name/Number (10)
+**Low (<10 uses):** SPRESET (9), CS (8), Transfer (3), SECC (3), EJB (2)
+
+**Note:** SECC and EJB are handled by parser aliases (→ DECC and FB respectively) so they work without Caspio entries, but adding them would improve clarity in reporting.
+
+---
+
 ## Alias Mappings Table
 
-For handling common typos and legacy code references. These should be implemented in the lookup service to normalize input before querying.
+For handling common typos and legacy code references. These are implemented in `shopworks-import-parser.js` to normalize input before querying.
 
 | Alias (Typo/Legacy) | Maps To | Notes |
 |---------------------|---------|-------|
-| Aonogram | Monogram | Common typo (A key near M on keyboard) |
-| Nname | Name | Common typo (double N) |
-| Nnames | Name | Common typo (double N, plural) |
-| Names | Monogram | Plural "names" = monogramming |
+| AONOGRAM | MONOGRAM | Common typo (A key near M on keyboard) |
+| NNAME | NAME | Common typo (double N) |
+| NNAMES | NAME | Common typo (double N, plural) |
+| NAMES | MONOGRAM | Plural "names" = monogramming |
 | EJB | FB | Legacy code for Flat Back (Embroidered Jacket Back) |
-| Flag | AL | Legacy code for Apparel Left (chest) position |
-| Setup | GRT-50 | Common shorthand for setup fee |
-| Setup Fee | DD | Maps to digitizing setup |
-| Design Prep | GRT-75 | Common shorthand for design prep/graphic design fee |
-| Excess Stitch | AS-GARM | Additional stitches (garment) |
+| FLAG | AL | Legacy code for Apparel Left (chest) position |
+| SETUP | GRT-50 | Common shorthand for setup fee |
+| SETUP FEE | DD | Maps to digitizing setup |
+| DESIGN PREP | GRT-75 | Common shorthand for design prep/graphic design fee |
+| EXCESS STITCH | AS-GARM | Additional stitches (garment) |
 | SECC | DECC | Typo for DECC (customer-supplied caps) |
 | SEW | SEG | Alias for sewing |
+| COLOR CHG | COLOR CHANGE | Typo for color change service |
 
-### Implementation Example
+### Implementation (shopworks-import-parser.js)
 
 ```javascript
-const SERVICE_CODE_ALIASES = {
-  'Aonogram': 'Monogram',
-  'Nname': 'Name',
-  'Names': 'Name',
-  'EJB': 'FB',
-  'Flag': 'AL',
-  'Setup': 'GRT-50',
-  'Design Prep': 'GRT-75'
+// From shared_components/js/shopworks-import-parser.js
+this.SERVICE_CODE_ALIASES = {
+    'AONOGRAM': 'MONOGRAM',
+    'NNAME': 'NAME',
+    'NNAMES': 'NAME',
+    'NAMES': 'MONOGRAM',
+    'EJB': 'FB',
+    'FLAG': 'AL',
+    'SETUP': 'GRT-50',
+    'SETUP FEE': 'DD',
+    'DESIGN PREP': 'GRT-75',
+    'EXCESS STITCH': 'AS-GARM',
+    'SECC': 'DECC',
+    'SEW': 'SEG',
+    'COLOR CHG': 'COLOR CHANGE'
 };
-
-function resolveServiceCode(code) {
-  // Check aliases first, then return original code
-  return SERVICE_CODE_ALIASES[code] || code;
-}
 ```
+
+**Note:** Keep this in sync with `caspio-pricing-proxy/src/routes/service-codes.js`
 
 ---
 

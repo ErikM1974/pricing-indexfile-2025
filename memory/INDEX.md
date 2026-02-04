@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-02-02 (added QUOTE_BUILDER_WORKFLOWS.md - Text import, PDF, shareable URLs)
+**Last Updated:** 2026-02-03 (order line item classification complete - 20,380 items analyzed, pending Caspio entries documented)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -47,7 +47,9 @@
 ├── CUSTOMER_LOOKUP_SYSTEM.md         # Customer autocomplete for quote builders
 ├── SHOPWORKS_IMPORT_PLAN.md          # ShopWorks order text import for quote builders (IMPLEMENTED 2026-01-31)
 ├── SERVICE_CODES_TABLE.md            # **NEW** Caspio Service_Codes table design (2026-02-01)
-├── CSV_ORDER_VALIDATION.md           # **NEW** 2025 embroidery order validation (line item classification)
+├── CSV_ORDER_VALIDATION.md           # 2025 embroidery order validation (line item classification)
+│                                      # Classification COMPLETE (2026-02-03): 20,380 items → 49 service codes,
+│                                      # 76 non-SanMar products, 2,955 SanMar products, 166 unknowns
 │
 ├── # Pricing References
 ├── PRICING_TIERS_MASTER_REFERENCE.md # **MASTER** All pricing tiers across all methods (2026-02-02)
@@ -89,6 +91,7 @@
 │
 ├── /api/                             # API endpoint modules
 │   ├── products-api.md              # Product search & inventory
+│   ├── non-sanmar-products-api.md   # **NEW** Non-SanMar products CRUD (2026-02-03)
 │   ├── product-showcase-api.md      # New Products & Top Sellers
 │   ├── cart-pricing-api.md          # Cart & pricing bundles
 │   ├── orders-quotes-api.md         # Orders & quote management

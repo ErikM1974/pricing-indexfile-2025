@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Pricing | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="embroidery-pricing-all.css">
+</head>
+<body>
+    <!-- Error Banner (hidden by default) -->
+    <div id="apiErrorBanner" class="api-error-banner hidden">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="apiErrorMessage">Unable to load pricing data. Please refresh the page.</span>
+    </div>
+
+    <div class="main-container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="breadcrumb">
+                    <a href="/dashboards/staff-portal-final.html">Staff Portal</a>
+                    <span class="separator">/</span>
+                    <span>Embroidery Pricing</span>
+                </div>
+                <h1><i class="fas fa-tshirt"></i> Embroidery Pricing</h1>
+                <p class="subtitle">Unified pricing reference for AL/Contract and Customer-Supplied embroidery</p>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="al-cemb" onclick="switchTab('al-cemb')">
+                <i class="fas fa-store"></i>
+                AL/Contract
+                <span class="tab-subtitle">Our Products</span>
+            </button>
+            <button class="tab-btn" data-tab="decg" onclick="switchTab('decg')">
+                <i class="fas fa-box-open"></i>
+                DECG
+                <span class="tab-subtitle">Customer-Supplied</span>
+            </button>
+        </div>
+
+        <!-- Tab Content: AL/CEMB -->
+        <div id="tab-al-cemb" class="tab-content active">
+            <div class="use-case-banner">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Use for:</strong> Adding logos to NWCA-sold products <strong>OR</strong> wholesale/contract embroidery (Ruthie's orders)
+                </div>
+            </div>
+
+            <!-- LTM Banner -->
+            <div class="ltm-banner">
+                <i class="fas fa-exclamation-circle"></i>
+                <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
+            </div>
+
+            <!-- Pricing Matrices Grid -->
+            <div class="matrices-grid">
+                <!-- Garments Matrix -->
+                <div class="matrix-card">
+                    <div class="matrix-header">
+                        <h3><i class="fas fa-tshirt"></i> Garments (AL)</h3>
+                        <div class="matrix-meta">5K base + $1.00/1K</div>
+                    </div>
+                    <table id="alGarmentsMatrix" class="pricing-matrix">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-tier">1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th class="best-tier">72+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Caps Matrix -->
+                <div class="matrix-card">
+                    <div class="matrix-header">
+                        <h3><i class="fas fa-hat-cowboy"></i> Caps (AL-CAP/CB/CS)</h3>
+                        <div class="matrix-meta">5K base + $1.00/1K</div>
+                    </div>
+                    <table id="alCapsMatrix" class="pricing-matrix">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-tier">1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th class="best-tier">72+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Full Back Matrix -->
+            <div class="matrix-card full-width">
+                <div class="matrix-header">
+                    <h3><i class="fas fa-expand"></i> Full Back (FB)</h3>
+                    <div class="matrix-meta">$1.25/1K flat rate &bull; 25K minimum</div>
+                </div>
+                <table id="alFullBackMatrix" class="pricing-matrix compact">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick Calculator -->
+            <div class="calculator-card">
+                <h3><i class="fas fa-calculator"></i> Quick Calculator</h3>
+                <div class="calc-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alItemType">Item Type</label>
+                            <select id="alItemType">
+                                <option value="garment">Garment</option>
+                                <option value="cap">Cap</option>
+                                <option value="fullback">Full Back</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alQuantity">Quantity</label>
+                            <input type="number" id="alQuantity" value="24" min="1" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="alStitches">Stitch Count</label>
+                            <input type="number" id="alStitches" value="5000" min="1000" max="100000" step="1000">
+                        </div>
+                    </div>
+                    <div class="calc-results">
+                        <div class="result-row breakdown" id="alBaseRow">
+                            <span id="alBaseLabel">Base (5K):</span>
+                            <span id="alBasePrice">$0.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="alExtraStitchRow">
+                            <span id="alExtraStitchLabel">+0K extra:</span>
+                            <span id="alExtraStitchPrice">+$0.00</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Unit Price:</span>
+                            <span id="alUnitPrice" class="price">$0.00</span>
+                        </div>
+                        <div class="result-row hidden" id="alLtmRow">
+                            <span>LTM Fee:</span>
+                            <span id="alLtmFee" class="fee">+$50.00</span>
+                        </div>
+                        <div class="result-row total">
+                            <span>Total:</span>
+                            <span id="alTotalPrice" class="total-price">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: DECG -->
+        <div id="tab-decg" class="tab-content">
+            <div class="use-case-banner decg">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Use for:</strong> Customer brings their own garments/caps (premium pricing for customer-supplied items)
+                </div>
+            </div>
+
+            <!-- LTM Banner -->
+            <div class="ltm-banner">
+                <i class="fas fa-exclamation-circle"></i>
+                <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
+            </div>
+
+            <!-- Pricing Matrices Grid -->
+            <div class="matrices-grid">
+                <!-- Garments Matrix -->
+                <div class="matrix-card">
+                    <div class="matrix-header">
+                        <h3><i class="fas fa-tshirt"></i> Garments (DECG-Garmt)</h3>
+                        <div class="matrix-meta">8K base + $1.25/1K</div>
+                    </div>
+                    <table id="decgGarmentsMatrix" class="pricing-matrix">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-tier">1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th class="best-tier">72+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Caps Matrix -->
+                <div class="matrix-card">
+                    <div class="matrix-header">
+                        <h3><i class="fas fa-hat-cowboy"></i> Caps (DECG-Cap)</h3>
+                        <div class="matrix-meta">8K base + $1.00/1K</div>
+                    </div>
+                    <table id="decgCapsMatrix" class="pricing-matrix">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-tier">1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th class="best-tier">72+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Full Back Matrix -->
+            <div class="matrix-card full-width">
+                <div class="matrix-header">
+                    <h3><i class="fas fa-expand"></i> Full Back (DECG-FB)</h3>
+                    <div class="matrix-meta">Tiered rate/1K &bull; 25K minimum &bull; Min 8 pieces</div>
+                </div>
+                <table id="decgFullBackMatrix" class="pricing-matrix">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th>8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th class="best-tier">72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick Calculator -->
+            <div class="calculator-card">
+                <h3><i class="fas fa-calculator"></i> Quick Calculator</h3>
+                <div class="calc-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="decgItemType">Item Type</label>
+                            <select id="decgItemType">
+                                <option value="garment">Garment</option>
+                                <option value="cap">Cap</option>
+                                <option value="fullback">Full Back</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="decgQuantity">Quantity</label>
+                            <input type="number" id="decgQuantity" value="24" min="1" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="decgStitches">Stitch Count</label>
+                            <input type="number" id="decgStitches" value="8000" min="1000" max="100000" step="1000">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="decgHeavyweight">
+                                <span>Heavyweight Surcharge (+$10/piece)</span>
+                            </label>
+                            <small>Carhartt jackets, bags, canvas, leather</small>
+                        </div>
+                    </div>
+                    <div class="calc-results">
+                        <div class="result-row breakdown" id="decgBaseRow">
+                            <span id="decgBaseLabel">Base (8K):</span>
+                            <span id="decgBasePrice">$0.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="decgExtraStitchRow">
+                            <span id="decgExtraStitchLabel">+0K extra:</span>
+                            <span id="decgExtraStitchPrice">+$0.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="decgHeavyweightRow">
+                            <span>Heavyweight:</span>
+                            <span>+$10.00</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Unit Price:</span>
+                            <span id="decgUnitPrice" class="price">$0.00</span>
+                        </div>
+                        <div class="result-row hidden" id="decgLtmRow">
+                            <span>LTM Fee:</span>
+                            <span id="decgLtmFee" class="fee">+$50.00</span>
+                        </div>
+                        <div class="result-row error hidden" id="decgErrorRow">
+                            <span id="decgErrorMessage"></span>
+                        </div>
+                        <div class="result-row total">
+                            <span>Total:</span>
+                            <span id="decgTotalPrice" class="total-price">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+            <p>Pricing effective February 2026 | Data from Caspio Embroidery_Costs table</p>
+        </footer>
+    </div>
+
+    <script src="embroidery-pricing-all.js"></script>
+</body>
+</html>

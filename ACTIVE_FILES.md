@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-02-02
+**Last Updated:** 2026-02-03
 **Total Active Files:** ~288 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -84,7 +84,9 @@
 ### Embroidery System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/embroidery-pricing.html` | Embroidery calculator | embroidery-pricing-service.js | ✅ Active |
+| `/calculators/embroidery-pricing-all/index.html` | **UNIFIED** Embroidery pricing page (AL/CEMB + DECG tabs) | embroidery-pricing-all.js | ✅ Active |
+| `/calculators/embroidery-pricing-all/embroidery-pricing-all.js` | Combined AL/DECG pricing logic | /api/al-pricing, /api/decg-pricing | ✅ Active |
+| `/calculators/embroidery-pricing-all/embroidery-pricing-all.css` | Tabbed interface styles | - | ✅ Active |
 | `/quote-builders/embroidery-quote-builder.html` | Embroidery/Cap Combo Quote Builder 2026 (Excel-style) | embroidery-quote-pricing.js | ✅ Active |
 
 ### Screen Print System
@@ -124,21 +126,32 @@
 | `/calculators/safety-stripe-creator.html` | Safety stripes | safety-stripe-calculator.js | ✅ Active |
 | `/calculators/art-invoice-creator.html` | Art invoices | art-invoice-service-v2.js | ✅ Active |
 
-### Customer Supplied Embroidery (DECG)
+### Embroidery Pricing (Unified - Feb 2026)
+
+**All embroidery pricing now consolidated in `/calculators/embroidery-pricing-all/`**
+
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/embroidery-customer/index.html` | DECG pricing matrix reference page | embroidery-customer-calculator.js | ✅ Active |
-| `/calculators/embroidery-customer/embroidery-customer-calculator.js` | Matrix builder + quick calculator | API /api/decg-pricing | ✅ Active |
-| `/calculators/embroidery-customer/embroidery-customer-styles.css` | Matrix layout styles | - | ✅ Active |
+| `/calculators/embroidery-pricing-all/index.html` | Unified AL/CEMB + DECG pricing page | embroidery-pricing-all.js, .css | ✅ Active |
+| `/calculators/archive/embroidery-customer/*` | DECG standalone calculator | - | 📦 Archived |
+| `/calculators/archive/embroidery-contract/*` | Contract embroidery calculator | - | 📦 Archived |
+| `/calculators/archive/embroidery-pricing.html` | Old embroidery pricing page | - | 📦 Archived |
 
-**DECG Pricing (2026 Feb redesign):**
+**AL/CEMB Pricing (Additional Logo / Contract Embroidery):**
+- Garments: 5K base, $13→$5 (1-7 to 72+), +$1.00/1K
+- Caps (AL-CAP/CB/CS): 5K base, $6.50→$4 (1-7 to 72+), +$1.00/1K
+- Full Back (FB): $1.25/1K flat rate, 25K minimum
+- LTM Fee: $50 for qty 1-7
+- **API:** `/api/al-pricing`
+
+**DECG Pricing (Customer-Supplied Embroidery):**
 - Garments: $28-$20/pc (1-7 to 72+ tier) + $1.25/1K above 8K stitches
 - Caps: $22.50-$16/pc (1-7 to 72+ tier) + $1.00/1K above 8K stitches
 - Full Back: $1.40-$1.20/1K (8-23 to 72+ tier, **MIN 8 PIECES**, min 25K stitches)
 - LTM Fee: $50 for 1-7 pieces (garments/caps only, not full back)
 - Heavyweight Surcharge: +$10/piece (Carhartt jackets, bags, canvas, leather)
-- **Caspio Records:** 14 records created (DECG-Garmt, DECG-Cap, DECG-FB)
-- **Docs:** `/memory/DECG_PRICING_2026.md`
+- **API:** `/api/decg-pricing`
+- **Docs:** `/memory/DECG_PRICING_2026.md`, `/memory/EMBROIDERY_PRICING_RULES.md`
 
 ## 🔧 Services & Components
 
@@ -543,6 +556,25 @@ cap-embroidery-fix.css
 - Which orders can be priced via the quote builder (service codes + SanMar products)
 - Which need manual lookup (non-SanMar vendors)
 - Which are oddballs (typos, free-text, comments)
+
+### Data Seeding Scripts (2026-02)
+| File | Purpose | Status |
+|------|---------|--------|
+| `/tests/scripts/seed-classified-items.js` | Seed service codes & non-SanMar products to Caspio | ✅ Active |
+| `/tests/scripts/cleanup-duplicate-products.js` | Remove duplicate non-SanMar products | ✅ Active |
+| `/tests/scripts/cleanup-duplicate-service-codes.js` | Remove duplicate service codes | ✅ Active |
+| `/tests/scripts/update-embroidery-costs.js` | **NEW** Update AL/CB/CS/FB records in Embroidery_Costs | ✅ Active |
+| `/tests/scripts/add-cemb-service-codes.js` | **NEW** Add CEMB/CEMB-CAP service codes | ✅ Active |
+
+**Run:** `node tests/scripts/seed-classified-items.js`
+
+**Seeded Data (Feb 2026):**
+- **8 service codes:** CDP, SPSU, Transfer, SPRESET, Shipping, Freight, Name/Number, emblem
+- **26 non-SanMar products:** Richardson caps (6), Callaway polos (2), Cutter & Buck (3), Hi-Vis safety (4), Polar Camel drinkware (4), Specialty items (5), Other (2)
+
+**Embroidery Pricing Consolidation (Feb 2026):**
+- **`update-embroidery-costs.js`:** Adds AL (5 tiers), AL-CAP (5 tiers), CB (5 tiers), CS (5 tiers), FB (1 record) = 21 records
+- **`add-cemb-service-codes.js`:** Adds CEMB (5 tiers), CEMB-CAP (5 tiers) = 10 service codes
 
 ## 🔄 Update Protocol
 

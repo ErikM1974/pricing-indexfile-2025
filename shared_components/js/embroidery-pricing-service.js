@@ -427,6 +427,297 @@ class EmbroideryPricingService {
             standardGarmentLogic: 'Small size (or first available)'
         };
     }
+
+    // ============================================================
+    // DECG (Customer Supplied Embroidery) PRICING
+    // ============================================================
+
+    /**
+     * Fetch DECG pricing data from API
+     * @returns {Promise<Object>} DECG pricing structure from API
+     * @throws {Error} If API request fails
+     */
+    async fetchDECGPricing() {
+        const url = `${this.baseURL}/api/decg-pricing`;
+        console.log('[EmbroideryPricingService] Fetching DECG pricing from:', url);
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch DECG pricing from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('[EmbroideryPricingService] DECG pricing loaded:', data);
+        return data;
+    }
+
+    /**
+     * Determine DECG tier from quantity
+     * Embroidery tiers: 1-7 (LTM), 8-23, 24-47, 48-71, 72+
+     * @param {number} quantity - Number of pieces
+     * @returns {string} Tier label (e.g., '1-7', '8-23', '72+')
+     */
+    getDECGTier(quantity) {
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
+        return '72+';
+    }
+
+    /**
+     * Calculate DECG (Customer-Supplied Embroidery) pricing
+     * Uses the same pricing logic as the DECG calculator
+     *
+     * @param {number} quantity - Number of pieces
+     * @param {number} stitchCount - Stitch count (default 8000)
+     * @param {string} itemType - 'garment' or 'cap'
+     * @param {Object} [cachedPricing] - Optional cached DECG pricing data to avoid refetch
+     * @returns {Promise<Object>} { unitPrice, ltmFee, tier, stitchCount, breakdown }
+     */
+    async calculateDECGPrice(quantity, stitchCount = 8000, itemType = 'garment', cachedPricing = null) {
+        // Fetch DECG pricing from API (or use cached)
+        const decgPricing = cachedPricing || await this.fetchDECGPricing();
+
+        // Determine tier from quantity
+        const tier = this.getDECGTier(quantity);
+
+        // Get pricing for item type
+        const category = itemType === 'cap' ? 'caps' : 'garments';
+        const pricingCategory = decgPricing[category];
+
+        if (!pricingCategory || !pricingCategory.basePrices) {
+            throw new Error(`DECG pricing not found for category: ${category}`);
+        }
+
+        const basePrice = pricingCategory.basePrices[tier];
+        const upchargeRate = pricingCategory.perThousandUpcharge || (itemType === 'cap' ? 1.00 : 1.25);
+        const ltmThreshold = pricingCategory.ltmThreshold || 7;
+        const ltmFeeAmount = pricingCategory.ltmFee || 50.00;
+
+        if (basePrice === undefined) {
+            throw new Error(`DECG base price not found for tier: ${tier}`);
+        }
+
+        // Calculate extra stitch charge (above 8K base)
+        const baseStitches = 8000;
+        const extraK = Math.max(0, (stitchCount - baseStitches) / 1000);
+        const extraCharge = extraK * upchargeRate;
+
+        // Unit price = base + extra stitches
+        const unitPrice = basePrice + extraCharge;
+
+        // LTM fee for small orders (≤7 pieces for embroidery)
+        const ltmFee = quantity <= ltmThreshold ? ltmFeeAmount : 0;
+
+        console.log(`[EmbroideryPricingService] DECG calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}`);
+
+        return {
+            unitPrice: parseFloat(unitPrice.toFixed(2)),
+            ltmFee: ltmFee,
+            tier: tier,
+            stitchCount: stitchCount,
+            itemType: itemType,
+            breakdown: {
+                basePrice: basePrice,
+                extraStitches: extraK * 1000,
+                upchargeRate: upchargeRate,
+                extraCharge: parseFloat(extraCharge.toFixed(2))
+            },
+            pricingSource: 'decg-api'
+        };
+    }
+
+    /**
+     * Calculate DECG pricing for multiple items at once (batch)
+     * More efficient as it fetches API data once
+     * @param {Array} items - Array of { quantity, stitchCount, itemType }
+     * @returns {Promise<Array>} Array of pricing results
+     */
+    async calculateDECGPriceBatch(items) {
+        // Fetch DECG pricing once
+        const decgPricing = await this.fetchDECGPricing();
+
+        // Calculate for each item using cached pricing
+        const results = [];
+        for (const item of items) {
+            const pricing = await this.calculateDECGPrice(
+                item.quantity,
+                item.stitchCount || 8000,
+                item.itemType || 'garment',
+                decgPricing  // Pass cached pricing
+            );
+            results.push({
+                ...item,
+                pricing: pricing
+            });
+        }
+
+        return results;
+    }
+
+    // ============================================================
+    // AL (Additional Logo) / CEMB (Contract Embroidery) PRICING
+    // ============================================================
+
+    /**
+     * Fetch AL/CEMB pricing data from API
+     * AL and CEMB use the SAME pricing - both are "embroidery only" (no garment markup)
+     * @returns {Promise<Object>} AL pricing structure from API
+     * @throws {Error} If API request fails
+     */
+    async fetchALPricing() {
+        const url = `${this.baseURL}/api/al-pricing`;
+        console.log('[EmbroideryPricingService] Fetching AL/CEMB pricing from:', url);
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch AL pricing from API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('[EmbroideryPricingService] AL/CEMB pricing loaded:', data);
+        return data;
+    }
+
+    /**
+     * Determine AL/CEMB tier from quantity
+     * Embroidery tiers: 1-7 (LTM), 8-23, 24-47, 48-71, 72+
+     * @param {number} quantity - Number of pieces
+     * @returns {string} Tier label (e.g., '1-7', '8-23', '72+')
+     */
+    getALTier(quantity) {
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
+        return '72+';
+    }
+
+    /**
+     * Calculate AL (Additional Logo) / CEMB (Contract Embroidery) pricing
+     * Uses unified pricing from Embroidery_Costs table (5K base)
+     *
+     * @param {number} quantity - Number of pieces
+     * @param {number} stitchCount - Stitch count (default 5000)
+     * @param {string} itemType - 'garment', 'cap', or 'fullback'
+     * @param {Object} [cachedPricing] - Optional cached AL pricing data to avoid refetch
+     * @returns {Promise<Object>} { unitPrice, ltmFee, tier, stitchCount, breakdown }
+     */
+    async calculateALPrice(quantity, stitchCount = 5000, itemType = 'garment', cachedPricing = null) {
+        // Fetch AL pricing from API (or use cached)
+        const alPricing = cachedPricing || await this.fetchALPricing();
+
+        // Handle full back separately (flat rate per 1K)
+        if (itemType === 'fullback') {
+            const { ratePerThousand, minStitches } = alPricing.fullBack;
+            const actualStitches = Math.max(stitchCount, minStitches);
+            const stitchesK = actualStitches / 1000;
+            const unitPrice = stitchesK * ratePerThousand;
+
+            console.log(`[EmbroideryPricingService] AL Full Back: ${stitchesK}K x $${ratePerThousand} = $${unitPrice.toFixed(2)}`);
+
+            return {
+                unitPrice: parseFloat(unitPrice.toFixed(2)),
+                ltmFee: 0, // No LTM for full back
+                tier: 'ALL',
+                stitchCount: actualStitches,
+                itemType: itemType,
+                breakdown: {
+                    basePrice: unitPrice,
+                    ratePerThousand: ratePerThousand,
+                    stitchesK: stitchesK,
+                    extraCharge: 0
+                },
+                pricingSource: 'al-api'
+            };
+        }
+
+        // Determine tier from quantity
+        const tier = this.getALTier(quantity);
+
+        // Get pricing for item type (garment or cap)
+        const category = itemType === 'cap' ? 'caps' : 'garments';
+        const pricingCategory = alPricing[category];
+
+        if (!pricingCategory || !pricingCategory.basePrices) {
+            throw new Error(`AL pricing not found for category: ${category}`);
+        }
+
+        const basePrice = pricingCategory.basePrices[tier];
+        const upchargeRate = pricingCategory.perThousandUpcharge || 1.00;
+        const baseStitches = pricingCategory.baseStitches || 5000;
+        const ltmThreshold = pricingCategory.ltmThreshold || 7;
+        const ltmFeeAmount = pricingCategory.ltmFee || 50.00;
+
+        if (basePrice === undefined) {
+            throw new Error(`AL base price not found for tier: ${tier}`);
+        }
+
+        // Calculate extra stitch charge (above 5K base)
+        const extraK = Math.max(0, (stitchCount - baseStitches) / 1000);
+        const extraCharge = extraK * upchargeRate;
+
+        // Unit price = base + extra stitches
+        const unitPrice = basePrice + extraCharge;
+
+        // LTM fee for small orders (≤7 pieces for embroidery)
+        const ltmFee = quantity <= ltmThreshold ? ltmFeeAmount : 0;
+
+        console.log(`[EmbroideryPricingService] AL calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}`);
+
+        return {
+            unitPrice: parseFloat(unitPrice.toFixed(2)),
+            ltmFee: ltmFee,
+            tier: tier,
+            stitchCount: stitchCount,
+            itemType: itemType,
+            breakdown: {
+                basePrice: basePrice,
+                baseStitches: baseStitches,
+                extraStitches: extraK * 1000,
+                upchargeRate: upchargeRate,
+                extraCharge: parseFloat(extraCharge.toFixed(2))
+            },
+            pricingSource: 'al-api'
+        };
+    }
+
+    /**
+     * Calculate AL/CEMB pricing for multiple items at once (batch)
+     * More efficient as it fetches API data once
+     * @param {Array} items - Array of { quantity, stitchCount, itemType }
+     * @returns {Promise<Array>} Array of pricing results
+     */
+    async calculateALPriceBatch(items) {
+        // Fetch AL pricing once
+        const alPricing = await this.fetchALPricing();
+
+        // Calculate for each item using cached pricing
+        const results = [];
+        for (const item of items) {
+            const pricing = await this.calculateALPrice(
+                item.quantity,
+                item.stitchCount || 5000,
+                item.itemType || 'garment',
+                alPricing  // Pass cached pricing
+            );
+            results.push({
+                ...item,
+                pricing: pricing
+            });
+        }
+
+        return results;
+    }
+
+    /**
+     * Alias for calculateALPrice - used by contract embroidery
+     * CEMB and AL use the same pricing
+     */
+    async calculateCEMBPrice(quantity, stitchCount = 5000, itemType = 'garment', cachedPricing = null) {
+        return this.calculateALPrice(quantity, stitchCount, itemType, cachedPricing);
+    }
 }
 
 // Make service globally available

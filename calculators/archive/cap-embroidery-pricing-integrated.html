@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Embroidery Pricing | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Universal Pricing Header -->
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20250110">
+
+    <style>
+        :root {
+            --primary-color: #4cb354;
+            --primary-dark: #409a47;
+            --primary-light: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --warning-bg: #fef3c7;
+            --warning-border: #fbbf24;
+            --warning-text: #92400e;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 300px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .search-result-item {
+            display: block;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-result-item:hover {
+            background: var(--primary-light);
+        }
+        
+        .search-result-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .search-result-style {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .search-result-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .search-loading,
+        .search-no-results {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        /* Product Hero */
+        .product-hero {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .product-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .image-gallery {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .main-image-container {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .image-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .image-thumbnail:hover {
+            transform: scale(1.05);
+        }
+        
+        .image-thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+        
+        .image-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-image:hover {
+            transform: scale(1.2);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .product-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .product-detail-item i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .product-detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Color Swatches */
+        .color-swatches-section {
+            margin-bottom: 32px;
+        }
+
+        .color-swatches-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Info Boxes */
+        .info-boxes {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-box {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-box.primary {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-dark);
+        }
+
+        .info-box.warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+        }
+
+        .info-box i {
+            margin-right: 8px;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .pricing-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .pricing-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pricing-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .pricing-table th {
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .pricing-table tbody tr:hover {
+            background: var(--primary-light);
+        }
+
+        .pricing-table td {
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .pricing-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: left;
+        }
+
+        .pricing-table .price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .pricing-table .size-note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* LTM Column Highlighting (1-7 pieces) - Subtle but clear */
+        .pricing-table th.ltm-column,
+        .pricing-table td.ltm-column {
+            background-color: #fefbf3;
+            border-left: 2px solid #e5d9c3;
+            border-right: 2px solid #e5d9c3;
+        }
+
+        .pricing-table thead th.ltm-column {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-left: 2px solid #e5d9c3;
+            border-right: 2px solid #e5d9c3;
+        }
+
+        .ltm-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.3px;
+        }
+
+        .ltm-price-note {
+            display: none;
+        }
+
+        /* Order Information */
+        .order-info-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+        }
+
+        .order-info-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+        }
+
+        .order-info-item {
+            display: flex;
+            gap: 16px;
+        }
+
+        .order-info-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        .order-info-content {
+            flex: 1;
+        }
+
+        .order-info-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .order-info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* API Error Notification */
+        .api-error-notification {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(204, 0, 0, 0.1);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .api-error-notification i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .api-error-notification strong {
+            margin-right: 8px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .product-content {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image-section {
+                min-height: 300px;
+            }
+
+            .pricing-table th,
+            .pricing-table td {
+                padding: 16px 12px;
+                font-size: 14px;
+            }
+
+            .order-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 0 15px;
+            }
+            
+            .api-error-notification {
+                margin: 15px;
+                font-size: 14px;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-title {
+                font-size: 24px;
+            }
+
+            .pricing-title {
+                font-size: 28px;
+            }
+
+            .product-image-section,
+            .product-info-section {
+                padding: 24px;
+            }
+
+            .pricing-section,
+            .order-info-section {
+                padding: 24px;
+            }
+        }
+        
+        /* Product type mismatch overlay */
+        .product-mismatch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .product-mismatch-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .product-mismatch-icon {
+            font-size: 48px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+        
+        .product-mismatch-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .product-mismatch-message {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .product-mismatch-message strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .product-mismatch-button {
+            background: #4cb354;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-mismatch-button:hover {
+            background: #409a47;
+            color: white;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 480px) {
+            .product-mismatch-modal {
+                padding: 30px 20px;
+            }
+            
+            .product-mismatch-icon {
+                font-size: 40px;
+            }
+            
+            .product-mismatch-title {
+                font-size: 20px;
+            }
+            
+            .product-mismatch-message {
+                font-size: 14px;
+            }
+        }
+
+        /* LTM Quick Calculator Component */
+        .ltm-calculator {
+            background: linear-gradient(135deg, #f8fdf8 0%, #eef7ee 100%);
+            border: 1px solid #c8e6c9;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: 0 4px 12px rgba(76, 179, 84, 0.08);
+        }
+
+        .ltm-calculator-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ltm-calculator-header i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .ltm-calculator-header h4 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ltm-calculator-header span {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .ltm-calculator-body {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .ltm-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ltm-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ltm-input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ltm-input-group select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            min-width: 140px;
+        }
+
+        .ltm-input-group select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .ltm-input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+        }
+
+        .ltm-result-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .ltm-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed #e0e0e0;
+        }
+
+        .ltm-breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .ltm-breakdown-row.subtotal {
+            color: var(--text-secondary);
+        }
+
+        .ltm-breakdown-row.fee {
+            color: #b45309;
+            font-weight: 500;
+        }
+
+        .ltm-breakdown-row.fee i {
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .ltm-breakdown-row.total {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 6px;
+        }
+
+        .ltm-per-piece {
+            text-align: center;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ltm-per-piece-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 4px;
+        }
+
+        .ltm-per-piece-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .ltm-upsell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        .ltm-upsell i {
+            color: #f59e0b;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .ltm-upsell strong {
+            color: var(--primary-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ltm-calculator-body {
+                grid-template-columns: 1fr;
+            }
+
+            .ltm-calculator {
+                padding: 20px;
+            }
+
+            .ltm-per-piece-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+    <!-- Additional Logo Calculator -->
+    <link rel="stylesheet" href="/shared_components/css/additional-logo-pricing-table.css">
+</head>
+<body class="pricing-calculator-page">
+    <!-- Enhanced Pricing Header -->
+    <header class="enhanced-pricing-header">
+        <!-- TIER 1: Contact Bar -->
+        <div class="header-contact-bar">
+            <div class="contact-bar-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:253-922-5793" class="contact-link">253-922-5793</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:sales@nwcustomapparel.com" class="contact-link">sales@nwcustomapparel.com</a>
+                    </div>
+                </div>
+                <div class="business-hours">
+                    <i class="fas fa-clock"></i>
+                    Monday - Friday: 8:30 AM - 5:00 PM PST
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 2: Logo/Navigation Bar -->
+        <div class="header-nav">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <a href="/" class="logo-link">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                             alt="Northwest Custom Apparel"
+                             class="logo-image">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIER 3: Pricing Context Bar -->
+        <div class="pricing-context-bar">
+            <div class="context-bar-content">
+                <div class="context-left">
+                    <!-- Breadcrumb Navigation -->
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="/">Home</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <a href="/product.html" id="products-breadcrumb">Products</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">Cap Embroidery Pricing</span>
+                    </nav>
+
+                    <!-- Calculator Type Badge -->
+                    <div class="calculator-type-badge">
+                        <i class="fas fa-hat-cowboy"></i>
+                        <span class="badge-text">Cap Embroidery Pricing Calculator</span>
+                    </div>
+                </div>
+
+                <!-- Search Wrapper -->
+                <div class="search-wrapper">
+                    <input type="text"
+                           class="search-input"
+                           id="styleSearch"
+                           placeholder="Search cap styles..."
+                           autocomplete="off"
+                           role="combobox"
+                           aria-label="Search products"
+                           aria-autocomplete="list"
+                           aria-controls="searchResults"
+                           aria-expanded="false">
+                    <button class="search-btn" id="searchBtn" aria-label="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <!-- Search Results Dropdown -->
+                    <div id="searchResults" class="search-results" role="listbox" aria-live="polite">
+                        <!-- Results will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- API Error Notification -->
+    <div id="apiErrorNotification" class="api-error-notification" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Pricing Service Unavailable</strong>
+        <span id="errorMessage">Unable to load pricing data. Please try again later or contact support at 253-922-5793.</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <i class="fas fa-spinner"></i>
+            <p>Loading cap information...</p>
+        </div>
+
+        <!-- Product Hero -->
+        <div class="product-hero" id="productHero" style="display: none;">
+            <div class="product-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <div class="image-gallery" id="imageGallery">
+                        <div class="main-image-container">
+                            <img id="productImage" class="product-image" style="display: none;">
+                            <div id="imagePlaceholder" class="image-placeholder">
+                                <i class="fas fa-hat-cowboy" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <div>Cap Image</div>
+                            </div>
+                        </div>
+                        <div class="image-thumbnails" id="imageThumbnails" style="display: none;">
+                            <!-- Thumbnails will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Info Section -->
+                <div class="product-info-section">
+                    <h1 class="product-title" id="productTitle">Loading...</h1>
+                    <p class="product-description" id="productDescription">Loading cap information...</p>
+                    
+                    <div class="product-details">
+                        <div class="product-detail-item">
+                            <i class="fas fa-palette"></i>
+                            <span>Color: <span class="product-detail-value" id="currentColor">Black</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Style: <span class="product-detail-value" id="currentStyle">#C112</span></span>
+                        </div>
+                        <div class="product-detail-item">
+                            <i class="fas fa-building"></i>
+                            <span>Brand: <span class="product-detail-value" id="currentBrand">Port Authority</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Color Swatches -->
+                    <div class="color-swatches-section" id="colorSwatchesSection" style="display: none;">
+                        <div class="color-swatches-title">Available Colors</div>
+                        <div class="color-swatches" id="colorSwatches"></div>
+                    </div>
+
+                    <!-- Info Boxes -->
+                    <div class="info-boxes">
+                        <div class="info-box primary">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Includes a Front Embroidered Logo.</strong> Orders of 1-7 pieces: +$50 Less Than Minimum Fee. Orders of 8+ pieces: No additional fee.
+                        </div>
+                        
+                        <div class="info-box warning">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Additional Logos:</strong> Use the Additional Logo Calculator above to price side, back, or additional logo locations. For complex multi-location designs, contact our sales team.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="pricing-section" id="pricingSection" style="display: none;">
+            <div class="pricing-header">
+                <h2 class="pricing-title">Cap Embroidery Pricing</h2>
+                <p class="pricing-subtitle">Includes one front logo at 8,000 stitches</p>
+            </div>
+            
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>Size Range</th>
+                        <th class="ltm-column">1-7 pieces <span class="ltm-badge">+$50 FEE</span></th>
+                        <th>8-23 pieces</th>
+                        <th>24-47 pieces</th>
+                        <th>48-71 pieces</th>
+                        <th>72+ pieces</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Pricing rows will be dynamically generated -->
+                </tbody>
+            </table>
+            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee for orders of 1-7 pieces</p>
+
+            <!-- LTM Quick Calculator -->
+            <div class="ltm-calculator" id="ltmCalculator">
+                <div class="ltm-calculator-header">
+                    <i class="fas fa-calculator"></i>
+                    <h4>Small Order Calculator <span>(1-7 caps)</span></h4>
+                </div>
+                <div class="ltm-calculator-body">
+                    <div class="ltm-input-section">
+                        <div class="ltm-input-group">
+                            <label for="ltmQuantity">Quantity</label>
+                            <select id="ltmQuantity">
+                                <option value="1">1 cap</option>
+                                <option value="2">2 caps</option>
+                                <option value="3" selected>3 caps</option>
+                                <option value="4">4 caps</option>
+                                <option value="5">5 caps</option>
+                                <option value="6">6 caps</option>
+                                <option value="7">7 caps</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ltm-result-section">
+                        <div class="ltm-breakdown">
+                            <div class="ltm-breakdown-row subtotal">
+                                <span><span id="ltmQtyDisplay">3</span> × $<span id="ltmUnitPrice">29.00</span></span>
+                                <span>$<span id="ltmSubtotal">87.00</span></span>
+                            </div>
+                            <div class="ltm-breakdown-row fee">
+                                <span><i class="fas fa-plus"></i>Less Than Minimum Fee</span>
+                                <span>$50.00</span>
+                            </div>
+                            <div class="ltm-breakdown-row total">
+                                <span>Total</span>
+                                <span>$<span id="ltmTotal">137.00</span></span>
+                            </div>
+                        </div>
+                        <div class="ltm-per-piece">
+                            <div class="ltm-per-piece-label">True Cost Per Cap</div>
+                            <div class="ltm-per-piece-value">$<span id="ltmPerPiece">45.67</span></div>
+                        </div>
+                        <div class="ltm-upsell">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Order <strong><span id="ltmPiecesNeeded">5</span> more</strong> to eliminate the $50 fee and pay just <strong>$<span id="ltmTier2Price">29.00</span>/cap</strong>!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <!-- Additional Logo Pricing Table -->
+    <div class="additional-logo-pricing-section">
+        <h3 class="additional-logo-title">
+            <i class="fas fa-plus-circle"></i> Additional Logo Pricing
+        </h3>
+
+        <table class="pricing-table additional-logo-table">
+            <thead>
+                <tr>
+                    <th>Size</th>
+                    <th class="ltm-column">1-7 pieces <span class="ltm-badge">+$50 FEE</span></th>
+                    <th>8-23 pieces</th>
+                    <th>24-47 pieces</th>
+                    <th>48-71 pieces</th>
+                    <th>72+ pieces</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="tier-label">Base Price<br><small>(5,000 stitches)</small></td>
+                    <td id="cap-al-1-7" class="price-cell ltm-column loading">Loading...</td>
+                    <td id="cap-al-8-23" class="price-cell loading">Loading...</td>
+                    <td id="cap-al-24-47" class="price-cell loading">Loading...</td>
+                    <td id="cap-al-48-71" class="price-cell loading">Loading...</td>
+                    <td id="cap-al-72" class="price-cell loading">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Plus $50 Less Than Minimum Fee for orders of 1-7 pieces</p>
+
+        <div class="additional-logo-notes">
+            <p><strong>Note:</strong> Additional logos up to 5,000 stitches. Add $1.00 per 1,000 stitches over base.</p>
+            <p><small>Preferred locations: Cap Back, Left Side, Right Side</small></p>
+        </div>
+    </div>
+
+        </div>
+
+        <!-- Order Information -->
+        <div class="order-info-section" id="orderInfoSection" style="display: none;">
+            <h3 class="order-info-title">Order Information</h3>
+            
+            <div class="order-info-grid">
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Minimum Order</div>
+                        <div class="order-info-text">No minimum order required</div>
+                    </div>
+                </div>
+
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Orders of 1-7 pieces</div>
+                        <div class="order-info-text">$50 Less Than Minimum Fee applies</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Mix & Match</div>
+                        <div class="order-info-text">Combine different cap styles and colors to meet quantity tiers for best pricing</div>
+                    </div>
+                </div>
+                
+                <div class="order-info-item">
+                    <div class="order-info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="order-info-content">
+                        <div class="order-info-label">Custom Quotes</div>
+                        <div class="order-info-text">Use the Additional Logo Calculator above to price additional logo positions. For complex multi-location designs, call 253-922-5793.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/shared_components/js/product-category-filter.js"></script>
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/manual-mode-indicator.js"></script>
+    <script>
+        // Initialize cap pricing service
+        const capService = new CapEmbroideryPricingService();
+        
+        // State
+        let currentProduct = null;
+        let currentColors = [];
+        let selectedColor = null;
+        let currentSizes = [];
+        let pricingData = null;
+        
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const productHero = document.getElementById('productHero');
+        const pricingSection = document.getElementById('pricingSection');
+        const orderInfoSection = document.getElementById('orderInfoSection');
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧢 Cap Embroidery Pricing Page - Simple Layout');
+
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // CHECK FOR MANUAL COST OVERRIDE FIRST
+            const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
+
+            if (manualCost && !isNaN(parseFloat(manualCost))) {
+                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
+                loadManualCapPricing(parseFloat(manualCost));
+                setupSearch();
+                return; // Skip normal product loading
+            }
+
+            // NORMAL FLOW: Get style from URL parameter
+            const styleNumber = urlParams.get('StyleNumber') || urlParams.get('STYLE_No') || urlParams.get('style') || 'C112';
+
+            loadCapProduct(styleNumber);
+            setupSearch();
+        });
+        
+        // Setup search functionality for caps only
+        function setupSearch() {
+            const searchInput = document.getElementById('styleSearch');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchWrapper = document.querySelector('.search-wrapper');
+            
+            // Create search results dropdown
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'search-results';
+            searchWrapper.appendChild(resultsContainer);
+            
+            let searchTimeout = null;
+            
+            // Perform API search for caps only
+            async function performAPISearch(query) {
+                if (query.length < 2) {
+                    resultsContainer.classList.remove('active');
+                    return;
+                }
+                
+                // Show loading state
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching caps...</div>';
+                resultsContainer.classList.add('active');
+                
+                try {
+                    const response = await fetch(`/api/stylesearch?term=${encodeURIComponent(query)}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Search failed');
+                    }
+                    
+                    const results = await response.json();
+                    
+                    // Filter results into caps vs beanies/knit items
+                    const capResults = [];
+                    const beanieResults = [];
+
+                    results.forEach(item => {
+                        // Use shared utility for filtering
+                        if (ProductCategoryFilter.isFlatHeadwear(item)) {
+                            beanieResults.push(item);
+                        } else if (ProductCategoryFilter.isStructuredCap(item)) {
+                            capResults.push(item);
+                        }
+                    });
+                    
+                    // Build the results display
+                    if (capResults.length === 0 && beanieResults.length === 0) {
+                        resultsContainer.innerHTML = '<div class="search-no-results">No cap styles found</div>';
+                    } else {
+                        let resultsHTML = '';
+                        
+                        // Add message about beanies if any were found
+                        if (beanieResults.length > 0) {
+                            resultsHTML += `
+                                <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
+                                    <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                                    Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="/pricing/embroidery" style="color: #4cb354; font-weight: 600;">Flat Embroidery Pricing</a> page for beanies and knit caps.
+                                </div>
+                            `;
+                        }
+                        
+                        // Add cap results
+                        if (capResults.length > 0) {
+                            resultsHTML += capResults.map(result => {
+                                return `
+                                    <div class="search-result-item" data-style="${result.value}">
+                                        <div class="search-result-info">
+                                            <div class="search-result-style">Style #${result.value}</div>
+                                            <div class="search-result-name">${result.label}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        } else if (beanieResults.length > 0) {
+                            // Only beanies were found, no caps
+                            resultsHTML += '<div class="search-no-results">No cap styles found. See message above for beanie/knit options.</div>';
+                        }
+                        
+                        resultsContainer.innerHTML = resultsHTML;
+                        
+                        // Add click handlers to cap results only
+                        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const style = item.dataset.style;
+                                window.location.href = `?StyleNumber=${style}`;
+                            });
+                        });
+                    }
+                    
+                } catch (error) {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+                }
+            }
+            
+            // Handle input changes with debouncing
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(e.target.value.trim());
+                }, 300);
+            });
+            
+            // Handle search button click
+            searchBtn.addEventListener('click', () => {
+                const value = searchInput.value.trim();
+                if (value) {
+                    window.location.href = `?StyleNumber=${value}`;
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    resultsContainer.classList.remove('active');
+                }
+            });
+            
+            // Handle escape key
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    resultsContainer.classList.remove('active');
+                    searchInput.blur();
+                }
+            });
+        }
+        
+        // Load cap product data
+        async function loadCapProduct(styleNumber) {
+            console.log(`🧢 Loading cap: ${styleNumber}`);
+            
+            try {
+                showLoading();
+                
+                // Fetch product details
+                console.log('📡 Fetching cap details...');
+                const productResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
+                if (!productResponse.ok) {
+                    if (productResponse.status === 404) {
+                        throw new Error(`Cap style "${styleNumber}" not found. Please check the style number and try again.`);
+                    } else if (productResponse.status >= 500) {
+                        throw new Error('Pricing server is temporarily unavailable. Please try again in a few moments.');
+                    } else {
+                        throw new Error(`Unable to load product details (Error ${productResponse.status}). Please contact support.`);
+                    }
+                }
+                
+                const productArray = await productResponse.json();
+                console.log('📦 Product details response:', productArray);
+                
+                if (!productArray || productArray.length === 0) {
+                    throw new Error(`No product information found for style "${styleNumber}". This may not be a valid cap style.`);
+                }
+                
+                currentProduct = productArray[0];
+                
+                // Validate that this is actually a cap product
+                const productTitle = (currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || '').toLowerCase();
+                const productDescription = (currentProduct.PRODUCT_DESCRIPTION || currentProduct.Description || '').toLowerCase();
+                const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();
+                const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';
+                
+                // Use shared utility for filtering
+                if (ProductCategoryFilter.isFlatHeadwear(currentProduct)) {
+                    showProductMismatchOverlay(
+                        styleNumber,
+                        `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
+                        'This is a flat headwear item that requires flat embroidery, not cap embroidery.'
+                    );
+                    return; // Stop loading the rest of the page
+                }
+
+                if (!ProductCategoryFilter.isStructuredCap(currentProduct)) {
+                    // This is not a cap - likely a shirt or other item
+                    showProductMismatchOverlay(
+                        styleNumber,
+                        `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
+                        'This product requires flat embroidery pricing, not cap embroidery.'
+                    );
+                    return; // Stop loading the rest of the page
+                }
+                
+                // Update product info
+                updateProductInfo(currentProduct, styleNumber);
+                
+                // Set initial main product image
+                setMainProductImage(currentProduct);
+                
+                // Load colors and images
+                await loadColors(styleNumber);
+                
+                // Load available sizes from API
+                await loadSizes(styleNumber);
+                
+                // Load cap pricing data
+                try {
+                    pricingData = await capService.fetchPricingData(styleNumber);
+                    
+                    if (!pricingData || !pricingData.pricing) {
+                        throw new Error('Pricing structure is invalid');
+                    }
+                } catch (pricingError) {
+                    console.error('❌ Pricing data error:', pricingError);
+                    throw new Error('Unable to load embroidery pricing. The pricing service may be temporarily unavailable. Please try again or contact support at 253-922-5793.');
+                }
+                
+                // Calculate and display cap prices
+                updateCapPricing();
+
+                // Update LTM calculator with real pricing
+                updateLTMCapPricing();
+
+                // Update breadcrumb
+                const productsBreadcrumb = document.getElementById('products-breadcrumb');
+                if (productsBreadcrumb) {
+                    productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
+                }
+                
+                // Show all sections
+                showProduct();
+                
+            } catch (error) {
+                console.error('❌ Error loading cap:', error);
+                showApiError(error.message || 'Failed to load cap pricing. Please try again later or contact support at 253-922-5793.');
+                showNoProduct();
+            }
+        }
+
+        // Load manual cap pricing (when ?manualCost parameter is provided)
+        async function loadManualCapPricing(manualCost) {
+            console.log(`🔧 Loading manual cap pricing with base cost: $${manualCost.toFixed(2)}`);
+
+            try {
+                showLoading();
+
+                // Use the service's manual data generation
+                pricingData = await capService.generateManualPricingData(manualCost);
+
+                // Update product info for manual mode
+                const manualProduct = {
+                    PRODUCT_TITLE: 'Manual Cap Pricing Mode',
+                    BRAND_NAME: 'Manual Entry',
+                    PRODUCT_DESCRIPTION: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`
+                };
+
+                currentProduct = manualProduct;
+                updateProductInfo(manualProduct, 'MANUAL');
+
+                // Hide product image
+                const productImage = document.querySelector('.product-image-main');
+                if (productImage) productImage.style.display = 'none';
+
+                // Set sizes to OSFA (One Size Fits All)
+                currentSizes = [{ size: 'OSFA', available: true }];
+
+                // Update pricing display
+                updateCapPricing();
+
+                // Update LTM calculator with real pricing
+                updateLTMCapPricing();
+
+                // Show product sections
+                showProduct();
+
+                console.log('✅ Manual cap pricing loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading manual cap pricing:', error);
+                showApiError('Failed to load manual pricing mode');
+                showNoProduct();
+            }
+        }
+
+        // Load available sizes from API
+        async function loadSizes(styleNumber) {
+            console.log('📏 Loading cap sizes...');
+            
+            try {
+                const sizePricingResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+                
+                if (sizePricingResponse.ok) {
+                    const sizePricingArray = await sizePricingResponse.json();
+                    console.log('📏 Size pricing response:', sizePricingArray);
+                    
+                    if (sizePricingArray && sizePricingArray.length > 0) {
+                        // Extract unique sizes from all color variants
+                        const allSizes = new Set();
+                        const sizeUpcharges = {};
+                        let baseCapPrice = null;
+                        
+                        sizePricingArray.forEach(colorData => {
+                            if (colorData.basePrices) {
+                                Object.keys(colorData.basePrices).forEach(size => {
+                                    allSizes.add(size);
+                                    // Store the first non-null base price we find
+                                    if (baseCapPrice === null && colorData.basePrices[size]) {
+                                        baseCapPrice = colorData.basePrices[size];
+                                    }
+                                });
+                            }
+                            // Collect upcharges
+                            if (colorData.sizeUpcharges) {
+                                Object.assign(sizeUpcharges, colorData.sizeUpcharges);
+                            }
+                        });
+                        
+                        currentSizes = Array.from(allSizes);
+                        window.currentSizeUpcharges = sizeUpcharges;
+                        
+                        // Store the base cap price from size-pricing API (this is the correct source)
+                        if (baseCapPrice !== null) {
+                            window.baseCapPriceFromSizeAPI = baseCapPrice;
+                            console.log('📏 Base cap price from size-pricing API:', baseCapPrice);
+                        }
+                        
+                        console.log('📏 Available sizes:', currentSizes);
+                        console.log('📏 Size upcharges:', sizeUpcharges);
+                    }
+                } else {
+                    console.log(`⚠️ Size pricing API returned ${sizePricingResponse.status}`);
+                    // Default to OSFA for caps
+                    currentSizes = ['OSFA'];
+                    window.currentSizeUpcharges = {};
+                    window.baseCapPriceFromSizeAPI = null;
+                }
+            } catch (error) {
+                console.log('❌ Could not load sizes:', error);
+                // Default to OSFA for caps
+                currentSizes = ['OSFA'];
+                window.currentSizeUpcharges = {};
+                window.baseCapPriceFromSizeAPI = null;
+            }
+        }
+        
+        // Calculate cap pricing using the same formula as cap-quote-pricing.js
+        function calculateCapPrice(baseCapPrice, quantity, sizeUpcharge = 0) {
+            console.log('💰 Calculating cap price for quantity:', quantity);
+            console.log('💰 Base cap price:', baseCapPrice);
+
+            // Get margin from API data, fallback to 0.57 (2026 margin)
+            const tier = getTierForQuantity(quantity);
+            let marginDenominator = 0.57; // 2026 margin fallback
+            if (pricingData && pricingData.apiData && pricingData.apiData.tiersR) {
+                const tierData = pricingData.apiData.tiersR.find(t => t.TierLabel === tier);
+                if (tierData && tierData.MarginDenominator) {
+                    marginDenominator = tierData.MarginDenominator;
+                }
+            }
+            const capSellingPrice = baseCapPrice / marginDenominator;
+            console.log('💰 Cap selling price (÷' + marginDenominator + '):', capSellingPrice.toFixed(2));
+
+            // Get embroidery price for the tier and 8000 stitches
+            const embroideryPrice = getEmbroideryPriceForTier(tier);
+            console.log('💰 Embroidery price for tier', tier + ':', embroideryPrice);
+            
+            // Calculate decorated price
+            const decoratedPrice = capSellingPrice + embroideryPrice;
+            console.log('💰 Decorated price (before rounding):', decoratedPrice.toFixed(2));
+            
+            // Round UP to nearest dollar (matching cap quote builder)
+            let finalPrice = Math.ceil(decoratedPrice);
+            console.log('💰 Rounded price:', finalPrice);
+            
+            // Note: LTM fee is only for orders under 24 pieces
+            // We don't show that in the regular pricing table
+            
+            // Add size upcharge if any
+            if (sizeUpcharge > 0) {
+                finalPrice += sizeUpcharge;
+                finalPrice = Math.ceil(finalPrice); // Round up again after upcharge
+                console.log('💰 Price with size upcharge:', finalPrice);
+            }
+            
+            console.log('💰 Final price:', finalPrice);
+            return finalPrice;
+        }
+        
+        // Get tier for quantity
+        function getTierForQuantity(quantity) {
+            if (quantity >= 72) return '72+';
+            if (quantity >= 48) return '48-71';
+            if (quantity >= 24) return '24-47';
+            if (quantity >= 8) return '8-23';
+            return '1-7';
+        }
+        
+        // Get embroidery price for tier (8000 stitches, no extra stitches)
+        function getEmbroideryPriceForTier(tier) {
+            if (!pricingData || !pricingData.apiData || !pricingData.apiData.allEmbroideryCostsR) {
+                console.error('❌ No embroidery cost data available from API');
+                // NO FALLBACKS - must have API data for accurate pricing
+                showApiError('Embroidery pricing data unavailable. Please refresh the page or contact support.');
+                return 0; // Return 0 to prevent calculation with bad data
+            }
+
+            // Find the embroidery data for this tier with 8000 stitch count
+            const embroideryData = pricingData.apiData.allEmbroideryCostsR.find(e =>
+                e.TierLabel === tier && e.StitchCount === 8000
+            );
+
+            if (embroideryData) {
+                console.log(`✅ Found embroidery cost for ${tier} (8000 stitches): $${embroideryData.EmbroideryCost}`);
+                return parseFloat(embroideryData.EmbroideryCost);
+            }
+
+            // If no 8000 stitch data, try without stitch count filter (backward compatibility)
+            const embroideryDataAny = pricingData.apiData.allEmbroideryCostsR.find(e =>
+                e.TierLabel === tier
+            );
+
+            if (embroideryDataAny) {
+                console.log(`✅ Found embroidery cost for ${tier}: $${embroideryDataAny.EmbroideryCost}`);
+                return parseFloat(embroideryDataAny.EmbroideryCost);
+            }
+
+            // For 1-7 and 8-23 tiers, fall back to 24-47 tier price (same embroidery cost, different quantity breaks)
+            // This handles backward compatibility when API doesn't have new tier data yet
+            if (tier === '1-7' || tier === '8-23') {
+                console.log(`⚠️ No embroidery cost for ${tier}, falling back to 24-47 tier`);
+                return getEmbroideryPriceForTier('24-47');
+            }
+
+            // NO FALLBACKS for other tiers - API data is required for accurate pricing
+            console.error(`❌ No embroidery cost found for tier ${tier} in API data`);
+            showApiError(`No embroidery pricing available for tier ${tier}. Please contact support.`);
+            return 0; // Return 0 to prevent calculation with bad data
+        }
+        
+        // Update cap pricing table
+        function updateCapPricing() {
+            console.log('💰 Updating cap pricing table...');
+            
+            const tbody = document.querySelector('.pricing-table tbody');
+            if (!tbody) return;
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Get base cap price - prioritize size-pricing API data (matches quote builder)
+            let baseCapPrice = 15; // Default fallback
+            
+            // First priority: Use the price from size-pricing API (this matches the quote builder)
+            if (window.baseCapPriceFromSizeAPI) {
+                baseCapPrice = window.baseCapPriceFromSizeAPI;
+                console.log('🧢 Using size-pricing API price (matches quote builder):', baseCapPrice);
+            } 
+            // Second priority: Use standardGarmentBaseCostUsed from bundle
+            else if (pricingData && pricingData.standardGarmentBaseCostUsed) {
+                baseCapPrice = pricingData.standardGarmentBaseCostUsed;
+                console.log('🧢 Using standardGarmentBaseCostUsed from bundle:', baseCapPrice);
+            } 
+            // Last resort: Use sizes from bundle data
+            else if (pricingData && pricingData.apiData && pricingData.apiData.sizes && pricingData.apiData.sizes.length > 0) {
+                const firstSize = pricingData.apiData.sizes[0];
+                if (firstSize) {
+                    baseCapPrice = firstSize.price || firstSize.maxCasePrice || 15;
+                    console.log('🧢 Using bundle sizes data:', baseCapPrice);
+                }
+            }
+            
+            console.log('🧢 Base cap price:', baseCapPrice);
+            console.log('🧢 Available sizes:', currentSizes);
+            
+            // Generate rows for each size
+            currentSizes.forEach(size => {
+                const row = document.createElement('tr');
+
+                // Get upcharge for this size
+                const upcharge = window.currentSizeUpcharges?.[size] || 0;
+
+                // Calculate prices for each tier (all 5 tiers)
+                const price1_7 = calculateCapPrice(baseCapPrice, 1, upcharge);
+                const price8_23 = calculateCapPrice(baseCapPrice, 8, upcharge);
+                const price24 = calculateCapPrice(baseCapPrice, 24, upcharge);
+                const price48 = calculateCapPrice(baseCapPrice, 48, upcharge);
+                const price72 = calculateCapPrice(baseCapPrice, 72, upcharge);
+
+                // Build row HTML
+                let sizeDisplay = size;
+                if (upcharge > 0) {
+                    sizeDisplay += ` <span class="size-note">(+$${upcharge.toFixed(2)} upcharge)</span>`;
+                }
+
+                row.innerHTML = `
+                    <td>${sizeDisplay}</td>
+                    <td class="ltm-column"><span class="price">$${price1_7.toFixed(2)}</span></td>
+                    <td><span class="price">$${price8_23.toFixed(2)}</span></td>
+                    <td><span class="price">$${price24.toFixed(2)}</span></td>
+                    <td><span class="price">$${price48.toFixed(2)}</span></td>
+                    <td><span class="price">$${price72.toFixed(2)}</span></td>
+                `;
+
+                tbody.appendChild(row);
+            });
+            
+            console.log('✅ Pricing table updated with all tiers');
+        }
+        
+        // Update product information
+        function updateProductInfo(product, styleNumber) {
+            console.log('📝 Updating product info with:', product);
+            
+            const title = product.PRODUCT_TITLE || product.ProductTitle || product.STYLE || styleNumber.toUpperCase();
+            const description = product.PRODUCT_DESCRIPTION || product.Description || product.PRODUCT_TITLE || '';
+            const brand = product.BRAND_NAME || product.BRAND || product.Brand || 'Unknown Brand';
+            
+            document.getElementById('productTitle').textContent = title;
+            document.getElementById('productDescription').textContent = description;
+            document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
+            document.getElementById('currentBrand').textContent = brand;
+            
+            console.log('✅ Product info updated:', { title, description, brand });
+        }
+        
+        // Helper function to detect generic catalog images
+        function isGenericProductImage(url) {
+            if (!url) return true;
+            
+            // Check for generic catalog image patterns
+            // These are typically: /catalog/images/[STYLE].jpg or similar
+            const genericPatterns = [
+                /\/catalog\/images\/[A-Z0-9]+\.jpg$/i,  // Matches /catalog/images/C112.jpg
+                /\/catalog\/[A-Z0-9]+\.jpg$/i,          // Matches /catalog/C112.jpg
+                /\/imglib\/mft\/[A-Z0-9]+\.jpg$/i       // Matches other generic patterns
+            ];
+            
+            return genericPatterns.some(pattern => pattern.test(url));
+        }
+        
+        // Set main product image and create thumbnails
+        function setMainProductImage(product, colorSpecific = false) {
+            console.log('🖼️ Setting main product image with:', product, 'Color-specific:', colorSpecific);
+            
+            // Collect all available images
+            const images = [];
+            
+            if (product.FRONT_MODEL) {
+                images.push({ url: product.FRONT_MODEL, label: 'Model', field: 'FRONT_MODEL' });
+            }
+            if (product.FRONT_FLAT) {
+                images.push({ url: product.FRONT_FLAT, label: 'Flat', field: 'FRONT_FLAT' });
+            }
+            
+            // Only add PRODUCT_IMAGE if it's different, not generic, and exists on this variant
+            if (product.PRODUCT_IMAGE && 
+                product.PRODUCT_IMAGE !== product.FRONT_MODEL && 
+                product.PRODUCT_IMAGE !== product.FRONT_FLAT &&
+                !isGenericProductImage(product.PRODUCT_IMAGE)) {
+                images.push({ url: product.PRODUCT_IMAGE, label: 'Product', field: 'PRODUCT_IMAGE' });
+            }
+            
+            // Add back/side images if available for this color
+            if (product.BACK_FLAT) {
+                images.push({ url: product.BACK_FLAT, label: 'Back', field: 'BACK_FLAT' });
+            }
+            if (product.SIDE_MODEL) {
+                images.push({ url: product.SIDE_MODEL, label: 'Side', field: 'SIDE_MODEL' });
+            }
+            
+            console.log('📸 Available images for', product.COLOR_NAME || 'default', ':', images);
+            
+            if (images.length > 0) {
+                // Set main image
+                const mainImage = document.getElementById('productImage');
+                const placeholder = document.getElementById('imagePlaceholder');
+                
+                mainImage.src = images[0].url;
+                mainImage.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                // Handle image load error
+                mainImage.onerror = () => {
+                    console.log('❌ Main image failed to load:', images[0].url);
+                    mainImage.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                };
+                
+                mainImage.onload = () => {
+                    console.log('✅ Main image loaded successfully');
+                };
+                
+                // Create thumbnails if multiple images
+                if (images.length > 1) {
+                    const thumbnailsContainer = document.getElementById('imageThumbnails');
+                    thumbnailsContainer.innerHTML = '';
+                    thumbnailsContainer.style.display = 'flex';
+                    
+                    images.forEach((img, index) => {
+                        const thumb = document.createElement('div');
+                        thumb.className = 'image-thumbnail' + (index === 0 ? ' active' : '');
+                        
+                        const thumbImg = document.createElement('img');
+                        thumbImg.src = img.url;
+                        thumbImg.alt = img.label;
+                        thumbImg.title = img.label;
+                        
+                        thumb.appendChild(thumbImg);
+                        
+                        thumb.onclick = () => {
+                            // Update main image
+                            mainImage.src = img.url;
+                            // Update active thumbnail
+                            document.querySelectorAll('.image-thumbnail').forEach(t => t.classList.remove('active'));
+                            thumb.classList.add('active');
+                            console.log('🖼️ Switched to image:', img.label);
+                        };
+                        
+                        thumbnailsContainer.appendChild(thumb);
+                    });
+                    
+                    console.log('✅ Created', images.length, 'thumbnails');
+                } else {
+                    // Hide thumbnails if only one image
+                    const thumbnailsContainer = document.getElementById('imageThumbnails');
+                    if (thumbnailsContainer) {
+                        thumbnailsContainer.style.display = 'none';
+                    }
+                }
+            } else {
+                console.log('⚠️ No images available, showing placeholder');
+                document.getElementById('productImage').style.display = 'none';
+                document.getElementById('imagePlaceholder').style.display = 'flex';
+            }
+        }
+        
+        // Load colors
+        async function loadColors(styleNumber) {
+            console.log('🎨 Loading colors for:', styleNumber);
+            
+            try {
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
+                
+                if (response.ok) {
+                    const colorsArray = await response.json();
+                    console.log('🎨 Color swatches response:', colorsArray);
+                    
+                    // API returns array directly
+                    const colors = Array.isArray(colorsArray) ? colorsArray : [];
+                    currentColors = colors;
+                    
+                    if (colors.length > 0) {
+                        // Set first color as selected
+                        selectedColor = colors[0];
+                        displayColorSwatches(colors);
+                        console.log(`✅ Loaded ${colors.length} colors, selected:`, selectedColor.COLOR_NAME || selectedColor.color);
+                    } else {
+                        console.log('⚠️ No colors found for this style');
+                    }
+                } else {
+                    console.log(`⚠️ Color swatches API returned ${response.status}`);
+                }
+            } catch (error) {
+                console.log('❌ Could not load colors:', error);
+            }
+        }
+        
+        // Display color swatches
+        function displayColorSwatches(colors) {
+            const section = document.getElementById('colorSwatchesSection');
+            const container = document.getElementById('colorSwatches');
+            
+            if (!colors || colors.length === 0) {
+                console.log('⚠️ No colors available for swatches');
+                return;
+            }
+            
+            container.innerHTML = '';
+            console.log('🎨 Displaying', colors.length, 'color swatches');
+            
+            colors.forEach((color, index) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch' + (index === 0 ? ' active' : '');
+                
+                // Try COLOR_SQUARE_IMAGE first, then fall back to solid color
+                if (color.COLOR_SQUARE_IMAGE || color.swatchUrl) {
+                    const img = document.createElement('img');
+                    img.src = color.COLOR_SQUARE_IMAGE || color.swatchUrl;
+                    img.alt = color.COLOR_NAME || color.color || 'Color swatch';
+                    img.onerror = function() {
+                        // If image fails to load, use solid color fallback
+                        console.log('⚠️ Swatch image failed for:', color.COLOR_NAME, '- using solid color');
+                        swatch.innerHTML = '';
+                        swatch.style.background = color.HEX_CODE || color.hexCode || '#cccccc';
+                    };
+                    swatch.appendChild(img);
+                } else if (color.HEX_CODE || color.hexCode) {
+                    // Use hex code if no image available
+                    swatch.style.background = color.HEX_CODE || color.hexCode;
+                } else {
+                    // Default gray if no color data
+                    swatch.style.background = '#cccccc';
+                }
+                
+                swatch.title = color.COLOR_NAME || color.color || 'Unknown Color';
+                swatch.onclick = () => {
+                    // Update active swatch
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    // Update current color display
+                    const colorName = color.COLOR_NAME || color.color || 'Unknown';
+                    document.getElementById('currentColor').textContent = colorName;
+                    selectedColor = color;
+                    
+                    // Update main product image for selected color
+                    updateMainImageForColor(colorName);
+                    
+                    console.log('🎨 Color selected:', colorName);
+                };
+                
+                container.appendChild(swatch);
+            });
+            
+            // Show the color swatches section if we have any colors
+            if (colors.length > 0) {
+                section.style.display = 'block';
+            }
+            
+            // Set initial color
+            if (colors.length > 0) {
+                selectedColor = colors[0];
+                const initialColorName = colors[0].COLOR_NAME || colors[0].color || 'Unknown';
+                document.getElementById('currentColor').textContent = initialColorName;
+                console.log('🎨 Initial color set:', initialColorName);
+            }
+        }
+        
+        // Update main product image for selected color
+        async function updateMainImageForColor(colorName) {
+            console.log('🖼️ Finding image for color:', colorName);
+            
+            if (!currentProduct || !currentProduct.STYLE) {
+                console.log('⚠️ No product loaded to update color for');
+                return;
+            }
+            
+            try {
+                // Fetch product details to get color-specific images
+                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${currentProduct.STYLE}`);
+                if (!response.ok) {
+                    console.log('⚠️ Could not fetch product details for color update');
+                    return;
+                }
+                
+                const productArray = await response.json();
+                
+                // Find ALL product entries that match this specific color
+                const matchingProducts = productArray.filter(p => p.COLOR_NAME === colorName);
+                
+                if (matchingProducts.length > 0) {
+                    // Merge all image fields from products with this color
+                    const mergedProduct = { ...matchingProducts[0] };
+                    
+                    // Collect all unique image URLs from this color's variants
+                    matchingProducts.forEach(p => {
+                        if (p.FRONT_MODEL && !mergedProduct.FRONT_MODEL) mergedProduct.FRONT_MODEL = p.FRONT_MODEL;
+                        if (p.FRONT_FLAT && !mergedProduct.FRONT_FLAT) mergedProduct.FRONT_FLAT = p.FRONT_FLAT;
+                        if (p.PRODUCT_IMAGE && !mergedProduct.PRODUCT_IMAGE) mergedProduct.PRODUCT_IMAGE = p.PRODUCT_IMAGE;
+                        if (p.BACK_FLAT && !mergedProduct.BACK_FLAT) mergedProduct.BACK_FLAT = p.BACK_FLAT;
+                        if (p.SIDE_MODEL && !mergedProduct.SIDE_MODEL) mergedProduct.SIDE_MODEL = p.SIDE_MODEL;
+                    });
+                    
+                    // Update product images with color-specific images
+                    setMainProductImage(mergedProduct, true);
+                    console.log('✅ Updated images for color:', colorName, 'with', matchingProducts.length, 'variants');
+                } else {
+                    console.log('⚠️ No matching product found for color:', colorName);
+                    // Keep the current images
+                }
+            } catch (error) {
+                console.log('❌ Error fetching color-specific image:', error);
+                // Keep the current images
+            }
+        }
+        
+        // Show product mismatch overlay
+        function showProductMismatchOverlay(styleNumber, productName, reason) {
+            console.log('⚠️ Product mismatch detected:', productName);
+            
+            // Hide loading state
+            document.getElementById('loadingState').style.display = 'none';
+            
+            // Create or get overlay
+            let overlay = document.getElementById('productMismatchOverlay');
+            if (!overlay) {
+                // Create the overlay HTML dynamically
+                const overlayHTML = `
+                    <div id="productMismatchOverlay" class="product-mismatch-overlay">
+                        <div class="product-mismatch-modal">
+                            <div class="product-mismatch-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h2 class="product-mismatch-title">Wrong Pricing Calculator</h2>
+                            <p class="product-mismatch-message" id="mismatchMessage"></p>
+                            <a id="redirectButton" href="#" class="product-mismatch-button">
+                                Go to Flat Embroidery Pricing →
+                            </a>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', overlayHTML);
+                overlay = document.getElementById('productMismatchOverlay');
+            }
+            
+            // Update message and button
+            document.getElementById('mismatchMessage').innerHTML = `
+                <strong>${productName}</strong><br><br>
+                ${reason}<br><br>
+                Cap embroidery pricing is only for structured caps like baseball caps and trucker hats.
+            `;
+            
+            document.getElementById('redirectButton').href = `/pricing/embroidery?StyleNumber=${styleNumber}`;
+            
+            // Show the overlay
+            overlay.style.display = 'flex';
+            
+            // Gray out the background content (they might be partially visible)
+            if (document.getElementById('productHero')) {
+                document.getElementById('productHero').style.opacity = '0.3';
+            }
+            if (document.getElementById('pricingSection')) {
+                document.getElementById('pricingSection').style.opacity = '0.3';
+            }
+            if (document.getElementById('orderInfoSection')) {
+                document.getElementById('orderInfoSection').style.opacity = '0.3';
+            }
+        }
+        
+        // Show/hide functions
+        function showLoading() {
+            loadingState.style.display = 'flex';
+            productHero.style.display = 'none';
+            pricingSection.style.display = 'none';
+            orderInfoSection.style.display = 'none';
+        }
+        
+        function showProduct() {
+            loadingState.style.display = 'none';
+            productHero.style.display = 'block';
+            pricingSection.style.display = 'block';
+            orderInfoSection.style.display = 'block';
+        }
+        
+        function showNoProduct() {
+            loadingState.innerHTML = `
+                <i class="fas fa-search"></i>
+                <p>Search for a cap style to view pricing</p>
+            `;
+        }
+        
+        function showApiError(message) {
+            const notification = document.getElementById('apiErrorNotification');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            notification.style.display = 'flex';
+        }
+
+        // ============================================
+        // LTM Quick Calculator for Caps
+        // ============================================
+
+        // Store pricing data for LTM calculator
+        let ltmCapPricingData = {
+            unitPrice: 29.00,    // Default cap price (1-7 tier)
+            tier2Price: 29.00   // 8-23 tier price for upsell message
+        };
+
+        // Initialize LTM calculator when page loads
+        function initLTMCalculator() {
+            const qtySelect = document.getElementById('ltmQuantity');
+
+            if (qtySelect) {
+                qtySelect.addEventListener('change', updateLTMCalculator);
+                updateLTMCalculator(); // Initial calculation
+            }
+        }
+
+        // Update LTM calculator with real cap pricing from the pricing table
+        function updateLTMCapPricing() {
+            // Get price from first row of pricing table (OSFA or first size)
+            const priceCell = document.querySelector('.pricing-table tbody tr td:nth-child(2) .price');
+            const tier2Cell = document.querySelector('.pricing-table tbody tr td:nth-child(3) .price');
+
+            if (priceCell) {
+                const priceText = priceCell.textContent.replace('$', '');
+                const price = parseFloat(priceText);
+                if (!isNaN(price)) {
+                    ltmCapPricingData.unitPrice = price;
+                }
+            }
+
+            if (tier2Cell) {
+                const tier2Text = tier2Cell.textContent.replace('$', '');
+                const tier2Price = parseFloat(tier2Text);
+                if (!isNaN(tier2Price)) {
+                    ltmCapPricingData.tier2Price = tier2Price;
+                }
+            }
+
+            console.log('🧢 LTM Calculator pricing updated:', ltmCapPricingData);
+            updateLTMCalculator();
+        }
+
+        // Calculate and update LTM display
+        function updateLTMCalculator() {
+            const qty = parseInt(document.getElementById('ltmQuantity')?.value || 3);
+            const unitPrice = ltmCapPricingData.unitPrice;
+
+            const LTM_FEE = 50;
+            const subtotal = qty * unitPrice;
+            const total = subtotal + LTM_FEE;
+            const perPiece = total / qty;
+            const piecesNeeded = 8 - qty;
+
+            // Update display elements
+            const elements = {
+                ltmQtyDisplay: qty,
+                ltmUnitPrice: unitPrice.toFixed(2),
+                ltmSubtotal: subtotal.toFixed(2),
+                ltmTotal: total.toFixed(2),
+                ltmPerPiece: perPiece.toFixed(2),
+                ltmPiecesNeeded: piecesNeeded,
+                ltmTier2Price: ltmCapPricingData.tier2Price.toFixed(2)
+            };
+
+            Object.entries(elements).forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            });
+        }
+
+        // Initialize calculator when DOM is ready
+        document.addEventListener('DOMContentLoaded', initLTMCalculator);
+    </script>
+    <!-- Additional Logo Calculator Script -->
+    <script src="/shared_components/js/additional-logo-cap-simple.js"></script>
+</body>
+</html>
