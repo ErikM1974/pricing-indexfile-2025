@@ -181,20 +181,52 @@ body {
     color: var(--primary-dark);
 }
 
-/* AL/Contract Tab - Pink Theme */
-.tab-btn[data-tab="al-cemb"]:hover {
+/* Contract Tab - Pink Theme */
+.tab-btn.contract:hover {
     border-color: var(--contract-border);
     color: var(--contract-text);
 }
 
-.tab-btn[data-tab="al-cemb"].active {
+.tab-btn.contract.active {
     background: var(--contract-bg);
     border-color: var(--contract-text);
     color: var(--contract-text-dark);
 }
 
-.tab-btn[data-tab="al-cemb"].active .tab-subtitle {
+.tab-btn.contract.active .tab-subtitle {
     color: var(--contract-text);
+}
+
+/* AL Retail Tab - Blue Theme */
+.tab-btn.al-retail:hover {
+    border-color: #7dd3fc;
+    color: #0369a1;
+}
+
+.tab-btn.al-retail.active {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+}
+
+.tab-btn.al-retail.active .tab-subtitle {
+    color: #0284c7;
+}
+
+/* DECG Retail Tab - Purple Theme */
+.tab-btn.decg-retail:hover {
+    border-color: #c4b5fd;
+    color: #6b21a8;
+}
+
+.tab-btn.decg-retail.active {
+    background: #f3e8ff;
+    border-color: #9333ea;
+    color: #6b21a8;
+}
+
+.tab-btn.decg-retail.active .tab-subtitle {
+    color: #9333ea;
 }
 
 /* Tab Content */
@@ -219,10 +251,16 @@ body {
     color: var(--info-text);
 }
 
-.use-case-banner.al-cemb {
+.use-case-banner.contract {
     background: var(--contract-bg);
     border-color: var(--contract-border);
     color: var(--contract-text-dark);
+}
+
+.use-case-banner.al-retail {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+    color: #0369a1;
 }
 
 .use-case-banner.decg {
@@ -300,6 +338,38 @@ body {
     background: var(--bg-color);
     padding: 4px 10px;
     border-radius: 20px;
+}
+
+/* Loading and Error States */
+.loading-cell {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.loading-cell::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-cell {
+    text-align: center;
+    padding: 24px;
+    color: var(--error-text);
+    background: var(--error-bg);
 }
 
 /* Pricing Matrix Table */
@@ -499,6 +569,179 @@ body {
     display: none;
 }
 
+/* Hourly Revenue Check */
+.hourly-check {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.hourly-check.good {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.hourly-check.warn {
+    background: #fef9c3;
+    color: #ca8a04;
+}
+
+.hourly-check.bad {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* Simplified Pricing Table */
+.pricing-matrix.simple {
+    max-width: 350px;
+}
+
+.pricing-matrix.simple td.price-cell {
+    font-weight: 600;
+    color: var(--primary-dark);
+    font-size: 1rem;
+}
+
+.matrix-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 12px;
+    font-style: italic;
+}
+
+.ltm-note {
+    color: var(--warning-text);
+    font-size: 0.75rem;
+}
+
+.ltm-badge-small {
+    background: var(--ltm-bg);
+    color: var(--warning-text);
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Fees Card */
+.fees-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+}
+
+.fees-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.fees-card h3 i {
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.fees-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.fee-item {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background: var(--bg-color);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+}
+
+.fee-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.fee-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 4px;
+}
+
+.fee-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Script Card */
+.script-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+}
+
+.script-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.script-card h3 i {
+    color: #0284c7;
+    margin-right: 8px;
+}
+
+.script-example {
+    background: #f8fafc;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    border-left: 4px solid #0284c7;
+}
+
+.script-example p {
+    margin-bottom: 12px;
+}
+
+.script-example p:last-child {
+    margin-bottom: 0;
+}
+
+.script-example strong {
+    color: var(--text-primary);
+}
+
+/* Surcharge Card */
+.surcharge-card {
+    background: #fef9c3;
+    border: 1px solid #fde047;
+    border-radius: var(--radius-lg);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+}
+
+.surcharge-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--warning-text);
+    margin-bottom: 8px;
+}
+
+.surcharge-card h3 i {
+    margin-right: 8px;
+}
+
+.surcharge-card p {
+    color: var(--warning-text);
+    font-size: 0.95rem;
+}
+
 /* Footer */
 .page-footer {
     text-align: center;
@@ -547,12 +790,18 @@ body {
 /* Print Styles */
 @media print {
     .tab-navigation,
-    .calculator-card {
+    .calculator-card,
+    .script-card {
         display: none;
     }
 
     .tab-content {
         display: block !important;
+        page-break-before: always;
+    }
+
+    .tab-content:first-of-type {
+        page-break-before: avoid;
     }
 
     .page-header {
@@ -560,9 +809,18 @@ body {
         border: 1px solid var(--border-color);
     }
 
-    .matrix-card {
+    .matrix-card,
+    .fees-card {
         box-shadow: none;
         border: 1px solid var(--border-color);
         page-break-inside: avoid;
+    }
+
+    .use-case-banner {
+        border-width: 2px;
+    }
+
+    .surcharge-card {
+        border-width: 2px;
     }
 }

@@ -31,30 +31,35 @@
                     <span>Embroidery Pricing</span>
                 </div>
                 <h1><i class="fas fa-tshirt"></i> Embroidery Pricing</h1>
-                <p class="subtitle">Unified pricing reference for AL/Contract and Customer-Supplied embroidery</p>
+                <p class="subtitle">Contract pricing for production | Simplified retail pricing for sales reps</p>
             </div>
         </header>
 
         <!-- Tab Navigation -->
         <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="al-cemb" onclick="switchTab('al-cemb')">
-                <i class="fas fa-store"></i>
-                AL/Contract
-                <span class="tab-subtitle">Our Products</span>
+            <button class="tab-btn contract active" data-tab="contract" onclick="switchTab('contract')">
+                <i class="fas fa-industry"></i>
+                Contract
+                <span class="tab-subtitle">Production/Ruthie</span>
             </button>
-            <button class="tab-btn" data-tab="decg" onclick="switchTab('decg')">
+            <button class="tab-btn al-retail" data-tab="al-retail" onclick="switchTab('al-retail')">
+                <i class="fas fa-tag"></i>
+                AL Retail
+                <span class="tab-subtitle">Additional Logo</span>
+            </button>
+            <button class="tab-btn decg-retail" data-tab="decg-retail" onclick="switchTab('decg-retail')">
                 <i class="fas fa-box-open"></i>
-                DECG
+                DECG Retail
                 <span class="tab-subtitle">Customer-Supplied</span>
             </button>
         </div>
 
-        <!-- Tab Content: AL/CEMB -->
-        <div id="tab-al-cemb" class="tab-content active">
-            <div class="use-case-banner al-cemb">
+        <!-- Tab Content: CONTRACT (Production/Ruthie) -->
+        <div id="tab-contract" class="tab-content active">
+            <div class="use-case-banner contract">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>Use for:</strong> Adding logos to NWCA-sold products <strong>OR</strong> wholesale/contract embroidery (Ruthie's orders)
+                    <strong>Contract Embroidery (Labor Only):</strong> Customer supplies their own garments/caps. Pricing covers embroidery service only. Target: $100-$125/hour billing rate.
                 </div>
             </div>
 
@@ -66,13 +71,13 @@
 
             <!-- Pricing Matrices Grid -->
             <div class="matrices-grid">
-                <!-- Garments Matrix -->
+                <!-- Contract Garments Matrix -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Garments (AL)</h3>
-                        <div class="matrix-meta">5K base + $1.00/1K</div>
+                        <h3><i class="fas fa-tshirt"></i> Contract Garments</h3>
+                        <div class="matrix-meta">16 pcs/hr @ 8K stitches</div>
                     </div>
-                    <table id="alGarmentsMatrix" class="pricing-matrix">
+                    <table id="contractGarmentsMatrix" class="pricing-matrix">
                         <thead>
                             <tr>
                                 <th>Stitches</th>
@@ -89,13 +94,13 @@
                     </table>
                 </div>
 
-                <!-- Caps Matrix -->
+                <!-- Contract Caps Matrix -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Caps (AL-CAP/CB/CS)</h3>
-                        <div class="matrix-meta">5K base + $1.00/1K</div>
+                        <h3><i class="fas fa-hat-cowboy"></i> Contract Cap Fronts</h3>
+                        <div class="matrix-meta">22 pcs/hr @ 8K stitches</div>
                     </div>
-                    <table id="alCapsMatrix" class="pricing-matrix">
+                    <table id="contractCapsMatrix" class="pricing-matrix">
                         <thead>
                             <tr>
                                 <th>Stitches</th>
@@ -113,17 +118,21 @@
                 </div>
             </div>
 
-            <!-- Full Back Matrix -->
+            <!-- Contract Full Back Matrix -->
             <div class="matrix-card full-width">
                 <div class="matrix-header">
-                    <h3><i class="fas fa-expand"></i> Full Back (FB)</h3>
-                    <div class="matrix-meta">$1.25/1K flat rate &bull; 25K minimum</div>
+                    <h3><i class="fas fa-expand"></i> Contract Full Back (25K+ Stitches)</h3>
+                    <div class="matrix-meta">Priced per 1,000 stitches &bull; 25K minimum &bull; Min $20.00</div>
                 </div>
-                <table id="alFullBackMatrix" class="pricing-matrix compact">
+                <table id="contractFullBackMatrix" class="pricing-matrix">
                     <thead>
                         <tr>
-                            <th>Stitches</th>
-                            <th>Price</th>
+                            <th>Tier</th>
+                            <th>$/1K</th>
+                            <th>25K</th>
+                            <th>30K</th>
+                            <th>35K</th>
+                            <th>50K</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -134,58 +143,80 @@
 
             <!-- Quick Calculator -->
             <div class="calculator-card">
-                <h3><i class="fas fa-calculator"></i> Quick Calculator</h3>
+                <h3><i class="fas fa-calculator"></i> Contract Calculator</h3>
                 <div class="calc-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="alItemType">Item Type</label>
-                            <select id="alItemType">
+                            <label for="contractItemType">Item Type</label>
+                            <select id="contractItemType">
                                 <option value="garment">Garment</option>
                                 <option value="cap">Cap</option>
                                 <option value="fullback">Full Back</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="alQuantity">Quantity</label>
-                            <input type="number" id="alQuantity" value="24" min="1" max="9999">
+                            <label for="contractQuantity">Quantity</label>
+                            <input type="number" id="contractQuantity" value="24" min="1" max="9999">
                         </div>
                         <div class="form-group">
-                            <label for="alStitches">Stitch Count</label>
-                            <input type="number" id="alStitches" value="5000" min="1000" max="100000" step="1000">
+                            <label for="contractStitches">Stitch Count</label>
+                            <input type="number" id="contractStitches" value="8000" min="1000" max="100000" step="1000">
                         </div>
                     </div>
                     <div class="calc-results">
-                        <div class="result-row breakdown" id="alBaseRow">
-                            <span id="alBaseLabel">Base (5K):</span>
-                            <span id="alBasePrice">$0.00</span>
-                        </div>
-                        <div class="result-row breakdown hidden" id="alExtraStitchRow">
-                            <span id="alExtraStitchLabel">+0K extra:</span>
-                            <span id="alExtraStitchPrice">+$0.00</span>
+                        <div class="result-row breakdown" id="contractBaseRow">
+                            <span id="contractBaseLabel">Base price:</span>
+                            <span id="contractBasePrice">$0.00</span>
                         </div>
                         <div class="result-row">
                             <span>Unit Price:</span>
-                            <span id="alUnitPrice" class="price">$0.00</span>
+                            <span id="contractUnitPrice" class="price">$0.00</span>
                         </div>
-                        <div class="result-row hidden" id="alLtmRow">
+                        <div class="result-row hidden" id="contractLtmRow">
                             <span>LTM Fee:</span>
-                            <span id="alLtmFee" class="fee">+$50.00</span>
+                            <span id="contractLtmFee" class="fee">+$50.00</span>
                         </div>
                         <div class="result-row total">
                             <span>Total:</span>
-                            <span id="alTotalPrice" class="total-price">$0.00</span>
+                            <span id="contractTotalPrice" class="total-price">$0.00</span>
                         </div>
+                        <div class="result-row breakdown" id="contractHourlyRow">
+                            <span>Est. Hourly Revenue:</span>
+                            <span id="contractHourlyRevenue" class="hourly-check">$0.00/hr</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Fees -->
+            <div class="fees-card">
+                <h3><i class="fas fa-plus-circle"></i> Additional Fees</h3>
+                <div class="fees-grid">
+                    <div class="fee-item">
+                        <span class="fee-label">LTM (Less Than Minimum)</span>
+                        <span class="fee-value">$50.00</span>
+                        <span class="fee-note">Orders of 1-7 pieces</span>
+                    </div>
+                    <div class="fee-item">
+                        <span class="fee-label">Extra Thread Colors</span>
+                        <span class="fee-value">$1.00/color/piece</span>
+                        <span class="fee-note">More than 4 colors</span>
+                    </div>
+                    <div class="fee-item">
+                        <span class="fee-label">Digitizing</span>
+                        <span class="fee-value">$100.00</span>
+                        <span class="fee-note">New logo setup</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tab Content: DECG -->
-        <div id="tab-decg" class="tab-content">
-            <div class="use-case-banner decg">
+        <!-- Tab Content: AL RETAIL (Additional Logo) -->
+        <div id="tab-al-retail" class="tab-content">
+            <div class="use-case-banner al-retail">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>Use for:</strong> Customer brings their own garments/caps (premium pricing for customer-supplied items)
+                    <strong>Additional Logo Retail:</strong> Adding extra logos to garments/caps WE'RE selling. Simplified pricing for quick sales quotes.
                 </div>
             </div>
 
@@ -195,135 +226,177 @@
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
-            <!-- Pricing Matrices Grid -->
+            <!-- Simplified Pricing Tables -->
             <div class="matrices-grid">
-                <!-- Garments Matrix -->
+                <!-- Garment AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Garments (DECG-Garmt)</h3>
-                        <div class="matrix-meta">8K base + $1.25/1K</div>
+                        <h3><i class="fas fa-tshirt"></i> Garment Additional Logo</h3>
+                        <div class="matrix-meta">Base 8K stitches</div>
                     </div>
-                    <table id="decgGarmentsMatrix" class="pricing-matrix">
+                    <table id="alRetailGarmentsMatrix" class="pricing-matrix simple">
                         <thead>
                             <tr>
-                                <th>Stitches</th>
-                                <th class="ltm-tier">1-7</th>
-                                <th>8-23</th>
-                                <th>24-47</th>
-                                <th>48-71</th>
-                                <th class="best-tier">72+</th>
+                                <th>Quantity</th>
+                                <th>Add Logo Price</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Populated by JS -->
                         </tbody>
                     </table>
+                    <p class="matrix-note">Includes logos up to 8,000 stitches. Larger logos add $1.25/1K.</p>
                 </div>
 
-                <!-- Caps Matrix -->
+                <!-- Cap AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Caps (DECG-Cap)</h3>
-                        <div class="matrix-meta">8K base + $1.00/1K</div>
+                        <h3><i class="fas fa-hat-cowboy"></i> Cap Additional Logo</h3>
+                        <div class="matrix-meta">Base 5K stitches</div>
                     </div>
-                    <table id="decgCapsMatrix" class="pricing-matrix">
+                    <table id="alRetailCapsMatrix" class="pricing-matrix simple">
                         <thead>
                             <tr>
-                                <th>Stitches</th>
-                                <th class="ltm-tier">1-7</th>
-                                <th>8-23</th>
-                                <th>24-47</th>
-                                <th>48-71</th>
-                                <th class="best-tier">72+</th>
+                                <th>Quantity</th>
+                                <th>Add Logo Price</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Populated by JS -->
                         </tbody>
                     </table>
+                    <p class="matrix-note">Includes logos up to 5,000 stitches. Larger logos add $1.00/1K.</p>
                 </div>
             </div>
 
-            <!-- Full Back Matrix -->
-            <div class="matrix-card full-width">
-                <div class="matrix-header">
-                    <h3><i class="fas fa-expand"></i> Full Back (DECG-FB)</h3>
-                    <div class="matrix-meta">Tiered rate/1K &bull; 25K minimum &bull; Min 8 pieces</div>
+            <!-- Sales Script Example -->
+            <div class="script-card">
+                <h3><i class="fas fa-comments"></i> Quick Quote Example</h3>
+                <div class="script-example">
+                    <p><strong>Customer:</strong> "I want Richardson 112 caps with front and back logos"</p>
+                    <p><strong>Sales Rep:</strong> "At 24 pieces, that's $22 per cap for the front logo. Adding a back logo is $5.75 each. Total: $27.75 per cap, $666 for 24 caps."</p>
                 </div>
-                <table id="decgFullBackMatrix" class="pricing-matrix">
-                    <thead>
-                        <tr>
-                            <th>Stitches</th>
-                            <th>8-23</th>
-                            <th>24-47</th>
-                            <th>48-71</th>
-                            <th class="best-tier">72+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            </div>
+        </div>
+
+        <!-- Tab Content: DECG RETAIL (Customer-Supplied) -->
+        <div id="tab-decg-retail" class="tab-content">
+            <div class="use-case-banner decg">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>DECG Retail (Customer-Supplied):</strong> Customer brings their own garments/caps for embroidery. Simplified pricing for sales reps.
+                </div>
+            </div>
+
+            <!-- LTM Banner -->
+            <div class="ltm-banner">
+                <i class="fas fa-exclamation-circle"></i>
+                <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
+            </div>
+
+            <!-- Simplified Pricing Tables -->
+            <div class="matrices-grid">
+                <!-- DECG Garments -->
+                <div class="matrix-card">
+                    <div class="matrix-header">
+                        <h3><i class="fas fa-tshirt"></i> DECG Garments</h3>
+                        <div class="matrix-meta">Base 8K stitches</div>
+                    </div>
+                    <table id="decgRetailGarmentsMatrix" class="pricing-matrix simple">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Embroidery Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                    <p class="matrix-note">Base 8,000 stitches. Add $1.25/1K for larger logos.</p>
+                </div>
+
+                <!-- DECG Caps -->
+                <div class="matrix-card">
+                    <div class="matrix-header">
+                        <h3><i class="fas fa-hat-cowboy"></i> DECG Caps</h3>
+                        <div class="matrix-meta">Base 8K stitches</div>
+                    </div>
+                    <table id="decgRetailCapsMatrix" class="pricing-matrix simple">
+                        <thead>
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Embroidery Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                    <p class="matrix-note">Base 8,000 stitches. Add $1.00/1K for larger logos.</p>
+                </div>
+            </div>
+
+            <!-- Heavyweight Surcharge Notice -->
+            <div class="surcharge-card">
+                <h3><i class="fas fa-weight-hanging"></i> Heavyweight Surcharge</h3>
+                <p>Add <strong>$10.00/piece</strong> for heavyweight items: Carhartt jackets, bags, canvas, leather</p>
             </div>
 
             <!-- Quick Calculator -->
             <div class="calculator-card">
-                <h3><i class="fas fa-calculator"></i> Quick Calculator</h3>
+                <h3><i class="fas fa-calculator"></i> DECG Calculator</h3>
                 <div class="calc-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="decgItemType">Item Type</label>
-                            <select id="decgItemType">
+                            <label for="decgRetailItemType">Item Type</label>
+                            <select id="decgRetailItemType">
                                 <option value="garment">Garment</option>
                                 <option value="cap">Cap</option>
-                                <option value="fullback">Full Back</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="decgQuantity">Quantity</label>
-                            <input type="number" id="decgQuantity" value="24" min="1" max="9999">
+                            <label for="decgRetailQuantity">Quantity</label>
+                            <input type="number" id="decgRetailQuantity" value="24" min="1" max="9999">
                         </div>
                         <div class="form-group">
-                            <label for="decgStitches">Stitch Count</label>
-                            <input type="number" id="decgStitches" value="8000" min="1000" max="100000" step="1000">
+                            <label for="decgRetailStitches">Stitch Count</label>
+                            <input type="number" id="decgRetailStitches" value="8000" min="1000" max="50000" step="1000">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group checkbox-group">
                             <label>
-                                <input type="checkbox" id="decgHeavyweight">
+                                <input type="checkbox" id="decgRetailHeavyweight">
                                 <span>Heavyweight Surcharge (+$10/piece)</span>
                             </label>
                             <small>Carhartt jackets, bags, canvas, leather</small>
                         </div>
                     </div>
                     <div class="calc-results">
-                        <div class="result-row breakdown" id="decgBaseRow">
-                            <span id="decgBaseLabel">Base (8K):</span>
-                            <span id="decgBasePrice">$0.00</span>
+                        <div class="result-row breakdown" id="decgRetailBaseRow">
+                            <span id="decgRetailBaseLabel">Base (8K):</span>
+                            <span id="decgRetailBasePrice">$0.00</span>
                         </div>
-                        <div class="result-row breakdown hidden" id="decgExtraStitchRow">
-                            <span id="decgExtraStitchLabel">+0K extra:</span>
-                            <span id="decgExtraStitchPrice">+$0.00</span>
+                        <div class="result-row breakdown hidden" id="decgRetailExtraStitchRow">
+                            <span id="decgRetailExtraStitchLabel">+0K extra:</span>
+                            <span id="decgRetailExtraStitchPrice">+$0.00</span>
                         </div>
-                        <div class="result-row breakdown hidden" id="decgHeavyweightRow">
+                        <div class="result-row breakdown hidden" id="decgRetailHeavyweightRow">
                             <span>Heavyweight:</span>
                             <span>+$10.00</span>
                         </div>
                         <div class="result-row">
                             <span>Unit Price:</span>
-                            <span id="decgUnitPrice" class="price">$0.00</span>
+                            <span id="decgRetailUnitPrice" class="price">$0.00</span>
                         </div>
-                        <div class="result-row hidden" id="decgLtmRow">
+                        <div class="result-row hidden" id="decgRetailLtmRow">
                             <span>LTM Fee:</span>
-                            <span id="decgLtmFee" class="fee">+$50.00</span>
-                        </div>
-                        <div class="result-row error hidden" id="decgErrorRow">
-                            <span id="decgErrorMessage"></span>
+                            <span id="decgRetailLtmFee" class="fee">+$50.00</span>
                         </div>
                         <div class="result-row total">
                             <span>Total:</span>
-                            <span id="decgTotalPrice" class="total-price">$0.00</span>
+                            <span id="decgRetailTotalPrice" class="total-price">$0.00</span>
                         </div>
                     </div>
                 </div>
@@ -332,7 +405,7 @@
 
         <!-- Footer -->
         <footer class="page-footer">
-            <p>Pricing effective February 2026 | Data from Caspio Embroidery_Costs table</p>
+            <p>Pricing effective February 2026 | Contract pricing targets $100/hr billing rate</p>
         </footer>
     </div>
 

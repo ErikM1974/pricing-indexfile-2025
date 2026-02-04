@@ -1,112 +1,215 @@
 /**
- * Embroidery Pricing All - Unified Embroidery Pricing Page
+ * Embroidery Pricing All - 3-Tab Unified Embroidery Pricing Page
  *
- * Combines AL/CEMB (Additional Logo / Contract) and DECG (Customer-Supplied) pricing
- * in a single tabbed interface with pricing matrices and calculators.
+ * Tab 1: CONTRACT - Detailed stitch-based pricing for production/Ruthie
+ *        Target: $100-$125/hour billing rate
+ *        Customer supplies their own garments/caps
  *
- * AL/CEMB Pricing (Feb 2026):
- * - Garments: 5K base, $13→$5, +$1.00/1K
- * - Caps: 5K base, $6.50→$4, +$1.00/1K
- * - Full Back: $1.25/1K flat, 25K minimum
- * - LTM: $50 for qty 1-7
+ * Tab 2: AL RETAIL - Simplified tier-only pricing for sales reps
+ *        Adding logos to garments/caps WE'RE selling
+ *        No stitch counts displayed - just tier prices
  *
- * DECG Pricing (Feb 2026):
- * - Garments: 8K base, $28→$20, +$1.25/1K
- * - Caps: 8K base, $22.50→$16, +$1.00/1K
- * - Full Back: $1.40-$1.20/1K by tier, 25K min, min 8 pieces
- * - LTM: $50 for qty 1-7 (garments/caps only)
- * - Heavyweight: +$10/piece
+ * Tab 3: DECG RETAIL - Simplified pricing for customer-supplied items
+ *        Retail pricing for sales reps
+ *
+ * Pricing effective February 2026
+ * All pricing data fetched from Caspio via API
  */
 
 const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
-// Pricing data from APIs
-let alPricingData = null;
-let decgPricingData = null;
+// ============================================
+// PRICING DATA (loaded from API)
+// ============================================
 
-// Tier orders
+let CONTRACT_PRICING = null;
+let AL_RETAIL_PRICING = null;
+let DECG_RETAIL_PRICING = null;
+
+// Production rates for hourly revenue calculation (static - not in Caspio)
+const PRODUCTION_RATES = {
+    garments: {
+        5000: 19.1, 6000: 17.8, 7000: 16.7, 8000: 15.7,
+        9000: 14.9, 10000: 14.1, 11000: 13.4, 12000: 12.7, 15000: 11.1
+    },
+    caps: {
+        5000: 26.3, 6000: 24.5, 7000: 23.0, 8000: 21.6,
+        9000: 20.4, 10000: 19.4, 11000: 18.5, 12000: 17.5, 15000: 15.2
+    }
+};
+
+// ============================================
+// TIER ORDERS
+// ============================================
+
 const TIER_ORDER = ['1-7', '8-23', '24-47', '48-71', '72+'];
-const TIER_ORDER_FULLBACK = ['8-23', '24-47', '48-71', '72+'];
+const FB_STITCH_EXAMPLES = [25000, 30000, 35000, 50000];
 
-// Stitch counts for matrices
-const AL_STITCH_COUNTS = [5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000];
-const DECG_STITCH_COUNTS = [8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000];
-const FB_STITCH_COUNTS = [25000, 30000, 35000, 40000, 45000, 50000];
+// Get stitch counts from loaded API data (sorted)
+function getContractStitchCounts() {
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.garments) {
+        return [5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 15000];
+    }
+    return Object.keys(CONTRACT_PRICING.garments)
+        .map(k => parseInt(k))
+        .filter(k => !isNaN(k))
+        .sort((a, b) => a - b);
+}
 
 // ============================================
 // INITIALIZATION
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Show loading state
+    showLoadingState();
+
     try {
-        // Load both pricing datasets in parallel
-        await Promise.all([
-            loadAlPricing(),
-            loadDecgPricing()
-        ]);
+        // Load all pricing data from API in parallel
+        await loadAllPricingData();
 
         // Build all matrices
-        buildAlGarmentsMatrix();
-        buildAlCapsMatrix();
-        buildAlFullBackMatrix();
-        buildDecgGarmentsMatrix();
-        buildDecgCapsMatrix();
-        buildDecgFullBackMatrix();
+        buildContractGarmentsMatrix();
+        buildContractCapsMatrix();
+        buildContractFullBackMatrix();
+        buildAlRetailGarmentsMatrix();
+        buildAlRetailCapsMatrix();
+        buildDecgRetailGarmentsMatrix();
+        buildDecgRetailCapsMatrix();
 
         // Setup calculators
-        setupAlCalculator();
-        setupDecgCalculator();
+        setupContractCalculator();
+        setupDecgRetailCalculator();
 
-        // Auto-select tab from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const tabParam = urlParams.get('tab');
-        if (tabParam && ['al-cemb', 'decg'].includes(tabParam)) {
-            switchTab(tabParam);
-        }
+        // Hide loading state
+        hideLoadingState();
 
     } catch (error) {
-        console.error('Failed to initialize pricing page:', error);
-        showError('Unable to load pricing data. Please refresh the page.');
+        console.error('Failed to load pricing data:', error);
+        showErrorState('Unable to load pricing data. Please refresh the page.');
+    }
+
+    // Auto-select tab from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam && ['contract', 'al-retail', 'decg-retail'].includes(tabParam)) {
+        switchTab(tabParam);
     }
 });
 
 // ============================================
-// API LOADING
+// API LOADING FUNCTIONS
 // ============================================
 
-async function loadAlPricing() {
+async function loadAllPricingData() {
+    const [contractData, alData, decgData] = await Promise.all([
+        fetchContractPricing(),
+        fetchAlPricing(),
+        fetchDecgPricing()
+    ]);
+
+    CONTRACT_PRICING = contractData;
+    AL_RETAIL_PRICING = alData;
+    DECG_RETAIL_PRICING = decgData;
+
+    console.log('Pricing data loaded from API:', {
+        contract: CONTRACT_PRICING ? 'loaded' : 'failed',
+        al: AL_RETAIL_PRICING ? 'loaded' : 'failed',
+        decg: DECG_RETAIL_PRICING ? 'loaded' : 'failed'
+    });
+}
+
+async function fetchContractPricing() {
+    const response = await fetch(`${API_BASE_URL}/api/contract-pricing`);
+    if (!response.ok) {
+        throw new Error(`Contract pricing API error: ${response.status}`);
+    }
+    const data = await response.json();
+
+    // Transform API response to match expected structure
+    return {
+        garments: data.garments,
+        caps: data.caps,
+        fullBack: {
+            ratesPerThousand: data.fullBack.ratesPerThousand,
+            minStitches: data.fullBack.minStitches || 25000,
+            minPrice: data.fullBack.minPrice || 20.00,
+            ltmFee: data.ltmFee || 50,
+            ltmThreshold: data.ltmThreshold || 7
+        },
+        ltmFee: data.ltmFee || 50,
+        ltmThreshold: data.ltmThreshold || 7
+    };
+}
+
+async function fetchAlPricing() {
     const response = await fetch(`${API_BASE_URL}/api/al-pricing`);
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `AL API returned ${response.status}`);
+        throw new Error(`AL pricing API error: ${response.status}`);
     }
-    alPricingData = await response.json();
-    if (alPricingData.error) {
-        throw new Error(alPricingData.message || alPricingData.error);
-    }
-    console.log('AL pricing loaded:', alPricingData);
+    const data = await response.json();
+
+    // Transform API response to match expected structure
+    return {
+        garments: {
+            basePrices: data.garments.basePrices,
+            baseStitches: data.garments.baseStitches || 8000,
+            perThousandUpcharge: data.garments.perThousandUpcharge || 1.25,
+            ltmFee: data.garments.ltmFee || 50,
+            ltmThreshold: data.garments.ltmThreshold || 7
+        },
+        caps: {
+            basePrices: data.caps.basePrices,
+            baseStitches: data.caps.baseStitches || 5000,
+            perThousandUpcharge: data.caps.perThousandUpcharge || 1.00,
+            ltmFee: data.caps.ltmFee || 50,
+            ltmThreshold: data.caps.ltmThreshold || 7
+        }
+    };
 }
 
-async function loadDecgPricing() {
+async function fetchDecgPricing() {
     const response = await fetch(`${API_BASE_URL}/api/decg-pricing`);
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `DECG API returned ${response.status}`);
+        throw new Error(`DECG pricing API error: ${response.status}`);
     }
-    decgPricingData = await response.json();
-    if (decgPricingData.error) {
-        throw new Error(decgPricingData.message || decgPricingData.error);
-    }
-    console.log('DECG pricing loaded:', decgPricingData);
+    const data = await response.json();
+
+    // Transform API response to match expected structure
+    return {
+        garments: {
+            basePrices: data.garments.basePrices,
+            baseStitches: 8000,
+            perThousandUpcharge: data.garments.perThousandUpcharge || 1.25,
+            ltmFee: data.garments.ltmFee || 50,
+            ltmThreshold: data.garments.ltmThreshold || 7
+        },
+        caps: {
+            basePrices: data.caps.basePrices,
+            baseStitches: 8000,
+            perThousandUpcharge: data.caps.perThousandUpcharge || 1.00,
+            ltmFee: data.caps.ltmFee || 50,
+            ltmThreshold: data.caps.ltmThreshold || 7
+        },
+        heavyweightSurcharge: data.heavyweightSurcharge || 10.00
+    };
 }
 
-function showError(message) {
-    const banner = document.getElementById('apiErrorBanner');
-    const messageEl = document.getElementById('apiErrorMessage');
-    if (banner && messageEl) {
-        messageEl.textContent = message;
-        banner.classList.remove('hidden');
-    }
+function showLoadingState() {
+    document.querySelectorAll('.pricing-matrix tbody').forEach(tbody => {
+        tbody.innerHTML = '<tr><td colspan="6" class="loading-cell">Loading pricing data...</td></tr>';
+    });
+}
+
+function hideLoadingState() {
+    // Loading state is replaced when matrices are built
+}
+
+function showErrorState(message) {
+    const errorHtml = `<tr><td colspan="6" class="error-cell">${message}</td></tr>`;
+    document.querySelectorAll('.pricing-matrix tbody').forEach(tbody => {
+        tbody.innerHTML = errorHtml;
+    });
 }
 
 // ============================================
@@ -123,6 +226,11 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.toggle('active', content.id === `tab-${tabId}`);
     });
+
+    // Update URL without reload
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabId);
+    window.history.replaceState({}, '', url);
 }
 
 // Make switchTab globally available
@@ -144,32 +252,63 @@ function getTierFromQuantity(qty) {
     return '72+';
 }
 
-function getTierFromQuantityFullBack(qty) {
+function getAlRetailTierFromQuantity(qty) {
+    // Now uses 5 tiers matching DECG structure
+    if (qty <= 7) return '1-7';
     if (qty <= 23) return '8-23';
     if (qty <= 47) return '24-47';
     if (qty <= 71) return '48-71';
     return '72+';
 }
 
+function getClosestStitchCount(stitches, itemType = 'garment') {
+    // Get available stitch counts from loaded API data
+    let available;
+    if (itemType === 'cap' && CONTRACT_PRICING && CONTRACT_PRICING.caps) {
+        available = Object.keys(CONTRACT_PRICING.caps)
+            .map(k => parseInt(k))
+            .filter(k => !isNaN(k))
+            .sort((a, b) => a - b);
+    } else if (CONTRACT_PRICING && CONTRACT_PRICING.garments) {
+        available = Object.keys(CONTRACT_PRICING.garments)
+            .map(k => parseInt(k))
+            .filter(k => !isNaN(k))
+            .sort((a, b) => a - b);
+    } else {
+        available = [5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 15000];
+    }
+
+    // Find the closest stitch count that's >= input, or the max if over
+    for (const count of available) {
+        if (stitches <= count) return count;
+    }
+    return available[available.length - 1];
+}
+
 // ============================================
-// AL/CEMB MATRICES
+// CONTRACT MATRICES
 // ============================================
 
-function buildAlGarmentsMatrix() {
-    const tbody = document.querySelector('#alGarmentsMatrix tbody');
-    if (!tbody || !alPricingData) return;
+function buildContractGarmentsMatrix() {
+    const tbody = document.querySelector('#contractGarmentsMatrix tbody');
+    if (!tbody) return;
 
-    const { basePrices, perThousandUpcharge, baseStitches } = alPricingData.garments;
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.garments) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Contract pricing not available</td></tr>';
+        return;
+    }
 
+    const stitchCounts = getContractStitchCounts();
     let html = '';
-    AL_STITCH_COUNTS.forEach(stitches => {
-        const extraK = Math.max(0, (stitches - baseStitches) / 1000);
+    stitchCounts.forEach(stitches => {
+        const prices = CONTRACT_PRICING.garments[stitches];
+        if (!prices) return;
+
         html += '<tr>';
         html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
 
         TIER_ORDER.forEach((tier, idx) => {
-            const basePrice = basePrices[tier] || 0;
-            const price = basePrice + (extraK * perThousandUpcharge);
+            const price = prices[tier];
             const cellClass = idx === 0 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
             html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
         });
@@ -180,21 +319,31 @@ function buildAlGarmentsMatrix() {
     tbody.innerHTML = html;
 }
 
-function buildAlCapsMatrix() {
-    const tbody = document.querySelector('#alCapsMatrix tbody');
-    if (!tbody || !alPricingData) return;
+function buildContractCapsMatrix() {
+    const tbody = document.querySelector('#contractCapsMatrix tbody');
+    if (!tbody) return;
 
-    const { basePrices, perThousandUpcharge, baseStitches } = alPricingData.caps;
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.caps) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Contract pricing not available</td></tr>';
+        return;
+    }
+
+    // Get cap stitch counts (may differ from garments)
+    const stitchCounts = Object.keys(CONTRACT_PRICING.caps)
+        .map(k => parseInt(k))
+        .filter(k => !isNaN(k))
+        .sort((a, b) => a - b);
 
     let html = '';
-    AL_STITCH_COUNTS.forEach(stitches => {
-        const extraK = Math.max(0, (stitches - baseStitches) / 1000);
+    stitchCounts.forEach(stitches => {
+        const prices = CONTRACT_PRICING.caps[stitches];
+        if (!prices) return;
+
         html += '<tr>';
         html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
 
         TIER_ORDER.forEach((tier, idx) => {
-            const basePrice = basePrices[tier] || 0;
-            const price = basePrice + (extraK * perThousandUpcharge);
+            const price = prices[tier];
             const cellClass = idx === 0 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
             html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
         });
@@ -205,98 +354,32 @@ function buildAlCapsMatrix() {
     tbody.innerHTML = html;
 }
 
-function buildAlFullBackMatrix() {
-    const tbody = document.querySelector('#alFullBackMatrix tbody');
-    if (!tbody || !alPricingData) return;
+function buildContractFullBackMatrix() {
+    const tbody = document.querySelector('#contractFullBackMatrix tbody');
+    if (!tbody) return;
 
-    const { ratePerThousand, minStitches } = alPricingData.fullBack;
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.ratesPerThousand) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
+        return;
+    }
 
-    let html = '';
-    FB_STITCH_COUNTS.forEach(stitches => {
-        const stitchesK = stitches / 1000;
-        const price = stitchesK * ratePerThousand;
-        html += '<tr>';
-        html += `<td>${stitchesK.toFixed(0)}K</td>`;
-        html += `<td>${formatPrice(price)}</td>`;
-        html += '</tr>';
-    });
-
-    tbody.innerHTML = html;
-}
-
-// ============================================
-// DECG MATRICES
-// ============================================
-
-function buildDecgGarmentsMatrix() {
-    const tbody = document.querySelector('#decgGarmentsMatrix tbody');
-    if (!tbody || !decgPricingData) return;
-
-    const { basePrices, perThousandUpcharge } = decgPricingData.garments;
-    const baseStitches = 8000; // DECG uses 8K base
+    const rates = CONTRACT_PRICING.fullBack.ratesPerThousand;
+    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
 
     let html = '';
-    DECG_STITCH_COUNTS.forEach(stitches => {
-        const extraK = Math.max(0, (stitches - baseStitches) / 1000);
+    TIER_ORDER.forEach(tier => {
+        const rate = rates[tier];
+        if (rate === undefined) return;
+
         html += '<tr>';
-        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
+        html += `<td>${tier}</td>`;
+        html += `<td>${formatPrice(rate)}</td>`;
 
-        TIER_ORDER.forEach((tier, idx) => {
-            const basePrice = basePrices[tier] || 0;
-            const price = basePrice + (extraK * perThousandUpcharge);
-            const cellClass = idx === 0 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
-        });
-
-        html += '</tr>';
-    });
-
-    tbody.innerHTML = html;
-}
-
-function buildDecgCapsMatrix() {
-    const tbody = document.querySelector('#decgCapsMatrix tbody');
-    if (!tbody || !decgPricingData) return;
-
-    const { basePrices, perThousandUpcharge } = decgPricingData.caps;
-    const baseStitches = 8000;
-
-    let html = '';
-    DECG_STITCH_COUNTS.forEach(stitches => {
-        const extraK = Math.max(0, (stitches - baseStitches) / 1000);
-        html += '<tr>';
-        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
-
-        TIER_ORDER.forEach((tier, idx) => {
-            const basePrice = basePrices[tier] || 0;
-            const price = basePrice + (extraK * perThousandUpcharge);
-            const cellClass = idx === 0 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
-        });
-
-        html += '</tr>';
-    });
-
-    tbody.innerHTML = html;
-}
-
-function buildDecgFullBackMatrix() {
-    const tbody = document.querySelector('#decgFullBackMatrix tbody');
-    if (!tbody || !decgPricingData) return;
-
-    const { ratesPerThousand } = decgPricingData.fullBack;
-
-    let html = '';
-    FB_STITCH_COUNTS.forEach(stitches => {
-        const stitchesK = stitches / 1000;
-        html += '<tr>';
-        html += `<td>${stitchesK.toFixed(0)}K</td>`;
-
-        TIER_ORDER_FULLBACK.forEach((tier, idx) => {
-            const rate = ratesPerThousand[tier] || 0;
-            const price = stitchesK * rate;
-            const cellClass = idx === TIER_ORDER_FULLBACK.length - 1 ? 'best-col' : '';
-            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
+        // Calculate prices for example stitch counts
+        FB_STITCH_EXAMPLES.forEach(stitches => {
+            const stitchesK = stitches / 1000;
+            const price = Math.max(stitchesK * rate, minPrice);
+            html += `<td>${formatPrice(price)}</td>`;
         });
 
         html += '</tr>';
@@ -306,17 +389,147 @@ function buildDecgFullBackMatrix() {
 }
 
 // ============================================
-// AL/CEMB CALCULATOR
+// AL RETAIL MATRICES (Simplified)
 // ============================================
 
-function setupAlCalculator() {
-    const itemTypeEl = document.getElementById('alItemType');
-    const quantityEl = document.getElementById('alQuantity');
-    const stitchesEl = document.getElementById('alStitches');
+function buildAlRetailGarmentsMatrix() {
+    const tbody = document.querySelector('#alRetailGarmentsMatrix tbody');
+    if (!tbody) return;
+
+    if (!AL_RETAIL_PRICING || !AL_RETAIL_PRICING.garments || !AL_RETAIL_PRICING.garments.basePrices) {
+        tbody.innerHTML = '<tr><td colspan="2" class="error-cell">AL pricing not available</td></tr>';
+        return;
+    }
+
+    // 5 tiers matching DECG structure for UI consistency
+    const tiers = [
+        { label: '1-7 pcs', key: '1-7', note: '+$50 LTM' },
+        { label: '8-23 pcs', key: '8-23', note: '' },
+        { label: '24-47 pcs', key: '24-47', note: '' },
+        { label: '48-71 pcs', key: '48-71', note: '' },
+        { label: '72+ pcs', key: '72+', note: '' }
+    ];
+
+    let html = '';
+    tiers.forEach(tier => {
+        const price = AL_RETAIL_PRICING.garments.basePrices[tier.key];
+        if (price === undefined) return;
+        html += '<tr>';
+        html += `<td>${tier.label}${tier.note ? ' <span class="ltm-badge-small">' + tier.note + '</span>' : ''}</td>`;
+        html += `<td class="price-cell">${formatPrice(price)} each</td>`;
+        html += '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+function buildAlRetailCapsMatrix() {
+    const tbody = document.querySelector('#alRetailCapsMatrix tbody');
+    if (!tbody) return;
+
+    if (!AL_RETAIL_PRICING || !AL_RETAIL_PRICING.caps || !AL_RETAIL_PRICING.caps.basePrices) {
+        tbody.innerHTML = '<tr><td colspan="2" class="error-cell">AL cap pricing not available</td></tr>';
+        return;
+    }
+
+    // 5 tiers matching DECG structure for UI consistency
+    const tiers = [
+        { label: '1-7 pcs', key: '1-7', note: '+$50 LTM' },
+        { label: '8-23 pcs', key: '8-23', note: '' },
+        { label: '24-47 pcs', key: '24-47', note: '' },
+        { label: '48-71 pcs', key: '48-71', note: '' },
+        { label: '72+ pcs', key: '72+', note: '' }
+    ];
+
+    let html = '';
+    tiers.forEach(tier => {
+        const price = AL_RETAIL_PRICING.caps.basePrices[tier.key];
+        if (price === undefined) return;
+        html += '<tr>';
+        html += `<td>${tier.label}${tier.note ? ' <span class="ltm-badge-small">' + tier.note + '</span>' : ''}</td>`;
+        html += `<td class="price-cell">${formatPrice(price)} each</td>`;
+        html += '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+// ============================================
+// DECG RETAIL MATRICES (Simplified)
+// ============================================
+
+function buildDecgRetailGarmentsMatrix() {
+    const tbody = document.querySelector('#decgRetailGarmentsMatrix tbody');
+    if (!tbody) return;
+
+    if (!DECG_RETAIL_PRICING || !DECG_RETAIL_PRICING.garments || !DECG_RETAIL_PRICING.garments.basePrices) {
+        tbody.innerHTML = '<tr><td colspan="2" class="error-cell">DECG pricing not available</td></tr>';
+        return;
+    }
+
+    const tiers = [
+        { label: '1-7 pcs', key: '1-7', note: '+$50 LTM' },
+        { label: '8-23 pcs', key: '8-23', note: '' },
+        { label: '24-47 pcs', key: '24-47', note: '' },
+        { label: '48-71 pcs', key: '48-71', note: '' },
+        { label: '72+ pcs', key: '72+', note: '' }
+    ];
+
+    let html = '';
+    tiers.forEach(tier => {
+        const price = DECG_RETAIL_PRICING.garments.basePrices[tier.key];
+        if (price === undefined) return;
+        html += '<tr>';
+        html += `<td>${tier.label}${tier.note ? ' <span class="ltm-badge-small">' + tier.note + '</span>' : ''}</td>`;
+        html += `<td class="price-cell">${formatPrice(price)} each</td>`;
+        html += '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+function buildDecgRetailCapsMatrix() {
+    const tbody = document.querySelector('#decgRetailCapsMatrix tbody');
+    if (!tbody) return;
+
+    if (!DECG_RETAIL_PRICING || !DECG_RETAIL_PRICING.caps || !DECG_RETAIL_PRICING.caps.basePrices) {
+        tbody.innerHTML = '<tr><td colspan="2" class="error-cell">DECG cap pricing not available</td></tr>';
+        return;
+    }
+
+    const tiers = [
+        { label: '1-7 pcs', key: '1-7', note: '+$50 LTM' },
+        { label: '8-23 pcs', key: '8-23', note: '' },
+        { label: '24-47 pcs', key: '24-47', note: '' },
+        { label: '48-71 pcs', key: '48-71', note: '' },
+        { label: '72+ pcs', key: '72+', note: '' }
+    ];
+
+    let html = '';
+    tiers.forEach(tier => {
+        const price = DECG_RETAIL_PRICING.caps.basePrices[tier.key];
+        if (price === undefined) return;
+        html += '<tr>';
+        html += `<td>${tier.label}${tier.note ? ' <span class="ltm-badge-small">' + tier.note + '</span>' : ''}</td>`;
+        html += `<td class="price-cell">${formatPrice(price)} each</td>`;
+        html += '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+// ============================================
+// CONTRACT CALCULATOR
+// ============================================
+
+function setupContractCalculator() {
+    const itemTypeEl = document.getElementById('contractItemType');
+    const quantityEl = document.getElementById('contractQuantity');
+    const stitchesEl = document.getElementById('contractStitches');
 
     if (!itemTypeEl || !quantityEl || !stitchesEl) return;
 
-    const updateCalc = () => calculateAlPrice();
+    const updateCalc = () => calculateContractPrice();
 
     itemTypeEl.addEventListener('change', updateCalc);
     quantityEl.addEventListener('input', updateCalc);
@@ -326,90 +539,101 @@ function setupAlCalculator() {
     updateCalc();
 }
 
-function calculateAlPrice() {
-    if (!alPricingData) return;
+function calculateContractPrice() {
+    if (!CONTRACT_PRICING) {
+        console.error('Contract pricing not loaded');
+        return;
+    }
 
-    const itemType = document.getElementById('alItemType').value;
-    const quantity = parseInt(document.getElementById('alQuantity').value) || 0;
-    const stitches = parseInt(document.getElementById('alStitches').value) || 5000;
+    const itemType = document.getElementById('contractItemType').value;
+    const quantity = parseInt(document.getElementById('contractQuantity').value) || 0;
+    const stitchesEl = document.getElementById('contractStitches');
+    let stitches = parseInt(stitchesEl.value) || 8000;
 
     // Update min stitches for full back
-    const stitchesEl = document.getElementById('alStitches');
+    const minStitches = CONTRACT_PRICING.fullBack?.minStitches || 25000;
     if (itemType === 'fullback') {
-        stitchesEl.min = 25000;
-        if (stitches < 25000) stitchesEl.value = 25000;
+        stitchesEl.min = minStitches;
+        if (stitches < minStitches) {
+            stitches = minStitches;
+            stitchesEl.value = minStitches;
+        }
     } else {
         stitchesEl.min = 1000;
     }
 
     // Elements
-    const baseRow = document.getElementById('alBaseRow');
-    const baseLabel = document.getElementById('alBaseLabel');
-    const basePrice = document.getElementById('alBasePrice');
-    const extraStitchRow = document.getElementById('alExtraStitchRow');
-    const extraStitchLabel = document.getElementById('alExtraStitchLabel');
-    const extraStitchPrice = document.getElementById('alExtraStitchPrice');
-    const unitPriceEl = document.getElementById('alUnitPrice');
-    const ltmRow = document.getElementById('alLtmRow');
-    const ltmFeeEl = document.getElementById('alLtmFee');
-    const totalPriceEl = document.getElementById('alTotalPrice');
+    const baseRow = document.getElementById('contractBaseRow');
+    const baseLabel = document.getElementById('contractBaseLabel');
+    const basePriceEl = document.getElementById('contractBasePrice');
+    const unitPriceEl = document.getElementById('contractUnitPrice');
+    const ltmRow = document.getElementById('contractLtmRow');
+    const ltmFeeEl = document.getElementById('contractLtmFee');
+    const totalPriceEl = document.getElementById('contractTotalPrice');
+    const hourlyRow = document.getElementById('contractHourlyRow');
+    const hourlyRevenueEl = document.getElementById('contractHourlyRevenue');
 
     let unitPrice = 0;
     let ltmFee = 0;
-    let breakdown = null;
+    let hourlyRevenue = 0;
+    const tier = getTierFromQuantity(quantity);
+    const ltmThreshold = CONTRACT_PRICING.ltmThreshold || 7;
+    const ltmFeeAmount = CONTRACT_PRICING.ltmFee || 50;
 
     if (itemType === 'garment') {
-        const tier = getTierFromQuantity(quantity);
-        const { basePrices, perThousandUpcharge, baseStitches, ltmThreshold } = alPricingData.garments;
-        const base = basePrices[tier] || 0;
-        const extraK = Math.max(0, (parseInt(stitchesEl.value) - baseStitches) / 1000);
-        const extraCharge = extraK * perThousandUpcharge;
-        unitPrice = base + extraCharge;
+        const closestStitches = getClosestStitchCount(stitches, 'garment');
+        const prices = CONTRACT_PRICING.garments[closestStitches];
+        unitPrice = prices ? prices[tier] : 0;
 
-        breakdown = { base, extraK, extraCharge, baseLabel: `Base (${baseStitches / 1000}K)` };
+        baseLabel.textContent = `${closestStitches / 1000}K stitches @ ${tier}:`;
+        basePriceEl.textContent = formatPrice(unitPrice);
 
         if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = alPricingData.garments.ltmFee || 50;
+            ltmFee = ltmFeeAmount;
         }
+
+        // Calculate hourly revenue using static production rates
+        const prodRate = PRODUCTION_RATES.garments[closestStitches] || 16;
+        hourlyRevenue = unitPrice * prodRate;
+
     } else if (itemType === 'cap') {
-        const tier = getTierFromQuantity(quantity);
-        const { basePrices, perThousandUpcharge, baseStitches, ltmThreshold } = alPricingData.caps;
-        const base = basePrices[tier] || 0;
-        const extraK = Math.max(0, (parseInt(stitchesEl.value) - baseStitches) / 1000);
-        const extraCharge = extraK * perThousandUpcharge;
-        unitPrice = base + extraCharge;
+        const closestStitches = getClosestStitchCount(stitches, 'cap');
+        const prices = CONTRACT_PRICING.caps[closestStitches];
+        unitPrice = prices ? prices[tier] : 0;
 
-        breakdown = { base, extraK, extraCharge, baseLabel: `Base (${baseStitches / 1000}K)` };
+        baseLabel.textContent = `${closestStitches / 1000}K stitches @ ${tier}:`;
+        basePriceEl.textContent = formatPrice(unitPrice);
 
         if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = alPricingData.caps.ltmFee || 50;
+            ltmFee = ltmFeeAmount;
         }
-    } else if (itemType === 'fullback') {
-        const { ratePerThousand, minStitches } = alPricingData.fullBack;
-        const actualStitches = Math.max(parseInt(stitchesEl.value), minStitches);
-        const stitchesK = actualStitches / 1000;
-        unitPrice = stitchesK * ratePerThousand;
 
-        breakdown = { base: unitPrice, extraK: 0, extraCharge: 0, baseLabel: `${stitchesK}K x $${ratePerThousand.toFixed(2)}`, isFlat: true };
-        // No LTM for full back
+        // Calculate hourly revenue using static production rates
+        const prodRate = PRODUCTION_RATES.caps[closestStitches] || 22;
+        hourlyRevenue = unitPrice * prodRate;
+
+    } else if (itemType === 'fullback') {
+        const rate = CONTRACT_PRICING.fullBack.ratesPerThousand[tier];
+        const stitchesK = stitches / 1000;
+        const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
+        unitPrice = Math.max(stitchesK * rate, minPrice);
+
+        baseLabel.textContent = `${stitchesK}K x ${formatPrice(rate)}/1K:`;
+        basePriceEl.textContent = formatPrice(unitPrice);
+
+        if (quantity > 0 && quantity <= ltmThreshold) {
+            ltmFee = ltmFeeAmount;
+        }
+
+        // Full back hourly is harder to estimate
+        hourlyRevenue = 0;
     }
 
     // Update UI
-    if (breakdown && quantity > 0) {
+    if (quantity > 0) {
         baseRow.classList.remove('hidden');
-        baseLabel.textContent = breakdown.baseLabel + ':';
-        basePrice.textContent = formatPrice(breakdown.base);
-
-        if (!breakdown.isFlat && breakdown.extraK > 0) {
-            extraStitchRow.classList.remove('hidden');
-            extraStitchLabel.textContent = `+${breakdown.extraK.toFixed(0)}K extra:`;
-            extraStitchPrice.textContent = '+' + formatPrice(breakdown.extraCharge);
-        } else {
-            extraStitchRow.classList.add('hidden');
-        }
     } else {
         baseRow.classList.add('hidden');
-        extraStitchRow.classList.add('hidden');
     }
 
     unitPriceEl.textContent = formatPrice(unitPrice);
@@ -423,21 +647,37 @@ function calculateAlPrice() {
 
     const total = (unitPrice * quantity) + ltmFee;
     totalPriceEl.textContent = formatPrice(total);
+
+    // Hourly revenue check
+    if (hourlyRevenue > 0 && itemType !== 'fullback') {
+        hourlyRow.classList.remove('hidden');
+        hourlyRevenueEl.textContent = formatPrice(hourlyRevenue) + '/hr';
+        // Color code: green if >= $100, yellow if $90-100, red if < $90
+        if (hourlyRevenue >= 100) {
+            hourlyRevenueEl.className = 'hourly-check good';
+        } else if (hourlyRevenue >= 90) {
+            hourlyRevenueEl.className = 'hourly-check warn';
+        } else {
+            hourlyRevenueEl.className = 'hourly-check bad';
+        }
+    } else {
+        hourlyRow.classList.add('hidden');
+    }
 }
 
 // ============================================
-// DECG CALCULATOR
+// DECG RETAIL CALCULATOR
 // ============================================
 
-function setupDecgCalculator() {
-    const itemTypeEl = document.getElementById('decgItemType');
-    const quantityEl = document.getElementById('decgQuantity');
-    const stitchesEl = document.getElementById('decgStitches');
-    const heavyweightEl = document.getElementById('decgHeavyweight');
+function setupDecgRetailCalculator() {
+    const itemTypeEl = document.getElementById('decgRetailItemType');
+    const quantityEl = document.getElementById('decgRetailQuantity');
+    const stitchesEl = document.getElementById('decgRetailStitches');
+    const heavyweightEl = document.getElementById('decgRetailHeavyweight');
 
     if (!itemTypeEl || !quantityEl || !stitchesEl || !heavyweightEl) return;
 
-    const updateCalc = () => calculateDecgPrice();
+    const updateCalc = () => calculateDecgRetailPrice();
 
     itemTypeEl.addEventListener('change', updateCalc);
     quantityEl.addEventListener('input', updateCalc);
@@ -448,117 +688,57 @@ function setupDecgCalculator() {
     updateCalc();
 }
 
-function calculateDecgPrice() {
-    if (!decgPricingData) return;
-
-    const itemType = document.getElementById('decgItemType').value;
-    const quantity = parseInt(document.getElementById('decgQuantity').value) || 0;
-    const stitches = parseInt(document.getElementById('decgStitches').value) || 8000;
-    const isHeavyweight = document.getElementById('decgHeavyweight').checked;
-
-    // Update min stitches for full back
-    const stitchesEl = document.getElementById('decgStitches');
-    if (itemType === 'fullback') {
-        stitchesEl.min = 25000;
-        if (stitches < 25000) stitchesEl.value = 25000;
-    } else {
-        stitchesEl.min = 1000;
-    }
-
-    // Elements
-    const baseRow = document.getElementById('decgBaseRow');
-    const baseLabel = document.getElementById('decgBaseLabel');
-    const basePriceEl = document.getElementById('decgBasePrice');
-    const extraStitchRow = document.getElementById('decgExtraStitchRow');
-    const extraStitchLabel = document.getElementById('decgExtraStitchLabel');
-    const extraStitchPrice = document.getElementById('decgExtraStitchPrice');
-    const heavyweightRow = document.getElementById('decgHeavyweightRow');
-    const unitPriceEl = document.getElementById('decgUnitPrice');
-    const ltmRow = document.getElementById('decgLtmRow');
-    const ltmFeeEl = document.getElementById('decgLtmFee');
-    const errorRow = document.getElementById('decgErrorRow');
-    const errorMessage = document.getElementById('decgErrorMessage');
-    const totalPriceEl = document.getElementById('decgTotalPrice');
-
-    let unitPrice = 0;
-    let ltmFee = 0;
-    let breakdown = null;
-    let error = null;
-
-    if (itemType === 'garment') {
-        const tier = getTierFromQuantity(quantity);
-        const { basePrices, perThousandUpcharge, ltmThreshold } = decgPricingData.garments;
-        const baseStitches = 8000;
-        const base = basePrices[tier] || 0;
-        const extraK = Math.max(0, (parseInt(stitchesEl.value) - baseStitches) / 1000);
-        const extraCharge = extraK * perThousandUpcharge;
-        unitPrice = base + extraCharge;
-
-        breakdown = { base, extraK, extraCharge, baseLabel: 'Base (8K)' };
-
-        if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = decgPricingData.garments.ltmFee || 50;
-        }
-    } else if (itemType === 'cap') {
-        const tier = getTierFromQuantity(quantity);
-        const { basePrices, perThousandUpcharge, ltmThreshold } = decgPricingData.caps;
-        const baseStitches = 8000;
-        const base = basePrices[tier] || 0;
-        const extraK = Math.max(0, (parseInt(stitchesEl.value) - baseStitches) / 1000);
-        const extraCharge = extraK * perThousandUpcharge;
-        unitPrice = base + extraCharge;
-
-        breakdown = { base, extraK, extraCharge, baseLabel: 'Base (8K)' };
-
-        if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = decgPricingData.caps.ltmFee || 50;
-        }
-    } else if (itemType === 'fullback') {
-        const { ratesPerThousand, minStitches, minQuantity } = decgPricingData.fullBack;
-
-        if (quantity > 0 && quantity < minQuantity) {
-            error = `Full back requires minimum ${minQuantity} pieces`;
-        } else {
-            const tier = getTierFromQuantityFullBack(quantity);
-            const actualStitches = Math.max(parseInt(stitchesEl.value), minStitches);
-            const stitchesK = actualStitches / 1000;
-            const rate = ratesPerThousand[tier] || ratesPerThousand['8-23'];
-            unitPrice = stitchesK * rate;
-
-            breakdown = { base: unitPrice, extraK: 0, extraCharge: 0, baseLabel: `${stitchesK}K x $${rate.toFixed(2)}`, isFlat: true };
-        }
-        // No LTM for full back
-    }
-
-    // Add heavyweight surcharge
-    if (isHeavyweight && !error) {
-        unitPrice += decgPricingData.heavyweightSurcharge || 10;
-    }
-
-    // Update UI
-    if (error) {
-        errorRow.classList.remove('hidden');
-        errorMessage.textContent = error;
-        baseRow.classList.add('hidden');
-        extraStitchRow.classList.add('hidden');
-        heavyweightRow.classList.add('hidden');
-        ltmRow.classList.add('hidden');
-        unitPriceEl.textContent = '$0.00';
-        totalPriceEl.textContent = '$0.00';
+function calculateDecgRetailPrice() {
+    if (!DECG_RETAIL_PRICING) {
+        console.error('DECG pricing not loaded');
         return;
     }
 
-    errorRow.classList.add('hidden');
+    const itemType = document.getElementById('decgRetailItemType').value;
+    const quantity = parseInt(document.getElementById('decgRetailQuantity').value) || 0;
+    const stitches = parseInt(document.getElementById('decgRetailStitches').value) || 8000;
+    const isHeavyweight = document.getElementById('decgRetailHeavyweight').checked;
 
-    if (breakdown && quantity > 0) {
+    // Elements
+    const baseRow = document.getElementById('decgRetailBaseRow');
+    const baseLabel = document.getElementById('decgRetailBaseLabel');
+    const basePriceEl = document.getElementById('decgRetailBasePrice');
+    const extraStitchRow = document.getElementById('decgRetailExtraStitchRow');
+    const extraStitchLabel = document.getElementById('decgRetailExtraStitchLabel');
+    const extraStitchPrice = document.getElementById('decgRetailExtraStitchPrice');
+    const heavyweightRow = document.getElementById('decgRetailHeavyweightRow');
+    const unitPriceEl = document.getElementById('decgRetailUnitPrice');
+    const ltmRow = document.getElementById('decgRetailLtmRow');
+    const ltmFeeEl = document.getElementById('decgRetailLtmFee');
+    const totalPriceEl = document.getElementById('decgRetailTotalPrice');
+
+    const tier = getTierFromQuantity(quantity);
+    let pricing, baseStitches, perThousandUpcharge;
+
+    if (itemType === 'garment') {
+        pricing = DECG_RETAIL_PRICING.garments;
+    } else {
+        pricing = DECG_RETAIL_PRICING.caps;
+    }
+
+    const basePrice = pricing.basePrices[tier] || 0;
+    baseStitches = pricing.baseStitches || 8000;
+    perThousandUpcharge = pricing.perThousandUpcharge || 1.25;
+
+    const extraK = Math.max(0, (stitches - baseStitches) / 1000);
+    const extraCharge = extraK * perThousandUpcharge;
+    let unitPrice = basePrice + extraCharge;
+
+    // Update UI
+    if (quantity > 0) {
         baseRow.classList.remove('hidden');
-        baseLabel.textContent = breakdown.baseLabel + ':';
-        basePriceEl.textContent = formatPrice(breakdown.base);
+        baseLabel.textContent = `Base (${baseStitches / 1000}K):`;
+        basePriceEl.textContent = formatPrice(basePrice);
 
-        if (!breakdown.isFlat && breakdown.extraK > 0) {
+        if (extraK > 0) {
             extraStitchRow.classList.remove('hidden');
-            extraStitchLabel.textContent = `+${breakdown.extraK.toFixed(0)}K extra:`;
-            extraStitchPrice.textContent = '+' + formatPrice(breakdown.extraCharge);
+            extraStitchLabel.textContent = `+${extraK.toFixed(0)}K extra:`;
+            extraStitchPrice.textContent = '+' + formatPrice(extraCharge);
         } else {
             extraStitchRow.classList.add('hidden');
         }
@@ -567,15 +747,23 @@ function calculateDecgPrice() {
         extraStitchRow.classList.add('hidden');
     }
 
+    // Heavyweight surcharge
+    const heavyweightSurcharge = DECG_RETAIL_PRICING.heavyweightSurcharge || 10.00;
     if (isHeavyweight) {
         heavyweightRow.classList.remove('hidden');
+        unitPrice += heavyweightSurcharge;
     } else {
         heavyweightRow.classList.add('hidden');
     }
 
     unitPriceEl.textContent = formatPrice(unitPrice);
 
-    if (ltmFee > 0) {
+    // LTM fee
+    const ltmThreshold = pricing.ltmThreshold || 7;
+    const ltmFeeAmount = pricing.ltmFee || 50;
+    let ltmFee = 0;
+    if (quantity > 0 && quantity <= ltmThreshold) {
+        ltmFee = ltmFeeAmount;
         ltmRow.classList.remove('hidden');
         ltmFeeEl.textContent = '+' + formatPrice(ltmFee);
     } else {
