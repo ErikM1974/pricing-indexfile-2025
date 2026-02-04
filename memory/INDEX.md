@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-02-03 (order line item classification complete - 20,380 items analyzed, pending Caspio entries documented)
+**Last Updated:** 2026-02-04 (embroidery pricing page API integration complete)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -161,6 +161,7 @@
 |------|-----------|
 | **All Pricing Tiers** | **[PRICING_TIERS_MASTER_REFERENCE.md](./PRICING_TIERS_MASTER_REFERENCE.md)** - All methods, all tiers, LTM thresholds |
 | Embroidery Pricing | [EMBROIDERY_PRICING_RULES.md](./EMBROIDERY_PRICING_RULES.md) - Formulas, FB, AL, caps |
+| **Embroidery Pricing Page** | `/calculators/embroidery-pricing-all/` - 3-tab page: Contract \| AL Retail \| DECG Retail (API-driven) |
 | 2026 Tier Restructure | [EMBROIDERY_PRICING_2026.md](./EMBROIDERY_PRICING_2026.md) - 5-tier details |
 | 2026 Pricing Margins | [2026_PRICING_MARGINS.md](./2026_PRICING_MARGINS.md) - Margin denominators |
 
