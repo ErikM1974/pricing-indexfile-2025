@@ -11,10 +11,10 @@
     const API_ENDPOINT = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=CAP-AL';
 
     // Fallback pricing (used only if API fails)
-    // 2026-02 RESTRUCTURE: New tiers 1-7 and 8-23
+    // 2026-02: Updated to $112-120/hr target billing rate
     const FALLBACK_PRICING = {
-        '1-7': 6.75,
-        '8-23': 6.75,
+        '1-7': 6.50,
+        '8-23': 6.00,
         '24-47': 5.75,
         '48-71': 5.50,
         '72+': 5.25

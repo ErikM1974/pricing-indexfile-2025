@@ -79,7 +79,12 @@
       "Bash(iconv:*)",
       "WebFetch(domain:www.customink.com)",
       "WebFetch(domain:www.printful.com)",
-      "WebFetch(domain:www.printrenegades.com)"
+      "WebFetch(domain:www.printrenegades.com)",
+      "Bash(cut:*)",
+      "Bash(__NEW_LINE_61b0c14869c11d09__ echo \"\")",
+      "Bash(__NEW_LINE_629cd7beb1937a33__ echo \"\")",
+      "Bash(__NEW_LINE_8214a137a78a0706__ echo \"\")",
+      "Bash(__NEW_LINE_3cf9512b717f0ce5__ echo \"\")"
     ],
     "deny": [],
     "ask": [],
