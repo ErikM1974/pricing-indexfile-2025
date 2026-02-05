@@ -1,0 +1,602 @@
+/**
+ * Embroidery Contract Pricing - Standalone Page Styles
+ *
+ * Clean, professional layout matching the print PDF but optimized for web viewing.
+ * Mobile responsive and printable.
+ */
+
+:root {
+    --primary-color: #4cb354;
+    --primary-dark: #409a47;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #e5e7eb;
+    --bg-light: #f9f9f9;
+    --ltm-bg: #fef08a;
+    --ltm-border: #ca8a04;
+    --ltm-text: #92400e;
+    --rate-row-bg: #e8f5e9;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+
+.contract-pricing-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    background: white;
+    min-height: 100vh;
+}
+
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid var(--primary-color);
+    margin-bottom: 24px;
+}
+
+.logo-section {
+    flex-shrink: 0;
+}
+
+.company-logo {
+    width: 120px;
+    height: auto;
+}
+
+.title-section {
+    flex: 1;
+}
+
+.company-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 8px 0;
+}
+
+.company-address {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.contact-section {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.contact-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.contact-title {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 4px 0;
+}
+
+.contact-email {
+    font-size: 13px;
+    color: var(--primary-color);
+    text-decoration: none;
+    display: block;
+    margin: 0 0 2px 0;
+}
+
+.contact-email:hover {
+    text-decoration: underline;
+}
+
+.contact-phone {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 10px 0;
+}
+
+/* Print Button */
+.print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.print-btn:hover {
+    background: var(--primary-dark);
+}
+
+.print-btn svg {
+    flex-shrink: 0;
+}
+
+/* ============================================
+   PRICING TABLES SECTION
+   ============================================ */
+
+.tables-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.table-section {
+    background: white;
+}
+
+.table-section h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.part-number {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* Pricing Table Styles */
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.pricing-table th,
+.pricing-table td {
+    padding: 8px 10px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.pricing-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+.pricing-table th:first-child,
+.pricing-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+    background: #fafafa;
+    width: 70px;
+}
+
+.pricing-table tbody tr:nth-child(even) {
+    background: #fcfcfc;
+}
+
+.pricing-table tbody tr:hover {
+    background: #f0f9f0;
+}
+
+/* LTM Columns (yellow highlight) */
+.pricing-table th.ltm-col,
+.pricing-table td.ltm-col {
+    background-color: var(--ltm-bg);
+    border-left: 3px solid var(--ltm-border);
+}
+
+.pricing-table tbody tr:hover td.ltm-col {
+    background-color: #fde047;
+}
+
+/* Rate footer row */
+.pricing-table tr.rate-row {
+    background: var(--rate-row-bg) !important;
+    font-weight: 600;
+}
+
+.pricing-table tr.rate-row td {
+    border-top: 2px solid var(--primary-color);
+}
+
+.pricing-table tr.rate-row td.ltm-col {
+    background-color: var(--ltm-bg) !important;
+}
+
+/* ============================================
+   LTM NOTE
+   ============================================ */
+
+.ltm-note {
+    font-size: 13px;
+    color: var(--ltm-text);
+    background: #fef9c3;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 16px 0;
+    border-left: 4px solid #fde047;
+}
+
+.ltm-note strong {
+    color: #78350f;
+}
+
+/* ============================================
+   LASER PATCH SECTION
+   ============================================ */
+
+.laser-patch-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--border-color);
+}
+
+.laser-patch-section h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+}
+
+.laser-patch-table {
+    max-width: 300px;
+}
+
+.laser-notes {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 12px;
+    line-height: 1.8;
+}
+
+.laser-notes li {
+    margin-bottom: 4px;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.page-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.page-footer p {
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+}
+
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+
+.loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-banner {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #ef4444;
+    display: none;
+}
+
+.error-banner.show {
+    display: block;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 900px) {
+    .contract-pricing-page {
+        padding: 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+
+    .contact-section {
+        text-align: center;
+    }
+
+    .tables-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .pricing-table {
+        font-size: 12px;
+    }
+
+    .pricing-table th,
+    .pricing-table td {
+        padding: 6px 4px;
+    }
+}
+
+@media (max-width: 600px) {
+    .company-name {
+        font-size: 22px;
+    }
+
+    .page-title {
+        font-size: 16px;
+    }
+
+    .company-logo {
+        width: 90px;
+    }
+
+    .pricing-table {
+        font-size: 11px;
+    }
+
+    .pricing-table th:first-child,
+    .pricing-table td:first-child {
+        width: 50px;
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 0.25in;
+    }
+
+    * {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    body {
+        background: white;
+        font-size: 10px;
+    }
+
+    /* Hide print button during printing */
+    .print-btn {
+        display: none !important;
+    }
+
+    .contract-pricing-page {
+        padding: 0;
+        max-width: none;
+    }
+
+    /* =============================================
+       HEADER - Force horizontal row layout
+       ============================================= */
+    .page-header {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .logo-section {
+        flex-shrink: 0 !important;
+    }
+
+    .company-logo {
+        width: 90px;
+        height: auto;
+    }
+
+    .title-section {
+        flex: 1 !important;
+        text-align: left !important;
+    }
+
+    .company-name {
+        font-size: 18px;
+        margin-bottom: 2px;
+    }
+
+    .page-title {
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .company-address {
+        font-size: 10px;
+    }
+
+    .contact-section {
+        flex-shrink: 0 !important;
+        text-align: right !important;
+    }
+
+    .contact-name {
+        font-size: 11px;
+    }
+
+    .contact-title,
+    .contact-email,
+    .contact-phone {
+        font-size: 9px;
+    }
+
+    /* =============================================
+       TABLES - Force side-by-side layout
+       ============================================= */
+    .tables-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 16px;
+        margin-bottom: 10px;
+    }
+
+    .table-section {
+        page-break-inside: avoid;
+    }
+
+    .table-section h3 {
+        font-size: 11px;
+        margin-bottom: 6px;
+        padding-bottom: 3px;
+    }
+
+    .part-number {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+
+    .pricing-table {
+        font-size: 9px;
+        width: 100%;
+    }
+
+    .pricing-table th,
+    .pricing-table td {
+        padding: 2px 4px;
+    }
+
+    .pricing-table th:first-child,
+    .pricing-table td:first-child {
+        width: 55px;
+    }
+
+    /* Force background colors in print */
+    .pricing-table th {
+        background: #f5f5f5 !important;
+    }
+
+    .pricing-table th:first-child,
+    .pricing-table td:first-child {
+        background: #fafafa !important;
+    }
+
+    .pricing-table th.ltm-col,
+    .pricing-table td.ltm-col,
+    .pricing-table tr.rate-row td.ltm-col {
+        background-color: var(--ltm-bg) !important;
+    }
+
+    .pricing-table tr.rate-row {
+        background-color: var(--rate-row-bg) !important;
+    }
+
+    /* =============================================
+       LTM NOTE & FOOTER - Compact
+       ============================================= */
+    .ltm-note {
+        font-size: 9px;
+        padding: 5px 8px;
+        margin: 8px 0;
+    }
+
+    .laser-patch-section {
+        margin-top: 10px;
+        padding-top: 8px;
+    }
+
+    .laser-patch-section h3 {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .laser-patch-table {
+        max-width: 250px;
+    }
+
+    .laser-notes {
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+    .page-footer {
+        margin-top: 10px;
+        padding-top: 6px;
+    }
+
+    .page-footer p {
+        font-size: 9px;
+    }
+}

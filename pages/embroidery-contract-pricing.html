@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Embroidery Pricing | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Page Styles -->
+    <link rel="stylesheet" href="/pages/embroidery-contract-pricing.css">
+</head>
+<body>
+    <div class="contract-pricing-page">
+        <!-- Error Banner -->
+        <div id="errorBanner" class="error-banner"></div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading pricing data...</p>
+        </div>
+
+        <!-- Main Content (hidden until loaded) -->
+        <div id="pricingContent" style="display: none;">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="logo-section">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png"
+                         class="company-logo"
+                         alt="Northwest Custom Apparel">
+                </div>
+                <div class="title-section">
+                    <h1 class="company-name">Northwest Custom Apparel</h1>
+                    <h2 class="page-title">Contract Embroidery Pricing — 2026</h2>
+                    <p class="company-address">2025 Freeman Road East, Milton, Washington 98354 | 253-922-5793</p>
+                </div>
+                <div class="contact-section">
+                    <p class="contact-name">Ruthie Nhoung</p>
+                    <p class="contact-title">Plant Manager Since 1998</p>
+                    <a href="mailto:ruth@nwcustomapparel.com" class="contact-email">ruth@nwcustomapparel.com</a>
+                    <p class="contact-phone">ext. 119</p>
+                    <button class="print-btn" onclick="printContractPricing()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        Print PDF
+                    </button>
+                </div>
+            </header>
+
+            <!-- Pricing Tables Row -->
+            <div class="tables-row">
+                <!-- Garments Table -->
+                <div class="table-section">
+                    <h3>Contract Garments <span class="part-number">CTR-Garmt</span></h3>
+                    <table class="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-col">1-7</th>
+                                <th class="ltm-col">8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th>72+</th>
+                            </tr>
+                        </thead>
+                        <tbody id="garmentsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Caps Table -->
+                <div class="table-section">
+                    <h3>Contract Cap Fronts <span class="part-number">CTR-Cap</span></h3>
+                    <table class="pricing-table">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th class="ltm-col">1-7</th>
+                                <th class="ltm-col">8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th>72+</th>
+                            </tr>
+                        </thead>
+                        <tbody id="capsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- LTM Note -->
+            <div class="ltm-note">
+                <strong>* Columns 1-7 and 8-23:</strong> $50 Less Than Minimum (LTM) fee applies to orders under 24 pieces.
+            </div>
+
+            <!-- Laser Patch Section -->
+            <div class="laser-patch-section">
+                <h3>Laser Leatherette Patch Pricing</h3>
+                <table class="pricing-table laser-patch-table">
+                    <thead>
+                        <tr>
+                            <th>Quantity</th>
+                            <th>Price Each</th>
+                        </tr>
+                    </thead>
+                    <tbody id="laserPatchTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <ul class="laser-notes">
+                    <li>Orders of 1-23 pieces include $50 LTM fee</li>
+                    <li>Laser Patch: $50 one-time design setup fee (GRT-50)</li>
+                    <li>$100 digitizing for new embroidery logos</li>
+                </ul>
+            </div>
+
+            <!-- Footer -->
+            <footer class="page-footer">
+                <p>Pricing effective February 2026 | Contract pricing targets $100/hr billing rate</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="/pages/embroidery-contract-pricing.js"></script>
+</body>
+</html>
