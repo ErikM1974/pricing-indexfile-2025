@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-02-03
+**Last Updated:** 2026-02-04
 **Total Active Files:** ~288 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -84,8 +84,8 @@
 ### Embroidery System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/embroidery-pricing-all/index.html` | **UNIFIED** Embroidery pricing page (AL/CEMB + DECG tabs) | embroidery-pricing-all.js | ✅ Active |
-| `/calculators/embroidery-pricing-all/embroidery-pricing-all.js` | Combined AL/DECG pricing logic | /api/al-pricing, /api/decg-pricing | ✅ Active |
+| `/calculators/embroidery-pricing-all/index.html` | **UNIFIED** Embroidery pricing page (Contract + DECG tabs) | embroidery-pricing-all.js | ✅ Active |
+| `/calculators/embroidery-pricing-all/embroidery-pricing-all.js` | Combined Contract/DECG pricing logic (linear $/1K model) | /api/contract-pricing, /api/decg-pricing | ✅ Active |
 | `/calculators/embroidery-pricing-all/embroidery-pricing-all.css` | Tabbed interface styles | - | ✅ Active |
 | `/quote-builders/embroidery-quote-builder.html` | Embroidery/Cap Combo Quote Builder 2026 (Excel-style) | embroidery-quote-pricing.js | ✅ Active |
 
@@ -347,6 +347,7 @@ cap-embroidery-fix.css
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_RULES.md` | **NEW** Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
+| `/memory/EMBROIDERY_ITEM_TYPES.md` | **NEW** Canonical ItemType reference for Embroidery_Costs table (2026-02-04) | ✅ Active |
 | `/memory/DECG_PRICING_2026.md` | **NEW** Customer Supplied Embroidery (DECG) pricing reference | ✅ Active |
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
@@ -565,6 +566,8 @@ cap-embroidery-fix.css
 | `/tests/scripts/cleanup-duplicate-service-codes.js` | Remove duplicate service codes | ✅ Active |
 | `/tests/scripts/update-embroidery-costs.js` | **NEW** Update AL/CB/CS/FB records in Embroidery_Costs | ✅ Active |
 | `/tests/scripts/add-cemb-service-codes.js` | **NEW** Add CEMB/CEMB-CAP service codes | ✅ Active |
+| `/tests/scripts/cleanup-embroidery-costs.js` | **NEW** Delete duplicates, add missing DECG-FB 1-7 (2026-02-04) | ✅ Active |
+| `/tests/scripts/update-ctr-pricing-linear.js` | **NEW** Update CTR pricing with linear $/1K model (2026-02-04) | ✅ Active |
 
 **Run:** `node tests/scripts/seed-classified-items.js`
 
@@ -575,6 +578,7 @@ cap-embroidery-fix.css
 **Embroidery Pricing Consolidation (Feb 2026):**
 - **`update-embroidery-costs.js`:** Adds AL (5 tiers), AL-CAP (5 tiers), CB (5 tiers), CS (5 tiers), FB (1 record) = 21 records
 - **`add-cemb-service-codes.js`:** Adds CEMB (5 tiers), CEMB-CAP (5 tiers) = 10 service codes
+- **`update-ctr-pricing-linear.js`:** Updates CTR-Garmt, CTR-Cap, CTR-FB with linear $/1K pricing (Feb 2026)
 
 ## 🔄 Update Protocol
 

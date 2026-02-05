@@ -653,6 +653,11 @@ app.get('/*.js', (req, res) => {
   res.sendFile(path.join(__dirname, fileName));
 });
 
+// Redirect old embroidery-contract URL to unified page
+app.get('/calculators/embroidery-contract*', (req, res) => {
+  res.redirect(301, '/calculators/embroidery-pricing-all/?tab=al-cemb');
+});
+
 // Serve specific HTML files from their locations
 app.get('/staff-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'staff-dashboard.html'));

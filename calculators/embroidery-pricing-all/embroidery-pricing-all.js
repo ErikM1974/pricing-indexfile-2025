@@ -45,15 +45,20 @@ const PRODUCTION_RATES = {
 const TIER_ORDER = ['1-7', '8-23', '24-47', '48-71', '72+'];
 const FB_STITCH_EXAMPLES = [25000, 30000, 35000, 50000];
 
-// Get stitch counts from loaded API data (sorted)
+// Stitch counts for full back pricing (25K minimum, higher range)
+const FB_STITCH_COUNTS = [25000, 30000, 35000, 40000, 45000, 50000];
+
+// Stitch counts for contract pricing matrices (5K to 25K)
+const CONTRACT_STITCH_COUNTS = [
+    5000, 6000, 7000, 8000, 9000, 10000,
+    11000, 12000, 13000, 14000, 15000,
+    16000, 17000, 18000, 19000, 20000,
+    21000, 22000, 23000, 24000, 25000
+];
+
+// Get stitch counts for contract pricing display
 function getContractStitchCounts() {
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.garments) {
-        return [5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 15000];
-    }
-    return Object.keys(CONTRACT_PRICING.garments)
-        .map(k => parseInt(k))
-        .filter(k => !isNaN(k))
-        .sort((a, b) => a - b);
+    return CONTRACT_STITCH_COUNTS;
 }
 
 // ============================================
@@ -131,14 +136,14 @@ async function fetchContractPricing() {
         garments: data.garments,
         caps: data.caps,
         fullBack: {
-            ratesPerThousand: data.fullBack.ratesPerThousand,
+            perThousandRates: data.fullBack.perThousandRates,
             minStitches: data.fullBack.minStitches || 25000,
             minPrice: data.fullBack.minPrice || 20.00,
             ltmFee: data.ltmFee || 50,
-            ltmThreshold: data.ltmThreshold || 7
+            ltmThreshold: data.ltmThreshold || 23
         },
         ltmFee: data.ltmFee || 50,
-        ltmThreshold: data.ltmThreshold || 7
+        ltmThreshold: data.ltmThreshold || 23
     };
 }
 
@@ -262,21 +267,10 @@ function getAlRetailTierFromQuantity(qty) {
 }
 
 function getClosestStitchCount(stitches, itemType = 'garment') {
-    // Get available stitch counts from loaded API data
-    let available;
-    if (itemType === 'cap' && CONTRACT_PRICING && CONTRACT_PRICING.caps) {
-        available = Object.keys(CONTRACT_PRICING.caps)
-            .map(k => parseInt(k))
-            .filter(k => !isNaN(k))
-            .sort((a, b) => a - b);
-    } else if (CONTRACT_PRICING && CONTRACT_PRICING.garments) {
-        available = Object.keys(CONTRACT_PRICING.garments)
-            .map(k => parseInt(k))
-            .filter(k => !isNaN(k))
-            .sort((a, b) => a - b);
-    } else {
-        available = [5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 15000];
-    }
+    // Get available stitch counts from PRODUCTION_RATES (for hourly revenue calculation)
+    const available = itemType === 'cap'
+        ? Object.keys(PRODUCTION_RATES.caps).map(k => parseInt(k)).sort((a, b) => a - b)
+        : Object.keys(PRODUCTION_RATES.garments).map(k => parseInt(k)).sort((a, b) => a - b);
 
     // Find the closest stitch count that's >= input, or the max if over
     for (const count of available) {
@@ -293,28 +287,40 @@ function buildContractGarmentsMatrix() {
     const tbody = document.querySelector('#contractGarmentsMatrix tbody');
     if (!tbody) return;
 
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.garments) {
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.garments || !CONTRACT_PRICING.garments.perThousandRates) {
         tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Contract pricing not available</td></tr>';
         return;
     }
 
     const stitchCounts = getContractStitchCounts();
+    const rates = CONTRACT_PRICING.garments.perThousandRates;
     let html = '';
-    stitchCounts.forEach(stitches => {
-        const prices = CONTRACT_PRICING.garments[stitches];
-        if (!prices) return;
 
+    stitchCounts.forEach(stitches => {
         html += '<tr>';
         html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
 
         TIER_ORDER.forEach((tier, idx) => {
-            const price = prices[tier];
-            const cellClass = idx === 0 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+            const rate = rates[tier];
+            const price = (stitches / 1000) * rate;
+            // LTM applies to first two tiers (1-7 and 8-23)
+            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
             html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
         });
 
         html += '</tr>';
     });
+
+    // Add footer row with per-thousand rates
+    html += '<tr class="rate-footer">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        // LTM applies to first two tiers (1-7 and 8-23)
+        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
 
     tbody.innerHTML = html;
 }
@@ -323,33 +329,40 @@ function buildContractCapsMatrix() {
     const tbody = document.querySelector('#contractCapsMatrix tbody');
     if (!tbody) return;
 
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.caps) {
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.caps || !CONTRACT_PRICING.caps.perThousandRates) {
         tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Contract pricing not available</td></tr>';
         return;
     }
 
-    // Get cap stitch counts (may differ from garments)
-    const stitchCounts = Object.keys(CONTRACT_PRICING.caps)
-        .map(k => parseInt(k))
-        .filter(k => !isNaN(k))
-        .sort((a, b) => a - b);
-
+    const stitchCounts = getContractStitchCounts();
+    const rates = CONTRACT_PRICING.caps.perThousandRates;
     let html = '';
-    stitchCounts.forEach(stitches => {
-        const prices = CONTRACT_PRICING.caps[stitches];
-        if (!prices) return;
 
+    stitchCounts.forEach(stitches => {
         html += '<tr>';
         html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
 
         TIER_ORDER.forEach((tier, idx) => {
-            const price = prices[tier];
-            const cellClass = idx === 0 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+            const rate = rates[tier];
+            const price = (stitches / 1000) * rate;
+            // LTM applies to first two tiers (1-7 and 8-23)
+            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
             html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
         });
 
         html += '</tr>';
     });
+
+    // Add footer row with per-thousand rates
+    html += '<tr class="rate-footer">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        // LTM applies to first two tiers (1-7 and 8-23)
+        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
 
     tbody.innerHTML = html;
 }
@@ -358,32 +371,41 @@ function buildContractFullBackMatrix() {
     const tbody = document.querySelector('#contractFullBackMatrix tbody');
     if (!tbody) return;
 
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.ratesPerThousand) {
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
         tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
         return;
     }
 
-    const rates = CONTRACT_PRICING.fullBack.ratesPerThousand;
+    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
     const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
-
     let html = '';
-    TIER_ORDER.forEach(tier => {
-        const rate = rates[tier];
-        if (rate === undefined) return;
 
+    // Build rows for each stitch count (like Garments/Caps)
+    FB_STITCH_COUNTS.forEach(stitches => {
         html += '<tr>';
-        html += `<td>${tier}</td>`;
-        html += `<td>${formatPrice(rate)}</td>`;
+        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
 
-        // Calculate prices for example stitch counts
-        FB_STITCH_EXAMPLES.forEach(stitches => {
+        TIER_ORDER.forEach((tier, idx) => {
+            const rate = rates[tier];
             const stitchesK = stitches / 1000;
             const price = Math.max(stitchesK * rate, minPrice);
-            html += `<td>${formatPrice(price)}</td>`;
+            // LTM applies to first two tiers (1-7 and 8-23)
+            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
         });
 
         html += '</tr>';
     });
+
+    // Add footer row with per-thousand rates
+    html += '<tr class="rate-footer">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
 
     tbody.innerHTML = html;
 }
@@ -577,43 +599,47 @@ function calculateContractPrice() {
     let ltmFee = 0;
     let hourlyRevenue = 0;
     const tier = getTierFromQuantity(quantity);
-    const ltmThreshold = CONTRACT_PRICING.ltmThreshold || 7;
+    const ltmThreshold = CONTRACT_PRICING.ltmThreshold || 23;
     const ltmFeeAmount = CONTRACT_PRICING.ltmFee || 50;
 
     if (itemType === 'garment') {
-        const closestStitches = getClosestStitchCount(stitches, 'garment');
-        const prices = CONTRACT_PRICING.garments[closestStitches];
-        unitPrice = prices ? prices[tier] : 0;
+        // Linear per-thousand pricing model
+        const rate = CONTRACT_PRICING.garments.perThousandRates[tier];
+        const stitchesK = stitches / 1000;
+        unitPrice = stitchesK * rate;
 
-        baseLabel.textContent = `${closestStitches / 1000}K stitches @ ${tier}:`;
+        baseLabel.textContent = `${stitchesK}K x ${formatPrice(rate)}/1K @ ${tier}:`;
         basePriceEl.textContent = formatPrice(unitPrice);
 
         if (quantity > 0 && quantity <= ltmThreshold) {
             ltmFee = ltmFeeAmount;
         }
 
-        // Calculate hourly revenue using static production rates
+        // Calculate hourly revenue using static production rates (use closest available)
+        const closestStitches = getClosestStitchCount(stitches, 'garment');
         const prodRate = PRODUCTION_RATES.garments[closestStitches] || 16;
         hourlyRevenue = unitPrice * prodRate;
 
     } else if (itemType === 'cap') {
-        const closestStitches = getClosestStitchCount(stitches, 'cap');
-        const prices = CONTRACT_PRICING.caps[closestStitches];
-        unitPrice = prices ? prices[tier] : 0;
+        // Linear per-thousand pricing model
+        const rate = CONTRACT_PRICING.caps.perThousandRates[tier];
+        const stitchesK = stitches / 1000;
+        unitPrice = stitchesK * rate;
 
-        baseLabel.textContent = `${closestStitches / 1000}K stitches @ ${tier}:`;
+        baseLabel.textContent = `${stitchesK}K x ${formatPrice(rate)}/1K @ ${tier}:`;
         basePriceEl.textContent = formatPrice(unitPrice);
 
         if (quantity > 0 && quantity <= ltmThreshold) {
             ltmFee = ltmFeeAmount;
         }
 
-        // Calculate hourly revenue using static production rates
+        // Calculate hourly revenue using static production rates (use closest available)
+        const closestStitches = getClosestStitchCount(stitches, 'cap');
         const prodRate = PRODUCTION_RATES.caps[closestStitches] || 22;
         hourlyRevenue = unitPrice * prodRate;
 
     } else if (itemType === 'fullback') {
-        const rate = CONTRACT_PRICING.fullBack.ratesPerThousand[tier];
+        const rate = CONTRACT_PRICING.fullBack.perThousandRates[tier];
         const stitchesK = stitches / 1000;
         const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
         unitPrice = Math.max(stitchesK * rate, minPrice);
