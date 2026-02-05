@@ -464,6 +464,18 @@ body {
     margin-bottom: 24px;
 }
 
+/* Compact calculator variant - for top-of-tab placement */
+.calculator-card.compact {
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-color) 100%);
+    border: 2px solid var(--primary-color);
+    box-shadow: var(--shadow-md);
+}
+
+.calculator-card.compact h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+
 .calculator-card h3 {
     font-size: 1.1rem;
     font-weight: 600;
@@ -575,6 +587,21 @@ body {
     padding-top: 12px;
     font-weight: 600;
     font-size: 1.1rem;
+}
+
+/* Final unit price row - emphasized for quick reading */
+.result-row.final {
+    border-top: 2px solid var(--primary-color);
+    margin-top: 8px;
+    padding-top: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.result-row .final-price {
+    font-size: 1.5rem;
+    color: var(--primary-dark);
+    font-weight: 700;
 }
 
 .result-row.error {

@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Setup calculators
         setupContractCalculator();
+        setupAlRetailCalculator();
         setupDecgRetailCalculator();
 
         // Hide loading state
@@ -347,6 +348,30 @@ function getClosestStitchCount(stitches, itemType = 'garment') {
         if (stitches <= count) return count;
     }
     return available[available.length - 1];
+}
+
+/**
+ * Calculate unit price with LTM fee built into the per-piece price
+ * @param {number} baseUnitPrice - The base unit price before LTM
+ * @param {number} quantity - Number of pieces
+ * @param {number} ltmThreshold - Quantity at or below which LTM applies
+ * @param {number} ltmFee - The LTM fee amount
+ * @returns {object} { finalUnitPrice, ltmPerPiece, hasLtm }
+ */
+function calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFee) {
+    if (quantity > 0 && quantity <= ltmThreshold) {
+        const ltmPerPiece = ltmFee / quantity;
+        return {
+            finalUnitPrice: baseUnitPrice + ltmPerPiece,
+            ltmPerPiece: ltmPerPiece,
+            hasLtm: true
+        };
+    }
+    return {
+        finalUnitPrice: baseUnitPrice,
+        ltmPerPiece: 0,
+        hasLtm: false
+    };
 }
 
 // ============================================
@@ -723,126 +748,154 @@ function calculateContractPrice() {
 
     const itemType = document.getElementById('contractItemType').value;
     const quantity = parseInt(document.getElementById('contractQuantity').value) || 0;
-    const stitchesEl = document.getElementById('contractStitches');
-    let stitches = parseInt(stitchesEl.value) || 8000;
+    const stitches = parseInt(document.getElementById('contractStitches').value) || 8000;
 
-    // Update min stitches for full back
-    const minStitches = CONTRACT_PRICING.fullBack?.minStitches || 25000;
-    if (itemType === 'fullback') {
-        stitchesEl.min = minStitches;
-        if (stitches < minStitches) {
-            stitches = minStitches;
-            stitchesEl.value = minStitches;
-        }
-    } else {
-        stitchesEl.min = 1000;
-    }
+    // Elements (new simplified structure)
+    const breakdownRow = document.getElementById('contractBreakdownRow');
+    const breakdownLabel = document.getElementById('contractBreakdownLabel');
+    const breakdownValue = document.getElementById('contractBreakdownValue');
+    const ltmBreakdownRow = document.getElementById('contractLtmBreakdownRow');
+    const ltmBreakdownLabel = document.getElementById('contractLtmBreakdownLabel');
+    const ltmBreakdownValue = document.getElementById('contractLtmBreakdownValue');
+    const finalUnitPriceEl = document.getElementById('contractFinalUnitPrice');
 
-    // Elements
-    const baseRow = document.getElementById('contractBaseRow');
-    const baseLabel = document.getElementById('contractBaseLabel');
-    const basePriceEl = document.getElementById('contractBasePrice');
-    const unitPriceEl = document.getElementById('contractUnitPrice');
-    const ltmRow = document.getElementById('contractLtmRow');
-    const ltmFeeEl = document.getElementById('contractLtmFee');
-    const totalPriceEl = document.getElementById('contractTotalPrice');
-    const hourlyRow = document.getElementById('contractHourlyRow');
-    const hourlyRevenueEl = document.getElementById('contractHourlyRevenue');
-
-    let unitPrice = 0;
-    let ltmFee = 0;
-    let hourlyRevenue = 0;
     const tier = getTierFromQuantity(quantity);
     const ltmThreshold = CONTRACT_PRICING.ltmThreshold || 23;
     const ltmFeeAmount = CONTRACT_PRICING.ltmFee || 50;
 
+    let baseUnitPrice = 0;
+    let rate = 0;
+
     if (itemType === 'garment') {
-        // Linear per-thousand pricing model
-        const rate = CONTRACT_PRICING.garments.perThousandRates[tier];
-        const stitchesK = stitches / 1000;
-        unitPrice = stitchesK * rate;
-
-        baseLabel.textContent = `${stitchesK}K x ${formatPrice(rate)}/1K @ ${tier}:`;
-        basePriceEl.textContent = formatPrice(unitPrice);
-
-        if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = ltmFeeAmount;
-        }
-
-        // Calculate hourly revenue using static production rates (use closest available)
-        const closestStitches = getClosestStitchCount(stitches, 'garment');
-        const prodRate = PRODUCTION_RATES.garments[closestStitches] || 16;
-        hourlyRevenue = unitPrice * prodRate;
-
+        rate = CONTRACT_PRICING.garments.perThousandRates[tier];
     } else if (itemType === 'cap') {
-        // Linear per-thousand pricing model
-        const rate = CONTRACT_PRICING.caps.perThousandRates[tier];
-        const stitchesK = stitches / 1000;
-        unitPrice = stitchesK * rate;
-
-        baseLabel.textContent = `${stitchesK}K x ${formatPrice(rate)}/1K @ ${tier}:`;
-        basePriceEl.textContent = formatPrice(unitPrice);
-
-        if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = ltmFeeAmount;
-        }
-
-        // Calculate hourly revenue using static production rates (use closest available)
-        const closestStitches = getClosestStitchCount(stitches, 'cap');
-        const prodRate = PRODUCTION_RATES.caps[closestStitches] || 22;
-        hourlyRevenue = unitPrice * prodRate;
-
-    } else if (itemType === 'fullback') {
-        const rate = CONTRACT_PRICING.fullBack.perThousandRates[tier];
-        const stitchesK = stitches / 1000;
-        const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
-        unitPrice = Math.max(stitchesK * rate, minPrice);
-
-        baseLabel.textContent = `${stitchesK}K x ${formatPrice(rate)}/1K:`;
-        basePriceEl.textContent = formatPrice(unitPrice);
-
-        if (quantity > 0 && quantity <= ltmThreshold) {
-            ltmFee = ltmFeeAmount;
-        }
-
-        // Full back hourly is harder to estimate
-        hourlyRevenue = 0;
+        rate = CONTRACT_PRICING.caps.perThousandRates[tier];
     }
 
-    // Update UI
+    const stitchesK = stitches / 1000;
+    baseUnitPrice = stitchesK * rate;
+
+    // Show breakdown: "8K × $0.625/1K = $5.00"
+    breakdownLabel.textContent = `${stitchesK}K × ${formatPrice(rate)}/1K:`;
+    breakdownValue.textContent = formatPrice(baseUnitPrice);
+
     if (quantity > 0) {
-        baseRow.classList.remove('hidden');
+        breakdownRow.classList.remove('hidden');
     } else {
-        baseRow.classList.add('hidden');
+        breakdownRow.classList.add('hidden');
     }
 
-    unitPriceEl.textContent = formatPrice(unitPrice);
+    // Calculate final price with LTM built in
+    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFeeAmount);
 
-    if (ltmFee > 0) {
-        ltmRow.classList.remove('hidden');
-        ltmFeeEl.textContent = '+' + formatPrice(ltmFee);
+    // Show LTM breakdown if applicable: "+ LTM ($50 ÷ 3) = +$16.67"
+    if (ltmResult.hasLtm && quantity > 0) {
+        ltmBreakdownRow.classList.remove('hidden');
+        ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+        ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
     } else {
-        ltmRow.classList.add('hidden');
+        ltmBreakdownRow.classList.add('hidden');
     }
 
-    const total = (unitPrice * quantity) + ltmFee;
-    totalPriceEl.textContent = formatPrice(total);
+    // Final unit price (emphasized)
+    finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
+}
 
-    // Hourly revenue check
-    if (hourlyRevenue > 0 && itemType !== 'fullback') {
-        hourlyRow.classList.remove('hidden');
-        hourlyRevenueEl.textContent = formatPrice(hourlyRevenue) + '/hr';
-        // Color code: green if >= $100, yellow if $90-100, red if < $90
-        if (hourlyRevenue >= 100) {
-            hourlyRevenueEl.className = 'hourly-check good';
-        } else if (hourlyRevenue >= 90) {
-            hourlyRevenueEl.className = 'hourly-check warn';
+// ============================================
+// AL RETAIL CALCULATOR
+// ============================================
+
+function setupAlRetailCalculator() {
+    const itemTypeEl = document.getElementById('alRetailItemType');
+    const quantityEl = document.getElementById('alRetailQuantity');
+    const stitchesEl = document.getElementById('alRetailStitches');
+
+    if (!itemTypeEl || !quantityEl || !stitchesEl) return;
+
+    const updateCalc = () => calculateAlRetailPrice();
+
+    itemTypeEl.addEventListener('change', updateCalc);
+    quantityEl.addEventListener('input', updateCalc);
+    stitchesEl.addEventListener('input', updateCalc);
+
+    // Initial calculation
+    updateCalc();
+}
+
+function calculateAlRetailPrice() {
+    if (!AL_RETAIL_PRICING) {
+        console.error('AL pricing not loaded');
+        return;
+    }
+
+    const itemType = document.getElementById('alRetailItemType').value;
+    const quantity = parseInt(document.getElementById('alRetailQuantity').value) || 0;
+    const stitches = parseInt(document.getElementById('alRetailStitches').value) || 8000;
+
+    // Elements
+    const breakdownRow = document.getElementById('alRetailBreakdownRow');
+    const breakdownLabel = document.getElementById('alRetailBreakdownLabel');
+    const breakdownValue = document.getElementById('alRetailBreakdownValue');
+    const extraStitchRow = document.getElementById('alRetailExtraStitchRow');
+    const extraStitchLabel = document.getElementById('alRetailExtraStitchLabel');
+    const extraStitchValue = document.getElementById('alRetailExtraStitchValue');
+    const ltmBreakdownRow = document.getElementById('alRetailLtmBreakdownRow');
+    const ltmBreakdownLabel = document.getElementById('alRetailLtmBreakdownLabel');
+    const ltmBreakdownValue = document.getElementById('alRetailLtmBreakdownValue');
+    const finalUnitPriceEl = document.getElementById('alRetailFinalUnitPrice');
+
+    const tier = getAlRetailTierFromQuantity(quantity);
+    let pricing, baseStitches, perThousandUpcharge;
+
+    if (itemType === 'garment') {
+        pricing = AL_RETAIL_PRICING.garments;
+    } else {
+        pricing = AL_RETAIL_PRICING.caps;
+    }
+
+    const basePrice = pricing.basePrices[tier] || 0;
+    baseStitches = pricing.baseStitches || 8000;
+    perThousandUpcharge = pricing.perThousandUpcharge || 1.25;
+    const ltmThreshold = pricing.ltmThreshold || 7;
+    const ltmFeeAmount = pricing.ltmFee || 50;
+
+    // Calculate extra stitch charge
+    const extraK = Math.max(0, (stitches - baseStitches) / 1000);
+    const extraCharge = extraK * perThousandUpcharge;
+    const baseUnitPrice = basePrice + extraCharge;
+
+    // Show breakdown
+    if (quantity > 0) {
+        breakdownRow.classList.remove('hidden');
+        breakdownLabel.textContent = `Base (${baseStitches / 1000}K):`;
+        breakdownValue.textContent = formatPrice(basePrice);
+
+        if (extraK > 0) {
+            extraStitchRow.classList.remove('hidden');
+            extraStitchLabel.textContent = `+${extraK.toFixed(0)}K extra:`;
+            extraStitchValue.textContent = '+' + formatPrice(extraCharge);
         } else {
-            hourlyRevenueEl.className = 'hourly-check bad';
+            extraStitchRow.classList.add('hidden');
         }
     } else {
-        hourlyRow.classList.add('hidden');
+        breakdownRow.classList.add('hidden');
+        extraStitchRow.classList.add('hidden');
     }
+
+    // Calculate final price with LTM built in
+    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFeeAmount);
+
+    // Show LTM breakdown if applicable
+    if (ltmResult.hasLtm && quantity > 0) {
+        ltmBreakdownRow.classList.remove('hidden');
+        ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+        ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
+    } else {
+        ltmBreakdownRow.classList.add('hidden');
+    }
+
+    // Final unit price (emphasized)
+    finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
 }
 
 // ============================================
@@ -879,18 +932,18 @@ function calculateDecgRetailPrice() {
     const stitches = parseInt(document.getElementById('decgRetailStitches').value) || 8000;
     const isHeavyweight = document.getElementById('decgRetailHeavyweight').checked;
 
-    // Elements
-    const baseRow = document.getElementById('decgRetailBaseRow');
-    const baseLabel = document.getElementById('decgRetailBaseLabel');
-    const basePriceEl = document.getElementById('decgRetailBasePrice');
+    // Elements (new simplified structure)
+    const breakdownRow = document.getElementById('decgRetailBreakdownRow');
+    const breakdownLabel = document.getElementById('decgRetailBreakdownLabel');
+    const breakdownValue = document.getElementById('decgRetailBreakdownValue');
     const extraStitchRow = document.getElementById('decgRetailExtraStitchRow');
     const extraStitchLabel = document.getElementById('decgRetailExtraStitchLabel');
-    const extraStitchPrice = document.getElementById('decgRetailExtraStitchPrice');
+    const extraStitchValue = document.getElementById('decgRetailExtraStitchValue');
     const heavyweightRow = document.getElementById('decgRetailHeavyweightRow');
-    const unitPriceEl = document.getElementById('decgRetailUnitPrice');
-    const ltmRow = document.getElementById('decgRetailLtmRow');
-    const ltmFeeEl = document.getElementById('decgRetailLtmFee');
-    const totalPriceEl = document.getElementById('decgRetailTotalPrice');
+    const ltmBreakdownRow = document.getElementById('decgRetailLtmBreakdownRow');
+    const ltmBreakdownLabel = document.getElementById('decgRetailLtmBreakdownLabel');
+    const ltmBreakdownValue = document.getElementById('decgRetailLtmBreakdownValue');
+    const finalUnitPriceEl = document.getElementById('decgRetailFinalUnitPrice');
 
     const tier = getTierFromQuantity(quantity);
     let pricing, baseStitches, perThousandUpcharge;
@@ -904,52 +957,53 @@ function calculateDecgRetailPrice() {
     const basePrice = pricing.basePrices[tier] || 0;
     baseStitches = pricing.baseStitches || 8000;
     perThousandUpcharge = pricing.perThousandUpcharge || 1.25;
+    const ltmThreshold = pricing.ltmThreshold || 7;
+    const ltmFeeAmount = pricing.ltmFee || 50;
 
+    // Calculate extra stitch charge
     const extraK = Math.max(0, (stitches - baseStitches) / 1000);
     const extraCharge = extraK * perThousandUpcharge;
-    let unitPrice = basePrice + extraCharge;
+    let baseUnitPrice = basePrice + extraCharge;
 
-    // Update UI
+    // Show breakdown
     if (quantity > 0) {
-        baseRow.classList.remove('hidden');
-        baseLabel.textContent = `Base (${baseStitches / 1000}K):`;
-        basePriceEl.textContent = formatPrice(basePrice);
+        breakdownRow.classList.remove('hidden');
+        breakdownLabel.textContent = `Base (${baseStitches / 1000}K):`;
+        breakdownValue.textContent = formatPrice(basePrice);
 
         if (extraK > 0) {
             extraStitchRow.classList.remove('hidden');
             extraStitchLabel.textContent = `+${extraK.toFixed(0)}K extra:`;
-            extraStitchPrice.textContent = '+' + formatPrice(extraCharge);
+            extraStitchValue.textContent = '+' + formatPrice(extraCharge);
         } else {
             extraStitchRow.classList.add('hidden');
         }
     } else {
-        baseRow.classList.add('hidden');
+        breakdownRow.classList.add('hidden');
         extraStitchRow.classList.add('hidden');
     }
 
-    // Heavyweight surcharge
+    // Heavyweight surcharge (added to base before LTM calculation)
     const heavyweightSurcharge = DECG_RETAIL_PRICING.heavyweightSurcharge || 10.00;
     if (isHeavyweight) {
         heavyweightRow.classList.remove('hidden');
-        unitPrice += heavyweightSurcharge;
+        baseUnitPrice += heavyweightSurcharge;
     } else {
         heavyweightRow.classList.add('hidden');
     }
 
-    unitPriceEl.textContent = formatPrice(unitPrice);
+    // Calculate final price with LTM built in
+    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFeeAmount);
 
-    // LTM fee
-    const ltmThreshold = pricing.ltmThreshold || 7;
-    const ltmFeeAmount = pricing.ltmFee || 50;
-    let ltmFee = 0;
-    if (quantity > 0 && quantity <= ltmThreshold) {
-        ltmFee = ltmFeeAmount;
-        ltmRow.classList.remove('hidden');
-        ltmFeeEl.textContent = '+' + formatPrice(ltmFee);
+    // Show LTM breakdown if applicable
+    if (ltmResult.hasLtm && quantity > 0) {
+        ltmBreakdownRow.classList.remove('hidden');
+        ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+        ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
     } else {
-        ltmRow.classList.add('hidden');
+        ltmBreakdownRow.classList.add('hidden');
     }
 
-    const total = (unitPrice * quantity) + ltmFee;
-    totalPriceEl.textContent = formatPrice(total);
+    // Final unit price (emphasized)
+    finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
 }

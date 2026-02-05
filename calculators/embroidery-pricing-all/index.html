@@ -70,6 +70,44 @@
                 <span><strong>LTM Fee:</strong> Orders of 1-23 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
+            <!-- Quick Calculator (moved to top) -->
+            <div class="calculator-card compact">
+                <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
+                <div class="calc-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contractItemType">Item Type</label>
+                            <select id="contractItemType">
+                                <option value="garment">Garment</option>
+                                <option value="cap">Cap</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contractQuantity">Quantity</label>
+                            <input type="number" id="contractQuantity" value="24" min="1" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="contractStitches">Stitch Count</label>
+                            <input type="number" id="contractStitches" value="8000" min="1000" max="100000" step="1000">
+                        </div>
+                    </div>
+                    <div class="calc-results">
+                        <div class="result-row breakdown" id="contractBreakdownRow">
+                            <span id="contractBreakdownLabel">8K × $0.625/1K:</span>
+                            <span id="contractBreakdownValue">$5.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="contractLtmBreakdownRow">
+                            <span id="contractLtmBreakdownLabel">+ LTM ($50 ÷ 3):</span>
+                            <span id="contractLtmBreakdownValue">+$16.67</span>
+                        </div>
+                        <div class="result-row final">
+                            <span>Unit Price:</span>
+                            <span id="contractFinalUnitPrice" class="final-price">$5.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ShopWorks Part Numbers Reference Card -->
             <div class="shopworks-ref-card">
                 <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
@@ -152,53 +190,6 @@
                         <!-- Populated by JS -->
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Quick Calculator -->
-            <div class="calculator-card">
-                <h3><i class="fas fa-calculator"></i> Contract Calculator</h3>
-                <div class="calc-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contractItemType">Item Type</label>
-                            <select id="contractItemType">
-                                <option value="garment">Garment</option>
-                                <option value="cap">Cap</option>
-                                <option value="fullback">Full Back</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="contractQuantity">Quantity</label>
-                            <input type="number" id="contractQuantity" value="24" min="1" max="9999">
-                        </div>
-                        <div class="form-group">
-                            <label for="contractStitches">Stitch Count</label>
-                            <input type="number" id="contractStitches" value="8000" min="1000" max="100000" step="1000">
-                        </div>
-                    </div>
-                    <div class="calc-results">
-                        <div class="result-row breakdown" id="contractBaseRow">
-                            <span id="contractBaseLabel">Base price:</span>
-                            <span id="contractBasePrice">$0.00</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Unit Price:</span>
-                            <span id="contractUnitPrice" class="price">$0.00</span>
-                        </div>
-                        <div class="result-row hidden" id="contractLtmRow">
-                            <span>LTM Fee:</span>
-                            <span id="contractLtmFee" class="fee">+$50.00</span>
-                        </div>
-                        <div class="result-row total">
-                            <span>Total:</span>
-                            <span id="contractTotalPrice" class="total-price">$0.00</span>
-                        </div>
-                        <div class="result-row breakdown" id="contractHourlyRow">
-                            <span>Est. Hourly Revenue:</span>
-                            <span id="contractHourlyRevenue" class="hourly-check">$0.00/hr</span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Additional Fees -->
@@ -285,6 +276,48 @@
             <div class="ltm-banner">
                 <i class="fas fa-exclamation-circle"></i>
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
+            </div>
+
+            <!-- Quick Calculator -->
+            <div class="calculator-card compact">
+                <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
+                <div class="calc-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alRetailItemType">Item Type</label>
+                            <select id="alRetailItemType">
+                                <option value="garment">Garment</option>
+                                <option value="cap">Cap</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alRetailQuantity">Quantity</label>
+                            <input type="number" id="alRetailQuantity" value="24" min="1" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="alRetailStitches">Stitch Count</label>
+                            <input type="number" id="alRetailStitches" value="8000" min="1000" max="50000" step="1000">
+                        </div>
+                    </div>
+                    <div class="calc-results">
+                        <div class="result-row breakdown" id="alRetailBreakdownRow">
+                            <span id="alRetailBreakdownLabel">Base (8K):</span>
+                            <span id="alRetailBreakdownValue">$8.50</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="alRetailExtraStitchRow">
+                            <span id="alRetailExtraStitchLabel">+0K extra:</span>
+                            <span id="alRetailExtraStitchValue">+$0.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="alRetailLtmBreakdownRow">
+                            <span id="alRetailLtmBreakdownLabel">+ LTM ($50 ÷ 5):</span>
+                            <span id="alRetailLtmBreakdownValue">+$10.00</span>
+                        </div>
+                        <div class="result-row final">
+                            <span>Unit Price:</span>
+                            <span id="alRetailFinalUnitPrice" class="final-price">$8.50</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- ShopWorks Part Numbers Reference Card -->
@@ -409,6 +442,61 @@
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
+            <!-- Quick Calculator (moved to top) -->
+            <div class="calculator-card compact">
+                <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
+                <div class="calc-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="decgRetailItemType">Item Type</label>
+                            <select id="decgRetailItemType">
+                                <option value="garment">Garment</option>
+                                <option value="cap">Cap</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="decgRetailQuantity">Quantity</label>
+                            <input type="number" id="decgRetailQuantity" value="24" min="1" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="decgRetailStitches">Stitch Count</label>
+                            <input type="number" id="decgRetailStitches" value="8000" min="1000" max="50000" step="1000">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="decgRetailHeavyweight">
+                                <span>Heavyweight Surcharge (+$10/piece)</span>
+                            </label>
+                            <small>Carhartt jackets, bags, canvas, leather</small>
+                        </div>
+                    </div>
+                    <div class="calc-results">
+                        <div class="result-row breakdown" id="decgRetailBreakdownRow">
+                            <span id="decgRetailBreakdownLabel">Base (8K):</span>
+                            <span id="decgRetailBreakdownValue">$28.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="decgRetailExtraStitchRow">
+                            <span id="decgRetailExtraStitchLabel">+0K extra:</span>
+                            <span id="decgRetailExtraStitchValue">+$0.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="decgRetailHeavyweightRow">
+                            <span>Heavyweight:</span>
+                            <span>+$10.00</span>
+                        </div>
+                        <div class="result-row breakdown hidden" id="decgRetailLtmBreakdownRow">
+                            <span id="decgRetailLtmBreakdownLabel">+ LTM ($50 ÷ 3):</span>
+                            <span id="decgRetailLtmBreakdownValue">+$16.67</span>
+                        </div>
+                        <div class="result-row final">
+                            <span>Unit Price:</span>
+                            <span id="decgRetailFinalUnitPrice" class="final-price">$28.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- ShopWorks Part Numbers Reference Card -->
             <div class="shopworks-ref-card decg-retail">
                 <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
@@ -496,64 +584,6 @@
                 </table>
             </div>
 
-            <!-- Quick Calculator -->
-            <div class="calculator-card">
-                <h3><i class="fas fa-calculator"></i> DECG Calculator</h3>
-                <div class="calc-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="decgRetailItemType">Item Type</label>
-                            <select id="decgRetailItemType">
-                                <option value="garment">Garment</option>
-                                <option value="cap">Cap</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="decgRetailQuantity">Quantity</label>
-                            <input type="number" id="decgRetailQuantity" value="24" min="1" max="9999">
-                        </div>
-                        <div class="form-group">
-                            <label for="decgRetailStitches">Stitch Count</label>
-                            <input type="number" id="decgRetailStitches" value="8000" min="1000" max="50000" step="1000">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group checkbox-group">
-                            <label>
-                                <input type="checkbox" id="decgRetailHeavyweight">
-                                <span>Heavyweight Surcharge (+$10/piece)</span>
-                            </label>
-                            <small>Carhartt jackets, bags, canvas, leather</small>
-                        </div>
-                    </div>
-                    <div class="calc-results">
-                        <div class="result-row breakdown" id="decgRetailBaseRow">
-                            <span id="decgRetailBaseLabel">Base (8K):</span>
-                            <span id="decgRetailBasePrice">$0.00</span>
-                        </div>
-                        <div class="result-row breakdown hidden" id="decgRetailExtraStitchRow">
-                            <span id="decgRetailExtraStitchLabel">+0K extra:</span>
-                            <span id="decgRetailExtraStitchPrice">+$0.00</span>
-                        </div>
-                        <div class="result-row breakdown hidden" id="decgRetailHeavyweightRow">
-                            <span>Heavyweight:</span>
-                            <span>+$10.00</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Unit Price:</span>
-                            <span id="decgRetailUnitPrice" class="price">$0.00</span>
-                        </div>
-                        <div class="result-row hidden" id="decgRetailLtmRow">
-                            <span>LTM Fee:</span>
-                            <span id="decgRetailLtmFee" class="fee">+$50.00</span>
-                        </div>
-                        <div class="result-row total">
-                            <span>Total:</span>
-                            <span id="decgRetailTotalPrice" class="total-price">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Footer -->
