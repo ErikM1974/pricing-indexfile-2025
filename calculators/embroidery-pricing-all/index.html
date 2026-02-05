@@ -31,7 +31,7 @@
                     <span>Embroidery Pricing</span>
                 </div>
                 <h1><i class="fas fa-tshirt"></i> Embroidery Pricing 2026</h1>
-                <p class="subtitle">Contract pricing for production | Simplified retail pricing for sales reps</p>
+                <p class="subtitle">Contract-Ruthie | Add Logo (NWCA garments) | Customer-Supplied (their items)</p>
                 <p class="version-info">Updated February 2026</p>
             </div>
         </header>
@@ -40,27 +40,47 @@
         <div class="tab-navigation">
             <button class="tab-btn contract active" data-tab="contract" onclick="switchTab('contract')">
                 <i class="fas fa-industry"></i>
-                Contract
-                <span class="tab-subtitle">Production/Ruthie</span>
+                Contract-Ruthie
+                <span class="tab-subtitle">Production/Partners</span>
             </button>
             <button class="tab-btn al-retail" data-tab="al-retail" onclick="switchTab('al-retail')">
                 <i class="fas fa-tag"></i>
-                AL Retail
-                <span class="tab-subtitle">Additional Logo</span>
+                Add Logo
+                <span class="tab-subtitle">NWCA Garments</span>
             </button>
             <button class="tab-btn decg-retail" data-tab="decg-retail" onclick="switchTab('decg-retail')">
                 <i class="fas fa-box-open"></i>
-                DECG Retail
-                <span class="tab-subtitle">Customer-Supplied</span>
+                Customer-Supplied
+                <span class="tab-subtitle">Customer's Own Items</span>
             </button>
         </div>
 
         <!-- Tab Content: CONTRACT (Production/Ruthie) -->
         <div id="tab-contract" class="tab-content active">
+            <div class="use-case-banner contract">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Contract Pricing:</strong> For established wholesale partners and production accounts (e.g., ad-specialty distributors who supply their own blanks).
+                </div>
+            </div>
+
             <!-- LTM Banner -->
             <div class="ltm-banner">
                 <i class="fas fa-exclamation-circle"></i>
                 <span><strong>LTM Fee:</strong> Orders of 1-23 pieces incur a $50 Less Than Minimum fee</span>
+            </div>
+
+            <!-- ShopWorks Part Numbers Reference Card -->
+            <div class="shopworks-ref-card">
+                <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
+                <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
+                <span class="ref-item"><span class="ref-code">CTR-Garmt</span> Garments</span>
+                <span class="ref-item"><span class="ref-code">CTR-Cap</span> Caps</span>
+                <span class="ref-item"><span class="ref-code">DECG-FB</span> Full Back</span>
+                <span class="ref-divider">|</span>
+                <span class="ref-upgrades" id="contractCapUpgrades">
+                    <span class="loading-text">Loading...</span>
+                </span>
             </div>
 
             <!-- Pricing Matrices Grid -->
@@ -68,7 +88,7 @@
                 <!-- Contract Garments Matrix -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Contract Garments</h3>
+                        <h3><i class="fas fa-tshirt"></i> Contract Garments <span class="part-number-badge">CTR-Garmt</span></h3>
                     </div>
                     <table id="contractGarmentsMatrix" class="pricing-matrix">
                         <thead>
@@ -90,7 +110,7 @@
                 <!-- Contract Caps Matrix -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Contract Cap Fronts</h3>
+                        <h3><i class="fas fa-hat-cowboy"></i> Contract Cap Fronts <span class="part-number-badge">CTR-Cap</span></h3>
                     </div>
                     <table id="contractCapsMatrix" class="pricing-matrix">
                         <thead>
@@ -113,7 +133,7 @@
             <!-- Contract Full Back Matrix -->
             <div class="matrix-card full-width">
                 <div class="matrix-header">
-                    <h3><i class="fas fa-expand"></i> Contract Full Back (25K+ Stitches)</h3>
+                    <h3><i class="fas fa-expand"></i> Contract Full Back (25K+ Stitches) <span class="part-number-badge">DECG-FB</span></h3>
                     <div class="matrix-meta">Priced per 1,000 stitches &bull; 25K minimum &bull; Min $20.00</div>
                     <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
                 </div>
@@ -206,10 +226,50 @@
 
         <!-- Tab Content: AL RETAIL (Additional Logo) -->
         <div id="tab-al-retail" class="tab-content">
+            <!-- Pricing Decision Guide -->
+            <div class="decision-guide">
+                <h4><i class="fas fa-question-circle"></i> Which Tab Should I Use?</h4>
+                <div class="decision-flowchart">
+                    <div class="decision-step">
+                        <span class="decision-question">Is customer buying garments FROM US in this order?</span>
+                        <div class="decision-answers">
+                            <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Add Logo</strong> pricing</span>
+                            <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Continue below</span>
+                        </div>
+                    </div>
+                    <div class="decision-step">
+                        <span class="decision-question">Is customer bringing their own garments/caps?</span>
+                        <div class="decision-answers">
+                            <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Customer-Supplied</strong> tab</span>
+                            <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Is this a wholesale partner?</span>
+                        </div>
+                    </div>
+                    <div class="decision-step">
+                        <span class="decision-question">Is this a wholesale/ad-specialty partner with their own blanks?</span>
+                        <div class="decision-answers">
+                            <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Contract-Ruthie</strong> tab</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="use-case-banner al-retail">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>Additional Logo Retail:</strong> Adding extra logos to garments/caps WE'RE selling. Simplified pricing for quick sales quotes.
+                    <strong>Add Logo Pricing:</strong> For garments/caps purchased FROM NWCA in <u>this same order</u>. We have margin in the garment, so embroidery is lower.
+                </div>
+            </div>
+
+            <!-- Important AL Eligibility Warning -->
+            <div class="eligibility-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Add Logo Eligibility Rules:</strong>
+                    <ul>
+                        <li>Customer must buy garments from NWCA <strong>in this same transaction</strong></li>
+                        <li>NOT for "repeat customers" who bought before - use Customer-Supplied</li>
+                        <li>NOT for mixed orders - items they bring get Customer-Supplied pricing</li>
+                    </ul>
                 </div>
             </div>
 
@@ -219,12 +279,25 @@
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
+            <!-- ShopWorks Part Numbers Reference Card -->
+            <div class="shopworks-ref-card al-retail">
+                <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
+                <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
+                <span class="ref-item"><span class="ref-code">AL</span> Garments</span>
+                <span class="ref-item"><span class="ref-code">AL-CAP</span> Caps</span>
+                <span class="ref-item"><span class="ref-code">DECG-FB</span> Full Back</span>
+                <span class="ref-divider">|</span>
+                <span class="ref-upgrades" id="alRetailCapUpgrades">
+                    <span class="loading-text">Loading...</span>
+                </span>
+            </div>
+
             <!-- Simplified Pricing Tables -->
             <div class="matrices-grid">
                 <!-- Garment AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Garment Additional Logo</h3>
+                        <h3><i class="fas fa-tshirt"></i> Garment Additional Logo <span class="part-number-badge al-retail">AL</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="alRetailGarmentsMatrix" class="pricing-matrix simple">
@@ -244,7 +317,7 @@
                 <!-- Cap AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Cap Additional Logo</h3>
+                        <h3><i class="fas fa-hat-cowboy"></i> Cap Additional Logo <span class="part-number-badge al-retail">AL-CAP</span></h3>
                         <div class="matrix-meta">Base 5K stitches</div>
                     </div>
                     <table id="alRetailCapsMatrix" class="pricing-matrix simple">
@@ -262,6 +335,31 @@
                 </div>
             </div>
 
+            <!-- AL Retail Full Back Matrix -->
+            <div class="matrix-card full-width">
+                <div class="matrix-header">
+                    <h3><i class="fas fa-expand"></i> Full Back Additional Logo (25K+ Stitches)
+                        <span class="part-number-badge al-retail">DECG-FB</span>
+                    </h3>
+                    <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
+                </div>
+                <table id="alRetailFullBackMatrix" class="pricing-matrix">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th class="ltm-tier">1-7</th>
+                            <th class="ltm-tier">8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th class="best-tier">72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
             <!-- Sales Script Example -->
             <div class="script-card">
                 <h3><i class="fas fa-comments"></i> Quick Quote Example</h3>
@@ -277,8 +375,19 @@
             <div class="use-case-banner decg">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>DECG Retail (Customer-Supplied):</strong> Customer brings their own garments/caps for embroidery. Simplified pricing for sales reps.
+                    <strong>Customer-Supplied Pricing:</strong> Customer brings their OWN garments/caps for embroidery. Higher price because we have no garment margin and assume more risk.
                 </div>
+            </div>
+
+            <!-- Why is this more expensive callout -->
+            <div class="pricing-rationale">
+                <strong><i class="fas fa-question-circle"></i> Why is this 4x wholesale pricing?</strong>
+                <ul>
+                    <li>No garment margin cushion - embroidery must carry full profit</li>
+                    <li>Higher defect risk - can't replace customer's items</li>
+                    <li>Quality inspection overhead - customer blanks vary widely</li>
+                    <li><em>We don't seek this work, but price to profit when we do it</em></li>
+                </ul>
             </div>
 
             <!-- LTM Banner -->
@@ -287,12 +396,25 @@
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
+            <!-- ShopWorks Part Numbers Reference Card -->
+            <div class="shopworks-ref-card decg-retail">
+                <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
+                <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
+                <span class="ref-item"><span class="ref-code">DECG</span> Garments</span>
+                <span class="ref-item"><span class="ref-code">DECC</span> Caps</span>
+                <span class="ref-item"><span class="ref-code">DECG-FB</span> Full Back</span>
+                <span class="ref-divider">|</span>
+                <span class="ref-upgrades" id="decgRetailCapUpgrades">
+                    <span class="loading-text">Loading...</span>
+                </span>
+            </div>
+
             <!-- Simplified Pricing Tables -->
             <div class="matrices-grid">
                 <!-- DECG Garments -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> DECG Garments</h3>
+                        <h3><i class="fas fa-tshirt"></i> DECG Garments <span class="part-number-badge decg-retail">DECG</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="decgRetailGarmentsMatrix" class="pricing-matrix simple">
@@ -312,7 +434,7 @@
                 <!-- DECG Caps -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> DECG Caps</h3>
+                        <h3><i class="fas fa-hat-cowboy"></i> DECG Caps <span class="part-number-badge decg-retail">DECC</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="decgRetailCapsMatrix" class="pricing-matrix simple">
@@ -334,6 +456,31 @@
             <div class="surcharge-card">
                 <h3><i class="fas fa-weight-hanging"></i> Heavyweight Surcharge</h3>
                 <p>Add <strong>$10.00/piece</strong> for heavyweight items: Carhartt jackets, bags, canvas, leather</p>
+            </div>
+
+            <!-- DECG Retail Full Back Matrix -->
+            <div class="matrix-card full-width">
+                <div class="matrix-header">
+                    <h3><i class="fas fa-expand"></i> Full Back (25K+ Stitches)
+                        <span class="part-number-badge decg-retail">DECG-FB</span>
+                    </h3>
+                    <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
+                </div>
+                <table id="decgRetailFullBackMatrix" class="pricing-matrix">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th class="ltm-tier">1-7</th>
+                            <th class="ltm-tier">8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th class="best-tier">72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
             </div>
 
             <!-- Quick Calculator -->

@@ -25,6 +25,7 @@ const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 let CONTRACT_PRICING = null;
 let AL_RETAIL_PRICING = null;
 let DECG_RETAIL_PRICING = null;
+let CAP_UPGRADES = null;
 
 // Production rates for hourly revenue calculation (static - not in Caspio)
 const PRODUCTION_RATES = {
@@ -73,14 +74,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Load all pricing data from API in parallel
         await loadAllPricingData();
 
+        // Fetch cap upgrades pricing
+        await fetchCapUpgrades();
+
         // Build all matrices
         buildContractGarmentsMatrix();
         buildContractCapsMatrix();
         buildContractFullBackMatrix();
         buildAlRetailGarmentsMatrix();
         buildAlRetailCapsMatrix();
+        buildAlRetailFullBackMatrix();
         buildDecgRetailGarmentsMatrix();
         buildDecgRetailCapsMatrix();
+        buildDecgRetailFullBackMatrix();
+
+        // Build cap upgrades cards
+        buildCapUpgradesCard('contractCapUpgrades');
+        buildCapUpgradesCard('alRetailCapUpgrades');
+        buildCapUpgradesCard('decgRetailCapUpgrades');
 
         // Setup calculators
         setupContractCalculator();
@@ -198,6 +209,65 @@ async function fetchDecgPricing() {
         },
         heavyweightSurcharge: data.heavyweightSurcharge || 10.00
     };
+}
+
+// Fetch cap upgrades (3D-Puff and Laser Patch)
+async function fetchCapUpgrades() {
+    try {
+        const [puffResponse, patchResponse] = await Promise.all([
+            fetch(`${API_BASE_URL}/api/embroidery-costs?itemType=3D-Puff&stitchCount=0`),
+            fetch(`${API_BASE_URL}/api/embroidery-costs?itemType=Patch&stitchCount=0`)
+        ]);
+
+        if (!puffResponse.ok || !patchResponse.ok) {
+            throw new Error('Cap upgrades API error');
+        }
+
+        const puffData = await puffResponse.json();
+        const patchData = await patchResponse.json();
+
+        CAP_UPGRADES = {
+            puff: {
+                name: '3D Puff Embroidery',
+                partNumber: '3D-EMB',
+                price: puffData[0]?.EmbroideryCost || 5.00
+            },
+            patch: {
+                name: 'Laser Faux Leather Patch',
+                partNumber: 'Laser Patch',
+                price: patchData[0]?.EmbroideryCost || 5.00
+            }
+        };
+
+        return CAP_UPGRADES;
+    } catch (error) {
+        console.error('Failed to fetch cap upgrades:', error);
+        // Fallback to default values - still show the card but log the error
+        CAP_UPGRADES = {
+            puff: { name: '3D Puff Embroidery', partNumber: '3D-EMB', price: 5.00 },
+            patch: { name: 'Laser Faux Leather Patch', partNumber: 'Laser Patch', price: 5.00 }
+        };
+        return CAP_UPGRADES;
+    }
+}
+
+// Build cap upgrades content (in ShopWorks reference card)
+function buildCapUpgradesCard(cardId) {
+    const container = document.getElementById(cardId);
+    if (!container || !CAP_UPGRADES) return;
+
+    container.innerHTML = `
+        <span class="upgrade-item">
+            <span class="ref-code">${CAP_UPGRADES.puff.partNumber}</span>
+            3D Puff
+            <span class="upgrade-price">+$${CAP_UPGRADES.puff.price.toFixed(2)}</span>
+        </span>
+        <span class="upgrade-item">
+            <span class="ref-code">${CAP_UPGRADES.patch.partNumber}</span>
+            Patch
+            <span class="upgrade-price">+$${CAP_UPGRADES.patch.price.toFixed(2)}</span>
+        </span>
+    `;
 }
 
 function showLoadingState() {
@@ -476,6 +546,48 @@ function buildAlRetailCapsMatrix() {
     tbody.innerHTML = html;
 }
 
+function buildAlRetailFullBackMatrix() {
+    const tbody = document.querySelector('#alRetailFullBackMatrix tbody');
+    if (!tbody) return;
+
+    // Use CONTRACT_PRICING since AL Full Back uses same pricing (DECG-FB)
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
+        return;
+    }
+
+    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
+    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
+    let html = '';
+
+    FB_STITCH_COUNTS.forEach(stitches => {
+        html += '<tr>';
+        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
+
+        TIER_ORDER.forEach((tier, idx) => {
+            const rate = rates[tier];
+            const stitchesK = stitches / 1000;
+            const price = Math.max(stitchesK * rate, minPrice);
+            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
+        });
+
+        html += '</tr>';
+    });
+
+    // Footer row with per-thousand rates
+    html += '<tr class="rate-footer">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
+
+    tbody.innerHTML = html;
+}
+
 // ============================================
 // DECG RETAIL MATRICES (Simplified)
 // ============================================
@@ -536,6 +648,48 @@ function buildDecgRetailCapsMatrix() {
         html += `<td class="price-cell">${formatPrice(price)} each</td>`;
         html += '</tr>';
     });
+
+    tbody.innerHTML = html;
+}
+
+function buildDecgRetailFullBackMatrix() {
+    const tbody = document.querySelector('#decgRetailFullBackMatrix tbody');
+    if (!tbody) return;
+
+    // Use CONTRACT_PRICING since DECG Full Back uses same pricing (DECG-FB)
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
+        return;
+    }
+
+    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
+    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
+    let html = '';
+
+    FB_STITCH_COUNTS.forEach(stitches => {
+        html += '<tr>';
+        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
+
+        TIER_ORDER.forEach((tier, idx) => {
+            const rate = rates[tier];
+            const stitchesK = stitches / 1000;
+            const price = Math.max(stitchesK * rate, minPrice);
+            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
+        });
+
+        html += '</tr>';
+    });
+
+    // Footer row with per-thousand rates
+    html += '<tr class="rate-footer">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
+        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
 
     tbody.innerHTML = html;
 }
