@@ -1156,3 +1156,148 @@ function calculateDecgRetailPrice() {
     // Final unit price (emphasized)
     finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
 }
+
+// ============================================
+// PRINT CONTRACT PRICING
+// ============================================
+
+// Stitch counts for print version (5K-15K only)
+const PRINT_STITCH_COUNTS = [5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000];
+
+/**
+ * Generate and print contract pricing PDF
+ * Shows Garments and Caps tables (5K-15K) plus Laser Patch pricing
+ */
+function printContractPricing() {
+    if (!CONTRACT_PRICING) {
+        alert('Pricing data not loaded. Please refresh the page.');
+        return;
+    }
+
+    // Build print tables
+    buildPrintGarmentsTable();
+    buildPrintCapsTable();
+    buildPrintLaserPatchTable();
+
+    // Set custom filename for PDF save (browsers use document.title)
+    const originalTitle = document.title;
+    document.title = 'NW Custom Apparel Contract Embroidery Pricing 2026';
+
+    // Trigger browser print dialog
+    window.print();
+
+    // Restore original title after print dialog opens
+    document.title = originalTitle;
+}
+
+/**
+ * Build print-specific garments table (5K-15K only)
+ */
+function buildPrintGarmentsTable() {
+    const tbody = document.querySelector('#printContractGarmentsTable tbody');
+    if (!tbody || !CONTRACT_PRICING.garments) return;
+
+    const rates = CONTRACT_PRICING.garments.perThousandRates;
+    let html = '';
+
+    PRINT_STITCH_COUNTS.forEach(stitches => {
+        html += '<tr>';
+        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
+
+        TIER_ORDER.forEach((tier, idx) => {
+            const rate = rates[tier];
+            const price = (stitches / 1000) * rate;
+            const ltmClass = idx <= 1 ? ' class="ltm-col"' : '';
+            html += `<td${ltmClass}>${formatPrice(price)}</td>`;
+        });
+
+        html += '</tr>';
+    });
+
+    // Add rate footer row
+    html += '<tr class="rate-row">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        const ltmClass = idx <= 1 ? ' class="ltm-col"' : '';
+        html += `<td${ltmClass}><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
+
+    tbody.innerHTML = html;
+}
+
+/**
+ * Build print-specific caps table (5K-15K only)
+ */
+function buildPrintCapsTable() {
+    const tbody = document.querySelector('#printContractCapsTable tbody');
+    if (!tbody || !CONTRACT_PRICING.caps) return;
+
+    const rates = CONTRACT_PRICING.caps.perThousandRates;
+    let html = '';
+
+    PRINT_STITCH_COUNTS.forEach(stitches => {
+        html += '<tr>';
+        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
+
+        TIER_ORDER.forEach((tier, idx) => {
+            const rate = rates[tier];
+            const price = (stitches / 1000) * rate;
+            const ltmClass = idx <= 1 ? ' class="ltm-col"' : '';
+            html += `<td${ltmClass}>${formatPrice(price)}</td>`;
+        });
+
+        html += '</tr>';
+    });
+
+    // Add rate footer row
+    html += '<tr class="rate-row">';
+    html += '<td><strong>$/1K</strong></td>';
+    TIER_ORDER.forEach((tier, idx) => {
+        const rate = rates[tier];
+        const ltmClass = idx <= 1 ? ' class="ltm-col"' : '';
+        html += `<td${ltmClass}><strong>${formatPrice(rate)}</strong></td>`;
+    });
+    html += '</tr>';
+
+    tbody.innerHTML = html;
+}
+
+/**
+ * Build laser patch pricing table for print
+ * Formula: (Contract Cap 8K rate × 8) + $5, rounded up to $0.50
+ */
+function buildPrintLaserPatchTable() {
+    const tbody = document.querySelector('#printLaserPatchTable tbody');
+    if (!tbody || !CONTRACT_PRICING.caps) return;
+
+    const rates = CONTRACT_PRICING.caps.perThousandRates;
+    const tiers = [
+        { label: '1-7 pcs', key: '1-7' },
+        { label: '8-23 pcs', key: '8-23' },
+        { label: '24-47 pcs', key: '24-47' },
+        { label: '48-71 pcs', key: '48-71' },
+        { label: '72+ pcs', key: '72+' }
+    ];
+
+    let html = '';
+
+    tiers.forEach(tier => {
+        const capRate = rates[tier.key];
+        const cap8kPrice = capRate * 8; // 8K stitches
+        const patchUpcharge = 5.00;
+        const rawPrice = cap8kPrice + patchUpcharge;
+        const laserPatchPrice = Math.ceil(rawPrice * 2) / 2; // Round up to nearest $0.50
+
+        html += '<tr>';
+        html += `<td>${tier.label}</td>`;
+        html += `<td>${formatPrice(laserPatchPrice)}</td>`;
+        html += '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+// Make printContractPricing globally available
+window.printContractPricing = printContractPricing;
