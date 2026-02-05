@@ -1,6 +1,6 @@
 # Active Files Registry
 **Last Updated:** 2026-02-05
-**Total Active Files:** ~288 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation)
+**Total Active Files:** ~291 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation + Contract Embroidery Pricing Page)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -46,6 +46,7 @@
 | `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
+| `/pages/embroidery-contract-pricing.html` | **NEW** Shareable contract embroidery pricing page | embroidery-contract-pricing.js, embroidery-contract-pricing.css | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 

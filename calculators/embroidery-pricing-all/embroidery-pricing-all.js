@@ -1301,3 +1301,38 @@ function buildPrintLaserPatchTable() {
 
 // Make printContractPricing globally available
 window.printContractPricing = printContractPricing;
+
+// ============================================
+// COPY SHAREABLE LINK
+// ============================================
+
+/**
+ * Copy shareable contract pricing page URL to clipboard
+ */
+function copyShareableLink() {
+    const shareUrl = `${window.location.origin}/pages/embroidery-contract-pricing.html`;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        // Visual feedback
+        const btn = document.querySelector('.share-link-btn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.classList.add('copied');
+
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Link copied to clipboard!');
+    });
+}
+
+window.copyShareableLink = copyShareableLink;

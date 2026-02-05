@@ -1325,11 +1325,45 @@ body {
 }
 
 /* ============================================
+   SHARE LINK BUTTON
+   ============================================ */
+
+.share-link-btn {
+    margin-left: auto;
+    padding: 8px 16px;
+    background: var(--contract-text);
+    color: white;
+    border: 1px solid var(--contract-text);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.share-link-btn:hover {
+    background: var(--contract-text-dark);
+    border-color: var(--contract-text-dark);
+}
+
+.share-link-btn i {
+    font-size: 0.9rem;
+}
+
+.share-link-btn.copied {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+/* ============================================
    PRINT CONTRACT BUTTON
    ============================================ */
 
 .print-contract-btn {
-    margin-left: auto;
+    margin-left: 8px;
     padding: 8px 16px;
     background: white;
     color: var(--contract-text-dark);
