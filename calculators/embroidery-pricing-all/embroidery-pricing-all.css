@@ -1076,6 +1076,183 @@ body {
     color: #16a34a;
 }
 
+/* ============================================
+   INFO DISCLOSURE (Collapsible Panels)
+   Modern <details>/<summary> with animations
+   ============================================ */
+
+.info-disclosure {
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.info-disclosure summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--info-text);
+    user-select: none;
+    list-style: none; /* Remove default marker */
+}
+
+.info-disclosure summary::-webkit-details-marker {
+    display: none; /* Remove Safari marker */
+}
+
+/* Custom expand/collapse icon */
+.info-disclosure summary::before {
+    content: '▶';
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.info-disclosure[open] summary::before {
+    transform: rotate(90deg);
+}
+
+/* Hint text on the right */
+.info-disclosure .disclosure-hint {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+/* Animate content with ::details-content (Chrome 131+) */
+.info-disclosure::details-content {
+    transition: height 0.3s ease, opacity 0.3s ease;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.info-disclosure[open]::details-content {
+    height: auto;
+    opacity: 1;
+}
+
+/* Fallback for browsers without ::details-content */
+@supports not selector(::details-content) {
+    .info-disclosure .disclosure-content {
+        padding: 0 16px 16px 16px;
+    }
+}
+
+/* Content area */
+.info-disclosure .disclosure-content {
+    padding: 0 16px 16px 16px;
+}
+
+/* Sections within disclosure content */
+.info-disclosure .disclosure-section {
+    margin-bottom: 12px;
+}
+
+.info-disclosure .disclosure-section:last-child {
+    margin-bottom: 0;
+}
+
+.info-disclosure .disclosure-section ul {
+    margin: 8px 0 0 20px;
+    color: var(--text-primary);
+}
+
+.info-disclosure .disclosure-section li {
+    margin-bottom: 4px;
+}
+
+.info-disclosure .disclosure-section.warning {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.info-disclosure .disclosure-section.warning strong {
+    color: #dc2626;
+}
+
+/* Theme variants */
+.info-disclosure.al-retail {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+}
+
+.info-disclosure.al-retail summary {
+    color: #0369a1;
+}
+
+.info-disclosure.decg {
+    background: #f3e8ff;
+    border-color: #c4b5fd;
+}
+
+.info-disclosure.decg summary {
+    color: #6b21a8;
+}
+
+/* Hover effect */
+.info-disclosure summary:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.info-disclosure summary:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+}
+
+/* Decision flowchart inside disclosure */
+.info-disclosure .decision-flowchart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-disclosure .decision-step {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    border-left: 4px solid #0284c7;
+}
+
+.info-disclosure .decision-question {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.info-disclosure .decision-answers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.info-disclosure .decision-yes {
+    color: #16a34a;
+}
+
+.info-disclosure .decision-yes i {
+    margin-right: 4px;
+}
+
+.info-disclosure .decision-no {
+    color: #dc2626;
+}
+
+.info-disclosure .decision-no i {
+    margin-right: 4px;
+}
+
 /* Print Styles */
 @media print {
     .tab-navigation,

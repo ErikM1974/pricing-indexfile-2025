@@ -143,6 +143,9 @@
 │   ├── contract-calculator-template.md
 │   └── specialty-calculator-template.md
 │
+├── /training/                        # Staff Training Materials
+│   └── EMBROIDERY_PRICING_SALES_TRAINING.md  # **NEW** Sales rep training (Taneisha, Ruthie)
+│
 └── MANUAL_CALCULATOR_*.md            # Manual calculator guide (3 parts)
 ```
 
@@ -190,6 +193,11 @@
 | ShopWorks EDP | [SHOPWORKS_EDP_INTEGRATION.md](./SHOPWORKS_EDP_INTEGRATION.md) |
 | PC61 Setup Guide | [PC61_SHOPWORKS_SETUP_GUIDE.md](./PC61_SHOPWORKS_SETUP_GUIDE.md) |
 | ArtRequests File Upload | [ARTREQUESTS_FILE_UPLOAD_GUIDE.md](./ARTREQUESTS_FILE_UPLOAD_GUIDE.md) |
+
+### Training Materials
+| Document | Audience |
+|----------|----------|
+| **Embroidery Pricing Training** | [training/EMBROIDERY_PRICING_SALES_TRAINING.md](./training/EMBROIDERY_PRICING_SALES_TRAINING.md) - Taneisha, Ruthie |
 
 ### Rep CRM Dashboards
 | Guide | Description |

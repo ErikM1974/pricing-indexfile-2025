@@ -226,52 +226,60 @@
 
         <!-- Tab Content: AL RETAIL (Additional Logo) -->
         <div id="tab-al-retail" class="tab-content">
-            <!-- Pricing Decision Guide -->
-            <div class="decision-guide">
-                <h4><i class="fas fa-question-circle"></i> Which Tab Should I Use?</h4>
-                <div class="decision-flowchart">
-                    <div class="decision-step">
-                        <span class="decision-question">Is customer buying garments FROM US in this order?</span>
-                        <div class="decision-answers">
-                            <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Add Logo</strong> pricing</span>
-                            <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Continue below</span>
+            <!-- Collapsible: Pricing Decision Guide -->
+            <details class="info-disclosure al-retail">
+                <summary>
+                    <i class="fas fa-question-circle"></i>
+                    Which Tab Should I Use?
+                    <span class="disclosure-hint">Click to expand</span>
+                </summary>
+                <div class="disclosure-content">
+                    <div class="decision-flowchart">
+                        <div class="decision-step">
+                            <span class="decision-question">Is customer buying garments FROM US in this order?</span>
+                            <div class="decision-answers">
+                                <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Add Logo</strong> pricing</span>
+                                <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Continue below</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="decision-step">
-                        <span class="decision-question">Is customer bringing their own garments/caps?</span>
-                        <div class="decision-answers">
-                            <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Customer-Supplied</strong> tab</span>
-                            <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Is this a wholesale partner?</span>
+                        <div class="decision-step">
+                            <span class="decision-question">Is customer bringing their own garments/caps?</span>
+                            <div class="decision-answers">
+                                <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Customer-Supplied</strong> tab</span>
+                                <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Is this a wholesale partner?</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="decision-step">
-                        <span class="decision-question">Is this a wholesale/ad-specialty partner with their own blanks?</span>
-                        <div class="decision-answers">
-                            <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Contract-Ruthie</strong> tab</span>
+                        <div class="decision-step">
+                            <span class="decision-question">Is this a wholesale/ad-specialty partner with their own blanks?</span>
+                            <div class="decision-answers">
+                                <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Contract-Ruthie</strong> tab</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </details>
 
-            <div class="use-case-banner al-retail">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <strong>Add Logo Pricing:</strong> For garments/caps purchased FROM NWCA in <u>this same order</u>. We have margin in the garment, so embroidery is lower.
+            <!-- Collapsible: Add Logo Info + Eligibility (combined) -->
+            <details class="info-disclosure al-retail">
+                <summary>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Add Logo Eligibility & Pricing Info
+                    <span class="disclosure-hint">Click to expand</span>
+                </summary>
+                <div class="disclosure-content">
+                    <div class="disclosure-section">
+                        <strong>Add Logo Pricing:</strong> For garments/caps purchased FROM NWCA in <u>this same order</u>. We have margin in the garment, so embroidery is lower.
+                    </div>
+                    <div class="disclosure-section warning">
+                        <strong>Eligibility Rules:</strong>
+                        <ul>
+                            <li>Customer must buy garments from NWCA <strong>in this same transaction</strong></li>
+                            <li>NOT for "repeat customers" who bought before - use Customer-Supplied</li>
+                            <li>NOT for mixed orders - items they bring get Customer-Supplied pricing</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Important AL Eligibility Warning -->
-            <div class="eligibility-warning">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>
-                    <strong>Add Logo Eligibility Rules:</strong>
-                    <ul>
-                        <li>Customer must buy garments from NWCA <strong>in this same transaction</strong></li>
-                        <li>NOT for "repeat customers" who bought before - use Customer-Supplied</li>
-                        <li>NOT for mixed orders - items they bring get Customer-Supplied pricing</li>
-                    </ul>
-                </div>
-            </div>
+            </details>
 
             <!-- LTM Banner -->
             <div class="ltm-banner">
@@ -372,23 +380,28 @@
 
         <!-- Tab Content: DECG RETAIL (Customer-Supplied) -->
         <div id="tab-decg-retail" class="tab-content">
-            <div class="use-case-banner decg">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <strong>Customer-Supplied Pricing:</strong> Customer brings their OWN garments/caps for embroidery. Higher price because we have no garment margin and assume more risk.
+            <!-- Collapsible: Customer-Supplied Info (combined) -->
+            <details class="info-disclosure decg">
+                <summary>
+                    <i class="fas fa-info-circle"></i>
+                    Customer-Supplied Pricing Info
+                    <span class="disclosure-hint">Click to expand</span>
+                </summary>
+                <div class="disclosure-content">
+                    <div class="disclosure-section">
+                        <strong>Customer-Supplied Pricing:</strong> Customer brings their OWN garments/caps for embroidery. Higher price because we have no garment margin and assume more risk.
+                    </div>
+                    <div class="disclosure-section">
+                        <strong><i class="fas fa-question-circle"></i> Why is this 4x wholesale pricing?</strong>
+                        <ul>
+                            <li>No garment margin cushion - embroidery must carry full profit</li>
+                            <li>Higher defect risk - can't replace customer's items</li>
+                            <li>Quality inspection overhead - customer blanks vary widely</li>
+                            <li><em>We don't seek this work, but price to profit when we do it</em></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Why is this more expensive callout -->
-            <div class="pricing-rationale">
-                <strong><i class="fas fa-question-circle"></i> Why is this 4x wholesale pricing?</strong>
-                <ul>
-                    <li>No garment margin cushion - embroidery must carry full profit</li>
-                    <li>Higher defect risk - can't replace customer's items</li>
-                    <li>Quality inspection overhead - customer blanks vary widely</li>
-                    <li><em>We don't seek this work, but price to profit when we do it</em></li>
-                </ul>
-            </div>
+            </details>
 
             <!-- LTM Banner -->
             <div class="ltm-banner">
