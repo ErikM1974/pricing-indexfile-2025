@@ -159,7 +159,11 @@ const StaffDashboardService = (function() {
     };
 
     /**
-     * Reps to group under "House" for simplified Team Performance display
+     * Reps to group under "House" for simplified Team Performance display.
+     * NOTE: This is different from the House Accounts page's "Assigned_To" field.
+     * - Team Performance "House" = orders WRITTEN BY these admin/production staff
+     * - House Accounts page "Ruthie/Erik/Jim/House" = customers ASSIGNED TO these people
+     * Ruthie is intentionally NOT in this list; she appears as her own row in Team Performance.
      */
     const HOUSE_REPS = [
         'jim mickelson',
@@ -198,7 +202,7 @@ const StaffDashboardService = (function() {
      * Uses date_Invoiced to get orders invoiced within the date range
      * (More accurate for sales reporting than date_Ordered)
      */
-    async function fetchOrders(startDate, endDate, refresh = false) {
+    async function fetchOrders(startDate, endDate, refresh = false, retries = 2) {
         const url = new URL(API_CONFIG.baseURL + API_CONFIG.endpoints.orders);
         url.searchParams.append('date_Invoiced_start', startDate);
         url.searchParams.append('date_Invoiced_end', endDate);
@@ -207,6 +211,15 @@ const StaffDashboardService = (function() {
         }
 
         const response = await fetch(url.toString());
+
+        // Retry on 429 rate limit (consistent with rep-crm.js and house-accounts.js)
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (3 - retries) * 3000 + 2000; // 2s, 5s
+            console.warn(`[fetchOrders] Rate limited (429), retry in ${waitTime / 1000}s (${retries} left)`);
+            await new Promise(r => setTimeout(r, waitTime));
+            return fetchOrders(startDate, endDate, refresh, retries - 1);
+        }
+
         if (!response.ok) {
             throw new Error(`Failed to fetch orders: ${response.status}`);
         }
@@ -1424,6 +1437,9 @@ const StaffDashboardService = (function() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(record)
         });
+        if (!response.ok) {
+            throw new Error(`Failed to post garment record: ${response.status}`);
+        }
         return response.json();
     }
 

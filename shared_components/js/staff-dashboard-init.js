@@ -307,34 +307,13 @@ const StaffDashboardInit = (function() {
                     </div>
                     <div class="error-state-content">
                         <div class="error-state-title">Unable to load metrics</div>
-                        <div class="error-state-message">${message || 'Please try again later.'}</div>
+                        <div class="error-state-message">${escapeHtml(message) || 'Please try again later.'}</div>
                         <button class="error-state-retry" onclick="StaffDashboardInit.loadMetrics(true)">
                             Try again
                         </button>
                     </div>
                 </div>
             `;
-        }
-    }
-
-    /**
-     * Render metrics data
-     */
-    function renderMetrics(metrics) {
-        if (!metrics) return;
-
-        // Render Revenue with date details (handles null gracefully)
-        renderRevenueCard(metrics.yoy, metrics.revenue, metrics.period);
-
-        // Render Team Performance (handles null gracefully)
-        renderTeamPerformance(metrics.team);
-
-        // Update data source badge
-        updateDataSourceBadge(metrics.hasPartialData);
-
-        // Show warning if we have partial data
-        if (metrics.hasPartialData) {
-            showPartialDataWarning();
         }
     }
 
@@ -538,6 +517,20 @@ const StaffDashboardInit = (function() {
         }
         if (dateRangeEl && teamData && teamData.dateRange) {
             dateRangeEl.textContent = `${teamData.dateRange.startFormatted} - ${teamData.dateRange.endFormatted}`;
+        }
+
+        // Show warning if CRM override failed (Rule #4: no silent API failures)
+        const existingWarning = document.getElementById('teamCrmWarning');
+        if (teamData && teamData.crmOverrideApplied === false) {
+            if (!existingWarning && titleEl) {
+                titleEl.insertAdjacentHTML('afterend',
+                    '<div id="teamCrmWarning" style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:#fff3cd;color:#856404;border-radius:4px;font-size:12px;margin:4px 0 8px;">' +
+                    '<i class="fas fa-exclamation-triangle"></i>' +
+                    '<span>CRM data unavailable \u2014 Nika/Taneisha totals may differ from their dashboards</span></div>'
+                );
+            }
+        } else if (existingWarning) {
+            existingWarning.remove();
         }
 
         if (!container) return;
@@ -758,16 +751,11 @@ const StaffDashboardInit = (function() {
                 console.error('Could not fetch live data:', e.message);
             }
 
-            // Part 3: Archive any days about to fall off (55-60 days ago)
-            // This runs in background, doesn't block the UI update
-            archiveSoonToExpireDays().catch(e =>
+            // Part 3: Archive days about to fall off (55-60 days ago)
+            // Single unified function handles both company-wide and per-rep archival,
+            // fetching orders once per day instead of twice (was 12 API calls, now 6)
+            archiveSoonToExpireDaysAll().catch(e =>
                 console.warn('Background archiving failed:', e.message)
-            );
-
-            // Part 4: Archive per-rep data for days about to fall off
-            // For YTD team performance tracking beyond 60-day limit
-            archivePerRepSoonToExpireDays().catch(e =>
-                console.warn('[PerRep] Background archiving failed:', e.message)
             );
 
             // Update banner
@@ -784,66 +772,37 @@ const StaffDashboardInit = (function() {
      * ManageOrders' 60-day retention window.
      * Runs in background on dashboard load.
      */
-    async function archiveSoonToExpireDays() {
+    /**
+     * Unified archival: fetches orders ONCE per day and archives both
+     * company-wide totals and per-rep breakdowns from the same data.
+     * Runs in background on dashboard load (days 55-60 ago buffer).
+     */
+    async function archiveSoonToExpireDaysAll() {
         const today = new Date();
         const year = today.getFullYear();
-        let archivedCount = 0;
+        let companyArchived = 0;
+        let perRepArchived = 0;
 
-        // Archive days 55-60 ago (buffer before 60-day cutoff)
         for (let daysAgo = 55; daysAgo <= 60; daysAgo++) {
             const date = new Date(today);
             date.setDate(date.getDate() - daysAgo);
             const dateStr = date.toISOString().split('T')[0];
 
-            // Only archive if in current year
             if (date.getFullYear() !== year) continue;
 
             try {
-                // Fetch from ManageOrders
+                // Single fetch per day (was two separate fetches before)
                 const orders = await StaffDashboardService.fetchOrders(dateStr, dateStr);
+
+                // Company-wide archive
                 const revenue = orders.reduce((sum, o) =>
                     sum + (parseFloat(o.cur_SubTotal) || 0), 0);
-
-                // Archive to Caspio (will update if exists, create if not)
                 await StaffDashboardService.archiveDailySales(dateStr, revenue, orders.length);
-                archivedCount++;
-            } catch (e) {
-                // Individual day failures are okay, continue with others
-                console.warn(`Could not archive ${dateStr}:`, e.message);
-            }
-        }
+                companyArchived++;
 
-        if (archivedCount > 0) {
-            console.log(`Archived ${archivedCount} days (55-60 days ago) to Caspio`);
-        }
-    }
-
-    /**
-     * Archive per-rep daily sales for days 55-60 ago
-     * Similar to archiveSoonToExpireDays but breaks down by sales rep
-     * for YTD team performance tracking.
-     */
-    async function archivePerRepSoonToExpireDays() {
-        const today = new Date();
-        const year = today.getFullYear();
-        let archivedCount = 0;
-
-        for (let daysAgo = 55; daysAgo <= 60; daysAgo++) {
-            const date = new Date(today);
-            date.setDate(date.getDate() - daysAgo);
-            const dateStr = date.toISOString().split('T')[0];
-
-            // Only archive if in current year
-            if (date.getFullYear() !== year) continue;
-
-            try {
-                // Fetch orders for this day
-                const orders = await StaffDashboardService.fetchOrders(dateStr, dateStr);
-
-                // Aggregate by rep using existing normalization
+                // Per-rep archive (reuse same orders data)
                 const repTotals = {};
                 for (const order of orders) {
-                    // Use CustomerServiceRep field (same as processTeamPerformanceYTD)
                     const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Unassigned';
                     if (!repTotals[repName]) {
                         repTotals[repName] = { revenue: 0, orderCount: 0 };
@@ -852,25 +811,23 @@ const StaffDashboardInit = (function() {
                     repTotals[repName].orderCount++;
                 }
 
-                // Format for API
                 const reps = Object.entries(repTotals).map(([name, data]) => ({
                     name,
                     revenue: Math.round(data.revenue * 100) / 100,
                     orderCount: data.orderCount
                 }));
 
-                // Archive to Caspio
                 if (reps.length > 0) {
                     await StaffDashboardService.archivePerRepDailySales(dateStr, reps);
-                    archivedCount++;
+                    perRepArchived++;
                 }
             } catch (e) {
-                console.warn(`[PerRep] Could not archive ${dateStr}:`, e.message);
+                console.warn(`Could not archive ${dateStr}:`, e.message);
             }
         }
 
-        if (archivedCount > 0) {
-            console.log(`[PerRep] Archived ${archivedCount} days (55-60 days ago) to Caspio`);
+        if (companyArchived > 0 || perRepArchived > 0) {
+            console.log(`Archived ${companyArchived} company + ${perRepArchived} per-rep days (55-60 days ago) to Caspio`);
         }
     }
 
@@ -941,6 +898,7 @@ const StaffDashboardInit = (function() {
             }
 
             // 3.5 Override Nika and Taneisha with CRM totals for exact match with their dashboards
+            let crmOverrideApplied = true;
             try {
                 const crmTotals = await StaffDashboardService.fetchRepCRMTotals();
                 for (const [repName, data] of Object.entries(crmTotals)) {
@@ -948,13 +906,18 @@ const StaffDashboardInit = (function() {
                         if (!mergedTotals[repName]) {
                             mergedTotals[repName] = { revenue: 0, orders: 0, firstNames: new Set() };
                         }
-                        // Keep order count from hybrid, but use CRM revenue for exact match
+                        // Override revenue with CRM total for exact match with rep's CRM dashboard.
+                        // NOTE: Order count still comes from ManageOrders hybrid (who WROTE the order),
+                        // while revenue now comes from CRM (customers ASSIGNED to the rep).
+                        // These can briefly diverge between sync-sales runs. The Gap Report
+                        // on the House Accounts page helps diagnose authority conflicts.
                         mergedTotals[repName].revenue = data.totalSales;
                         console.log(`[TeamPerformance] Using CRM total for ${repName}: $${data.totalSales.toFixed(2)}`);
                     }
                 }
             } catch (e) {
                 console.warn('[TeamPerformance] Could not fetch CRM totals, using hybrid values:', e.message);
+                crmOverrideApplied = false;
             }
 
             // 4. Format for display (same structure as processTeamPerformanceYTD)
@@ -983,6 +946,7 @@ const StaffDashboardInit = (function() {
                 totalReps: reps.length,
                 topPerformer: reps[0] || null,
                 period: '2026 YTD',
+                crmOverrideApplied,
                 dateRange: {
                     start: `${new Date().getFullYear()}-01-01`,
                     end: today,

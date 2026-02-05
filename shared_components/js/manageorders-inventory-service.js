@@ -18,7 +18,6 @@ class ManageOrdersInventoryService {
         this.cache = new Map();
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
 
-        console.log('[ManageOrdersInventory] Service initialized');
     }
 
     /**
@@ -67,21 +66,6 @@ class ManageOrdersInventoryService {
 
             const inventory = data.result[0];
 
-            // 🔍 DEBUG: Log raw inventory data to understand the discrepancy
-            console.log(`[ManageOrdersInventory] 🔍 DEBUG - Raw API Response for ${partNumber}:`);
-            console.log('  PartNumber:', inventory.PartNumber);
-            console.log('  Color:', inventory.Color);
-            console.log('  SKU:', inventory.SKU);
-            console.log('  Description:', inventory.Description);
-            console.log('  Size Breakdown:');
-            console.log('    Size01 (XS):', inventory.Size01 || 0);
-            console.log('    Size02 (S):', inventory.Size02 || 0);
-            console.log('    Size03 (M):', inventory.Size03 || 0);
-            console.log('    Size04 (L):', inventory.Size04 || 0);
-            console.log('    Size05 (XL):', inventory.Size05 || 0);
-            console.log('    Size06 (2XL):', inventory.Size06 || 0);
-            console.log('  Full inventory object:', inventory);
-
             // Calculate total stock across all sizes
             const totalStock =
                 (inventory.Size01 || 0) +
@@ -90,8 +74,6 @@ class ManageOrdersInventoryService {
                 (inventory.Size04 || 0) +
                 (inventory.Size05 || 0) +
                 (inventory.Size06 || 0);
-
-            console.log('  ✅ Calculated Total:', totalStock);
 
             const result = {
                 available: totalStock > 0,
