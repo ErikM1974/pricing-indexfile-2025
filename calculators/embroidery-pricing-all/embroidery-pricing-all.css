@@ -627,6 +627,12 @@ body {
     display: none;
 }
 
+/* General hidden class for form groups and checkbox groups */
+.form-group.hidden,
+.checkbox-group.hidden {
+    display: none;
+}
+
 /* Hourly Revenue Check */
 .hourly-check {
     font-weight: 600;
@@ -1278,6 +1284,44 @@ body {
 
 .info-disclosure .decision-no i {
     margin-right: 4px;
+}
+
+/* ============================================
+   LASER PATCH SECTION
+   Shows laser patch pricing (cap 8K + $5)
+   ============================================ */
+
+.laser-patch-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px dashed var(--border-color);
+}
+
+.laser-patch-section h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.laser-patch-section h4 i {
+    color: #d97706;
+}
+
+.laser-patch-section .calc-results {
+    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+    border: 1px solid #fde047;
+}
+
+.laser-patch-section .result-row.final {
+    border-top-color: #d97706;
+}
+
+.laser-patch-section .final-price {
+    color: #b45309;
 }
 
 /* Print Styles */

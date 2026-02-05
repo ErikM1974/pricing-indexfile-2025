@@ -751,6 +751,7 @@ function calculateContractPrice() {
     const stitches = parseInt(document.getElementById('contractStitches').value) || 8000;
 
     // Elements (new simplified structure)
+    const stitchesGroup = document.getElementById('contractStitches').closest('.form-group');
     const breakdownRow = document.getElementById('contractBreakdownRow');
     const breakdownLabel = document.getElementById('contractBreakdownLabel');
     const breakdownValue = document.getElementById('contractBreakdownValue');
@@ -763,6 +764,48 @@ function calculateContractPrice() {
     const ltmThreshold = CONTRACT_PRICING.ltmThreshold || 23;
     const ltmFeeAmount = CONTRACT_PRICING.ltmFee || 50;
 
+    // Hide stitch count for laser patch
+    if (itemType === 'laser-patch') {
+        stitchesGroup.classList.add('hidden');
+    } else {
+        stitchesGroup.classList.remove('hidden');
+    }
+
+    // ---- LASER PATCH CALCULATION ----
+    if (itemType === 'laser-patch') {
+        // Laser patch uses cap 8K price + $5, rounded up to nearest $0.50
+        const capRate = CONTRACT_PRICING.caps.perThousandRates[tier];
+        const cap8kPrice = capRate * 8; // 8K stitches
+        const patchUpcharge = 5.00;
+        const rawPrice = cap8kPrice + patchUpcharge;
+        const laserPatchPrice = Math.ceil(rawPrice * 2) / 2; // Round up to nearest $0.50
+
+        // Show breakdown
+        if (quantity > 0) {
+            breakdownRow.classList.remove('hidden');
+            breakdownLabel.textContent = `Laser Patch:`;
+            breakdownValue.textContent = formatPrice(laserPatchPrice);
+        } else {
+            breakdownRow.classList.add('hidden');
+        }
+
+        // UNIFIED LTM: Laser patches use ≤7 threshold (matches AL and DECG tabs)
+        const laserLtmThreshold = 7;
+        const ltmResult = calculateUnitPriceWithLTM(laserPatchPrice, quantity, laserLtmThreshold, ltmFeeAmount);
+
+        if (ltmResult.hasLtm && quantity > 0) {
+            ltmBreakdownRow.classList.remove('hidden');
+            ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+            ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
+        } else {
+            ltmBreakdownRow.classList.add('hidden');
+        }
+
+        finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
+        return;
+    }
+
+    // ---- GARMENT/CAP CALCULATION ----
     let baseUnitPrice = 0;
     let rate = 0;
 
@@ -833,6 +876,7 @@ function calculateAlRetailPrice() {
     const stitches = parseInt(document.getElementById('alRetailStitches').value) || 8000;
 
     // Elements
+    const stitchesGroup = document.getElementById('alRetailStitches').closest('.form-group');
     const breakdownRow = document.getElementById('alRetailBreakdownRow');
     const breakdownLabel = document.getElementById('alRetailBreakdownLabel');
     const breakdownValue = document.getElementById('alRetailBreakdownValue');
@@ -845,6 +889,56 @@ function calculateAlRetailPrice() {
     const finalUnitPriceEl = document.getElementById('alRetailFinalUnitPrice');
 
     const tier = getAlRetailTierFromQuantity(quantity);
+
+    // Hide stitch count for laser patch
+    if (itemType === 'laser-patch') {
+        stitchesGroup.classList.add('hidden');
+    } else {
+        stitchesGroup.classList.remove('hidden');
+    }
+
+    // LTM threshold for AL/DECG is 7 pieces
+    const ltmThreshold = AL_RETAIL_PRICING.caps.ltmThreshold || 7;
+    const ltmFeeAmount = AL_RETAIL_PRICING.caps.ltmFee || 50;
+
+    // ---- LASER PATCH CALCULATION ----
+    if (itemType === 'laser-patch') {
+        // Use CONTRACT pricing for cap 8K rate + $5, rounded up to nearest $0.50
+        // This ensures consistent laser patch pricing across all tabs
+        const capRate = CONTRACT_PRICING.caps.perThousandRates[tier];
+        const cap8kPrice = capRate * 8; // 8K stitches
+        const patchUpcharge = 5.00;
+        const rawPrice = cap8kPrice + patchUpcharge;
+        const laserPatchPrice = Math.ceil(rawPrice * 2) / 2; // Round up to nearest $0.50
+
+        // Show breakdown
+        if (quantity > 0) {
+            breakdownRow.classList.remove('hidden');
+            breakdownLabel.textContent = `Laser Patch:`;
+            breakdownValue.textContent = formatPrice(laserPatchPrice);
+        } else {
+            breakdownRow.classList.add('hidden');
+        }
+
+        // Hide extra stitch row (not applicable)
+        extraStitchRow.classList.add('hidden');
+
+        // Calculate LTM (uses AL threshold: 7)
+        const ltmResult = calculateUnitPriceWithLTM(laserPatchPrice, quantity, ltmThreshold, ltmFeeAmount);
+
+        if (ltmResult.hasLtm && quantity > 0) {
+            ltmBreakdownRow.classList.remove('hidden');
+            ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+            ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
+        } else {
+            ltmBreakdownRow.classList.add('hidden');
+        }
+
+        finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
+        return;
+    }
+
+    // ---- GARMENT/CAP CALCULATION ----
     let pricing, baseStitches, perThousandUpcharge;
 
     if (itemType === 'garment') {
@@ -856,8 +950,8 @@ function calculateAlRetailPrice() {
     const basePrice = pricing.basePrices[tier] || 0;
     baseStitches = pricing.baseStitches || 8000;
     perThousandUpcharge = pricing.perThousandUpcharge || 1.25;
-    const ltmThreshold = pricing.ltmThreshold || 7;
-    const ltmFeeAmount = pricing.ltmFee || 50;
+    const itemLtmThreshold = pricing.ltmThreshold || 7;
+    const itemLtmFeeAmount = pricing.ltmFee || 50;
 
     // Calculate extra stitch charge
     const extraK = Math.max(0, (stitches - baseStitches) / 1000);
@@ -883,12 +977,12 @@ function calculateAlRetailPrice() {
     }
 
     // Calculate final price with LTM built in
-    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFeeAmount);
+    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, itemLtmThreshold, itemLtmFeeAmount);
 
     // Show LTM breakdown if applicable
     if (ltmResult.hasLtm && quantity > 0) {
         ltmBreakdownRow.classList.remove('hidden');
-        ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+        ltmBreakdownLabel.textContent = `+ LTM ($${itemLtmFeeAmount} ÷ ${quantity}):`;
         ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
     } else {
         ltmBreakdownRow.classList.add('hidden');
@@ -933,6 +1027,8 @@ function calculateDecgRetailPrice() {
     const isHeavyweight = document.getElementById('decgRetailHeavyweight').checked;
 
     // Elements (new simplified structure)
+    const stitchesGroup = document.getElementById('decgRetailStitches').closest('.form-group');
+    const heavyweightGroup = document.getElementById('decgRetailHeavyweight').closest('.form-group');
     const breakdownRow = document.getElementById('decgRetailBreakdownRow');
     const breakdownLabel = document.getElementById('decgRetailBreakdownLabel');
     const breakdownValue = document.getElementById('decgRetailBreakdownValue');
@@ -946,6 +1042,59 @@ function calculateDecgRetailPrice() {
     const finalUnitPriceEl = document.getElementById('decgRetailFinalUnitPrice');
 
     const tier = getTierFromQuantity(quantity);
+
+    // Hide stitch count and heavyweight for laser patch
+    if (itemType === 'laser-patch') {
+        stitchesGroup.classList.add('hidden');
+        heavyweightGroup.classList.add('hidden');
+    } else {
+        stitchesGroup.classList.remove('hidden');
+        heavyweightGroup.classList.remove('hidden');
+    }
+
+    // LTM threshold for DECG is 7 pieces
+    const ltmThreshold = DECG_RETAIL_PRICING.caps.ltmThreshold || 7;
+    const ltmFeeAmount = DECG_RETAIL_PRICING.caps.ltmFee || 50;
+
+    // ---- LASER PATCH CALCULATION ----
+    if (itemType === 'laser-patch') {
+        // Use CONTRACT pricing for cap 8K rate + $5, rounded up to nearest $0.50
+        // This ensures consistent laser patch pricing across all tabs
+        const capRate = CONTRACT_PRICING.caps.perThousandRates[tier];
+        const cap8kPrice = capRate * 8; // 8K stitches
+        const patchUpcharge = 5.00;
+        const rawPrice = cap8kPrice + patchUpcharge;
+        const laserPatchPrice = Math.ceil(rawPrice * 2) / 2; // Round up to nearest $0.50
+
+        // Show breakdown
+        if (quantity > 0) {
+            breakdownRow.classList.remove('hidden');
+            breakdownLabel.textContent = `Laser Patch:`;
+            breakdownValue.textContent = formatPrice(laserPatchPrice);
+        } else {
+            breakdownRow.classList.add('hidden');
+        }
+
+        // Hide extra stitch and heavyweight rows (not applicable)
+        extraStitchRow.classList.add('hidden');
+        heavyweightRow.classList.add('hidden');
+
+        // Calculate LTM (uses DECG threshold: 7)
+        const ltmResult = calculateUnitPriceWithLTM(laserPatchPrice, quantity, ltmThreshold, ltmFeeAmount);
+
+        if (ltmResult.hasLtm && quantity > 0) {
+            ltmBreakdownRow.classList.remove('hidden');
+            ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+            ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
+        } else {
+            ltmBreakdownRow.classList.add('hidden');
+        }
+
+        finalUnitPriceEl.textContent = formatPrice(ltmResult.finalUnitPrice);
+        return;
+    }
+
+    // ---- GARMENT/CAP CALCULATION ----
     let pricing, baseStitches, perThousandUpcharge;
 
     if (itemType === 'garment') {
@@ -957,8 +1106,8 @@ function calculateDecgRetailPrice() {
     const basePrice = pricing.basePrices[tier] || 0;
     baseStitches = pricing.baseStitches || 8000;
     perThousandUpcharge = pricing.perThousandUpcharge || 1.25;
-    const ltmThreshold = pricing.ltmThreshold || 7;
-    const ltmFeeAmount = pricing.ltmFee || 50;
+    const itemLtmThreshold = pricing.ltmThreshold || 7;
+    const itemLtmFeeAmount = pricing.ltmFee || 50;
 
     // Calculate extra stitch charge
     const extraK = Math.max(0, (stitches - baseStitches) / 1000);
@@ -993,12 +1142,12 @@ function calculateDecgRetailPrice() {
     }
 
     // Calculate final price with LTM built in
-    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFeeAmount);
+    const ltmResult = calculateUnitPriceWithLTM(baseUnitPrice, quantity, itemLtmThreshold, itemLtmFeeAmount);
 
     // Show LTM breakdown if applicable
     if (ltmResult.hasLtm && quantity > 0) {
         ltmBreakdownRow.classList.remove('hidden');
-        ltmBreakdownLabel.textContent = `+ LTM ($${ltmFeeAmount} ÷ ${quantity}):`;
+        ltmBreakdownLabel.textContent = `+ LTM ($${itemLtmFeeAmount} ÷ ${quantity}):`;
         ltmBreakdownValue.textContent = '+' + formatPrice(ltmResult.ltmPerPiece);
     } else {
         ltmBreakdownRow.classList.add('hidden');

@@ -254,6 +254,39 @@ if (artworkServices) {
 
 ---
 
+## Embroidery Pricing Calculator Integration
+
+> **Added:** February 2026
+
+### Laser Patch in Price Calculators
+
+The `/calculators/embroidery-pricing-all/` page now includes Laser Patch as a dropdown option in all three tabs (Contract, Add Logo, Customer-Supplied).
+
+**UI Behavior:**
+- Item Type dropdown: Garment | Cap | **Laser Patch**
+- When "Laser Patch" selected, stitch count input is hidden (not applicable)
+- Heavyweight surcharge checkbox hidden in DECG tab for laser patch
+
+**Pricing Formula (Contract Tab):**
+```
+rawPrice = (Contract Cap 8K rate × 8) + $5.00
+finalPrice = Math.ceil(rawPrice × 2) / 2   // Round up to nearest $0.50
+```
+
+**LTM Rules:**
+- ALL tabs: LTM applies ≤7 pcs ($50 fee) - unified threshold for laser patches
+
+**Pricing by Tier (Contract Tab):**
+| Qty Tier | Cap 8K Price | +$5 | Raw Total | Rounded Up |
+|----------|--------------|-----|-----------|------------|
+| 1-7      | $6.40        | $5  | $11.40    | **$11.50** |
+| 8-23     | $6.40        | $5  | $11.40    | **$11.50** |
+| 24-47    | $6.40        | $5  | $11.40    | **$11.50** |
+| 48-71    | $6.00        | $5  | $11.00    | **$11.00** |
+| 72+      | $5.60        | $5  | $10.60    | **$11.00** |
+
+---
+
 ## Related Documentation
 
 - [CLAUDE.md](/CLAUDE.md) - Project overview and rules
