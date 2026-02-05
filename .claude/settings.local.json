@@ -97,7 +97,8 @@
       "WebFetch(domain:wholesalewestonline.com)",
       "WebFetch(domain:www.nnep.com)",
       "WebFetch(domain:www.dldsales.com)",
-      "WebFetch(domain:ezstitchdigitizing.com)"
+      "WebFetch(domain:ezstitchdigitizing.com)",
+      "WebFetch(domain:threadlogic.com)"
     ],
     "deny": [],
     "ask": [],
