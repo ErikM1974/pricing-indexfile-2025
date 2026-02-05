@@ -120,15 +120,53 @@ FullBackCost = (StitchCount / 1000) * $1.25  // All stitches, min 25K
 - [x] Cap-only 15 pieces: Verify tier "8-23" + NO LTM
 - [x] Mixed quote: Verify separate tiers for caps/garments
 
+## Calculator UI (Feb 2026 Redesign)
+
+### Key Change: LTM Built Into Unit Price
+Instead of showing LTM as a separate line item, calculators now build the LTM fee into the per-piece price:
+
+**Formula:** `finalUnitPrice = baseUnitPrice + (ltmFee / quantity)`
+
+**Example:** 3 pieces at $5.00 base with $50 LTM:
+- Old display: "$5.00/piece + $50 LTM = $65 total"
+- New display: "$21.67/piece" (LTM breakdown shown: "+ LTM ($50 ÷ 3): +$16.67")
+
+### Calculator Locations
+All 3 tabs have calculators at TOP (above pricing tables):
+1. **Contract** - Garments & Caps only (no Full Back)
+2. **Add Logo** - Garments & Caps only
+3. **Customer-Supplied** - Garments & Caps + Heavyweight checkbox
+
+### Key Function
+`calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFee)`
+- Returns `{ finalUnitPrice, ltmPerPiece, hasLtm }`
+- Used by all 3 calculators
+- Located in `/calculators/embroidery-pricing-all/embroidery-pricing-all.js`
+
+### LTM Thresholds by Calculator
+| Calculator | LTM Threshold | LTM Fee |
+|------------|---------------|---------|
+| Contract | ≤23 pieces | $50 |
+| Add Logo | ≤7 pieces | $50 |
+| Customer-Supplied | ≤7 pieces | $50 |
+
 ## Related Files
 
 - `/shared_components/js/embroidery-quote-pricing.js` - Core pricing calculator
 - `/shared_components/js/cap-quote-pricing.js` - Cap-specific pricing
 - `/quote-builders/embroidery-quote-builder.html` - Quote builder UI
 - `/calculators/embroidery-pricing.html` - Pricing calculator page
+- `/calculators/embroidery-pricing-all/` - Combined embroidery pricing page (Feb 2026)
 - `/memory/INDEX.md` - Documentation index
 
 ## Changelog
+
+- **2026-02-05:** Calculator UI redesign
+  - Moved calculators to TOP of each tab (above pricing tables)
+  - Added `calculateUnitPriceWithLTM()` function to build LTM into unit price
+  - Added calculator to Add Logo tab
+  - Simplified display: Quantity + Stitch Count → Final Unit Price
+  - Removed hourly revenue display from Contract calculator
 
 - **2026-02-02:** Initial implementation
   - Updated frontend code for new tier structure
