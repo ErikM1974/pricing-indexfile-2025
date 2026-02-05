@@ -62,6 +62,9 @@
                 <div>
                     <strong>Contract Pricing:</strong> For established wholesale partners and production accounts (e.g., ad-specialty distributors who supply their own blanks).
                 </div>
+                <button class="print-contract-btn" onclick="printContractPricing()">
+                    <i class="fas fa-print"></i> Print Contract Pricing
+                </button>
             </div>
 
             <!-- LTM Banner -->
@@ -596,6 +599,92 @@
         <footer class="page-footer">
             <p>Pricing effective February 2026 | Contract pricing targets $100/hr billing rate</p>
         </footer>
+    </div>
+
+    <!-- Hidden Print Container (for Contract Pricing PDF) -->
+    <div id="print-contract-pricing" class="print-only">
+        <div class="print-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" class="print-logo" alt="Northwest Custom Apparel">
+            <div class="print-title-block">
+                <h1>Northwest Custom Apparel</h1>
+                <h2>Contract Pricing — 2-5-26</h2>
+                <p>2025 Freeman Road East, Milton, Washington 98354 | 253-922-5793</p>
+            </div>
+            <div class="print-contact-block">
+                <strong>Ruthie Nhoung</strong>
+                <span>Plant Manager Since 1998</span>
+                <span>ruth@nwcustomapparel.com</span>
+                <span>ext. 119</span>
+            </div>
+        </div>
+
+        <div class="print-tables-row">
+            <div class="print-table-wrapper">
+                <h3>Contract Garments <span class="print-part-num">CTR-Garmt</span></h3>
+                <table id="printContractGarmentsTable" class="print-pricing-table">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th class="ltm-col">1-7</th>
+                            <th class="ltm-col">8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th>72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="print-table-wrapper">
+                <h3>Contract Cap Fronts <span class="print-part-num">CTR-Cap</span></h3>
+                <table id="printContractCapsTable" class="print-pricing-table">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th class="ltm-col">1-7</th>
+                            <th class="ltm-col">8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th>72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="print-ltm-note">
+            <strong>* Columns 1-7 and 8-23:</strong> $50 Less Than Minimum (LTM) fee applies
+        </p>
+
+        <div class="print-laser-section">
+            <h3>Laser Leatherette Patch Pricing</h3>
+            <table id="printLaserPatchTable" class="print-pricing-table laser-patch-table">
+                <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Price Each</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+            <p class="print-notes">
+                * Orders of 1-23 pieces include $50 LTM fee<br>
+                * Laser Patch: $50 one-time design setup fee (GRT-50)<br>
+                * $100 digitizing for new logos
+            </p>
+        </div>
+
+        <div class="print-footer">
+            <p>Pricing effective February 2026</p>
+        </div>
     </div>
 
     <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js"></script>

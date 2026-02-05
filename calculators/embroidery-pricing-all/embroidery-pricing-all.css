@@ -1324,40 +1324,274 @@ body {
     color: #b45309;
 }
 
-/* Print Styles */
+/* ============================================
+   PRINT CONTRACT BUTTON
+   ============================================ */
+
+.print-contract-btn {
+    margin-left: auto;
+    padding: 8px 16px;
+    background: white;
+    color: var(--contract-text-dark);
+    border: 1px solid var(--contract-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.print-contract-btn:hover {
+    background: var(--contract-bg-light);
+    border-color: var(--contract-text);
+}
+
+.print-contract-btn i {
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   PRINT-ONLY CONTAINER (Hidden on screen)
+   ============================================ */
+
+.print-only {
+    display: none;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
 @media print {
-    .tab-navigation,
-    .calculator-card,
-    .script-card {
-        display: none;
+    @page {
+        size: landscape;
+        margin: 0.25in;  /* Tighter margins to fit on 1 page */
     }
 
-    .tab-content {
+    /* Hide everything except print container */
+    body > *:not(#print-contract-pricing) {
+        display: none !important;
+    }
+
+    #print-contract-pricing {
         display: block !important;
-        page-break-before: always;
     }
 
-    .tab-content:first-of-type {
-        page-break-before: avoid;
+    /* Print Header */
+    .print-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #333;
     }
 
-    .page-header {
-        box-shadow: none;
-        border: 1px solid var(--border-color);
+    .print-logo {
+        width: 100px;
+        height: auto;
     }
 
-    .matrix-card,
-    .fees-card {
-        box-shadow: none;
-        border: 1px solid var(--border-color);
-        page-break-inside: avoid;
+    .print-title-block {
+        flex: 1;
     }
 
-    .use-case-banner {
-        border-width: 2px;
+    .print-title-block h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 2px 0;
     }
 
-    .surcharge-card {
-        border-width: 2px;
+    .print-title-block h2 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4cb354;
+        margin: 0 0 6px 0;
+    }
+
+    .print-title-block p {
+        font-size: 11px;
+        color: #666;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* Ruthie's contact block (right side of header) */
+    .print-contact-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+        font-size: 10px;
+        color: #333;
+        line-height: 1.5;
+    }
+
+    .print-contact-block strong {
+        font-size: 12px;
+        color: #333;
+    }
+
+    .print-contact-block span {
+        color: #666;
+    }
+
+    /* Print Tables Row (side by side) */
+    .print-tables-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .print-table-wrapper {
+        flex: 1;
+    }
+
+    .print-table-wrapper h3 {
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 6px 0;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Part number badge in print table titles */
+    .print-part-num {
+        font-family: 'Consolas', monospace;
+        font-size: 9px;
+        font-weight: 500;
+        color: #666;
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+    }
+
+    /* Print Pricing Tables */
+    .print-pricing-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9px;
+    }
+
+    .print-pricing-table th,
+    .print-pricing-table td {
+        padding: 2px 4px;
+        text-align: center;
+        border: 1px solid #ccc;
+    }
+
+    .print-pricing-table th {
+        background: #f0f0f0;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .print-pricing-table th:first-child,
+    .print-pricing-table td:first-child {
+        text-align: left;
+        font-weight: 500;
+        background: #f8f8f8;
+    }
+
+    .print-pricing-table tbody tr:nth-child(even) {
+        background: #fafafa;
+    }
+
+    /* Rate footer row */
+    .print-pricing-table tr.rate-row {
+        background: #e8f5e9 !important;
+        font-weight: 600;
+    }
+
+    .print-pricing-table tr.rate-row td {
+        border-top: 2px solid #4cb354;
+    }
+
+    /* LTM columns (1-7 and 8-23) - yellow highlight with print-color-adjust */
+    .print-pricing-table th.ltm-col,
+    .print-pricing-table td.ltm-col {
+        background-color: #fef08a !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        border-left: 3px solid #ca8a04 !important;  /* Amber border as visual fallback */
+    }
+
+    /* Ensure LTM highlight shows on rate-row too */
+    .print-pricing-table tr.rate-row td.ltm-col {
+        background-color: #fef08a !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    /* LTM fee notation styling */
+    .print-ltm-note {
+        font-size: 9px;
+        color: #92400e;
+        background: #fef9c3;
+        padding: 4px 8px;
+        border-radius: 4px;
+        margin: 6px 0;
+        border-left: 3px solid #fde047;
+    }
+
+    .print-ltm-note strong {
+        color: #78350f;
+    }
+
+    /* Laser Patch Section */
+    .print-laser-section {
+        margin-top: 8px;
+        padding-top: 6px;
+        border-top: 1px dashed #ccc;
+    }
+
+    .print-laser-section h3 {
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 4px 0;
+    }
+
+    .print-laser-section .laser-patch-table {
+        max-width: 250px;
+    }
+
+    .print-notes {
+        font-size: 9px;
+        color: #666;
+        margin-top: 10px;
+        line-height: 1.5;
+    }
+
+    /* Print Footer */
+    .print-footer {
+        margin-top: 8px;
+        padding-top: 6px;
+        border-top: 1px solid #ccc;
+        text-align: center;
+    }
+
+    .print-footer p {
+        font-size: 9px;
+        color: #999;
+        margin: 0;
+    }
+}
+
+/* Screen-only styles (hide print elements) */
+@media screen {
+    .print-only {
+        display: none !important;
     }
 }
