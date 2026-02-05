@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-02-04 (embroidery pricing page API integration complete, added EMBROIDERY_ITEM_TYPES.md)
+**Last Updated:** 2026-02-05 (embroidery pricing philosophy analysis, tab names clarified, decision flowchart added)
 **Purpose:** Master navigation for all documentation files
 
 ## Directory Map
@@ -55,7 +55,8 @@
 ├── PRICING_TIERS_MASTER_REFERENCE.md # **MASTER** All pricing tiers across all methods (2026-02-02)
 ├── EMBROIDERY_PRICING_RULES.md       # Complete embroidery pricing formulas reference
 ├── EMBROIDERY_PRICING_2026.md        # Feb 2026 embroidery tier restructure
-├── EMBROIDERY_ITEM_TYPES.md          # **NEW** Canonical ItemType reference for Embroidery_Costs (2026-02-04)
+├── EMBROIDERY_PRICING_PHILOSOPHY.md  # **NEW** Three-tier philosophy, loopholes, financial impact (2026-02-05)
+├── EMBROIDERY_ITEM_TYPES.md          # Canonical ItemType reference for Embroidery_Costs
 ├── DECG_PRICING_2026.md              # Customer-supplied embroidery pricing (DECG)
 │
 ├── # Quote Builder Implementation Files
@@ -162,6 +163,7 @@
 |------|-----------|
 | **All Pricing Tiers** | **[PRICING_TIERS_MASTER_REFERENCE.md](./PRICING_TIERS_MASTER_REFERENCE.md)** - All methods, all tiers, LTM thresholds |
 | Embroidery Pricing | [EMBROIDERY_PRICING_RULES.md](./EMBROIDERY_PRICING_RULES.md) - Formulas, FB, AL, caps |
+| **Emb Pricing Philosophy** | **[EMBROIDERY_PRICING_PHILOSOPHY.md](./EMBROIDERY_PRICING_PHILOSOPHY.md)** - Three-tier philosophy, loopholes |
 | **Embroidery Pricing Page** | `/calculators/embroidery-pricing-all/` - 3-tab page: Contract \| AL Retail \| DECG Retail (API-driven) |
 | **Embroidery ItemTypes** | **[EMBROIDERY_ITEM_TYPES.md](./EMBROIDERY_ITEM_TYPES.md)** - Canonical ItemType reference, prevents duplicates |
 | 2026 Tier Restructure | [EMBROIDERY_PRICING_2026.md](./EMBROIDERY_PRICING_2026.md) - 5-tier details |

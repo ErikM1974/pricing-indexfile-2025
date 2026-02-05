@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-02-04
+**Last Updated:** 2026-02-05
 **Total Active Files:** ~288 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
@@ -346,8 +346,9 @@ cap-embroidery-fix.css
 |------|---------|--------|
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
-| `/memory/EMBROIDERY_PRICING_RULES.md` | **NEW** Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
-| `/memory/EMBROIDERY_ITEM_TYPES.md` | **NEW** Canonical ItemType reference for Embroidery_Costs table (2026-02-04) | ✅ Active |
+| `/memory/EMBROIDERY_PRICING_RULES.md` | Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
+| `/memory/EMBROIDERY_PRICING_PHILOSOPHY.md` | **NEW** Three-tier philosophy, loopholes, financial impact (2026-02-05) | ✅ Active |
+| `/memory/EMBROIDERY_ITEM_TYPES.md` | Canonical ItemType reference for Embroidery_Costs table | ✅ Active |
 | `/memory/DECG_PRICING_2026.md` | **NEW** Customer Supplied Embroidery (DECG) pricing reference | ✅ Active |
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
