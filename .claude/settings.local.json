@@ -102,7 +102,8 @@
       "Bash($tempFile = \"$env:TEMP\\\\emb_pricing.json\")",
       "Bash(TMPFILE=\"C:/Users/erik/AppData/Local/Temp/claude/emb.json\")",
       "Bash(for TYPE in CAP EMB-AL CAP-AL PATCH CAP-PUFF)",
-      "Bash(do)"
+      "Bash(do)",
+      "Read(//c/Users/erik/OneDrive - Northwest Custom Apparel/**)"
     ],
     "deny": [],
     "ask": [],
