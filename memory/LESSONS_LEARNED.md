@@ -31,6 +31,33 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: Garment Tracker Archive Silently Archiving 0 Records for 11 Days
+**Date:** 2026-02-05
+**Project:** [caspio-proxy]
+**Problem:** The Heroku Scheduler ran `npm run archive-garment-tracker` daily since Jan 25, but archived 0 records every time. The script reported "SUCCESS" with exit code 0, so Heroku showed no errors.
+**Symptoms:** Archive table had only 15 records (from initial manual backfill on Jan 25). Live table had 22 records. 11 days of scheduled runs produced nothing.
+**Root Cause:** Two bugs in the `archive-range` endpoint (`garment-tracker.js`):
+1. Tried to read `Part01`-`Part10` fields on ManageOrders ORDER objects, but part numbers only exist on LINE ITEMS (separate API call via `fetchLineItems()`)
+2. Used exact `===` matching for part numbers instead of `startsWith()` — missed size variants like `CT104670_2X`, `112_OSFA`
+**Solution:**
+1. Changed daily script default from `archive-range` (broken) to `archive-from-live` (working) — copies live GarmentTracker table to archive
+2. Rewrote `archive-range` endpoint to use `fetchLineItems()` per order with `startsWith` matching
+3. Added dashboard-triggered background archival as safety net (fire-and-forget on page load)
+4. Added `console.warn` 0-record warnings to ALL 4 Heroku Scheduler scripts
+**Prevention:**
+- **Never assume ManageOrders order objects have part/line item data** — always use `fetchLineItems(orderId)` for part numbers
+- **Use `startsWith(base + '_')` matching** for part numbers, never exact equality
+- **Add 0-record warnings** to any archival/sync script — silent "success" with no data is a hidden failure
+- **Test archival scripts end-to-end** by checking if records actually appear in the target table, not just that the script exits 0
+**Files:**
+- `caspio-pricing-proxy/scripts/archive-garment-tracker.js` (default mode changed)
+- `caspio-pricing-proxy/src/routes/garment-tracker.js` (archive-range rewritten)
+- `caspio-pricing-proxy/scripts/archive-daily-sales.js` (0-record warning added)
+- `caspio-pricing-proxy/scripts/sync-crm-dashboards.js` (0-record warning added)
+- `caspio-pricing-proxy/scripts/sync-contacts.js` (0-record warning added)
+- `shared_components/js/staff-dashboard-service.js` (dashboard archival function added)
+- `shared_components/js/staff-dashboard-init.js` (background archival trigger added)
+
 ## Bug: Manual Calculator Used Old 4-Tier Tiers While Quote Builder Used New 5-Tier
 **Date:** 2026-02-02
 **Project:** [Pricing Index]
