@@ -1443,6 +1443,22 @@ const StaffDashboardService = (function() {
         return response.json();
     }
 
+    /**
+     * Archive garment tracker data from live table to permanent archive (background safety net)
+     * Called on dashboard load to ensure archive stays current even if Heroku Scheduler fails
+     */
+    async function archiveGarmentTrackerToArchive() {
+        const response = await fetch(`${API_CONFIG.baseURL}/garment-tracker/archive-from-live`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+        if (!response.ok) {
+            throw new Error(`Archive sync failed: ${response.status}`);
+        }
+        return response.json();
+    }
+
     // =====================================================
     // REP CRM ACCOUNT TOTALS
     // Fetches YTD sales from each rep's CRM account table
@@ -1550,7 +1566,8 @@ const StaffDashboardService = (function() {
         // Garment Tracker (table-based - fast)
         loadGarmentTrackerFromTable,
         syncGarmentTracker,
-        postGarmentRecord
+        postGarmentRecord,
+        archiveGarmentTrackerToArchive
     };
 })();
 

@@ -297,20 +297,29 @@ Convert(nvarchar(20), [@field:OrderNumber]) + '_' + [@field:PartNumber]
 
 **Modes:**
 ```bash
-# Archive yesterday's garment data
+# Default: Archive from live GarmentTracker table (recommended)
 npm run archive-garment-tracker
 
-# Archive date range from ManageOrders (within 60 days)
+# Archive date range from ManageOrders (within 60 days, uses line items)
 npm run archive-garment-tracker -- --start 2026-01-01 --end 2026-01-31
 
-# Archive from current live GarmentTracker table
+# Archive from live table (explicit, same as default)
 npm run archive-garment-tracker -- --from-live
 ```
 
-**Heroku Scheduler:** Run daily at 6 AM Pacific (14:00 UTC):
+**Heroku Scheduler:** Run daily at 2:00 PM UTC (6 AM Pacific):
 ```
 npm run archive-garment-tracker
 ```
+
+### Archive Safety Nets (Two Layers)
+
+| Layer | Trigger | How |
+|-------|---------|-----|
+| **Heroku Scheduler** | Daily at 6 AM Pacific | Copies live table → archive via `archive-from-live` |
+| **Dashboard load** | Every time staff dashboard loads | Background `archive-from-live` call (fire-and-forget) |
+
+Both layers use `POST /api/garment-tracker/archive-from-live` which upserts (no duplicates).
 
 ### Live Table vs Archive Table
 
@@ -319,31 +328,23 @@ npm run archive-garment-tracker
 | `GarmentTracker` | Current quarter dashboard display | Cleared quarterly |
 | `GarmentTrackerArchive` | Historical records | Permanent |
 
-The live `GarmentTracker` table is populated by `staff-dashboard-init.js:loadGarmentTracker()` and shows current quarter data. The archive preserves this data permanently.
+The live `GarmentTracker` table is populated by dashboard sync button and shows current quarter data. The archive preserves this data permanently.
 
 ### Data Flow
 
 ```
 ManageOrders (60-day limit)
-        ↓
-   Dashboard loads
-        ↓
-GarmentTracker (live, current quarter)
-        ↓
-  Archive script (daily)
-        ↓
+        ↓  Sync button on dashboard
+GarmentTracker (live, current year)
+        ↓  Dashboard load (background) + Daily script (Heroku Scheduler)
 GarmentTrackerArchive (permanent)
 ```
 
-### Initial Backfill (2026-01-25)
+### Bug Fix (2026-02-05)
 
-Archive populated with January 2026 data:
-
-| Rep | Items | Bonus | Orders | Premium | Richardson |
-|-----|-------|-------|--------|---------|------------|
-| Nika Lao | 41 | $126.50 | 5 | 24 | 17 |
-| Taneisha Clark | 186 | $124.50 | 5 | 7 | 179 |
-| **Total** | **227** | **$251.00** | **10** | **31** | **196** |
+**Problem:** Daily archive script ran every day since Jan 25 but archived 0 records.
+**Root cause:** The `archive-range` endpoint tried to read `Part01`-`Part10` fields on ManageOrders order objects, but those fields don't exist — part numbers are on line items (separate API call). Also used exact matching instead of `startsWith` for size variants.
+**Fix:** Changed daily script default from `archive-range` (broken) to `archive-from-live` (working). Fixed `archive-range` to use `fetchLineItems()` with `startsWith` matching. Added dashboard-triggered archival as safety net.
 
 ### Quarterly Reporting
 

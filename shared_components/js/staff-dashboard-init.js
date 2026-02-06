@@ -983,6 +983,11 @@ const StaffDashboardInit = (function() {
             const data = await StaffDashboardService.loadGarmentTrackerFromTable();
             console.log('[GarmentTracker] Loaded from table');
             renderGarmentTracker(data);
+
+            // Background archive to permanent table (safety net in case Heroku Scheduler misses)
+            StaffDashboardService.archiveGarmentTrackerToArchive()
+                .then(() => console.log('[GarmentTracker] Background archive sync complete'))
+                .catch(e => console.warn('[GarmentTracker] Background archive failed (non-critical):', e.message));
         } catch (error) {
             console.warn('[GarmentTracker] Table load failed, showing sync prompt:', error.message);
             container.innerHTML = `
