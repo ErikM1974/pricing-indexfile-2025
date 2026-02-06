@@ -29,6 +29,7 @@ class ShopWorksImportParser {
         this.decgApiFailed = false;  // Track if API call failed (for error display)
 
         // Size mapping from ShopWorks to quote builder format
+        // Includes short forms extracted from part number suffixes (e.g., _4X → '4X' → '4XL')
         this.SIZE_MAP = {
             'XS': 'XS',
             'S': 'S',
@@ -40,26 +41,51 @@ class ShopWorksImportParser {
             'XL': 'XL',
             'XXL': '2XL',
             '2XL': '2XL',
+            '2X': '2XL',       // From _2X suffix extraction
             'XXXL': '3XL',
             '3XL': '3XL',
+            '3X': '3XL',       // From _3X suffix extraction
             '4XL': '4XL',
+            '4X': '4XL',       // From _4X suffix extraction (103 real occurrences)
             'XXXXL': '4XL',
             '5XL': '5XL',
+            '5X': '5XL',       // From _5X suffix extraction
             'XXXXXL': '5XL',
             '6XL': '6XL',
+            '6X': '6XL',       // From _6X suffix extraction
             // OSFA/One Size
             'OSFA': 'OSFA',
             'O/S': 'OSFA',
             'ONE SIZE': 'OSFA',
             // Size ranges (caps)
             'S/M': 'S/M',
+            'SM/MD': 'S/M',    // From _SM/MD suffix (Richardson caps)
+            'M/L': 'M/L',      // From _M/L suffix (New Era, Nike caps)
             'L/XL': 'L/XL',
+            'LG/XL': 'L/XL',   // From _LG/XL suffix (Richardson caps)
+            // Extra small
+            'XXS': 'XXS',
+            '2XS': 'XXS',      // Alternate notation for XXS
             // Tall sizes
             'LT': 'LT',
+            'MT': 'MT',        // Medium Tall
+            'ST': 'ST',        // Small Tall
+            'XST': 'XST',     // Extra Small Tall
             'XLT': 'XLT',
             '2XLT': '2XLT',
             '3XLT': '3XLT',
-            '4XLT': '4XLT'
+            '4XLT': '4XLT',
+            '5XLT': '5XLT',
+            // Infant/toddler sizes
+            '06M': '06M',
+            '12M': '12M',
+            '18M': '18M',
+            '24M': '24M',
+            'NB': 'NB',
+            '2T': '2T',
+            '3T': '3T',
+            '4T': '4T',
+            '5T': '5T'
         };
 
         // DECG (Customer-Supplied Garments) pricing tiers - FALLBACK if API unavailable
@@ -139,7 +165,21 @@ class ShopWorksImportParser {
         this.GRAPHIC_DESIGN_CODES = ['GRT-75'];
 
         // Part number suffixes to strip
-        this.SIZE_SUFFIXES = ['_2X', '_3X', '_4X', '_5X', '_6X', '_XS', '_LT', '_XLT', '_2XLT', '_3XLT', '_4XLT', '_OSFA', '_S/M', '_L/XL'];
+        // Validated against 6,218 real order lines + 15,200 ShopWorks product catalog entries
+        this.SIZE_SUFFIXES = [
+            // Extended sizes — full forms (ShopWorks product catalog format)
+            '_2XL', '_3XL', '_4XL', '_5XL', '_6XL', '_XXXL',
+            // Extended sizes — short forms (order text export format)
+            '_2X', '_3X', '_4X', '_5X', '_6X', '_XXL',
+            // Extra small
+            '_XXS', '_2XS', '_XS',
+            // Tall sizes (longer suffixes first)
+            '_2XLT', '_3XLT', '_4XLT', '_5XLT', '_XLT', '_XST', '_LT', '_MT', '_ST',
+            // One size / size ranges
+            '_OSFA', '_SM/MD', '_LG/XL', '_S/M', '_M/L', '_L/XL',
+            // Infant / toddler
+            '_24M', '_18M', '_12M', '_06M', '_NB', '_2T', '_3T', '_4T', '_5T'
+        ];
     }
 
     /**

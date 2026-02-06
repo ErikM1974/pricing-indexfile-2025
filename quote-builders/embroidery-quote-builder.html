@@ -3257,7 +3257,7 @@ Company:Absher Construction Company
         }
 
         async function onStyleChange(input, rowId) {
-            const styleNumber = input.value.trim().toUpperCase();
+            let styleNumber = input.value.trim().toUpperCase();
             if (!styleNumber) return;
 
             const row = document.getElementById(`row-${rowId}`);
@@ -3281,6 +3281,31 @@ Company:Absher Construction Company
                             PRODUCT_TITLE: result.label
                         };
                         productCache[styleNumber] = product;
+                    }
+                }
+
+                // Generic fallback: if SanMar lookup failed and style has underscore,
+                // strip the suffix and retry (handles pants sizes, fit variants, etc.)
+                if (!product && styleNumber.includes('_')) {
+                    const baseStyle = styleNumber.substring(0, styleNumber.lastIndexOf('_'));
+                    if (baseStyle) {
+                        const retryResponse = await fetch(`${API_BASE}/api/stylesearch?term=${baseStyle}`);
+                        const retryData = await retryResponse.json();
+                        if (retryData && retryData.length > 0) {
+                            const exactMatch = retryData.find(p => p.value.toUpperCase() === baseStyle);
+                            const result = exactMatch || retryData[0];
+                            product = {
+                                STYLE: result.value,
+                                PRODUCT_TITLE: result.label
+                            };
+                            productCache[baseStyle] = product;
+                            const strippedSuffix = styleNumber.substring(styleNumber.lastIndexOf('_'));
+                            row.dataset.originalPartNumber = styleNumber;
+                            input.value = baseStyle;
+                            styleNumber = baseStyle;
+                            console.log(`[onStyleChange] Suffix fallback: ${row.dataset.originalPartNumber} → ${baseStyle} (stripped ${strippedSuffix})`);
+                            showToast(`${row.dataset.originalPartNumber} → imported as ${baseStyle} (suffix ${strippedSuffix} stripped)`, 'info', 5000);
+                        }
                     }
                 }
 
@@ -4939,23 +4964,51 @@ Company:Absher Construction Company
                 }
             }
 
-            // Calculate total from enabled size inputs in parent row ONLY
-            // 2XL is disabled when it has a value (child row created), so it's excluded
-            // Child rows display their own quantities separately
-            // Bug fix 2026-01-14: Parent row was incorrectly adding child quantities
-            let total = 0;
-            row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-                total += parseInt(input.value) || 0;
-            });
-
-            // DO NOT add child row quantities - each row displays its own quantity
-            // The sidebar/pricing calculator handles the true total separately
-
-            // Update parent row quantity display (parent sizes only)
-            document.getElementById(`row-qty-${rowId}`).textContent = total;
+            // Update parent row quantity display
+            // Shows standard sizes total when > 0, or child row total for variant-only products
+            // Bug fix 2026-01-14: Standard total excludes disabled 2XL (counted in child row)
+            // Enhancement 2026-02-06: Variant-only products show child total instead of "0"
+            updateParentQtyDisplay(rowId);
 
             // Recalculate pricing
             recalculatePricing();
+        }
+
+        /**
+         * Update parent row Qty display.
+         * Shows standard size total when > 0, otherwise shows sum of child row quantities.
+         * DISPLAY-ONLY: collectProductsFromTable(), pricing engine, save/load, and
+         * ShopWorks Entry Guide all read size inputs and child .qty-display directly,
+         * never this cell. Safe to update without affecting data.
+         */
+        function updateParentQtyDisplay(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+            if (row.classList.contains('child-row')) return;
+            if (row.dataset.isOsfaOnly === 'true') return; // OSFA-only already handled directly
+
+            let standardTotal = 0;
+            row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+                standardTotal += parseInt(input.value) || 0;
+            });
+
+            if (standardTotal > 0) {
+                // Normal case: parent has standard sizes, show their total
+                document.getElementById(`row-qty-${rowId}`).textContent = standardTotal;
+            } else {
+                // Variant-only: show child row total so parent doesn't display "0"
+                let childTotal = 0;
+                if (childRowMap[rowId]) {
+                    Object.values(childRowMap[rowId]).forEach(childRowId => {
+                        const childRow = document.getElementById(`row-${childRowId}`);
+                        if (childRow) {
+                            const qtyDisplay = childRow.querySelector('.qty-display');
+                            childTotal += parseInt(qtyDisplay?.textContent) || 0;
+                        }
+                    });
+                }
+                document.getElementById(`row-qty-${rowId}`).textContent = childTotal;
+            }
         }
 
         /**
@@ -5157,6 +5210,9 @@ Company:Absher Construction Company
             // Update child row quantity display
             document.getElementById(`row-qty-${childRowId}`).textContent = qty;
 
+            // Update parent Qty display (reflects child changes for variant-only rows)
+            updateParentQtyDisplay(parseInt(parentRowId));
+
             // Sync back to parent row's hidden input
             const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
             if (parentInput) {
@@ -5189,6 +5245,9 @@ Company:Absher Construction Company
 
             // Remove child row
             removeChildRow(parentRowId, size);
+
+            // Update parent Qty display (may revert to 0 if no children remain)
+            updateParentQtyDisplay(parentRowId);
 
             recalculatePricing();
         }
@@ -8308,12 +8367,25 @@ Company:Absher Construction Company
                     if (size === 'LG') internalSize = 'L';
                     if (size === 'XXL' || size === '2X') internalSize = '2XL';
                     if (size === 'XXXL' || size === '3X') internalSize = '3XL';
+                    if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
+                    if (size === '5X') internalSize = '5XL';
+                    if (size === '6X') internalSize = '6XL';
 
                     // Apply cap size mapping if this is a cap
                     if (isCapRow && CAP_SIZE_MAP[internalSize.toUpperCase()]) {
                         const capSize = CAP_SIZE_MAP[internalSize.toUpperCase()];
                         console.log(`[ShopWorks Import] Cap size mapping: ${internalSize} → ${capSize}`);
                         internalSize = capSize;
+                    }
+
+                    // OSFA-only products (beanies, caps, bags): put qty in parent row directly
+                    // Matches popup behavior at applyExtendedSizes() line 1804
+                    if (internalSize === 'OSFA' && row.dataset.sizeCategory === 'osfa-only') {
+                        row.dataset.osfaQty = qty;
+                        row.dataset.isOsfaOnly = 'true';
+                        document.getElementById(`row-qty-${rowId}`).textContent = qty;
+                        console.log(`[ShopWorks Import] OSFA-only product: qty ${qty} in parent row (no child row)`);
+                        continue;
                     }
 
                     // Check if this is an extended size that needs a child row
