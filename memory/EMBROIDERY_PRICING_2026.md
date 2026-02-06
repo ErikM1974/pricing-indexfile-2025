@@ -10,7 +10,7 @@ This document describes the updated embroidery pricing tier structure implemente
 
 | Tier | Qty Range | LTM/Setup Fee | Surcharge | Notes |
 |------|-----------|---------------|-----------|-------|
-| **1-7** | 1-7 | $50 | — | Setup fee shown separately |
+| **1-7** | 1-7 | $50 | — | Fee baked into per-piece price (quote builder + calculators) |
 | **8-23** | 8-23 | $0 | +$4/piece | Surcharge baked into EmbroideryCost |
 | **24-47** | 24-47 | $0 | — | Standard pricing |
 | **48-71** | 48-71 | $0 | — | Volume pricing |
@@ -74,6 +74,21 @@ This document describes the updated embroidery pricing tier structure implemente
    - Table headers: Added 1-7 and 8-23 columns
    - Info boxes: Updated text about setup fees
    - Cell IDs: Added `emb-al-1-7` and `emb-al-8-23`
+
+### Calculator Display (Baked LTM — 2026-02-06)
+
+Both calculator pages show **all-in prices** in the 1-7 column. No customer-facing "$50" or "LTM" text.
+
+**How it works:**
+- Pricing table rows store base 1-7 price in `data-base-price` attribute
+- Quantity picker (1-7, default 3) triggers `updateLTMCalculator()`
+- Function loops through 1-7 cells: `allInPrice = basePrice + (50 / qty)`
+- Column header shows "1-7 pieces (N pcs)" for context
+- Additional Logo table 1-7 column shows base price (no LTM — applies to primary product only)
+
+**Files:**
+- `calculators/embroidery-pricing.html` — `updateLTMCalculator()`, `data-base-price` on rows
+- `calculators/cap-embroidery-pricing-integrated.html` — same pattern, targets `<span class="price">` inside cells
 
 ## Pricing Formulas
 

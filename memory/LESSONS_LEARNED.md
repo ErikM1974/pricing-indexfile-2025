@@ -751,6 +751,17 @@ Plus, CRM sync may be stale if not run recently.
 
 # Multi-SKU Products & Sizes
 
+## Bug: Shopworks_Integration Table Does Not Exist — Extended Sizes Broken
+**Date:** 2026-02-06
+**Project:** [caspio-proxy]
+**Problem:** All 3 quote builders (embroidery, DTG, screenprint) couldn't load extended sizes (3XL, 4XL, etc.). The `/api/sanmar-shopworks/import-format` endpoint returned 500 for every product. Users saw "No extended sizes available" and couldn't add 2XL+ sizes.
+**Root Cause:** The `sanmar-shopworks.js` route queried a Caspio table `Shopworks_Integration` that **does not exist**. Caspio returned `TableNotFound` error. The endpoint was built assuming this table existed, but it was never created.
+**Solution:** Rewrote all helper functions (`detectSKUPattern`, `getShopWorksSizeMapping`, `mapSKUToFieldsEnhanced`) and the `import-format` endpoint to derive SKU patterns and size mappings from `Sanmar_Bulk_251816_Feb2024` instead. Also made the `color` parameter optional so the frontend fallback (no-color query) works. Deployed as caspio-proxy v339.
+**Prevention:** Before writing code that queries a Caspio table, verify the table exists by testing the query first. Never assume a table exists just because a variable references it.
+**File:** `caspio-pricing-proxy/src/routes/sanmar-shopworks.js`
+
+---
+
 ## Bug: Tall-Only Products Missing from PDF and Quote Link
 **Date:** 2026-02-01
 **Project:** [Pricing Index]
@@ -907,6 +918,26 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 ---
 
 # Calculator & Quote Builder Sync
+
+## Pattern: Bake LTM Fee Into Calculator 1-7 Column Prices (No Visible $50)
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Context:** Calculator pages previously showed "$50 small order fee" messaging and a detailed breakdown calculator. This was confusing for customers and drew attention to the fee rather than the all-in price.
+**Change:** Both calculator pages (embroidery + cap embroidery) now:
+1. Show all-in prices in the 1-7 column: `basePrice + ($50 / selectedQty)`
+2. Quantity picker (default 3) updates all 1-7 column cells dynamically
+3. Base prices stored in `data-base-price` attributes on `<td>` cells
+4. Column header updates to show "1-7 pieces (N pcs)"
+5. All "$50" / "Less Than Minimum" / "LTM" text removed from customer-facing content
+6. Additional Logo tables left showing base prices (LTM applies to primary product only)
+**Key Technique:** `data-base-price` attribute on each 1-7 `<td>` cell, read by `updateLTMCalculator()` which adds `50/qty` to each base price
+**Cap difference:** Cap calculator wraps prices in `<span class="price">` inside cells, so update targets `cell.querySelector('.price') || cell`
+**Files:**
+- `calculators/embroidery-pricing.html` — table generation + `updateLTMCalculator()`
+- `calculators/cap-embroidery-pricing-integrated.html` — same pattern adapted for caps
+**Prevention:**
+- When modifying calculator pricing display, remember 1-7 prices are dynamic based on qty picker. Always store base price in `data-base-price` for recalculation.
+- **SYNC RULE:** The embroidery quote builder, embroidery calculator, AND cap embroidery calculator must all use the same LTM logic and pricing formulas. If you change LTM handling in one, update all three. The quote builder bakes LTM into `FinalUnitPrice` via the pricing engine (`ltmDistributed: true`); the calculators bake LTM via `data-base-price + 50/qty` in `updateLTMCalculator()`. Both approaches produce the same all-in price — just verify with identical inputs.
 
 ## Problem: Programmatically Checking Checkbox Doesn't Trigger Line Items
 **Date:** 2026-01-31
