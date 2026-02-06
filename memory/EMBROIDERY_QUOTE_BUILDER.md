@@ -706,3 +706,86 @@ When a quote contains both caps and garments:
 | 112 | Richardson | Cap badge shown, cap pricing |
 | PC54 | T-Shirt | No badge, garment pricing |
 | PC90H | Hoodie | No badge, garment pricing |
+
+---
+
+## Fee Line Items in quote_items (Added Feb 2026)
+
+### Overview
+Fee and charge items are now saved as `quote_items` rows with `EmbellishmentType: 'fee'`, giving ShopWorks complete line-by-line order data. Previously, fees were only stored as session-level fields on `quote_sessions`.
+
+### Implementation
+- **Helper method**: `_saveFeeLineItems()` in `embroidery-quote-service.js`
+- Called by both `saveQuote()` and `updateQuote()` after DECG items
+- Only saves fees with non-zero values
+
+### Fee → ShopWorks Part Number Mapping
+
+| Fee | Part Number | Source Field | Qty Logic |
+|-----|------------|--------------|-----------|
+| Extra stitches (garment) | AS-GARM | `sessionData.GarmentStitchCharge` | garmentQty |
+| Extra stitches (cap) | AS-CAP | `sessionData.CapStitchCharge` | capQty |
+| Digitizing (garment) | DD | `sessionData.GarmentDigitizing` | 1 |
+| Digitizing (cap) | DD | `sessionData.CapDigitizing` | 1 |
+| Art/Setup | GRT-50 | `sessionData.ArtCharge` | 1 |
+| Graphic Design | GRT-75 | `sessionData.GraphicDesignCharge` | hours |
+| Rush | RUSH | `sessionData.RushFee` | 1 |
+| Sample | SAMPLE | `sessionData.SampleFee` | sampleQty |
+| LTM (garment) | LTM | `sessionData.LTM_Garment` | 1 |
+| LTM (cap) | LTM | `sessionData.LTM_Cap` | 1 |
+| Discount | DISCOUNT | `sessionData.Discount` | 1 (negative total) |
+
+### EmbellishmentType Values in quote_items
+
+| Value | Used For |
+|-------|----------|
+| `embroidery` | Product garment/cap rows |
+| `embroidery-additional` | Additional Logo (AL) rows |
+| `customer-supplied` | DECG/DECC rows |
+| `fee` | All fee/charge rows (new) |
+| `monogram` | Monogram service rows |
+
+---
+
+## ShopWorks Data Entry Guide (Added Feb 2026)
+
+### Overview
+Printable guide showing staff exactly how to enter embroidery orders in ShopWorks. Includes product rows with size breakdowns AND fee rows with part numbers.
+
+### Files
+- **Generator**: `shared_components/js/shopworks-guide-generator.js`
+- **Button**: Action panel in `embroidery-quote-builder.html`
+- **Function**: `generateShopWorksGuide()` in inline script
+
+### Features
+- Product rows with size columns (S, M, LG, XL, XXL, XXXL)
+- Fee rows with light blue background (`#e3f2fd`)
+- Discount rows in red
+- Separate subtotals (products vs fees)
+- Data entry checklist with all line items
+- Auto-print dialog
+
+### Data Flow
+1. `collectProductsFromTable()` → get products
+2. `pricingCalculator.calculateQuote()` → get pricing
+3. `getAdditionalCharges()` → get fee values
+4. Build `feeItems[]` array from pricing + charges
+5. Build `guideProducts[]` with size breakdowns
+6. `new ShopWorksGuideGenerator().generateGuide(quoteData)`
+
+---
+
+## Bug Fix: /api/embroidery-costs Endpoint (Feb 2026)
+
+### Problem
+`GET /api/embroidery-costs` always returned 400 errors.
+
+### Root Cause
+WHERE clause used `StitchCountRange` (non-existent field) instead of `StitchCount` (actual Caspio field name).
+
+### Fix
+- Changed field name: `StitchCountRange` → `StitchCount`
+- Added itemType whitelist validation (Shirt, Cap, AL, AL-CAP, etc.)
+- Added stitchCount integer validation
+- Removed quotes around stitchCount value (it's numeric)
+- **File**: `caspio-pricing-proxy/src/routes/pricing.js`

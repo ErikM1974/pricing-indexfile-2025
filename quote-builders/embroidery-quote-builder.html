@@ -728,6 +728,9 @@
                 <button class="btn-action btn-secondary-action" onclick="printQuote()">
                     <i class="fas fa-print"></i> Print Quote
                 </button>
+                <button class="btn-action btn-secondary-action" onclick="generateShopWorksGuide()">
+                    <i class="fas fa-clipboard-list"></i> ShopWorks Entry Guide
+                </button>
             </div>
             </div><!-- End sidebar-scroll-container -->
 
@@ -949,6 +952,9 @@ Company:Absher Construction Company
 
     <!-- ShopWorks Import Parser -->
     <script src="/shared_components/js/shopworks-import-parser.js?v=20260204-decg-error"></script>
+
+    <!-- ShopWorks Data Entry Guide Generator -->
+    <script src="/shared_components/js/shopworks-guide-generator.js?v=20260205"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -1826,8 +1832,6 @@ Company:Absher Construction Company
 
         function restoreEmbroideryDraft(draft) {
             if (!draft) return;
-
-            console.log('[Embroidery] Restoring draft:', draft);
 
             // Restore customer info
             if (draft.customerName) {
@@ -2741,7 +2745,7 @@ Company:Absher Construction Company
 
                 // Auto-load exact matches immediately
                 onExactMatch: (product) => {
-                    console.log('[Embroidery] Exact match found:', product.value);
+                    // Exact match found
                     searchInput.value = '';
                     selectProduct(product.value);
                 },
@@ -2758,7 +2762,7 @@ Company:Absher Construction Company
 
                 // Keyboard navigation: select item via Enter
                 onSelect: (product) => {
-                    console.log('[Embroidery] Keyboard selected:', product.value);
+                    // Keyboard selected product
                     searchInput.value = '';
                     selectProduct(product.value);
                 },
@@ -2806,7 +2810,7 @@ Company:Absher Construction Company
                 }
             });
 
-            console.log('[Embroidery] Search autocomplete initialized with ExactMatchSearch');
+            // Search autocomplete initialized
         }
 
         /**
@@ -5187,8 +5191,6 @@ Company:Absher Construction Company
                 // Collect extended sizes from CHILD ROWS - GROUP BY COLOR
                 // Child rows may have different colors than parent
                 const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
-                // BUG DIAGNOSTIC 2026-02-01: Log child row collection for tall-only products
-                console.log(`[collectProducts] Parent ${style} rowId=${rowId}, found ${childRows.length} child rows`);
                 childRows.forEach(childRow => {
                     const size = childRow.dataset.extendedSize;
                     const childColor = childRow.dataset.color;
@@ -5251,15 +5253,6 @@ Company:Absher Construction Company
                 if (a.isCap === b.isCap) return 0;
                 return a.isCap ? 1 : -1; // Garments first, caps last
             });
-
-            // BUG DIAGNOSTIC 2026-02-01: Log final products collected
-            console.log(`[collectProducts] Final products: ${products.length}`, products.map(p => ({
-                style: p.style,
-                color: p.color,
-                qty: p.totalQuantity,
-                sizes: Object.keys(p.sizeBreakdown).join(','),
-                isCap: p.isCap
-            })));
 
             return products;
         }
@@ -5716,6 +5709,156 @@ Company:Absher Construction Company
         }
 
         /**
+         * Generate ShopWorks Data Entry Guide
+         * Collects products + fees, opens printable guide with all line items
+         */
+        async function generateShopWorksGuide() {
+            const products = collectProductsFromTable();
+            if (products.length === 0) {
+                showToast('Add products before generating guide', 'error');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                // Build logo configs
+                const logoConfigs = {
+                    garment: {
+                        primary: { ...primaryLogo, id: 'primary' },
+                        additional: additionalLogos
+                    },
+                    cap: {
+                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
+                        additional: capAdditionalLogos
+                    }
+                };
+
+                const allLogos = [
+                    { ...primaryLogo, id: 'primary' },
+                    ...additionalLogos
+                ];
+
+                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                const additionalCharges = getAdditionalCharges();
+
+                // Build fee items array for the guide (only non-zero fees)
+                const feeItems = [];
+
+                // Extra stitches - garments (AS-GARM)
+                if (pricing.garmentStitchTotal > 0) {
+                    const garmentQty = pricing.garmentQuantity || 0;
+                    const unitPrice = garmentQty > 0 ? pricing.garmentStitchTotal / garmentQty : pricing.garmentStitchTotal;
+                    feeItems.push({ partNumber: 'AS-GARM', description: 'Extra Stitches - Garments', quantity: garmentQty || 1, unitPrice: unitPrice, lineTotal: pricing.garmentStitchTotal });
+                }
+
+                // Extra stitches - caps (AS-CAP)
+                if (pricing.capStitchTotal > 0) {
+                    const capQty = pricing.capQuantity || 0;
+                    const unitPrice = capQty > 0 ? pricing.capStitchTotal / capQty : pricing.capStitchTotal;
+                    feeItems.push({ partNumber: 'AS-CAP', description: 'Extra Stitches - Caps', quantity: capQty || 1, unitPrice: unitPrice, lineTotal: pricing.capStitchTotal });
+                }
+
+                // Digitizing - garments (DD)
+                if (pricing.garmentSetupFees > 0) {
+                    feeItems.push({ partNumber: 'DD', description: 'Digitizing - Garments', quantity: 1, unitPrice: pricing.garmentSetupFees, lineTotal: pricing.garmentSetupFees });
+                }
+
+                // Digitizing - caps (DD)
+                if (pricing.capSetupFees > 0) {
+                    feeItems.push({ partNumber: 'DD', description: 'Digitizing - Caps', quantity: 1, unitPrice: pricing.capSetupFees, lineTotal: pricing.capSetupFees });
+                }
+
+                // Art/Setup (GRT-50)
+                if (additionalCharges.artCharge > 0) {
+                    feeItems.push({ partNumber: 'GRT-50', description: 'Art/Setup Fee', quantity: 1, unitPrice: additionalCharges.artCharge, lineTotal: additionalCharges.artCharge });
+                }
+
+                // Graphic Design (GRT-75)
+                if (additionalCharges.graphicDesignCharge > 0) {
+                    feeItems.push({ partNumber: 'GRT-75', description: 'Graphic Design Services', quantity: additionalCharges.graphicDesignHours || 1, unitPrice: 75, lineTotal: additionalCharges.graphicDesignCharge });
+                }
+
+                // Rush (RUSH)
+                if (additionalCharges.rushFee > 0) {
+                    feeItems.push({ partNumber: 'RUSH', description: 'Rush Order Fee', quantity: 1, unitPrice: additionalCharges.rushFee, lineTotal: additionalCharges.rushFee });
+                }
+
+                // Sample (SAMPLE)
+                if (additionalCharges.sampleFee > 0) {
+                    const sampleQty = additionalCharges.sampleQty || 1;
+                    feeItems.push({ partNumber: 'SAMPLE', description: 'Sample Fee', quantity: sampleQty, unitPrice: additionalCharges.sampleFee / sampleQty, lineTotal: additionalCharges.sampleFee });
+                }
+
+                // LTM - Garments
+                if (pricing.garmentLtmFee > 0) {
+                    feeItems.push({ partNumber: 'LTM', description: 'Less Than Minimum - Garments', quantity: 1, unitPrice: pricing.garmentLtmFee, lineTotal: pricing.garmentLtmFee });
+                }
+
+                // LTM - Caps
+                if (pricing.capLtmFee > 0) {
+                    feeItems.push({ partNumber: 'LTM', description: 'Less Than Minimum - Caps', quantity: 1, unitPrice: pricing.capLtmFee, lineTotal: pricing.capLtmFee });
+                }
+
+                // Discount (negative)
+                if (additionalCharges.discount > 0) {
+                    const reason = additionalCharges.discountReason ? `Discount - ${additionalCharges.discountReason}` : 'Discount';
+                    feeItems.push({ partNumber: 'DISCOUNT', description: reason, quantity: 1, unitPrice: -additionalCharges.discount, lineTotal: -additionalCharges.discount });
+                }
+
+                // Build quoteData for the guide
+                const customerName = document.getElementById('customer-name')?.value || 'Customer';
+                const quoteID = editingQuoteId || 'DRAFT';
+
+                // Build product objects with size-specific pricing for the guide
+                const guideProducts = [];
+                for (const pp of pricing.products) {
+                    for (const lineItem of pp.lineItems) {
+                        const sizeBreakdown = lineItem.description
+                            ? quoteService.parseDescriptionToSizeBreakdown(lineItem.description)
+                            : {};
+
+                        // Build per-size pricing from lineItem data
+                        const sizesPricing = {};
+                        Object.keys(sizeBreakdown).forEach(size => {
+                            sizesPricing[size] = lineItem.unitPriceWithLTM || lineItem.unitPrice;
+                        });
+
+                        guideProducts.push({
+                            StyleNumber: pp.product.style,
+                            ProductName: `${pp.product.title} - ${pp.product.color}`,
+                            Color: pp.product.color,
+                            CatalogColor: pp.product.catalogColor || '',
+                            SizeBreakdown: sizeBreakdown,
+                            FinalUnitPrice: lineItem.unitPriceWithLTM || lineItem.unitPrice,
+                            BaseUnitPrice: lineItem.basePrice || lineItem.unitPrice,
+                            SizesPricing: sizesPricing
+                        });
+                    }
+                }
+
+                const quoteData = {
+                    products: guideProducts,
+                    feeItems: feeItems,
+                    CustomerName: customerName,
+                    QuoteID: quoteID,
+                    TotalQuantity: pricing.totalQuantity,
+                    Notes: ''
+                };
+
+                const generator = new ShopWorksGuideGenerator();
+                generator.generateGuide(quoteData);
+
+                showToast('Opening ShopWorks guide...', 'success');
+            } catch (error) {
+                console.error('ShopWorks guide error:', error);
+                showToast('Error generating ShopWorks guide', 'error');
+            }
+
+            showLoading(false);
+        }
+
+        /**
          * Save quote and get shareable link
          * Uses EmbroideryQuoteService and QuoteShareModal
          */
@@ -5770,18 +5913,7 @@ Company:Absher Construction Company
                     }
                 };
 
-                // BUG DIAGNOSTIC 2026-02-01: Log products collected before pricing
-                console.log('[Embroidery] Products collected:', products.length, products.map(p => `${p.style}:${p.totalQuantity}`));
-
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
-
-                // BUG DIAGNOSTIC 2026-02-01: Log pricing results
-                console.log('[Embroidery] Pricing products:', pricing.products?.length || 0);
-                if (pricing.products && pricing.products.length > 0) {
-                    pricing.products.forEach((pp, i) => {
-                        console.log(`[Embroidery] Pricing product ${i + 1}: ${pp.product?.style} - ${pp.lineItems?.length || 0} line items, subtotal: $${pp.subtotal?.toFixed(2)}`);
-                    });
-                }
 
                 // Get sales rep NAME from dropdown selected option text
                 const salesRepSelect = document.getElementById('sales-rep');
@@ -5833,7 +5965,6 @@ Company:Absher Construction Company
                 let result;
                 if (editingQuoteId) {
                     // Edit mode: Update existing quote (save revision)
-                    console.log('[Embroidery] Updating quote:', editingQuoteId);
                     result = await quoteService.updateQuote(editingQuoteId, quoteData, customerData, pricing);
                 } else {
                     // New quote mode: Create new quote
@@ -5842,8 +5973,6 @@ Company:Absher Construction Company
 
                 if (result && result.quoteID) {
                     const isUpdate = !!editingQuoteId;
-                    console.log(`[Embroidery] Quote ${isUpdate ? 'updated' : 'saved'}:`, result.quoteID);
-
                     // Clear auto-save draft on successful save (2026 consolidation)
                     if (embPersistence) {
                         embPersistence.clearDraft();

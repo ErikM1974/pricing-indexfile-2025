@@ -3,6 +3,10 @@
  * Generates a printable HTML/PDF document showing exactly how to enter
  * embroidery quotes into ShopWorks with correct part numbers and formatting.
  *
+ * Supports:
+ * - Product line items (garments/caps with size breakdowns)
+ * - Fee/charge line items (digitizing, stitch charges, art, rush, LTM, etc.)
+ *
  * CRITICAL: Uses _2X format (NOT _2XL) for oversize part numbers to match ShopWorks inventory
  */
 
@@ -44,24 +48,23 @@ class ShopWorksGuideGenerator {
             // One size
             'OSFA': '_OSFA'
         };
-
-        console.log('[ShopWorksGuide] Generator initialized');
     }
 
     /**
      * Generate ShopWorks entry guide from quote data
      * Opens in new window for preview with manual print button
+     * @param {Object} quoteData - Quote data with products and optional feeItems array
      */
     generateGuide(quoteData) {
-        console.log('[ShopWorksGuide] Generating guide for:', quoteData);
-
         try {
             // Parse quote data into ShopWorks line items
             const lineItems = this.parseQuoteIntoLineItems(quoteData);
-            console.log('[ShopWorksGuide] Parsed into line items:', lineItems);
+
+            // Get fee items (passed in quoteData or empty)
+            const feeItems = quoteData.feeItems || [];
 
             // Generate HTML document
-            const html = this.generateHTML(lineItems, quoteData);
+            const html = this.generateHTML(lineItems, feeItems, quoteData);
 
             // Open in new window
             const printWindow = window.open('', '_blank', 'width=1200,height=800');
@@ -78,8 +81,6 @@ class ShopWorksGuideGenerator {
                 printWindow.focus();
                 printWindow.print();
             }, 500);
-
-            console.log('[ShopWorksGuide] Guide opened in new window');
 
         } catch (error) {
             console.error('[ShopWorksGuide] Error generating guide:', error);
@@ -98,10 +99,6 @@ class ShopWorksGuideGenerator {
         const products = quoteData.products || [quoteData];
 
         products.forEach(product => {
-            console.log('[ShopWorksGuide] Processing product:', product);
-            console.log('[ShopWorksGuide] product.SizeBreakdown type:', typeof product.SizeBreakdown);
-            console.log('[ShopWorksGuide] product.SizeBreakdown value:', product.SizeBreakdown);
-
             // Parse size breakdown
             let sizeBreakdown = {};
             if (typeof product.SizeBreakdown === 'string') {
@@ -113,9 +110,6 @@ class ShopWorksGuideGenerator {
             } else if (typeof product.SizeBreakdown === 'object') {
                 sizeBreakdown = product.SizeBreakdown;
             }
-
-            console.log('[ShopWorksGuide] Parsed sizeBreakdown:', sizeBreakdown);
-            console.log('[ShopWorksGuide] sizeBreakdown keys:', Object.keys(sizeBreakdown));
 
             // Separate standard sizes from oversizes
             const standardSizes = {};
@@ -145,11 +139,11 @@ class ShopWorksGuideGenerator {
                     partNumber: product.StyleNumber || product.styleNumber,
                     colorRange: '',
                     color: product.Color || product.color || '',
-                    catalogColor: product.CatalogColor || product.catalogColor || '',  // ShopWorks catalog color format
+                    catalogColor: product.CatalogColor || product.catalogColor || '',
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks(standardSizes),
                     manualPrice: this.getStandardSizePrice(standardSizes, product),
-                    calcPrice: 'Off',  // Changed to Off since we're using final price with LTM included
+                    calcPrice: 'Off',
                     lineTotal: this.calculateLineTotal(standardSizes, product)
                 });
             }
@@ -164,11 +158,11 @@ class ShopWorksGuideGenerator {
                     partNumber: `${basePartNumber}${suffix}`,
                     colorRange: '',
                     color: product.Color || product.color || '',
-                    catalogColor: product.CatalogColor || product.catalogColor || '',  // ShopWorks catalog color format
+                    catalogColor: product.CatalogColor || product.catalogColor || '',
                     description: product.ProductName || product.productName || '',
                     sizes: this.formatSizesForShopWorks({ [size]: qty }),
                     manualPrice: this.getPriceForSize(size, product),
-                    calcPrice: 'Off',  // Changed to Off since we're using final price with LTM included
+                    calcPrice: 'Off',
                     lineTotal: qty * this.getPriceForSize(size, product)
                 });
             });
@@ -217,23 +211,22 @@ class ShopWorksGuideGenerator {
         const sizeUpper = size.toUpperCase();
 
         const columnMap = {
-            'XS': 'XXXL',   // XS goes in XXXL column (will be highlighted)
+            'XS': 'XXXL',
             'S': 'S',
             'M': 'M',
             'L': 'LG',      // ShopWorks uses "LG" not "L"
             'XL': 'XL',
-            'XXL': 'XXL',   // XXL can be written as 'XXL' or '2XL'
-            '2XL': 'XXL',   // 2XL goes in XXL column
-            '3XL': 'XXXL',  // True 3XL (no highlight)
-            '4XL': 'XXXL',  // 4XL and beyond go in XXXL column (will be highlighted)
+            'XXL': 'XXL',
+            '2XL': 'XXL',
+            '3XL': 'XXXL',
+            '4XL': 'XXXL',
             '5XL': 'XXXL',
             '6XL': 'XXXL',
             '7XL': 'XXXL',
             '8XL': 'XXXL',
             '9XL': 'XXXL',
             '10XL': 'XXXL',
-            'OSFA': 'XXXL', // One-size-fits-all goes in XXXL column (will be highlighted)
-            // Youth sizes
+            'OSFA': 'XXXL',
             'YXS': 'XXXL',
             'YS': 'XXXL',
             'YM': 'XXXL',
@@ -255,52 +248,38 @@ class ShopWorksGuideGenerator {
             Object.entries(sizes).forEach(([size, qty]) => {
                 const price = this.getPriceForSize(size, product);
                 total += qty * price;
-                console.log(`[ShopWorksGuide] Line total calculation for ${size}: ${qty} × $${price.toFixed(2)} = $${(qty * price).toFixed(2)}`);
             });
-            console.log(`[ShopWorksGuide] Total line total: $${total.toFixed(2)}`);
             return total;
         }
 
         // Fallback to using average price if size-specific pricing not available
         const totalQty = Object.values(sizes).reduce((a, b) => a + b, 0);
         const price = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-        console.log(`[ShopWorksGuide] Using average price: ${totalQty} × $${price.toFixed(2)} = $${(totalQty * price).toFixed(2)}`);
         return totalQty * price;
     }
 
     /**
      * Get price for specific size (handles size upcharges if needed)
-     * CHANGE #3: Enhanced to use size-specific pricing when available
      */
     getPriceForSize(size, product) {
         // First, check if size-specific pricing is available
         if (product.SizesPricing && product.SizesPricing[size]) {
-            const sizePrice = parseFloat(product.SizesPricing[size]);
-            console.log(`[ShopWorksGuide] Using size-specific price for ${size}: $${sizePrice.toFixed(2)}`);
-            return sizePrice;
+            return parseFloat(product.SizesPricing[size]);
         }
 
         // Fall back to final price (includes LTM) if size-specific pricing not available
-        const finalPrice = parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
-        console.log(`[ShopWorksGuide] Using final price for ${size}: $${finalPrice.toFixed(2)}`);
-        return finalPrice;
+        return parseFloat(product.FinalUnitPrice || product.BaseUnitPrice || 0);
     }
 
     /**
      * Get the price for standard sizes (S/M/L/XL)
      * Since all standard sizes have the same price, we can use any of them
-     * @param {Object} standardSizes - Object with standard size breakdown
-     * @param {Object} product - Product object with pricing data
-     * @returns {number} Price per piece for standard sizes
      */
     getStandardSizePrice(standardSizes, product) {
-        // Find first available standard size to get the price
         const firstSize = Object.keys(standardSizes).find(size => standardSizes[size] > 0);
 
         if (firstSize) {
-            const price = this.getPriceForSize(firstSize, product);
-            console.log(`[ShopWorksGuide] Using standard size price from ${firstSize}: $${price.toFixed(2)}`);
-            return price;
+            return this.getPriceForSize(firstSize, product);
         }
 
         // Fallback to FinalUnitPrice if no sizes found (shouldn't happen)
@@ -309,19 +288,53 @@ class ShopWorksGuideGenerator {
     }
 
     /**
-     * Generate HTML document
+     * Generate HTML document with product rows and fee rows
      */
-    generateHTML(lineItems, quoteData) {
+    generateHTML(lineItems, feeItems, quoteData) {
         const today = new Date().toLocaleDateString();
         const customerName = quoteData.CustomerName || quoteData.customerName || 'Customer';
         const quoteID = quoteData.QuoteID || quoteData.quoteID || 'N/A';
         const totalQty = quoteData.TotalQuantity || lineItems.reduce((sum, item) => sum + item.lineQty, 0);
-        const subtotal = quoteData.SubtotalAmount || lineItems.reduce((sum, item) => sum + item.lineTotal, 0);
+
+        // Product subtotal from line items
+        const productSubtotal = lineItems.reduce((sum, item) => sum + item.lineTotal, 0);
+
+        // Fee subtotal (positive fees minus discount)
+        const feeSubtotal = feeItems.reduce((sum, fee) => sum + fee.lineTotal, 0);
+
+        // Combined subtotal
+        const subtotal = quoteData.SubtotalAmount || (productSubtotal + feeSubtotal);
 
         // Calculate 10.1% Milton, WA sales tax
-        // Use passed tax amount if available, otherwise calculate from subtotal
         const tax = quoteData.SalesTaxAmount || (subtotal * 0.101);
         const total = quoteData.TotalAmount || (subtotal + tax);
+
+        // Generate fee rows HTML
+        const feeRowsHTML = feeItems.length > 0 ? `
+            <tr class="fee-section-header">
+                <td colspan="14" style="background: #1565c0; color: white; font-weight: bold; text-align: left; padding: 8px; font-size: 10pt;">
+                    FEES &amp; CHARGES
+                </td>
+            </tr>
+            ${feeItems.map((fee, idx) => `
+                <tr class="fee-row">
+                    <td>${fee.quantity}</td>
+                    <td class="part-number" style="color: #1565c0;">${fee.partNumber}</td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-left">${fee.description}</td>
+                    <td></td><td></td><td></td><td></td><td></td><td></td>
+                    <td>${fee.unitPrice != null ? '$' + fee.unitPrice.toFixed(2) : ''}</td>
+                    <td>Off</td>
+                    <td${fee.lineTotal < 0 ? ' style="color: #d32f2f; font-weight: bold;"' : ''}>$${fee.lineTotal.toFixed(2)}</td>
+                </tr>
+            `).join('')}
+        ` : '';
+
+        // Generate checklist items for fees
+        const feeChecklistItems = feeItems.map(fee =>
+            `<li>Enter <strong>${fee.partNumber}</strong> — ${fee.description} (${fee.quantity > 1 ? fee.quantity + ' × ' : ''}$${fee.lineTotal.toFixed(2)})</li>`
+        ).join('');
 
         return `<!DOCTYPE html>
 <html lang="en">
@@ -419,7 +432,7 @@ class ShopWorksGuideGenerator {
         }
 
         td.non-standard-xxxl::after {
-            content: " ⚠";  /* Warning icon */
+            content: " \\26A0";  /* Warning icon */
             color: #ff9800;
             font-size: 10pt;
         }
@@ -442,6 +455,15 @@ class ShopWorksGuideGenerator {
 
         .row-even {
             background: #f9f9f9;
+        }
+
+        /* Fee rows styling — light blue background */
+        .fee-row {
+            background: #e3f2fd !important;
+        }
+
+        .fee-row td {
+            border-color: #90caf9;
         }
 
         .totals {
@@ -484,6 +506,12 @@ class ShopWorksGuideGenerator {
             color: #2d5f3f;
         }
 
+        .checklist h4 {
+            margin: 15px 0 5px 0;
+            color: #1565c0;
+            font-size: 11pt;
+        }
+
         .checklist ul {
             list-style: none;
             padding: 0;
@@ -498,7 +526,7 @@ class ShopWorksGuideGenerator {
         }
 
         .checklist li:before {
-            content: '☐';
+            content: '\\2610';
             position: absolute;
             left: 0;
             font-size: 14pt;
@@ -539,7 +567,7 @@ class ShopWorksGuideGenerator {
     </style>
 </head>
 <body>
-    <button class="print-button no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="print-button no-print" onclick="window.print()">Print / Save as PDF</button>
 
     <div class="header">
         <h1>SHOPWORKS DATA ENTRY GUIDE</h1>
@@ -586,21 +614,43 @@ class ShopWorksGuideGenerator {
                     <td>$${item.lineTotal.toFixed(2)}</td>
                 </tr>
             `).join('')}
+            ${feeRowsHTML}
         </tbody>
     </table>
 
     <div class="totals">
         <h3>VERIFY THESE TOTALS IN SHOPWORKS:</h3>
         <p><span class="total-label">Total Product Quantity:</span> <span>${totalQty}</span></p>
-        <p><span class="total-label">Total Pricing Quantity:</span> <span>${totalQty}</span></p>
+        <p><span class="total-label">Product Subtotal:</span> <span>$${productSubtotal.toFixed(2)}</span></p>
+        ${feeItems.length > 0 ? `<p><span class="total-label">Fees &amp; Charges:</span> <span>$${feeSubtotal.toFixed(2)}</span></p>` : ''}
         <p><span class="total-label">Subtotal:</span> <span>$${subtotal.toFixed(2)}</span></p>
         ${tax > 0 ? `<p><span class="total-label">Sales Tax:</span> <span>$${tax.toFixed(2)}</span></p>` : ''}
         <p class="grand-total"><span class="total-label">GRAND TOTAL:</span> <span>$${total.toFixed(2)}</span></p>
     </div>
 
+    <div class="checklist">
+        <h3>DATA ENTRY CHECKLIST:</h3>
+        <ul>
+            ${lineItems.map(item =>
+                `<li>Enter <strong>${item.partNumber}</strong> — ${item.description} (${item.lineQty} pcs × $${item.manualPrice.toFixed(2)})</li>`
+            ).join('')}
+        </ul>
+        ${feeItems.length > 0 ? `
+        <h4>Fees &amp; Charges:</h4>
+        <ul>
+            ${feeChecklistItems}
+        </ul>
+        ` : ''}
+        <ul>
+            <li>Verify all line totals match</li>
+            <li>Verify grand total: <strong>$${total.toFixed(2)}</strong></li>
+            <li>Set Calc. Price to <strong>Off</strong> for all lines</li>
+        </ul>
+    </div>
+
     ${quoteData.Notes ? `
     <div class="notes">
-        <h4>📝 QUOTE NOTES:</h4>
+        <h4>QUOTE NOTES:</h4>
         <p>${quoteData.Notes}</p>
     </div>
     ` : ''}
@@ -612,5 +662,3 @@ class ShopWorksGuideGenerator {
 
 // Make available globally
 window.ShopWorksGuideGenerator = ShopWorksGuideGenerator;
-
-console.log('[ShopWorksGuide] Service loaded successfully');

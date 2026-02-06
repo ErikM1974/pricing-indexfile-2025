@@ -31,6 +31,22 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: /api/embroidery-costs Endpoint Always Returns 400
+**Date:** 2026-02-05
+**Project:** [caspio-proxy]
+**Problem:** `GET /api/embroidery-costs?itemType=Shirt&stitchCount=8000` always returned 400. The endpoint appeared non-functional since creation.
+**Root Cause:** WHERE clause referenced `StitchCountRange` (non-existent field). The actual Caspio field is `StitchCount`. Also the value was quoted as a string (`'8000'`) but it's a numeric field.
+**Solution:** Changed `StitchCountRange='${stitchCount}'` to `StitchCount=${stitchCountInt}`. Added itemType whitelist and integer validation for security.
+**Prevention:** When writing Caspio WHERE clauses, always verify field names against the actual table schema. Use the Caspio DataPage builder to confirm field names.
+**File:** `caspio-pricing-proxy/src/routes/pricing.js`
+
+## Discovery: Fee Items Not Saved as quote_items Line Items
+**Date:** 2026-02-05
+**Project:** [Pricing Index]
+**Problem:** Embroidery quote fees (digitizing, stitch charges, art, rush, LTM, discount) were stored ONLY as session-level fields on `quote_sessions`. ShopWorks order entry was incomplete because each fee has a specific part number that should appear as a separate line.
+**Solution:** Added `_saveFeeLineItems()` method to `embroidery-quote-service.js`. Saves 11 fee types as `quote_items` with `EmbellishmentType: 'fee'` and correct ShopWorks part numbers (AS-GARM, AS-CAP, DD, GRT-50, GRT-75, RUSH, SAMPLE, LTM, DISCOUNT).
+**Prevention:** When adding new charge types to quote builders, always consider: does this need its own line item for ShopWorks order entry?
+
 ## Bug: Garment Tracker Archive Silently Archiving 0 Records for 11 Days
 **Date:** 2026-02-05
 **Project:** [caspio-proxy]

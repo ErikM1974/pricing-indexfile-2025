@@ -99,7 +99,7 @@ class EmbroideryQuoteService {
             const items = await response.json();
             if (!items || !items.length) return;
 
-            console.log(`[EmbroideryQuoteService] Deleting ${items.length} existing items for ${quoteID}`);
+            // Delete existing items before re-saving
 
             // Delete items in parallel batches for speed (10 at a time to avoid overwhelming server)
             const batchSize = 10;
@@ -126,15 +126,8 @@ class EmbroideryQuoteService {
      */
     async saveQuote(quoteData, customerData, pricingResults) {
         try {
-            // BUG DIAGNOSTIC 2026-02-01: Log products to identify missing items
-            console.log('[EmbroideryQuoteService] Products to save:', pricingResults.products?.length || 0);
             if (!pricingResults.products || pricingResults.products.length === 0) {
                 console.warn('[EmbroideryQuoteService] WARNING: No products in pricingResults!');
-                console.warn('[EmbroideryQuoteService] pricingResults keys:', Object.keys(pricingResults));
-            } else {
-                pricingResults.products.forEach((pp, i) => {
-                    console.log(`[EmbroideryQuoteService] Product ${i + 1}: ${pp.product?.style || 'NO STYLE'} - ${pp.lineItems?.length || 0} line items`);
-                });
             }
 
             const quoteID = await this.generateQuoteID();
@@ -418,8 +411,15 @@ class EmbroideryQuoteService {
                 }
             }
 
-            console.log('[EmbroideryQuoteService] Quote saved:', quoteID,
-                failedItems > 0 ? `(${failedItems} items failed)` : '');
+            // Save fee/charge items as line items (ShopWorks part numbers)
+            const feeResult = await this._saveFeeLineItems(quoteID, lineNumber, sessionData, pricingResults);
+            lineNumber = feeResult.lineNumber;
+            totalItems += feeResult.totalItems;
+            failedItems += feeResult.failedItems;
+
+            if (failedItems > 0) {
+                console.warn(`[EmbroideryQuoteService] Quote saved with ${failedItems} failed items:`, quoteID);
+            }
 
             return {
                 success: true,
@@ -435,6 +435,199 @@ class EmbroideryQuoteService {
         }
     }
     
+    /**
+     * Save fee/charge items as quote_items with ShopWorks part numbers.
+     * Called by both saveQuote() and updateQuote() to avoid duplication.
+     * Only saves fees with non-zero values.
+     */
+    async _saveFeeLineItems(quoteID, startLineNumber, sessionData, pricingResults) {
+        let lineNumber = startLineNumber;
+        let failedItems = 0;
+        let totalItems = 0;
+        const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+
+        // Build fee items array — only include non-zero fees
+        const feeItems = [];
+
+        // Extra stitches - garment (AS-GARM)
+        if (sessionData.GarmentStitchCharge > 0) {
+            const garmentQty = pricingResults.garmentQuantity || 0;
+            const unitPrice = garmentQty > 0 ? parseFloat((sessionData.GarmentStitchCharge / garmentQty).toFixed(4)) : sessionData.GarmentStitchCharge;
+            feeItems.push({
+                StyleNumber: 'AS-GARM',
+                ProductName: 'Extra Stitches - Garments',
+                Quantity: garmentQty || 1,
+                BaseUnitPrice: unitPrice,
+                FinalUnitPrice: unitPrice,
+                LineTotal: sessionData.GarmentStitchCharge
+            });
+        }
+
+        // Extra stitches - cap (AS-CAP)
+        if (sessionData.CapStitchCharge > 0) {
+            const capQty = pricingResults.capQuantity || 0;
+            const unitPrice = capQty > 0 ? parseFloat((sessionData.CapStitchCharge / capQty).toFixed(4)) : sessionData.CapStitchCharge;
+            feeItems.push({
+                StyleNumber: 'AS-CAP',
+                ProductName: 'Extra Stitches - Caps',
+                Quantity: capQty || 1,
+                BaseUnitPrice: unitPrice,
+                FinalUnitPrice: unitPrice,
+                LineTotal: sessionData.CapStitchCharge
+            });
+        }
+
+        // Digitizing - garment (DD)
+        if (sessionData.GarmentDigitizing > 0) {
+            feeItems.push({
+                StyleNumber: 'DD',
+                ProductName: 'Digitizing - Garments',
+                Quantity: 1,
+                BaseUnitPrice: sessionData.GarmentDigitizing,
+                FinalUnitPrice: sessionData.GarmentDigitizing,
+                LineTotal: sessionData.GarmentDigitizing
+            });
+        }
+
+        // Digitizing - cap (DD)
+        if (sessionData.CapDigitizing > 0) {
+            feeItems.push({
+                StyleNumber: 'DD',
+                ProductName: 'Digitizing - Caps',
+                Quantity: 1,
+                BaseUnitPrice: sessionData.CapDigitizing,
+                FinalUnitPrice: sessionData.CapDigitizing,
+                LineTotal: sessionData.CapDigitizing
+            });
+        }
+
+        // Art/Setup (GRT-50)
+        if (sessionData.ArtCharge > 0) {
+            feeItems.push({
+                StyleNumber: 'GRT-50',
+                ProductName: 'Art/Setup Fee',
+                Quantity: 1,
+                BaseUnitPrice: sessionData.ArtCharge,
+                FinalUnitPrice: sessionData.ArtCharge,
+                LineTotal: sessionData.ArtCharge
+            });
+        }
+
+        // Graphic Design (GRT-75)
+        if (sessionData.GraphicDesignCharge > 0) {
+            feeItems.push({
+                StyleNumber: 'GRT-75',
+                ProductName: 'Graphic Design Services',
+                Quantity: sessionData.GraphicDesignHours || 1,
+                BaseUnitPrice: 75,
+                FinalUnitPrice: 75,
+                LineTotal: sessionData.GraphicDesignCharge
+            });
+        }
+
+        // Rush (RUSH)
+        if (sessionData.RushFee > 0) {
+            feeItems.push({
+                StyleNumber: 'RUSH',
+                ProductName: 'Rush Order Fee',
+                Quantity: 1,
+                BaseUnitPrice: sessionData.RushFee,
+                FinalUnitPrice: sessionData.RushFee,
+                LineTotal: sessionData.RushFee
+            });
+        }
+
+        // Sample (SAMPLE)
+        if (sessionData.SampleFee > 0) {
+            feeItems.push({
+                StyleNumber: 'SAMPLE',
+                ProductName: 'Sample Fee',
+                Quantity: sessionData.SampleQty || 1,
+                BaseUnitPrice: parseFloat(((sessionData.SampleFee) / (sessionData.SampleQty || 1)).toFixed(2)),
+                FinalUnitPrice: parseFloat(((sessionData.SampleFee) / (sessionData.SampleQty || 1)).toFixed(2)),
+                LineTotal: sessionData.SampleFee
+            });
+        }
+
+        // LTM - Garments (LTM)
+        if (sessionData.LTM_Garment > 0) {
+            feeItems.push({
+                StyleNumber: 'LTM',
+                ProductName: 'Less Than Minimum - Garments',
+                Quantity: 1,
+                BaseUnitPrice: sessionData.LTM_Garment,
+                FinalUnitPrice: sessionData.LTM_Garment,
+                LineTotal: sessionData.LTM_Garment
+            });
+        }
+
+        // LTM - Caps (LTM)
+        if (sessionData.LTM_Cap > 0) {
+            feeItems.push({
+                StyleNumber: 'LTM',
+                ProductName: 'Less Than Minimum - Caps',
+                Quantity: 1,
+                BaseUnitPrice: sessionData.LTM_Cap,
+                FinalUnitPrice: sessionData.LTM_Cap,
+                LineTotal: sessionData.LTM_Cap
+            });
+        }
+
+        // Discount (DISCOUNT) — stored as negative
+        if (sessionData.Discount > 0) {
+            feeItems.push({
+                StyleNumber: 'DISCOUNT',
+                ProductName: sessionData.DiscountReason
+                    ? `Discount - ${sessionData.DiscountReason}`
+                    : 'Discount',
+                Quantity: 1,
+                BaseUnitPrice: -sessionData.Discount,
+                FinalUnitPrice: -sessionData.Discount,
+                LineTotal: -sessionData.Discount
+            });
+        }
+
+        // Save each fee item
+        for (const fee of feeItems) {
+            const itemData = {
+                QuoteID: quoteID,
+                LineNumber: lineNumber++,
+                StyleNumber: fee.StyleNumber,
+                ProductName: fee.ProductName,
+                Color: '',
+                ColorCode: '',
+                EmbellishmentType: 'fee',
+                PrintLocation: '',
+                PrintLocationName: '',
+                Quantity: fee.Quantity,
+                HasLTM: 'No',
+                BaseUnitPrice: parseFloat(fee.BaseUnitPrice.toFixed(2)),
+                LTMPerUnit: 0,
+                FinalUnitPrice: parseFloat(fee.FinalUnitPrice.toFixed(2)),
+                LineTotal: parseFloat(fee.LineTotal.toFixed(2)),
+                SizeBreakdown: '',
+                PricingTier: '',
+                ImageURL: '',
+                AddedAt: addedAt,
+                LogoSpecs: ''
+            };
+
+            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(itemData)
+            });
+
+            totalItems++;
+            if (!itemResponse.ok) {
+                console.error('[EmbroideryQuoteService] Fee item save failed:', fee.StyleNumber);
+                failedItems++;
+            }
+        }
+
+        return { lineNumber, totalItems, failedItems };
+    }
+
     /**
      * Send quote email
      */
@@ -506,8 +699,6 @@ class EmbroideryQuoteService {
                 logoCount: (pricingResults.logos?.length || 0).toString()
             };
             
-            console.log('[EmbroideryQuoteService] Email data being sent:', emailData);
-            
             // Send email
             const result = await emailjs.send(
                 'service_1c4k67j',
@@ -515,7 +706,6 @@ class EmbroideryQuoteService {
                 emailData
             );
             
-            console.log('[EmbroideryQuoteService] Email sent successfully');
             return { success: true, result: result };
             
         } catch (error) {
@@ -558,9 +748,6 @@ class EmbroideryQuoteService {
                 .filter(service => service.type === 'additional_logo')
                 .reduce((sum, service) => sum + service.unitPrice, 0);
         }
-        
-        console.log('[EmbroideryQuoteService] Total AL cost per piece for email:', totalAdditionalLogoCost);
-        console.log('[EmbroideryQuoteService] Additional services:', pricingResults.additionalServices);
         
         let html = '';
         pricingResults.products.forEach(pp => {
@@ -804,7 +991,7 @@ class EmbroideryQuoteService {
      */
     async loadQuote(quoteId) {
         try {
-            console.log('[EmbroideryQuoteService] Loading quote:', quoteId);
+            // Load quote session and items
 
             // Fetch session data
             const sessionResponse = await fetch(
@@ -833,12 +1020,6 @@ class EmbroideryQuoteService {
 
             const items = await itemsResponse.json();
 
-            console.log('[EmbroideryQuoteService] Loaded quote:', {
-                quoteId,
-                session: session,
-                itemCount: items?.length || 0
-            });
-
             return {
                 success: true,
                 session: session,
@@ -860,7 +1041,7 @@ class EmbroideryQuoteService {
      */
     async updateQuote(quoteId, quoteData, customerData, pricingResults, revisionNotes = '') {
         try {
-            console.log('[EmbroideryQuoteService] Updating quote:', quoteId);
+            // Update existing quote with new data
 
             // Get current session to find PK_ID and revision number
             const loadResult = await this.loadQuote(quoteId);
@@ -1119,8 +1300,15 @@ class EmbroideryQuoteService {
                 }
             }
 
-            console.log('[EmbroideryQuoteService] Quote updated:', quoteId, 'Revision:', newRevision,
-                failedItems > 0 ? `(${failedItems} items failed)` : '');
+            // Save fee/charge items as line items (ShopWorks part numbers)
+            const feeResult = await this._saveFeeLineItems(quoteId, lineNumber, sessionData, pricingResults);
+            lineNumber = feeResult.lineNumber;
+            totalItems += feeResult.totalItems;
+            failedItems += feeResult.failedItems;
+
+            if (failedItems > 0) {
+                console.warn(`[EmbroideryQuoteService] Quote updated with ${failedItems} failed items:`, quoteId);
+            }
 
             return {
                 success: true,
