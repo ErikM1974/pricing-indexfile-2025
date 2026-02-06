@@ -119,6 +119,15 @@
 | `/calculators/richardson-factory-direct.js` | Richardson pricing lookup (2026 refactor - simplified) | API pricing-bundle | ✅ Active |
 | `/calculators/richardson-2025-styles.css` | Richardson page styles | - | ✅ Active |
 
+### Webstore System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/webstores.html` | Webstore quote + fundraiser calculator | webstores-calculator.js, webstores-fundraiser.js, webstores-styles.css | ✅ Active |
+| `/calculators/webstores-calculator.js` | Webstore setup quote logic + email | webstores-quote-service.js, EmailJS | ✅ Active |
+| `/calculators/webstores-fundraiser.js` | **NEW** Fundraiser/donation pricing calculator | — | ✅ Active |
+| `/calculators/webstores-quote-service.js` | Webstore quote save service | base-quote-service.js | ✅ Active |
+| `/calculators/webstores-styles.css` | Webstore + fundraiser styles | calculator-base.css | ✅ Active |
+
 ### Special Calculators
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|

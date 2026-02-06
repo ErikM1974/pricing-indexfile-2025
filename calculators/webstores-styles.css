@@ -2,7 +2,70 @@
 /* WEBSTORES CALCULATOR SPECIFIC STYLES        */
 /* ============================================ */
 
-/* Store Type Selection */
+/* ============================================
+   TAB NAVIGATION
+   ============================================ */
+.ws-tab-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 2rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.ws-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ws-tab:hover {
+    color: var(--text-primary);
+    background: var(--hover-bg);
+}
+
+.ws-tab.active {
+    background: var(--primary-green);
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.25);
+}
+
+.ws-tab i {
+    font-size: 1rem;
+}
+
+/* Tab Panels */
+.ws-tab-panel {
+    display: none;
+}
+
+.ws-tab-panel.active {
+    display: block;
+    animation: tabFadeIn 0.3s ease;
+}
+
+@keyframes tabFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   STORE TYPE SELECTION (Tab 1)
+   ============================================ */
 .store-type-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -47,7 +110,9 @@
     color: var(--text-primary);
 }
 
-/* Information Accordion */
+/* ============================================
+   INFORMATION ACCORDION (Tab 1)
+   ============================================ */
 .info-section {
     margin-top: 3rem;
 }
@@ -195,29 +260,454 @@
     font-weight: 400;
 }
 
-/* Webstore-specific responsive */
+/* ============================================
+   FUNDRAISER CALCULATOR (Tab 2)
+   ============================================ */
+
+/* Subtitle */
+.fr-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: -0.75rem 0 1.5rem 0;
+}
+
+/* Main price input */
+.fr-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.fr-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.fr-input {
+    width: 100%;
+    padding: 14px 14px 14px 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: #fffdf5;
+    border: 2px solid #e9c46a;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fr-input:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+}
+
+.fr-input::placeholder {
+    color: #ccc;
+    font-weight: 400;
+}
+
+/* Hint text */
+.fr-hint {
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+/* Advanced toggle */
+.fr-advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.5rem 0;
+}
+
+.fr-adv-text {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.fr-adv-arrow {
+    font-size: 10px;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.fr-advanced-toggle.open .fr-adv-arrow {
+    transform: rotate(90deg);
+}
+
+.fr-advanced-section {
+    display: none;
+    padding-bottom: 12px;
+}
+
+.fr-advanced-section.show {
+    display: block;
+    animation: tabFadeIn 0.2s ease;
+}
+
+/* Small input rows (advanced) */
+.fr-small-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.fr-small-group label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.fr-small-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.fr-small-input {
+    width: 100%;
+    padding: 10px 32px 10px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: white;
+    border: 1.5px solid var(--border-color);
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.fr-small-input.has-prefix {
+    padding-left: 26px;
+}
+
+.fr-small-input:focus {
+    border-color: var(--primary-green);
+}
+
+.fr-suffix {
+    position: absolute;
+    right: 10px;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.fr-small-prefix {
+    position: absolute;
+    left: 10px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Fixed costs display grid */
+.fr-fixed-costs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+    margin-bottom: 1rem;
+}
+
+.fr-fixed-item {
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.fr-fc-label {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.fr-fc-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 2px;
+}
+
+/* Rounding note */
+.fr-rounding-note {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-left: 3px solid var(--primary-green);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+}
+
+.fr-rounding-note p {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.fr-rounding-note strong {
+    color: var(--primary-dark);
+}
+
+/* ============================================
+   FUNDRAISER RESULT CARD
+   ============================================ */
+.fr-result-card {
+    background: linear-gradient(145deg, #0f2b3c, #1a3d52);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(15, 43, 60, 0.2);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.fr-result-card::before {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(76, 179, 84, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.fr-result-card::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(233, 196, 106, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.fr-result-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #e9c46a;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.fr-result-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.fr-result-price.empty {
+    font-size: 1.25rem;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.fr-result-note {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Breakdown */
+.fr-breakdown {
+    margin-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    text-align: left;
+    position: relative;
+    z-index: 1;
+}
+
+.fr-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.8125rem;
+}
+
+.fr-br-label {
+    color: rgba(255,255,255,0.6);
+}
+
+.fr-br-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.8125rem;
+}
+
+.fr-breakdown-row.fr-total {
+    border-top: 1px solid rgba(255,255,255,0.15);
+    margin-top: 8px;
+    padding-top: 12px;
+}
+
+.fr-breakdown-row.fr-total .fr-br-label {
+    color: #e9c46a;
+    font-weight: 700;
+}
+
+.fr-breakdown-row.fr-total .fr-br-value {
+    color: #4CAF50;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.fr-breakdown-row.negative .fr-br-value {
+    color: #E76F51;
+}
+
+/* Customer Message */
+.fr-customer-msg {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: left;
+    position: relative;
+    z-index: 1;
+}
+
+.fr-cm-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #F4A261;
+    margin-bottom: 10px;
+}
+
+.fr-cm-text {
+    font-size: 0.9375rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.fr-cm-text span {
+    font-weight: 700;
+    color: #4CAF50;
+    font-style: normal;
+}
+
+/* Tax Note */
+.fr-tax-note {
+    margin-top: 20px;
+    background: rgba(233, 196, 106, 0.1);
+    border-left: 3px solid rgba(233, 196, 106, 0.4);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    text-align: left;
+    position: relative;
+    z-index: 1;
+}
+
+.fr-tax-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #e9c46a;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fr-tax-note p {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.fr-tax-note strong {
+    color: rgba(255,255,255,0.8);
+}
+
+/* ============================================
+   RESPONSIVE STYLES
+   ============================================ */
 @media (max-width: 768px) {
     .store-type-container {
         grid-template-columns: 1fr;
     }
-    
+
     .info-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .accordion-body {
         padding: 0 1rem 1rem;
     }
+
+    .ws-tab-nav {
+        flex-direction: column;
+    }
+
+    .fr-small-row {
+        grid-template-columns: 1fr;
+    }
+
+    .fr-fixed-costs {
+        grid-template-columns: 1fr;
+    }
+
+    .fr-result-price {
+        font-size: 2.75rem;
+    }
 }
 
-/* Print styles */
+/* ============================================
+   PRINT STYLES
+   ============================================ */
 @media print {
     .info-section,
-    .accordion {
+    .accordion,
+    .ws-tab-nav {
         display: none !important;
     }
-    
+
     .store-type-card {
         break-inside: avoid;
+    }
+
+    .ws-tab-panel {
+        display: block !important;
     }
 }

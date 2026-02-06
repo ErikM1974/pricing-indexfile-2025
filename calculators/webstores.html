@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Webstore Quote Calculator - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
     <!-- EmailJS SDK -->
@@ -20,6 +20,8 @@
     <script src="webstores-quote-service.js"></script>
     <!-- Webstore Calculator Class -->
     <script src="webstores-calculator.js"></script>
+    <!-- Fundraiser Calculator -->
+    <script src="webstores-fundraiser.js"></script>
     
     <!-- Shared Calculator Styles -->
     <link href="../shared_components/css/calculator-base.css" rel="stylesheet">
@@ -54,8 +56,23 @@
     <main class="main-container">
         <h1 class="calculator-title">
             <i class="fas fa-store"></i>
-            Webstore Quote Calculator
+            Webstore Tools
         </h1>
+
+        <!-- Tab Navigation -->
+        <div class="ws-tab-nav">
+            <button class="ws-tab active" data-tab="tab-setup">
+                <i class="fas fa-cog"></i>
+                Store Setup Quote
+            </button>
+            <button class="ws-tab" data-tab="tab-fundraiser">
+                <i class="fas fa-hand-holding-heart"></i>
+                Donation Calculator
+            </button>
+        </div>
+
+        <!-- TAB 1: Webstore Setup Quote -->
+        <div class="ws-tab-panel active" id="tab-setup">
 
         <div class="calculator-grid">
             <!-- Input Section -->
@@ -257,6 +274,156 @@
                 </div>
             </div>
         </div>
+
+        </div><!-- end tab-setup -->
+
+        <!-- TAB 2: Fundraiser/Donation Calculator -->
+        <div class="ws-tab-panel" id="tab-fundraiser">
+
+            <div class="calculator-grid">
+                <!-- Left Column: Inputs -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        Fundraiser Pricing
+                    </h2>
+                    <p class="fr-subtitle">Enter blank cost &amp; donation — get the sell price instantly</p>
+
+                    <div class="form-group">
+                        <label for="fr-blankCost">Blank Garment Cost <span class="fr-hint">— what you pay for the blank</span></label>
+                        <div class="fr-input-wrap">
+                            <span class="fr-prefix">$</span>
+                            <input type="number" id="fr-blankCost" class="fr-input" placeholder="0.00" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fr-donation">Donation Per Item <span class="fr-hint">— flat $ back to the program</span></label>
+                        <div class="fr-input-wrap">
+                            <span class="fr-prefix">$</span>
+                            <input type="number" id="fr-donation" class="fr-input" placeholder="5.00" min="0" step="0.50" value="5">
+                        </div>
+                    </div>
+
+                    <!-- Advanced Settings Toggle -->
+                    <div class="fr-advanced-toggle" id="fr-advToggle">
+                        <span class="fr-adv-arrow" id="fr-advArrow">&#9654;</span>
+                        <span class="fr-adv-text">Advanced Settings (margin, fees, decoration cost)</span>
+                    </div>
+                    <div class="fr-advanced-section" id="fr-advSection">
+                        <div class="fr-small-row">
+                            <div class="fr-small-group">
+                                <label>Margin on Blanks</label>
+                                <div class="fr-small-wrap">
+                                    <input type="number" id="fr-margin" class="fr-small-input" value="43" min="0" max="80" step="1">
+                                    <span class="fr-suffix">%</span>
+                                </div>
+                            </div>
+                            <div class="fr-small-group">
+                                <label>Credit Card Fee</label>
+                                <div class="fr-small-wrap">
+                                    <input type="number" id="fr-ccFee" class="fr-small-input" value="3.5" min="0" max="10" step="0.1">
+                                    <span class="fr-suffix">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fr-small-row">
+                            <div class="fr-small-group">
+                                <label>Embellishment Fee</label>
+                                <div class="fr-small-wrap">
+                                    <span class="fr-small-prefix">$</span>
+                                    <input type="number" id="fr-embellishment" class="fr-small-input has-prefix" value="15" min="0" step="0.50">
+                                </div>
+                            </div>
+                            <div class="fr-small-group">
+                                <label>Actual Decoration Cost</label>
+                                <div class="fr-small-wrap">
+                                    <span class="fr-small-prefix">$</span>
+                                    <input type="number" id="fr-decoCost" class="fr-small-input has-prefix" value="8" min="0" step="0.50">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fixed Costs Summary -->
+                    <div class="fr-fixed-costs">
+                        <div class="fr-fixed-item">
+                            <span class="fr-fc-label">Embellishment Fee</span>
+                            <span class="fr-fc-value" id="fr-dispEmb">$15.00</span>
+                        </div>
+                        <div class="fr-fixed-item">
+                            <span class="fr-fc-label">Your Decoration Cost</span>
+                            <span class="fr-fc-value" id="fr-dispDeco">$8.00</span>
+                        </div>
+                        <div class="fr-fixed-item">
+                            <span class="fr-fc-label">Margin on Blanks</span>
+                            <span class="fr-fc-value" id="fr-dispMargin">43%</span>
+                        </div>
+                        <div class="fr-fixed-item">
+                            <span class="fr-fc-label">CC Fee Built In</span>
+                            <span class="fr-fc-value" id="fr-dispCC">3.5%</span>
+                        </div>
+                    </div>
+
+                    <!-- Rounding Note -->
+                    <div class="fr-rounding-note">
+                        <p><strong>Pricing rounds UP</strong> to the nearest $5 to give NW Custom extra wiggle room on every piece. Your actual margin will always be at or above target.</p>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="fr-result-card">
+                    <div class="fr-result-label">Customer Sell Price</div>
+                    <div class="fr-result-price empty" id="fr-sellPrice">Enter blank cost</div>
+                    <div class="fr-result-note" id="fr-resultNote"></div>
+
+                    <div class="fr-breakdown" id="fr-breakdown" style="display:none;">
+                        <div class="fr-breakdown-row">
+                            <span class="fr-br-label">Blank w/ margin</span>
+                            <span class="fr-br-value" id="fr-brkMargin">--</span>
+                        </div>
+                        <div class="fr-breakdown-row">
+                            <span class="fr-br-label">+ Embellishment fee</span>
+                            <span class="fr-br-value" id="fr-brkEmb">--</span>
+                        </div>
+                        <div class="fr-breakdown-row">
+                            <span class="fr-br-label">+ Donation built in</span>
+                            <span class="fr-br-value" id="fr-brkDonation">--</span>
+                        </div>
+                        <div class="fr-breakdown-row">
+                            <span class="fr-br-label">+ CC fee recovery</span>
+                            <span class="fr-br-value" id="fr-brkCC">--</span>
+                        </div>
+                        <div class="fr-breakdown-row">
+                            <span class="fr-br-label">+ Rounded up cushion</span>
+                            <span class="fr-br-value" id="fr-brkRound">--</span>
+                        </div>
+                        <div class="fr-breakdown-row fr-total" id="fr-profitRow">
+                            <span class="fr-br-label">Your Profit Per Piece</span>
+                            <span class="fr-br-value" id="fr-brkProfit">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Message -->
+                    <div class="fr-customer-msg">
+                        <div class="fr-cm-label">What the Customer Hears</div>
+                        <div class="fr-cm-text">
+                            "For every item purchased, <span id="fr-cmDonation">$5</span> goes directly back to your program. Shipping is calculated at checkout."
+                        </div>
+                    </div>
+
+                    <!-- 1099 Tax Note -->
+                    <div class="fr-tax-note">
+                        <div class="fr-tax-label"><i class="fas fa-file-alt"></i> Tax Reminder — 1099 Requirement</div>
+                        <p>
+                            If the total donation payout to a program or organization exceeds <strong>$600 in a calendar year</strong>, NW Custom Apparel is required to issue a <strong>1099-NEC form</strong> to the recipient. Collect the organization's <strong>W-9 form</strong> (name, address, and Tax ID / EIN) before issuing the first donation payout.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end tab-fundraiser -->
+
     </main>
 
     <!-- Email Modal -->
