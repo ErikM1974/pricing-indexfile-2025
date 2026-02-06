@@ -291,7 +291,7 @@
                 <div id="min-order-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>Small Order Notice</strong> -
-                    Orders of 7 or fewer pieces include a $50 Less Than Minimum Fee.
+                    Orders of 7 or fewer pieces include a $50 small order fee, built into the per-piece price.
                 </div>
 
                 <!-- Excel-Style Product Table -->
@@ -5022,8 +5022,8 @@ Company:Absher Construction Company
                                     const priceCell = document.getElementById(`row-price-${rowId}`);
                                     const totalCell = document.getElementById(`row-total-${rowId}`);
                                     if (priceCell) {
-                                        // Display base unit price (LTM shown as separate line item)
-                                        const displayPrice = standardLineItem.unitPrice;
+                                        // Display unit price (LTM built into per-piece price when applicable)
+                                        const displayPrice = standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice;
                                         priceCell.textContent = `$${displayPrice.toFixed(2)}`;
 
                                         // Calculate and display line total
@@ -5077,8 +5077,8 @@ Company:Absher Construction Company
                                             const childPriceCell = document.getElementById(`row-price-${childRowId}`);
                                             const childTotalCell = document.getElementById(`row-total-${childRowId}`);
                                             if (childPriceCell) {
-                                                // Display base unit price (LTM shown as separate line item)
-                                                const displayPrice = li.unitPrice;
+                                                // Display unit price (LTM built into per-piece price when applicable)
+                                                const displayPrice = li.unitPriceWithLTM || li.unitPrice;
                                                 childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
 
                                                 // Calculate and display line total for child row
@@ -5263,7 +5263,7 @@ Company:Absher Construction Company
 
             const totalQty = pricing.totalQuantity || 0;
             document.getElementById('total-qty').textContent = totalQty;
-            document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
+            document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
             document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
             // Minimum order warning banner (show when qty > 0 but <= 7)
@@ -5331,16 +5331,16 @@ Company:Absher Construction Company
             const capSubtotalRow = document.getElementById('cap-subtotal-row');
 
             if (isMixedQuote) {
-                // Show breakdown rows
+                // Show breakdown rows (LTM baked into subtotals)
                 garmentSubtotalRow.style.display = 'flex';
                 capSubtotalRow.style.display = 'flex';
-                document.getElementById('garment-subtotal').textContent = `$${(pricing.garmentSubtotal || 0).toFixed(2)}`;
-                document.getElementById('cap-subtotal').textContent = `$${(pricing.capSubtotal || 0).toFixed(2)}`;
+                document.getElementById('garment-subtotal').textContent = `$${((pricing.garmentSubtotal || 0) + (pricing.garmentLtmFee || 0)).toFixed(2)}`;
+                document.getElementById('cap-subtotal').textContent = `$${((pricing.capSubtotal || 0) + (pricing.capLtmFee || 0)).toFixed(2)}`;
             } else if (pricing.hasCaps && !pricing.hasGarments) {
-                // Caps only - show just cap breakdown
+                // Caps only - show just cap breakdown (LTM baked in)
                 garmentSubtotalRow.style.display = 'none';
                 capSubtotalRow.style.display = 'flex';
-                document.getElementById('cap-subtotal').textContent = `$${(pricing.capSubtotal || 0).toFixed(2)}`;
+                document.getElementById('cap-subtotal').textContent = `$${((pricing.capSubtotal || 0) + (pricing.capLtmFee || 0)).toFixed(2)}`;
             } else if (pricing.hasGarments && !pricing.hasCaps) {
                 // Garments only - hide breakdown rows (default view)
                 garmentSubtotalRow.style.display = 'none';
@@ -5351,38 +5351,11 @@ Company:Absher Construction Company
                 capSubtotalRow.style.display = 'none';
             }
 
-            // LTM display (table rows only - sidebar removed in 2026 refactor)
+            // LTM is now built into per-piece prices - always hide LTM fee rows
             const garmentLtmTableRow = document.getElementById('garment-ltm-table-row');
             const capLtmTableRow = document.getElementById('cap-ltm-table-row');
-            const garmentLtmUnit = document.getElementById('garment-ltm-unit');
-            const garmentLtmTableTotal = document.getElementById('garment-ltm-table-total');
-            const capLtmUnit = document.getElementById('cap-ltm-unit');
-            const capLtmTableTotal = document.getElementById('cap-ltm-table-total');
-
-            if (pricing.ltmFee > 0) {
-                const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
-                const hasCapLtm = (pricing.capLtmFee || 0) > 0;
-
-                // Update table rows based on what applies
-                if (hasGarmentLtm && garmentLtmTableRow) {
-                    garmentLtmTableRow.style.display = 'table-row';
-                    if (garmentLtmUnit) garmentLtmUnit.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
-                    if (garmentLtmTableTotal) garmentLtmTableTotal.textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
-                } else if (garmentLtmTableRow) {
-                    garmentLtmTableRow.style.display = 'none';
-                }
-                if (hasCapLtm && capLtmTableRow) {
-                    capLtmTableRow.style.display = 'table-row';
-                    if (capLtmUnit) capLtmUnit.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
-                    if (capLtmTableTotal) capLtmTableTotal.textContent = `$${pricing.capLtmFee.toFixed(2)}`;
-                } else if (capLtmTableRow) {
-                    capLtmTableRow.style.display = 'none';
-                }
-            } else {
-                // No LTM fee (qty > 7) - hide all LTM rows
-                if (garmentLtmTableRow) garmentLtmTableRow.style.display = 'none';
-                if (capLtmTableRow) capLtmTableRow.style.display = 'none';
-            }
+            if (garmentLtmTableRow) garmentLtmTableRow.style.display = 'none';
+            if (capLtmTableRow) capLtmTableRow.style.display = 'none';
 
             // Setup (Digitizing) row - table row only (sidebar removed in 2026 refactor)
             const setupFeeTableRow = document.getElementById('setup-fee-table-row');
@@ -5670,8 +5643,8 @@ Company:Absher Construction Company
                     salesRepEmail: document.getElementById('sales-rep').value
                 };
 
-                // LTM always shown as separate line item
-                pricing.ltmDistributed = false;
+                // LTM baked into per-piece prices (2026-02-06)
+                pricing.ltmDistributed = true;
 
                 // Add additional charges to pricing data for PDF (2026 fee refactor)
                 const additionalCharges = getAdditionalCharges();

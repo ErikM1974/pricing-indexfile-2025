@@ -1665,7 +1665,8 @@ class EmbroideryPricingCalculator {
             // Cap embellishment type (2026)
             capEmbellishmentType: capEmbellishmentType,
             capPatchSetupFee: capPatchSetupFee,
-            puffUpchargePerCap: capEmbellishmentType === '3d-puff' ? this.puffUpchargePerCap : 0
+            puffUpchargePerCap: capEmbellishmentType === '3d-puff' ? this.puffUpchargePerCap : 0,
+            ltmDistributed: true  // LTM baked into per-piece prices (2026-02-06)
         };
     }
     

@@ -153,8 +153,8 @@ class EmbroideryQuoteService {
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity || 0,
-                SubtotalAmount: parseFloat((pricingResults.subtotal || 0).toFixed(2)),
-                LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),
+                SubtotalAmount: parseFloat(((pricingResults.subtotal || 0) + (pricingResults.ltmFee || 0)).toFixed(2)),
+                LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),  // Keep for internal tracking
                 // TotalAmount includes ALL fees: grandTotal + Art + GraphicDesign + Rush + Sample - Discount
                 // (2026-01-14 fix: Art/Rush/Sample/Discount were missing from TotalAmount)
                 TotalAmount: parseFloat((
@@ -221,10 +221,9 @@ class EmbroideryQuoteService {
                 // Sample Fee
                 SampleFee: parseFloat(customerData.sampleFee?.toFixed(2)) || 0,
                 SampleQty: parseInt(customerData.sampleQty) || 0,
-                // LTM fees split by garment vs cap
-                // Note: pricing engine returns garmentLtmFee/capLtmFee (not ltmGarment/ltmCap)
-                LTM_Garment: parseFloat(pricingResults.garmentLtmFee?.toFixed(2)) || 0,
-                LTM_Cap: parseFloat(pricingResults.capLtmFee?.toFixed(2)) || 0,
+                // LTM baked into per-piece prices — set to 0 so quote-view doesn't render fee rows
+                LTM_Garment: 0,
+                LTM_Cap: 0,
                 // Discount (sales rep discount)
                 Discount: parseFloat(customerData.discount?.toFixed(2)) || 0,
                 DiscountPercent: parseFloat(customerData.discountPercent) || 0,
@@ -296,12 +295,11 @@ class EmbroideryQuoteService {
                         PrintLocationName: pricingResults.logos.map(l => l.position).join(' + '),
                         Quantity: lineItem.quantity,
                         HasLTM: pricingResults.ltmFee > 0 ? 'Yes' : 'No',
-                        // Use basePrice (not unitPrice) so BaseUnitPrice × Quantity = LineTotal
-                        // unitPrice includes extra stitch cost, basePrice is the base price used for total
-                        BaseUnitPrice: parseFloat((lineItem.basePrice || lineItem.unitPrice).toFixed(2)),
-                        LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
+                        // LTM baked into per-piece prices (2026-02-06)
+                        BaseUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.basePrice || lineItem.unitPrice).toFixed(2)),
+                        LTMPerUnit: parseFloat((lineItem.ltmPerUnit || 0).toFixed(2)),  // Keep for internal tracking
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
-                        LineTotal: parseFloat(lineItem.total.toFixed(2)),
+                        LineTotal: parseFloat(((lineItem.unitPriceWithLTM || lineItem.unitPrice) * lineItem.quantity).toFixed(2)),
                         SizeBreakdown: JSON.stringify(this.parseDescriptionToSizeBreakdown(lineItem.description)),  // Parse sizes from description
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',
@@ -549,29 +547,8 @@ class EmbroideryQuoteService {
             });
         }
 
-        // LTM - Garments (LTM)
-        if (sessionData.LTM_Garment > 0) {
-            feeItems.push({
-                StyleNumber: 'LTM',
-                ProductName: 'Less Than Minimum - Garments',
-                Quantity: 1,
-                BaseUnitPrice: sessionData.LTM_Garment,
-                FinalUnitPrice: sessionData.LTM_Garment,
-                LineTotal: sessionData.LTM_Garment
-            });
-        }
-
-        // LTM - Caps (LTM)
-        if (sessionData.LTM_Cap > 0) {
-            feeItems.push({
-                StyleNumber: 'LTM',
-                ProductName: 'Less Than Minimum - Caps',
-                Quantity: 1,
-                BaseUnitPrice: sessionData.LTM_Cap,
-                FinalUnitPrice: sessionData.LTM_Cap,
-                LineTotal: sessionData.LTM_Cap
-            });
-        }
+        // LTM fees are now baked into per-piece prices (2026-02-06)
+        // No longer saved as separate fee line items
 
         // Discount (DISCOUNT) — stored as negative
         if (sessionData.Discount > 0) {
@@ -1066,8 +1043,8 @@ class EmbroideryQuoteService {
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity || 0,
-                SubtotalAmount: parseFloat((pricingResults.subtotal || 0).toFixed(2)),
-                LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),
+                SubtotalAmount: parseFloat(((pricingResults.subtotal || 0) + (pricingResults.ltmFee || 0)).toFixed(2)),
+                LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),  // Keep for internal tracking
                 TotalAmount: parseFloat((
                     pricingResults.grandTotal +
                     (customerData.artCharge || 0) +
@@ -1115,8 +1092,9 @@ class EmbroideryQuoteService {
                 RushFee: parseFloat(customerData.rushFee?.toFixed(2)) || 0,
                 SampleFee: parseFloat(customerData.sampleFee?.toFixed(2)) || 0,
                 SampleQty: parseInt(customerData.sampleQty) || 0,
-                LTM_Garment: parseFloat(pricingResults.garmentLtmFee?.toFixed(2)) || 0,
-                LTM_Cap: parseFloat(pricingResults.capLtmFee?.toFixed(2)) || 0,
+                // LTM baked into per-piece prices — set to 0 so quote-view doesn't render fee rows
+                LTM_Garment: 0,
+                LTM_Cap: 0,
                 Discount: parseFloat(customerData.discount?.toFixed(2)) || 0,
                 DiscountPercent: parseFloat(customerData.discountPercent) || 0,
                 DiscountReason: customerData.discountReason || '',
@@ -1190,12 +1168,11 @@ class EmbroideryQuoteService {
                         PrintLocationName: pricingResults.logos.map(l => l.position).join(' + '),
                         Quantity: lineItem.quantity,
                         HasLTM: pricingResults.ltmFee > 0 ? 'Yes' : 'No',
-                        // Use basePrice (not unitPrice) so BaseUnitPrice × Quantity = LineTotal
-                        // unitPrice includes extra stitch cost, basePrice is the base price used for total
-                        BaseUnitPrice: parseFloat((lineItem.basePrice || lineItem.unitPrice).toFixed(2)),
-                        LTMPerUnit: parseFloat((pricingResults.ltmPerUnit || 0).toFixed(2)),
+                        // LTM baked into per-piece prices (2026-02-06)
+                        BaseUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.basePrice || lineItem.unitPrice).toFixed(2)),
+                        LTMPerUnit: parseFloat((lineItem.ltmPerUnit || 0).toFixed(2)),  // Keep for internal tracking
                         FinalUnitPrice: parseFloat((lineItem.unitPriceWithLTM || lineItem.unitPrice).toFixed(2)),
-                        LineTotal: parseFloat(lineItem.total.toFixed(2)),
+                        LineTotal: parseFloat(((lineItem.unitPriceWithLTM || lineItem.unitPrice) * lineItem.quantity).toFixed(2)),
                         SizeBreakdown: JSON.stringify(this.parseDescriptionToSizeBreakdown(lineItem.description)),
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',

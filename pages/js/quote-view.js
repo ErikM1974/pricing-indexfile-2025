@@ -2581,10 +2581,14 @@ class QuoteViewPage {
         console.groupEnd();
 
         // 7. Verification math
+        // Note: For quotes saved after 2026-02-06, LTM is baked into SubtotalAmount
+        // and LTM_Garment/LTM_Cap are 0, so ltmFee from LTMFeeTotal would double-count.
+        // Use LTM_Garment + LTM_Cap (the display values) instead of LTMFeeTotal for the formula.
         console.group('7️⃣ VERIFICATION');
-        const expectedTotal = subtotal + ltmFee + totalSetup + totalAL + artCharge + rushFee + sampleFee - discount;
-        console.log('Formula: subtotal + LTM + setup + AL + art + rush + sample - discount');
-        console.log(`         ${subtotal.toFixed(2)} + ${ltmFee.toFixed(2)} + ${totalSetup.toFixed(2)} + ${totalAL.toFixed(2)} + ${artCharge.toFixed(2)} + ${rushFee.toFixed(2)} + ${sampleFee.toFixed(2)} - ${discount.toFixed(2)}`);
+        const displayLtm = (parseFloat(q?.LTM_Garment) || 0) + (parseFloat(q?.LTM_Cap) || 0);
+        const expectedTotal = subtotal + displayLtm + totalSetup + totalAL + artCharge + rushFee + sampleFee - discount;
+        console.log('Formula: subtotal + LTM(display) + setup + AL + art + rush + sample - discount');
+        console.log(`         ${subtotal.toFixed(2)} + ${displayLtm.toFixed(2)} + ${totalSetup.toFixed(2)} + ${totalAL.toFixed(2)} + ${artCharge.toFixed(2)} + ${rushFee.toFixed(2)} + ${sampleFee.toFixed(2)} - ${discount.toFixed(2)}`);
         console.log('Expected Total:', expectedTotal.toFixed(2));
         console.log('Actual TotalAmount:', totalAmount.toFixed(2));
         const diff = Math.abs(expectedTotal - totalAmount);
