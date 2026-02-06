@@ -92,8 +92,6 @@ class MonogramFormService {
      */
     async lookupOrder(orderNumber) {
         try {
-            console.log('[MonogramService] Looking up order:', orderNumber);
-
             // Fetch order header and line items in parallel
             const [orderResponse, lineItemsResponse] = await Promise.all([
                 fetch(`${this.baseURL}/api/manageorders/orders/${orderNumber}`),
@@ -141,9 +139,6 @@ class MonogramFormService {
             // Parse line items into usable format
             const products = this.parseLineItems(lineItems);
 
-            console.log('[MonogramService] Order found:', order.CustomerName);
-            console.log('[MonogramService] Products found:', products.length);
-
             return {
                 success: true,
                 order: {
@@ -171,10 +166,6 @@ class MonogramFormService {
      * Parse line items from ManageOrders into products with sizes
      */
     parseLineItems(lineItems) {
-        // Debug: Log raw line items from API
-        console.log('[MonogramService] Raw line items from API:', lineItems);
-        console.log('[MonogramService] First item fields:', lineItems[0] ? Object.keys(lineItems[0]) : 'No items');
-
         // CORRECTED Size slot mapping (Size01-Size05 only, Size06 is catch-all)
         // ShopWorks: S, M, L, XL, XXL, then catch-all
         const SIZE_SLOT_MAP = {
@@ -204,10 +195,6 @@ class MonogramFormService {
                 return hasQuantity;
             })
             .map(item => {
-                // Debug: Log each item being parsed
-                console.log('[MonogramService] Parsing line item:', item);
-                console.log('[MonogramService] PartColor:', item.PartColor, '| PartDescription:', item.PartDescription, '| LineQuantity:', item.LineQuantity);
-
                 const sizes = [];
 
                 // Parse Size01-Size05 with fixed mapping
@@ -229,7 +216,6 @@ class MonogramFormService {
                         const suffix = partNumber.substring(lastUnderscoreIdx + 1).toUpperCase();
                         if (SIZE_SUFFIXES.includes(suffix)) {
                             size06Label = suffix;
-                            console.log(`[MonogramService] Size from PartNumber suffix: ${partNumber} → ${size06Label}`);
                         }
                     }
 
@@ -258,8 +244,6 @@ class MonogramFormService {
      */
     async saveMonogramSession(sessionData, items) {
         try {
-            console.log('[MonogramService] Saving monogram for order:', sessionData.orderNumber);
-
             // Filter out empty rows and prepare items for JSON storage
             const validItems = items.filter(item =>
                 item.monogramName && item.monogramName.trim()
@@ -296,8 +280,6 @@ class MonogramFormService {
                 ModifiedAt: now
             };
 
-            console.log('[MonogramService] Payload:', payload);
-
             // Save to API (upsert - creates or updates based on OrderNumber)
             const response = await fetch(`${this.baseURL}/api/monograms`, {
                 method: 'POST',
@@ -308,8 +290,6 @@ class MonogramFormService {
             const result = await response.json();
 
             if (result.success) {
-                console.log('[MonogramService] Saved to database, ID:', result.monogram?.ID_Monogram);
-
                 // Also save to localStorage as backup
                 this.saveToLocalStorage(sessionData.orderNumber, { session: payload, items: validItems });
 
@@ -376,8 +356,6 @@ class MonogramFormService {
      */
     async loadMonogramSession(orderNumber) {
         try {
-            console.log('[MonogramService] Loading monogram for order:', orderNumber);
-
             const response = await fetch(`${this.baseURL}/api/monograms/${orderNumber}`);
             const data = await response.json();
 

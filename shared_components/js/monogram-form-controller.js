@@ -41,8 +41,6 @@ class MonogramFormController {
     // ============================================
 
     init() {
-        console.log('[MonogramController] Initializing...');
-
         // Set current date
         this.setCurrentDate();
 
@@ -63,8 +61,6 @@ class MonogramFormController {
 
         // Check for URL parameters
         this.checkURLParameters();
-
-        console.log('[MonogramController] Initialization complete');
     }
 
     setCurrentDate() {
@@ -117,6 +113,14 @@ class MonogramFormController {
             this.isDirty = true;
         });
 
+        // Warn before navigating away with unsaved changes
+        window.addEventListener('beforeunload', (e) => {
+            if (this.isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
@@ -135,10 +139,16 @@ class MonogramFormController {
         const params = new URLSearchParams(window.location.search);
         const orderNumber = params.get('order');
         const loadOrder = params.get('load');  // Load existing monogram by order number
+        const autoPrint = params.get('print') === 'true';
 
         if (loadOrder) {
             // Load existing monogram from database
-            this.loadExistingForm(loadOrder);
+            this.loadExistingForm(loadOrder).then(() => {
+                if (autoPrint) {
+                    // Delay to allow form to render before triggering print
+                    setTimeout(() => this.printPDF(), 500);
+                }
+            });
         } else if (orderNumber) {
             // Just populate order number field and do lookup
             document.getElementById('orderNumber').value = orderNumber;
@@ -166,17 +176,13 @@ class MonogramFormController {
 
         // Bind Done button
         if (doneBtn) {
-            console.log('[MonogramController] Done button found, binding click handler');
             doneBtn.addEventListener('click', (e) => {
-                console.log('[MonogramController] Done button clicked!');
                 e.stopPropagation();
                 e.preventDefault();
                 this.closeThreadColorDropdown();
                 // Auto-fill rows if only one thread color selected
                 this.autoFillThreadColorIfSingle();
             });
-        } else {
-            console.log('[MonogramController] WARNING: Done button NOT found!');
         }
 
         // Bind search input
@@ -200,9 +206,7 @@ class MonogramFormController {
      */
     async loadThreadColors() {
         try {
-            console.log('[MonogramController] Loading thread colors...');
             this.threadColors = await this.service.fetchThreadColors();
-            console.log(`[MonogramController] Loaded ${this.threadColors.length} thread colors`);
             this.renderThreadColorOptions();
         } catch (error) {
             console.error('[MonogramController] Failed to load thread colors:', error);
@@ -238,17 +242,11 @@ class MonogramFormController {
      * Close thread color dropdown
      */
     closeThreadColorDropdown() {
-        console.log('[MonogramController] closeThreadColorDropdown() called');
         const dropdown = document.getElementById('threadColorDropdown');
         const toggleBtn = document.getElementById('threadColorBtn');
 
-        console.log('[MonogramController] dropdown element:', dropdown);
-        console.log('[MonogramController] dropdown.hidden before:', dropdown?.hidden);
-
         if (dropdown) dropdown.hidden = true;
         if (toggleBtn) toggleBtn.classList.remove('open');
-
-        console.log('[MonogramController] dropdown.hidden after:', dropdown?.hidden);
     }
 
     /**
@@ -1304,12 +1302,6 @@ class MonogramFormController {
             // These come from Size06 catch-all with PartNumber suffix detection
             const isSingleSuffixSize = sizes.length === 1 && !STANDARD_SIZES.includes(sizes[0].label);
 
-            console.log('[MonogramController] Size dropdown update:', {
-                sizes: sizes,
-                isSingleSuffixSize: isSingleSuffixSize,
-                sizeLabel: sizes[0]?.label
-            });
-
             if (isSingleSuffixSize) {
                 // Single suffix-derived size (OSFA, 3X, 2XLT, etc.):
                 // Just show the size - no quantity, no "Other Sizes"
@@ -1471,15 +1463,14 @@ class MonogramFormController {
 
         if (!tbody || !countEl) return;
 
-        const filledRows = tbody.querySelectorAll('tr').length;
-        const withNames = tbody.querySelectorAll('.name-input').length;
+        const totalRows = tbody.querySelectorAll('tr').length;
         let actualCount = 0;
 
         tbody.querySelectorAll('.name-input').forEach(input => {
             if (input.value.trim()) actualCount++;
         });
 
-        countEl.textContent = `(${actualCount} entries)`;
+        countEl.textContent = `(${actualCount} entries, ${totalRows}/50 rows)`;
     }
 
     updateStyleDropdowns() {
@@ -1610,7 +1601,6 @@ class MonogramFormController {
             }
         }
 
-        console.log(`[MonogramController] Rows refreshed. Mode: ${this.orderLoaded ? 'Order' : 'Manual'}`);
     }
 
     // ============================================
@@ -1816,20 +1806,20 @@ class MonogramFormController {
                 const rowLocationSelect = row.querySelector('.row-location');
                 const nameInput = row.querySelector('.name-input');
 
-                if (item.IsCustomStyle) {
+                if (item.isCustomStyle) {
                     row.querySelector('.style-input').value = '__custom__';
                     customStyle.style.display = 'block';
-                    customStyle.value = item.StyleNumber || '';
+                    customStyle.value = item.styleNumber || '';
                     descInput.readOnly = false;
                     descInput.classList.remove('input-readonly');
                 }
 
-                descInput.value = item.Description || '';
-                colorSelect.innerHTML = `<option value="${item.ShirtColor || ''}">${item.ShirtColor || 'Select...'}</option>`;
-                sizeSelect.value = item.Size || '';
-                if (rowThreadColorSelect) rowThreadColorSelect.value = item.RowThreadColor || '';
-                if (rowLocationSelect) rowLocationSelect.value = item.RowLocation || '';
-                nameInput.value = item.MonogramName || '';
+                descInput.value = item.description || '';
+                colorSelect.value = item.shirtColor || '';
+                sizeSelect.value = item.size || '';
+                if (rowThreadColorSelect) rowThreadColorSelect.value = item.rowThreadColor || '';
+                if (rowLocationSelect) rowLocationSelect.value = item.rowLocation || '';
+                nameInput.value = item.monogramName || '';
             });
         } else {
             // Add empty rows
@@ -1912,8 +1902,9 @@ class MonogramFormController {
 
         document.getElementById('monogramForm').reset();
 
-        // Reset thread colors
+        // Reset thread colors and locations
         this.setThreadColorsFromString('');
+        this.setLocationsFromString('');
 
         // Reset to manual mode
         this.orderData = null;

@@ -86,6 +86,16 @@
                         </select>
                     </div>
                     <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter" class="filter-input filter-select" onchange="filterMonograms()">
+                            <option value="">All Statuses</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Printed">Printed</option>
+                            <option value="Complete">Complete</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
                         <label>From Date</label>
                         <input type="date" id="dateFrom" class="filter-input" onchange="filterMonograms()">
                     </div>
@@ -111,12 +121,13 @@
                             <th>Sales Rep</th>
                             <th># of Names</th>
                             <th>Created</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="monogramsTableBody">
                         <tr>
-                            <td colspan="6" class="loading">
+                            <td colspan="7" class="loading">
                                 <i class="fas fa-spinner"></i> Loading monograms...
                             </td>
                         </tr>

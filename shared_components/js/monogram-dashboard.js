@@ -34,7 +34,7 @@ async function loadMonograms() {
 
     tbody.innerHTML = `
         <tr>
-            <td colspan="6" class="loading">
+            <td colspan="7" class="loading">
                 <i class="fas fa-spinner"></i> Loading monograms...
             </td>
         </tr>
@@ -58,7 +58,7 @@ async function loadMonograms() {
         console.error('Error loading monograms:', error);
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="empty-state">
+                <td colspan="7" class="empty-state">
                     <i class="fas fa-exclamation-triangle"></i>
                     <p>Unable to load monograms. Please try again.</p>
                     <button class="btn btn-primary" onclick="loadMonograms()" style="margin-top: 1rem;">
@@ -119,6 +119,7 @@ function escapeHTML(str) {
 function filterMonograms() {
     const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
     const salesRepFilter = document.getElementById('salesRepFilter')?.value || '';
+    const statusFilter = document.getElementById('statusFilter')?.value || '';
     const dateFrom = document.getElementById('dateFrom').value;
     const dateTo = document.getElementById('dateTo').value;
 
@@ -133,6 +134,11 @@ function filterMonograms() {
         // Sales rep filter
         if (salesRepFilter) {
             if (m.SalesRepEmail !== salesRepFilter) return false;
+        }
+
+        // Status filter
+        if (statusFilter) {
+            if ((m.Status || 'Submitted') !== statusFilter) return false;
         }
 
         // Date from filter
@@ -163,7 +169,7 @@ function renderTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="empty-state">
+                <td colspan="7" class="empty-state">
                     <i class="fas fa-inbox"></i>
                     <p>No monogram orders found</p>
                 </td>
@@ -175,27 +181,38 @@ function renderTable(data) {
 
     tbody.innerHTML = data.map(m => {
         const createdDate = formatDate(m.CreatedAt);
-        const salesRep = formatSalesRep(m.SalesRepEmail);
+        const salesRep = escapeHTML(formatSalesRep(m.SalesRepEmail));
+        const companyName = escapeHTML(truncate(m.CompanyName, 30)) || '-';
+        const orderNum = parseInt(m.OrderNumber, 10) || 0;
+        const idMonogram = parseInt(m.ID_Monogram, 10) || 0;
+        const totalItems = parseInt(m.TotalItems, 10) || 0;
+        const status = m.Status || 'Submitted';
+        const statusBadge = getStatusBadge(status);
 
         return `
-            <tr>
+            <tr data-id="${idMonogram}">
                 <td>
-                    <a href="/quote-builders/monogram-form.html?load=${m.OrderNumber}" class="order-link">
-                        ${m.OrderNumber || '-'}
+                    <a href="/quote-builders/monogram-form.html?load=${encodeURIComponent(orderNum)}" class="order-link">
+                        ${orderNum || '-'}
                     </a>
                 </td>
-                <td>${truncate(m.CompanyName, 30) || '-'}</td>
+                <td>${companyName}</td>
                 <td>${salesRep}</td>
-                <td style="text-align: center;">${m.TotalItems || 0}</td>
+                <td style="text-align: center;">${totalItems}</td>
                 <td>${createdDate}</td>
+                <td style="text-align: center;">${statusBadge}</td>
                 <td>
-                    <button class="action-btn edit" onclick="editMonogram(${m.OrderNumber})" title="Edit">
+                    <button class="action-btn edit" onclick="editMonogram(${orderNum})" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn print" onclick="printMonogram(${m.OrderNumber})" title="Print">
+                    <button class="action-btn print" onclick="printMonogram(${orderNum})" title="Print">
                         <i class="fas fa-print"></i>
                     </button>
-                    <button class="action-btn delete" onclick="deleteMonogram(${m.ID_Monogram}, ${m.OrderNumber})" title="Delete">
+                    ${status !== 'Printed' ? `
+                    <button class="action-btn done" onclick="markPrinted(${idMonogram})" title="Mark as Printed">
+                        <i class="fas fa-check"></i>
+                    </button>` : ''}
+                    <button class="action-btn delete" onclick="deleteMonogram(${idMonogram}, ${orderNum})" title="Delete">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -240,6 +257,19 @@ function truncate(str, maxLen) {
     return str.length > maxLen ? str.substring(0, maxLen) + '...' : str;
 }
 
+/**
+ * Get status badge HTML
+ */
+function getStatusBadge(status) {
+    const badges = {
+        'Submitted': '<span class="badge badge-secondary"><i class="fas fa-clock"></i> Submitted</span>',
+        'Printed': '<span class="badge badge-success"><i class="fas fa-check"></i> Printed</span>',
+        'Complete': '<span class="badge badge-info"><i class="fas fa-check-double"></i> Complete</span>',
+        'Cancelled': '<span class="badge badge-warning"><i class="fas fa-ban"></i> Cancelled</span>'
+    };
+    return badges[status] || badges['Submitted'];
+}
+
 // =====================
 // Action Functions
 // =====================
@@ -248,15 +278,44 @@ function truncate(str, maxLen) {
  * Open monogram form for editing
  */
 function editMonogram(orderNumber) {
-    window.location.href = `/quote-builders/monogram-form.html?load=${orderNumber}`;
+    window.location.href = `/quote-builders/monogram-form.html?load=${encodeURIComponent(orderNumber)}`;
 }
 
 /**
  * Open print view for monogram
  */
 function printMonogram(orderNumber) {
-    // Open the monogram form in print mode
-    window.open(`/quote-builders/monogram-form.html?load=${orderNumber}&print=true`, '_blank');
+    window.open(`/quote-builders/monogram-form.html?load=${encodeURIComponent(orderNumber)}&print=true`, '_blank');
+}
+
+/**
+ * Mark monogram as printed
+ */
+async function markPrinted(idMonogram) {
+    const apiUrl = getApiBaseUrl();
+
+    try {
+        const response = await fetch(`${apiUrl}/api/monograms/${idMonogram}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Status: 'Printed', PrintedAt: new Date().toISOString() })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('Marked as Printed', 'success');
+            // Update local state and re-render without full reload
+            const monogram = allMonograms.find(m => m.ID_Monogram === idMonogram);
+            if (monogram) monogram.Status = 'Printed';
+            filterMonograms();
+        } else {
+            throw new Error(data.error || 'Failed to update status');
+        }
+    } catch (error) {
+        console.error('Error marking as printed:', error);
+        showToast('Failed to update status', 'error');
+    }
 }
 
 /**
@@ -266,6 +325,10 @@ async function deleteMonogram(idMonogram, orderNumber) {
     if (!confirm(`Delete monogram for Order #${orderNumber}?\n\nThis cannot be undone.`)) return;
 
     const apiUrl = getApiBaseUrl();
+
+    // Disable all delete buttons to prevent double-clicks
+    const deleteButtons = document.querySelectorAll('.action-btn.delete');
+    deleteButtons.forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; });
 
     try {
         const response = await fetch(`${apiUrl}/api/monograms/${idMonogram}`, {
@@ -283,6 +346,9 @@ async function deleteMonogram(idMonogram, orderNumber) {
     } catch (error) {
         console.error('Error deleting monogram:', error);
         showToast('Failed to delete monogram', 'error');
+    } finally {
+        // Re-enable delete buttons
+        deleteButtons.forEach(btn => { btn.disabled = false; btn.style.opacity = '1'; });
     }
 }
 
