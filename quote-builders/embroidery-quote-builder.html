@@ -921,6 +921,148 @@ Company:Absher Construction Company
         }
     </style>
 
+    <!-- Add Non-SanMar Product Modal -->
+    <div class="shopworks-import-modal" id="add-nonsanmar-modal">
+        <div class="shopworks-import-content" style="max-width: 520px;">
+            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+                <h3><i class="fas fa-plus-circle"></i> Add Non-SanMar Product</h3>
+                <button class="shopworks-import-close" onclick="closeAddNonSanmarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="shopworks-import-body">
+                <p class="shopworks-import-hint">
+                    <i class="fas fa-info-circle"></i>
+                    This product is not in the SanMar database. Add it for future use.
+                </p>
+                <input type="hidden" id="ns-modal-row-id" value="">
+                <div class="ns-form-grid">
+                    <div class="ns-form-group">
+                        <label>Style Number</label>
+                        <input type="text" id="ns-style-number" readonly class="ns-input ns-input-readonly">
+                    </div>
+                    <div class="ns-form-group">
+                        <label>Brand <span class="ns-required">*</span></label>
+                        <input type="text" id="ns-brand" class="ns-input" placeholder="e.g. Edwards">
+                    </div>
+                    <div class="ns-form-group ns-full-width">
+                        <label>Product Name <span class="ns-required">*</span></label>
+                        <input type="text" id="ns-product-name" class="ns-input" placeholder="e.g. Kitchen Skull Cap">
+                    </div>
+                    <div class="ns-form-group">
+                        <label>Category</label>
+                        <select id="ns-category" class="ns-input">
+                            <option value="">Select...</option>
+                            <option value="Caps">Caps</option>
+                            <option value="T-Shirts">T-Shirts</option>
+                            <option value="Polos/Knits">Polos/Knits</option>
+                            <option value="Fleece">Fleece</option>
+                            <option value="Outerwear">Outerwear</option>
+                            <option value="Woven Shirts">Woven Shirts</option>
+                            <option value="Activewear">Activewear</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="ns-form-group">
+                        <label>Sell Price ($)</label>
+                        <input type="number" id="ns-sell-price" class="ns-input" step="0.01" min="0" placeholder="15.50">
+                    </div>
+                    <div class="ns-form-group ns-full-width">
+                        <label>Default Colors <small>(comma-separated)</small></label>
+                        <input type="text" id="ns-default-colors" class="ns-input" placeholder="e.g. Black, White, Navy">
+                    </div>
+                    <div class="ns-form-group ns-full-width">
+                        <label>Available Sizes <small>(comma-separated)</small></label>
+                        <input type="text" id="ns-available-sizes" class="ns-input" placeholder="e.g. S,M,L,XL,2XL or OSFA">
+                    </div>
+                </div>
+            </div>
+            <div class="shopworks-import-footer">
+                <button class="btn-cancel-import" onclick="closeAddNonSanmarModal()">Cancel</button>
+                <button class="btn-parse-import" id="btn-save-nonsanmar" onclick="saveNonSanmarProduct()">
+                    <i class="fas fa-save"></i> Save & Apply
+                </button>
+            </div>
+        </div>
+    </div>
+    <style>
+        /* Non-SanMar Modal Styles */
+        .ns-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .ns-full-width {
+            grid-column: 1 / -1;
+        }
+        .ns-form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .ns-form-group label small {
+            font-weight: 400;
+            color: #94a3b8;
+        }
+        .ns-required {
+            color: #ef4444;
+        }
+        .ns-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .ns-input:focus {
+            border-color: #7c3aed;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+        }
+        .ns-input-readonly {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        /* "Add" button in product row */
+        .btn-add-nonsanmar {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            margin-left: 6px;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+        .btn-add-nonsanmar:hover {
+            background: #6d28d9;
+        }
+        .btn-add-nonsanmar i {
+            font-size: 10px;
+        }
+        /* Non-SanMar badge on row */
+        .non-sanmar-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            margin-left: 4px;
+            background: #ede9fe;
+            color: #7c3aed;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            vertical-align: middle;
+        }
+    </style>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
@@ -3211,8 +3353,38 @@ Company:Absher Construction Company
                     row.dataset.productName = cleanTitle || styleNumber;
 
                 } else {
+                    // SanMar product not found — check Non-SanMar Products database
+                    try {
+                        const nsResponse = await fetch(`${API_BASE}/api/non-sanmar-products/style/${encodeURIComponent(styleNumber)}`);
+                        if (nsResponse.ok) {
+                            const nsData = await nsResponse.json();
+                            if (nsData.success && nsData.data) {
+                                populateNonSanmarRow(row, rowId, nsData.data);
+                                return;
+                            }
+                        }
+                    } catch (nsErr) {
+                        console.warn('[onStyleChange] Non-SanMar lookup failed:', nsErr.message);
+                    }
+
+                    // Not in SanMar or Non-SanMar database — show "Not found" with Add button
                     descInput.value = 'Not found';
-                    showToast(`Style ${styleNumber} not found`, 'error');
+                    showToast(`Style ${styleNumber} not found — click "Add" to register it`, 'warning');
+
+                    // Store import data on the row for the Add modal
+                    row.dataset.style = styleNumber;
+                    row.dataset.notFound = 'true';
+
+                    // Add "Add" button next to the description
+                    const descCell = descInput.closest('td') || descInput.parentElement;
+                    if (descCell && !descCell.querySelector('.btn-add-nonsanmar')) {
+                        const addBtn = document.createElement('button');
+                        addBtn.className = 'btn-add-nonsanmar';
+                        addBtn.title = 'Add to Non-SanMar database';
+                        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add';
+                        addBtn.onclick = () => showAddNonSanmarModal(rowId);
+                        descCell.appendChild(addBtn);
+                    }
                 }
             } catch (error) {
                 console.error('Error loading product:', error);
@@ -3221,6 +3393,248 @@ Company:Absher Construction Company
         }
 
         // escapeHtml() is now provided by quote-builder-utils.js
+
+        /**
+         * Populate a product row from Non_SanMar_Products data
+         */
+        function populateNonSanmarRow(row, rowId, product) {
+            const descInput = row.querySelector('[data-field="description"]');
+            const pickerSelected = row.querySelector('.color-picker-selected');
+            const pickerDropdown = row.querySelector('.color-picker-dropdown');
+
+            // Set description and mark as non-SanMar
+            descInput.value = product.ProductName || product.StyleNumber;
+            row.dataset.nonSanmar = 'true';
+            row.dataset.sellPrice = product.DefaultSellPrice || 0;
+            row.dataset.style = product.StyleNumber;
+            row.dataset.productName = product.ProductName || product.StyleNumber;
+
+            // Remove any "Add" button if it existed
+            const addBtn = row.querySelector('.btn-add-nonsanmar');
+            if (addBtn) addBtn.remove();
+            delete row.dataset.notFound;
+
+            // Detect cap vs garment
+            const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');
+            const capBadge = document.getElementById(`cap-badge-${rowId}`);
+            if (isCap) {
+                row.dataset.isCap = 'true';
+                if (capBadge) capBadge.style.display = 'inline-flex';
+                showToast('Non-SanMar cap detected — using sell price override', 'info', 3000);
+            } else {
+                row.dataset.isCap = 'false';
+                if (capBadge) capBadge.style.display = 'none';
+            }
+
+            // Reorder and update section visibility
+            reorderRowByProductType(row);
+            updateCapLogoSectionVisibility();
+            updateGarmentLogoSectionVisibility();
+
+            // Populate color dropdown from DefaultColors (comma-separated text)
+            const defaultColors = (product.DefaultColors || '').split(',').map(c => c.trim()).filter(Boolean);
+            if (defaultColors.length > 0 && pickerDropdown) {
+                pickerDropdown.innerHTML = defaultColors.map(color => `
+                    <div class="color-picker-option"
+                         data-color-name="${escapeHtml(color)}"
+                         data-catalog-color="${escapeHtml(color)}"
+                         data-swatch-url=""
+                         data-hex="#ccc"
+                         data-image-url=""
+                         onclick="selectNonSanmarColor(${rowId}, this)">
+                        <span class="color-swatch" style="background-color: #ccc;"></span>
+                        <span class="color-name">${escapeHtml(color)}</span>
+                    </div>
+                `).join('');
+
+                pickerSelected.classList.remove('disabled');
+                row.dataset.colors = JSON.stringify(defaultColors.map(c => ({ COLOR_NAME: c, CATALOG_COLOR: c })));
+            }
+
+            // Enable size inputs based on product type
+            if (isCap) {
+                setNonSanmarCapSizes(row, rowId, product.AvailableSizes);
+            } else {
+                setNonSanmarGarmentSizes(row, rowId, product.AvailableSizes);
+            }
+
+            // Add non-SanMar badge to style cell
+            const styleCell = row.querySelector('.style-input')?.closest('td');
+            if (styleCell && !styleCell.querySelector('.non-sanmar-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'non-sanmar-badge';
+                badge.textContent = 'Custom';
+                badge.title = 'Non-SanMar product — sell price override';
+                styleCell.appendChild(badge);
+            }
+        }
+
+        /**
+         * Select color for non-SanMar product (simpler than SanMar — no swatch images)
+         */
+        function selectNonSanmarColor(rowId, optionEl) {
+            const row = document.getElementById(`row-${rowId}`);
+            const colorName = optionEl.dataset.colorName;
+
+            // Update selected display
+            const pickerSelected = row.querySelector('.color-picker-selected');
+            const swatch = pickerSelected.querySelector('.color-swatch');
+            const nameSpan = pickerSelected.querySelector('.color-name');
+            swatch.style.backgroundImage = '';
+            swatch.style.backgroundColor = '#ccc';
+            swatch.classList.remove('empty');
+            nameSpan.textContent = colorName;
+            nameSpan.classList.remove('placeholder');
+
+            // Mark selected
+            row.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
+            optionEl.classList.add('selected');
+
+            // Store on row
+            row.dataset.color = colorName;
+            row.dataset.catalogColor = colorName;
+
+            // Close dropdown
+            row.querySelector('.color-picker-dropdown').classList.add('hidden');
+
+            // Enable size inputs (non-SanMar skips detectAndAdjustSizeUI API call)
+            row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+
+            // For caps, keep only OSFA enabled
+            if (row.dataset.isCap === 'true') {
+                setNonSanmarCapSizes(row, rowId, row.dataset.availableSizes || 'OSFA');
+            }
+
+            // Focus first size input
+            const firstSize = row.querySelector('.size-input:not([disabled])');
+            if (firstSize) firstSize.focus();
+
+            // Cascade to child rows
+            cascadeColorToChildRows(rowId, colorName, colorName, '', '#ccc');
+            recalculatePricing();
+        }
+
+        /**
+         * Set cap sizes for non-SanMar products (default: OSFA only)
+         */
+        function setNonSanmarCapSizes(row, rowId, availableSizes) {
+            const sizes = (availableSizes || 'OSFA').split(',').map(s => s.trim().toUpperCase());
+            row.dataset.availableSizes = sizes.join(',');
+
+            // Disable all size inputs first
+            row.querySelectorAll('.size-input').forEach(input => input.disabled = true);
+
+            // Enable only the available sizes
+            sizes.forEach(size => {
+                const input = row.querySelector(`[data-size="${size}"]`);
+                if (input) input.disabled = false;
+            });
+        }
+
+        /**
+         * Set garment sizes for non-SanMar products (default: S-3XL)
+         */
+        function setNonSanmarGarmentSizes(row, rowId, availableSizes) {
+            const defaultSizes = 'S,M,L,XL,2XL,3XL';
+            const sizes = (availableSizes || defaultSizes).split(',').map(s => s.trim().toUpperCase());
+            row.dataset.availableSizes = sizes.join(',');
+
+            // Enable standard sizes
+            row.querySelectorAll('.size-input').forEach(input => {
+                const size = input.dataset.size;
+                input.disabled = !sizes.includes(size);
+            });
+        }
+
+        /**
+         * Parse ShopWorks description to extract brand, product name, color, and category
+         * Patterns:
+         *   "Kitchen Skull Cap: Edwards, Black" → Brand: Edwards, Name: Kitchen Skull Cap, Color: Black
+         *   "Port Authority Soft Brushed Canvas Cap" → Brand: Port Authority, Name: rest
+         */
+        function parseShopWorksDescription(description, partNumber) {
+            const result = { brand: '', name: '', color: '', category: '' };
+            if (!description) return result;
+
+            const desc = description.trim();
+
+            // Pattern 1: "ProductName: Brand, Color" (colon format)
+            const colonMatch = desc.match(/^(.+?):\s*(.+?)(?:,\s*(.+))?$/);
+            if (colonMatch) {
+                result.name = colonMatch[1].trim();
+                result.brand = colonMatch[2].trim();
+                result.color = (colonMatch[3] || '').trim();
+            } else {
+                // Pattern 2: Known brand prefix
+                const knownBrands = ['Port Authority', 'Port & Company', 'Sport-Tek', 'CornerStone',
+                    'The North Face', 'Nike', 'Carhartt', 'Brooks Brothers', 'TravisMathew',
+                    'Under Armour', 'New Era', 'OGIO', 'Red House', 'Mercer+Mettle',
+                    'Edwards', 'Richardson', 'Outdoor Cap', 'Pacific Headwear'];
+
+                let matched = false;
+                for (const brand of knownBrands) {
+                    if (desc.toLowerCase().startsWith(brand.toLowerCase())) {
+                        result.brand = brand;
+                        const rest = desc.substring(brand.length).replace(/^\s+/, '');
+                        // Check for trailing color after comma
+                        const commaIdx = rest.lastIndexOf(',');
+                        if (commaIdx > 0) {
+                            result.name = rest.substring(0, commaIdx).trim();
+                            result.color = rest.substring(commaIdx + 1).trim();
+                        } else {
+                            result.name = rest;
+                        }
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched) {
+                    // Fallback: check for trailing color after last comma
+                    const commaIdx = desc.lastIndexOf(',');
+                    if (commaIdx > 0) {
+                        result.name = desc.substring(0, commaIdx).trim();
+                        const possibleColor = desc.substring(commaIdx + 1).trim();
+                        if (isCommonColor(possibleColor)) {
+                            result.color = possibleColor;
+                        } else {
+                            result.name = desc; // Not a color, keep full desc
+                        }
+                    } else {
+                        result.name = desc;
+                    }
+                }
+            }
+
+            // Category detection from keywords
+            const combined = `${result.name} ${desc}`.toLowerCase();
+            if (/\b(cap|hat|beanie|visor|snapback|trucker|headwear|skull cap)\b/.test(combined)) {
+                result.category = 'Caps';
+            } else if (/\b(tee|t-shirt|tshirt)\b/.test(combined)) {
+                result.category = 'T-Shirts';
+            } else if (/\b(polo|pique)\b/.test(combined)) {
+                result.category = 'Polos/Knits';
+            } else if (/\b(jacket|coat|parka|outerwear)\b/.test(combined)) {
+                result.category = 'Outerwear';
+            } else if (/\b(fleece|hoodie|hooded|sweatshirt|pullover)\b/.test(combined)) {
+                result.category = 'Fleece';
+            } else if (/\b(button|dress shirt|oxford|woven)\b/.test(combined)) {
+                result.category = 'Woven Shirts';
+            }
+
+            return result;
+        }
+
+        /**
+         * Check if a string is a common garment color name
+         */
+        function isCommonColor(str) {
+            const colors = ['black', 'white', 'navy', 'royal', 'red', 'grey', 'gray', 'charcoal',
+                'khaki', 'tan', 'brown', 'green', 'olive', 'blue', 'pink', 'purple', 'orange',
+                'yellow', 'teal', 'burgundy', 'maroon', 'cream', 'ivory', 'silver', 'gold',
+                'heather', 'camo', 'natural', 'stone', 'steel', 'slate', 'smoke', 'iron'];
+            return colors.some(c => str.toLowerCase().includes(c));
+        }
 
         /**
          * Update product thumbnail when color is selected
@@ -5239,6 +5653,7 @@ Company:Absher Construction Company
                             isCap: isCap,  // Cap detection for pricing routing
                             rowId: rowId,  // Track row for AL price updates
                             imageUrl: row.dataset.imageUrl || '',  // Image URL for quote view display
+                            sellPriceOverride: parseFloat(row.dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
                             logoAssignments: {
                                 primary: { logoId: 'primary', quantity: group.totalQty },
                                 additional: additionalLogos
@@ -6987,6 +7402,181 @@ Company:Absher Construction Company
         }
 
         /**
+         * Show the Add Non-SanMar Product modal, pre-filled from row data
+         */
+        function showAddNonSanmarModal(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            const styleNumber = row.dataset.style || row.querySelector('.style-input')?.value?.trim().toUpperCase() || '';
+            const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : {};
+
+            // Pre-parse description from import data
+            const description = importData.description || '';
+            const parsed = parseShopWorksDescription(description, styleNumber);
+
+            // Fill modal fields
+            document.getElementById('ns-modal-row-id').value = rowId;
+            document.getElementById('ns-style-number').value = styleNumber;
+            document.getElementById('ns-brand').value = parsed.brand || importData.brand || '';
+            document.getElementById('ns-product-name').value = parsed.name || '';
+            document.getElementById('ns-category').value = parsed.category || '';
+            document.getElementById('ns-sell-price').value = importData.unitPrice || '';
+            document.getElementById('ns-default-colors').value = parsed.color || importData.color || '';
+
+            // Auto-fill available sizes based on detected category
+            if (parsed.category === 'Caps') {
+                document.getElementById('ns-available-sizes').value = 'OSFA';
+            } else {
+                document.getElementById('ns-available-sizes').value = 'S,M,L,XL,2XL,3XL';
+            }
+
+            // Show modal
+            const modal = document.getElementById('add-nonsanmar-modal');
+            modal.classList.add('active');
+
+            // Focus the brand field (first editable field)
+            setTimeout(() => document.getElementById('ns-brand').focus(), 100);
+        }
+
+        /**
+         * Close the Add Non-SanMar Product modal
+         */
+        function closeAddNonSanmarModal() {
+            const modal = document.getElementById('add-nonsanmar-modal');
+            modal.classList.remove('active');
+        }
+
+        /**
+         * Save non-SanMar product to database and re-populate the row
+         */
+        async function saveNonSanmarProduct() {
+            const rowId = parseInt(document.getElementById('ns-modal-row-id').value);
+            const styleNumber = document.getElementById('ns-style-number').value.trim();
+            const brand = document.getElementById('ns-brand').value.trim();
+            const productName = document.getElementById('ns-product-name').value.trim();
+            const category = document.getElementById('ns-category').value;
+            const sellPrice = parseFloat(document.getElementById('ns-sell-price').value) || 0;
+            const defaultColors = document.getElementById('ns-default-colors').value.trim();
+            const availableSizes = document.getElementById('ns-available-sizes').value.trim();
+
+            // Validate required fields
+            if (!brand) {
+                showToast('Brand is required', 'error');
+                document.getElementById('ns-brand').focus();
+                return;
+            }
+            if (!productName) {
+                showToast('Product Name is required', 'error');
+                document.getElementById('ns-product-name').focus();
+                return;
+            }
+
+            const saveBtn = document.getElementById('btn-save-nonsanmar');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const payload = {
+                    StyleNumber: styleNumber,
+                    Brand: brand,
+                    ProductName: productName,
+                    Category: category,
+                    DefaultSellPrice: sellPrice,
+                    DefaultColors: defaultColors,
+                    AvailableSizes: availableSizes,
+                    PricingMethod: 'FIXED',
+                    IsActive: true
+                };
+
+                const response = await fetch(`${API_BASE}/api/non-sanmar-products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `Save failed (${response.status})`);
+                }
+
+                const result = await response.json();
+                showToast(`${styleNumber} saved to database`, 'success');
+
+                // Close modal
+                closeAddNonSanmarModal();
+
+                // Re-populate the row with the saved product data
+                const row = document.getElementById(`row-${rowId}`);
+                if (row) {
+                    populateNonSanmarRow(row, rowId, payload);
+
+                    // If we have import data, re-apply color and sizes
+                    const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : null;
+                    if (importData) {
+                        await reImportNonSanmarRow(row, rowId, importData);
+                    }
+                }
+
+                recalculatePricing();
+
+            } catch (error) {
+                console.error('[saveNonSanmarProduct] Error:', error);
+                showToast('Failed to save: ' + error.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save & Apply';
+            }
+        }
+
+        /**
+         * Re-apply import data (color, sizes) to a non-SanMar row after it's been populated
+         */
+        async function reImportNonSanmarRow(row, rowId, importData) {
+            // Select color if available
+            if (importData.color) {
+                const pickerDropdown = row.querySelector('.color-picker-dropdown');
+                if (pickerDropdown) {
+                    const colorOption = pickerDropdown.querySelector(
+                        `[data-color-name="${importData.color}"]`
+                    );
+                    if (colorOption) {
+                        selectNonSanmarColor(rowId, colorOption);
+                    } else {
+                        // Color not in defaults — add it and select it
+                        const optHtml = `<div class="color-picker-option selected"
+                            data-color-name="${escapeHtml(importData.color)}"
+                            data-catalog-color="${escapeHtml(importData.color)}"
+                            data-swatch-url="" data-hex="#ccc" data-image-url=""
+                            onclick="selectNonSanmarColor(${rowId}, this)">
+                            <span class="color-swatch" style="background-color:#ccc"></span>
+                            <span class="color-name">${escapeHtml(importData.color)}</span>
+                        </div>`;
+                        pickerDropdown.insertAdjacentHTML('afterbegin', optHtml);
+                        selectNonSanmarColor(rowId, pickerDropdown.querySelector('.color-picker-option'));
+                    }
+                }
+            }
+
+            // Set sizes from import data
+            if (importData.sizes) {
+                for (const [size, qty] of Object.entries(importData.sizes)) {
+                    if (qty > 0) {
+                        let internalSize = size;
+                        if (size === 'LG') internalSize = 'L';
+                        if (size === 'XXL' || size === '2X') internalSize = '2XL';
+
+                        const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
+                        if (sizeInput && !sizeInput.disabled) {
+                            sizeInput.value = qty;
+                        }
+                    }
+                }
+                onSizeChange(rowId);
+            }
+        }
+
+        /**
          * Parse pasted text and show preview
          */
         async function parseAndPreviewShopWorks() {
@@ -7531,26 +8121,15 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 12. Handle non-SanMar products (customProducts - need manual pricing)
+                // 12. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
                 let customProductsImported = 0;
                 if (data.customProducts && data.customProducts.length > 0) {
-                    const notesEl = document.getElementById('notes');
-                    const customNotes = [];
-
                     for (const product of data.customProducts) {
-                        const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;
-                        customNotes.push(`NON-SANMAR: ${product.partNumber} - ${product.description || product.color || 'Unknown'} (${totalQty} pcs) - NEEDS MANUAL PRICING`);
+                        await importProductRow(product);
                         customProductsImported++;
                     }
 
-                    if (notesEl && customNotes.length > 0) {
-                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
-                            '--- NON-SANMAR PRODUCTS (Manual Pricing Required) ---\n' +
-                            customNotes.join('\n');
-                    }
-
-                    // Show prominent warning
-                    showToast(`${customProductsImported} non-SanMar products need manual pricing`, 'warning', 8000);
+                    showToast(`${customProductsImported} non-SanMar product(s) imported — verify pricing`, 'info', 5000);
                 }
 
                 // Recalculate pricing
@@ -7562,7 +8141,7 @@ Company:Absher Construction Company
 
                 const summary = [];
                 if (productsImported > 0) summary.push(`${productsImported} products`);
-                if (customProductsImported > 0) summary.push(`${customProductsImported} need manual pricing`);
+                if (customProductsImported > 0) summary.push(`${customProductsImported} non-SanMar`);
                 if (data.services.digitizing) summary.push('digitizing');
                 if (additionalLogos.length > 0) summary.push(`${additionalLogos.length} additional logo(s)`);
                 if (data.decgItems.length > 0) summary.push('customer-supplied items');
@@ -7624,6 +8203,16 @@ Company:Absher Construction Company
             const rowId = parseInt(row.dataset.rowId);
             const styleInput = row.querySelector('.style-input');
 
+            // Store import data on the row (for non-SanMar "Add" modal pre-fill and re-import)
+            row.dataset.importData = JSON.stringify({
+                partNumber: product.partNumber,
+                color: product.color || '',
+                description: product.description || '',
+                sizes: product.sizes,
+                unitPrice: product.unitPrice || 0,
+                brand: product.brand || ''
+            });
+
             // 1. Set the style number and trigger load
             styleInput.value = product.partNumber;
             await onStyleChange(styleInput, rowId);
@@ -7631,7 +8220,25 @@ Company:Absher Construction Company
             // 2. Wait for colors to populate dropdown
             await new Promise(resolve => setTimeout(resolve, 600));
 
-            // 3. SELECT COLOR (this enables size inputs!)
+            // 3. Check if this row was populated as non-SanMar
+            const isNonSanmar = row.dataset.nonSanmar === 'true';
+
+            if (isNonSanmar) {
+                // Non-SanMar row — use simplified color/size import
+                await reImportNonSanmarRow(row, rowId, {
+                    color: product.color,
+                    sizes: product.sizes
+                });
+                return;
+            }
+
+            // Row is still "Not found" — it will have an "Add" button for the user
+            if (row.dataset.notFound === 'true') {
+                console.log(`[ShopWorks Import] ${product.partNumber} not found — user can click "Add" to register it`);
+                return;
+            }
+
+            // 4. SELECT COLOR for SanMar products (this enables size inputs!)
             if (product.color) {
                 const pickerDropdown = row.querySelector('.color-picker-dropdown');
                 if (pickerDropdown) {
@@ -7670,7 +8277,7 @@ Company:Absher Construction Company
                 }
             }
 
-            // 4. Set sizes (inputs should now be enabled from selectColor)
+            // 5. Set sizes (inputs should now be enabled from selectColor)
             // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
             // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
             const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
@@ -7738,7 +8345,7 @@ Company:Absher Construction Company
                 }
             }
 
-            // 5. Trigger size change to recalculate
+            // 6. Trigger size change to recalculate
             onSizeChange(rowId);
         }
     </script>

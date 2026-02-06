@@ -567,6 +567,11 @@ class EmbroideryPricingCalculator {
      * @param {string} embellishmentType - Type of cap embellishment
      */
     async calculateCapProductPrice(product, totalQuantity, capStitchCount = 8000, embellishmentType = 'embroidery') {
+        // Sell price override — non-SanMar products with a fixed decorated price
+        if (product.sellPriceOverride && product.sellPriceOverride > 0) {
+            return this.buildFixedPriceResult(product, product.sellPriceOverride);
+        }
+
         // Ensure cap pricing is initialized
         if (!this.capInitialized) {
             await this.initializeCapConfig();
@@ -835,9 +840,48 @@ class EmbroideryPricingCalculator {
     }
     
     /**
+     * Build a pricing result with a fixed sell price (non-SanMar products)
+     * Skips margin formula and embroidery cost — the sell price IS the final decorated price
+     */
+    buildFixedPriceResult(product, sellPrice) {
+        console.log(`[EmbroideryPricingCalculator] SELL PRICE OVERRIDE: ${product.style} @ $${sellPrice}/ea`);
+
+        const lineItems = [];
+        let lineSubtotal = 0;
+
+        for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+            if (qty <= 0) continue;
+
+            lineItems.push({
+                description: `${size}(${qty})`,
+                quantity: qty,
+                unitPrice: sellPrice,
+                basePrice: sellPrice,
+                extraStitchCost: 0,
+                alCost: 0,
+                total: sellPrice * qty
+            });
+
+            lineSubtotal += sellPrice * qty;
+        }
+
+        return {
+            product: product,
+            lineItems: lineItems,
+            subtotal: lineSubtotal,
+            isCap: product.isCap || false
+        };
+    }
+
+    /**
      * Calculate price for a product line
      */
     async calculateProductPrice(product, totalQuantity, additionalStitchCost) {
+        // Sell price override — non-SanMar products with a fixed decorated price
+        if (product.sellPriceOverride && product.sellPriceOverride > 0) {
+            return this.buildFixedPriceResult(product, product.sellPriceOverride);
+        }
+
         const tier = this.getTier(totalQuantity);
 
         // Detect item type and log for debugging
@@ -848,7 +892,7 @@ class EmbroideryPricingCalculator {
         // TODO: When API supports different item types, use itemType to get correct cost
         const embCost = this.getEmbroideryCost(tier);
         console.log(`[EmbroideryPricingCalculator] Using embroidery cost: $${embCost} for tier ${tier}`);
-        
+
         // Fetch size pricing for this style
         const sizePricingData = await this.fetchSizePricing(product.style);
         
