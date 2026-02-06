@@ -789,3 +789,53 @@ WHERE clause used `StitchCountRange` (non-existent field) instead of `StitchCoun
 - Added stitchCount integer validation
 - Removed quotes around stitchCount value (it's numeric)
 - **File**: `caspio-pricing-proxy/src/routes/pricing.js`
+
+---
+
+## Non-SanMar Product Support (Added Feb 2026)
+
+### Overview
+Products not in the SanMar database (e.g. HT01 Edwards Skull Cap) can now be imported from ShopWorks and added to the Non_SanMar_Products Caspio table directly from the quote builder. Uses sell price override — user enters final decorated price, no margin formula applied.
+
+### Flow
+1. **ShopWorks import** → `importProductRow()` stores `importData` on row
+2. **`onStyleChange()`** → SanMar lookup fails → tries `GET /api/non-sanmar-products/style/{style}`
+3. **If found in DB** → `populateNonSanmarRow()` auto-fills row with colors, sizes, sell price
+4. **If not found** → Shows "Not found" + purple "Add" button → opens modal
+5. **Modal** → Pre-parsed from ShopWorks description via `parseShopWorksDescription()`
+6. **Save** → `POST /api/non-sanmar-products` → re-populates row → re-applies import data
+
+### Key Functions (embroidery-quote-builder.html)
+| Function | Purpose |
+|----------|---------|
+| `populateNonSanmarRow(row, rowId, product)` | Fill row from Non_SanMar_Products data |
+| `selectNonSanmarColor(rowId, optionEl)` | Color selection without SanMar swatch images |
+| `setNonSanmarCapSizes(row, rowId, sizes)` | Enable cap sizes (default OSFA) |
+| `setNonSanmarGarmentSizes(row, rowId, sizes)` | Enable garment sizes (default S-3XL) |
+| `parseShopWorksDescription(desc, partNumber)` | Extract brand/name/color/category |
+| `showAddNonSanmarModal(rowId)` | Open modal pre-filled from import data |
+| `saveNonSanmarProduct()` | POST to API, re-populate row |
+| `reImportNonSanmarRow(row, rowId, importData)` | Re-apply color/sizes after save |
+
+### Row Dataset Attributes
+| Attribute | Value | Purpose |
+|-----------|-------|---------|
+| `data-non-sanmar` | `"true"` | Marks row as non-SanMar |
+| `data-sell-price` | e.g. `"15.50"` | Fixed sell price (no margin formula) |
+| `data-import-data` | JSON string | ShopWorks import data for re-import |
+| `data-not-found` | `"true"` | Row awaiting user to click "Add" |
+
+### Pricing Engine (embroidery-quote-pricing.js)
+- `buildFixedPriceResult(product, sellPrice)` — Returns line items at fixed price per piece
+- `calculateProductPrice()` and `calculateCapProductPrice()` check `product.sellPriceOverride` first
+- `collectProductsFromTable()` adds `sellPriceOverride` from `row.dataset.sellPrice`
+- LTM still distributes on top of sell price override if qty <= 7
+
+### customProducts Import (Changed Feb 2026)
+**Before**: Non-SanMar products from ShopWorks parser were dumped to notes field as text
+**After**: Imported as real rows via `importProductRow()` — go through non-SanMar lookup flow
+
+### API Used
+- `GET /api/non-sanmar-products/style/{style}` — Lookup by StyleNumber
+- `POST /api/non-sanmar-products` — Create new product (requires StyleNumber, Brand, ProductName)
+- Full CRUD API in `caspio-pricing-proxy/src/routes/non-sanmar-products.js`

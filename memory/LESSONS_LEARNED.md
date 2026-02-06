@@ -31,6 +31,19 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Pattern: Non-SanMar Product "Add on the Fly" in Quote Builder
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** ShopWorks orders with non-SanMar products (e.g. HT01 Edwards Skull Cap) failed silently — showed "Not found" with no way to proceed. The `Non_SanMar_Products` API existed but was disconnected from the quote builder.
+**Solution:** Three-tier fallback in `onStyleChange()`: (1) SanMar API, (2) Non-SanMar Products API, (3) "Add" button with modal. Pricing engine supports `sellPriceOverride` — bypasses margin formula via `buildFixedPriceResult()`. ShopWorks parser's `customProducts` now imported as real rows instead of notes.
+**Key Design Decisions:**
+- Sell price override = user enters final decorated price (no margin calculation)
+- `parseShopWorksDescription()` pre-parses brand/name/color/category from ShopWorks description patterns
+- Non-SanMar rows get simplified color picker (no swatch images) and manually-set size UI
+- LTM still distributes on top of sell price override (it's a minimum order surcharge, not part of product price)
+**Prevention:** When adding a new product source, always wire it into the existing product lookup chain rather than creating a parallel flow.
+**Files:** `embroidery-quote-builder.html`, `embroidery-quote-pricing.js`
+
 ## Bug: /api/embroidery-costs Endpoint Always Returns 400
 **Date:** 2026-02-05
 **Project:** [caspio-proxy]
