@@ -31,6 +31,21 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: "Unable to load size pricing for DECG" on ShopWorks DECG-Only Import
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** Pasting a ShopWorks order with only DECG/DECC items (customer-supplied garments, no SanMar products) showed a red error banner: "Unable to load size pricing for style DECG." The import partially worked but the error was confusing.
+**Root Cause:** `collectProductsFromTable()` pushes DECG service rows into `products[]` with `isService: true`. In `recalculatePricing()`, the check `if (productList.length === 0)` was supposed to trigger the DECG-only path, but the array contained the service row so `length > 0`. The pricing engine then tried `fetchSizePricing('DECG')` which returned nothing, triggering the error.
+**Solution:** Filter service items out before sending to pricing engine:
+```javascript
+const allItems = collectProductsFromTable();
+const productList = allItems.filter(p => !p.isService);
+const serviceItems = allItems.filter(p => p.isService);
+```
+For mixed orders (SanMar + DECG), add service item totals back to `pricing.subtotal` and `pricing.grandTotal` after the engine returns.
+**Prevention:** When a collection function returns mixed item types (products vs. services), always filter before passing to type-specific logic. Don't assume `length > 0` means "has real products."
+**Files:** `embroidery-quote-builder.html` (lines 5192-5194, 5375-5382)
+
 ## Pattern: Non-SanMar Product "Add on the Fly" in Quote Builder
 **Date:** 2026-02-06
 **Project:** [Pricing Index]

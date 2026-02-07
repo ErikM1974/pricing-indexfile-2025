@@ -5189,7 +5189,9 @@ Company:Absher Construction Company
 
         async function recalculatePricing() {
             // Collect products from table (parent rows only)
-            const productList = collectProductsFromTable();
+            const allItems = collectProductsFromTable();
+            const productList = allItems.filter(p => !p.isService);
+            const serviceItems = allItems.filter(p => p.isService);
 
             if (productList.length === 0) {
                 // Even with no SanMar products, check for DECG/DECC service product rows
@@ -5368,6 +5370,16 @@ Company:Absher Construction Company
                             });
                         }
                     });
+
+                    // Add service item totals (DECG/DECC) to pricing for mixed orders
+                    if (serviceItems.length > 0) {
+                        let serviceTotal = 0;
+                        serviceItems.forEach(si => {
+                            serviceTotal += si.unitPrice * si.totalQuantity;
+                        });
+                        pricing.subtotal += serviceTotal;
+                        pricing.grandTotal += serviceTotal;
+                    }
 
                     updatePricingDisplay(pricing);
                 }
