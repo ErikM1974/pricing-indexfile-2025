@@ -1657,13 +1657,18 @@ class EmbroideryPricingCalculator {
         const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
         // Calculate total additional stitch charge across all products
-        // BUG FIX 2026-01-15: Previous loop was broken - it summed lineItem.extraStitchCost
-        // but we pass 0 to calculateProductPrice(), so all extraStitchCost values were 0!
-        // Fix: Use primaryAdditionalStitchCost (already calculated correctly) × garmentQuantity
-        // Caps have fixed 8K stitches - no extra stitch charge for caps
+        // Garment: primaryAdditionalStitchCost (calculated above) × garmentQuantity
         // Full Back: ALL stitches charged at $1.25/1K (separate from excess stitch charges)
         let garmentStitchTotal = (primaryAdditionalStitchCost + primaryFullBackStitchCost) * garmentQuantity;
+        // Cap stitch charges: same architecture as garments, rate=$1.00/1K (vs garment $1.25/1K)
+        // Laser patches have no stitches — skip stitch charges
         let capStitchTotal = 0;
+        if (capQuantity > 0 && capEmbellishmentType !== 'laser-patch') {
+            const capBaseStitches = 8000;
+            const extraCapStitches = Math.max(0, capStitchCount - capBaseStitches);
+            const capPrimaryStitchCost = (extraCapStitches / 1000) * (this.capAdditionalStitchRate || 1.00);
+            capStitchTotal = capPrimaryStitchCost * capQuantity;
+        }
         const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
         console.log(`[EmbroideryPricingCalculator] Stitch charges - Garment: $${garmentStitchTotal.toFixed(2)}, Cap: $${capStitchTotal.toFixed(2)}, Total: $${additionalStitchTotal.toFixed(2)}`);
 

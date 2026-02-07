@@ -86,14 +86,16 @@
                 <div class="logo-cards-column">
                     <!-- Primary Logo Card (Garments) - Hidden until garments added -->
                     <div class="logo-card" id="garment-logo-card" style="display: none;">
-                        <div class="logo-card-header">
+                        <div class="logo-card-header" onclick="toggleLogoCard('garment-logo-card')">
                             <div class="logo-card-icon garment">
                                 <i class="fas fa-tshirt"></i>
                             </div>
                             <span class="logo-card-title">Primary Logo</span>
+                            <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
                             <div class="logo-form-row">
+                                <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
                                     <label>Position</label>
                                     <select id="primary-position" onchange="onPrimaryPositionChange()">
@@ -116,44 +118,30 @@
                                     <span class="digitizing-checkbox-label">Digitizing</span>
                                     <span class="digitizing-checkbox-price">$100</span>
                                 </div>
-                            </div>
-                            <!-- Additional Logo Toggle -->
-                            <div class="additional-logo-section">
-                                <div class="toggle-switch-container">
+                                <!-- Vertical divider -->
+                                <div class="logo-form-divider"></div>
+                                <!-- AL Toggle (inline) -->
+                                <div class="al-inline-toggle" id="garment-al-inline">
                                     <div class="toggle-switch" id="garment-al-switch" onclick="toggleGlobalALNew('garment')">
                                         <div class="toggle-switch-handle"></div>
                                     </div>
-                                    <span class="toggle-switch-label" id="garment-al-label">Additional logo on garments</span>
+                                    <span class="al-inline-label" id="garment-al-label">AL</span>
                                     <input type="checkbox" id="garment-al-toggle" style="display: none;">
                                 </div>
-                                <div class="additional-logo-config" id="garment-al-config-new">
-                                    <div class="logo-form-row">
-                                        <div class="logo-form-field">
-                                            <label>Position</label>
-                                            <select id="garment-al-position-select" onchange="updateGlobalAL('garment')">
-                                                <option value="Right Chest">Right Chest</option>
-                                                <option value="Left Chest">Left Chest</option>
-                                                <option value="Left Sleeve">Left Sleeve</option>
-                                                <option value="Right Sleeve">Right Sleeve</option>
-                                                <option value="Full Back">Full Back (25K min)</option>
-                                                <option value="Additional Location">Additional Location</option>
-                                            </select>
-                                        </div>
-                                        <div class="logo-form-field">
-                                            <label>Stitches</label>
-                                            <input type="number" id="garment-al-stitches" value="8000"
-                                                   min="1000" max="50000" step="1000"
-                                                   onchange="updateGlobalAL('garment')">
-                                        </div>
+                                <!-- AL Config Fields (hidden until toggle is on) -->
+                                <div class="al-inline-fields" id="garment-al-config-new">
+                                    <div class="logo-form-field">
+                                        <label>AL Stitches</label>
+                                        <input type="number" id="garment-al-stitches" value="8000"
+                                               min="1000" max="50000" step="1000"
+                                               oninput="updateGlobalAL('garment')">
                                     </div>
-                                    <div class="logo-form-row digitizing-row">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" id="garment-al-digitizing-checkbox"
-                                                   onchange="updateGlobalAL('garment')">
-                                            <span>Digitizing</span>
-                                            <span class="digitizing-price">$100</span>
-                                        </label>
-                                    </div>
+                                    <label class="al-inline-digitizing">
+                                        <input type="checkbox" id="garment-al-digitizing-checkbox"
+                                               onchange="updateGlobalAL('garment')">
+                                        <span>Digitize</span>
+                                        <span class="digitizing-price">$100</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -161,21 +149,22 @@
 
                     <!-- Cap Logo Card (hidden by default) -->
                     <div class="logo-card" id="cap-logo-card" style="display: none;">
-                        <div class="logo-card-header">
+                        <div class="logo-card-header" onclick="toggleLogoCard('cap-logo-card')">
                             <div class="logo-card-icon cap">
                                 <i class="fas fa-hat-cowboy"></i>
                             </div>
                             <span class="logo-card-title">Cap Front Logo</span>
+                            <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
                             <!-- Embellishment Type Selection -->
-                            <div class="logo-form-row" style="margin-bottom: 12px;">
-                                <div class="logo-form-field" style="flex: 1;">
-                                    <label>Embellishment Type</label>
+                            <div class="logo-form-row cap-embellishment-row">
+                                <div class="logo-form-field">
+                                    <label>Type</label>
                                     <select id="cap-embellishment-type" onchange="handleCapEmbellishmentChange()">
                                         <option value="embroidery" selected>Flat Embroidery</option>
-                                        <option value="3d-puff">3D Puff Embroidery (+$5/cap)</option>
-                                        <option value="laser-patch">Laser Leatherette Patch (+$5/cap)</option>
+                                        <option value="3d-puff">3D Puff (+$5/cap)</option>
+                                        <option value="laser-patch">Laser Patch (+$5/cap)</option>
                                     </select>
                                 </div>
                             </div>
@@ -201,10 +190,34 @@
                                         <span class="digitizing-checkbox-label">Digitizing</span>
                                         <span class="digitizing-checkbox-price">$100</span>
                                     </div>
+                                    <!-- Vertical divider -->
+                                    <div class="logo-form-divider"></div>
+                                    <!-- Cap AL Toggle (inline) -->
+                                    <div class="al-inline-toggle" id="cap-al-inline">
+                                        <div class="toggle-switch" id="cap-al-switch" onclick="toggleGlobalALNew('cap')">
+                                            <div class="toggle-switch-handle"></div>
+                                        </div>
+                                        <span class="al-inline-label" id="cap-al-label">AL</span>
+                                        <input type="checkbox" id="cap-al-toggle" style="display: none;">
+                                    </div>
+                                    <!-- Cap AL Config Fields (hidden until toggle is on) -->
+                                    <div class="al-inline-fields" id="cap-al-config-new">
+                                        <div class="logo-form-field">
+                                            <label>AL Stitches</label>
+                                            <input type="number" id="cap-al-stitches" value="5000"
+                                                   min="1000" max="50000" step="1000"
+                                                   oninput="updateGlobalAL('cap')">
+                                        </div>
+                                        <label class="al-inline-digitizing">
+                                            <input type="checkbox" id="cap-al-digitizing-checkbox"
+                                                   onchange="updateGlobalAL('cap')">
+                                            <span>Digitize</span>
+                                            <span class="digitizing-price">$100</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Patch Options (hidden by default, shown for laser-patch) -->
-                            <!-- Note: All laser patches are standard size (2-4"), no size selection needed -->
                             <div id="cap-patch-options" style="display: none;">
                                 <div class="logo-form-row">
                                     <div class="logo-form-field">
@@ -220,43 +233,6 @@
                                         </div>
                                         <span class="digitizing-checkbox-label">Design Setup</span>
                                         <span class="digitizing-checkbox-price">$50</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Additional Logo Toggle (hidden for patches - front only) -->
-                            <div class="additional-logo-section" id="cap-al-section">
-                                <div class="toggle-switch-container">
-                                    <div class="toggle-switch" id="cap-al-switch" onclick="toggleGlobalALNew('cap')">
-                                        <div class="toggle-switch-handle"></div>
-                                    </div>
-                                    <span class="toggle-switch-label" id="cap-al-label">Additional logo on caps</span>
-                                    <input type="checkbox" id="cap-al-toggle" style="display: none;">
-                                </div>
-                                <div class="additional-logo-config" id="cap-al-config-new">
-                                    <div class="logo-form-row">
-                                        <div class="logo-form-field">
-                                            <label>Position</label>
-                                            <select id="cap-al-position-select" onchange="updateGlobalAL('cap')">
-                                                <option value="Cap Back">Cap Back</option>
-                                                <option value="Cap Left">Cap Left</option>
-                                                <option value="Cap Right">Cap Right</option>
-                                                <option value="Additional Location">Additional Location</option>
-                                            </select>
-                                        </div>
-                                        <div class="logo-form-field">
-                                            <label>Stitches</label>
-                                            <input type="number" id="cap-al-stitches" value="5000"
-                                                   min="1000" max="50000" step="1000"
-                                                   onchange="updateGlobalAL('cap')">
-                                        </div>
-                                    </div>
-                                    <div class="logo-form-row digitizing-row">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" id="cap-al-digitizing-checkbox"
-                                                   onchange="updateGlobalAL('cap')">
-                                            <span>Digitizing</span>
-                                            <span class="digitizing-price">$100</span>
-                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -358,16 +334,45 @@
                                 <td class="cell-total" id="setup-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <!-- NOTE: Service items (DECG, DECC, AL, MONOGRAM) now appear as product rows via createServiceProductRow() -->
-                            <!-- The following were REMOVED in 2026-02 refactor:
-                                 - stitches-fee-row (AS-GARM/AS-CAP) - now service product row
-                                 - garment-al-fee-row (AL) - now service product row
-                                 - cap-al-fee-row (AL cap) - now service product row
-                                 - monogram-fee-row (MONOGRAM) - now service product row
-                                 - decg-fee-row (DECG) - now service product row
-                                 - decc-fee-row (DECC) - now service product row
-                            -->
-                            <!-- Garment Additional Logo Digitizing Row - KEEP (setup fee) -->
+                            <!-- Additional Stitches Fee Rows (AS-GARM / AS-CAP) -->
+                            <tr id="garment-stitch-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-layer-group"></i> AS-GARM : Extra Stitches (Garments)
+                                </td>
+                                <td class="cell-qty" id="garment-stitch-fee-qty">0</td>
+                                <td class="cell-price" id="garment-stitch-fee-unit">$0.00</td>
+                                <td class="cell-total" id="garment-stitch-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="cap-stitch-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-layer-group"></i> AS-CAP : Extra Stitches (Caps)
+                                </td>
+                                <td class="cell-qty" id="cap-stitch-fee-qty">0</td>
+                                <td class="cell-price" id="cap-stitch-fee-unit">$0.00</td>
+                                <td class="cell-total" id="cap-stitch-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Additional Logo Fee Rows (AL / AL-Cap per-piece charges) -->
+                            <tr id="garment-al-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-layer-group"></i> AL : Additional Logo (Garments)
+                                </td>
+                                <td class="cell-qty" id="garment-al-fee-qty">0</td>
+                                <td class="cell-price" id="garment-al-fee-unit">$0.00</td>
+                                <td class="cell-total" id="garment-al-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="cap-al-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-layer-group"></i> AL-Cap : Additional Logo (Caps)
+                                </td>
+                                <td class="cell-qty" id="cap-al-fee-qty">0</td>
+                                <td class="cell-price" id="cap-al-fee-unit">$0.00</td>
+                                <td class="cell-total" id="cap-al-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Additional Logo Digitizing Rows (setup fees) -->
                             <tr id="garment-al-digitizing-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-cog"></i> AL Digitizing: <span id="garment-al-digitizing-position">--</span>
@@ -1161,7 +1166,7 @@ Company:Absher Construction Company
 
         // Additional logos array (for garments)
         let additionalLogos = [];
-        // Example entry: { id: 'al-1', position: 'Right Chest', stitchCount: 8000, needsDigitizing: false, isPrimary: false }
+        // Example entry: { id: 'global-al-garment', position: 'AL', stitchCount: 8000, needsDigitizing: false, isPrimary: false }
 
         // Cap Logo Configuration (separate from garment logos)
         // Supports multiple embellishment types: 'embroidery', '3d-puff', 'patch'
@@ -1174,7 +1179,7 @@ Company:Absher Construction Company
             needsSetup: true  // For patches: $50 design setup fee (GRT-50)
         };
         let capAdditionalLogos = [];
-        // Example entry: { id: 'cap-al-1', position: 'CB', stitchCount: 5000, needsDigitizing: false, isPrimary: false }
+        // Example entry: { id: 'global-al-cap', position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false, isPrimary: false }
 
         let products = [];
         let rowCounter = 0;
@@ -1182,20 +1187,27 @@ Company:Absher Construction Company
         let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
         // Global AL config (applies to all products of type when enabled)
         let globalAL = {
-            garment: { enabled: false, position: 'Right Chest', stitchCount: 8000, needsDigitizing: false },
-            cap: { enabled: false, position: 'Cap Back', stitchCount: 5000, needsDigitizing: false }
+            garment: { enabled: false, position: 'AL', stitchCount: 8000, needsDigitizing: false },
+            cap: { enabled: false, position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false }
         };
 
-        // Toggle global AL on/off
-        function toggleGlobalAL(type) {
-            const checkbox = document.getElementById(`${type}-al-toggle`);
-            const config = document.getElementById(`${type}-al-config`);
-
-            globalAL[type].enabled = checkbox.checked;
-            config.style.display = checkbox.checked ? 'flex' : 'none';
-
-            // Recalculate all product prices
-            recalculatePricing();
+        // Sync module-level AL arrays from globalAL state
+        // Called whenever globalAL changes so all existing references (save, invoice, etc.) get correct data
+        function _syncALArrays() {
+            additionalLogos = globalAL.garment.enabled ? [{
+                id: 'global-al-garment',
+                position: 'AL',
+                stitchCount: globalAL.garment.stitchCount,
+                needsDigitizing: globalAL.garment.needsDigitizing,
+                isPrimary: false
+            }] : [];
+            capAdditionalLogos = globalAL.cap.enabled ? [{
+                id: 'global-al-cap',
+                position: 'AL-Cap',
+                stitchCount: globalAL.cap.stitchCount,
+                needsDigitizing: globalAL.cap.needsDigitizing,
+                isPrimary: false
+            }] : [];
         }
 
         // Handle primary logo position change (for Full Back 25K minimum)
@@ -1217,28 +1229,16 @@ Company:Absher Construction Company
             recalculatePricing();
         }
 
-        // Update global AL config (position, stitch count, or digitizing change)
+        // Update global AL config (stitch count or digitizing change)
+        // Position is fixed: 'AL' for garments, 'AL-Cap' for caps
         function updateGlobalAL(type) {
-            const positionSelect = document.getElementById(`${type}-al-position-select`);
             const stitchesInput = document.getElementById(`${type}-al-stitches`);
             const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
 
-            // Full Back requires minimum 25K stitches
-            if (positionSelect && positionSelect.value === 'Full Back') {
-                if (parseInt(stitchesInput.value) < 25000) {
-                    stitchesInput.value = 25000;
-                    showToast('Full Back requires minimum 25,000 stitches', 'info');
-                }
-                stitchesInput.min = 25000;
-            } else if (stitchesInput) {
-                stitchesInput.min = 1000;
-            }
-
-            if (positionSelect) globalAL[type].position = positionSelect.value;
             if (stitchesInput) globalAL[type].stitchCount = parseInt(stitchesInput.value) || (type === 'cap' ? 5000 : 8000);
             if (digitizingCheckbox) globalAL[type].needsDigitizing = digitizingCheckbox.checked;
 
-            // Recalculate all product prices
+            _syncALArrays();
             recalculatePricing();
         }
 
@@ -1260,8 +1260,15 @@ Company:Absher Construction Company
             // Update global state
             globalAL[type].enabled = isActive;
 
-            // Recalculate pricing
+            // Sync module-level arrays and recalculate
+            _syncALArrays();
             recalculatePricing();
+        }
+
+        // Toggle logo card collapse/expand
+        function toggleLogoCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) card.classList.toggle('collapsed');
         }
 
         // NEW: Toggle function for modernized digitizing checkbox
@@ -1291,33 +1298,26 @@ Company:Absher Construction Company
             const embellishmentType = document.getElementById('cap-embellishment-type').value;
             const embroideryOptions = document.getElementById('cap-embroidery-options');
             const patchOptions = document.getElementById('cap-patch-options');
-            const alSection = document.getElementById('cap-al-section');
 
             // Update the capPrimaryLogo object with new embellishment type
             capPrimaryLogo.embellishmentType = embellishmentType;
 
             if (embellishmentType === 'laser-patch') {
-                // Show patch options, hide embroidery options
+                // Show patch options, hide embroidery options (AL toggle is inside embroidery options)
                 embroideryOptions.style.display = 'none';
                 patchOptions.style.display = 'block';
-                // Hide additional logo section - patches are front only
-                alSection.style.display = 'none';
-                // Disable AL if it was enabled
+                // Disable AL if it was enabled (toggle is hidden with embroidery options)
                 if (globalAL.cap.enabled) {
                     toggleGlobalALNew('cap'); // Turn it off
                 }
-                // Note: Artwork services panel is now in sidebar (always visible)
                 // For patches: no stitches needed, use setup fee instead of digitizing
                 capPrimaryLogo.stitchCount = 0;
                 capPrimaryLogo.needsDigitizing = false;
                 capPrimaryLogo.needsSetup = document.getElementById('cap-patch-setup')?.checked ?? true;
             } else {
-                // Show embroidery options (for both flat and 3D puff)
+                // Show embroidery options (for both flat and 3D puff) — AL toggle is inline
                 embroideryOptions.style.display = 'block';
                 patchOptions.style.display = 'none';
-                // Show additional logo section for embroidery types
-                alSection.style.display = 'block';
-                // Note: Artwork services panel is now in sidebar (always visible)
                 // Restore stitch count from input
                 capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
                 capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
@@ -1953,16 +1953,16 @@ Company:Absher Construction Company
                 primaryLogo: { ...primaryLogo },
                 capPrimaryLogo: typeof capPrimaryLogo !== 'undefined' ? { ...capPrimaryLogo } : null,
                 garmentAL: {
-                    enabled: document.getElementById('garment-al-toggle')?.checked || false,
-                    position: document.getElementById('garment-al-position-select')?.value || 'Right Chest',
-                    stitches: document.getElementById('garment-al-stitches')?.value || 8000,
-                    needsDigitizing: document.getElementById('garment-al-digitizing-checkbox')?.checked || false
+                    enabled: globalAL.garment.enabled,
+                    position: 'AL',
+                    stitches: globalAL.garment.stitchCount,
+                    needsDigitizing: globalAL.garment.needsDigitizing
                 },
                 capAL: {
-                    enabled: document.getElementById('cap-al-toggle')?.checked || false,
-                    position: document.getElementById('cap-al-position-select')?.value || 'Cap Back',
-                    stitches: document.getElementById('cap-al-stitches')?.value || 5000,
-                    needsDigitizing: document.getElementById('cap-al-digitizing-checkbox')?.checked || false
+                    enabled: globalAL.cap.enabled,
+                    position: 'AL-Cap',
+                    stitches: globalAL.cap.stitchCount,
+                    needsDigitizing: globalAL.cap.needsDigitizing
                 },
                 customerName: document.getElementById('customer-name')?.value || '',
                 customerEmail: document.getElementById('customer-email')?.value || '',
@@ -2015,33 +2015,51 @@ Company:Absher Construction Company
 
             // Restore garment AL configuration
             if (draft.garmentAL && draft.garmentAL.enabled) {
+                globalAL.garment.enabled = true;
+                globalAL.garment.position = 'AL';
+                globalAL.garment.stitchCount = parseInt(draft.garmentAL.stitches) || 8000;
+                globalAL.garment.needsDigitizing = draft.garmentAL.needsDigitizing || false;
+
+                // Update UI toggle
+                const garmentALSwitch = document.getElementById('garment-al-switch');
+                const garmentALLabel = document.getElementById('garment-al-label');
+                const garmentALConfig = document.getElementById('garment-al-config-new');
                 const garmentALToggle = document.getElementById('garment-al-toggle');
-                if (garmentALToggle) {
-                    garmentALToggle.checked = true;
-                    toggleGlobalAL('garment');
-                    const posEl = document.getElementById('garment-al-position-select');
-                    if (posEl) posEl.value = draft.garmentAL.position;
-                    const stitchEl = document.getElementById('garment-al-stitches');
-                    if (stitchEl) stitchEl.value = draft.garmentAL.stitches;
-                    const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
-                    if (digitizingEl) digitizingEl.checked = draft.garmentAL.needsDigitizing || false;
-                }
+                if (garmentALSwitch) garmentALSwitch.classList.add('active');
+                if (garmentALLabel) garmentALLabel.classList.add('active');
+                if (garmentALConfig) garmentALConfig.classList.add('visible');
+                if (garmentALToggle) garmentALToggle.checked = true;
+
+                const stitchEl = document.getElementById('garment-al-stitches');
+                if (stitchEl) stitchEl.value = globalAL.garment.stitchCount;
+                const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
             }
 
             // Restore cap AL configuration
             if (draft.capAL && draft.capAL.enabled) {
+                globalAL.cap.enabled = true;
+                globalAL.cap.position = 'AL-Cap';
+                globalAL.cap.stitchCount = parseInt(draft.capAL.stitches) || 5000;
+                globalAL.cap.needsDigitizing = draft.capAL.needsDigitizing || false;
+
+                // Update UI toggle
+                const capALSwitch = document.getElementById('cap-al-switch');
+                const capALLabel = document.getElementById('cap-al-label');
+                const capALConfig = document.getElementById('cap-al-config-new');
                 const capALToggle = document.getElementById('cap-al-toggle');
-                if (capALToggle) {
-                    capALToggle.checked = true;
-                    toggleGlobalAL('cap');
-                    const posEl = document.getElementById('cap-al-position-select');
-                    if (posEl) posEl.value = draft.capAL.position;
-                    const stitchEl = document.getElementById('cap-al-stitches');
-                    if (stitchEl) stitchEl.value = draft.capAL.stitches;
-                    const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
-                    if (digitizingEl) digitizingEl.checked = draft.capAL.needsDigitizing || false;
-                }
+                if (capALSwitch) capALSwitch.classList.add('active');
+                if (capALLabel) capALLabel.classList.add('active');
+                if (capALConfig) capALConfig.classList.add('visible');
+                if (capALToggle) capALToggle.checked = true;
+
+                const stitchEl = document.getElementById('cap-al-stitches');
+                if (stitchEl) stitchEl.value = globalAL.cap.stitchCount;
+                const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
+                if (digitizingEl) digitizingEl.checked = globalAL.cap.needsDigitizing;
             }
+
+            _syncALArrays();
 
             // Restore products
             if (draft.products && draft.products.length > 0) {
@@ -2245,24 +2263,22 @@ Company:Absher Construction Company
             // Additional logo on garments
             if (session.AdditionalLogoLocation) {
                 globalAL.garment.enabled = true;
-                globalAL.garment.position = session.AdditionalLogoLocation;
+                globalAL.garment.position = 'AL';
                 globalAL.garment.stitchCount = session.AdditionalStitchCount || 8000;
 
                 // Update UI
                 const alSwitch = document.getElementById('garment-al-switch');
                 if (alSwitch) alSwitch.classList.add('active');
+                const alLabel = document.getElementById('garment-al-label');
+                if (alLabel) alLabel.classList.add('active');
                 const alConfig = document.getElementById('garment-al-config-new');
-                if (alConfig) alConfig.style.display = 'block';
+                if (alConfig) alConfig.classList.add('visible');
                 const alToggle = document.getElementById('garment-al-toggle');
                 if (alToggle) alToggle.checked = true;
-
-                const posSelect = document.getElementById('garment-al-position-select');
-                if (posSelect) posSelect.value = session.AdditionalLogoLocation;
                 const stitchInput = document.getElementById('garment-al-stitches');
-                if (stitchInput) stitchInput.value = session.AdditionalStitchCount || 8000;
-                // Update globalAL state
-                globalAL.garment.position = session.AdditionalLogoLocation;
-                globalAL.garment.stitchCount = session.AdditionalStitchCount || 8000;
+                if (stitchInput) stitchInput.value = globalAL.garment.stitchCount;
+
+                _syncALArrays();
             }
 
             // Cap primary logo
@@ -2640,10 +2656,10 @@ Company:Absher Construction Company
                 });
             }
 
-            // Stitch count input
+            // Stitch count input — use 'input' event for immediate feedback as user types
             const stitchInput = document.getElementById('primary-stitches');
             if (stitchInput) {
-                stitchInput.addEventListener('change', function() {
+                stitchInput.addEventListener('input', function() {
                     primaryLogo.stitchCount = parseInt(this.value) || 8000;
                     recalculatePricing();
                 });
@@ -2659,139 +2675,7 @@ Company:Absher Construction Company
             }
         }
 
-        // ============================================================
-        // ADDITIONAL LOGO MANAGEMENT
-        // ============================================================
-
-        function addAdditionalLogo() {
-            const id = 'al-' + Date.now();
-            const newLogo = {
-                id: id,
-                position: 'Right Chest',
-                stitchCount: 8000,
-                needsDigitizing: false,
-                isPrimary: false
-            };
-            additionalLogos.push(newLogo);
-            renderAdditionalLogos();
-            recalculatePricing();
-        }
-
-        function removeAdditionalLogo(id) {
-            additionalLogos = additionalLogos.filter(logo => logo.id !== id);
-            renderAdditionalLogos();
-            recalculatePricing();
-        }
-
-        function updateAdditionalLogo(id, field, value) {
-            const logo = additionalLogos.find(l => l.id === id);
-            if (logo) {
-                logo[field] = value;
-                recalculatePricing();
-            }
-        }
-
-        function renderAdditionalLogos() {
-            const container = document.getElementById('additional-logos-list');
-            if (!container) return;
-
-            if (additionalLogos.length === 0) {
-                container.innerHTML = '<div class="no-logos">No additional logos added</div>';
-                return;
-            }
-
-            container.innerHTML = additionalLogos.map(logo => `
-                <div class="additional-logo-row" data-logo-id="${logo.id}">
-                    <select class="al-position" onchange="updateAdditionalLogo('${logo.id}', 'position', this.value)">
-                        <option value="Right Chest" ${logo.position === 'Right Chest' ? 'selected' : ''}>Right Chest</option>
-                        <option value="Left Sleeve" ${logo.position === 'Left Sleeve' ? 'selected' : ''}>Left Sleeve</option>
-                        <option value="Right Sleeve" ${logo.position === 'Right Sleeve' ? 'selected' : ''}>Right Sleeve</option>
-                    </select>
-                    <div class="stitch-input-group">
-                        <input type="number" class="al-stitches" value="${logo.stitchCount}"
-                               min="1000" step="1000"
-                               onchange="updateAdditionalLogo('${logo.id}', 'stitchCount', parseInt(this.value) || 8000)">
-                        <span>stitches</span>
-                    </div>
-                    <label class="al-digitizing">
-                        <input type="checkbox" ${logo.needsDigitizing ? 'checked' : ''}
-                               onchange="updateAdditionalLogo('${logo.id}', 'needsDigitizing', this.checked)">
-                        Digitizing
-                    </label>
-                    <span class="al-price" id="al-price-${logo.id}">$0.00/ea</span>
-                    <button class="remove-al-btn" onclick="removeAdditionalLogo('${logo.id}')" title="Remove logo">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        // ============================================================
-        // CAP ADDITIONAL LOGO MANAGEMENT
-        // ============================================================
-
-        function addCapAdditionalLogo() {
-            const id = 'cap-al-' + Date.now();
-            const newLogo = {
-                id: id,
-                position: 'CB',  // Cap Back default
-                stitchCount: 5000,  // Default 5000 for cap additional logos
-                needsDigitizing: false,
-                isPrimary: false
-            };
-            capAdditionalLogos.push(newLogo);
-            renderCapAdditionalLogos();
-            recalculatePricing();
-        }
-
-        function removeCapAdditionalLogo(id) {
-            capAdditionalLogos = capAdditionalLogos.filter(logo => logo.id !== id);
-            renderCapAdditionalLogos();
-            recalculatePricing();
-        }
-
-        function updateCapAdditionalLogo(id, field, value) {
-            const logo = capAdditionalLogos.find(l => l.id === id);
-            if (logo) {
-                logo[field] = value;
-                recalculatePricing();
-            }
-        }
-
-        function renderCapAdditionalLogos() {
-            const container = document.getElementById('cap-additional-logos-list');
-            if (!container) return;
-
-            if (capAdditionalLogos.length === 0) {
-                container.innerHTML = '<div class="no-logos">No additional cap logos added</div>';
-                return;
-            }
-
-            container.innerHTML = capAdditionalLogos.map(logo => `
-                <div class="additional-logo-row" data-logo-id="${logo.id}">
-                    <select class="al-position" onchange="updateCapAdditionalLogo('${logo.id}', 'position', this.value)">
-                        <option value="CB" ${logo.position === 'CB' ? 'selected' : ''}>Cap Back</option>
-                        <option value="CL" ${logo.position === 'CL' ? 'selected' : ''}>Left Side</option>
-                        <option value="CR" ${logo.position === 'CR' ? 'selected' : ''}>Right Side</option>
-                    </select>
-                    <div class="stitch-input-group">
-                        <input type="number" class="al-stitches" value="${logo.stitchCount}"
-                               min="1000" step="1000"
-                               onchange="updateCapAdditionalLogo('${logo.id}', 'stitchCount', parseInt(this.value) || 5000)">
-                        <span>stitches</span>
-                    </div>
-                    <label class="al-digitizing">
-                        <input type="checkbox" ${logo.needsDigitizing ? 'checked' : ''}
-                               onchange="updateCapAdditionalLogo('${logo.id}', 'needsDigitizing', this.checked)">
-                        Digitizing
-                    </label>
-                    <span class="al-price" id="cap-al-price-${logo.id}">$0.00/ea</span>
-                    <button class="remove-al-btn" onclick="removeCapAdditionalLogo('${logo.id}')" title="Remove logo">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
+        // (Per-logo card functions removed — AL is now managed via global toggle only)
 
         // Update cap logo section visibility based on caps in quote
         function updateCapLogoSectionVisibility() {
@@ -2845,7 +2729,7 @@ Company:Absher Construction Company
             const digitizingCheckbox = document.getElementById('cap-primary-digitizing');
 
             if (stitchesInput) {
-                stitchesInput.addEventListener('change', function() {
+                stitchesInput.addEventListener('input', function() {
                     capPrimaryLogo.stitchCount = parseInt(this.value) || 8000;
                     recalculatePricing();
                 });
@@ -5012,6 +4896,62 @@ Company:Absher Construction Company
         }
 
         /**
+         * Post-import: Hide parent rows that have zero standard sizes (variant-only).
+         * Promotes child rows to look like normal product rows (standalone-child class).
+         * Called once after all products are imported in confirmShopWorksImport().
+         */
+        function hideVariantOnlyParents() {
+            const tbody = document.getElementById('product-tbody');
+            if (!tbody) return;
+
+            const parentRows = tbody.querySelectorAll('tr:not(.child-row):not(.service-product-row)');
+            parentRows.forEach(parentRow => {
+                const rowId = parseInt(parentRow.dataset.rowId);
+                if (!rowId || !childRowMap[rowId]) return;
+                if (parentRow.dataset.isOsfaOnly === 'true') return;
+
+                // Check if ALL standard size inputs are empty/zero
+                let standardTotal = 0;
+                parentRow.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+                    standardTotal += parseInt(input.value) || 0;
+                });
+
+                if (standardTotal > 0) return; // Has standard sizes — keep parent visible
+
+                // This is a variant-only parent — hide it and promote children
+                parentRow.classList.add('variant-only-parent');
+                parentRow.dataset.variantOnlyHidden = 'true';
+
+                // Promote each child row to standalone
+                const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+                childRows.forEach(childRow => {
+                    childRow.classList.add('standalone-child');
+
+                    // Copy thumbnail from parent to child
+                    const parentThumbCell = parentRow.querySelector('.thumbnail-col');
+                    const childThumbCell = childRow.querySelector('.thumbnail-col');
+                    if (parentThumbCell && childThumbCell && parentThumbCell.innerHTML.trim()) {
+                        childThumbCell.innerHTML = parentThumbCell.innerHTML;
+                    }
+                });
+
+                console.log(`[hideVariantOnlyParents] Hidden parent row ${rowId} (${parentRow.dataset.style}), promoted ${childRows.length} child(ren)`);
+            });
+        }
+
+        /**
+         * Unhide a variant-only parent row (called when its last child is deleted).
+         */
+        function unhideVariantOnlyParent(parentRowId) {
+            const parentRow = document.getElementById(`row-${parentRowId}`);
+            if (!parentRow || parentRow.dataset.variantOnlyHidden !== 'true') return;
+
+            parentRow.classList.remove('variant-only-parent');
+            parentRow.dataset.variantOnlyHidden = 'false';
+            console.log(`[unhideVariantOnlyParent] Restored parent row ${parentRowId}`);
+        }
+
+        /**
          * Generate ShopWorks-compatible part number
          * Uses SIZE_TO_SUFFIX which contains ALL size suffixes (tall, youth, toddler, etc.)
          */
@@ -5246,6 +5186,14 @@ Company:Absher Construction Company
             // Remove child row
             removeChildRow(parentRowId, size);
 
+            // If parent was hidden (variant-only) and has no more children, unhide it
+            if (parentRow.dataset.variantOnlyHidden === 'true') {
+                const remainingChildren = document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`);
+                if (remainingChildren.length === 0) {
+                    unhideVariantOnlyParent(parentRowId);
+                }
+            }
+
             // Update parent Qty display (may revert to 0 if no children remain)
             updateParentQtyDisplay(parentRowId);
 
@@ -5451,22 +5399,35 @@ Company:Absher Construction Company
             }
 
             // Calculate using the existing pricing calculator
-            // Build separate logo configs for garments and caps
+            // Build AL entries from global toggle state (for digitizing counting in pricing engine)
+            const garmentALForConfig = globalAL.garment.enabled ? [{
+                id: 'global-al-garment',
+                position: 'AL',
+                stitchCount: globalAL.garment.stitchCount,
+                needsDigitizing: globalAL.garment.needsDigitizing
+            }] : [];
+            const capALForConfig = globalAL.cap.enabled ? [{
+                id: 'global-al-cap',
+                position: 'AL-Cap',
+                stitchCount: globalAL.cap.stitchCount,
+                needsDigitizing: globalAL.cap.needsDigitizing
+            }] : [];
+
             const logoConfigs = {
                 garment: {
                     primary: { ...primaryLogo, id: 'primary' },
-                    additional: additionalLogos
+                    additional: garmentALForConfig
                 },
                 cap: {
                     primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                    additional: capAdditionalLogos
+                    additional: capALForConfig
                 }
             };
 
             // For backward compatibility, also create combined array (garment logos only for non-cap products)
             const allLogos = [
                 { ...primaryLogo, id: 'primary' },
-                ...additionalLogos
+                ...garmentALForConfig
             ];
 
             try {
@@ -5861,68 +5822,91 @@ Company:Absher Construction Company
                 if (setupFeeTableRow) setupFeeTableRow.style.display = 'none';
             }
 
-            // Additional Stitches calculation (2026-02 refactor: now included in pricing calculation)
-            // Extra stitch costs are calculated in the pricing engine and included in unit prices
-            // Fee rows removed - additional stitches handled via service product rows when needed
-            // Kept calculation for sidebar display reference
-            const garmentStitches = parseInt(document.getElementById('primary-stitches').value) || 8000;
-            const capStitchesInput = document.getElementById('cap-primary-stitches');
-            const capStitches = capStitchesInput ? (parseInt(capStitchesInput.value) || 8000) : 8000;
+            // Additional Stitches fee rows (AS-GARM / AS-CAP)
+            // Stitch fees are calculated by the pricing engine and included in grandTotal
+            // These rows provide visible feedback to the user
+            const garmentStitchFeeRow = document.getElementById('garment-stitch-fee-row');
+            const capStitchFeeRow = document.getElementById('cap-stitch-fee-row');
 
-            // Calculate garment extra stitches (rate: $1.25/K)
-            const garmentExtraK = Math.max(0, (garmentStitches - 8000) / 1000);
-            const garmentQty = pricing.garmentQuantity || 0;
-            const garmentStitchFee = garmentExtraK * 1.25 * garmentQty;
-
-            // Calculate cap extra stitches (rate: $1.00/K)
-            // Skip for laser patches - they don't use stitches
-            const capQty = pricing.capQuantity || 0;
-            let capStitchFee = 0;
-            if (capEmbType !== 'laser-patch') {
-                const capExtraK = Math.max(0, (capStitches - 8000) / 1000);
-                capStitchFee = capExtraK * 1.00 * capQty;
+            if (pricing.garmentStitchTotal > 0) {
+                if (garmentStitchFeeRow) {
+                    garmentStitchFeeRow.style.display = 'table-row';
+                    const garmentQty = pricing.garmentQuantity || 0;
+                    const unitPrice = garmentQty > 0 ? pricing.garmentStitchTotal / garmentQty : 0;
+                    document.getElementById('garment-stitch-fee-qty').textContent = garmentQty;
+                    document.getElementById('garment-stitch-fee-unit').textContent = `$${unitPrice.toFixed(2)}`;
+                    document.getElementById('garment-stitch-fee-total').textContent = `$${pricing.garmentStitchTotal.toFixed(2)}`;
+                }
+            } else {
+                if (garmentStitchFeeRow) garmentStitchFeeRow.style.display = 'none';
             }
 
-            const totalStitchFee = garmentStitchFee + capStitchFee;
-
-            // Additional Logos pricing section (GARMENTS) - reads from globalAL state
-            const alContainer = document.getElementById('additional-logos-pricing');
-            if (globalAL.garment.enabled && pricing.garmentQuantity > 0) {
-                // Calculate AL pricing based on garment tier (fetch from API)
-                const tier = pricing.garmentTier || pricing.tier || '1-7';
-                let alBaseRate = 13.50; // 2026 fallback
-                if (pricingCalculator.alTiers && pricingCalculator.alTiers[tier]) {
-                    alBaseRate = pricingCalculator.alTiers[tier].embCost;
-                } else {
-                    // Tier-based fallback if API unavailable (2026 AL costs)
-                    if (tier.includes('72')) alBaseRate = 9.50;
-                    else if (tier.includes('48')) alBaseRate = 10.50;
-                    else if (tier.includes('24')) alBaseRate = 12.50;
-                    console.warn('[Garment AL] Using fallback rates - API data unavailable for tier:', tier);
+            if (pricing.capStitchTotal > 0) {
+                if (capStitchFeeRow) {
+                    capStitchFeeRow.style.display = 'table-row';
+                    const capQty = pricing.capQuantity || 0;
+                    const unitPrice = capQty > 0 ? pricing.capStitchTotal / capQty : 0;
+                    document.getElementById('cap-stitch-fee-qty').textContent = capQty;
+                    document.getElementById('cap-stitch-fee-unit').textContent = `$${unitPrice.toFixed(2)}`;
+                    document.getElementById('cap-stitch-fee-total').textContent = `$${pricing.capStitchTotal.toFixed(2)}`;
                 }
+            } else {
+                if (capStitchFeeRow) capStitchFeeRow.style.display = 'none';
+            }
 
-                // Get base stitch count and rate from API (with fallbacks)
-                const alConfig = pricingCalculator.alTiers && pricingCalculator.alTiers[tier];
-                const alBaseStitches = alConfig?.baseStitchCount || 8000;
-                const alStitchRate = alConfig?.additionalStitchRate || 1.25;
+            // ============================================
+            // Additional Logo (AL) fee rows + sidebar display
+            // Uses pricing engine's additionalServices — no duplicate calculation
+            // ============================================
+            const garmentAlFeeRow = document.getElementById('garment-al-fee-row');
+            const capAlFeeRow = document.getElementById('cap-al-fee-row');
 
-                // Use globalAL.garment config instead of legacy additionalLogos array
-                const logo = globalAL.garment;
-                const logoExtraStitches = Math.max(0, logo.stitchCount - alBaseStitches);
-                const logoExtraK = logoExtraStitches / 1000;
-                const stitchCost = logoExtraK * alStitchRate;
-                const alUnitPrice = alBaseRate + stitchCost;
-                const alTotal = alUnitPrice * pricing.garmentQuantity;
+            // Find garment AL and cap AL from pricing engine results
+            const garmentALServices = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
+            const capALServices = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
 
-                // Add line item to quote summary
-                const stitchNote = logoExtraStitches > 0 ? ` (+${logoExtraK}K)` : '';
+            // Garment AL fee row
+            const garmentALTotal = garmentALServices.reduce((sum, s) => sum + s.total, 0);
+            if (garmentALTotal > 0 && garmentALServices.length > 0) {
+                if (garmentAlFeeRow) {
+                    garmentAlFeeRow.style.display = 'table-row';
+                    const garmentALQty = garmentALServices.reduce((sum, s) => sum + s.quantity, 0);
+                    const garmentALUnitPrice = garmentALQty > 0 ? garmentALTotal / garmentALQty : 0;
+                    document.getElementById('garment-al-fee-qty').textContent = garmentALQty;
+                    document.getElementById('garment-al-fee-unit').textContent = `$${garmentALUnitPrice.toFixed(2)}`;
+                    document.getElementById('garment-al-fee-total').textContent = `$${garmentALTotal.toFixed(2)}`;
+                }
+            } else {
+                if (garmentAlFeeRow) garmentAlFeeRow.style.display = 'none';
+            }
+
+            // Cap AL fee row
+            const capALTotal = capALServices.reduce((sum, s) => sum + s.total, 0);
+            if (capALTotal > 0 && capALServices.length > 0) {
+                if (capAlFeeRow) {
+                    capAlFeeRow.style.display = 'table-row';
+                    const capALQty = capALServices.reduce((sum, s) => sum + s.quantity, 0);
+                    const capALUnitPrice = capALQty > 0 ? capALTotal / capALQty : 0;
+                    document.getElementById('cap-al-fee-qty').textContent = capALQty;
+                    document.getElementById('cap-al-fee-unit').textContent = `$${capALUnitPrice.toFixed(2)}`;
+                    document.getElementById('cap-al-fee-total').textContent = `$${capALTotal.toFixed(2)}`;
+                }
+            } else {
+                if (capAlFeeRow) capAlFeeRow.style.display = 'none';
+            }
+
+            // Sidebar summary display
+            const alContainer = document.getElementById('additional-logos-pricing');
+            if (garmentALTotal > 0) {
+                const garmentALSideQty = garmentALServices.reduce((sum, s) => sum + s.quantity, 0);
+                const garmentALSideUnit = garmentALSideQty > 0 ? garmentALTotal / garmentALSideQty : 0;
                 alContainer.innerHTML = `
                     <div class="pricing-row al-pricing-row">
-                        <span class="label"><i class="fas fa-tshirt" style="font-size: 10px; margin-right: 3px;"></i> AL: ${logo.position}${stitchNote}:</span>
-                        <span class="value">$${alTotal.toFixed(2)}</span>
+                        <span class="label"><i class="fas fa-tshirt" style="font-size: 10px; margin-right: 3px;"></i> AL:</span>
+                        <span class="value">$${garmentALTotal.toFixed(2)}</span>
                     </div>
                     <div class="pricing-row sub-breakdown">
-                        <span class="label">$${alUnitPrice.toFixed(2)} × ${pricing.garmentQuantity}</span>
+                        <span class="label">$${garmentALSideUnit.toFixed(2)} × ${garmentALSideQty}</span>
                         <span class="value sub-value"></span>
                     </div>
                 `;
@@ -5930,46 +5914,17 @@ Company:Absher Construction Company
                 alContainer.innerHTML = '';
             }
 
-            // Cap Additional Logos pricing section - reads from globalAL state
             const capAlContainer = document.getElementById('cap-additional-logos-pricing');
-            if (globalAL.cap.enabled && pricing.capQuantity > 0) {
-                // Get cap AL pricing based on CAP tier (not combined tier)
-                const capTier = pricing.capTier || '1-7';
-                let capAlBaseRate = 6.75; // 2026 fallback (AL-CAP tier 1-7)
-                if (pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier]) {
-                    capAlBaseRate = pricingCalculator.capAlTiers[capTier].embCost;
-                } else {
-                    // Tier-based fallback if API unavailable (2026 AL-CAP costs)
-                    if (capTier.includes('72')) capAlBaseRate = 5.25;
-                    else if (capTier.includes('48')) capAlBaseRate = 5.50;
-                    else if (capTier.includes('24')) capAlBaseRate = 5.75;
-                    console.warn('[Cap AL] Using fallback rates - API data unavailable for tier:', capTier);
-                }
-
-                // Get base stitch count and rate from API (with fallbacks)
-                const capAlConfig = pricingCalculator.capAlTiers && pricingCalculator.capAlTiers[capTier];
-                const capAlBaseStitches = capAlConfig?.baseStitchCount || 5000;
-                const capAlStitchRate = capAlConfig?.additionalStitchRate || 1.00;
-
-                // Use globalAL.cap config instead of legacy capAdditionalLogos array
-                const logo = globalAL.cap;
-                // Cap AL base is 5000 stitches (from API, not 8000 like garments)
-                const logoExtraStitches = Math.max(0, logo.stitchCount - capAlBaseStitches);
-                const logoExtraK = logoExtraStitches / 1000; // No rounding, consistent with garment AL
-                // Cap AL rate is $1.00/1K from API (not $1.25 like garments)
-                const stitchCost = logoExtraK * capAlStitchRate;
-                const capAlUnitPrice = capAlBaseRate + stitchCost;
-                const capAlTotal = capAlUnitPrice * pricing.capQuantity;
-
-                // Add line item to quote summary
-                const stitchNote = logoExtraStitches > 0 ? ` (+${logoExtraK}K)` : '';
+            if (capALTotal > 0) {
+                const capALSideQty = capALServices.reduce((sum, s) => sum + s.quantity, 0);
+                const capALSideUnit = capALSideQty > 0 ? capALTotal / capALSideQty : 0;
                 capAlContainer.innerHTML = `
                     <div class="pricing-row al-pricing-row cap-al">
-                        <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 10px; margin-right: 3px;"></i> AL: ${logo.position}${stitchNote}:</span>
-                        <span class="value">$${capAlTotal.toFixed(2)}</span>
+                        <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 10px; margin-right: 3px;"></i> AL-Cap:</span>
+                        <span class="value">$${capALTotal.toFixed(2)}</span>
                     </div>
                     <div class="pricing-row sub-breakdown">
-                        <span class="label">$${capAlUnitPrice.toFixed(2)} × ${pricing.capQuantity}</span>
+                        <span class="label">$${capALSideUnit.toFixed(2)} × ${capALSideQty}</span>
                         <span class="value sub-value"></span>
                     </div>
                 `;
@@ -5978,36 +5933,26 @@ Company:Absher Construction Company
             }
 
             // ============================================
-            // Additional Logo Digitizing Fee Rows (Garments)
-            // NOTE: AL service charges now appear as product rows via createServiceProductRow()
-            // Only the digitizing FEE stays in the fee table
+            // Additional Logo Digitizing Fee Rows
+            // Digitizing fees are now counted in pricing engine via logoConfigs.additional
+            // These display rows show/hide based on globalAL state
             // ============================================
-
-            // Garment AL Digitizing Row
             const garmentAlDigitizingRow = document.getElementById('garment-al-digitizing-row');
             const garmentAlDigitizingPosition = document.getElementById('garment-al-digitizing-position');
-            const garmentAlDigitizingCheckbox = document.getElementById('garment-al-digitizing-checkbox');
 
             if (globalAL.garment.enabled && globalAL.garment.needsDigitizing && pricing.garmentQuantity > 0) {
                 if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'table-row';
-                if (garmentAlDigitizingPosition) garmentAlDigitizingPosition.textContent = globalAL.garment.position || 'Right Chest';
+                if (garmentAlDigitizingPosition) garmentAlDigitizingPosition.textContent = 'AL';
             } else {
                 if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'none';
             }
 
-            // ============================================
-            // Additional Logo Digitizing Fee Rows (Caps)
-            // NOTE: AL service charges now appear as product rows via createServiceProductRow()
-            // Only the digitizing FEE stays in the fee table
-            // ============================================
-
-            // Cap AL Digitizing Row
             const capAlDigitizingRow = document.getElementById('cap-al-digitizing-row');
             const capAlDigitizingPosition = document.getElementById('cap-al-digitizing-position');
 
             if (globalAL.cap.enabled && globalAL.cap.needsDigitizing && pricing.capQuantity > 0) {
                 if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'table-row';
-                if (capAlDigitizingPosition) capAlDigitizingPosition.textContent = globalAL.cap.position || 'Cap Back';
+                if (capAlDigitizingPosition) capAlDigitizingPosition.textContent = 'AL-Cap';
             } else {
                 if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
             }
@@ -6604,8 +6549,8 @@ Company:Absher Construction Company
             // Logo configuration fields
             const logoFields = [
                 'primary-position', 'primary-stitches', 'primary-digitizing',
-                'garment-al-position-select', 'garment-al-stitches', 'garment-al-digitizing-checkbox',
-                'cap-primary-stitches', 'cap-al-position-select', 'cap-al-stitches', 'cap-al-digitizing-checkbox',
+                'garment-al-stitches', 'garment-al-digitizing-checkbox',
+                'cap-primary-stitches', 'cap-al-stitches', 'cap-al-digitizing-checkbox',
                 'cap-embellishment-type'
             ];
             logoFields.forEach(id => {
@@ -6663,19 +6608,35 @@ Company:Absher Construction Company
 
             // Reset logo configurations to defaults
             primaryLogo.position = 'Left Chest';
-            primaryLogo.stitches = 8000;
-            primaryLogo.digitizing = false;
+            primaryLogo.stitchCount = 8000;
+            primaryLogo.needsDigitizing = false;
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = 8000;
             document.getElementById('primary-digitizing').checked = false;
 
-            // Reset additional logo toggles
+            // Reset additional logo toggles and globalAL state
+            globalAL.garment = { enabled: false, position: 'AL', stitchCount: 8000, needsDigitizing: false };
+            globalAL.cap = { enabled: false, position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false };
+            _syncALArrays();
+
             const garmentALSwitch = document.getElementById('garment-al-switch');
+            const garmentALLabel = document.getElementById('garment-al-label');
+            const garmentALConfig = document.getElementById('garment-al-config-new');
             const capALSwitch = document.getElementById('cap-al-switch');
+            const capALLabel = document.getElementById('cap-al-label');
+            const capALConfig = document.getElementById('cap-al-config-new');
             if (garmentALSwitch) garmentALSwitch.classList.remove('active');
+            if (garmentALLabel) garmentALLabel.classList.remove('active');
+            if (garmentALConfig) garmentALConfig.classList.remove('visible');
             if (capALSwitch) capALSwitch.classList.remove('active');
+            if (capALLabel) capALLabel.classList.remove('active');
+            if (capALConfig) capALConfig.classList.remove('visible');
             document.getElementById('garment-al-toggle').checked = false;
             document.getElementById('cap-al-toggle').checked = false;
+            const garmentStitchEl = document.getElementById('garment-al-stitches');
+            if (garmentStitchEl) garmentStitchEl.value = 8000;
+            const capStitchEl = document.getElementById('cap-al-stitches');
+            if (capStitchEl) capStitchEl.value = 5000;
 
             // Reset customer form fields
             document.getElementById('customer-name').value = '';
@@ -7982,66 +7943,45 @@ Company:Absher Construction Company
                 }
 
                 if (additionalLogos.length > 0) {
-                    // Show garment logo card first if not visible
-                    const garmentLogoCard = document.getElementById('garment-logo-card');
-                    if (garmentLogoCard) garmentLogoCard.style.display = '';
+                    // Enable garment AL toggle
+                    globalAL.garment.enabled = true;
+                    globalAL.garment.position = 'AL';
 
-                    // Process each additional logo position
-                    const positionsImported = [];
-                    for (const al of additionalLogos) {
-                        const position = al.position || 'Additional Location';
-                        const alType = al.type || 'al';  // al, fb, or cb
-
-                        // For now, enable first AL and set position
-                        // Full support for multiple ALs would require UI changes
-                        if (positionsImported.length === 0) {
-                            const alToggle = document.getElementById('garment-al-toggle');
-                            const alSwitch = document.getElementById('garment-al-switch');
-                            if (alToggle && alSwitch) {
-                                alToggle.checked = true;
-                                alSwitch.classList.add('active');
-                                const alConfig = document.getElementById('garment-al-config-new');
-                                if (alConfig) alConfig.style.display = '';
-
-                                // Set position - handle special positions
-                                const posSelect = document.getElementById('garment-al-position-select');
-                                if (posSelect) {
-                                    let matched = false;
-                                    // Map FB/CB types to positions
-                                    const searchPosition = alType === 'fb' ? 'Back' :
-                                                          alType === 'cb' ? 'Cap' :
-                                                          position.split(' ')[0];
-
-                                    for (const opt of posSelect.options) {
-                                        if (opt.value.toLowerCase().includes(searchPosition.toLowerCase())) {
-                                            posSelect.value = opt.value;
-                                            matched = true;
-                                            break;
-                                        }
-                                    }
-                                    // Default to Right Chest if no match
-                                    if (!matched) {
-                                        posSelect.value = 'Right Chest';
-                                    }
-                                }
-
-                                // Update global state
-                                globalAL.garment.enabled = true;
-                                globalAL.garment.position = posSelect ? posSelect.value : 'Right Chest';
-                            }
-                        }
-                        positionsImported.push(position);
+                    // Read stitch count from first AL if provided
+                    const firstAL = additionalLogos[0];
+                    if (firstAL.stitchCount) {
+                        globalAL.garment.stitchCount = firstAL.stitchCount;
+                    }
+                    if (firstAL.needsDigitizing) {
+                        globalAL.garment.needsDigitizing = true;
                     }
 
-                    // If multiple logos imported, add note about additional positions
-                    if (positionsImported.length > 1) {
+                    // Update UI
+                    const alToggle = document.getElementById('garment-al-toggle');
+                    const alSwitch = document.getElementById('garment-al-switch');
+                    const alLabel = document.getElementById('garment-al-label');
+                    const alConfig = document.getElementById('garment-al-config-new');
+                    if (alToggle) alToggle.checked = true;
+                    if (alSwitch) alSwitch.classList.add('active');
+                    if (alLabel) alLabel.classList.add('active');
+                    if (alConfig) alConfig.classList.add('visible');
+
+                    const stitchEl = document.getElementById('garment-al-stitches');
+                    if (stitchEl) stitchEl.value = globalAL.garment.stitchCount;
+                    const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                    if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
+
+                    // If multiple logos imported, add note about original positions
+                    if (additionalLogos.length > 1) {
+                        const positions = additionalLogos.map(al => al.position || 'Additional Location');
                         const notesEl = document.getElementById('notes');
                         if (notesEl) {
-                            const alNote = `Additional logo positions: ${positionsImported.join(', ')}`;
+                            const alNote = `Additional logo positions: ${positions.join(', ')}`;
                             notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + alNote;
                         }
                     }
 
+                    _syncALArrays();
                     recalculatePricing();
                 }
 
@@ -8190,6 +8130,9 @@ Company:Absher Construction Company
 
                     showToast(`${customProductsImported} non-SanMar product(s) imported — verify pricing`, 'info', 5000);
                 }
+
+                // Hide variant-only parents (products with no standard sizes, only extended children)
+                hideVariantOnlyParents();
 
                 // Recalculate pricing
                 recalculatePricing();

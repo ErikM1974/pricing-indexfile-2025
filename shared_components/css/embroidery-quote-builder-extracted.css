@@ -251,19 +251,20 @@ body {
 /* Main container - two column layout */
 .logo-config-container {
     display: flex;
-    gap: 20px;
-    padding: 20px;
+    gap: 16px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Left column - Logo cards stack */
+/* Logo cards row — side-by-side when both visible */
 .logo-cards-column {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 16px;
     min-width: 0;
+    align-items: flex-start;
 }
 
 /* Right column - Artwork services */
@@ -280,13 +281,15 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     transition: box-shadow 0.2s ease;
+    flex: 1;
+    min-width: 0;
 }
 
 .logo-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Card header */
+/* Card header — clickable to collapse/expand */
 .logo-card-header {
     display: flex;
     align-items: center;
@@ -294,6 +297,12 @@ body {
     padding: 14px 16px;
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
     border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    user-select: none;
+}
+
+.logo-card-header:hover {
+    background: linear-gradient(135deg, #f1f5f9 0%, #f8fafc 100%);
 }
 
 .logo-card-icon {
@@ -324,15 +333,36 @@ body {
 
 /* Card body */
 .logo-card-body {
-    padding: 16px;
+    padding: 12px 16px;
+}
+
+/* Collapse chevron indicator */
+.logo-card-collapse-icon {
+    margin-left: auto;
+    font-size: 12px;
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+}
+
+.logo-card.collapsed .logo-card-collapse-icon {
+    transform: rotate(-90deg);
+}
+
+.logo-card.collapsed .logo-card-body {
+    display: none;
+}
+
+.logo-card.collapsed .logo-card-header {
+    border-bottom: none;
 }
 
 /* Form row within card */
 .logo-form-row {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .logo-form-row:last-child {
@@ -378,7 +408,7 @@ body {
 }
 
 .logo-form-field input[type="number"] {
-    width: 100px;
+    width: 85px;
 }
 
 /* Modern digitizing checkbox */
@@ -456,20 +486,82 @@ body {
     margin-left: auto;
 }
 
-/* Additional logo toggle section */
-.additional-logo-section {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid #f1f5f9;
+/* Vertical divider between primary and AL fields */
+.logo-form-divider {
+    width: 1px;
+    height: 36px;
+    background: #e5e7eb;
+    flex-shrink: 0;
+    align-self: center;
 }
 
-/* Modern toggle switch */
-.toggle-switch-container {
+/* AL toggle inline in the form row */
+.al-inline-toggle {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.al-inline-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.al-inline-label.active {
+    color: #166534;
+}
+
+/* AL config fields — inline, hidden until toggle is on */
+.al-inline-fields {
+    display: none;
     align-items: center;
     gap: 12px;
 }
 
+.al-inline-fields.visible {
+    display: flex;
+}
+
+/* AL inline digitizing checkbox */
+.al-inline-digitizing {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #374151;
+    padding: 8px 10px;
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.al-inline-digitizing input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #059669;
+    cursor: pointer;
+}
+
+.al-inline-digitizing .digitizing-price {
+    font-weight: 600;
+    color: #059669;
+    margin-left: 2px;
+}
+
+/* Cap embellishment type row — compact */
+.cap-embellishment-row {
+    margin-bottom: 8px !important;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Modern toggle switch */
 .toggle-switch {
     position: relative;
     width: 44px;
@@ -478,6 +570,7 @@ body {
     border-radius: 12px;
     cursor: pointer;
     transition: background 0.2s;
+    flex-shrink: 0;
 }
 
 .toggle-switch.active {
@@ -498,63 +591,6 @@ body {
 
 .toggle-switch.active .toggle-switch-handle {
     transform: translateX(20px);
-}
-
-.toggle-switch-label {
-    font-size: 13px;
-    color: #4b5563;
-}
-
-.toggle-switch-label.active {
-    color: #166534;
-    font-weight: 500;
-}
-
-/* Additional logo config panel (expandable) */
-.additional-logo-config {
-    display: none;
-    margin-top: 14px;
-    padding: 14px;
-    background: #fefce8;
-    border: 1px solid #fef08a;
-    border-radius: 8px;
-}
-
-.additional-logo-config.visible {
-    display: block;
-}
-
-.additional-logo-config .logo-form-row {
-    margin-bottom: 0;
-}
-
-/* AL Digitizing checkbox row */
-.additional-logo-config .logo-form-row.digitizing-row {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #fef08a;
-}
-
-.additional-logo-config .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    color: #374151;
-}
-
-.additional-logo-config .checkbox-label input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #059669;
-    cursor: pointer;
-}
-
-.additional-logo-config .checkbox-label .digitizing-price {
-    margin-left: auto;
-    font-weight: 600;
-    color: #059669;
 }
 
 /* Artwork Services Card */
@@ -1264,6 +1300,35 @@ body {
 .product-table tr.child-row:last-of-type,
 .product-table tr.child-row + tr:not(.child-row) {
     border-bottom: 2px solid var(--border-color);
+}
+
+/* Variant-only parent: hidden when all standard sizes are empty (only child rows have data) */
+.product-table tr.variant-only-parent {
+    display: none;
+}
+
+/* Standalone child: promoted child row when parent is hidden (looks like a normal product row) */
+.product-table tr.standalone-child {
+    border-left: none;
+    background: #fff;
+}
+
+.product-table tr.standalone-child td:first-child {
+    padding-left: 8px;
+}
+
+.product-table tr.standalone-child td:first-child::before {
+    content: none;
+}
+
+.product-table tr.standalone-child .desc-display {
+    color: #333;
+    font-size: 14px;
+}
+
+.product-table tr.standalone-child .style-display {
+    color: #333;
+    font-size: 14px;
 }
 
 /* Size badge for extended sizes */
@@ -2647,6 +2712,10 @@ td.size-disabled input {
     .logo-config-container {
         flex-direction: column;
         padding: 16px;
+    }
+
+    .logo-cards-column {
+        flex-direction: column;
     }
 
     .artwork-services-column {
