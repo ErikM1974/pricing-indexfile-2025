@@ -1318,6 +1318,7 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/product-category-filter.js"></script>
     <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
     <script src="/shared_components/js/manual-mode-indicator.js"></script>
@@ -1340,7 +1341,6 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('🧢 Cap Embroidery Pricing Page - Simple Layout');
 
             // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
@@ -1349,7 +1349,6 @@
             const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
 
             if (manualCost && !isNaN(parseFloat(manualCost))) {
-                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
                 loadManualCapPricing(parseFloat(manualCost));
                 setupSearch();
                 return; // Skip normal product loading
@@ -1492,13 +1491,11 @@
         
         // Load cap product data
         async function loadCapProduct(styleNumber) {
-            console.log(`🧢 Loading cap: ${styleNumber}`);
             
             try {
                 showLoading();
                 
                 // Fetch product details
-                console.log('📡 Fetching cap details...');
                 const productResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
                 if (!productResponse.ok) {
                     if (productResponse.status === 404) {
@@ -1511,7 +1508,6 @@
                 }
                 
                 const productArray = await productResponse.json();
-                console.log('📦 Product details response:', productArray);
                 
                 if (!productArray || productArray.length === 0) {
                     throw new Error(`No product information found for style "${styleNumber}". This may not be a valid cap style.`);
@@ -1593,7 +1589,6 @@
 
         // Load manual cap pricing (when ?manualCost parameter is provided)
         async function loadManualCapPricing(manualCost) {
-            console.log(`🔧 Loading manual cap pricing with base cost: $${manualCost.toFixed(2)}`);
 
             try {
                 showLoading();
@@ -1627,7 +1622,6 @@
                 // Show product sections
                 showProduct();
 
-                console.log('✅ Manual cap pricing loaded successfully');
 
             } catch (error) {
                 console.error('❌ Error loading manual cap pricing:', error);
@@ -1638,14 +1632,12 @@
 
         // Load available sizes from API
         async function loadSizes(styleNumber) {
-            console.log('📏 Loading cap sizes...');
             
             try {
                 const sizePricingResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
                 
                 if (sizePricingResponse.ok) {
                     const sizePricingArray = await sizePricingResponse.json();
-                    console.log('📏 Size pricing response:', sizePricingArray);
                     
                     if (sizePricingArray && sizePricingArray.length > 0) {
                         // Extract unique sizes from all color variants
@@ -1675,21 +1667,16 @@
                         // Store the base cap price from size-pricing API (this is the correct source)
                         if (baseCapPrice !== null) {
                             window.baseCapPriceFromSizeAPI = baseCapPrice;
-                            console.log('📏 Base cap price from size-pricing API:', baseCapPrice);
                         }
                         
-                        console.log('📏 Available sizes:', currentSizes);
-                        console.log('📏 Size upcharges:', sizeUpcharges);
                     }
                 } else {
-                    console.log(`⚠️ Size pricing API returned ${sizePricingResponse.status}`);
                     // Default to OSFA for caps
                     currentSizes = ['OSFA'];
                     window.currentSizeUpcharges = {};
                     window.baseCapPriceFromSizeAPI = null;
                 }
             } catch (error) {
-                console.log('❌ Could not load sizes:', error);
                 // Default to OSFA for caps
                 currentSizes = ['OSFA'];
                 window.currentSizeUpcharges = {};
@@ -1699,8 +1686,6 @@
         
         // Calculate cap pricing using the same formula as cap-quote-pricing.js
         function calculateCapPrice(baseCapPrice, quantity, sizeUpcharge = 0) {
-            console.log('💰 Calculating cap price for quantity:', quantity);
-            console.log('💰 Base cap price:', baseCapPrice);
 
             // Get margin from API data, fallback to 0.57 (2026 margin)
             const tier = getTierForQuantity(quantity);
@@ -1712,31 +1697,25 @@
                 }
             }
             const capSellingPrice = baseCapPrice / marginDenominator;
-            console.log('💰 Cap selling price (÷' + marginDenominator + '):', capSellingPrice.toFixed(2));
 
             // Get embroidery price for the tier and 8000 stitches
             const embroideryPrice = getEmbroideryPriceForTier(tier);
-            console.log('💰 Embroidery price for tier', tier + ':', embroideryPrice);
             
             // Calculate decorated price
             const decoratedPrice = capSellingPrice + embroideryPrice;
-            console.log('💰 Decorated price (before rounding):', decoratedPrice.toFixed(2));
             
             // Round UP to nearest dollar (matching cap quote builder)
             let finalPrice = Math.ceil(decoratedPrice);
-            console.log('💰 Rounded price:', finalPrice);
             
-            // Note: LTM fee is only for orders under 24 pieces
+            // Note: LTM fee is only for orders of 7 or fewer pieces
             // We don't show that in the regular pricing table
             
             // Add size upcharge if any
             if (sizeUpcharge > 0) {
                 finalPrice += sizeUpcharge;
                 finalPrice = Math.ceil(finalPrice); // Round up again after upcharge
-                console.log('💰 Price with size upcharge:', finalPrice);
             }
             
-            console.log('💰 Final price:', finalPrice);
             return finalPrice;
         }
         
@@ -1764,7 +1743,6 @@
             );
 
             if (embroideryData) {
-                console.log(`✅ Found embroidery cost for ${tier} (8000 stitches): $${embroideryData.EmbroideryCost}`);
                 return parseFloat(embroideryData.EmbroideryCost);
             }
 
@@ -1774,14 +1752,12 @@
             );
 
             if (embroideryDataAny) {
-                console.log(`✅ Found embroidery cost for ${tier}: $${embroideryDataAny.EmbroideryCost}`);
                 return parseFloat(embroideryDataAny.EmbroideryCost);
             }
 
             // For 1-7 and 8-23 tiers, fall back to 24-47 tier price (same embroidery cost, different quantity breaks)
             // This handles backward compatibility when API doesn't have new tier data yet
             if (tier === '1-7' || tier === '8-23') {
-                console.log(`⚠️ No embroidery cost for ${tier}, falling back to 24-47 tier`);
                 return getEmbroideryPriceForTier('24-47');
             }
 
@@ -1793,7 +1769,6 @@
         
         // Update cap pricing table
         function updateCapPricing() {
-            console.log('💰 Updating cap pricing table...');
             
             const tbody = document.querySelector('.pricing-table tbody');
             if (!tbody) return;
@@ -1807,24 +1782,19 @@
             // First priority: Use the price from size-pricing API (this matches the quote builder)
             if (window.baseCapPriceFromSizeAPI) {
                 baseCapPrice = window.baseCapPriceFromSizeAPI;
-                console.log('🧢 Using size-pricing API price (matches quote builder):', baseCapPrice);
             } 
             // Second priority: Use standardGarmentBaseCostUsed from bundle
             else if (pricingData && pricingData.standardGarmentBaseCostUsed) {
                 baseCapPrice = pricingData.standardGarmentBaseCostUsed;
-                console.log('🧢 Using standardGarmentBaseCostUsed from bundle:', baseCapPrice);
             } 
             // Last resort: Use sizes from bundle data
             else if (pricingData && pricingData.apiData && pricingData.apiData.sizes && pricingData.apiData.sizes.length > 0) {
                 const firstSize = pricingData.apiData.sizes[0];
                 if (firstSize) {
                     baseCapPrice = firstSize.price || firstSize.maxCasePrice || 15;
-                    console.log('🧢 Using bundle sizes data:', baseCapPrice);
                 }
             }
             
-            console.log('🧢 Base cap price:', baseCapPrice);
-            console.log('🧢 Available sizes:', currentSizes);
             
             // Generate rows for each size
             currentSizes.forEach(size => {
@@ -1858,12 +1828,10 @@
                 tbody.appendChild(row);
             });
             
-            console.log('✅ Pricing table updated with all tiers');
         }
         
         // Update product information
         function updateProductInfo(product, styleNumber) {
-            console.log('📝 Updating product info with:', product);
             
             const title = product.PRODUCT_TITLE || product.ProductTitle || product.STYLE || styleNumber.toUpperCase();
             const description = product.PRODUCT_DESCRIPTION || product.Description || product.PRODUCT_TITLE || '';
@@ -1874,7 +1842,6 @@
             document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
             document.getElementById('currentBrand').textContent = brand;
             
-            console.log('✅ Product info updated:', { title, description, brand });
         }
         
         // Helper function to detect generic catalog images
@@ -1894,7 +1861,6 @@
         
         // Set main product image and create thumbnails
         function setMainProductImage(product, colorSpecific = false) {
-            console.log('🖼️ Setting main product image with:', product, 'Color-specific:', colorSpecific);
             
             // Collect all available images
             const images = [];
@@ -1922,7 +1888,6 @@
                 images.push({ url: product.SIDE_MODEL, label: 'Side', field: 'SIDE_MODEL' });
             }
             
-            console.log('📸 Available images for', product.COLOR_NAME || 'default', ':', images);
             
             if (images.length > 0) {
                 // Set main image
@@ -1935,13 +1900,11 @@
                 
                 // Handle image load error
                 mainImage.onerror = () => {
-                    console.log('❌ Main image failed to load:', images[0].url);
                     mainImage.style.display = 'none';
                     placeholder.style.display = 'flex';
                 };
                 
                 mainImage.onload = () => {
-                    console.log('✅ Main image loaded successfully');
                 };
                 
                 // Create thumbnails if multiple images
@@ -1967,13 +1930,11 @@
                             // Update active thumbnail
                             document.querySelectorAll('.image-thumbnail').forEach(t => t.classList.remove('active'));
                             thumb.classList.add('active');
-                            console.log('🖼️ Switched to image:', img.label);
                         };
                         
                         thumbnailsContainer.appendChild(thumb);
                     });
                     
-                    console.log('✅ Created', images.length, 'thumbnails');
                 } else {
                     // Hide thumbnails if only one image
                     const thumbnailsContainer = document.getElementById('imageThumbnails');
@@ -1982,7 +1943,6 @@
                     }
                 }
             } else {
-                console.log('⚠️ No images available, showing placeholder');
                 document.getElementById('productImage').style.display = 'none';
                 document.getElementById('imagePlaceholder').style.display = 'flex';
             }
@@ -1990,14 +1950,12 @@
         
         // Load colors
         async function loadColors(styleNumber) {
-            console.log('🎨 Loading colors for:', styleNumber);
             
             try {
                 const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
                 
                 if (response.ok) {
                     const colorsArray = await response.json();
-                    console.log('🎨 Color swatches response:', colorsArray);
                     
                     // API returns array directly
                     const colors = Array.isArray(colorsArray) ? colorsArray : [];
@@ -2007,15 +1965,11 @@
                         // Set first color as selected
                         selectedColor = colors[0];
                         displayColorSwatches(colors);
-                        console.log(`✅ Loaded ${colors.length} colors, selected:`, selectedColor.COLOR_NAME || selectedColor.color);
                     } else {
-                        console.log('⚠️ No colors found for this style');
                     }
                 } else {
-                    console.log(`⚠️ Color swatches API returned ${response.status}`);
                 }
             } catch (error) {
-                console.log('❌ Could not load colors:', error);
             }
         }
         
@@ -2025,12 +1979,10 @@
             const container = document.getElementById('colorSwatches');
             
             if (!colors || colors.length === 0) {
-                console.log('⚠️ No colors available for swatches');
                 return;
             }
             
             container.innerHTML = '';
-            console.log('🎨 Displaying', colors.length, 'color swatches');
             
             colors.forEach((color, index) => {
                 const swatch = document.createElement('div');
@@ -2043,7 +1995,6 @@
                     img.alt = color.COLOR_NAME || color.color || 'Color swatch';
                     img.onerror = function() {
                         // If image fails to load, use solid color fallback
-                        console.log('⚠️ Swatch image failed for:', color.COLOR_NAME, '- using solid color');
                         swatch.innerHTML = '';
                         swatch.style.background = color.HEX_CODE || color.hexCode || '#cccccc';
                     };
@@ -2069,7 +2020,6 @@
                     // Update main product image for selected color
                     updateMainImageForColor(colorName);
                     
-                    console.log('🎨 Color selected:', colorName);
                 };
                 
                 container.appendChild(swatch);
@@ -2085,16 +2035,13 @@
                 selectedColor = colors[0];
                 const initialColorName = colors[0].COLOR_NAME || colors[0].color || 'Unknown';
                 document.getElementById('currentColor').textContent = initialColorName;
-                console.log('🎨 Initial color set:', initialColorName);
             }
         }
         
         // Update main product image for selected color
         async function updateMainImageForColor(colorName) {
-            console.log('🖼️ Finding image for color:', colorName);
             
             if (!currentProduct || !currentProduct.STYLE) {
-                console.log('⚠️ No product loaded to update color for');
                 return;
             }
             
@@ -2102,7 +2049,6 @@
                 // Fetch product details to get color-specific images
                 const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${currentProduct.STYLE}`);
                 if (!response.ok) {
-                    console.log('⚠️ Could not fetch product details for color update');
                     return;
                 }
                 
@@ -2126,20 +2072,16 @@
                     
                     // Update product images with color-specific images
                     setMainProductImage(mergedProduct, true);
-                    console.log('✅ Updated images for color:', colorName, 'with', matchingProducts.length, 'variants');
                 } else {
-                    console.log('⚠️ No matching product found for color:', colorName);
                     // Keep the current images
                 }
             } catch (error) {
-                console.log('❌ Error fetching color-specific image:', error);
                 // Keep the current images
             }
         }
         
         // Show product mismatch overlay
         function showProductMismatchOverlay(styleNumber, productName, reason) {
-            console.log('⚠️ Product mismatch detected:', productName);
             
             // Hide loading state
             document.getElementById('loadingState').style.display = 'none';
@@ -2234,7 +2176,6 @@
 
         // Update LTM calculator with real cap pricing from the pricing table
         function updateLTMCapPricing() {
-            console.log('🧢 LTM pricing updated, recalculating 1-7 column');
             updateLTMCalculator();
         }
 

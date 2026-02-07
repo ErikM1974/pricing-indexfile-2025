@@ -5,7 +5,7 @@
 
 class EmbroideryQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.quotePrefix = 'EMB';
         
         // Staff directory

@@ -1349,6 +1349,7 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/product-category-filter.js"></script>
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
     <script src="/shared_components/js/manual-mode-indicator.js"></script>
@@ -1369,7 +1370,6 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('🎨 Embroidery Pricing Page - Professional Layout');
 
             // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
@@ -1378,7 +1378,6 @@
             const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
 
             if (manualCost && !isNaN(parseFloat(manualCost))) {
-                console.log('🔧 MANUAL PRICING MODE - Base cost:', parseFloat(manualCost));
                 loadManualEmbroideryPricing(parseFloat(manualCost));
                 return; // Skip normal product loading
             }
@@ -1558,20 +1557,17 @@
         
         // Load product data
         async function loadProduct(styleNumber) {
-            console.log(`🎨 Loading product: ${styleNumber}`);
             
             try {
                 showLoading();
                 
                 // Fetch product details - API returns array
-                console.log('📡 Fetching product details...');
                 const productResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${styleNumber}`);
                 if (!productResponse.ok) {
                     throw new Error(`Product details API error: ${productResponse.status}`);
                 }
                 
                 const productArray = await productResponse.json();
-                console.log('📦 Product details response:', productArray);
                 
                 // API returns array - use first item or find by color
                 if (!productArray || productArray.length === 0) {
@@ -1615,7 +1611,6 @@
                 const productsBreadcrumb = document.getElementById('products-breadcrumb');
                 if (productsBreadcrumb) {
                     productsBreadcrumb.href = `/product.html?style=${styleNumber}`;
-                    console.log('✅ Updated products breadcrumb with style:', styleNumber);
                 }
                 
                 // Show all sections
@@ -1630,7 +1625,6 @@
 
         // Load manual embroidery pricing (when ?manualCost parameter is provided)
         async function loadManualEmbroideryPricing(manualCost) {
-            console.log(`🔧 Loading manual embroidery pricing with base cost: $${manualCost.toFixed(2)}`);
 
             try {
                 showLoading();
@@ -1661,7 +1655,6 @@
                 // Show product sections
                 showProduct();
 
-                console.log('✅ Manual embroidery pricing loaded successfully');
 
             } catch (error) {
                 console.error('❌ Error loading manual embroidery pricing:', error);
@@ -1672,7 +1665,6 @@
 
         // Update product information
         function updateProductInfo(product, styleNumber) {
-            console.log('📝 Updating product info with:', product);
             
             // Extract product info from API response
             const title = product.PRODUCT_TITLE || product.ProductTitle || product.STYLE || styleNumber.toUpperCase();
@@ -1685,7 +1677,6 @@
             document.getElementById('currentStyle').textContent = `#${styleNumber.toUpperCase()}`;
             document.getElementById('currentBrand').textContent = brand;
             
-            console.log('✅ Product info updated:', { title, description, brand });
         }
         
         // Validate if product is a cap and should use cap pricing
@@ -1695,20 +1686,13 @@
             const description = (product.PRODUCT_DESCRIPTION || product.Description || '').toLowerCase();
             const category = (product.CATEGORY || product.Category || '').toLowerCase();
             
-            console.log('🔍 Validating product type:', {
-                title: productTitle,
-                description: description,
-                category: category
-            });
 
             // Use shared utility for filtering
             if (ProductCategoryFilter.isFlatHeadwear(product)) {
-                console.log('✅ Flat headwear detected - valid for embroidery pricing');
                 return true; // Valid for flat embroidery
             }
 
             if (ProductCategoryFilter.isStructuredCap(product)) {
-                console.log('⚠️ Structured cap product detected - should use cap embroidery pricing');
                 const productName = product.PRODUCT_TITLE || product.ProductTitle || `Style ${styleNumber}`;
                 const reason = 'This product is a structured cap and requires cap embroidery pricing.';
                 showProductMismatchOverlay(styleNumber, productName, reason);
@@ -1720,7 +1704,6 @@
         
         // Show overlay for product type mismatch
         function showProductMismatchOverlay(styleNumber, productName, reason) {
-            console.log('🚫 Showing product mismatch overlay');
             
             // Check if overlay already exists
             let overlay = document.getElementById('productMismatchOverlay');
@@ -1783,7 +1766,6 @@
         
         // Set main product image and create thumbnails
         function setMainProductImage(product, colorSpecific = false) {
-            console.log('🖼️ Setting main product image with:', product);
             
             // Collect all available images ONLY from this specific product/color variant
             const images = [];
@@ -1818,7 +1800,6 @@
                 }
             }
             
-            console.log('🖼️ Found images for color:', product.COLOR_NAME || 'default', images);
             
             // Set main image
             const mainImageUrl = images[0]?.url || null;
@@ -1832,13 +1813,11 @@
                 
                 // Handle image load error
                 img.onerror = () => {
-                    console.log('❌ Main image failed to load:', mainImageUrl);
                     img.style.display = 'none';
                     placeholder.style.display = 'flex';
                 };
                 
                 img.onload = () => {
-                    console.log('✅ Main image loaded successfully:', mainImageUrl);
                 };
                 
                 // Create thumbnails if we have multiple images
@@ -1846,7 +1825,6 @@
                     createImageThumbnails(images);
                 }
             } else {
-                console.log('⚠️ No images found in product data');
             }
         }
         
@@ -1877,24 +1855,20 @@
                     document.querySelectorAll('.image-thumbnail').forEach(t => t.classList.remove('active'));
                     thumbnail.classList.add('active');
                     
-                    console.log('🖼️ Switched to image:', image.label);
                 });
                 
                 thumbnailsContainer.appendChild(thumbnail);
             });
             
             thumbnailsContainer.style.display = 'flex';
-            console.log('✅ Created', images.length, 'thumbnails');
         }
         
         // Load colors and images
         async function loadColors(styleNumber) {
             try {
-                console.log('🎨 Fetching color swatches...');
                 const colorsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=${styleNumber}`);
                 if (colorsResponse.ok) {
                     const colorsArray = await colorsResponse.json();
-                    console.log('🎨 Color swatches response:', colorsArray);
                     
                     // API returns array directly
                     const colors = Array.isArray(colorsArray) ? colorsArray : [];
@@ -1910,15 +1884,11 @@
                             displayColorSwatches(colors);
                         }
                         
-                        console.log(`✅ Loaded ${colors.length} colors, selected:`, selectedColor.COLOR_NAME || selectedColor.color);
                     } else {
-                        console.log('⚠️ No colors found, using placeholder');
                     }
                 } else {
-                    console.log(`⚠️ Colors API returned ${colorsResponse.status}`);
                 }
             } catch (error) {
-                console.log('❌ Could not load colors:', error);
                 // Use default image placeholder
             }
         }
@@ -1957,31 +1927,25 @@
         // Load size pricing for upcharges
         async function loadSizePricing(styleNumber) {
             try {
-                console.log('📏 Fetching size pricing...');
                 const sizePricingResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
                 if (sizePricingResponse.ok) {
                     const sizePricingArray = await sizePricingResponse.json();
-                    console.log('📏 Size pricing response:', sizePricingArray);
                     
                     // API returns array - use first item or find by color
                     if (sizePricingArray && sizePricingArray.length > 0) {
                         const sizePricingData = sizePricingArray[0]; // Use first item
-                        console.log('📏 Using size pricing data:', sizePricingData);
                         
                         // Store for use in pricing table
                         window.currentSizePricing = sizePricingData;
                     }
                 } else {
-                    console.log(`⚠️ Size pricing API returned ${sizePricingResponse.status}`);
                 }
             } catch (error) {
-                console.log('❌ Could not load size pricing:', error);
             }
         }
 
         // Update selected color
         function updateSelectedColor(color) {
-            console.log('🎨 Updating selected color:', color);
             
             const colorName = color.COLOR_NAME || color.color || 'Natural';
             document.getElementById('currentColor').textContent = colorName;
@@ -1992,7 +1956,6 @@
         
         // Update main product image for selected color
         function updateMainImageForColor(colorName) {
-            console.log('🖼️ Finding image for color:', colorName);
             
             // Find matching product from original product data that has the same color and has image
             const productResponse = fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-details?styleNumber=${currentProduct.STYLE}`)
@@ -2016,15 +1979,12 @@
                         
                         // Update with all images for this specific color only
                         setMainProductImage(mergedProduct, true);
-                        console.log('✅ Updated images for color:', colorName, 'with', matchingProducts.length, 'variants');
                     } else {
-                        console.log('⚠️ No matching product found for color:', colorName);
                         // Use the original default image
                         setMainProductImage(currentProduct, false);
                     }
                 })
                 .catch(error => {
-                    console.log('❌ Error fetching color-specific image:', error);
                     // Fall back to original image
                     setMainProductImage(currentProduct, false);
                 });
@@ -2032,7 +1992,6 @@
         
         // Update pricing table with multiple size rows
         function updatePricing(pricingData) {
-            console.log('💰 Updating pricing table with:', pricingData);
             
             const tiers = pricingData.tierData || [];
             
@@ -2072,7 +2031,6 @@
 
             const baseSizeToUse = firstBaseSize ? firstBaseSize.size : sizesWithOrder[0]?.size || 'S';
             
-            console.log('🎯 Using base size for pricing:', baseSizeToUse);
             
             // Try to get calculated prices from the service
             if (pricingData.pricing) {
@@ -2108,7 +2066,6 @@
                 }
             }
             
-            console.log('💰 Calculated base prices:', basePrices);
             
             // Check if we have valid pricing data (tier2, tier3, tier4 are required; tier0 and tier1 may be missing from older API responses)
             if (!basePrices.tier2 || !basePrices.tier3 || !basePrices.tier4) {
@@ -2132,9 +2089,6 @@
             // Sort by sortOrder (we already have sizesWithOrder and displayAddOns from above)
             const sortedSizes = [...sizesWithOrder].sort((a, b) => a.sortOrder - b.sortOrder);
             
-            console.log('💰 Base prices:', basePrices);
-            console.log('📏 Sorted sizes:', sortedSizes);
-            console.log('💰 Display add-ons:', displayAddOns);
             
             // Build pricing table HTML with multiple rows
             const pricingTable = document.querySelector('.pricing-table');
@@ -2162,7 +2116,6 @@
             const baseSizeNames = baseSizes.map(s => s.size);
             const baseSizeDisplay = baseSizeNames.length > 0 ? baseSizeNames.join(', ') : sortedSizes[0]?.size || 'N/A';
             
-            console.log('📏 Base sizes from API:', baseSizeNames);
             
             // Add base sizes row
             const baseRow = document.createElement('tr');
@@ -2230,7 +2183,6 @@
                 }
             });
             
-            console.log('✅ Pricing table updated with multiple size tiers in correct sort order');
         }
         
         // Show loading state
@@ -2300,7 +2252,6 @@
         // Update LTM pricing data from loaded pricing — stores base prices and triggers column update
         function updateLTMPricingData(pricingData) {
             if (!pricingData || !pricingData.pricing) return;
-            console.log('📊 LTM pricing data received, updating 1-7 column');
             updateLTMCalculator();
         }
 

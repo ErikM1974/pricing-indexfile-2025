@@ -114,7 +114,7 @@
 ### Cap Embroidery System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/cap-embroidery-pricing.html` | SanMar cap pricing (23 Richardson styles) | cap-embroidery-pricing-service.js | ✅ Active |
+| `/calculators/cap-embroidery-pricing-integrated.html` | SanMar cap pricing (23 Richardson styles) | cap-embroidery-pricing-service.js | ✅ Active |
 | `/calculators/richardson-2025.html` | Richardson Factory Direct pricing (133 styles) | richardson-factory-direct.js | ✅ Active |
 | `/calculators/richardson-factory-direct.js` | Richardson pricing lookup (2026 refactor - simplified) | API pricing-bundle | ✅ Active |
 | `/calculators/richardson-2025-styles.css` | Richardson page styles | - | ✅ Active |
@@ -143,6 +143,7 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/embroidery-pricing-all/index.html` | Unified AL/CEMB + DECG pricing page | embroidery-pricing-all.js, .css | ✅ Active |
+| `/calculators/embroidery-pricing.html` | Embroidery pricing calculator (garment + cap) | embroidery-pricing-service.js | ✅ Active |
 | `/calculators/archive/embroidery-customer/*` | DECG standalone calculator | - | 📦 Archived |
 | `/calculators/archive/embroidery-contract/*` | Contract embroidery calculator | - | 📦 Archived |
 | `/calculators/archive/embroidery-pricing.html` | Old embroidery pricing page | - | 📦 Archived |
@@ -186,6 +187,7 @@
 |------|---------|---------|--------|
 | `/shared_components/js/quote-builder-base.js` | Base functionality | All quote builders | ✅ Active |
 | `/shared_components/js/quote-builder-utils.js` | **NEW** Shared utilities: escapeHtml, formatPrice, showToast, etc. (2026-01-30 consolidation) | All quote builders | ✅ Active |
+| `/shared_components/js/fetch-timeout.js` | Global fetch() wrapper adding 15s AbortController timeout to all requests | All embroidery pages | ✅ Active |
 | `/shared_components/js/quote-formatter.js` | Format quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-persistence.js` | Save/load quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-session.js` | Session management | All quote builders | ✅ Active |

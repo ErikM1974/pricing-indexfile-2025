@@ -5,7 +5,7 @@
 
 class ProductLineManager {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.products = [];
         this.nextProductId = 1;
         this.currentProduct = null;
@@ -37,7 +37,6 @@ class ProductLineManager {
             }
         });
 
-        console.log('[ProductLineManager] Exact match search initialized');
         return true;
     }
 
@@ -75,13 +74,11 @@ class ProductLineManager {
 
         // PRIORITY 1: Check for flat embroidery headwear using shared utility
         if (ProductCategoryFilter.isFlatHeadwear(product)) {
-            console.log('[ProductLineManager] Allowed flat headwear product:', title);
             return true;  // ALLOW - flat embroidery works on these
         }
 
         // PRIORITY 2: Check for structured caps using shared utility
         if (ProductCategoryFilter.isStructuredCap(product)) {
-            console.log('[ProductLineManager] Filtered out cap product:', title);
             return false;  // EXCLUDE - these go on cap machines
         }
 
@@ -163,7 +160,6 @@ class ProductLineManager {
                     suggestionsDiv.querySelectorAll('.suggestion-item').forEach(item => {
                         item.addEventListener('click', () => {
                             const style = item.dataset.style;
-                            console.log('[ProductLineManager] Autocomplete selection:', style);
                             document.getElementById('style-search').value = style;
                             suggestionsDiv.style.display = 'none';
                             this.loadProductDetails(style);
@@ -186,7 +182,6 @@ class ProductLineManager {
                 suggestionsDiv.querySelectorAll('.suggestion-item').forEach(item => {
                     item.addEventListener('click', () => {
                         const style = item.dataset.style;
-                        console.log('[ProductLineManager] Autocomplete selection:', style);
                         document.getElementById('style-search').value = style;
                         suggestionsDiv.style.display = 'none';
                         this.loadProductDetails(style);
@@ -211,25 +206,18 @@ class ProductLineManager {
         if (styleNumber.toLowerCase().includes('cap') || styleNumber.toLowerCase().includes('hat')) {
             console.warn('[ProductLineManager] Warning: This might be a cap product. Verifying...');
         }
-        console.log('[ProductLineManager] Loading product details for:', styleNumber);
         
         try {
             this.showLoading(true);
             
             // Get product details and colors
-            console.log('[ProductLineManager] Fetching product data...');
             const [detailsResponse, colorsResponse] = await Promise.all([
                 fetch(`${this.baseURL}/api/product-details?styleNumber=${styleNumber}`),
                 fetch(`${this.baseURL}/api/product-colors?styleNumber=${styleNumber}`)
             ]);
             
-            console.log('[ProductLineManager] API responses:', detailsResponse.status, colorsResponse.status);
-            
             const details = await detailsResponse.json();
             const colors = await colorsResponse.json();
-            
-            console.log('[ProductLineManager] Product details:', details);
-            console.log('[ProductLineManager] Available colors:', colors);
             
             if (details && details.length > 0) {
                 // Extract brand from the BRAND_NAME field (from console: BRAND_NAME is available)
@@ -252,19 +240,12 @@ class ProductLineManager {
                     description: colors.PRODUCT_DESCRIPTION || details[0].PRODUCT_DESCRIPTION || details[0].DESCRIPTION || details[0].Description || 'Product description not available'
                 };
                 
-                console.log('[ProductLineManager] Current product set:', this.currentProduct);
-                console.log('[ProductLineManager] Raw product details fields:', Object.keys(details[0] || {}));
-                console.log('[ProductLineManager] Raw colors fields:', Object.keys(colors || {}));
                 
                 // Update color dropdown
                 const colorSelect = document.getElementById('color-select');
                 if (colors.colors && colors.colors.length > 0) {
-                    console.log('[ProductLineManager] Populating color dropdown with', colors.colors.length, 'colors');
-
                     // Store full color data for future use
                     this.currentProduct.colorData = colors.colors;
-
-                    console.log('[ProductLineManager] Sample color object:', colors.colors[0]);
 
                     colorSelect.innerHTML = '<option value="">Select a color</option>' +
                         colors.colors.map(color =>
@@ -275,13 +256,11 @@ class ProductLineManager {
                     // Fetch and display color swatches if available
                     this.fetchAndDisplayColorSwatches(styleNumber);
                 } else {
-                    console.log('[ProductLineManager] No colors available');
                     colorSelect.innerHTML = '<option value="">No colors available</option>';
                     colorSelect.disabled = true;
                 }
 
                 // Load Product button removed (2025-10-17) - Auto-load on color selection now
-                console.log('[ProductLineManager] Product details loaded, ready for color selection');
             } else {
                 console.error('[ProductLineManager] No product data returned');
             }
@@ -306,7 +285,6 @@ class ProductLineManager {
         }
 
         try {
-            console.log('[ProductLineManager] Fetching color swatches for:', styleNumber);
 
             // Show loading state
             swatchContainer.innerHTML = '<div class="color-swatch-loading"><i class="fas fa-spinner fa-spin"></i> Loading colors...</div>';
@@ -320,14 +298,12 @@ class ProductLineManager {
             }
 
             const data = await response.json();
-            console.log('[ProductLineManager] Color swatches received:', data);
 
             // API returns array directly, not wrapped in { swatches: [] }
             const swatches = Array.isArray(data) ? data : (data.swatches || []);
 
             if (swatches.length === 0) {
                 // No swatches available, keep using dropdown
-                console.log('[ProductLineManager] No swatches available, using dropdown');
                 swatchContainer.style.display = 'none';
                 colorSelect.classList.remove('swatch-mode');
                 return;
@@ -383,18 +359,15 @@ class ProductLineManager {
                 // Add click handlers to ALL swatches (visible and hidden)
                 this.attachSwatchClickHandlers(swatchContainer, colorSelect);
 
-                console.log('[ProductLineManager] ✅ Color swatches displayed:', swatches.length, '(showing', Math.min(12, swatches.length), 'initially)');
 
                 // 🎨 MODERN STEP 2 UI INTEGRATION (2025-10-15)
                 // Show the modern swatches section (progressive disclosure pattern)
                 const swatchesSection = document.getElementById('qb-swatches-section');
                 if (swatchesSection) {
                     swatchesSection.style.display = 'block';
-                    console.log('[ProductLineManager] ✅ Modern swatches section shown');
                 }
             } else {
                 // No valid swatches with images, fall back to dropdown
-                console.log('[ProductLineManager] No valid swatch images, using dropdown');
                 swatchContainer.style.display = 'none';
                 colorSelect.classList.remove('swatch-mode');
             }
@@ -445,7 +418,6 @@ class ProductLineManager {
         });
 
         container.appendChild(button);
-        console.log('[ProductLineManager] ✅ "Show More" button added for', hiddenCount, 'hidden colors');
     }
 
     /**
@@ -478,11 +450,9 @@ class ProductLineManager {
                 // Trigger change event to auto-load product
                 colorSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
-                console.log('[ProductLineManager] ✅ Color swatch selected:', selectedColor, catalogColor);
             });
         });
 
-        console.log('[ProductLineManager] ✅ Click handlers attached to', container.querySelectorAll('.color-swatch').length, 'swatches');
     }
 
     /**
@@ -491,7 +461,6 @@ class ProductLineManager {
     handleColorChange(color) {
         if (!color || !this.currentProduct) return;
 
-        console.log('[ProductLineManager] Color selected:', color);
 
         // 🎯 AUTO-LOAD IMPROVEMENT (2025-10-17): Match Cap builder behavior
         // Automatically load product when color is selected (no button click needed)
@@ -505,7 +474,6 @@ class ProductLineManager {
         const styleNumber = document.getElementById('style-search').value;
         const color = document.getElementById('color-select').value;
         
-        console.log('[ProductLineManager] Load Product clicked:', { styleNumber, color });
         
         if (!styleNumber || !color) {
             alert('Please select style and color');
@@ -518,30 +486,24 @@ class ProductLineManager {
             const colorObj = this.currentProduct.colorData.find(c => c.COLOR_NAME === color);
             if (colorObj && colorObj.CATALOG_COLOR) {
                 catalogColor = colorObj.CATALOG_COLOR;
-                console.log('[ProductLineManager] Using catalog color:', catalogColor, 'instead of display color:', color);
             } else {
-                console.log('[ProductLineManager] No catalog color found, using display color:', color);
             }
         }
         
         try {
             this.showLoading(true);
             
-            console.log('[ProductLineManager] Fetching sizes and product colors...');
             
             // Get available sizes and product colors with images (use catalog color for sizes API)
             const sizesUrl = `${this.baseURL}/api/sizes-by-style-color?styleNumber=${styleNumber}&color=${encodeURIComponent(catalogColor)}`;
             const colorsUrl = `${this.baseURL}/api/product-colors?styleNumber=${styleNumber}`;
             
-            console.log('[ProductLineManager] Sizes URL:', sizesUrl);
-            console.log('[ProductLineManager] Colors URL:', colorsUrl);
             
             const [sizesResponse, colorsResponse] = await Promise.all([
                 fetch(sizesUrl),
                 fetch(colorsUrl)
             ]);
             
-            console.log('[ProductLineManager] API responses:', sizesResponse.status, colorsResponse.status);
             
             if (!sizesResponse.ok) {
                 console.warn(`[ProductLineManager] Sizes API failed: ${sizesResponse.status} ${sizesResponse.statusText}`);
@@ -550,11 +512,8 @@ class ProductLineManager {
                 // Try fallback with original display color name if catalog color failed
                 if (catalogColor !== color) {
                     const fallbackUrl = `${this.baseURL}/api/sizes-by-style-color?styleNumber=${styleNumber}&color=${encodeURIComponent(color)}`;
-                    console.log('[ProductLineManager] Fallback URL:', fallbackUrl);
-                    
                     const fallbackResponse = await fetch(fallbackUrl);
                     if (fallbackResponse.ok) {
-                        console.log('[ProductLineManager] Fallback successful with display color');
                         const fallbackSizes = await fallbackResponse.json();
                         const colors = await colorsResponse.json();
                         return this.handleSizesResponse(fallbackSizes, colors, color, styleNumber);
@@ -585,8 +544,6 @@ class ProductLineManager {
      * Handle sizes response and display product
      */
     handleSizesResponse(sizes, colors, color, styleNumber) {
-        console.log('[ProductLineManager] Raw sizes response:', sizes);
-        console.log('[ProductLineManager] Raw colors response:', colors);
         
         // Handle multiple possible response formats: {data: [...]} or {sizes: [...]} or direct array
         let sizesArray = sizes.data || sizes.sizes || sizes;
@@ -594,13 +551,11 @@ class ProductLineManager {
             this.availableSizes = sizesArray;
             this.currentProduct.color = color;
             
-            console.log('[ProductLineManager] Available sizes:', this.availableSizes);
             
             // Find image from colors data (product-colors API returns colors array)
             let colorData = null;
             if (colors.colors && Array.isArray(colors.colors)) {
                 colorData = colors.colors.find(c => c.COLOR_NAME === color);
-                console.log('[ProductLineManager] Found color data by COLOR_NAME:', color, colorData);
             }
             
             // If not found by exact match, try fuzzy matching
@@ -609,20 +564,16 @@ class ProductLineManager {
                     c.COLOR_NAME?.toLowerCase() === color.toLowerCase() ||
                     c.CATALOG_COLOR?.toLowerCase() === color.toLowerCase()
                 );
-                console.log('[ProductLineManager] Found color data by fuzzy match:', color, colorData);
             }
             
             // Extract the model image URL (prioritize MAIN_IMAGE_URL or FRONT_MODEL)
             if (colorData) {
                 this.currentProduct.imageUrl = colorData.MAIN_IMAGE_URL || colorData.FRONT_MODEL || colorData.FRONT_FLAT || '';
-                console.log('[ProductLineManager] Using product model image:', this.currentProduct.imageUrl);
             } else {
                 console.warn('[ProductLineManager] No color data found for:', color);
                 this.currentProduct.imageUrl = '';
             }
             
-            console.log('[ProductLineManager] Color data found:', colorData);
-            console.log('[ProductLineManager] Product image URL:', this.currentProduct.imageUrl);
             
             this.displayProduct();
             return true;
@@ -637,8 +588,6 @@ class ProductLineManager {
      * Display loaded product
      */
     displayProduct() {
-        console.log('[ProductLineManager] Displaying product:', this.currentProduct);
-        console.log('[ProductLineManager] Available sizes:', this.availableSizes);
         
         const display = document.getElementById('product-display');
         if (!display) {
@@ -658,17 +607,14 @@ class ProductLineManager {
             productImage.onerror = () => {
                 productImage.src = `https://via.placeholder.com/150x150/f0f0f0/666?text=${encodeURIComponent(this.currentProduct.style)}`;
             };
-            console.log('[ProductLineManager] Set product image:', productImage.src);
         }
         
         if (productName) {
             productName.textContent = `${this.currentProduct.style} - ${this.currentProduct.title}`;
-            console.log('[ProductLineManager] Set product name:', productName.textContent);
         }
         
         if (productDescription) {
             productDescription.textContent = `${this.currentProduct.brand} | ${this.currentProduct.color}`;
-            console.log('[ProductLineManager] Set product description:', productDescription.textContent);
         }
         
         // Create size inputs
@@ -684,14 +630,12 @@ class ProductLineManager {
                            value="0">
                 </div>
             `).join('');
-            console.log('[ProductLineManager] Created size inputs for:', this.availableSizes);
         } else {
             console.error('[ProductLineManager] Size inputs div not found or no sizes available');
         }
         
         display.style.display = 'block';
-        console.log('[ProductLineManager] Product display shown');
-        
+
         this.updateProductTotal();
     }
     
@@ -913,7 +857,6 @@ class ProductLineManager {
         const swatchesSection = document.getElementById('qb-swatches-section');
         if (swatchesSection) {
             swatchesSection.style.display = 'none';
-            console.log('[ProductLineManager] ✅ Swatches section hidden (clean state)');
         }
 
         // Clear swatches container
@@ -927,7 +870,6 @@ class ProductLineManager {
 
         // Load Product button removed (2025-10-17) - No longer needed with auto-load
 
-        console.log('[ProductLineManager] ✅ Form reset to clean search state');
     }
     
     /**

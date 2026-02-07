@@ -21,7 +21,6 @@
 
         // Override setupUI for embroidery-specific UI
         setupUI() {
-            console.log('[QUOTE:EMBROIDERY] Setting up embroidery quote UI');
             
             // Replace "Add to Cart" section with quote builder
             const cartSection = document.getElementById('add-to-cart-section');
@@ -443,7 +442,6 @@
 
     // Initialize when DOM is ready
     function initEmbroideryQuoteAdapter() {
-        console.log('[QUOTE:EMBROIDERY] Initializing embroidery quote adapter');
         
         // Check if QuoteAdapterBase is available
         if (!window.QuoteAdapterBase) {

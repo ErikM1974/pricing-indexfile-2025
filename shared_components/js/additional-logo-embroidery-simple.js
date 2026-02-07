@@ -8,7 +8,8 @@
 (function() {
     'use strict';
 
-    const API_ENDPOINT = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=EMB-AL';
+    const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_ENDPOINT = `${API_BASE}/api/pricing-bundle?method=EMB-AL`;
 
     // Fallback pricing (used only if API fails)
     // 2026-02: Updated to $112-120/hr target billing rate
@@ -29,7 +30,6 @@
      * Initialize the additional logo pricing table
      */
     async function initAdditionalLogoPricing() {
-        console.log('[AdditionalLogo-EMB-Simple] Initializing...');
 
         try {
             // Fetch pricing from API
@@ -38,7 +38,6 @@
             // Populate table with API data
             populatePricingTable(data);
 
-            console.log('[AdditionalLogo-EMB-Simple] ✅ Initialized successfully');
 
         } catch (error) {
             console.error('[AdditionalLogo-EMB-Simple] ❌ Error:', error);
@@ -58,7 +57,6 @@
      * Fetch pricing data from API
      */
     async function fetchPricingFromAPI() {
-        console.log('[AdditionalLogo-EMB-Simple] Fetching from API:', API_ENDPOINT);
 
         const response = await fetch(API_ENDPOINT, {
             method: 'GET',
@@ -72,7 +70,6 @@
         }
 
         const data = await response.json();
-        console.log('[AdditionalLogo-EMB-Simple] API data received:', data);
 
         // Extract pricing from allEmbroideryCostsR array
         const pricing = {};
@@ -93,8 +90,6 @@
                 }
             });
 
-            console.log('[AdditionalLogo-EMB-Simple] Extracted pricing:', pricing);
-            console.log('[AdditionalLogo-EMB-Simple] Config:', config);
 
             return { pricing, config };
         } else {
@@ -121,7 +116,6 @@
             updateNoteWithStitchRate(config.baseStitchCount, config.additionalStitchRate);
         }
 
-        console.log('[AdditionalLogo-EMB-Simple] ✅ Table populated');
     }
 
     /**

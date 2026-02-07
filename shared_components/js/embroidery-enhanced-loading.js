@@ -2,8 +2,6 @@
 (function() {
     'use strict';
     
-    console.log('[EMBROIDERY-LOADING] Enhanced loading adapter initialized');
-    
     // Enhanced loading simulation
     function simulateEnhancedLoading() {
         const loadingSteps = [
@@ -42,8 +40,6 @@
     
     // Enhanced show loading state function
     function showEnhancedLoadingState() {
-        console.log('[EMBROIDERY-LOADING] Showing enhanced loading state');
-        
         const initialState = document.getElementById('pricing-initial-state');
         const loadingSpinner = document.getElementById('pricing-table-loading');
         const pricingGrid = document.getElementById('custom-pricing-grid');
@@ -62,8 +58,6 @@
     
     // Hide loading and show table with animation
     function hideLoadingShowTable() {
-        console.log('[EMBROIDERY-LOADING] Hiding loading, showing table');
-        
         const initialState = document.getElementById('pricing-initial-state');
         const loadingSpinner = document.getElementById('pricing-table-loading');
         const pricingGrid = document.getElementById('custom-pricing-grid');
@@ -90,7 +84,6 @@
                     if (target && target.id === 'pricing-calculator') {
                         const hasLoadingMessage = target.querySelector('.loading-message');
                         if (hasLoadingMessage && target.classList.contains('loading')) {
-                            console.log('[EMBROIDERY-LOADING] Detected Caspio loading start');
                             showEnhancedLoadingState();
                         }
                     }
@@ -110,7 +103,6 @@
         
         // Also listen for pricingDataLoaded event
         window.addEventListener('pricingDataLoaded', function(event) {
-            console.log('[EMBROIDERY-LOADING] Pricing data loaded, hiding loading');
             setTimeout(() => {
                 hideLoadingShowTable();
             }, 1000); // Small delay to show completion
@@ -119,7 +111,6 @@
     
     // Initialize when DOM is ready
     function initialize() {
-        console.log('[EMBROIDERY-LOADING] Initializing enhanced loading');
         hookCaspioLoading();
         
         // If page already has data, hide initial state

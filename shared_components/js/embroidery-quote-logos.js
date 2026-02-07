@@ -7,7 +7,7 @@ class LogoManager {
     constructor() {
         this.additionalLogos = [];
         this.nextId = 1;
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
         // Default fallback positions (shirts only - no caps)
         this.positions = [
@@ -42,9 +42,7 @@ class LogoManager {
      * @returns {Promise<LogoManager>} Returns this for chaining
      */
     async init() {
-        console.log('[LogoManager] Initializing...');
         await this.fetchConfiguration();
-        console.log('[LogoManager] Initialization complete');
         return this;
     }
     
@@ -53,8 +51,6 @@ class LogoManager {
      */
     async fetchConfiguration() {
         try {
-            console.log('[LogoManager] Fetching configuration from API...');
-            
             // Fetch embroidery configuration
             const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC54`);
             const data = await response.json();
@@ -66,7 +62,6 @@ class LogoManager {
                 // Parse logo positions from API (shirts only, no caps)
                 if (shirtConfig.LogoPositions) {
                     this.positions = shirtConfig.LogoPositions.split(',').map(p => p.trim());
-                    console.log('[LogoManager] Logo positions from API:', this.positions);
                 }
                 
                 // Apply other configuration values
@@ -76,19 +71,12 @@ class LogoManager {
                 this.minStitchCount = this.stitchIncrement; // Minimum is 1000
                 this.stitchIncrement = shirtConfig.StitchIncrement || 1000;
                 
-                console.log('[LogoManager] Configuration loaded:');
-                console.log('- Positions:', this.positions.length, 'options');
-                console.log('- Digitizing Fee:', this.digitizingFee);
-                console.log('- Min Stitch Count:', this.minStitchCount);
-
                 // Initialize UI after config loaded
                 this.initializePrimaryLogo();
                 this.initializeEvents();
             }
         } catch (error) {
             console.error('[LogoManager] Error fetching configuration:', error);
-            console.log('[LogoManager] Using fallback positions - CONFIGURATION MAY BE INCORRECT!');
-
             // Show warning about configuration failure
             this.showConfigWarning(
                 'Logo configuration could not be loaded from server. ' +
@@ -110,7 +98,6 @@ class LogoManager {
             console.error('❌ [LogoManager] #primary-position not found! DOM may not be ready.');
             return;
         }
-        console.log('✅ [LogoManager] Primary position dropdown found, initializing...');
 
         // Populate dropdown with positions from API
         positionSelect.innerHTML = '<option value="">Select position...</option>' +

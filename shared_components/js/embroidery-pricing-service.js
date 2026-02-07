@@ -6,10 +6,9 @@
 
 class EmbroideryPricingService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.cachePrefix = 'embroideryPricingData';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
-        console.log('[EmbroideryPricingService] Initialized');
     }
 
     /**
@@ -17,12 +16,16 @@ class EmbroideryPricingService {
      * @returns {number|null} Manual cost or null if not set
      */
     getManualCostOverride() {
+        // Only allow manual cost override on localhost/internal (staff-only feature)
+        const host = window.location.hostname;
+        const isInternal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.herokuapp.com');
+        if (!isInternal) return null;
+
         // Check URL parameter first (priority)
         const urlParams = new URLSearchParams(window.location.search);
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {
             const cost = parseFloat(urlCost);
-            console.log('[EmbroideryPricingService] Manual cost from URL:', cost);
             sessionStorage.setItem('manualCostOverride', cost.toString());
             return cost;
         }
@@ -31,7 +34,6 @@ class EmbroideryPricingService {
         const storedCost = sessionStorage.getItem('manualCostOverride');
         if (storedCost && !isNaN(parseFloat(storedCost))) {
             const cost = parseFloat(storedCost);
-            console.log('[EmbroideryPricingService] Manual cost from storage:', cost);
             return cost;
         }
 
@@ -43,7 +45,6 @@ class EmbroideryPricingService {
      */
     clearManualCostOverride() {
         sessionStorage.removeItem('manualCostOverride');
-        console.log('[EmbroideryPricingService] Manual cost override cleared');
     }
 
     /**
@@ -53,7 +54,6 @@ class EmbroideryPricingService {
      */
     async fetchEmbroideryCosts() {
         const url = `${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC61`;
-        console.log('[EmbroideryPricingService] Fetching embroidery costs from API...');
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -65,7 +65,6 @@ class EmbroideryPricingService {
             throw new Error('Invalid API response: missing embroidery costs');
         }
 
-        console.log('[EmbroideryPricingService] Successfully fetched embroidery costs from API');
         return data.allEmbroideryCostsR;
     }
 
@@ -75,7 +74,6 @@ class EmbroideryPricingService {
      * @returns {Object} Synthetic API-compatible data
      */
     async generateManualPricingData(manualCost) {
-        console.log('[EmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
 
         // Default tiers matching API structure - 2026 margin (43%)
         // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
@@ -145,17 +143,14 @@ class EmbroideryPricingService {
         // FIRST: Check for manual cost override
         const manualCost = this.getManualCostOverride();
         if (manualCost !== null) {
-            console.log('[EmbroideryPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
             return await this.generateManualPricingData(manualCost);
         }
 
-        console.log(`[EmbroideryPricingService] Fetching pricing data for ${styleNumber}`);
 
         // Check cache first
         const cacheKey = `${this.cachePrefix}-${styleNumber}`;
         const cached = this.getFromCache(cacheKey);
         if (cached && !options.forceRefresh) {
-            console.log('[EmbroideryPricingService] Returning cached data');
             return cached;
         }
 
@@ -184,7 +179,6 @@ class EmbroideryPricingService {
      */
     async fetchFromAPI(styleNumber) {
         const url = `${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=${styleNumber}`;
-        console.log(`[EmbroideryPricingService] Fetching from: ${url}`);
         
         const response = await fetch(url);
         if (!response.ok) {
@@ -192,7 +186,6 @@ class EmbroideryPricingService {
         }
         
         const data = await response.json();
-        console.log('[EmbroideryPricingService] API data received:', data);
         
         // Validate required fields
         if (!data.tiersR || !data.allEmbroideryCostsR || !data.sizes) {
@@ -207,7 +200,6 @@ class EmbroideryPricingService {
      * Uses Small size as standard garment (or first available)
      */
     calculatePricing(apiData) {
-        console.log('[EmbroideryPricingService] Starting price calculations...');
 
         const { tiersR, rulesR, allEmbroideryCostsR, sizes, sellingPriceDisplayAddOns } = apiData;
 
@@ -220,23 +212,22 @@ class EmbroideryPricingService {
         }
 
         const standardGarmentCost = parseFloat(standardGarment.price || standardGarment.maxCasePrice);
-        console.log('[EmbroideryPricingService] Standard garment cost:', standardGarmentCost);
 
         // Find the base size upcharge (for relative upcharge calculation)
         // For products without S/M/L/XL, the base size is the first size (lowest sortOrder)
         const baseSize = sortedSizes.find(s => s.size.toUpperCase() === 'S') || sortedSizes[0];
         const baseSizeUpcharge = parseFloat(sellingPriceDisplayAddOns?.[baseSize.size] || 0);
-        console.log(`[EmbroideryPricingService] Base size: ${baseSize.size}, Base upcharge: $${baseSizeUpcharge}`);
 
         // Rounding function based on rulesData
         const roundPrice = (price, roundingMethod) => {
             if (isNaN(price)) return null;
-            if (roundingMethod === 'CeilDollar') {
-                return Math.ceil(price);
+            if (roundingMethod === 'HalfDollarUp') {
+                // Round UP to nearest $0.50
+                if (price % 0.5 === 0) return price;
+                return Math.ceil(price * 2) / 2;
             }
-            // Default to HalfDollarUp - always round UP to nearest $0.50
-            if (price % 0.5 === 0) return price;
-            return Math.ceil(price * 2) / 2;
+            // Default to CeilDollar (matches quote builder)
+            return Math.ceil(price);
         };
 
         const priceProfile = {};
@@ -262,7 +253,6 @@ class EmbroideryPricingService {
             const embCost = parseFloat(costEntry.EmbroideryCost);
             const marginDenom = parseFloat(tier.MarginDenominator);
 
-            console.log(`[EmbroideryPricingService] Tier ${tierLabel}: EmbCost=$${embCost}, MarginDenom=${marginDenom}`);
 
             if (isNaN(marginDenom) || marginDenom === 0 || isNaN(embCost)) {
                 sortedSizes.forEach(s => {
@@ -280,7 +270,6 @@ class EmbroideryPricingService {
             // Apply rounding
             const roundedStandardPrice = roundPrice(decoratedStandardPrice, rulesR?.RoundingMethod);
 
-            console.log(`[EmbroideryPricingService] Tier ${tierLabel}: Garment=$${markedUpGarment.toFixed(2)}, Decorated=$${decoratedStandardPrice.toFixed(2)}, Rounded=$${roundedStandardPrice}`);
 
             // Apply to each size with RELATIVE upcharges
             sortedSizes.forEach(sizeInfo => {
@@ -289,15 +278,10 @@ class EmbroideryPricingService {
                 const finalPrice = roundedStandardPrice + relativeUpcharge;
 
                 // Debug logging for tall products
-                if (baseSizeUpcharge > 0) {
-                    console.log(`[EmbroideryPricingService] ${sizeInfo.size}: Absolute upcharge=$${absoluteUpcharge}, Relative upcharge=$${relativeUpcharge}, Final=$${finalPrice}`);
-                }
-
                 priceProfile[tierLabel][sizeInfo.size] = parseFloat(finalPrice.toFixed(2));
             });
         });
         
-        console.log('[EmbroideryPricingService] All prices calculated successfully');
         
         return {
             pricing: priceProfile,
@@ -342,7 +326,6 @@ class EmbroideryPricingService {
             apiData: apiData
         };
         
-        console.log('[EmbroideryPricingService] Bundle transformed for compatibility');
         return masterBundle;
     }
 
@@ -412,7 +395,6 @@ class EmbroideryPricingService {
                 sessionStorage.removeItem(key);
             }
         });
-        console.log('[EmbroideryPricingService] Cache cleared');
     }
 
     /**
@@ -439,7 +421,6 @@ class EmbroideryPricingService {
      */
     async fetchDECGPricing() {
         const url = `${this.baseURL}/api/decg-pricing`;
-        console.log('[EmbroideryPricingService] Fetching DECG pricing from:', url);
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -447,7 +428,6 @@ class EmbroideryPricingService {
         }
 
         const data = await response.json();
-        console.log('[EmbroideryPricingService] DECG pricing loaded:', data);
         return data;
     }
 
@@ -510,7 +490,6 @@ class EmbroideryPricingService {
         // LTM fee for small orders (≤7 pieces for embroidery)
         const ltmFee = quantity <= ltmThreshold ? ltmFeeAmount : 0;
 
-        console.log(`[EmbroideryPricingService] DECG calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}`);
 
         return {
             unitPrice: parseFloat(unitPrice.toFixed(2)),
@@ -568,7 +547,6 @@ class EmbroideryPricingService {
      */
     async fetchALPricing() {
         const url = `${this.baseURL}/api/al-pricing`;
-        console.log('[EmbroideryPricingService] Fetching AL/CEMB pricing from:', url);
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -576,7 +554,6 @@ class EmbroideryPricingService {
         }
 
         const data = await response.json();
-        console.log('[EmbroideryPricingService] AL/CEMB pricing loaded:', data);
         return data;
     }
 
@@ -615,7 +592,6 @@ class EmbroideryPricingService {
             const stitchesK = actualStitches / 1000;
             const unitPrice = stitchesK * ratePerThousand;
 
-            console.log(`[EmbroideryPricingService] AL Full Back: ${stitchesK}K x $${ratePerThousand} = $${unitPrice.toFixed(2)}`);
 
             return {
                 unitPrice: parseFloat(unitPrice.toFixed(2)),
@@ -664,7 +640,6 @@ class EmbroideryPricingService {
         // LTM fee for small orders (≤7 pieces for embroidery)
         const ltmFee = quantity <= ltmThreshold ? ltmFeeAmount : 0;
 
-        console.log(`[EmbroideryPricingService] AL calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}`);
 
         return {
             unitPrice: parseFloat(unitPrice.toFixed(2)),

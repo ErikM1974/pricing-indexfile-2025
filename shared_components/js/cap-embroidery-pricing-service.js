@@ -6,10 +6,9 @@
 
 class CapEmbroideryPricingService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.cachePrefix = 'capEmbroideryPricingData';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
-        console.log('[CapEmbroideryPricingService] Initialized');
     }
 
     /**
@@ -21,7 +20,6 @@ class CapEmbroideryPricingService {
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {
             const cost = parseFloat(urlCost);
-            console.log('[CapEmbroideryPricingService] Manual cost from URL:', cost);
             sessionStorage.setItem('manualCostOverride', cost.toString());
             return cost;
         }
@@ -29,7 +27,6 @@ class CapEmbroideryPricingService {
         const storedCost = sessionStorage.getItem('manualCostOverride');
         if (storedCost && !isNaN(parseFloat(storedCost))) {
             const cost = parseFloat(storedCost);
-            console.log('[CapEmbroideryPricingService] Manual cost from storage:', cost);
             return cost;
         }
 
@@ -41,7 +38,6 @@ class CapEmbroideryPricingService {
      */
     clearManualCostOverride() {
         sessionStorage.removeItem('manualCostOverride');
-        console.log('[CapEmbroideryPricingService] Manual cost override cleared');
     }
 
     /**
@@ -51,7 +47,6 @@ class CapEmbroideryPricingService {
      */
     async fetchEmbroideryCosts() {
         const url = `${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=C112`;
-        console.log('[CapEmbroideryPricingService] Fetching cap embroidery costs from API...');
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -63,7 +58,6 @@ class CapEmbroideryPricingService {
             throw new Error('Invalid API response: missing cap embroidery costs');
         }
 
-        console.log('[CapEmbroideryPricingService] Successfully fetched cap embroidery costs from API');
         return data.allEmbroideryCostsR;
     }
 
@@ -73,7 +67,6 @@ class CapEmbroideryPricingService {
      * @returns {Object} Synthetic API-compatible data
      */
     async generateManualPricingData(manualCost) {
-        console.log('[CapEmbroideryPricingService] Generating manual pricing data with base cost:', manualCost);
 
         // Default tiers - 2026 margin (43%) - All 5 tiers to match flat embroidery
         const defaultTiers = [
@@ -135,17 +128,14 @@ class CapEmbroideryPricingService {
         // FIRST: Check for manual cost override
         const manualCost = this.getManualCostOverride();
         if (manualCost !== null) {
-            console.log('[CapEmbroideryPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
             return await this.generateManualPricingData(manualCost);
         }
 
-        console.log(`[CapEmbroideryPricingService] Fetching pricing data for ${styleNumber}`);
 
         // Check cache first
         const cacheKey = `${this.cachePrefix}-${styleNumber}`;
         const cached = this.getFromCache(cacheKey);
         if (cached && !options.forceRefresh) {
-            console.log('[CapEmbroideryPricingService] Returning cached data');
             return cached;
         }
 
@@ -174,7 +164,6 @@ class CapEmbroideryPricingService {
      */
     async fetchFromAPI(styleNumber) {
         const url = `${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=${styleNumber}`;
-        console.log(`[CapEmbroideryPricingService] Fetching from: ${url}`);
         
         const response = await fetch(url);
         if (!response.ok) {
@@ -182,7 +171,6 @@ class CapEmbroideryPricingService {
         }
         
         const data = await response.json();
-        console.log('[CapEmbroideryPricingService] API data received:', data);
         
         // Validate required fields
         if (!data.tiersR || !data.allEmbroideryCostsR || !data.sizes) {
@@ -197,7 +185,6 @@ class CapEmbroideryPricingService {
      * Uses 8000 stitch count as specified
      */
     calculatePricing(apiData) {
-        console.log('[CapEmbroideryPricingService] Starting price calculations...');
         
         const { tiersR, rulesR, allEmbroideryCostsR, sizes, sellingPriceDisplayAddOns } = apiData;
         
@@ -210,7 +197,6 @@ class CapEmbroideryPricingService {
         }
         
         const standardGarmentCost = parseFloat(standardGarment.price || standardGarment.maxCasePrice);
-        console.log('[CapEmbroideryPricingService] Standard garment cost:', standardGarmentCost);
         
         // Rounding function based on rulesData
         const roundPrice = (price, roundingMethod) => {
@@ -246,7 +232,6 @@ class CapEmbroideryPricingService {
             const embCost = parseFloat(costEntry.EmbroideryCost);
             const marginDenom = parseFloat(tier.MarginDenominator);
             
-            console.log(`[CapEmbroideryPricingService] Tier ${tierLabel}: EmbCost=$${embCost}, MarginDenom=${marginDenom}`);
             
             if (isNaN(marginDenom) || marginDenom === 0 || isNaN(embCost)) {
                 sortedSizes.forEach(s => {
@@ -264,7 +249,6 @@ class CapEmbroideryPricingService {
             // Apply rounding
             const roundedStandardPrice = roundPrice(decoratedStandardPrice, rulesR?.RoundingMethod);
             
-            console.log(`[CapEmbroideryPricingService] Tier ${tierLabel}: Garment=$${markedUpGarment.toFixed(2)}, Decorated=$${decoratedStandardPrice.toFixed(2)}, Rounded=$${roundedStandardPrice}`);
             
             // Apply to each size (caps often have no upcharges for OSFA)
             sortedSizes.forEach(sizeInfo => {
@@ -274,7 +258,6 @@ class CapEmbroideryPricingService {
             });
         });
         
-        console.log('[CapEmbroideryPricingService] All prices calculated successfully');
         
         return {
             pricing: priceProfile,
@@ -319,7 +302,6 @@ class CapEmbroideryPricingService {
             apiData: apiData
         };
         
-        console.log('[CapEmbroideryPricingService] Bundle transformed for compatibility');
         return masterBundle;
     }
 
@@ -389,7 +371,6 @@ class CapEmbroideryPricingService {
                 sessionStorage.removeItem(key);
             }
         });
-        console.log('[CapEmbroideryPricingService] Cache cleared');
     }
 
     /**

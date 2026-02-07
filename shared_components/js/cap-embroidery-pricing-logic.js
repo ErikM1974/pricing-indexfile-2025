@@ -99,12 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // After rendering the table, attempt to create the quantity matrix
         if (window.ProductQuantityUI && typeof window.ProductQuantityUI.createQuantityMatrix === 'function' && groupedHeaders) {
-            console.log("[cap-embroidery-logic] Calling ProductQuantityUI.createQuantityMatrix with headers:", groupedHeaders);
             const quantityMatrixCreated = window.ProductQuantityUI.createQuantityMatrix(groupedHeaders);
             if (quantityMatrixCreated) {
                 // Trigger an update for add-to-cart.js to re-scan for quantity inputs and update totals
                 if (typeof window.updateCartTotal === 'function') {
-                    console.log("[cap-embroidery-logic] Triggering updateCartTotal after quantity matrix creation.");
                     window.updateCartTotal();
                 }
                  // Also, re-attach listeners if add-to-cart.js has a function for it
@@ -178,14 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Listener for when Caspio finishes its calculations
     document.addEventListener('caspioCapPricingCalculated', (event) => {
-        console.log("External JS: Received 'caspioCapPricingCalculated' event.", event.detail);
         if (event.detail && event.detail.success) {
             caspioCalculatedData.profiles = event.detail.profiles;
             caspioCalculatedData.groupedHeaders = event.detail.groupedHeaders;
             caspioCalculatedData.groupedPrices = event.detail.groupedPrices;
             
             if (event.detail.stitchCount && stitchCountSelectExt.value !== event.detail.stitchCount) {
-                console.log(`External JS: Aligning external dropdown to Caspio's calculated stitch count: ${event.detail.stitchCount}`);
                 currentExternalStitchValue = event.detail.stitchCount;
                 stitchCountSelectExt.value = currentExternalStitchValue;
             }
@@ -200,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stitchCountSelectExt) {
         stitchCountSelectExt.addEventListener('change', (event) => {
             currentExternalStitchValue = event.target.value;
-            console.log("External dropdown changed to:", currentExternalStitchValue);
             if (typeof window.updateCaspioCapPricingForStitchCount === 'function') {
                 if(pricingTableContainerExt) pricingTableContainerExt.innerHTML = '<div class="loading-message">Updating prices for new stitch count...</div>';
                 // Clear old quantity matrix before Caspio recalculates and new one is built
@@ -233,6 +228,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // after its first calculation (for the default 8000 stitches).
     // So, no explicit initial call to render is needed here, we just wait for the event.
     if(pricingTableContainerExt) pricingTableContainerExt.innerHTML = '<div class="loading-message">Initializing pricing engine...</div>';
-    console.log("External JS: Initialized. Waiting for Caspio's 'DataPageReady' and then 'caspioCapPricingCalculated' event.");
 
 });

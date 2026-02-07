@@ -1072,6 +1072,7 @@ Company:Absher Construction Company
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Core Dependencies -->
+    <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/quote-builder-utils.js?v=20260130"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
@@ -1324,7 +1325,6 @@ Company:Absher Construction Company
                 capPrimaryLogo.needsSetup = false; // Not applicable for embroidery
             }
 
-            console.log(`[Cap Embellishment] Changed to: ${embellishmentType}`, capPrimaryLogo);
 
             // Recalculate pricing with new embellishment type
             recalculatePricing();
@@ -1358,7 +1358,6 @@ Company:Absher Construction Company
                 patchOption.textContent = `Laser Leatherette Patch (+$${upcharges.patch}/cap)`;
             }
 
-            console.log('[UI] Embellishment dropdown labels updated from API:', upcharges);
         }
 
         // Extended sizes available for Size06 (Other) column
@@ -1503,7 +1502,6 @@ Company:Absher Construction Company
 
                 // Return as sorted array, maintaining standard order
                 const orderedSizes = SIZE06_EXTENDED_SIZES.filter(size => extendedSizes.has(size));
-                console.log(`📦 Available extended sizes for ${styleNumber}:`, orderedSizes);
                 return orderedSizes;
 
             } catch (error) {
@@ -1588,7 +1586,6 @@ Company:Absher Construction Company
                     </div>
                 `;
                 applyBtn.disabled = true;
-                console.log(`ℹ️ No ${sizeType} sizes available for ${styleNumber}`);
                 return;
             }
 
@@ -1686,7 +1683,6 @@ Company:Absher Construction Company
 
             // Store available sizes for OSFA-only detection in applyExtendedSizes()
             popup.dataset.availableSizes = JSON.stringify(availableSizes);
-            console.log(`📐 Extended size popup opened for ${styleNumber} with sizes:`, availableSizes);
         }
 
         /**
@@ -1805,7 +1801,6 @@ Company:Absher Construction Company
                         parentRow.dataset.osfaQty = qty;
                         parentRow.dataset.isOsfaOnly = 'true';
                         document.getElementById(`row-qty-${rowId}`).textContent = qty;
-                        console.log(`🧢 OSFA-only product: qty ${qty} in parent row (no child row)`);
                     } else {
                         // Normal extended size - create child row with upcharge
                         createOrUpdateExtendedChildRow(rowId, size, qty);
@@ -1839,7 +1834,6 @@ Company:Absher Construction Company
             closeExtendedSizePopup();
 
             if (sizesChanged.length > 0) {
-                console.log('📐 Extended sizes applied:', sizesChanged);
             }
         }
 
@@ -2143,7 +2137,6 @@ Company:Absher Construction Company
          * Populates all form fields with quote data
          */
         async function loadQuoteForEditing(quoteId) {
-            console.log('[EditMode] Loading quote for editing:', quoteId);
             showToast('Loading quote...', 'info');
 
             try {
@@ -2177,7 +2170,6 @@ Company:Absher Construction Company
                 // Recalculate pricing to update totals
                 recalculatePricing();
 
-                console.log('[EditMode] Quote loaded successfully');
                 showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
             } catch (error) {
@@ -2377,7 +2369,6 @@ Company:Absher Construction Company
                     isCap: isCap
                 });
 
-                console.log(`[EditMode] Created service row: ${serviceType}, qty=${serviceItem.Quantity}`);
             }
         }
 
@@ -2428,11 +2419,9 @@ Company:Absher Construction Company
 
                 if (isExtendedSize) {
                     // Create child row for extended size (same pattern as ShopWorks import)
-                    console.log(`[addProductFromQuote] Creating child row for extended size: ${size} qty=${qty}`);
                     createChildRow(rowIdNum, size, qty);
                 } else if (size === '2XL') {
                     // 2XL goes in Size05 column but still needs a child row
-                    console.log(`[addProductFromQuote] Creating child row for 2XL qty=${qty}`);
                     createChildRow(rowIdNum, '2XL', qty);
                 } else {
                     // Standard size - find existing input
@@ -2549,7 +2538,6 @@ Company:Absher Construction Company
         // ============================================================
 
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Power Quote Builder initializing...');
 
             showLoading(true);
 
@@ -2598,7 +2586,6 @@ Company:Absher Construction Company
                 // Check for edit mode (loading existing quote for revision)
                 const editQuoteId = checkForEditMode();
                 if (editQuoteId) {
-                    console.log('[Init] Edit mode detected:', editQuoteId);
                     // Skip draft recovery and load the existing quote instead
                     await loadQuoteForEditing(editQuoteId);
                 } else {
@@ -2618,7 +2605,6 @@ Company:Absher Construction Company
                     // No auto-row - empty state message guides user to search
                 }
 
-                console.log('✅ Power Quote Builder ready');
                 showToast('Ready to build quotes!', 'success');
 
                 // Initialize additional charges display (for default $50 art charge)
@@ -2661,7 +2647,7 @@ Company:Absher Construction Company
             if (stitchInput) {
                 stitchInput.addEventListener('input', function() {
                     primaryLogo.stitchCount = parseInt(this.value) || 8000;
-                    recalculatePricing();
+                    debouncedRecalculatePricing();
                 });
             }
 
@@ -2731,7 +2717,7 @@ Company:Absher Construction Company
             if (stitchesInput) {
                 stitchesInput.addEventListener('input', function() {
                     capPrimaryLogo.stitchCount = parseInt(this.value) || 8000;
-                    recalculatePricing();
+                    debouncedRecalculatePricing();
                 });
             }
 
@@ -3187,7 +3173,6 @@ Company:Absher Construction Company
                             row.dataset.originalPartNumber = styleNumber;
                             input.value = baseStyle;
                             styleNumber = baseStyle;
-                            console.log(`[onStyleChange] Suffix fallback: ${row.dataset.originalPartNumber} → ${baseStyle} (stripped ${strippedSuffix})`);
                             showToast(`${row.dataset.originalPartNumber} → imported as ${baseStyle} (suffix ${strippedSuffix} stripped)`, 'info', 5000);
                         }
                     }
@@ -3725,7 +3710,6 @@ Company:Absher Construction Company
             // BEST METHOD: Check CATEGORY_NAME from SanMar API
             // SanMar categorizes all caps/hats under "Caps" category
             if (categoryName && categoryName.toLowerCase() === 'caps') {
-                console.log(`[isCapProduct] ${style} detected as cap via CATEGORY_NAME: "${categoryName}"`);
                 return true;
             }
 
@@ -3740,13 +3724,11 @@ Company:Absher Construction Company
             // C+digit (C112, C118)
             // Richardson styles (112, 110, 115, etc) - numeric only
             if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
-                console.log(`[isCapProduct] ${style} detected as cap via style pattern`);
                 return true;
             }
 
             // Richardson caps - 2-3 digit numeric styles (100-999)
             if (/^\d{2,3}$/.test(styleUpper)) {
-                console.log(`[isCapProduct] ${style} detected as cap via Richardson numeric pattern`);
                 return true;
             }
 
@@ -3754,7 +3736,6 @@ Company:Absher Construction Company
             if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
                 titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||
                 titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {
-                console.log(`[isCapProduct] ${style} detected as cap via title keyword`);
                 return true;
             }
 
@@ -4152,7 +4133,6 @@ Company:Absher Construction Company
             if (row.dataset.isCap === 'true') {
                 try {
                     const capUrl = `${API_BASE}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
-                    console.log(`[Cap Sizes] Fetching sizes for ${styleNumber}: ${capUrl}`);
                     const capResponse = await fetch(capUrl);
 
                     let capSizes = ['OSFA']; // Default fallback
@@ -4164,13 +4144,12 @@ Company:Absher Construction Company
                         }
                     } else {
                         console.warn(`[Cap Sizes] API failed for ${styleNumber}, using OSFA fallback`);
+                        showToast(`Cap sizes unavailable for ${styleNumber}, defaulting to OSFA`, 'warning');
                     }
 
-                    console.log(`[Cap Sizes] ${styleNumber} sizes:`, capSizes);
 
                     // Analyze cap sizes and update UI
                     const sizeInfo = analyzeSizeCategory(capSizes);
-                    console.log(`📐 Cap size category for ${styleNumber}: ${sizeInfo.category}`, sizeInfo);
 
                     updateRowForSizeCategory(row, sizeInfo);
                     row.dataset.availableSizes = JSON.stringify(capSizes);
@@ -4204,16 +4183,13 @@ Company:Absher Construction Company
                     // Try fallback: fetch without color filter to at least get size info
                     try {
                         const altUrl = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`;
-                        console.log(`[Size Detection] Trying fallback without color: ${altUrl}`);
                         const altResponse = await fetch(altUrl);
 
                         if (altResponse.ok) {
                             const skus = await altResponse.json();
                             if (skus && skus.length > 0) {
-                                console.log(`[Size Detection] Fallback succeeded with ${skus.length} SKUs`);
                                 const allSizes = extractAllSizes(skus);
                                 const sizeInfo = analyzeSizeCategory(allSizes);
-                                console.log(`📐 Size category for ${styleNumber} (fallback): ${sizeInfo.category}`, sizeInfo);
                                 updateRowForSizeCategory(row, sizeInfo);
                                 row.dataset.availableSizes = JSON.stringify(allSizes);
                                 return;
@@ -4232,7 +4208,6 @@ Company:Absher Construction Company
 
                 // Analyze and update UI
                 const sizeInfo = analyzeSizeCategory(allSizes);
-                console.log(`📐 Size category for ${styleNumber}: ${sizeInfo.category}`, sizeInfo);
 
                 updateRowForSizeCategory(row, sizeInfo);
 
@@ -4317,11 +4292,6 @@ Company:Absher Construction Company
                 }
             }
 
-            console.log(`[SKU Validation] ${styleNumber} validated:`, {
-                availableSizes,
-                catalogColor,
-                validatedAt: new Date().toISOString()
-            });
         }
 
         /**
@@ -4390,62 +4360,6 @@ Company:Absher Construction Company
                 if (selectedOption) {
                     selectedOption.scrollIntoView({ block: 'nearest' });
                 }
-            }
-        }
-
-        /**
-         * Detect if product is tall/youth/toddler-only and gray out unavailable size columns
-         * This improves UX by showing users which sizes actually exist for the product
-         */
-        async function detectProductTypeAndAdjustUI(rowId) {
-            const row = document.getElementById(`row-${rowId}`);
-            if (!row) return;
-
-            const style = row.dataset.style;
-            const catalogColor = row.dataset.catalogColor;
-            if (!style || !catalogColor) return;
-
-            try {
-                // Fetch available sizes from API
-                const availableSizes = await getAvailableExtendedSizes(style, catalogColor);
-
-                // Check for standard sizes (S, M, L, XL)
-                const standardSizeLabels = ['S', 'M', 'L', 'XL'];
-                const hasStandardSizes = standardSizeLabels.some(s => availableSizes.includes(s));
-
-                // Detect tall/youth/toddler-only products
-                const tallSizes = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT', 'XST'];
-                const youthSizes = ['YXS', 'YS', 'YM', 'YL', 'YXL'];
-                const toddlerSizes = ['2T', '3T', '4T', '5T', '5/6T', '6T'];
-
-                const hasTallOnly = !hasStandardSizes && availableSizes.some(s => tallSizes.includes(s));
-                const hasYouthOnly = !hasStandardSizes && availableSizes.some(s => youthSizes.includes(s));
-                const hasToddlerOnly = !hasStandardSizes && availableSizes.some(s => toddlerSizes.includes(s));
-
-                if (hasTallOnly || hasYouthOnly || hasToddlerOnly) {
-                    // Gray out standard size columns - they don't exist for this product
-                    standardSizeLabels.forEach(size => {
-                        const input = row.querySelector(`input[data-size="${size}"]`);
-                        if (input) {
-                            input.disabled = true;
-                            input.value = '';
-                            input.placeholder = 'N/A';
-                            input.style.backgroundColor = '#f0f0f0';
-                            input.style.color = '#999';
-                            input.title = 'Size not available for this product';
-                        }
-                    });
-
-                    // Store product type for reference
-                    row.dataset.productType = hasTallOnly ? 'tall-only' :
-                                               hasYouthOnly ? 'youth-only' : 'toddler-only';
-
-                    // Focus on the extended size picker instead
-                    const xxxlInput = row.querySelector('input[data-size="3XL"]');
-                    if (xxxlInput) xxxlInput.focus();
-                }
-            } catch (error) {
-                console.warn('Could not detect product type for UI adjustment:', error);
             }
         }
 
@@ -4671,91 +4585,6 @@ Company:Absher Construction Company
             recalculatePricing();
         }
 
-        async function onColorChange(select, rowId) {
-            const row = document.getElementById(`row-${rowId}`);
-            const color = select.value;
-
-            if (!color) return;
-
-            const selectedOption = select.options[select.selectedIndex];
-            const catalogColor = selectedOption.dataset.catalog || '';
-            const style = row.dataset.style;
-
-            // Check for duplicate row (same style + color)
-            const existingRow = findExistingRow(style, catalogColor, rowId);
-            if (existingRow) {
-                // Show toast and focus on existing row
-                showToast(`${style} in ${color} already exists. Adding to existing row.`, 'info');
-
-                // Clear this row's color selection
-                select.value = '';
-
-                // Focus on the existing row's first size input
-                const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
-                if (existingFirstSize) existingFirstSize.focus();
-                return;
-            }
-
-            row.dataset.color = color;
-            row.dataset.catalogColor = catalogColor;
-
-            // Enable size inputs
-            row.querySelectorAll('.size-input').forEach(input => {
-                input.disabled = false;
-            });
-
-            // Cascade color change to child rows that haven't been manually edited
-            if (childRowMap[rowId]) {
-                Object.entries(childRowMap[rowId]).forEach(([size, childRowId]) => {
-                    const childRow = document.getElementById(`row-${childRowId}`);
-                    if (childRow && childRow.dataset.colorManuallySet !== 'true') {
-                        // Update child row color
-                        childRow.dataset.color = color;
-                        childRow.dataset.catalogColor = catalogColor;
-
-                        // Update child row's color dropdown selection
-                        const childColorSelect = childRow.querySelector('.child-color-select');
-                        if (childColorSelect) {
-                            childColorSelect.value = color;
-                        }
-
-                        console.log(`Cascaded color change to child row ${childRowId}: ${color}`);
-                    }
-                });
-                updateChildRowColorIndicators(rowId);
-            }
-
-            // Focus first size input
-            const firstSize = row.querySelector('.size-input');
-            if (firstSize) firstSize.focus();
-        }
-
-        /**
-         * Handle color change in a child row
-         * Updates child row's color and marks it as manually set
-         */
-        function onChildColorChange(select, childRowId, parentRowId) {
-            const childRow = document.getElementById(`row-${childRowId}`);
-            if (!childRow) return;
-
-            const color = select.value;
-            const selectedOption = select.options[select.selectedIndex];
-            const catalogColor = selectedOption.dataset.catalog || '';
-
-            // Update child row data attributes
-            childRow.dataset.color = color;
-            childRow.dataset.catalogColor = catalogColor;
-            childRow.dataset.colorManuallySet = 'true';  // Mark as manually edited
-
-            // Update visual indicator
-            updateChildRowColorIndicators(parentRowId);
-
-            console.log(`Child row ${childRowId} color changed to ${color} (catalog: ${catalogColor})`);
-
-            // Recalculate pricing
-            recalculatePricing();
-        }
-
         /**
          * Update visual styling for child rows based on color match with parent
          */
@@ -4935,7 +4764,6 @@ Company:Absher Construction Company
                     }
                 });
 
-                console.log(`[hideVariantOnlyParents] Hidden parent row ${rowId} (${parentRow.dataset.style}), promoted ${childRows.length} child(ren)`);
             });
         }
 
@@ -4948,7 +4776,6 @@ Company:Absher Construction Company
 
             parentRow.classList.remove('variant-only-parent');
             parentRow.dataset.variantOnlyHidden = 'false';
-            console.log(`[unhideVariantOnlyParent] Restored parent row ${parentRowId}`);
         }
 
         /**
@@ -5104,7 +4931,6 @@ Company:Absher Construction Company
             }
             childRowMap[parentRowId][size] = childRowId;
 
-            console.log(`Created child row ${childRowId} for ${baseStyle} ${size}`);
         }
 
         /**
@@ -5350,6 +5176,17 @@ Company:Absher Construction Company
         // PRICING CALCULATIONS
         // ============================================================
 
+        // Debounce utility for input handlers that fire on every keystroke
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 250);
+
         async function recalculatePricing() {
             // Collect products from table (parent rows only)
             const productList = collectProductsFromTable();
@@ -5536,6 +5373,7 @@ Company:Absher Construction Company
                 }
             } catch (error) {
                 console.error('Pricing calculation error:', error);
+                showToast('Pricing calculation error. Please try again.', 'error');
             }
 
             // Mark as dirty for auto-save (2026 consolidation)
@@ -5962,38 +5800,53 @@ Company:Absher Construction Company
         }
 
         /**
+         * Calculate the discountable subtotal consistently across all functions.
+         * Includes: products grandTotal + art charge + graphic design + rush fee + sample fees
+         * LTM is already baked into grandTotal so no separate LTM addition needed.
+         * @returns {{ baseSubtotal: number, additionalCharges: number, discountableSubtotal: number, discount: number, adjustedSubtotal: number }}
+         */
+        function calculateDiscountableSubtotal() {
+            const baseSubtotalText = document.getElementById('grand-total')?.textContent || '$0.00';
+            const baseSubtotal = parseFloat(baseSubtotalText.replace(/[$,]/g, '')) || 0;
+
+            const artChargeToggle = document.getElementById('art-charge-toggle');
+            const artCharge = artChargeToggle?.checked
+                ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
+            const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * 75;
+            const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
+            const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
+            const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
+
+            const additionalCharges = artCharge + designFee + rushFee + (sampleFee * sampleQty);
+            const discountableSubtotal = baseSubtotal + additionalCharges;
+
+            const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
+            const discountType = document.getElementById('discount-type')?.value || 'fixed';
+
+            let discount = 0;
+            if (discountType === 'percent') {
+                discount = discountableSubtotal * (discountAmount / 100);
+            } else {
+                discount = discountAmount;
+            }
+
+            return {
+                baseSubtotal,
+                additionalCharges,
+                discountableSubtotal,
+                discount,
+                adjustedSubtotal: discountableSubtotal - discount
+            };
+        }
+
+        /**
          * Update tax calculation based on toggle state
-         * Includes Additional Charges (Art, Rush, Sample, Discount) in subtotal
+         * Uses shared calculateDiscountableSubtotal() for consistent discount math
          * Called after pricing updates and when any charge input changes
          */
         function updateTaxCalculation() {
             const includeTax = document.getElementById('include-tax')?.checked ?? true;
-
-            // Get base subtotal (products + LTM + digitizing + stitches + AL)
-            const baseSubtotalText = document.getElementById('grand-total')?.textContent || '$0.00';
-            const baseSubtotal = parseFloat(baseSubtotalText.replace(/[$,]/g, '')) || 0;
-
-            // Get additional charges
-            const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
-            const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
-            const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
-            const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
-            const discountValue = parseFloat(document.getElementById('discount-amount')?.value) || 0;
-            const discountType = document.getElementById('discount-type')?.value || 'fixed';
-
-            // Calculate additional charges total
-            const additionalCharges = artCharge + rushFee + (sampleFee * sampleQty);
-
-            // Calculate discount
-            let discount = 0;
-            if (discountType === 'percent') {
-                discount = (baseSubtotal + additionalCharges) * (discountValue / 100);
-            } else {
-                discount = discountValue;
-            }
-
-            // Calculate adjusted subtotal (includes additional charges and discount)
-            const adjustedSubtotal = baseSubtotal + additionalCharges - discount;
+            const { adjustedSubtotal } = calculateDiscountableSubtotal();
 
             const taxRate = 0.101; // WA State sales tax
 
@@ -6035,21 +5888,35 @@ Company:Absher Construction Company
 
             try {
                 // Build separate logo configs for garments and caps
+                // Build AL entries from global toggle state (same as recalculatePricing)
+                const garmentALForPrint = globalAL.garment.enabled ? [{
+                    id: 'global-al-garment',
+                    position: 'AL',
+                    stitchCount: globalAL.garment.stitchCount,
+                    needsDigitizing: globalAL.garment.needsDigitizing
+                }] : [];
+                const capALForPrint = globalAL.cap.enabled ? [{
+                    id: 'global-al-cap',
+                    position: 'AL-Cap',
+                    stitchCount: globalAL.cap.stitchCount,
+                    needsDigitizing: globalAL.cap.needsDigitizing
+                }] : [];
+
                 const logoConfigs = {
                     garment: {
                         primary: { ...primaryLogo, id: 'primary' },
-                        additional: additionalLogos
+                        additional: garmentALForPrint
                     },
                     cap: {
                         primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capAdditionalLogos
+                        additional: capALForPrint
                     }
                 };
 
                 // For backward compatibility, also create combined array
                 const allLogos = [
                     { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos
+                    ...garmentALForPrint
                 ];
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
 
@@ -6064,6 +5931,9 @@ Company:Absher Construction Company
 
                 // LTM baked into per-piece prices (2026-02-06)
                 pricing.ltmDistributed = true;
+
+                // Pass tax toggle state to invoice
+                pricing.includeTax = document.getElementById('include-tax')?.checked ?? true;
 
                 // Add additional charges to pricing data for PDF (2026 fee refactor)
                 const additionalCharges = getAdditionalCharges();
@@ -6182,13 +6052,13 @@ Company:Absher Construction Company
                     feeItems.push({ partNumber: 'SAMPLE', description: 'Sample Fee', quantity: sampleQty, unitPrice: additionalCharges.sampleFee / sampleQty, lineTotal: additionalCharges.sampleFee });
                 }
 
-                // LTM - Garments
-                if (pricing.garmentLtmFee > 0) {
+                // LTM - Garments (skip when LTM is distributed into per-piece prices)
+                if (pricing.garmentLtmFee > 0 && !pricing.ltmDistributed) {
                     feeItems.push({ partNumber: 'LTM', description: 'Less Than Minimum - Garments', quantity: 1, unitPrice: pricing.garmentLtmFee, lineTotal: pricing.garmentLtmFee });
                 }
 
-                // LTM - Caps
-                if (pricing.capLtmFee > 0) {
+                // LTM - Caps (skip when LTM is distributed into per-piece prices)
+                if (pricing.capLtmFee > 0 && !pricing.ltmDistributed) {
                     feeItems.push({ partNumber: 'LTM', description: 'Less Than Minimum - Caps', quantity: 1, unitPrice: pricing.capLtmFee, lineTotal: pricing.capLtmFee });
                 }
 
@@ -6431,7 +6301,7 @@ Company:Absher Construction Company
                 return;
             }
 
-            showToast('Email functionality coming soon', 'info');
+            showToast('Email functionality not yet available. Use Print to PDF and email manually.', 'info');
         }
 
         // Toggle Coming Soon accordion
@@ -6866,19 +6736,8 @@ Company:Absher Construction Company
                     discountRow.style.display = 'table-row';
                     let actualDiscount = discountAmount;
                     if (discountType === 'percent') {
-                        // Calculate discountable subtotal (products + additional services)
-                        const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
-                        const artCharge = document.getElementById('art-charge-toggle')?.checked
-                            ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-                        const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
-                        const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-                        const garmentLtmFee = document.getElementById('garment-ltm-table-row')?.style.display !== 'none'
-                            ? parseFloat(document.getElementById('garment-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
-                        const capLtmFee = document.getElementById('cap-ltm-table-row')?.style.display !== 'none'
-                            ? parseFloat(document.getElementById('cap-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
-
-                        const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + garmentLtmFee + capLtmFee;
-                        actualDiscount = discountableSubtotal * (discountAmount / 100);
+                        const { discount } = calculateDiscountableSubtotal();
+                        actualDiscount = discount;
                     }
                     const reasonLabel = document.getElementById('discount-reason-label');
                     if (reasonLabel) {
@@ -6907,28 +6766,9 @@ Company:Absher Construction Company
             const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
             const discountType = document.getElementById('discount-type')?.value || 'fixed';
 
-            // Calculate actual discount value based on type
-            let discountValue = 0;
-            let discountPercent = 0;
-            if (discountType === 'percent') {
-                discountPercent = discountAmount;
-                // Calculate discountable subtotal (products + additional services)
-                const subtotalText = document.getElementById('subtotal')?.textContent || '$0.00';
-                const productsSubtotal = parseFloat(subtotalText.replace(/[$,]/g, '')) || 0;
-                const artCharge = document.getElementById('art-charge-toggle')?.checked
-                    ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
-                const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-                const garmentLtmFee = document.getElementById('garment-ltm-table-row')?.style.display !== 'none'
-                    ? parseFloat(document.getElementById('garment-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
-                const capLtmFee = document.getElementById('cap-ltm-table-row')?.style.display !== 'none'
-                    ? parseFloat(document.getElementById('cap-ltm-table-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
-
-                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + garmentLtmFee + capLtmFee;
-                discountValue = discountableSubtotal * (discountAmount / 100);
-            } else {
-                discountValue = discountAmount;
-            }
+            // Use shared helper for consistent discount calculation
+            const { discount: discountValue } = calculateDiscountableSubtotal();
+            const discountPercent = discountType === 'percent' ? discountAmount : 0;
 
             // Graphic Design Services (GRT-75) @ $75/hr
             const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
@@ -7615,17 +7455,13 @@ Company:Absher Construction Company
 
                 const result = parser.parse(text);
 
-                console.log('[ShopWorks Import] Parsed items:', result.products.length, result.products);
-                console.log('[ShopWorks Import] DECG items:', result.decgItems?.length || 0, result.decgItems);
 
                 // Consolidate products by partNumber + color (merges size-split SKUs like ST253, ST253_2X into one row)
                 result.products = parser.consolidateProducts(result.products);
                 pendingShopWorksImport = result;
 
-                console.log('[ShopWorks Import] After consolidation:', result.products.length, 'products');
                 result.products.forEach((p, i) => {
                     const totalQty = Object.values(p.sizes).reduce((sum, q) => sum + q, 0);
-                    console.log(`  [${i + 1}] ${p.partNumber} ${p.color}: ${totalQty} pcs`, p.sizes);
                 });
 
                 // Show preview
@@ -7863,7 +7699,6 @@ Company:Absher Construction Company
                 }
 
                 // Also populate customer lookup search field for easy CRM lookup
-                console.log('[ShopWorks Import] Customer data:', data.customer);
                 const customerLookupInput = document.getElementById('customer-lookup');
                 if (customerLookupInput && data.customer.email) {
                     customerLookupInput.value = data.customer.email;
@@ -7872,9 +7707,7 @@ Company:Absher Construction Company
                     // This avoids timing issues with modal close/blur events
                     if (window.customerLookupInstance) {
                         try {
-                            console.log('[ShopWorks Import] Searching CRM for:', data.customer.email);
                             const results = await window.customerLookupInstance.search(data.customer.email);
-                            console.log('[ShopWorks Import] CRM results:', results);
 
                             if (results.length > 0) {
                                 // Auto-populate from first CRM match
@@ -7885,7 +7718,6 @@ Company:Absher Construction Company
                                 showToast('Customer info loaded from CRM', 'success');
                             } else {
                                 // Show that lookup ran but found nothing - not an error
-                                console.log('[ShopWorks Import] No CRM match for:', data.customer.email);
                                 showToast('Customer not found in CRM - using imported values', 'info');
                             }
                         } catch (err) {
@@ -8019,16 +7851,13 @@ Company:Absher Construction Company
 
                 // 9. Import DECG/DECC items as SERVICE PRODUCT ROWS (2026-02 refactor)
                 // These now appear in the product table, not as fee rows
-                console.log('[confirmShopWorksImport] Section 9 - data.decgItems:', data.decgItems);
                 if (data.decgItems && data.decgItems.length > 0) {
                     // Separate DECG (garments) from DECC (caps)
                     const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
                     const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
-                    console.log('[confirmShopWorksImport] After filter - DECG garments:', decgGarments.length, 'DECC caps:', deccCaps.length);
 
                     // Create DECG SERVICE PRODUCT ROW (customer-supplied garments)
                     if (decgGarments.length > 0) {
-                        console.log('[confirmShopWorksImport] Creating DECG service product row');
                         // Aggregate all DECG items into one row
                         let totalQty = 0, totalCharge = 0;
                         let avgStitchCount = 0;
@@ -8047,12 +7876,10 @@ Company:Absher Construction Company
                             total: totalCharge,
                             isCap: false
                         });
-                        console.log('[confirmShopWorksImport] DECG row created - qty:', totalQty, 'total:', totalCharge);
                     }
 
                     // Create DECC SERVICE PRODUCT ROW (customer-supplied caps)
                     if (deccCaps.length > 0) {
-                        console.log('[confirmShopWorksImport] Creating DECC service product row');
                         let totalQty = 0, totalCharge = 0;
                         let avgStitchCount = 0;
                         deccCaps.forEach(d => {
@@ -8070,7 +7897,6 @@ Company:Absher Construction Company
                             total: totalCharge,
                             isCap: true
                         });
-                        console.log('[confirmShopWorksImport] DECC row created - qty:', totalQty, 'total:', totalCharge);
                     }
 
                     const totalItems = decgGarments.reduce((sum, d) => sum + d.quantity, 0) +
@@ -8091,7 +7917,6 @@ Company:Absher Construction Company
                         total: totalPrice,
                         isCap: false
                     });
-                    console.log('[confirmShopWorksImport] MONOGRAM row created - qty:', totalNames, 'total:', totalPrice);
 
                     // Also add name details to notes
                     const nameDetails = data.services.monograms
@@ -8195,7 +8020,6 @@ Company:Absher Construction Company
          */
         async function importProductRow(product) {
             const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
-            console.log(`[ShopWorks Import] Importing product: ${product.partNumber} ${product.color} (${totalQty} pcs)`, product.sizes);
 
             // Add a new row
             addNewRow();
@@ -8236,7 +8060,6 @@ Company:Absher Construction Company
 
             // Row is still "Not found" — it will have an "Add" button for the user
             if (row.dataset.notFound === 'true') {
-                console.log(`[ShopWorks Import] ${product.partNumber} not found — user can click "Add" to register it`);
                 return;
             }
 
@@ -8317,7 +8140,6 @@ Company:Absher Construction Company
                     // Apply cap size mapping if this is a cap
                     if (isCapRow && CAP_SIZE_MAP[internalSize.toUpperCase()]) {
                         const capSize = CAP_SIZE_MAP[internalSize.toUpperCase()];
-                        console.log(`[ShopWorks Import] Cap size mapping: ${internalSize} → ${capSize}`);
                         internalSize = capSize;
                     }
 
@@ -8327,7 +8149,6 @@ Company:Absher Construction Company
                         row.dataset.osfaQty = qty;
                         row.dataset.isOsfaOnly = 'true';
                         document.getElementById(`row-qty-${rowId}`).textContent = qty;
-                        console.log(`[ShopWorks Import] OSFA-only product: qty ${qty} in parent row (no child row)`);
                         continue;
                     }
 
@@ -8337,7 +8158,6 @@ Company:Absher Construction Company
                     const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
                                           (sizeInput && sizeInput.disabled);
 
-                    console.log(`[ShopWorks Import] Size ${internalSize}: qty=${qty}, input=${sizeInput ? 'found' : 'missing'}, disabled=${sizeInput?.disabled}, needsChildRow=${needsChildRow}${isCapRow ? ' (CAP)' : ''}`);
 
                     if (needsChildRow) {
                         // Use the existing extended size function to create child row

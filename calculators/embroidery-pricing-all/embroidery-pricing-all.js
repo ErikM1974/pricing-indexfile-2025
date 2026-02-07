@@ -129,11 +129,6 @@ async function loadAllPricingData() {
     AL_RETAIL_PRICING = alData;
     DECG_RETAIL_PRICING = decgData;
 
-    console.log('Pricing data loaded from API:', {
-        contract: CONTRACT_PRICING ? 'loaded' : 'failed',
-        al: AL_RETAIL_PRICING ? 'loaded' : 'failed',
-        decg: DECG_RETAIL_PRICING ? 'loaded' : 'failed'
-    });
 }
 
 async function fetchContractPricing() {
@@ -243,11 +238,21 @@ async function fetchCapUpgrades() {
         return CAP_UPGRADES;
     } catch (error) {
         console.error('Failed to fetch cap upgrades:', error);
-        // Fallback to default values - still show the card but log the error
+        // Fallback to default values but warn the user
         CAP_UPGRADES = {
             puff: { name: '3D Puff Embroidery', partNumber: '3D-EMB', price: 5.00 },
             patch: { name: 'Laser Faux Leather Patch', partNumber: 'Laser Patch', price: 5.00 }
         };
+        // Show visible warning — using fallback pricing
+        const warningEl = document.getElementById('api-warning') || document.createElement('div');
+        if (!warningEl.id) {
+            warningEl.id = 'api-warning';
+            warningEl.style.cssText = 'background:#fff3cd;color:#856404;border:1px solid #ffc107;padding:8px 12px;margin:8px 0;border-radius:4px;font-size:13px;';
+            const container = document.querySelector('.calculator-container') || document.body;
+            container.prepend(warningEl);
+        }
+        warningEl.textContent = 'Cap upgrade pricing may be approximate — API unavailable. Refresh to retry.';
+        warningEl.style.display = 'block';
         return CAP_UPGRADES;
     }
 }

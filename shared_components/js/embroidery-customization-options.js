@@ -28,8 +28,6 @@ class EmbroideryCustomizationOptions {
     }
     
     initialize() {
-        console.log('[EmbroideryCustomization] Initializing customization options');
-        
         // Wait for DOM if needed
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.render());
@@ -404,18 +402,14 @@ class EmbroideryCustomizationOptions {
     }
     
     updateAdditionalLogoStitchesFromSlider(logoId, newValue) {
-        console.log('[EmbroideryCustomization] updateAdditionalLogoStitchesFromSlider called:', logoId, newValue);
         const logo = this.state.additionalLogos.find(l => l.id === logoId);
         if (!logo) {
             console.warn('[EmbroideryCustomization] Logo not found in state:', logoId);
             return;
         }
-        
+
         logo.stitches = newValue;
-        console.log('[EmbroideryCustomization] About to call calculator.updateAdditionalLogo');
-        console.log('[EmbroideryCustomization] Calculator instance:', this.calculator);
         this.calculator.updateAdditionalLogo(logoId, newValue);
-        console.log('[EmbroideryCustomization] calculator.updateAdditionalLogo called');
         
         // Update the bubble value
         const bubble = document.querySelector(`.additional-bubble[data-logo-id="${logoId}"]`);

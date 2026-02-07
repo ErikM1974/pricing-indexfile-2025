@@ -5,7 +5,7 @@
 
 class EmbroideryPricingCalculator {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         
         // Default fallback values (will be replaced by API data)
         // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM, +$4 surcharge baked in)
@@ -108,7 +108,6 @@ class EmbroideryPricingCalculator {
      */
     async _doInitializeConfig() {
         try {
-            console.log('[EmbroideryPricingCalculator] Fetching configuration from API...');
             
             // Fetch embroidery pricing bundle (includes all config)
             const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC54`);
@@ -150,11 +149,6 @@ class EmbroideryPricingCalculator {
                         }
                     });
                     
-                    console.log('[EmbroideryPricingCalculator] Configuration loaded from API:');
-                    console.log('- Digitizing Fee:', this.digitizingFee);
-                    console.log('- Additional Stitch Rate:', this.additionalStitchRate);
-                    console.log('- Base Stitch Count:', this.baseStitchCount);
-                    console.log('- Tiers:', this.tiers);
                     
                     // Mark main pricing as successfully loaded
                     this.apiStatus.mainPricing = true;
@@ -164,7 +158,6 @@ class EmbroideryPricingCalculator {
                 // Extract rounding method
                 if (data.rulesR && data.rulesR.RoundingMethod) {
                     this.roundingMethod = data.rulesR.RoundingMethod;
-                    console.log('[EmbroideryPricingCalculator] Rounding method:', this.roundingMethod);
                 } else {
                     // Fallback: fetch from pricing-rules endpoint
                     await this.fetchRoundingRules();
@@ -173,17 +166,14 @@ class EmbroideryPricingCalculator {
             
             // Fetch Additional Logo (AL) pricing from EMB-AL endpoint
             try {
-                console.log('[EmbroideryPricingCalculator] Fetching AL pricing from EMB-AL endpoint...');
                 const alResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB-AL`);
                 const alData = await alResponse.json();
                 
-                console.log('🔍 [DEBUG] Raw EMB-AL API Response:', alData);
                 
                 if (alData && alData.allEmbroideryCostsR && alData.allEmbroideryCostsR.length > 0) {
                     this.alTiers = {};
                     alData.allEmbroideryCostsR.forEach(cost => {
                         if (cost.ItemType === 'AL') {
-                            console.log(`🔍 [DEBUG] AL Tier ${cost.TierLabel}: EmbroideryCost = $${cost.EmbroideryCost}, BaseStitchCount = ${cost.BaseStitchCount}, AdditionalStitchRate = $${cost.AdditionalStitchRate}`);
                             this.alTiers[cost.TierLabel] = {
                                 embCost: cost.EmbroideryCost,
                                 hasLTM: cost.TierLabel === '1-7',
@@ -192,7 +182,6 @@ class EmbroideryPricingCalculator {
                             };
                         }
                     });
-                    console.log('[EmbroideryPricingCalculator] AL pricing loaded from API:', this.alTiers);
                     this.apiStatus.alPricing = true;
                 } else {
                     throw new Error('No AL data in response');
@@ -219,7 +208,6 @@ class EmbroideryPricingCalculator {
             await this.loadServiceCodes();
 
             this.initialized = true;
-            console.log('[EmbroideryPricingCalculator] Initialization complete');
             
         } catch (error) {
             console.error('[EmbroideryPricingCalculator] CRITICAL ERROR: Failed to load pricing configuration');
@@ -260,7 +248,6 @@ class EmbroideryPricingCalculator {
                 const roundingRule = data.find(rule => rule.RuleName === 'RoundingMethod');
                 if (roundingRule) {
                     this.roundingMethod = roundingRule.RuleValue;
-                    console.log('[EmbroideryPricingCalculator] Rounding method from pricing-rules:', this.roundingMethod);
                 }
             }
         } catch (error) {
@@ -280,13 +267,11 @@ class EmbroideryPricingCalculator {
      */
     async loadServiceCodes() {
         try {
-            console.log('[EmbroideryPricingCalculator] Loading service codes from API...');
             const response = await fetch(`${this.baseURL}/api/service-codes`);
             const data = await response.json();
 
             if (data.success && data.data) {
                 const codes = data.data;
-                console.log(`[EmbroideryPricingCalculator] Loaded ${codes.length} service codes from database`);
 
                 // FB (Full Back) - stitch-based pricing
                 // BUG FIX 2026-02-01: Removed PricingMethod filter - API may return null
@@ -298,28 +283,24 @@ class EmbroideryPricingCalculator {
                     if (fb.SellPrice) {
                         this.fbStitchRate = fb.SellPrice;
                     }
-                    console.log(`  - FB: StitchBase=${this.fbBaseStitchCount}, Rate=$${fb.SellPrice}/1K`);
                 }
 
                 // LTM (Less Than Minimum) fee
                 const ltm = codes.find(c => c.ServiceCode === 'LTM');
                 if (ltm && ltm.SellPrice) {
                     this.ltmFee = ltm.SellPrice;
-                    console.log(`  - LTM Fee: $${this.ltmFee}`);
                 }
 
                 // GRT-50 (Patch Setup Fee)
                 const grt50 = codes.find(c => c.ServiceCode === 'GRT-50');
                 if (grt50 && grt50.SellPrice) {
                     this.patchSetupFee = grt50.SellPrice;
-                    console.log(`  - Patch Setup Fee (GRT-50): $${this.patchSetupFee}`);
                 }
 
                 // Monogram pricing
                 const monogram = codes.find(c => c.ServiceCode === 'Monogram');
                 if (monogram && monogram.SellPrice) {
                     this.monogramPrice = monogram.SellPrice;
-                    console.log(`  - Monogram Price: $${this.monogramPrice}`);
                 }
 
                 // CONFIG: Garment stitch rate
@@ -331,7 +312,6 @@ class EmbroideryPricingCalculator {
                     if (stitchRate.StitchBase) {
                         this.baseStitchCount = stitchRate.StitchBase;
                     }
-                    console.log(`  - Garment Stitch Rate: $${this.additionalStitchRate}/1K, Base: ${this.baseStitchCount}`);
                 }
 
                 // CONFIG: Cap stitch rate
@@ -343,24 +323,20 @@ class EmbroideryPricingCalculator {
                     if (capStitchRate.StitchBase) {
                         this.capStitchCount = capStitchRate.StitchBase;
                     }
-                    console.log(`  - Cap Stitch Rate: $${this.capAdditionalStitchRate}/1K, Base: ${this.capStitchCount}`);
                 }
 
                 // CONFIG: 3D Puff upcharge
                 const puffUpcharge = codes.find(c => c.ServiceCode === 'PUFF-UPCHARGE');
                 if (puffUpcharge && puffUpcharge.SellPrice) {
                     this.puffUpchargePerCap = puffUpcharge.SellPrice;
-                    console.log(`  - Puff Upcharge: $${this.puffUpchargePerCap}/cap`);
                 }
 
                 // CONFIG: Patch upcharge
                 const patchUpcharge = codes.find(c => c.ServiceCode === 'PATCH-UPCHARGE');
                 if (patchUpcharge && patchUpcharge.SellPrice) {
                     this.patchUpchargePerCap = patchUpcharge.SellPrice;
-                    console.log(`  - Patch Upcharge: $${this.patchUpchargePerCap}/cap`);
                 }
 
-                console.log('[EmbroideryPricingCalculator] Service codes applied successfully');
             }
         } catch (error) {
             console.warn('[EmbroideryPricingCalculator] Failed to load service codes, using defaults:', error.message);
@@ -397,7 +373,6 @@ class EmbroideryPricingCalculator {
      * @private
      */
     async _doInitializeCapConfig() {
-        console.log('[EmbroideryPricingCalculator] Initializing cap pricing configuration...');
 
         try {
             // Fetch cap pricing bundle
@@ -418,7 +393,6 @@ class EmbroideryPricingCalculator {
                         if (cost.AdditionalStitchRate && !this._capRateLoaded) {
                             this.capAdditionalStitchRate = cost.AdditionalStitchRate;
                             this._capRateLoaded = true;
-                            console.log(`[EmbroideryPricingCalculator] Cap additional stitch rate: $${this.capAdditionalStitchRate}/1K`);
                         }
                     }
                 });
@@ -433,10 +407,6 @@ class EmbroideryPricingCalculator {
                     this.capRoundingMethod = data.rulesR.RoundingMethod;
                 }
 
-                console.log('[EmbroideryPricingCalculator] Cap pricing loaded:');
-                console.log('- Cap Tiers:', this.capTiers);
-                console.log('- Cap Margin:', this.capMarginDenominator);
-                console.log('- Cap Rounding:', this.capRoundingMethod);
 
                 this.apiStatus.capPricing = true;
             }
@@ -459,7 +429,6 @@ class EmbroideryPricingCalculator {
                             };
                         }
                     });
-                    console.log('[EmbroideryPricingCalculator] Cap AL pricing loaded:', this.capAlTiers);
                     this.apiStatus.capAlPricing = true;
                 }
             } catch (alError) {
@@ -478,7 +447,6 @@ class EmbroideryPricingCalculator {
                     const puffRecord = puffData.allEmbroideryCostsR.find(cost => cost.ItemType === '3D-Puff');
                     if (puffRecord && puffRecord.EmbroideryCost) {
                         this.puffUpchargePerCap = puffRecord.EmbroideryCost;
-                        console.log(`[EmbroideryPricingCalculator] 3D Puff upcharge loaded from API: $${this.puffUpchargePerCap}`);
                     } else {
                         console.warn('[EmbroideryPricingCalculator] 3D-Puff record not found in API, using default');
                     }
@@ -499,7 +467,6 @@ class EmbroideryPricingCalculator {
                     const patchRecord = patchData.allPatchCostsR.find(cost => cost.ItemType === 'Patch');
                     if (patchRecord && patchRecord.EmbroideryCost) {
                         this.patchUpchargePerCap = patchRecord.EmbroideryCost;
-                        console.log(`[EmbroideryPricingCalculator] Patch upcharge loaded from API: $${this.patchUpchargePerCap}`);
                     } else {
                         console.warn('[EmbroideryPricingCalculator] Patch record not found in API, using default');
                     }
@@ -510,7 +477,6 @@ class EmbroideryPricingCalculator {
             }
 
             this.capInitialized = true;
-            console.log('[EmbroideryPricingCalculator] Cap pricing initialization complete');
 
         } catch (error) {
             console.error('[EmbroideryPricingCalculator] Failed to load cap pricing:', error);
@@ -605,12 +571,9 @@ class EmbroideryPricingCalculator {
         // Add embellishment-specific upcharges
         if (embellishmentType === '3d-puff') {
             puffUpcharge = this.puffUpchargePerCap;
-            console.log(`[EmbroideryPricingCalculator] Cap 3D PUFF ${product.style}: tier=${tier}, embCost=$${embCost}, puffUpcharge=$${puffUpcharge}, stitches=${capStitchCount}, extraStitchCost=$${capExtraStitchCost.toFixed(2)}`);
         } else if (embellishmentType === 'laser-patch') {
             patchUpcharge = this.patchUpchargePerCap;
-            console.log(`[EmbroideryPricingCalculator] Cap LASER-PATCH ${product.style}: tier=${tier}, embCost=$${embCost}, patchUpcharge=$${patchUpcharge}`);
         } else {
-            console.log(`[EmbroideryPricingCalculator] Cap EMBROIDERY ${product.style}: tier=${tier}, embCost=$${embCost}, stitches=${capStitchCount}, extraStitchCost=$${capExtraStitchCost.toFixed(2)}`);
         }
 
         // Fetch size pricing for this cap style
@@ -658,7 +621,6 @@ class EmbroideryPricingCalculator {
                 const sizePrice = priceData.basePrices[orderedSize];
                 if (sizePrice && sizePrice > 0) {
                     standardBasePrice = sizePrice;
-                    console.log(`[EmbroideryPricingCalculator] Found cap price from ordered size ${orderedSize}: $${standardBasePrice}`);
                     break;
                 }
             }
@@ -679,7 +641,6 @@ class EmbroideryPricingCalculator {
             return null;
         }
 
-        console.log(`[EmbroideryPricingCalculator] Cap ${product.style} base price: $${standardBasePrice}`);
 
         // Calculate decorated price for each size in the order
         for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
@@ -700,18 +661,6 @@ class EmbroideryPricingCalculator {
             // Step 2: Extra stitch fees shown as separate AS-CAP line item (NOT added to unit price)
             const finalPrice = roundedBase + upcharge;
 
-            console.log(`[CAP PRICING DEBUG] ${product.style} ${size} (${embellishmentType}):
-                Base: $${sizeBasePrice}
-                Margin: ${marginDenom}
-                Garment: $${garmentCost.toFixed(2)}
-                Decoration: $${decorationCost}
-                Puff Upcharge: $${puffUpcharge}
-                Patch Upcharge: $${patchUpcharge}
-                Base Decorated: $${baseDecoratedPrice.toFixed(2)}
-                Rounded Base: $${roundedBase}
-                ExtraStitch: $${capExtraStitchCost.toFixed(2)} (shown as separate AS-CAP line)
-                Upcharge: $${upcharge}
-                Final: $${finalPrice}`);
 
             lineItems.push({
                 description: `${size}(${qty})`,
@@ -844,7 +793,6 @@ class EmbroideryPricingCalculator {
      * Skips margin formula and embroidery cost — the sell price IS the final decorated price
      */
     buildFixedPriceResult(product, sellPrice) {
-        console.log(`[EmbroideryPricingCalculator] SELL PRICE OVERRIDE: ${product.style} @ $${sellPrice}/ea`);
 
         const lineItems = [];
         let lineSubtotal = 0;
@@ -886,12 +834,10 @@ class EmbroideryPricingCalculator {
 
         // Detect item type and log for debugging
         const itemType = this.detectItemType(product.style);
-        console.log(`[EmbroideryPricingCalculator] Product ${product.style} detected as: ${itemType}`);
 
         // Get embroidery cost (currently API only returns Shirt costs)
         // TODO: When API supports different item types, use itemType to get correct cost
         const embCost = this.getEmbroideryCost(tier);
-        console.log(`[EmbroideryPricingCalculator] Using embroidery cost: $${embCost} for tier ${tier}`);
 
         // Fetch size pricing for this style
         const sizePricingData = await this.fetchSizePricing(product.style);
@@ -946,7 +892,6 @@ class EmbroideryPricingCalculator {
                 availableSizes.sort((a, b) => a[1] - b[1]);
                 baseSize = availableSizes[0][0];
                 standardBasePrice = availableSizes[0][1];
-                console.log(`[EmbroideryPricingCalculator] Using ${baseSize} as base size with price $${standardBasePrice}`);
             }
         }
 
@@ -960,7 +905,6 @@ class EmbroideryPricingCalculator {
                 if (sizePrice && sizePrice > 0) {
                     baseSize = orderedSize;
                     standardBasePrice = sizePrice;
-                    console.log(`[EmbroideryPricingCalculator] Found price from ordered size ${orderedSize}: $${standardBasePrice}`);
                     break;
                 }
             }
@@ -1029,16 +973,6 @@ class EmbroideryPricingCalculator {
             // Step 2: Add extra stitch fees on top (no more rounding)
             const finalPrice = roundedBase + additionalStitchCost;
 
-            // Debug logging for pricing calculation
-            console.log(`[PRICING DEBUG] ${product.style} Standard Sizes:
-                Base Price: $${standardBasePrice}
-                Margin Denominator: ${this.marginDenominator}
-                Garment Cost: $${garmentCost.toFixed(2)}
-                Embroidery Cost: $${embCost}
-                Base Decorated: $${baseDecoratedPrice.toFixed(2)}
-                Rounded Base: $${roundedBase}
-                Additional Stitch: $${additionalStitchCost}
-                Final Price: $${finalPrice}`);
             
             lineItems.push({
                 description: sizeList.join(' '),
@@ -1076,18 +1010,6 @@ class EmbroideryPricingCalculator {
             // Step 3: Add extra stitch fees on top (no more rounding)
             const finalPrice = roundedBase + additionalStitchCost;
 
-            // Debug logging for upcharge pricing calculation
-            console.log(`[PRICING DEBUG] ${product.style} Upcharge Sizes (${sizeList.join(', ')}):
-                Base Price: $${standardBasePrice}
-                Margin Denominator: ${this.marginDenominator}
-                Garment Cost: $${garmentCost.toFixed(2)}
-                Embroidery Cost: $${embCost}
-                Base Decorated: $${baseDecoratedPrice.toFixed(2)}
-                Standard Rounded: $${standardRoundedBase}
-                Upcharge Amount: $${upchargeAmount}
-                Rounded Base w/Upcharge: $${roundedBase}
-                Additional Stitch: $${additionalStitchCost}
-                Final Price: $${finalPrice}`);
             
             lineItems.push({
                 description: sizeList.join(' '),
@@ -1335,7 +1257,6 @@ class EmbroideryPricingCalculator {
         const capProducts = products.filter(p => p.isCap === true);
         const garmentProducts = products.filter(p => p.isCap !== true);
 
-        console.log(`[EmbroideryPricingCalculator] Mixed quote: ${capProducts.length} caps, ${garmentProducts.length} garments`);
 
         // Initialize cap pricing if any caps in the quote
         if (capProducts.length > 0 && !this.capInitialized) {
@@ -1352,7 +1273,6 @@ class EmbroideryPricingCalculator {
         const capTier = capQuantity > 0 ? this.getTier(capQuantity) : '1-7';
         const tierEmbCost = this.getEmbroideryCost(garmentTier);
 
-        console.log(`[EmbroideryPricingCalculator] Separate tiers: garments=${garmentTier} (${garmentQuantity} pcs), caps=${capTier} (${capQuantity} pcs)`);
 
         // =========================================
         // USE SEPARATE LOGO CONFIGS IF PROVIDED
@@ -1370,7 +1290,6 @@ class EmbroideryPricingCalculator {
             capAdditionalLogos = logoConfigs.cap.additional || [];
             capLogos = [capPrimaryLogo, ...capAdditionalLogos].filter(Boolean);
 
-            console.log(`[EmbroideryPricingCalculator] Using separate logo configs: ${garmentLogos.length} garment logos, ${capLogos.length} cap logos`);
         } else {
             // Legacy: All logos are garment logos
             garmentPrimaryLogos = logos.filter(l => l.isPrimary);
@@ -1429,7 +1348,6 @@ class EmbroideryPricingCalculator {
         // Get cap stitch count and embellishment type from logo config
         const capStitchCount = capPrimaryLogo?.stitchCount || 8000;
         const capEmbellishmentType = capPrimaryLogo?.embellishmentType || 'embroidery';
-        console.log(`[EmbroideryPricingCalculator] Cap config: stitches=${capStitchCount}, embellishmentType=${capEmbellishmentType}`);
 
         for (const product of capProducts) {
             const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount, capEmbellishmentType);
@@ -1473,7 +1391,6 @@ class EmbroideryPricingCalculator {
         ltmTotal = garmentLtm + capLtm;
         const ltmPerUnit = totalQuantity > 0 ? ltmTotal / totalQuantity : 0;
 
-        console.log(`[EmbroideryPricingCalculator] LTM: garments=$${garmentLtm} (${garmentQuantity}<24), caps=$${capLtm} (${capQuantity}<24), total=$${ltmTotal}`);
         
         // Calculate additional logos pricing
         const additionalServices = [];
@@ -1516,10 +1433,6 @@ class EmbroideryPricingCalculator {
                                 const unitPrice = (fbStitchCount / 1000) * fbStitchRate;
                                 const total = unitPrice * quantity;
 
-                                console.log(`🔍 [DEBUG] Full Back Calculation:`);
-                                console.log(`   - Stitch Count: ${fbStitchCount} (min 25K)`);
-                                console.log(`   - Rate: $${fbStitchRate}/1K`);
-                                console.log(`   - Unit Price: $${unitPrice.toFixed(2)}`);
 
                                 const partNumber = `FB-${fbStitchCount}`;
 
@@ -1580,19 +1493,10 @@ class EmbroideryPricingCalculator {
 
                             const alTierCost = alTierData[alTier].embCost;
 
-                            // Debug logging for AL calculation
-                            console.log(`🔍 [DEBUG] AL Calculation for ${logo.position} (${isCap ? 'Cap' : 'Garment'}):`);
-                            console.log(`   - Tier: ${alTier}`);
-                            console.log(`   - AL Tier Cost: $${alTierCost}`);
-                            console.log(`   - Stitch Count: ${logo.stitchCount}`);
-                            console.log(`   - Extra Stitches: ${extraStitches}`);
-                            console.log(`   - Stitch Cost: $${stitchCost}`);
-                            console.log(`   - Raw Total: $${alTierCost + stitchCost}`);
 
                             // Direct tier cost + stitch cost (NO subset upcharge - simplified pricing)
                             // AL pricing uses raw price - no rounding applied
                             const unitPrice = alTierCost + stitchCost;
-                            console.log(`   - Final Unit Price: $${unitPrice} (AL pricing - no rounding)`);
                             const total = unitPrice * quantity;
 
                             // Generate part number
@@ -1670,7 +1574,6 @@ class EmbroideryPricingCalculator {
             capStitchTotal = capPrimaryStitchCost * capQuantity;
         }
         const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
-        console.log(`[EmbroideryPricingCalculator] Stitch charges - Garment: $${garmentStitchTotal.toFixed(2)}, Cap: $${capStitchTotal.toFixed(2)}, Total: $${additionalStitchTotal.toFixed(2)}`);
 
         // Final totals - NOW includes additionalStitchTotal as a separate line item (not baked into product prices)
         const grandTotal = subtotal + ltmTotal + setupFees + additionalStitchTotal + additionalServicesTotal;

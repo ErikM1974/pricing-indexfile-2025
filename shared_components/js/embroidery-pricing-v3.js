@@ -64,7 +64,6 @@
         
         // Listen for API-loaded embroidery pricing data
         document.addEventListener('embroideryPricingDataLoaded', function(event) {
-            console.log('[Embroidery-V3] API pricing data received');
             if (event.detail) {
                 window.nwcaMasterBundleData = event.detail;
                 window.nwcaPricingData = event.detail;
@@ -89,7 +88,6 @@
                 handlePricingData({ detail: window.nwcaPricingData });
             } else if (window.EMBROIDERY_API_MODE) {
                 // If in API mode, try to load pricing data
-                console.log('[Embroidery-V3] API mode detected, waiting for data...');
                 const params = new URLSearchParams(window.location.search);
                 const styleNumber = params.get('StyleNumber');
                 if (styleNumber && window.loadEmbroideryPricingData) {
