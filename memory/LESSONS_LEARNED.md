@@ -932,6 +932,45 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 
 # Calculator & Quote Builder Sync
 
+## Bug: AL Fee Row Shows Wrong Quantity (First Product Row Only)
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** AL fee row displayed qty=5 when there were 26 garments. Total dollar amount was correct ($208).
+**Root Cause:** `pricing.additionalServices` contains **one entry per product row** (not aggregated). Display code read `garmentALServices[0].quantity` (first product = 5) instead of summing all entries (5+4+7+5+5 = 26). Same bug in 4 places: garment fee row, cap fee row, garment sidebar, cap sidebar.
+**Solution:** Replace all `[0].quantity` and `[0].unitPrice` with `.reduce()` aggregation across all entries. Unit price = total / summed qty.
+**Prevention:** When pricing engine returns per-product arrays, always aggregate for display. Never assume `[0]` represents the whole.
+**Files:** `embroidery-quote-builder.html` (`updatePricingDisplay()`)
+
+## Bug: Stitch Count Changes Don't Update Prices (3 Bugs)
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** Changing primary logo stitch count from 8000 to 12000 showed no visible pricing change.
+**Root Cause (3 bugs):**
+1. **Missing fee display:** AS-GARM/AS-CAP fee table rows were removed in a refactor but replacement `createServiceProductRow()` was never called. Pricing engine calculated stitch fees correctly but nothing displayed them.
+2. **No `input` event:** Stitch input only had `change` listener (fires on blur/Enter). No `input` event = no update while typing or using spinner arrows.
+3. **Wrong property names in reset:** Clear/New Quote set `primaryLogo.stitches = 8000` and `primaryLogo.digitizing = false` — correct names are `stitchCount` and `needsDigitizing`.
+**Solution:** Added AS-GARM/AS-CAP fee rows to HTML + display logic in `updatePricingDisplay()`. Added `input` event listeners. Fixed property names in reset function.
+**Prevention:** When refactoring fee display (removing old → adding new), verify the new approach is actually implemented, not just commented as TODO.
+**Files:** `embroidery-quote-builder.html`
+
+## Bug: Cap Stitch Total Hardcoded to Zero
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** Changing cap stitch count above 8000 never produced an AS-CAP fee.
+**Root Cause:** `embroidery-quote-pricing.js` line 1666: `capStitchTotal = 0` with comment "Caps have fixed 8K stitches." But the UI has a cap stitch input (1000-50000) and `calculateCapProductPrice()` calculates excess stitch cost — it just never rolled up into `capStitchTotal`.
+**Solution:** Calculate `capStitchTotal` using same architecture as garments: `(extraStitches/1000) * capAdditionalStitchRate * capQuantity`. Skip for `laser-patch` embellishment (no stitches).
+**Prevention:** When adding UI inputs, verify the full data flow: UI → object property → pricing engine → display. A working input with a hardcoded-zero rollup is invisible to users.
+**Files:** `embroidery-quote-pricing.js`
+
+## Bug: AL Digitizing Not Included in Grand Total
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** Enabling AL digitizing ($100) showed the fee in the table but grand total didn't increase.
+**Root Cause:** `recalculatePricing()` passed `logoConfigs.garment.additional: additionalLogos` — but `additionalLogos` was an empty module-level array from dead per-logo card code (System B). The working global toggle (System A) stored AL state in `globalAL` object, which was never injected into `logoConfigs`. So the pricing engine counted 0 AL logos for digitizing.
+**Solution:** Build AL entries from `globalAL` state and inject into `logoConfigs.garment.additional` / `logoConfigs.cap.additional`. Removed dead System B code entirely.
+**Prevention:** Two competing systems for the same feature = bugs. When one system supersedes another, delete the old code immediately.
+**Files:** `embroidery-quote-builder.html`
+
 ## Pattern: Bake LTM Fee Into Calculator 1-7 Column Prices (No Visible $50)
 **Date:** 2026-02-06
 **Project:** [Pricing Index]
