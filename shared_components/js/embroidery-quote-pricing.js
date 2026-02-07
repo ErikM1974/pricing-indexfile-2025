@@ -1792,6 +1792,174 @@ class EmbroideryPricingCalculator {
     }
     
     /**
+     * Calculate the base decorated unit price for a product (S-XL size, no upcharge)
+     * Used by the service pricing review modal during ShopWorks import
+     * @param {string} styleNumber - Product style (e.g., 'PC54')
+     * @param {number} totalQuantity - Total quantity for tier determination
+     * @param {boolean} isCap - Whether this is a cap product
+     * @returns {Promise<number|null>} Base decorated price or null if unavailable
+     */
+    async getProductBasePrice(styleNumber, totalQuantity, isCap = false) {
+        const tier = this.getTier(totalQuantity);
+
+        // Ensure cap pricing if needed
+        if (isCap && !this.capInitialized) {
+            await this.initializeCapConfig();
+        }
+
+        const sizePricingData = await this.fetchSizePricing(styleNumber);
+        if (!sizePricingData || sizePricingData.length === 0) return null;
+
+        const priceData = sizePricingData[0];
+
+        if (isCap) {
+            // Cap: find OSFA or first available price
+            const osfaSizes = ['OSFA', 'S/M', 'M/L', 'L/XL', 'OS'];
+            let basePrice = 0;
+            for (const size of osfaSizes) {
+                if (priceData.basePrices[size] && priceData.basePrices[size] > 0) {
+                    basePrice = priceData.basePrices[size];
+                    break;
+                }
+            }
+            if (basePrice === 0) {
+                const avail = Object.values(priceData.basePrices).filter(p => p > 0);
+                if (avail.length > 0) basePrice = Math.min(...avail);
+            }
+            if (basePrice === 0) return null;
+
+            const marginDenom = this.capMarginDenominator || 0.57;
+            const embCost = this.getCapEmbroideryCost(tier);
+            const garmentCost = basePrice / marginDenom;
+            return this.roundCapPrice(garmentCost + embCost);
+        } else {
+            // Garment: find S/M/L/XL base price
+            const standardSizes = ['S', 'M', 'L', 'XL'];
+            let basePrice = 0;
+            for (const size of standardSizes) {
+                if (priceData.basePrices[size] && priceData.basePrices[size] > 0) {
+                    basePrice = priceData.basePrices[size];
+                    break;
+                }
+            }
+            if (basePrice === 0) {
+                const avail = Object.values(priceData.basePrices).filter(p => p > 0);
+                if (avail.length > 0) basePrice = Math.min(...avail);
+            }
+            if (basePrice === 0) return null;
+
+            const embCost = this.getEmbroideryCost(tier);
+            const garmentCost = basePrice / this.marginDenominator;
+            return this.roundPrice(garmentCost + embCost);
+        }
+    }
+
+    /**
+     * Calculate per-size decorated prices for a product
+     * Used by the pricing review modal to show API price breakdown per size group
+     * Follows the same calculation logic as calculateProductPrice() / calculateCapProductPrice()
+     * @param {string} styleNumber - Product style (e.g., 'PC54')
+     * @param {number} totalQuantity - Total quantity for tier determination
+     * @param {boolean} isCap - Whether this is a cap product
+     * @returns {Promise<Object|null>} { 'S': 23.00, '2XL': 25.00, ... } or null if unavailable
+     */
+    async getProductSizePrices(styleNumber, totalQuantity, isCap = false) {
+        const tier = this.getTier(totalQuantity);
+
+        if (isCap && !this.capInitialized) {
+            await this.initializeCapConfig();
+        }
+
+        const sizePricingData = await this.fetchSizePricing(styleNumber);
+        if (!sizePricingData || sizePricingData.length === 0) return null;
+
+        const priceData = sizePricingData[0];
+        const result = {};
+
+        if (isCap) {
+            const marginDenom = this.capMarginDenominator || 0.57;
+            const embCost = this.getCapEmbroideryCost(tier);
+
+            for (const [size, basePrice] of Object.entries(priceData.basePrices)) {
+                if (basePrice <= 0) continue;
+                const upcharge = priceData.sizeUpcharges[size] || 0;
+                const garmentCost = basePrice / marginDenom;
+                result[size] = this.roundCapPrice(garmentCost + embCost) + upcharge;
+            }
+        } else {
+            const embCost = this.getEmbroideryCost(tier);
+
+            // Find the base size and its upcharge to calculate relative upcharges
+            const standardSizes = ['S', 'M', 'L', 'XL'];
+            let standardBasePrice = 0;
+            let baseSize = null;
+            for (const size of standardSizes) {
+                if (priceData.basePrices[size] && priceData.basePrices[size] > 0) {
+                    standardBasePrice = priceData.basePrices[size];
+                    baseSize = size;
+                    break;
+                }
+            }
+            if (standardBasePrice === 0) {
+                const avail = Object.entries(priceData.basePrices).filter(([, p]) => p > 0).sort((a, b) => a[1] - b[1]);
+                if (avail.length > 0) {
+                    baseSize = avail[0][0];
+                    standardBasePrice = avail[0][1];
+                }
+            }
+            if (standardBasePrice === 0) return null;
+
+            const baseSizeUpcharge = baseSize ? (priceData.sizeUpcharges[baseSize] || 0) : 0;
+            const garmentCost = standardBasePrice / this.marginDenominator;
+            const roundedBase = this.roundPrice(garmentCost + embCost);
+
+            for (const [size, basePrice] of Object.entries(priceData.basePrices)) {
+                if (basePrice <= 0) continue;
+                const apiUpcharge = priceData.sizeUpcharges[size] || 0;
+                const relativeUpcharge = apiUpcharge - baseSizeUpcharge;
+                result[size] = roundedBase + relativeUpcharge;
+            }
+        }
+
+        return Object.keys(result).length > 0 ? result : null;
+    }
+
+    /**
+     * Calculate API unit price for a service item (AL, CB, CS, FB, Monogram)
+     * Used by the service pricing review modal during ShopWorks import
+     * @param {string} serviceType - 'al', 'cb', 'cs', 'fb', or 'monogram'
+     * @param {number} stitchCount - Stitch count for the service
+     * @param {number} quantity - Total quantity (for tier determination)
+     * @param {boolean} isCap - Whether this is a cap service item
+     * @returns {number|null} Unit price or null if data unavailable
+     */
+    getServiceUnitPrice(serviceType, stitchCount, quantity, isCap = false) {
+        const tier = this.getTier(quantity);
+
+        switch (serviceType) {
+            case 'al':
+            case 'cb':
+            case 'cs': {
+                const tierData = isCap ? this.capAlTiers : this.alTiers;
+                const tierInfo = tierData[tier];
+                if (!tierInfo || !tierInfo.embCost) return null;
+                const baseStitches = isCap ? (tierInfo.baseStitchCount || 5000) : (tierInfo.baseStitchCount || 8000);
+                const rate = tierInfo.additionalStitchRate || (isCap ? 1.00 : 1.25);
+                const extra = Math.max(0, stitchCount - baseStitches);
+                return tierInfo.embCost + (extra / 1000) * rate;
+            }
+            case 'fb': {
+                const base = Math.max(stitchCount, this.fbBaseStitchCount || 25000);
+                return (base / 1000) * (this.fbStitchRate || 1.25);
+            }
+            case 'monogram':
+                return this.monogramPrice || 12.50;
+            default:
+                return null;
+        }
+    }
+
+    /**
      * Round stitch count to increment
      */
     roundStitchCount(stitches) {

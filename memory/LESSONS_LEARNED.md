@@ -31,6 +31,21 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: Custom Price Override Lost During ShopWorks Import (Async Race Condition)
+**Date:** 2026-02-06
+**Project:** [Pricing Index]
+**Problem:** User selects "Custom" radio in the ShopWorks import review modal and enters $55.00 for NKDM3976 (Nike duffel bag). After import, the product shows $67.50 (API price) instead of $55.00. The custom price override was silently discarded.
+**Root Cause:** `importProductRow()` set `row.dataset.sellPrice` at line 8878 — **after** `selectColor()` at line 8789. `selectColor()` calls `recalculatePricing()` asynchronously (fire-and-forget, not awaited). The timeline:
+1. `selectColor()` fires `recalculatePricing()` — sellPrice NOT yet set → calculates API price ($67.50)
+2. Code continues, sets sizes, then finally sets `row.dataset.sellPrice = "55"`
+3. `onSizeChange()` fires `recalculatePricing()` — sees sellPrice → calculates $55.00
+4. `selectColor()`'s async `recalculatePricing()` resolves **last** → overwrites $55.00 with $67.50
+
+Additionally, two early-return paths (non-SanMar, not-found) skipped the sellPrice assignment entirely.
+**Solution:** Move `row.dataset.sellPrice` assignment to immediately after row creation (line 8745), **before** any pricing-related calls (`onStyleChange`, `selectColor`, `onSizeChange`). Remove the duplicate late assignment.
+**Prevention:** When a function sets dataset attributes that affect pricing, always set them **before** any function that triggers `recalculatePricing()`. Async fire-and-forget calls are especially dangerous — they resolve in unpredictable order. Rule of thumb: **dataset setup first, then trigger pricing.**
+**Files:** `embroidery-quote-builder.html` (`importProductRow()` ~line 8745)
+
 ## Bug: "Unable to load size pricing for DECG" on ShopWorks DECG-Only Import
 **Date:** 2026-02-06
 **Project:** [Pricing Index]

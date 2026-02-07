@@ -778,13 +778,15 @@ class ShopWorksImportParser {
                     position: position,
                     type: 'al',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0
                 });
                 // Keep backward compatibility with single additionalLogo
                 result.services.additionalLogo = {
                     position: position,
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0
                 };
                 break;
 

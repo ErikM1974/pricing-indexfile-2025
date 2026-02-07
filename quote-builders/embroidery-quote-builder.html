@@ -858,6 +858,61 @@ Company:Absher Construction Company
             </div>
         </div>
     </div>
+
+    <!-- Pricing Review Modal (shown during ShopWorks import for products + services) -->
+    <div class="shopworks-import-modal" id="service-pricing-review-modal">
+        <div class="shopworks-import-content" style="max-width: 800px;">
+            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+                <h3><i class="fas fa-tags"></i> Review Import Pricing</h3>
+                <button class="shopworks-import-close" onclick="cancelServicePricingReview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="shopworks-import-body">
+                <p class="shopworks-import-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Choose pricing source for each item. API uses current tier pricing; ShopWorks uses the imported price.
+                </p>
+
+                <!-- Products section (dynamically shown/hidden) -->
+                <div id="spr-products-section" style="display: none;">
+                    <div class="spr-section-label">Products</div>
+                    <div id="spr-products-container">
+                        <!-- Populated by showServicePricingReview() -->
+                    </div>
+                </div>
+
+                <!-- Services section (dynamically shown/hidden) -->
+                <div id="spr-services-section" style="display: none;">
+                    <div class="spr-section-label">Services</div>
+                    <div class="spr-table-wrapper">
+                        <table class="spr-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Qty</th>
+                                    <th>Stitches</th>
+                                    <th>ShopWorks</th>
+                                    <th>API Price</th>
+                                    <th>Custom</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spr-table-body">
+                                <!-- Populated by showServicePricingReview() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="shopworks-import-footer">
+                <button class="btn-cancel-import" onclick="cancelServicePricingReview()">Cancel</button>
+                <button class="btn-parse-import" id="btn-apply-service-pricing" onclick="applyServicePricingReview()">
+                    <i class="fas fa-check"></i> Apply Pricing
+                </button>
+            </div>
+        </div>
+    </div>
+
     <style>
         /* DECG Stitch Count Modal Styles */
         .decg-stitch-items {
@@ -924,6 +979,203 @@ Company:Absher Construction Company
             font-weight: 600;
             color: #059669;
         }
+
+        /* Service Pricing Review Modal Styles */
+        .spr-table-wrapper {
+            overflow-x: auto;
+            margin-top: 8px;
+        }
+        .spr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .spr-table th {
+            background: #f1f5f9;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .spr-table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+        .spr-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        .spr-type-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .spr-type-al { background: #dbeafe; color: #1e40af; }
+        .spr-type-fb { background: #fce7f3; color: #9d174d; }
+        .spr-type-monogram { background: #f3e8ff; color: #6b21a8; }
+        .spr-type-decg { background: #fef3c7; color: #92400e; }
+        .spr-type-decc { background: #cffafe; color: #155e75; }
+        .spr-type-cb { background: #dbeafe; color: #1e40af; }
+        .spr-type-cs { background: #dbeafe; color: #1e40af; }
+        .spr-stitch-input {
+            width: 75px;
+            padding: 5px 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: right;
+        }
+        .spr-stitch-input:focus {
+            border-color: #0ea5e9;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+        .spr-radio-cell {
+            text-align: center;
+            white-space: nowrap;
+        }
+        .spr-radio-cell label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            justify-content: center;
+        }
+        .spr-radio-cell input[type="radio"] {
+            margin: 0;
+            cursor: pointer;
+        }
+        .spr-price-label {
+            font-weight: 500;
+            color: #334155;
+        }
+        .spr-price-label.disabled {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .spr-custom-input {
+            width: 70px;
+            padding: 4px 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: right;
+        }
+        .spr-custom-input:disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+        }
+        .spr-custom-input:focus {
+            border-color: #0ea5e9;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+        .spr-unavailable {
+            font-size: 11px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+        .spr-section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 4px;
+            margin: 14px 0 8px;
+        }
+        #spr-products-section .spr-section-label { margin-top: 0; }
+        .spr-product-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .spr-product-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .spr-product-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1e293b;
+        }
+        .spr-product-radios {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .spr-product-radios label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            padding: 3px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background: #fff;
+            transition: border-color 0.15s;
+        }
+        .spr-product-radios label:has(input:checked) {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+            color: #0369a1;
+        }
+        .spr-product-radios input[type="radio"] { margin: 0; cursor: pointer; }
+        .spr-product-radios .spr-custom-input {
+            width: 75px;
+            font-size: 12px;
+            padding: 3px 5px;
+        }
+        .spr-product-sizes {
+            padding: 6px 12px;
+        }
+        .spr-size-row {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            font-size: 12px;
+            color: #475569;
+        }
+        .spr-size-row + .spr-size-row { border-top: 1px solid #f1f5f9; }
+        .spr-size-label {
+            flex: 1;
+            font-weight: 500;
+        }
+        .spr-size-price {
+            min-width: 70px;
+            text-align: right;
+            font-weight: 500;
+        }
+        .spr-size-price.sw-col { color: #64748b; }
+        .spr-size-price.api-col { color: #0369a1; }
+        .spr-size-header {
+            display: flex;
+            align-items: center;
+            padding: 3px 0 2px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+        }
+        .spr-size-header .spr-size-label { font-weight: 600; }
+        .spr-size-header .spr-size-price { font-weight: 600; }
     </style>
 
     <!-- Add Non-SanMar Product Modal -->
@@ -5194,18 +5446,17 @@ Company:Absher Construction Company
             const serviceItems = allItems.filter(p => p.isService);
 
             if (productList.length === 0) {
-                // Even with no SanMar products, check for DECG/DECC service product rows
-                const decgItems = collectDECGItems();
-                let customerSuppliedTotal = 0;
+                // Sum ALL service items (DECG, DECC, Monogram, AL, etc.)
+                let serviceOnlyTotal = 0;
                 let totalQty = 0;
                 let hasGarments = false;
                 let hasCaps = false;
 
-                decgItems.forEach(item => {
-                    customerSuppliedTotal += item.total;
-                    totalQty += item.quantity;
-                    if (item.type === 'DECG') hasGarments = true;
-                    if (item.type === 'DECC') hasCaps = true;
+                serviceItems.forEach(si => {
+                    serviceOnlyTotal += si.unitPrice * si.totalQuantity;
+                    totalQty += si.totalQuantity;
+                    if (si.serviceType === 'decg' || !si.isCap) hasGarments = true;
+                    if (si.serviceType === 'decc' || si.isCap) hasCaps = true;
                 });
 
                 // Check for laser-patch cap setup fee
@@ -5220,14 +5471,14 @@ Company:Absher Construction Company
                 updatePricingDisplay({
                     totalQuantity: totalQty,
                     tier: tier,
-                    subtotal: customerSuppliedTotal,
-                    ltmFee: 0,  // LTM already included in DECG row total calculation
+                    subtotal: serviceOnlyTotal,
+                    ltmFee: 0,
                     setupFees: patchSetupFee,
                     capSetupFees: patchSetupFee,
                     garmentSetupFees: 0,
                     hasCaps: hasCaps || capHasStyle,
-                    hasGarments: hasGarments || customerSuppliedTotal > 0,
-                    grandTotal: customerSuppliedTotal + patchSetupFee
+                    hasGarments: hasGarments || serviceOnlyTotal > 0,
+                    grandTotal: serviceOnlyTotal + patchSetupFee
                 });
 
                 // Clear product price cells (not service rows)
@@ -7055,6 +7306,340 @@ Company:Absher Construction Company
         // DECG STITCH COUNT MODAL FUNCTIONS
         // ============================================================
 
+        // ============================================================
+        // SERVICE PRICING REVIEW MODAL
+        // Shows during ShopWorks import for AL/DECG/DECC/Monogram/FB
+        // ============================================================
+
+        // Promise resolve/reject for the review modal
+        let _sprResolve = null;
+        let _sprReject = null;
+        let _sprItems = [];
+        let _sprProductItems = [];
+
+        /**
+         * Show the pricing review modal and return a Promise
+         * Supports both product items (SanMar products) and service items (AL/DECG/DECC/Monogram)
+         * @param {Array} serviceItems - Array of { type, quantity, stitchCount, isCap, shopWorksPrice, apiPrice, label }
+         * @param {Array} productItems - Array of { partNumber, color, sizes, unitPrice, isCap, sizePrices, totalQty, description }
+         * @returns {Promise<Object>} Resolves to { services: [...], products: [...] } or null if cancelled
+         */
+        function showServicePricingReview(serviceItems, productItems) {
+            serviceItems = serviceItems || [];
+            productItems = productItems || [];
+
+            if (serviceItems.length === 0 && productItems.length === 0) {
+                return Promise.resolve({ services: [], products: [] });
+            }
+
+            _sprItems = serviceItems;
+            _sprProductItems = productItems;
+
+            return new Promise((resolve, reject) => {
+                _sprResolve = resolve;
+                _sprReject = reject;
+
+                // === PRODUCTS SECTION ===
+                const productsSection = document.getElementById('spr-products-section');
+                const productsContainer = document.getElementById('spr-products-container');
+
+                if (productItems.length > 0) {
+                    productsSection.style.display = '';
+                    let pHtml = '';
+
+                    productItems.forEach((prod, pIdx) => {
+                        const swPrice = prod.unitPrice || 0;
+                        const swAvail = swPrice > 0;
+                        const apiAvail = prod.sizePrices != null;
+                        const defaultSel = apiAvail ? 'api' : (swAvail ? 'sw' : 'custom');
+
+                        pHtml += `<div class="spr-product-card" data-spr-pidx="${pIdx}">`;
+                        pHtml += `<div class="spr-product-header">`;
+                        pHtml += `<span class="spr-product-title">${escapeHtml(prod.partNumber)} ${escapeHtml(prod.color || '')}</span>`;
+                        pHtml += `<div class="spr-product-radios">`;
+                        // ShopWorks radio
+                        if (swAvail) {
+                            pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})"> ShopWorks</label>`;
+                        }
+                        // API radio
+                        if (apiAvail) {
+                            pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})"> API</label>`;
+                        }
+                        // Custom radio + input
+                        pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})">`;
+                        pHtml += `<input type="number" class="spr-custom-input" id="spr-pcustom-${pIdx}" step="0.01" min="0" placeholder="0.00" ${defaultSel !== 'custom' ? 'disabled' : ''}></label>`;
+                        pHtml += `</div></div>`;
+
+                        // Size breakdown rows
+                        pHtml += `<div class="spr-product-sizes">`;
+                        // Header row
+                        pHtml += `<div class="spr-size-header">`;
+                        pHtml += `<span class="spr-size-label">Sizes</span>`;
+                        pHtml += `<span class="spr-size-price sw-col">ShopWorks</span>`;
+                        pHtml += `<span class="spr-size-price api-col">API</span>`;
+                        pHtml += `</div>`;
+
+                        // Group sizes: standard (same price) and upcharge (each separate)
+                        const sizeGroups = _groupSizesForReview(prod.sizes, prod.sizePrices, swPrice);
+                        sizeGroups.forEach(group => {
+                            pHtml += `<div class="spr-size-row">`;
+                            pHtml += `<span class="spr-size-label">${escapeHtml(group.label)}</span>`;
+                            pHtml += `<span class="spr-size-price sw-col">$${swPrice.toFixed(2)}</span>`;
+                            pHtml += `<span class="spr-size-price api-col">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span>`;
+                            pHtml += `</div>`;
+                        });
+                        pHtml += `</div></div>`;
+                    });
+
+                    productsContainer.innerHTML = pHtml;
+                } else {
+                    productsSection.style.display = 'none';
+                    productsContainer.innerHTML = '';
+                }
+
+                // === SERVICES SECTION ===
+                const servicesSection = document.getElementById('spr-services-section');
+                const tbody = document.getElementById('spr-table-body');
+
+                if (serviceItems.length > 0) {
+                    servicesSection.style.display = '';
+                    let html = '';
+
+                    serviceItems.forEach((item, idx) => {
+                        const typeUpper = (item.type || '').toUpperCase();
+                        const badgeClass = 'spr-type-' + (item.type || '').toLowerCase().replace(/[^a-z]/g, '');
+                        const hasStitches = !['monogram'].includes((item.type || '').toLowerCase());
+                        const swPrice = item.shopWorksPrice;
+                        const apiPrice = item.apiPrice;
+                        const swAvail = swPrice != null && swPrice > 0;
+                        const apiAvail = apiPrice != null;
+
+                        let defaultSel = apiAvail ? 'api' : (swAvail ? 'sw' : 'custom');
+
+                        html += `<tr data-spr-idx="${idx}">`;
+                        html += `<td><span class="spr-type-badge ${badgeClass}">${escapeHtml(typeUpper)}</span></td>`;
+                        html += `<td>${item.quantity}</td>`;
+
+                        if (hasStitches) {
+                            html += `<td><input type="number" class="spr-stitch-input" id="spr-stitch-${idx}" value="${item.stitchCount || 8000}" min="1000" max="200000" step="1000" onchange="onSprStitchChange(${idx})"></td>`;
+                        } else {
+                            html += `<td style="text-align:center; color:#94a3b8;">&mdash;</td>`;
+                        }
+
+                        html += `<td class="spr-radio-cell">`;
+                        if (swAvail) {
+                            html += `<label><input type="radio" name="spr-source-${idx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} onchange="onSprSourceChange(${idx})"><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
+                        } else {
+                            html += `<span class="spr-price-label disabled">$0.00</span>`;
+                        }
+                        html += `</td>`;
+
+                        html += `<td class="spr-radio-cell">`;
+                        if (apiAvail) {
+                            html += `<label><input type="radio" name="spr-source-${idx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} onchange="onSprSourceChange(${idx})"><span class="spr-price-label" id="spr-api-price-${idx}">$${apiPrice.toFixed(2)}</span></label>`;
+                        } else {
+                            html += `<span class="spr-unavailable">(unavailable)</span>`;
+                        }
+                        html += `</td>`;
+
+                        html += `<td class="spr-radio-cell">`;
+                        html += `<label><input type="radio" name="spr-source-${idx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprSourceChange(${idx})">`;
+                        html += `<input type="number" class="spr-custom-input" id="spr-custom-${idx}" step="0.01" min="0" placeholder="0.00" ${defaultSel !== 'custom' ? 'disabled' : ''}></label>`;
+                        html += `</td>`;
+                        html += `</tr>`;
+                    });
+
+                    tbody.innerHTML = html;
+                } else {
+                    servicesSection.style.display = 'none';
+                    tbody.innerHTML = '';
+                }
+
+                // Show the modal
+                const modal = document.getElementById('service-pricing-review-modal');
+                modal.classList.add('active');
+            });
+        }
+
+        /**
+         * Group product sizes for the review modal display
+         * Standard sizes (same API price) grouped together, upcharge sizes shown separately
+         */
+        function _groupSizesForReview(sizes, sizePrices, swPrice) {
+            if (!sizes || Object.keys(sizes).length === 0) return [];
+
+            // Build entries: { size, qty, apiPrice }
+            const entries = [];
+            for (const [size, qty] of Object.entries(sizes)) {
+                if (qty > 0) {
+                    entries.push({
+                        size,
+                        qty,
+                        apiPrice: sizePrices ? (sizePrices[size] || null) : null
+                    });
+                }
+            }
+
+            if (entries.length === 0) return [];
+
+            // Group by API price (sizes with same price grouped together)
+            const priceGroups = {};
+            entries.forEach(e => {
+                const key = e.apiPrice != null ? e.apiPrice.toFixed(2) : 'null';
+                if (!priceGroups[key]) priceGroups[key] = [];
+                priceGroups[key].push(e);
+            });
+
+            const groups = [];
+            for (const [priceKey, items] of Object.entries(priceGroups)) {
+                const label = items.map(i => `${i.size}(${i.qty})`).join(' ');
+                groups.push({
+                    label,
+                    apiPrice: priceKey !== 'null' ? parseFloat(priceKey) : null
+                });
+            }
+
+            // Sort: standard (lower) prices first
+            groups.sort((a, b) => (a.apiPrice || 0) - (b.apiPrice || 0));
+            return groups;
+        }
+
+        /**
+         * Handle product source radio change — enable/disable custom input
+         */
+        function onSprProductSourceChange(pIdx) {
+            const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
+            const customInput = document.getElementById(`spr-pcustom-${pIdx}`);
+            let selectedValue = '';
+            radios.forEach(r => { if (r.checked) selectedValue = r.value; });
+            customInput.disabled = (selectedValue !== 'custom');
+            if (selectedValue === 'custom') customInput.focus();
+        }
+
+        /**
+         * Handle radio source change — enable/disable custom input
+         */
+        function onSprSourceChange(idx) {
+            const radios = document.querySelectorAll(`input[name="spr-source-${idx}"]`);
+            const customInput = document.getElementById(`spr-custom-${idx}`);
+            let selectedValue = '';
+            radios.forEach(r => { if (r.checked) selectedValue = r.value; });
+            customInput.disabled = (selectedValue !== 'custom');
+            if (selectedValue === 'custom') {
+                customInput.focus();
+            }
+        }
+
+        /**
+         * Handle stitch count change — recalculate API price live
+         */
+        function onSprStitchChange(idx) {
+            const item = _sprItems[idx];
+            if (!item) return;
+
+            const input = document.getElementById(`spr-stitch-${idx}`);
+            const newStitch = parseInt(input.value) || 8000;
+            item.stitchCount = newStitch;
+
+            // Recalculate API price
+            const apiPriceEl = document.getElementById(`spr-api-price-${idx}`);
+            if (apiPriceEl && pricingCalculator) {
+                const newApiPrice = pricingCalculator.getServiceUnitPrice(
+                    item.type.toLowerCase(), newStitch, item.quantity, item.isCap
+                );
+                if (newApiPrice != null) {
+                    item.apiPrice = newApiPrice;
+                    apiPriceEl.textContent = `$${newApiPrice.toFixed(2)}`;
+                } else {
+                    item.apiPrice = null;
+                    apiPriceEl.textContent = '(unavailable)';
+                    apiPriceEl.className = 'spr-unavailable';
+                }
+            }
+        }
+
+        /**
+         * Cancel the service pricing review — resolve with null
+         */
+        function cancelServicePricingReview() {
+            const modal = document.getElementById('service-pricing-review-modal');
+            modal.classList.remove('active');
+            if (_sprResolve) {
+                _sprResolve(null); // null = user cancelled
+                _sprResolve = null;
+                _sprReject = null;
+            }
+        }
+
+        /**
+         * Apply the user's chosen pricing and resolve the Promise
+         * Returns { services: [...], products: [...] }
+         */
+        function applyServicePricingReview() {
+            // Collect service results
+            const serviceResults = [];
+            _sprItems.forEach((item, idx) => {
+                const radios = document.querySelectorAll(`input[name="spr-source-${idx}"]`);
+                let selectedSource = 'api';
+                radios.forEach(r => { if (r.checked) selectedSource = r.value; });
+
+                let unitPrice = 0;
+                if (selectedSource === 'sw') {
+                    unitPrice = item.shopWorksPrice || 0;
+                } else if (selectedSource === 'api') {
+                    unitPrice = item.apiPrice || 0;
+                } else if (selectedSource === 'custom') {
+                    const customInput = document.getElementById(`spr-custom-${idx}`);
+                    unitPrice = parseFloat(customInput.value) || 0;
+                }
+
+                const stitchInput = document.getElementById(`spr-stitch-${idx}`);
+                const stitchCount = stitchInput ? (parseInt(stitchInput.value) || 8000) : (item.stitchCount || 8000);
+
+                serviceResults.push({
+                    type: item.type,
+                    quantity: item.quantity,
+                    unitPrice: unitPrice,
+                    stitchCount: stitchCount,
+                    isCap: item.isCap || false,
+                    originalData: item.originalData || null
+                });
+            });
+
+            // Collect product results
+            const productResults = [];
+            _sprProductItems.forEach((prod, pIdx) => {
+                const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
+                let selectedSource = 'api';
+                radios.forEach(r => { if (r.checked) selectedSource = r.value; });
+
+                let overridePrice = 0; // 0 = use API (no override)
+                if (selectedSource === 'sw') {
+                    overridePrice = prod.unitPrice || 0;
+                } else if (selectedSource === 'custom') {
+                    const customInput = document.getElementById(`spr-pcustom-${pIdx}`);
+                    overridePrice = parseFloat(customInput.value) || 0;
+                }
+                // 'api' → overridePrice stays 0 → no sellPriceOverride set
+
+                productResults.push({
+                    ...prod,
+                    selectedSource: selectedSource,
+                    overridePrice: overridePrice
+                });
+            });
+
+            // Close modal
+            const modal = document.getElementById('service-pricing-review-modal');
+            modal.classList.remove('active');
+
+            if (_sprResolve) {
+                _sprResolve({ services: serviceResults, products: productResults });
+                _sprResolve = null;
+                _sprReject = null;
+            }
+        }
+
         /**
          * Open the DECG stitch count modal to confirm stitch counts
          * @param {Array} decgItems - Array of DECG/DECC items from import
@@ -7779,54 +8364,11 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 5. Handle additional logos (supports new additionalLogos array and legacy additionalLogo)
+                // 5. Collect additional logos for service pricing review
                 const additionalLogos = data.services.additionalLogos || [];
                 // Add legacy single additionalLogo if exists and not already in array
                 if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
                     additionalLogos.push(data.services.additionalLogo);
-                }
-
-                if (additionalLogos.length > 0) {
-                    // Enable garment AL toggle
-                    globalAL.garment.enabled = true;
-                    globalAL.garment.position = 'AL';
-
-                    // Read stitch count from first AL if provided
-                    const firstAL = additionalLogos[0];
-                    if (firstAL.stitchCount) {
-                        globalAL.garment.stitchCount = firstAL.stitchCount;
-                    }
-                    if (firstAL.needsDigitizing) {
-                        globalAL.garment.needsDigitizing = true;
-                    }
-
-                    // Update UI
-                    const alToggle = document.getElementById('garment-al-toggle');
-                    const alSwitch = document.getElementById('garment-al-switch');
-                    const alLabel = document.getElementById('garment-al-label');
-                    const alConfig = document.getElementById('garment-al-config-new');
-                    if (alToggle) alToggle.checked = true;
-                    if (alSwitch) alSwitch.classList.add('active');
-                    if (alLabel) alLabel.classList.add('active');
-                    if (alConfig) alConfig.classList.add('visible');
-
-                    const stitchEl = document.getElementById('garment-al-stitches');
-                    if (stitchEl) stitchEl.value = globalAL.garment.stitchCount;
-                    const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
-                    if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
-
-                    // If multiple logos imported, add note about original positions
-                    if (additionalLogos.length > 1) {
-                        const positions = additionalLogos.map(al => al.position || 'Additional Location');
-                        const notesEl = document.getElementById('notes');
-                        if (notesEl) {
-                            const alNote = `Additional logo positions: ${positions.join(', ')}`;
-                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + alNote;
-                        }
-                    }
-
-                    _syncALArrays();
-                    recalculatePricing();
                 }
 
                 // 6. Handle art charges
@@ -7850,103 +8392,260 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 8. Import products
-                let productsImported = 0;
+                // 8. Collect product items for pricing review (deferred import)
+                const productReviewItems = [];
+                const totalProductQty = data.products.reduce((sum, p) => {
+                    return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
+                }, 0);
+
                 for (const product of data.products) {
-                    try {
-                        await importProductRow(product);
-                        productsImported++;
-                    } catch (err) {
-                        console.warn(`Failed to import product ${product.partNumber}:`, err);
-                    }
-                }
-
-                // 9. Import DECG/DECC items as SERVICE PRODUCT ROWS (2026-02 refactor)
-                // These now appear in the product table, not as fee rows
-                if (data.decgItems && data.decgItems.length > 0) {
-                    // Separate DECG (garments) from DECC (caps)
-                    const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
-                    const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
-
-                    // Create DECG SERVICE PRODUCT ROW (customer-supplied garments)
-                    if (decgGarments.length > 0) {
-                        // Aggregate all DECG items into one row
-                        let totalQty = 0, totalCharge = 0;
-                        let avgStitchCount = 0;
-                        decgGarments.forEach(d => {
-                            totalQty += d.quantity;
-                            totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
-                            avgStitchCount += (d.stitchCount || 8000) * d.quantity;
-                        });
-                        const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
-                        avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
-
-                        createServiceProductRow('DECG', {
-                            quantity: totalQty,
-                            stitchCount: avgStitchCount,
-                            unitPrice: avgUnitPrice,
-                            total: totalCharge,
-                            isCap: false
-                        });
-                    }
-
-                    // Create DECC SERVICE PRODUCT ROW (customer-supplied caps)
-                    if (deccCaps.length > 0) {
-                        let totalQty = 0, totalCharge = 0;
-                        let avgStitchCount = 0;
-                        deccCaps.forEach(d => {
-                            totalQty += d.quantity;
-                            totalCharge += (d.calculatedUnitPrice * d.quantity) + (d.ltmFee || 0);
-                            avgStitchCount += (d.stitchCount || 8000) * d.quantity;
-                        });
-                        const avgUnitPrice = totalQty > 0 ? totalCharge / totalQty : 0;
-                        avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
-
-                        createServiceProductRow('DECC', {
-                            quantity: totalQty,
-                            stitchCount: avgStitchCount,
-                            unitPrice: avgUnitPrice,
-                            total: totalCharge,
-                            isCap: true
-                        });
-                    }
-
-                    const totalItems = decgGarments.reduce((sum, d) => sum + d.quantity, 0) +
-                                       deccCaps.reduce((sum, d) => sum + d.quantity, 0);
-                    showToast(`${totalItems} customer-supplied items imported`, 'success');
-                }
-
-                // 10. Handle monogram charges - CREATE SERVICE PRODUCT ROW (2026-02 refactor)
-                if (data.services.monograms.length > 0) {
-                    const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
-                    const unitPrice = 12.50; // From Service_Codes API
-                    const totalPrice = totalNames * unitPrice;
-
-                    // Create MONOGRAM service product row (instead of fee row)
-                    createServiceProductRow('MONOGRAM', {
-                        quantity: totalNames,
-                        unitPrice: unitPrice,
-                        total: totalPrice,
-                        isCap: false
-                    });
-
-                    // Also add name details to notes
-                    const nameDetails = data.services.monograms
-                        .filter(m => m.description)
-                        .map(m => m.description)
-                        .join('\n');
-                    if (nameDetails) {
-                        const notesEl = document.getElementById('notes');
-                        if (notesEl) {
-                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
-                                            '--- Names/Monograms ---\n' + nameDetails;
+                    const isCap = isCapProduct(product.partNumber, product.description || '');
+                    let sizePrices = null;
+                    if (pricingCalculator) {
+                        try {
+                            sizePrices = await pricingCalculator.getProductSizePrices(
+                                product.partNumber, totalProductQty, isCap
+                            );
+                        } catch (e) {
+                            console.warn(`[ShopWorks Import] Could not get API prices for ${product.partNumber}:`, e);
                         }
                     }
 
-                    showToast(`${totalNames} monogram/name entries imported`, 'success');
+                    productReviewItems.push({
+                        partNumber: product.partNumber,
+                        color: product.color || '',
+                        description: product.description || '',
+                        sizes: product.sizes,
+                        unitPrice: product.unitPrice || 0,
+                        isCap: isCap,
+                        sizePrices: sizePrices,
+                        totalQty: Object.values(product.sizes || {}).reduce((s, q) => s + q, 0),
+                        brand: product.brand || '',
+                        // Pass through full product for importProductRow()
+                        _importData: product
+                    });
                 }
 
-                // 11. Handle LTM fee
+                // 9. Collect all service items for pricing review modal
+                const serviceReviewItems = [];
+
+                // 9a. Collect AL items
+                if (additionalLogos.length > 0) {
+                    const alQty = additionalLogos.reduce((sum, al) => sum + al.quantity, 0);
+                    const firstAL = additionalLogos[0];
+                    const alStitchCount = firstAL.stitchCount || 8000;
+                    const swPrice = firstAL.unitPrice || 0;
+                    const apiPrice = pricingCalculator
+                        ? pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
+                        : null;
+
+                    serviceReviewItems.push({
+                        type: 'AL',
+                        quantity: alQty,
+                        stitchCount: alStitchCount,
+                        isCap: false,
+                        shopWorksPrice: swPrice,
+                        apiPrice: apiPrice,
+                        label: 'Additional Logo',
+                        originalData: { additionalLogos, needsDigitizing: firstAL.needsDigitizing }
+                    });
+                }
+
+                // 9b. Collect DECG/DECC items
+                if (data.decgItems && data.decgItems.length > 0) {
+                    const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
+                    const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
+
+                    if (decgGarments.length > 0) {
+                        let totalQty = 0, avgStitchCount = 0;
+                        decgGarments.forEach(d => {
+                            totalQty += d.quantity;
+                            avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+                        });
+                        avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
+
+                        const swTotal = decgGarments.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
+                        const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
+
+                        const apiTotal = decgGarments.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
+                        const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
+
+                        serviceReviewItems.push({
+                            type: 'DECG',
+                            quantity: totalQty,
+                            stitchCount: avgStitchCount,
+                            isCap: false,
+                            shopWorksPrice: swAvg,
+                            apiPrice: apiAvg > 0 ? apiAvg : null,
+                            label: 'Customer-Supplied Garments',
+                            originalData: { items: decgGarments }
+                        });
+                    }
+
+                    if (deccCaps.length > 0) {
+                        let totalQty = 0, avgStitchCount = 0;
+                        deccCaps.forEach(d => {
+                            totalQty += d.quantity;
+                            avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+                        });
+                        avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
+
+                        const swTotal = deccCaps.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
+                        const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
+
+                        const apiTotal = deccCaps.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
+                        const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
+
+                        serviceReviewItems.push({
+                            type: 'DECC',
+                            quantity: totalQty,
+                            stitchCount: avgStitchCount,
+                            isCap: true,
+                            shopWorksPrice: swAvg,
+                            apiPrice: apiAvg > 0 ? apiAvg : null,
+                            label: 'Customer-Supplied Caps',
+                            originalData: { items: deccCaps }
+                        });
+                    }
+                }
+
+                // 9c. Collect Monogram items
+                if (data.services.monograms && data.services.monograms.length > 0) {
+                    const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+                    const monogramApiPrice = pricingCalculator
+                        ? pricingCalculator.getServiceUnitPrice('monogram', 0, totalNames, false)
+                        : 12.50;
+
+                    serviceReviewItems.push({
+                        type: 'MONOGRAM',
+                        quantity: totalNames,
+                        stitchCount: 0,
+                        isCap: false,
+                        shopWorksPrice: 12.50,
+                        apiPrice: monogramApiPrice,
+                        label: 'Monogram/Name',
+                        originalData: { monograms: data.services.monograms }
+                    });
+                }
+
+                // 10. Show pricing review modal if there are any items to review
+                let reviewResults = null;
+                if (productReviewItems.length > 0 || serviceReviewItems.length > 0) {
+                    reviewResults = await showServicePricingReview(serviceReviewItems, productReviewItems);
+                }
+
+                // If user cancelled, abort entire import
+                if (reviewResults === null) {
+                    closeShopWorksImportModal();
+                    showToast('Import cancelled', 'info');
+                    return;
+                }
+
+                const serviceResults = reviewResults ? reviewResults.services : [];
+                const productResults = reviewResults ? reviewResults.products : [];
+
+                // 11. Import products (deferred from step 8)
+                let productsImported = 0;
+                for (const prodResult of productResults) {
+                    try {
+                        await importProductRow(prodResult._importData, prodResult.overridePrice || 0);
+                        productsImported++;
+                    } catch (err) {
+                        console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
+                    }
+                }
+
+                // 12. Process service results
+                if (serviceResults && serviceResults.length > 0) {
+                    for (const result of serviceResults) {
+                        const typeUpper = result.type.toUpperCase();
+
+                        if (typeUpper === 'AL') {
+                            if (data.products.length > 0 || (data.customProducts && data.customProducts.length > 0)) {
+                                globalAL.garment.enabled = true;
+                                globalAL.garment.position = 'AL';
+                                globalAL.garment.stitchCount = result.stitchCount;
+                                if (result.originalData && result.originalData.needsDigitizing) {
+                                    globalAL.garment.needsDigitizing = true;
+                                }
+
+                                const alToggle = document.getElementById('garment-al-toggle');
+                                const alSwitch = document.getElementById('garment-al-switch');
+                                const alLabel = document.getElementById('garment-al-label');
+                                const alConfig = document.getElementById('garment-al-config-new');
+                                if (alToggle) alToggle.checked = true;
+                                if (alSwitch) alSwitch.classList.add('active');
+                                if (alLabel) alLabel.classList.add('active');
+                                if (alConfig) alConfig.classList.add('visible');
+
+                                const stitchEl = document.getElementById('garment-al-stitches');
+                                if (stitchEl) stitchEl.value = globalAL.garment.stitchCount;
+                                const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                                if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
+
+                                if (result.originalData && result.originalData.additionalLogos && result.originalData.additionalLogos.length > 1) {
+                                    const positions = result.originalData.additionalLogos.map(al => al.position || 'Additional Location');
+                                    const notesEl = document.getElementById('notes');
+                                    if (notesEl) {
+                                        const alNote = `Additional logo positions: ${positions.join(', ')}`;
+                                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + alNote;
+                                    }
+                                }
+
+                                _syncALArrays();
+                            }
+
+                            if (data.products.length === 0 && (!data.customProducts || data.customProducts.length === 0)) {
+                                createServiceProductRow('AL', {
+                                    quantity: result.quantity,
+                                    unitPrice: result.unitPrice,
+                                    total: result.quantity * result.unitPrice,
+                                    isCap: false,
+                                    position: 'Additional Location'
+                                });
+                            }
+                        } else if (typeUpper === 'DECG') {
+                            createServiceProductRow('DECG', {
+                                quantity: result.quantity,
+                                stitchCount: result.stitchCount,
+                                unitPrice: result.unitPrice,
+                                total: result.quantity * result.unitPrice,
+                                isCap: false
+                            });
+                        } else if (typeUpper === 'DECC') {
+                            createServiceProductRow('DECC', {
+                                quantity: result.quantity,
+                                stitchCount: result.stitchCount,
+                                unitPrice: result.unitPrice,
+                                total: result.quantity * result.unitPrice,
+                                isCap: true
+                            });
+                        } else if (typeUpper === 'MONOGRAM') {
+                            createServiceProductRow('MONOGRAM', {
+                                quantity: result.quantity,
+                                unitPrice: result.unitPrice,
+                                total: result.quantity * result.unitPrice,
+                                isCap: false
+                            });
+
+                            if (result.originalData && result.originalData.monograms) {
+                                const nameDetails = result.originalData.monograms
+                                    .filter(m => m.description)
+                                    .map(m => m.description)
+                                    .join('\n');
+                                if (nameDetails) {
+                                    const notesEl = document.getElementById('notes');
+                                    if (notesEl) {
+                                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                                                        '--- Names/Monograms ---\n' + nameDetails;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 13. Handle LTM fee
                 if (data.services.ltmFee) {
                     const additionalChargesInput = document.getElementById('additional-charges');
                     if (additionalChargesInput) {
@@ -7957,7 +8656,7 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 12. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
+                // 14. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
                 let customProductsImported = 0;
                 if (data.customProducts && data.customProducts.length > 0) {
                     for (const product of data.customProducts) {
@@ -7979,28 +8678,20 @@ Company:Absher Construction Company
                 closeShopWorksImportModal();
 
                 const summary = [];
-                if (productsImported > 0) summary.push(`${productsImported} products`);
+                if (productsImported > 0) {
+                    const overrideCount = productResults.filter(p => p.overridePrice > 0).length;
+                    summary.push(`${productsImported} products` + (overrideCount > 0 ? ` (${overrideCount} price override)` : ''));
+                }
                 if (customProductsImported > 0) summary.push(`${customProductsImported} non-SanMar`);
                 if (data.services.digitizing) summary.push('digitizing');
-                if (additionalLogos.length > 0) summary.push(`${additionalLogos.length} additional logo(s)`);
-                if (data.decgItems.length > 0) summary.push('customer-supplied items');
+                if (serviceResults && serviceResults.length > 0) {
+                    const serviceTypes = serviceResults.map(r => r.type);
+                    if (serviceTypes.includes('AL')) summary.push('additional logo(s)');
+                    if (serviceTypes.includes('DECG') || serviceTypes.includes('DECC')) summary.push('customer-supplied items');
+                    if (serviceTypes.includes('MONOGRAM')) summary.push('monogram/names');
+                }
 
                 showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
-
-                // Show warning if DECG items used fallback pricing (CLAUDE.md rule #4)
-                if (data.decgApiFailed && data.decgItems.length > 0) {
-                    setTimeout(() => {
-                        showToast('⚠️ DECG prices are fallback estimates - verify before sending quote', 'warning', 8000);
-                    }, 1500);
-                }
-
-                // If DECG/DECC items were imported, show stitch count confirmation modal
-                if (data.decgItems && data.decgItems.length > 0) {
-                    // Store the imported items for the stitch count modal
-                    pendingDECGItems = data.decgItems;
-                    // Small delay to let the import toast appear first
-                    setTimeout(() => openDECGStitchModal(pendingDECGItems), 500);
-                }
 
             } catch (error) {
                 console.error('Import failed:', error);
@@ -8030,7 +8721,7 @@ Company:Absher Construction Company
         /**
          * Import a single product row from ShopWorks data
          */
-        async function importProductRow(product) {
+        async function importProductRow(product, sellPriceOverride = 0) {
             const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
 
             // Add a new row
@@ -8051,6 +8742,11 @@ Company:Absher Construction Company
                 brand: product.brand || ''
             });
 
+            // Set sell price override BEFORE any pricing calls (selectColor, onSizeChange, etc.)
+            if (sellPriceOverride > 0) {
+                row.dataset.sellPrice = sellPriceOverride.toString();
+            }
+
             // 1. Set the style number and trigger load
             styleInput.value = product.partNumber;
             await onStyleChange(styleInput, rowId);
@@ -8067,12 +8763,12 @@ Company:Absher Construction Company
                     color: product.color,
                     sizes: product.sizes
                 });
-                return;
+                return row;
             }
 
             // Row is still "Not found" — it will have an "Add" button for the user
             if (row.dataset.notFound === 'true') {
-                return;
+                return row;
             }
 
             // 4. SELECT COLOR for SanMar products (this enables size inputs!)
@@ -8194,6 +8890,7 @@ Company:Absher Construction Company
 
             // 6. Trigger size change to recalculate
             onSizeChange(rowId);
+            return row;
         }
     </script>
 </body>

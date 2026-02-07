@@ -839,3 +839,27 @@ Products not in the SanMar database (e.g. HT01 Edwards Skull Cap) can now be imp
 - `GET /api/non-sanmar-products/style/{style}` — Lookup by StyleNumber
 - `POST /api/non-sanmar-products` — Create new product (requires StyleNumber, Brand, ProductName)
 - Full CRUD API in `caspio-pricing-proxy/src/routes/non-sanmar-products.js`
+
+## ShopWorks Import Review Modal — Price Override & CSS (Feb 2026)
+
+### Custom Price Override — Async Race Condition Fix
+**Problem:** Custom sell price entered in the review modal was overwritten by API price after import.
+**Root cause:** `importProductRow()` set `row.dataset.sellPrice` too late — after `selectColor()` already fired an async `recalculatePricing()` that resolved last and overwrote the custom price.
+**Fix:** Moved `row.dataset.sellPrice` assignment to immediately after row creation (line ~8745), before `onStyleChange()`, `selectColor()`, or `onSizeChange()` run. Now every pricing call sees the override.
+
+### Critical Ordering Rule in `importProductRow()`
+```
+1. addNewRow() + get row reference
+2. row.dataset.importData = JSON.stringify(...)
+3. row.dataset.sellPrice = sellPriceOverride   ← MUST be here (before ANY pricing)
+4. onStyleChange()                              ← triggers API lookup
+5. selectColor() → recalculatePricing()         ← async, sees sellPrice ✓
+6. Set sizes
+7. onSizeChange() → recalculatePricing()        ← sees sellPrice ✓
+```
+
+### Review Modal Radio Button CSS
+- Radio labels use **pill-style** borders (`border: 1px solid #e2e8f0`, `border-radius: 4px`)
+- Selected state via `:has(input:checked)` — blue border + light blue background
+- Custom price input width: 75px (was 65px)
+- CSS classes: `.spr-product-radios label`, `.spr-product-radios .spr-custom-input`
