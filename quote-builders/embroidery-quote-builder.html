@@ -6364,7 +6364,8 @@ Company:Absher Construction Company
         async function printQuote() {
             const allItems = collectProductsFromTable();
             const products = allItems.filter(p => !p.isService);
-            if (products.length === 0) {
+            const decgItems = collectDECGItems();
+            if (products.length === 0 && decgItems.length === 0) {
                 showToast('Add products before printing', 'error');
                 return;
             }
@@ -6405,7 +6406,31 @@ Company:Absher Construction Company
                     { ...capPrimaryLogo, id: 'cap-primary' },
                     ...capALForPrint
                 ];
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+
+                let pricing;
+                if (products.length === 0) {
+                    // DECG-only: build minimal pricing (no pricing engine needed)
+                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+                    pricing = {
+                        products: [],
+                        totalQuantity: decgQty,
+                        subtotal: decgTotal,
+                        grandTotal: decgTotal,
+                        tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+                        ltmFee: 0,
+                        additionalServices: [],
+                        additionalStitchTotal: 0,
+                        garmentStitchTotal: 0,
+                        capStitchTotal: 0,
+                        garmentSetupFees: 0,
+                        capSetupFees: 0,
+                        garmentQuantity: 0,
+                        capQuantity: 0
+                    };
+                } else {
+                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                }
 
                 // Generate and open print window
                 const invoiceGenerator = new EmbroideryInvoiceGenerator();
@@ -6614,7 +6639,8 @@ Company:Absher Construction Company
         async function saveAndGetLink() {
             const allItems = collectProductsFromTable();
             const products = allItems.filter(p => !p.isService);
-            if (products.length === 0) {
+            const decgItems = collectDECGItems();
+            if (products.length === 0 && decgItems.length === 0) {
                 showToast('Add products before saving', 'error');
                 return;
             }
@@ -6674,7 +6700,30 @@ Company:Absher Construction Company
                     ...capALForSave
                 ];
 
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                let pricing;
+                if (products.length === 0) {
+                    // DECG-only: build minimal pricing (no pricing engine needed)
+                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+                    pricing = {
+                        products: [],
+                        totalQuantity: decgQty,
+                        subtotal: decgTotal,
+                        grandTotal: decgTotal,
+                        tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+                        ltmFee: 0,
+                        additionalServices: [],
+                        additionalStitchTotal: 0,
+                        garmentStitchTotal: 0,
+                        capStitchTotal: 0,
+                        garmentSetupFees: 0,
+                        capSetupFees: 0,
+                        garmentQuantity: 0,
+                        capQuantity: 0
+                    };
+                } else {
+                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                }
 
                 // Get sales rep NAME from dropdown selected option text
                 const salesRepSelect = document.getElementById('sales-rep');
@@ -6704,8 +6753,7 @@ Company:Absher Construction Company
                     discountReason: additionalCharges.discountReason
                 };
 
-                // Collect DECG/DECC items (Customer-Supplied Garments/Caps)
-                const decgItems = collectDECGItems();
+                // DECG/DECC items already collected at function start
 
                 // Build quote data
                 const quoteData = {
@@ -6787,8 +6835,9 @@ Company:Absher Construction Company
         }
 
         async function emailQuote() {
-            const products = collectProductsFromTable();
-            if (products.length === 0) {
+            const allItems = collectProductsFromTable();
+            const decgItems = collectDECGItems();
+            if (allItems.length === 0 && decgItems.length === 0) {
                 showToast('Add products before emailing', 'error');
                 return;
             }
@@ -7338,34 +7387,72 @@ Company:Absher Construction Company
         }
 
         async function copyToClipboard() {
-            const products = collectProductsFromTable();
-            if (products.length === 0) {
+            const allItems = collectProductsFromTable();
+            const products = allItems.filter(p => !p.isService);
+            const decgItems = collectDECGItems();
+            if (products.length === 0 && decgItems.length === 0) {
                 showToast('Add products first', 'error');
                 return;
             }
 
             try {
-                // Combine all logos for backward compat
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos,
-                    { ...capPrimaryLogo, id: 'cap-primary' },
-                    ...capAdditionalLogos
-                ];
+                // Build AL entries from global toggle state (same as recalculatePricing)
+                const garmentALForCopy = globalAL.garment.enabled ? [{
+                    id: 'global-al-garment',
+                    position: 'AL',
+                    stitchCount: globalAL.garment.stitchCount,
+                    needsDigitizing: globalAL.garment.needsDigitizing
+                }] : [];
+                const capALForCopy = globalAL.cap.enabled ? [{
+                    id: 'global-al-cap',
+                    position: 'AL-Cap',
+                    stitchCount: globalAL.cap.stitchCount,
+                    needsDigitizing: globalAL.cap.needsDigitizing
+                }] : [];
 
-                // Build separate logo configs for cap vs garment
                 const logoConfigs = {
                     garment: {
                         primary: { ...primaryLogo, id: 'primary' },
-                        additional: additionalLogos
+                        additional: garmentALForCopy
                     },
                     cap: {
                         primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capAdditionalLogos
+                        additional: capALForCopy
                     }
                 };
 
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                // Combined array for backward compat
+                const allLogos = [
+                    { ...primaryLogo, id: 'primary' },
+                    ...garmentALForCopy,
+                    { ...capPrimaryLogo, id: 'cap-primary' },
+                    ...capALForCopy
+                ];
+
+                let pricing;
+                if (products.length === 0) {
+                    // DECG-only: build minimal pricing (no pricing engine needed)
+                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+                    pricing = {
+                        products: [],
+                        totalQuantity: decgQty,
+                        subtotal: decgTotal,
+                        grandTotal: decgTotal,
+                        tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+                        ltmFee: 0,
+                        additionalServices: [],
+                        additionalStitchTotal: 0,
+                        garmentStitchTotal: 0,
+                        capStitchTotal: 0,
+                        garmentSetupFees: 0,
+                        capSetupFees: 0,
+                        garmentQuantity: 0,
+                        capQuantity: 0
+                    };
+                } else {
+                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                }
 
                 const text = generateQuoteText(products, pricing, logoConfigs);
                 await navigator.clipboard.writeText(text);

@@ -973,6 +973,14 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 
 # Calculator & Quote Builder Sync
 
+## Bug: DECG-Only Quotes Blocked from Save/Print/Email/Copy (2026-02-08)
+**Project:** [Pricing Index]
+**Problem:** When a quote contains only DECG/DECC items (customer-supplied garments/caps, no SanMar products), clicking Save & Get Link, Print, Email, or Copy showed "Add products before saving" error and blocked the action.
+**Root Cause:** All 4 action functions (`saveAndGetLink`, `printQuote`, `emailQuote`, `copyToClipboard`) filter out service items (`!p.isService`) then check `products.length === 0`. For DECG-only orders, ALL items are service items, so the guard always fails — even though `recalculatePricing()` already handles DECG-only quotes correctly.
+**Solution:** Updated all 4 guards to also check `collectDECGItems().length === 0`. Added DECG-only pricing path in `saveAndGetLink` and `printQuote` that builds a minimal pricing object (skipping the pricing engine) when `products.length === 0` but DECG items exist.
+**Prevention:** When adding guard checks for "no products", always consider service-only items (DECG/DECC). The pricing engine requires SanMar products — service-only quotes need a bypass path.
+**Files:** `embroidery-quote-builder.html` (`saveAndGetLink()`, `printQuote()`, `emailQuote()`, `copyToClipboard()`)
+
 ## Bug: PDF/URL Quote Pricing Divergence from UI (2026-02-08)
 **Project:** [Pricing Index]
 **Problem:** After recalculating pricing (changing stitch counts, toggling AL, overriding prices), the Print PDF and Save & Get Link outputs showed wrong/stale prices.
