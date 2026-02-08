@@ -283,6 +283,41 @@ class EmbroideryQuoteService {
                         }
                     }
                     
+                    // If this product has a manual price override, store it in LogoSpecs
+                    // (non-first items have empty LogoSpecs, so this doesn't conflict)
+                    const hasPriceOverride = productPricing.product.sellPriceOverride > 0;
+                    let itemLogoSpecs = logoSpecsData;
+                    if (!isFirstItem && hasPriceOverride) {
+                        itemLogoSpecs = JSON.stringify({ priceOverride: true, overridePrice: productPricing.product.sellPriceOverride });
+                    } else if (isFirstItem && hasPriceOverride) {
+                        // First item with override — merge override flag into existing logo specs
+                        try {
+                            const parsed = logoSpecsData ? JSON.parse(logoSpecsData) : {};
+                            parsed.priceOverride = true;
+                            parsed.overridePrice = productPricing.product.sellPriceOverride;
+                            itemLogoSpecs = JSON.stringify(parsed);
+                        } catch (e) {
+                            itemLogoSpecs = JSON.stringify({ priceOverride: true, overridePrice: productPricing.product.sellPriceOverride });
+                        }
+                    }
+
+                    // Check for per-size price overrides (child row overrides)
+                    const sizeOverrides = productPricing.product.sizeOverrides || {};
+                    const lineItemSizes = Object.keys(this.parseDescriptionToSizeBreakdown(lineItem.description));
+                    const sizeOverridePrice = lineItemSizes.length === 1 ? sizeOverrides[lineItemSizes[0]] : null;
+                    if (sizeOverridePrice > 0 && !hasPriceOverride) {
+                        // Store per-size override in LogoSpecs (separate from parent override)
+                        try {
+                            const parsed = itemLogoSpecs ? JSON.parse(itemLogoSpecs) : {};
+                            parsed.priceOverride = true;
+                            parsed.overridePrice = sizeOverridePrice;
+                            parsed.sizeOverride = true;
+                            itemLogoSpecs = JSON.stringify(parsed);
+                        } catch (e) {
+                            itemLogoSpecs = JSON.stringify({ priceOverride: true, overridePrice: sizeOverridePrice, sizeOverride: true });
+                        }
+                    }
+
                     const itemData = {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
@@ -304,15 +339,15 @@ class EmbroideryQuoteService {
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
-                        LogoSpecs: logoSpecsData  // Already a string or empty
+                        LogoSpecs: itemLogoSpecs  // Already a string or empty
                     };
-                    
+
                     const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
                     });
-                    
+
                     totalItems++;
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
@@ -391,7 +426,7 @@ class EmbroideryQuoteService {
                         PricingTier: pricingResults.tier || '',
                         ImageURL: '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
-                        LogoSpecs: ''
+                        LogoSpecs: decgItem.hasPriceOverride ? JSON.stringify({ priceOverride: true, overridePrice: decgItem.unitPrice }) : ''
                     };
 
                     const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
@@ -1156,6 +1191,38 @@ class EmbroideryQuoteService {
                         }
                     }
 
+                    // If this product has a manual price override, store it in LogoSpecs
+                    const hasPriceOverride = productPricing.product.sellPriceOverride > 0;
+                    let itemLogoSpecs = logoSpecsData;
+                    if (!isFirstItem && hasPriceOverride) {
+                        itemLogoSpecs = JSON.stringify({ priceOverride: true, overridePrice: productPricing.product.sellPriceOverride });
+                    } else if (isFirstItem && hasPriceOverride) {
+                        try {
+                            const parsed = logoSpecsData ? JSON.parse(logoSpecsData) : {};
+                            parsed.priceOverride = true;
+                            parsed.overridePrice = productPricing.product.sellPriceOverride;
+                            itemLogoSpecs = JSON.stringify(parsed);
+                        } catch (e) {
+                            itemLogoSpecs = JSON.stringify({ priceOverride: true, overridePrice: productPricing.product.sellPriceOverride });
+                        }
+                    }
+
+                    // Check for per-size price overrides (child row overrides)
+                    const sizeOverrides = productPricing.product.sizeOverrides || {};
+                    const lineItemSizes = Object.keys(this.parseDescriptionToSizeBreakdown(lineItem.description));
+                    const sizeOverridePrice = lineItemSizes.length === 1 ? sizeOverrides[lineItemSizes[0]] : null;
+                    if (sizeOverridePrice > 0 && !hasPriceOverride) {
+                        try {
+                            const parsed = itemLogoSpecs ? JSON.parse(itemLogoSpecs) : {};
+                            parsed.priceOverride = true;
+                            parsed.overridePrice = sizeOverridePrice;
+                            parsed.sizeOverride = true;
+                            itemLogoSpecs = JSON.stringify(parsed);
+                        } catch (e) {
+                            itemLogoSpecs = JSON.stringify({ priceOverride: true, overridePrice: sizeOverridePrice, sizeOverride: true });
+                        }
+                    }
+
                     const itemData = {
                         QuoteID: quoteId,
                         LineNumber: lineNumber++,
@@ -1177,7 +1244,7 @@ class EmbroideryQuoteService {
                         PricingTier: pricingResults.tier,
                         ImageURL: productPricing.product.imageUrl || '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
-                        LogoSpecs: logoSpecsData
+                        LogoSpecs: itemLogoSpecs
                     };
 
                     totalItems++;
@@ -1260,7 +1327,7 @@ class EmbroideryQuoteService {
                         PricingTier: pricingResults.tier || '',
                         ImageURL: '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
-                        LogoSpecs: ''
+                        LogoSpecs: decgItem.hasPriceOverride ? JSON.stringify({ priceOverride: true, overridePrice: decgItem.unitPrice }) : ''
                     };
 
                     totalItems++;

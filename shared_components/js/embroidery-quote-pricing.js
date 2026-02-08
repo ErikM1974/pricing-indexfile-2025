@@ -643,8 +643,29 @@ class EmbroideryPricingCalculator {
 
 
         // Calculate decorated price for each size in the order
+        const sizeOverrides = product.sizeOverrides || {};
+
         for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
             if (qty <= 0) continue;
+
+            // Per-size price override (child row manual edit) — use fixed price
+            if (sizeOverrides[size] && sizeOverrides[size] > 0) {
+                lineItems.push({
+                    description: `${size}(${qty})`,
+                    quantity: qty,
+                    unitPrice: sizeOverrides[size],
+                    unitPriceWithLTM: sizeOverrides[size],
+                    ltmPerUnit: 0,
+                    basePrice: sizeOverrides[size],
+                    extraStitchCost: 0,
+                    alCost: 0,
+                    total: sizeOverrides[size] * qty,
+                    isCap: true,
+                    isOverride: true
+                });
+                lineSubtotal += sizeOverrides[size] * qty;
+                continue;
+            }
 
             // Get size-specific base price and upcharge
             const sizeBasePrice = priceData.basePrices[size] || standardBasePrice;
@@ -939,7 +960,27 @@ class EmbroideryPricingCalculator {
         // For tall-only or non-standard products, calculate relative upcharges
         const baseSizeUpcharge = baseSize ? (priceData.sizeUpcharges[baseSize] || 0) : 0;
 
+        const sizeOverrides = product.sizeOverrides || {};
+
         for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+            // Per-size price override (child row manual edit) — use fixed price, skip grouping
+            if (sizeOverrides[size] && sizeOverrides[size] > 0) {
+                lineItems.push({
+                    description: `${size}(${qty})`,
+                    quantity: qty,
+                    unitPrice: sizeOverrides[size],
+                    unitPriceWithLTM: sizeOverrides[size],
+                    ltmPerUnit: 0,
+                    basePrice: sizeOverrides[size],
+                    extraStitchCost: 0,
+                    alCost: 0,
+                    total: sizeOverrides[size] * qty,
+                    isOverride: true
+                });
+                lineSubtotal += sizeOverrides[size] * qty;
+                continue;
+            }
+
             const apiUpcharge = priceData.sizeUpcharges[size] || 0;
 
             // Calculate relative upcharge from the base size
@@ -1380,6 +1421,11 @@ class EmbroideryPricingCalculator {
                     return;
                 }
                 pp.lineItems.forEach(item => {
+                    if (item.isOverride) {
+                        item.ltmPerUnit = 0;
+                        item.unitPriceWithLTM = item.unitPrice;
+                        return;
+                    }
                     item.ltmPerUnit = garmentLtmPerUnit;
                     item.unitPriceWithLTM = item.unitPrice + garmentLtmPerUnit;
                 });
@@ -1400,6 +1446,11 @@ class EmbroideryPricingCalculator {
                     return;
                 }
                 pp.lineItems.forEach(item => {
+                    if (item.isOverride) {
+                        item.ltmPerUnit = 0;
+                        item.unitPriceWithLTM = item.unitPrice;
+                        return;
+                    }
                     item.ltmPerUnit = capLtmPerUnit;
                     item.unitPriceWithLTM = item.unitPrice + capLtmPerUnit;
                 });

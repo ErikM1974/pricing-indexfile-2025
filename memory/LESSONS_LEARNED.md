@@ -973,6 +973,22 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 
 # Calculator & Quote Builder Sync
 
+## Bug: PDF/URL Quote Pricing Divergence from UI (2026-02-08)
+**Project:** [Pricing Index]
+**Problem:** After recalculating pricing (changing stitch counts, toggling AL, overriding prices), the Print PDF and Save & Get Link outputs showed wrong/stale prices.
+**Root Cause:** Each quote builder has 3 functions that build pricing calculator inputs: `recalculatePricing()`, `printQuote()`, and `saveAndGetLink()`. When `recalculatePricing()` was refactored (2026-02-06 AL simplification), the other two were not updated. Specifically: (1) service items (DECG/DECC) weren't filtered, inflating tier counts; (2) `saveAndGetLink()` used empty global arrays instead of `globalAL` state for AL configs; (3) `printQuote()` omitted cap logos from `allLogos`.
+**Solution:** Made all 3 functions use identical patterns: filter `!p.isService`, build AL from `globalAL`, include both garment and cap logos.
+**Prevention:** When modifying `recalculatePricing()`, always check `printQuote()` and `saveAndGetLink()` for the same change. Added reminder to CLAUDE.md sync rules.
+**Files:** `embroidery-quote-builder.html` (`printQuote()`, `saveAndGetLink()`, `recalculatePricing()`)
+
+## Bug: Per-Size Price Override Not Applied in PDF/URL Quotes (2026-02-08)
+**Project:** [Pricing Index]
+**Problem:** When a user manually overrides the unit price on a child row (e.g., changing BB18000_2X from $90 to $95), the UI correctly shows $95, but Print Quote PDF and Save & Get Link still show $90. The override is visually correct but lost in all outputs.
+**Root Cause:** The pricing engine (`embroidery-quote-pricing.js`) completely ignores `product.sizeOverrides`. The data flows correctly through `collectProductsFromTable()` which builds `sizeOverrides: { '2XL': 95 }`, but `calculateProductPrice()` and `calculateCapProductPrice()` never check it when building line items. The UI only worked because `recalculatePricing()` has a DOM-level post-processing hack (lines ~5810-5843) that overwrites cell text after the pricing engine runs. `printQuote()` and `saveAndGetLink()` use pricing engine output directly with no such hack.
+**Solution:** In both `calculateProductPrice()` and `calculateCapProductPrice()`, check `sizeOverrides[size]` before grouping. If override exists, create a standalone line item with the fixed price and `isOverride: true` flag, then `continue` (skip normal grouping). In LTM distribution, skip items with `isOverride: true` so LTM isn't added on top of a user-specified price.
+**Prevention:** When the pricing engine builds line items, it must respect ALL data collected by `collectProductsFromTable()`. If the UI modifies a value post-engine, the engine should be fixed to handle it natively — DOM hacks are fragile.
+**Files:** `shared_components/js/embroidery-quote-pricing.js` (`calculateProductPrice()`, `calculateCapProductPrice()`, LTM distribution)
+
 ## Bug: AL Fee Row Shows Wrong Quantity (First Product Row Only)
 **Date:** 2026-02-06
 **Project:** [Pricing Index]

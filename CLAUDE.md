@@ -39,6 +39,7 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Update ACTIVE_FILES.md
 - No hardcoded URLs (use config)
 - **Quote builder change?** → Check if same change needed in other 3 builders
+- **Pricing logic change?** → Verify `printQuote()` and `saveAndGetLink()` use same inputs as `recalculatePricing()`
 - **Run `npm run validate-docs`** if you created/moved memory files
 - **Document any ManageOrders discoveries** (see [ManageOrders Documentation Updates](#manageorders-documentation-updates))
 - Descriptive commit message
@@ -214,6 +215,7 @@ Common utility functions are now in `/shared_components/js/quote-builder-utils.j
 **After making quote builder changes, always ask:**
 > "Does this change apply to the other 3 quote builders?"
 > "Should this be moved to quote-builder-utils.js?"
+> "Does this affect `printQuote()` or `saveAndGetLink()`? Verify PDF and URL quote output match the UI."
 
 ### Embroidery Tier Structure (Feb 2026)
 

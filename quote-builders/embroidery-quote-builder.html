@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Embroidery Quote Builder Styles (External CSS - Extracted January 2026) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260106">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260208">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260127">
@@ -2532,8 +2532,28 @@ Company:Absher Construction Company
                         styleNumber: item.StyleNumber,
                         color: item.Color,
                         productName: item.ProductName,
-                        sizeBreakdown: {}
+                        sizeBreakdown: {},
+                        priceOverride: 0,
+                        sizeOverrides: {}  // Per-size price overrides (child rows)
                     };
+                }
+                // Check for price override stored in LogoSpecs
+                if (item.LogoSpecs) {
+                    try {
+                        const specs = JSON.parse(item.LogoSpecs);
+                        if (specs.priceOverride && specs.overridePrice > 0) {
+                            if (specs.sizeOverride) {
+                                // Per-size override — map to specific sizes in this line item
+                                const sizes = JSON.parse(item.SizeBreakdown || '{}');
+                                for (const sz of Object.keys(sizes)) {
+                                    productGroups[key].sizeOverrides[sz] = specs.overridePrice;
+                                }
+                            } else {
+                                // Parent row override
+                                productGroups[key].priceOverride = specs.overridePrice;
+                            }
+                        }
+                    } catch (e) { /* ignore parse errors */ }
                 }
                 // Merge size breakdowns
                 try {
@@ -2564,7 +2584,7 @@ Company:Absher Construction Company
                     stitchCount = meta.stitchCount || 8000;
                 } catch (e) { /* ignore */ }
 
-                createServiceProductRow(serviceType, {
+                const serviceRow = createServiceProductRow(serviceType, {
                     quantity: serviceItem.Quantity,
                     unitPrice: serviceItem.BaseUnitPrice || serviceItem.FinalUnitPrice,
                     total: serviceItem.LineTotal,
@@ -2572,6 +2592,16 @@ Company:Absher Construction Company
                     position: serviceItem.PrintLocationName || '',
                     isCap: isCap
                 });
+
+                // Restore price override for DECG/DECC if saved
+                if (serviceRow && serviceItem.LogoSpecs) {
+                    try {
+                        const specs = JSON.parse(serviceItem.LogoSpecs);
+                        if (specs.priceOverride && specs.overridePrice > 0) {
+                            serviceRow.dataset.sellPrice = specs.overridePrice.toString();
+                        }
+                    } catch (e) { /* ignore */ }
+                }
 
             }
         }
@@ -2637,6 +2667,22 @@ Company:Absher Construction Company
                     } else {
                         console.warn(`[addProductFromQuote] No input found for size ${size}, creating child row`);
                         createChildRow(rowIdNum, size, qty);
+                    }
+                }
+            }
+
+            // Restore price override if saved
+            if (product.priceOverride > 0) {
+                row.dataset.sellPrice = product.priceOverride.toString();
+            }
+
+            // Restore per-size price overrides on child rows
+            if (product.sizeOverrides && Object.keys(product.sizeOverrides).length > 0) {
+                for (const [size, price] of Object.entries(product.sizeOverrides)) {
+                    const childRowId = childRowMap[rowIdNum]?.[size];
+                    if (childRowId) {
+                        const childRow = document.getElementById(`row-${childRowId}`);
+                        if (childRow) childRow.dataset.sellPrice = price.toString();
                     }
                 }
             }
@@ -3152,7 +3198,9 @@ Company:Absher Construction Company
                 <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
                 <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
                 <td class="cell-qty" id="row-qty-${rowId}">0</td>
-                <td class="cell-price" id="row-price-${rowId}">-</td>
+                <td class="cell-price" id="row-price-${rowId}"
+                    ondblclick="enablePriceOverride(${rowId})"
+                    title="Double-click to override price">-</td>
                 <td class="cell-total" id="row-total-${rowId}">-</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
@@ -3275,7 +3323,8 @@ Company:Absher Construction Company
                            onchange="onServiceQtyChange(${rowId})" onkeydown="handleCellKeydown(event, this)"
                            style="width: 60px; text-align: center;">
                 </td>
-                <td class="cell-price" id="row-price-${rowId}">$${unitPrice.toFixed(2)}</td>
+                <td class="cell-price" id="row-price-${rowId}"
+                    ${['DECG', 'DECC'].includes(serviceType) ? `ondblclick="enablePriceOverride(${rowId})" title="Double-click to override price"` : ''}>$${unitPrice.toFixed(2)}</td>
                 <td class="cell-total" id="row-total-${rowId}">$${total.toFixed(2)}</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="deleteServiceRow(${rowId})" title="Delete service">
@@ -3306,8 +3355,22 @@ Company:Absher Construction Company
 
             const qtyInput = row.querySelector('.service-qty');
             const quantity = parseInt(qtyInput?.value) || 0;
-            const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+            // Use sell price override if set, otherwise use original unit price
+            const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
+            const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
             const total = quantity * unitPrice;
+
+            // Update price cell with override indicator if applicable
+            const priceCell = document.getElementById(`row-price-${rowId}`);
+            if (priceCell) {
+                if (overridePrice > 0) {
+                    priceCell.classList.add('price-overridden');
+                    priceCell.innerHTML = `<span class="price-override-wrapper">$${unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
+                } else {
+                    priceCell.classList.remove('price-overridden');
+                    priceCell.textContent = `$${unitPrice.toFixed(2)}`;
+                }
+            }
 
             // Update total display
             const totalCell = document.getElementById(`row-total-${rowId}`);
@@ -4614,6 +4677,11 @@ Company:Absher Construction Company
             row.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
             optionEl.classList.add('selected');
 
+            // Clear manual price override when color changes (new color = different product cost)
+            if (row.dataset.nonSanmar !== 'true' && row.dataset.sellPrice) {
+                delete row.dataset.sellPrice;
+            }
+
             // Store data on row
             row.dataset.color = colorName;
             row.dataset.catalogColor = catalogColor;
@@ -4779,6 +4847,9 @@ Company:Absher Construction Company
             childRow.dataset.swatchUrl = swatchUrl || '';
             childRow.dataset.hex = hex || '';
             childRow.dataset.colorManuallySet = 'true';  // Mark as manually changed
+
+            // Clear per-size price override on color change (new color = new product cost)
+            delete childRow.dataset.sellPrice;
 
             // Close dropdown
             childRow.querySelector('.color-picker-dropdown').classList.add('hidden');
@@ -5093,7 +5164,9 @@ Company:Absher Construction Company
                 <td><input type="number" class="cell-input size-input" data-size="2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
                 <td><input type="number" class="cell-input size-input" data-size="${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
                 <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
-                <td class="cell-price unit-price-display" id="row-price-${childRowId}">-</td>
+                <td class="cell-price unit-price-display" id="row-price-${childRowId}"
+                    ondblclick="enablePriceOverride(${childRowId})"
+                    title="Double-click to override price">-</td>
                 <td class="cell-total" id="row-total-${childRowId}">-</td>
                 <td class="cell-actions">
                     <button class="btn-delete-row" onclick="clearExtendedSize(${parentRowId}, '${size}')" title="Remove ${displaySize}">
@@ -5281,6 +5354,103 @@ Company:Absher Construction Company
         }
 
         // ============================================================
+        // PRICE OVERRIDE (double-click to edit)
+        // ============================================================
+
+        /**
+         * Enable price override on a product row via double-click.
+         * Replaces price cell content with an editable input.
+         * Enter/blur commits the override; Escape cancels.
+         */
+        function enablePriceOverride(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            // Only allow override on product rows and DECG/DECC service rows
+            if (row.dataset.productType === 'service') {
+                const sType = (row.dataset.serviceType || '').toUpperCase();
+                if (sType !== 'DECG' && sType !== 'DECC') return;
+            }
+
+            // Don't allow override on empty product rows (no style or no quantities yet)
+            // Child rows inherit style/color from parent, so allow them through
+            const isChildRow = row.classList.contains('child-row');
+            if (row.dataset.productType !== 'service' && !isChildRow && (!row.dataset.style || !row.dataset.color)) return;
+
+            const priceCell = document.getElementById(`row-price-${rowId}`);
+            if (!priceCell) return;
+
+            // Already editing — don't re-enter
+            if (priceCell.querySelector('.price-override-input')) return;
+
+            // Read current displayed price (strip $ and any reset button text)
+            const currentText = priceCell.textContent.replace(/[^0-9.]/g, '');
+            const currentPrice = parseFloat(currentText) || 0;
+
+            // Replace cell content with input
+            priceCell.innerHTML = `<input type="number" class="price-override-input"
+                step="0.01" min="0" value="${currentPrice.toFixed(2)}">`;
+
+            const input = priceCell.querySelector('.price-override-input');
+            input.focus();
+            input.select();
+
+            // Commit on Enter or blur
+            function commitOverride() {
+                const newPrice = parseFloat(input.value);
+                if (isNaN(newPrice) || newPrice <= 0) {
+                    cancelOverride();
+                    return;
+                }
+
+                // Set the sell price override on the row
+                row.dataset.sellPrice = newPrice.toString();
+                markAsUnsaved();
+                recalculatePricing();
+            }
+
+            // Cancel on Escape — restore original display
+            function cancelOverride() {
+                // Remove input, let recalculatePricing restore the cell
+                // If there was an existing override, keep it; otherwise clear
+                recalculatePricing();
+            }
+
+            let committed = false;
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    committed = true;
+                    commitOverride();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    committed = true;
+                    cancelOverride();
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                if (!committed) {
+                    commitOverride();
+                }
+            });
+        }
+
+        /**
+         * Clear price override on a product row — revert to formula-calculated price.
+         */
+        function clearPriceOverride(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            // Remove override
+            delete row.dataset.sellPrice;
+
+            markAsUnsaved();
+            recalculatePricing();
+        }
+
+        // ============================================================
         // KEYBOARD NAVIGATION (Excel-style)
         // ============================================================
 
@@ -5409,6 +5579,24 @@ Company:Absher Construction Company
                     totalQty += si.totalQuantity;
                     if (si.serviceType === 'decg' || !si.isCap) hasGarments = true;
                     if (si.serviceType === 'decc' || si.isCap) hasCaps = true;
+
+                    // Update service row price/total cells (reflects overrides)
+                    const siRow = document.getElementById(`row-${si.rowId}`);
+                    const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
+                    const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
+                    const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
+                    if (siPriceCell) {
+                        if (siHasOverride) {
+                            siPriceCell.classList.add('price-overridden');
+                            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${si.unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${si.rowId})" title="Clear override">&times;</button></span>`;
+                        } else {
+                            siPriceCell.classList.remove('price-overridden');
+                            siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
+                        }
+                    }
+                    if (siTotalCell) {
+                        siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
+                    }
                 });
 
                 // Check for laser-patch cap setup fee
@@ -5436,6 +5624,7 @@ Company:Absher Construction Company
                 // Clear product price cells (not service rows)
                 document.querySelectorAll('tr[data-style]:not(.service-product-row) .cell-price').forEach(cell => {
                     cell.textContent = '-';
+                    cell.classList.remove('price-overridden');
                 });
                 return;
             }
@@ -5500,7 +5689,15 @@ Company:Absher Construction Company
                                     if (priceCell) {
                                         // Display unit price (LTM built into per-piece price when applicable)
                                         const displayPrice = standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice;
-                                        priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                                        const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+
+                                        if (hasOverride) {
+                                            priceCell.classList.add('price-overridden');
+                                            priceCell.innerHTML = `<span class="price-override-wrapper">$${displayPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
+                                        } else {
+                                            priceCell.classList.remove('price-overridden');
+                                            priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                                        }
 
                                         // Calculate and display line total
                                         if (totalCell) {
@@ -5555,6 +5752,14 @@ Company:Absher Construction Company
                                             if (childPriceCell) {
                                                 // Display unit price (LTM built into per-piece price when applicable)
                                                 const displayPrice = li.unitPriceWithLTM || li.unitPrice;
+                                                // Check parent override (child-specific overrides handled in post-processing)
+                                                const childHasOwnOverride = parseFloat(childRow.dataset.sellPrice) > 0;
+                                                const hasParentOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                                                if (hasParentOverride && !childHasOwnOverride) {
+                                                    childPriceCell.classList.add('price-overridden');
+                                                } else if (!childHasOwnOverride) {
+                                                    childPriceCell.classList.remove('price-overridden');
+                                                }
                                                 childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
 
                                                 // Calculate and display line total for child row
@@ -5579,9 +5784,62 @@ Company:Absher Construction Company
                         let serviceTotal = 0;
                         serviceItems.forEach(si => {
                             serviceTotal += si.unitPrice * si.totalQuantity;
+
+                            // Update service row price/total cells (reflects overrides)
+                            const siRow = document.getElementById(`row-${si.rowId}`);
+                            const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
+                            const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
+                            const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
+                            if (siPriceCell) {
+                                if (siHasOverride) {
+                                    siPriceCell.classList.add('price-overridden');
+                                    siPriceCell.innerHTML = `<span class="price-override-wrapper">$${si.unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${si.rowId})" title="Clear override">&times;</button></span>`;
+                                } else {
+                                    siPriceCell.classList.remove('price-overridden');
+                                    siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
+                                }
+                            }
+                            if (siTotalCell) {
+                                siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
+                            }
                         });
                         pricing.subtotal += serviceTotal;
                         pricing.grandTotal += serviceTotal;
+                    }
+
+                    // Post-process: per-size price overrides on child rows
+                    let childOverrideDelta = 0;
+                    document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
+                        const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+                        if (childOverride <= 0) return;
+
+                        const childRowId = childRow.dataset.rowId;
+                        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                        const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+                        const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
+                        if (!childPriceCell) return;
+
+                        // Get the calculated price currently in the cell
+                        const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
+                        const calculatedPrice = parseFloat(currentText) || 0;
+                        const qty = parseInt(childQtyCell?.textContent) || 0;
+
+                        // Override display
+                        childPriceCell.classList.add('price-overridden');
+                        childPriceCell.innerHTML = `<span class="price-override-wrapper">$${childOverride.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${childRowId})" title="Clear override">&times;</button></span>`;
+
+                        if (childTotalCell && qty > 0) {
+                            childTotalCell.textContent = `$${(childOverride * qty).toFixed(2)}`;
+                        }
+
+                        // Track delta for total adjustment
+                        childOverrideDelta += (childOverride - calculatedPrice) * qty;
+                    });
+
+                    // Adjust totals if child overrides changed prices
+                    if (childOverrideDelta !== 0) {
+                        pricing.subtotal += childOverrideDelta;
+                        pricing.grandTotal += childOverrideDelta;
                     }
 
                     updatePricingDisplay(pricing);
@@ -5614,7 +5872,9 @@ Company:Absher Construction Company
                         const isCap = row.dataset.isCap === 'true';
                         const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
                         const position = row.dataset.position || '';
-                        const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+                        // Use sell price override if set (DECG/DECC), otherwise original unit price
+                        const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
+                        const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
 
                         products.push({
                             style: style,
@@ -5677,6 +5937,8 @@ Company:Absher Construction Company
 
                 // Collect extended sizes from CHILD ROWS - GROUP BY COLOR
                 // Child rows may have different colors than parent
+                // Also collect per-size price overrides from child rows
+                const sizeOverrides = {};
                 const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
                 childRows.forEach(childRow => {
                     const size = childRow.dataset.extendedSize;
@@ -5698,6 +5960,12 @@ Company:Absher Construction Company
 
                         colorGroups[childCatalogColor].sizeBreakdown[size] = qty;
                         colorGroups[childCatalogColor].totalQty += qty;
+
+                        // Collect per-size price override if set
+                        const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+                        if (childOverride > 0) {
+                            sizeOverrides[size] = childOverride;
+                        }
                     }
                 });
 
@@ -5727,6 +5995,7 @@ Company:Absher Construction Company
                             rowId: rowId,  // Track row for AL price updates
                             imageUrl: row.dataset.imageUrl || '',  // Image URL for quote view display
                             sellPriceOverride: parseFloat(row.dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
+                            sizeOverrides: sizeOverrides,  // Per-size price overrides from child rows (e.g., { '2XL': 27, '3XL': 29 })
                             logoAssignments: {
                                 primary: { logoId: 'primary', quantity: group.totalQty },
                                 additional: additionalLogos
@@ -6093,7 +6362,8 @@ Company:Absher Construction Company
         // ============================================================
 
         async function printQuote() {
-            const products = collectProductsFromTable();
+            const allItems = collectProductsFromTable();
+            const products = allItems.filter(p => !p.isService);
             if (products.length === 0) {
                 showToast('Add products before printing', 'error');
                 return;
@@ -6131,7 +6401,9 @@ Company:Absher Construction Company
                 // For backward compatibility, also create combined array
                 const allLogos = [
                     { ...primaryLogo, id: 'primary' },
-                    ...garmentALForPrint
+                    ...garmentALForPrint,
+                    { ...capPrimaryLogo, id: 'cap-primary' },
+                    ...capALForPrint
                 ];
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
 
@@ -6340,7 +6612,8 @@ Company:Absher Construction Company
          * Uses EmbroideryQuoteService and QuoteShareModal
          */
         async function saveAndGetLink() {
-            const products = collectProductsFromTable();
+            const allItems = collectProductsFromTable();
+            const products = allItems.filter(p => !p.isService);
             if (products.length === 0) {
                 showToast('Add products before saving', 'error');
                 return;
@@ -6368,27 +6641,38 @@ Company:Absher Construction Company
             showLoading(true);
 
             try {
-                // Combine ALL logos: garment primary + additional + cap primary + cap additional
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos,
-                    { ...capPrimaryLogo, id: 'cap-primary' },
-                    ...capAdditionalLogos
-                ];
+                // Build AL entries from global toggle state (same as recalculatePricing)
+                const garmentALForSave = globalAL.garment.enabled ? [{
+                    id: 'global-al-garment',
+                    position: 'AL',
+                    stitchCount: globalAL.garment.stitchCount,
+                    needsDigitizing: globalAL.garment.needsDigitizing
+                }] : [];
+                const capALForSave = globalAL.cap.enabled ? [{
+                    id: 'global-al-cap',
+                    position: 'AL-Cap',
+                    stitchCount: globalAL.cap.stitchCount,
+                    needsDigitizing: globalAL.cap.needsDigitizing
+                }] : [];
 
-                // Build logoConfigs for proper garment vs cap digitizing separation
-                // Bug fix 2026-01-14: Without this, pricing engine uses legacy path that
-                // counts ALL logos as garment digitizing instead of separating them
                 const logoConfigs = {
                     garment: {
                         primary: { ...primaryLogo, id: 'primary' },
-                        additional: additionalLogos
+                        additional: garmentALForSave
                     },
                     cap: {
                         primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capAdditionalLogos
+                        additional: capALForSave
                     }
                 };
+
+                // Combined array for backward compat + LogoSpecs storage
+                const allLogos = [
+                    { ...primaryLogo, id: 'primary' },
+                    ...garmentALForSave,
+                    { ...capPrimaryLogo, id: 'cap-primary' },
+                    ...capALForSave
+                ];
 
                 const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
 
@@ -7031,7 +7315,9 @@ Company:Absher Construction Company
                 if (serviceType === 'DECG' || serviceType === 'DECC') {
                     const qtyInput = row.querySelector('.service-qty');
                     const qty = parseInt(qtyInput?.value) || 0;
-                    const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+                    // Use sell price override if set, otherwise original unit price
+                    const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
+                    const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
                     const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
 
                     if (qty > 0) {
@@ -7041,7 +7327,8 @@ Company:Absher Construction Company
                             unitPrice: unitPrice,
                             total: qty * unitPrice,
                             stitchCount: stitchCount,
-                            rowId: row.dataset.rowId
+                            rowId: row.dataset.rowId,
+                            hasPriceOverride: overridePrice > 0
                         });
                     }
                 }

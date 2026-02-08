@@ -1456,6 +1456,72 @@ body {
     padding: 0 10px;
     color: var(--nwca-green);
     background: #e8f5e9;
+    cursor: pointer;
+    position: relative;
+}
+
+.cell-price:hover {
+    background: #c8e6c9;
+}
+
+.cell-price.price-overridden {
+    background: #fef3c7;
+    color: #92400e;
+    border-left: 3px solid #f59e0b;
+}
+
+.cell-price.price-overridden:hover {
+    background: #fde68a;
+}
+
+.cell-price .price-override-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cell-price .btn-clear-override {
+    background: none;
+    border: none;
+    color: #b45309;
+    cursor: pointer;
+    padding: 0 2px;
+    font-size: 11px;
+    line-height: 1;
+    opacity: 0.6;
+}
+
+.cell-price .btn-clear-override:hover {
+    opacity: 1;
+    color: #dc2626;
+}
+
+.cell-price .price-override-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px 4px;
+    border: 2px solid #f59e0b;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    background: #fffbeb;
+    color: #92400e;
+    outline: none;
+}
+
+.cell-price .price-override-input::-webkit-outer-spin-button,
+.cell-price .price-override-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.cell-price .price-override-input {
+    -moz-appearance: textfield;
+}
+
+.cell-price .price-override-input:focus {
+    border-color: #d97706;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
 }
 
 .cell-total {
