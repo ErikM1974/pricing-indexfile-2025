@@ -804,6 +804,8 @@ class EmbroideryPricingCalculator {
                 description: `${size}(${qty})`,
                 quantity: qty,
                 unitPrice: sellPrice,
+                unitPriceWithLTM: sellPrice,
+                ltmPerUnit: 0,
                 basePrice: sellPrice,
                 extraStitchCost: 0,
                 alCost: 0,
@@ -1369,6 +1371,14 @@ class EmbroideryPricingCalculator {
             garmentLtm = this.ltmFee;
             const garmentLtmPerUnit = garmentLtm / garmentQuantity;
             productPricing.filter(pp => !pp.isCap).forEach(pp => {
+                // Skip fixed-price products — custom price already includes all costs
+                if (pp.product.sellPriceOverride > 0) {
+                    pp.lineItems.forEach(item => {
+                        item.ltmPerUnit = 0;
+                        item.unitPriceWithLTM = item.unitPrice;
+                    });
+                    return;
+                }
                 pp.lineItems.forEach(item => {
                     item.ltmPerUnit = garmentLtmPerUnit;
                     item.unitPriceWithLTM = item.unitPrice + garmentLtmPerUnit;
@@ -1381,6 +1391,14 @@ class EmbroideryPricingCalculator {
             capLtm = this.ltmFee;
             const capLtmPerUnit = capLtm / capQuantity;
             productPricing.filter(pp => pp.isCap).forEach(pp => {
+                // Skip fixed-price products — custom price already includes all costs
+                if (pp.product.sellPriceOverride > 0) {
+                    pp.lineItems.forEach(item => {
+                        item.ltmPerUnit = 0;
+                        item.unitPriceWithLTM = item.unitPrice;
+                    });
+                    return;
+                }
                 pp.lineItems.forEach(item => {
                     item.ltmPerUnit = capLtmPerUnit;
                     item.unitPriceWithLTM = item.unitPrice + capLtmPerUnit;
