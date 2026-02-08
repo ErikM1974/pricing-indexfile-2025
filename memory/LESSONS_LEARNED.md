@@ -902,6 +902,17 @@ Same fix applied to `calculateCapProductPrice()` (lines 646-667).
 
 # Code Organization
 
+## Problem: Review Import Pricing modal had misaligned columns
+**Date:** 2026-02-08
+**Project:** [Pricing Index]
+**Problem:** Products section showed only 2 price columns (ShopWorks, API) with radios detached in card header; Services section had left-aligned headers but center-aligned data cells.
+**Root Cause:** Products used flex-based layout with radios in card header separate from size breakdown rows. Services table `th` inherited `text-align: left` while `.spr-radio-cell` used `text-align: center`.
+**Solution:** (1) Products: Converted flex layout to `<table>` with 4 columns (Sizes/ShopWorks/API/Custom), moved radios inline with first size row. (2) Services: Added `.spr-table th:nth-child(n+4) { text-align: center }`. Removed ~50 lines of dead CSS.
+**Prevention:** When building modal tables with radio+price columns, use `<table>` from the start — flex layouts drift when columns need alignment across header and data.
+**Files:** `quote-builders/embroidery-quote-builder.html`
+
+---
+
 ## Problem: 71+ orphaned files in codebase
 **Date:** 2025
 **Project:** Pricing Index

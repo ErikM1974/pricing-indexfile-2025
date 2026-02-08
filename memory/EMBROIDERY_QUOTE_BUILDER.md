@@ -858,6 +858,12 @@ Products not in the SanMar database (e.g. HT01 Edwards Skull Cap) can now be imp
 7. onSizeChange() → recalculatePricing()        ← sees sellPrice ✓
 ```
 
+### Review Modal Column Alignment (Feb 2026)
+- Products section now uses `<table>` layout with 4 aligned columns: Sizes | ShopWorks | API | Custom
+- Radio buttons are inline with the first size row (not detached in card header)
+- Services section headers centered to match data cell alignment (`.spr-table th:nth-child(n+4) { text-align: center }`)
+- ~50 lines of dead flex-based CSS removed
+
 ### Review Modal Radio Button CSS
 - Radio labels use **pill-style** borders (`border: 1px solid #e2e8f0`, `border-radius: 4px`)
 - Selected state via `:has(input:checked)` — blue border + light blue background
