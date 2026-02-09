@@ -6432,6 +6432,13 @@ Company:Absher Construction Company
                     pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
                 }
 
+                // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
+                if (decgItems.length > 0) {
+                    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    pricing.subtotal += decgServiceTotal;
+                    pricing.grandTotal += decgServiceTotal;
+                }
+
                 // Generate and open print window
                 const invoiceGenerator = new EmbroideryInvoiceGenerator();
                 const customerData = {
@@ -6723,6 +6730,13 @@ Company:Absher Construction Company
                     };
                 } else {
                     pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                }
+
+                // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
+                if (decgItems.length > 0) {
+                    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    pricing.subtotal += decgServiceTotal;
+                    pricing.grandTotal += decgServiceTotal;
                 }
 
                 // Get sales rep NAME from dropdown selected option text
@@ -7452,6 +7466,13 @@ Company:Absher Construction Company
                     };
                 } else {
                     pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                }
+
+                // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
+                if (decgItems.length > 0) {
+                    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    pricing.subtotal += decgServiceTotal;
+                    pricing.grandTotal += decgServiceTotal;
                 }
 
                 const text = generateQuoteText(products, pricing, logoConfigs);

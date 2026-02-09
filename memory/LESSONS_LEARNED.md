@@ -981,6 +981,21 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 **Prevention:** When adding guard checks for "no products", always consider service-only items (DECG/DECC). The pricing engine requires SanMar products — service-only quotes need a bypass path.
 **Files:** `embroidery-quote-builder.html` (`saveAndGetLink()`, `printQuote()`, `emailQuote()`, `copyToClipboard()`)
 
+## Bug: DECG Totals Excluded from Subtotal in PDF/Save/Copy (2026-02-09)
+**Project:** [Pricing Index]
+**Problem:** Quotes with customer-supplied garments (DECG) showed the DECG line items in the PDF and URL view, but the subtotal/grandTotal only summed SanMar product prices. EMB-2026-057 showed subtotal $230 instead of $370 (missing 5 × $28 = $140 DECG).
+**Root Cause:** `recalculatePricing()` adds DECG totals to subtotal/grandTotal for UI display, but the 3 output functions (`printQuote()`, `saveAndGetLink()`, `copyToClipboard()`) never did the same aggregation — they passed the pricing engine result directly without DECG adjustment.
+**Solution:** Added identical DECG aggregation block to all 3 output functions:
+```js
+if (decgItems.length > 0) {
+    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+    pricing.subtotal += decgServiceTotal;
+    pricing.grandTotal += decgServiceTotal;
+}
+```
+**Prevention:** The embroidery quote builder has **4 code paths** that compute totals: `recalculatePricing()` (UI), `printQuote()` (PDF), `saveAndGetLink()` (URL), `copyToClipboard()` (text). ANY change to total aggregation in one must be mirrored in all 4. This is the third time this divergence caused a bug (see also 2026-02-08 entries above).
+**Files:** `embroidery-quote-builder.html` (lines ~6435, ~6735, ~7471)
+
 ## Bug: PDF/URL Quote Pricing Divergence from UI (2026-02-08)
 **Project:** [Pricing Index]
 **Problem:** After recalculating pricing (changing stitch counts, toggling AL, overriding prices), the Print PDF and Save & Get Link outputs showed wrong/stale prices.

@@ -1145,6 +1145,23 @@ body {
     font-weight: 600;
 }
 
+/* Customer-supplied items (DECG/DECC) */
+.product-table tr.customer-supplied-row {
+    border-top: 1px solid #e5e7eb;
+}
+
+.product-table tr.customer-supplied-row td {
+    font-style: normal;
+}
+
+.product-table tr.customer-supplied-row td.style-col {
+    font-weight: 600;
+}
+
+.product-table tr.customer-supplied-row td.total-col {
+    font-weight: 600;
+}
+
 /* Discount row (negative fee) - red styling */
 .product-table tr.discount-row {
     background-color: #fef2f2;
@@ -1424,8 +1441,17 @@ body {
 
 /* Print Styles */
 @media print {
+    @page {
+        size: letter portrait;
+        margin: 0.25in 0.4in;
+    }
+
+    /* Base */
     body {
         background: white;
+        line-height: 1.3;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .quote-page {
@@ -1435,14 +1461,193 @@ body {
     .quote-container {
         box-shadow: none;
         max-width: 100%;
+        page-break-inside: avoid;
     }
 
     .quote-actions {
         display: none;
     }
 
+    /* Header — compact */
     .quote-header {
+        padding: 8px 15px;
         background: var(--primary-color) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .company-logo {
+        max-width: 70px;
+    }
+
+    .logo-container {
+        padding: 3px 6px;
+    }
+
+    .header-right h1 {
+        font-size: 1rem;
+        margin-bottom: 2px;
+    }
+
+    .status-badge {
+        display: none;
+    }
+
+    /* Meta section (Customer info + Quote details) — compact */
+    .quote-meta {
+        gap: 8px;
+        padding: 6px 15px;
+    }
+
+    .meta-card {
+        padding: 5px 10px;
+    }
+
+    .meta-card h3 {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+    }
+
+    .customer-name {
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .company-name {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    .date-row {
+        padding: 3px 0;
+    }
+
+    /* Quote items section — compact */
+    .quote-items {
+        padding: 8px 15px;
+    }
+
+    .quote-items h2 {
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+        padding-bottom: 5px;
+    }
+
+    /* Embroidery info box — compact */
+    .embroidery-info {
+        padding: 5px 10px;
+        gap: 10px;
+        margin-bottom: 5px;
+    }
+
+    /* Product table — compact cells, no overflow forcing */
+    .product-table-wrapper {
+        overflow: visible;
+        page-break-inside: avoid;
+    }
+
+    .product-table {
+        min-width: 0 !important;
+    }
+
+    .product-table.compact {
+        min-width: 0 !important;
+    }
+
+    .product-table th,
+    .product-table td {
+        padding: 4px 3px;
+        font-size: 0.8rem;
+    }
+
+    .product-table.compact th,
+    .product-table.compact td {
+        padding: 4px 3px;
+    }
+
+    .product-thumb {
+        display: none;
+    }
+
+    /* Totals section — compact */
+    .quote-totals {
+        padding: 0 15px 6px;
+    }
+
+    .totals-card {
+        padding: 6px 10px;
+        page-break-inside: avoid;
+    }
+
+    .total-row {
+        padding: 3px 0;
+        font-size: 0.9rem;
+    }
+
+    .total-row.grand-total {
+        margin-top: 8px;
+        padding-top: 10px;
+    }
+
+    .total-row.grand-total .label,
+    .total-row.grand-total .value {
+        font-size: 1rem;
+    }
+
+    /* Footer — compact */
+    .quote-footer {
+        padding: 8px 15px;
+        page-break-inside: avoid;
+    }
+
+    .footer-content {
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+
+    .footer-section h4 {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+    }
+
+    .footer-section p {
+        font-size: 0.8rem;
+        margin-bottom: 3px;
+    }
+
+    .phone-link {
+        font-size: 0.85rem;
+    }
+
+    .terms-list {
+        font-size: 0.7rem;
+    }
+
+    .terms-list li {
+        padding: 1px 0;
+        padding-left: 12px;
+    }
+
+    .footer-bottom {
+        padding-top: 6px;
+    }
+
+    .footer-bottom p {
+        font-size: 0.75rem;
+    }
+
+    /* Hide internal ShopWorks part numbers from customer print view */
+    .fee-row .fee-part {
+        font-size: 0;
+        color: transparent;
+    }
+
+    /* Ensure background colors print correctly */
+    .product-table thead,
+    .product-table tr.fee-row,
+    .product-table tr.customer-supplied-row,
+    .product-table tr.discount-row,
+    .quote-footer {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }

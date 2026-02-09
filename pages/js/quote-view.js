@@ -9,6 +9,8 @@ class QuoteViewPage {
         this.quoteId = null;
         this.quoteData = null;
         this.items = [];
+        this.productItems = [];
+        this.customerSuppliedItems = [];
         this.taxRate = 0.101; // 10.1% WA Sales Tax
 
         // Quote type mapping
@@ -126,6 +128,9 @@ class QuoteViewPage {
             headerText += ` • Rev ${revision}`;
         }
         document.getElementById('quote-id-header').textContent = headerText;
+
+        // Set document title for PDF filename (Ctrl+P → Save as PDF)
+        document.title = `Quote ${this.quoteId} - NWCA`;
 
         // Status
         this.renderStatus();
@@ -446,7 +451,11 @@ class QuoteViewPage {
             return;
         }
 
-        // Group items by StyleNumber + Color
+        // Separate customer-supplied items (DECG/DECC) from regular products
+        this.customerSuppliedItems = this.items.filter(item => item.EmbellishmentType === 'customer-supplied');
+        this.productItems = this.items.filter(item => item.EmbellishmentType !== 'customer-supplied');
+
+        // Group regular product items by StyleNumber + Color
         const productGroups = this.groupItemsByProduct();
         const groups = Object.values(productGroups);
 
@@ -462,7 +471,7 @@ class QuoteViewPage {
                 <table class="product-table compact">
                     <thead>
                         <tr>
-                            <th class="style-col">Style</th>
+                            <th class="style-col">Item / Description</th>
                             <th class="color-col">Color</th>
                             <th class="size-col">S</th>
                             <th class="size-col">M</th>
@@ -487,6 +496,9 @@ class QuoteViewPage {
                 rowIndex++;
             });
         });
+
+        // Render customer-supplied items (DECG/DECC) as service rows
+        html += this.renderCustomerSuppliedRows();
 
         // Render fee line items (Additional Stitches, AL charges, Digitizing)
         html += this.renderFeeRows();
@@ -642,6 +654,43 @@ class QuoteViewPage {
         }
 
         html += `</div>`;
+        return html;
+    }
+
+    /**
+     * Render customer-supplied items (DECG/DECC) as service rows in the product table
+     */
+    renderCustomerSuppliedRows() {
+        if (!this.customerSuppliedItems || this.customerSuppliedItems.length === 0) {
+            return '';
+        }
+
+        let html = '';
+        this.customerSuppliedItems.forEach(item => {
+            const styleNumber = item.StyleNumber || 'DECG';
+            const description = item.ProductName || 'Customer-Supplied Item';
+            const qty = parseInt(item.Quantity) || 0;
+            const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
+            const lineTotal = item.LineTotal || (qty * unitPrice);
+            const isDECC = styleNumber === 'DECC';
+            const displayLabel = isDECC ? 'Customer Caps' : 'Customer Garments';
+
+            html += `
+                <tr class="customer-supplied-row" style="background: ${isDECC ? '#eff6ff' : '#fffbeb'};">
+                    <td class="style-col" style="font-weight: 600; color: ${isDECC ? '#1e40af' : '#92400e'};">
+                        ${this.escapeHtml(displayLabel)}
+                    </td>
+                    <td class="color-col" style="font-size: 11px;">${this.escapeHtml(description)}</td>
+                    <td class="size-col" colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
+                        Customer-supplied
+                    </td>
+                    <td class="qty-col">${qty}</td>
+                    <td class="price-col">${this.formatCurrency(unitPrice)}</td>
+                    <td class="total-col">${this.formatCurrency(lineTotal)}</td>
+                </tr>
+            `;
+        });
+
         return html;
     }
 
@@ -977,7 +1026,7 @@ class QuoteViewPage {
                 <td class="style-col clickable" onclick="window.quoteViewPage.openProductModal(${groupIndex})">
                     <div class="style-with-image">
                         <img id="product-image-${groupIndex}" class="product-thumb" src="/pages/images/product-placeholder.png" alt="${this.escapeHtml(row.style)}">
-                        <span>${this.escapeHtml(row.style)}</span>
+                        <span>${this.escapeHtml(row.style)} - ${this.escapeHtml((row.description || '').substring(0, 25))}</span>
                     </div>
                 </td>
             `;
@@ -1010,7 +1059,9 @@ class QuoteViewPage {
     groupItemsByProduct() {
         const groups = {};
 
-        this.items.forEach(item => {
+        // Use productItems (excludes customer-supplied) if available, fall back to all items
+        const items = this.productItems || this.items;
+        items.forEach(item => {
             // Get display color (prefer Color, fall back to ColorCode)
             const displayColor = item.Color || item.ColorCode || 'Unknown';
 
@@ -2128,8 +2179,8 @@ class QuoteViewPage {
                              || row.sizes['OSFA'] || row.sizes['S/M'] || row.sizes['M/L'] || row.sizes['L/XL']
                              || row.sizes['ONE SIZE'] || row.sizes['ADJ'] || '';
 
-                // Truncate description to fit (increased from 18 to 22 chars for long names like "Richardson Trucker Cap")
-                const truncDesc = (row.description || '').substring(0, 22);
+                // Truncate description to fit (increased to 28 chars for long names like "Carhartt Rain Defender Paxt...")
+                const truncDesc = (row.description || '').substring(0, 28);
                 const styleDesc = `${row.style} - ${truncDesc}`;
 
                 pdf.setFontSize(7);
@@ -2140,8 +2191,8 @@ class QuoteViewPage {
                     pdf.setTextColor(180, 83, 9); // Orange for extended
                 }
 
-                // Combined style/description column (increased from 28 to 32 chars)
-                pdf.text(styleDesc.substring(0, 32), colX.styleDesc + 2, yPos);
+                // Combined style/description column (increased to 42 chars — fits ~58mm at font 7)
+                pdf.text(styleDesc.substring(0, 42), colX.styleDesc + 2, yPos);
                 pdf.setFont('helvetica', 'normal');
                 pdf.setTextColor(51, 51, 51);
                 // Color column (increased from 10 to 16 chars for combos like "White/Charcoal")
@@ -2166,6 +2217,9 @@ class QuoteViewPage {
                 yPos += 6;
             });
         });
+
+        // Customer-supplied items (DECG/DECC)
+        yPos = this.renderPdfCustomerSuppliedRows(pdf, yPos, colX);
 
         // Fee line items (Additional Stitches, AL charges, Digitizing)
         yPos = this.renderPdfFeeRows(pdf, yPos, colX);
@@ -2209,6 +2263,57 @@ class QuoteViewPage {
 
         pdf.setTextColor(76, 179, 84);
         pdf.text(`Northwest Custom Apparel | (253) 922-5793 | nwcustomapparel.com`, pageWidth / 2, footerY + 10, { align: 'center' });
+    }
+
+    /**
+     * Render customer-supplied items (DECG/DECC) in PDF
+     * @returns {number} Updated yPos after rendering rows
+     */
+    renderPdfCustomerSuppliedRows(pdf, yPos, colX) {
+        if (!this.customerSuppliedItems || this.customerSuppliedItems.length === 0) {
+            return yPos;
+        }
+
+        const pageWidth = 215.9;
+        const margin = 10;
+
+        this.customerSuppliedItems.forEach(item => {
+            if (yPos > 250) {
+                pdf.addPage();
+                yPos = 20;
+            }
+
+            const styleNumber = item.StyleNumber || 'DECG';
+            const description = item.ProductName || 'Customer-Supplied Item';
+            const qty = parseInt(item.Quantity) || 0;
+            const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
+            const lineTotal = item.LineTotal || (qty * unitPrice);
+
+            // Light background for service rows
+            pdf.setFillColor(255, 251, 235);
+            pdf.rect(margin, yPos - 3.5, pageWidth - margin * 2, 6, 'F');
+
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(146, 64, 14);
+            pdf.text(styleNumber, colX.style, yPos);
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(51, 51, 51);
+            pdf.text(description, colX.color, yPos);
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(String(qty), colX.qty + 4, yPos);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(this.formatCurrency(unitPrice), colX.price, yPos);
+            pdf.setTextColor(76, 179, 84);
+            pdf.text(this.formatCurrency(lineTotal), colX.total, yPos);
+            pdf.setTextColor(51, 51, 51);
+
+            yPos += 6;
+        });
+
+        return yPos;
     }
 
     /**

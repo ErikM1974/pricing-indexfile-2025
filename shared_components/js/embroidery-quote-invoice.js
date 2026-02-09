@@ -1119,6 +1119,10 @@ class EmbroideryInvoiceGenerator {
      */
     generateSizeMatrixTable(pricingData) {
         if (!pricingData.products || pricingData.products.length === 0) {
+            // Check for DECG/DECC customer-supplied items before showing "No products"
+            if ((pricingData.decgQty > 0) || (pricingData.deccQty > 0)) {
+                return this.generateCustomerSuppliedTable(pricingData);
+            }
             return '<div style="color: #666; font-style: italic;">No products added</div>';
         }
 
@@ -1292,6 +1296,78 @@ class EmbroideryInvoiceGenerator {
                     <td colspan="6"></td>
                     <td class="qty-cell" style="text-align: center;"><strong>${grandTotalQty}</strong></td>
                     <td class="unit-cell" style="text-align: right;"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
+                </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        return tableHTML;
+    }
+
+    /**
+     * Generate table for DECG/DECC customer-supplied items (no SanMar products)
+     * Used when a quote has only customer-supplied garments/caps
+     */
+    generateCustomerSuppliedTable(pricingData) {
+        let grandTotalQty = 0;
+        let grandTotalAmount = 0;
+
+        let tableHTML = `
+            <div style="margin: 15px 0;">
+                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                    Products
+                </div>
+                <table class="size-matrix">
+                    <thead>
+                        <tr>
+                            <th class="part-col" style="width: 80px;">Part #</th>
+                            <th style="width: 300px;">Description</th>
+                            <th style="width: 60px; text-align: center;">Qty</th>
+                            <th style="width: 80px; text-align: right;">Unit Price</th>
+                            <th style="width: 80px; text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // DECG row
+        if (pricingData.decgQty > 0) {
+            grandTotalQty += pricingData.decgQty;
+            grandTotalAmount += pricingData.decgTotal;
+            tableHTML += `
+                <tr class="product-row">
+                    <td class="part-cell" style="font-weight: 600;">DECG</td>
+                    <td>Customer-Supplied Garments — Embroidery</td>
+                    <td style="text-align: center;">${pricingData.decgQty}</td>
+                    <td style="text-align: right;">$${pricingData.decgUnit.toFixed(2)}</td>
+                    <td style="text-align: right;">$${pricingData.decgTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        }
+
+        // DECC row
+        if (pricingData.deccQty > 0) {
+            grandTotalQty += pricingData.deccQty;
+            grandTotalAmount += pricingData.deccTotal;
+            tableHTML += `
+                <tr class="product-row">
+                    <td class="part-cell" style="font-weight: 600;">DECC</td>
+                    <td>Customer-Supplied Caps — Embroidery</td>
+                    <td style="text-align: center;">${pricingData.deccQty}</td>
+                    <td style="text-align: right;">$${pricingData.deccUnit.toFixed(2)}</td>
+                    <td style="text-align: right;">$${pricingData.deccTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        }
+
+        // Totals row
+        tableHTML += `
+                <tr class="totals-row">
+                    <td colspan="2" style="text-align: right; padding-right: 10px;"><strong>TOTAL:</strong></td>
+                    <td style="text-align: center;"><strong>${grandTotalQty}</strong></td>
+                    <td></td>
+                    <td style="text-align: right;"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
                 </tr>
                     </tbody>
                 </table>
