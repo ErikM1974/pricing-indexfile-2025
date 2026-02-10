@@ -107,7 +107,8 @@
       "Bash(claude config:*)",
       "Bash(printenv:*)",
       "Bash(powershell -File -:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(for f in shared_components/js/embroidery-*.js)"
     ],
     "deny": [],
     "ask": [],

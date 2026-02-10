@@ -31,6 +31,22 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Change: Stitch Surcharges Switched from Linear to Flat Tiers
+**Date:** 2026-02-10
+**Project:** [Pricing Index] + [caspio-proxy]
+**Problem:** Additional stitch fees (AS-GARM/AS-CAP) used a linear per-1K rate formula: `(stitchCount - 8000) / 1000 × $1.25` for garments, `$1.00` for caps. This produced inconsistent prices (e.g., 12K stitches = $5.00, 18K = $12.50) that didn't match business intent.
+**Root Cause:** The pricing model was inherited from the original linear rate system. Business actually wanted simple flat tier pricing: $4 for Mid (10K-15K), $10 for Large (15K-25K).
+**Solution:**
+1. Added `stitchSurchargeTiers` array and `getStitchSurcharge(stitchCount)` method to `embroidery-quote-pricing.js` — returns flat $0/$4/$10
+2. Replaced 3 linear calculation sites (garment primary, cap per-product, cap total) with flat tier lookup
+3. Added 4 new rows to Caspio `Embroidery_Costs` table: `AS-Garm`/`AS-Cap` × `StitchCount=10000` ($4) and `15000` ($10), `TierLabel='ALL'`
+4. Added `'AS-Garm', 'AS-Cap'` to `allowedItemTypes` in `caspio-pricing-proxy/src/routes/pricing.js:109`
+5. Created "Additional Stitch Charges" tab on embroidery pricing calculator page with tier cards, customer surcharge list (107 designs), and Full Back table
+**Prevention:** AL and Full Back stitch costs still use linear per-1K rates — do NOT change those. Only primary logo stitch surcharges use flat tiers.
+**Files:** `shared_components/js/embroidery-quote-pricing.js` (pricing engine), `caspio-pricing-proxy/src/routes/pricing.js` (API), `calculators/embroidery-pricing-all/` (staff reference tab)
+
+---
+
 ## Pattern: Retry Wrapper for POST/PUT API Calls — `_fetchWithRetry()`
 **Date:** 2026-02-10
 **Project:** [Pricing Index]

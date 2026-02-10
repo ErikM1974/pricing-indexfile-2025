@@ -613,7 +613,7 @@ Available sizes: 70+ waist/inseam combinations
   - Automatic cap detection via `CATEGORY_NAME` from API (primary)
   - Pattern matching fallback: `/^C[P0-9]/`, `/^NE/`, `/^\d{2,3}$/`, title keywords
   - Separate pricing tiers for caps vs garments (don't combine for discounts)
-  - Different stitch rates: Caps $1.00/1K vs Garments $1.25/1K
+  - Flat tier stitch surcharges: 0-10K=$0, 10K-15K=$4/piece, 15K-25K=$10/piece (same for caps and garments)
   - Different rounding: Caps HalfDollarUp vs Garments CeilDollar
   - Different AL base: Cap AL 5K base vs Garment AL 8K base
   - Separate LTM fees per product type
@@ -635,9 +635,9 @@ Available sizes: 70+ waist/inseam combinations
 
 | Factor | Garments (EMB) | Caps (CAP) |
 |--------|----------------|------------|
-| **Primary Stitch Rate** | $1.25/1K over 8K | $1.00/1K over 8K |
+| **Primary Stitch Surcharge** | Flat tiers: 0-10K=$0, 10K-15K=$4, 15K-25K=$10 | Same flat tiers |
 | **AL Base Stitches** | 8,000 | **5,000** |
-| **AL Stitch Rate** | $1.25/1K | $1.00/1K |
+| **AL Stitch Rate** | $1.25/1K (linear, unchanged) | $1.00/1K (linear, unchanged) |
 | **Rounding Method** | CeilDollar | HalfDollarUp |
 | **Tier Calculation** | Based on garment qty only | Based on cap qty only |
 | **LTM Fee** | $50 when qty <= 7 | $50 when qty <= 7 (separate) |
@@ -723,8 +723,8 @@ Fee and charge items are now saved as `quote_items` rows with `EmbellishmentType
 
 | Fee | Part Number | Source Field | Qty Logic |
 |-----|------------|--------------|-----------|
-| Extra stitches (garment) | AS-GARM | `sessionData.GarmentStitchCharge` | garmentQty |
-| Extra stitches (cap) | AS-CAP | `sessionData.CapStitchCharge` | capQty |
+| Extra stitches (garment) | AS-GARM | `sessionData.GarmentStitchCharge` | garmentQty | Flat: $4 (Mid 10K-15K) or $10 (Large 15K-25K) |
+| Extra stitches (cap) | AS-CAP | `sessionData.CapStitchCharge` | capQty | Flat: $4 (Mid 10K-15K) or $10 (Large 15K-25K) |
 | Digitizing (garment) | DD | `sessionData.GarmentDigitizing` | 1 |
 | Digitizing (cap) | DD | `sessionData.CapDigitizing` | 1 |
 | Art/Setup | GRT-50 | `sessionData.ArtCharge` | 1 |
