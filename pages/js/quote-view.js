@@ -183,6 +183,9 @@ class QuoteViewPage {
         // Items - render as product cards with size matrix (async for image fetching)
         await this.renderItems();
 
+        // Special notes (plain text from embroidery imports, etc.)
+        this.renderNotes();
+
         // Totals with tax
         this.renderTotals();
 
@@ -351,6 +354,25 @@ class QuoteViewPage {
         } else {
             specsContainer.innerHTML = html;
         }
+    }
+
+    /**
+     * Render special notes section for plain-text notes (embroidery imports, etc.)
+     * JSON notes (DTG/DTF/SP location config) are skipped — those are handled by renderDTFSpecs/renderScreenPrintSpecs.
+     */
+    renderNotes() {
+        const rawNotes = this.quoteData?.Notes;
+        if (!rawNotes) return;
+
+        // Skip if Notes is valid JSON (structured config for DTG/DTF/SP)
+        try { JSON.parse(rawNotes); return; } catch (e) { /* plain text — render it */ }
+
+        const section = document.getElementById('special-notes-section');
+        const content = document.getElementById('special-notes-content');
+        if (!section || !content) return;
+
+        content.textContent = rawNotes;
+        section.style.display = 'block';
     }
 
     /**
@@ -2252,6 +2274,29 @@ class QuoteViewPage {
         pdf.text('TOTAL:', margin + 120, yPos);
         pdf.setTextColor(76, 179, 84);
         pdf.text(this.formatCurrency(totalWithTax), margin + 155, yPos);
+        yPos += 10;
+
+        // Special Notes (plain text only — skip JSON config notes)
+        const rawNotes = this.quoteData?.Notes;
+        if (rawNotes) {
+            let isJson = false;
+            try { JSON.parse(rawNotes); isJson = true; } catch (e) { /* plain text */ }
+            if (!isJson) {
+                if (yPos > 240) { pdf.addPage(); yPos = 20; }
+                pdf.setFillColor(255, 249, 196);
+                const noteLines = pdf.splitTextToSize(rawNotes, pageWidth - margin * 2 - 10);
+                const boxHeight = Math.min(noteLines.length * 4 + 12, 40);
+                pdf.rect(margin, yPos - 2, pageWidth - margin * 2, boxHeight, 'F');
+                pdf.setFontSize(8);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(146, 64, 14);
+                pdf.text('Special Notes', margin + 4, yPos + 4);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(120, 53, 15);
+                pdf.text(noteLines, margin + 4, yPos + 9);
+                yPos += boxHeight + 4;
+            }
+        }
 
         // Footer
         const footerY = 265;

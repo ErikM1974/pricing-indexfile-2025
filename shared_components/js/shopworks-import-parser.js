@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.10.0 - Priced no-part-number items → customProducts (not comments); added -G suffix and 115 patterns
- * @date 2026-02-09
+ * @version 1.11.0 - Invalid items → reviewItems[] for user review in preview modal
+ * @date 2026-02-10
  */
 
 class ShopWorksImportParser {
@@ -140,16 +140,13 @@ class ShopWorksImportParser {
             /^MCK\d{5}/,      // Cutter & Buck
             /^MQK\d{5}/,      // Unknown vendor polos
             /^470CB$/,        // Specific cap
-            /^PTS\d+$/,       // Richardson fitted caps
-            /^110$/,          // Richardson R-Flex
-            /^112P$/,         // Richardson Printed
-            /^511$/,          // Acrylic-Wool cap
+            /^PTS\d+$/,       // Richardson fitted caps (NOT in SanMar)
+            /^110$/,          // Richardson R-Flex (NOT in SanMar)
             /^J26\d{3}$/,     // Safety jackets
             /^7007$/,         // Safety vest
             /^8001$/,         // Safety bomber
             /^STK-/,          // Stickers (non-apparel)
             /^\d+-G$/,        // Promotional products with -G suffix (Owala, BlenderBottle)
-            /^115$/           // Richardson Low Pro Trucker 115
         ];
 
         this.CAP_DISCOUNT = 0.20;           // -20% for caps (loaded from API if available)
@@ -450,6 +447,7 @@ class ShopWorksImportParser {
             },
             notes: [],              // Comment rows
             warnings: [],           // Import warnings
+            reviewItems: [],        // Invalid/skipped items with data for user review
             rawItems: [],           // All parsed items for debugging
             pricingSource: this.serviceCodesLoaded ? 'caspio' : 'fallback'
         };
@@ -920,8 +918,16 @@ class ShopWorksImportParser {
                 break;
 
             case 'invalid':
-                // Invalid/skipped items - add to warnings
+                // Invalid/skipped items - add to warnings AND reviewItems for user review
                 result.warnings.push(`Skipped invalid item: ${item.partNumber}`);
+                result.reviewItems.push({
+                    partNumber: item.partNumber,
+                    description: item.description,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice || 0,
+                    lineTotal: (item.unitPrice || 0) * (item.quantity || 0),
+                    source: 'invalid'
+                });
                 break;
 
             case 'comment':
@@ -1354,9 +1360,12 @@ class ShopWorksImportParser {
         const groups = {};
 
         for (const product of products) {
-            // Key: cleaned partNumber + color (lowercase for consistency)
+            // Key: cleaned partNumber + color + unitPrice (lowercase for consistency)
+            // Include unitPrice so size variants with different prices don't merge
+            // (e.g., CT105292 $61 standard vs CT105292_2X $63 after cleanPartNumber strips _2X)
             const colorKey = (product.color || '').toLowerCase().trim();
-            const key = `${product.partNumber}|${colorKey}`;
+            const priceKey = product.unitPrice || 0;
+            const key = `${product.partNumber}|${colorKey}|${priceKey}`;
 
             if (!groups[key]) {
                 // First occurrence - clone the product
@@ -1442,4 +1451,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.10.0 - Priced no-PN items → customProducts; -G suffix + 115 patterns');
+console.log('[ShopWorksImportParser] Module loaded v1.11.0 - Invalid items → reviewItems[] for user review');

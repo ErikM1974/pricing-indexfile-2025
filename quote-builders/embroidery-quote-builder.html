@@ -718,6 +718,19 @@
                             </select>
                         </div>
                     </div>
+                    <!-- Special Notes (collapsible) -->
+                    <div class="notes-section collapsed" id="notes-section">
+                        <div class="notes-header" onclick="toggleNotesSection()">
+                            <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
+                                <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
+                                <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
+                                <i class="fas fa-chevron-down notes-toggle-icon" style="margin-left: auto; font-size: 10px; transition: transform 0.2s;"></i>
+                            </label>
+                        </div>
+                        <div class="notes-body" style="display: none;">
+                            <textarea id="notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
+                        </div>
+                    </div>
                     <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
@@ -1463,6 +1476,31 @@ Company:Absher Construction Company
             if (card) card.classList.toggle('collapsed');
         }
 
+        // Toggle notes section collapse/expand
+        function toggleNotesSection() {
+            const section = document.getElementById('notes-section');
+            if (!section) return;
+            const isCollapsed = section.classList.toggle('collapsed');
+            const body = section.querySelector('.notes-body');
+            const icon = section.querySelector('.notes-toggle-icon');
+            if (body) body.style.display = isCollapsed ? 'none' : 'block';
+            if (icon) icon.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+        }
+
+        // Update notes badge count
+        function updateNotesBadge() {
+            const notesEl = document.getElementById('notes');
+            const badge = document.getElementById('notes-badge');
+            if (!notesEl || !badge) return;
+            const lines = notesEl.value.trim().split('\n').filter(l => l.trim()).length;
+            if (lines > 0) {
+                badge.textContent = lines;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
         // NEW: Toggle function for modernized digitizing checkbox
         function toggleDigitizingCheckbox(element, checkboxId) {
             const checkbox = document.getElementById(checkboxId);
@@ -2153,6 +2191,7 @@ Company:Absher Construction Company
                 customerEmail: document.getElementById('customer-email')?.value || '',
                 companyName: document.getElementById('company-name')?.value || '',
                 salesRep: document.getElementById('sales-rep')?.value || '',
+                notes: document.getElementById('notes')?.value || '',
                 timestamp: Date.now()
             };
         }
@@ -2176,6 +2215,22 @@ Company:Absher Construction Company
             if (draft.salesRep) {
                 const salesRepEl = document.getElementById('sales-rep');
                 if (salesRepEl) salesRepEl.value = draft.salesRep;
+            }
+            if (draft.notes) {
+                const notesEl = document.getElementById('notes');
+                if (notesEl) {
+                    notesEl.value = draft.notes;
+                    // Show the notes section
+                    const section = document.getElementById('notes-section');
+                    if (section && section.classList.contains('collapsed')) {
+                        section.classList.remove('collapsed');
+                        const body = section.querySelector('.notes-body');
+                        const icon = section.querySelector('.notes-toggle-icon');
+                        if (body) body.style.display = 'block';
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    }
+                    updateNotesBadge();
+                }
             }
 
             // Restore primary logo configuration
@@ -2412,6 +2467,28 @@ Company:Absher Construction Company
                     if (salesRepSelect.options[i].value === session.SalesRepEmail) {
                         salesRepSelect.selectedIndex = i;
                         break;
+                    }
+                }
+            }
+
+            // Restore notes (plain text — not JSON)
+            if (session.Notes) {
+                let notesText = session.Notes;
+                // If Notes is JSON (DTG/DTF/SP), skip — those are structured config, not user notes
+                try { JSON.parse(notesText); notesText = ''; } catch (e) { /* plain text — use as-is */ }
+                if (notesText) {
+                    const notesEl = document.getElementById('notes');
+                    if (notesEl) {
+                        notesEl.value = notesText;
+                        const section = document.getElementById('notes-section');
+                        if (section && section.classList.contains('collapsed')) {
+                            section.classList.remove('collapsed');
+                            const body = section.querySelector('.notes-body');
+                            const icon = section.querySelector('.notes-toggle-icon');
+                            if (body) body.style.display = 'block';
+                            if (icon) icon.style.transform = 'rotate(180deg)';
+                        }
+                        updateNotesBadge();
                     }
                 }
             }
@@ -2807,6 +2884,12 @@ Company:Absher Construction Company
                         document.getElementById('company-name').value = '';
                     }
                 });
+            }
+
+            // Notes textarea badge update on input
+            const notesTextarea = document.getElementById('notes');
+            if (notesTextarea) {
+                notesTextarea.addEventListener('input', updateNotesBadge);
             }
 
             // Setup unsaved changes tracking for form fields (UX improvement)
@@ -4620,7 +4703,7 @@ Company:Absher Construction Company
         /**
          * Select a color from the dropdown
          */
-        function selectColor(rowId, optionEl) {
+        function selectColor(rowId, optionEl, skipDuplicateCheck) {
             const row = document.getElementById(`row-${rowId}`);
             const colorName = optionEl.dataset.colorName;
             const catalogColor = optionEl.dataset.catalogColor;
@@ -4629,14 +4712,16 @@ Company:Absher Construction Company
             const imageUrl = optionEl.dataset.imageUrl;
             const style = row.dataset.style;
 
-            // Check for duplicate row (same style + color)
-            const existingRow = findExistingRow(style, catalogColor, rowId);
-            if (existingRow) {
-                showToast(`${style} in ${colorName} already exists. Adding to existing row.`, 'info');
-                row.querySelector('.color-picker-dropdown').classList.add('hidden');
-                const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
-                if (existingFirstSize) existingFirstSize.focus();
-                return;
+            // Check for duplicate row (same style + color) — skip during import where same style+color at different prices is legitimate
+            if (!skipDuplicateCheck) {
+                const existingRow = findExistingRow(style, catalogColor, rowId);
+                if (existingRow) {
+                    showToast(`${style} in ${colorName} already exists. Adding to existing row.`, 'info');
+                    row.querySelector('.color-picker-dropdown').classList.add('hidden');
+                    const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
+                    if (existingFirstSize) existingFirstSize.focus();
+                    return;
+                }
             }
 
             // Update selected display with swatch and full color name
@@ -5881,7 +5966,10 @@ Company:Absher Construction Company
                 const parentColor = row.dataset.color;
                 const parentCatalogColor = row.dataset.catalogColor || '';
 
-                if (!style || !parentColor) return;
+                if (!style || !parentColor) {
+                    console.warn(`[collectProducts] Skipping row ${rowId}: style="${style || ''}", color="${parentColor || ''}"`, row.dataset.importData || '');
+                    return;
+                }
 
                 // Group sizes by color - different colors become separate products
                 const colorGroups = {};
@@ -6458,7 +6546,7 @@ Company:Absher Construction Company
                     company: document.getElementById('company-name')?.value?.trim() || '',
                     salesRepEmail: salesRepEmail,
                     salesRepName: salesRepName,
-                    notes: '',
+                    notes: document.getElementById('notes')?.value?.trim() || '',
                     // Additional charges (2026-01-14)
                     artCharge: additionalCharges.artCharge,
                     graphicDesignHours: additionalCharges.graphicDesignHours,
@@ -6779,6 +6867,19 @@ Company:Absher Construction Company
             document.getElementById('customer-email').value = '';
             document.getElementById('company-name').value = '';
             document.getElementById('customer-lookup').value = '';
+
+            // Reset notes
+            const notesEl = document.getElementById('notes');
+            if (notesEl) notesEl.value = '';
+            const notesSection = document.getElementById('notes-section');
+            if (notesSection) {
+                notesSection.classList.add('collapsed');
+                const notesBody = notesSection.querySelector('.notes-body');
+                const notesIcon = notesSection.querySelector('.notes-toggle-icon');
+                if (notesBody) notesBody.style.display = 'none';
+                if (notesIcon) notesIcon.style.transform = '';
+            }
+            updateNotesBadge();
 
             // Reset additional charges
             document.getElementById('rush-fee').value = '';
@@ -8131,6 +8232,52 @@ Company:Absher Construction Company
                 warnings.style.display = 'none';
             }
 
+            // Build combined review list from multiple sources (invalid items, AS-GARM/CAP, LTM)
+            const allReviewItems = [...(data.reviewItems || [])];
+
+            // Add AS-GARM/AS-CAP stitch fees
+            if (data.services.additionalStitches && data.services.additionalStitches.length > 0) {
+                data.services.additionalStitches.forEach(s => {
+                    allReviewItems.push({
+                        partNumber: s.type === 'cap' ? 'AS-CAP' : 'AS-GARM',
+                        description: s.description || 'Additional Stitches',
+                        quantity: s.quantity,
+                        unitPrice: s.unitPrice || 0,
+                        source: 'additional-stitches'
+                    });
+                });
+            }
+
+            // Add LTM fee
+            if (data.services.ltmFee) {
+                allReviewItems.push({
+                    partNumber: 'LTM',
+                    description: 'Less Than Minimum Fee',
+                    quantity: 1,
+                    unitPrice: data.services.ltmFee.amount || 0,
+                    source: 'ltm'
+                });
+            }
+
+            // Show "Items for Review" section with checkboxes
+            if (allReviewItems.length > 0) {
+                let reviewHtml = '<h5 style="margin-top: 12px; color: #b45309;"><i class="fas fa-search"></i> Items for Review — Check to Import as Notes</h5>';
+                reviewHtml += '<div style="max-height: 150px; overflow-y: auto; padding: 4px 0;">';
+                allReviewItems.forEach((item, i) => {
+                    const hasPrice = item.unitPrice > 0;
+                    reviewHtml += `<label style="display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; cursor: pointer;">
+                        <input type="checkbox" class="review-item-check" data-index="${i}" ${hasPrice ? 'checked' : ''}>
+                        <span><strong>${escapeHtml(item.partNumber || '(no PN)')}</strong>: ${escapeHtml(item.description || '')}${hasPrice ? ' — $' + item.unitPrice.toFixed(2) + '/ea × ' + (item.quantity || 1) : ''}</span>
+                    </label>`;
+                });
+                reviewHtml += '</div>';
+                warnings.innerHTML = (warnings.innerHTML || '') + reviewHtml;
+                warnings.style.display = '';
+            }
+
+            // Store combined list on data object for import step
+            data._allReviewItems = allReviewItems;
+
             preview.classList.add('active');
         }
 
@@ -8247,6 +8394,15 @@ Company:Absher Construction Company
                         artInput.disabled = false;
                         artInput.value = data.services.artCharges.amount.toFixed(2);
                         updateArtworkCharges();
+                    }
+                }
+
+                // 6b. Rush fee → fee table input
+                if (data.services.rush) {
+                    const rushInput = document.getElementById('rush-fee');
+                    if (rushInput) {
+                        rushInput.value = data.services.rush.amount.toFixed(2);
+                        rushInput.dispatchEvent(new Event('input'));
                     }
                 }
 
@@ -8413,12 +8569,17 @@ Company:Absher Construction Company
 
                 // 11. Import products (deferred from step 8)
                 let productsImported = 0;
-                for (const prodResult of productResults) {
+                for (let i = 0; i < productResults.length; i++) {
+                    const prodResult = productResults[i];
                     try {
                         await importProductRow(prodResult._importData, prodResult.overridePrice || 0);
                         productsImported++;
                     } catch (err) {
                         console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
+                    }
+                    // Small delay between imports to reduce API rate limiting
+                    if (i < productResults.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 150));
                     }
                 }
 
@@ -8512,16 +8673,8 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 13. Handle LTM fee
-                if (data.services.ltmFee) {
-                    const additionalChargesInput = document.getElementById('additional-charges');
-                    if (additionalChargesInput) {
-                        const existing = additionalChargesInput.value.trim();
-                        const newEntry = `Less Than Minimum Fee: $${data.services.ltmFee.amount.toFixed(2)}`;
-                        additionalChargesInput.value = existing ? existing + '\n' + newEntry : newEntry;
-                        updateAdditionalCharges();
-                    }
-                }
+                // 13. LTM fee handled via review items (preview checkboxes → notes)
+                // Previously targeted non-existent #additional-charges element
 
                 // 14. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
                 let customProductsImported = 0;
@@ -8537,9 +8690,112 @@ Company:Absher Construction Company
                 // Hide variant-only parents (products with no standard sizes, only extended children)
                 hideVariantOnlyParents();
 
+                // 15. Populate notes from import (employee names, warnings, etc.)
+                if (data.notes && data.notes.length > 0) {
+                    const notesEl = document.getElementById('notes');
+                    if (notesEl) {
+                        const importNotes = '--- ShopWorks Import Notes ---\n' + data.notes.join('\n');
+                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + importNotes;
+                    }
+                }
+
+                // 16. Capture sewing service items (SEG) into notes — no dedicated UI for these
+                if (data.services.sewing && data.services.sewing.length > 0) {
+                    const notesEl = document.getElementById('notes');
+                    if (notesEl) {
+                        const sewingNotes = data.services.sewing.map(s =>
+                            `SEG: ${s.description} — Qty: ${s.quantity}, $${s.unitPrice.toFixed(2)}/ea`
+                        ).join('\n');
+                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                            '--- Sewing Services ---\n' + sewingNotes;
+                    }
+                }
+
+                // 17. Import checked review items as notes (invalid items, AS-GARM/CAP, LTM)
+                if (data._allReviewItems && data._allReviewItems.length > 0) {
+                    const checkedItems = [];
+                    document.querySelectorAll('.review-item-check:checked').forEach(cb => {
+                        const idx = parseInt(cb.dataset.index);
+                        if (data._allReviewItems[idx]) checkedItems.push(data._allReviewItems[idx]);
+                    });
+                    if (checkedItems.length > 0) {
+                        const notesEl = document.getElementById('notes');
+                        if (notesEl) {
+                            const reviewNotes = checkedItems.map(item => {
+                                const priceStr = item.unitPrice > 0
+                                    ? ` — $${item.unitPrice.toFixed(2)}/ea × ${item.quantity || 1}`
+                                    : '';
+                                return `${item.partNumber || '(no PN)'}: ${item.description || ''}${priceStr}`;
+                            }).join('\n');
+                            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                                '--- Imported Review Items ---\n' + reviewNotes;
+                        }
+                    }
+                }
+
+                // 18. Catch-all: dump any unprocessed service data into notes
+                const handledServiceKeys = [
+                    'digitizing', 'digitizingCodes', 'digitizingCount',
+                    'patchSetup', 'additionalLogo', 'additionalLogos',
+                    'artCharges', 'graphicDesign', 'monograms',
+                    'rush', 'ltmFee', 'sewing', 'additionalStitches'
+                ];
+                const unhandled = Object.entries(data.services || {})
+                    .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
+                    .filter(([key, val]) => {
+                        if (Array.isArray(val) && val.length === 0) return false;
+                        if (val === false) return false;
+                        if (typeof val === 'number' && val === 0) return false;
+                        return true;
+                    });
+                if (unhandled.length > 0) {
+                    const notesEl = document.getElementById('notes');
+                    if (notesEl) {
+                        const lines = unhandled.map(([key, val]) => {
+                            if (Array.isArray(val)) {
+                                return val.map(item =>
+                                    `${key.toUpperCase()}: ${item.description || item.partNumber || ''} — Qty: ${item.quantity || ''}, $${(item.unitPrice || 0).toFixed(2)}/ea`
+                                ).join('\n');
+                            }
+                            if (typeof val === 'object' && val.amount !== undefined) {
+                                return `${key.toUpperCase()}: $${val.amount.toFixed(2)}${val.description ? ' — ' + val.description : ''}`;
+                            }
+                            return `${key.toUpperCase()}: ${JSON.stringify(val)}`;
+                        }).join('\n');
+                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                            '--- Unrecognized Services ---\n' + lines;
+                    }
+                }
+
+                // Auto-show notes section if any notes were written (import notes, AL positions, monogram names, DECG stitch counts, sewing)
+                const finalNotesEl = document.getElementById('notes');
+                if (finalNotesEl && finalNotesEl.value.trim()) {
+                    const section = document.getElementById('notes-section');
+                    if (section && section.classList.contains('collapsed')) {
+                        section.classList.remove('collapsed');
+                        const body = section.querySelector('.notes-body');
+                        const icon = section.querySelector('.notes-toggle-icon');
+                        if (body) body.style.display = 'block';
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    }
+                    updateNotesBadge();
+                }
+
                 // Recalculate pricing
                 recalculatePricing();
                 markAsUnsaved();
+
+                // Post-import validation: detect silently dropped rows
+                const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
+                const productRows = document.querySelectorAll('#product-table-body tr[data-style]:not(.child-row)');
+                const validProducts = Array.from(productRows).filter(r =>
+                    r.dataset.color || r.dataset.nonSanmar === 'true'
+                ).length;
+                if (validProducts < expectedProducts) {
+                    const dropped = expectedProducts - validProducts;
+                    console.warn(`[ShopWorks Import] ${dropped} of ${expectedProducts} product rows may be incomplete (missing color). Check rows for issues.`);
+                    showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
+                }
 
                 // Close modal and show success
                 closeShopWorksImportModal();
@@ -8753,7 +9009,7 @@ Company:Absher Construction Company
                     }
 
                     if (colorOption) {
-                        selectColor(rowId, colorOption);
+                        selectColor(rowId, colorOption, true);
                         // Wait for detectAndAdjustSizeUI to complete
                         await new Promise(resolve => setTimeout(resolve, 300));
                         // Re-apply — selectColor() clears sellPrice for SanMar products (line 4668)
@@ -8761,7 +9017,7 @@ Company:Absher Construction Company
                             row.dataset.sellPrice = sellPriceOverride.toString();
                         }
                     } else {
-                        console.warn(`[ShopWorks Import] Color "${product.color}" not found for ${product.partNumber}`);
+                        console.warn(`[ShopWorks Import] Color "${product.color}" not found for ${product.partNumber} — row may be excluded from quote output`);
                     }
                 }
             }

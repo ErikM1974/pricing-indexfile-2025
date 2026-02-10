@@ -359,6 +359,34 @@ body {
     font-style: italic;
 }
 
+/* Special Notes Section */
+.special-notes-section {
+    padding: 0 25px 15px;
+}
+
+.special-notes-card {
+    background: #fff9c4;
+    border-radius: 8px;
+    padding: 16px 20px;
+    border: 1px solid #f9e68c;
+}
+
+.special-notes-card h3 {
+    font-size: 0.95rem;
+    color: #92400e;
+    margin: 0 0 10px;
+}
+
+.special-notes-content {
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #78350f;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
 /* Quote Items (compact) */
 .quote-items {
     padding: 15px 25px;

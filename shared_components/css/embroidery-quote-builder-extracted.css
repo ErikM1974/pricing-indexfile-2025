@@ -2966,3 +2966,35 @@ td.size-disabled input {
         border: none;
     }
 }
+
+/* ============================================
+   NOTES SECTION (Special Notes / ShopWorks Import)
+   ============================================ */
+.notes-section {
+    margin-top: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.notes-header {
+    padding: 8px 10px;
+    background: #fefce8;
+    cursor: pointer;
+}
+
+.notes-header:hover {
+    background: #fef9c3;
+}
+
+.notes-badge {
+    background: #f59e0b;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
+    display: inline-block;
+}
