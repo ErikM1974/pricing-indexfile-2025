@@ -458,14 +458,14 @@
                     </div>
                     <div class="es-tier es-tier--mid">
                         <div class="es-tier-label">Mid</div>
-                        <div class="es-tier-range">10,001 – 15,000</div>
-                        <div class="es-tier-price">+$4</div>
+                        <div class="es-tier-range" id="es-mid-range">10,001 – 15,000</div>
+                        <div class="es-tier-price" id="es-mid-price">+$4</div>
                         <div class="es-tier-unit">per piece</div>
                     </div>
                     <div class="es-tier es-tier--large">
                         <div class="es-tier-label">Large</div>
-                        <div class="es-tier-range">15,001 – 25,000</div>
-                        <div class="es-tier-price">+$10</div>
+                        <div class="es-tier-range" id="es-large-range">15,001 – 25,000</div>
+                        <div class="es-tier-price" id="es-large-price">+$10</div>
                         <div class="es-tier-unit">per piece</div>
                     </div>
                 </div>
@@ -563,63 +563,8 @@
                                     <th>72+</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>25K</td>
-                                    <td>$30.00</td>
-                                    <td>$25.00</td>
-                                    <td>$22.50</td>
-                                    <td>$21.25</td>
-                                    <td>$20.00</td>
-                                </tr>
-                                <tr>
-                                    <td>30K</td>
-                                    <td>$36.00</td>
-                                    <td>$30.00</td>
-                                    <td>$27.00</td>
-                                    <td>$25.50</td>
-                                    <td>$24.00</td>
-                                </tr>
-                                <tr>
-                                    <td>35K</td>
-                                    <td>$42.00</td>
-                                    <td>$35.00</td>
-                                    <td>$31.50</td>
-                                    <td>$29.75</td>
-                                    <td>$28.00</td>
-                                </tr>
-                                <tr>
-                                    <td>40K</td>
-                                    <td>$48.00</td>
-                                    <td>$40.00</td>
-                                    <td>$36.00</td>
-                                    <td>$34.00</td>
-                                    <td>$32.00</td>
-                                </tr>
-                                <tr>
-                                    <td>45K</td>
-                                    <td>$54.00</td>
-                                    <td>$45.00</td>
-                                    <td>$40.50</td>
-                                    <td>$38.25</td>
-                                    <td>$36.00</td>
-                                </tr>
-                                <tr>
-                                    <td>50K</td>
-                                    <td>$60.00</td>
-                                    <td>$50.00</td>
-                                    <td>$45.00</td>
-                                    <td>$42.50</td>
-                                    <td>$40.00</td>
-                                </tr>
-                                <tr class="es-fb-rate-row">
-                                    <td>$ / 1K</td>
-                                    <td>$1.20</td>
-                                    <td>$1.00</td>
-                                    <td>$0.90</td>
-                                    <td>$0.85</td>
-                                    <td>$0.80</td>
-                                </tr>
+                            <tbody id="esFbTableBody">
+                                <!-- Populated by JS from CONTRACT_PRICING -->
                             </tbody>
                         </table>
                         <div class="es-fb-ltm">
@@ -641,37 +586,8 @@
                                     <th>Add to Quote</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>7,500</td>
-                                    <td><span class="es-tier-tag es-tier-tag--included">Standard</span></td>
-                                    <td>None</td>
-                                    <td class="es-price-cell">$0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>11,000</td>
-                                    <td><span class="es-tier-tag es-tier-tag--mid">Mid</span></td>
-                                    <td>AS-Garm or AS-CAP</td>
-                                    <td class="es-price-cell">+$4.00</td>
-                                </tr>
-                                <tr>
-                                    <td>14,500</td>
-                                    <td><span class="es-tier-tag es-tier-tag--mid">Mid</span></td>
-                                    <td>AS-Garm or AS-CAP</td>
-                                    <td class="es-price-cell">+$4.00</td>
-                                </tr>
-                                <tr>
-                                    <td>18,000</td>
-                                    <td><span class="es-tier-tag es-tier-tag--large">Large</span></td>
-                                    <td>AS-Garm or AS-CAP</td>
-                                    <td class="es-price-cell">+$10.00</td>
-                                </tr>
-                                <tr>
-                                    <td>30,000</td>
-                                    <td><span class="es-tier-tag" style="background:#f1f5f9;color:#0f172a;">Full Back</span></td>
-                                    <td>DECG-FB</td>
-                                    <td class="es-price-cell">See table &#9652;</td>
-                                </tr>
+                            <tbody id="esQuickRefBody">
+                                <!-- Populated by JS from STITCH_CHARGE_DATA -->
                             </tbody>
                         </table>
                     </div>

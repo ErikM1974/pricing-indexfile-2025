@@ -539,7 +539,7 @@ class EmbroideryQuoteService {
             const garmentQty = pricingResults.garmentQuantity || 0;
             const unitPrice = garmentQty > 0 ? parseFloat((sessionData.GarmentStitchCharge / garmentQty).toFixed(4)) : sessionData.GarmentStitchCharge;
             feeItems.push({
-                StyleNumber: 'AS-GARM',
+                StyleNumber: 'AS-Garm',
                 ProductName: 'Extra Stitches - Garments',
                 Quantity: garmentQty || 1,
                 BaseUnitPrice: unitPrice,
@@ -636,6 +636,36 @@ class EmbroideryQuoteService {
 
         // LTM fees are now baked into per-piece prices (2026-02-06)
         // No longer saved as separate fee line items
+
+        // 3D Puff upcharge (3D-EMB) — extracted from per-piece price as separate fee item
+        if (sessionData.CapEmbellishmentType === '3d-puff' && pricingResults.puffUpchargePerCap > 0) {
+            const capQty = pricingResults.capQuantity || 0;
+            if (capQty > 0) {
+                feeItems.push({
+                    StyleNumber: '3D-EMB',
+                    ProductName: '3D Puff Embroidery Upcharge',
+                    Quantity: capQty,
+                    BaseUnitPrice: pricingResults.puffUpchargePerCap,
+                    FinalUnitPrice: pricingResults.puffUpchargePerCap,
+                    LineTotal: parseFloat((pricingResults.puffUpchargePerCap * capQty).toFixed(2))
+                });
+            }
+        }
+
+        // Laser Patch upcharge (Laser Patch) — extracted from per-piece price as separate fee item
+        if (sessionData.CapEmbellishmentType === 'laser-patch' && pricingResults.patchUpchargePerCap > 0) {
+            const capQty = pricingResults.capQuantity || 0;
+            if (capQty > 0) {
+                feeItems.push({
+                    StyleNumber: 'Laser Patch',
+                    ProductName: 'Laser Leatherette Patch Upcharge',
+                    Quantity: capQty,
+                    BaseUnitPrice: pricingResults.patchUpchargePerCap,
+                    FinalUnitPrice: pricingResults.patchUpchargePerCap,
+                    LineTotal: parseFloat((pricingResults.patchUpchargePerCap * capQty).toFixed(2))
+                });
+            }
+        }
 
         // Discount (DISCOUNT) — stored as negative
         if (sessionData.Discount > 0) {

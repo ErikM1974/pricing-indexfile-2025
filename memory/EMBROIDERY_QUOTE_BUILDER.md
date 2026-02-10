@@ -227,6 +227,57 @@ Replaced standard `<select>` with custom dropdown showing:
 
 ---
 
+## ShopWorks Part Number Reference (2026-02-10)
+
+All 18 ShopWorks embroidery service part numbers and their mapping:
+
+| Service | Part Number | EmbellishmentType | Notes |
+|---------|-------------|-------------------|-------|
+| Garment decoration | `DECG` | `customer-supplied` | Primary garment logo |
+| Cap decoration | `DECC` | `customer-supplied` | Primary cap logo |
+| Garment AL | `AL` | `embroidery-additional` | No stitch suffix — always `AL` |
+| Cap AL (front) | `AL-CAP` | `embroidery-additional` | Position-aware since 2026-02-10 |
+| Cap Back | `CB` | `embroidery-additional` | Position-aware since 2026-02-10 |
+| Cap Side | `CS` | `embroidery-additional` | Was `CSD` before fix |
+| Full Back | `DECG-FB` | `embroidery-additional` | Was `FB-{stitchCount}` before fix |
+| Monogram | `Monogram` | `embroidery-additional` | Case-sensitive |
+| Extra stitches garment | `AS-Garm` | `fee` | Case-sensitive (not AS-GARM) |
+| Extra stitches cap | `AS-CAP` | `fee` | — |
+| Digitizing garment | `DD` | `fee` | Setup fee |
+| Digitizing cap | `GRT-50` | `fee` | $50 setup |
+| Editing | `GRT-75` | `fee` | $75 setup |
+| Rush | `RUSH` | `fee` | Rush surcharge |
+| Sample | `SAMPLE` | `fee` | Sample charge |
+| Discount | `DISCOUNT` | `fee` | Negative amount |
+| 3D Puff | `3D-EMB` | `fee` | Extracted from per-piece cap price |
+| Laser Patch | `Laser Patch` | `fee` | Extracted from per-piece cap price |
+
+### Position-Aware AL Logic (pricing engine)
+```javascript
+if (isCap) {
+    if (logo.position === 'Cap Back') partNumber = 'CB';
+    else if (logo.position === 'Cap Side') partNumber = 'CS';
+    else partNumber = 'AL-CAP';  // Cap front default
+} else {
+    partNumber = 'AL';  // All garment ALs
+}
+```
+
+### Backward Compatibility
+Legacy part numbers kept in `SERVICE_STYLE_NUMBERS` + `SERVICE_META`:
+- `FB` → matches old `FB-30000` via `startsWith('FB')`
+- `MONOGRAM` → old casing
+- `AS-GARM` → old casing
+
+### 3D Puff / Laser Patch Fee Extraction
+Before 2026-02-10, upcharges were baked into per-piece cap price. Now:
+- Per-piece cap price = garment cost + decoration cost only (no upcharge)
+- Upcharge saved as separate fee line item (`3D-EMB` or `Laser Patch`)
+- `grandTotal` includes `puffUpchargeTotal + patchUpchargeTotal`
+- UI: `cap-embellishment-fee-row` shows upcharge in charges panel
+
+---
+
 ## API Endpoints Used
 
 | Endpoint | Purpose |

@@ -156,8 +156,28 @@ class EmbroideryPricingCalculator {
                             this.tiers[cost.TierLabel].embCost = cost.EmbroideryCost;
                         }
                     });
-                    
-                    
+
+                    // Parse AS-Garm stitch surcharge tiers from API data
+                    // These replace the hardcoded $4/$10 flat tier surcharges
+                    // AS-Cap uses same tiers as AS-Garm (prices are identical as of Feb 2026)
+                    const asGarmRows = data.allEmbroideryCostsR
+                        .filter(c => c.ItemType === 'AS-Garm')
+                        .sort((a, b) => a.StitchCount - b.StitchCount);
+                    if (asGarmRows.length >= 2) {
+                        this.stitchSurchargeTiers = [
+                            { max: asGarmRows[0].StitchCount, fee: 0 },
+                            { max: asGarmRows[1].StitchCount, fee: asGarmRows[0].EmbroideryCost },
+                            { max: 25000, fee: asGarmRows[1].EmbroideryCost }
+                        ];
+                        // Expose for UI label updates
+                        this.stitchSurchargeData = {
+                            midFee: asGarmRows[0].EmbroideryCost,
+                            largeFee: asGarmRows[1].EmbroideryCost,
+                            midThreshold: asGarmRows[0].StitchCount,
+                            largeThreshold: asGarmRows[1].StitchCount
+                        };
+                    }
+
                     // Mark main pricing as successfully loaded
                     this.apiStatus.mainPricing = true;
                     this.apiStatus.configuration = true;
@@ -684,7 +704,7 @@ class EmbroideryPricingCalculator {
             // For embroidery: decorationCost = embCost, no upcharge
             // For 3D puff: decorationCost = embCost + puffUpcharge (flat $5 add-on)
             // For patch: decorationCost = embCost + patchUpcharge (flat $5 add-on, no stitches)
-            const baseDecoratedPrice = garmentCost + decorationCost + puffUpcharge + patchUpcharge;
+            const baseDecoratedPrice = garmentCost + decorationCost;
             const roundedBase = this.roundCapPrice(baseDecoratedPrice);  // Round the base FIRST
             // Step 2: Extra stitch fees shown as separate AS-CAP line item (NOT added to unit price)
             const finalPrice = roundedBase + upcharge;
@@ -1249,7 +1269,7 @@ class EmbroideryPricingCalculator {
             'Back Yoke': 'BY',
             'Cap Front': 'CF',
             'Cap Back': 'CB',
-            'Cap Side': 'CSD'
+            'Cap Side': 'CS'
         };
 
         return positionMap[position] || position.substring(0, 2).toUpperCase();
@@ -1520,7 +1540,7 @@ class EmbroideryPricingCalculator {
                                 const total = unitPrice * quantity;
 
 
-                                const partNumber = `FB-${fbStitchCount}`;
+                                const partNumber = 'DECG-FB';
 
                                 additionalServices.push({
                                     type: 'additional_logo',
@@ -1585,8 +1605,15 @@ class EmbroideryPricingCalculator {
                             const unitPrice = alTierCost + stitchCost;
                             const total = unitPrice * quantity;
 
-                            // Generate part number
-                            const partNumber = logo.stitchCount === 8000 ? 'AL' : `AL-${logo.stitchCount}`;
+                            // Generate part number — position-aware for caps
+                            let partNumber;
+                            if (isCap) {
+                                if (logo.position === 'Cap Back') partNumber = 'CB';
+                                else if (logo.position === 'Cap Side') partNumber = 'CS';
+                                else partNumber = 'AL-CAP';
+                            } else {
+                                partNumber = 'AL';  // No stitch suffix — ShopWorks just uses 'AL'
+                            }
                             
                             additionalServices.push({
                                 type: 'additional_logo',
@@ -1659,8 +1686,12 @@ class EmbroideryPricingCalculator {
         }
         const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
 
+        // Calculate cap embellishment upcharge totals (extracted from per-piece prices as separate fee items)
+        const puffUpchargeTotal = capEmbellishmentType === '3d-puff' ? this.puffUpchargePerCap * capQuantity : 0;
+        const patchUpchargeTotal = capEmbellishmentType === 'laser-patch' ? this.patchUpchargePerCap * capQuantity : 0;
+
         // Final totals - NOW includes additionalStitchTotal as a separate line item (not baked into product prices)
-        const grandTotal = subtotal + ltmTotal + setupFees + additionalStitchTotal + additionalServicesTotal;
+        const grandTotal = subtotal + ltmTotal + setupFees + additionalStitchTotal + additionalServicesTotal + puffUpchargeTotal + patchUpchargeTotal;
 
         return {
             products: productPricing,
@@ -1702,6 +1733,7 @@ class EmbroideryPricingCalculator {
             capEmbellishmentType: capEmbellishmentType,
             capPatchSetupFee: capPatchSetupFee,
             puffUpchargePerCap: capEmbellishmentType === '3d-puff' ? this.puffUpchargePerCap : 0,
+            patchUpchargePerCap: capEmbellishmentType === 'laser-patch' ? this.patchUpchargePerCap : 0,
             ltmDistributed: true  // LTM baked into per-piece prices (2026-02-06)
         };
     }

@@ -26,6 +26,7 @@ let CONTRACT_PRICING = null;
 let AL_RETAIL_PRICING = null;
 let DECG_RETAIL_PRICING = null;
 let CAP_UPGRADES = null;
+let STITCH_CHARGE_DATA = null;
 
 // Production rates for hourly revenue calculation (static - not in Caspio)
 const PRODUCTION_RATES = {
@@ -88,6 +89,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         buildDecgRetailCapsMatrix();
         buildDecgRetailFullBackMatrix();
 
+        // Build stitch-charges tab (API-driven)
+        updateStitchChargesTierCards();
+        buildStitchChargesFullBackTable();
+        buildStitchChargesQuickRefTable();
+
         // Build cap upgrades cards
         buildCapUpgradesCard('contractCapUpgrades');
         buildCapUpgradesCard('alRetailCapUpgrades');
@@ -129,6 +135,8 @@ async function loadAllPricingData() {
     AL_RETAIL_PRICING = alData;
     DECG_RETAIL_PRICING = decgData;
 
+    // Fetch AS-Garm stitch surcharge data for stitch-charges tab
+    await fetchStitchChargeData();
 }
 
 async function fetchContractPricing() {
@@ -720,6 +728,147 @@ function buildDecgRetailFullBackMatrix() {
         html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
     });
     html += '</tr>';
+
+    tbody.innerHTML = html;
+}
+
+// ============================================
+// STITCH CHARGES TAB (API-DRIVEN)
+// ============================================
+
+/**
+ * Fetch AS-Garm stitch surcharge tiers from Caspio via pricing-bundle
+ * Same data source as embroidery-quote-pricing.js uses (allEmbroideryCostsR)
+ */
+async function fetchStitchChargeData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/pricing-bundle?method=EMB`);
+        if (!response.ok) {
+            throw new Error(`EMB pricing-bundle API error: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (!data.allEmbroideryCostsR) return;
+
+        // Sort by StitchCount ascending (same logic as embroidery-quote-pricing.js lines 163-178)
+        const asGarmRows = data.allEmbroideryCostsR
+            .filter(c => c.ItemType === 'AS-Garm')
+            .sort((a, b) => a.StitchCount - b.StitchCount);
+
+        if (asGarmRows.length >= 2) {
+            STITCH_CHARGE_DATA = {
+                midFee: asGarmRows[0].EmbroideryCost,
+                largeFee: asGarmRows[1].EmbroideryCost,
+                midThreshold: asGarmRows[0].StitchCount,
+                largeThreshold: asGarmRows[1].StitchCount
+            };
+        }
+    } catch (error) {
+        console.error('Failed to fetch AS-Garm stitch charge data:', error);
+        // Fallback: leave STITCH_CHARGE_DATA null, HTML defaults stay visible
+    }
+}
+
+/**
+ * Update the 3 tier cards on the stitch-charges tab with API data
+ */
+function updateStitchChargesTierCards() {
+    if (!STITCH_CHARGE_DATA) return;
+
+    const midPriceEl = document.getElementById('es-mid-price');
+    const largePriceEl = document.getElementById('es-large-price');
+    const midRangeEl = document.getElementById('es-mid-range');
+    const largeRangeEl = document.getElementById('es-large-range');
+
+    if (midPriceEl) {
+        midPriceEl.textContent = `+$${STITCH_CHARGE_DATA.midFee}`;
+    }
+    if (largePriceEl) {
+        largePriceEl.textContent = `+$${STITCH_CHARGE_DATA.largeFee}`;
+    }
+    if (midRangeEl) {
+        const midStart = (10001).toLocaleString();
+        const midEnd = STITCH_CHARGE_DATA.largeThreshold.toLocaleString();
+        midRangeEl.textContent = `${midStart} – ${midEnd}`;
+    }
+    if (largeRangeEl) {
+        const largeStart = (STITCH_CHARGE_DATA.largeThreshold + 1).toLocaleString();
+        largeRangeEl.textContent = `${largeStart} – 25,000`;
+    }
+}
+
+/**
+ * Build the DECG-FB Full Back table on the stitch-charges tab from CONTRACT_PRICING
+ * Uses the same data as the contract/AL/DECG Full Back tables
+ */
+function buildStitchChargesFullBackTable() {
+    const tbody = document.getElementById('esFbTableBody');
+    if (!tbody) return;
+
+    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
+        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
+        return;
+    }
+
+    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
+    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
+    let html = '';
+
+    FB_STITCH_COUNTS.forEach(stitches => {
+        html += '<tr>';
+        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
+
+        TIER_ORDER.forEach(tier => {
+            const rate = rates[tier];
+            const stitchesK = stitches / 1000;
+            const price = Math.max(stitchesK * rate, minPrice);
+            html += `<td>${formatPrice(price)}</td>`;
+        });
+
+        html += '</tr>';
+    });
+
+    // Footer row with per-thousand rates
+    html += '<tr class="es-fb-rate-row">';
+    html += '<td>$ / 1K</td>';
+    TIER_ORDER.forEach(tier => {
+        const rate = rates[tier];
+        html += `<td>${formatPrice(rate)}</td>`;
+    });
+    html += '</tr>';
+
+    tbody.innerHTML = html;
+}
+
+/**
+ * Build the Quick Reference table on the stitch-charges tab from API data
+ */
+function buildStitchChargesQuickRefTable() {
+    const tbody = document.getElementById('esQuickRefBody');
+    if (!tbody) return;
+
+    // Use API-driven surcharge values if available, fallback to defaults
+    const midFee = STITCH_CHARGE_DATA ? STITCH_CHARGE_DATA.midFee : 4;
+    const largeFee = STITCH_CHARGE_DATA ? STITCH_CHARGE_DATA.largeFee : 10;
+
+    const rows = [
+        { stitches: '7,500', tier: 'Standard', tierClass: 'es-tier-tag--included', lineItem: 'None', price: '$0.00' },
+        { stitches: '11,000', tier: 'Mid', tierClass: 'es-tier-tag--mid', lineItem: 'AS-Garm or AS-CAP', price: `+$${midFee.toFixed(2)}` },
+        { stitches: '14,500', tier: 'Mid', tierClass: 'es-tier-tag--mid', lineItem: 'AS-Garm or AS-CAP', price: `+$${midFee.toFixed(2)}` },
+        { stitches: '18,000', tier: 'Large', tierClass: 'es-tier-tag--large', lineItem: 'AS-Garm or AS-CAP', price: `+$${largeFee.toFixed(2)}` },
+        { stitches: '30,000', tier: 'Full Back', tierClass: '', lineItem: 'DECG-FB', price: 'See table &#9652;' }
+    ];
+
+    let html = '';
+    rows.forEach(row => {
+        const tierStyle = row.tierClass === '' ? ' style="background:#f1f5f9;color:#0f172a;"' : '';
+        html += '<tr>';
+        html += `<td>${row.stitches}</td>`;
+        html += `<td><span class="es-tier-tag ${row.tierClass}"${tierStyle}>${row.tier}</span></td>`;
+        html += `<td>${row.lineItem}</td>`;
+        html += `<td class="es-price-cell">${row.price}</td>`;
+        html += '</tr>';
+    });
 
     tbody.innerHTML = html;
 }

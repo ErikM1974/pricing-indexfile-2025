@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Embroidery Quote Builder Styles (External CSS - Extracted January 2026) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260208">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260210">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260127">
@@ -106,9 +106,19 @@
                                     </select>
                                 </div>
                                 <div class="logo-form-field">
-                                    <label>Stitches</label>
-                                    <input type="number" id="primary-stitches" value="8000"
-                                           min="1000" max="50000" step="1000">
+                                    <label>Design Size</label>
+                                    <select id="primary-stitches" onchange="onPrimaryStitchTierChange()">
+                                        <option value="8000" selected>Standard (≤10K)</option>
+                                        <option value="12000">Mid +$4/pc (10-15K)</option>
+                                        <option value="18000">Large +$10/pc (15-25K)</option>
+                                        <option value="25000">Full Back (25K+)</option>
+                                    </select>
+                                </div>
+                                <div class="logo-form-field" id="fb-stitch-count-field" style="display: none;">
+                                    <label>Stitch Count</label>
+                                    <input type="number" id="fb-stitch-count" value="25000"
+                                           min="25000" max="100000" step="1000"
+                                           oninput="onFullBackStitchCountChange()">
                                 </div>
                                 <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')">
                                     <input type="checkbox" id="primary-digitizing">
@@ -130,12 +140,6 @@
                                 </div>
                                 <!-- AL Config Fields (hidden until toggle is on) -->
                                 <div class="al-inline-fields" id="garment-al-config-new">
-                                    <div class="logo-form-field">
-                                        <label>AL Stitches</label>
-                                        <input type="number" id="garment-al-stitches" value="8000"
-                                               min="1000" max="50000" step="1000"
-                                               oninput="updateGlobalAL('garment')">
-                                    </div>
                                     <label class="al-inline-digitizing">
                                         <input type="checkbox" id="garment-al-digitizing-checkbox"
                                                onchange="updateGlobalAL('garment')">
@@ -178,9 +182,12 @@
                                         </select>
                                     </div>
                                     <div class="logo-form-field">
-                                        <label>Stitches</label>
-                                        <input type="number" id="cap-primary-stitches" value="8000"
-                                               min="1000" max="50000" step="1000">
+                                        <label>Design Size</label>
+                                        <select id="cap-primary-stitches" onchange="onCapStitchTierChange()">
+                                            <option value="8000" selected>Standard (≤10K)</option>
+                                            <option value="12000">Mid +$4/pc (10-15K)</option>
+                                            <option value="18000">Large +$10/pc (15-25K)</option>
+                                        </select>
                                     </div>
                                     <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
                                         <input type="checkbox" id="cap-primary-digitizing">
@@ -202,12 +209,6 @@
                                     </div>
                                     <!-- Cap AL Config Fields (hidden until toggle is on) -->
                                     <div class="al-inline-fields" id="cap-al-config-new">
-                                        <div class="logo-form-field">
-                                            <label>AL Stitches</label>
-                                            <input type="number" id="cap-al-stitches" value="5000"
-                                                   min="1000" max="50000" step="1000"
-                                                   oninput="updateGlobalAL('cap')">
-                                        </div>
                                         <label class="al-inline-digitizing">
                                             <input type="checkbox" id="cap-al-digitizing-checkbox"
                                                    onchange="updateGlobalAL('cap')">
@@ -370,6 +371,16 @@
                                 <td class="cell-qty" id="cap-al-fee-qty">0</td>
                                 <td class="cell-price" id="cap-al-fee-unit">$0.00</td>
                                 <td class="cell-total" id="cap-al-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Cap Embellishment Upcharge Row (3D-EMB / Laser Patch) -->
+                            <tr id="cap-embellishment-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-cube"></i> <span id="cap-embellishment-fee-label">3D Puff Upcharge</span>
+                                </td>
+                                <td class="cell-qty" id="cap-embellishment-fee-qty">0</td>
+                                <td class="cell-price" id="cap-embellishment-fee-unit">$0.00</td>
+                                <td class="cell-total" id="cap-embellishment-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Additional Logo Digitizing Rows (setup fees) -->
@@ -1426,31 +1437,107 @@ Company:Absher Construction Company
         }
 
         // Handle primary logo position change (for Full Back 25K minimum)
+        // Map arbitrary stitch count to nearest tier dropdown value
+        function mapStitchCountToTierValue(stitchCount, position) {
+            if (position === 'Full Back' || stitchCount >= 25000) return '25000';
+            if (stitchCount > 15000) return '18000';
+            if (stitchCount > 10000) return '12000';
+            return '8000';
+        }
+
         function onPrimaryPositionChange() {
             const posSelect = document.getElementById('primary-position');
-            const stitchInput = document.getElementById('primary-stitches');
+            const tierSelect = document.getElementById('primary-stitches');
+            const fbField = document.getElementById('fb-stitch-count-field');
+            primaryLogo.position = posSelect.value;
 
             if (posSelect.value === 'Full Back') {
-                // Set minimum 25K for Full Back
-                if (parseInt(stitchInput.value) < 25000) {
-                    stitchInput.value = 25000;
-                }
-                stitchInput.min = 25000;
+                tierSelect.value = '25000';
+                fbField.style.display = '';
+                const fbInput = document.getElementById('fb-stitch-count');
+                primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
                 showToast('Full Back requires minimum 25,000 stitches', 'info');
             } else {
-                // Reset to normal minimum
-                stitchInput.min = 1000;
+                fbField.style.display = 'none';
+                if (parseInt(tierSelect.value) >= 25000) {
+                    // Switching away from Full Back — reset tier
+                    tierSelect.value = '8000';
+                    primaryLogo.stitchCount = 8000;
+                }
             }
             recalculatePricing();
+        }
+
+        // Handle garment stitch tier dropdown change
+        function onPrimaryStitchTierChange() {
+            const select = document.getElementById('primary-stitches');
+            const posSelect = document.getElementById('primary-position');
+            const fbField = document.getElementById('fb-stitch-count-field');
+            const sc = parseInt(select.value) || 8000;
+
+            if (sc >= 25000) {
+                // Full Back tier selected — sync position, show stitch input
+                posSelect.value = 'Full Back';
+                primaryLogo.position = 'Full Back';
+                posSelect.disabled = true;
+                fbField.style.display = '';
+                const fbInput = document.getElementById('fb-stitch-count');
+                primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
+            } else {
+                // Standard/Mid/Large — hide FB stitch input
+                fbField.style.display = 'none';
+                primaryLogo.stitchCount = sc;
+                if (posSelect.disabled) {
+                    posSelect.disabled = false;
+                    posSelect.value = 'Left Chest';
+                    primaryLogo.position = 'Left Chest';
+                }
+            }
+            recalculatePricing();
+        }
+
+        // Handle Full Back stitch count input change
+        function onFullBackStitchCountChange() {
+            const fbInput = document.getElementById('fb-stitch-count');
+            const val = parseInt(fbInput.value) || 25000;
+            primaryLogo.stitchCount = Math.max(val, 25000);
+            recalculatePricing();
+        }
+
+        // Handle cap stitch tier dropdown change
+        function onCapStitchTierChange() {
+            const select = document.getElementById('cap-primary-stitches');
+            capPrimaryLogo.stitchCount = parseInt(select.value) || 8000;
+            recalculatePricing();
+        }
+
+        // Update dropdown labels from API-driven surcharge data
+        function updateStitchTierDropdownLabels() {
+            const data = pricingCalculator && pricingCalculator.stitchSurchargeData;
+            if (!data) return; // API didn't load, keep hardcoded labels
+
+            const selects = [
+                document.getElementById('primary-stitches'),
+                document.getElementById('cap-primary-stitches')
+            ];
+            for (const select of selects) {
+                if (!select) continue;
+                for (const opt of select.options) {
+                    const val = parseInt(opt.value);
+                    if (val === 12000) {
+                        opt.text = `Mid +$${data.midFee}/pc (10-15K)`;
+                    } else if (val === 18000) {
+                        opt.text = `Large +$${data.largeFee}/pc (15-25K)`;
+                    }
+                }
+            }
         }
 
         // Update global AL config (stitch count or digitizing change)
         // Position is fixed: 'AL' for garments, 'AL-Cap' for caps
         function updateGlobalAL(type) {
-            const stitchesInput = document.getElementById(`${type}-al-stitches`);
+            // Stitch count is always base (no input field — simplified)
             const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
-
-            if (stitchesInput) globalAL[type].stitchCount = parseInt(stitchesInput.value) || (type === 'cap' ? 5000 : 8000);
             if (digitizingCheckbox) globalAL[type].needsDigitizing = digitizingCheckbox.checked;
 
             _syncALArrays();
@@ -2249,16 +2336,31 @@ Company:Absher Construction Company
                 const positionEl = document.getElementById('primary-position');
                 if (positionEl) positionEl.value = draft.primaryLogo.position || 'Left Chest';
                 const stitchesEl = document.getElementById('primary-stitches');
-                if (stitchesEl) stitchesEl.value = draft.primaryLogo.stitchCount || 8000;
+                if (stitchesEl) stitchesEl.value = mapStitchCountToTierValue(
+                    draft.primaryLogo.stitchCount || 8000,
+                    draft.primaryLogo.position
+                );
                 const digitizingEl = document.getElementById('primary-digitizing');
                 if (digitizingEl) digitizingEl.checked = draft.primaryLogo.needsDigitizing || false;
+                // Sync position dropdown disabled state and FB stitch input for Full Back
+                if (draft.primaryLogo.position === 'Full Back') {
+                    const posEl = document.getElementById('primary-position');
+                    if (posEl) posEl.disabled = true;
+                    const fbField = document.getElementById('fb-stitch-count-field');
+                    const fbInput = document.getElementById('fb-stitch-count');
+                    if (fbField) fbField.style.display = '';
+                    if (fbInput) fbInput.value = draft.primaryLogo.stitchCount || 25000;
+                }
             }
 
             // Restore cap primary logo if present
             if (draft.capPrimaryLogo && typeof capPrimaryLogo !== 'undefined') {
                 capPrimaryLogo = { ...capPrimaryLogo, ...draft.capPrimaryLogo };
                 const capStitchesEl = document.getElementById('cap-primary-stitches');
-                if (capStitchesEl) capStitchesEl.value = draft.capPrimaryLogo.stitchCount || 8000;
+                if (capStitchesEl) capStitchesEl.value = mapStitchCountToTierValue(
+                    draft.capPrimaryLogo.stitchCount || 8000,
+                    'CF'
+                );
                 const capDigitizingEl = document.getElementById('cap-primary-digitizing');
                 if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
             }
@@ -2280,8 +2382,6 @@ Company:Absher Construction Company
                 if (garmentALConfig) garmentALConfig.classList.add('visible');
                 if (garmentALToggle) garmentALToggle.checked = true;
 
-                const stitchEl = document.getElementById('garment-al-stitches');
-                if (stitchEl) stitchEl.value = globalAL.garment.stitchCount;
                 const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
                 if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
             }
@@ -2303,8 +2403,6 @@ Company:Absher Construction Company
                 if (capALConfig) capALConfig.classList.add('visible');
                 if (capALToggle) capALToggle.checked = true;
 
-                const stitchEl = document.getElementById('cap-al-stitches');
-                if (stitchEl) stitchEl.value = globalAL.cap.stitchCount;
                 const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
                 if (digitizingEl) digitizingEl.checked = globalAL.cap.needsDigitizing;
             }
@@ -2516,8 +2614,17 @@ Company:Absher Construction Company
             }
             if (session.StitchCount) {
                 const stitchInput = document.getElementById('primary-stitches');
-                if (stitchInput) stitchInput.value = session.StitchCount;
+                if (stitchInput) stitchInput.value = mapStitchCountToTierValue(session.StitchCount, session.PrintLocation);
                 primaryLogo.stitchCount = session.StitchCount;
+                // Sync position dropdown disabled state and FB stitch input for Full Back
+                if (session.PrintLocation === 'Full Back') {
+                    const posEl = document.getElementById('primary-position');
+                    if (posEl) posEl.disabled = true;
+                    const fbField = document.getElementById('fb-stitch-count-field');
+                    const fbInput = document.getElementById('fb-stitch-count');
+                    if (fbField) fbField.style.display = '';
+                    if (fbInput) fbInput.value = session.StitchCount || 25000;
+                }
             }
             if (session.DigitizingFee > 0) {
                 const digitizingCb = document.getElementById('primary-digitizing');
@@ -2545,8 +2652,6 @@ Company:Absher Construction Company
                 if (alConfig) alConfig.classList.add('visible');
                 const alToggle = document.getElementById('garment-al-toggle');
                 if (alToggle) alToggle.checked = true;
-                const stitchInput = document.getElementById('garment-al-stitches');
-                if (stitchInput) stitchInput.value = globalAL.garment.stitchCount;
 
                 _syncALArrays();
             }
@@ -2559,7 +2664,7 @@ Company:Absher Construction Company
             }
             if (session.CapStitchCount) {
                 const capStitchInput = document.getElementById('cap-primary-stitches');
-                if (capStitchInput) capStitchInput.value = session.CapStitchCount;
+                if (capStitchInput) capStitchInput.value = mapStitchCountToTierValue(session.CapStitchCount, 'CF');
                 capPrimaryLogo.stitchCount = session.CapStitchCount;
             }
             if (session.CapDigitizingFee > 0) {
@@ -2579,7 +2684,12 @@ Company:Absher Construction Company
          */
         async function populateProducts(items) {
             // Service items to create as service product rows (2026-02 refactor)
-            const SERVICE_STYLE_NUMBERS = ['DECG', 'DECC', 'AL', 'FB', 'CB', 'CS', 'MONOGRAM', 'AS-GARM', 'AS-CAP'];
+            const SERVICE_STYLE_NUMBERS = [
+                'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
+                '3D-EMB', 'Laser Patch',
+                // Legacy backward-compat (old quotes):
+                'FB', 'MONOGRAM', 'AS-GARM'
+            ];
 
             // Separate service items from regular products
             const serviceItems = items.filter(item =>
@@ -2649,7 +2759,7 @@ Company:Absher Construction Company
             // Add service items as service product rows (2026-02 refactor)
             for (const serviceItem of serviceItems) {
                 const serviceType = serviceItem.StyleNumber;
-                const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP';
+                const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP' || serviceType === 'AL-CAP' || serviceType === '3D-EMB' || serviceType === 'Laser Patch';
 
                 // Parse metadata from SizeBreakdown if available
                 let stitchCount = 8000;
@@ -2909,6 +3019,7 @@ Company:Absher Construction Company
                 // Initialize pricing calculator
                 pricingCalculator = new EmbroideryPricingCalculator();
                 await pricingCalculator.initializeConfig();
+                updateStitchTierDropdownLabels();
 
                 // Initialize quote service
                 quoteService = new EmbroideryQuoteService();
@@ -2959,27 +3070,16 @@ Company:Absher Construction Company
         // ============================================================
 
         // ============================================================
+        // STITCH TIER BADGE
+        // ============================================================
+
+        // ============================================================
         // PRIMARY LOGO HANDLERS
         // ============================================================
 
         function setupPrimaryLogoHandlers() {
-            // Position dropdown
-            const positionSelect = document.getElementById('primary-position');
-            if (positionSelect) {
-                positionSelect.addEventListener('change', function() {
-                    primaryLogo.position = this.value;
-                    recalculatePricing();
-                });
-            }
-
-            // Stitch count input — use 'input' event for immediate feedback as user types
-            const stitchInput = document.getElementById('primary-stitches');
-            if (stitchInput) {
-                stitchInput.addEventListener('input', function() {
-                    primaryLogo.stitchCount = parseInt(this.value) || 8000;
-                    debouncedRecalculatePricing();
-                });
-            }
+            // Position and tier dropdown handled by inline onchange handlers
+            // (onPrimaryPositionChange, onPrimaryStitchTierChange)
 
             // Digitizing checkbox
             const digitizingCheckbox = document.getElementById('primary-digitizing');
@@ -3041,15 +3141,8 @@ Company:Absher Construction Company
 
         // Setup cap primary logo event handlers
         function setupCapPrimaryLogoHandlers() {
-            const stitchesInput = document.getElementById('cap-primary-stitches');
+            // Tier dropdown handled by inline onchange handler (onCapStitchTierChange)
             const digitizingCheckbox = document.getElementById('cap-primary-digitizing');
-
-            if (stitchesInput) {
-                stitchesInput.addEventListener('input', function() {
-                    capPrimaryLogo.stitchCount = parseInt(this.value) || 8000;
-                    debouncedRecalculatePricing();
-                });
-            }
 
             if (digitizingCheckbox) {
                 digitizingCheckbox.addEventListener('change', function() {
@@ -3337,12 +3430,18 @@ Company:Absher Construction Company
                 'DECG': { description: 'Customer-Supplied Garments', icon: 'fa-tshirt', isCap: false },
                 'DECC': { description: 'Customer-Supplied Caps', icon: 'fa-hard-hat', isCap: true },
                 'AL': { description: 'Additional Logo', icon: 'fa-plus-circle', isCap: false },
+                'AL-CAP': { description: 'Additional Logo Cap', icon: 'fa-plus-circle', isCap: true },
                 'FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
+                'DECG-FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
                 'CB': { description: 'Cap Back Embroidery', icon: 'fa-hat-cowboy', isCap: true },
                 'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
+                'Monogram': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
                 'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+                'AS-Garm': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
                 'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
-                'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true }
+                'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
+                '3D-EMB': { description: '3D Puff Embroidery', icon: 'fa-cube', isCap: true },
+                'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true }
             };
 
             const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
@@ -3358,7 +3457,7 @@ Company:Absher Construction Company
             if (position) {
                 displayDescription += `: ${position}`;
             }
-            if (stitchCount && serviceType !== 'MONOGRAM') {
+            if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB') {
                 displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
             }
 
@@ -6342,6 +6441,34 @@ Company:Absher Construction Company
             }
 
             // ============================================
+            // Cap Embellishment Upcharge Fee Row (3D-EMB / Laser Patch)
+            // Extracted from per-piece price as separate fee item for ShopWorks
+            // ============================================
+            const capEmbFeeRow = document.getElementById('cap-embellishment-fee-row');
+            const capEmbFeeLabel = document.getElementById('cap-embellishment-fee-label');
+            const puffTotal = pricing.puffUpchargePerCap > 0 ? pricing.puffUpchargePerCap * (pricing.capQuantity || 0) : 0;
+            const patchTotal = pricing.patchUpchargePerCap > 0 ? pricing.patchUpchargePerCap * (pricing.capQuantity || 0) : 0;
+            const capEmbTotal = puffTotal + patchTotal;
+
+            if (capEmbTotal > 0 && capEmbFeeRow) {
+                capEmbFeeRow.style.display = 'table-row';
+                const capQty = pricing.capQuantity || 0;
+                const unitPrice = pricing.puffUpchargePerCap || pricing.patchUpchargePerCap || 0;
+                if (capEmbFeeLabel) {
+                    if (puffTotal > 0) {
+                        capEmbFeeLabel.textContent = '3D-EMB : 3D Puff Upcharge';
+                    } else {
+                        capEmbFeeLabel.textContent = 'Laser Patch : Patch Upcharge';
+                    }
+                }
+                document.getElementById('cap-embellishment-fee-qty').textContent = capQty;
+                document.getElementById('cap-embellishment-fee-unit').textContent = `$${unitPrice.toFixed(2)}`;
+                document.getElementById('cap-embellishment-fee-total').textContent = `$${capEmbTotal.toFixed(2)}`;
+            } else {
+                if (capEmbFeeRow) capEmbFeeRow.style.display = 'none';
+            }
+
+            // ============================================
             // Additional Logo Digitizing Fee Rows
             // Digitizing fees are now counted in pricing engine via logoConfigs.additional
             // These display rows show/hide based on globalAL state
@@ -6771,8 +6898,9 @@ Company:Absher Construction Company
             // Logo configuration fields
             const logoFields = [
                 'primary-position', 'primary-stitches', 'primary-digitizing',
-                'garment-al-stitches', 'garment-al-digitizing-checkbox',
-                'cap-primary-stitches', 'cap-al-stitches', 'cap-al-digitizing-checkbox',
+                'fb-stitch-count',
+                'garment-al-digitizing-checkbox',
+                'cap-primary-stitches', 'cap-al-digitizing-checkbox',
                 'cap-embellishment-type'
             ];
             logoFields.forEach(id => {
@@ -6835,6 +6963,16 @@ Company:Absher Construction Company
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             document.getElementById('primary-digitizing').checked = false;
+            // Re-enable position dropdown in case it was disabled by Full Back
+            document.getElementById('primary-position').disabled = false;
+            // Hide and reset Full Back stitch count input
+            const fbField = document.getElementById('fb-stitch-count-field');
+            if (fbField) fbField.style.display = 'none';
+            const fbInput = document.getElementById('fb-stitch-count');
+            if (fbInput) fbInput.value = 25000;
+            // Reset cap tier dropdown
+            const capTierEl = document.getElementById('cap-primary-stitches');
+            if (capTierEl) capTierEl.value = '8000';
 
             // Reset additional logo toggles and globalAL state
             globalAL.garment = { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false };
@@ -6855,10 +6993,6 @@ Company:Absher Construction Company
             if (capALConfig) capALConfig.classList.remove('visible');
             document.getElementById('garment-al-toggle').checked = false;
             document.getElementById('cap-al-toggle').checked = false;
-            const garmentStitchEl = document.getElementById('garment-al-stitches');
-            if (garmentStitchEl) garmentStitchEl.value = EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
-            const capStitchEl = document.getElementById('cap-al-stitches');
-            if (capStitchEl) capStitchEl.value = EMB_DEFAULTS.CAP_STITCH_COUNT;
 
             // Reset customer form fields
             document.getElementById('customer-name').value = '';
@@ -8237,7 +8371,7 @@ Company:Absher Construction Company
             if (data.services.additionalStitches && data.services.additionalStitches.length > 0) {
                 data.services.additionalStitches.forEach(s => {
                     allReviewItems.push({
-                        partNumber: s.type === 'cap' ? 'AS-CAP' : 'AS-GARM',
+                        partNumber: s.type === 'cap' ? 'AS-CAP' : 'AS-Garm',
                         description: s.description || 'Additional Stitches',
                         quantity: s.quantity,
                         unitPrice: s.unitPrice || 0,
@@ -8538,7 +8672,7 @@ Company:Absher Construction Company
                         : 12.50;
 
                     serviceReviewItems.push({
-                        type: 'MONOGRAM',
+                        type: 'Monogram',
                         quantity: totalNames,
                         stitchCount: 0,
                         isCap: false,
@@ -8604,8 +8738,6 @@ Company:Absher Construction Company
                                 if (alLabel) alLabel.classList.add('active');
                                 if (alConfig) alConfig.classList.add('visible');
 
-                                const stitchEl = document.getElementById('garment-al-stitches');
-                                if (stitchEl) stitchEl.value = globalAL.garment.stitchCount;
                                 const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
                                 if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
 
@@ -8647,7 +8779,7 @@ Company:Absher Construction Company
                                 isCap: true
                             });
                         } else if (typeUpper === 'MONOGRAM') {
-                            createServiceProductRow('MONOGRAM', {
+                            createServiceProductRow('Monogram', {
                                 quantity: result.quantity,
                                 unitPrice: result.unitPrice,
                                 total: result.quantity * result.unitPrice,
@@ -8809,7 +8941,7 @@ Company:Absher Construction Company
                     const serviceTypes = serviceResults.map(r => r.type);
                     if (serviceTypes.includes('AL')) summary.push('additional logo(s)');
                     if (serviceTypes.includes('DECG') || serviceTypes.includes('DECC')) summary.push('customer-supplied items');
-                    if (serviceTypes.includes('MONOGRAM')) summary.push('monogram/names');
+                    if (serviceTypes.includes('Monogram') || serviceTypes.includes('MONOGRAM')) summary.push('monogram/names');
                 }
 
                 showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
@@ -9295,7 +9427,7 @@ Company:Absher Construction Company
                 const expectedFees = [];
                 if ((pricing.garmentSetupFees || 0) > 0) expectedFees.push('DD (garment digitizing)');
                 if ((pricing.capSetupFees || 0) > 0) expectedFees.push('DD (cap digitizing)');
-                if ((pricing.garmentStitchTotal || 0) > 0) expectedFees.push('AS-GARM');
+                if ((pricing.garmentStitchTotal || 0) > 0) expectedFees.push('AS-Garm');
                 if ((pricing.capStitchTotal || 0) > 0) expectedFees.push('AS-CAP');
                 if (garmentALEnabled && garmentALInPricing.length > 0) expectedFees.push('AL');
                 if (capALEnabled && capALInPricing.length > 0) expectedFees.push('AL-Cap');

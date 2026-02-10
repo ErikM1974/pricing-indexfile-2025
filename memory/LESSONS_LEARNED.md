@@ -31,6 +31,27 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Change: ShopWorks Part Number Alignment — 10 Fixes Across 3 Files
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** Frontend embroidery quote builder saved part numbers that didn't match what ShopWorks expects. 10 mismatches found: wrong casing (AS-GARM→AS-Garm, MONOGRAM→Monogram), wrong abbreviations (CSD→CS), non-standard formats (FB-30000→DECG-FB, AL-12000→AL), missing position-awareness for cap ALs (all saved as 'AL' instead of AL-CAP/CB/CS), and missing fee items (3D Puff and Laser Patch upcharges baked into per-piece price instead of separate line items).
+**Root Cause:** Part numbers were defined organically as the builder was built, never cross-referenced against ShopWorks' actual part number list. Each service got whatever abbreviation felt natural at the time.
+**Solution:**
+1. Position-aware AL: garment→`AL`, cap front→`AL-CAP`, cap back→`CB`, cap side→`CS` (pricing engine)
+2. Full Back: `DECG-FB` instead of `FB-{stitchCount}` (pricing engine)
+3. Casing fixes: `AS-Garm` (service file), `Monogram` (HTML builder)
+4. Cap Side abbreviation: `CS` instead of `CSD` (pricing engine)
+5. 3D Puff/Laser Patch extracted from per-piece cap price → separate fee items (`3D-EMB`, `Laser Patch`). `grandTotal` updated to include `puffUpchargeTotal + patchUpchargeTotal`
+6. `cap-embellishment-fee-row` added to UI for 3D/patch display
+7. SERVICE_STYLE_NUMBERS + SERVICE_META updated with new entries + legacy backward-compat entries
+**Prevention:**
+- Always cross-reference part numbers against ShopWorks' master list before adding new services
+- Keep legacy part numbers in SERVICE_STYLE_NUMBERS for backward compatibility with old saved quotes
+- Backend Caspio proxy was already correct — frontend was the only place with mismatches
+**Files:** `shared_components/js/embroidery-quote-pricing.js`, `shared_components/js/embroidery-quote-service.js`, `quote-builders/embroidery-quote-builder.html`
+
+---
+
 ## Change: Stitch Surcharges Switched from Linear to Flat Tiers
 **Date:** 2026-02-10
 **Project:** [Pricing Index] + [caspio-proxy]
