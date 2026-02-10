@@ -103,7 +103,11 @@
       "Bash(TMPFILE=\"C:/Users/erik/AppData/Local/Temp/claude/emb.json\")",
       "Bash(for TYPE in CAP EMB-AL CAP-AL PATCH CAP-PUFF)",
       "Bash(do)",
-      "Read(//c/Users/erik/OneDrive - Northwest Custom Apparel/**)"
+      "Read(//c/Users/erik/OneDrive - Northwest Custom Apparel/**)",
+      "Bash(claude config:*)",
+      "Bash(printenv:*)",
+      "Bash(powershell -File -:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": [],

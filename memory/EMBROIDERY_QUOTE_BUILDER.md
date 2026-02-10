@@ -853,10 +853,23 @@ Products not in the SanMar database (e.g. HT01 Edwards Skull Cap) can now be imp
 2. row.dataset.importData = JSON.stringify(...)
 3. row.dataset.sellPrice = sellPriceOverride   ← MUST be here (before ANY pricing)
 4. onStyleChange()                              ← triggers API lookup
-5. selectColor() → recalculatePricing()         ← async, sees sellPrice ✓
-6. Set sizes
-7. onSizeChange() → recalculatePricing()        ← sees sellPrice ✓
+5. Re-apply sellPrice (onStyleChange may overwrite for non-SanMar)
+6. selectColor() → recalculatePricing()         ← async, sees sellPrice ✓
+7. Re-apply sellPrice AGAIN (selectColor clears it for SanMar products!)
+8. Set sizes
+9. onSizeChange() → recalculatePricing()        ← sees sellPrice ✓
 ```
+
+### `selectColor()` Clears `sellPrice` (Bug Fixed 2026-02-09)
+**Problem:** `selectColor()` (line 4668) deletes `row.dataset.sellPrice` for SanMar products when color changes. During import, the override was set at step 3 and re-applied after step 4, but `selectColor()` at step 6 wiped it again. Result: API pricing used instead of ShopWorks invoiced prices.
+**Fix:** Re-apply `sellPriceOverride` immediately after `selectColor()` + 300ms wait (line 8760-8762).
+**Rule:** Any import step that calls a function which might clear dataset attributes must be followed by a re-apply of those attributes.
+
+### Empty-PN Items (Bug Fixed 2026-02-09)
+**Problem:** Items with empty part numbers (e.g., "drinkware laser logo setup") showed "-" for price.
+**Root cause:** `row.dataset.style = ''` and missing color caused `collectProductsFromTable()` to skip the row (`if (!style || !parentColor) return`).
+**Fix:** Use `product.description || 'Custom Item'` as style (line 8631). Set default color `product.color || 'N/A'` before calling `reImportNonSanmarRow()` (lines 8712-8714).
+**Rule:** Never use empty strings for dataset fields that downstream code checks with `if (!value)` guards — use sentinel values instead.
 
 ### Review Modal Column Alignment (Feb 2026)
 - Products section now uses `<table>` layout with 4 aligned columns: Sizes | ShopWorks | API | Custom

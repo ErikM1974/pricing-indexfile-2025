@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.9.1 - Added visible error handling for DECG API failures (CLAUDE.md rule #4)
- * @date 2026-02-04
+ * @version 1.10.0 - Priced no-part-number items → customProducts (not comments); added -G suffix and 115 patterns
+ * @date 2026-02-09
  */
 
 class ShopWorksImportParser {
@@ -147,7 +147,9 @@ class ShopWorksImportParser {
             /^J26\d{3}$/,     // Safety jackets
             /^7007$/,         // Safety vest
             /^8001$/,         // Safety bomber
-            /^STK-/           // Stickers (non-apparel)
+            /^STK-/,          // Stickers (non-apparel)
+            /^\d+-G$/,        // Promotional products with -G suffix (Owala, BlenderBottle)
+            /^115$/           // Richardson Low Pro Trucker 115
         ];
 
         this.CAP_DISCOUNT = 0.20;           // -20% for caps (loaded from API if available)
@@ -638,6 +640,7 @@ class ShopWorksImportParser {
         };
 
         let inSizeSection = false;
+        let hasOtherSizes = false;
 
         for (const line of lines) {
             const trimmed = line.trim();
@@ -661,6 +664,7 @@ class ShopWorksImportParser {
             } else if (inSizeSection && trimmed.includes(':')) {
                 // Parse size:quantity pairs
                 const [size, qty] = trimmed.split(':');
+                if (size.includes('(Other)')) hasOtherSizes = true;
                 const normalizedSize = this._normalizeSize(size.trim());
                 const quantity = parseInt(qty.trim()) || 0;
 
@@ -688,6 +692,15 @@ class ShopWorksImportParser {
                 // Clean the part number (remove the suffix)
                 item.partNumber = extracted.cleanedPartNumber;
             }
+
+            // Handle old caps with no _OSFA suffix where sizes came from "(Other)" columns
+            // e.g., Richardson 112 with "S (Other): 12" → remap to 112_OSFA with OSFA size
+            if (!extracted.size && hasOtherSizes && this._isCapFromDescription(item.description)) {
+                item.sizes = { 'OSFA': item.quantity };
+                item.partNumber = item.partNumber + '_OSFA';
+                console.log(`[ShopWorksImportParser] Remapped cap ${item.partNumber} to OSFA (legacy "(Other)" size data)`);
+            }
+
             return item;
         }
         return null;
@@ -912,8 +925,16 @@ class ShopWorksImportParser {
                 break;
 
             case 'comment':
-                // Note/comment row
-                if (item.description) {
+                // Check if this is a priced item with no part number (e.g., "drinkware laser logo setup")
+                if (item.unitPrice > 0 && item.quantity > 0) {
+                    result.customProducts.push({
+                        ...item,
+                        partNumber: '',
+                        description: item.description,
+                        needsManualPricing: true,
+                        reason: 'Priced item with no part number'
+                    });
+                } else if (item.description) {
                     result.notes.push(item.description);
                 }
                 break;
@@ -1421,4 +1442,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.9.1 - DECG/DECC pricing via /api/decg-pricing (+ visible error handling)');
+console.log('[ShopWorksImportParser] Module loaded v1.10.0 - Priced no-PN items → customProducts; -G suffix + 115 patterns');

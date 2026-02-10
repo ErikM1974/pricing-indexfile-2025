@@ -1026,12 +1026,12 @@ class QuoteViewPage {
                 <td class="style-col clickable" onclick="window.quoteViewPage.openProductModal(${groupIndex})">
                     <div class="style-with-image">
                         <img id="product-image-${groupIndex}" class="product-thumb" src="/pages/images/product-placeholder.png" alt="${this.escapeHtml(row.style)}">
-                        <span>${this.escapeHtml(row.style)} - ${this.escapeHtml((row.description || '').substring(0, 25))}</span>
+                        <span>${this.escapeHtml(row.style)} - ${this.escapeHtml(row.description || '')}</span>
                     </div>
                 </td>
             `;
         } else {
-            styleCell = `<td class="style-col ext-style">${this.escapeHtml(row.style)}</td>`;
+            styleCell = `<td class="style-col ext-style">${this.escapeHtml(row.style)} - ${this.escapeHtml(row.description || '')}</td>`;
         }
 
         return `

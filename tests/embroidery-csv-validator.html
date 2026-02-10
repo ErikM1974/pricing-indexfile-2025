@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery CSV Validator - NWCA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-body: #13151a;
+            --bg-sidebar: #1a1d23;
+            --bg-card: #2d3039;
+            --bg-card-hover: #353842;
+            --bg-input: #23262e;
+            --bg-table-header: #1e2128;
+            --bg-table-row-alt: #252830;
+            --text-primary: #e8e9eb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #3d4150;
+            --border-subtle: #2a2d36;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-green: #22c55e;
+            --accent-green-bg: rgba(34,197,94,0.12);
+            --accent-yellow: #eab308;
+            --accent-yellow-bg: rgba(234,179,8,0.12);
+            --accent-red: #ef4444;
+            --accent-red-bg: rgba(239,68,68,0.12);
+            --accent-gray: #6b7280;
+            --accent-gray-bg: rgba(107,114,128,0.12);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.4);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+            --transition: 150ms ease;
+        }
+
+        html { font-size: 14px; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* ===== Header ===== */
+        .app-header {
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-header .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .app-header .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header .brand-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .app-header .brand-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            white-space: nowrap;
+        }
+
+        .btn:hover { background: var(--bg-card-hover); border-color: var(--accent-blue); }
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--accent-blue-hover); }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn:disabled:hover { background: var(--bg-card); border-color: var(--border-color); }
+
+        /* ===== Main Layout ===== */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ===== Drop Zone ===== */
+        .drop-zone-container {
+            margin-bottom: 24px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: var(--bg-card);
+            position: relative;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--accent-blue);
+            background: rgba(59,130,246,0.05);
+        }
+
+        .drop-zone.drag-over {
+            transform: scale(1.005);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+        }
+
+        .drop-zone-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .drop-zone h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .drop-zone .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: var(--accent-blue);
+            color: #fff;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .drop-zone .file-input-label:hover { background: var(--accent-blue-hover); }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .drop-zone .format-hint {
+            margin-top: 16px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* ===== Progress ===== */
+        .progress-container {
+            display: none;
+            margin-bottom: 24px;
+        }
+
+        .progress-container.visible { display: block; }
+
+        .progress-bar-wrapper {
+            background: var(--bg-input);
+            border-radius: 100px;
+            height: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), #8b5cf6);
+            border-radius: 100px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* ===== Stats Dashboard ===== */
+        .stats-dashboard {
+            display: none;
+            margin-bottom: 24px;
+        }
+
+        .stats-dashboard.visible { display: block; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .stat-card .stat-detail {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-card.quality-high .stat-value { color: var(--accent-green); }
+        .stat-card.quality-mid .stat-value { color: var(--accent-yellow); }
+        .stat-card.quality-low .stat-value { color: var(--accent-red); }
+
+        /* Breakdowns row */
+        .breakdown-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .breakdown-row { grid-template-columns: 1fr; }
+        }
+
+        .breakdown-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .breakdown-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .breakdown-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .breakdown-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        .breakdown-tag .tag-label { color: var(--text-secondary); }
+        .breakdown-tag .tag-count { color: var(--text-primary); font-weight: 600; }
+
+        /* ===== Filter Bar ===== */
+        .filter-bar {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            flex-wrap: wrap;
+        }
+
+        .filter-bar.visible { display: flex; }
+
+        .filter-bar label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .filter-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .filter-btn:hover { border-color: var(--accent-blue); color: var(--text-primary); }
+        .filter-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        .filter-search {
+            flex: 1;
+            min-width: 200px;
+            padding: 6px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        .filter-search::placeholder { color: var(--text-muted); }
+        .filter-search:focus { outline: none; border-color: var(--accent-blue); }
+
+        /* ===== Orders List ===== */
+        .orders-container {
+            display: none;
+        }
+
+        .orders-container.visible { display: block; }
+
+        .order-section {
+            margin-bottom: 8px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+
+        .order-section.has-warnings { border-left: 3px solid var(--accent-yellow); }
+        .order-section.has-errors { border-left: 3px solid var(--accent-red); }
+        .order-section.all-pass { border-left: 3px solid var(--accent-green); }
+
+        .order-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background var(--transition);
+            gap: 12px;
+            user-select: none;
+        }
+
+        .order-header:hover { background: var(--bg-card-hover); }
+
+        .order-chevron {
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .order-section.expanded .order-chevron { transform: rotate(90deg); }
+
+        .order-id {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .order-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .order-meta span { white-space: nowrap; }
+
+        .order-badges {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .badge-pass { background: var(--accent-green-bg); color: var(--accent-green); }
+        .badge-warn { background: var(--accent-yellow-bg); color: var(--accent-yellow); }
+        .badge-fail { background: var(--accent-red-bg); color: var(--accent-red); }
+        .badge-note { background: var(--accent-gray-bg); color: var(--accent-gray); }
+
+        /* Order body (collapsible) */
+        .order-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .order-section.expanded .order-body {
+            max-height: 5000px;
+        }
+
+        .order-table-wrapper {
+            overflow-x: auto;
+            padding: 0 12px 12px 12px;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: var(--font-mono);
+        }
+
+        .order-table th {
+            text-align: left;
+            padding: 8px 10px;
+            background: var(--bg-table-header);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+        }
+
+        .order-table th.size-col { text-align: center; min-width: 36px; }
+
+        .order-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid var(--border-subtle);
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .order-table tr:last-child td { border-bottom: none; }
+
+        .order-table tr:nth-child(even) { background: var(--bg-table-row-alt); }
+
+        .order-table tr.row-product {}
+        .order-table tr.row-fee { background: rgba(59,130,246,0.06) !important; }
+        .order-table tr.row-note {
+            opacity: 0.5;
+            font-style: italic;
+        }
+
+        .order-table td.size-col {
+            text-align: center;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        .order-table td.size-col.zero { color: var(--text-muted); font-weight: 400; }
+
+        .status-cell {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-dot.pass { background: var(--accent-green); }
+        .status-dot.warn { background: var(--accent-yellow); }
+        .status-dot.fail { background: var(--accent-red); }
+        .status-dot.skip { background: var(--accent-gray); }
+
+        .validation-messages {
+            padding: 4px 10px 8px 10px;
+        }
+
+        .validation-msg {
+            font-size: 11px;
+            padding: 2px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .validation-msg .msg-icon { flex-shrink: 0; }
+        .validation-msg.msg-warn { color: var(--accent-yellow); }
+        .validation-msg.msg-fail { color: var(--accent-red); }
+        .validation-msg.msg-pass { color: var(--accent-green); }
+
+        /* ===== Load More ===== */
+        .load-more-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .load-more-container.visible { display: block; }
+
+        .load-more-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-green);
+            border-radius: var(--radius);
+            color: var(--accent-green);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 100px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .main-content { padding: 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .drop-zone { padding: 40px 20px; }
+            .order-meta { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="brand">
+        <div class="brand-logo">NW</div>
+        <div class="brand-text">
+            <span class="brand-name">Northwest Custom Apparel</span>
+            <span class="brand-sub">Embroidery CSV Validator</span>
+        </div>
+    </div>
+    <div class="header-actions">
+        <button class="btn" id="btnReset" disabled onclick="resetAll()">Reset</button>
+        <button class="btn" id="btnCopyReport" disabled onclick="copyReportToClipboard()">Copy Report JSON</button>
+    </div>
+</header>
+
+<main class="main-content">
+
+    <!-- Drop Zone -->
+    <div class="drop-zone-container" id="dropZoneContainer">
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-icon">&#128203;</div>
+            <h2>Drop ShopWorks CSV Export Here</h2>
+            <p>Drag and drop a CSV file, or click to browse</p>
+            <label class="file-input-label" for="fileInput">
+                Choose File
+            </label>
+            <input type="file" id="fileInput" accept=".csv,.txt">
+            <div class="format-hint">
+                Expected columns: id_Order, PartNumber, PartColor, Type, Description,
+                LineQty, LineTotal, date_Creation, S, M, LG, XL, XXL, XXXL (other)
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar-wrapper">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">Parsing CSV...</div>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-dashboard" id="statsDashboard">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="breakdown-row" id="breakdownRow"></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar" id="filterBar">
+        <label>Filter:</label>
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" data-filter="warn" onclick="setFilter('warn', this)">Warnings</button>
+        <button class="filter-btn" data-filter="fail" onclick="setFilter('fail', this)">Errors</button>
+        <button class="filter-btn" data-filter="pass" onclick="setFilter('pass', this)">Clean</button>
+        <input type="text" class="filter-search" id="filterSearch" placeholder="Search order ID or part number..." oninput="applyFilters()">
+    </div>
+
+    <!-- Orders -->
+    <div class="orders-container" id="ordersContainer"></div>
+
+    <!-- Load More -->
+    <div class="load-more-container" id="loadMoreContainer">
+        <button class="btn btn-primary" onclick="loadMoreOrders()">Load More Orders</button>
+        <div class="load-more-info" id="loadMoreInfo"></div>
+    </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// Constants & Configuration
+// ============================================================
+
+const KNOWN_FEES = new Set([
+    'DD', 'DECG', 'DECC', 'AL', 'MONOGRAM', 'AS-GARM', 'AS-CAP',
+    'RUSH', 'SAMPLE', 'LTM', 'GRT-50', 'GRT-75', 'DISCOUNT',
+    'DGT-001', 'NAME'
+]);
+
+const FEE_PRICE_RANGES = {
+    'DD':       { min: 25, max: 300, label: 'Digitizing' },
+    'DECG':     { min: 5, max: 200, label: 'Customer Garment' },
+    'DECC':     { min: 5, max: 200, label: 'Customer Cap' },
+    'AL':       { min: 0.50, max: 100, label: 'Additional Location' },
+    'MONOGRAM': { min: 1, max: 100, label: 'Monogram' },
+    'AS-GARM':  { min: 0.01, max: 500, label: 'Garment Stitch Charge' },
+    'AS-CAP':   { min: 0.01, max: 500, label: 'Cap Stitch Charge' },
+    'GRT-50':   { min: 25, max: 100, label: 'Garment Setup $50' },
+    'GRT-75':   { min: 50, max: 100, label: 'Garment Setup $75' },
+    'RUSH':     { min: 10, max: 1000, label: 'Rush Fee' },
+    'SAMPLE':   { min: 5, max: 200, label: 'Sample' },
+    'LTM':      { min: 10, max: 100, label: 'Less Than Minimum' },
+    'DISCOUNT': { min: -100000, max: 0, label: 'Discount' },
+    'DGT-001':  { min: 25, max: 300, label: 'Digitizing' },
+    'NAME':     { min: 1, max: 100, label: 'Name/Personalization' }
+};
+
+// Suffix -> which ShopWorks column(s) should have quantity
+// Base SKU (no suffix) -> S, M, LG, XL
+// _2X or _XXL -> XXL column
+// Everything else (_3X, _4X, _XS, _OSFA, tall, youth) -> XXXL column
+const SUFFIX_COLUMN_MAP = {
+    '': ['S', 'M', 'LG', 'XL'],
+    '_2X': ['XXL'],
+    '_XXL': ['XXL'],
+    '_3X': ['XXXL'],
+    '_4X': ['XXXL'],
+    '_5X': ['XXXL'],
+    '_6X': ['XXXL'],
+    '_XS': ['XXXL'],
+    '_OSFA': ['XXXL'],
+    '_XLT': ['XXXL'],
+    '_2XLT': ['XXXL'],
+    '_LT': ['XXXL'],
+    'Y': ['XXXL']  // youth prefix
+};
+
+const SIZE_COLUMNS = ['S', 'M', 'LG', 'XL', 'XXL', 'XXXL'];
+const BATCH_SIZE = 50;
+
+// ============================================================
+// State
+// ============================================================
+
+let parsedData = null;       // { orders: Map, allRows: [], columnMap: {} }
+let validationResults = null; // Map<orderId, { rows: [...], stats: {} }>
+let currentFilter = 'all';
+let searchTerm = '';
+let renderedCount = 0;
+let filteredOrderIds = [];
+
+// ============================================================
+// CSV Parsing
+// ============================================================
+
+/**
+ * Parse a CSV string into rows of fields.
+ * Handles: quoted fields with embedded commas/newlines, RFC 4180 escaped quotes (""),
+ * whitespace in headers, currency format, empty rows.
+ */
+function parseCSV(text) {
+    const rows = [];
+    let headers = null;
+    let currentRow = [];
+    let currentField = '';
+    let inQuotes = false;
+    let i = 0;
+    const len = text.length;
+
+    while (i < len) {
+        const ch = text[i];
+
+        if (inQuotes) {
+            if (ch === '"') {
+                // Check for escaped quote ""
+                if (i + 1 < len && text[i + 1] === '"') {
+                    currentField += '"';
+                    i += 2;
+                    continue;
+                }
+                // End of quoted field
+                inQuotes = false;
+                i++;
+                continue;
+            }
+            currentField += ch;
+            i++;
+        } else {
+            if (ch === '"') {
+                inQuotes = true;
+                i++;
+            } else if (ch === ',') {
+                currentRow.push(currentField);
+                currentField = '';
+                i++;
+            } else if (ch === '\r') {
+                // Handle \r\n or lone \r
+                currentRow.push(currentField);
+                currentField = '';
+                if (i + 1 < len && text[i + 1] === '\n') i++;
+                i++;
+                finishRow();
+            } else if (ch === '\n') {
+                currentRow.push(currentField);
+                currentField = '';
+                i++;
+                finishRow();
+            } else {
+                currentField += ch;
+                i++;
+            }
+        }
+    }
+
+    // Handle last field/row
+    if (currentField || currentRow.length > 0) {
+        currentRow.push(currentField);
+        finishRow();
+    }
+
+    function finishRow() {
+        // Skip completely empty rows
+        if (currentRow.length === 1 && currentRow[0].trim() === '') {
+            currentRow = [];
+            return;
+        }
+
+        if (!headers) {
+            // First non-empty row is header -- trim whitespace from each column name
+            headers = currentRow.map(h => h.trim());
+            currentRow = [];
+            return;
+        }
+
+        // Build object from fields
+        const obj = {};
+        for (let j = 0; j < headers.length; j++) {
+            obj[headers[j]] = j < currentRow.length ? currentRow[j] : '';
+        }
+        rows.push(obj);
+        currentRow = [];
+    }
+
+    return { headers: headers || [], rows };
+}
+
+/**
+ * Parse a currency string to a number.
+ * "$1,420.00" -> 1420, "$-" -> 0, "" -> 0, "150.00" -> 150
+ */
+function parseCurrency(val) {
+    if (!val || typeof val !== 'string') return 0;
+    const cleaned = val.trim();
+    if (cleaned === '' || cleaned === '$-' || cleaned === '-' || cleaned === '$') return 0;
+    // Remove $ and commas, then parse
+    const num = parseFloat(cleaned.replace(/[$,]/g, ''));
+    return isNaN(num) ? 0 : num;
+}
+
+/**
+ * Parse a numeric string (for qty fields).
+ * Handles blanks, returns 0 for non-numeric.
+ */
+function parseQty(val) {
+    if (!val || typeof val !== 'string') return 0;
+    const trimmed = val.trim();
+    if (trimmed === '') return 0;
+    const n = parseInt(trimmed, 10);
+    return isNaN(n) ? 0 : n;
+}
+
+// ============================================================
+// Row Classification & Validation
+// ============================================================
+
+function classifyRow(row) {
+    const pn = (row['PartNumber'] || '').trim();
+
+    if (!pn) return 'note';
+
+    // Normalize to uppercase for fee matching
+    const pnUpper = pn.toUpperCase();
+
+    // Check against known fees
+    if (KNOWN_FEES.has(pnUpper)) return 'fee';
+
+    // Also check if starts with a known fee prefix (for variations like AL-Cap)
+    for (const fee of KNOWN_FEES) {
+        if (pnUpper === fee || pnUpper.startsWith(fee + '-') || pnUpper.startsWith(fee + '_')) {
+            return 'fee';
+        }
+    }
+
+    return 'product';
+}
+
+function extractSuffix(partNumber) {
+    if (!partNumber) return '';
+    const pn = partNumber.trim();
+
+    // Check for youth prefix: starts with Y and rest is a known style pattern
+    // e.g., YPC54, YST350
+    if (/^Y[A-Z]/.test(pn) && !KNOWN_FEES.has(pn.toUpperCase())) {
+        return 'Y';
+    }
+
+    // Check for suffix after underscore
+    const underscoreIdx = pn.lastIndexOf('_');
+    if (underscoreIdx > 0) {
+        return pn.substring(underscoreIdx);  // includes the underscore
+    }
+
+    return '';  // base SKU
+}
+
+function getExpectedColumns(suffix) {
+    const su = suffix.toUpperCase();
+
+    // Direct lookup
+    if (SUFFIX_COLUMN_MAP.hasOwnProperty(su)) {
+        return SUFFIX_COLUMN_MAP[su];
+    }
+
+    // Anything with a suffix not explicitly mapped goes to XXXL
+    if (su.length > 0) {
+        return ['XXXL'];
+    }
+
+    // Base SKU
+    return ['S', 'M', 'LG', 'XL'];
+}
+
+function validateRow(row, rowType) {
+    const checks = [];
+    const pn = (row['PartNumber'] || '').trim();
+    const lineQty = parseQty(row['LineQty']);
+    const lineTotal = parseCurrency(row['LineTotal']);
+
+    // --- Size Column Sum Check ---
+    if (rowType === 'product') {
+        const sizeSum = SIZE_COLUMNS.reduce((sum, col) => sum + parseQty(row[col]), 0);
+
+        if (sizeSum === 0 && lineQty === 0) {
+            checks.push({ check: 'size-sum', status: 'skip', message: 'No quantities' });
+        } else if (sizeSum === lineQty) {
+            checks.push({ check: 'size-sum', status: 'pass', message: 'Size sum matches LineQty' });
+        } else {
+            checks.push({
+                check: 'size-sum',
+                status: 'warn',
+                message: 'LineQty ' + lineQty + ' != size sum ' + sizeSum
+            });
+        }
+    } else {
+        checks.push({ check: 'size-sum', status: 'skip', message: rowType + ' row' });
+    }
+
+    // --- Part Number Suffix Validation ---
+    if (rowType === 'product') {
+        const suffix = extractSuffix(pn);
+        const expectedCols = getExpectedColumns(suffix);
+        const sizeValues = {};
+        let hasAnySize = false;
+
+        for (const col of SIZE_COLUMNS) {
+            const q = parseQty(row[col]);
+            sizeValues[col] = q;
+            if (q > 0) hasAnySize = true;
+        }
+
+        if (!hasAnySize) {
+            checks.push({ check: 'suffix', status: 'skip', message: 'No size quantities to validate' });
+        } else {
+            // Check that qty appears in expected columns
+            const qtyInExpected = expectedCols.some(col => sizeValues[col] > 0);
+            // Check for qty in unexpected columns
+            const unexpectedCols = SIZE_COLUMNS.filter(
+                col => sizeValues[col] > 0 && !expectedCols.includes(col)
+            );
+
+            if (qtyInExpected && unexpectedCols.length === 0) {
+                checks.push({
+                    check: 'suffix',
+                    status: 'pass',
+                    message: 'Suffix ' + (suffix || '(base)') + ' matches size columns'
+                });
+            } else if (!qtyInExpected) {
+                checks.push({
+                    check: 'suffix',
+                    status: 'warn',
+                    message: 'Suffix ' + (suffix || '(base)') + ' expects qty in [' + expectedCols.join(',') + '] but found in [' +
+                        SIZE_COLUMNS.filter(c => sizeValues[c] > 0).join(',') + ']'
+                });
+            } else {
+                checks.push({
+                    check: 'suffix',
+                    status: 'warn',
+                    message: 'Unexpected qty in columns: ' + unexpectedCols.join(', ') + ' for suffix ' + (suffix || '(base)')
+                });
+            }
+        }
+    } else {
+        checks.push({ check: 'suffix', status: 'skip', message: rowType + ' row' });
+    }
+
+    // --- Unit Price Reasonableness ---
+    if (rowType === 'product') {
+        if (lineQty === 0) {
+            checks.push({ check: 'unit-price', status: 'skip', message: 'Qty is 0' });
+        } else {
+            const unitPrice = lineTotal / lineQty;
+            if (unitPrice >= 0.50 && unitPrice <= 500) {
+                checks.push({
+                    check: 'unit-price',
+                    status: 'pass',
+                    message: 'Unit price $' + unitPrice.toFixed(2) + ' is reasonable'
+                });
+            } else if (unitPrice === 0) {
+                checks.push({
+                    check: 'unit-price',
+                    status: 'warn',
+                    message: 'Unit price is $0.00 (placeholder?)'
+                });
+            } else {
+                checks.push({
+                    check: 'unit-price',
+                    status: 'warn',
+                    message: 'Unit price $' + unitPrice.toFixed(2) + ' outside $0.50-$500 range'
+                });
+            }
+        }
+    } else if (rowType === 'fee') {
+        // Fee validation
+        const pnUpper = pn.toUpperCase();
+        // Find matching fee key
+        let feeKey = null;
+        for (const key of KNOWN_FEES) {
+            if (pnUpper === key || pnUpper.startsWith(key + '-') || pnUpper.startsWith(key + '_')) {
+                feeKey = key;
+                break;
+            }
+        }
+
+        if (feeKey && FEE_PRICE_RANGES[feeKey]) {
+            const range = FEE_PRICE_RANGES[feeKey];
+            if (lineTotal >= range.min && lineTotal <= range.max) {
+                checks.push({
+                    check: 'fee-price',
+                    status: 'pass',
+                    message: range.label + ' total $' + lineTotal.toFixed(2) + ' in range'
+                });
+            } else if (lineTotal === 0) {
+                checks.push({
+                    check: 'fee-price',
+                    status: 'warn',
+                    message: range.label + ' total is $0'
+                });
+            } else {
+                checks.push({
+                    check: 'fee-price',
+                    status: 'warn',
+                    message: range.label + ' total $' + lineTotal.toFixed(2) + ' outside expected range ($' + range.min + ' - $' + range.max + ')'
+                });
+            }
+        } else {
+            checks.push({
+                check: 'fee-price',
+                status: 'pass',
+                message: 'Fee row: $' + lineTotal.toFixed(2)
+            });
+        }
+    } else {
+        checks.push({ check: 'unit-price', status: 'skip', message: 'Note row' });
+    }
+
+    // Overall status for the row
+    const statuses = checks.map(c => c.status);
+    let overall = 'pass';
+    if (statuses.includes('fail')) overall = 'fail';
+    else if (statuses.includes('warn')) overall = 'warn';
+    else if (statuses.every(s => s === 'skip')) overall = 'skip';
+
+    return { checks, overall };
+}
+
+// ============================================================
+// Processing Pipeline
+// ============================================================
+
+function processFile(text) {
+    showProgress(true);
+    updateProgress(10, 'Parsing CSV...');
+
+    // Use setTimeout to allow UI to update
+    setTimeout(function() {
+        const { headers, rows } = parseCSV(text);
+
+        if (rows.length === 0) {
+            showProgress(false);
+            showToast('No data rows found in CSV.');
+            return;
+        }
+
+        updateProgress(30, 'Parsed ' + rows.length.toLocaleString() + ' rows. Grouping by order...');
+
+        setTimeout(function() {
+            // Group by order
+            const orders = new Map();
+            const suffixCounts = {};
+            const feeCounts = {};
+            let productCount = 0, feeCount = 0, noteCount = 0;
+            let minDate = null, maxDate = null;
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const orderId = (row['id_Order'] || '').trim();
+                if (!orderId) continue;
+
+                if (!orders.has(orderId)) {
+                    orders.set(orderId, []);
+                }
+                orders.get(orderId).push(row);
+
+                // Classify
+                const rowType = classifyRow(row);
+                if (rowType === 'product') {
+                    productCount++;
+                    const suffix = extractSuffix((row['PartNumber'] || '').trim());
+                    if (suffix) {
+                        suffixCounts[suffix] = (suffixCounts[suffix] || 0) + 1;
+                    }
+                } else if (rowType === 'fee') {
+                    feeCount++;
+                    const pnUpper = (row['PartNumber'] || '').trim().toUpperCase();
+                    // Map to canonical fee name
+                    let feeKey = pnUpper;
+                    for (const key of KNOWN_FEES) {
+                        if (pnUpper === key || pnUpper.startsWith(key + '-') || pnUpper.startsWith(key + '_')) {
+                            feeKey = key;
+                            break;
+                        }
+                    }
+                    feeCounts[feeKey] = (feeCounts[feeKey] || 0) + 1;
+                } else {
+                    noteCount++;
+                }
+
+                // Date tracking
+                const dateStr = (row['date_Creation'] || '').trim();
+                if (dateStr) {
+                    const d = new Date(dateStr);
+                    if (!isNaN(d.getTime())) {
+                        if (!minDate || d < minDate) minDate = d;
+                        if (!maxDate || d > maxDate) maxDate = d;
+                    }
+                }
+            }
+
+            updateProgress(60, 'Validating ' + rows.length.toLocaleString() + ' rows...');
+
+            setTimeout(function() {
+                // Validate all rows
+                const validationMap = new Map();
+                let totalValidatable = 0;
+                let totalPassing = 0;
+
+                for (const [orderId, orderRows] of orders) {
+                    const validatedRows = [];
+                    let orderWarnings = 0;
+                    let orderErrors = 0;
+                    let orderTotal = 0;
+
+                    for (const row of orderRows) {
+                        const rowType = classifyRow(row);
+                        const validation = validateRow(row, rowType);
+                        const lineTotal = parseCurrency(row['LineTotal']);
+                        orderTotal += lineTotal;
+
+                        if (validation.overall === 'warn') orderWarnings++;
+                        if (validation.overall === 'fail') orderErrors++;
+                        if (validation.overall !== 'skip') {
+                            totalValidatable++;
+                            if (validation.overall === 'pass') totalPassing++;
+                        }
+
+                        validatedRows.push({
+                            row,
+                            rowType,
+                            validation,
+                            lineTotal
+                        });
+                    }
+
+                    validationMap.set(orderId, {
+                        rows: validatedRows,
+                        stats: {
+                            lineItems: orderRows.length,
+                            warnings: orderWarnings,
+                            errors: orderErrors,
+                            orderTotal
+                        }
+                    });
+                }
+
+                const passRate = totalValidatable > 0
+                    ? Math.round((totalPassing / totalValidatable) * 100)
+                    : 100;
+
+                // Store globally
+                parsedData = {
+                    orders,
+                    allRows: rows,
+                    headers,
+                    suffixCounts,
+                    feeCounts,
+                    productCount,
+                    feeCount,
+                    noteCount,
+                    minDate,
+                    maxDate,
+                    passRate,
+                    totalValidatable,
+                    totalPassing
+                };
+                validationResults = validationMap;
+
+                updateProgress(90, 'Rendering results...');
+
+                setTimeout(function() {
+                    renderDashboard();
+                    renderOrders();
+                    showProgress(false);
+                    document.getElementById('btnCopyReport').disabled = false;
+                    document.getElementById('btnReset').disabled = false;
+                    document.getElementById('dropZoneContainer').style.display = 'none';
+                }, 50);
+
+            }, 50);
+        }, 50);
+    }, 50);
+}
+
+// ============================================================
+// Rendering
+// ============================================================
+
+function renderDashboard() {
+    const d = parsedData;
+    const dateRange = (d.minDate && d.maxDate)
+        ? formatDate(d.minDate) + ' to ' + formatDate(d.maxDate)
+        : 'N/A';
+
+    // Quality card class
+    let qualityClass = 'quality-high';
+    if (d.passRate < 90) qualityClass = 'quality-mid';
+    if (d.passRate < 70) qualityClass = 'quality-low';
+
+    const statsGrid = document.getElementById('statsGrid');
+    statsGrid.innerHTML =
+        statCard('Total Orders', d.orders.size.toLocaleString(), dateRange) +
+        statCard('Total Rows', d.allRows.length.toLocaleString(),
+            d.productCount.toLocaleString() + ' product, ' +
+            d.feeCount.toLocaleString() + ' fee, ' +
+            d.noteCount.toLocaleString() + ' note') +
+        statCard('Data Quality', d.passRate + '%',
+            d.totalPassing.toLocaleString() + ' / ' + d.totalValidatable.toLocaleString() + ' checks pass',
+            qualityClass) +
+        statCard('Products', d.productCount.toLocaleString(), 'Garment/cap line items') +
+        statCard('Fees', d.feeCount.toLocaleString(), Object.keys(d.feeCounts).length + ' fee types') +
+        statCard('Notes', d.noteCount.toLocaleString(), 'Empty PartNumber rows');
+
+    // Breakdowns
+    const breakdownRow = document.getElementById('breakdownRow');
+    breakdownRow.innerHTML =
+        breakdownCard('Fee Frequency', d.feeCounts) +
+        breakdownCard('Size Suffix Distribution', d.suffixCounts);
+
+    document.getElementById('statsDashboard').classList.add('visible');
+}
+
+function statCard(label, value, detail, extraClass) {
+    return '<div class="stat-card ' + (extraClass || '') + '">' +
+        '<div class="stat-label">' + escapeHtml(label) + '</div>' +
+        '<div class="stat-value">' + escapeHtml(value) + '</div>' +
+        (detail ? '<div class="stat-detail">' + escapeHtml(detail) + '</div>' : '') +
+        '</div>';
+}
+
+function breakdownCard(title, countsObj) {
+    // Sort by count descending
+    const entries = Object.entries(countsObj).sort((a, b) => b[1] - a[1]);
+
+    let tags = '';
+    for (const [key, count] of entries) {
+        tags += '<span class="breakdown-tag">' +
+            '<span class="tag-label">' + escapeHtml(key || '(base)') + '</span>' +
+            '<span class="tag-count">' + count.toLocaleString() + '</span>' +
+            '</span>';
+    }
+
+    if (entries.length === 0) {
+        tags = '<span class="breakdown-tag"><span class="tag-label">None</span></span>';
+    }
+
+    return '<div class="breakdown-card">' +
+        '<h3>' + escapeHtml(title) + '</h3>' +
+        '<div class="breakdown-list">' + tags + '</div>' +
+        '</div>';
+}
+
+function renderOrders() {
+    // Build sorted list of order IDs
+    buildFilteredList();
+    renderedCount = 0;
+    document.getElementById('ordersContainer').innerHTML = '';
+    document.getElementById('ordersContainer').classList.add('visible');
+    document.getElementById('filterBar').classList.add('visible');
+    loadMoreOrders();
+}
+
+function buildFilteredList() {
+    const allIds = Array.from(validationResults.keys());
+
+    filteredOrderIds = allIds.filter(function(orderId) {
+        const orderData = validationResults.get(orderId);
+
+        // Status filter
+        if (currentFilter === 'warn' && orderData.stats.warnings === 0 && orderData.stats.errors === 0) return false;
+        if (currentFilter === 'fail' && orderData.stats.errors === 0) return false;
+        if (currentFilter === 'pass' && (orderData.stats.warnings > 0 || orderData.stats.errors > 0)) return false;
+
+        // Search filter
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            if (orderId.toLowerCase().includes(term)) return true;
+            // Check part numbers in this order
+            for (const vr of orderData.rows) {
+                const pn = (vr.row['PartNumber'] || '').toLowerCase();
+                if (pn.includes(term)) return true;
+            }
+            return false;
+        }
+
+        return true;
+    });
+
+    // Sort: errors first, then warnings, then clean
+    filteredOrderIds.sort(function(a, b) {
+        const ad = validationResults.get(a).stats;
+        const bd = validationResults.get(b).stats;
+        // Errors first
+        if (ad.errors !== bd.errors) return bd.errors - ad.errors;
+        // Then warnings
+        if (ad.warnings !== bd.warnings) return bd.warnings - ad.warnings;
+        // Then by order ID
+        return a.localeCompare(b);
+    });
+}
+
+function loadMoreOrders() {
+    const container = document.getElementById('ordersContainer');
+    const end = Math.min(renderedCount + BATCH_SIZE, filteredOrderIds.length);
+
+    const fragment = document.createDocumentFragment();
+    for (let i = renderedCount; i < end; i++) {
+        fragment.appendChild(createOrderElement(filteredOrderIds[i]));
+    }
+    container.appendChild(fragment);
+    renderedCount = end;
+
+    // Update load more
+    const remaining = filteredOrderIds.length - renderedCount;
+    const loadMore = document.getElementById('loadMoreContainer');
+    if (remaining > 0) {
+        loadMore.classList.add('visible');
+        document.getElementById('loadMoreInfo').textContent =
+            'Showing ' + renderedCount + ' of ' + filteredOrderIds.length + ' orders (' + remaining + ' remaining)';
+    } else {
+        loadMore.classList.remove('visible');
+    }
+}
+
+function createOrderElement(orderId) {
+    const orderData = validationResults.get(orderId);
+    const stats = orderData.stats;
+
+    const section = document.createElement('div');
+    section.className = 'order-section';
+    if (stats.errors > 0) section.classList.add('has-errors');
+    else if (stats.warnings > 0) section.classList.add('has-warnings');
+    else section.classList.add('all-pass');
+    section.setAttribute('data-order-id', orderId);
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'order-header';
+    header.onclick = function() { toggleOrder(section); };
+
+    // Badges HTML
+    let badgesHtml = '';
+    const passCount = orderData.rows.filter(r => r.validation.overall === 'pass').length;
+    const warnCount = stats.warnings;
+    const failCount = stats.errors;
+    const skipCount = orderData.rows.filter(r => r.validation.overall === 'skip').length;
+
+    if (failCount > 0) badgesHtml += '<span class="badge badge-fail">' + failCount + ' fail</span>';
+    if (warnCount > 0) badgesHtml += '<span class="badge badge-warn">' + warnCount + ' warn</span>';
+    if (passCount > 0) badgesHtml += '<span class="badge badge-pass">' + passCount + ' pass</span>';
+    if (skipCount > 0) badgesHtml += '<span class="badge badge-note">' + skipCount + ' skip</span>';
+
+    header.innerHTML =
+        '<span class="order-chevron">&#9654;</span>' +
+        '<span class="order-id">Order #' + escapeHtml(orderId) + '</span>' +
+        '<span class="order-meta">' +
+            '<span>' + stats.lineItems + ' line items</span>' +
+            '<span>$' + stats.orderTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</span>' +
+        '</span>' +
+        '<div class="order-badges">' + badgesHtml + '</div>';
+
+    section.appendChild(header);
+
+    // Body (lazy — built on first expand)
+    const body = document.createElement('div');
+    body.className = 'order-body';
+    body.setAttribute('data-rendered', 'false');
+    section.appendChild(body);
+
+    return section;
+}
+
+function toggleOrder(section) {
+    const wasExpanded = section.classList.contains('expanded');
+    section.classList.toggle('expanded');
+
+    if (!wasExpanded) {
+        const body = section.querySelector('.order-body');
+        if (body.getAttribute('data-rendered') === 'false') {
+            renderOrderBody(body, section.getAttribute('data-order-id'));
+            body.setAttribute('data-rendered', 'true');
+        }
+    }
+}
+
+function renderOrderBody(bodyEl, orderId) {
+    const orderData = validationResults.get(orderId);
+
+    let html = '<div class="order-table-wrapper"><table class="order-table">' +
+        '<thead><tr>' +
+        '<th>Status</th>' +
+        '<th>Part Number</th>' +
+        '<th>Color</th>' +
+        '<th>Type</th>' +
+        '<th>Description</th>' +
+        '<th>LineQty</th>' +
+        '<th class="size-col">S</th>' +
+        '<th class="size-col">M</th>' +
+        '<th class="size-col">LG</th>' +
+        '<th class="size-col">XL</th>' +
+        '<th class="size-col">XXL</th>' +
+        '<th class="size-col">XXXL</th>' +
+        '<th>LineTotal</th>' +
+        '</tr></thead><tbody>';
+
+    for (const vr of orderData.rows) {
+        const row = vr.row;
+        const pn = (row['PartNumber'] || '').trim();
+        const color = (row['PartColor'] || '').trim();
+        const type = (row['Type'] || '').trim();
+        const desc = (row['Description'] || '').trim();
+        const lineQty = (row['LineQty'] || '').trim();
+        const lineTotal = (row['LineTotal'] || '').trim();
+        const overall = vr.validation.overall;
+
+        const rowClass = 'row-' + vr.rowType;
+
+        html += '<tr class="' + rowClass + '">';
+
+        // Status
+        html += '<td><div class="status-cell"><span class="status-dot ' + overall + '"></span>' +
+            '<span>' + overall.toUpperCase() + '</span></div></td>';
+
+        // Part Number
+        html += '<td>' + escapeHtml(pn) + '</td>';
+
+        // Color
+        html += '<td>' + escapeHtml(color) + '</td>';
+
+        // Type
+        html += '<td>' + escapeHtml(type) + '</td>';
+
+        // Description (truncated)
+        const descShort = desc.length > 40 ? desc.substring(0, 37) + '...' : desc;
+        html += '<td title="' + escapeHtml(desc) + '">' + escapeHtml(descShort) + '</td>';
+
+        // LineQty
+        html += '<td>' + escapeHtml(lineQty) + '</td>';
+
+        // Size columns
+        for (const col of SIZE_COLUMNS) {
+            const val = parseQty(row[col]);
+            const cls = val === 0 ? 'size-col zero' : 'size-col';
+            html += '<td class="' + cls + '">' + (val || '') + '</td>';
+        }
+
+        // LineTotal
+        html += '<td>' + escapeHtml(lineTotal) + '</td>';
+
+        html += '</tr>';
+
+        // Validation messages (only show non-skip, non-pass messages, plus pass summary)
+        const nonTrivial = vr.validation.checks.filter(c => c.status === 'warn' || c.status === 'fail');
+        if (nonTrivial.length > 0) {
+            html += '<tr class="' + rowClass + '"><td colspan="13"><div class="validation-messages">';
+            for (const chk of nonTrivial) {
+                const cls = chk.status === 'fail' ? 'msg-fail' : 'msg-warn';
+                const icon = chk.status === 'fail' ? '&#10060;' : '&#9888;';
+                html += '<div class="validation-msg ' + cls + '">' +
+                    '<span class="msg-icon">' + icon + '</span>' +
+                    '<span>' + escapeHtml(chk.message) + '</span></div>';
+            }
+            html += '</div></td></tr>';
+        }
+    }
+
+    html += '</tbody></table></div>';
+    bodyEl.innerHTML = html;
+}
+
+// ============================================================
+// Filtering
+// ============================================================
+
+function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    applyFilters();
+}
+
+function applyFilters() {
+    searchTerm = document.getElementById('filterSearch').value.trim();
+    buildFilteredList();
+    renderedCount = 0;
+    document.getElementById('ordersContainer').innerHTML = '';
+    loadMoreOrders();
+}
+
+// ============================================================
+// Export / Copy Report
+// ============================================================
+
+function copyReportToClipboard() {
+    if (!parsedData || !validationResults) return;
+
+    const d = parsedData;
+    const dateRange = (d.minDate && d.maxDate)
+        ? formatDate(d.minDate) + ' to ' + formatDate(d.maxDate)
+        : 'N/A';
+
+    // Collect all issues
+    const issues = [];
+    for (const [orderId, orderData] of validationResults) {
+        for (const vr of orderData.rows) {
+            for (const chk of vr.validation.checks) {
+                if (chk.status === 'warn' || chk.status === 'fail') {
+                    issues.push({
+                        orderId: orderId,
+                        partNumber: (vr.row['PartNumber'] || '').trim(),
+                        issue: chk.message,
+                        severity: chk.status
+                    });
+                }
+            }
+        }
+    }
+
+    const report = {
+        summary: {
+            totalOrders: d.orders.size,
+            totalRows: d.allRows.length,
+            productRows: d.productCount,
+            feeRows: d.feeCount,
+            noteRows: d.noteCount,
+            passRate: d.passRate,
+            dateRange: dateRange
+        },
+        suffixDistribution: d.suffixCounts,
+        feeBreakdown: d.feeCounts,
+        issues: issues
+    };
+
+    const json = JSON.stringify(report, null, 2);
+
+    navigator.clipboard.writeText(json).then(function() {
+        showToast('Report JSON copied to clipboard (' + issues.length + ' issues)');
+    }).catch(function() {
+        // Fallback: create a temporary textarea
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            showToast('Report JSON copied to clipboard (' + issues.length + ' issues)');
+        } catch (e) {
+            showToast('Failed to copy. Check console for report.');
+            console.log(json);
+        }
+        document.body.removeChild(ta);
+    });
+}
+
+// ============================================================
+// UI Helpers
+// ============================================================
+
+function showProgress(visible) {
+    const el = document.getElementById('progressContainer');
+    if (visible) el.classList.add('visible');
+    else el.classList.remove('visible');
+}
+
+function updateProgress(pct, text) {
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = text;
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(function() {
+        toast.classList.remove('visible');
+    }, 3000);
+}
+
+function formatDate(d) {
+    if (!d) return '';
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function resetAll() {
+    parsedData = null;
+    validationResults = null;
+    currentFilter = 'all';
+    searchTerm = '';
+    renderedCount = 0;
+    filteredOrderIds = [];
+
+    document.getElementById('dropZoneContainer').style.display = '';
+    document.getElementById('statsDashboard').classList.remove('visible');
+    document.getElementById('filterBar').classList.remove('visible');
+    document.getElementById('ordersContainer').classList.remove('visible');
+    document.getElementById('ordersContainer').innerHTML = '';
+    document.getElementById('loadMoreContainer').classList.remove('visible');
+    document.getElementById('btnCopyReport').disabled = true;
+    document.getElementById('btnReset').disabled = true;
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('fileInput').value = '';
+
+    // Reset filter buttons
+    document.querySelectorAll('.filter-btn').forEach(function(b) {
+        b.classList.toggle('active', b.getAttribute('data-filter') === 'all');
+    });
+}
+
+// ============================================================
+// File Handling / Drag & Drop
+// ============================================================
+
+function handleFile(file) {
+    if (!file) return;
+    if (!file.name.match(/\.(csv|txt)$/i)) {
+        showToast('Please select a .csv or .txt file');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        processFile(e.target.result);
+    };
+    reader.onerror = function() {
+        showToast('Error reading file');
+    };
+    reader.readAsText(file);
+}
+
+// Setup drag & drop
+(function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
+            fileInput.click();
+        }
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) handleFile(this.files[0]);
+    });
+
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFile(files[0]);
+    });
+
+    // Prevent default browser behavior for drag on the whole document
+    document.addEventListener('dragover', function(e) { e.preventDefault(); });
+    document.addEventListener('drop', function(e) { e.preventDefault(); });
+})();
+</script>
+
+</body>
+</html>

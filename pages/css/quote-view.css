@@ -1030,6 +1030,10 @@ body {
     padding-left: 10px;
     font-weight: 600;
     color: var(--primary-color);
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .product-table td.desc-col {
@@ -1072,6 +1076,12 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.style-with-image span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .product-thumb {

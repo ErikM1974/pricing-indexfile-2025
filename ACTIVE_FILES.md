@@ -557,6 +557,13 @@ cap-embroidery-fix.css
 6. **Color Count** (2 tests) - 1-6 color validation
 7. **Complex Scenarios** (2 tests) - Combined features testing
 
+### Embroidery CSV Validator (2026-02)
+| File | Purpose | Status |
+|------|---------|--------|
+| `/tests/embroidery-csv-validator.html` | Drag-and-drop ShopWorks CSV validation tool (size suffix, qty math, fee checks) | ✅ Active |
+
+**Usage:** Open in browser, drag CSV export → instant validation report with pass/warn/fail per row
+
 ### Order Validation Tests (2026-02)
 | File | Purpose | Status |
 |------|---------|--------|
@@ -571,6 +578,13 @@ cap-embroidery-fix.css
 - Which orders can be priced via the quote builder (service codes + SanMar products)
 - Which need manual lookup (non-SanMar vendors)
 - Which are oddballs (typos, free-text, comments)
+
+| `/tests/validation/validate-csv-output-paths.js` | Full simulation: 3-CSV join, live API pricing, all 4 output path validation | ✅ Active |
+| `/tests/validation/csv-output-paths-report.json` | Generated full simulation report (not in git) | 📊 Output |
+
+**Run:** `node tests/validation/validate-csv-output-paths.js` (~3 min, 1134 API calls)
+
+**Purpose:** Joins 3 CSV data sources (line items, ODBC orders, stitch counts), reconstructs 1,261 embroidery orders, calls live pricing API, validates all 4 output paths (UI, PDF, Save, Clipboard). Compares computed pricing vs ShopWorks actuals.
 
 ### Data Seeding Scripts (2026-02)
 | File | Purpose | Status |

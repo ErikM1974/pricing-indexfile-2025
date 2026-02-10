@@ -450,8 +450,7 @@
                     <div class="keyboard-hint-content">
                         <kbd>Tab</kbd> Next cell &nbsp;|&nbsp;
                         <kbd>Enter</kbd> Next row &nbsp;|&nbsp;
-                        <kbd>Ctrl+S</kbd> Save &nbsp;|&nbsp;
-                        <kbd>Ctrl+P</kbd> Print PDF
+                        <kbd>Ctrl+S</kbd> Save
                     </div>
                 </div>
 
@@ -725,18 +724,10 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-panel">
-                <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
-                    <i class="fas fa-copy"></i> Copy Quote to Clipboard
-                </button>
-                <button class="btn-action btn-secondary-action" onclick="printQuote()">
-                    <i class="fas fa-print"></i> Print Quote
-                </button>
-                <button class="btn-action btn-secondary-action" onclick="generateShopWorksGuide()">
-                    <i class="fas fa-clipboard-list"></i> ShopWorks Entry Guide
-                </button>
-            </div>
+            <!-- Diagnose (dev tool) -->
+            <button class="btn-action btn-secondary-action" onclick="diagnoseQuote()" style="background: #7c3aed; color: white; margin-top: 8px; width: 100%;">
+                <i class="fas fa-stethoscope"></i> Diagnose Quote
+            </button>
             </div><!-- End sidebar-scroll-container -->
 
             <!-- Sticky TOTAL - Hidden (totals now shown in pricing summary above) -->
@@ -1283,7 +1274,6 @@ Company:Absher Construction Company
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
     <script src="/shared_components/js/embroidery-quote-pricing.js?v=20251219-no-monogram"></script>
     <script src="/shared_components/js/embroidery-quote-service.js?v=20260114-totalamount-fix"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20251219-no-monogram"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
@@ -1304,9 +1294,6 @@ Company:Absher Construction Company
 
     <!-- ShopWorks Import Parser -->
     <script src="/shared_components/js/shopworks-import-parser.js?v=20260204-decg-error"></script>
-
-    <!-- ShopWorks Data Entry Guide Generator -->
-    <script src="/shared_components/js/shopworks-guide-generator.js?v=20260205"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -5472,11 +5459,6 @@ Company:Absher Construction Company
                     saveQuote();
                 }
 
-                // Ctrl+P = Print
-                if (e.ctrlKey && e.key === 'p') {
-                    e.preventDefault();
-                    printQuote();
-                }
             });
         }
 
@@ -6361,284 +6343,6 @@ Company:Absher Construction Company
         // ACTIONS (Save, Print, Email, Copy)
         // ============================================================
 
-        async function printQuote() {
-            const allItems = collectProductsFromTable();
-            const products = allItems.filter(p => !p.isService);
-            const decgItems = collectDECGItems();
-            if (products.length === 0 && decgItems.length === 0) {
-                showToast('Add products before printing', 'error');
-                return;
-            }
-
-            showLoading(true);
-
-            try {
-                // Build separate logo configs for garments and caps
-                // Build AL entries from global toggle state (same as recalculatePricing)
-                const garmentALForPrint = globalAL.garment.enabled ? [{
-                    id: 'global-al-garment',
-                    position: 'AL',
-                    stitchCount: globalAL.garment.stitchCount,
-                    needsDigitizing: globalAL.garment.needsDigitizing
-                }] : [];
-                const capALForPrint = globalAL.cap.enabled ? [{
-                    id: 'global-al-cap',
-                    position: 'AL-Cap',
-                    stitchCount: globalAL.cap.stitchCount,
-                    needsDigitizing: globalAL.cap.needsDigitizing
-                }] : [];
-
-                const logoConfigs = {
-                    garment: {
-                        primary: { ...primaryLogo, id: 'primary' },
-                        additional: garmentALForPrint
-                    },
-                    cap: {
-                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capALForPrint
-                    }
-                };
-
-                // For backward compatibility, also create combined array
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...garmentALForPrint,
-                    { ...capPrimaryLogo, id: 'cap-primary' },
-                    ...capALForPrint
-                ];
-
-                let pricing;
-                if (products.length === 0) {
-                    // DECG-only: build minimal pricing (no pricing engine needed)
-                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-                    const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
-                    pricing = {
-                        products: [],
-                        totalQuantity: decgQty,
-                        subtotal: decgTotal,
-                        grandTotal: decgTotal,
-                        tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
-                        ltmFee: 0,
-                        additionalServices: [],
-                        additionalStitchTotal: 0,
-                        garmentStitchTotal: 0,
-                        capStitchTotal: 0,
-                        garmentSetupFees: 0,
-                        capSetupFees: 0,
-                        garmentQuantity: 0,
-                        capQuantity: 0
-                    };
-                } else {
-                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
-                }
-
-                // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
-                if (decgItems.length > 0) {
-                    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-                    pricing.subtotal += decgServiceTotal;
-                    pricing.grandTotal += decgServiceTotal;
-                }
-
-                // Generate and open print window
-                const invoiceGenerator = new EmbroideryInvoiceGenerator();
-                const customerData = {
-                    customerName: document.getElementById('customer-name').value || 'Customer',
-                    companyName: document.getElementById('company-name').value || '',
-                    customerEmail: document.getElementById('customer-email').value || '',
-                    salesRepEmail: document.getElementById('sales-rep').value
-                };
-
-                // LTM baked into per-piece prices (2026-02-06)
-                pricing.ltmDistributed = true;
-
-                // Pass tax toggle state to invoice
-                pricing.includeTax = document.getElementById('include-tax')?.checked ?? true;
-
-                // Add additional charges to pricing data for PDF (2026 fee refactor)
-                const additionalCharges = getAdditionalCharges();
-                pricing.artCharge = additionalCharges.artCharge || 0;
-                pricing.graphicDesignHours = additionalCharges.graphicDesignHours || 0;
-                pricing.graphicDesignCharge = additionalCharges.graphicDesignCharge || 0;
-                pricing.rushFee = additionalCharges.rushFee || 0;
-                pricing.discount = additionalCharges.discount || 0;
-                pricing.discountReason = additionalCharges.discountReason || '';
-
-                // Add DECG/DECC (Customer-Supplied items) for PDF
-                pricing.decgQty = additionalCharges.decgQty || 0;
-                pricing.decgUnit = additionalCharges.decgUnit || 0;
-                pricing.decgTotal = additionalCharges.decgTotal || 0;
-                pricing.deccQty = additionalCharges.deccQty || 0;
-                pricing.deccUnit = additionalCharges.deccUnit || 0;
-                pricing.deccTotal = additionalCharges.deccTotal || 0;
-
-                const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricing, customerData);
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(invoiceHTML);
-                printWindow.document.close();
-
-                setTimeout(() => {
-                    printWindow.print();
-                }, 300);
-
-                showToast('Opening print dialog...', 'success');
-            } catch (error) {
-                console.error('Print error:', error);
-                showToast('Error generating PDF', 'error');
-            }
-
-            showLoading(false);
-        }
-
-        /**
-         * Generate ShopWorks Data Entry Guide
-         * Collects products + fees, opens printable guide with all line items
-         */
-        async function generateShopWorksGuide() {
-            const products = collectProductsFromTable();
-            if (products.length === 0) {
-                showToast('Add products before generating guide', 'error');
-                return;
-            }
-
-            showLoading(true);
-
-            try {
-                // Build logo configs
-                const logoConfigs = {
-                    garment: {
-                        primary: { ...primaryLogo, id: 'primary' },
-                        additional: additionalLogos
-                    },
-                    cap: {
-                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capAdditionalLogos
-                    }
-                };
-
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...additionalLogos
-                ];
-
-                const pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
-                const additionalCharges = getAdditionalCharges();
-
-                // Build fee items array for the guide (only non-zero fees)
-                const feeItems = [];
-
-                // Extra stitches - garments (AS-GARM)
-                if (pricing.garmentStitchTotal > 0) {
-                    const garmentQty = pricing.garmentQuantity || 0;
-                    const unitPrice = garmentQty > 0 ? pricing.garmentStitchTotal / garmentQty : pricing.garmentStitchTotal;
-                    feeItems.push({ partNumber: 'AS-GARM', description: 'Extra Stitches - Garments', quantity: garmentQty || 1, unitPrice: unitPrice, lineTotal: pricing.garmentStitchTotal });
-                }
-
-                // Extra stitches - caps (AS-CAP)
-                if (pricing.capStitchTotal > 0) {
-                    const capQty = pricing.capQuantity || 0;
-                    const unitPrice = capQty > 0 ? pricing.capStitchTotal / capQty : pricing.capStitchTotal;
-                    feeItems.push({ partNumber: 'AS-CAP', description: 'Extra Stitches - Caps', quantity: capQty || 1, unitPrice: unitPrice, lineTotal: pricing.capStitchTotal });
-                }
-
-                // Digitizing - garments (DD)
-                if (pricing.garmentSetupFees > 0) {
-                    feeItems.push({ partNumber: 'DD', description: 'Digitizing - Garments', quantity: 1, unitPrice: pricing.garmentSetupFees, lineTotal: pricing.garmentSetupFees });
-                }
-
-                // Digitizing - caps (DD)
-                if (pricing.capSetupFees > 0) {
-                    feeItems.push({ partNumber: 'DD', description: 'Digitizing - Caps', quantity: 1, unitPrice: pricing.capSetupFees, lineTotal: pricing.capSetupFees });
-                }
-
-                // Art/Setup (GRT-50)
-                if (additionalCharges.artCharge > 0) {
-                    feeItems.push({ partNumber: 'GRT-50', description: 'Art/Setup Fee', quantity: 1, unitPrice: additionalCharges.artCharge, lineTotal: additionalCharges.artCharge });
-                }
-
-                // Graphic Design (GRT-75)
-                if (additionalCharges.graphicDesignCharge > 0) {
-                    feeItems.push({ partNumber: 'GRT-75', description: 'Graphic Design Services', quantity: additionalCharges.graphicDesignHours || 1, unitPrice: 75, lineTotal: additionalCharges.graphicDesignCharge });
-                }
-
-                // Rush (RUSH)
-                if (additionalCharges.rushFee > 0) {
-                    feeItems.push({ partNumber: 'RUSH', description: 'Rush Order Fee', quantity: 1, unitPrice: additionalCharges.rushFee, lineTotal: additionalCharges.rushFee });
-                }
-
-                // Sample (SAMPLE)
-                if (additionalCharges.sampleFee > 0) {
-                    const sampleQty = additionalCharges.sampleQty || 1;
-                    feeItems.push({ partNumber: 'SAMPLE', description: 'Sample Fee', quantity: sampleQty, unitPrice: additionalCharges.sampleFee / sampleQty, lineTotal: additionalCharges.sampleFee });
-                }
-
-                // LTM - Garments (skip when LTM is distributed into per-piece prices)
-                if (pricing.garmentLtmFee > 0 && !pricing.ltmDistributed) {
-                    feeItems.push({ partNumber: 'LTM', description: 'Less Than Minimum - Garments', quantity: 1, unitPrice: pricing.garmentLtmFee, lineTotal: pricing.garmentLtmFee });
-                }
-
-                // LTM - Caps (skip when LTM is distributed into per-piece prices)
-                if (pricing.capLtmFee > 0 && !pricing.ltmDistributed) {
-                    feeItems.push({ partNumber: 'LTM', description: 'Less Than Minimum - Caps', quantity: 1, unitPrice: pricing.capLtmFee, lineTotal: pricing.capLtmFee });
-                }
-
-                // Discount (negative)
-                if (additionalCharges.discount > 0) {
-                    const reason = additionalCharges.discountReason ? `Discount - ${additionalCharges.discountReason}` : 'Discount';
-                    feeItems.push({ partNumber: 'DISCOUNT', description: reason, quantity: 1, unitPrice: -additionalCharges.discount, lineTotal: -additionalCharges.discount });
-                }
-
-                // Build quoteData for the guide
-                const customerName = document.getElementById('customer-name')?.value || 'Customer';
-                const quoteID = editingQuoteId || 'DRAFT';
-
-                // Build product objects with size-specific pricing for the guide
-                const guideProducts = [];
-                for (const pp of pricing.products) {
-                    for (const lineItem of pp.lineItems) {
-                        const sizeBreakdown = lineItem.description
-                            ? quoteService.parseDescriptionToSizeBreakdown(lineItem.description)
-                            : {};
-
-                        // Build per-size pricing from lineItem data
-                        const sizesPricing = {};
-                        Object.keys(sizeBreakdown).forEach(size => {
-                            sizesPricing[size] = lineItem.unitPriceWithLTM || lineItem.unitPrice;
-                        });
-
-                        guideProducts.push({
-                            StyleNumber: pp.product.style,
-                            ProductName: `${pp.product.title} - ${pp.product.color}`,
-                            Color: pp.product.color,
-                            CatalogColor: pp.product.catalogColor || '',
-                            SizeBreakdown: sizeBreakdown,
-                            FinalUnitPrice: lineItem.unitPriceWithLTM || lineItem.unitPrice,
-                            BaseUnitPrice: lineItem.basePrice || lineItem.unitPrice,
-                            SizesPricing: sizesPricing
-                        });
-                    }
-                }
-
-                const quoteData = {
-                    products: guideProducts,
-                    feeItems: feeItems,
-                    CustomerName: customerName,
-                    QuoteID: quoteID,
-                    TotalQuantity: pricing.totalQuantity,
-                    Notes: ''
-                };
-
-                const generator = new ShopWorksGuideGenerator();
-                generator.generateGuide(quoteData);
-
-                showToast('Opening ShopWorks guide...', 'success');
-            } catch (error) {
-                console.error('ShopWorks guide error:', error);
-                showToast('Error generating ShopWorks guide', 'error');
-            }
-
-            showLoading(false);
-        }
-
         /**
          * Save quote and get shareable link
          * Uses EmbroideryQuoteService and QuoteShareModal
@@ -7400,230 +7104,6 @@ Company:Absher Construction Company
             return items;
         }
 
-        async function copyToClipboard() {
-            const allItems = collectProductsFromTable();
-            const products = allItems.filter(p => !p.isService);
-            const decgItems = collectDECGItems();
-            if (products.length === 0 && decgItems.length === 0) {
-                showToast('Add products first', 'error');
-                return;
-            }
-
-            try {
-                // Build AL entries from global toggle state (same as recalculatePricing)
-                const garmentALForCopy = globalAL.garment.enabled ? [{
-                    id: 'global-al-garment',
-                    position: 'AL',
-                    stitchCount: globalAL.garment.stitchCount,
-                    needsDigitizing: globalAL.garment.needsDigitizing
-                }] : [];
-                const capALForCopy = globalAL.cap.enabled ? [{
-                    id: 'global-al-cap',
-                    position: 'AL-Cap',
-                    stitchCount: globalAL.cap.stitchCount,
-                    needsDigitizing: globalAL.cap.needsDigitizing
-                }] : [];
-
-                const logoConfigs = {
-                    garment: {
-                        primary: { ...primaryLogo, id: 'primary' },
-                        additional: garmentALForCopy
-                    },
-                    cap: {
-                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capALForCopy
-                    }
-                };
-
-                // Combined array for backward compat
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...garmentALForCopy,
-                    { ...capPrimaryLogo, id: 'cap-primary' },
-                    ...capALForCopy
-                ];
-
-                let pricing;
-                if (products.length === 0) {
-                    // DECG-only: build minimal pricing (no pricing engine needed)
-                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-                    const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
-                    pricing = {
-                        products: [],
-                        totalQuantity: decgQty,
-                        subtotal: decgTotal,
-                        grandTotal: decgTotal,
-                        tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
-                        ltmFee: 0,
-                        additionalServices: [],
-                        additionalStitchTotal: 0,
-                        garmentStitchTotal: 0,
-                        capStitchTotal: 0,
-                        garmentSetupFees: 0,
-                        capSetupFees: 0,
-                        garmentQuantity: 0,
-                        capQuantity: 0
-                    };
-                } else {
-                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
-                }
-
-                // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
-                if (decgItems.length > 0) {
-                    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-                    pricing.subtotal += decgServiceTotal;
-                    pricing.grandTotal += decgServiceTotal;
-                }
-
-                const text = generateQuoteText(products, pricing, logoConfigs);
-                await navigator.clipboard.writeText(text);
-
-                showToast('Quote copied to clipboard!', 'success');
-            } catch (error) {
-                console.error('Copy error:', error);
-                showToast('Error copying to clipboard', 'error');
-            }
-        }
-
-        function generateQuoteText(products, pricing, logoConfigs) {
-            // Cap position name mapping
-            const capPositionNames = {
-                'CF': 'Cap Front',
-                'CB': 'Cap Back',
-                'CL': 'Left Side',
-                'CR': 'Right Side'
-            };
-
-            const lines = [
-                'NORTHWEST CUSTOM APPAREL - EMBROIDERY QUOTE',
-                '================================================',
-                `Date: ${new Date().toLocaleDateString()}`,
-                `Customer: ${document.getElementById('customer-name').value || 'N/A'}`,
-                `Company: ${document.getElementById('company-name').value || 'N/A'}`,
-            ];
-
-            // Separate caps from garments
-            const capProducts = products.filter(p => p.isCap === true);
-            const garmentProducts = products.filter(p => p.isCap !== true);
-
-            // Show garment embroidery section if garments in quote
-            if (garmentProducts.length > 0) {
-                lines.push('');
-                lines.push('GARMENT EMBROIDERY:');
-                lines.push(`  Primary: ${logoConfigs.garment.primary.position}, ${logoConfigs.garment.primary.stitchCount.toLocaleString()} stitches`);
-                if (logoConfigs.garment.additional.length > 0) {
-                    logoConfigs.garment.additional.forEach(logo => {
-                        lines.push(`  Additional: ${logo.position}, ${logo.stitchCount.toLocaleString()} stitches`);
-                    });
-                }
-            }
-
-            // Show cap embellishment section if caps in quote
-            if (capProducts.length > 0) {
-                lines.push('');
-                // Show embellishment type in header
-                const embType = logoConfigs.cap.primary.embellishmentType || 'embroidery';
-                const embTypeLabel = {
-                    'embroidery': 'CAP EMBROIDERY:',
-                    '3d-puff': 'CAP 3D PUFF EMBROIDERY:',
-                    'laser-patch': 'CAP LASER LEATHERETTE PATCH:'
-                }[embType] || 'CAP EMBELLISHMENT:';
-                lines.push(embTypeLabel);
-
-                const capPosName = capPositionNames[logoConfigs.cap.primary.position] || logoConfigs.cap.primary.position;
-                if (embType === 'laser-patch') {
-                    // Patches don't have stitch count - standard size only (2-4")
-                    lines.push(`  Position: ${capPosName}`);
-                    lines.push(`  Patch Size: Standard (2-4")`);
-                } else {
-                    // Embroidery (flat or 3D puff) shows stitch count
-                    lines.push(`  Front Logo: ${capPosName}, ${logoConfigs.cap.primary.stitchCount.toLocaleString()} stitches`);
-                    if (embType === '3d-puff') {
-                        const upcharges = pricingCalculator.getEmbellishmentUpcharges();
-                        lines.push(`  3D Puff Upcharge: +$${upcharges.puff.toFixed(2)}/cap`);
-                    }
-                }
-                // Only show additional logos for embroidery (not patches)
-                if (embType !== 'laser-patch' && logoConfigs.cap.additional.length > 0) {
-                    logoConfigs.cap.additional.forEach(logo => {
-                        const posName = capPositionNames[logo.position] || logo.position;
-                        lines.push(`  Additional: ${posName}, ${logo.stitchCount.toLocaleString()} stitches`);
-                    });
-                }
-            }
-
-            // Show garment products if any
-            if (garmentProducts.length > 0) {
-                lines.push('');
-                lines.push('GARMENTS:');
-                lines.push('------------------------------------------------');
-                garmentProducts.forEach(p => {
-                    const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
-                    lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQuantity}`);
-                });
-            }
-
-            // Show cap products if any
-            if (capProducts.length > 0) {
-                lines.push('');
-                lines.push('CAPS:');
-                lines.push('------------------------------------------------');
-                capProducts.forEach(p => {
-                    const sizes = Object.entries(p.sizeBreakdown).map(([s, q]) => `${s}:${q}`).join(' ');
-                    lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQuantity}`);
-                });
-            }
-
-            lines.push('');
-            lines.push('------------------------------------------------');
-            lines.push(`Total Pieces: ${pricing.totalQuantity}`);
-            // Show quantity breakdown for mixed quotes
-            if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`  Garments: ${pricing.garmentQuantity}`);
-                lines.push(`  Caps: ${pricing.capQuantity}`);
-            }
-
-            // Show tier (with breakdown for mixed quotes)
-            if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`Pricing Tier: Mixed`);
-                lines.push(`  Garment Tier: ${pricing.garmentTier}`);
-                lines.push(`  Cap Tier: ${pricing.capTier}`);
-            } else if (pricing.hasCaps) {
-                lines.push(`Tier: ${pricing.capTier}`);
-            } else {
-                lines.push(`Tier: ${pricing.garmentTier || pricing.tier}`);
-            }
-
-            // Show subtotal breakdown for mixed quotes
-            if (pricing.hasCaps && pricing.hasGarments) {
-                lines.push(`Products (Base 8K): $${pricing.subtotal.toFixed(2)}`);
-                lines.push(`  Garments Subtotal: $${pricing.garmentSubtotal.toFixed(2)}`);
-                lines.push(`  Caps Subtotal: $${pricing.capSubtotal.toFixed(2)}`);
-            } else {
-                lines.push(`Products (Base 8K): $${pricing.subtotal.toFixed(2)}`);
-            }
-
-            // Show LTM (with breakdown for mixed quotes)
-            if (pricing.ltmFee > 0) {
-                const hasGarmentLtm = (pricing.garmentLtmFee || 0) > 0;
-                const hasCapLtm = (pricing.capLtmFee || 0) > 0;
-
-                if (hasGarmentLtm && hasCapLtm) {
-                    lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
-                    lines.push(`  Garment: $${pricing.garmentLtmFee.toFixed(2)}`);
-                    lines.push(`  Cap: $${pricing.capLtmFee.toFixed(2)}`);
-                } else {
-                    lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
-                }
-            }
-            if (pricing.setupFees > 0) lines.push(`Setup: $${pricing.setupFees.toFixed(2)}`);
-            lines.push(`TOTAL: $${pricing.grandTotal.toFixed(2)}`);
-            lines.push('');
-            lines.push('Northwest Custom Apparel | 253-922-5793');
-
-            return lines.join('\n');
-        }
-
         // ============================================================
         // UTILITIES
         // ============================================================
@@ -7698,7 +7178,7 @@ Company:Absher Construction Company
                         const swPrice = prod.unitPrice || 0;
                         const swAvail = swPrice > 0;
                         const apiAvail = prod.sizePrices != null;
-                        const defaultSel = apiAvail ? 'api' : (swAvail ? 'sw' : 'custom');
+                        const defaultSel = swAvail ? 'sw' : (apiAvail ? 'api' : 'custom');
 
                         pHtml += `<div class="spr-product-card" data-spr-pidx="${pIdx}">`;
                         pHtml += `<div class="spr-product-header">`;
@@ -9047,7 +8527,7 @@ Company:Absher Construction Company
                 let customProductsImported = 0;
                 if (data.customProducts && data.customProducts.length > 0) {
                     for (const product of data.customProducts) {
-                        await importProductRow(product);
+                        await importProductRow(product, product.unitPrice || 0);
                         customProductsImported++;
                     }
 
@@ -9115,6 +8595,7 @@ Company:Absher Construction Company
             addNewRow();
             const row = document.querySelector('tr.new-row');
             if (!row) throw new Error('Failed to create row');
+            row.classList.remove('new-row');  // Remove immediately to prevent collision with next import
 
             const rowId = parseInt(row.dataset.rowId);
             const styleInput = row.querySelector('.style-input');
@@ -9135,12 +8616,25 @@ Company:Absher Construction Company
             }
 
             // 1. Set the style number and trigger load
-            styleInput.value = product.partNumber;
-            await onStyleChange(styleInput, rowId);
+            if (product.partNumber) {
+                styleInput.value = product.partNumber;
+                await onStyleChange(styleInput, rowId);
 
-            // Re-apply — onStyleChange may overwrite sellPrice for non-SanMar products
-            if (sellPriceOverride > 0) {
-                row.dataset.sellPrice = sellPriceOverride.toString();
+                // Re-apply — onStyleChange may overwrite sellPrice for non-SanMar products
+                if (sellPriceOverride > 0) {
+                    row.dataset.sellPrice = sellPriceOverride.toString();
+                }
+            } else {
+                // Empty PN (e.g., "drinkware laser logo setup") — skip API lookup,
+                // go straight to notFound handler below
+                row.dataset.notFound = 'true';
+                row.dataset.style = product.description || 'Custom Item';
+                const descInput = row.querySelector('[data-field="description"]');
+                if (descInput) {
+                    descInput.value = product.description || 'Custom Item';
+                    descInput.readOnly = false;
+                }
+                row.dataset.productName = product.description || 'Custom Item';
             }
 
             // 2. Wait for colors to populate dropdown
@@ -9158,8 +8652,74 @@ Company:Absher Construction Company
                 return row;
             }
 
-            // Row is still "Not found" — it will have an "Add" button for the user
+            // Row is still "Not found" — force-import as non-SanMar so sizes work
             if (row.dataset.notFound === 'true') {
+                // Convert from "Not Found" to non-SanMar so size inputs get enabled
+                row.dataset.nonSanmar = 'true';
+                delete row.dataset.notFound;
+
+                // Remove the "Add" button (no longer needed since we're force-importing)
+                const addBtn = row.querySelector('.btn-add-nonsanmar');
+                if (addBtn) addBtn.remove();
+
+                // Set sell price from pricing review modal
+                if (sellPriceOverride > 0) {
+                    row.dataset.sellPrice = sellPriceOverride.toString();
+                }
+
+                // Preserve ShopWorks description as ProductName for all output paths
+                const importData = JSON.parse(row.dataset.importData || '{}');
+                if (importData.description) {
+                    const descInput = row.querySelector('[data-field="description"]');
+                    if (descInput) descInput.value = importData.description;
+                    row.dataset.productName = importData.description;
+                }
+
+                // Detect cap vs garment and enable appropriate size inputs
+                const isCap = isCapProduct(product.partNumber, product.description || '');
+                if (isCap) {
+                    row.dataset.isCap = 'true';
+                    const capBadge = document.getElementById(`cap-badge-${rowId}`);
+                    if (capBadge) capBadge.style.display = 'inline-flex';
+
+                    // Check if sizes are OSFA — set up OSFA-only mode
+                    const hasOSFA = product.sizes && product.sizes['OSFA'];
+                    if (hasOSFA) {
+                        row.dataset.sizeCategory = 'osfa-only';
+                        row.dataset.isOsfaOnly = 'true';
+                        row.dataset.osfaQty = product.sizes['OSFA'];
+                        row.dataset.availableSizes = JSON.stringify(['OSFA']);
+                        row.dataset.capSizes = JSON.stringify(['OSFA']);
+                        const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
+                        if (qtyDisplay) qtyDisplay.textContent = product.sizes['OSFA'];
+                    } else {
+                        // Cap with standard sizes (S, M, L, etc.) — enable all size inputs
+                        row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+                    }
+                } else {
+                    row.dataset.isCap = 'false';
+                    // Enable standard garment sizes (S-3XL)
+                    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+                }
+
+                // Reorder row into correct section (caps vs garments)
+                reorderRowByProductType(row);
+                updateCapLogoSectionVisibility();
+
+                // Now apply color and sizes — inputs are enabled so quantities will set
+                // For OSFA caps, sizes are already set above; reImportNonSanmarRow
+                // handles color and any non-OSFA sizes
+                const importColor = product.color || 'N/A';
+                row.dataset.color = importColor;
+                row.dataset.catalogColor = importColor;
+
+                await reImportNonSanmarRow(row, rowId, {
+                    color: importColor,
+                    sizes: product.sizes
+                });
+
+                // Trigger size change to update qty display and pricing
+                onSizeChange(rowId);
                 return row;
             }
 
@@ -9196,6 +8756,10 @@ Company:Absher Construction Company
                         selectColor(rowId, colorOption);
                         // Wait for detectAndAdjustSizeUI to complete
                         await new Promise(resolve => setTimeout(resolve, 300));
+                        // Re-apply — selectColor() clears sellPrice for SanMar products (line 4668)
+                        if (sellPriceOverride > 0) {
+                            row.dataset.sellPrice = sellPriceOverride.toString();
+                        }
                     } else {
                         console.warn(`[ShopWorks Import] Color "${product.color}" not found for ${product.partNumber}`);
                     }
@@ -9283,6 +8847,289 @@ Company:Absher Construction Company
             // 6. Trigger size change to recalculate
             onSizeChange(rowId);
             return row;
+        }
+
+        // ============================================================
+        // DIAGNOSTIC TOOL — diagnoseQuote()
+        // Captures current quote state, runs validation checks,
+        // and copies compact JSON to clipboard for analysis
+        // ============================================================
+        async function diagnoseQuote() {
+            const allItems = collectProductsFromTable();
+            const products = allItems.filter(p => !p.isService);
+            const serviceItems = allItems.filter(p => p.isService);
+            const decgItems = collectDECGItems();
+
+            if (products.length === 0 && serviceItems.length === 0 && decgItems.length === 0) {
+                showToast('Add products before diagnosing', 'error');
+                return;
+            }
+
+            const checks = [];
+            let passCount = 0;
+            let warnCount = 0;
+            let failCount = 0;
+
+            function addCheck(name, status, detail) {
+                checks.push({ name, status, detail });
+                if (status === 'PASS') passCount++;
+                else if (status === 'WARN') warnCount++;
+                else failCount++;
+            }
+
+            try {
+                // Re-run pricing engine (same as recalculatePricing)
+                const garmentALForDiag = globalAL.garment.enabled ? [{
+                    id: 'global-al-garment', position: 'AL',
+                    stitchCount: globalAL.garment.stitchCount,
+                    needsDigitizing: globalAL.garment.needsDigitizing
+                }] : [];
+                const capALForDiag = globalAL.cap.enabled ? [{
+                    id: 'global-al-cap', position: 'AL-Cap',
+                    stitchCount: globalAL.cap.stitchCount,
+                    needsDigitizing: globalAL.cap.needsDigitizing
+                }] : [];
+
+                const logoConfigs = {
+                    garment: { primary: { ...primaryLogo, id: 'primary' }, additional: garmentALForDiag },
+                    cap: { primary: { ...capPrimaryLogo, id: 'cap-primary' }, additional: capALForDiag }
+                };
+                const allLogos = [{ ...primaryLogo, id: 'primary' }, ...garmentALForDiag];
+
+                let pricing;
+                if (products.length === 0) {
+                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+                    pricing = {
+                        products: [], totalQuantity: decgQty, subtotal: decgTotal,
+                        grandTotal: decgTotal,
+                        tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+                        ltmFee: 0, additionalServices: [], additionalStitchTotal: 0,
+                        garmentStitchTotal: 0, capStitchTotal: 0,
+                        garmentSetupFees: 0, capSetupFees: 0,
+                        garmentQuantity: 0, capQuantity: 0
+                    };
+                } else {
+                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                }
+
+                // Include service item totals (same as recalculatePricing)
+                let serviceTotal = 0;
+                serviceItems.forEach(si => { serviceTotal += si.unitPrice * si.totalQuantity; });
+                if (serviceTotal > 0) {
+                    pricing.subtotal += serviceTotal;
+                    pricing.grandTotal += serviceTotal;
+                }
+
+                // Include DECG/DECC totals (same as recalculatePricing)
+                if (decgItems.length > 0) {
+                    const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    pricing.subtotal += decgServiceTotal;
+                    pricing.grandTotal += decgServiceTotal;
+                }
+
+                // Include child row override deltas (same as recalculatePricing)
+                let childOverrideDelta = 0;
+                document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
+                    const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+                    if (childOverride <= 0) return;
+                    const childRowId = childRow.dataset.rowId;
+                    const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                    const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
+                    if (!childPriceCell) return;
+                    const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
+                    const calculatedPrice = parseFloat(currentText) || 0;
+                    const qty = parseInt(childQtyCell?.textContent) || 0;
+                    childOverrideDelta += (childOverride - calculatedPrice) * qty;
+                });
+                if (childOverrideDelta !== 0) {
+                    pricing.subtotal += childOverrideDelta;
+                    pricing.grandTotal += childOverrideDelta;
+                }
+
+                const additionalCharges = getAdditionalCharges();
+                const { baseSubtotal, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
+
+                // ---- CHECK 1: Line items sum to subtotal ----
+                let productLineTotal = 0;
+                if (pricing.products) {
+                    pricing.products.forEach(pp => {
+                        pp.lineItems.forEach(li => {
+                            const price = li.unitPriceWithLTM || li.unitPrice;
+                            productLineTotal += price * li.quantity;
+                        });
+                    });
+                }
+                productLineTotal += serviceTotal;
+                if (decgItems.length > 0) {
+                    productLineTotal += decgItems.reduce((sum, d) => sum + d.total, 0);
+                }
+                productLineTotal += childOverrideDelta;
+                const subtotalDiff = Math.abs(productLineTotal - pricing.subtotal);
+                if (subtotalDiff < 0.02) {
+                    addCheck('Line items sum to subtotal', 'PASS', `$${productLineTotal.toFixed(2)} == $${pricing.subtotal.toFixed(2)}`);
+                } else {
+                    addCheck('Line items sum to subtotal', 'FAIL', `Product lines: $${productLineTotal.toFixed(2)}, Subtotal: $${pricing.subtotal.toFixed(2)}, diff: $${subtotalDiff.toFixed(2)}`);
+                }
+
+                // ---- CHECK 2: Grand total formula ----
+                const expectedGrand = pricing.subtotal + (pricing.setupFees || ((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)));
+                const actualGrand = pricing.grandTotal;
+                const grandDiff = Math.abs(expectedGrand - actualGrand);
+                if (grandDiff < 0.02) {
+                    addCheck('Grand total formula', 'PASS', `subtotal($${pricing.subtotal.toFixed(2)}) + setup($${((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)).toFixed(2)}) = $${actualGrand.toFixed(2)}`);
+                } else {
+                    addCheck('Grand total formula', 'WARN', `Expected: $${expectedGrand.toFixed(2)}, Got: $${actualGrand.toFixed(2)}, diff: $${grandDiff.toFixed(2)}`);
+                }
+
+                // ---- CHECK 3: DECG included in output paths ----
+                if (decgItems.length > 0) {
+                    const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+                    const grandIncludesDECG = pricing.grandTotal >= decgTotal - 0.01;
+                    if (grandIncludesDECG) {
+                        addCheck('DECG in grandTotal', 'PASS', `$${decgTotal.toFixed(2)} included in grandTotal $${pricing.grandTotal.toFixed(2)}`);
+                    } else {
+                        addCheck('DECG in grandTotal', 'FAIL', `DECG total $${decgTotal.toFixed(2)} NOT reflected in grandTotal $${pricing.grandTotal.toFixed(2)}`);
+                    }
+                } else {
+                    addCheck('DECG in grandTotal', 'PASS', 'No DECG items (N/A)');
+                }
+
+                // ---- CHECK 4: UI displayed total matches computed total ----
+                const displayedGrandText = document.getElementById('grand-total')?.textContent || '$0.00';
+                const displayedGrand = parseFloat(displayedGrandText.replace(/[$,]/g, '')) || 0;
+                const uiDiff = Math.abs(displayedGrand - pricing.grandTotal);
+                if (uiDiff < 0.02) {
+                    addCheck('UI total matches computed', 'PASS', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}`);
+                } else {
+                    addCheck('UI total matches computed', 'FAIL', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}, diff: $${uiDiff.toFixed(2)}`);
+                }
+
+                // ---- CHECK 5: AL module arrays in sync with globalAL ----
+                const garmentALEnabled = globalAL.garment.enabled;
+                const capALEnabled = globalAL.cap.enabled;
+                const garmentALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
+                const capALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
+
+                let alSyncOk = true;
+                let alDetail = [];
+                if (garmentALEnabled && garmentALInPricing.length === 0 && (pricing.garmentQuantity || 0) > 0) {
+                    alSyncOk = false;
+                    alDetail.push('Garment AL enabled but no AL in pricing results');
+                }
+                if (!garmentALEnabled && garmentALInPricing.length > 0) {
+                    alSyncOk = false;
+                    alDetail.push('Garment AL disabled but pricing has AL entries');
+                }
+                if (capALEnabled && capALInPricing.length === 0 && (pricing.capQuantity || 0) > 0) {
+                    alSyncOk = false;
+                    alDetail.push('Cap AL enabled but no AL in pricing results');
+                }
+                if (!capALEnabled && capALInPricing.length > 0) {
+                    alSyncOk = false;
+                    alDetail.push('Cap AL disabled but pricing has AL entries');
+                }
+                addCheck('AL sync with globalAL', alSyncOk ? 'PASS' : 'FAIL',
+                    alSyncOk ? `Garment AL: ${garmentALEnabled ? 'ON' : 'OFF'}, Cap AL: ${capALEnabled ? 'ON' : 'OFF'}` : alDetail.join('; '));
+
+                // ---- CHECK 6: Expected ShopWorks fee part numbers ----
+                const expectedFees = [];
+                if ((pricing.garmentSetupFees || 0) > 0) expectedFees.push('DD (garment digitizing)');
+                if ((pricing.capSetupFees || 0) > 0) expectedFees.push('DD (cap digitizing)');
+                if ((pricing.garmentStitchTotal || 0) > 0) expectedFees.push('AS-GARM');
+                if ((pricing.capStitchTotal || 0) > 0) expectedFees.push('AS-CAP');
+                if (garmentALEnabled && garmentALInPricing.length > 0) expectedFees.push('AL');
+                if (capALEnabled && capALInPricing.length > 0) expectedFees.push('AL-Cap');
+                if (additionalCharges.artCharge > 0) expectedFees.push('GRT-50');
+                if (additionalCharges.graphicDesignCharge > 0) expectedFees.push('GRT-75');
+                if (additionalCharges.rushFee > 0) expectedFees.push('RUSH');
+                if (additionalCharges.discount > 0) expectedFees.push('DISCOUNT');
+                addCheck('ShopWorks fee part numbers', 'PASS', expectedFees.length > 0 ? expectedFees.join(', ') : 'No fees');
+
+                // ---- CHECK 7: Product count matches pricing product count ----
+                const tableProductCount = products.length;
+                const pricingProductCount = pricing.products ? pricing.products.length : 0;
+                if (tableProductCount === pricingProductCount) {
+                    addCheck('Product count match', 'PASS', `${tableProductCount} products in table, ${pricingProductCount} in pricing engine`);
+                } else {
+                    addCheck('Product count match', 'WARN', `Table: ${tableProductCount}, Pricing: ${pricingProductCount} (difference may be from color grouping)`);
+                }
+
+                // ---- CHECK 8: TotalAmount = grandTotal + fees - discount ----
+                const totalFees = (additionalCharges.artCharge || 0) +
+                    (additionalCharges.graphicDesignCharge || 0) +
+                    (additionalCharges.rushFee || 0) +
+                    (additionalCharges.sampleFee || 0);
+                const expectedTotal = pricing.grandTotal + totalFees - (additionalCharges.discount || 0);
+                const displayedTotal = adjustedSubtotal;
+                const totalDiff = Math.abs(expectedTotal - displayedTotal);
+                if (totalDiff < 0.02) {
+                    addCheck('TotalAmount formula', 'PASS', `grandTotal($${pricing.grandTotal.toFixed(2)}) + fees($${totalFees.toFixed(2)}) - discount($${(additionalCharges.discount || 0).toFixed(2)}) = $${displayedTotal.toFixed(2)}`);
+                } else {
+                    addCheck('TotalAmount formula', 'FAIL', `Expected: $${expectedTotal.toFixed(2)}, Displayed: $${displayedTotal.toFixed(2)}, diff: $${totalDiff.toFixed(2)}`);
+                }
+
+                // Build diagnostic output
+                const diagnostic = {
+                    timestamp: new Date().toISOString(),
+                    quoteId: editingQuoteId || 'DRAFT',
+                    checks: checks,
+                    summary: { pass: passCount, warn: warnCount, fail: failCount, total: checks.length },
+                    state: {
+                        productCount: products.length,
+                        serviceCount: serviceItems.length,
+                        decgCount: decgItems.length,
+                        totalQuantity: pricing.totalQuantity || 0,
+                        subtotal: pricing.subtotal,
+                        grandTotal: pricing.grandTotal,
+                        adjustedSubtotal: adjustedSubtotal,
+                        garmentQty: pricing.garmentQuantity || 0,
+                        capQty: pricing.capQuantity || 0,
+                        garmentTier: pricing.garmentTier || pricing.tier,
+                        capTier: pricing.capTier || null,
+                        ltmFee: pricing.ltmFee || 0,
+                        garmentSetupFees: pricing.garmentSetupFees || 0,
+                        capSetupFees: pricing.capSetupFees || 0,
+                        garmentStitchTotal: pricing.garmentStitchTotal || 0,
+                        capStitchTotal: pricing.capStitchTotal || 0,
+                        garmentAL: garmentALEnabled ? { stitchCount: globalAL.garment.stitchCount, total: garmentALInPricing.reduce((s, a) => s + a.total, 0) } : null,
+                        capAL: capALEnabled ? { stitchCount: globalAL.cap.stitchCount, total: capALInPricing.reduce((s, a) => s + a.total, 0) } : null,
+                        fees: {
+                            artCharge: additionalCharges.artCharge || 0,
+                            graphicDesign: additionalCharges.graphicDesignCharge || 0,
+                            rushFee: additionalCharges.rushFee || 0,
+                            sampleFee: additionalCharges.sampleFee || 0,
+                            discount: additionalCharges.discount || 0
+                        }
+                    },
+                    products: products.map(p => ({
+                        style: p.style,
+                        color: p.color,
+                        qty: p.totalQuantity,
+                        isCap: p.isCap || false,
+                        sizes: p.sizeBreakdown
+                    })),
+                    decgItems: decgItems.map(d => ({
+                        type: d.type,
+                        qty: d.quantity,
+                        unitPrice: d.unitPrice,
+                        total: d.total
+                    }))
+                };
+
+                // Copy to clipboard
+                const jsonStr = JSON.stringify(diagnostic, null, 2);
+                await navigator.clipboard.writeText(jsonStr);
+
+                // Show result summary as toast
+                const statusIcon = failCount > 0 ? 'error' : warnCount > 0 ? 'warning' : 'success';
+                const statusMsg = `Diagnosis: ${passCount} pass, ${warnCount} warn, ${failCount} fail — copied to clipboard`;
+                showToast(statusMsg, statusIcon === 'warning' ? 'success' : statusIcon);
+
+            } catch (error) {
+                console.error('[Diagnose] Error:', error);
+                showToast('Diagnosis error: ' + error.message, 'error');
+            }
         }
     </script>
 </body>

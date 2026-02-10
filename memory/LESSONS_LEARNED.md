@@ -46,6 +46,17 @@ Additionally, two early-return paths (non-SanMar, not-found) skipped the sellPri
 **Prevention:** When a function sets dataset attributes that affect pricing, always set them **before** any function that triggers `recalculatePricing()`. Async fire-and-forget calls are especially dangerous — they resolve in unpredictable order. Rule of thumb: **dataset setup first, then trigger pricing.**
 **Files:** `embroidery-quote-builder.html` (`importProductRow()` ~line 8745)
 
+## Bug: SanMar Prices Lost + Empty-PN Items Show No Price After ShopWorks Import
+**Date:** 2026-02-09
+**Project:** [Pricing Index]
+**Problem:** Two ShopWorks import bugs: (A) SanMar products used API-calculated prices instead of ShopWorks invoiced prices (e.g., C909 showed $20 instead of $23). (B) Empty-PN items like "drinkware laser logo setup" showed "-" for price instead of the expected $65.
+**Root Cause A:** `selectColor()` (line 4668) deletes `row.dataset.sellPrice` for SanMar products (`nonSanmar !== 'true'`). During import, `sellPriceOverride` was re-applied at line 8625 (after `onStyleChange`) but **before** `selectColor()`. After `selectColor()` deleted it, no re-apply existed. The pricing engine saw `sellPriceOverride = 0` and used API pricing.
+**Root Cause B:** Empty-PN handler set `row.dataset.style = ''` (empty string) and had no color. `collectProductsFromTable()` checks `if (!style || !parentColor) return` — both empty, so the row was skipped entirely, producing "-" in price display.
+**Solution A:** Re-apply `sellPriceOverride` immediately after `selectColor()` and its 300ms wait (line 8760-8762).
+**Solution B:** Set `row.dataset.style = product.description || 'Custom Item'` instead of empty string (line 8631). Set default color `product.color || 'N/A'` with dataset assignments before calling `reImportNonSanmarRow()` (lines 8712-8714).
+**Prevention:** Any function that clears dataset attributes (like `selectColor()` clearing `sellPrice`) is dangerous during import flows. Always re-apply overrides **after** every function that might clear them, not just before. For empty/missing data, use sentinel values ('N/A', 'Custom Item') instead of empty strings when downstream code has `if (!value)` guards.
+**Files:** `embroidery-quote-builder.html` (lines 8760-8762, 8631, 8712-8714)
+
 ## Bug: "Unable to load size pricing for DECG" on ShopWorks DECG-Only Import
 **Date:** 2026-02-06
 **Project:** [Pricing Index]
