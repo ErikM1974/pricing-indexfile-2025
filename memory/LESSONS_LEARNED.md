@@ -31,6 +31,17 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Fix: ShopWorks Import Duplicate Detection Dropping Rows ($366 Discrepancy)
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** Order #136706 showed $3,591 in the embroidery quote builder but should have been $3,957. Six product rows were silently dropped during ShopWorks import, losing $366.
+**Root Cause:** `selectColor()` has duplicate detection that prevents adding the same style+color combination twice (shows "already exists" toast and returns early). During ShopWorks import, products with the same style and same color but different prices (e.g., M=$61 vs 2XL=$63 due to size upcharges) were being rejected as duplicates. The first row imported fine, but subsequent rows for the same style+color were silently skipped.
+**Solution:** Added `skipDuplicateCheck` parameter to `selectColor()`. When called from `importProductRow()`, passes `skipDuplicateCheck=true` to bypass the duplicate detection. Manual interactive use still gets duplicate warnings.
+**Prevention:**
+- Import flows should always bypass interactive safety checks (duplicate detection, confirmation dialogs) since the data is already validated
+- Added **post-import validation** (line ~8788): after import completes, counts expected vs actual valid product rows. If any rows are missing `data-color`, shows a warning toast. This catches **any** future row-drop scenario regardless of cause.
+**Files:** `embroidery-quote-builder.html` (`selectColor()`, `importProductRow()`, post-import validation block)
+
 ## Bug: Custom Price Override Lost During ShopWorks Import (Async Race Condition)
 **Date:** 2026-02-06
 **Project:** [Pricing Index]

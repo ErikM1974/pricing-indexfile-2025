@@ -860,6 +860,11 @@ Products not in the SanMar database (e.g. HT01 Edwards Skull Cap) can now be imp
 9. onSizeChange() → recalculatePricing()        ← sees sellPrice ✓
 ```
 
+### `selectColor()` Duplicate Detection Dropping Import Rows (Bug Fixed 2026-02-10)
+**Problem:** ShopWorks import of Order #136706 silently dropped 6 product rows ($366 discrepancy). Products with same style+color but different prices (size upcharges like 2XL=$63 vs M=$61) were rejected by `selectColor()`'s duplicate detection.
+**Fix:** Added `skipDuplicateCheck` parameter to `selectColor()`. Import calls pass `skipDuplicateCheck=true`. Manual interactive use still gets duplicate warnings.
+**Post-import validation:** After import completes (~line 8788), counts expected vs actual valid product rows. Shows warning toast if any rows lack `data-color` (the condition that causes `collectProductsFromTable()` to silently drop them at line 5969). Catches any future row-drop scenario.
+
 ### `selectColor()` Clears `sellPrice` (Bug Fixed 2026-02-09)
 **Problem:** `selectColor()` (line 4668) deletes `row.dataset.sellPrice` for SanMar products when color changes. During import, the override was set at step 3 and re-applied after step 4, but `selectColor()` at step 6 wiped it again. Result: API pricing used instead of ShopWorks invoiced prices.
 **Fix:** Re-apply `sellPriceOverride` immediately after `selectColor()` + 300ms wait (line 8760-8762).
