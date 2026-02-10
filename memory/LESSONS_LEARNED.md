@@ -31,6 +31,49 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Pattern: Retry Wrapper for POST/PUT API Calls — `_fetchWithRetry()`
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** 9 POST/PUT fetch calls in the embroidery quote service had no retry logic. A transient network hiccup or 5xx error = lost data, no recovery.
+**Solution:** Added `_fetchWithRetry(url, options, maxRetries = 2)` to `EmbroideryQuoteService`. Retries on network errors, 5xx, and 429 with exponential backoff (1s, 2s). Does NOT retry 4xx (client errors). Returns the Response object so existing `.ok` checks work unchanged.
+**Prevention:** All new POST/PUT calls in quote services should use `_fetchWithRetry()` instead of raw `fetch()`. GET calls don't need it (already have fallbacks).
+**Files:** `shared_components/js/embroidery-quote-service.js` (`_fetchWithRetry()`, 9 call sites)
+
+---
+
+## Fix: Partial Quote Save Shown as Full Success
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** `saveQuote()` returned `{ success: true, partialSave: true, warning: "..." }` when some items failed to save, but the caller only checked `result.quoteID`. User saw "Quote saved successfully!" with missing items.
+**Root Cause:** Caller didn't check `result.partialSave` flag. The service returned the data, but the UI ignored the warning.
+**Solution:** Added `if (result.partialSave && result.warning) showToast(result.warning, 'error')` before the success modal in the save handler.
+**Prevention:** Any API response with a `partialSave` or `warning` field must be surfaced to the user, not silently swallowed.
+**Files:** `quote-builders/embroidery-quote-builder.html` (~line 6584)
+
+---
+
+## Fix: Quote Update Race Condition — DELETE-then-INSERT Risks Data Loss
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** `updateQuote()` deleted ALL existing quote items, then re-inserted them one by one. If the browser crashed or network failed mid-insert, the quote was permanently empty — all items lost with no recovery.
+**Root Cause:** Classic delete-then-insert anti-pattern. The delete was unconditional and happened before any new data was written.
+**Solution:** Reversed to insert-then-delete: (1) capture existing item IDs, (2) insert all new items, (3) only delete old items if ALL new inserts succeeded. If any inserts fail, old items are preserved and an error is thrown.
+**Prevention:** For any replace-all operation on important data, always write new data first, verify success, then remove old data. Never delete before confirming the replacement exists.
+**Files:** `shared_components/js/embroidery-quote-service.js` (`updateQuote()`, `fetchExistingItemIds()`, `deleteExistingItems()`)
+
+---
+
+## Fix: Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs
+**Date:** 2026-02-10
+**Project:** [caspio-proxy]
+**Problem:** Two rapid save clicks or two browser tabs could get the same quote sequence number because the GET-then-PUT on Caspio's `quote_counters` table isn't atomic.
+**Root Cause:** Caspio doesn't support atomic increment. The endpoint reads `NextSequence`, returns it, then PUTs the incremented value. Two concurrent requests could read the same value before either increments.
+**Solution:** Added in-memory mutex lock per prefix (`acquireLock`/`releaseLock`). Concurrent requests for the same prefix are serialized via a promise queue. Lock is always released in a `finally` block.
+**Prevention:** Any read-modify-write pattern on Caspio needs application-level locking. Since there's one backend server, an in-memory mutex per key is sufficient.
+**Files:** `caspio-pricing-proxy/src/routes/quote-sequence.js`
+
+---
+
 ## Fix: ShopWorks Import Duplicate Detection Dropping Rows ($366 Discrepancy)
 **Date:** 2026-02-10
 **Project:** [Pricing Index]
@@ -924,6 +967,16 @@ Same fix applied to `calculateCapProductPrice()` (lines 646-667).
 
 # Code Organization
 
+## Pattern: EMB_DEFAULTS Constants Block for Embroidery Magic Numbers
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** `8000`, `5000`, `50` (stitch counts, patch setup fee) appeared 30+ times scattered across the embroidery quote builder with no named constants. Easy to change one and miss others.
+**Solution:** Added `EMB_DEFAULTS` constants object at the top of the script section. Replaced 12 key instances in initialization, reset, and config code. Left HTML `value=` attributes and runtime `|| 8000` fallbacks as-is (they're safe defaults that don't need coordinated changes).
+**Prevention:** New embroidery defaults should be added to `EMB_DEFAULTS`. The remaining `|| 8000` instances are safe runtime fallbacks — only update them if you're changing the actual default value.
+**Files:** `quote-builders/embroidery-quote-builder.html` (line ~1321 `EMB_DEFAULTS`)
+
+---
+
 ## Problem: Review Import Pricing modal had misaligned columns
 **Date:** 2026-02-08
 **Project:** [Pricing Index]
@@ -1446,6 +1499,28 @@ const colX = {
 **Root cause:** User/external data rendered without escaping
 **Solution:** Use `escapeHTML()` helper when rendering via innerHTML
 **Prevention:** Documented in CLAUDE.md Security Checklist
+
+---
+
+## Fix: XSS in Embroidery Quote Builder — 4 Unescaped innerHTML Locations
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** Product colors, quote IDs, and search suggestion values were inserted into `innerHTML` without escaping. A product color like `<img onerror=alert(1)>` would execute.
+**Root Cause:** Template literals used `${variable}` directly inside innerHTML assignments. The `escapeHtml()` utility existed in `quote-builder-utils.js` but wasn't being used at these locations.
+**Solution:** Applied `escapeHtml()` to: (1) product color in color cell, (2) quoteId/revision in edit mode header, (3) product.value and productName in search suggestions (both onclick attribute and display text).
+**Prevention:** grep for `innerHTML.*\$\{` periodically. Any template literal inside innerHTML must use `escapeHtml()` unless the value is provably safe (numbers from `.toFixed()`, hardcoded strings).
+**Files:** `quote-builders/embroidery-quote-builder.html` (lines ~2333, ~2438, ~3164-3166)
+
+---
+
+## Fix: Pricing API Fetches Missing response.ok Checks — Silent Bad Data
+**Date:** 2026-02-10
+**Project:** [Pricing Index]
+**Problem:** 4 fetch calls in the pricing engine went straight to `.json()` without checking HTTP status. A 404 or 500 response would silently produce garbage/undefined pricing data — worse than showing an error.
+**Root Cause:** Missing `if (!response.ok)` guard before `.json()`. The `fetch()` API doesn't throw on HTTP errors, only on network failures.
+**Solution:** Added `if (!response.ok) throw new Error(...)` before each `.json()` call. The existing try/catch blocks already handle errors with console warnings and fallback defaults.
+**Prevention:** Every `fetch()` call must check `response.ok` before `.json()`. Erik's #1 rule: wrong pricing data is WORSE than showing an error.
+**Files:** `shared_components/js/embroidery-quote-pricing.js` (lines ~114, ~246, ~273, ~383)
 
 ---
 

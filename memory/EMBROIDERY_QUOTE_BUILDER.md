@@ -887,3 +887,24 @@ Products not in the SanMar database (e.g. HT01 Edwards Skull Cap) can now be imp
 - Selected state via `:has(input:checked)` — blue border + light blue background
 - Custom price input width: 75px (was 65px)
 - CSS classes: `.spr-product-radios label`, `.spr-product-radios .spr-custom-input`
+
+---
+
+## System Hardening Audit (Feb 2026)
+
+### Changes Made
+| Fix | What | Where |
+|-----|------|-------|
+| Retry wrapper | `_fetchWithRetry()` retries POST/PUT on 5xx/429/network errors | `embroidery-quote-service.js` |
+| Partial save warning | `result.partialSave` shows error toast if items failed | `embroidery-quote-builder.html` save handler |
+| DECG fallback warning | Persistent toast after import if DECG API was down | `confirmShopWorksImport()` |
+| Dead code removal | `window.currentPricingData` removed (write-only, never read) | `updatePricingDisplay()` |
+| `buildLogoConfiguration()` | Shared helper extracts duplicated logoConfigs+allLogos building | Used by `recalculatePricing()` and `saveAndGetLink()` |
+| `EMB_DEFAULTS` constants | Named constants for 8000/5000/50 magic numbers | Top of script section |
+| Input validation | `max` attributes on qty/fee inputs + discount capped at subtotal | HTML templates + `calculateDiscountableSubtotal()` |
+
+### Key Architecture Notes
+- **`_fetchWithRetry()`**: 2 retries, exponential backoff (1s, 2s). Only POST/PUT — not GET or DELETE.
+- **`buildLogoConfiguration()`**: Returns `{ logoConfigs, allLogos }`. Both `recalculatePricing()` and `saveAndGetLink()` use identical config now (was divergent — recalc only had garment ALs in allLogos).
+- **`EMB_DEFAULTS`**: `GARMENT_STITCH_COUNT` (8000), `CAP_STITCH_COUNT` (5000), `AL_GARMENT_STITCH_COUNT` (8000), `STITCH_STEP` (1000), `MAX_STITCH_COUNT` (50000), `PATCH_SETUP_FEE` (50)
+- **Discount cap**: `calculateDiscountableSubtotal()` caps discount at subtotal amount, shows warning toast.

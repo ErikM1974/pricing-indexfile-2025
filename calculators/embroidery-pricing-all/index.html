@@ -31,7 +31,7 @@
                     <span>Embroidery Pricing</span>
                 </div>
                 <h1><i class="fas fa-tshirt"></i> Embroidery Pricing 2026</h1>
-                <p class="subtitle">Contract-Ruthie | Add Logo (NWCA garments) | Customer-Supplied (their items)</p>
+                <p class="subtitle">Contract-Ruthie | Add Logo (NWCA garments) | Additional Stitch Charges | Customer-Supplied (their items)</p>
                 <p class="version-info">Updated February 2026</p>
             </div>
         </header>
@@ -47,6 +47,11 @@
                 <i class="fas fa-tag"></i>
                 Add Logo
                 <span class="tab-subtitle">NWCA Garments</span>
+            </button>
+            <button class="tab-btn stitch-charges" data-tab="stitch-charges" onclick="switchTab('stitch-charges')">
+                <i class="fas fa-layer-group"></i>
+                Additional Stitch Charges
+                <span class="tab-subtitle">Surcharges &gt; 10K Stitches</span>
             </button>
             <button class="tab-btn decg-retail" data-tab="decg-retail" onclick="switchTab('decg-retail')">
                 <i class="fas fa-box-open"></i>
@@ -415,6 +420,279 @@
                     <p><strong>Customer:</strong> "I want Richardson 112 caps with front and back logos"</p>
                     <p><strong>Sales Rep:</strong> "At 24 pieces, that's $22 per cap for the front logo. Adding a back logo is $5.75 each. Total: $27.75 per cap, $666 for 24 caps."</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: ADDITIONAL STITCH CHARGES -->
+        <div id="tab-stitch-charges" class="tab-content">
+            <div class="es-container">
+
+                <div class="es-header">
+                    <h2>Additional Stitch Pricing</h2>
+                    <p>First logo location — surcharge for designs exceeding 10,000 stitches</p>
+                </div>
+
+                <div class="es-parts">
+                    <div class="es-part">
+                        <span class="es-part-label">Part #</span>
+                        <span class="es-part-num">AS-Garm</span>
+                        <span class="es-part-desc">— Garment</span>
+                    </div>
+                    <div class="es-part">
+                        <span class="es-part-label">Part #</span>
+                        <span class="es-part-num">AS-CAP</span>
+                        <span class="es-part-desc">— Cap</span>
+                    </div>
+                </div>
+
+                <div class="es-included">
+                    10,000 Stitches Included <span>· per first logo location · no AS line item needed</span>
+                </div>
+
+                <div class="es-tiers">
+                    <div class="es-tier es-tier--standard">
+                        <div class="es-tier-label">Standard</div>
+                        <div class="es-tier-range">0 – 10,000</div>
+                        <div class="es-tier-price">$0</div>
+                        <div class="es-tier-unit">included</div>
+                    </div>
+                    <div class="es-tier es-tier--mid">
+                        <div class="es-tier-label">Mid</div>
+                        <div class="es-tier-range">10,001 – 15,000</div>
+                        <div class="es-tier-price">+$4</div>
+                        <div class="es-tier-unit">per piece</div>
+                    </div>
+                    <div class="es-tier es-tier--large">
+                        <div class="es-tier-label">Large</div>
+                        <div class="es-tier-range">15,001 – 25,000</div>
+                        <div class="es-tier-price">+$10</div>
+                        <div class="es-tier-unit">per piece</div>
+                    </div>
+                </div>
+
+                <!-- Customer Surcharge List -->
+                <button class="es-cust-btn" onclick="openCustPanel()">
+                    Customer Surcharge List <span class="es-btn-count">107 designs</span>
+                </button>
+
+                <!-- Overlay -->
+                <div class="es-overlay" id="custOverlay" onclick="closeCustPanel()"></div>
+
+                <!-- Slide-out Panel -->
+                <div class="es-panel" id="custPanel">
+                    <div class="es-panel-header">
+                        <div class="es-panel-top">
+                            <div>
+                                <div class="es-panel-title">Customer Surcharge List</div>
+                                <div class="es-panel-subtitle">Existing customers get a reduced rate through Dec 2026. Full tier pricing starts Jan 2027.</div>
+                            </div>
+                            <button class="es-close-btn" onclick="closeCustPanel()">&#10005;</button>
+                        </div>
+                        <div class="es-search-row">
+                            <input class="es-search" id="custSearch" type="text" placeholder="Search customer or design..." oninput="esCustFilterTable()">
+                        </div>
+                        <div class="es-filters">
+                            <button class="es-filter-btn active" data-filter="rep" data-val="all" onclick="esCustToggleFilter(this)">All Reps</button>
+                            <button class="es-filter-btn" data-filter="rep" data-val="Nika Lao" onclick="esCustToggleFilter(this)">Nika <span style="opacity:0.5">73</span></button>
+                            <button class="es-filter-btn" data-filter="rep" data-val="Taneisha Clark" onclick="esCustToggleFilter(this)">Taneisha <span style="opacity:0.5">28</span></button>
+                            <button class="es-filter-btn" data-filter="rep" data-val="House" onclick="esCustToggleFilter(this)">House <span style="opacity:0.5">6</span></button>
+                            <div class="es-filter-sep"></div>
+                            <button class="es-filter-btn active" data-filter="tier" data-val="all" onclick="esCustToggleFilter(this)">All Tiers</button>
+                            <button class="es-filter-btn" data-filter="tier" data-val="Full Back" onclick="esCustToggleFilter(this)">Full Back</button>
+                            <button class="es-filter-btn" data-filter="tier" data-val="Large" onclick="esCustToggleFilter(this)">Large</button>
+                            <button class="es-filter-btn" data-filter="tier" data-val="Mid" onclick="esCustToggleFilter(this)">Mid</button>
+                        </div>
+                        <div class="es-result-count" id="resultCount"></div>
+                    </div>
+                    <div class="es-panel-body">
+                        <table class="es-cust-table">
+                            <thead>
+                                <tr>
+                                    <th>Rep</th>
+                                    <th>Customer</th>
+                                    <th>Design</th>
+                                    <th>Stitches</th>
+                                    <th>Tier</th>
+                                    <th class="es-tooltip" data-tip="Reduced rate for existing customers. Expires Dec 31, 2026 — then switches to Full Price.">GF Price</th>
+                                    <th>Full Price</th>
+                                    <th>Savings</th>
+                                </tr>
+                            </thead>
+                            <tbody id="custBody"></tbody>
+                        </table>
+                        <div class="es-no-results" id="noResults" style="display:none">
+                            <div class="es-no-results-icon">?</div>
+                            <div class="es-no-results-text">No matches found</div>
+                        </div>
+                    </div>
+                    <div class="es-panel-footer">
+                        GF Price = reduced grandfather rate for existing customers · Use through Dec 2026 · Full Price takes effect Jan 2027
+                    </div>
+                </div>
+
+                <!-- Full Back Toggle -->
+                <div class="es-fullback" onclick="document.getElementById('esFbPanel').classList.toggle('open'); this.classList.toggle('open')">
+                    <div class="es-fullback-left">
+                        <div><span class="es-fullback-text"><strong>25,000+ stitches</strong> — Full back embroidery pricing table</span></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="es-fullback-tag">DECG-FB</div>
+                        <div class="es-fullback-arrow">&#9662;</div>
+                    </div>
+                </div>
+
+                <!-- DECG-FB Collapsible Panel -->
+                <div class="es-fb-panel" id="esFbPanel">
+                    <div class="es-fb-inner">
+                        <div class="es-fb-header">
+                            <div class="es-fb-title">Full Back Embroidery — DECG-FB</div>
+                            <div class="es-fb-meta">
+                                <span>Priced per <strong>1,000 stitches</strong></span>
+                                <span>Min <strong>25K stitches</strong></span>
+                                <span>Min charge <strong>$20.00</strong></span>
+                            </div>
+                        </div>
+                        <table class="es-fb-table">
+                            <thead>
+                                <tr>
+                                    <th>Stitches</th>
+                                    <th>1-7</th>
+                                    <th>8-23</th>
+                                    <th>24-47</th>
+                                    <th>48-71</th>
+                                    <th>72+</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>25K</td>
+                                    <td>$30.00</td>
+                                    <td>$25.00</td>
+                                    <td>$22.50</td>
+                                    <td>$21.25</td>
+                                    <td>$20.00</td>
+                                </tr>
+                                <tr>
+                                    <td>30K</td>
+                                    <td>$36.00</td>
+                                    <td>$30.00</td>
+                                    <td>$27.00</td>
+                                    <td>$25.50</td>
+                                    <td>$24.00</td>
+                                </tr>
+                                <tr>
+                                    <td>35K</td>
+                                    <td>$42.00</td>
+                                    <td>$35.00</td>
+                                    <td>$31.50</td>
+                                    <td>$29.75</td>
+                                    <td>$28.00</td>
+                                </tr>
+                                <tr>
+                                    <td>40K</td>
+                                    <td>$48.00</td>
+                                    <td>$40.00</td>
+                                    <td>$36.00</td>
+                                    <td>$34.00</td>
+                                    <td>$32.00</td>
+                                </tr>
+                                <tr>
+                                    <td>45K</td>
+                                    <td>$54.00</td>
+                                    <td>$45.00</td>
+                                    <td>$40.50</td>
+                                    <td>$38.25</td>
+                                    <td>$36.00</td>
+                                </tr>
+                                <tr>
+                                    <td>50K</td>
+                                    <td>$60.00</td>
+                                    <td>$50.00</td>
+                                    <td>$45.00</td>
+                                    <td>$42.50</td>
+                                    <td>$40.00</td>
+                                </tr>
+                                <tr class="es-fb-rate-row">
+                                    <td>$ / 1K</td>
+                                    <td>$1.20</td>
+                                    <td>$1.00</td>
+                                    <td>$0.90</td>
+                                    <td>$0.85</td>
+                                    <td>$0.80</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="es-fb-ltm">
+                            <strong>LTM Fee: $100.00</strong> — applies to full back orders of 1–23 pieces
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Ref -->
+                <div class="es-ref">
+                    <h3>Quick Reference</h3>
+                    <div class="es-table-wrap">
+                        <table class="es-table">
+                            <thead>
+                                <tr>
+                                    <th>Stitch Count</th>
+                                    <th>Tier</th>
+                                    <th>Line Item</th>
+                                    <th>Add to Quote</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>7,500</td>
+                                    <td><span class="es-tier-tag es-tier-tag--included">Standard</span></td>
+                                    <td>None</td>
+                                    <td class="es-price-cell">$0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>11,000</td>
+                                    <td><span class="es-tier-tag es-tier-tag--mid">Mid</span></td>
+                                    <td>AS-Garm or AS-CAP</td>
+                                    <td class="es-price-cell">+$4.00</td>
+                                </tr>
+                                <tr>
+                                    <td>14,500</td>
+                                    <td><span class="es-tier-tag es-tier-tag--mid">Mid</span></td>
+                                    <td>AS-Garm or AS-CAP</td>
+                                    <td class="es-price-cell">+$4.00</td>
+                                </tr>
+                                <tr>
+                                    <td>18,000</td>
+                                    <td><span class="es-tier-tag es-tier-tag--large">Large</span></td>
+                                    <td>AS-Garm or AS-CAP</td>
+                                    <td class="es-price-cell">+$10.00</td>
+                                </tr>
+                                <tr>
+                                    <td>30,000</td>
+                                    <td><span class="es-tier-tag" style="background:#f1f5f9;color:#0f172a;">Full Back</span></td>
+                                    <td>DECG-FB</td>
+                                    <td class="es-price-cell">See table &#9652;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="es-notes">
+                    <h3>Reminders</h3>
+                    <ul>
+                        <li>Stitch count is <strong>per logo location</strong>, not per order</li>
+                        <li>AS line item quantity = same as garment/cap quantity</li>
+                        <li>Caps rarely exceed 10K — check with Ruthie if unsure</li>
+                        <li>Additional locations (2nd/3rd logo) use <strong>AL</strong> or <strong>AL-CAP</strong> line items — separate pricing</li>
+                        <li>Grandfather pricing applies to existing customers through Dec 2026 — check the surcharge customer list</li>
+                    </ul>
+                </div>
+
+                <div class="es-footer">
+                    NWCA Staff Reference · Effective Feb 2026
+                </div>
+
             </div>
         </div>
 

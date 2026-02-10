@@ -558,7 +558,7 @@
                         </label>
                         <div id="art-charge-wrapper" style="position: relative; opacity: 0.4; margin-top: 6px;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="art-charge" min="0" step="0.01" value="0" disabled
+                            <input type="number" id="art-charge" min="0" max="5000" step="0.01" value="0" disabled
                                    onchange="updateArtworkCharges()" oninput="updateArtworkCharges()"
                                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
@@ -567,7 +567,7 @@
                     <div class="charge-field">
                         <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design ($75/hr)</label>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="number" id="graphic-design-hours" min="0" step="0.5" placeholder="0"
+                            <input type="number" id="graphic-design-hours" min="0" max="100" step="0.5" placeholder="0"
                                    onchange="updateArtworkCharges()" oninput="updateArtworkCharges()"
                                    style="width: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                             <span style="color: #666; font-size: 13px;">hrs</span>
@@ -596,7 +596,7 @@
                         <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
                         <div style="position: relative;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="rush-fee" min="0" step="0.01" placeholder="0.00"
+                            <input type="number" id="rush-fee" min="0" max="10000" step="0.01" placeholder="0.00"
                                    onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
@@ -608,7 +608,7 @@
                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                             <div id="discount-input-wrapper" style="position: relative; flex: 1; display: none;">
                                 <span id="discount-symbol" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                                <input type="number" id="discount-amount" min="0" step="0.01" placeholder="0.00" value="0"
+                                <input type="number" id="discount-amount" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
                                        onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                        style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                             </div>
@@ -1317,6 +1317,16 @@ Company:Absher Construction Company
         // Use centralized config (fallback to hardcoded URL for backwards compatibility)
         const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+        // Embroidery defaults — synced with API values at runtime
+        const EMB_DEFAULTS = {
+            GARMENT_STITCH_COUNT: 8000,
+            CAP_STITCH_COUNT: 5000,
+            AL_GARMENT_STITCH_COUNT: 8000,
+            STITCH_STEP: 1000,
+            MAX_STITCH_COUNT: 50000,
+            PATCH_SETUP_FEE: 50
+        };
+
         // NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
         // SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
 
@@ -1364,7 +1374,7 @@ Company:Absher Construction Company
         // Primary logo configuration
         let primaryLogo = {
             position: 'Left Chest',
-            stitchCount: 8000,
+            stitchCount: EMB_DEFAULTS.GARMENT_STITCH_COUNT,
             needsDigitizing: false,
             isPrimary: true
         };
@@ -1377,11 +1387,11 @@ Company:Absher Construction Company
         // Supports multiple embellishment types: 'embroidery', '3d-puff', 'patch'
         let capPrimaryLogo = {
             position: 'CF',  // Cap Front (always)
-            stitchCount: 8000,
+            stitchCount: EMB_DEFAULTS.GARMENT_STITCH_COUNT,
             needsDigitizing: false,
             isPrimary: true,
             embellishmentType: 'embroidery',  // Default: flat embroidery
-            needsSetup: true  // For patches: $50 design setup fee (GRT-50)
+            needsSetup: true  // For patches: setup fee (GRT-50)
         };
         let capAdditionalLogos = [];
         // Example entry: { id: 'global-al-cap', position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false, isPrimary: false }
@@ -1392,8 +1402,8 @@ Company:Absher Construction Company
         let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
         // Global AL config (applies to all products of type when enabled)
         let globalAL = {
-            garment: { enabled: false, position: 'AL', stitchCount: 8000, needsDigitizing: false },
-            cap: { enabled: false, position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false }
+            garment: { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false },
+            cap: { enabled: false, position: 'AL-Cap', stitchCount: EMB_DEFAULTS.CAP_STITCH_COUNT, needsDigitizing: false }
         };
 
         // Sync module-level AL arrays from globalAL state
@@ -2330,7 +2340,7 @@ Company:Absher Construction Company
 
                     const colorCell = row.querySelector('.cell-color');
                     if (colorCell) {
-                        colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${product.color || ''}`;
+                        colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${escapeHtml(product.color || '')}`;
                     }
 
                     // Restore size quantities
@@ -2435,7 +2445,7 @@ Company:Absher Construction Company
             // Update header subtitle
             const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child');
             if (headerSubtitle) {
-                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(quoteId)} • Rev ${escapeHtml(String(revision))}</span>`;
             }
 
             // Update save button text
@@ -2524,7 +2534,7 @@ Company:Absher Construction Company
             if (session.AdditionalLogoLocation) {
                 globalAL.garment.enabled = true;
                 globalAL.garment.position = 'AL';
-                globalAL.garment.stitchCount = session.AdditionalStitchCount || 8000;
+                globalAL.garment.stitchCount = session.AdditionalStitchCount || EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
 
                 // Update UI
                 const alSwitch = document.getElementById('garment-al-switch');
@@ -3161,9 +3171,9 @@ Company:Absher Construction Company
                 // Extract product name (remove style prefix from label)
                 const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
                 return `
-                    <div class="suggestion-item" onclick="selectProduct('${product.value}')">
-                        <span class="style">${product.value}</span>
-                        <span class="name">${productName}</span>
+                    <div class="suggestion-item" onclick="selectProduct('${escapeHtml(product.value)}')">
+                        <span class="style">${escapeHtml(product.value)}</span>
+                        <span class="name">${escapeHtml(productName)}</span>
                     </div>
                 `;
             }).join('');
@@ -3261,11 +3271,11 @@ Company:Absher Construction Company
                         <div class="color-picker-dropdown hidden" id="color-dropdown-${rowId}"></div>
                     </div>
                 </td>
-                <td><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-                <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="S" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="M" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="L" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+                <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
                 <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
                 <td class="cell-qty" id="row-qty-${rowId}">0</td>
                 <td class="cell-price" id="row-price-${rowId}"
@@ -3389,7 +3399,7 @@ Company:Absher Construction Company
                     Service item - no size breakdown
                 </td>
                 <td class="cell-qty">
-                    <input type="number" class="cell-input service-qty" min="0" value="${quantity}"
+                    <input type="number" class="cell-input service-qty" min="0" max="9999" value="${quantity}"
                            onchange="onServiceQtyChange(${rowId})" onkeydown="handleCellKeydown(event, this)"
                            style="width: 60px; text-align: center;">
                 </td>
@@ -5626,6 +5636,45 @@ Company:Absher Construction Company
             };
         }
 
+        /**
+         * Build logo configuration from current global state.
+         * Shared between recalculatePricing() and saveAndGetLink() to avoid duplication.
+         */
+        function buildLogoConfiguration() {
+            const garmentAL = globalAL.garment.enabled ? [{
+                id: 'global-al-garment',
+                position: 'AL',
+                stitchCount: globalAL.garment.stitchCount,
+                needsDigitizing: globalAL.garment.needsDigitizing
+            }] : [];
+            const capAL = globalAL.cap.enabled ? [{
+                id: 'global-al-cap',
+                position: 'AL-Cap',
+                stitchCount: globalAL.cap.stitchCount,
+                needsDigitizing: globalAL.cap.needsDigitizing
+            }] : [];
+
+            const logoConfigs = {
+                garment: {
+                    primary: { ...primaryLogo, id: 'primary' },
+                    additional: garmentAL
+                },
+                cap: {
+                    primary: { ...capPrimaryLogo, id: 'cap-primary' },
+                    additional: capAL
+                }
+            };
+
+            const allLogos = [
+                { ...primaryLogo, id: 'primary' },
+                ...garmentAL,
+                { ...capPrimaryLogo, id: 'cap-primary' },
+                ...capAL
+            ];
+
+            return { logoConfigs, allLogos };
+        }
+
         const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 250);
 
         async function recalculatePricing() {
@@ -5670,7 +5719,7 @@ Company:Absher Construction Company
                 const capEmbType = getCapEmbellishmentType();
                 const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
                 const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
-                const patchSetupFee = showPatchSetup ? 50 : 0;
+                const patchSetupFee = showPatchSetup ? EMB_DEFAULTS.PATCH_SETUP_FEE : 0;
 
                 // Determine tier based on total quantity
                 const tier = totalQty <= 7 ? '1-7' : totalQty <= 23 ? '8-23' : totalQty <= 47 ? '24-47' : totalQty <= 71 ? '48-71' : '72+';
@@ -5696,37 +5745,8 @@ Company:Absher Construction Company
                 return;
             }
 
-            // Calculate using the existing pricing calculator
-            // Build AL entries from global toggle state (for digitizing counting in pricing engine)
-            const garmentALForConfig = globalAL.garment.enabled ? [{
-                id: 'global-al-garment',
-                position: 'AL',
-                stitchCount: globalAL.garment.stitchCount,
-                needsDigitizing: globalAL.garment.needsDigitizing
-            }] : [];
-            const capALForConfig = globalAL.cap.enabled ? [{
-                id: 'global-al-cap',
-                position: 'AL-Cap',
-                stitchCount: globalAL.cap.stitchCount,
-                needsDigitizing: globalAL.cap.needsDigitizing
-            }] : [];
-
-            const logoConfigs = {
-                garment: {
-                    primary: { ...primaryLogo, id: 'primary' },
-                    additional: garmentALForConfig
-                },
-                cap: {
-                    primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                    additional: capALForConfig
-                }
-            };
-
-            // For backward compatibility, also create combined array (garment logos only for non-cap products)
-            const allLogos = [
-                { ...primaryLogo, id: 'primary' },
-                ...garmentALForConfig
-            ];
+            // Build logo configuration from global state (shared helper)
+            const { logoConfigs, allLogos } = buildLogoConfiguration();
 
             try {
                 const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs);
@@ -6085,9 +6105,6 @@ Company:Absher Construction Company
         }
 
         function updatePricingDisplay(pricing) {
-            // Store for toggle reference
-            window.currentPricingData = pricing;
-
             const totalQty = pricing.totalQuantity || 0;
             document.getElementById('total-qty').textContent = totalQty;
             document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
@@ -6384,6 +6401,12 @@ Company:Absher Construction Company
                 discount = discountAmount;
             }
 
+            // Cap discount at subtotal to prevent negative totals
+            if (discount > discountableSubtotal && discountableSubtotal > 0) {
+                discount = discountableSubtotal;
+                showToast('Discount capped at subtotal amount', 'warning');
+            }
+
             return {
                 baseSubtotal,
                 additionalCharges,
@@ -6466,38 +6489,8 @@ Company:Absher Construction Company
             showLoading(true);
 
             try {
-                // Build AL entries from global toggle state (same as recalculatePricing)
-                const garmentALForSave = globalAL.garment.enabled ? [{
-                    id: 'global-al-garment',
-                    position: 'AL',
-                    stitchCount: globalAL.garment.stitchCount,
-                    needsDigitizing: globalAL.garment.needsDigitizing
-                }] : [];
-                const capALForSave = globalAL.cap.enabled ? [{
-                    id: 'global-al-cap',
-                    position: 'AL-Cap',
-                    stitchCount: globalAL.cap.stitchCount,
-                    needsDigitizing: globalAL.cap.needsDigitizing
-                }] : [];
-
-                const logoConfigs = {
-                    garment: {
-                        primary: { ...primaryLogo, id: 'primary' },
-                        additional: garmentALForSave
-                    },
-                    cap: {
-                        primary: { ...capPrimaryLogo, id: 'cap-primary' },
-                        additional: capALForSave
-                    }
-                };
-
-                // Combined array for backward compat + LogoSpecs storage
-                const allLogos = [
-                    { ...primaryLogo, id: 'primary' },
-                    ...garmentALForSave,
-                    { ...capPrimaryLogo, id: 'cap-primary' },
-                    ...capALForSave
-                ];
+                // Build logo configuration from global state (shared helper)
+                const { logoConfigs, allLogos } = buildLogoConfiguration();
 
                 let pricing;
                 if (products.length === 0) {
@@ -6587,6 +6580,11 @@ Company:Absher Construction Company
                 }
 
                 if (result && result.quoteID) {
+                    // Warn if partial save (some items failed to persist)
+                    if (result.partialSave && result.warning) {
+                        showToast(result.warning, 'error');
+                    }
+
                     const isUpdate = !!editingQuoteId;
                     // Clear auto-save draft on successful save (2026 consolidation)
                     if (embPersistence) {
@@ -6832,15 +6830,15 @@ Company:Absher Construction Company
 
             // Reset logo configurations to defaults
             primaryLogo.position = 'Left Chest';
-            primaryLogo.stitchCount = 8000;
+            primaryLogo.stitchCount = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             primaryLogo.needsDigitizing = false;
             document.getElementById('primary-position').value = 'Left Chest';
-            document.getElementById('primary-stitches').value = 8000;
+            document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             document.getElementById('primary-digitizing').checked = false;
 
             // Reset additional logo toggles and globalAL state
-            globalAL.garment = { enabled: false, position: 'AL', stitchCount: 8000, needsDigitizing: false };
-            globalAL.cap = { enabled: false, position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false };
+            globalAL.garment = { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false };
+            globalAL.cap = { enabled: false, position: 'AL-Cap', stitchCount: EMB_DEFAULTS.CAP_STITCH_COUNT, needsDigitizing: false };
             _syncALArrays();
 
             const garmentALSwitch = document.getElementById('garment-al-switch');
@@ -6858,9 +6856,9 @@ Company:Absher Construction Company
             document.getElementById('garment-al-toggle').checked = false;
             document.getElementById('cap-al-toggle').checked = false;
             const garmentStitchEl = document.getElementById('garment-al-stitches');
-            if (garmentStitchEl) garmentStitchEl.value = 8000;
+            if (garmentStitchEl) garmentStitchEl.value = EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
             const capStitchEl = document.getElementById('cap-al-stitches');
-            if (capStitchEl) capStitchEl.value = 5000;
+            if (capStitchEl) capStitchEl.value = EMB_DEFAULTS.CAP_STITCH_COUNT;
 
             // Reset customer form fields
             document.getElementById('customer-name').value = '';
@@ -8815,6 +8813,11 @@ Company:Absher Construction Company
                 }
 
                 showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
+
+                // Persistent warning if DECG prices used fallback values (API was down during parse)
+                if (data.decgApiFailed) {
+                    showToast('DECG prices may be outdated — API was unavailable during import. Verify prices before sending.', 'warning');
+                }
 
             } catch (error) {
                 console.error('Import failed:', error);

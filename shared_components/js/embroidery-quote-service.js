@@ -85,40 +85,92 @@ class EmbroideryQuoteService {
     }
 
     /**
-     * Delete all existing items for a quote ID before saving new ones
-     * Prevents item accumulation when re-saving a quote
+     * Fetch existing item IDs for a quote (used to capture before insert-then-delete)
      */
-    async deleteExistingItems(quoteID) {
+    async fetchExistingItemIds(quoteID) {
         try {
-            // Query existing items
             const response = await fetch(
                 `${this.baseURL}/api/quote_items?QuoteID=${encodeURIComponent(quoteID)}`
             );
-            if (!response.ok) return; // No items to delete
+            if (!response.ok) return [];
 
             const items = await response.json();
-            if (!items || !items.length) return;
+            if (!items || !items.length) return [];
 
-            // Delete existing items before re-saving
+            return items.filter(item => item.PK_ID).map(item => item.PK_ID);
+        } catch (error) {
+            console.warn('[EmbroideryQuoteService] Error fetching existing items:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Delete existing items by their PK_IDs.
+     * If no itemIds provided, queries by quoteID (legacy behavior for saveQuote).
+     */
+    async deleteExistingItems(quoteID, itemIds) {
+        try {
+            let idsToDelete = itemIds;
+
+            // If no specific IDs provided, fetch them by quoteID
+            if (!idsToDelete) {
+                idsToDelete = await this.fetchExistingItemIds(quoteID);
+            }
+
+            if (!idsToDelete || !idsToDelete.length) return;
 
             // Delete items in parallel batches for speed (10 at a time to avoid overwhelming server)
             const batchSize = 10;
-            for (let i = 0; i < items.length; i += batchSize) {
-                const batch = items.slice(i, i + batchSize);
+            for (let i = 0; i < idsToDelete.length; i += batchSize) {
+                const batch = idsToDelete.slice(i, i + batchSize);
                 await Promise.all(
-                    batch
-                        .filter(item => item.PK_ID)
-                        .map(item =>
-                            fetch(`${this.baseURL}/api/quote_items/${item.PK_ID}`, {
-                                method: 'DELETE'
-                            }).catch(err => console.warn(`Failed to delete item ${item.PK_ID}:`, err))
-                        )
+                    batch.map(id =>
+                        fetch(`${this.baseURL}/api/quote_items/${id}`, {
+                            method: 'DELETE'
+                        }).catch(err => console.warn(`Failed to delete item ${id}:`, err))
+                    )
                 );
             }
         } catch (error) {
             console.warn('[EmbroideryQuoteService] Error deleting existing items:', error);
             // Don't throw - allow save to continue
         }
+    }
+
+    /**
+     * Fetch with automatic retry for transient failures.
+     * Retries on network errors, 5xx, and 429 (NOT 4xx client errors).
+     * Each attempt gets its own timeout via fetch-timeout.js if loaded.
+     */
+    async _fetchWithRetry(url, options, maxRetries = 2) {
+        let lastError;
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                const response = await fetch(url, options);
+                if (response.ok || (response.status >= 400 && response.status < 500 && response.status !== 429)) {
+                    return response;
+                }
+                // 5xx or 429 — retry
+                lastError = new Error(`HTTP ${response.status}`);
+                if (attempt < maxRetries) {
+                    const delay = 1000 * Math.pow(2, attempt);
+                    console.warn(`[EmbroideryQuoteService] Retry ${attempt + 1}/${maxRetries} after ${response.status} for ${url} (waiting ${delay}ms)`);
+                    await new Promise(r => setTimeout(r, delay));
+                } else {
+                    return response;
+                }
+            } catch (networkError) {
+                lastError = networkError;
+                if (attempt < maxRetries) {
+                    const delay = 1000 * Math.pow(2, attempt);
+                    console.warn(`[EmbroideryQuoteService] Retry ${attempt + 1}/${maxRetries} after network error for ${url} (waiting ${delay}ms)`);
+                    await new Promise(r => setTimeout(r, delay));
+                } else {
+                    throw networkError;
+                }
+            }
+        }
+        throw lastError;
     }
 
     /**
@@ -231,7 +283,7 @@ class EmbroideryQuoteService {
             };
 
             // Save session
-            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
+            const sessionResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(sessionData)
@@ -342,7 +394,7 @@ class EmbroideryQuoteService {
                         LogoSpecs: itemLogoSpecs  // Already a string or empty
                     };
 
-                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
@@ -386,7 +438,7 @@ class EmbroideryQuoteService {
                         LogoSpecs: ''  // Additional services don't need logo specs
                     };
 
-                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
@@ -429,7 +481,7 @@ class EmbroideryQuoteService {
                         LogoSpecs: decgItem.hasPriceOverride ? JSON.stringify({ priceOverride: true, overridePrice: decgItem.unitPrice }) : ''
                     };
 
-                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
@@ -624,7 +676,7 @@ class EmbroideryQuoteService {
                 LogoSpecs: ''
             };
 
-            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+            const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(itemData)
@@ -1141,7 +1193,7 @@ class EmbroideryQuoteService {
             };
 
             // Update session via PUT
-            const sessionResponse = await fetch(
+            const sessionResponse = await this._fetchWithRetry(
                 `${this.baseURL}/api/quote_sessions/${existingSession.PK_ID}`,
                 {
                     method: 'PUT',
@@ -1155,10 +1207,10 @@ class EmbroideryQuoteService {
                 throw new Error(`Session update failed: ${errorText}`);
             }
 
-            // Delete existing items and save new ones
-            await this.deleteExistingItems(quoteId);
+            // Capture existing item IDs BEFORE saving new ones (for safe delete-after-insert)
+            const existingItemIds = await this.fetchExistingItemIds(quoteId);
 
-            // Save line items (same logic as saveQuote) - track failures
+            // Save new items first — old items remain intact as safety net
             let lineNumber = 1;
             let failedItems = 0;
             let totalItems = 0;
@@ -1248,7 +1300,7 @@ class EmbroideryQuoteService {
                     };
 
                     totalItems++;
-                    const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
@@ -1290,7 +1342,7 @@ class EmbroideryQuoteService {
                     };
 
                     totalItems++;
-                    const serviceResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    const serviceResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
@@ -1331,7 +1383,7 @@ class EmbroideryQuoteService {
                     };
 
                     totalItems++;
-                    const decgResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    const decgResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(itemData)
@@ -1350,17 +1402,22 @@ class EmbroideryQuoteService {
             totalItems += feeResult.totalItems;
             failedItems += feeResult.failedItems;
 
-            if (failedItems > 0) {
-                console.warn(`[EmbroideryQuoteService] Quote updated with ${failedItems} failed items:`, quoteId);
+            // Only delete old items if ALL new items saved successfully
+            // This prevents data loss if insert fails mid-way (old items remain as safety net)
+            if (failedItems === 0 && existingItemIds.length > 0) {
+                await this.deleteExistingItems(quoteId, existingItemIds);
+            } else if (failedItems > 0) {
+                console.error(`[EmbroideryQuoteService] ${failedItems} of ${totalItems} items failed to save. Old items preserved for safety.`);
+                throw new Error(`${failedItems} of ${totalItems} items failed to save. Old quote items preserved — please try again.`);
             }
 
             return {
                 success: true,
                 quoteID: quoteId,
                 revision: newRevision,
-                partialSave: failedItems > 0,
-                failedItems: failedItems,
-                warning: failedItems > 0 ? `${failedItems} of ${totalItems} items failed to save. Please verify your quote.` : null
+                partialSave: false,
+                failedItems: 0,
+                warning: null
             };
 
         } catch (error) {

@@ -1006,6 +1006,11 @@ class ShopWorksImportParser {
             pn = this.SERVICE_CODE_ALIASES[pn];
         }
 
+        // Rare items → reviewItems for manual handling
+        if (pn === 'COLOR CHANGE' || pn === 'STARS') {
+            return 'invalid';
+        }
+
         // Digitizing/Setup fees (DD or any DGT-XXX code)
         if (pn === 'DD' || pn.startsWith('DGT-')) {
             return 'digitizing';

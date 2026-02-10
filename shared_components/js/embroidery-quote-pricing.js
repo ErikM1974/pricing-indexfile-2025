@@ -20,8 +20,15 @@ class EmbroideryPricingCalculator {
         this.marginDenominator = 0.57; // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
         this.ltmFee = 50.00;
         this.digitizingFee = 100.00;
-        this.additionalStitchRate = 1.25; // per 1000 stitches over 8000 (overridden by API)
+        this.additionalStitchRate = 1.25; // per 1000 stitches over 8000 (legacy linear rate, kept for AL/FB)
         this.baseStitchCount = 8000; // base included stitches for standard positions (overridden by API)
+        // Flat tier stitch surcharges for AS-GARM / AS-CAP (Feb 2026)
+        // Replaces linear per-1K formula for primary logo stitch fees
+        this.stitchSurchargeTiers = [
+            { max: 10000, fee: 0 },    // Standard: included
+            { max: 15000, fee: 4 },    // Mid: +$4 per piece
+            { max: 25000, fee: 10 }    // Large: +$10 per piece
+        ];
         this.fbBaseStitchCount = 25000; // base included stitches for Full Back position (overridden by API)
         this.fbStitchRate = 1.25; // Full Back stitch rate per 1K (overridden by API)
         this.monogramPrice = 12.50; // Monogram/Name price (overridden by API)
@@ -111,6 +118,7 @@ class EmbroideryPricingCalculator {
             
             // Fetch embroidery pricing bundle (includes all config)
             const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC54`);
+            if (!response.ok) throw new Error(`EMB pricing bundle API returned ${response.status}: ${response.statusText}`);
             const data = await response.json();
             
             if (data) {
@@ -242,6 +250,7 @@ class EmbroideryPricingCalculator {
     async fetchRoundingRules() {
         try {
             const response = await fetch(`${this.baseURL}/api/pricing-rules?method=EmbroideryShirts`);
+            if (!response.ok) throw new Error(`Pricing rules API returned ${response.status}: ${response.statusText}`);
             const data = await response.json();
 
             if (data && data.length > 0) {
@@ -268,6 +277,7 @@ class EmbroideryPricingCalculator {
     async loadServiceCodes() {
         try {
             const response = await fetch(`${this.baseURL}/api/service-codes`);
+            if (!response.ok) throw new Error(`Service codes API returned ${response.status}: ${response.statusText}`);
             const data = await response.json();
 
             if (data.success && data.data) {
@@ -377,6 +387,7 @@ class EmbroideryPricingCalculator {
         try {
             // Fetch cap pricing bundle
             const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=C112`);
+            if (!response.ok) throw new Error(`CAP pricing bundle API returned ${response.status}: ${response.statusText}`);
             const data = await response.json();
 
             if (data && data.allEmbroideryCostsR) {
@@ -558,14 +569,10 @@ class EmbroideryPricingCalculator {
         decorationCost = embCost;
 
         // Calculate extra stitch cost for caps (embroidery and 3D puff only, not patches)
-        // Base is 8000 stitches, charge extra per 1000 above that
-        // CRITICAL: Caps use $1.00/1K (NOT Shirt's $1.25/1K)
-        const capBaseStitches = 8000;
-
+        // Flat tier surcharge: 0-10K=$0, 10,001-15K=$4 (Mid), 15,001-25K=$10 (Large)
         // Extra stitch cost only applies to embroidery and 3D puff (patches have no stitches)
         if (embellishmentType !== 'laser-patch') {
-            const extraCapStitches = Math.max(0, capStitchCount - capBaseStitches);
-            capExtraStitchCost = (extraCapStitches / 1000) * (this.capAdditionalStitchRate || 1.00);
+            capExtraStitchCost = this.getStitchSurcharge(capStitchCount);
         }
 
         // Add embellishment-specific upcharges
@@ -776,7 +783,19 @@ class EmbroideryPricingCalculator {
         if (totalQuantity <= 71) return '48-71';
         return '72+';
     }
-    
+
+    /**
+     * Get flat stitch surcharge for AS-GARM / AS-CAP fee line items.
+     * 0-10K: $0, 10,001-15K: $4 (Mid), 15,001-25K: $10 (Large).
+     * Full Back (25K+) is handled separately via DECG-FB pricing.
+     */
+    getStitchSurcharge(stitchCount) {
+        for (const tier of this.stitchSurchargeTiers) {
+            if (stitchCount <= tier.max) return tier.fee;
+        }
+        return 10; // Above 25K in non-FB position — cap at Large tier
+    }
+
     /**
      * Get embroidery cost for tier
      */
@@ -1348,9 +1367,8 @@ class EmbroideryPricingCalculator {
         const additionalLogos = garmentAdditionalLogos;
 
         // Calculate additional stitch cost for PRIMARY logos only (GARMENTS ONLY)
-        // Caps have fixed 8K stitches - no extra stitch charge
-        // Full Back: ALL stitches charged at $1.25/1K (min 25K = $31.25)
-        // Other positions: excess over 8K base charged at $1.25/1K
+        // Full Back: ALL stitches charged at per-1K rate (min 25K) — separate DECG-FB pricing
+        // Other positions: flat tier surcharge (0-10K=$0, Mid=$4, Large=$10)
         let primaryAdditionalStitchCost = 0;
         let primaryFullBackStitchCost = 0; // Separate tracking for Full Back (ALL stitches)
         if (garmentProducts.length > 0) {
@@ -1360,9 +1378,8 @@ class EmbroideryPricingCalculator {
                     const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount);
                     primaryFullBackStitchCost += (fbStitchCount / 1000) * this.additionalStitchRate;
                 } else {
-                    // Other positions: charge for excess over 8K base
-                    const extraStitches = Math.max(0, logo.stitchCount - this.baseStitchCount);
-                    primaryAdditionalStitchCost += (extraStitches / 1000) * this.additionalStitchRate;
+                    // Other positions: flat tier surcharge (Mid $4, Large $10)
+                    primaryAdditionalStitchCost += this.getStitchSurcharge(logo.stitchCount);
                 }
             });
         }
@@ -1630,16 +1647,14 @@ class EmbroideryPricingCalculator {
         const digitizingCount = garmentDigitizingCount + capDigitizingCount;
 
         // Calculate total additional stitch charge across all products
-        // Garment: primaryAdditionalStitchCost (calculated above) × garmentQuantity
-        // Full Back: ALL stitches charged at $1.25/1K (separate from excess stitch charges)
+        // Garment: flat tier surcharge × garmentQuantity
+        // Full Back: per-1K rate (separate DECG-FB pricing)
         let garmentStitchTotal = (primaryAdditionalStitchCost + primaryFullBackStitchCost) * garmentQuantity;
-        // Cap stitch charges: same architecture as garments, rate=$1.00/1K (vs garment $1.25/1K)
+        // Cap stitch charges: same flat tier surcharge as garments
         // Laser patches have no stitches — skip stitch charges
         let capStitchTotal = 0;
         if (capQuantity > 0 && capEmbellishmentType !== 'laser-patch') {
-            const capBaseStitches = 8000;
-            const extraCapStitches = Math.max(0, capStitchCount - capBaseStitches);
-            const capPrimaryStitchCost = (extraCapStitches / 1000) * (this.capAdditionalStitchRate || 1.00);
+            const capPrimaryStitchCost = this.getStitchSurcharge(capStitchCount);
             capStitchTotal = capPrimaryStitchCost * capQuantity;
         }
         const additionalStitchTotal = garmentStitchTotal + capStitchTotal;
