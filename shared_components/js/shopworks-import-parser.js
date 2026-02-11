@@ -8,7 +8,7 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.12.0 - Parse Order Summary (shipping, tax rate) + Design Information sections
+ * @version 1.13.0 - Parse Shipping Information (address for WA DOR tax lookup)
  * @date 2026-02-11
  */
 
@@ -453,6 +453,7 @@ class ShopWorksImportParser {
                 total: null,
                 taxRate: null
             },
+            shipping: null,         // Parsed shipping address { method, rawAddress, street, city, state, zip }
             notes: [],              // Comment rows
             warnings: [],           // Import warnings
             reviewItems: [],        // Invalid/skipped items with data for user review
@@ -481,6 +482,8 @@ class ShopWorksImportParser {
                 this._parseOrderSummary(trimmed, result);
             } else if (trimmed.includes('Design Information') || trimmed.includes('Design #')) {
                 this._parseDesignInfo(trimmed, result);
+            } else if (trimmed.includes('Shipping Information') || trimmed.includes('Ship Method')) {
+                this._parseShippingInfo(trimmed, result);
             }
         }
 
@@ -688,6 +691,88 @@ class ShopWorksImportParser {
                 console.log(`[ShopWorksImportParser] Design info: #${simpleMatch[1]}`);
             }
         }
+    }
+
+    /**
+     * Parse Shipping Information section
+     * Extracts ship method and address (street, city, state, zip)
+     * Address format: "CompanyName, StreetAddr, City, ST ZIP-XXXX, Country"
+     * Example: "RPD, 23916 70TH AVENUE CT E, GRAHAM, WA 98338-9356, US"
+     */
+    _parseShippingInfo(text, result) {
+        const lines = text.split('\n');
+        let method = null;
+        let rawAddress = null;
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+
+            if (trimmed.startsWith('Ship Method:')) {
+                method = trimmed.replace('Ship Method:', '').trim();
+            } else if (trimmed.startsWith('Ship Address:')) {
+                rawAddress = trimmed.replace('Ship Address:', '').trim();
+            }
+        }
+
+        if (!rawAddress && !method) return;
+
+        const shipping = {
+            method: method || null,
+            rawAddress: rawAddress || null,
+            street: null,
+            city: null,
+            state: null,
+            zip: null
+        };
+
+        if (rawAddress) {
+            // Split by ", " (comma-space)
+            const parts = rawAddress.split(', ');
+
+            if (parts.length >= 3) {
+                // Work backwards: last = country, second-to-last = "ST ZIP(-XXXX)", third-to-last = city
+                // Remaining (minus first = company) = street
+
+                // Check if last part is a country code (US, CA, etc.)
+                const lastPart = parts[parts.length - 1].trim();
+                let countryOffset = 0;
+                if (/^[A-Z]{2,3}$/.test(lastPart)) {
+                    countryOffset = 1;
+                }
+
+                // State + ZIP is second-to-last (before country if present)
+                const stateZipIdx = parts.length - 1 - countryOffset;
+                const stateZipStr = parts[stateZipIdx] ? parts[stateZipIdx].trim() : '';
+
+                // Parse "WA 98338" or "WA 98338-9356"
+                const stateZipMatch = stateZipStr.match(/^([A-Z]{2})\s+(\d{5})(?:-\d{4})?$/);
+
+                if (stateZipMatch) {
+                    shipping.state = stateZipMatch[1];
+                    shipping.zip = stateZipMatch[2]; // 5-digit only
+
+                    // City is one before state+zip
+                    const cityIdx = stateZipIdx - 1;
+                    if (cityIdx >= 0) {
+                        shipping.city = parts[cityIdx].trim();
+                    }
+
+                    // Street is everything between first part (company) and city
+                    // If only 4 parts (company, street, city, state+zip) or 5 with country
+                    const streetParts = parts.slice(1, cityIdx);
+                    if (streetParts.length > 0) {
+                        shipping.street = streetParts.join(', ').trim();
+                    } else if (cityIdx > 1) {
+                        // Multi-part street address
+                        shipping.street = parts.slice(1, cityIdx).join(', ').trim();
+                    }
+                }
+            }
+
+            console.log(`[ShopWorksImportParser] Shipping parsed: ${shipping.street}, ${shipping.city}, ${shipping.state} ${shipping.zip}`);
+        }
+
+        result.shipping = shipping;
     }
 
     /**
@@ -1554,4 +1639,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.12.0 - Parse Order Summary (shipping, tax rate) + Design Information');
+console.log('[ShopWorksImportParser] Module loaded v1.13.0 - Parse Shipping Information (address for WA DOR tax lookup)');

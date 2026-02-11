@@ -31,6 +31,46 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Fix: Tax Lookup Crashes on Undeployed Backend + Import Loses Fallback Rate (2026-02-11)
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+**Symptoms:** Importing ShopWorks order for Graham, WA 98338 showed 10.1% tax ($8.89) instead of 8.1% ($7.13). Console showed `SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON`.
+**Root cause (two bugs):**
+1. `lookupTaxRate()` called `resp.json()` without checking `resp.ok`. When backend wasn't deployed, the 404 HTML page caused a JSON parse crash.
+2. Import code called `lookupTaxRate()` as fire-and-forget (no `await`). When it failed, the `else if` branch with the order summary's back-calculated rate (9.5%) was never reached. Tax stayed at default 10.1%.
+**Solution:**
+1. Added `if (!resp.ok) throw new Error(...)` before `resp.json()`
+2. Made `lookupTaxRate()` return `true`/`false`. Import now `await`s it and falls back to order summary rate when lookup fails.
+**Prevention:** Always check `resp.ok` before parsing JSON. Never fire-and-forget an async call when a fallback `else if` depends on its result — `await` it and check the return value.
+
+---
+
+## Feature: WA DOR Tax Rate Lookup — Hybrid API + Caspio (2026-02-11)
+**Date:** 2026-02-11
+**Project:** [Pricing Index] + [caspio-proxy]
+**Problem:** WA sales tax varies by city (Milton=10.1%, Graham=8.1%, etc.). Embroidery builder defaulted to 10.1% requiring manual override per order, causing wrong tax on ~40% of quotes.
+**Solution:** Hybrid lookup system:
+1. Backend `POST /api/tax-rates/lookup` calls WA DOR API (`webgis.dor.wa.gov/webapi/AddressRates.aspx`) with address/city/zip
+2. DOR returns location code + exact rate (e.g., 0.081 for Graham)
+3. Rate matched to ShopWorks tax account in Caspio `sales_tax_accounts_2026` table (e.g., 0.081 → account `2200.81`)
+4. Two caches: DOR results (24h TTL, keyed by ZIP), Caspio accounts (5min TTL)
+5. Non-WA → account 2202 (0%). DOR failure → fallback to 10.1% with warning
+6. Frontend: Ship To fields in embroidery builder, auto-lookup on ZIP blur or ShopWorks import
+7. ShopWorks parser (`_parseShippingInfo()`) extracts address from `Ship Address:` line
+**Prevention:** Always use DOR lookup for WA addresses. Out-of-state detection is automatic. DOR API is free, no auth needed.
+
+---
+
+## Fix: Shipping Not Taxed in Quote View / Email (WA State Requires It) (2026-02-11)
+**Date:** 2026-02-11
+**Project:** Pricing Index
+**Symptoms:** Quote view, PDF, and email showed tax calculated on subtotal only (`$75.00 × 9.5% = $7.13`), but WA state requires tax on shipping too (`$87.99 × 9.5% = $8.36`). The embroidery quote builder UI already taxed shipping correctly, so saved quotes showed different totals when viewed.
+**Root cause:** `quote-view.js` had `tax = subtotal * rate` in 4 places and `embroidery-quote-service.js` had `tax = subtotal * 0.101` in 2 email generation functions. Shipping was added after tax, not before.
+**Solution:** Changed all 6 sites to `taxableAmount = subtotal + shipping; tax = round(taxableAmount * rate)`. Reordered display: Subtotal → Shipping → Tax → Total. Added shipping row to professional quote email HTML.
+**Prevention:** WA state taxes shipping. When adding new tax calculation sites, always include shipping in the taxable base.
+
+---
+
 ## Fix: 1-Cent Tax Rounding Error in Quote PDF Totals (2026-02-11)
 **Date:** 2026-02-11
 **Project:** Pricing Index

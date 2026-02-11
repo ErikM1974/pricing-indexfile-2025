@@ -1640,12 +1640,14 @@ class QuoteViewPage {
     }
 
     /**
-     * Calculate total with tax (shipping is NOT taxed per WA state law)
+     * Calculate total with tax (shipping is taxable in WA state)
      */
     calculateTotalWithTax() {
         const subtotal = parseFloat(this.quoteData.TotalAmount) || 0;
-        const taxAmount = Math.round(subtotal * this.taxRate * 100) / 100;
-        return subtotal + taxAmount + this.getShippingFee();
+        const shippingFee = this.getShippingFee();
+        const taxableAmount = subtotal + shippingFee;
+        const taxAmount = Math.round(taxableAmount * this.taxRate * 100) / 100;
+        return taxableAmount + taxAmount;
     }
 
     /**
@@ -1656,9 +1658,10 @@ class QuoteViewPage {
         // TotalAmount includes: products + LTM + digitizing + art + rush + sample - discount
         // This ensures the displayed Subtotal matches the visible line items
         const grandTotalBeforeTax = parseFloat(this.quoteData.TotalAmount) || 0;
-        const taxAmount = Math.round(grandTotalBeforeTax * this.taxRate * 100) / 100;
         const shippingFee = this.getShippingFee();
-        const totalWithTax = grandTotalBeforeTax + taxAmount + shippingFee;
+        const taxableAmount = grandTotalBeforeTax + shippingFee;
+        const taxAmount = Math.round(taxableAmount * this.taxRate * 100) / 100;
+        const totalWithTax = taxableAmount + taxAmount;
 
         // Build totals HTML
         const totalsCard = document.querySelector('.totals-card');
@@ -1675,6 +1678,16 @@ class QuoteViewPage {
 
         // LTM no longer shown here - it's now a line item (LTM-G, LTM-C) in the product table
 
+        // Shipping row before tax (so customer sees tax applies to subtotal + shipping)
+        if (shippingFee > 0) {
+            totalsHtml += `
+                <div class="total-row">
+                    <span class="label">Shipping:</span>
+                    <span class="value">${this.formatCurrency(shippingFee)}</span>
+                </div>
+            `;
+        }
+
         // Add tax row with dynamic rate label
         const ratePercent = (this.taxRate * 100).toFixed(1);
         const rateLabel = ratePercent === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${ratePercent}%)`;
@@ -1684,16 +1697,6 @@ class QuoteViewPage {
                 <span class="value">${this.formatCurrency(taxAmount)}</span>
             </div>
         `;
-
-        // Shipping row (only if quote has shipping fee — NOT taxed per WA state law)
-        if (shippingFee > 0) {
-            totalsHtml += `
-                <div class="total-row">
-                    <span class="label">Shipping:</span>
-                    <span class="value">${this.formatCurrency(shippingFee)}</span>
-                </div>
-            `;
-        }
 
         // Grand total with tax
         totalsHtml += `
@@ -2305,9 +2308,10 @@ class QuoteViewPage {
         // Use TotalAmount as pre-tax subtotal (includes all fees)
         // This matches the visible line items in the PDF
         const grandTotal = parseFloat(this.quoteData.TotalAmount) || 0;
-        const taxAmount = Math.round(grandTotal * this.taxRate * 100) / 100;
         const pdfShippingFee = this.getShippingFee();
-        const totalWithTax = grandTotal + taxAmount + pdfShippingFee;
+        const pdfTaxableAmount = grandTotal + pdfShippingFee;
+        const taxAmount = Math.round(pdfTaxableAmount * this.taxRate * 100) / 100;
+        const totalWithTax = pdfTaxableAmount + taxAmount;
 
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
@@ -2316,18 +2320,18 @@ class QuoteViewPage {
         pdf.text(this.formatCurrency(grandTotal), margin + 155, yPos);
         yPos += 6;
 
-        const pdfRatePercent = (this.taxRate * 100).toFixed(1);
-        const pdfRateLabel = pdfRatePercent === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pdfRatePercent}%):`;
-        pdf.text(pdfRateLabel, margin + 100, yPos);
-        pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
-        yPos += 6;
-
-        // Shipping line (only if present — NOT taxed per WA state law)
+        // Shipping line before tax (so customer sees tax applies to subtotal + shipping)
         if (pdfShippingFee > 0) {
             pdf.text('Shipping:', margin + 120, yPos);
             pdf.text(this.formatCurrency(pdfShippingFee), margin + 155, yPos);
             yPos += 6;
         }
+
+        const pdfRatePercent = (this.taxRate * 100).toFixed(1);
+        const pdfRateLabel = pdfRatePercent === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pdfRatePercent}%):`;
+        pdf.text(pdfRateLabel, margin + 100, yPos);
+        pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
+        yPos += 6;
         yPos += 2;
 
         pdf.setFont('helvetica', 'bold');
@@ -2833,18 +2837,19 @@ class QuoteViewPage {
         console.group('8️⃣ Shipping');
         const shippingFee = this.getShippingFee();
         console.log('Shipping Fee (SHIP item):', shippingFee.toFixed(2));
-        console.log('✅ Shipping is NOT taxed (WA state law — separately stated shipping exempt)');
         console.groupEnd();
 
-        // 9. Tax calculation
+        // 9. Tax calculation (shipping is taxable in WA state)
         console.group('9️⃣ Tax & Grand Total');
         const taxRate = this.taxRate || 0.101;
-        const tax = Math.round(totalAmount * taxRate * 100) / 100;
-        const grandTotalWithTax = totalAmount + tax + shippingFee;
+        const taxableAmount = totalAmount + shippingFee;
+        const tax = Math.round(taxableAmount * taxRate * 100) / 100;
+        const grandTotalWithTax = taxableAmount + tax;
         console.log('Tax Rate:', (taxRate * 100).toFixed(1) + '%');
+        console.log('Taxable Amount (subtotal + shipping):', taxableAmount.toFixed(2));
         console.log('Tax Amount:', tax.toFixed(2));
-        console.log('Shipping (untaxed):', shippingFee.toFixed(2));
-        console.log('Grand Total (subtotal + tax + shipping):', grandTotalWithTax.toFixed(2));
+        console.log('Shipping:', shippingFee.toFixed(2));
+        console.log('Grand Total (subtotal + shipping + tax):', grandTotalWithTax.toFixed(2));
         console.groupEnd();
 
         console.groupEnd(); // End main group

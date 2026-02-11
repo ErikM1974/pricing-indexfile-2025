@@ -762,11 +762,13 @@ class EmbroideryQuoteService {
             // Get sales rep info
             const salesRep = this.salesReps.find(rep => rep.email === salesRepEmail) || this.salesReps[0];
             
-            // Calculate totals with tax
+            // Calculate totals with tax (shipping is taxable in WA state)
+            const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
             const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
-            const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
-            const grandTotalWithTax = subtotalBeforeTax + salesTax;
-            
+            const taxableAmount = subtotalBeforeTax + shippingFee;
+            const salesTax = Math.round(taxableAmount * 0.101 * 100) / 100;
+            const grandTotalWithTax = taxableAmount + salesTax;
+
             // Build email data - ALWAYS provide all variables even if empty
             const emailData = {
                 // Email routing (these match EmailJS settings)
@@ -914,10 +916,12 @@ class EmbroideryQuoteService {
         const currentDate = new Date().toLocaleDateString('en-US');
         const salesRep = this.salesReps.find(rep => rep.email === (customerData.salesRepEmail || 'sales@nwcustomapparel.com')) || this.salesReps[0];
         
-        // Calculate totals with tax
+        // Calculate totals with tax (shipping is taxable in WA state)
+        const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
         const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
-        const salesTax = subtotalBeforeTax * 0.101; // 10.1% Milton, WA sales tax
-        const grandTotalWithTax = subtotalBeforeTax + salesTax;
+        const taxableAmount = subtotalBeforeTax + shippingFee;
+        const salesTax = Math.round(taxableAmount * 0.101 * 100) / 100;
+        const grandTotalWithTax = taxableAmount + salesTax;
         
         let html = `
         <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
@@ -988,6 +992,14 @@ class EmbroideryQuoteService {
                                 <strong>$${subtotalBeforeTax.toFixed(2)}</strong>
                             </td>
                         </tr>
+                        ${shippingFee > 0 ? `<tr>
+                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                Shipping:
+                            </td>
+                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
+                                $${shippingFee.toFixed(2)}
+                            </td>
+                        </tr>` : ''}
                         <tr>
                             <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
                                 Milton, WA Sales Tax (10.1%):

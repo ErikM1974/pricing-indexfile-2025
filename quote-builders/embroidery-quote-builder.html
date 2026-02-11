@@ -622,6 +622,47 @@
                                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
                     </div>
+                    <!-- Ship To Address (for WA DOR tax rate lookup) -->
+                    <div style="margin-bottom: 10px; padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;">
+                        <label style="font-size: 12px; color: #0369a1; margin-bottom: 6px; display: block; font-weight: 600;">
+                            <i class="fas fa-map-marker-alt" style="margin-right: 4px;"></i>Ship To
+                        </label>
+                        <input type="text" id="ship-address" placeholder="Street address"
+                               style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-bottom: 6px;">
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" id="ship-city" placeholder="City"
+                                   style="flex: 2; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            <select id="ship-state" onchange="onShipStateChange()"
+                                    style="width: 58px; padding: 6px 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white;">
+                                <option value="WA" selected>WA</option>
+                                <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                                <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                                <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
+                                <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
+                                <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
+                                <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
+                                <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+                                <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
+                                <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
+                                <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
+                                <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                                <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
+                                <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
+                                <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
+                                <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+                                <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
+                                <option value="WI">WI</option><option value="WY">WY</option>
+                            </select>
+                            <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
+                                   onblur="onShipZipBlur()"
+                                   style="width: 72px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
+                                    style="padding: 6px 10px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div id="tax-lookup-status" style="font-size: 11px; margin-top: 4px; color: #64748b; min-height: 16px;"></div>
+                    </div>
                     <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
                     <!-- LTM Override (shown only when qty <= 7) -->
                     <div id="ltm-override-row" style="display: none; margin-bottom: 10px; padding: 8px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;">
@@ -2394,6 +2435,10 @@ Company:Absher Construction Company
                 taxRate: document.getElementById('tax-rate-input')?.value || '10.1',
                 includeTax: document.getElementById('include-tax')?.checked ?? true,
                 shippingFee: document.getElementById('shipping-fee')?.value || '0',
+                shipAddress: document.getElementById('ship-address')?.value || '',
+                shipCity: document.getElementById('ship-city')?.value || '',
+                shipState: document.getElementById('ship-state')?.value || 'WA',
+                shipZip: document.getElementById('ship-zip')?.value || '',
                 timestamp: Date.now()
             };
         }
@@ -2487,6 +2532,13 @@ Company:Absher Construction Company
             if (draft.shippingFee && parseFloat(draft.shippingFee) > 0) {
                 document.getElementById('shipping-fee').value = draft.shippingFee;
             }
+
+            // Restore Ship To address
+            if (draft.shipAddress) document.getElementById('ship-address').value = draft.shipAddress;
+            if (draft.shipCity) document.getElementById('ship-city').value = draft.shipCity;
+            if (draft.shipState) document.getElementById('ship-state').value = draft.shipState;
+            if (draft.shipZip) document.getElementById('ship-zip').value = draft.shipZip;
+
             updateTaxCalculation();
 
             // Restore garment AL configuration
@@ -6695,6 +6747,133 @@ Company:Absher Construction Company
             };
         }
 
+        // ============================================================
+        // TAX RATE LOOKUP (WA DOR API)
+        // ============================================================
+
+        /**
+         * Show status message in the tax lookup status area
+         * @param {string} message - Status text
+         * @param {string} type - 'success'|'warning'|'error'|'loading'|'info'
+         */
+        function showTaxStatus(message, type) {
+            const el = document.getElementById('tax-lookup-status');
+            if (!el) return;
+
+            const colors = {
+                success: '#16a34a',
+                warning: '#d97706',
+                error: '#dc2626',
+                loading: '#6366f1',
+                info: '#0284c7'
+            };
+
+            const icons = {
+                success: '<i class="fas fa-check-circle"></i> ',
+                warning: '<i class="fas fa-exclamation-triangle"></i> ',
+                error: '<i class="fas fa-times-circle"></i> ',
+                loading: '<i class="fas fa-spinner fa-spin"></i> ',
+                info: '<i class="fas fa-info-circle"></i> '
+            };
+
+            el.style.color = colors[type] || '#64748b';
+            el.innerHTML = (icons[type] || '') + message;
+        }
+
+        /**
+         * Look up WA tax rate via DOR API
+         * Called on ZIP blur, state change, and manual button click
+         */
+        async function lookupTaxRate() {
+            const state = document.getElementById('ship-state').value;
+            const zip = document.getElementById('ship-zip').value.trim();
+            const city = document.getElementById('ship-city').value.trim();
+            const address = document.getElementById('ship-address').value.trim();
+
+            // Non-WA state → 0% tax
+            if (state !== 'WA') {
+                document.getElementById('tax-rate-input').value = '0';
+                updateTaxCalculation();
+                showTaxStatus('Out of State — No Tax', 'info');
+                return true;
+            }
+
+            // Need at least a ZIP code
+            if (!zip || zip.length < 5) {
+                showTaxStatus('Enter ZIP code to look up rate', 'info');
+                return false;
+            }
+
+            try {
+                showTaxStatus('Looking up tax rate...', 'loading');
+                const resp = await fetch(`${API_BASE}/api/tax-rates/lookup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, city, state, zip })
+                });
+                if (!resp.ok) {
+                    throw new Error(`API returned ${resp.status}`);
+                }
+                const data = await resp.json();
+
+                if (!data.success) {
+                    showTaxStatus(data.error || 'Lookup failed', 'error');
+                    return false;
+                }
+
+                document.getElementById('tax-rate-input').value = data.taxRate;
+                updateTaxCalculation();
+
+                if (data.outOfState) {
+                    showTaxStatus('Out of State — No Tax', 'info');
+                } else if (data.fallback) {
+                    showTaxStatus(`Default rate ${data.taxRate}% (DOR unavailable)`, 'warning');
+                } else {
+                    const locationLabel = city || data.locationCode || 'WA';
+                    showTaxStatus(`${locationLabel} — ${data.taxRate}% (Account ${data.account})`, 'success');
+                }
+                return true;
+            } catch (err) {
+                console.error('[Tax Lookup] Error:', err);
+                showTaxStatus('Lookup failed — using current rate', 'error');
+                return false;
+            }
+        }
+
+        /**
+         * Handle state dropdown change
+         * If non-WA, set tax to 0%. If WA with ZIP, trigger lookup.
+         */
+        function onShipStateChange() {
+            const state = document.getElementById('ship-state').value;
+            if (state !== 'WA') {
+                document.getElementById('tax-rate-input').value = '0';
+                updateTaxCalculation();
+                showTaxStatus('Out of State — No Tax', 'info');
+            } else {
+                const zip = document.getElementById('ship-zip').value.trim();
+                if (zip && zip.length >= 5) {
+                    lookupTaxRate();
+                } else {
+                    // Reset to WA default
+                    document.getElementById('tax-rate-input').value = '10.1';
+                    updateTaxCalculation();
+                    showTaxStatus('', 'info');
+                }
+            }
+        }
+
+        /**
+         * Handle ZIP code blur — trigger lookup if WA + valid ZIP
+         */
+        function onShipZipBlur() {
+            const state = document.getElementById('ship-state').value;
+            const zip = document.getElementById('ship-zip').value.trim();
+            if (state === 'WA' && zip.length >= 5) {
+                lookupTaxRate();
+            }
+        }
+
         /**
          * Update tax calculation based on toggle state
          * Uses shared calculateDiscountableSubtotal() for consistent discount math
@@ -7187,6 +7366,14 @@ Company:Absher Construction Company
             if (taxRateInput) taxRateInput.value = '10.1';
             document.getElementById('include-tax').checked = true;
             document.getElementById('rush-fee').value = '';
+
+            // Reset Ship To fields
+            document.getElementById('ship-address').value = '';
+            document.getElementById('ship-city').value = '';
+            document.getElementById('ship-state').value = 'WA';
+            document.getElementById('ship-zip').value = '';
+            const taxStatus = document.getElementById('tax-lookup-status');
+            if (taxStatus) taxStatus.innerHTML = '';
             document.getElementById('discount-amount').value = '';
             document.getElementById('discount-reason').value = '';
             const reasonPreset = document.getElementById('discount-reason-preset');
@@ -8842,8 +9029,22 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 6d. Auto-detect tax rate from Order Summary
-                if (data.orderSummary && data.orderSummary.taxRate) {
+                // 6d. Populate Ship To address and auto-lookup tax rate
+                if (data.shipping) {
+                    if (data.shipping.street) document.getElementById('ship-address').value = data.shipping.street;
+                    if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
+                    if (data.shipping.state) document.getElementById('ship-state').value = data.shipping.state;
+                    if (data.shipping.zip) document.getElementById('ship-zip').value = data.shipping.zip;
+                    // Use DOR API to get precise tax rate from address
+                    const lookupOk = await lookupTaxRate();
+                    // If lookup failed and we have a back-calculated rate, use it as fallback
+                    if (!lookupOk && data.orderSummary && data.orderSummary.taxRate) {
+                        document.getElementById('tax-rate-input').value = data.orderSummary.taxRate.toFixed(1);
+                        document.getElementById('include-tax').checked = true;
+                        updateTaxCalculation();
+                    }
+                } else if (data.orderSummary && data.orderSummary.taxRate) {
+                    // Fallback: use back-calculated tax rate from Order Summary
                     const taxInput = document.getElementById('tax-rate-input');
                     if (taxInput) {
                         taxInput.value = data.orderSummary.taxRate.toFixed(1);
