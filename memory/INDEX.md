@@ -72,6 +72,7 @@
 ├── MANUAL_CALCULATOR_TEMPLATES.md    # Manual calculator HTML templates
 │
 ├── # Integration & Features
+├── UPS_SHIPPING_INTEGRATION_PLAN.md  # **NEW** UPS shipping rates for embroidery builder (PLANNED, 2026-02-10)
 ├── STRIPE_INTEGRATION_GUIDE.md       # Stripe payment integration
 ├── B2B_REWARDS_SYSTEM_PLAN.md        # B2B rewards system planning doc
 ├── FILE_UPLOAD_API_REQUIREMENTS.md   # File upload API specification
