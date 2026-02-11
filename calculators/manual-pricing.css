@@ -541,6 +541,18 @@
     min-width: 70px;
 }
 
+.ltm-qty-input {
+    width: 65px;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.ltm-qty-input::-webkit-outer-spin-button,
+.ltm-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 /* =====================================================
    RESPONSIVE
    ===================================================== */

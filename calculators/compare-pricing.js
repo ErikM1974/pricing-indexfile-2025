@@ -251,6 +251,11 @@ class ComparePricingCalculator {
         const sizeLabels = sizes.map(s => s.size);
         const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
 
+        // LTM distribution
+        const ltmQty = parseInt(document.getElementById('dtgLtmQty')?.value || 12);
+        const LTM_FEE = 50;
+        const ltmPerUnit = Math.floor((LTM_FEE / ltmQty) * 100) / 100;
+
         // Build a synthetic "1-23" tier using 24-47 pricing
         const tier2447 = tiers.find(t => t.TierLabel === '24-47');
         const allTiers = [];
@@ -283,23 +288,30 @@ class ComparePricingCalculator {
             const sizePrices = {};
             sizeLabels.forEach(size => {
                 const upcharge = parseFloat(upcharges[size] || 0);
-                sizePrices[size] = roundedBase + upcharge;
+                sizePrices[size] = roundedBase + upcharge + (tier.isLTM ? ltmPerUnit : 0);
             });
 
             rows.push({
                 label: tier.displayLabel,
                 isLTM: tier.isLTM,
+                ltmPerUnit: tier.isLTM ? ltmPerUnit : 0,
                 prices: sizePrices
             });
         });
 
-        this.renderPricingTable('dtgBody', sizeLabels, rows, { ltmNote: 'Orders under 24 pieces incur a $50 LTM fee' });
+        this.renderPricingTable('dtgBody', sizeLabels, rows, {
+            ltmNote: `1-23 prices include $50 LTM fee (${ltmQty} pcs). Tiers 24+ are standard pricing (no LTM).`
+        });
     }
 
     onDTGLocationChange() {
         if (this.cachedData.dtg) {
             this.renderDTG();
         }
+    }
+
+    onDTGLtmQtyChange() {
+        if (this.cachedData.dtg) this.renderDTG();
     }
 
     // =========================================================
@@ -324,6 +336,8 @@ class ComparePricingCalculator {
             return;
         }
 
+        const ltmQty = parseInt(document.getElementById('dtfLtmQty')?.value || 12);
+
         const rows = [];
         transferSize.pricingTiers.forEach(transferTier => {
             const repQty = transferTier.minQty;
@@ -343,16 +357,21 @@ class ComparePricingCalculator {
             const finalPrice = Math.ceil(rawTotal * 2) / 2;
 
             const isLTM = marginTier && marginTier.ltmFee > 0;
+            const tierLtmPerUnit = (isLTM && marginTier.ltmFee > 0)
+                ? Math.floor((marginTier.ltmFee / ltmQty) * 100) / 100
+                : 0;
+            let displayPrice = finalPrice + tierLtmPerUnit;
 
             rows.push({
                 label: transferTier.range || `${transferTier.minQty}-${transferTier.maxQty}`,
                 isLTM: isLTM,
-                prices: { 'Price': finalPrice }
+                ltmPerUnit: tierLtmPerUnit,
+                prices: { 'Price': displayPrice }
             });
         });
 
         this.renderPricingTable('dtfBody', ['Price'], rows, {
-            ltmNote: 'Small orders may incur an LTM fee',
+            ltmNote: `10-23 prices include $50 LTM fee (${ltmQty} pcs). Tiers 24+ are standard pricing (no LTM).`,
             singleColumn: true
         });
     }
@@ -361,6 +380,10 @@ class ComparePricingCalculator {
         if (this.cachedData.dtf) {
             this.renderDTF();
         }
+    }
+
+    onDTFLtmQtyChange() {
+        if (this.cachedData.dtf) this.renderDTF();
     }
 
     // =========================================================
@@ -409,6 +432,7 @@ class ComparePricingCalculator {
             rows.push({
                 label: tierLabel,
                 isLTM: isLTM,
+                ltmPerUnit: isLTM ? parseFloat(ltmPerUnit.toFixed(2)) : 0,
                 prices: sizePrices
             });
         });
@@ -468,6 +492,7 @@ class ComparePricingCalculator {
             rows.push({
                 label: tierLabel,
                 isLTM: isLTM,
+                ltmPerUnit: isLTM ? parseFloat(ltmPerUnit.toFixed(2)) : 0,
                 prices: sizePrices
             });
         });
@@ -507,9 +532,27 @@ class ComparePricingCalculator {
         const data = this.cachedData.sp;
         if (!data || !data.finalPrices) return;
 
+        const ltmQty = parseInt(document.getElementById('spLtmQty')?.value || 36);
         const colorCount = document.getElementById('spColors').value || '1';
         const primaryPrices = data.finalPrices.PrimaryLocation;
         const uniqueSizes = data.uniqueSizes || [];
+
+        // Determine which tier the selected qty falls into
+        let matchingTierLabel = null;
+        let matchingLtmFee = 0;
+        if (data.tierData) {
+            for (const [label, td] of Object.entries(data.tierData)) {
+                if (ltmQty >= td.MinQuantity && ltmQty <= td.MaxQuantity && td.LTM_Fee > 0) {
+                    matchingTierLabel = label;
+                    matchingLtmFee = td.LTM_Fee;
+                    break;
+                }
+            }
+        }
+
+        const ltmPerUnit = matchingLtmFee > 0
+            ? Math.floor((matchingLtmFee / ltmQty) * 100) / 100
+            : 0;
 
         const rows = [];
         const tierLabels = Object.keys(primaryPrices);
@@ -518,33 +561,46 @@ class ComparePricingCalculator {
             const colorPrices = primaryPrices[tierLabel][colorCount];
             if (!colorPrices) return;
 
-            const tierData = data.tierData && data.tierData[tierLabel];
-            const isLTM = tierData && tierData.LTM_Fee > 0;
+            const tierInfo = data.tierData && data.tierData[tierLabel];
+            const isLTM = tierInfo && tierInfo.LTM_Fee > 0;
+            const isMatchingTier = tierLabel === matchingTierLabel;
 
             const sizePrices = {};
             uniqueSizes.forEach(size => {
-                sizePrices[size] = colorPrices[size];
+                let price = colorPrices[size];
+                if (isMatchingTier && price != null) {
+                    price += ltmPerUnit;
+                    price = parseFloat(price.toFixed(2));
+                }
+                sizePrices[size] = price;
             });
 
             rows.push({
                 label: tierLabel,
                 isLTM: isLTM,
+                ltmPerUnit: isMatchingTier ? ltmPerUnit : 0,
                 prices: sizePrices
             });
         });
 
-        const ltmTier = data.tierData && Object.values(data.tierData).find(t => t.LTM_Fee > 0);
-        const ltmAmount = ltmTier ? `$${ltmTier.LTM_Fee}` : '$50';
+        let ltmNote;
+        if (matchingTierLabel && matchingLtmFee > 0) {
+            ltmNote = `${matchingTierLabel} prices include $${matchingLtmFee} LTM fee (${ltmQty} pcs). Tiers 72+ are standard pricing (no LTM).`;
+        } else {
+            ltmNote = 'Tiers 72+ are standard pricing (no LTM).';
+        }
 
-        this.renderPricingTable('spBody', uniqueSizes, rows, {
-            ltmNote: `Orders in LTM tiers incur a ${ltmAmount} fee`
-        });
+        this.renderPricingTable('spBody', uniqueSizes, rows, { ltmNote });
     }
 
     onSPColorChange() {
         if (this.cachedData.sp) {
             this.renderScreenPrint();
         }
+    }
+
+    onSPLtmQtyChange() {
+        if (this.cachedData.sp) this.renderScreenPrint();
     }
 
     // =========================================================
@@ -583,7 +639,10 @@ class ComparePricingCalculator {
             html += `<tr class="${ltmClass}">`;
             html += `<td>${escapeHtml(row.label)}`;
             if (row.isLTM) {
-                html += ' <span class="ltm-badge">LTM</span>';
+                const ltmText = row.ltmPerUnit > 0
+                    ? `LTM +$${row.ltmPerUnit.toFixed(2)}/ea`
+                    : 'LTM';
+                html += ` <span class="ltm-badge">${ltmText}</span>`;
             }
             html += '</td>';
 

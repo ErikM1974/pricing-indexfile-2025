@@ -108,6 +108,12 @@
                             <select id="dtgLocation" class="method-select" onchange="compareCalc.onDTGLocationChange()">
                                 <!-- Populated by JS -->
                             </select>
+                            <div class="ltm-qty-picker">
+                                <label for="dtgLtmQty">LTM qty:</label>
+                                <input type="number" id="dtgLtmQty" class="method-select ltm-qty-input"
+                                       min="1" max="23" value="12"
+                                       onchange="compareCalc.onDTGLtmQtyChange()">
+                            </div>
                         </div>
                     </div>
                     <div class="method-card-body" id="dtgBody">
@@ -128,6 +134,12 @@
                                 <option value="medium" selected>Medium (9" x 12")</option>
                                 <option value="large">Large (12" x 16.5")</option>
                             </select>
+                            <div class="ltm-qty-picker">
+                                <label for="dtfLtmQty">LTM qty:</label>
+                                <input type="number" id="dtfLtmQty" class="method-select ltm-qty-input"
+                                       min="10" max="23" value="12"
+                                       onchange="compareCalc.onDTFLtmQtyChange()">
+                            </div>
                         </div>
                     </div>
                     <div class="method-card-body" id="dtfBody">
@@ -174,6 +186,12 @@
                             <select id="spColors" class="method-select" onchange="compareCalc.onSPColorChange()">
                                 <!-- Populated by JS with available color counts -->
                             </select>
+                            <div class="ltm-qty-picker">
+                                <label for="spLtmQty">LTM qty:</label>
+                                <input type="number" id="spLtmQty" class="method-select ltm-qty-input"
+                                       min="24" max="71" value="36"
+                                       onchange="compareCalc.onSPLtmQtyChange()">
+                            </div>
                         </div>
                     </div>
                     <div class="method-card-body" id="spBody">
