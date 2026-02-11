@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Manual Pricing Calculator | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Base calculator styles + page-specific styles -->
+    <link rel="stylesheet" href="/calculators/manual-calculator-styles.css">
+    <link rel="stylesheet" href="/calculators/manual-pricing.css">
+</head>
+<body>
+    <!-- Global Error Banner -->
+    <div id="apiErrorBanner" class="api-error-banner hidden">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="apiErrorMessage">Unable to load pricing data. Please refresh the page.</span>
+    </div>
+
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Staff Dashboard</a>
+                        <span>/</span>
+                        <span>Manual Pricing</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Title -->
+        <div class="page-title">
+            <i class="fas fa-calculator"></i> Manual Pricing Calculator
+        </div>
+        <p class="page-subtitle">Non-SanMar garment & cap pricing lookup. Enter the blank cost from your supplier.</p>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-row">
+                <div class="cost-input-group">
+                    <label for="blankCost">Blank Cost</label>
+                    <div class="cost-input-wrapper">
+                        <span class="dollar-sign">$</span>
+                        <input type="number"
+                               id="blankCost"
+                               class="cost-input"
+                               step="0.01"
+                               min="0.01"
+                               max="999.99"
+                               placeholder="e.g. 6.25"
+                               onkeypress="if(event.key === 'Enter') document.getElementById('calculateBtn').click()">
+                    </div>
+                </div>
+
+                <div class="item-type-group">
+                    <label>Item Type</label>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn active" data-type="garment" onclick="manualCalc.setItemType('garment')">
+                            <i class="fas fa-tshirt"></i> Garment
+                        </button>
+                        <button class="toggle-btn" data-type="cap" onclick="manualCalc.setItemType('cap')">
+                            <i class="fas fa-hat-cowboy"></i> Cap
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calculate-group">
+                    <label>&nbsp;</label>
+                    <button id="calculateBtn" class="btn-calculate" onclick="manualCalc.calculate()">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                </div>
+            </div>
+            <p class="input-hint">Enter the blank garment/cap cost from your supplier (S&S Active Wear, etc.)</p>
+            <div id="inputError" class="input-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="inputErrorText"></span>
+            </div>
+        </div>
+
+        <!-- Method Cards Container -->
+        <div id="methodCards" class="methods-container" style="display: none;">
+
+            <!-- GARMENT MODE CARDS -->
+            <div id="garmentCards">
+
+                <!-- DTG Card -->
+                <div class="method-card" id="dtgCard">
+                    <div class="method-card-header">
+                        <h3 class="method-card-title">
+                            <span class="method-icon dtg"><i class="fas fa-print"></i></span>
+                            DTG (Direct-to-Garment)
+                        </h3>
+                        <div class="method-card-controls">
+                            <select id="dtgLocation" class="method-select" onchange="manualCalc.onDTGLocationChange()">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="method-card-body" id="dtgBody">
+                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                    </div>
+                </div>
+
+                <!-- DTF Card -->
+                <div class="method-card" id="dtfCard">
+                    <div class="method-card-header">
+                        <h3 class="method-card-title">
+                            <span class="method-icon dtf"><i class="fas fa-film"></i></span>
+                            DTF (Direct-to-Film)
+                        </h3>
+                        <div class="method-card-controls">
+                            <select id="dtfTransferSize" class="method-select" onchange="manualCalc.onDTFSizeChange()">
+                                <option value="small">Small (5" x 5")</option>
+                                <option value="medium" selected>Medium (9" x 12")</option>
+                                <option value="large">Large (12" x 16.5")</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="method-card-body" id="dtfBody">
+                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                    </div>
+                </div>
+
+                <!-- Embroidery Card -->
+                <div class="method-card" id="embCard">
+                    <div class="method-card-header">
+                        <h3 class="method-card-title">
+                            <span class="method-icon emb"><i class="fas fa-needle"></i></span>
+                            Embroidery
+                        </h3>
+                        <div class="method-card-controls">
+                            <span class="text-muted" style="font-size: 0.8125rem;">Standard 8K stitches</span>
+                        </div>
+                    </div>
+                    <div class="method-card-body" id="embBody">
+                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                    </div>
+                </div>
+
+                <!-- Screen Print Card -->
+                <div class="method-card" id="spCard">
+                    <div class="method-card-header">
+                        <h3 class="method-card-title">
+                            <span class="method-icon sp"><i class="fas fa-palette"></i></span>
+                            Screen Print
+                        </h3>
+                        <div class="method-card-controls">
+                            <select id="spColors" class="method-select" onchange="manualCalc.onSPColorChange()">
+                                <!-- Populated by JS with available color counts -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="method-card-body" id="spBody">
+                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAP MODE CARDS -->
+            <div id="capCards" style="display: none;">
+
+                <!-- Cap Embroidery Card -->
+                <div class="method-card" id="capEmbCard">
+                    <div class="method-card-header">
+                        <h3 class="method-card-title">
+                            <span class="method-icon cap"><i class="fas fa-hat-cowboy"></i></span>
+                            Cap Embroidery
+                        </h3>
+                        <div class="method-card-controls">
+                            <span class="text-muted" style="font-size: 0.8125rem;">Standard 8K stitches</span>
+                        </div>
+                    </div>
+                    <div class="method-card-body" id="capEmbBody">
+                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Service Dependencies -->
+    <script src="/shared_components/js/dtg-pricing-service.js"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js"></script>
+    <script src="/shared_components/js/embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+
+    <!-- Page Logic -->
+    <script src="/calculators/manual-pricing.js"></script>
+</body>
+</html>

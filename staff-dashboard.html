@@ -308,19 +308,7 @@
                                 <span class="tool-category-title">Manual Pricing</span>
                             </div>
                             <div class="tool-buttons">
-                                <div class="tool-dropdown">
-                                    <button class="tool-dropdown-btn">
-                                        <span>Select Calculator</span>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </button>
-                                    <div class="tool-dropdown-menu">
-                                        <a href="javascript:void(0)" onclick="openManualPricingModal('dtg')" class="tool-dropdown-item">DTG</a>
-                                        <a href="javascript:void(0)" onclick="openManualPricingModal('dtf')" class="tool-dropdown-item">DTF</a>
-                                        <a href="javascript:void(0)" onclick="openManualPricingModal('embroidery')" class="tool-dropdown-item">Embroidery</a>
-                                        <a href="javascript:void(0)" onclick="openManualPricingModal('cap-embroidery')" class="tool-dropdown-item">Cap Embroidery</a>
-                                        <a href="javascript:void(0)" onclick="openManualPricingModal('screen-print')" class="tool-dropdown-item">Screen Print</a>
-                                    </div>
-                                </div>
+                                <a href="/calculators/manual-pricing.html" class="tool-btn">Manual Pricing 2026</a>
                             </div>
                         </div>
 
@@ -667,57 +655,6 @@
     </div>
 
     <!-- =====================================================
-         MANUAL PRICING COST INPUT MODAL
-         ===================================================== -->
-    <div id="manualPricingModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-header-content">
-                    <i class="fas fa-calculator"></i>
-                    <div class="modal-header-text">
-                        <h3>Manual Pricing</h3>
-                        <span class="modal-subtitle" id="modalCalculatorName">DTG (Direct-to-Garment)</span>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="closeManualPricingModal()" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p class="modal-description">Enter the base garment cost to calculate manual pricing.</p>
-
-                <div class="modal-input-group">
-                    <label for="manualCostInput" class="modal-label">
-                        Base Garment Cost ($)
-                    </label>
-                    <input
-                        type="number"
-                        id="manualCostInput"
-                        step="0.01"
-                        min="0.01"
-                        placeholder="Example: 6.25"
-                        class="modal-input"
-                        onkeypress="if(event.key === 'Enter') openManualPricingWithCost()"
-                    />
-                    <div id="manualCostError" class="modal-error" style="display: none;">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span id="manualCostErrorText">Please enter a valid cost</span>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button onclick="closeManualPricingModal()" class="modal-btn modal-btn-cancel">
-                        Cancel
-                    </button>
-                    <button onclick="openManualPricingWithCost()" class="modal-btn modal-btn-primary">
-                        <i class="fas fa-arrow-right"></i> Calculate Pricing
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- =====================================================
          EXTERNAL JAVASCRIPT
          ===================================================== -->
     <!-- Dashboard Services -->
@@ -961,105 +898,6 @@
         }
 
         // =====================================================
-        // MANUAL PRICING MODAL FUNCTIONS
-        // =====================================================
-
-        let currentManualCalculatorType = '';
-        let currentManualCalculatorUrl = '';
-
-        const MANUAL_PRICING_CALCULATORS = {
-            'dtg': {
-                name: 'DTG (Direct-to-Garment)',
-                url: '/calculators/dtg-pricing.html',
-                available: true
-            },
-            'dtf': {
-                name: 'DTF (Direct-to-Film)',
-                url: '/calculators/dtf-pricing.html',
-                available: true
-            },
-            'embroidery': {
-                name: 'Embroidery',
-                url: '/calculators/embroidery-pricing-all/',
-                available: true
-            },
-            'cap-embroidery': {
-                name: 'Cap Embroidery',
-                url: '/calculators/embroidery-pricing-all/',
-                available: true
-            },
-            'screen-print': {
-                name: 'Screen Print',
-                url: '/calculators/screen-print-pricing.html',
-                available: true
-            }
-        };
-
-        function openManualPricingModal(calculatorType) {
-            const calculator = MANUAL_PRICING_CALCULATORS[calculatorType];
-
-            if (!calculator) {
-                console.error('Unknown calculator type:', calculatorType);
-                return;
-            }
-
-            if (!calculator.available) {
-                alert(`${calculator.name} manual pricing is coming soon!`);
-                return;
-            }
-
-            currentManualCalculatorType = calculatorType;
-            currentManualCalculatorUrl = calculator.url;
-
-            document.getElementById('modalCalculatorName').textContent = calculator.name;
-            document.getElementById('manualCostInput').value = '';
-            document.getElementById('manualCostError').style.display = 'none';
-            document.getElementById('manualPricingModal').style.display = 'flex';
-
-            setTimeout(() => {
-                document.getElementById('manualCostInput').focus();
-            }, 100);
-        }
-
-        function closeManualPricingModal() {
-            document.getElementById('manualPricingModal').style.display = 'none';
-            currentManualCalculatorType = '';
-            currentManualCalculatorUrl = '';
-        }
-
-        function openManualPricingWithCost() {
-            const costInput = document.getElementById('manualCostInput');
-            const cost = parseFloat(costInput.value);
-            const errorDiv = document.getElementById('manualCostError');
-            const errorText = document.getElementById('manualCostErrorText');
-
-            if (isNaN(cost) || cost <= 0) {
-                errorText.textContent = 'Please enter a valid cost greater than $0';
-                errorDiv.style.display = 'block';
-                costInput.focus();
-                return;
-            }
-
-            if (cost > 1000) {
-                errorText.textContent = 'Cost seems unusually high. Please verify the amount.';
-                errorDiv.style.display = 'block';
-                costInput.focus();
-                return;
-            }
-
-            const url = `${currentManualCalculatorUrl}?manualCost=${cost.toFixed(2)}`;
-            window.location.href = url;
-            closeManualPricingModal();
-        }
-
-        // Close manual pricing modal when clicking outside
-        document.getElementById('manualPricingModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeManualPricingModal();
-            }
-        });
-
-        // =====================================================
         // CELEBRATION DROPDOWN FUNCTIONS
         // =====================================================
 
@@ -1180,10 +1018,6 @@
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeStaffDirectory();
-                const manualModal = document.getElementById('manualPricingModal');
-                if (manualModal && manualModal.style.display === 'flex') {
-                    closeManualPricingModal();
-                }
             }
         });
     </script>

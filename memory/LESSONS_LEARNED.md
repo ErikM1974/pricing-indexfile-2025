@@ -31,6 +31,24 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: Embroidery/Cap Manual Pricing Crash — Double-Calculation of Already-Transformed Data
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+
+**Problem:** Unified manual pricing page crashed with `TypeError: sizes is not iterable` when rendering embroidery and cap embroidery cards.
+
+**Root Cause:** `generateManualPricingData()` in both `embroidery-pricing-service.js` and `cap-embroidery-pricing-service.js` internally calls `calculatePricing()` + `transformToExistingFormat()`, returning FINAL transformed data. The manual pricing page then called `calculatePricing()` AGAIN on the already-transformed output. The transformed data uses `uniqueSizes`/`tierData` instead of `sizes`/`tiersR`, so destructuring `sizes` yields `undefined` → crash.
+
+**Solution:** Removed redundant `calculatePricing()` call. Cached the returned data directly. Updated render methods to destructure `tierData` (array of tier objects) instead of `tiers`.
+
+**Prevention:**
+- **Each pricing service's `generateManualPricingData()` has a different return contract.** DTG returns raw data (needs manual calculation). DTF/Embroidery/Cap/ScreenPrint return fully transformed data. Always check what the service returns before adding calculation steps.
+- When reusing a service method, read its implementation to understand the return shape — don't assume it matches another service.
+
+**Files:** `calculators/manual-pricing.js` (fetchEmbroidery, fetchCapEmbroidery, renderEmbroidery, renderCapEmbroidery)
+
+---
+
 ## Change: ShopWorks Part Number Alignment — 10 Fixes Across 3 Files
 **Date:** 2026-02-10
 **Project:** [Pricing Index]

@@ -1,0 +1,601 @@
+/**
+ * Manual Pricing Calculator - Unified Page Styles
+ * Extends manual-calculator-styles.css base theme
+ * Single page for all decoration method pricing lookups
+ *
+ * Method accent colors:
+ *   DTG: #3b82f6 (blue)
+ *   DTF: #8b5cf6 (purple)
+ *   Embroidery: #10b981 (green)
+ *   Cap Embroidery: #f59e0b (amber)
+ *   Screen Print: #ef4444 (red)
+ */
+
+/* Animation keyframes */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================================
+   INPUT SECTION - Cost entry and item type toggle
+   ===================================================== */
+.input-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    margin-bottom: 2rem;
+}
+
+.input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.cost-input-group {
+    flex: 0 0 220px;
+}
+
+.cost-input-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+
+.cost-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cost-input-wrapper .dollar-sign {
+    position: absolute;
+    left: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.cost-input {
+    width: 100%;
+    padding: 0.75rem 0.875rem 0.75rem 1.875rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-family: inherit;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 44px;
+}
+
+.cost-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+}
+
+.cost-input::placeholder {
+    font-weight: 400;
+    color: #9ca3af;
+}
+
+/* Item type toggle (Garment / Cap) */
+.item-type-group {
+    flex: 0 0 auto;
+}
+
+.item-type-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+
+.toggle-buttons {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.toggle-btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 8px;
+    min-height: 40px;
+}
+
+.toggle-btn:first-child {
+    border-right: none;
+}
+
+.toggle-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.3);
+    font-weight: 600;
+}
+
+.toggle-btn:not(.active):hover {
+    background: rgba(76, 179, 84, 0.08);
+    color: var(--text-primary);
+}
+
+.calculate-group {
+    flex: 0 0 auto;
+}
+
+.btn-calculate {
+    padding: 0.75rem 1.75rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+}
+
+.btn-calculate:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+}
+
+.btn-calculate:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.2);
+}
+
+.btn-calculate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.input-hint {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    margin-top: 0.75rem;
+}
+
+.input-error {
+    color: var(--error-text);
+    font-size: 0.8125rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.input-error.visible {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* =====================================================
+   METHOD CARDS - One per decoration method
+   ===================================================== */
+.methods-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.method-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    position: relative;
+}
+
+.method-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
+
+/* Colored top accent bars per method */
+#dtgCard    { border-top: 3px solid #3b82f6; }
+#dtfCard    { border-top: 3px solid #8b5cf6; }
+#embCard    { border-top: 3px solid #10b981; }
+#capEmbCard { border-top: 3px solid #f59e0b; }
+#spCard     { border-top: 3px solid #ef4444; }
+
+.method-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(180deg, #fafbfc 0%, #f6f8fa 100%);
+}
+
+.method-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.method-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.method-icon.dtg { background: #3b82f6; }
+.method-icon.dtf { background: #8b5cf6; }
+.method-icon.emb { background: #10b981; }
+.method-icon.cap { background: #f59e0b; }
+.method-icon.sp  { background: #ef4444; }
+
+.method-card-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.method-select {
+    padding: 0.4375rem 0.75rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-family: inherit;
+    background: white;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.method-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.12);
+}
+
+.method-card-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    animation: fadeIn 0.3s ease;
+}
+
+/* =====================================================
+   PRICING TABLES
+   ===================================================== */
+.pricing-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    border: 1px solid #e8ecf1;
+}
+
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.pricing-table thead th {
+    background: #e8ecf1;
+    padding: 0.625rem 0.875rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #d1d9e4;
+    white-space: nowrap;
+}
+
+.pricing-table thead th:first-child {
+    text-align: left;
+    min-width: 80px;
+}
+
+/* Sticky Qty column for horizontal scroll */
+.pricing-table thead th:first-child,
+.pricing-table tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+.pricing-table thead th:first-child {
+    background: #e8ecf1;
+}
+
+.pricing-table tbody td:first-child {
+    background: var(--card-bg);
+}
+
+.pricing-table tbody td {
+    padding: 0.625rem 0.875rem;
+    text-align: center;
+    border-bottom: 1px solid #f0f3f7;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+}
+
+.pricing-table tbody td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+/* Alternating row backgrounds */
+.pricing-table tbody tr:nth-child(even) td {
+    background: #f8fafb;
+}
+
+.pricing-table tbody tr:nth-child(even) td:first-child {
+    background: #f8fafb;
+}
+
+/* Row hover */
+.pricing-table tbody tr:hover td {
+    background: rgba(76, 179, 84, 0.06);
+}
+
+.pricing-table tbody tr:hover td:first-child {
+    background: rgba(76, 179, 84, 0.06);
+    box-shadow: inset 3px 0 0 var(--primary-color);
+}
+
+.pricing-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Price cells */
+.pricing-table .price-cell {
+    font-weight: 700;
+    color: #166534;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+}
+
+/* LTM row accent */
+.pricing-table .ltm-row td {
+    background: #fffbeb;
+}
+
+.pricing-table .ltm-row td:first-child {
+    background: #fffbeb;
+    box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+.pricing-table tbody tr.ltm-row:hover td {
+    background: #fef3c7;
+}
+
+.pricing-table tbody tr.ltm-row:hover td:first-child {
+    background: #fef3c7;
+    box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+/* LTM Badge */
+.ltm-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    background: #fbbf24;
+    color: #78350f;
+    padding: 0.125rem 0.5rem;
+    border-radius: 10px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* Size upcharge footnote */
+.upcharge-note {
+    margin-top: 0.625rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* =====================================================
+   LOADING AND ERROR STATES
+   ===================================================== */
+.card-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    animation: fadeIn 0.2s ease;
+}
+
+.card-loading .spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid var(--border-color);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 0.8s linear infinite;
+}
+
+.card-error {
+    padding: 1rem 1.25rem;
+    background: #fef2f2;
+    color: var(--error-text);
+    border-radius: 8px;
+    border-left: 4px solid var(--error-text);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+.card-placeholder {
+    text-align: center;
+    padding: 2.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* =====================================================
+   GLOBAL ERROR BANNER
+   ===================================================== */
+.api-error-banner {
+    background: #fef2f2;
+    color: var(--error-text);
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-bottom: 2px solid #fecaca;
+}
+
+.api-error-banner.hidden {
+    display: none;
+}
+
+/* =====================================================
+   LTM NOTE
+   ===================================================== */
+.ltm-note {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.875rem;
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.8125rem;
+    color: #92400e;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .input-section {
+        padding: 1.25rem;
+    }
+
+    .input-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cost-input-group {
+        flex: 1 1 auto;
+    }
+
+    .method-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .method-card-controls {
+        width: 100%;
+    }
+
+    .method-select {
+        flex: 1;
+    }
+
+    .method-card-body {
+        padding: 1rem;
+    }
+
+    .pricing-table {
+        font-size: 0.8125rem;
+    }
+
+    .pricing-table thead th,
+    .pricing-table tbody td {
+        padding: 0.5rem 0.5rem;
+    }
+
+    .pricing-table .price-cell {
+        font-size: 0.875rem;
+    }
+}
+
+/* =====================================================
+   PRINT
+   ===================================================== */
+@media print {
+    .input-section {
+        box-shadow: none;
+        border: 1px solid var(--border-color);
+    }
+
+    .method-card {
+        box-shadow: none;
+        border: 1px solid var(--border-color);
+        break-inside: avoid;
+        transform: none !important;
+    }
+
+    .method-card:hover {
+        box-shadow: none;
+        transform: none;
+    }
+
+    .btn-calculate {
+        display: none;
+    }
+
+    .pricing-table tbody tr:hover td {
+        background: inherit;
+        box-shadow: none;
+    }
+}

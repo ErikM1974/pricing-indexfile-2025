@@ -50,6 +50,13 @@
 
 ## 📊 Calculators & Quote Builders
 
+### Unified Manual Pricing Calculator
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/manual-pricing.html` | Unified manual pricing — all 5 methods on one page | manual-pricing.js, manual-pricing.css, all 5 pricing services | ✅ Active |
+| `/calculators/manual-pricing.js` | Page logic — orchestrates DTG/DTF/EMB/CAP/SP pricing services | All 5 *-pricing-service.js files | ✅ Active |
+| `/calculators/manual-pricing.css` | Page styles — extends manual-calculator-styles.css | manual-calculator-styles.css | ✅ Active |
+
 ### DTG System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
