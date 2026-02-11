@@ -31,6 +31,16 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Fix: 1-Cent Tax Rounding Error in Quote PDF Totals (2026-02-11)
+**Date:** 2026-02-11
+**Project:** Pricing Index
+**Symptoms:** Quote EMB0211-1 PDF showed TOTAL $95.11, but $75.00 + $7.13 + $12.99 = $95.12. Off by 1 cent.
+**Root cause:** Tax was computed as a raw float ($75 × 0.095 = $7.125), displayed rounded to $7.13, but added to the total as $7.125. The sum $75 + $7.125 + $12.99 = $95.115, which IEEE 754 represents as ~95.11499… so `toFixed(2)` rounds down to $95.11.
+**Solution:** Round tax to cents **before** summing into total: `Math.round(subtotal * taxRate * 100) / 100`. Applied to all 4 tax calculation sites in `quote-view.js` (lines 1647, 1659, 2308, 2842).
+**Prevention:** Standard accounting rule — round each component to cents first, then sum. Never sum unrounded floats and round only at the end.
+
+---
+
 ## Bug: Embroidery Tier Ordering Wrong — API Returns Non-Sequential `tiersR`
 **Date:** 2026-02-11
 **Project:** [Pricing Index]

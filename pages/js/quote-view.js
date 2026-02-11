@@ -1644,7 +1644,7 @@ class QuoteViewPage {
      */
     calculateTotalWithTax() {
         const subtotal = parseFloat(this.quoteData.TotalAmount) || 0;
-        const taxAmount = subtotal * this.taxRate;
+        const taxAmount = Math.round(subtotal * this.taxRate * 100) / 100;
         return subtotal + taxAmount + this.getShippingFee();
     }
 
@@ -1656,7 +1656,7 @@ class QuoteViewPage {
         // TotalAmount includes: products + LTM + digitizing + art + rush + sample - discount
         // This ensures the displayed Subtotal matches the visible line items
         const grandTotalBeforeTax = parseFloat(this.quoteData.TotalAmount) || 0;
-        const taxAmount = grandTotalBeforeTax * this.taxRate;
+        const taxAmount = Math.round(grandTotalBeforeTax * this.taxRate * 100) / 100;
         const shippingFee = this.getShippingFee();
         const totalWithTax = grandTotalBeforeTax + taxAmount + shippingFee;
 
@@ -2305,7 +2305,7 @@ class QuoteViewPage {
         // Use TotalAmount as pre-tax subtotal (includes all fees)
         // This matches the visible line items in the PDF
         const grandTotal = parseFloat(this.quoteData.TotalAmount) || 0;
-        const taxAmount = grandTotal * this.taxRate;
+        const taxAmount = Math.round(grandTotal * this.taxRate * 100) / 100;
         const pdfShippingFee = this.getShippingFee();
         const totalWithTax = grandTotal + taxAmount + pdfShippingFee;
 
@@ -2839,7 +2839,7 @@ class QuoteViewPage {
         // 9. Tax calculation
         console.group('9️⃣ Tax & Grand Total');
         const taxRate = this.taxRate || 0.101;
-        const tax = totalAmount * taxRate;
+        const tax = Math.round(totalAmount * taxRate * 100) / 100;
         const grandTotalWithTax = totalAmount + tax + shippingFee;
         console.log('Tax Rate:', (taxRate * 100).toFixed(1) + '%');
         console.log('Tax Amount:', tax.toFixed(2));
