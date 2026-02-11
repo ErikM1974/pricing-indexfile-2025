@@ -684,7 +684,7 @@ class EmbroideryQuoteService {
         const includeTax = document.getElementById('include-tax')?.checked;
         const taxRateInput = document.getElementById('tax-rate-input');
         const taxRateVal = taxRateInput ? parseFloat(taxRateInput.value) : 10.1;
-        if (includeTax && taxRateVal > 0) {
+        if (includeTax) {
             // Calculate tax amount from adjusted subtotal
             const grandTotalText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
             const adjustedSubtotal = parseFloat(grandTotalText.replace(/[$,]/g, '')) || 0;
@@ -766,7 +766,9 @@ class EmbroideryQuoteService {
             const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
             const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
             const taxableAmount = subtotalBeforeTax + shippingFee;
-            const salesTax = Math.round(taxableAmount * 0.101 * 100) / 100;
+            const taxRateInput = document.getElementById('tax-rate-input');
+            const emailTaxRate = taxRateInput ? parseFloat(taxRateInput.value) / 100 : 0.101;
+            const salesTax = Math.round(taxableAmount * emailTaxRate * 100) / 100;
             const grandTotalWithTax = taxableAmount + salesTax;
 
             // Build email data - ALWAYS provide all variables even if empty
@@ -814,7 +816,7 @@ class EmbroideryQuoteService {
                 productionDays: '14',
                 rushDays: '7',
                 rushPercent: '25',
-                taxRate: '10.1',
+                taxRate: (emailTaxRate * 100).toFixed(1),
                 taxLocation: 'Milton, WA',
                 companyYear: '1977',
                 companyName: 'Northwest Custom Apparel',
@@ -920,9 +922,11 @@ class EmbroideryQuoteService {
         const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
         const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
         const taxableAmount = subtotalBeforeTax + shippingFee;
-        const salesTax = Math.round(taxableAmount * 0.101 * 100) / 100;
+        const htmlTaxRateInput = document.getElementById('tax-rate-input');
+        const htmlTaxRate = htmlTaxRateInput ? parseFloat(htmlTaxRateInput.value) / 100 : 0.101;
+        const salesTax = Math.round(taxableAmount * htmlTaxRate * 100) / 100;
         const grandTotalWithTax = taxableAmount + salesTax;
-        
+
         let html = `
         <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
             <!-- Header with Company Info -->
@@ -1000,14 +1004,14 @@ class EmbroideryQuoteService {
                                 $${shippingFee.toFixed(2)}
                             </td>
                         </tr>` : ''}
-                        <tr>
+                        ${htmlTaxRate > 0 ? `<tr>
                             <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
-                                Milton, WA Sales Tax (10.1%):
+                                Sales Tax (${(htmlTaxRate * 100).toFixed(1)}%):
                             </td>
                             <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
                                 $${salesTax.toFixed(2)}
                             </td>
-                        </tr>
+                        </tr>` : ''}
                         <tr style="background: #f8f9fa;">
                             <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd; font-size: 18px;">
                                 <strong>GRAND TOTAL:</strong>

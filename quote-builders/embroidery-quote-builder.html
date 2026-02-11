@@ -6245,7 +6245,7 @@ Company:Absher Construction Company
         function collectProductsFromTable() {
             const products = [];
             // Only collect from parent rows (not child rows or AL config rows)
-            const rows = document.querySelectorAll('#product-tbody tr:not(.child-row):not(.al-config-row)');
+            const rows = document.querySelectorAll('#product-tbody tr:not(.child-row):not(.al-config-row):not(.fee-row):not(#empty-state-row)');
 
             rows.forEach(row => {
                 const rowId = parseInt(row.id.replace('row-', ''));
@@ -9518,7 +9518,7 @@ Company:Absher Construction Company
 
                 // Post-import validation: detect silently dropped rows
                 const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
-                const productRows = document.querySelectorAll('#product-table-body tr[data-style]:not(.child-row)');
+                const productRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row)');
                 const validProducts = Array.from(productRows).filter(r =>
                     r.dataset.color || r.dataset.nonSanmar === 'true'
                 ).length;

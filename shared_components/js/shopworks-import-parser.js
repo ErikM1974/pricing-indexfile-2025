@@ -766,6 +766,12 @@ class ShopWorksImportParser {
                         // Multi-part street address
                         shipping.street = parts.slice(1, cityIdx).join(', ').trim();
                     }
+
+                    // Fallback: if no street found and first part looks like an address
+                    // (contains a digit), it's the street, not a company name
+                    if (!shipping.street && parts.length >= 3 && /\d/.test(parts[0])) {
+                        shipping.street = parts[0].trim();
+                    }
                 }
             }
 

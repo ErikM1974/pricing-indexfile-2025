@@ -1104,6 +1104,18 @@ Same fix applied to `calculateCapProductPrice()` (lines 646-667).
 
 # Code Organization
 
+## Fix: Console Spam from collectProductsFromTable Iterating Fee Rows (2026-02-11)
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+**Problem:** After importing a ShopWorks order, console showed 12x `[collectProducts] Skipping row NaN: style="", color=""`. The 12 `.fee-row` elements (LTM, stitch fees, AL fees, etc.) and `#empty-state-row` in `#product-tbody` were being iterated by `collectProductsFromTable()` because the selector only excluded `.child-row` and `.al-config-row`.
+**Solution:** Extended the selector to also exclude `.fee-row` and `#empty-state-row`:
+`#product-tbody tr:not(.child-row):not(.al-config-row):not(.fee-row):not(#empty-state-row)`
+Also fixed post-import validation selector from `#product-table-body` (wrong ID) to `#product-tbody`.
+**Prevention:** When adding new non-product row types to `#product-tbody`, always add their class/ID to the exclusion list in `collectProductsFromTable()`.
+**Files:** `quote-builders/embroidery-quote-builder.html` (lines ~6248, ~9521)
+
+---
+
 ## Pattern: EMB_DEFAULTS Constants Block for Embroidery Magic Numbers
 **Date:** 2026-02-10
 **Project:** [Pricing Index]

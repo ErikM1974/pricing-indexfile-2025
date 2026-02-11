@@ -113,7 +113,7 @@ class QuoteViewPage {
             const taxFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
             if (taxFeeItem) {
                 this.taxRate = taxFeeItem.BaseUnitPrice / 100;
-                this.includeTax = true;
+                this.includeTax = this.taxRate > 0;
             }
 
             // Debug charge verification (2026-01-14)
@@ -1688,15 +1688,17 @@ class QuoteViewPage {
             `;
         }
 
-        // Add tax row with dynamic rate label
-        const ratePercent = (this.taxRate * 100).toFixed(1);
-        const rateLabel = ratePercent === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${ratePercent}%)`;
-        totalsHtml += `
-            <div class="total-row tax-row">
-                <span class="label">${rateLabel}:</span>
-                <span class="value">${this.formatCurrency(taxAmount)}</span>
-            </div>
-        `;
+        // Add tax row with dynamic rate label (hide when rate is 0%)
+        if (this.taxRate > 0) {
+            const ratePercent = (this.taxRate * 100).toFixed(1);
+            const rateLabel = ratePercent === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${ratePercent}%)`;
+            totalsHtml += `
+                <div class="total-row tax-row">
+                    <span class="label">${rateLabel}:</span>
+                    <span class="value">${this.formatCurrency(taxAmount)}</span>
+                </div>
+            `;
+        }
 
         // Grand total with tax
         totalsHtml += `
@@ -2327,11 +2329,14 @@ class QuoteViewPage {
             yPos += 6;
         }
 
-        const pdfRatePercent = (this.taxRate * 100).toFixed(1);
-        const pdfRateLabel = pdfRatePercent === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pdfRatePercent}%):`;
-        pdf.text(pdfRateLabel, margin + 100, yPos);
-        pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
-        yPos += 6;
+        // Only show tax line in PDF if rate > 0
+        if (this.taxRate > 0) {
+            const pdfRatePercent = (this.taxRate * 100).toFixed(1);
+            const pdfRateLabel = pdfRatePercent === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pdfRatePercent}%):`;
+            pdf.text(pdfRateLabel, margin + 100, yPos);
+            pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
+            yPos += 6;
+        }
         yPos += 2;
 
         pdf.setFont('helvetica', 'bold');
