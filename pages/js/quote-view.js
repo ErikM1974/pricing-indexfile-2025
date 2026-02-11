@@ -161,6 +161,53 @@ class QuoteViewPage {
             document.getElementById('sales-rep-row').style.display = 'flex';
         }
 
+        // PO Number (if available)
+        const poNumber = this.quoteData.PurchaseOrderNumber || '';
+        if (poNumber) {
+            document.getElementById('po-number-display').textContent = poNumber;
+            document.getElementById('po-number-row').style.display = 'block';
+        }
+
+        // Ship To card (if address available)
+        const shipToAddress = this.quoteData.ShipToAddress || '';
+        const shipToCity = this.quoteData.ShipToCity || '';
+        const shipToState = this.quoteData.ShipToState || '';
+        const shipToZip = this.quoteData.ShipToZip || '';
+        const shipMethod = this.quoteData.ShipMethod || '';
+        if (shipToAddress || shipToCity) {
+            const shipCard = document.getElementById('ship-to-card');
+            if (shipCard) {
+                document.getElementById('ship-to-address').textContent = shipToAddress;
+                const cityLine = [shipToCity, shipToState].filter(Boolean).join(', ') + (shipToZip ? ' ' + shipToZip : '');
+                document.getElementById('ship-to-city-state').textContent = cityLine;
+                if (shipMethod) {
+                    document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
+                }
+                shipCard.style.display = 'block';
+            }
+        }
+
+        // Order Number (if available)
+        const orderNumber = this.quoteData.OrderNumber || '';
+        if (orderNumber) {
+            document.getElementById('order-number').textContent = orderNumber;
+            document.getElementById('order-number-row').style.display = 'flex';
+        }
+
+        // Req Ship Date (if available)
+        const reqShipDate = this.quoteData.ReqShipDate || '';
+        if (reqShipDate) {
+            document.getElementById('req-ship-date').textContent = this.formatDate(reqShipDate);
+            document.getElementById('req-ship-date-row').style.display = 'flex';
+        }
+
+        // Drop Dead Date (if available)
+        const dropDeadDate = this.quoteData.DropDeadDate || '';
+        if (dropDeadDate) {
+            document.getElementById('drop-dead-date').textContent = this.formatDate(dropDeadDate);
+            document.getElementById('drop-dead-date-row').style.display = 'flex';
+        }
+
         // Revision info (if quote has been revised)
         if (revision > 1 && this.quoteData.RevisedAt) {
             const revisionRow = document.getElementById('revision-row');
@@ -1688,7 +1735,7 @@ class QuoteViewPage {
             `;
         }
 
-        // Add tax row with dynamic rate label (hide when rate is 0%)
+        // Add tax row with dynamic rate label
         if (this.taxRate > 0) {
             const ratePercent = (this.taxRate * 100).toFixed(1);
             const rateLabel = ratePercent === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${ratePercent}%)`;
@@ -1696,6 +1743,13 @@ class QuoteViewPage {
                 <div class="total-row tax-row">
                     <span class="label">${rateLabel}:</span>
                     <span class="value">${this.formatCurrency(taxAmount)}</span>
+                </div>
+            `;
+        } else {
+            totalsHtml += `
+                <div class="total-row tax-row">
+                    <span class="label">Out of State Sales:</span>
+                    <span class="value">$0.00</span>
                 </div>
             `;
         }
@@ -1937,7 +1991,9 @@ class QuoteViewPage {
         // Quote ID (right side)
         pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(`Quote #${this.quoteId}`, pageWidth - margin, 14, { align: 'right' });
+        const pdfPO = this.quoteData.PurchaseOrderNumber || '';
+        const quoteHeaderText = pdfPO ? `Quote #${this.quoteId}  |  PO# ${pdfPO}` : `Quote #${this.quoteId}`;
+        pdf.text(quoteHeaderText, pageWidth - margin, 14, { align: 'right' });
 
         pdf.setFontSize(9);
         pdf.setFont('helvetica', 'normal');
@@ -1966,6 +2022,37 @@ class QuoteViewPage {
             pdf.text(this.quoteData.CustomerEmail, margin, yPos);
             yPos += 5;
         }
+        if (this.quoteData.Phone) {
+            pdf.text(this.formatPhone(this.quoteData.Phone), margin, yPos);
+            yPos += 5;
+        }
+
+        // Ship To block (below Prepared For, only if address present)
+        const pdfShipAddr = this.quoteData.ShipToAddress || '';
+        const pdfShipCity = this.quoteData.ShipToCity || '';
+        if (pdfShipAddr || pdfShipCity) {
+            yPos += 3;
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('SHIP TO', margin, yPos);
+            yPos += 6;
+            pdf.setFont('helvetica', 'normal');
+            if (pdfShipAddr) {
+                pdf.text(pdfShipAddr, margin, yPos);
+                yPos += 5;
+            }
+            const pdfCityLine = [pdfShipCity, this.quoteData.ShipToState].filter(Boolean).join(', ') +
+                (this.quoteData.ShipToZip ? ' ' + this.quoteData.ShipToZip : '');
+            if (pdfCityLine.trim()) {
+                pdf.text(pdfCityLine, margin, yPos);
+                yPos += 5;
+            }
+            if (this.quoteData.ShipMethod) {
+                pdf.setFont('helvetica', 'italic');
+                pdf.text('Via: ' + this.quoteData.ShipMethod, margin, yPos);
+                pdf.setFont('helvetica', 'normal');
+                yPos += 5;
+            }
+        }
 
         // Quote Details (right side)
         const rightCol = pageWidth - margin - 50;
@@ -1973,17 +2060,40 @@ class QuoteViewPage {
         pdf.text('QUOTE DETAILS', rightCol, 50);
 
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`Type: ${this.getQuoteType()}`, rightCol, 56);
-        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt_Quote)}`, rightCol, 62);
-        pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, rightCol, 68);
+        let detailY = 56;
+        pdf.text(`Type: ${this.getQuoteType()}`, rightCol, detailY);
+        detailY += 6;
+        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt_Quote)}`, rightCol, detailY);
+        detailY += 6;
+        pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, rightCol, detailY);
+        detailY += 6;
 
         // Add Sales Rep if available
         const salesRep = this.quoteData.SalesRepName || this.quoteData.SalesRep || '';
         if (salesRep) {
-            pdf.text(`Sales Rep: ${salesRep}`, rightCol, 74);
+            pdf.text(`Sales Rep: ${salesRep}`, rightCol, detailY);
+            detailY += 6;
         }
 
-        yPos = Math.max(yPos, 80);
+        // Order Number if available
+        if (this.quoteData.OrderNumber) {
+            pdf.text(`Order #: ${this.quoteData.OrderNumber}`, rightCol, detailY);
+            detailY += 6;
+        }
+
+        // Req Ship Date if available
+        if (this.quoteData.ReqShipDate) {
+            pdf.text(`Req Ship Date: ${this.formatDate(this.quoteData.ReqShipDate)}`, rightCol, detailY);
+            detailY += 6;
+        }
+
+        // Drop Dead Date if available
+        if (this.quoteData.DropDeadDate) {
+            pdf.text(`Drop Dead: ${this.formatDate(this.quoteData.DropDeadDate)}`, rightCol, detailY);
+            detailY += 6;
+        }
+
+        yPos = Math.max(yPos, detailY + 6);
 
         // Divider
         pdf.setDrawColor(76, 179, 84);
@@ -2329,12 +2439,16 @@ class QuoteViewPage {
             yPos += 6;
         }
 
-        // Only show tax line in PDF if rate > 0
+        // Tax line in PDF
         if (this.taxRate > 0) {
             const pdfRatePercent = (this.taxRate * 100).toFixed(1);
             const pdfRateLabel = pdfRatePercent === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pdfRatePercent}%):`;
             pdf.text(pdfRateLabel, margin + 100, yPos);
             pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
+            yPos += 6;
+        } else {
+            pdf.text('Out of State Sales:', margin + 100, yPos);
+            pdf.text('$0.00', margin + 155, yPos);
             yPos += 6;
         }
         yPos += 2;
@@ -2846,7 +2960,7 @@ class QuoteViewPage {
 
         // 9. Tax calculation (shipping is taxable in WA state)
         console.group('9️⃣ Tax & Grand Total');
-        const taxRate = this.taxRate || 0.101;
+        const taxRate = this.taxRate ?? 0.101;
         const taxableAmount = totalAmount + shippingFee;
         const tax = Math.round(taxableAmount * taxRate * 100) / 100;
         const grandTotalWithTax = taxableAmount + tax;

@@ -8,7 +8,7 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.13.0 - Parse Shipping Information (address for WA DOR tax lookup)
+ * @version 1.14.0 - Parse Order Details (PO#, dates, terms, phone)
  * @date 2026-02-11
  */
 
@@ -426,7 +426,8 @@ class ShopWorksImportParser {
                 customerId: null,
                 company: null,
                 contactName: null,
-                email: null
+                email: null,
+                phone: null
             },
             salesRep: {
                 name: null,
@@ -454,6 +455,11 @@ class ShopWorksImportParser {
                 taxRate: null
             },
             shipping: null,         // Parsed shipping address { method, rawAddress, street, city, state, zip }
+            purchaseOrderNumber: null,
+            dateOrderPlaced: null,
+            reqShipDate: null,
+            dropDeadDate: null,
+            paymentTerms: null,
             notes: [],              // Comment rows
             warnings: [],           // Import warnings
             reviewItems: [],        // Invalid/skipped items with data for user review
@@ -470,7 +476,7 @@ class ShopWorksImportParser {
             if (!trimmed) continue;
 
             // Check section type and parse accordingly
-            if (trimmed.includes('Order #:')) {
+            if (/^Order #:/m.test(trimmed)) {
                 this._parseOrderHeader(trimmed, result);
             } else if (trimmed.includes('Customer #:') || trimmed.includes('Company:')) {
                 this._parseCompanyInfo(trimmed, result);
@@ -603,7 +609,7 @@ class ShopWorksImportParser {
     }
 
     /**
-     * Parse order information section (Ordered by, customer email)
+     * Parse order information section (Ordered by, customer email, PO#, dates, terms, phone)
      */
     _parseOrderInfo(text, result) {
         const lines = text.split('\n');
@@ -615,6 +621,18 @@ class ShopWorksImportParser {
             } else if (trimmed.startsWith('Email:')) {
                 // This is the customer email (different from salesperson)
                 result.customer.email = trimmed.replace('Email:', '').trim();
+            } else if (trimmed.startsWith('Purchase Order #:') || trimmed.startsWith('Purchase Order#:') || trimmed.startsWith('PO #:') || trimmed.startsWith('PO#:')) {
+                result.purchaseOrderNumber = trimmed.replace(/^(Purchase Order\s*#|PO\s*#)\s*:\s*/i, '').trim();
+            } else if (trimmed.startsWith('Date Order Placed:')) {
+                result.dateOrderPlaced = trimmed.replace('Date Order Placed:', '').trim();
+            } else if (trimmed.startsWith('Req. Ship Date:') || trimmed.startsWith('Req Ship Date:')) {
+                result.reqShipDate = trimmed.replace(/^Req\.?\s*Ship Date:\s*/i, '').trim();
+            } else if (trimmed.startsWith('Drop Dead Date:')) {
+                result.dropDeadDate = trimmed.replace('Drop Dead Date:', '').trim();
+            } else if (trimmed.startsWith('Terms:')) {
+                result.paymentTerms = trimmed.replace('Terms:', '').trim();
+            } else if (trimmed.startsWith('Phone:') && !result.customer.phone) {
+                result.customer.phone = trimmed.replace('Phone:', '').trim();
             }
         }
     }
@@ -1645,4 +1663,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.13.0 - Parse Shipping Information (address for WA DOR tax lookup)');
+console.log('[ShopWorksImportParser] Module loaded v1.14.0 - Parse Order Details (PO#, dates, terms, phone)');

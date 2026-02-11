@@ -31,6 +31,16 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Fix: Falsy-zero bug in debug tax rate display (2026-02-11)
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+**Symptom:** Debug console (`debugChargeVerification()`) showed "Tax Rate: 10.1%" for out-of-state quotes where `this.taxRate` was `0`.
+**Root cause:** `const taxRate = this.taxRate || 0.101` — JavaScript `||` treats `0` as falsy and falls through to the default.
+**Solution:** Changed to `this.taxRate ?? 0.101` (nullish coalescing) — only falls through on `null`/`undefined`, not `0`.
+**Prevention:** Always use `??` instead of `||` when the variable can legitimately be `0`, `""`, or `false`. Reserve `||` for cases where all falsy values should trigger the default.
+
+---
+
 ## Fix: Tax Lookup Crashes on Undeployed Backend + Import Loses Fallback Rate (2026-02-11)
 **Date:** 2026-02-11
 **Project:** [Pricing Index]

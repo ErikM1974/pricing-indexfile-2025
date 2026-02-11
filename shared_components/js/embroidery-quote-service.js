@@ -138,6 +138,16 @@ class EmbroideryQuoteService {
     }
 
     /**
+     * Convert a date string (e.g. "2/11/2026") to ISO format for Caspio Date/Time fields.
+     * Returns null if the input is empty or unparseable.
+     */
+    _toISODate(dateStr) {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        return isNaN(d.getTime()) ? null : d.toISOString();
+    }
+
+    /**
      * Fetch with automatic retry for transient failures.
      * Retries on network errors, 5xx, and 429 (NOT 4xx client errors).
      * Each attempt gets its own timeout via fetch-timeout.js if loaded.
@@ -279,7 +289,21 @@ class EmbroideryQuoteService {
                 // Discount (sales rep discount)
                 Discount: parseFloat(customerData.discount?.toFixed(2)) || 0,
                 DiscountPercent: parseFloat(customerData.discountPercent) || 0,
-                DiscountReason: customerData.discountReason || ''
+                DiscountReason: customerData.discountReason || '',
+                // Order details (2026-02-11)
+                Phone: customerData.phone || '',
+                OrderNumber: customerData.orderNumber || '',
+                CustomerNumber: customerData.customerNumber || '',
+                PurchaseOrderNumber: customerData.purchaseOrderNumber || '',
+                ShipToAddress: customerData.shipToAddress || '',
+                ShipToCity: customerData.shipToCity || '',
+                ShipToState: customerData.shipToState || '',
+                ShipToZip: customerData.shipToZip || '',
+                ShipMethod: customerData.shipMethod || '',
+                DateOrderPlaced: this._toISODate(customerData.dateOrderPlaced),
+                ReqShipDate: this._toISODate(customerData.reqShipDate),
+                DropDeadDate: this._toISODate(customerData.dropDeadDate),
+                PaymentTerms: customerData.paymentTerms || ''
             };
 
             // Save session
@@ -817,6 +841,7 @@ class EmbroideryQuoteService {
                 rushDays: '7',
                 rushPercent: '25',
                 taxRate: (emailTaxRate * 100).toFixed(1),
+                taxLabel: emailTaxRate > 0 ? `Sales Tax (${(emailTaxRate * 100).toFixed(1)}%)` : 'Out of State Sales',
                 taxLocation: 'Milton, WA',
                 companyYear: '1977',
                 companyName: 'Northwest Custom Apparel',
@@ -1004,14 +1029,14 @@ class EmbroideryQuoteService {
                                 $${shippingFee.toFixed(2)}
                             </td>
                         </tr>` : ''}
-                        ${htmlTaxRate > 0 ? `<tr>
+                        <tr>
                             <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
-                                Sales Tax (${(htmlTaxRate * 100).toFixed(1)}%):
+                                ${htmlTaxRate > 0 ? `Sales Tax (${(htmlTaxRate * 100).toFixed(1)}%):` : 'Out of State Sales:'}
                             </td>
                             <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
                                 $${salesTax.toFixed(2)}
                             </td>
-                        </tr>` : ''}
+                        </tr>
                         <tr style="background: #f8f9fa;">
                             <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd; font-size: 18px;">
                                 <strong>GRAND TOTAL:</strong>
@@ -1263,6 +1288,20 @@ class EmbroideryQuoteService {
                 Discount: parseFloat(customerData.discount?.toFixed(2)) || 0,
                 DiscountPercent: parseFloat(customerData.discountPercent) || 0,
                 DiscountReason: customerData.discountReason || '',
+                // Order details (2026-02-11)
+                Phone: customerData.phone || '',
+                OrderNumber: customerData.orderNumber || '',
+                CustomerNumber: customerData.customerNumber || '',
+                PurchaseOrderNumber: customerData.purchaseOrderNumber || '',
+                ShipToAddress: customerData.shipToAddress || '',
+                ShipToCity: customerData.shipToCity || '',
+                ShipToState: customerData.shipToState || '',
+                ShipToZip: customerData.shipToZip || '',
+                ShipMethod: customerData.shipMethod || '',
+                DateOrderPlaced: this._toISODate(customerData.dateOrderPlaced),
+                ReqShipDate: this._toISODate(customerData.reqShipDate),
+                DropDeadDate: this._toISODate(customerData.dropDeadDate),
+                PaymentTerms: customerData.paymentTerms || '',
                 // Revision tracking (fields added to Caspio 2026-01-15)
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),

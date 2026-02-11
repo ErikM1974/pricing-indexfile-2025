@@ -47,6 +47,11 @@
                 </div>
             </header>
 
+            <!-- PO Number (inline with header, shown if present) -->
+            <div id="po-number-row" style="display: none; text-align: right; margin: -8px 0 8px; padding-right: 4px;">
+                <span style="font-size: 14px; color: #475569; font-weight: 600;">PO# <span id="po-number-display" style="color: #0f172a;"></span></span>
+            </div>
+
             <!-- Quote Meta -->
             <section class="quote-meta">
                 <div class="meta-card customer-card">
@@ -55,6 +60,12 @@
                     <p class="company-name" id="company-name"></p>
                     <p class="customer-email" id="customer-email">---</p>
                     <p class="customer-phone" id="customer-phone">---</p>
+                </div>
+                <div class="meta-card ship-to-card" id="ship-to-card" style="display: none;">
+                    <h3>Ship To</h3>
+                    <p id="ship-to-address"></p>
+                    <p id="ship-to-city-state"></p>
+                    <p id="ship-to-method" style="margin-top: 4px; font-style: italic; color: #64748b;"></p>
                 </div>
                 <div class="meta-card dates-card">
                     <h3>Quote Details</h3>
@@ -73,6 +84,18 @@
                     <div class="date-row" id="sales-rep-row" style="display: none;">
                         <span class="label">Sales Rep:</span>
                         <span class="value" id="sales-rep">---</span>
+                    </div>
+                    <div class="date-row" id="order-number-row" style="display: none;">
+                        <span class="label">Order #:</span>
+                        <span class="value" id="order-number">---</span>
+                    </div>
+                    <div class="date-row" id="req-ship-date-row" style="display: none;">
+                        <span class="label">Req Ship Date:</span>
+                        <span class="value" id="req-ship-date">---</span>
+                    </div>
+                    <div class="date-row" id="drop-dead-date-row" style="display: none;">
+                        <span class="label">Drop Dead Date:</span>
+                        <span class="value" id="drop-dead-date">---</span>
                     </div>
                     <div class="date-row" id="revision-row" style="display: none;">
                         <span class="label">Last Revised:</span>

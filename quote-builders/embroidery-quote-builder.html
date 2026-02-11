@@ -663,6 +663,52 @@
                         </div>
                         <div id="tax-lookup-status" style="font-size: 11px; margin-top: 4px; color: #64748b; min-height: 16px;"></div>
                     </div>
+                    <!-- Order Details (collapsible) -->
+                    <div id="order-details-panel" style="margin-bottom: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+                        <div onclick="toggleOrderDetails()" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                            <label style="font-size: 12px; color: #475569; margin: 0; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-file-invoice" style="margin-right: 4px;"></i>Order Details
+                                <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 4px;">!</span>
+                            </label>
+                            <i id="order-details-chevron" class="fas fa-chevron-down" style="font-size: 10px; color: #94a3b8; transition: transform 0.2s;"></i>
+                        </div>
+                        <div id="order-details-content" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e2e8f0;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">PO #</label>
+                                    <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Order #</label>
+                                    <input type="text" id="order-number" placeholder="ShopWorks Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Customer #</label>
+                                    <input type="text" id="customer-number" placeholder="Customer ID" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Ship Method</label>
+                                    <input type="text" id="ship-method" placeholder="e.g. UPS Ground" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Date Placed</label>
+                                    <input type="text" id="date-order-placed" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Req Ship Date</label>
+                                    <input type="text" id="req-ship-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Drop Dead Date</label>
+                                    <input type="text" id="drop-dead-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">Terms</label>
+                                    <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
                     <!-- LTM Override (shown only when qty <= 7) -->
                     <div id="ltm-override-row" style="display: none; margin-bottom: 10px; padding: 8px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;">
@@ -778,6 +824,10 @@
                         <div class="customer-field">
                             <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
                             <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-field">
+                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
+                            <input type="tel" id="customer-phone" placeholder="(XXX) XXX-XXXX" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
                         <div class="customer-field">
                             <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
@@ -2439,6 +2489,16 @@ Company:Absher Construction Company
                 shipCity: document.getElementById('ship-city')?.value || '',
                 shipState: document.getElementById('ship-state')?.value || 'WA',
                 shipZip: document.getElementById('ship-zip')?.value || '',
+                // Order details
+                customerPhone: document.getElementById('customer-phone')?.value || '',
+                poNumber: document.getElementById('po-number')?.value || '',
+                orderNumber: document.getElementById('order-number')?.value || '',
+                customerNumber: document.getElementById('customer-number')?.value || '',
+                shipMethod: document.getElementById('ship-method')?.value || '',
+                dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
+                reqShipDate: document.getElementById('req-ship-date')?.value || '',
+                dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
+                paymentTerms: document.getElementById('payment-terms')?.value || '',
                 timestamp: Date.now()
             };
         }
@@ -2538,6 +2598,25 @@ Company:Absher Construction Company
             if (draft.shipCity) document.getElementById('ship-city').value = draft.shipCity;
             if (draft.shipState) document.getElementById('ship-state').value = draft.shipState;
             if (draft.shipZip) document.getElementById('ship-zip').value = draft.shipZip;
+
+            // Restore order details
+            if (draft.customerPhone) document.getElementById('customer-phone').value = draft.customerPhone;
+            if (draft.poNumber) document.getElementById('po-number').value = draft.poNumber;
+            if (draft.orderNumber) document.getElementById('order-number').value = draft.orderNumber;
+            if (draft.customerNumber) document.getElementById('customer-number').value = draft.customerNumber;
+            if (draft.shipMethod) document.getElementById('ship-method').value = draft.shipMethod;
+            if (draft.dateOrderPlaced) document.getElementById('date-order-placed').value = draft.dateOrderPlaced;
+            if (draft.reqShipDate) document.getElementById('req-ship-date').value = draft.reqShipDate;
+            if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = draft.dropDeadDate;
+            if (draft.paymentTerms) document.getElementById('payment-terms').value = draft.paymentTerms;
+            // Auto-expand Order Details panel if any field restored
+            if (draft.poNumber || draft.orderNumber || draft.customerNumber || draft.shipMethod ||
+                draft.dateOrderPlaced || draft.reqShipDate || draft.dropDeadDate || draft.paymentTerms) {
+                const odContent = document.getElementById('order-details-content');
+                const odChevron = document.getElementById('order-details-chevron');
+                if (odContent) odContent.style.display = 'block';
+                if (odChevron) odChevron.style.transform = 'rotate(180deg)';
+            }
 
             updateTaxCalculation();
 
@@ -7018,7 +7097,21 @@ Company:Absher Construction Company
                     sampleQty: additionalCharges.sampleQty,
                     discount: additionalCharges.discount,
                     discountPercent: additionalCharges.discountPercent,
-                    discountReason: additionalCharges.discountReason
+                    discountReason: additionalCharges.discountReason,
+                    // Order details (2026-02-11)
+                    phone: document.getElementById('customer-phone')?.value?.trim() || '',
+                    orderNumber: document.getElementById('order-number')?.value?.trim() || '',
+                    customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
+                    purchaseOrderNumber: document.getElementById('po-number')?.value?.trim() || '',
+                    shipToAddress: document.getElementById('ship-address')?.value?.trim() || '',
+                    shipToCity: document.getElementById('ship-city')?.value?.trim() || '',
+                    shipToState: document.getElementById('ship-state')?.value || '',
+                    shipToZip: document.getElementById('ship-zip')?.value?.trim() || '',
+                    shipMethod: document.getElementById('ship-method')?.value?.trim() || '',
+                    dateOrderPlaced: document.getElementById('date-order-placed')?.value?.trim() || '',
+                    reqShipDate: document.getElementById('req-ship-date')?.value?.trim() || '',
+                    dropDeadDate: document.getElementById('drop-dead-date')?.value?.trim() || '',
+                    paymentTerms: document.getElementById('payment-terms')?.value?.trim() || ''
                 };
 
                 // DECG/DECC items already collected at function start
@@ -7170,6 +7263,18 @@ Company:Absher Construction Company
                 // Collapsing - hide content, chevron points DOWN
                 content.style.display = 'none';
                 chevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function toggleOrderDetails() {
+            const content = document.getElementById('order-details-content');
+            const chevron = document.getElementById('order-details-chevron');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                chevron.style.transform = '';
             }
         }
 
@@ -7340,6 +7445,7 @@ Company:Absher Construction Company
             document.getElementById('customer-name').value = '';
             document.getElementById('customer-email').value = '';
             document.getElementById('company-name').value = '';
+            document.getElementById('customer-phone').value = '';
             document.getElementById('customer-lookup').value = '';
 
             // Reset notes
@@ -7374,6 +7480,22 @@ Company:Absher Construction Company
             document.getElementById('ship-zip').value = '';
             const taxStatus = document.getElementById('tax-lookup-status');
             if (taxStatus) taxStatus.innerHTML = '';
+
+            // Reset Order Details fields
+            document.getElementById('po-number').value = '';
+            document.getElementById('order-number').value = '';
+            document.getElementById('customer-number').value = '';
+            document.getElementById('ship-method').value = '';
+            document.getElementById('date-order-placed').value = '';
+            document.getElementById('req-ship-date').value = '';
+            document.getElementById('drop-dead-date').value = '';
+            document.getElementById('payment-terms').value = '';
+            const odContent = document.getElementById('order-details-content');
+            const odChevron = document.getElementById('order-details-chevron');
+            const odBadge = document.getElementById('order-details-badge');
+            if (odContent) odContent.style.display = 'none';
+            if (odChevron) odChevron.style.transform = '';
+            if (odBadge) odBadge.style.display = 'none';
             document.getElementById('discount-amount').value = '';
             document.getElementById('discount-reason').value = '';
             const reasonPreset = document.getElementById('discount-reason-preset');
@@ -9029,7 +9151,31 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 6d. Populate Ship To address and auto-lookup tax rate
+                // 6d. Populate Order Details fields
+                if (data.purchaseOrderNumber) document.getElementById('po-number').value = data.purchaseOrderNumber;
+                if (data.orderId) document.getElementById('order-number').value = data.orderId;
+                if (data.customer.customerId) document.getElementById('customer-number').value = data.customer.customerId;
+                if (data.shipping?.method) document.getElementById('ship-method').value = data.shipping.method;
+                if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
+                if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = data.dateOrderPlaced;
+                if (data.reqShipDate) document.getElementById('req-ship-date').value = data.reqShipDate;
+                if (data.dropDeadDate) document.getElementById('drop-dead-date').value = data.dropDeadDate;
+                if (data.paymentTerms) document.getElementById('payment-terms').value = data.paymentTerms;
+
+                // Auto-expand Order Details panel if any field populated
+                const hasOrderDetails = data.purchaseOrderNumber || data.orderId || data.customer.customerId ||
+                    data.shipping?.method || data.dateOrderPlaced || data.reqShipDate ||
+                    data.dropDeadDate || data.paymentTerms;
+                if (hasOrderDetails) {
+                    const odContent = document.getElementById('order-details-content');
+                    const odChevron = document.getElementById('order-details-chevron');
+                    const odBadge = document.getElementById('order-details-badge');
+                    if (odContent) odContent.style.display = 'block';
+                    if (odChevron) odChevron.style.transform = 'rotate(180deg)';
+                    if (odBadge) odBadge.style.display = 'inline';
+                }
+
+                // 6e. Populate Ship To address and auto-lookup tax rate
                 if (data.shipping) {
                     if (data.shipping.street) document.getElementById('ship-address').value = data.shipping.street;
                     if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
