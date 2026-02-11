@@ -1300,7 +1300,7 @@ class EmbroideryPricingCalculator {
      * @param {Array} logos - Legacy: all logos (garment logos for backward compat)
      * @param {Object} logoConfigs - NEW: Separate configs { garment: {primary, additional}, cap: {primary, additional} }
      */
-    async calculateQuote(products, logos, logoConfigs = null) {
+    async calculateQuote(products, logos, logoConfigs = null, options = {}) {
         if (!products || products.length === 0) {
             return null;
         }
@@ -1440,12 +1440,14 @@ class EmbroideryPricingCalculator {
         
         // Apply LTM separately for caps and garments
         // Each product type has its own LTM if qty <= 7 (2026 5-tier restructure)
+        // LTM override: skip if user disabled via options.ltmEnabled === false
+        const ltmEnabled = options.ltmEnabled !== false; // default true
         let ltmTotal = 0;
         let garmentLtm = 0;
         let capLtm = 0;
 
         // Garment LTM: apply if garments exist and qty <= 7 (2026-02 restructure)
-        if (garmentQuantity > 0 && garmentQuantity <= 7) {
+        if (ltmEnabled && garmentQuantity > 0 && garmentQuantity <= 7) {
             garmentLtm = this.ltmFee;
             const garmentLtmPerUnit = garmentLtm / garmentQuantity;
             productPricing.filter(pp => !pp.isCap).forEach(pp => {
@@ -1470,7 +1472,7 @@ class EmbroideryPricingCalculator {
         }
 
         // Cap LTM: apply if caps exist and qty <= 7 (2026-02 restructure)
-        if (capQuantity > 0 && capQuantity <= 7) {
+        if (ltmEnabled && capQuantity > 0 && capQuantity <= 7) {
             capLtm = this.ltmFee;
             const capLtmPerUnit = capLtm / capQuantity;
             productPricing.filter(pp => pp.isCap).forEach(pp => {

@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.11.0 - Invalid items → reviewItems[] for user review in preview modal
- * @date 2026-02-10
+ * @version 1.12.0 - Parse Order Summary (shipping, tax rate) + Design Information sections
+ * @date 2026-02-11
  */
 
 class ShopWorksImportParser {
@@ -131,8 +131,8 @@ class ShopWorksImportParser {
 
         // Invalid part numbers to skip
         this.INVALID_PARTS = [
-            'WEIGHT', 'GIFT CODE', 'DISCOUNT', 'FREIGHT', 'TEST',
-            'SPSU', 'SHIPPING', 'TAX', 'TOTAL'
+            'WEIGHT', 'GIFT CODE', 'DISCOUNT', 'TEST',
+            'SPSU', 'TAX', 'TOTAL'
         ];
 
         // Non-SanMar product patterns (require manual pricing)
@@ -443,7 +443,15 @@ class ShopWorksImportParser {
                 rush: null,              // { amount }
                 artCharges: null,        // { amount }
                 patchSetup: false,
-                graphicDesign: null      // { hours, amount }
+                graphicDesign: null,     // { hours, amount }
+                shipping: null           // { amount, description }
+            },
+            orderSummary: {
+                subtotal: null,
+                salesTax: null,
+                shipping: null,
+                total: null,
+                taxRate: null
             },
             notes: [],              // Comment rows
             warnings: [],           // Import warnings
@@ -469,6 +477,10 @@ class ShopWorksImportParser {
                 this._parseOrderInfo(trimmed, result);
             } else if (trimmed.includes('Items Purchased') || trimmed.includes('Part Number:')) {
                 this._parseItems(trimmed, result);
+            } else if (trimmed.includes('Order Summary')) {
+                this._parseOrderSummary(trimmed, result);
+            } else if (trimmed.includes('Design Information') || trimmed.includes('Design #')) {
+                this._parseDesignInfo(trimmed, result);
             }
         }
 
@@ -600,6 +612,80 @@ class ShopWorksImportParser {
             } else if (trimmed.startsWith('Email:')) {
                 // This is the customer email (different from salesperson)
                 result.customer.email = trimmed.replace('Email:', '').trim();
+            }
+        }
+    }
+
+    /**
+     * Parse Order Summary section (Subtotal, Sales Tax, Shipping, Total)
+     * Back-calculates tax rate from salesTax / subtotal
+     * Populates result.services.shipping if no SHIPPING part number was found
+     */
+    _parseOrderSummary(text, result) {
+        const lines = text.split('\n');
+        for (const line of lines) {
+            const trimmed = line.trim();
+
+            // Match "Label: $XX.XX" or "Label: XX.XX" patterns
+            const match = trimmed.match(/^(.+?):\s*\$?([\d,]+\.?\d*)$/);
+            if (!match) continue;
+
+            const label = match[1].trim().toLowerCase();
+            const value = parseFloat(match[2].replace(',', '')) || 0;
+
+            if (label === 'subtotal' || label === 'sub total') {
+                result.orderSummary.subtotal = value;
+            } else if (label.includes('sales tax') || label.includes('tax')) {
+                result.orderSummary.salesTax = value;
+            } else if (label.includes('shipping') || label.includes('freight')) {
+                result.orderSummary.shipping = value;
+            } else if (label === 'total' || label === 'order total' || label === 'grand total') {
+                result.orderSummary.total = value;
+            }
+        }
+
+        // Back-calculate tax rate if we have both salesTax and subtotal
+        if (result.orderSummary.salesTax > 0 && result.orderSummary.subtotal > 0) {
+            result.orderSummary.taxRate = parseFloat(
+                ((result.orderSummary.salesTax / result.orderSummary.subtotal) * 100).toFixed(1)
+            );
+            console.log(`[ShopWorksImportParser] Order Summary tax rate: ${result.orderSummary.taxRate}% ($${result.orderSummary.salesTax} / $${result.orderSummary.subtotal})`);
+        }
+
+        // Populate services.shipping from Order Summary if no SHIPPING part number was found
+        if (result.orderSummary.shipping > 0 && !result.services.shipping) {
+            result.services.shipping = {
+                amount: result.orderSummary.shipping,
+                description: 'Shipping (from Order Summary)'
+            };
+            console.log(`[ShopWorksImportParser] Shipping from Order Summary: $${result.orderSummary.shipping}`);
+        }
+    }
+
+    /**
+     * Parse Design Information section
+     * Extracts design number and description, adds to notes[]
+     */
+    _parseDesignInfo(text, result) {
+        const lines = text.split('\n');
+        for (const line of lines) {
+            const trimmed = line.trim();
+
+            // Match "Design #:NNNNN - description" or "Design #NNNNN - description"
+            const designMatch = trimmed.match(/Design\s*#:?\s*(\d+)\s*[-–—]\s*(.+)/i);
+            if (designMatch) {
+                const designNum = designMatch[1];
+                const designName = designMatch[2].trim();
+                result.notes.push(`Design #${designNum} — ${designName}`);
+                console.log(`[ShopWorksImportParser] Design info: #${designNum} — ${designName}`);
+                continue;
+            }
+
+            // Also match standalone "Design #:NNNNN" without description
+            const simpleMatch = trimmed.match(/Design\s*#:?\s*(\d+)/i);
+            if (simpleMatch) {
+                result.notes.push(`Design #${simpleMatch[1]}`);
+                console.log(`[ShopWorksImportParser] Design info: #${simpleMatch[1]}`);
             }
         }
     }
@@ -902,6 +988,13 @@ class ShopWorksImportParser {
                 });
                 break;
 
+            case 'shipping':
+                result.services.shipping = {
+                    amount: item.unitPrice * item.quantity,
+                    description: item.description || 'Shipping'
+                };
+                break;
+
             case 'additional-stitches':
                 // Additional stitches (AS-Garm or AS-CAP) - manual pricing
                 if (!result.services.additionalStitches) {
@@ -1084,6 +1177,11 @@ class ShopWorksImportParser {
         // Additional stitches (garment or cap) - manual pricing
         if (pn === 'AS-GARM' || pn === 'AS-CAP') {
             return 'additional-stitches';
+        }
+
+        // Shipping / Freight
+        if (pn === 'SHIPPING' || pn === 'FREIGHT' || pn === 'SHIP') {
+            return 'shipping';
         }
 
         // Everything else is a product
@@ -1456,4 +1554,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.11.0 - Invalid items → reviewItems[] for user review');
+console.log('[ShopWorksImportParser] Module loaded v1.12.0 - Parse Order Summary (shipping, tax rate) + Design Information');

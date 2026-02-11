@@ -667,6 +667,38 @@ class EmbroideryQuoteService {
             }
         }
 
+        // Shipping fee (SHIP)
+        const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+        if (shippingFee > 0) {
+            feeItems.push({
+                StyleNumber: 'SHIP',
+                ProductName: 'Shipping',
+                Quantity: 1,
+                BaseUnitPrice: shippingFee,
+                FinalUnitPrice: shippingFee,
+                LineTotal: shippingFee
+            });
+        }
+
+        // Sales Tax (TAX) — stores rate in BaseUnitPrice, amount in LineTotal
+        const includeTax = document.getElementById('include-tax')?.checked;
+        const taxRateInput = document.getElementById('tax-rate-input');
+        const taxRateVal = taxRateInput ? parseFloat(taxRateInput.value) : 10.1;
+        if (includeTax && taxRateVal > 0) {
+            // Calculate tax amount from adjusted subtotal
+            const grandTotalText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
+            const adjustedSubtotal = parseFloat(grandTotalText.replace(/[$,]/g, '')) || 0;
+            const taxAmount = adjustedSubtotal * (taxRateVal / 100);
+            feeItems.push({
+                StyleNumber: 'TAX',
+                ProductName: `Sales Tax (${taxRateVal}%)`,
+                Quantity: 1,
+                BaseUnitPrice: taxRateVal,
+                FinalUnitPrice: taxRateVal,
+                LineTotal: parseFloat(taxAmount.toFixed(2))
+            });
+        }
+
         // Discount (DISCOUNT) — stored as negative
         if (sessionData.Discount > 0) {
             feeItems.push({

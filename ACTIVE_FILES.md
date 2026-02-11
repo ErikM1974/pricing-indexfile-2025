@@ -57,6 +57,13 @@
 | `/calculators/manual-pricing.js` | Page logic — orchestrates DTG/DTF/EMB/CAP/SP pricing services | All 5 *-pricing-service.js files | ✅ Active |
 | `/calculators/manual-pricing.css` | Page styles — extends manual-calculator-styles.css | manual-calculator-styles.css | ✅ Active |
 
+### Compare Pricing by Style
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/compare-pricing.html` | Compare pricing by SanMar style — all methods on one page | compare-pricing.js, compare-pricing.css, manual-pricing.css, all 5 pricing services | ✅ Active |
+| `/calculators/compare-pricing.js` | Page logic — fetches SanMar product data then pricing | All 5 *-pricing-service.js files | ✅ Active |
+| `/calculators/compare-pricing.css` | Page styles — product info banner, extends manual-pricing.css | manual-pricing.css, manual-calculator-styles.css | ✅ Active |
+
 ### DTG System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|

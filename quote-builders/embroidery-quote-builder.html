@@ -612,7 +612,27 @@
                                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
                     </div>
+                    <!-- Shipping Fee -->
+                    <div class="charge-field" style="margin-bottom: 10px;">
+                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Shipping</label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
+                            <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
+                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
+                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                    </div>
                     <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
+                    <!-- LTM Override (shown only when qty <= 7) -->
+                    <div id="ltm-override-row" style="display: none; margin-bottom: 10px; padding: 8px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #92400e; font-weight: 500;">
+                            <input type="checkbox" id="ltm-enabled" checked onchange="onLtmOverrideChange()"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #f59e0b;">
+                            <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                            LTM Fee ($50)
+                            <span id="ltm-status-label" style="font-size: 12px; color: #6b7280; margin-left: auto;">Applied</span>
+                        </label>
+                    </div>
                     <!-- Discount -->
                     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fca5a5; background: #fef2f2; margin: 12px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
                         <label style="font-size: 12px; color: #b91c1c; margin-bottom: 4px; display: block; font-weight: 600;">Discount</label>
@@ -671,11 +691,15 @@
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: #475569;">
                             <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()"
                                    style="width: 16px; height: 16px; cursor: pointer; accent-color: #22c55e;">
-                            <span>Include WA Sales Tax (10.1%)</span>
+                            <span>Sales Tax</span>
+                            <input type="number" id="tax-rate-input" value="10.1" min="0" max="20" step="0.1"
+                                   onchange="updateTaxCalculation()" onclick="event.stopPropagation()"
+                                   style="width: 60px; padding: 2px 4px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px; text-align: right;">
+                            <span>%</span>
                         </label>
                     </div>
                     <div class="pricing-row tax-amount-row" id="tax-row">
-                        <span class="label" style="color: #64748b;">WA Sales Tax:</span>
+                        <span class="label" id="tax-label" style="color: #64748b;">Sales Tax:</span>
                         <span class="value" id="tax-amount" style="color: #64748b;">$0.00</span>
                     </div>
                     <div class="pricing-row grand-total-row" style="margin-top: 10px; padding-top: 10px; border-top: 2px solid #22c55e; background: linear-gradient(135deg, #f0fdf4, #dcfce7); margin: 10px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
@@ -886,7 +910,7 @@ Company:Absher Construction Company
             <div class="shopworks-import-body">
                 <p class="shopworks-import-hint">
                     <i class="fas fa-info-circle"></i>
-                    Choose pricing source for each item. API uses current tier pricing; ShopWorks uses the imported price.
+                    Choose pricing source &amp; embroidery config. API uses current tier pricing; ShopWorks uses the imported price.
                 </p>
 
                 <!-- Products section (dynamically shown/hidden) -->
@@ -894,6 +918,83 @@ Company:Absher Construction Company
                     <div class="spr-section-label">Products</div>
                     <div id="spr-products-container">
                         <!-- Populated by showServicePricingReview() -->
+                    </div>
+                </div>
+
+                <!-- Embroidery Configuration section (dynamically shown/hidden) -->
+                <div id="spr-embconfig-section" style="display: none;">
+                    <div class="spr-section-label">Embroidery Configuration</div>
+                    <div id="spr-design-info-banner" style="display: none; padding: 6px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; margin-bottom: 10px; font-size: 12px; color: #1e40af;">
+                        <i class="fas fa-palette" style="margin-right: 6px;"></i><span id="spr-design-info-text"></span>
+                    </div>
+                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                        <!-- Garment config -->
+                        <div id="spr-garment-config" style="display: none; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                            <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px;">&#128085; Garment</div>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 130px;">
+                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Position</label>
+                                    <select id="spr-garment-position" onchange="onSprGarmentPositionChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                        <option value="Left Chest">Left Chest</option>
+                                        <option value="Right Chest">Right Chest</option>
+                                        <option value="Center Chest">Center Chest</option>
+                                        <option value="Full Back">Full Back</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1; min-width: 130px;">
+                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Design Size</label>
+                                    <select id="spr-garment-stitch-tier" onchange="onSprGarmentStitchTierChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                        <option value="8000">Standard (&le;10K)</option>
+                                        <option value="12000">Mid (&le;15K)</option>
+                                        <option value="18000">Large (&le;25K)</option>
+                                        <option value="25000">Full Back (25K+)</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+                                    <label style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="spr-garment-digitizing" style="width: 14px; height: 14px; accent-color: #3b82f6;">
+                                        Digitizing ($100)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Cap config -->
+                        <div id="spr-cap-config" style="display: none; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                            <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px;">&#129506; Cap</div>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 130px;">
+                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Type</label>
+                                    <select id="spr-cap-embellishment" onchange="onSprCapEmbellishmentChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                        <option value="embroidery">Flat Embroidery</option>
+                                        <option value="3d-puff">3D Puff</option>
+                                        <option value="laser-patch">Laser Patch</option>
+                                    </select>
+                                </div>
+                                <div id="spr-cap-stitch-tier-wrapper" style="flex: 1; min-width: 130px;">
+                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Design Size</label>
+                                    <select id="spr-cap-stitch-tier" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                        <option value="8000">Standard (&le;10K)</option>
+                                        <option value="12000">Mid (&le;15K)</option>
+                                        <option value="18000">Large (&le;25K)</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+                                    <label style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="spr-cap-digitizing" style="width: 14px; height: 14px; accent-color: #3b82f6;">
+                                        Digitizing ($100)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- LTM override -->
+                        <div id="spr-ltm-row" style="display: none; padding: 10px 12px; background: #fffbeb; border-top: 1px solid #fde68a;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #92400e;">
+                                <input type="checkbox" id="spr-ltm-enabled" checked style="width: 15px; height: 15px; accent-color: #f59e0b;">
+                                <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                                Apply LTM Fee ($50)
+                                <span id="spr-ltm-hint" style="font-size: 11px; color: #6b7280; margin-left: auto;"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -922,7 +1023,7 @@ Company:Absher Construction Company
             <div class="shopworks-import-footer">
                 <button class="btn-cancel-import" onclick="cancelServicePricingReview()">Cancel</button>
                 <button class="btn-parse-import" id="btn-apply-service-pricing" onclick="applyServicePricingReview()">
-                    <i class="fas fa-check"></i> Apply Pricing
+                    <i class="fas fa-check"></i> Apply &amp; Import
                 </button>
             </div>
         </div>
@@ -2289,6 +2390,10 @@ Company:Absher Construction Company
                 companyName: document.getElementById('company-name')?.value || '',
                 salesRep: document.getElementById('sales-rep')?.value || '',
                 notes: document.getElementById('notes')?.value || '',
+                ltmEnabled: document.getElementById('ltm-enabled')?.checked !== false,
+                taxRate: document.getElementById('tax-rate-input')?.value || '10.1',
+                includeTax: document.getElementById('include-tax')?.checked ?? true,
+                shippingFee: document.getElementById('shipping-fee')?.value || '0',
                 timestamp: Date.now()
             };
         }
@@ -2364,6 +2469,25 @@ Company:Absher Construction Company
                 const capDigitizingEl = document.getElementById('cap-primary-digitizing');
                 if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
             }
+
+            // Restore LTM override state
+            if (draft.ltmEnabled === false) {
+                document.getElementById('ltm-enabled').checked = false;
+                document.getElementById('ltm-status-label').textContent = 'Waived';
+            }
+
+            // Restore tax rate and shipping
+            if (draft.taxRate) {
+                const rateInput = document.getElementById('tax-rate-input');
+                if (rateInput) rateInput.value = draft.taxRate;
+            }
+            if (draft.includeTax === false) {
+                document.getElementById('include-tax').checked = false;
+            }
+            if (draft.shippingFee && parseFloat(draft.shippingFee) > 0) {
+                document.getElementById('shipping-fee').value = draft.shippingFee;
+            }
+            updateTaxCalculation();
 
             // Restore garment AL configuration
             if (draft.garmentAL && draft.garmentAL.enabled) {
@@ -2520,6 +2644,17 @@ Company:Absher Construction Company
 
                 // Populate additional charges
                 populateAdditionalCharges(session);
+
+                // Restore tax rate and shipping from fee items
+                const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
+                if (taxFeeItem) {
+                    const rateInput = document.getElementById('tax-rate-input');
+                    if (rateInput) rateInput.value = taxFeeItem.BaseUnitPrice || 10.1;
+                }
+                const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
+                if (shipFeeItem && shipFeeItem.LineTotal > 0) {
+                    document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
+                }
 
                 // Recalculate pricing to update totals
                 recalculatePricing();
@@ -5847,8 +5982,24 @@ Company:Absher Construction Company
             // Build logo configuration from global state (shared helper)
             const { logoConfigs, allLogos } = buildLogoConfiguration();
 
+            // Show/hide LTM override toggle based on quantities
+            const garmentQtyForLtm = productList.filter(p => !p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
+            const capQtyForLtm = productList.filter(p => p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
+            const wouldHaveLTM = (garmentQtyForLtm > 0 && garmentQtyForLtm <= 7) || (capQtyForLtm > 0 && capQtyForLtm <= 7);
+            const ltmRow = document.getElementById('ltm-override-row');
+            if (ltmRow) {
+                ltmRow.style.display = wouldHaveLTM ? 'flex' : 'none';
+                if (!wouldHaveLTM) {
+                    document.getElementById('ltm-enabled').checked = true;
+                    document.getElementById('ltm-status-label').textContent = 'Applied';
+                }
+            }
+
+            // Read LTM override state
+            const ltmEnabled = document.getElementById('ltm-enabled')?.checked !== false;
+
             try {
-                const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs);
+                const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
 
                 if (pricing) {
                     // Update row prices - match line items to rows by style AND color
@@ -6514,8 +6665,9 @@ Company:Absher Construction Company
             const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
             const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
             const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
+            const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
 
-            const additionalCharges = artCharge + designFee + rushFee + (sampleFee * sampleQty);
+            const additionalCharges = artCharge + designFee + rushFee + (sampleFee * sampleQty) + shippingFee;
             const discountableSubtotal = baseSubtotal + additionalCharges;
 
             const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
@@ -6552,7 +6704,8 @@ Company:Absher Construction Company
             const includeTax = document.getElementById('include-tax')?.checked ?? true;
             const { adjustedSubtotal } = calculateDiscountableSubtotal();
 
-            const taxRate = 0.101; // WA State sales tax
+            const rateInput = document.getElementById('tax-rate-input');
+            const taxRate = rateInput ? parseFloat(rateInput.value) / 100 : 0.101;
 
             const taxRow = document.getElementById('tax-row');
             const taxAmountEl = document.getElementById('tax-amount');
@@ -6564,6 +6717,13 @@ Company:Absher Construction Company
             // Update pre-tax subtotal display to show adjusted amount
             if (preTaxSubtotal) {
                 preTaxSubtotal.textContent = '$' + adjustedSubtotal.toFixed(2);
+            }
+
+            // Update tax label dynamically
+            const taxLabel = document.getElementById('tax-label');
+            if (taxLabel) {
+                const pct = (taxRate * 100).toFixed(1);
+                taxLabel.textContent = pct === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pct}%):`;
             }
 
             if (includeTax) {
@@ -6619,6 +6779,9 @@ Company:Absher Construction Company
                 // Build logo configuration from global state (shared helper)
                 const { logoConfigs, allLogos } = buildLogoConfiguration();
 
+                // Read LTM override state
+                const ltmEnabled = document.getElementById('ltm-enabled')?.checked !== false;
+
                 let pricing;
                 if (products.length === 0) {
                     // DECG-only: build minimal pricing (no pricing engine needed)
@@ -6641,7 +6804,7 @@ Company:Absher Construction Company
                         capQuantity: 0
                     };
                 } else {
-                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
                 }
 
                 // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
@@ -7013,7 +7176,16 @@ Company:Absher Construction Company
             }
             updateNotesBadge();
 
+            // Reset LTM override toggle
+            document.getElementById('ltm-enabled').checked = true;
+            document.getElementById('ltm-status-label').textContent = 'Applied';
+            document.getElementById('ltm-override-row').style.display = 'none';
+
             // Reset additional charges
+            document.getElementById('shipping-fee').value = '0';
+            const taxRateInput = document.getElementById('tax-rate-input');
+            if (taxRateInput) taxRateInput.value = '10.1';
+            document.getElementById('include-tax').checked = true;
             document.getElementById('rush-fee').value = '';
             document.getElementById('discount-amount').value = '';
             document.getElementById('discount-reason').value = '';
@@ -7130,6 +7302,13 @@ Company:Absher Construction Company
         /**
          * Calculate and update additional charges display badge
          */
+        function onLtmOverrideChange() {
+            const enabled = document.getElementById('ltm-enabled').checked;
+            document.getElementById('ltm-status-label').textContent = enabled ? 'Applied' : 'Waived';
+            recalculatePricing();
+            markAsUnsaved();
+        }
+
         function updateAdditionalCharges() {
             const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
             const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
@@ -7145,8 +7324,10 @@ Company:Absher Construction Company
                 graphicDesignTotalEl.textContent = graphicDesignCharge.toFixed(2);
             }
 
+            const shippingFeeVal = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+
             // Calculate total additional charges (before discount)
-            const totalCharges = artCharge + graphicDesignCharge + rushFee + sampleFee;
+            const totalCharges = artCharge + graphicDesignCharge + rushFee + sampleFee + shippingFeeVal;
 
             // Calculate discount value
             let discountValue = 0;
@@ -7376,6 +7557,7 @@ Company:Absher Construction Company
         let _sprReject = null;
         let _sprItems = [];
         let _sprProductItems = [];
+        let _sprEmbConfigOptions = null;
 
         /**
          * Show the pricing review modal and return a Promise
@@ -7384,16 +7566,18 @@ Company:Absher Construction Company
          * @param {Array} productItems - Array of { partNumber, color, sizes, unitPrice, isCap, sizePrices, totalQty, description }
          * @returns {Promise<Object>} Resolves to { services: [...], products: [...] } or null if cancelled
          */
-        function showServicePricingReview(serviceItems, productItems) {
+        function showServicePricingReview(serviceItems, productItems, embConfigOptions) {
             serviceItems = serviceItems || [];
             productItems = productItems || [];
+            embConfigOptions = embConfigOptions || null;
 
-            if (serviceItems.length === 0 && productItems.length === 0) {
-                return Promise.resolve({ services: [], products: [] });
+            if (serviceItems.length === 0 && productItems.length === 0 && !embConfigOptions) {
+                return Promise.resolve({ services: [], products: [], embConfig: null });
             }
 
             _sprItems = serviceItems;
             _sprProductItems = productItems;
+            _sprEmbConfigOptions = embConfigOptions;
 
             return new Promise((resolve, reject) => {
                 _sprResolve = resolve;
@@ -7531,6 +7715,60 @@ Company:Absher Construction Company
                     tbody.innerHTML = '';
                 }
 
+                // === EMBROIDERY CONFIG SECTION ===
+                const embConfigSection = document.getElementById('spr-embconfig-section');
+                if (embConfigOptions) {
+                    embConfigSection.style.display = '';
+
+                    // Design info banner
+                    const designBanner = document.getElementById('spr-design-info-banner');
+                    if (embConfigOptions.designInfo) {
+                        designBanner.style.display = '';
+                        document.getElementById('spr-design-info-text').textContent = embConfigOptions.designInfo;
+                    } else {
+                        designBanner.style.display = 'none';
+                    }
+
+                    // Garment config
+                    const garmentConfig = document.getElementById('spr-garment-config');
+                    garmentConfig.style.display = embConfigOptions.hasGarments ? '' : 'none';
+                    if (embConfigOptions.hasGarments) {
+                        document.getElementById('spr-garment-position').value = 'Left Chest';
+                        document.getElementById('spr-garment-stitch-tier').value = '8000';
+                        document.getElementById('spr-garment-digitizing').checked = embConfigOptions.digitizing || false;
+                    }
+
+                    // Cap config
+                    const capConfig = document.getElementById('spr-cap-config');
+                    capConfig.style.display = embConfigOptions.hasCaps ? '' : 'none';
+                    if (embConfigOptions.hasCaps) {
+                        document.getElementById('spr-cap-embellishment').value = 'embroidery';
+                        document.getElementById('spr-cap-stitch-tier').value = '8000';
+                        document.getElementById('spr-cap-stitch-tier-wrapper').style.display = '';
+                        document.getElementById('spr-cap-digitizing').checked = embConfigOptions.digitizing || false;
+                    }
+
+                    // LTM row (only if qty <= 7)
+                    const ltmRow = document.getElementById('spr-ltm-row');
+                    if (embConfigOptions.totalQty > 0 && embConfigOptions.totalQty <= 7) {
+                        ltmRow.style.display = '';
+                        // Smart default: uncheck if all products have ShopWorks pricing
+                        const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+                        const ltmHint = document.getElementById('spr-ltm-hint');
+                        if (embConfigOptions.allProductsHaveSwPrice) {
+                            ltmCheckbox.checked = false;
+                            ltmHint.textContent = 'ShopWorks prices may include LTM';
+                        } else {
+                            ltmCheckbox.checked = true;
+                            ltmHint.textContent = '';
+                        }
+                    } else {
+                        ltmRow.style.display = 'none';
+                    }
+                } else {
+                    embConfigSection.style.display = 'none';
+                }
+
                 // Show the modal
                 const modal = document.getElementById('service-pricing-review-modal');
                 modal.classList.add('active');
@@ -7595,6 +7833,8 @@ Company:Absher Construction Company
                 customInput.classList.add('spr-muted');
                 customInput.value = '';
             }
+            // Reactively update LTM default when pricing source changes
+            _updateSprLtmDefault();
         }
 
         function onSprCustomProductFocus(pIdx) {
@@ -7627,6 +7867,58 @@ Company:Absher Construction Company
             if (customRadio && !customRadio.checked) {
                 customRadio.checked = true;
                 onSprSourceChange(idx);
+            }
+        }
+
+        // === SPR Embroidery Config Handlers ===
+
+        function onSprGarmentPositionChange() {
+            const pos = document.getElementById('spr-garment-position').value;
+            const tierEl = document.getElementById('spr-garment-stitch-tier');
+            if (pos === 'Full Back') {
+                tierEl.value = '25000';
+            } else if (tierEl.value === '25000') {
+                tierEl.value = '8000';
+            }
+        }
+
+        function onSprGarmentStitchTierChange() {
+            const tier = document.getElementById('spr-garment-stitch-tier').value;
+            const posEl = document.getElementById('spr-garment-position');
+            if (tier === '25000') {
+                posEl.value = 'Full Back';
+            } else if (posEl.value === 'Full Back') {
+                posEl.value = 'Left Chest';
+            }
+        }
+
+        function onSprCapEmbellishmentChange() {
+            const type = document.getElementById('spr-cap-embellishment').value;
+            const stitchWrapper = document.getElementById('spr-cap-stitch-tier-wrapper');
+            stitchWrapper.style.display = (type === 'laser-patch') ? 'none' : '';
+        }
+
+        function _updateSprLtmDefault() {
+            if (!_sprEmbConfigOptions || _sprEmbConfigOptions.totalQty > 7) return;
+            const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+            const ltmHint = document.getElementById('spr-ltm-hint');
+            if (!ltmCheckbox) return;
+
+            // Check if ALL products currently have ShopWorks pricing selected
+            let allSw = true;
+            _sprProductItems.forEach((prod, pIdx) => {
+                const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
+                let selected = 'api';
+                radios.forEach(r => { if (r.checked) selected = r.value; });
+                if (selected !== 'sw') allSw = false;
+            });
+
+            if (allSw && _sprProductItems.length > 0) {
+                ltmCheckbox.checked = false;
+                ltmHint.textContent = 'ShopWorks prices may include LTM';
+            } else {
+                ltmCheckbox.checked = true;
+                ltmHint.textContent = '';
             }
         }
 
@@ -7664,6 +7956,7 @@ Company:Absher Construction Company
         function cancelServicePricingReview() {
             const modal = document.getElementById('service-pricing-review-modal');
             modal.classList.remove('active');
+            _sprEmbConfigOptions = null;
             if (_sprResolve) {
                 _sprResolve(null); // null = user cancelled
                 _sprResolve = null;
@@ -7729,12 +8022,26 @@ Company:Absher Construction Company
                 });
             });
 
+            // Collect embroidery config if section was shown
+            let embConfig = null;
+            if (_sprEmbConfigOptions) {
+                embConfig = {
+                    garmentPosition: document.getElementById('spr-garment-position')?.value || 'Left Chest',
+                    garmentStitchTier: parseInt(document.getElementById('spr-garment-stitch-tier')?.value) || 8000,
+                    garmentDigitizing: document.getElementById('spr-garment-digitizing')?.checked || false,
+                    capEmbellishment: document.getElementById('spr-cap-embellishment')?.value || 'embroidery',
+                    capStitchTier: parseInt(document.getElementById('spr-cap-stitch-tier')?.value) || 8000,
+                    capDigitizing: document.getElementById('spr-cap-digitizing')?.checked || false,
+                    ltmEnabled: document.getElementById('spr-ltm-enabled')?.checked ?? true
+                };
+            }
+
             // Close modal
             const modal = document.getElementById('service-pricing-review-modal');
             modal.classList.remove('active');
 
             if (_sprResolve) {
-                _sprResolve({ services: serviceResults, products: productResults });
+                _sprResolve({ services: serviceResults, products: productResults, embConfig: embConfig });
                 _sprResolve = null;
                 _sprReject = null;
             }
@@ -8486,19 +8793,7 @@ Company:Absher Construction Company
                     selectSalesRepByEmail(data.salesRep.email);
                 }
 
-                // 3. Handle digitizing checkbox
-                if (data.services.digitizing) {
-                    const digitizingCheckbox = document.getElementById('primary-digitizing');
-                    if (digitizingCheckbox) {
-                        digitizingCheckbox.checked = true;
-                        // Update the visual state
-                        const wrapper = digitizingCheckbox.closest('.digitizing-checkbox');
-                        if (wrapper) wrapper.classList.add('checked');
-                        // Update state and trigger pricing (matching native change handler at line 2340-2341)
-                        primaryLogo.needsDigitizing = true;
-                        recalculatePricing();
-                    }
-                }
+                // 3. Digitizing is now configured in the Review Import Pricing modal (embroidery config section)
 
                 // 4. Handle patch setup
                 if (data.services.patchSetup) {
@@ -8536,6 +8831,28 @@ Company:Absher Construction Company
                         rushInput.value = data.services.rush.amount.toFixed(2);
                         rushInput.dispatchEvent(new Event('input'));
                     }
+                }
+
+                // 6c. Shipping fee
+                if (data.services.shipping) {
+                    const shippingInput = document.getElementById('shipping-fee');
+                    if (shippingInput) {
+                        shippingInput.value = data.services.shipping.amount.toFixed(2);
+                        shippingInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+
+                // 6d. Auto-detect tax rate from Order Summary
+                if (data.orderSummary && data.orderSummary.taxRate) {
+                    const taxInput = document.getElementById('tax-rate-input');
+                    if (taxInput) {
+                        taxInput.value = data.orderSummary.taxRate.toFixed(1);
+                    }
+                    const taxCheckbox = document.getElementById('include-tax');
+                    if (taxCheckbox) {
+                        taxCheckbox.checked = true;
+                    }
+                    updateTaxCalculation();
                 }
 
                 // 7. Handle graphic design hours
@@ -8683,10 +9000,40 @@ Company:Absher Construction Company
                     });
                 }
 
-                // 10. Show pricing review modal if there are any items to review
+                // 10. Build embroidery configuration options for the modal
+                const totalProductQtyForConfig = productReviewItems.reduce((sum, p) => {
+                    return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
+                }, 0) + (data.decgItems ? data.decgItems.reduce((s, d) => s + d.quantity, 0) : 0);
+
+                const hasGarmentProducts = productReviewItems.some(p => !p.isCap) ||
+                    (data.decgItems && data.decgItems.some(d => d.serviceType === 'decg'));
+                const hasCapProducts = productReviewItems.some(p => p.isCap) ||
+                    (data.decgItems && data.decgItems.some(d => d.serviceType === 'decc'));
+                const allProductsHaveSwPrice = productReviewItems.length > 0 &&
+                    productReviewItems.every(p => (p.unitPrice || 0) > 0);
+
+                // Extract design info from notes
+                let designInfo = null;
+                if (data.notes && data.notes.length > 0) {
+                    const designMatch = data.notes.join(' ').match(/Design\s*#?\s*:?\s*(\d+)\s*[-–—]\s*(.+)/i);
+                    if (designMatch) {
+                        designInfo = `Design #${designMatch[1]} — ${designMatch[2].trim()}`;
+                    }
+                }
+
+                const embConfigOptions = {
+                    hasGarments: hasGarmentProducts,
+                    hasCaps: hasCapProducts,
+                    totalQty: totalProductQtyForConfig,
+                    digitizing: data.services.digitizing || false,
+                    designInfo: designInfo,
+                    allProductsHaveSwPrice: allProductsHaveSwPrice
+                };
+
+                // Show pricing review modal with embroidery config
                 let reviewResults = null;
-                if (productReviewItems.length > 0 || serviceReviewItems.length > 0) {
-                    reviewResults = await showServicePricingReview(serviceReviewItems, productReviewItems);
+                if (productReviewItems.length > 0 || serviceReviewItems.length > 0 || embConfigOptions.hasGarments || embConfigOptions.hasCaps) {
+                    reviewResults = await showServicePricingReview(serviceReviewItems, productReviewItems, embConfigOptions);
                 }
 
                 // If user cancelled, abort entire import
@@ -8698,6 +9045,58 @@ Company:Absher Construction Company
 
                 const serviceResults = reviewResults ? reviewResults.services : [];
                 const productResults = reviewResults ? reviewResults.products : [];
+
+                // 10b. Apply embroidery configuration from modal
+                const embConfig = reviewResults ? reviewResults.embConfig : null;
+                if (embConfig) {
+                    // Garment logo config
+                    primaryLogo.position = embConfig.garmentPosition;
+                    primaryLogo.stitchCount = embConfig.garmentStitchTier;
+                    primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
+                    document.getElementById('primary-position').value = embConfig.garmentPosition;
+                    document.getElementById('primary-stitches').value = embConfig.garmentStitchTier;
+                    const digitizingEl = document.getElementById('primary-digitizing');
+                    if (digitizingEl) {
+                        digitizingEl.checked = embConfig.garmentDigitizing;
+                        const wrapper = digitizingEl.closest('.digitizing-checkbox');
+                        if (wrapper) wrapper.classList.toggle('checked', embConfig.garmentDigitizing);
+                    }
+                    // Handle Full Back position sync
+                    if (embConfig.garmentPosition === 'Full Back') {
+                        document.getElementById('primary-position').disabled = true;
+                        const fbField = document.getElementById('fb-stitch-count-field');
+                        const fbInput = document.getElementById('fb-stitch-count');
+                        if (fbField) fbField.style.display = '';
+                        if (fbInput) fbInput.value = embConfig.garmentStitchTier;
+                    }
+
+                    // Cap config
+                    if (embConfig.capEmbellishment) {
+                        const capEmbEl = document.getElementById('cap-embellishment-type');
+                        if (capEmbEl) {
+                            capEmbEl.value = embConfig.capEmbellishment;
+                            handleCapEmbellishmentChange();
+                        }
+                        if (typeof capPrimaryLogo !== 'undefined') {
+                            capPrimaryLogo.stitchCount = embConfig.capStitchTier;
+                            const capStitchEl = document.getElementById('cap-primary-stitches');
+                            if (capStitchEl) capStitchEl.value = embConfig.capStitchTier;
+                        }
+                        const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+                        if (capDigitizingEl) {
+                            capDigitizingEl.checked = embConfig.capDigitizing;
+                            const wrapper = capDigitizingEl.closest('.digitizing-checkbox');
+                            if (wrapper) wrapper.classList.toggle('checked', embConfig.capDigitizing);
+                        }
+                    }
+
+                    // LTM override
+                    const ltmCheckbox = document.getElementById('ltm-enabled');
+                    if (ltmCheckbox) {
+                        ltmCheckbox.checked = embConfig.ltmEnabled;
+                        document.getElementById('ltm-status-label').textContent = embConfig.ltmEnabled ? 'Applied' : 'Waived';
+                    }
+                }
 
                 // 11. Import products (deferred from step 8)
                 let productsImported = 0;
@@ -8868,7 +9267,8 @@ Company:Absher Construction Company
                     'digitizing', 'digitizingCodes', 'digitizingCount',
                     'patchSetup', 'additionalLogo', 'additionalLogos',
                     'artCharges', 'graphicDesign', 'monograms',
-                    'rush', 'ltmFee', 'sewing', 'additionalStitches'
+                    'rush', 'ltmFee', 'sewing', 'additionalStitches',
+                    'shipping'
                 ];
                 const unhandled = Object.entries(data.services || {})
                     .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
@@ -9301,7 +9701,8 @@ Company:Absher Construction Company
                         garmentQuantity: 0, capQuantity: 0
                     };
                 } else {
-                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs);
+                    const ltmEnabledDiag = document.getElementById('ltm-enabled')?.checked !== false;
+                    pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled: ltmEnabledDiag });
                 }
 
                 // Include service item totals (same as recalculatePricing)

@@ -1,0 +1,136 @@
+/**
+ * Compare Pricing by Style — Page-Specific Styles
+ * Extends manual-pricing.css (shared method card/table styles)
+ * Only adds: product info banner, style input tweaks, item type badge
+ */
+
+/* =====================================================
+   PRODUCT INFO BANNER
+   ===================================================== */
+.product-info-banner {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--primary-color);
+    animation: fadeIn 0.3s ease;
+}
+
+.product-info-content {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.product-info-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.product-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 10px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.item-type-badge.garment {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.item-type-badge.cap {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.product-info-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.product-meta-item {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    white-space: nowrap;
+}
+
+.product-meta-item i {
+    font-size: 0.6875rem;
+    opacity: 0.6;
+}
+
+/* =====================================================
+   STYLE INPUT TWEAKS
+   ===================================================== */
+#styleInput {
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+#styleInput::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .product-info-banner {
+        padding: 1rem;
+    }
+
+    .product-info-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .product-info-meta {
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+}
+
+/* =====================================================
+   PRINT
+   ===================================================== */
+@media print {
+    .product-info-banner {
+        box-shadow: none;
+        border: 1px solid var(--border-color);
+        border-left: 4px solid var(--primary-color);
+    }
+}

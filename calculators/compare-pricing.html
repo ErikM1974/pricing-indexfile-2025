@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Manual Pricing Calculator 2026 | Northwest Custom Apparel</title>
+    <title>Compare Pricing by Style 2026 | Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
 
     <!-- Font Awesome -->
@@ -12,9 +12,10 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Base calculator styles + page-specific styles -->
+    <!-- Base calculator styles + shared method card styles + page-specific styles -->
     <link rel="stylesheet" href="/calculators/manual-calculator-styles.css">
     <link rel="stylesheet" href="/calculators/manual-pricing.css">
+    <link rel="stylesheet" href="/calculators/compare-pricing.css">
 </head>
 <body>
     <!-- Global Error Banner -->
@@ -31,7 +32,7 @@
                     <div class="breadcrumb">
                         <a href="/staff-dashboard.html">Staff Dashboard</a>
                         <span>/</span>
-                        <span>Manual Pricing</span>
+                        <span>Compare Pricing</span>
                     </div>
                 </div>
             </div>
@@ -39,51 +40,54 @@
 
         <!-- Page Title -->
         <div class="page-title">
-            <i class="fas fa-calculator"></i> Manual Pricing Calculator 2026
+            <i class="fas fa-magnifying-glass-chart"></i> Compare Pricing by Style 2026
         </div>
-        <p class="page-subtitle">Embroidered Garments, Embroidered Caps, Screen Print, DTG and DTF. Enter the blank cost from your supplier.</p>
+        <p class="page-subtitle">Look up any SanMar product to see decorated sell prices for Embroidery, Cap Embroidery, Screen Print, DTG and DTF.</p>
 
         <!-- Input Section -->
         <div class="input-section">
             <div class="input-row">
-                <div class="cost-input-group">
-                    <label for="blankCost">Blank Cost</label>
+                <div class="cost-input-group" style="flex: 0 0 280px;">
+                    <label for="styleInput">SanMar Style Number</label>
                     <div class="cost-input-wrapper">
-                        <span class="dollar-sign">$</span>
-                        <input type="number"
-                               id="blankCost"
+                        <span class="dollar-sign" style="font-size: 0.9rem;"><i class="fas fa-tag"></i></span>
+                        <input type="text"
+                               id="styleInput"
                                class="cost-input"
-                               step="0.01"
-                               min="0.01"
-                               max="999.99"
-                               placeholder="e.g. 6.25"
-                               onkeypress="if(event.key === 'Enter') document.getElementById('calculateBtn').click()">
-                    </div>
-                </div>
-
-                <div class="item-type-group">
-                    <label>Item Type</label>
-                    <div class="toggle-buttons">
-                        <button class="toggle-btn active" data-type="garment" onclick="manualCalc.setItemType('garment')">
-                            <i class="fas fa-tshirt"></i> Garment
-                        </button>
-                        <button class="toggle-btn" data-type="cap" onclick="manualCalc.setItemType('cap')">
-                            <i class="fas fa-hat-cowboy"></i> Cap
-                        </button>
+                               placeholder="e.g. PC54, C112, ST850"
+                               autocomplete="off"
+                               onkeypress="if(event.key === 'Enter') document.getElementById('lookUpBtn').click()">
                     </div>
                 </div>
 
                 <div class="calculate-group">
                     <label>&nbsp;</label>
-                    <button id="calculateBtn" class="btn-calculate" onclick="manualCalc.calculate()">
-                        <i class="fas fa-calculator"></i> Calculate
+                    <button id="lookUpBtn" class="btn-calculate" onclick="compareCalc.lookUp()">
+                        <i class="fas fa-search"></i> Look Up
                     </button>
                 </div>
             </div>
-            <p class="input-hint">Enter the blank garment/cap cost from your supplier (S&S Active Wear, etc.)</p>
+            <p class="input-hint">Enter a SanMar style number to look up pricing across all decoration methods</p>
             <div id="inputError" class="input-error">
                 <i class="fas fa-exclamation-circle"></i>
                 <span id="inputErrorText"></span>
+            </div>
+        </div>
+
+        <!-- Product Info Banner (populated by JS) -->
+        <div id="productInfoBanner" class="product-info-banner" style="display: none;">
+            <div class="product-info-content">
+                <div class="product-info-details">
+                    <div class="product-info-header">
+                        <h3 id="productName" class="product-name"></h3>
+                        <span id="itemTypeBadge" class="item-type-badge"></span>
+                    </div>
+                    <div class="product-info-meta">
+                        <span id="productBrand" class="product-meta-item"><i class="fas fa-tag"></i> </span>
+                        <span id="productCategory" class="product-meta-item"><i class="fas fa-folder"></i> </span>
+                        <span id="productBasePrice" class="product-meta-item"><i class="fas fa-dollar-sign"></i> </span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -101,13 +105,13 @@
                             DTG (Direct-to-Garment)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtgLocation" class="method-select" onchange="manualCalc.onDTGLocationChange()">
+                            <select id="dtgLocation" class="method-select" onchange="compareCalc.onDTGLocationChange()">
                                 <!-- Populated by JS -->
                             </select>
                         </div>
                     </div>
                     <div class="method-card-body" id="dtgBody">
-                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                        <div class="card-placeholder">Enter a style number and click Look Up</div>
                     </div>
                 </div>
 
@@ -119,7 +123,7 @@
                             DTF (Direct-to-Film)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtfTransferSize" class="method-select" onchange="manualCalc.onDTFSizeChange()">
+                            <select id="dtfTransferSize" class="method-select" onchange="compareCalc.onDTFSizeChange()">
                                 <option value="small">Small (5" x 5")</option>
                                 <option value="medium" selected>Medium (9" x 12")</option>
                                 <option value="large">Large (12" x 16.5")</option>
@@ -127,7 +131,7 @@
                         </div>
                     </div>
                     <div class="method-card-body" id="dtfBody">
-                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                        <div class="card-placeholder">Enter a style number and click Look Up</div>
                     </div>
                 </div>
 
@@ -141,7 +145,7 @@
                         <div class="method-card-controls">
                             <div class="ltm-qty-picker">
                                 <label for="embLtmQty">1-7 qty:</label>
-                                <select id="embLtmQty" class="method-select ltm-select" onchange="manualCalc.onEmbLTMQtyChange()">
+                                <select id="embLtmQty" class="method-select ltm-select" onchange="compareCalc.onEmbLTMQtyChange()">
                                     <option value="1">1 pc</option>
                                     <option value="2">2 pcs</option>
                                     <option value="3" selected>3 pcs</option>
@@ -155,7 +159,7 @@
                         </div>
                     </div>
                     <div class="method-card-body" id="embBody">
-                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                        <div class="card-placeholder">Enter a style number and click Look Up</div>
                     </div>
                 </div>
 
@@ -167,13 +171,13 @@
                             Screen Print
                         </h3>
                         <div class="method-card-controls">
-                            <select id="spColors" class="method-select" onchange="manualCalc.onSPColorChange()">
+                            <select id="spColors" class="method-select" onchange="compareCalc.onSPColorChange()">
                                 <!-- Populated by JS with available color counts -->
                             </select>
                         </div>
                     </div>
                     <div class="method-card-body" id="spBody">
-                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                        <div class="card-placeholder">Enter a style number and click Look Up</div>
                     </div>
                 </div>
             </div>
@@ -191,7 +195,7 @@
                         <div class="method-card-controls">
                             <div class="ltm-qty-picker">
                                 <label for="capEmbLtmQty">1-7 qty:</label>
-                                <select id="capEmbLtmQty" class="method-select ltm-select" onchange="manualCalc.onCapEmbLTMQtyChange()">
+                                <select id="capEmbLtmQty" class="method-select ltm-select" onchange="compareCalc.onCapEmbLTMQtyChange()">
                                     <option value="1">1 pc</option>
                                     <option value="2">2 pcs</option>
                                     <option value="3" selected>3 pcs</option>
@@ -205,7 +209,7 @@
                         </div>
                     </div>
                     <div class="method-card-body" id="capEmbBody">
-                        <div class="card-placeholder">Enter a cost and click Calculate</div>
+                        <div class="card-placeholder">Enter a style number and click Look Up</div>
                     </div>
                 </div>
             </div>
@@ -220,6 +224,6 @@
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
 
     <!-- Page Logic -->
-    <script src="/calculators/manual-pricing.js"></script>
+    <script src="/calculators/compare-pricing.js"></script>
 </body>
 </html>

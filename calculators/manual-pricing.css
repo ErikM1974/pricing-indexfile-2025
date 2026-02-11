@@ -521,6 +521,27 @@
 }
 
 /* =====================================================
+   LTM QTY PICKER (Embroidery / Cap Embroidery cards)
+   ===================================================== */
+.ltm-qty-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+}
+
+.ltm-qty-picker label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ltm-select {
+    width: auto;
+    min-width: 70px;
+}
+
+/* =====================================================
    RESPONSIVE
    ===================================================== */
 @media (max-width: 768px) {

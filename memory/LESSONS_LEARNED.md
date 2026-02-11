@@ -31,6 +31,38 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Bug: Embroidery Tier Ordering Wrong — API Returns Non-Sequential `tiersR`
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+
+**Problem:** Compare Pricing and Manual Pricing embroidery cards showed tiers in wrong order: 1-7, 24-47, 48-71, 72+, 8-23. The 8-23 tier appeared last.
+
+**Root Cause:** `fetchPricingData()` returns `tiersR` from the API in whatever order the database returns them. Unlike `generateManualPricingData()` which constructs tiers in hardcoded order, the API path has no guaranteed sort.
+
+**Solution:** Sort `tierData` by `MinQuantity` before rendering: `[...tierData].sort((a, b) => (a.MinQuantity || 0) - (b.MinQuantity || 0))`. Applied to `renderEmbroidery()` and `renderCapEmbroidery()` in both `compare-pricing.js` and `manual-pricing.js`.
+
+**Prevention:** Always sort API-returned tier data by `MinQuantity` before display. Never assume API returns data in presentation order.
+
+**Files:** `calculators/compare-pricing.js`, `calculators/manual-pricing.js`
+
+---
+
+## Bug: LTM Fee Not Distributed in Manual/Compare Calculators — Price Mismatch
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+
+**Problem:** Compare Pricing showed J790 embroidery 1-7 tier at $78.00 (base price), while customer-facing calculator showed $94.67. $16.67 discrepancy.
+
+**Root Cause:** Customer-facing embroidery calculator distributes $50 LTM across pieces via `updateLTMCalculator()` (default 3 pcs → $50/3 = $16.67 added per piece). The internal calculators rendered raw base prices without LTM distribution.
+
+**Solution:** Added LTM qty picker dropdown (1-7 pcs, default 3) to embroidery and cap embroidery cards. `renderEmbroidery()` adds `$50/ltmQty` to 1-7 tier prices only. Footer note clarifies: "1-7 prices include $50 LTM fee (N pcs). Tiers 8+ are standard pricing (no LTM)."
+
+**Prevention:** When building new pricing displays, always check how the customer-facing calculator handles LTM/fees. The LTM Sync Rule (MEMORY.md) now covers 4 places: embroidery calculator, cap embroidery calculator, manual pricing, compare pricing.
+
+**Files:** `calculators/compare-pricing.js`, `calculators/compare-pricing.html`, `calculators/manual-pricing.js`, `calculators/manual-pricing.html`, `calculators/manual-pricing.css`
+
+---
+
 ## Bug: Embroidery/Cap Manual Pricing Crash — Double-Calculation of Already-Transformed Data
 **Date:** 2026-02-11
 **Project:** [Pricing Index]

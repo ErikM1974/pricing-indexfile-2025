@@ -11,7 +11,8 @@ class QuoteViewPage {
         this.items = [];
         this.productItems = [];
         this.customerSuppliedItems = [];
-        this.taxRate = 0.101; // 10.1% WA Sales Tax
+        this.taxRate = 0.101; // 10.1% WA Sales Tax (default, may be overridden by TAX fee item)
+        this.includeTax = true;
 
         // Quote type mapping
         this.quoteTypes = {
@@ -107,6 +108,13 @@ class QuoteViewPage {
 
             console.log('[QuoteView] Loaded quote data:', this.quoteData);
             console.log('[QuoteView] Loaded items:', this.items);
+
+            // Read tax rate from saved TAX fee item (fallback to 10.1% for old quotes)
+            const taxFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
+            if (taxFeeItem) {
+                this.taxRate = taxFeeItem.BaseUnitPrice / 100;
+                this.includeTax = true;
+            }
 
             // Debug charge verification (2026-01-14)
             this.debugChargeVerification();
@@ -475,7 +483,8 @@ class QuoteViewPage {
 
         // Separate customer-supplied items (DECG/DECC) from regular products
         this.customerSuppliedItems = this.items.filter(item => item.EmbellishmentType === 'customer-supplied');
-        this.productItems = this.items.filter(item => item.EmbellishmentType !== 'customer-supplied');
+        this.productItems = this.items.filter(item =>
+            item.EmbellishmentType !== 'customer-supplied' && item.EmbellishmentType !== 'fee');
 
         // Group regular product items by StyleNumber + Color
         const productGroups = this.groupItemsByProduct();
@@ -802,6 +811,20 @@ class QuoteViewPage {
             }
         }
 
+        // 4b. 3D Puff Embroidery Upcharge (from saved fee items)
+        const puffFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === '3D-EMB');
+        if (puffFeeItem && puffFeeItem.LineTotal > 0) {
+            html += this.renderFeeRow('3D-EMB', '3D Puff Embroidery Upcharge',
+                puffFeeItem.Quantity, puffFeeItem.FinalUnitPrice, puffFeeItem.LineTotal);
+        }
+
+        // 4c. Laser Leatherette Patch Upcharge (from saved fee items)
+        const patchFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'Laser Patch');
+        if (patchFeeItem && patchFeeItem.LineTotal > 0) {
+            html += this.renderFeeRow('Laser Patch', 'Laser Leatherette Patch Upcharge',
+                patchFeeItem.Quantity, patchFeeItem.FinalUnitPrice, patchFeeItem.LineTotal);
+        }
+
         // 5. Logo Mockup & Print Review - ShopWorks SKU: GRT-50
         const artCharge = parseFloat(this.quoteData?.ArtCharge) || 0;
         if (artCharge > 0) {
@@ -823,6 +846,8 @@ class QuoteViewPage {
         if (rushFee > 0) {
             html += this.renderFeeRow('RUSH', 'Rush Fee', 1, rushFee, rushFee);
         }
+
+        // NOTE: Shipping fee shown in totals section only (not as fee line item)
 
         // NOTE: Sample Fee removed from UI per user request (2026-01-14)
 
@@ -871,7 +896,7 @@ class QuoteViewPage {
                 <td class="size-col"></td>
                 <td class="size-col"></td>
                 <td class="size-col"></td>
-                <td class="size-col">${qty}</td>
+                <td class="size-col"></td>
                 <td class="qty-col">${qty}</td>
                 <td class="price-col">${this.formatCurrency(unitPrice)}</td>
                 <td class="total-col">${this.formatCurrency(total)}</td>
@@ -1440,7 +1465,8 @@ class QuoteViewPage {
      */
     getBaseSellingPrice() {
         // Prefer BaseUnitPrice so LTM is shown separately in LTM-G row
-        const itemsWithBasePrice = this.items.filter(i => i.BaseUnitPrice && i.BaseUnitPrice > 0);
+        const itemsWithBasePrice = this.items.filter(i =>
+            i.BaseUnitPrice && i.BaseUnitPrice > 0 && i.EmbellishmentType !== 'fee');
         if (itemsWithBasePrice.length > 0) {
             return Math.min(...itemsWithBasePrice.map(i => i.BaseUnitPrice));
         }
@@ -1606,12 +1632,20 @@ class QuoteViewPage {
     }
 
     /**
-     * Calculate total with tax
+     * Get shipping fee from SHIP fee line item (if present)
+     */
+    getShippingFee() {
+        const shipItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
+        return (shipItem && shipItem.LineTotal > 0) ? parseFloat(shipItem.LineTotal) : 0;
+    }
+
+    /**
+     * Calculate total with tax (shipping is NOT taxed per WA state law)
      */
     calculateTotalWithTax() {
         const subtotal = parseFloat(this.quoteData.TotalAmount) || 0;
         const taxAmount = subtotal * this.taxRate;
-        return subtotal + taxAmount;
+        return subtotal + taxAmount + this.getShippingFee();
     }
 
     /**
@@ -1623,7 +1657,8 @@ class QuoteViewPage {
         // This ensures the displayed Subtotal matches the visible line items
         const grandTotalBeforeTax = parseFloat(this.quoteData.TotalAmount) || 0;
         const taxAmount = grandTotalBeforeTax * this.taxRate;
-        const totalWithTax = grandTotalBeforeTax + taxAmount;
+        const shippingFee = this.getShippingFee();
+        const totalWithTax = grandTotalBeforeTax + taxAmount + shippingFee;
 
         // Build totals HTML
         const totalsCard = document.querySelector('.totals-card');
@@ -1640,13 +1675,25 @@ class QuoteViewPage {
 
         // LTM no longer shown here - it's now a line item (LTM-G, LTM-C) in the product table
 
-        // Add tax row
+        // Add tax row with dynamic rate label
+        const ratePercent = (this.taxRate * 100).toFixed(1);
+        const rateLabel = ratePercent === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${ratePercent}%)`;
         totalsHtml += `
             <div class="total-row tax-row">
-                <span class="label">WA Sales Tax (10.1%):</span>
+                <span class="label">${rateLabel}:</span>
                 <span class="value">${this.formatCurrency(taxAmount)}</span>
             </div>
         `;
+
+        // Shipping row (only if quote has shipping fee — NOT taxed per WA state law)
+        if (shippingFee > 0) {
+            totalsHtml += `
+                <div class="total-row">
+                    <span class="label">Shipping:</span>
+                    <span class="value">${this.formatCurrency(shippingFee)}</span>
+                </div>
+            `;
+        }
 
         // Grand total with tax
         totalsHtml += `
@@ -2160,13 +2207,16 @@ class QuoteViewPage {
         pdf.setFont('helvetica', 'bold');
         pdf.text('Item / Description', colX.styleDesc + 2, yPos);
         pdf.text('Color', colX.color + 2, yPos);
-        pdf.text('S', colX.s + 2, yPos);
-        pdf.text('M', colX.m + 2, yPos);
-        pdf.text('L', colX.lg + 2, yPos);
-        pdf.text('XL', colX.xl + 1, yPos);
-        pdf.text('2X', colX.xxl + 1, yPos);
-        pdf.text('3X+', colX.xxxl, yPos);
-        pdf.text('Qty', colX.qty + 1, yPos);
+        // Size columns centered (each size col is 7mm wide, qty col is 12mm)
+        const sizeW = 7;
+        const qtyW = colX.price - colX.qty;
+        pdf.text('S', colX.s + sizeW / 2, yPos, { align: 'center' });
+        pdf.text('M', colX.m + sizeW / 2, yPos, { align: 'center' });
+        pdf.text('L', colX.lg + sizeW / 2, yPos, { align: 'center' });
+        pdf.text('XL', colX.xl + sizeW / 2, yPos, { align: 'center' });
+        pdf.text('2X', colX.xxl + sizeW / 2, yPos, { align: 'center' });
+        pdf.text('3X+', colX.xxxl + (colX.qty - colX.xxxl) / 2, yPos, { align: 'center' });
+        pdf.text('Qty', colX.qty + qtyW / 2, yPos, { align: 'center' });
         pdf.text('Unit $', colX.price - 1, yPos);
         pdf.text('Total', colX.total, yPos);
 
@@ -2220,16 +2270,16 @@ class QuoteViewPage {
                 // Color column (increased from 10 to 16 chars for combos like "White/Charcoal")
                 pdf.text(row.color.substring(0, 16), colX.color + 2, yPos);
 
-                // Size columns
-                pdf.text(String(sCol), colX.s + 3, yPos);
-                pdf.text(String(mCol), colX.m + 3, yPos);
-                pdf.text(String(lgCol), colX.lg + 3, yPos);
-                pdf.text(String(xlCol), colX.xl + 3, yPos);
-                pdf.text(String(xxlCol), colX.xxl + 3, yPos);
-                pdf.text(String(xxxlCol), colX.xxxl + 3, yPos);
+                // Size columns (centered to match headers)
+                pdf.text(String(sCol), colX.s + sizeW / 2, yPos, { align: 'center' });
+                pdf.text(String(mCol), colX.m + sizeW / 2, yPos, { align: 'center' });
+                pdf.text(String(lgCol), colX.lg + sizeW / 2, yPos, { align: 'center' });
+                pdf.text(String(xlCol), colX.xl + sizeW / 2, yPos, { align: 'center' });
+                pdf.text(String(xxlCol), colX.xxl + sizeW / 2, yPos, { align: 'center' });
+                pdf.text(String(xxxlCol), colX.xxxl + (colX.qty - colX.xxxl) / 2, yPos, { align: 'center' });
                 // Qty, Price, Total - properly spaced
                 pdf.setFont('helvetica', 'bold');
-                pdf.text(String(row.qty), colX.qty + 4, yPos);
+                pdf.text(String(row.qty), colX.qty + qtyW / 2, yPos, { align: 'center' });
                 pdf.setFont('helvetica', 'normal');
                 pdf.text(this.formatCurrency(row.unitPrice), colX.price, yPos);
                 pdf.setTextColor(76, 179, 84);
@@ -2256,7 +2306,8 @@ class QuoteViewPage {
         // This matches the visible line items in the PDF
         const grandTotal = parseFloat(this.quoteData.TotalAmount) || 0;
         const taxAmount = grandTotal * this.taxRate;
-        const totalWithTax = grandTotal + taxAmount;
+        const pdfShippingFee = this.getShippingFee();
+        const totalWithTax = grandTotal + taxAmount + pdfShippingFee;
 
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
@@ -2265,9 +2316,19 @@ class QuoteViewPage {
         pdf.text(this.formatCurrency(grandTotal), margin + 155, yPos);
         yPos += 6;
 
-        pdf.text('WA Sales Tax (10.1%):', margin + 100, yPos);
+        const pdfRatePercent = (this.taxRate * 100).toFixed(1);
+        const pdfRateLabel = pdfRatePercent === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pdfRatePercent}%):`;
+        pdf.text(pdfRateLabel, margin + 100, yPos);
         pdf.text(this.formatCurrency(taxAmount), margin + 155, yPos);
-        yPos += 8;
+        yPos += 6;
+
+        // Shipping line (only if present — NOT taxed per WA state law)
+        if (pdfShippingFee > 0) {
+            pdf.text('Shipping:', margin + 120, yPos);
+            pdf.text(this.formatCurrency(pdfShippingFee), margin + 155, yPos);
+            yPos += 6;
+        }
+        yPos += 2;
 
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
@@ -2348,7 +2409,8 @@ class QuoteViewPage {
             pdf.text(description, colX.color, yPos);
 
             pdf.setFont('helvetica', 'bold');
-            pdf.text(String(qty), colX.qty + 4, yPos);
+            const csQtyW = colX.price - colX.qty;
+            pdf.text(String(qty), colX.qty + csQtyW / 2, yPos, { align: 'center' });
             pdf.setFont('helvetica', 'normal');
             pdf.text(this.formatCurrency(unitPrice), colX.price, yPos);
             pdf.setTextColor(76, 179, 84);
@@ -2387,12 +2449,16 @@ class QuoteViewPage {
         const ltmCapPdf = parseFloat(this.quoteData?.LTM_Cap) || 0;
         const discountPdf = parseFloat(this.quoteData?.Discount) || 0;
 
-        // CHANGED 2026-01-14: Added stitch charges back to hasFees, split by garment/cap
+        // Check for 3D Puff / Laser Patch fee items (shipping shown in totals only)
+        const hasPuffFee = this.items.some(i => i.EmbellishmentType === 'fee' && i.StyleNumber === '3D-EMB' && i.LineTotal > 0);
+        const hasPatchFee = this.items.some(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'Laser Patch' && i.LineTotal > 0);
+
         const hasFees = garmentStitchCharge > 0 || capStitchCharge > 0 ||
                         alGarmentCharge > 0 || alCapCharge > 0 ||
                         garmentDigitizing > 0 || capDigitizing > 0 ||
                         artChargePdf > 0 || rushFeePdf > 0 ||
-                        ltmGarmentPdf > 0 || ltmCapPdf > 0 || discountPdf > 0;
+                        ltmGarmentPdf > 0 || ltmCapPdf > 0 || discountPdf > 0 ||
+                        hasPuffFee || hasPatchFee;
         if (!hasFees) return yPos;
 
         // Add separator line before fees
@@ -2440,6 +2506,20 @@ class QuoteViewPage {
             }
         }
 
+        // 4b. 3D Puff Embroidery Upcharge (from saved fee items)
+        const puffFeeItemPdf = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === '3D-EMB');
+        if (puffFeeItemPdf && puffFeeItemPdf.LineTotal > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, '3D-EMB', '3D Puff Embroidery Upcharge',
+                puffFeeItemPdf.Quantity, puffFeeItemPdf.FinalUnitPrice, puffFeeItemPdf.LineTotal);
+        }
+
+        // 4c. Laser Leatherette Patch Upcharge (from saved fee items)
+        const patchFeeItemPdf = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'Laser Patch');
+        if (patchFeeItemPdf && patchFeeItemPdf.LineTotal > 0) {
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'Laser Patch', 'Laser Leatherette Patch Upcharge',
+                patchFeeItemPdf.Quantity, patchFeeItemPdf.FinalUnitPrice, patchFeeItemPdf.LineTotal);
+        }
+
         // 5. Logo Mockup & Print Review (ShopWorks SKU: GRT-50)
         const artCharge = parseFloat(this.quoteData?.ArtCharge) || 0;
         if (artCharge > 0) {
@@ -2461,6 +2541,8 @@ class QuoteViewPage {
         if (rushFee > 0) {
             yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'RUSH', 'Rush Fee', 1, rushFee, rushFee);
         }
+
+        // NOTE: Shipping fee shown in totals section only (not as fee line item)
 
         // NOTE: Sample Fee removed from UI per user request (2026-01-14)
 
@@ -2513,12 +2595,10 @@ class QuoteViewPage {
         const truncDesc = description.substring(0, 40);
         pdf.text(truncDesc, colX.color + 2, yPos);
 
-        // Quantity in XXXL column (Size06 catch-all)
-        pdf.text(String(qty), colX.xxxl + 3, yPos);
-
-        // Qty column
+        // Qty column only (no duplicate in XXXL)
         pdf.setFont('helvetica', 'bold');
-        pdf.text(String(qty), colX.qty + 4, yPos);
+        const feeQtyW = colX.price - colX.qty;
+        pdf.text(String(qty), colX.qty + feeQtyW / 2, yPos, { align: 'center' });
 
         // Unit price and total
         pdf.setFont('helvetica', 'normal');
@@ -2749,14 +2829,22 @@ class QuoteViewPage {
         }
         console.groupEnd();
 
-        // 8. Tax calculation
-        console.group('8️⃣ Tax Calculation');
-        const taxRate = 0.101;
+        // 8. Shipping
+        console.group('8️⃣ Shipping');
+        const shippingFee = this.getShippingFee();
+        console.log('Shipping Fee (SHIP item):', shippingFee.toFixed(2));
+        console.log('✅ Shipping is NOT taxed (WA state law — separately stated shipping exempt)');
+        console.groupEnd();
+
+        // 9. Tax calculation
+        console.group('9️⃣ Tax & Grand Total');
+        const taxRate = this.taxRate || 0.101;
         const tax = totalAmount * taxRate;
-        const grandTotalWithTax = totalAmount + tax;
+        const grandTotalWithTax = totalAmount + tax + shippingFee;
         console.log('Tax Rate:', (taxRate * 100).toFixed(1) + '%');
         console.log('Tax Amount:', tax.toFixed(2));
-        console.log('Grand Total (with tax):', grandTotalWithTax.toFixed(2));
+        console.log('Shipping (untaxed):', shippingFee.toFixed(2));
+        console.log('Grand Total (subtotal + tax + shipping):', grandTotalWithTax.toFixed(2));
         console.groupEnd();
 
         console.groupEnd(); // End main group

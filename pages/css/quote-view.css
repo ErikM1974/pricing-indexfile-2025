@@ -1034,15 +1034,19 @@ body {
 .product-table th.size-col {
     min-width: 45px;
     width: 45px;
+    letter-spacing: 0;
 }
 
 .product-table th.qty-col {
     min-width: 50px;
+    width: 50px;
+    letter-spacing: 0;
 }
 
 .product-table th.price-col,
 .product-table th.total-col {
     min-width: 80px;
+    width: 80px;
 }
 
 .product-table td {
@@ -1077,6 +1081,9 @@ body {
 .product-table td.size-col {
     font-weight: 600;
     color: var(--text-primary);
+    text-align: center;
+    min-width: 45px;
+    width: 45px;
 }
 
 .product-table td.size-col:not(:empty) {
@@ -1084,8 +1091,10 @@ body {
 }
 
 .product-table td.qty-col {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--primary-color);
+    text-align: center;
+    min-width: 50px;
 }
 
 .product-table td.price-col,
@@ -1586,10 +1595,16 @@ body {
 
     .product-table {
         min-width: 0 !important;
+        table-layout: fixed;
     }
 
     .product-table.compact {
         min-width: 0 !important;
+        table-layout: fixed;
+    }
+
+    .product-table th {
+        border-right: none;
     }
 
     .product-table th,

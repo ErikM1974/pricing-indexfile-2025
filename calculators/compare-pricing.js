@@ -1,17 +1,17 @@
 /**
- * Manual Pricing Calculator — Unified Page
- * Orchestrates all 5 pricing services to show decorated sell prices
- * for a user-supplied blank garment/cap cost.
+ * Compare Pricing Calculator — By SanMar Style Number
+ * Looks up a SanMar product and shows decorated sell prices
+ * across all methods (DTG, DTF, Embroidery, Cap Embroidery, Screen Print).
  *
- * Services used (no modifications needed):
- *   DTGPricingService, DTFPricingService, EmbroideryPricingService,
- *   CapEmbroideryPricingService, ScreenPrintPricingService
+ * Copy-modified from manual-pricing.js — same render methods,
+ * different fetch layer (fetchPricingData instead of generateManualPricingData).
  */
 
-class ManualPricingCalculator {
+class ComparePricingCalculator {
     constructor() {
         this.currentItemType = 'garment';
         this.currentCost = null;
+        this.currentStyle = null;
 
         // Cached API results (re-render without re-fetching when dropdown changes)
         this.cachedData = {
@@ -32,7 +32,7 @@ class ManualPricingCalculator {
         };
 
         this.checkUrlParams();
-        console.log('[ManualPricing] Calculator initialized');
+        console.log('[ComparePricing] Calculator initialized');
     }
 
     // =========================================================
@@ -41,60 +41,143 @@ class ManualPricingCalculator {
 
     checkUrlParams() {
         const params = new URLSearchParams(window.location.search);
-        const cost = parseFloat(params.get('cost') || params.get('manualCost'));
-        const type = params.get('type');
+        const style = params.get('style');
 
-        if (type === 'cap') {
-            this.setItemType('cap');
-        }
-
-        if (!isNaN(cost) && cost > 0 && cost < 1000) {
-            document.getElementById('blankCost').value = cost.toFixed(2);
-            // Delay to let services initialize
-            setTimeout(() => this.calculate(), 100);
+        if (style && style.trim()) {
+            document.getElementById('styleInput').value = style.trim().toUpperCase();
+            setTimeout(() => this.lookUp(), 100);
         }
     }
 
     setItemType(type) {
         this.currentItemType = type;
 
-        // Update toggle buttons
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.type === type);
-        });
-
         // Show/hide card groups
         document.getElementById('garmentCards').style.display = type === 'garment' ? 'block' : 'none';
         document.getElementById('capCards').style.display = type === 'cap' ? 'block' : 'none';
-
-        // Recalculate if we have a cost
-        if (this.currentCost) {
-            this.calculate();
-        }
     }
 
     // =========================================================
-    // MAIN CALCULATE
+    // PRODUCT INFO FETCH
     // =========================================================
 
-    async calculate() {
-        const input = document.getElementById('blankCost');
-        const cost = parseFloat(input.value);
+    /**
+     * Fetches product info from DTG product-bundle endpoint.
+     * Returns product name, brand, category, sizes with SanMar prices.
+     * Also extracts base cost and auto-detects garment/cap.
+     */
+    async fetchProductInfo(styleNumber) {
+        const apiBase = this.services.dtg.apiBase;
+        const url = `${apiBase}/dtg/product-bundle?styleNumber=${encodeURIComponent(styleNumber)}`;
+
+        console.log('[ComparePricing] Fetching product info:', url);
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error(`Style "${styleNumber}" not found in SanMar catalog`);
+            }
+            throw new Error(`Product lookup failed (${response.status})`);
+        }
+
+        const data = await response.json();
+
+        // Extract product info
+        const product = data.product || {};
+        const pricing = data.pricing || data;
+        const sizes = pricing.sizes || data.sizes || [];
+
+        // Get base cost (minimum size price)
+        const prices = sizes.map(s => parseFloat(s.price || s.maxCasePrice)).filter(p => p > 0);
+        if (prices.length === 0) {
+            throw new Error(`No pricing data found for style "${styleNumber}"`);
+        }
+        const baseCost = Math.min(...prices);
+
+        // Auto-detect garment vs cap
+        const category = (product.CATEGORY_NAME || product.categoryName || '').toLowerCase();
+        const title = (product.PRODUCT_TITLE || product.productTitle || product.name || '').toLowerCase();
+        const isCap = category.includes('cap') || category.includes('headwear') ||
+                       category.includes('hat') || category.includes('beanie') ||
+                       category.includes('visor') ||
+                       title.includes(' cap') || title.includes(' hat') ||
+                       title.includes('beanie') || title.includes('visor');
+
+        return {
+            name: product.PRODUCT_TITLE || product.productTitle || product.name || styleNumber,
+            brand: product.BRAND_NAME || product.brandName || product.brand || '',
+            category: product.CATEGORY_NAME || product.categoryName || '',
+            baseCost: baseCost,
+            isCap: isCap,
+            sizeCount: sizes.length
+        };
+    }
+
+    renderProductInfo(info, styleNumber) {
+        const banner = document.getElementById('productInfoBanner');
+        document.getElementById('productName').textContent = `${styleNumber} — ${info.name}`;
+
+        const badge = document.getElementById('itemTypeBadge');
+        badge.textContent = info.isCap ? 'Cap' : 'Garment';
+        badge.className = 'item-type-badge ' + (info.isCap ? 'cap' : 'garment');
+
+        document.getElementById('productBrand').innerHTML =
+            `<i class="fas fa-tag"></i> ${escapeHtml(info.brand)}`;
+        document.getElementById('productCategory').innerHTML =
+            `<i class="fas fa-folder"></i> ${escapeHtml(info.category)}`;
+        document.getElementById('productBasePrice').innerHTML =
+            `<i class="fas fa-dollar-sign"></i> Base cost: $${info.baseCost.toFixed(2)}`;
+
+        banner.style.display = 'block';
+    }
+
+    hideProductInfo() {
+        document.getElementById('productInfoBanner').style.display = 'none';
+    }
+
+    // =========================================================
+    // MAIN LOOK UP
+    // =========================================================
+
+    async lookUp() {
+        const input = document.getElementById('styleInput');
+        const style = (input.value || '').trim().toUpperCase();
 
         // Validate
-        if (isNaN(cost) || cost <= 0) {
-            this.showInputError('Please enter a valid cost greater than $0');
+        if (!style) {
+            this.showInputError('Please enter a SanMar style number');
             return;
         }
-        if (cost > 999) {
-            this.showInputError('Cost seems unusually high. Please verify.');
+        if (style.length < 2) {
+            this.showInputError('Style number is too short');
             return;
         }
 
         this.hideInputError();
-        this.currentCost = cost;
+        this.hideProductInfo();
+        this.currentStyle = style;
 
-        // Show cards container
+        // Reset cached data and dropdowns for new style
+        this.cachedData = { dtg: null, dtf: null, emb: null, capEmb: null, sp: null };
+        document.getElementById('dtgLocation').innerHTML = '';
+        document.getElementById('spColors').innerHTML = '';
+
+        // Step 1: Fetch product info to get base cost and auto-detect type
+        let productInfo;
+        try {
+            productInfo = await this.fetchProductInfo(style);
+        } catch (error) {
+            console.error('[ComparePricing] Product info fetch failed:', error);
+            this.showInputError(error.message || `Unable to find style "${style}"`);
+            return;
+        }
+
+        // Step 2: Render product info and set type
+        this.renderProductInfo(productInfo, style);
+        this.currentCost = productInfo.baseCost;
+        this.setItemType(productInfo.isCap ? 'cap' : 'garment');
+
+        // Step 3: Show cards and fetch pricing
         document.getElementById('methodCards').style.display = 'block';
 
         if (this.currentItemType === 'garment') {
@@ -103,12 +186,11 @@ class ManualPricingCalculator {
             this.showLoading('embBody');
             this.showLoading('spBody');
 
-            // Fire all 4 garment methods in parallel
             const results = await Promise.allSettled([
-                this.fetchDTG(cost),
-                this.fetchDTF(cost),
-                this.fetchEmbroidery(cost),
-                this.fetchScreenPrint(cost)
+                this.fetchDTG(style),
+                this.fetchDTF(style),
+                this.fetchEmbroidery(style),
+                this.fetchScreenPrint(style)
             ]);
 
             this.handleResult(results[0], 'dtgBody', 'DTG');
@@ -120,7 +202,7 @@ class ManualPricingCalculator {
             this.showLoading('capEmbBody');
 
             const results = await Promise.allSettled([
-                this.fetchCapEmbroidery(cost)
+                this.fetchCapEmbroidery(style)
             ]);
 
             this.handleResult(results[0], 'capEmbBody', 'Cap Embroidery');
@@ -129,24 +211,25 @@ class ManualPricingCalculator {
 
     handleResult(result, bodyId, methodName) {
         if (result.status === 'rejected') {
-            console.error(`[ManualPricing] ${methodName} failed:`, result.reason);
+            console.error(`[ComparePricing] ${methodName} failed:`, result.reason);
             this.showCardError(bodyId, `Unable to load ${methodName} pricing. Please refresh.`);
         }
-        // fulfilled results are already rendered by their fetch functions
     }
 
     // =========================================================
     // DTG
     // =========================================================
 
-    async fetchDTG(cost) {
-        const data = await this.services.dtg.generateManualPricingData(cost);
-        this.cachedData.dtg = data;
+    async fetchDTG(style) {
+        const data = await this.services.dtg.fetchPricingData(style);
+        // Normalize: fetchPricingData returns flat { tiers, costs, sizes, ... }
+        // but renderDTG() expects data.pricing.* wrapper
+        this.cachedData.dtg = { pricing: data };
 
         // Populate location dropdown from data
         const select = document.getElementById('dtgLocation');
         if (select.options.length === 0) {
-            const locations = data.pricing.locations || this.services.dtg.locations || [];
+            const locations = data.locations || this.services.dtg.locations || [];
             locations.forEach(loc => {
                 const opt = document.createElement('option');
                 opt.value = loc.code;
@@ -165,7 +248,6 @@ class ManualPricingCalculator {
         const locationCode = document.getElementById('dtgLocation').value || 'LC';
         const { tiers, costs, sizes, upcharges } = data.pricing;
 
-        // Build table rows for each tier
         const sizeLabels = sizes.map(s => s.size);
         const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
 
@@ -183,7 +265,6 @@ class ManualPricingCalculator {
         const locationCodes = locationCode.split('_');
 
         allTiers.forEach(tier => {
-            // Find print cost for this location and tier (use the real tier label for cost lookup)
             const lookupTier = tier.isLTM ? '24-47' : tier.TierLabel;
             let totalPrintCost = 0;
             locationCodes.forEach(code => {
@@ -225,9 +306,8 @@ class ManualPricingCalculator {
     // DTF
     // =========================================================
 
-    async fetchDTF(cost) {
-        const data = await this.services.dtf.generateManualPricingData(cost);
-        // Set apiData on the service so helper methods work
+    async fetchDTF(style) {
+        const data = await this.services.dtf.fetchPricingData(style);
         this.services.dtf.apiData = data;
         this.cachedData.dtf = data;
         this.renderDTF();
@@ -246,19 +326,18 @@ class ManualPricingCalculator {
 
         const rows = [];
         transferSize.pricingTiers.forEach(transferTier => {
-            // Find margin tier for representative quantity
             const repQty = transferTier.minQty;
             const marginTier = data.pricingTiers.find(t =>
                 repQty >= t.minQuantity && repQty <= t.maxQuantity
             );
             const marginDenom = marginTier ? marginTier.marginDenominator : 0.57;
 
-            // Find freight for this quantity range
             const freightTier = data.freightTiers.find(t =>
                 repQty >= t.minQty && repQty <= t.maxQty
             );
             const freight = freightTier ? freightTier.costPerTransfer : 0;
 
+            // Use base cost from product info for garment markup
             const garmentSell = this.currentCost / marginDenom;
             const rawTotal = garmentSell + transferTier.unitPrice + data.laborCostPerLocation + freight;
             const finalPrice = Math.ceil(rawTotal * 2) / 2;
@@ -288,10 +367,10 @@ class ManualPricingCalculator {
     // EMBROIDERY
     // =========================================================
 
-    async fetchEmbroidery(cost) {
-        // generateManualPricingData() already calls calculatePricing() + transformToExistingFormat()
-        // Returns fully transformed data — do NOT call calculatePricing() again
-        const data = await this.services.emb.generateManualPricingData(cost);
+    async fetchEmbroidery(style) {
+        // fetchPricingData() calls calculatePricing() + transformToExistingFormat()
+        // Returns same shape as generateManualPricingData()
+        const data = await this.services.emb.fetchPricingData(style);
         this.cachedData.emb = data;
         this.renderEmbroidery();
     }
@@ -347,10 +426,10 @@ class ManualPricingCalculator {
     // CAP EMBROIDERY
     // =========================================================
 
-    async fetchCapEmbroidery(cost) {
-        // generateManualPricingData() already calls calculatePricing() + transformToExistingFormat()
-        // Returns fully transformed data — do NOT call calculatePricing() again
-        const data = await this.services.capEmb.generateManualPricingData(cost);
+    async fetchCapEmbroidery(style) {
+        // fetchPricingData() calls calculatePricing() + transformToExistingFormat()
+        // Returns same shape as generateManualPricingData()
+        const data = await this.services.capEmb.fetchPricingData(style);
         this.cachedData.capEmb = data;
         this.renderCapEmbroidery();
     }
@@ -406,8 +485,8 @@ class ManualPricingCalculator {
     // SCREEN PRINT
     // =========================================================
 
-    async fetchScreenPrint(cost) {
-        const data = await this.services.sp.generateManualPricingData(cost);
+    async fetchScreenPrint(style) {
+        const data = await this.services.sp.fetchPricingData(style);
         this.cachedData.sp = data;
 
         // Populate color dropdown
@@ -439,7 +518,6 @@ class ManualPricingCalculator {
             const colorPrices = primaryPrices[tierLabel][colorCount];
             if (!colorPrices) return;
 
-            // Check if this tier has LTM
             const tierData = data.tierData && data.tierData[tierLabel];
             const isLTM = tierData && tierData.LTM_Fee > 0;
 
@@ -577,7 +655,7 @@ function escapeHtml(str) {
 }
 
 // Initialize on load
-let manualCalc;
+let compareCalc;
 document.addEventListener('DOMContentLoaded', () => {
-    manualCalc = new ManualPricingCalculator();
+    compareCalc = new ComparePricingCalculator();
 });
