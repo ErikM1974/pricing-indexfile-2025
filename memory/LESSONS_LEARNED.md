@@ -31,6 +31,18 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Fix: resetQuote() crash + stale patch setup checkbox (2026-02-11)
+**Date:** 2026-02-11
+**Project:** [Pricing Index]
+**Symptom:** Clicking "New Quote" in embroidery builder crashed with `recalculateAllPricing is not defined`. Additionally, importing an order without leather patches after one that had them left the `cap-patch-setup` checkbox checked, causing incorrect GRT-50 fee.
+**Root cause (two bugs):**
+1. `resetQuote()` called `recalculateAllPricing()` — a function that doesn't exist. The correct name is `recalculatePricing()`. The crash at line 7528 prevented `updateAdditionalCharges()`, `markAsSaved()`, and focus from running.
+2. `resetQuote()` never unchecked the `cap-patch-setup` checkbox. The import code re-checks it when `patchSetup: true`, but reset needs to clear it first so consecutive imports start clean.
+**Solution:** Fixed function name to `recalculatePricing()`. Added checkbox reset (`.checked = false` + remove `.checked` class from wrapper) alongside the other logo config resets.
+**Prevention:** After renaming/removing a function, search for all call sites. When adding a new checkbox/toggle to a builder, always add its reset to `resetQuote()`.
+
+---
+
 ## Fix: Falsy-zero bug in debug tax rate display (2026-02-11)
 **Date:** 2026-02-11
 **Project:** [Pricing Index]

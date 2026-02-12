@@ -7410,6 +7410,13 @@ Company:Absher Construction Company
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             document.getElementById('primary-digitizing').checked = false;
+            // Reset patch setup checkbox
+            const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+            if (patchSetupCheckbox) {
+                patchSetupCheckbox.checked = false;
+                const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
+                if (wrapper) wrapper.classList.remove('checked');
+            }
             // Re-enable position dropdown in case it was disabled by Full Back
             document.getElementById('primary-position').disabled = false;
             // Hide and reset Full Back stitch count input
@@ -7525,7 +7532,7 @@ Company:Absher Construction Company
             }
 
             // Recalculate pricing (will show zeros)
-            recalculateAllPricing();
+            recalculatePricing();
             updateAdditionalCharges();
 
             // Mark as saved (no unsaved changes)
@@ -9181,6 +9188,14 @@ Company:Absher Construction Company
                     if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
                     if (data.shipping.state) document.getElementById('ship-state').value = data.shipping.state;
                     if (data.shipping.zip) document.getElementById('ship-zip').value = data.shipping.zip;
+
+                    // Customer Pickup = local pickup at Milton, WA — auto-set for tax lookup
+                    if (data.shipping.method && data.shipping.method.toLowerCase().includes('pickup') && !data.shipping.zip) {
+                        document.getElementById('ship-state').value = 'WA';
+                        document.getElementById('ship-zip').value = '98354';
+                        document.getElementById('ship-city').value = 'Milton';
+                    }
+
                     // Use DOR API to get precise tax rate from address
                     const lookupOk = await lookupTaxRate();
                     // If lookup failed and we have a back-calculated rate, use it as fallback

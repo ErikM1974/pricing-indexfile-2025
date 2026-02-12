@@ -168,18 +168,22 @@ class QuoteViewPage {
             document.getElementById('po-number-row').style.display = 'block';
         }
 
-        // Ship To card (if address available)
+        // Ship To card (show if address OR ship method present)
         const shipToAddress = this.quoteData.ShipToAddress || '';
         const shipToCity = this.quoteData.ShipToCity || '';
         const shipToState = this.quoteData.ShipToState || '';
         const shipToZip = this.quoteData.ShipToZip || '';
         const shipMethod = this.quoteData.ShipMethod || '';
-        if (shipToAddress || shipToCity) {
+        if (shipToAddress || shipToCity || shipMethod) {
             const shipCard = document.getElementById('ship-to-card');
             if (shipCard) {
-                document.getElementById('ship-to-address').textContent = shipToAddress;
+                if (shipToAddress) {
+                    document.getElementById('ship-to-address').textContent = shipToAddress;
+                }
                 const cityLine = [shipToCity, shipToState].filter(Boolean).join(', ') + (shipToZip ? ' ' + shipToZip : '');
-                document.getElementById('ship-to-city-state').textContent = cityLine;
+                if (cityLine.trim()) {
+                    document.getElementById('ship-to-city-state').textContent = cityLine;
+                }
                 if (shipMethod) {
                     document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
                 }
@@ -206,6 +210,18 @@ class QuoteViewPage {
         if (dropDeadDate) {
             document.getElementById('drop-dead-date').textContent = this.formatDate(dropDeadDate);
             document.getElementById('drop-dead-date-row').style.display = 'flex';
+        }
+
+        // Customer Number (if available)
+        if (this.quoteData.CustomerNumber) {
+            document.getElementById('customer-number-display').textContent = this.quoteData.CustomerNumber;
+            document.getElementById('customer-number-row').style.display = 'flex';
+        }
+
+        // Payment Terms (if available)
+        if (this.quoteData.PaymentTerms) {
+            document.getElementById('payment-terms').textContent = this.quoteData.PaymentTerms;
+            document.getElementById('payment-terms-row').style.display = 'flex';
         }
 
         // Revision info (if quote has been revised)
@@ -2027,10 +2043,10 @@ class QuoteViewPage {
             yPos += 5;
         }
 
-        // Ship To block (below Prepared For, only if address present)
+        // Ship To block (below Prepared For, if address or ship method present)
         const pdfShipAddr = this.quoteData.ShipToAddress || '';
         const pdfShipCity = this.quoteData.ShipToCity || '';
-        if (pdfShipAddr || pdfShipCity) {
+        if (pdfShipAddr || pdfShipCity || this.quoteData.ShipMethod) {
             yPos += 3;
             pdf.setFont('helvetica', 'bold');
             pdf.text('SHIP TO', margin, yPos);
@@ -2072,6 +2088,18 @@ class QuoteViewPage {
         const salesRep = this.quoteData.SalesRepName || this.quoteData.SalesRep || '';
         if (salesRep) {
             pdf.text(`Sales Rep: ${salesRep}`, rightCol, detailY);
+            detailY += 6;
+        }
+
+        // Customer Number if available
+        if (this.quoteData.CustomerNumber) {
+            pdf.text(`Customer #: ${this.quoteData.CustomerNumber}`, rightCol, detailY);
+            detailY += 6;
+        }
+
+        // Payment Terms if available
+        if (this.quoteData.PaymentTerms) {
+            pdf.text(`Terms: ${this.quoteData.PaymentTerms}`, rightCol, detailY);
             detailY += 6;
         }
 
