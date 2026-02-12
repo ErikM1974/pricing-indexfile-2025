@@ -27,6 +27,19 @@ class EmbroideryQuoteService {
     }
 
     /**
+     * Escape HTML special characters to prevent XSS in email templates
+     */
+    _escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    /**
      * Parse line item description into size breakdown object
      * Example: "S(6) M(6) L(6)" → {"S": 6, "M": 6, "L": 6}
      */
@@ -841,7 +854,7 @@ class EmbroideryQuoteService {
                 rushDays: '7',
                 rushPercent: '25',
                 taxRate: (emailTaxRate * 100).toFixed(1),
-                taxLabel: emailTaxRate > 0 ? `Sales Tax (${(emailTaxRate * 100).toFixed(1)}%)` : 'Out of State Sales',
+                taxLabel: emailTaxRate > 0 ? ((emailTaxRate * 100).toFixed(1) === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${(emailTaxRate * 100).toFixed(1)}%)`) : 'Out of State Sales',
                 taxLocation: 'Milton, WA',
                 companyYear: '1977',
                 companyName: 'Northwest Custom Apparel',
@@ -916,10 +929,10 @@ class EmbroideryQuoteService {
                 html += `
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd;">
-                            <strong>${product.style} - ${product.color}</strong><br>
-                            ${product.title}<br>
+                            <strong>${this._escapeHtml(product.style)} - ${this._escapeHtml(product.color)}</strong><br>
+                            ${this._escapeHtml(product.title)}<br>
                             <span style="color: #666; font-size: 12px;">
-                                ${item.description}<br>
+                                ${this._escapeHtml(item.description)}<br>
                                 Includes embroidery
                             </span>
                         </td>
@@ -978,15 +991,15 @@ class EmbroideryQuoteService {
             <div style="display: flex; gap: 20px; padding: 20px; background: #f8f9fa;">
                 <div style="flex: 1;">
                     <h3 style="color: #4cb354; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">Customer Information</h3>
-                    <p style="margin: 5px 0; font-weight: bold;">${customerData.name || 'Not provided'}</p>
-                    ${customerData.company ? `<p style="margin: 5px 0;">${customerData.company}</p>` : ''}
-                    <p style="margin: 5px 0;">${customerData.email || 'Not provided'}</p>
-                    ${customerData.phone ? `<p style="margin: 5px 0;">${customerData.phone}</p>` : ''}
+                    <p style="margin: 5px 0; font-weight: bold;">${this._escapeHtml(customerData.name) || 'Not provided'}</p>
+                    ${customerData.company ? `<p style="margin: 5px 0;">${this._escapeHtml(customerData.company)}</p>` : ''}
+                    <p style="margin: 5px 0;">${this._escapeHtml(customerData.email) || 'Not provided'}</p>
+                    ${customerData.phone ? `<p style="margin: 5px 0;">${this._escapeHtml(customerData.phone)}</p>` : ''}
                 </div>
                 <div style="flex: 1;">
                     <h3 style="color: #4cb354; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">Project Details</h3>
                     <p style="margin: 5px 0;"><strong>Type:</strong> Embroidery</p>
-                    ${customerData.project ? `<p style="margin: 5px 0;"><strong>Project:</strong> ${customerData.project}</p>` : ''}
+                    ${customerData.project ? `<p style="margin: 5px 0;"><strong>Project:</strong> ${this._escapeHtml(customerData.project)}</p>` : ''}
                     <p style="margin: 5px 0;"><strong>Total Pieces:</strong> ${pricingResults.totalQuantity}</p>
                     <p style="margin: 5px 0;"><strong>Quote Prepared By:</strong> ${salesRep.name}</p>
                 </div>
@@ -1031,7 +1044,7 @@ class EmbroideryQuoteService {
                         </tr>` : ''}
                         <tr>
                             <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">
-                                ${htmlTaxRate > 0 ? `Sales Tax (${(htmlTaxRate * 100).toFixed(1)}%):` : 'Out of State Sales:'}
+                                ${htmlTaxRate > 0 ? ((htmlTaxRate * 100).toFixed(1) === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${(htmlTaxRate * 100).toFixed(1)}%):`) : 'Out of State Sales:'}
                             </td>
                             <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">
                                 $${salesTax.toFixed(2)}
@@ -1053,7 +1066,7 @@ class EmbroideryQuoteService {
             ${customerData.notes ? `
                 <div style="padding: 20px; background: #fff9c4; margin: 20px; border-radius: 8px;">
                     <h3 style="color: #f9a825; margin: 0 0 10px 0;">Special Notes</h3>
-                    <p style="margin: 0; color: #666;">${customerData.notes}</p>
+                    <p style="margin: 0; color: #666;">${this._escapeHtml(customerData.notes)}</p>
                 </div>
             ` : ''}
             

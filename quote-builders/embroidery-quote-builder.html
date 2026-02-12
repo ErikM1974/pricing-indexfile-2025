@@ -6156,7 +6156,7 @@ Company:Absher Construction Company
                                     const totalCell = document.getElementById(`row-total-${rowId}`);
                                     if (priceCell) {
                                         // Display unit price (LTM built into per-piece price when applicable)
-                                        const displayPrice = standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice;
+                                        const displayPrice = standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0;
                                         const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
 
                                         if (hasOverride) {
@@ -6219,7 +6219,7 @@ Company:Absher Construction Company
                                             const childTotalCell = document.getElementById(`row-total-${childRowId}`);
                                             if (childPriceCell) {
                                                 // Display unit price (LTM built into per-piece price when applicable)
-                                                const displayPrice = li.unitPriceWithLTM || li.unitPrice;
+                                                const displayPrice = li.unitPriceWithLTM || li.unitPrice || 0;
                                                 // Check parent override (child-specific overrides handled in post-processing)
                                                 const childHasOwnOverride = parseFloat(childRow.dataset.sellPrice) > 0;
                                                 const hasParentOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
@@ -7168,7 +7168,8 @@ Company:Absher Construction Company
                             QuoteShareModal.show(result.quoteID);
                         } else {
                             const url = `${window.location.origin}/quote/${result.quoteID}`;
-                            alert(`Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${newRevision}\n\nShareable Link:\n${url}`);
+                            navigator.clipboard.writeText(url).catch(() => {});
+                            showToast(`Quote ${result.quoteID} updated (Rev ${newRevision}). Link copied!`, 'success');
                         }
                     } else {
                         // New quote: Show success modal with shareable link
@@ -7176,7 +7177,8 @@ Company:Absher Construction Company
                             QuoteShareModal.show(result.quoteID);
                         } else {
                             const url = `${window.location.origin}/quote/${result.quoteID}`;
-                            alert(`Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`);
+                            navigator.clipboard.writeText(url).catch(() => {});
+                            showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
                         }
                     }
                 } else {
