@@ -109,11 +109,16 @@ class QuoteViewPage {
             console.log('[QuoteView] Loaded quote data:', this.quoteData);
             console.log('[QuoteView] Loaded items:', this.items);
 
-            // Read tax rate from saved TAX fee item (fallback to 10.1% for old quotes)
-            const taxFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
-            if (taxFeeItem) {
-                this.taxRate = taxFeeItem.BaseUnitPrice / 100;
+            // Read tax rate: prefer frozen TaxRate column, then TAX fee item, then default 10.1%
+            if (this.quoteData.TaxRate != null && this.quoteData.TaxRate !== '') {
+                this.taxRate = parseFloat(this.quoteData.TaxRate) || 0;
                 this.includeTax = this.taxRate > 0;
+            } else {
+                const taxFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
+                if (taxFeeItem) {
+                    this.taxRate = taxFeeItem.BaseUnitPrice / 100;
+                    this.includeTax = this.taxRate > 0;
+                }
             }
 
             // Debug charge verification (2026-01-14)
@@ -256,6 +261,9 @@ class QuoteViewPage {
 
         // Special notes (plain text from embroidery imports, etc.)
         this.renderNotes();
+
+        // Design references (from ShopWorks import)
+        this.renderDesignNumbers();
 
         // Totals with tax
         this.renderTotals();
@@ -443,6 +451,30 @@ class QuoteViewPage {
         if (!section || !content) return;
 
         content.textContent = rawNotes;
+        section.style.display = 'block';
+    }
+
+    /**
+     * Render design reference numbers if saved (from ShopWorks import)
+     */
+    renderDesignNumbers() {
+        const raw = this.quoteData?.DesignNumbers;
+        if (!raw) return;
+
+        let designs;
+        try { designs = JSON.parse(raw); } catch (e) { return; }
+        if (!Array.isArray(designs) || designs.length === 0) return;
+
+        // Render into the special-notes section (append below existing notes)
+        const section = document.getElementById('special-notes-section');
+        const content = document.getElementById('special-notes-content');
+        if (!section || !content) return;
+
+        const designHtml = designs.map(d => this.escapeHtml(d)).join('<br>');
+        const block = document.createElement('div');
+        block.style.marginTop = '12px';
+        block.innerHTML = `<strong>Design References:</strong><br>${designHtml}`;
+        content.appendChild(block);
         section.style.display = 'block';
     }
 
@@ -2508,6 +2540,28 @@ class QuoteViewPage {
                 pdf.text(noteLines, margin + 4, yPos + 9);
                 yPos += boxHeight + 4;
             }
+        }
+
+        // Design References in PDF (from ShopWorks import)
+        const rawDesigns = this.quoteData?.DesignNumbers;
+        if (rawDesigns) {
+            try {
+                const designs = JSON.parse(rawDesigns);
+                if (Array.isArray(designs) && designs.length > 0) {
+                    if (yPos > 240) { pdf.addPage(); yPos = 20; }
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(51, 51, 51);
+                    pdf.text('Design References:', margin, yPos + 4);
+                    pdf.setFont('helvetica', 'normal');
+                    yPos += 8;
+                    for (const design of designs) {
+                        pdf.text(design, margin + 4, yPos);
+                        yPos += 4;
+                    }
+                    yPos += 4;
+                }
+            } catch (e) { /* not valid JSON, skip */ }
         }
 
         // Footer

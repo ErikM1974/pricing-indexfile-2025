@@ -8,9 +8,18 @@
     "validate-docs": "node scripts/validate-memory-docs.js",
     "doc-freshness": "node scripts/doc-freshness.js",
     "quarterly-cleanup": "node scripts/quarterly-cleanup.js",
+    "test": "jest --verbose",
+    "test:unit": "jest tests/unit/ --verbose",
+    "test:integration": "jest tests/integration/ --verbose",
+    "test:parser": "jest tests/unit/parser --verbose",
+    "test:pricing": "jest tests/unit/pricing --verbose",
+    "test:utils": "jest tests/unit/utils --verbose",
+    "test:coverage": "jest --coverage --verbose",
     "test:emb-calibrate": "node tests/validation/validate-2025-embroidery-pricing.js --calibrate",
     "test:emb-pricing": "node tests/validation/validate-2025-embroidery-pricing.js",
     "test:emb-pricing-verbose": "node tests/validation/validate-2025-embroidery-pricing.js --verbose",
+    "test:order": "node tests/run-order.js",
+    "test:batch": "node tests/e2e-batch-runner.js",
     "test:emb-ltm": "node tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis"
   },
   "engines": {
@@ -29,6 +38,7 @@
     "stripe": "^19.3.0"
   },
   "devDependencies": {
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "jest": "^30.2.0"
   }
 }

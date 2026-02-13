@@ -1,0 +1,82 @@
+**************
+Order #: 140580
+Salesperson: Erik
+Email: erik@nwcustomapparel.com
+**************
+Customer #: 10789
+Company: United Wound Care
+**************
+Order Information
+Ordered by: Sarah Johnson
+Email: sjohnson@unitedwound.com
+Date Order Placed: 01/28/2026
+Terms: Net 30
+**************
+Items Purchased
+Item 1 of 5
+
+Part Number: WW3150
+Description: Wink Medical Top, Caribbean Blue
+Item Quantity: 4
+Unit Price: $28.00
+Adult:Quantity
+S:1
+M:1
+L:1
+XL:1
+
+Item 2 of 5
+
+Part Number: WW3160
+Description: Wink Medical Pant, Caribbean Blue
+Item Quantity: 4
+Unit Price: $28.00
+Adult:Quantity
+S:1
+M:1
+L:1
+XL:1
+
+Item 3 of 5
+
+Part Number: WW3150
+Description: Wink Medical Top, Black
+Item Quantity: 4
+Unit Price: $28.00
+Adult:Quantity
+S:1
+M:1
+L:1
+XL:1
+
+Item 4 of 5
+
+Part Number: WW3160
+Description: Wink Medical Pant, Black
+Item Quantity: 4
+Unit Price: $28.00
+Adult:Quantity
+S:1
+M:1
+L:1
+XL:1
+
+Item 5 of 5
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+**************
+Design Information
+Design #:39500 - United Wound Care logo
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: United Wound Care, 8901 NE 112th Ave, Vancouver, WA 98662-1234, US
+**************
+Order Summary
+Subtotal: $548.00
+Sales Tax: $44.39
+Shipping: $0.00
+Total: $592.39

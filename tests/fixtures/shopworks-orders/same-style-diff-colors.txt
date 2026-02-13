@@ -1,0 +1,68 @@
+**************
+Order #: 140531
+Salesperson: Tina
+Email: tina@nwcustomapparel.com
+**************
+Customer #: 10890
+Company: Stella Jones Inc
+**************
+Order Information
+Ordered by: Rachel Torres
+Email: rtorres@stellajones.com
+Date Order Placed: 01/26/2026
+Terms: Net 30
+Phone: 360-555-7890
+**************
+Items Purchased
+Item 1 of 4
+
+Part Number: K500
+Description: Port Authority Silk Touch Polo, Black
+Item Quantity: 5
+Unit Price: $22.00
+Adult:Quantity
+S:1
+M:1
+L:1
+XL:1
+XXL:1
+
+Item 2 of 4
+
+Part Number: K500
+Description: Port Authority Silk Touch Polo, Majestic Purple
+Item Quantity: 5
+Unit Price: $22.00
+Adult:Quantity
+S:1
+M:1
+L:1
+XL:1
+XXL:1
+
+Item 3 of 4
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+
+Item 4 of 4
+
+Part Number: MONOGRAM
+Description: Name Monogram
+Item Quantity: 10
+Unit Price: $12.50
+**************
+Design Information
+Design #:39719.01 - Stella Jones signature logo
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: Stella Jones Inc, 789 Industrial Way, Tacoma, WA 98402-3456, US
+**************
+Order Summary
+Subtotal: $445.00
+Sales Tax: $36.05
+Shipping: $9.99
+Total: $491.04

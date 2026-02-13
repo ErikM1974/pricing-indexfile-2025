@@ -94,8 +94,12 @@ _ul
 .claude/settings.local.json
 memory/CSV_ORDER_VALIDATION.md
 memory/EMBROIDERY_PRICING_RULES.md
-# Test reports (generated output - don't commit)
+# Ad-hoc order test files (may contain PII)
+tests/orders/
+
+# Test reports and coverage (generated output - don't commit)
 tests/reports/
+tests/coverage/
 
 # Large validation data files (generated)
 tests/validation/*.json

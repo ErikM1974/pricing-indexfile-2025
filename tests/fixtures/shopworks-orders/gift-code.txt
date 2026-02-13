@@ -1,0 +1,60 @@
+**************
+Order #: 140618
+Salesperson: Erik
+Email: erik@nwcustomapparel.com
+**************
+Customer #: 10345
+Company: Forma Construction
+**************
+Order Information
+Ordered by: Mike Chen
+Email: mike@forma.com
+Date Order Placed: 01/30/2026
+Terms: Net 30
+Phone: 206-555-4321
+**************
+Items Purchased
+Item 1 of 4
+
+Part Number: K500
+Description: Port Authority Silk Touch Polo, Black
+Item Quantity: 6
+Unit Price: $22.00
+Adult:Quantity
+M:2
+L:2
+XL:2
+
+Item 2 of 4
+
+Part Number: GIFT CODE
+Description: Gift Code Redemption
+Item Quantity: 1
+Unit Price: $-50.00
+
+Item 3 of 4
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+
+Item 4 of 4
+
+Part Number: WEIGHT
+Description: Package Weight
+Item Quantity: 1
+Unit Price: $0.00
+**************
+Design Information
+Design #:39600 - Forma Construction logo
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: Forma Construction, 1234 Main St, Seattle, WA 98101-5678, US
+**************
+Order Summary
+Subtotal: $182.00
+Sales Tax: $17.84
+Shipping: $0.00
+Total: $199.84

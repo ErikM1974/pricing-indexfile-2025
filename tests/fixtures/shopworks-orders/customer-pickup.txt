@@ -1,0 +1,46 @@
+**************
+Order #: 140623
+Salesperson: Erik
+Email: erik@nwcustomapparel.com
+**************
+Customer #: 10345
+Company: Forma Construction
+**************
+Order Information
+Ordered by: Mike Chen
+Email: mike@forma.com
+Date Order Placed: 01/31/2026
+Terms: Prepaid
+**************
+Items Purchased
+Item 1 of 2
+
+Part Number: K500
+Description: Port Authority Silk Touch Polo, Majestic Purple
+Item Quantity: 3
+Unit Price: $22.00
+Adult:Quantity
+L:1
+XL:1
+XXL:1
+
+Item 2 of 2
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+**************
+Design Information
+Design #:39719.01 - Forma signature logo
+Design #:39719.02 - Forma back design
+**************
+Shipping Information
+Ship Method: Customer Pick Up
+Ship Address: Customer Pick Up
+**************
+Order Summary
+Subtotal: $166.00
+Sales Tax: $16.77
+Shipping: $0.00
+Total: $182.77

@@ -1,0 +1,81 @@
+**************
+Your Company Information
+Company:Northwest Custom Apparel
+Phone:
+Fax:
+Order #:140731
+Salesperson:Erik
+Email:erik@nwcustomapparel.com
+**************
+Customer #:20456
+Company:ProVac Environmental Services
+**************
+Order Information
+Ordered by:Mike Johnson
+Email:mike@provac.com
+Purchase Order #:PV-2026-088
+Date Order Placed:02/05/2026
+Req. Ship Date:02/19/2026
+Drop Dead Date:
+Terms:Net 30
+Phone:253-555-9876
+**************
+Items Purchased
+Item 1 of 4
+
+Part Number:PC55
+Description:Port & Company Core Blend Tee, Dark Heather Grey
+Item Quantity:24
+Unit Price:$14.50
+Line Item Price:$348.00
+Adult:Quantity
+S:2
+M:6
+L:8
+XL:6
+XXL:2
+
+Item 2 of 4
+
+Part Number:PC55_3X
+Description:Port & Company Core Blend Tee 3XL, Dark Heather Grey
+Item Quantity:2
+Unit Price:$16.50
+Line Item Price:$33.00
+Adult:Quantity
+XXXL (Other):2
+
+Item 3 of 4
+
+Part Number:DD
+Description:Digitizing
+Item Quantity:1
+Unit Price:$75.00
+Line Item Price:$75.00
+
+Item 4 of 4
+
+Part Number:AL
+Description:Additional Logo Location
+Item Quantity:24
+Unit Price:$4.00
+Line Item Price:$96.00
+**************
+Design Information
+Design #:40102 - ProVac Logo Front
+Design #:40103 - ProVac Logo Back
+**************
+Shipping Information
+Ship Method:UPS Ground
+Ship Address:ProVac Environmental, 1234 Industrial Way, Tacoma, WA 98402-1234, US
+**************
+Order Summary
+Subtotal:$552.00
+Sales Tax:$55.75
+Shipping:$19.95
+Total:$627.70
+Paid To Date:
+Balance:
+**************
+Note
+Left chest front, full back. Customer approved mockup 02/03.

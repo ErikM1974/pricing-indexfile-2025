@@ -906,6 +906,14 @@ TotalAmount: parseFloat((
 
 # Order Processing & ShopWorks
 
+## Gap: ShopWorks Parser Silently Dropped Paid To Date, Balance, and Note Sections
+**Date:** 2026-02-12
+**Project:** [Pricing Index]
+**Problem:** Parser's section dispatcher didn't recognize the `Note` section (silently skipped). `_parseOrderSummary()` didn't match `Paid To Date:` or `Balance:` lines — they fell through to `unmatchedLines`. These 3 data points existed in every ShopWorks order but were never captured or saved to Caspio.
+**Root Cause:** Parser was built incrementally — only the fields needed at the time were added. `Paid To Date`, `Balance`, and the `Note` section weren't needed for initial quoting, so they were never wired up even though the Caspio columns existed.
+**Solution:** (1) Added `paidToDate`/`balance` to `orderSummary` init + two `else if` branches in `_parseOrderSummary()`. (2) Added `Note` section handler in main dispatcher → `result.orderNotes`. (3) `lastImportMetadata` and `customerData` pass through to service. (4) `saveQuote()`/`updateQuote()` write `PaidToDate`, `BalanceAmount`, `OrderNotes` to Caspio.
+**Prevention:** When adding new Caspio columns for ShopWorks data, always check: does the parser already extract this field, or does it fall to `unmatchedLines`? Use `unmatchedLines` output as a checklist of unhandled data.
+
 ## Problem: ShopWorks Import Email Not Extracted for CRM Lookup
 **Date:** 2026-01-31
 **Project:** [Pricing Index]
@@ -1673,6 +1681,16 @@ const colX = {
 
 ---
 
+## Fix: XSS in email HTML templates (embroidery-quote-service.js) (2026-02-12)
+**Date:** 2026-02-12
+**Project:** [Pricing Index]
+**Symptom:** Pre-ship audit found customer data (name, company, phone, project, notes) and product data (style, color, title, description) rendered unescaped in `generateProfessionalQuoteHTML()` and `generateProductsTableHTML()`. Meanwhile `quote-view.js` already used `escapeHtml()` in 15+ locations — so the web view was safe but the email was not.
+**Root cause:** Service class didn't have its own `_escapeHtml()` method, and the global `escapeHtml()` from `quote-builder-utils.js` wasn't available in the class context.
+**Solution:** Added `_escapeHtml()` as a class method on `EmbroideryQuoteService`. Applied to all 10 user-input interpolation sites in email HTML generation.
+**Prevention:** When generating HTML in ANY file (not just views), always escape user input. The `quote-view.js` file is a good reference — grep for `escapeHtml` to see all protected sites. **Rule: if a string came from a user or database and goes into innerHTML/template literal HTML, it MUST be escaped.**
+
+---
+
 ## Fix: XSS in Embroidery Quote Builder — 4 Unescaped innerHTML Locations
 **Date:** 2026-02-10
 **Project:** [Pricing Index]
@@ -1802,6 +1820,17 @@ for (let i = 0; i < items.length; i += batchSize) {
 **Files:**
 - Analysis script: `tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis`
 - Report: `tests/reports/ltm-analysis.json`
+
+---
+
+## Bug: E2E Batch Runner Used Frontend-Only Route Against Backend Proxy (2026-02-13)
+**Date:** 2026-02-13
+**Project:** [Pricing Index]
+**Symptoms:** E2E verify/cleanup calls to `/api/public/quote/:quoteId` returned 404 from the backend proxy.
+**Root cause:** That route only exists on the frontend Express server (`server.js:2801`), not the backend Caspio proxy. The batch runner was calling the backend URL directly.
+**Solution:** Changed verify/cleanup to fetch session and items separately via Caspio REST filter endpoints: `GET /api/quote_sessions?filter=QuoteID='...'` and `GET /api/quote_items?filter=QuoteID='...'`.
+**Prevention:** Always check which server a route lives on. Frontend routes use `makeApiRequest()` (proxy to Caspio). Backend routes are direct Caspio REST. Also added 5s+ delay between orders to avoid 429 rate limits from rapid sequential API calls.
+**Files:** `tests/e2e-batch-runner.js`, `tests/e2e-verify-order.js`
 
 ---
 

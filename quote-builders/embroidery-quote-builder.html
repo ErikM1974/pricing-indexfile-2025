@@ -447,10 +447,33 @@
                     </table>
                 </div>
 
-                <!-- Add Row Button -->
-                <button class="add-row-btn" onclick="addNewRow()">
-                    <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
-                </button>
+                <!-- Add Row Buttons -->
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <button class="add-row-btn" onclick="addNewRow()">
+                        <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
+                    </button>
+                    <div class="add-service-dropdown" style="position: relative; display: inline-block;">
+                        <button class="add-row-btn" onclick="toggleServiceDropdown()" style="background: #eff6ff; color: #1e40af; border-color: #93c5fd;">
+                            <i class="fas fa-concierge-bell"></i> Add Service <i class="fas fa-caret-down" style="margin-left: 4px;"></i>
+                        </button>
+                        <div id="service-dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; z-index: 100; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 220px; margin-top: 4px;">
+                            <div style="padding: 4px 0;">
+                                <button onclick="addManualServiceRow('Monogram')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                                    <i class="fas fa-font" style="color: #f59e0b; width: 16px;"></i>
+                                    <span>Monogram / Name — <strong>$12.50</strong></span>
+                                </button>
+                                <button onclick="addManualServiceRow('NAME')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                                    <i class="fas fa-id-badge" style="color: #6366f1; width: 16px;"></i>
+                                    <span>Individual Name — <strong>$12.50</strong></span>
+                                </button>
+                                <button onclick="addManualServiceRow('WEIGHT')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                                    <i class="fas fa-weight-hanging" style="color: #10b981; width: 16px;"></i>
+                                    <span>Weight — <strong>$6.25</strong></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Keyboard Hints -->
                 <!-- Keyboard Hints - Show on Hover -->
@@ -3642,6 +3665,9 @@ Company:Absher Construction Company
                     title="Double-click to override price">-</td>
                 <td class="cell-total" id="row-total-${rowId}">-</td>
                 <td class="cell-actions">
+                    <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; font-size: 13px; display: none;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#94a3b8'">
+                        <i class="fas fa-copy"></i>
+                    </button>
                     <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
                         <i class="fas fa-times"></i>
                     </button>
@@ -3703,6 +3729,8 @@ Company:Absher Construction Company
                 'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
                 'Monogram': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
                 'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+                'NAME': { description: 'Individual Name', icon: 'fa-id-badge', isCap: false },
+                'WEIGHT': { description: 'Weight', icon: 'fa-weight-hanging', isCap: false },
                 'AS-Garm': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
                 'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
                 'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
@@ -3789,6 +3817,66 @@ Company:Absher Construction Company
             }
 
             return row;
+        }
+
+        /**
+         * Toggle the "Add Service" dropdown menu
+         */
+        function toggleServiceDropdown() {
+            const menu = document.getElementById('service-dropdown-menu');
+            if (!menu) return;
+            const isVisible = menu.style.display !== 'none';
+            menu.style.display = isVisible ? 'none' : 'block';
+            // Close on outside click
+            if (!isVisible) {
+                const closeHandler = (e) => {
+                    if (!e.target.closest('.add-service-dropdown')) {
+                        menu.style.display = 'none';
+                        document.removeEventListener('click', closeHandler);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', closeHandler), 0);
+            }
+        }
+
+        /**
+         * Add a manual service row (Monogram, NAME, WEIGHT)
+         * Called from the "Add Service" dropdown
+         */
+        function addManualServiceRow(serviceType) {
+            // Close dropdown
+            const menu = document.getElementById('service-dropdown-menu');
+            if (menu) menu.style.display = 'none';
+
+            // Default prices per service type
+            const SERVICE_DEFAULTS = {
+                'Monogram': { unitPrice: 12.50, quantity: 1 },
+                'NAME': { unitPrice: 12.50, quantity: 1 },
+                'WEIGHT': { unitPrice: 6.25, quantity: 1 }
+            };
+
+            const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };
+
+            const row = createServiceProductRow(serviceType, {
+                quantity: defaults.quantity,
+                unitPrice: defaults.unitPrice,
+                total: defaults.quantity * defaults.unitPrice,
+                isCap: false
+            });
+
+            if (row) {
+                // Focus the quantity input so user can immediately set count
+                const qtyInput = row.querySelector('.service-qty');
+                if (qtyInput) {
+                    setTimeout(() => {
+                        qtyInput.focus();
+                        qtyInput.select();
+                    }, 50);
+                }
+                markAsUnsaved();
+                recalculatePricing();
+                showToast(`${serviceType} service row added`, 'success');
+            }
         }
 
         /**
@@ -3958,6 +4046,10 @@ Company:Absher Construction Company
                     row.dataset.style = styleNumber;
                     row.dataset.productName = cleanTitle || styleNumber;
 
+                    // Show "duplicate row" button now that style is loaded
+                    const dupBtn = row.querySelector('.btn-duplicate-row');
+                    if (dupBtn) dupBtn.style.display = '';
+
                 } else {
                     // SanMar product not found — check Non-SanMar Products database
                     try {
@@ -4019,6 +4111,10 @@ Company:Absher Construction Company
             const addBtn = row.querySelector('.btn-add-nonsanmar');
             if (addBtn) addBtn.remove();
             delete row.dataset.notFound;
+
+            // Show "duplicate row" button for non-SanMar products too
+            const dupBtn = row.querySelector('.btn-duplicate-row');
+            if (dupBtn) dupBtn.style.display = '';
 
             // Detect cap vs garment
             const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');
@@ -5800,6 +5896,35 @@ Company:Absher Construction Company
             updateGarmentLogoSectionVisibility();
         }
 
+        /**
+         * Duplicate a product row for a different color of the same style.
+         * Pre-populates the style number and triggers onStyleChange() so
+         * the color picker loads — user just picks the new color.
+         */
+        async function duplicateRowNewColor(sourceRowId) {
+            const sourceRow = document.getElementById(`row-${sourceRowId}`);
+            if (!sourceRow) return;
+
+            const style = sourceRow.dataset.style;
+            if (!style) {
+                showToast('No style loaded on this row', 'error');
+                return;
+            }
+
+            // Create a new row
+            addNewRow();
+            const newRow = document.querySelector('tr.new-row');
+            if (!newRow) return;
+
+            const newRowId = parseInt(newRow.dataset.rowId);
+            const styleInput = newRow.querySelector('.style-input');
+            if (styleInput) {
+                styleInput.value = style;
+                await onStyleChange(styleInput, newRowId);
+                showToast(`Select a new color for ${style}`, 'info', 3000);
+            }
+        }
+
         // ============================================================
         // PRICE OVERRIDE (double-click to edit)
         // ============================================================
@@ -7006,8 +7131,9 @@ Company:Absher Construction Company
         async function saveAndGetLink() {
             const allItems = collectProductsFromTable();
             const products = allItems.filter(p => !p.isService);
+            const manualServiceItems = allItems.filter(p => p.isService);
             const decgItems = collectDECGItems();
-            if (products.length === 0 && decgItems.length === 0) {
+            if (products.length === 0 && decgItems.length === 0 && manualServiceItems.length === 0) {
                 showToast('Add products before saving', 'error');
                 return;
             }
@@ -7072,6 +7198,13 @@ Company:Absher Construction Company
                     pricing.grandTotal += decgServiceTotal;
                 }
 
+                // Include manual service items (Monogram/NAME/WEIGHT) in grandTotal
+                if (manualServiceItems.length > 0) {
+                    const manualServiceTotal = manualServiceItems.reduce((sum, si) => sum + (si.unitPrice * si.totalQuantity), 0);
+                    pricing.subtotal += manualServiceTotal;
+                    pricing.grandTotal += manualServiceTotal;
+                }
+
                 // Get sales rep NAME from dropdown selected option text
                 const salesRepSelect = document.getElementById('sales-rep');
                 const salesRepEmail = salesRepSelect?.value || 'sales@nwcustomapparel.com';
@@ -7111,7 +7244,30 @@ Company:Absher Construction Company
                     dateOrderPlaced: document.getElementById('date-order-placed')?.value?.trim() || '',
                     reqShipDate: document.getElementById('req-ship-date')?.value?.trim() || '',
                     dropDeadDate: document.getElementById('drop-dead-date')?.value?.trim() || '',
-                    paymentTerms: document.getElementById('payment-terms')?.value?.trim() || ''
+                    paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
+                    // Frozen tax & design data for Caspio (2026-02-12)
+                    designNumbers: lastImportMetadata?.designNumbers || [],
+                    taxRate: (() => {
+                        const includeTax = document.getElementById('include-tax')?.checked;
+                        if (!includeTax) return 0;
+                        const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+                        return rateVal / 100;
+                    })(),
+                    taxAmount: (() => {
+                        const includeTax = document.getElementById('include-tax')?.checked;
+                        if (!includeTax) return 0;
+                        const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+                        const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
+                        const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
+                        const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+                        return Math.round((preTaxSubtotal + shippingFee) * (rateVal / 100) * 100) / 100;
+                    })(),
+                    importNotes: lastImportMetadata
+                        ? [...(lastImportMetadata.warnings || []), ...(lastImportMetadata.unmatchedLines || []), ...(lastImportMetadata.reviewItems || [])]
+                        : [],
+                    paidToDate: lastImportMetadata?.paidToDate ?? 0,
+                    balanceAmount: lastImportMetadata?.balanceAmount ?? 0,
+                    orderNotes: lastImportMetadata?.orderNotes ?? ''
                 };
 
                 // DECG/DECC items already collected at function start
@@ -7131,6 +7287,8 @@ Company:Absher Construction Company
                 pricing.capEmbellishmentType = getCapEmbellishmentType();
                 // Attach DECG items to pricing for service to access
                 pricing.decgItems = decgItems;
+                // Attach manual service items (Monogram/NAME/WEIGHT) for saving
+                pricing.manualServiceItems = manualServiceItems;
 
                 let result;
                 if (editingQuoteId) {
@@ -7524,9 +7682,10 @@ Company:Absher Construction Company
                 artworkBadge.style.display = 'none';
             }
 
-            // Clear edit mode
+            // Clear edit mode and import metadata
             editingQuoteId = null;
             editingRevision = null;
+            lastImportMetadata = null;
 
             // Clear draft storage
             if (embPersistence) {
@@ -7857,6 +8016,9 @@ Company:Absher Construction Company
 
         // Store parsed data for confirmation
         let pendingShopWorksImport = null;
+
+        // Store import metadata for Caspio save (designNumbers, warnings, unmatchedLines)
+        let lastImportMetadata = null;
 
         // Store DECG/DECC items for stitch count modal
         let pendingDECGItems = null;
@@ -9679,6 +9841,17 @@ Company:Absher Construction Company
                 recalculatePricing();
                 markAsUnsaved();
 
+                // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
+                lastImportMetadata = {
+                    designNumbers: data.designNumbers || [],
+                    warnings: data.warnings || [],
+                    reviewItems: (data.reviewItems || []).map(r => `${r.partNumber || '(no PN)'}: ${r.description || ''}`),
+                    unmatchedLines: (data.unmatchedLines || []).map(u => `[${u.section}] ${u.line}`),
+                    paidToDate: data.orderSummary?.paidToDate || 0,
+                    balanceAmount: data.orderSummary?.balance || 0,
+                    orderNotes: data.orderNotes || ''
+                };
+
                 // Post-import validation: detect silently dropped rows
                 const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
                 const productRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row)');
@@ -9809,6 +9982,35 @@ Company:Absher Construction Company
 
             // Row is still "Not found" — force-import as non-SanMar so sizes work
             if (row.dataset.notFound === 'true') {
+                // Auto-create non-SanMar product in Caspio for future imports
+                if (product.partNumber) {
+                    try {
+                        const parsed = parseShopWorksDescription(product.description || '', product.partNumber);
+                        const createPayload = {
+                            StyleNumber: product.partNumber,
+                            Brand: parsed.brand || product.brand || 'Unknown',
+                            ProductName: parsed.name || product.description || product.partNumber,
+                            Category: parsed.category || '',
+                            DefaultSellPrice: sellPriceOverride || product.unitPrice || 0,
+                            DefaultColors: product.color || '',
+                            AvailableSizes: Object.keys(product.sizes || {}).join(','),
+                            PricingMethod: 'FIXED',
+                            Notes: 'Auto-created from ShopWorks import'
+                        };
+                        const resp = await fetch(`${APP_CONFIG.API.BASE_URL}/api/non-sanmar-products`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(createPayload)
+                        });
+                        if (resp.ok) {
+                            showToast(`Auto-added ${product.partNumber} to product database`, 'success', 3000);
+                        }
+                        // If POST fails (duplicate, etc.), continue silently — force-import still works
+                    } catch (e) {
+                        console.warn(`[Import] Auto-create non-SanMar failed for ${product.partNumber}:`, e.message);
+                    }
+                }
+
                 // Convert from "Not Found" to non-SanMar so size inputs get enabled
                 row.dataset.nonSanmar = 'true';
                 delete row.dataset.notFound;

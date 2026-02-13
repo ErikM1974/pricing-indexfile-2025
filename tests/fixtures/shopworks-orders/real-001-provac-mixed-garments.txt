@@ -1,0 +1,96 @@
+**************************************************************************
+Order #:140721
+
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+
+**************************************************************************
+Your Company Information
+
+Customer #:12025
+Company:Pro-Vac LLC
+
+**************************************************************************
+Order Information
+
+Date Order Placed:2/11/2026
+Req. Ship Date:2/25/2026
+Drop Dead Date:
+
+Purchase Order #:52471
+Terms:Prepaid/Gift Code
+Ordered by:Yezenia Martinez
+Phone:409-457-8651
+Fax:
+Email:yezenia.martinez@pro-vac.com
+
+**************************************************************************
+Shipping Information
+Ship Method:UPS Ground
+Ship Address:10928 SPRUCE DR N, LA PORTE, TX 77571-4369, US
+
+**************************************************************************
+Design Information
+
+
+Design #:32937 - Pro-Vac- Cap Front Center
+**************************************************************************
+Items Purchased
+
+Item 1 of 4
+Part Number:OG101
+Description:Ogio - Caliber2.0 Polo, Blacktop
+Unit Price:37.40
+Line Item Price:37.40
+Item Quantity:1
+
+Adult:Quantity
+S (Other):1
+
+Item 2 of 4
+Part Number:L293
+Description:Port Authority Womens Slub Fleece Full-Zip Jacket, Black
+Unit Price:44.30
+Line Item Price:44.30
+Item Quantity:1
+
+Adult:Quantity
+M:1
+
+Item 3 of 4
+Part Number:LST469
+Description:Sport-Tek  Womens Endeavor 1/2-Zip Pullover, Black Hthr
+Unit Price:28.80
+Line Item Price:28.80
+Item Quantity:1
+
+Adult:Quantity
+M:1
+
+Item 4 of 4
+Part Number:DT671
+Description:District  Womens Featherweight French Terry  Hoodie, Washed Coal
+Unit Price:29.90
+Line Item Price:29.90
+Item Quantity:1
+
+Adult:Quantity
+M:1
+
+**************************************************************************
+Order Summary
+
+Subtotal:140.40
+Sales Tax:0.00
+Shipping:12.99
+Total:153.39
+Paid To Date:3.39
+Balance:150.00
+**************************************************************************
+Note
+
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************

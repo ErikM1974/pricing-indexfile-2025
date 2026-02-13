@@ -1,0 +1,21 @@
+{
+    "tiersR": [
+        { "TierLabel": "1-7", "MarginDenominator": 0.57, "LTM_Fee": 50 },
+        { "TierLabel": "8-23", "MarginDenominator": 0.57, "LTM_Fee": 0 },
+        { "TierLabel": "24-47", "MarginDenominator": 0.57, "LTM_Fee": 0 },
+        { "TierLabel": "48-71", "MarginDenominator": 0.57, "LTM_Fee": 0 },
+        { "TierLabel": "72+", "MarginDenominator": 0.57, "LTM_Fee": 0 }
+    ],
+    "allEmbroideryCostsR": [
+        { "ItemType": "Shirt", "TierLabel": "1-7", "EmbroideryCost": 18.00, "DigitizingFee": 100, "AdditionalStitchRate": 1.25, "BaseStitchCount": 8000, "StitchCount": 8000, "StitchIncrement": 1000 },
+        { "ItemType": "Shirt", "TierLabel": "8-23", "EmbroideryCost": 18.00 },
+        { "ItemType": "Shirt", "TierLabel": "24-47", "EmbroideryCost": 14.00 },
+        { "ItemType": "Shirt", "TierLabel": "48-71", "EmbroideryCost": 13.00 },
+        { "ItemType": "Shirt", "TierLabel": "72+", "EmbroideryCost": 12.00 },
+        { "ItemType": "AS-Garm", "StitchCount": 15000, "EmbroideryCost": 4.00 },
+        { "ItemType": "AS-Garm", "StitchCount": 25000, "EmbroideryCost": 10.00 }
+    ],
+    "rulesR": {
+        "RoundingMethod": "HalfDollarUp"
+    }
+}

@@ -1,0 +1,70 @@
+**************
+Order #: 140679
+Salesperson: Tina
+Email: tina@nwcustomapparel.com
+**************
+Customer #: 10345
+Company: Forma Construction
+**************
+Order Information
+Ordered by: Mike Chen
+Email: mike@forma.com
+Date Order Placed: 02/03/2026
+Terms: Net 30
+**************
+Items Purchased
+Item 1 of 5
+
+Part Number: PC54
+Description: Port & Company Core Cotton Tee, Safety Green
+Item Quantity: 10
+Unit Price: $12.00
+Adult:Quantity
+M:3
+L:3
+XL:2
+XXL:2
+
+Item 2 of 5
+
+Part Number: C112
+Description: Port Authority Snapback Cap, Black/White
+Item Quantity: 10
+Unit Price: $15.00
+Other:Quantity
+S (Other):10
+
+Item 3 of 5
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 2
+Unit Price: $100.00
+
+Item 4 of 5
+
+Part Number: AL
+Description: Additional Logo
+Item Quantity: 10
+Unit Price: $6.00
+
+Item 5 of 5
+
+Part Number: RUSH
+Description: Rush Fee
+Item Quantity: 1
+Unit Price: $75.00
+**************
+Design Information
+Design #:40200 - Forma hard hat logo
+Design #:40201 - Forma text back
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: Forma Construction, 1234 Main St, Seattle, WA 98101-5678, US
+**************
+Order Summary
+Subtotal: $695.00
+Sales Tax: $70.20
+Shipping: $15.99
+Total: $781.19

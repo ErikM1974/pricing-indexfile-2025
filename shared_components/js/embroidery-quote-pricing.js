@@ -4,8 +4,8 @@
  */
 
 class EmbroideryPricingCalculator {
-    constructor() {
-        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    constructor(options = {}) {
+        this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG?.API?.BASE_URL) || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         
         // Default fallback values (will be replaced by API data)
         // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM, +$4 surcharge baked in)
@@ -88,9 +88,11 @@ class EmbroideryPricingCalculator {
         this._initializePromise = null;
         this._capInitializePromise = null;
 
-        // Fetch configuration from API
+        // Fetch configuration from API (skip in test/Node.js environments)
         this.initialized = false;
-        this.initializeConfig();
+        if (!options.skipInit) {
+            this.initializeConfig();
+        }
     }
     
     /**
@@ -2099,5 +2101,11 @@ class EmbroideryPricingCalculator {
     }
 }
 
-// Make available globally
-window.EmbroideryPricingCalculator = EmbroideryPricingCalculator;
+// Make available globally (browser)
+if (typeof window !== 'undefined') {
+    window.EmbroideryPricingCalculator = EmbroideryPricingCalculator;
+}
+// Node.js export (testing)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = EmbroideryPricingCalculator;
+}

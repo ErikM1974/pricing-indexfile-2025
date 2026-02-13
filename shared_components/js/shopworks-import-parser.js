@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.14.0 - Parse Order Details (PO#, dates, terms, phone)
- * @date 2026-02-11
+ * @version 1.16.0 - Weight service type, _XLR suffix, expanded non-SanMar patterns
+ * @date 2026-02-13
  */
 
 class ShopWorksImportParser {
@@ -39,6 +39,7 @@ class ShopWorksImportParser {
             'LG': 'L',
             'L': 'L',
             'XL': 'XL',
+            'XLR': 'XL',       // XL Regular (from _XLR suffix)
             'XXL': '2XL',
             '2XL': '2XL',
             '2X': '2XL',       // From _2X suffix extraction
@@ -131,9 +132,12 @@ class ShopWorksImportParser {
 
         // Invalid part numbers to skip
         this.INVALID_PARTS = [
-            'WEIGHT', 'GIFT CODE', 'DISCOUNT', 'TEST',
+            'GIFT CODE', 'DISCOUNT', 'TEST',
             'SPSU', 'TAX', 'TOTAL'
         ];
+
+        // Weight service pricing (fallback)
+        this.WEIGHT_PRICE = 6.25;
 
         // Non-SanMar product patterns (require manual pricing)
         this.NON_SANMAR_PATTERNS = [
@@ -147,6 +151,10 @@ class ShopWorksImportParser {
             /^8001$/,         // Safety bomber
             /^STK-/,          // Stickers (non-apparel)
             /^\d+-G$/,        // Promotional products with -G suffix (Owala, BlenderBottle)
+            /^WW\d{4}/,       // Wink medical scrubs
+            /^323\w+$/,       // Richardson 323 series caps (323FPC etc.)
+            /^HT\d+$/,       // Edwards/Chef Works headwear (HT01 etc.)
+            /^LTM\d+$/,      // Polar Camel tumblers/drinkware (LTM752 etc.)
         ];
 
         this.CAP_DISCOUNT = 0.20;           // -20% for caps (loaded from API if available)
@@ -174,6 +182,8 @@ class ShopWorksImportParser {
             '_XXS', '_2XS', '_XS',
             // Tall sizes (longer suffixes first)
             '_2XLT', '_3XLT', '_4XLT', '_5XLT', '_XLT', '_XST', '_LT', '_MT', '_ST',
+            // Regular fit suffixes (e.g., SP24_XLR → XL Regular)
+            '_XLR',
             // One size / size ranges
             '_OSFA', '_SM/MD', '_LG/XL', '_S/M', '_M/L', '_L/XL',
             // Infant / toddler
@@ -452,8 +462,11 @@ class ShopWorksImportParser {
                 salesTax: null,
                 shipping: null,
                 total: null,
-                taxRate: null
+                taxRate: null,
+                paidToDate: 0,
+                balance: 0
             },
+            orderNotes: '',
             shipping: null,         // Parsed shipping address { method, rawAddress, street, city, state, zip }
             purchaseOrderNumber: null,
             dateOrderPlaced: null,
@@ -461,8 +474,10 @@ class ShopWorksImportParser {
             dropDeadDate: null,
             paymentTerms: null,
             notes: [],              // Comment rows
+            designNumbers: [],      // Design references (e.g., "#39719.01 — Absher Logo")
             warnings: [],           // Import warnings
             reviewItems: [],        // Invalid/skipped items with data for user review
+            unmatchedLines: [],     // Lines in known sections that didn't match any field pattern
             rawItems: [],           // All parsed items for debugging
             pricingSource: this.serviceCodesLoaded ? 'caspio' : 'fallback'
         };
@@ -490,6 +505,9 @@ class ShopWorksImportParser {
                 this._parseDesignInfo(trimmed, result);
             } else if (trimmed.includes('Shipping Information') || trimmed.includes('Ship Method')) {
                 this._parseShippingInfo(trimmed, result);
+            } else if (/^Note\b/i.test(trimmed)) {
+                const noteLines = trimmed.split('\n').slice(1).map(l => l.trim()).filter(Boolean);
+                result.orderNotes = noteLines.join('\n');
             }
         }
 
@@ -580,6 +598,7 @@ class ShopWorksImportParser {
         const lines = text.split('\n');
         for (const line of lines) {
             const trimmed = line.trim();
+            if (!trimmed) continue;
 
             if (trimmed.startsWith('Order #:')) {
                 result.orderId = trimmed.replace('Order #:', '').trim();
@@ -588,6 +607,12 @@ class ShopWorksImportParser {
             } else if (trimmed.startsWith('Email:') && !result.salesRep.email) {
                 // First Email in header is salesperson email
                 result.salesRep.email = trimmed.replace('Email:', '').trim();
+            } else if (trimmed.startsWith('Company:') || trimmed.startsWith('Phone:') || trimmed.startsWith('Fax:')
+                || trimmed === 'Your Company Information') {
+                // Real ShopWorks exports include these in the header — skip silently
+                // (Company here is OUR company, not the customer; customer company is in CompanyInfo section)
+            } else {
+                result.unmatchedLines.push({ section: 'OrderHeader', line: trimmed });
             }
         }
     }
@@ -615,6 +640,7 @@ class ShopWorksImportParser {
         const lines = text.split('\n');
         for (const line of lines) {
             const trimmed = line.trim();
+            if (!trimmed || /^Order Information$/i.test(trimmed)) continue;
 
             if (trimmed.startsWith('Ordered by:')) {
                 result.customer.contactName = trimmed.replace('Ordered by:', '').trim();
@@ -633,6 +659,10 @@ class ShopWorksImportParser {
                 result.paymentTerms = trimmed.replace('Terms:', '').trim();
             } else if (trimmed.startsWith('Phone:') && !result.customer.phone) {
                 result.customer.phone = trimmed.replace('Phone:', '').trim();
+            } else if (trimmed.startsWith('Fax:') || trimmed.startsWith('Date Order Shipped:') || trimmed.startsWith('Date Order Invoiced:')) {
+                // Known fields we don't need — skip silently
+            } else {
+                result.unmatchedLines.push({ section: 'OrderInfo', line: trimmed });
             }
         }
     }
@@ -646,13 +676,19 @@ class ShopWorksImportParser {
         const lines = text.split('\n');
         for (const line of lines) {
             const trimmed = line.trim();
+            if (!trimmed || /^Order Summary$/i.test(trimmed)) continue;
 
-            // Match "Label: $XX.XX" or "Label: XX.XX" patterns
-            const match = trimmed.match(/^(.+?):\s*\$?([\d,]+\.?\d*)$/);
-            if (!match) continue;
+            // Match "Label: $XX.XX" or "Label: XX.XX" or "Label:" (empty value) patterns
+            const match = trimmed.match(/^(.+?):\s*\$?([\d,]*\.?\d*)$/);
+            if (!match) {
+                result.unmatchedLines.push({ section: 'OrderSummary', line: trimmed });
+                continue;
+            }
+            // Empty value (e.g. "Paid To Date:") — treat as 0, don't push to unmatchedLines
+            if (!match[2]) continue;
 
             const label = match[1].trim().toLowerCase();
-            const value = parseFloat(match[2].replace(',', '')) || 0;
+            const value = parseFloat(match[2].replace(/,/g, '')) || 0;
 
             if (label === 'subtotal' || label === 'sub total') {
                 result.orderSummary.subtotal = value;
@@ -662,6 +698,12 @@ class ShopWorksImportParser {
                 result.orderSummary.shipping = value;
             } else if (label === 'total' || label === 'order total' || label === 'grand total') {
                 result.orderSummary.total = value;
+            } else if (label === 'paid to date') {
+                result.orderSummary.paidToDate = value;
+            } else if (label === 'balance' || label === 'balance due') {
+                result.orderSummary.balance = value;
+            } else {
+                result.unmatchedLines.push({ section: 'OrderSummary', line: trimmed });
             }
         }
 
@@ -691,21 +733,26 @@ class ShopWorksImportParser {
         const lines = text.split('\n');
         for (const line of lines) {
             const trimmed = line.trim();
+            if (!trimmed || /^Design Information$/i.test(trimmed)) continue;
 
             // Match "Design #:NNNNN - description" or "Design #NNNNN - description"
-            const designMatch = trimmed.match(/Design\s*#:?\s*(\d+)\s*[-–—]\s*(.+)/i);
+            const designMatch = trimmed.match(/Design\s*#:?\s*([\d.]+)\s*[-–—]\s*(.+)/i);
             if (designMatch) {
                 const designNum = designMatch[1];
                 const designName = designMatch[2].trim();
-                result.notes.push(`Design #${designNum} — ${designName}`);
+                const entry = `Design #${designNum} — ${designName}`;
+                result.notes.push(entry);
+                result.designNumbers.push(entry);
                 console.log(`[ShopWorksImportParser] Design info: #${designNum} — ${designName}`);
                 continue;
             }
 
             // Also match standalone "Design #:NNNNN" without description
-            const simpleMatch = trimmed.match(/Design\s*#:?\s*(\d+)/i);
+            const simpleMatch = trimmed.match(/Design\s*#:?\s*([\d.]+)/i);
             if (simpleMatch) {
-                result.notes.push(`Design #${simpleMatch[1]}`);
+                const entry = `Design #${simpleMatch[1]}`;
+                result.notes.push(entry);
+                result.designNumbers.push(entry);
                 console.log(`[ShopWorksImportParser] Design info: #${simpleMatch[1]}`);
             }
         }
@@ -888,7 +935,8 @@ class ShopWorksImportParser {
 
             // Handle old caps with no _OSFA suffix where sizes came from "(Other)" columns
             // e.g., Richardson 112 with "S (Other): 12" → remap to 112_OSFA with OSFA size
-            if (!extracted.size && hasOtherSizes && this._isCapFromDescription(item.description)) {
+            if (!extracted.size && hasOtherSizes && this._isCapFromDescription(item.description)
+                && this.classifyPartNumber(item.partNumber) === 'product') {
                 item.sizes = { 'OSFA': item.quantity };
                 item.partNumber = item.partNumber + '_OSFA';
                 console.log(`[ShopWorksImportParser] Remapped cap ${item.partNumber} to OSFA (legacy "(Other)" size data)`);
@@ -927,11 +975,20 @@ class ShopWorksImportParser {
             case 'digitizing':
                 result.services.digitizing = true;
                 result.services.digitizingCount++;
-                // Store digitizing code for proper fee lookup
+                // Store digitizing code and amount for fee lookup
                 if (!result.services.digitizingCodes) {
                     result.services.digitizingCodes = [];
                 }
                 result.services.digitizingCodes.push(item.partNumber.toUpperCase());
+                // Track actual fee amounts from DGT items
+                if (!result.services.digitizingFees) {
+                    result.services.digitizingFees = [];
+                }
+                result.services.digitizingFees.push({
+                    code: item.partNumber.toUpperCase(),
+                    amount: item.unitPrice || 0,
+                    description: item.description || ''
+                });
                 break;
 
             case 'patch-setup':
@@ -1002,6 +1059,19 @@ class ShopWorksImportParser {
                     description: item.description,
                     unitPrice: this.MONOGRAM_PRICE,
                     total: item.quantity * this.MONOGRAM_PRICE
+                });
+                break;
+
+            case 'weight':
+                // Weight service (per-person, e.g., wrestling singlets)
+                if (!result.services.weights) {
+                    result.services.weights = [];
+                }
+                result.services.weights.push({
+                    quantity: item.quantity,
+                    description: item.description,
+                    unitPrice: item.unitPrice || this.WEIGHT_PRICE,
+                    total: item.quantity * (item.unitPrice || this.WEIGHT_PRICE)
                 });
                 break;
 
@@ -1256,6 +1326,11 @@ class ShopWorksImportParser {
         // Monogram/Names (includes typo variants via aliases)
         if (pn === 'MONOGRAM' || pn === 'NAME' || pn === 'NAMES') {
             return 'monogram';
+        }
+
+        // Weight service (per-person weight embroidery, e.g., wrestling singlets)
+        if (pn === 'WEIGHT') {
+            return 'weight';
         }
 
         // Rush charge
@@ -1635,6 +1710,8 @@ class ShopWorksImportParser {
         if (parseResult.services.artCharges) services.push('Art Charges');
         if (parseResult.services.ltmFee) services.push('LTM Fee');
         if (totalMonograms > 0) services.push(`Monograms (${totalMonograms})`);
+        const totalWeights = parseResult.services.weights?.reduce((sum, w) => sum + w.quantity, 0) || 0;
+        if (totalWeights > 0) services.push(`Weight (${totalWeights})`);
 
         // Separate DECG and DECC counts
         const decgGarments = parseResult.decgItems.filter(d => d.serviceType === 'decg').length;
@@ -1663,4 +1740,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.14.0 - Parse Order Details (PO#, dates, terms, phone)');
+console.log('[ShopWorksImportParser] Module loaded v1.16.0 - Weight service type, _XLR suffix, expanded non-SanMar patterns');

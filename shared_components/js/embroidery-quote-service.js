@@ -316,7 +316,15 @@ class EmbroideryQuoteService {
                 DateOrderPlaced: this._toISODate(customerData.dateOrderPlaced),
                 ReqShipDate: this._toISODate(customerData.reqShipDate),
                 DropDeadDate: this._toISODate(customerData.dropDeadDate),
-                PaymentTerms: customerData.paymentTerms || ''
+                PaymentTerms: customerData.paymentTerms || '',
+                // Frozen tax & design data (2026-02-12)
+                DesignNumbers: JSON.stringify(customerData.designNumbers || []),
+                TaxRate: customerData.taxRate ?? 0,
+                TaxAmount: customerData.taxAmount ?? 0,
+                ImportNotes: JSON.stringify(customerData.importNotes || []),
+                PaidToDate: customerData.paidToDate ?? 0,
+                BalanceAmount: customerData.balanceAmount ?? 0,
+                OrderNotes: customerData.orderNotes || ''
             };
 
             // Save session
@@ -528,6 +536,47 @@ class EmbroideryQuoteService {
                     if (!itemResponse.ok) {
                         const errorText = await itemResponse.text();
                         console.error('DECG/DECC item save failed for line', lineNumber - 1, 'Error:', errorText);
+                        failedItems++;
+                    }
+                }
+            }
+
+            // Save manual service items (Monogram/NAME/WEIGHT from "Add Service" button)
+            if (pricingResults.manualServiceItems && pricingResults.manualServiceItems.length > 0) {
+                for (const svc of pricingResults.manualServiceItems) {
+                    const svcTotal = svc.unitPrice * svc.totalQuantity;
+                    const itemData = {
+                        QuoteID: quoteID,
+                        LineNumber: lineNumber++,
+                        StyleNumber: svc.style,
+                        ProductName: svc.productName || svc.title || svc.style,
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: 'fee',
+                        PrintLocation: '',
+                        PrintLocationName: '',
+                        Quantity: svc.totalQuantity,
+                        HasLTM: 'No',
+                        BaseUnitPrice: parseFloat(svc.unitPrice.toFixed(2)),
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: parseFloat(svc.unitPrice.toFixed(2)),
+                        LineTotal: parseFloat(svcTotal.toFixed(2)),
+                        SizeBreakdown: JSON.stringify({ serviceType: svc.serviceType }),
+                        PricingTier: '',
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: ''
+                    };
+
+                    const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+
+                    totalItems++;
+                    if (!itemResponse.ok) {
+                        console.error('[EmbroideryQuoteService] Manual service item save failed:', svc.style);
                         failedItems++;
                     }
                 }
@@ -1315,6 +1364,14 @@ class EmbroideryQuoteService {
                 ReqShipDate: this._toISODate(customerData.reqShipDate),
                 DropDeadDate: this._toISODate(customerData.dropDeadDate),
                 PaymentTerms: customerData.paymentTerms || '',
+                // Frozen tax & design data (2026-02-12)
+                DesignNumbers: JSON.stringify(customerData.designNumbers || []),
+                TaxRate: customerData.taxRate ?? 0,
+                TaxAmount: customerData.taxAmount ?? 0,
+                ImportNotes: JSON.stringify(customerData.importNotes || []),
+                PaidToDate: customerData.paidToDate ?? 0,
+                BalanceAmount: customerData.balanceAmount ?? 0,
+                OrderNotes: customerData.orderNotes || '',
                 // Revision tracking (fields added to Caspio 2026-01-15)
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
@@ -1521,6 +1578,47 @@ class EmbroideryQuoteService {
 
                     if (!decgResponse.ok) {
                         console.error('[EmbroideryQuoteService] DECG/DECC item save failed for line', lineNumber - 1);
+                        failedItems++;
+                    }
+                }
+            }
+
+            // Save manual service items (Monogram/NAME/WEIGHT from "Add Service" button)
+            if (pricingResults.manualServiceItems && pricingResults.manualServiceItems.length > 0) {
+                for (const svc of pricingResults.manualServiceItems) {
+                    const svcTotal = svc.unitPrice * svc.totalQuantity;
+                    const itemData = {
+                        QuoteID: quoteId,
+                        LineNumber: lineNumber++,
+                        StyleNumber: svc.style,
+                        ProductName: svc.productName || svc.title || svc.style,
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: 'fee',
+                        PrintLocation: '',
+                        PrintLocationName: '',
+                        Quantity: svc.totalQuantity,
+                        HasLTM: 'No',
+                        BaseUnitPrice: parseFloat(svc.unitPrice.toFixed(2)),
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: parseFloat(svc.unitPrice.toFixed(2)),
+                        LineTotal: parseFloat(svcTotal.toFixed(2)),
+                        SizeBreakdown: JSON.stringify({ serviceType: svc.serviceType }),
+                        PricingTier: '',
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+                        LogoSpecs: ''
+                    };
+
+                    const itemResponse = await this._fetchWithRetry(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(itemData)
+                    });
+
+                    totalItems++;
+                    if (!itemResponse.ok) {
+                        console.error('[EmbroideryQuoteService] Manual service item save failed:', svc.style);
                         failedItems++;
                     }
                 }

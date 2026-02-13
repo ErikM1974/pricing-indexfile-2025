@@ -1,0 +1,64 @@
+**************
+Order #: 140666
+Salesperson: Erik
+Email: erik@nwcustomapparel.com
+**************
+Customer #: 10234
+Company: Absher Construction
+**************
+Order Information
+Ordered by: John Smith
+Email: john@absher.com
+Purchase Order #: PO-2026-001
+Date Order Placed: 02/01/2026
+Req. Ship Date: 02/15/2026
+Drop Dead Date: 02/20/2026
+Terms: Net 30
+Phone: 253-555-1234
+**************
+Items Purchased
+Item 1 of 3
+
+Part Number: PC61LS
+Description: Port & Company Long Sleeve Tee, Jet Black
+Item Quantity: 12
+Unit Price: $18.00
+Adult:Quantity
+M:3
+L:4
+XL:3
+XXL:2
+
+Item 2 of 3
+
+Part Number: PC61LS_3X
+Description: Port & Company Long Sleeve Tee 3XL, Jet Black
+Item Quantity: 1
+Unit Price: $20.00
+Other:Quantity
+XXXL (Other):1
+
+Item 3 of 3
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+**************
+Design Information
+Design #:39800 - Absher Construction Logo
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: Absher Construction, 33431 Pacific Hwy S, Federal Way, WA 98003-5747, US
+**************
+Order Summary
+Subtotal: $330.00
+Sales Tax: $33.33
+Shipping: $12.99
+Total: $376.32
+Paid To Date: $3.39
+Balance: $372.93
+**************
+Note
+Billing Questions? accounting@nwcustomapparel.com

@@ -560,5 +560,10 @@ function initializeDiscountControls() {
     }
 }
 
+// Node.js export (testing) — pure functions only
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { escapeHtml, formatPrice };
+}
+
 // Log that utilities are loaded
 console.log('[QuoteBuilderUtils] Shared utilities loaded v1.0.0');

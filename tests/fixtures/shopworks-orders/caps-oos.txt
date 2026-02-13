@@ -1,0 +1,64 @@
+**************
+Order #: 140510
+Salesperson: Erik
+Email: erik@nwcustomapparel.com
+**************
+Customer #: 10567
+Company: Cedar Square Homes
+**************
+Order Information
+Ordered by: Dave Wilson
+Email: dave@cedarsquare.com
+Date Order Placed: 01/25/2026
+Req. Ship Date: 02/10/2026
+Terms: Net 30
+**************
+Items Purchased
+Item 1 of 4
+
+Part Number: C112
+Description: Port Authority Snapback Cap, Grey/Black
+Item Quantity: 24
+Unit Price: $15.00
+Other:Quantity
+S (Other):24
+
+Item 2 of 4
+
+Part Number: PC54
+Description: Port & Company Core Cotton Tee, Athletic Heather
+Item Quantity: 24
+Unit Price: $12.00
+Adult:Quantity
+S:2
+M:6
+L:8
+XL:6
+XXL:2
+
+Item 3 of 4
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+
+Item 4 of 4
+
+Part Number: DISCOUNT
+Description: Volume Discount
+Item Quantity: 1
+Unit Price: $-100.00
+**************
+Design Information
+Design #:39200 - Cedar Square Homes logo
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: Cedar Square Homes, 456 Capitol Blvd, Boise, ID 83702-1234, US
+**************
+Order Summary
+Subtotal: $748.00
+Sales Tax: $0.00
+Shipping: $18.99
+Total: $766.99

@@ -1,0 +1,85 @@
+**************
+Order #: 140721
+Salesperson: Tina
+Email: tina@nwcustomapparel.com
+**************
+Customer #: 10456
+Company: ProVac Services
+**************
+Order Information
+Ordered by: Maria Garcia
+Email: maria@provac.com
+Date Order Placed: 02/05/2026
+Req. Ship Date: 02/20/2026
+Terms: Prepaid
+Phone: 512-555-9876
+**************
+Items Purchased
+Item 1 of 6
+
+Part Number: PC54
+Description: Port & Company Core Cotton Tee, Safety Orange
+Item Quantity: 6
+Unit Price: $12.00
+Adult:Quantity
+M:2
+L:2
+XL:2
+
+Item 2 of 6
+
+Part Number: PC54
+Description: Port & Company Core Cotton Tee, Navy
+Item Quantity: 6
+Unit Price: $12.00
+Adult:Quantity
+S:1
+M:2
+L:2
+XL:1
+
+Item 3 of 6
+
+Part Number: PC54_2X
+Description: Port & Company Core Cotton Tee 2XL, Safety Orange
+Item Quantity: 2
+Unit Price: $14.00
+Other:Quantity
+XXL (Other):2
+
+Item 4 of 6
+
+Part Number: PC54_2X
+Description: Port & Company Core Cotton Tee 2XL, Navy
+Item Quantity: 2
+Unit Price: $14.00
+Other:Quantity
+XXL (Other):2
+
+Item 5 of 6
+
+Part Number: DD
+Description: Digitizing
+Item Quantity: 1
+Unit Price: $100.00
+
+Item 6 of 6
+
+Part Number: AL
+Description: Additional Logo - Left Chest
+Item Quantity: 16
+Unit Price: $6.00
+**************
+Design Information
+Design #:40100 - ProVac Services logo
+Design #:40101 - ProVac safety text
+**************
+Shipping Information
+Ship Method: UPS Ground
+Ship Address: ProVac Services, 4521 Research Blvd Ste 200, Austin, TX 78759-6438, US
+**************
+Order Summary
+Subtotal: $488.00
+Sales Tax: $0.00
+Shipping: $12.99
+Total: $500.99

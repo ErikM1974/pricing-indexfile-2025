@@ -1,0 +1,731 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 4)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:135217
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:4461
+Company:Veneer Chip Transport, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2025
+Req. Ship Date:2/25/2025
+Drop Dead Date:
+Date Order Shipped:3/5/2025
+Date Order Invoiced:2/28/2025
+Purchase Order #:
+Terms:COD
+Ordered by:James Lucich
+Phone:922-1911 x12
+Fax:C253-606-0180
+Email:jameslucich@veneerchip.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Veneer Chip Transport, Inc., 2205  Pacific Highway East, Fife, WA 98424
+**************************************************************************
+Design Information
+Design #:38400 - VCT 3 Colors 3"
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:CT105292
+Description:Carhartt Force Solid Short Sleeve Shirt, Black
+Unit Price:66.00
+Line Item Price:66.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 2 of 4
+Part Number:CT105291
+Description:Carhartt Force Solid Long Sleeve Shirt, Black
+Unit Price:73.00
+Line Item Price:73.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 3 of 4
+Part Number:W668
+Description:Port Authority Plaid Flannel Shirt, G/BkOpnPld
+Unit Price:41.00
+Line Item Price:41.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 4 of 4
+Part Number:W672
+Description:Port Authority Long Sleeve Ombre Plaid Shirt, DeepBlack
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:226.00
+Sales Tax:22.83
+Shipping:
+Total:248.83
+Paid To Date:248.83
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:135218
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:6326
+Company:Archterra Landscape Services
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2025
+Req. Ship Date:2/25/2025
+Drop Dead Date:
+Date Order Shipped:2/28/2025
+Date Order Invoiced:2/26/2025
+Purchase Order #:
+Terms:COD
+Ordered by:Chauney Roemer
+Phone:253-815-8365
+Fax:
+Email:chauney@archterralandscape.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Archterra Landscape Service, 11125 Valley Ave E, Puyallup, WA 98372
+**************************************************************************
+Design Information
+Design #:38675 - Archterra Design- 2024 Straight Tree
+Design #:38675.01 - Archterra Design- 2024 Straight Tree
+Design #:38675.02 - Archterra Design- 2024 Straight Tree
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:OG101_2X
+Description:Ogio - Caliber2.0 Polo, Rogue Grey
+Unit Price:45.00
+Line Item Price:90.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 2 of 3
+Part Number:OG101_2X
+Description:Ogio - Caliber2.0 Polo, Blacktop
+Unit Price:45.00
+Line Item Price:90.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 3 of 3
+Part Number:PC61LS_2X
+Description:Port  Company - Long Sleeve Essential Tee, Jet Black
+Unit Price:25.00
+Line Item Price:50.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+**************************************************************************
+Order Summary
+Subtotal:230.00
+Sales Tax:23.23
+Shipping:
+Total:253.23
+Paid To Date:253.23
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:135251
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11714
+Company:Skunk Work Robotics Booster Club
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2025
+Req. Ship Date:2/25/2025
+Drop Dead Date:
+Date Order Shipped:2/26/2025
+Date Order Invoiced:2/24/2025
+Purchase Order #:
+Terms:COD
+Ordered by:Amie   Fisher
+Phone:
+Fax:
+Email:amie.fisher@skunkworks1983.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Skunk Work Robotics Booster Club, PO Box 81062, Seattle, WA 98108
+**************************************************************************
+Design Information
+Design #:31535.01 - Skunkworks Logo
+Design #:33053 - Skunk Works Beanies
+**************************************************************************
+Items Purchased
+Item 1 of 16
+Part Number:F222
+Description:Port Authority Pique Fleece Jacket, Black
+Unit Price:55.00
+Line Item Price:55.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 2 of 16
+Part Number:Monogram
+Description:Embroider Names - Eddie
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 3 of 16
+Part Number:F222
+Description:Port Authority Pique Fleece Jacket, Black
+Unit Price:55.00
+Line Item Price:55.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 4 of 16
+Part Number:Monogram
+Description:Embroider Names - Vince Carlile-Kovács
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 5 of 16
+Part Number:ST258
+Description:Sport-Tek Full-Zip Hooded Sweatshirt, Black
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 6 of 16
+Part Number:Monogram
+Description:Embroider Names - Kiya
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 7 of 16
+Part Number:J318
+Description:Port Authority Core Colorblock Soft Shell Jacket, Black/Bat Grey
+Unit Price:54.00
+Line Item Price:54.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 8 of 16
+Part Number:Monogram
+Description:Embroider Names - Haven
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 9 of 16
+Part Number:BG805_OSFA
+Description:Port Authority  Form Duffel, Black
+Unit Price:41.00
+Line Item Price:41.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 10 of 16
+Part Number:Monogram
+Description:Embroider Names - Nate Saffery
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 11 of 16
+Part Number:F222
+Description:Port Authority Pique Fleece Jacket, Black
+Unit Price:55.00
+Line Item Price:165.00
+Item Quantity:3
+Adult:Quantity
+LG:2
+XL:1
+Item 12 of 16
+Part Number:ST258
+Description:Sport-Tek Full-Zip Hooded Sweatshirt, Black
+Unit Price:46.00
+Line Item Price:414.00
+Item Quantity:9
+Adult:Quantity
+S (Other):1
+M:3
+LG:3
+XL:2
+Item 13 of 16
+Part Number:ST258_2X
+Description:Sport-Tek Full-Zip Hooded Sweatshirt, Black
+Unit Price:48.00
+Line Item Price:48.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 14 of 16
+Part Number:ST970
+Description:Sport-Tek Colorblock Soft Shell Jacket, Black/Tr Red
+Unit Price:54.00
+Line Item Price:54.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 15 of 16
+Part Number:J318
+Description:Port Authority Core Colorblock Soft Shell Jacket, Black/Bat Grey
+Unit Price:54.00
+Line Item Price:54.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 16 of 16
+Part Number:STC31_OSFA
+Description:Sport-Tek Striped Beanie With Solid Band, Black/White
+Unit Price:18.00
+Line Item Price:198.00
+Item Quantity:11
+Adult:Quantity
+XXXL (Other):11
+**************************************************************************
+Order Summary
+Subtotal:1,246.50
+Sales Tax:125.90
+Shipping:
+Total:1,372.40
+Paid To Date:1,372.40
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:135256
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11844
+Company:Taylor Metal Products
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2025
+Req. Ship Date:2/14/2025
+Drop Dead Date:
+Date Order Shipped:2/17/2025
+Date Order Invoiced:2/24/2025
+Purchase Order #:
+Terms:Net 30
+Ordered by:Chris Coffey
+Phone:206-900-9923
+Fax:C206-445-4105
+Email:chris@taylormetal.com
+**************************************************************************
+Design Information
+Design #:38871 - Exterior Metals Full Logo
+Design #:32167.07 - Taylor Metal Products
+**************************************************************************
+Items Purchased
+Item 1 of 6
+Part Number:CT102199_2X
+Description:Carhartt  Crowley Soft Shell Jacket, Black
+Unit Price:152.00
+Line Item Price:152.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 2 of 6
+Part Number:CT102199_3X
+Description:Carhartt  Crowley Soft Shell Jacket, Black
+Unit Price:153.00
+Line Item Price:153.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 3 of 6
+Part Number:AL
+Description:Additional Logo
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 4 of 6
+Part Number:DGT-002
+Description:Fee for revising existing digitized designs to meet new specifications
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 5 of 6
+Part Number:
+Description:Taylor Logo ONLY - RC
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 6 of 6
+Part Number:CT102199
+Description:Carhartt  Crowley Soft Shell Jacket, Black
+Unit Price:150.00
+Line Item Price:900.00
+Item Quantity:6
+Adult:Quantity
+M:1
+LG:2
+XL:3
+**************************************************************************
+Order Summary
+Subtotal:1,280.00
+Sales Tax:129.28
+Shipping:
+Total:1,409.28
+Paid To Date:1,409.28
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:135257
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8045
+Company:PICK-QUICK Operating Company LLC
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2025
+Req. Ship Date:2/25/2025
+Drop Dead Date:
+Date Order Shipped:3/13/2025
+Date Order Invoiced:2/28/2025
+Purchase Order #:beanies
+Terms:COD
+Ordered by:Janice Herron
+Phone:253-831-6173
+Fax:
+Email:janice@pick-quick.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:PICK-QUICK Operating Company LLC, 1132 Auburn Way North, Auburn, WA 98001
+**************************************************************************
+Design Information
+Design #:18595 - J1152, L/C, Pick Quick Drive Thru
+Design #:18595.01 - J1152, L/C, Pick Quick Drive Thru
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:CP90_OSFA
+Description:Port  Companyknit Cap, Black
+Unit Price:12.00
+Line Item Price:480.00
+Item Quantity:40
+Adult:Quantity
+XXXL (Other):40
+**************************************************************************
+Order Summary
+Subtotal:480.00
+Sales Tax:48.48
+Shipping:
+Total:528.48
+Paid To Date:528.48
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:135258
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8045
+Company:PICK-QUICK Operating Company LLC
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2025
+Req. Ship Date:2/25/2025
+Drop Dead Date:
+Date Order Shipped:3/13/2025
+Date Order Invoiced:2/28/2025
+Purchase Order #:
+Terms:COD
+Ordered by:Janice Herron
+Phone:253-831-6173
+Fax:
+Email:janice@pick-quick.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:PICK-QUICK Operating Company LLC, 1132 Auburn Way North, Auburn, WA 98001
+**************************************************************************
+Design Information
+Design #:18595 - J1152, L/C, Pick Quick Drive Thru
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:NF0A7V4G
+Description:The North Face Womens Down Hybrid Jacket, TNFBlack
+Unit Price:202.00
+Line Item Price:202.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 2 of 4
+Part Number:NF0A3LHL
+Description:The North Face  Ladies Thermoball   Trekker Vest, TNF Black
+Unit Price:202.00
+Line Item Price:202.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 3 of 4
+Part Number:CT89350303_OSFA
+Description:Carhartt  Foundry Series Backpack, CarharttBr
+Unit Price:99.00
+Line Item Price:99.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 4 of 4
+Part Number:DECG
+Description:Di. Embroider Garms
+Unit Price:15.00
+Line Item Price:45.00
+Item Quantity:3
+Adult:Quantity
+S (Other):3
+**************************************************************************
+Order Summary
+Subtotal:548.00
+Sales Tax:55.35
+Shipping:
+Total:603.35
+Paid To Date:603.35
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:135284
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11844
+Company:Taylor Metal Products
+**************************************************************************
+Order Information
+Date Order Placed:2/12/2025
+Req. Ship Date:2/26/2025
+Drop Dead Date:
+Date Order Shipped:3/20/2025
+Date Order Invoiced:3/7/2025
+Purchase Order #:
+Terms:Net 30
+Ordered by:Jeff Wear
+Phone:
+Fax:
+Email:jeff.wear@taylormetal.com
+**************************************************************************
+Design Information
+Design #:32167 - Taylor Metal Products
+Design #:38910 - Taylor Metal - With Outline
+Design #:38871 - Exterior Metals Full Logo
+**************************************************************************
+Items Purchased
+Item 1 of 10
+Part Number:CT104078
+Description:Carhartt Midweight Thermal-Lined Full-Zip Sweatshirt, Black
+Unit Price:99.00
+Line Item Price:99.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 2 of 10
+Part Number:OE720
+Description:Ogio Crux Soft Shell, Blacktop
+Unit Price:91.00
+Line Item Price:91.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 3 of 10
+Part Number:NF0A8ENN_2X
+Description:The North Face Edge Stretch Soft Shell Jacket, TNFBlack
+Unit Price:139.00
+Line Item Price:139.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 4 of 10
+Part Number:NF0A8BUD_2X
+Description:The North Face Barr Lake Soft Shell Jacket, TNFBlkHthr
+Unit Price:157.00
+Line Item Price:157.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 5 of 10
+Part Number:CT102199_3X
+Description:Carhartt  Crowley Soft Shell Jacket, Black
+Unit Price:150.00
+Line Item Price:150.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 6 of 10
+Part Number:DECG
+Description:Di. Embroider Garms
+Unit Price:20.00
+Line Item Price:20.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 7 of 10
+Part Number:DECG
+Description:Di. Embroider Garms Brandon
+Unit Price:20.00
+Line Item Price:20.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 8 of 10
+Part Number:
+Description:Taylor and Exterior Metal
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 9 of 10
+Part Number:CT102199
+Description:Carhartt  Crowley Soft Shell Jacket, Black
+Unit Price:150.00
+Line Item Price:150.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 10 of 10
+Part Number:AL
+Description:Additional Logo
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:838.50
+Sales Tax:84.69
+Shipping:
+Total:923.19
+Paid To Date:923.19
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:135303
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8417
+Company:Tag Master North America, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:2/13/2025
+Req. Ship Date:2/27/2025
+Drop Dead Date:
+Date Order Shipped:3/7/2025
+Date Order Invoiced:2/24/2025
+Purchase Order #:
+Terms:COD
+Ordered by:Azita Ebrahimi
+Phone:253-238-1421
+Fax:
+Email:aebrahimi@tagmasterna.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Tag Master North America, Inc., 2007A 70th Ave West, Tacoma, WA 98466
+**************************************************************************
+Design Information
+Design #:38880.01 - Tag Master 3" logo
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DECG
+Description:Di. Embroider Garms Polo
+Unit Price:20.00
+Line Item Price:520.00
+Item Quantity:26
+Adult:Quantity
+S (Other):26
+Item 2 of 2
+Part Number:DECG
+Description:Di. Embroider Garms Jakcets
+Unit Price:20.00
+Line Item Price:60.00
+Item Quantity:3
+Adult:Quantity
+S (Other):3
+**************************************************************************
+Order Summary
+Subtotal:580.00
+Sales Tax:58.58
+Shipping:
+Total:638.58
+Paid To Date:638.58
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 4
+================================================================================

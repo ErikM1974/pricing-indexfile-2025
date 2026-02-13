@@ -1,0 +1,44 @@
+**************
+Order #: 150999
+Salesperson: Erik
+Email: erik@nwcustomapparel.com
+Department: Screen Print
+**************
+Customer #: 10500
+Company: Test Company LLC
+**************
+Order Information
+Ordered by: Jane Doe
+Email: jane@testcompany.com
+Purchase Order #: PO-TEST-001
+Date Order Placed: 02/12/2026
+Req. Ship Date: 02/20/2026
+Terms: Net 30
+Phone: 253-555-9999
+Approval Status: Approved by Manager
+**************
+Items Purchased
+Item 1 of 1
+
+Part Number: PC54
+Description: Port & Company Core Cotton Tee, White
+Item Quantity: 24
+Unit Price: $12.00
+Adult:Quantity
+S:6
+M:6
+L:6
+XL:6
+**************
+Design Information
+Design #:50001 - Test Company Logo
+**************
+Shipping Information
+Ship Method: FedEx Ground
+Ship Address: Test Company LLC, 123 Main St, Seattle, WA 98101-1234, US
+**************
+Order Summary
+Subtotal: $288.00
+Handling Fee: $5.00
+Sales Tax: $29.09
+Total: $322.09
