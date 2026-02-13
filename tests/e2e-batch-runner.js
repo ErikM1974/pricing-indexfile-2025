@@ -205,6 +205,22 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessio
                 checks.push({ name: 'DigitizingCodes RT', ok: (session.DigitizingCodes || '') === savedSessionData.DigitizingCodes,
                     detail: `saved="${savedSessionData.DigitizingCodes}" loaded="${session.DigitizingCodes || ''}"` });
             }
+
+            // 17. SWTotal round-trip
+            const savedSW = parseFloat(savedSessionData.SWTotal) || 0;
+            const loadedSW = parseFloat(session.SWTotal) || 0;
+            if (savedSW > 0) {
+                checks.push({ name: 'SWTotal RT', ok: Math.abs(savedSW - loadedSW) < 0.01,
+                    detail: `saved=${savedSW} loaded=${loadedSW}` });
+            }
+
+            // 18. SWSubtotal round-trip
+            const savedSWSub = parseFloat(savedSessionData.SWSubtotal) || 0;
+            const loadedSWSub = parseFloat(session.SWSubtotal) || 0;
+            if (savedSWSub > 0) {
+                checks.push({ name: 'SWSubtotal RT', ok: Math.abs(savedSWSub - loadedSWSub) < 0.01,
+                    detail: `saved=${savedSWSub} loaded=${loadedSWSub}` });
+            }
         }
 
         // ── Line item detail checks ─────────────────────────────────────
@@ -350,6 +366,8 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         services: [],
         ourTotal: 0,
         swTotal: 0,
+        swSubtotal: 0,
+        priceAudit: null,
         quoteId: null,
         quoteUrl: null,
         savedItems: 0,
@@ -368,6 +386,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         result.orderId = parsed.orderId;
         result.company = parsed.customer.company || '(unknown)';
         result.swTotal = parsed.orderSummary.total || 0;
+        result.swSubtotal = parsed.orderSummary.subtotal || 0;
 
         // ── STEP 2: MERGE SIZE-SUFFIXED PRODUCTS ────────────────────────
         const productMap = new Map();
@@ -622,6 +641,43 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
 
         result.ourTotal = totalAmount;
 
+        // ── PRICE AUDIT: Compare SW pricing vs 2026 calculated ─────────
+        const pricingForAudit = result._pricing || { grandTotal: 0, products: [] };
+        const swSub = parsed.orderSummary.subtotal || 0;
+        const ourSub = pricingGrandTotal;
+        const deltaSub = ourSub - swSub;
+        const deltaPct = swSub > 0 ? Math.abs(deltaSub / swSub) * 100 : 0;
+        const auditFlag = deltaPct <= 5 ? 'OK' : deltaPct <= 15 ? 'REVIEW' : 'MISMATCH';
+
+        const auditProducts = [];
+        for (const pp of (pricingForAudit.products || [])) {
+            const firstLi = (pp.lineItems || [pp])[0];
+            const ourUnit = firstLi?.unitPriceWithLTM || firstLi?.unitPrice || 0;
+            const swUnit = pp.product?._swUnitPrice || 0;
+            const qty = pp.product?.totalQuantity || 0;
+            const pDelta = ourUnit - swUnit;
+            const pPct = swUnit > 0 ? Math.abs(pDelta / swUnit) * 100 : 0;
+            auditProducts.push({
+                style: pp.product?.style || '?',
+                color: pp.product?.color || '?',
+                qty,
+                swUnit: parseFloat(swUnit.toFixed(2)),
+                ourUnit: parseFloat(ourUnit.toFixed(2)),
+                delta: parseFloat(pDelta.toFixed(2)),
+                flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
+            });
+        }
+
+        result.priceAudit = {
+            swTotal: result.swTotal,
+            swSubtotal: swSub,
+            ourSubtotal: parseFloat(ourSub.toFixed(2)),
+            deltaSubtotal: parseFloat(deltaSub.toFixed(2)),
+            deltaPct: parseFloat(deltaPct.toFixed(1)),
+            flag: auditFlag,
+            products: auditProducts
+        };
+
         // ── STEP 6: SAVE (--live only) ──────────────────────────────────
         const pricing = result._pricing || { grandTotal: 0, totalQuantity: 0, subtotal: 0, ltmFee: 0, products: [], additionalServices: [], garmentQuantity: 0, capQuantity: 0 };
         if (doSave) {
@@ -720,7 +776,11 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 )]),
                 PaidToDate: parsed.orderSummary.paidToDate ?? 0,
                 BalanceAmount: parsed.orderSummary.balance ?? 0,
-                OrderNotes: parsed.orderNotes || ''
+                OrderNotes: parsed.orderNotes || '',
+                // ShopWorks pricing audit (2026-02-13)
+                SWTotal: parsed.orderSummary.total || 0,
+                SWSubtotal: parsed.orderSummary.subtotal || 0,
+                PriceAuditJSON: JSON.stringify(result.priceAudit || {})
             };
 
             // Save session
@@ -1168,6 +1228,57 @@ async function main() {
         console.log('\n  All products are SanMar.');
     }
 
+    // ── PRICING AUDIT ────────────────────────────────────────────────────
+    const auditable = results.filter(r => !r.error && r.priceAudit);
+    if (auditable.length > 0) {
+        console.log('\n  PRICING AUDIT');
+        console.log('  ' + '═'.repeat(66));
+        printTable(
+            ['#', 'Order ID', 'SW Subtotal', 'Our Subtotal', 'Delta', 'Flag'],
+            auditable.map(r => {
+                const a = r.priceAudit;
+                const sign = a.deltaSubtotal >= 0 ? '+' : '';
+                return [
+                    r.orderIndex,
+                    r.orderId || '?',
+                    currency(a.swSubtotal),
+                    currency(a.ourSubtotal),
+                    `${sign}${currency(a.deltaSubtotal)} (${a.deltaPct}%)`,
+                    a.flag
+                ];
+            })
+        );
+
+        // Per-product breakdown for REVIEW/MISMATCH orders
+        const flagged = auditable.filter(r => r.priceAudit.flag !== 'OK');
+        for (const r of flagged) {
+            const a = r.priceAudit;
+            if (a.products.length > 0) {
+                console.log(`\n  #${r.orderId} — Per-product breakdown:`);
+                printTable(
+                    ['Style', 'Color', 'Qty', 'SW/pc', '2026/pc', 'Delta/pc', 'Flag'],
+                    a.products.map(p => {
+                        const sign = p.delta >= 0 ? '+' : '';
+                        return [
+                            p.style,
+                            (p.color || '').substring(0, 15),
+                            p.qty,
+                            currency(p.swUnit),
+                            currency(p.ourUnit),
+                            `${sign}${currency(p.delta)}`,
+                            p.flag
+                        ];
+                    })
+                );
+            }
+        }
+
+        const okCount = auditable.filter(r => r.priceAudit.flag === 'OK').length;
+        const reviewCount = auditable.filter(r => r.priceAudit.flag === 'REVIEW').length;
+        const mismatchCount = auditable.filter(r => r.priceAudit.flag === 'MISMATCH').length;
+        console.log(`\n  Audit: ${okCount} OK, ${reviewCount} REVIEW, ${mismatchCount} MISMATCH`);
+    }
+
     // Warnings
     const ordersWithWarnings = results.filter(r => r.warnings.length > 0);
     if (ordersWithWarnings.length > 0) {
@@ -1201,6 +1312,7 @@ async function main() {
             // Round-trip session field checks
             'TotalQuantity RT', 'CustomerName RT', 'CompanyName RT',
             'TaxRate RT', 'TaxAmount RT', 'OrderNumber RT', 'ShipToState RT', 'DigitizingCodes RT',
+            'SWTotal RT', 'SWSubtotal RT',
             // Line item detail checks
             'Fee PNs valid', 'Product prices', 'Size breakdowns'
         ];

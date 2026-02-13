@@ -129,6 +129,45 @@ async function deleteJSON(url) {
     return resp;
 }
 
+// ── Price Audit Helper ────────────────────────────────────────────────────
+
+function buildPriceAudit(parsed, pricing, mergedProducts) {
+    const swSubtotal = parsed.orderSummary.subtotal || 0;
+    const ourSubtotal = pricing.grandTotal || 0;
+    const deltaSubtotal = ourSubtotal - swSubtotal;
+    const deltaPct = swSubtotal > 0 ? Math.abs(deltaSubtotal / swSubtotal) * 100 : 0;
+    const flag = deltaPct <= 5 ? 'OK' : deltaPct <= 15 ? 'REVIEW' : 'MISMATCH';
+
+    const products = [];
+    for (const pp of (pricing.products || [])) {
+        const firstLi = (pp.lineItems || [pp])[0];
+        const ourUnit = firstLi?.unitPriceWithLTM || firstLi?.unitPrice || 0;
+        const swUnit = pp.product?._swUnitPrice || 0;
+        const qty = pp.product?.totalQuantity || 0;
+        const pDelta = ourUnit - swUnit;
+        const pPct = swUnit > 0 ? Math.abs(pDelta / swUnit) * 100 : 0;
+        products.push({
+            style: pp.product?.style || '?',
+            color: pp.product?.color || '?',
+            qty,
+            swUnit: parseFloat(swUnit.toFixed(2)),
+            ourUnit: parseFloat(ourUnit.toFixed(2)),
+            delta: parseFloat(pDelta.toFixed(2)),
+            flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
+        });
+    }
+
+    return {
+        swTotal: parsed.orderSummary.total || 0,
+        swSubtotal,
+        ourSubtotal: parseFloat(ourSubtotal.toFixed(2)),
+        deltaSubtotal: parseFloat(deltaSubtotal.toFixed(2)),
+        deltaPct: parseFloat(deltaPct.toFixed(1)),
+        flag,
+        products
+    };
+}
+
 // ── Verify & Cleanup Helpers ──────────────────────────────────────────────
 
 async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessionData) {
@@ -191,6 +230,20 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessio
             if (savedSessionData.DigitizingCodes) {
                 checks.push({ name: 'DigitizingCodes RT', ok: (session.DigitizingCodes || '') === savedSessionData.DigitizingCodes,
                     detail: `saved="${savedSessionData.DigitizingCodes}" loaded="${session.DigitizingCodes || ''}"` });
+            }
+
+            // ShopWorks pricing audit round-trip
+            const savedSW = parseFloat(savedSessionData.SWTotal) || 0;
+            const loadedSW = parseFloat(session.SWTotal) || 0;
+            if (savedSW > 0) {
+                checks.push({ name: 'SWTotal RT', ok: Math.abs(savedSW - loadedSW) < 0.01,
+                    detail: `saved=${savedSW} loaded=${loadedSW}` });
+            }
+            const savedSWSub = parseFloat(savedSessionData.SWSubtotal) || 0;
+            const loadedSWSub = parseFloat(session.SWSubtotal) || 0;
+            if (savedSWSub > 0) {
+                checks.push({ name: 'SWSubtotal RT', ok: Math.abs(savedSWSub - loadedSWSub) < 0.01,
+                    detail: `saved=${savedSWSub} loaded=${loadedSWSub}` });
             }
         }
 
@@ -963,7 +1016,11 @@ async function main() {
                 DigitizingCodes: (parsed.services.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
-                ImportNotes: JSON.stringify(customerData.importNotes || [])
+                ImportNotes: JSON.stringify(customerData.importNotes || []),
+                // ShopWorks pricing audit (2026-02-13)
+                SWTotal: parsed.orderSummary.total || 0,
+                SWSubtotal: parsed.orderSummary.subtotal || 0,
+                PriceAuditJSON: JSON.stringify(buildPriceAudit(parsed, pricing, mergedProducts))
             };
 
             // Save session

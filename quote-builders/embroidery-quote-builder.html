@@ -7268,7 +7268,37 @@ Company:Absher Construction Company
                         : [],
                     paidToDate: lastImportMetadata?.paidToDate ?? 0,
                     balanceAmount: lastImportMetadata?.balanceAmount ?? 0,
-                    orderNotes: lastImportMetadata?.orderNotes ?? ''
+                    orderNotes: lastImportMetadata?.orderNotes ?? '',
+                    // ShopWorks pricing audit (2026-02-13)
+                    swTotal: lastImportMetadata?.swTotal ?? 0,
+                    swSubtotal: lastImportMetadata?.swSubtotal ?? 0,
+                    priceAuditJSON: (() => {
+                        if (!lastImportMetadata || !lastImportMetadata.swSubtotal) return '';
+                        const swSub = lastImportMetadata.swSubtotal;
+                        const ourSub = pricing.grandTotal || 0;
+                        const delta = ourSub - swSub;
+                        const pct = swSub > 0 ? Math.abs(delta / swSub) * 100 : 0;
+                        const flag = pct <= 5 ? 'OK' : pct <= 15 ? 'REVIEW' : 'MISMATCH';
+                        const prods = (pricing.products || []).map(pp => {
+                            const li = (pp.lineItems || [pp])[0];
+                            const ourUnit = li?.unitPriceWithLTM || li?.unitPrice || 0;
+                            const swUnit = pp.product?._swUnitPrice || 0;
+                            const pDelta = ourUnit - swUnit;
+                            const pPct = swUnit > 0 ? Math.abs(pDelta / swUnit) * 100 : 0;
+                            return {
+                                style: pp.product?.style || '?',
+                                color: pp.product?.color || '?',
+                                qty: pp.product?.totalQuantity || 0,
+                                swUnit: parseFloat(swUnit.toFixed(2)),
+                                ourUnit: parseFloat(ourUnit.toFixed(2)),
+                                delta: parseFloat(pDelta.toFixed(2)),
+                                flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
+                            };
+                        });
+                        return JSON.stringify({ swTotal: lastImportMetadata.swTotal, swSubtotal: swSub,
+                            ourSubtotal: parseFloat(ourSub.toFixed(2)), deltaSubtotal: parseFloat(delta.toFixed(2)),
+                            deltaPct: parseFloat(pct.toFixed(1)), flag, products: prods });
+                    })()
                 };
 
                 // DECG/DECC items already collected at function start
@@ -9851,7 +9881,9 @@ Company:Absher Construction Company
                     unmatchedLines: (data.unmatchedLines || []).map(u => `[${u.section}] ${u.line}`),
                     paidToDate: data.orderSummary?.paidToDate || 0,
                     balanceAmount: data.orderSummary?.balance || 0,
-                    orderNotes: data.orderNotes || ''
+                    orderNotes: data.orderNotes || '',
+                    swTotal: data.orderSummary?.total || 0,
+                    swSubtotal: data.orderSummary?.subtotal || 0
                 };
 
                 // Post-import validation: detect silently dropped rows
