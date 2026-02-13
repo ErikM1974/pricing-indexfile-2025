@@ -95,12 +95,14 @@ async function deleteJSON(url) {
 
 /**
  * Verify a saved quote by fetching it back and validating fields.
+ * Round-trip verification: ensures what was saved can be loaded and matches.
  * @param {string} quoteId - The QuoteID to verify
  * @param {number} expectedProducts - Expected product item count
  * @param {number} expectedTotal - Expected TotalAmount (with tax)
+ * @param {Object} [savedSessionData] - Original session data for deep field comparison
  * @returns {{ ok: boolean, checks: Array, session: Object, items: Array }}
  */
-async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
+async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessionData) {
     try {
         // Fetch session and items separately (backend doesn't have /api/public/quote combo endpoint)
         const sessResp = await fetch(`${BASE_URL}/api/quote_sessions?filter=QuoteID%3D'${encodeURIComponent(quoteId)}'`);
@@ -114,6 +116,8 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
         const allItems = await itemsResp.json();
         const items = (allItems || []).filter(i => i.QuoteID === quoteId);
         const checks = [];
+
+        // ── Core checks (original 8) ────────────────────────────────────
 
         // 1. Session exists with correct QuoteID
         checks.push({ name: 'QuoteID match', ok: session.QuoteID === quoteId });
@@ -146,6 +150,90 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
         const validTypes = new Set(['embroidery', 'embroidery-additional', 'customer-supplied', 'fee', 'monogram']);
         const allTypesValid = items.every(i => validTypes.has(i.EmbellishmentType));
         checks.push({ name: 'Item types valid', ok: allTypesValid });
+
+        // ── Round-trip session field checks (Gap 2 fix) ─────────────────
+
+        if (savedSessionData) {
+            // 9. TotalQuantity round-trip
+            const savedQty = savedSessionData.TotalQuantity || 0;
+            const loadedQty = parseInt(session.TotalQuantity) || 0;
+            checks.push({ name: 'TotalQuantity RT', ok: savedQty === loadedQty,
+                detail: `saved=${savedQty} loaded=${loadedQty}` });
+
+            // 10. CustomerName round-trip
+            checks.push({ name: 'CustomerName RT', ok: session.CustomerName === savedSessionData.CustomerName,
+                detail: session.CustomerName !== savedSessionData.CustomerName
+                    ? `saved="${savedSessionData.CustomerName}" loaded="${session.CustomerName}"`
+                    : undefined });
+
+            // 11. CompanyName round-trip
+            checks.push({ name: 'CompanyName RT', ok: session.CompanyName === savedSessionData.CompanyName,
+                detail: session.CompanyName !== savedSessionData.CompanyName
+                    ? `saved="${savedSessionData.CompanyName}" loaded="${session.CompanyName}"`
+                    : undefined });
+
+            // 12. TaxRate round-trip (within floating point tolerance)
+            const savedTaxRate = parseFloat(savedSessionData.TaxRate) || 0;
+            const loadedTaxRate = parseFloat(session.TaxRate) || 0;
+            checks.push({ name: 'TaxRate RT', ok: Math.abs(savedTaxRate - loadedTaxRate) < 0.001,
+                detail: `saved=${savedTaxRate} loaded=${loadedTaxRate}` });
+
+            // 13. TaxAmount round-trip
+            const savedTaxAmt = parseFloat(savedSessionData.TaxAmount) || 0;
+            const loadedTaxAmt = parseFloat(session.TaxAmount) || 0;
+            checks.push({ name: 'TaxAmount RT', ok: Math.abs(savedTaxAmt - loadedTaxAmt) < 0.02,
+                detail: `saved=$${savedTaxAmt.toFixed(2)} loaded=$${loadedTaxAmt.toFixed(2)}` });
+
+            // 14. OrderNumber round-trip
+            if (savedSessionData.OrderNumber) {
+                checks.push({ name: 'OrderNumber RT', ok: session.OrderNumber === savedSessionData.OrderNumber,
+                    detail: session.OrderNumber !== savedSessionData.OrderNumber
+                        ? `saved="${savedSessionData.OrderNumber}" loaded="${session.OrderNumber}"`
+                        : undefined });
+            }
+
+            // 15. ShipToState round-trip (important for tax determination)
+            if (savedSessionData.ShipToState) {
+                checks.push({ name: 'ShipToState RT', ok: session.ShipToState === savedSessionData.ShipToState,
+                    detail: session.ShipToState !== savedSessionData.ShipToState
+                        ? `saved="${savedSessionData.ShipToState}" loaded="${session.ShipToState}"`
+                        : undefined });
+            }
+
+            // 16. DigitizingCodes round-trip
+            if (savedSessionData.DigitizingCodes) {
+                checks.push({ name: 'DigitizingCodes RT', ok: (session.DigitizingCodes || '') === savedSessionData.DigitizingCodes,
+                    detail: `saved="${savedSessionData.DigitizingCodes}" loaded="${session.DigitizingCodes || ''}"` });
+            }
+        }
+
+        // ── Line item detail checks ─────────────────────────────────────
+
+        // 17. Fee items: check expected ShopWorks part numbers present
+        const feeItems = items.filter(i => i.EmbellishmentType === 'fee');
+        const feePartNumbers = new Set(feeItems.map(i => i.StyleNumber));
+        const validFeePNs = new Set([
+            'AS-Garm', 'AS-CAP', 'DD', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'DISCOUNT', '3D-EMB', 'Laser Patch', 'SHIP', 'TAX',
+            'Monogram', 'NAME', 'WEIGHT'
+        ]);
+        const unknownFees = [...feePartNumbers].filter(pn => !validFeePNs.has(pn));
+        checks.push({ name: 'Fee PNs valid', ok: unknownFees.length === 0,
+            detail: unknownFees.length > 0 ? `unknown: ${unknownFees.join(', ')}` : `${feePartNumbers.size} fee type(s)` });
+
+        // 18. All product items have non-zero FinalUnitPrice
+        const zeroPrice = productItems.filter(i => !parseFloat(i.FinalUnitPrice));
+        checks.push({ name: 'Product prices', ok: zeroPrice.length === 0,
+            detail: zeroPrice.length > 0
+                ? `${zeroPrice.length} item(s) with $0 price`
+                : `${productItems.length} item(s) priced` });
+
+        // 19. All product items have non-empty SizeBreakdown
+        const noSizes = productItems.filter(i => !i.SizeBreakdown || i.SizeBreakdown === '{}');
+        checks.push({ name: 'Size breakdowns', ok: noSizes.length === 0,
+            detail: noSizes.length > 0
+                ? `${noSizes.length} item(s) missing sizes`
+                : `all ${productItems.length} have sizes` });
 
         const allOk = checks.every(c => c.ok);
         return { ok: allOk, checks, session, items };
@@ -624,6 +712,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 DropDeadDate: parsed.dropDeadDate ? new Date(parsed.dropDeadDate).toISOString() : null,
                 PaymentTerms: parsed.paymentTerms || '',
                 DesignNumbers: JSON.stringify(parsed.designNumbers || []),
+                DigitizingCodes: (parsed.services.digitizingCodes || []).join(','),
                 TaxRate: taxRate,
                 TaxAmount: taxAmount,
                 ImportNotes: JSON.stringify([...parsed.warnings, ...parsed.unmatchedLines.map(u =>
@@ -831,7 +920,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
             // Brief delay for Caspio to process the writes
             await new Promise(r => setTimeout(r, 1500));
 
-            const verify = await verifyQuote(quoteID, result.productCount, totalAmount);
+            const verify = await verifyQuote(quoteID, result.productCount, totalAmount, sessionData);
             result.verified = verify.ok;
             result.verifyChecks = verify.checks;
 
@@ -1106,7 +1195,15 @@ async function main() {
     // Verification summary (if live mode)
     if (doSave && verified.length > 0) {
         // Aggregate check results across all verified orders
-        const checkNames = ['QuoteID match', 'Status=Open', 'Items saved', 'Product count', 'Total math', 'Customer data', 'Item QuoteIDs', 'Item types valid'];
+        const checkNames = [
+            'QuoteID match', 'Status=Open', 'Items saved', 'Product count', 'Total math',
+            'Customer data', 'Item QuoteIDs', 'Item types valid',
+            // Round-trip session field checks
+            'TotalQuantity RT', 'CustomerName RT', 'CompanyName RT',
+            'TaxRate RT', 'TaxAmount RT', 'OrderNumber RT', 'ShipToState RT', 'DigitizingCodes RT',
+            // Line item detail checks
+            'Fee PNs valid', 'Product prices', 'Size breakdowns'
+        ];
         console.log('\n  Verification checks:');
         for (const name of checkNames) {
             const passed = results.filter(r => r.verifyChecks.find(c => c.name === name && c.ok)).length;

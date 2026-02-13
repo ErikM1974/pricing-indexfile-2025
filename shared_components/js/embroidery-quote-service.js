@@ -319,6 +319,7 @@ class EmbroideryQuoteService {
                 PaymentTerms: customerData.paymentTerms || '',
                 // Frozen tax & design data (2026-02-12)
                 DesignNumbers: JSON.stringify(customerData.designNumbers || []),
+                DigitizingCodes: (customerData.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
                 ImportNotes: JSON.stringify(customerData.importNotes || []),
@@ -1366,6 +1367,7 @@ class EmbroideryQuoteService {
                 PaymentTerms: customerData.paymentTerms || '',
                 // Frozen tax & design data (2026-02-12)
                 DesignNumbers: JSON.stringify(customerData.designNumbers || []),
+                DigitizingCodes: (customerData.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
                 ImportNotes: JSON.stringify(customerData.importNotes || []),

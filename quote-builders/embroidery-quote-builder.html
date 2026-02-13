@@ -7247,6 +7247,7 @@ Company:Absher Construction Company
                     paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
                     // Frozen tax & design data for Caspio (2026-02-12)
                     designNumbers: lastImportMetadata?.designNumbers || [],
+                    digitizingCodes: lastImportMetadata?.digitizingCodes || [],
                     taxRate: (() => {
                         const includeTax = document.getElementById('include-tax')?.checked;
                         if (!includeTax) return 0;
@@ -9844,6 +9845,7 @@ Company:Absher Construction Company
                 // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
                 lastImportMetadata = {
                     designNumbers: data.designNumbers || [],
+                    digitizingCodes: data.services?.digitizingCodes || [],
                     warnings: data.warnings || [],
                     reviewItems: (data.reviewItems || []).map(r => `${r.partNumber || '(no PN)'}: ${r.description || ''}`),
                     unmatchedLines: (data.unmatchedLines || []).map(u => `[${u.section}] ${u.line}`),

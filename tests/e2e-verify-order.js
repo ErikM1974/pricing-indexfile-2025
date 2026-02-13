@@ -131,7 +131,7 @@ async function deleteJSON(url) {
 
 // ── Verify & Cleanup Helpers ──────────────────────────────────────────────
 
-async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
+async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessionData) {
     try {
         // Fetch session and items separately (backend doesn't have /api/public/quote combo endpoint)
         const sessResp = await fetch(`${BASE_URL}/api/quote_sessions?filter=QuoteID%3D'${encodeURIComponent(quoteId)}'`);
@@ -146,6 +146,7 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
         const items = (allItems || []).filter(i => i.QuoteID === quoteId);
         const checks = [];
 
+        // ── Core checks ─────────────────────────────────────────────────
         checks.push({ name: 'QuoteID match', ok: session.QuoteID === quoteId });
         checks.push({ name: 'Status=Open', ok: session.Status === 'Open' });
         checks.push({ name: 'Items saved', ok: items.length > 0, detail: `${items.length} items` });
@@ -154,7 +155,6 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
         checks.push({ name: 'Product count', ok: productItems.length >= expectedProducts,
             detail: `got ${productItems.length}, expected ${expectedProducts}` });
 
-        // Sum ALL item LineTotals (including TAX) vs session TotalAmount
         const itemsTotal = items.reduce((sum, i) => sum + (parseFloat(i.LineTotal) || 0), 0);
         const sessionTotal = parseFloat(session.TotalAmount) || 0;
         const totalDiff = Math.abs(itemsTotal - sessionTotal);
@@ -166,6 +166,53 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal) {
 
         const validTypes = new Set(['embroidery', 'embroidery-additional', 'customer-supplied', 'fee', 'monogram']);
         checks.push({ name: 'Item types valid', ok: items.every(i => validTypes.has(i.EmbellishmentType)) });
+
+        // ── Round-trip session field checks ──────────────────────────────
+        if (savedSessionData) {
+            const savedQty = savedSessionData.TotalQuantity || 0;
+            const loadedQty = parseInt(session.TotalQuantity) || 0;
+            checks.push({ name: 'TotalQuantity RT', ok: savedQty === loadedQty,
+                detail: `saved=${savedQty} loaded=${loadedQty}` });
+
+            checks.push({ name: 'CustomerName RT', ok: session.CustomerName === savedSessionData.CustomerName });
+            checks.push({ name: 'CompanyName RT', ok: session.CompanyName === savedSessionData.CompanyName });
+
+            const savedTaxRate = parseFloat(savedSessionData.TaxRate) || 0;
+            const loadedTaxRate = parseFloat(session.TaxRate) || 0;
+            checks.push({ name: 'TaxRate RT', ok: Math.abs(savedTaxRate - loadedTaxRate) < 0.001,
+                detail: `saved=${savedTaxRate} loaded=${loadedTaxRate}` });
+
+            if (savedSessionData.OrderNumber) {
+                checks.push({ name: 'OrderNumber RT', ok: session.OrderNumber === savedSessionData.OrderNumber });
+            }
+            if (savedSessionData.ShipToState) {
+                checks.push({ name: 'ShipToState RT', ok: session.ShipToState === savedSessionData.ShipToState });
+            }
+            if (savedSessionData.DigitizingCodes) {
+                checks.push({ name: 'DigitizingCodes RT', ok: (session.DigitizingCodes || '') === savedSessionData.DigitizingCodes,
+                    detail: `saved="${savedSessionData.DigitizingCodes}" loaded="${session.DigitizingCodes || ''}"` });
+            }
+        }
+
+        // ── Line item detail checks ─────────────────────────────────────
+        const feeItems = items.filter(i => i.EmbellishmentType === 'fee');
+        const feePartNumbers = new Set(feeItems.map(i => i.StyleNumber));
+        const validFeePNs = new Set([
+            'AS-Garm', 'AS-CAP', 'DD', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'DISCOUNT', '3D-EMB', 'Laser Patch', 'SHIP', 'TAX',
+            'Monogram', 'NAME', 'WEIGHT'
+        ]);
+        const unknownFees = [...feePartNumbers].filter(pn => !validFeePNs.has(pn));
+        checks.push({ name: 'Fee PNs valid', ok: unknownFees.length === 0,
+            detail: unknownFees.length > 0 ? `unknown: ${unknownFees.join(', ')}` : `${feePartNumbers.size} fee type(s)` });
+
+        const zeroPrice = productItems.filter(i => !parseFloat(i.FinalUnitPrice));
+        checks.push({ name: 'Product prices', ok: zeroPrice.length === 0,
+            detail: zeroPrice.length > 0 ? `${zeroPrice.length} with $0` : `${productItems.length} priced` });
+
+        const noSizes = productItems.filter(i => !i.SizeBreakdown || i.SizeBreakdown === '{}');
+        checks.push({ name: 'Size breakdowns', ok: noSizes.length === 0,
+            detail: noSizes.length > 0 ? `${noSizes.length} missing` : `all ${productItems.length} have sizes` });
 
         return { ok: checks.every(c => c.ok), checks, session, items };
     } catch (err) {
@@ -913,6 +960,7 @@ async function main() {
                 DropDeadDate: customerData.dropDeadDate ? new Date(customerData.dropDeadDate).toISOString() : null,
                 PaymentTerms: customerData.paymentTerms || '',
                 DesignNumbers: JSON.stringify(customerData.designNumbers || []),
+                DigitizingCodes: (parsed.services.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
                 ImportNotes: JSON.stringify(customerData.importNotes || [])
@@ -1073,7 +1121,7 @@ async function main() {
             await new Promise(r => setTimeout(r, 1500));
 
             const productCount = pricing.products.reduce((sum, pp) => sum + pp.lineItems.length, 0);
-            const verify = await verifyQuote(quoteID, productCount, totalAmount);
+            const verify = await verifyQuote(quoteID, productCount, totalAmount, sessionData);
 
             console.log('');
             for (const c of verify.checks) {
