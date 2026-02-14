@@ -1684,6 +1684,16 @@
             }
         }
         
+        // Round cap price using API rounding method (matches pricing engine's roundCapPrice)
+        function roundCapPrice(price) {
+            if (isNaN(price)) return null;
+            const method = pricingData?.apiData?.rulesR?.RoundingMethod;
+            if (method === 'CeilDollar') return Math.ceil(price);
+            // Default: HalfDollarUp — round UP to nearest $0.50
+            if (price % 0.5 === 0) return price;
+            return Math.ceil(price * 2) / 2;
+        }
+
         // Calculate cap pricing using the same formula as cap-quote-pricing.js
         function calculateCapPrice(baseCapPrice, quantity, sizeUpcharge = 0) {
 
@@ -1700,22 +1710,22 @@
 
             // Get embroidery price for the tier and 8000 stitches
             const embroideryPrice = getEmbroideryPriceForTier(tier);
-            
+
             // Calculate decorated price
             const decoratedPrice = capSellingPrice + embroideryPrice;
-            
-            // Round UP to nearest dollar (matching cap quote builder)
-            let finalPrice = Math.ceil(decoratedPrice);
-            
+
+            // Round using API-driven method (HalfDollarUp default, matching pricing engine)
+            let finalPrice = roundCapPrice(decoratedPrice);
+
             // Note: LTM fee is only for orders of 7 or fewer pieces
             // We don't show that in the regular pricing table
-            
+
             // Add size upcharge if any
             if (sizeUpcharge > 0) {
                 finalPrice += sizeUpcharge;
-                finalPrice = Math.ceil(finalPrice); // Round up again after upcharge
+                finalPrice = roundCapPrice(finalPrice);
             }
-            
+
             return finalPrice;
         }
         

@@ -1227,6 +1227,17 @@ Files affected: `app-modern.js`, `cart.js`, `cart-ui.js`, `cart-price-recalculat
 
 # Calculator & Quote Builder Sync
 
+## Verified: Cap Calculator ↔ Pricing Engine Sync (2026-02-14)
+**Project:** [Pricing Index]
+**Problem:** Cap calculator page used hardcoded `Math.ceil()` rounding — needed to verify it matches the pricing engine after switching to API-driven `roundCapPrice()`.
+**Finding:** All 3 systems (pricing engine, calculator page, pricing service) produce identical prices. Verified with live API data for Richardson 112 — all 5 tiers match to the penny.
+**Key facts:**
+- Cap rounding method is `CeilDollar` (whole dollar ceiling, NOT `HalfDollarUp`). Returned by API `rulesR.RoundingMethod`.
+- All cap tier margins are identical (0.57), so pricing engine's `tiersR[0]` shortcut and calculator's per-tier lookup produce the same result.
+- LTM bake-in confirmed: `$29.00 + $50/1 = $79.00` for 1-piece qty.
+- Verification script: `tests/verify-cap-calculator-sync.js` — runs against live API, compares all 5 tiers.
+**Prevention:** If cap margins ever differ by tier in Caspio, the pricing engine's single-margin approach (`tiersR[0]`) would need updating to per-tier lookup.
+
 ## Bug: DECG-Only Quotes Blocked from Save/Print/Email/Copy (2026-02-08)
 **Project:** [Pricing Index]
 **Problem:** When a quote contains only DECG/DECC items (customer-supplied garments/caps, no SanMar products), clicking Save & Get Link, Print, Email, or Copy showed "Add products before saving" error and blocked the action.

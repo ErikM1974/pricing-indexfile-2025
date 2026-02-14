@@ -1,0 +1,631 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 2)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:140731
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:5281
+Company:Absher Construction Company
+**************************************************************************
+Order Information
+Date Order Placed:2/12/2026
+Req. Ship Date:3/5/2026
+Drop Dead Date:
+Purchase Order #:52475
+Terms:Net 10
+Ordered by:Joshuwauh Mccullough
+Phone:
+Fax:
+Email:Joshuwauh.mccullough@absherco.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address: 
+**************************************************************************
+Design Information
+Design #:23074 - Absher logo
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:CT100617
+Description:Carhartt  Rain Defender  Paxton Heavyweight Hooded Zip Mock Sweatshirt, Black
+Unit Price:75.99
+Line Item Price:75.99
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:75.99
+Sales Tax:7.67
+Shipping:0.00
+Total:83.66
+Paid To Date:
+Balance:83.66
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:140732
+Company:Northwest Custom Apparel
+Salesperson:Taneisha Clark
+Phone:
+Fax:
+Email:
+**************************************************************************
+Your Company Information
+Customer #:11420
+Company:HOPSNDROPS - Gig Harbor
+**************************************************************************
+Order Information
+Date Order Placed:2/12/2026
+Req. Ship Date:2/26/2026
+Drop Dead Date:
+Purchase Order #:52476
+Terms:Net 10
+Ordered by:Bill Boyle
+Phone:253-514-6074
+Fax:
+Email:gigharbor@rocksolidrestaurants.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS Ground
+Ship Address:Hops N Drops, 5414 POINT FOSDICK DR, BLDG A 100, GIG HARBOR, WA 98335-0035, US
+**************************************************************************
+Design Information
+Design #:31071 - Hops N Drops
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:ST350_3X
+Description:Sport-Tek Posicharge Competitor Tee, Black
+Unit Price:15.50
+Line Item Price:46.50
+Item Quantity:3
+Adult:Quantity
+XXXL (Other):3
+Item 2 of 5
+Part Number:ST350
+Description:Sport-Tek Posicharge Competitor Tee, Black
+Unit Price:12.50
+Line Item Price:75.00
+Item Quantity:6
+Adult:Quantity
+M:2
+LG:2
+XL:2
+Item 3 of 5
+Part Number:ST350_2X
+Description:Sport-Tek Posicharge Competitor Tee, Black
+Unit Price:14.50
+Line Item Price:29.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 4 of 5
+Part Number:CP96_OSFA
+Description:Port Authority Soft Brushed Canvas Cap, Black
+Unit Price:11.00
+Line Item Price:22.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 5 of 5
+Part Number:HT01
+Description:Kitchen Skull Cap: Edwards, Black
+Unit Price:15.50
+Line Item Price:31.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+**************************************************************************
+Order Summary
+Subtotal:203.50
+Sales Tax:18.52
+Shipping:0.001
+Total:222.02
+Paid To Date:
+Balance:222.02
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:140730
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11926
+Company:Forma Construction
+**************************************************************************
+Order Information
+Date Order Placed:2/11/2026
+Req. Ship Date:3/5/2026
+Drop Dead Date:
+Purchase Order #:52474
+Terms:Gift Code
+Ordered by:Zachary Vance
+Phone:
+Fax:
+Email:zachv@formacc.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address: 
+**************************************************************************
+Design Information
+Design #:32451 - Forma Logo Jackets only
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:CTK121_2X
+Description:Carhartt  Midweight Hooded Sweatshirt, Black
+Unit Price:72.00
+Line Item Price:72.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+**************************************************************************
+Order Summary
+Subtotal:72.00
+Sales Tax:7.27
+Shipping:0.00
+Total:79.27
+Paid To Date:
+Balance:79.27
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:140267
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2633
+Company:Olympic Pipeline 
+**************************************************************************
+Order Information
+Date Order Placed:1/5/2026
+Req. Ship Date:2/19/2026
+Drop Dead Date:
+Purchase Order #:
+Terms:Pay On Pickup
+Ordered by:Chris Anderson
+Phone:206-786-0658
+Fax:
+Email:don.anderson@bp.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Olympic Pipeline , 2932 167th St. SE, Bothell, WA 98012-6046
+**************************************************************************
+Design Information
+Design #:40084 - BP UAS PANH Logo
+Design #:40085 - Olympic UAS Incident Logo
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:
+Description:40084 BP UAS PANH Logo
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 2 of 5
+Part Number:CP90L_OSFA
+Description:Port Authority Fleece-Lined Knit Cap, Black
+Unit Price:
+Line Item Price:0.00
+Item Quantity:25
+Adult:Quantity
+XXXL (Other):25
+Item 3 of 5
+Part Number:CP90L_OSFA
+Description:Port Authority Fleece-Lined Knit Cap, Black
+Unit Price:22.00
+Line Item Price:550.00
+Item Quantity:25
+Adult:Quantity
+XXXL (Other):25
+Item 4 of 5
+Part Number:
+Description:Olympic UAS Incident Logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 5 of 5
+Part Number:CP90L_OSFA
+Description:Port Authority Fleece-Lined Knit Cap, Black
+Unit Price:22.00
+Line Item Price:550.00
+Item Quantity:25
+Adult:Quantity
+XXXL (Other):25
+**************************************************************************
+Order Summary
+Subtotal:1,100.00
+Sales Tax:111.10
+Shipping:
+Total:1,211.10
+Paid To Date:
+Balance:1,211.10
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:140348
+Company:Northwest Custom Apparel
+Salesperson:House 
+Phone:
+Fax:
+Email:
+**************************************************************************
+Your Company Information
+Customer #:12920
+Company:Hearthside and Home LLC
+**************************************************************************
+Order Information
+Date Order Placed:1/12/2026
+Req. Ship Date:2/2/2026
+Drop Dead Date:
+Purchase Order #:
+Terms:Pay On Pickup
+Ordered by:Theresa Percy
+Phone:425-771-6434
+Fax:
+Email:hearthsideandhomellc@hotmail.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS Ground
+Ship Address:Hearthside and Home LLC, 4829 196th St. SW, Lynnwood, Wa 98036
+**************************************************************************
+Design Information
+Design #:35605.01 - Hearthside
+Design #:36707.01 - Enviro Fireplaces New logo
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:AL2014
+Description:Allmade  Unisex Tri-Blend V-Neck Tee, Space Black
+Unit Price:29.57
+Line Item Price:147.85
+Item Quantity:5
+Adult:Quantity
+LG:5
+Item 2 of 5
+Part Number:AL2014_2X
+Description:Allmade  Unisex Tri-Blend V-Neck Tee, Space Black
+Unit Price:31.57
+Line Item Price:63.14
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 3 of 5
+Part Number:AL2018
+Description:Allmade  Womens Tri-Blend V-Neck Tee, Space Black
+Unit Price:29.57
+Line Item Price:147.85
+Item Quantity:5
+Adult:Quantity
+S (Other):2
+XL:3
+Item 4 of 5
+Part Number:AL2018_2X
+Description:Allmade  Womens Tri-Blend V-Neck Tee, Space Black
+Unit Price:31.57
+Line Item Price:63.14
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 5 of 5
+Part Number:AL
+Description:Additional Logo - enviro
+Unit Price:6.50
+Line Item Price:91.00
+Item Quantity:14
+Adult:Quantity
+S (Other):14
+**************************************************************************
+Order Summary
+Subtotal:512.98
+Sales Tax:53.83
+Shipping:20.00
+Total:586.81
+Paid To Date:
+Balance:586.81
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:140408
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11919
+Company:Interstate - McBee LLC
+**************************************************************************
+Order Information
+Date Order Placed:1/16/2026
+Req. Ship Date:2/19/2026
+Drop Dead Date:
+Purchase Order #:
+Terms:Net 30
+Ordered by:Laura  Andrea
+Phone:440-903-8119
+Fax:
+Email:landreas@interstate-mcbee.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS Ground
+Ship Address:Interstate - McBee LLC, ATTN: Laura Andrea , 4901 Lakeside Ave, Cleveland , OH 44114
+**************************************************************************
+Design Information
+Design #:40153 - Inter - McBee 
+Design #:40153.01 - Inter - McBee 
+**************************************************************************
+Items Purchased
+Item 1 of 8
+Part Number:S663
+Description:Port Authority Superpro Twill Shirt, Ultramarine Bl
+Unit Price:39.00
+Line Item Price:1,872.00
+Item Quantity:48
+Adult:Quantity
+S (Other):12
+M:12
+LG:12
+XL:12
+Item 2 of 8
+Part Number:S663_2X
+Description:Port Authority Superpro Twill Shirt, Ultramarine Bl
+Unit Price:41.00
+Line Item Price:492.00
+Item Quantity:12
+Adult:Quantity
+XXL:12
+Item 3 of 8
+Part Number:S663
+Description:Port Authority Superpro Twill Shirt, White
+Unit Price:39.00
+Line Item Price:1,872.00
+Item Quantity:48
+Adult:Quantity
+S (Other):12
+M:12
+LG:12
+XL:12
+Item 4 of 8
+Part Number:S663_2X
+Description:Port Authority Superpro Twill Shirt, White
+Unit Price:41.00
+Line Item Price:492.00
+Item Quantity:12
+Adult:Quantity
+XXL:12
+Item 5 of 8
+Part Number:S663
+Description:Port Authority Superpro Twill Shirt, True Navy
+Unit Price:39.00
+Line Item Price:1,872.00
+Item Quantity:48
+Adult:Quantity
+S (Other):12
+M:12
+LG:12
+XL:12
+Item 6 of 8
+Part Number:S663_2X
+Description:Port Authority Superpro Twill Shirt, True Navy
+Unit Price:41.00
+Line Item Price:492.00
+Item Quantity:12
+Adult:Quantity
+XXL:12
+Item 7 of 8
+Part Number:S663
+Description:Port Authority Superpro Twill Shirt, Sterling Grey
+Unit Price:39.00
+Line Item Price:1,872.00
+Item Quantity:48
+Adult:Quantity
+S (Other):12
+M:12
+LG:12
+XL:12
+Item 8 of 8
+Part Number:S663_2X
+Description:Port Authority Superpro Twill Shirt, Sterling Grey
+Unit Price:41.00
+Line Item Price:492.00
+Item Quantity:12
+Adult:Quantity
+XXL:12
+**************************************************************************
+Order Summary
+Subtotal:9,456.00
+Sales Tax:0.00
+Shipping:
+Total:9,456.00
+Paid To Date:
+Balance:9,456.00
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:140458
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2705
+Company:New Dimension Lawn & Landscape, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:1/21/2026
+Req. Ship Date:3/13/2026
+Drop Dead Date:
+Purchase Order #:
+Terms:COD 
+Ordered by:Jon Kessler
+Phone:949-315-1625
+Fax:
+Email:Sales@ndll.net
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:New Dimension Lawn & Landscape, Inc., 8504 Canyon RD East, Puyallup, WA 98371
+**************************************************************************
+Design Information
+Design #:230.01 - T3551 New Dimension Lawn & Landscape, Inc.
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:J792
+Description:Port Authority Nootka Jacket., Engine Red/Blk
+Unit Price:120.00
+Line Item Price:1,920.00
+Item Quantity:16
+Adult:Quantity
+M:10
+LG:4
+XL:2
+Item 2 of 2
+Part Number:Monogram
+Description:Dir. Embroider Names - Block 2 White - All caps
+Unit Price:12.50
+Line Item Price:200.00
+Item Quantity:16
+Adult:Quantity
+S (Other):16
+**************************************************************************
+Order Summary
+Subtotal:2,120.00
+Sales Tax:214.12
+Shipping:
+Total:2,334.12
+Paid To Date:
+Balance:2,334.12
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:140471
+Company:Northwest Custom Apparel
+Salesperson:Taneisha Clark
+Phone:
+Fax:
+Email:
+**************************************************************************
+Your Company Information
+Customer #:12430
+Company:Northwest Heavy Haul 
+**************************************************************************
+Order Information
+Date Order Placed:1/22/2026
+Req. Ship Date:2/19/2026
+Drop Dead Date:
+Purchase Order #:
+Terms:Pay On Pickup
+Ordered by:Frank  LeTourneau
+Phone:253-405-7502
+Fax:
+Email:Frank@nwheavyhaul.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Northwest Heavy Haul , 11814 237th Ave CT E, Buckley, WA 98321
+**************************************************************************
+Design Information
+Design #:40114 - NW Heavy Haul Cap 
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:C865_L/XL
+Description:Port Authority Flexfit Cap - Purple Logo , Black
+Unit Price:24.00
+Line Item Price:720.00
+Item Quantity:30
+Adult:Quantity
+XXXL (Other):30
+Item 2 of 4
+Part Number:323FPC_OSFA
+Description:Richardson Full Fabric 5-Panel Champ 323FPC Black Logo , Crm/Crm/Bk
+Unit Price:24.00
+Line Item Price:720.00
+Item Quantity:30
+Adult:Quantity
+XXXL (Other):30
+Item 3 of 4
+Part Number:STK-GLS-SQR-250x250
+Description:2.5" x 2.5" Full-Color Glossy Sticker
+Unit Price:1.04
+Line Item Price:156.00
+Item Quantity:150
+Adult:Quantity
+S (Other):150
+Item 4 of 4
+Part Number:LTM752
+Description:Polar Camel Black 16 oz. Pint with Slider Lid, Black
+Unit Price:16.00
+Line Item Price:576.00
+Item Quantity:36
+Adult:Quantity
+S (Other):36
+**************************************************************************
+Order Summary
+Subtotal:2,172.00
+Sales Tax:219.37
+Shipping:
+Total:2,391.37
+Paid To Date:700.00
+Balance:1,691.37
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 2
+================================================================================

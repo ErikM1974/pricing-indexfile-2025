@@ -36,6 +36,8 @@ Check the batch runner output for:
 
 5. **Parser warnings** — Unmatched lines, unexpected data, missing fields
 
+6. **Pricing audit flags** — Summarize OK/REVIEW/MISMATCH counts. For REVIEW/MISMATCH orders, show the per-product breakdown including service items (AL, Monogram, DECG, Weight, Digitizing). Flag any orders where DECG-only items cause 100% MISMATCH (indicates missing service item audit data).
+
 ### Step 3: Fix Code If Needed
 
 If parser bugs or batch runner issues are found:

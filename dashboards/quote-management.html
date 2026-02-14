@@ -423,6 +423,9 @@
                             <button class="action-btn" onclick="event.stopPropagation(); copyQuoteLink('${quote.QuoteID}')" title="Copy Link">
                                 <i class="fas fa-link"></i>
                             </button>
+                            <button class="action-btn action-audit" onclick="event.stopPropagation(); viewAudit('${quote.QuoteID}')" title="Pricing Audit">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
                             <button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${quote.QuoteID}', '${quote.Status || 'Open'}')" title="Delete Quote">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -582,6 +585,10 @@
                 // Fallback
                 prompt('Copy this link:', url);
             });
+        }
+
+        function viewAudit(quoteId) {
+            window.open(`/pages/quote-audit.html?id=${quoteId}`, '_blank');
         }
 
         // Utilities

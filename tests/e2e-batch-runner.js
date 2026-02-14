@@ -594,6 +594,10 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         else if (parsed.services.additionalLogo) result.services.push('AL');
         if (parsed.services.monograms.length > 0) result.services.push(`Monogram x${parsed.services.monograms.reduce((s, m) => s + m.quantity, 0)}`);
         if (parsed.services.weights?.length > 0) result.services.push(`Weight x${parsed.services.weights.reduce((s, w) => s + w.quantity, 0)}`);
+        if (parsed.services.sewing?.length > 0) result.services.push(`Sewing x${parsed.services.sewing.reduce((s, sw) => s + sw.quantity, 0)}`);
+        if (parsed.services.designTransfer) result.services.push('DT');
+        if (parsed.services.contract?.length > 0) result.services.push(`CTR x${parsed.services.contract.length}`);
+        if (parsed.services.digitalPrint?.length > 0) result.services.push(`CDP x${parsed.services.digitalPrint.length}`);
         if (parsed.services.rush) result.services.push('RUSH');
         if (parsed.services.artCharges) result.services.push('ART');
         if (parsed.services.graphicDesign) result.services.push('GRT-75');
@@ -633,9 +637,12 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         const shippingFee = parsed.orderSummary.shipping || parsed.services.shipping?.amount || 0;
         const monogramTotal = parsed.services.monograms.reduce((s, m) => s + m.total, 0);
         const weightTotal = parsed.services.weights?.reduce((s, w) => s + w.total, 0) || 0;
+        const sewingTotal = parsed.services.sewing?.reduce((s, sw) => s + (sw.unitPrice * sw.quantity), 0) || 0;
+        const designTransferFee = parsed.services.designTransfer?.amount || 0;
+        const contractTotal = parsed.services.contract?.reduce((s, c) => s + (c.unitPrice * c.quantity), 0) || 0;
         const taxRate = (parsed.orderSummary.taxRate || 0) / 100;
-        // Include DECG, monogram, weight in taxable base (matches embroidery builder behavior)
-        const taxableBase = pricingGrandTotal + decgTotal + artCharge + graphicDesignCharge + rushFee + shippingFee + monogramTotal + weightTotal;
+        // Include DECG, monogram, weight, sewing, DT, contract in taxable base (matches embroidery builder behavior)
+        const taxableBase = pricingGrandTotal + decgTotal + artCharge + graphicDesignCharge + rushFee + shippingFee + monogramTotal + weightTotal + sewingTotal + designTransferFee + contractTotal;
         const taxAmount = Math.round(taxableBase * taxRate * 100) / 100;
         const totalAmount = taxableBase + taxAmount;
 
@@ -667,6 +674,105 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
             });
         }
+
+        // ── Append service items to audit (AL, Monogram, Weight, Digitizing, DECG/DECC) ──
+        const pricingForAL = result._pricing || {};
+        const alUnitPrice = pricingForAL.additionalServices?.length > 0
+            ? (pricingForAL.additionalServices[0]?.unitPrice || 6.50)
+            : 6.50;
+        (parsed.services.additionalLogos || []).forEach(al => {
+            const swU = parseFloat(al.unitPrice || al.price || 0);
+            const ourU = parseFloat(alUnitPrice.toFixed(2));
+            const d = ourU - swU;
+            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+            auditProducts.push({ style: 'AL', color: 'Service', qty: parseInt(al.quantity || al.qty || 0),
+                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        });
+        (parsed.services.monograms || []).forEach(m => {
+            const swU = parseFloat(m.unitPrice || m.price || 0);
+            const ourU = 12.50;
+            const d = ourU - swU;
+            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+            auditProducts.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
+                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        });
+        (parsed.services.weights || []).forEach(w => {
+            const swU = parseFloat(w.unitPrice || w.price || 0);
+            const ourU = 6.25;
+            const d = ourU - swU;
+            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+            auditProducts.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
+                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        });
+        (parsed.services.sewing || []).forEach(sw => {
+            const swU = parseFloat(sw.unitPrice || 0);
+            const ourU = 10.00; // Fixed 2026 sewing rate
+            const d = ourU - swU;
+            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+            auditProducts.push({ style: sw.partNumber || 'SEG', color: 'Service', qty: parseInt(sw.quantity || 0),
+                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        });
+        const digitizingPrices = { 'DD': 100, 'DDE': 50, 'DDT': 50, 'DGT-001': 100, 'DGT-002': 50, 'DGT-003': 50 };
+        (parsed.services.digitizingFees || []).forEach(df => {
+            const swU = parseFloat(df.amount || df.unitPrice || 0);
+            const ourU = digitizingPrices[df.code] || 100;
+            const d = ourU - swU;
+            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+            auditProducts.push({ style: df.code || 'DD', color: 'Service', qty: 1,
+                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        });
+        (parsed.decgItems || []).forEach(pd => {
+            const swU = parseFloat(pd.unitPrice || 0);
+            const ourU = parseFloat(pd.calculatedUnitPrice || pd.unitPrice || 0);
+            const qty = parseInt(pd.quantity || 0);
+            const d = ourU - swU;
+            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+            const label = pd.serviceType === 'decc' ? 'DECC' : 'DECG';
+            auditProducts.push({ style: label, color: 'Service', qty,
+                swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        });
+        // RUSH audit — 25% of subtotal
+        if (parsed.services.rush) {
+            const swRush = parsed.services.rush.amount || 0;
+            const ourRush = pricingGrandTotal * 0.25;
+            const d = ourRush - swRush;
+            const p = swRush > 0 ? Math.abs(d / swRush) * 100 : 0;
+            auditProducts.push({ style: 'RUSH', color: 'Service', qty: 1,
+                swUnit: parseFloat(swRush.toFixed(2)), ourUnit: parseFloat(ourRush.toFixed(2)),
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        }
+        // Art charges audit — $75/hr (same as GRT-75)
+        if (parsed.services.artCharges) {
+            const swArt = parsed.services.artCharges.amount || 0;
+            const ourArt = 75;
+            const d = ourArt - swArt;
+            const p = swArt > 0 ? Math.abs(d / swArt) * 100 : 0;
+            auditProducts.push({ style: 'Art/GRT-75', color: 'Service', qty: 1,
+                swUnit: parseFloat(swArt.toFixed(2)), ourUnit: ourArt,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        }
+        // Design Transfer audit — $50 sell
+        if (parsed.services.designTransfer) {
+            const swDT = parsed.services.designTransfer.swAmount || 0;
+            const ourDT = 50;
+            const d = ourDT - swDT;
+            const p = swDT > 0 ? Math.abs(d / swDT) * 100 : 0;
+            auditProducts.push({ style: 'DT', color: 'Service', qty: parsed.services.designTransfer.quantity || 1,
+                swUnit: parseFloat(swDT.toFixed(2)), ourUnit: ourDT,
+                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+        }
+        // Contract embroidery audit — pass-through (tiered pricing)
+        (parsed.services.contract || []).forEach(c => {
+            auditProducts.push({ style: c.partNumber, color: 'Service', qty: c.quantity,
+                swUnit: c.unitPrice, ourUnit: c.unitPrice,
+                delta: 0, flag: 'OK', isService: true });
+        });
 
         result.priceAudit = {
             swTotal: result.swTotal,
@@ -712,7 +818,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 SalesRepEmail: customerData.salesRepEmail,
                 SalesRepName: customerData.salesRepName,
                 TotalQuantity: pricing.totalQuantity || 0,
-                SubtotalAmount: parseFloat(((pricing.subtotal || 0) + (pricing.ltmFee || 0) + decgTotal + monogramTotal + weightTotal).toFixed(2)),
+                SubtotalAmount: parseFloat(((pricing.subtotal || 0) + (pricing.ltmFee || 0) + decgTotal + monogramTotal + weightTotal + sewingTotal + designTransferFee + contractTotal).toFixed(2)),
                 LTMFeeTotal: parseFloat((pricing.ltmFee || 0).toFixed(2)),
                 TotalAmount: parseFloat(totalAmount.toFixed(2)),
                 Status: 'Open',
@@ -780,7 +886,10 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 // ShopWorks pricing audit (2026-02-13)
                 SWTotal: parsed.orderSummary.total || 0,
                 SWSubtotal: parsed.orderSummary.subtotal || 0,
-                PriceAuditJSON: JSON.stringify(result.priceAudit || {})
+                PriceAuditJSON: JSON.stringify(result.priceAudit || {}),
+                // Package tracking (2026-02-14)
+                Carrier: parsed.packageTracking?.carrier || '',
+                TrackingNumber: parsed.packageTracking?.trackingNumber || ''
             };
 
             // Save session
@@ -944,6 +1053,20 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
             // Weight service fee items
             for (const wt of (parsed.services.weights || [])) {
                 feeItems.push({ pn: 'WEIGHT', name: `Weight: ${wt.description || 'Per-Person Weight'}`, qty: wt.quantity, unit: wt.unitPrice, total: wt.total });
+            }
+            // Sewing service fee items
+            for (const sw of (parsed.services.sewing || [])) {
+                const sewPN = sw.partNumber || 'SEG';
+                const sewDesc = sw.isCap ? 'Sew Emblems to Caps' : 'Sew Emblems to Garments';
+                feeItems.push({ pn: sewPN, name: `Sewing: ${sw.description || sewDesc}`, qty: sw.quantity, unit: sw.unitPrice, total: sw.unitPrice * sw.quantity });
+            }
+            // Design Transfer fee
+            if (designTransferFee > 0) {
+                feeItems.push({ pn: 'DT', name: 'Design Transfer / Sample', qty: parsed.services.designTransfer?.quantity || 1, unit: designTransferFee, total: designTransferFee });
+            }
+            // Contract embroidery fee items
+            for (const c of (parsed.services.contract || [])) {
+                feeItems.push({ pn: c.partNumber, name: c.description || 'Contract Embroidery', qty: c.quantity, unit: c.unitPrice, total: c.unitPrice * c.quantity });
             }
             if (taxAmount > 0)
                 feeItems.push({ pn: 'TAX', name: `Sales Tax (${(taxRate * 100).toFixed(1)}%)`, qty: 1, unit: taxRate * 100, total: taxAmount });

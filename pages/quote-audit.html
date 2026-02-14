@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Pricing Audit - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/pages/css/quote-audit.css?v=20260213b">
+</head>
+<body>
+    <!-- Staff Auth Gate -->
+    <div id="auth-gate" class="auth-gate" style="display: none;">
+        <div class="auth-gate-card">
+            <i class="fas fa-lock"></i>
+            <h2>Staff Login Required</h2>
+            <p>You must be logged in via the staff dashboard to view pricing audits.</p>
+            <a href="/staff-dashboard.html" class="btn btn-primary">Go to Staff Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading audit data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-state" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2 id="error-title">Error</h2>
+        <p id="error-message">Something went wrong.</p>
+    </div>
+
+    <!-- Audit Content -->
+    <div id="audit-content" class="audit-container" style="display: none;">
+        <!-- Header Bar -->
+        <header class="audit-page-header">
+            <div class="header-left">
+                <h1>Pricing Audit</h1>
+                <span class="quote-id-label" id="audit-quote-id">---</span>
+            </div>
+            <div class="header-right">
+                <span class="flag-badge" id="overall-flag-badge"></span>
+            </div>
+        </header>
+
+        <!-- Context Row -->
+        <section class="audit-context">
+            <div class="context-field" id="ctx-customer" style="display: none;">
+                <span class="ctx-label">Customer</span>
+                <span class="ctx-value" id="ctx-customer-value"></span>
+            </div>
+            <div class="context-field" id="ctx-company" style="display: none;">
+                <span class="ctx-label">Company</span>
+                <span class="ctx-value" id="ctx-company-value"></span>
+            </div>
+            <div class="context-field" id="ctx-sales-rep" style="display: none;">
+                <span class="ctx-label">Sales Rep</span>
+                <span class="ctx-value" id="ctx-sales-rep-value"></span>
+            </div>
+            <div class="context-field" id="ctx-order" style="display: none;">
+                <span class="ctx-label">Order #</span>
+                <span class="ctx-value" id="ctx-order-value"></span>
+            </div>
+            <div class="context-field" id="ctx-created" style="display: none;">
+                <span class="ctx-label">Created</span>
+                <span class="ctx-value" id="ctx-created-value"></span>
+            </div>
+        </section>
+
+        <!-- Summary Card -->
+        <section class="audit-summary-card">
+            <h3>Order-Level Comparison</h3>
+            <div class="summary-grid" id="summary-grid"></div>
+        </section>
+
+        <!-- Per-Product Table -->
+        <section class="audit-products-section">
+            <h3>Per-Product Breakdown</h3>
+            <div class="table-wrapper">
+                <table class="audit-table" id="audit-products-table">
+                    <thead>
+                        <tr>
+                            <th>Style</th>
+                            <th>Color</th>
+                            <th class="num-col">Qty</th>
+                            <th class="num-col">Charged (unit)</th>
+                            <th class="num-col">Correct (unit)</th>
+                            <th class="num-col">Charged (line)</th>
+                            <th class="num-col">Correct (line)</th>
+                            <th class="num-col">Diff ($)</th>
+                            <th>Flag</th>
+                        </tr>
+                    </thead>
+                    <tbody id="audit-products-tbody"></tbody>
+                    <tfoot id="audit-products-tfoot"></tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- Actions -->
+        <section class="audit-actions no-print">
+            <a id="view-customer-quote" href="#" target="_blank" class="btn btn-secondary">
+                <i class="fas fa-eye"></i> View Customer Quote
+            </a>
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Audit
+            </button>
+            <a href="/dashboards/quote-management.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Back to Quotes
+            </a>
+        </section>
+    </div>
+
+    <script src="/shared_components/js/staff-auth-helper.js"></script>
+    <script src="/pages/js/quote-audit.js?v=20260213b"></script>
+</body>
+</html>

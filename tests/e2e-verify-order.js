@@ -157,6 +157,55 @@ function buildPriceAudit(parsed, pricing, mergedProducts) {
         });
     }
 
+    // ── Append service items (AL, Monogram, Weight, Digitizing, DECG/DECC) ──
+    const alUnitPrice = pricing.additionalServices?.length > 0
+        ? (pricing.additionalServices[0]?.unitPrice || 6.50)
+        : 6.50;
+    (parsed.services.additionalLogos || []).forEach(al => {
+        const swU = parseFloat(al.unitPrice || al.price || 0);
+        const ourU = parseFloat(alUnitPrice.toFixed(2));
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        products.push({ style: 'AL', color: 'Service', qty: parseInt(al.quantity || al.qty || 0),
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    (parsed.services.monograms || []).forEach(m => {
+        const swU = parseFloat(m.unitPrice || m.price || 0);
+        const ourU = 12.50;
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        products.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    (parsed.services.weights || []).forEach(w => {
+        const swU = parseFloat(w.unitPrice || w.price || 0);
+        const ourU = 6.25;
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        products.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    (parsed.services.digitizingFees || []).forEach(df => {
+        const swU = parseFloat(df.amount || df.unitPrice || 0);
+        products.push({ style: df.code || 'DD', color: 'Service', qty: 1,
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(swU.toFixed(2)),
+            delta: 0, flag: 'OK', isService: true });
+    });
+    (parsed.decgItems || []).forEach(pd => {
+        const swU = parseFloat(pd.unitPrice || 0);
+        const ourU = parseFloat(pd.calculatedUnitPrice || pd.unitPrice || 0);
+        const qty = parseInt(pd.quantity || 0);
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        const label = pd.serviceType === 'decc' ? 'DECC' : 'DECG';
+        products.push({ style: label, color: 'Service', qty,
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+
     return {
         swTotal: parsed.orderSummary.total || 0,
         swSubtotal,
@@ -251,9 +300,10 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessio
         const feeItems = items.filter(i => i.EmbellishmentType === 'fee');
         const feePartNumbers = new Set(feeItems.map(i => i.StyleNumber));
         const validFeePNs = new Set([
-            'AS-Garm', 'AS-CAP', 'DD', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'AS-Garm', 'AS-CAP', 'DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
             'DISCOUNT', '3D-EMB', 'Laser Patch', 'SHIP', 'TAX',
-            'Monogram', 'NAME', 'WEIGHT'
+            'Monogram', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT',
+            'CTR-GARMT', 'CTR-CAP'
         ]);
         const unknownFees = [...feePartNumbers].filter(pn => !validFeePNs.has(pn));
         checks.push({ name: 'Fee PNs valid', ok: unknownFees.length === 0,

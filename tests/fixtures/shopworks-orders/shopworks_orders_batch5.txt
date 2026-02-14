@@ -1,0 +1,526 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 5)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:135928
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:6326
+Company:Archterra Landscape Services
+**************************************************************************
+Order Information
+Date Order Placed:4/2/2025
+Req. Ship Date:4/11/2025
+Drop Dead Date:
+Date Order Shipped:4/17/2025
+Date Order Invoiced:4/8/2025
+Purchase Order #:TAE
+Terms:COD 
+Ordered by:Chauney Roemer
+Phone:253-815-8365
+Fax:
+Email:chauney@archterralandscape.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Archterra Landscape Service, 11125 Valley Ave E, Puyallup, WA 98372
+**************************************************************************
+Design Information
+Design #:38675 - Archterra Design- 2024 Straight Tree
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:NF0A7V4F
+Description:The North Face Down Hybrid Jacket, TNFBlack
+Unit Price:224.00
+Line Item Price:224.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:224.00
+Sales Tax:22.62
+Shipping:
+Total:246.62
+Paid To Date:246.62
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:135940
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12822
+Company:Peak Industrial
+**************************************************************************
+Order Information
+Date Order Placed:4/2/2025
+Req. Ship Date:4/21/2025
+Drop Dead Date:
+Date Order Shipped:4/23/2025
+Date Order Invoiced:4/21/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Greta Pullum
+Phone:
+Fax:
+Email:gretapullum@peakthermoking.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Peak Industrial, 931 Valentine Ave SE, Pacific, WA 
+**************************************************************************
+Design Information
+Design #:37278.01 - Peak Industrial ThermoKing
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:OG126
+Description:Ogio Onyx Polo, Petrol Grey
+Unit Price:40.00
+Line Item Price:600.00
+Item Quantity:15
+Adult:Quantity
+M:5
+LG:5
+XL:5
+Item 2 of 2
+Part Number:K455
+Description:Port Authority Rapid Dry Polo, Charcoal
+Unit Price:34.00
+Line Item Price:510.00
+Item Quantity:15
+Adult:Quantity
+M:5
+LG:5
+XL:5
+**************************************************************************
+Order Summary
+Subtotal:1,110.00
+Sales Tax:112.11
+Shipping:
+Total:1,222.11
+Paid To Date:1,222.11
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:135951
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13183
+Company:Potelco, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:4/3/2025
+Req. Ship Date:4/11/2025
+Drop Dead Date:4/11/2025
+Date Order Shipped:4/10/2025
+Date Order Invoiced:4/10/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Maddie  Miller 
+Phone:253-337-1850
+Fax:
+Email:MMMiller@Potelco.net
+**************************************************************************
+Design Information
+Design #:38710 - Infrasource 
+Design #:38709 - Potelco, Inc
+Design #:39025 - CRUX
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:DD
+Description:Digitizing Setup - CRUX
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 5
+Part Number:
+Description:All will get the logo on Right Sleeve right above the elbow - Tonal color 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 3 of 5
+Part Number:DECG
+Description:Di. Embroider Garms (potelco)
+Unit Price:20.00
+Line Item Price:940.00
+Item Quantity:47
+Adult:Quantity
+S (Other):47
+Item 4 of 5
+Part Number:DECG
+Description:Di. Embroider Garms (Infrasource)
+Unit Price:20.00
+Line Item Price:180.00
+Item Quantity:9
+Adult:Quantity
+S (Other):9
+Item 5 of 5
+Part Number:DECG
+Description:Di. Embroider Garms (CRUX)
+Unit Price:20.00
+Line Item Price:80.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+**************************************************************************
+Order Summary
+Subtotal:1,300.00
+Sales Tax:131.30
+Shipping:
+Total:1,431.30
+Paid To Date:1,431.30
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:135953
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:10216
+Company:Puyallup Tribe - Elder Dept
+**************************************************************************
+Order Information
+Date Order Placed:4/3/2025
+Req. Ship Date:5/30/2025
+Drop Dead Date:
+Date Order Shipped:6/4/2025
+Date Order Invoiced:6/3/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Shantrell McCloud
+Phone:253-680-5483
+Fax:
+Email:shanetrell.mccloud-lacroix@puyalluptribe-nsn.gov
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Puyallup Tribe - Elder Dept, 3010 Duct Cho St, Attn: Shantrell, Tacoma, WA 98404
+**************************************************************************
+Design Information
+Design #:24596 - L/C Logo - Puyallup Tribe Elders Dept
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:J920
+Description:Port Authority Collective Tech Outer Shell Jacket, DeepBlack
+Unit Price:98.00
+Line Item Price:98.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 2 of 4
+Part Number:J920_2X
+Description:Port Authority Collective Tech Outer Shell Jacket, DeepBlack
+Unit Price:100.00
+Line Item Price:200.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 3 of 4
+Part Number:L920
+Description:Port Authority Womens Collective Tech Outer Shell Jacket, DeepBlack
+Unit Price:98.00
+Line Item Price:784.00
+Item Quantity:8
+Adult:Quantity
+S (Other):2
+M:2
+LG:2
+XL:2
+Item 4 of 4
+Part Number:L920_4X
+Description:Port Authority Womens Collective Tech Outer Shell Jacket, DeepBlack
+Unit Price:102.00
+Line Item Price:102.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+**************************************************************************
+Order Summary
+Subtotal:1,184.00
+Sales Tax:0.00
+Shipping:
+Total:1,184.00
+Paid To Date:1,184.00
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:135954
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12838
+Company:Mirabella
+**************************************************************************
+Order Information
+Date Order Placed:4/3/2025
+Req. Ship Date:4/17/2025
+Drop Dead Date:
+Date Order Shipped:4/18/2025
+Date Order Invoiced:4/18/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Ruth  Benfield
+Phone:206-701-4883
+Fax:
+Email:ruth.benfield2014@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Mirabella, ATTN: Ruth Benfield , 116 Fairview Ave N Unit 631, Seattle, WA 98109
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130341317136
+**************************************************************************
+Design Information
+Design #:37426 - Mirabella- White
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:25.00
+Line Item Price:25.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:25.00
+Sales Tax:4.04
+Shipping:15.00
+Total:44.04
+Paid To Date:44.04
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:135964
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13232
+Company:Linda Wood 
+**************************************************************************
+Order Information
+Date Order Placed:4/3/2025
+Req. Ship Date:4/10/2025
+Drop Dead Date:
+Date Order Shipped:4/17/2025
+Date Order Invoiced:4/10/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Linda  Wood 
+Phone:253-241-5691
+Fax:
+Email:linda@drain-pro.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Linda Wood , 10212 438th ST CT E, Eatonville , WA 98328
+**************************************************************************
+Design Information
+Design #:38823 - EEC
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms Blankets
+Unit Price:25.00
+Line Item Price:200.00
+Item Quantity:8
+Adult:Quantity
+S (Other):8
+**************************************************************************
+Order Summary
+Subtotal:200.00
+Sales Tax:20.20
+Shipping:
+Total:220.20
+Paid To Date:220.20
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:135969
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8661
+Company:Okanogan County Fire District #6
+**************************************************************************
+Order Information
+Date Order Placed:4/4/2025
+Req. Ship Date:4/18/2025
+Drop Dead Date:
+Date Order Shipped:4/10/2025
+Date Order Invoiced:4/10/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Rusty Stamps
+Phone:509-679-0345
+Fax:
+Email:rstamps@okanogancountyfd6.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Okanogan County Fire District #6, 33 Horizon Flats Road , Winthrop, WA 98862-0895
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130341415299
+**************************************************************************
+Design Information
+Design #:18947 - Okanogan County Fire District 6 - LC Logo
+Design #:18947.02 - Okanogan County Fire District 6 - LC Logo
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:DECG
+Description:Embroider Garms-Polos (Captain Keith)
+Unit Price:35.00
+Line Item Price:70.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 2 of 3
+Part Number:DECG
+Description:Embroider Garms-Job Shirts (Chief Acord)
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 3 of 3
+Part Number:DECG
+Description:Embroider Garms-Job Shirts (Asst. Chief)
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+**************************************************************************
+Order Summary
+Subtotal:140.00
+Sales Tax:16.93
+Shipping:27.66
+Total:184.59
+Paid To Date:184.59
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:135970
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13035
+Company:Day-Lee Foods, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:4/4/2025
+Req. Ship Date:4/8/2025
+Drop Dead Date:4/8/2025
+Date Order Shipped:4/8/2025
+Date Order Invoiced:4/8/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Kaori Araki
+Phone:562-802-6851
+Fax:
+Email:karaki@day-lee.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Day-Lee Foods, Inc., ATTN: Karori Araki, 13055 E Molette Street , Santa Fe Springs, CA 90670
+**************************************************************************
+Design Information
+Design #:38231 - Day-Lee Foods, Inc. 
+Design #:38232 - NH Foods - Day-Lee Foods, Inc.  
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:AL
+Description:Additional NH Logo - Left Sleeve
+Unit Price:5.50
+Line Item Price:5.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:J324
+Description:Port Authority Welded Soft Shell Jacket, Batlshp Grey
+Unit Price:55.00
+Line Item Price:55.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:60.50
+Sales Tax:0.00
+Shipping:
+Total:60.50
+Paid To Date:60.50
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 5
+================================================================================

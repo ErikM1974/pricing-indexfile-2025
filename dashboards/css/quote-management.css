@@ -498,6 +498,15 @@ body {
     cursor: not-allowed;
 }
 
+/* Audit Action Button */
+.action-audit {
+    color: #7c3aed;
+}
+
+.action-audit:hover {
+    background: #ede9fe;
+}
+
 /* Delete Action Button */
 .action-delete {
     color: #dc3545;

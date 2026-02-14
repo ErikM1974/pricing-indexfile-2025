@@ -260,6 +260,9 @@
 | `/pages/quote-view.html` | Public customer-facing quote page | quote-view.js, quote-view.css, jsPDF | ✅ Active |
 | `/pages/js/quote-view.js` | Quote data loading, PDF generation, acceptance flow | jsPDF, html2canvas | ✅ Active |
 | `/pages/css/quote-view.css` | Professional quote styling (mobile-responsive) | Inter font | ✅ Active |
+| `/pages/quote-audit.html` | Staff-only pricing audit page (SW vs 2026) | quote-audit.js, quote-audit.css, staff-auth-helper.js | ✅ Active |
+| `/pages/js/quote-audit.js` | Audit data rendering, staff auth gate | staff-auth-helper.js | ✅ Active |
+| `/pages/css/quote-audit.css` | Audit page styling (self-contained) | Inter font | ✅ Active |
 
 **Server Routes (server.js):**
 - `GET /quote/:quoteId` - Serves public quote page
@@ -610,6 +613,7 @@ cap-embroidery-fix.css
 | `/tests/scripts/add-cemb-service-codes.js` | **NEW** Add CEMB/CEMB-CAP service codes | ✅ Active |
 | `/tests/scripts/cleanup-embroidery-costs.js` | **NEW** Delete duplicates, add missing DECG-FB 1-7 (2026-02-04) | ✅ Active |
 | `/tests/scripts/update-ctr-pricing-linear.js` | **NEW** Update CTR pricing with linear $/1K model (2026-02-04) | ✅ Active |
+| `/tests/scripts/sync-shopworks-service-codes.js` | **NEW** Sync all 28 ShopWorks service codes to Caspio (2026-02-14) | ✅ Active |
 
 **Run:** `node tests/scripts/seed-classified-items.js`
 

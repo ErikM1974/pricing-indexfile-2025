@@ -1,0 +1,553 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 6)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:135972
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12329
+Company:OhDoody Pet Waste Removal 
+**************************************************************************
+Order Information
+Date Order Placed:4/4/2025
+Req. Ship Date:4/18/2025
+Drop Dead Date:
+Date Order Shipped:4/25/2025
+Date Order Invoiced:4/22/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Albert  Rideaux
+Phone:253-237-7575
+Fax:
+Email:al.rideaux@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:OhDoody Pet Waste Removal , 6005 Park St E, Fife , WA 98424
+**************************************************************************
+Design Information
+Design #:34794.02 - OhDoody Pet Waste Removal 
+Design #:37975 - Dog Only
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:
+Description:Full Logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 2 of 4
+Part Number:C812_L/XL
+Description:Port Authority Flexfit Mesh Back Cap, Tr Royal/White
+Unit Price:32.00
+Line Item Price:160.00
+Item Quantity:5
+Adult:Quantity
+XXXL (Other):5
+Item 3 of 4
+Part Number:
+Description:Dog Logo ONLY
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 4 of 4
+Part Number:C812_L/XL
+Description:Port Authority Flexfit Mesh Back Cap, Tr Royal/White
+Unit Price:32.00
+Line Item Price:160.00
+Item Quantity:5
+Adult:Quantity
+XXXL (Other):5
+**************************************************************************
+Order Summary
+Subtotal:320.00
+Sales Tax:32.32
+Shipping:
+Total:352.32
+Paid To Date:352.32
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:135973
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13200
+Company:D & R Monitoring Networking, LLC 
+**************************************************************************
+Order Information
+Date Order Placed:4/4/2025
+Req. Ship Date:4/18/2025
+Drop Dead Date:
+Date Order Shipped:5/7/2025
+Date Order Invoiced:4/21/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Dre Terry 
+Phone:253-350-1697
+Fax:
+Email:cedrea@drmonitoringnetworks.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:D & R Monitoring Networking, LLC , PO BOX 44185 , Tacoma , WA 98448
+**************************************************************************
+Design Information
+Design #:29116 - D & R Monitoring Networks
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:CT106676_3X
+Description:Carhartt  Duck Vest, Black
+Unit Price:100.00
+Line Item Price:200.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+**************************************************************************
+Order Summary
+Subtotal:200.00
+Sales Tax:20.20
+Shipping:
+Total:220.20
+Paid To Date:220.20
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:135979
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:10963
+Company:Jacksons
+**************************************************************************
+Order Information
+Date Order Placed:4/7/2025
+Req. Ship Date:4/16/2025
+Drop Dead Date:
+Date Order Shipped:4/17/2025
+Date Order Invoiced:4/17/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jacob Brooks
+Phone:206-552-5323
+Fax:
+Email:jacob.brooks@jacksons.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Jacksons, 3450 E. Commercial ST, Meridian,  83642
+**************************************************************************
+Design Information
+Design #:27963 - Jacksons
+Design #:27963.01 - Jacksons
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:PC55T_3XLT
+Description:Port  Company Tall Long Sleeve Essential Pocket Tee, Safety Orange
+Unit Price:29.00
+Line Item Price:87.00
+Item Quantity:3
+Adult:Quantity
+XXXL (Other):3
+Item 2 of 5
+Part Number:Monogram
+Description:Dir. Embroider Names Jacob in Black 
+Unit Price:12.50
+Line Item Price:37.50
+Item Quantity:3
+Adult:Quantity
+XXXL (Other):3
+Item 3 of 5
+Part Number:C112_OSFA
+Description:Port Authority Snapback Trucker Cap, Heather Gry/Bk
+Unit Price:21.00
+Line Item Price:21.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 4 of 5
+Part Number:PC90H_3X
+Description:Port  Company Tall Essential Fleece Full-Zip Hooded Sweatshirt, Jet Black
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 5 of 5
+Part Number:Monogram
+Description:Dir. Embroider Names Jacob in White
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+**************************************************************************
+Order Summary
+Subtotal:204.00
+Sales Tax:20.60
+Shipping:
+Total:224.60
+Paid To Date:224.60
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:135994
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2909
+Company:Sitka Harbor Dept
+**************************************************************************
+Order Information
+Date Order Placed:4/7/2025
+Req. Ship Date:4/21/2025
+Drop Dead Date:
+Date Order Shipped:4/22/2025
+Date Order Invoiced:4/22/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Mark  Hodges
+Phone:907-747-4015
+Fax:
+Email:mark.hodges@cityofsitka.org
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:City and Borough of Sitka, 617 Katlian Street, Sitka, AK 99835
+**************************************************************************
+Design Information
+Design #:35429 - Sitka Harbor Department 
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:CT104670
+Description:Carhartt Storm Defender Shoreline Jacket, Black
+Unit Price:224.00
+Line Item Price:224.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:224.00
+Sales Tax:0.00
+Shipping:
+Total:224.00
+Paid To Date:224.00
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136015
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8672
+Company:Costco Wholesale
+**************************************************************************
+Order Information
+Date Order Placed:4/9/2025
+Req. Ship Date:4/23/2025
+Drop Dead Date:
+Date Order Shipped:5/8/2025
+Date Order Invoiced:4/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:KENNETH MOORMAN
+Phone:2537224107
+Fax:
+Email:d171flm1@costco.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Costco Wholesale, 4000 B 142nd Ave E, Sumner, WA 98390
+**************************************************************************
+Design Information
+Design #:18831.06 - Costco - Sumner Fleet
+Design #:35205 - Costco Wholesale (Transfer)
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:J705
+Description:Port Authority Textured Soft Shell Jacket, Black
+Unit Price:67.00
+Line Item Price:67.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 2 of 5
+Part Number:J705_2X
+Description:Port Authority Textured Soft Shell Jacket, Black
+Unit Price:69.00
+Line Item Price:69.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 3 of 5
+Part Number:C114_OSFA
+Description:Port Authority  Digi Camo Snapback Trucker Cap, Black Digi/Blk
+Unit Price:18.00
+Line Item Price:270.00
+Item Quantity:15
+Adult:Quantity
+XXXL (Other):15
+Item 4 of 5
+Part Number:C116_OSFA
+Description:Port Authority Snapback Flat Bill Cap, Black
+Unit Price:18.00
+Line Item Price:270.00
+Item Quantity:15
+Adult:Quantity
+XXXL (Other):15
+Item 5 of 5
+Part Number:CSV105_S/M
+Description:Cornerstone  Ansi 107 Class 2 Surveyor Zippered Two-Tone Vest - Transfer , SftyOrg
+Unit Price:40.03
+Line Item Price:200.15
+Item Quantity:5
+Adult:Quantity
+XXXL (Other):5
+**************************************************************************
+Order Summary
+Subtotal:876.15
+Sales Tax:88.49
+Shipping:
+Total:964.64
+Paid To Date:964.64
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136025
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:9086
+Company:Hunt's Services, LLC
+**************************************************************************
+Order Information
+Date Order Placed:4/10/2025
+Req. Ship Date:4/24/2025
+Drop Dead Date:
+Date Order Shipped:5/1/2025
+Date Order Invoiced:4/21/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Liz Hunt's 
+Phone:253-533-7500
+Fax:
+Email:Liz@huntsservices.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Hunt's Services, LLC, 8111 Pacific Highway E, Tacoma, WA 98422
+**************************************************************************
+Design Information
+Design #:32578.03 - HUNT'S SERVICES TEXT ONLY 
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:25.00
+Line Item Price:50.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+**************************************************************************
+Order Summary
+Subtotal:50.00
+Sales Tax:5.05
+Shipping:
+Total:55.05
+Paid To Date:55.05
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136029
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:6997
+Company:Asphalt Patch Systems Inc.
+**************************************************************************
+Order Information
+Date Order Placed:4/10/2025
+Req. Ship Date:4/24/2025
+Drop Dead Date:
+Date Order Shipped:4/22/2025
+Date Order Invoiced:4/21/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Becky  Smith 
+Phone:253-535-2590
+Fax:
+Email:becky@asphaltpatchsystems.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Asphalt Patch Systems Inc., 8812 Canyon Road E, Puyallup, WA 98371
+**************************************************************************
+Design Information
+Design #:36766 - Asphalt Patch System Inc. (NEW LOGO)
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:LSW2890
+Description:Port Authority Womens Easy Care Open-Front Cardigan Sweater, MdHtGrey
+Unit Price:59.00
+Line Item Price:236.00
+Item Quantity:4
+Adult:Quantity
+S (Other):1
+M:1
+LG:2
+Item 2 of 3
+Part Number:LSW2890_3X
+Description:Port Authority Womens Easy Care Open-Front Cardigan Sweater, MdHtGrey
+Unit Price:62.00
+Line Item Price:62.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 3 of 3
+Part Number:Sew-on
+Description:Sew-on patch
+Unit Price:15.00
+Line Item Price:750.00
+Item Quantity:50
+Adult:Quantity
+S (Other):50
+**************************************************************************
+Order Summary
+Subtotal:1,048.00
+Sales Tax:105.85
+Shipping:
+Total:1,153.85
+Paid To Date:1,153.85
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136032
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11392
+Company:Patriot Fire Protection
+**************************************************************************
+Order Information
+Date Order Placed:4/10/2025
+Req. Ship Date:4/22/2025
+Drop Dead Date:4/22/2025
+Date Order Shipped:4/17/2025
+Date Order Invoiced:4/17/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Jimmy Twinning
+Phone:509-462-6823
+Fax:
+Email:jimmyt@patriotfire.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Patriot Fire Protection, 12439 E Pinecrest Way Ste 101, Spokane Valley, WA 99216
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130342729494
+**************************************************************************
+Design Information
+Design #:29988 - Patriot Fire Protection
+Design #:29988.04 - 
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:F243
+Description:Sport-Tek Sport-Wick Fleece 1/4-Zip Pullover, Dp Red/Silver
+Unit Price:49.00
+Line Item Price:196.00
+Item Quantity:4
+Adult:Quantity
+M:1
+LG:3
+Item 2 of 3
+Part Number:F243_2X
+Description:Sport-Tek Sport-Wick Fleece 1/4-Zip Pullover, Dp Red/Silver
+Unit Price:51.00
+Line Item Price:51.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 3 of 3
+Part Number:AL
+Description:Additional Logo on RS- TOP TECH 2025
+Unit Price:8.50
+Line Item Price:42.50
+Item Quantity:5
+Adult:Quantity
+S (Other):5
+**************************************************************************
+Order Summary
+Subtotal:289.50
+Sales Tax:31.41
+Shipping:21.45
+Total:342.36
+Paid To Date:342.36
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 6
+================================================================================

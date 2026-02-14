@@ -470,6 +470,10 @@
                                     <i class="fas fa-weight-hanging" style="color: #10b981; width: 16px;"></i>
                                     <span>Weight — <strong>$6.25</strong></span>
                                 </button>
+                                <button onclick="addManualServiceRow('SEG')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                                    <i class="fas fa-tape" style="color: #ef4444; width: 16px;"></i>
+                                    <span>Sewing — <strong>$10.00</strong></span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -3852,7 +3856,8 @@ Company:Absher Construction Company
             const SERVICE_DEFAULTS = {
                 'Monogram': { unitPrice: 12.50, quantity: 1 },
                 'NAME': { unitPrice: 12.50, quantity: 1 },
-                'WEIGHT': { unitPrice: 6.25, quantity: 1 }
+                'WEIGHT': { unitPrice: 6.25, quantity: 1 },
+                'SEG': { unitPrice: 10.00, quantity: 1 }
             };
 
             const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };
@@ -6592,6 +6597,7 @@ Company:Absher Construction Company
                             imageUrl: row.dataset.imageUrl || '',  // Image URL for quote view display
                             sellPriceOverride: parseFloat(row.dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
                             sizeOverrides: sizeOverrides,  // Per-size price overrides from child rows (e.g., { '2XL': 27, '3XL': 29 })
+                            _swUnitPrice: parseFloat(row.dataset.swUnitPrice) || 0,  // ShopWorks charged price for audit
                             logoAssignments: {
                                 primary: { logoId: 'primary', quantity: group.totalQty },
                                 additional: additionalLogos
@@ -7269,6 +7275,9 @@ Company:Absher Construction Company
                     paidToDate: lastImportMetadata?.paidToDate ?? 0,
                     balanceAmount: lastImportMetadata?.balanceAmount ?? 0,
                     orderNotes: lastImportMetadata?.orderNotes ?? '',
+                    // Package tracking (2026-02-14)
+                    carrier: lastImportMetadata?.carrier || '',
+                    trackingNumber: lastImportMetadata?.trackingNumber || '',
                     // ShopWorks pricing audit (2026-02-13)
                     swTotal: lastImportMetadata?.swTotal ?? 0,
                     swSubtotal: lastImportMetadata?.swSubtotal ?? 0,
@@ -7294,6 +7303,58 @@ Company:Absher Construction Company
                                 delta: parseFloat(pDelta.toFixed(2)),
                                 flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
                             };
+                        });
+                        // Append service items (AL, Monogram, Weight, Digitizing) to audit
+                        const svc = lastImportMetadata.parsedServices || {};
+                        const alFeePerUnit = pricing.additionalServices?.length > 0
+                            ? (pricing.additionalServices[0]?.unitPrice || 6.50)
+                            : 6.50;
+                        (svc.additionalLogos || []).forEach(al => {
+                            const swU = parseFloat(al.unitPrice || al.price || 0);
+                            const ourU = parseFloat(alFeePerUnit.toFixed(2));
+                            const d = ourU - swU;
+                            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                            prods.push({ style: 'AL', color: 'Service', qty: parseInt(al.quantity || al.qty || 0),
+                                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                        });
+                        (svc.monograms || []).forEach(m => {
+                            const swU = parseFloat(m.unitPrice || m.price || 0);
+                            const ourU = 12.50;
+                            const d = ourU - swU;
+                            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                            prods.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
+                                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                        });
+                        (svc.weights || []).forEach(w => {
+                            const swU = parseFloat(w.unitPrice || w.price || 0);
+                            const ourU = 6.25;
+                            const d = ourU - swU;
+                            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                            prods.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
+                                swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                        });
+                        (svc.digitizingFees || []).forEach(df => {
+                            const swU = parseFloat(df.amount || df.unitPrice || 0);
+                            const ourU = swU; // Digitizing is pass-through, same price expected
+                            prods.push({ style: df.code || 'DD', color: 'Service', qty: 1,
+                                swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+                                delta: 0, flag: 'OK', isService: true });
+                        });
+                        // DECG/DECC items
+                        const parsedDecg = svc.decgItems || [];
+                        parsedDecg.forEach(pd => {
+                            const swU = parseFloat(pd.unitPrice || 0);
+                            const ourU = parseFloat(pd.calculatedUnitPrice || 0);
+                            const qty = parseInt(pd.quantity || 0);
+                            const d = ourU - swU;
+                            const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                            const label = pd.serviceType === 'decc' ? 'DECC' : 'DECG';
+                            prods.push({ style: label, color: 'Service', qty: qty,
+                                swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+                                delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
                         });
                         return JSON.stringify({ swTotal: lastImportMetadata.swTotal, swSubtotal: swSub,
                             ourSubtotal: parseFloat(ourSub.toFixed(2)), deltaSubtotal: parseFloat(delta.toFixed(2)),
@@ -9883,7 +9944,16 @@ Company:Absher Construction Company
                     balanceAmount: data.orderSummary?.balance || 0,
                     orderNotes: data.orderNotes || '',
                     swTotal: data.orderSummary?.total || 0,
-                    swSubtotal: data.orderSummary?.subtotal || 0
+                    swSubtotal: data.orderSummary?.subtotal || 0,
+                    carrier: data.packageTracking?.carrier || '',
+                    trackingNumber: data.packageTracking?.trackingNumber || '',
+                    parsedServices: {
+                        additionalLogos: data.services?.additionalLogos || [],
+                        monograms: data.services?.monograms || [],
+                        weights: data.services?.weights || [],
+                        digitizingFees: data.services?.digitizingFees || [],
+                        decgItems: data.decgItems || []
+                    }
                 };
 
                 // Post-import validation: detect silently dropped rows
@@ -9971,6 +10041,9 @@ Company:Absher Construction Company
                 unitPrice: product.unitPrice || 0,
                 brand: product.brand || ''
             });
+
+            // Store ShopWorks unit price for pricing audit (survives selectColor which only clears sellPrice)
+            row.dataset.swUnitPrice = (product.unitPrice || 0).toString();
 
             // Set sell price override BEFORE any pricing calls (selectColor, onSizeChange, etc.)
             if (sellPriceOverride > 0) {

@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.16.0 - Weight service type, _XLR suffix, expanded non-SanMar patterns
- * @date 2026-02-13
+ * @version 1.17.0 - Full ShopWorks service parts cross-reference (SECC fix, DDE/DDT/DT/CTR/CDP)
+ * @date 2026-02-14
  */
 
 class ShopWorksImportParser {
@@ -125,8 +125,9 @@ class ShopWorksImportParser {
             'SETUP FEE': 'DD',         // Maps to digitizing setup
             'DESIGN PREP': 'GRT-75',   // Shorthand for design/graphic fee
             'EXCESS STITCH': 'AS-GARM', // Additional stitches (garment)
-            'SECC': 'DECC',            // Typo for DECC (customer-supplied caps)
+            // SECC is cap sewing (NOT DECC) — separate service from customer-supplied caps
             'SEW': 'SEG',              // Alias Sew → SEG (sewing)
+            'SEW-ON': 'SEG',           // Alias Sew-on → SEG (sewing)
             'COLOR CHG': 'COLOR CHANGE' // Typo for color change service
         };
 
@@ -138,6 +139,9 @@ class ShopWorksImportParser {
 
         // Weight service pricing (fallback)
         this.WEIGHT_PRICE = 6.25;
+
+        // Sewing service pricing (fallback, overridden by Service_Codes API)
+        this.SEWING_PRICE = 10.00;
 
         // Non-SanMar product patterns (require manual pricing)
         this.NON_SANMAR_PATTERNS = [
@@ -167,7 +171,7 @@ class ShopWorksImportParser {
         this.MONOGRAM_PRICE = 12.50;
 
         // Known service item patterns
-        this.DIGITIZING_CODES = ['DD', 'DGT-001', 'DGT-002', 'DGT-003'];
+        this.DIGITIZING_CODES = ['DD', 'DDE', 'DDT', 'DGT-001', 'DGT-002', 'DGT-003'];
         this.PATCH_SETUP_CODES = ['GRT-50'];
         this.GRAPHIC_DESIGN_CODES = ['GRT-75'];
 
@@ -308,6 +312,13 @@ class ShopWorksImportParser {
         if (grt75Record && grt75Record.SellPrice) {
             this.GRT75_RATE = grt75Record.SellPrice;
             console.log('[ShopWorksImportParser] GRT75_RATE from API:', this.GRT75_RATE);
+        }
+
+        // Get sewing price from API (SEG/SECC)
+        const segRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'SEG');
+        if (segRecord && segRecord.SellPrice) {
+            this.SEWING_PRICE = segRecord.SellPrice;
+            console.log('[ShopWorksImportParser] SEWING_PRICE from API:', this.SEWING_PRICE);
         }
     }
 
@@ -505,6 +516,8 @@ class ShopWorksImportParser {
                 this._parseDesignInfo(trimmed, result);
             } else if (trimmed.includes('Shipping Information') || trimmed.includes('Ship Method')) {
                 this._parseShippingInfo(trimmed, result);
+            } else if (trimmed.includes('Package Tracking')) {
+                this._parsePackageTracking(trimmed, result);
             } else if (/^Note\b/i.test(trimmed)) {
                 const noteLines = trimmed.split('\n').slice(1).map(l => l.trim()).filter(Boolean);
                 result.orderNotes = noteLines.join('\n');
@@ -847,6 +860,31 @@ class ShopWorksImportParser {
     }
 
     /**
+     * Parse Package Tracking section (Carrier + Tracking #)
+     */
+    _parsePackageTracking(text, result) {
+        const lines = text.split('\n');
+        let carrier = null;
+        let trackingNumber = null;
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('Carrier:')) {
+                carrier = trimmed.replace('Carrier:', '').trim();
+            } else if (trimmed.startsWith('Tracking #:')) {
+                trackingNumber = trimmed.replace('Tracking #:', '').trim();
+            }
+        }
+
+        if (carrier || trackingNumber) {
+            result.packageTracking = {
+                carrier: carrier || '',
+                trackingNumber: trackingNumber || ''
+            };
+        }
+    }
+
+    /**
      * Parse items purchased section
      */
     _parseItems(text, result) {
@@ -1121,7 +1159,7 @@ class ShopWorksImportParser {
                 break;
 
             case 'decc':
-                // Customer-supplied caps (DECC/SECC) - uses DECG API pricing (caps table)
+                // Customer-supplied caps (DECC) - uses DECG API pricing (caps table)
                 // Default to 8K stitches - user can update via modal after import
                 const deccStitchCount = 8000;
                 const deccPricing = this.calculateDECCPrice(item.quantity, deccStitchCount);
@@ -1142,15 +1180,18 @@ class ShopWorksImportParser {
                 break;
 
             case 'sewing':
-                // Sewing service (SEG - Sew Emblems to Garments) - manual pricing
+                // Sewing service (SEG/SECC) - $10.00 sell price (API-driven)
                 if (!result.services.sewing) {
                     result.services.sewing = [];
                 }
+                const isSewCap = item.partNumber.toUpperCase() === 'SECC';
                 result.services.sewing.push({
                     quantity: item.quantity,
                     description: item.description,
-                    unitPrice: item.unitPrice || 0,
-                    needsManualPricing: true
+                    unitPrice: this.SEWING_PRICE,
+                    total: item.quantity * this.SEWING_PRICE,
+                    isCap: isSewCap,
+                    partNumber: isSewCap ? 'SECC' : 'SEG'
                 });
                 break;
 
@@ -1186,6 +1227,39 @@ class ShopWorksImportParser {
                     description: item.description,
                     unitPrice: item.unitPrice || 0,
                     needsManualPricing: true
+                });
+                break;
+
+            case 'design-transfer':
+                // DT — Transfer customer design / run sample ($50 sell)
+                result.services.designTransfer = {
+                    quantity: item.quantity,
+                    amount: 50,
+                    swAmount: item.unitPrice || 0,
+                    description: item.description
+                };
+                break;
+
+            case 'contract':
+                // CTR-Garmt / CTR-Cap — contract embroidery (tiered pricing)
+                if (!result.services.contract) result.services.contract = [];
+                result.services.contract.push({
+                    partNumber: item.partNumber.toUpperCase(),
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice || 0,
+                    description: item.description,
+                    isCap: item.partNumber.toUpperCase().includes('CAP')
+                });
+                break;
+
+            case 'digital-print':
+                // CDP, CDP 5x5, CDP 5x5-10, Pallet — non-embroidery, track for reference
+                if (!result.services.digitalPrint) result.services.digitalPrint = [];
+                result.services.digitalPrint.push({
+                    partNumber: item.partNumber,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice || 0,
+                    description: item.description
                 });
                 break;
 
@@ -1259,7 +1333,7 @@ class ShopWorksImportParser {
     /**
      * Classify a part number by type
      * @param {string} partNumber - The part number to classify
-     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'invalid', 'comment'
+     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'sewing', 'design-transfer', 'contract', 'digital-print', 'invalid', 'comment'
      */
     classifyPartNumber(partNumber) {
         if (!partNumber || partNumber.trim() === '') {
@@ -1283,8 +1357,8 @@ class ShopWorksImportParser {
             return 'invalid';
         }
 
-        // Digitizing/Setup fees (DD or any DGT-XXX code)
-        if (pn === 'DD' || pn.startsWith('DGT-')) {
+        // Digitizing/Setup fees (DD, DDE, DDT, or any DGT-XXX code)
+        if (pn === 'DD' || pn === 'DDE' || pn === 'DDT' || pn.startsWith('DGT-')) {
             return 'digitizing';
         }
 
@@ -1319,7 +1393,7 @@ class ShopWorksImportParser {
         }
 
         // Customer-supplied caps
-        if (pn === 'DECC' || pn === 'SECC') {
+        if (pn === 'DECC') {
             return 'decc';
         }
 
@@ -1348,9 +1422,24 @@ class ShopWorksImportParser {
             return 'ltm';
         }
 
-        // Sewing services (SEG = Sew Emblems to Garments)
-        if (pn === 'SEG') {
+        // Sewing services (SEG = Sew Emblems to Garments, SECC = Sew Emblems to Caps)
+        if (pn === 'SEG' || pn === 'SECC') {
             return 'sewing';
+        }
+
+        // Design Transfer / Sample
+        if (pn === 'DT') {
+            return 'design-transfer';
+        }
+
+        // Contract embroidery (CTR-Garmt, CTR-Cap)
+        if (pn === 'CTR-GARMT' || pn === 'CTR-CAP') {
+            return 'contract';
+        }
+
+        // Digital print services (non-embroidery, tracked only)
+        if (pn === 'CDP' || pn.startsWith('CDP ') || pn === 'PALLET') {
+            return 'digital-print';
         }
 
         // Cap Side logo (same pricing as Cap Back)

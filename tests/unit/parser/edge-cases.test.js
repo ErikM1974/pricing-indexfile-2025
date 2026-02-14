@@ -63,8 +63,40 @@ describe('classifyPartNumber() — service codes', () => {
         expect(parser.classifyPartNumber('DECC')).toBe('decc');
     });
 
-    test('SECC → decc (alias for customer cap)', () => {
-        expect(parser.classifyPartNumber('SECC')).toBe('decc');
+    test('SECC → sewing (cap sewing, NOT decc)', () => {
+        expect(parser.classifyPartNumber('SECC')).toBe('sewing');
+    });
+
+    test('DDE → digitizing (edit digitizing)', () => {
+        expect(parser.classifyPartNumber('DDE')).toBe('digitizing');
+    });
+
+    test('DDT → digitizing (text digitizing)', () => {
+        expect(parser.classifyPartNumber('DDT')).toBe('digitizing');
+    });
+
+    test('DT → design-transfer', () => {
+        expect(parser.classifyPartNumber('DT')).toBe('design-transfer');
+    });
+
+    test('CTR-GARMT → contract', () => {
+        expect(parser.classifyPartNumber('CTR-GARMT')).toBe('contract');
+    });
+
+    test('CTR-CAP → contract', () => {
+        expect(parser.classifyPartNumber('CTR-CAP')).toBe('contract');
+    });
+
+    test('CDP → digital-print', () => {
+        expect(parser.classifyPartNumber('CDP')).toBe('digital-print');
+    });
+
+    test('CDP 5x5 → digital-print', () => {
+        expect(parser.classifyPartNumber('CDP 5x5')).toBe('digital-print');
+    });
+
+    test('PALLET → digital-print', () => {
+        expect(parser.classifyPartNumber('PALLET')).toBe('digital-print');
     });
 
     test('MONOGRAM → monogram', () => {

@@ -329,7 +329,10 @@ class EmbroideryQuoteService {
                 // ShopWorks pricing audit (2026-02-13)
                 SWTotal: customerData.swTotal ?? 0,
                 SWSubtotal: customerData.swSubtotal ?? 0,
-                PriceAuditJSON: customerData.priceAuditJSON || ''
+                PriceAuditJSON: customerData.priceAuditJSON || '',
+                // Package tracking (2026-02-14)
+                Carrier: customerData.carrier || '',
+                TrackingNumber: customerData.trackingNumber || ''
             };
 
             // Save session
@@ -1382,6 +1385,9 @@ class EmbroideryQuoteService {
                 SWTotal: customerData.swTotal ?? 0,
                 SWSubtotal: customerData.swSubtotal ?? 0,
                 PriceAuditJSON: customerData.priceAuditJSON || '',
+                // Package tracking (2026-02-14)
+                Carrier: customerData.carrier || '',
+                TrackingNumber: customerData.trackingNumber || '',
                 // Revision tracking (fields added to Caspio 2026-01-15)
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
