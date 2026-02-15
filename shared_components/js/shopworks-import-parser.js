@@ -90,25 +90,23 @@ class ShopWorksImportParser {
         };
 
         // DECG (Customer-Supplied Garments) pricing tiers - FALLBACK if API unavailable
+        // 2026 structure: 5 tiers matching /api/decg-pricing and getDECGTier()
         this.DECG_TIERS = {
-            '1-2': 45.00,
-            '3-5': 40.00,
-            '6-11': 38.00,
-            '12-23': 32.00,
-            '24-71': 30.00,
-            '72-143': 25.00,
-            '144+': 15.00
+            '1-7': 28.00,
+            '8-23': 26.00,
+            '24-47': 24.00,
+            '48-71': 22.00,
+            '72+': 20.00
         };
 
         // DECC (Customer-Supplied Caps) pricing tiers - FALLBACK if API unavailable
+        // 2026 structure: 5 tiers matching /api/decg-pricing and getDECGTier()
         this.DECC_TIERS = {
-            '1-2': 36.00,
-            '3-5': 32.00,
-            '6-11': 30.00,
-            '12-23': 25.00,
-            '24-71': 24.00,
-            '72-143': 20.00,
-            '144+': 12.00
+            '1-7': 22.50,
+            '8-23': 21.00,
+            '24-47': 19.00,
+            '48-71': 17.50,
+            '72+': 16.00
         };
 
         // Service code aliases for typo handling (kept in code per Erik's decision)
@@ -1611,15 +1609,9 @@ class ShopWorksImportParser {
             basePrice = this.DECG_TIERS_API[tier];
             pricingSource = 'decg-api';
         } else {
-            // Fallback to legacy tiers (old structure, less accurate)
-            if (quantity >= 144) basePrice = this.DECG_TIERS['144+'] || 15.00;
-            else if (quantity >= 72) basePrice = this.DECG_TIERS['72-143'] || 25.00;
-            else if (quantity >= 24) basePrice = this.DECG_TIERS['24-71'] || 30.00;
-            else if (quantity >= 12) basePrice = this.DECG_TIERS['12-23'] || 32.00;
-            else if (quantity >= 6) basePrice = this.DECG_TIERS['6-11'] || 38.00;
-            else if (quantity >= 3) basePrice = this.DECG_TIERS['3-5'] || 40.00;
-            else basePrice = this.DECG_TIERS['1-2'] || 45.00;
-            pricingSource = 'fallback-legacy';
+            // Fallback to 2026 tiers (same structure as API, used when API unavailable)
+            basePrice = this.DECG_TIERS[tier] || 28.00;
+            pricingSource = 'fallback';
         }
 
         // Calculate extra stitch charge (above 8K base)
@@ -1683,15 +1675,9 @@ class ShopWorksImportParser {
             basePrice = this.DECC_TIERS_API[tier];
             pricingSource = 'decg-api';
         } else {
-            // Fallback to legacy tiers
-            if (quantity >= 144) basePrice = this.DECC_TIERS['144+'] || 12.00;
-            else if (quantity >= 72) basePrice = this.DECC_TIERS['72-143'] || 20.00;
-            else if (quantity >= 24) basePrice = this.DECC_TIERS['24-71'] || 24.00;
-            else if (quantity >= 12) basePrice = this.DECC_TIERS['12-23'] || 25.00;
-            else if (quantity >= 6) basePrice = this.DECC_TIERS['6-11'] || 30.00;
-            else if (quantity >= 3) basePrice = this.DECC_TIERS['3-5'] || 32.00;
-            else basePrice = this.DECC_TIERS['1-2'] || 36.00;
-            pricingSource = 'fallback-legacy';
+            // Fallback to 2026 tiers (same structure as API, used when API unavailable)
+            basePrice = this.DECC_TIERS[tier] || 22.50;
+            pricingSource = 'fallback';
         }
 
         // Calculate extra stitch charge (above 8K base)

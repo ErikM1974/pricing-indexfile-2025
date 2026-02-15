@@ -80,6 +80,24 @@ class QuoteAuditPage {
             this.setContextField('ctx-created', this.formatDate(this.session.CreatedAt));
         }
 
+        // Staff-only context fields
+        const paidToDate = parseFloat(this.session.PaidToDate) || 0;
+        if (paidToDate > 0) {
+            this.setContextField('ctx-paid', '$' + paidToDate.toFixed(2));
+        }
+        const balance = parseFloat(this.session.BalanceAmount) || 0;
+        if (balance > 0) {
+            this.setContextField('ctx-balance', '$' + balance.toFixed(2));
+        }
+        if (this.session.DigitizingCodes) {
+            this.setContextField('ctx-digitizing', this.session.DigitizingCodes);
+        }
+        const carrier = this.session.Carrier || '';
+        const trackNum = this.session.TrackingNumber || '';
+        if (carrier || trackNum) {
+            this.setContextField('ctx-tracking', (trackNum || 'N/A') + (carrier ? ' (' + carrier + ')' : ''));
+        }
+
         // Summary card
         const swSub = parseFloat(audit.swSubtotal || this.session.SWSubtotal || 0);
         const ourSub = parseFloat(audit.ourSubtotal || this.session.SubtotalAmount || 0);
@@ -168,6 +186,25 @@ class QuoteAuditPage {
                     <td class="num-col diff-col ${totalDiffClass}"><strong>${totalDiffSign}$${Math.abs(totalDiff).toFixed(2)}</strong></td>
                     <td></td>
                 </tr>`;
+        }
+
+        // Import Notes (parser warnings stored as JSON array)
+        if (this.session.ImportNotes) {
+            try {
+                const importNotes = JSON.parse(this.session.ImportNotes);
+                if (Array.isArray(importNotes) && importNotes.length > 0) {
+                    const listEl = document.getElementById('import-notes-list');
+                    listEl.innerHTML = importNotes.map(note =>
+                        `<li>${this.escapeHtml(typeof note === 'string' ? note : JSON.stringify(note))}</li>`
+                    ).join('');
+                    document.getElementById('import-notes-section').style.display = 'block';
+                }
+            } catch (e) {
+                // Not valid JSON — show as single item
+                const listEl = document.getElementById('import-notes-list');
+                listEl.innerHTML = `<li>${this.escapeHtml(this.session.ImportNotes)}</li>`;
+                document.getElementById('import-notes-section').style.display = 'block';
+            }
         }
 
         // View Customer Quote link

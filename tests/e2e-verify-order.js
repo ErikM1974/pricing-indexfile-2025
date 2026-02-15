@@ -131,7 +131,7 @@ async function deleteJSON(url) {
 
 // ── Price Audit Helper ────────────────────────────────────────────────────
 
-function buildPriceAudit(parsed, pricing, mergedProducts) {
+function buildPriceAudit(parsed, pricing, mergedProducts, serviceCodeMap = {}) {
     const swSubtotal = parsed.orderSummary.subtotal || 0;
     const ourSubtotal = pricing.grandTotal || 0;
     const deltaSubtotal = ourSubtotal - swSubtotal;
@@ -158,9 +158,10 @@ function buildPriceAudit(parsed, pricing, mergedProducts) {
     }
 
     // ── Append service items (AL, Monogram, Weight, Digitizing, DECG/DECC) ──
+    const alFallback = serviceCodeMap['AL']?.SellPrice || 6.50;
     const alUnitPrice = pricing.additionalServices?.length > 0
-        ? (pricing.additionalServices[0]?.unitPrice || 6.50)
-        : 6.50;
+        ? (pricing.additionalServices[0]?.unitPrice || alFallback)
+        : alFallback;
     (parsed.services.additionalLogos || []).forEach(al => {
         const swU = parseFloat(al.unitPrice || al.price || 0);
         const ourU = parseFloat(alUnitPrice.toFixed(2));
@@ -172,7 +173,7 @@ function buildPriceAudit(parsed, pricing, mergedProducts) {
     });
     (parsed.services.monograms || []).forEach(m => {
         const swU = parseFloat(m.unitPrice || m.price || 0);
-        const ourU = 12.50;
+        const ourU = serviceCodeMap['Monogram']?.SellPrice || 12.50;
         const d = ourU - swU;
         const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
         products.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
@@ -181,7 +182,7 @@ function buildPriceAudit(parsed, pricing, mergedProducts) {
     });
     (parsed.services.weights || []).forEach(w => {
         const swU = parseFloat(w.unitPrice || w.price || 0);
-        const ourU = 6.25;
+        const ourU = serviceCodeMap['WEIGHT']?.SellPrice || 6.25;
         const d = ourU - swU;
         const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
         products.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
@@ -508,6 +509,20 @@ async function main() {
     // STEP 2: PRICING ENGINE (live API calls)
     // ═══════════════════════════════════════════════════════════════════════
     printSection('STEP 2: PRICING ENGINE (live API)');
+
+    // Load service codes from API for audit price lookups (replaces hardcoded prices)
+    let serviceCodeMap = {};
+    try {
+        const scResp = await fetchJSON(`${BASE_URL}/api/service-codes`);
+        if (scResp.success && Array.isArray(scResp.data)) {
+            for (const sc of scResp.data) {
+                if (sc.ServiceCode) serviceCodeMap[sc.ServiceCode] = sc;
+            }
+            console.log(`  Service codes loaded: ${Object.keys(serviceCodeMap).length} codes`);
+        }
+    } catch (e) {
+        console.log(`  Service codes API unavailable, using fallback prices: ${e.message}`);
+    }
 
     // Initialize calculator with real API data
     const calc = new EmbroideryPricingCalculator({ skipInit: true });
@@ -1070,7 +1085,7 @@ async function main() {
                 // ShopWorks pricing audit (2026-02-13)
                 SWTotal: parsed.orderSummary.total || 0,
                 SWSubtotal: parsed.orderSummary.subtotal || 0,
-                PriceAuditJSON: JSON.stringify(buildPriceAudit(parsed, pricing, mergedProducts))
+                PriceAuditJSON: JSON.stringify(buildPriceAudit(parsed, pricing, mergedProducts, serviceCodeMap))
             };
 
             // Save session

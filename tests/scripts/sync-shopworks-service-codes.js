@@ -1,7 +1,7 @@
 /**
  * Sync ShopWorks Service Codes to Caspio Service_Codes Table
  *
- * Master cross-reference of ALL 28 ShopWorks service part numbers
+ * Master cross-reference of ALL 32 ShopWorks service part numbers
  * with correct 2026 sell prices. Idempotent: safe to run anytime.
  *
  * Usage:
@@ -134,6 +134,55 @@ const SHOPWORKS_SERVICE_CODES = [
         SellPrice: 12.50,
         PerUnit: 'each',
         Notes: 'Monogram/name embroidery. SW cost $7, 2026 sell $12.50.'
+    },
+    {
+        ServiceCode: 'NAME',
+        ServiceType: 'EMBROIDERY',
+        DisplayName: 'Names on Garments',
+        Category: 'Service',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 7.00,
+        SellPrice: 12.50,
+        PerUnit: 'each',
+        Notes: 'Individual name embroidery (same price as Monogram). SW cost $7, 2026 sell $12.50.'
+    },
+    // ── Digitizing Variants ──
+    {
+        ServiceCode: 'DGT-001',
+        ServiceType: 'DIGITIZING',
+        DisplayName: 'Digitizing - New Design',
+        Category: 'Setup',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 75.00,
+        SellPrice: 100.00,
+        PerUnit: 'each',
+        Notes: 'New design digitizing (same as DD). SW cost $75, 2026 sell $100.'
+    },
+    {
+        ServiceCode: 'DGT-002',
+        ServiceType: 'DIGITIZING',
+        DisplayName: 'Digitizing - Revision',
+        Category: 'Setup',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 25.00,
+        SellPrice: 50.00,
+        PerUnit: 'each',
+        Notes: 'Digitizing revision (same as DDE). SW cost $25, 2026 sell $50.'
+    },
+    {
+        ServiceCode: 'DGT-003',
+        ServiceType: 'DIGITIZING',
+        DisplayName: 'Digitizing - Text Only',
+        Category: 'Setup',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 25.00,
+        SellPrice: 50.00,
+        PerUnit: 'each',
+        Notes: 'Text-only digitizing (same as DDT). SW cost $25, 2026 sell $50.'
     },
     // ── Weight ──
     {

@@ -66,23 +66,37 @@ function printTable(headers, rows) {
 
 // ── API Helpers ─────────────────────────────────────────────────────────────
 
-async function fetchJSON(url) {
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`API ${resp.status}: ${url}`);
-    return resp.json();
+async function fetchJSON(url, retries = 2) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        const resp = await fetch(url);
+        if (resp.ok) return resp.json();
+        if (resp.status === 429 && attempt < retries) {
+            const delay = (attempt + 1) * 5000;
+            process.stdout.write(`[429 retry in ${delay / 1000}s] `);
+            await new Promise(r => setTimeout(r, delay));
+            continue;
+        }
+        throw new Error(`API ${resp.status}: ${url}`);
+    }
 }
 
-async function postJSON(url, data) {
-    const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-    if (!resp.ok) {
+async function postJSON(url, data, retries = 2) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (resp.ok) return resp;
+        if (resp.status === 429 && attempt < retries) {
+            const delay = (attempt + 1) * 5000;
+            process.stdout.write(`[429 retry in ${delay / 1000}s] `);
+            await new Promise(r => setTimeout(r, delay));
+            continue;
+        }
         const text = await resp.text();
         throw new Error(`POST ${resp.status}: ${text.substring(0, 200)}`);
     }
-    return resp;
 }
 
 async function deleteJSON(url) {
@@ -229,9 +243,10 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessio
         const feeItems = items.filter(i => i.EmbellishmentType === 'fee');
         const feePartNumbers = new Set(feeItems.map(i => i.StyleNumber));
         const validFeePNs = new Set([
-            'AS-Garm', 'AS-CAP', 'DD', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'AS-Garm', 'AS-CAP', 'DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
             'DISCOUNT', '3D-EMB', 'Laser Patch', 'SHIP', 'TAX',
-            'Monogram', 'NAME', 'WEIGHT'
+            'Monogram', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT',
+            'CTR-GARMT', 'CTR-CAP'
         ]);
         const unknownFees = [...feePartNumbers].filter(pn => !validFeePNs.has(pn));
         checks.push({ name: 'Fee PNs valid', ok: unknownFees.length === 0,
@@ -356,7 +371,7 @@ async function checkSanMarStyle(style) {
  * @param {boolean} doSave - Whether to save to Caspio
  * @returns {Object} Result summary for this order
  */
-async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
+async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serviceCodeMap = {}) {
     const result = {
         orderIndex,
         orderId: null,
@@ -381,6 +396,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
     try {
         // ── STEP 1: PARSE ───────────────────────────────────────────────
         const parser = new ShopWorksImportParser();
+        await parser.loadServiceCodes();  // Load DECG pricing + service codes from API
         const parsed = parser.parse(orderText);
 
         result.orderId = parsed.orderId;
@@ -605,8 +621,8 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         if (parsed.services.shipping) result.services.push('SHIP');
 
         // ── STEP 5: PRICE ───────────────────────────────────────────────
-        // Calculate DECG/DECC totals (customer-supplied garments/caps)
-        const decgTotal = parsed.decgItems.reduce((sum, d) => sum + ((d.unitPrice || 0) * (d.quantity || 0)), 0);
+        // Calculate DECG/DECC totals using API-calculated prices (not ShopWorks prices)
+        const decgTotal = parsed.decgItems.reduce((sum, d) => sum + ((d.calculatedUnitPrice || d.unitPrice || 0) * (d.quantity || 0)), 0);
 
         if (mergedProducts.length === 0 && decgTotal === 0) {
             result.warnings.push('No products to price');
@@ -651,7 +667,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         // ── PRICE AUDIT: Compare SW pricing vs 2026 calculated ─────────
         const pricingForAudit = result._pricing || { grandTotal: 0, products: [] };
         const swSub = parsed.orderSummary.subtotal || 0;
-        const ourSub = pricingGrandTotal;
+        const ourSub = pricingGrandTotal + decgTotal;
         const deltaSub = ourSub - swSub;
         const deltaPct = swSub > 0 ? Math.abs(deltaSub / swSub) * 100 : 0;
         const auditFlag = deltaPct <= 5 ? 'OK' : deltaPct <= 15 ? 'REVIEW' : 'MISMATCH';
@@ -677,9 +693,10 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
 
         // ── Append service items to audit (AL, Monogram, Weight, Digitizing, DECG/DECC) ──
         const pricingForAL = result._pricing || {};
+        const alFallback = serviceCodeMap['AL']?.SellPrice || 6.50;
         const alUnitPrice = pricingForAL.additionalServices?.length > 0
-            ? (pricingForAL.additionalServices[0]?.unitPrice || 6.50)
-            : 6.50;
+            ? (pricingForAL.additionalServices[0]?.unitPrice || alFallback)
+            : alFallback;
         (parsed.services.additionalLogos || []).forEach(al => {
             const swU = parseFloat(al.unitPrice || al.price || 0);
             const ourU = parseFloat(alUnitPrice.toFixed(2));
@@ -691,7 +708,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         });
         (parsed.services.monograms || []).forEach(m => {
             const swU = parseFloat(m.unitPrice || m.price || 0);
-            const ourU = 12.50;
+            const ourU = serviceCodeMap['Monogram']?.SellPrice || 12.50;
             const d = ourU - swU;
             const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
             auditProducts.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
@@ -700,7 +717,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         });
         (parsed.services.weights || []).forEach(w => {
             const swU = parseFloat(w.unitPrice || w.price || 0);
-            const ourU = 6.25;
+            const ourU = serviceCodeMap['WEIGHT']?.SellPrice || 6.25;
             const d = ourU - swU;
             const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
             auditProducts.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
@@ -709,17 +726,16 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
         });
         (parsed.services.sewing || []).forEach(sw => {
             const swU = parseFloat(sw.unitPrice || 0);
-            const ourU = 10.00; // Fixed 2026 sewing rate
+            const ourU = serviceCodeMap['SEG']?.SellPrice || 10.00;
             const d = ourU - swU;
             const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
             auditProducts.push({ style: sw.partNumber || 'SEG', color: 'Service', qty: parseInt(sw.quantity || 0),
                 swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
                 delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
         });
-        const digitizingPrices = { 'DD': 100, 'DDE': 50, 'DDT': 50, 'DGT-001': 100, 'DGT-002': 50, 'DGT-003': 50 };
         (parsed.services.digitizingFees || []).forEach(df => {
             const swU = parseFloat(df.amount || df.unitPrice || 0);
-            const ourU = digitizingPrices[df.code] || 100;
+            const ourU = serviceCodeMap[df.code]?.SellPrice || serviceCodeMap['DD']?.SellPrice || 100;
             const d = ourU - swU;
             const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
             auditProducts.push({ style: df.code || 'DD', color: 'Service', qty: 1,
@@ -747,20 +763,20 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 swUnit: parseFloat(swRush.toFixed(2)), ourUnit: parseFloat(ourRush.toFixed(2)),
                 delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
         }
-        // Art charges audit — $75/hr (same as GRT-75)
+        // Art charges audit — API-driven hourly rate (GRT-75)
         if (parsed.services.artCharges) {
             const swArt = parsed.services.artCharges.amount || 0;
-            const ourArt = 75;
+            const ourArt = serviceCodeMap['Art']?.SellPrice || 75;
             const d = ourArt - swArt;
             const p = swArt > 0 ? Math.abs(d / swArt) * 100 : 0;
             auditProducts.push({ style: 'Art/GRT-75', color: 'Service', qty: 1,
                 swUnit: parseFloat(swArt.toFixed(2)), ourUnit: ourArt,
                 delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
         }
-        // Design Transfer audit — $50 sell
+        // Design Transfer audit — API-driven sell price
         if (parsed.services.designTransfer) {
             const swDT = parsed.services.designTransfer.swAmount || 0;
-            const ourDT = 50;
+            const ourDT = serviceCodeMap['DT']?.SellPrice || 50;
             const d = ourDT - swDT;
             const p = swDT > 0 ? Math.abs(d / swDT) * 100 : 0;
             auditProducts.push({ style: 'DT', color: 'Service', qty: parsed.services.designTransfer.quantity || 1,
@@ -991,10 +1007,11 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                 savedCount++;
             }
 
-            // Save DECG items
+            // Save DECG items (use calculatedUnitPrice from API tiers, fall back to SW price)
             if (parsed.decgItems.length > 0) {
                 for (const decg of parsed.decgItems) {
                     const isDECC = decg.type === 'DECC' || (decg.serviceType === 'decc');
+                    const decgUnit = decg.calculatedUnitPrice || decg.unitPrice || 0;
                     await postJSON(`${BASE_URL}/api/quote_items`, {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
@@ -1007,10 +1024,10 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup) {
                         PrintLocationName: '',
                         Quantity: decg.quantity,
                         HasLTM: 'No',
-                        BaseUnitPrice: parseFloat((decg.unitPrice || 0).toFixed(2)),
+                        BaseUnitPrice: parseFloat(decgUnit.toFixed(2)),
                         LTMPerUnit: 0,
-                        FinalUnitPrice: parseFloat((decg.unitPrice || 0).toFixed(2)),
-                        LineTotal: parseFloat(((decg.unitPrice || 0) * decg.quantity).toFixed(2)),
+                        FinalUnitPrice: parseFloat(decgUnit.toFixed(2)),
+                        LineTotal: parseFloat((decgUnit * decg.quantity).toFixed(2)),
                         SizeBreakdown: JSON.stringify({ type: isDECC ? 'DECC' : 'DECG' }),
                         PricingTier: '',
                         ImageURL: '',
@@ -1229,13 +1246,28 @@ async function main() {
     console.log = origLog;
     console.warn = origWarn;
     console.error = origError;
-    console.log('  Pricing engine ready.\n');
+    console.log('  Pricing engine ready.');
+
+    // Load service codes from API for audit price lookups (replaces hardcoded prices)
+    let serviceCodeMap = {};
+    try {
+        const scResp = await fetchJSON(`${BASE_URL}/api/service-codes`);
+        if (scResp.success && Array.isArray(scResp.data)) {
+            for (const sc of scResp.data) {
+                if (sc.ServiceCode) serviceCodeMap[sc.ServiceCode] = sc;
+            }
+            console.log(`  Service codes loaded: ${Object.keys(serviceCodeMap).length} codes`);
+        }
+    } catch (e) {
+        console.log(`  Service codes API unavailable, using fallback prices: ${e.message}`);
+    }
+    console.log('');
 
     // Process each order (with delay between live saves to avoid rate limiting)
     const results = [];
     for (let i = 0; i < orderTexts.length; i++) {
-        // Rate limit delay: 5s between orders in live mode to avoid 429
-        if (doSave && i > 0) await new Promise(r => setTimeout(r, 5000));
+        // Rate limit delay: 8s between orders in live mode to avoid 429
+        if (doSave && i > 0) await new Promise(r => setTimeout(r, 8000));
 
         const orderNum = i + 1;
         process.stdout.write(`  Processing order ${orderNum}/${orderTexts.length}...`);
@@ -1248,7 +1280,7 @@ async function main() {
             origError.apply(console, a);
         };
 
-        const result = await processOrder(orderTexts[i], orderNum, calc, doSave, noCleanup);
+        const result = await processOrder(orderTexts[i], orderNum, calc, doSave, noCleanup, serviceCodeMap);
         results.push(result);
 
         console.log = origLog;

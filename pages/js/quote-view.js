@@ -179,7 +179,8 @@ class QuoteViewPage {
         const shipToState = this.quoteData.ShipToState || '';
         const shipToZip = this.quoteData.ShipToZip || '';
         const shipMethod = this.quoteData.ShipMethod || '';
-        if (shipToAddress || shipToCity || shipMethod) {
+        const hasTracking = this.quoteData.Carrier || this.quoteData.TrackingNumber;
+        if (shipToAddress || shipToCity || shipMethod || hasTracking) {
             const shipCard = document.getElementById('ship-to-card');
             if (shipCard) {
                 if (shipToAddress) {
@@ -192,6 +193,23 @@ class QuoteViewPage {
                 if (shipMethod) {
                     document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
                 }
+
+                // Tracking info
+                const carrier = this.quoteData.Carrier || '';
+                const trackingNum = this.quoteData.TrackingNumber || '';
+                if (carrier || trackingNum) {
+                    const trackingEl = document.getElementById('ship-to-tracking');
+                    if (trackingEl) {
+                        const trackingLink = this.getTrackingLink(carrier, trackingNum);
+                        if (trackingLink) {
+                            trackingEl.innerHTML = `Tracking: <a href="${this.escapeHtml(trackingLink)}" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">${this.escapeHtml(trackingNum)}</a>${carrier ? ' (' + this.escapeHtml(carrier) + ')' : ''}`;
+                        } else {
+                            trackingEl.textContent = `Tracking: ${trackingNum}${carrier ? ' (' + carrier + ')' : ''}`;
+                        }
+                        trackingEl.style.display = 'block';
+                    }
+                }
+
                 shipCard.style.display = 'block';
             }
         }
@@ -459,23 +477,42 @@ class QuoteViewPage {
      */
     renderDesignNumbers() {
         const raw = this.quoteData?.DesignNumbers;
-        if (!raw) return;
-
-        let designs;
-        try { designs = JSON.parse(raw); } catch (e) { return; }
-        if (!Array.isArray(designs) || designs.length === 0) return;
-
-        // Render into the special-notes section (append below existing notes)
         const section = document.getElementById('special-notes-section');
         const content = document.getElementById('special-notes-content');
         if (!section || !content) return;
 
-        const designHtml = designs.map(d => this.escapeHtml(d)).join('<br>');
-        const block = document.createElement('div');
-        block.style.marginTop = '12px';
-        block.innerHTML = `<strong>Design References:</strong><br>${designHtml}`;
-        content.appendChild(block);
-        section.style.display = 'block';
+        if (raw) {
+            let designs;
+            try { designs = JSON.parse(raw); } catch (e) { /* ignore */ }
+            if (Array.isArray(designs) && designs.length > 0) {
+                const designHtml = designs.map(d => this.escapeHtml(d)).join('<br>');
+                const block = document.createElement('div');
+                block.style.marginTop = '12px';
+                block.innerHTML = `<strong>Design References:</strong><br>${designHtml}`;
+                content.appendChild(block);
+                section.style.display = 'block';
+            }
+        }
+
+        // Digitizing Codes (comma-separated string, e.g., "DD,DGT-002")
+        const digCodes = this.quoteData?.DigitizingCodes;
+        if (digCodes) {
+            const block = document.createElement('div');
+            block.style.marginTop = '8px';
+            block.innerHTML = `<strong>Digitizing:</strong> ${this.escapeHtml(digCodes)}`;
+            content.appendChild(block);
+            section.style.display = 'block';
+        }
+
+        // Order Notes (from ShopWorks Note section)
+        const orderNotes = this.quoteData?.OrderNotes;
+        if (orderNotes) {
+            const block = document.createElement('div');
+            block.style.cssText = 'margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb;';
+            block.innerHTML = `<strong>Order Notes:</strong><br>${this.escapeHtml(orderNotes).replace(/\n/g, '<br>')}`;
+            content.appendChild(block);
+            section.style.display = 'block';
+        }
     }
 
     /**
@@ -970,6 +1007,30 @@ class QuoteViewPage {
                 : `Discount${discountReason ? ': ' + discountReason : ''}`;
             // Discount shows as negative
             html += this.renderFeeRow('DISCOUNT', discountDesc, 1, -discount, -discount, true);
+        }
+
+        // 11. Catch-all: render any remaining fee items not already handled above
+        // Covers: Monogram, NAME, WEIGHT, SEG, SECC, DT, CTR-GARMT, CTR-CAP, etc.
+        const handledFeeStyleNumbers = new Set([
+            'AS-GARM', 'AS-Garm', 'AS-CAP', 'AL-GARM', 'AL', 'AL-CAP', 'CB', 'CS',
+            'DD', 'DD-CAP', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'LTM', 'LTM-CAP', 'DISCOUNT', '3D-EMB', 'Laser Patch',
+            'TAX', 'SHIP'
+        ]);
+        const unhandledFees = (this.items || []).filter(i =>
+            i.EmbellishmentType === 'fee' &&
+            !handledFeeStyleNumbers.has(i.StyleNumber) &&
+            i.LineTotal !== 0
+        );
+        for (const fee of unhandledFees) {
+            const desc = fee.ProductName || fee.StyleNumber || 'Service Fee';
+            html += this.renderFeeRow(
+                this.escapeHtml(fee.StyleNumber || ''),
+                desc,
+                fee.Quantity || 1,
+                fee.FinalUnitPrice || fee.BaseUnitPrice || 0,
+                fee.LineTotal || 0
+            );
         }
 
         return html;
@@ -2075,10 +2136,10 @@ class QuoteViewPage {
             yPos += 5;
         }
 
-        // Ship To block (below Prepared For, if address or ship method present)
+        // Ship To block (below Prepared For, if address, ship method, or tracking present)
         const pdfShipAddr = this.quoteData.ShipToAddress || '';
         const pdfShipCity = this.quoteData.ShipToCity || '';
-        if (pdfShipAddr || pdfShipCity || this.quoteData.ShipMethod) {
+        if (pdfShipAddr || pdfShipCity || this.quoteData.ShipMethod || this.quoteData.Carrier || this.quoteData.TrackingNumber) {
             yPos += 3;
             pdf.setFont('helvetica', 'bold');
             pdf.text('SHIP TO', margin, yPos);
@@ -2098,6 +2159,13 @@ class QuoteViewPage {
                 pdf.setFont('helvetica', 'italic');
                 pdf.text('Via: ' + this.quoteData.ShipMethod, margin, yPos);
                 pdf.setFont('helvetica', 'normal');
+                yPos += 5;
+            }
+            if (this.quoteData.Carrier || this.quoteData.TrackingNumber) {
+                const pdfTrack = this.quoteData.TrackingNumber || '';
+                const pdfCarrier = this.quoteData.Carrier || '';
+                const trackText = pdfCarrier ? `Tracking: ${pdfTrack} (${pdfCarrier})` : `Tracking: ${pdfTrack}`;
+                pdf.text(trackText, margin, yPos);
                 yPos += 5;
             }
         }
@@ -2564,6 +2632,33 @@ class QuoteViewPage {
             } catch (e) { /* not valid JSON, skip */ }
         }
 
+        // Digitizing Codes in PDF
+        const pdfDigCodes = this.quoteData?.DigitizingCodes;
+        if (pdfDigCodes) {
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(51, 51, 51);
+            pdf.text('Digitizing: ', margin, yPos);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(pdfDigCodes, margin + 20, yPos);
+            yPos += 6;
+        }
+
+        // Order Notes in PDF
+        const pdfOrderNotes = this.quoteData?.OrderNotes;
+        if (pdfOrderNotes) {
+            if (yPos > 240) { pdf.addPage(); yPos = 20; }
+            pdf.setFontSize(8);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setTextColor(51, 51, 51);
+            pdf.text('Order Notes:', margin, yPos);
+            pdf.setFont('helvetica', 'normal');
+            yPos += 4;
+            const noteLines = pdf.splitTextToSize(pdfOrderNotes, pageWidth - margin * 2 - 10);
+            pdf.text(noteLines, margin + 4, yPos);
+            yPos += noteLines.length * 4 + 4;
+        }
+
         // Footer
         const footerY = 265;
         pdf.setFontSize(8);
@@ -2658,12 +2753,23 @@ class QuoteViewPage {
         const hasPuffFee = this.items.some(i => i.EmbellishmentType === 'fee' && i.StyleNumber === '3D-EMB' && i.LineTotal > 0);
         const hasPatchFee = this.items.some(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'Laser Patch' && i.LineTotal > 0);
 
+        // Check for catch-all fee items (Monogram, WEIGHT, SEG, etc.)
+        const handledPdfCheckSet = new Set([
+            'AS-GARM', 'AS-Garm', 'AS-CAP', 'AL-GARM', 'AL', 'AL-CAP', 'CB', 'CS',
+            'DD', 'DD-CAP', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'LTM', 'LTM-CAP', 'DISCOUNT', '3D-EMB', 'Laser Patch',
+            'TAX', 'SHIP'
+        ]);
+        const hasExtraFees = (this.items || []).some(i =>
+            i.EmbellishmentType === 'fee' && !handledPdfCheckSet.has(i.StyleNumber) && i.LineTotal !== 0
+        );
+
         const hasFees = garmentStitchCharge > 0 || capStitchCharge > 0 ||
                         alGarmentCharge > 0 || alCapCharge > 0 ||
                         garmentDigitizing > 0 || capDigitizing > 0 ||
                         artChargePdf > 0 || rushFeePdf > 0 ||
                         ltmGarmentPdf > 0 || ltmCapPdf > 0 || discountPdf > 0 ||
-                        hasPuffFee || hasPatchFee;
+                        hasPuffFee || hasPatchFee || hasExtraFees;
         if (!hasFees) return yPos;
 
         // Add separator line before fees
@@ -2776,6 +2882,28 @@ class QuoteViewPage {
             yPos = this.renderPdfFeeRow(pdf, yPos, colX, 'DISCOUNT', discountDesc, 1, -discount, -discount, true);
         }
 
+        // 11. Catch-all: render remaining fee items not already handled
+        const handledPdfFeeStyleNumbers = new Set([
+            'AS-GARM', 'AS-Garm', 'AS-CAP', 'AL-GARM', 'AL', 'AL-CAP', 'CB', 'CS',
+            'DD', 'DD-CAP', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
+            'LTM', 'LTM-CAP', 'DISCOUNT', '3D-EMB', 'Laser Patch',
+            'TAX', 'SHIP'
+        ]);
+        const unhandledPdfFees = (this.items || []).filter(i =>
+            i.EmbellishmentType === 'fee' &&
+            !handledPdfFeeStyleNumbers.has(i.StyleNumber) &&
+            i.LineTotal !== 0
+        );
+        for (const fee of unhandledPdfFees) {
+            const desc = fee.ProductName || fee.StyleNumber || 'Service Fee';
+            yPos = this.renderPdfFeeRow(pdf, yPos, colX,
+                fee.StyleNumber || '', desc,
+                fee.Quantity || 1,
+                fee.FinalUnitPrice || fee.BaseUnitPrice || 0,
+                fee.LineTotal || 0
+            );
+        }
+
         return yPos;
     }
 
@@ -2846,6 +2974,15 @@ class QuoteViewPage {
     formatCurrency(amount) {
         const num = parseFloat(amount) || 0;
         return '$' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    getTrackingLink(carrier, trackingNumber) {
+        if (!trackingNumber) return '';
+        const c = (carrier || '').toUpperCase();
+        if (c.includes('UPS')) return `https://www.ups.com/track?tracknum=${encodeURIComponent(trackingNumber)}`;
+        if (c.includes('FEDEX') || c.includes('FED EX')) return `https://www.fedex.com/fedextrack/?trknbr=${encodeURIComponent(trackingNumber)}`;
+        if (c.includes('USPS')) return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(trackingNumber)}`;
+        return '';
     }
 
     formatPhone(phone) {

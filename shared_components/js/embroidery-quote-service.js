@@ -851,17 +851,20 @@ class EmbroideryQuoteService {
     /**
      * Send quote email
      */
-    async sendQuoteEmail(quoteData, customerData, pricingResults, salesRepEmail = 'sales@nwcustomapparel.com') {
+    async sendQuoteEmail(quoteData, customerData, pricingResults, salesRepEmail = 'sales@nwcustomapparel.com', options = {}) {
         try {
             // Get sales rep info
             const salesRep = this.salesReps.find(rep => rep.email === salesRepEmail) || this.salesReps[0];
-            
+
             // Calculate totals with tax (shipping is taxable in WA state)
-            const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+            // Support options override for DOM-free usage
+            const shippingFee = options.shippingFee ?? (parseFloat(document.getElementById('shipping-fee')?.value) || 0);
             const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
             const taxableAmount = subtotalBeforeTax + shippingFee;
-            const taxRateInput = document.getElementById('tax-rate-input');
-            const emailTaxRate = taxRateInput ? parseFloat(taxRateInput.value) / 100 : 0.101;
+            const emailTaxRate = options.taxRate ?? (() => {
+                const taxRateInput = document.getElementById('tax-rate-input');
+                return taxRateInput ? parseFloat(taxRateInput.value) / 100 : 0.101;
+            })();
             const salesTax = Math.round(taxableAmount * emailTaxRate * 100) / 100;
             const grandTotalWithTax = taxableAmount + salesTax;
 
@@ -1009,16 +1012,19 @@ class EmbroideryQuoteService {
     /**
      * Generate complete professional quote HTML
      */
-    generateProfessionalQuoteHTML(quoteData, customerData, pricingResults) {
+    generateProfessionalQuoteHTML(quoteData, customerData, pricingResults, options = {}) {
         const currentDate = new Date().toLocaleDateString('en-US');
         const salesRep = this.salesReps.find(rep => rep.email === (customerData.salesRepEmail || 'sales@nwcustomapparel.com')) || this.salesReps[0];
-        
+
         // Calculate totals with tax (shipping is taxable in WA state)
-        const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+        // Support options override for DOM-free usage
+        const shippingFee = options.shippingFee ?? (parseFloat(document.getElementById('shipping-fee')?.value) || 0);
         const subtotalBeforeTax = pricingResults.subtotal + pricingResults.setupFees + (pricingResults.ltmFee || 0) + (pricingResults.additionalServicesTotal || 0);
         const taxableAmount = subtotalBeforeTax + shippingFee;
-        const htmlTaxRateInput = document.getElementById('tax-rate-input');
-        const htmlTaxRate = htmlTaxRateInput ? parseFloat(htmlTaxRateInput.value) / 100 : 0.101;
+        const htmlTaxRate = options.taxRate ?? (() => {
+            const htmlTaxRateInput = document.getElementById('tax-rate-input');
+            return htmlTaxRateInput ? parseFloat(htmlTaxRateInput.value) / 100 : 0.101;
+        })();
         const salesTax = Math.round(taxableAmount * htmlTaxRate * 100) / 100;
         const grandTotalWithTax = taxableAmount + salesTax;
 

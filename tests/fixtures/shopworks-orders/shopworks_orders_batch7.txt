@@ -1,0 +1,798 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 7)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136089
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13303
+Company:Carolyn Salter
+**************************************************************************
+Order Information
+Date Order Placed:4/15/2025
+Req. Ship Date:4/29/2025
+Drop Dead Date:
+Date Order Shipped:5/8/2025
+Date Order Invoiced:5/6/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Carolyn Salter
+Phone:240-674-4116
+Fax:
+Email:csalter3@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Carolyn Salter, 2144 McDonald Ave, Dupont, WA 98327
+**************************************************************************
+Design Information
+Design #:39054 - Testical Festival
+Design #:39054.01 - Testical Festival
+**************************************************************************
+Items Purchased
+Item 1 of 18
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 18
+Part Number:CC8C
+Description:Champion Adult Long-Sleeve T-Shirt, Black
+Unit Price:23.00
+Line Item Price:69.00
+Item Quantity:3
+Adult:Quantity
+S (Other):2
+LG:1
+Item 3 of 18
+Part Number:CC8C_2X
+Description:Champion Adult Long-Sleeve T-Shirt, Black
+Unit Price:25.00
+Line Item Price:25.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 4 of 18
+Part Number:CC8C
+Description:Champion Adult Long-Sleeve T-Shirt, Cardinal
+Unit Price:23.00
+Line Item Price:46.00
+Item Quantity:2
+Adult:Quantity
+S (Other):1
+M:1
+Item 5 of 18
+Part Number:64001LCVC
+Description:Gildan Softstyle Womens Cvc T-Shirt, SteelBlue
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 6 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Sky
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 7 of 18
+Part Number:2000_2X
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Sky
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 8 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Charcoal
+Unit Price:17.00
+Line Item Price:68.00
+Item Quantity:4
+Adult:Quantity
+M:1
+LG:1
+XL:2
+Item 9 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Purple
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 10 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, White
+Unit Price:17.00
+Line Item Price:34.00
+Item Quantity:2
+Adult:Quantity
+M:1
+XL:1
+Item 11 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Pistachio
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 12 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Lime
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 13 of 18
+Part Number:2000
+Description:Gildan - Ultra Cotton 100 Us Cotton T-Shirt, Dark Heather
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 14 of 18
+Part Number:64000L
+Description:Gildan Softstyle Ladies T-Shirt, Black
+Unit Price:18.00
+Line Item Price:72.00
+Item Quantity:4
+Adult:Quantity
+S (Other):1
+M:1
+LG:1
+XL:1
+Item 15 of 18
+Part Number:64000L
+Description:Gildan Softstyle Ladies T-Shirt, White
+Unit Price:18.00
+Line Item Price:36.00
+Item Quantity:2
+Adult:Quantity
+S (Other):1
+LG:1
+Item 16 of 18
+Part Number:64000L
+Description:Gildan Softstyle Ladies T-Shirt, Charcoal
+Unit Price:18.00
+Line Item Price:36.00
+Item Quantity:2
+Adult:Quantity
+S (Other):1
+LG:1
+Item 17 of 18
+Part Number:64000L
+Description:Gildan Softstyle Ladies T-Shirt, Dark Heather
+Unit Price:18.00
+Line Item Price:36.00
+Item Quantity:2
+Adult:Quantity
+LG:2
+Item 18 of 18
+Part Number:64000L
+Description:Gildan Softstyle Ladies T-Shirt, Red
+Unit Price:18.00
+Line Item Price:36.00
+Item Quantity:2
+Adult:Quantity
+M:1
+XL:1
+**************************************************************************
+Order Summary
+Subtotal:681.00
+Sales Tax:68.78
+Shipping:
+Total:749.78
+Paid To Date:749.78
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136094
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:6608
+Company:RUI Refrigeration Unlimited, INC.
+**************************************************************************
+Order Information
+Date Order Placed:4/16/2025
+Req. Ship Date:4/21/2025
+Drop Dead Date:
+Date Order Shipped:5/2/2025
+Date Order Invoiced:4/21/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Viktor  Nozdrin
+Phone:253-298-2282
+Fax:
+Email:viktornozdrin@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:RUI Refrigeration Unlimited, INC., 5102 20TH ST E STE 102, Fife, WA 98424-1996
+**************************************************************************
+Design Information
+Design #:27191 - RUI 2.5" wide
+Design #:39059 - RUI -DTG
+Design #:27191.02 - 
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DECG
+Description:Di. Embroider Garms (EMB LC)
+Unit Price:20.00
+Line Item Price:100.00
+Item Quantity:5
+Adult:Quantity
+S (Other):5
+Item 2 of 2
+Part Number:DECG
+Description:DTG BACK
+Unit Price:15.00
+Line Item Price:75.00
+Item Quantity:5
+Adult:Quantity
+S (Other):5
+**************************************************************************
+Order Summary
+Subtotal:175.00
+Sales Tax:17.68
+Shipping:
+Total:192.68
+Paid To Date:192.68
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136102
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:4042
+Company:Gene's Towing
+**************************************************************************
+Order Information
+Date Order Placed:4/16/2025
+Req. Ship Date:4/16/2025
+Drop Dead Date:
+Date Order Shipped:7/10/2025
+Date Order Invoiced:7/10/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Marnie Young
+Phone:253-588-1757 ex104
+Fax:
+Email:marnie@genestow.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Gene's Towing, 1120 E Main Ave, Puyallup, WA 98372
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130342275028
+**************************************************************************
+Design Information
+Design #:17452 - L349, L/C Gene's Towing and Transportation
+Design #:17452.01 - 
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:NKDX6718_4X
+Description:Nike Club Fleece Sleeve Swoosh 1/2-Zip, Anthracite
+Unit Price:67.00
+Line Item Price:67.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+**************************************************************************
+Order Summary
+Subtotal:67.00
+Sales Tax:8.41
+Shipping:16.26
+Total:91.67
+Paid To Date:91.67
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136103
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13304
+Company:Mary Robinson
+**************************************************************************
+Order Information
+Date Order Placed:4/16/2025
+Req. Ship Date:4/23/2025
+Drop Dead Date:4/23/2025
+Date Order Shipped:4/23/2025
+Date Order Invoiced:4/23/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Mary  Robinson 
+Phone:202-329-9738
+Fax:
+Email:m.elizabethrobinson@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Mary Robinson, 3151 E Laurelhurst Dr NE , Seattle , WA 98105
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130341883695
+**************************************************************************
+Design Information
+Design #:39060 - Guyyy
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:DECG
+Description:Di. Embroider Garms (Towels)
+Unit Price:25.00
+Line Item Price:200.00
+Item Quantity:8
+Adult:Quantity
+S (Other):8
+**************************************************************************
+Order Summary
+Subtotal:300.00
+Sales Tax:33.28
+Shipping:29.54
+Total:362.82
+Paid To Date:362.82
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136107
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12161
+Company:Paradigm Building Contractors 
+**************************************************************************
+Order Information
+Date Order Placed:4/16/2025
+Req. Ship Date:4/30/2025
+Drop Dead Date:
+Date Order Shipped:5/8/2025
+Date Order Invoiced:5/1/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Monica De La Torre
+Phone:253-246-7835
+Fax:
+Email:mdelatorre@pbcontractors.net
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Paradigm Building Contractors , 27008 168th PL SE, Covington , WA 98042
+**************************************************************************
+Design Information
+Design #:39062 - PBG - FB
+Design #:39091 - PBC - LC 
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:40.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 2 of 3
+Part Number:AL
+Description:Additional Logo 
+Unit Price:75.00
+Line Item Price:150.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 3 of 3
+Part Number:DGT-001
+Description:Digitizing fee for converting artwork into an embroidery-friendly format
+Unit Price:150.00
+Line Item Price:150.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:340.00
+Sales Tax:34.34
+Shipping:
+Total:374.34
+Paid To Date:374.34
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136109
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12907
+Company:Hilltop Heritage Middle School 
+**************************************************************************
+Order Information
+Date Order Placed:4/17/2025
+Req. Ship Date:4/24/2025
+Drop Dead Date:4/24/2025
+Date Order Shipped:4/23/2025
+Date Order Invoiced:4/22/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Brandon Lake
+Phone:214-636-7836
+Fax:
+Email:bmlake95@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Hilltop Heritage Middle School , 12810 50th ST CT E, Edgewood , WA 98372
+**************************************************************************
+Design Information
+Design #:37728 - Hilltop Heritage Middle School 
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:K110
+Description:Port Authority Dry Zone Uv Micro-Mesh Polo, Rich Red
+Unit Price:42.00
+Line Item Price:126.00
+Item Quantity:3
+Adult:Quantity
+M:1
+LG:2
+Item 2 of 4
+Part Number:Name 
+Description:Right chest - Coach X
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 3 of 4
+Part Number:Name 
+Description:Right chest - Coach Tru
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 4 of 4
+Part Number:Name 
+Description:Right chest - Coach Wilson
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:163.50
+Sales Tax:16.51
+Shipping:
+Total:180.01
+Paid To Date:180.01
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136111
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:9886
+Company:HARTS Services
+**************************************************************************
+Order Information
+Date Order Placed:4/17/2025
+Req. Ship Date:5/1/2025
+Drop Dead Date:
+Date Order Shipped:5/2/2025
+Date Order Invoiced:4/29/2025
+Purchase Order #:Connor Regan
+Terms:Net 10
+Ordered by:Julie  Burr
+Phone:253-993-0547
+Fax:
+Email:jburr@hartsservices.com
+**************************************************************************
+Design Information
+Design #:38464 - Harts New Logo 
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:CT100615
+Description:Carhartt  Rain Defender  Paxton Heavyweight Hooded Sweatshirt, Carbon Heather
+Unit Price:86.00
+Line Item Price:86.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 2 of 2
+Part Number:Name
+Description:John
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+**************************************************************************
+Order Summary
+Subtotal:111.00
+Sales Tax:11.21
+Shipping:
+Total:122.21
+Paid To Date:122.21
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136113
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11392
+Company:Patriot Fire Protection
+**************************************************************************
+Order Information
+Date Order Placed:4/17/2025
+Req. Ship Date:5/23/2025
+Drop Dead Date:
+Date Order Shipped:5/29/2025
+Date Order Invoiced:5/27/2025
+Purchase Order #:Field Order
+Terms:Net 10
+Ordered by:Jennifer Forrester
+Phone:253-284-3525
+Fax:
+Email:jennifer.forrester@patriotfire.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Patriot Fire Protection, 2707 70th Ave E, Tacoma, WA 98424
+**************************************************************************
+Design Information
+Design #:29988 - Patriot Fire Protection
+Design #:29988.04 - 
+Design #:29988.01 - 
+Design #:29988.1 - Patriot Fire Protection
+**************************************************************************
+Items Purchased
+Item 1 of 19
+Part Number:TST850_4XLT
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Black
+Unit Price:48.00
+Line Item Price:96.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 2 of 19
+Part Number:TST850_4XLT
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Charcoal Grey
+Unit Price:48.00
+Line Item Price:96.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 3 of 19
+Part Number:ST850
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, True Royal
+Unit Price:41.00
+Line Item Price:246.00
+Item Quantity:6
+Adult:Quantity
+M:2
+LG:2
+XL:2
+Item 4 of 19
+Part Number:ST850_2X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, True Royal
+Unit Price:43.00
+Line Item Price:86.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 5 of 19
+Part Number:ST850_3X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, True Royal
+Unit Price:44.00
+Line Item Price:88.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 6 of 19
+Part Number:ST850
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Black
+Unit Price:41.00
+Line Item Price:246.00
+Item Quantity:6
+Adult:Quantity
+M:2
+LG:2
+XL:2
+Item 7 of 19
+Part Number:ST850_2X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Black
+Unit Price:43.00
+Line Item Price:86.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 8 of 19
+Part Number:ST850_3X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Black
+Unit Price:44.00
+Line Item Price:88.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 9 of 19
+Part Number:K540
+Description:Port Authority Silk Touch Performance Polo, Black
+Unit Price:26.00
+Line Item Price:104.00
+Item Quantity:4
+Adult:Quantity
+LG:4
+Item 10 of 19
+Part Number:K540_2X
+Description:Port Authority Silk Touch Performance Polo, Black
+Unit Price:28.00
+Line Item Price:112.00
+Item Quantity:4
+Adult:Quantity
+XXL:4
+Item 11 of 19
+Part Number:K540
+Description:Port Authority Silk Touch Performance Polo, Steel Grey
+Unit Price:26.00
+Line Item Price:104.00
+Item Quantity:4
+Adult:Quantity
+LG:4
+Item 12 of 19
+Part Number:K540_2X
+Description:Port Authority Silk Touch Performance Polo, Steel Grey
+Unit Price:28.00
+Line Item Price:112.00
+Item Quantity:4
+Adult:Quantity
+XXL:4
+Item 13 of 19
+Part Number:TLK540_4XLT
+Description:Port Authority Silk Touch Performance Polo, Royal
+Unit Price:32.00
+Line Item Price:128.00
+Item Quantity:4
+Adult:Quantity
+XXXL (Other):4
+Item 14 of 19
+Part Number:TLK540_4XLT
+Description:Port Authority Silk Touch Performance Polo, Black
+Unit Price:32.00
+Line Item Price:128.00
+Item Quantity:4
+Adult:Quantity
+XXXL (Other):4
+Item 15 of 19
+Part Number:ST850
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, True Red
+Unit Price:41.00
+Line Item Price:246.00
+Item Quantity:6
+Adult:Quantity
+M:2
+LG:2
+XL:2
+Item 16 of 19
+Part Number:ST850_2X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, True Red
+Unit Price:43.00
+Line Item Price:86.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 17 of 19
+Part Number:ST850_3X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, True Red
+Unit Price:43.00
+Line Item Price:86.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 18 of 19
+Part Number:TLK540_2XLT
+Description:Port Authority Silk Touch Performance Polo, Royal
+Unit Price:30.00
+Line Item Price:120.00
+Item Quantity:4
+Adult:Quantity
+XXXL (Other):4
+Item 19 of 19
+Part Number:TLK540_2XLT
+Description:Port Authority Silk Touch Performance Polo, Black
+Unit Price:30.00
+Line Item Price:120.00
+Item Quantity:4
+Adult:Quantity
+XXXL (Other):4
+**************************************************************************
+Order Summary
+Subtotal:2,378.00
+Sales Tax:240.18
+Shipping:
+Total:2,618.18
+Paid To Date:2,618.18
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 7
+================================================================================

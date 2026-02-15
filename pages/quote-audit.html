@@ -71,6 +71,22 @@
                 <span class="ctx-label">Created</span>
                 <span class="ctx-value" id="ctx-created-value"></span>
             </div>
+            <div class="context-field" id="ctx-paid" style="display: none;">
+                <span class="ctx-label">Paid to Date</span>
+                <span class="ctx-value" id="ctx-paid-value"></span>
+            </div>
+            <div class="context-field" id="ctx-balance" style="display: none;">
+                <span class="ctx-label">Balance</span>
+                <span class="ctx-value" id="ctx-balance-value"></span>
+            </div>
+            <div class="context-field" id="ctx-digitizing" style="display: none;">
+                <span class="ctx-label">Digitizing</span>
+                <span class="ctx-value" id="ctx-digitizing-value"></span>
+            </div>
+            <div class="context-field" id="ctx-tracking" style="display: none;">
+                <span class="ctx-label">Tracking</span>
+                <span class="ctx-value" id="ctx-tracking-value"></span>
+            </div>
         </section>
 
         <!-- Summary Card -->
@@ -101,6 +117,12 @@
                     <tfoot id="audit-products-tfoot"></tfoot>
                 </table>
             </div>
+        </section>
+
+        <!-- Import Notes (parser warnings) -->
+        <section class="audit-import-notes" id="import-notes-section" style="display: none;">
+            <h3>Import Notes</h3>
+            <ul id="import-notes-list" class="import-notes-list"></ul>
         </section>
 
         <!-- Actions -->

@@ -297,8 +297,14 @@
                             <tr id="empty-state-row">
                                 <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
                                     <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
-                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
+                                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
+                                        <span style="background:#eef2ff; padding:2px 8px; border-radius:4px; color:#4f46e5;">1</span> Type a style # above (e.g., PC54, G500, C112)
+                                        &nbsp;&bull;&nbsp;
+                                        <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#6366f1; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
+                                        &nbsp;&bull;&nbsp;
+                                        <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use <strong>+ Add Service</strong> for Monogram, Weight, Sewing, etc.
+                                    </div>
                                 </td>
                             </tr>
                             <!-- Product rows will be added here -->
@@ -473,6 +479,10 @@
                                 <button onclick="addManualServiceRow('SEG')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
                                     <i class="fas fa-tape" style="color: #ef4444; width: 16px;"></i>
                                     <span>Sewing — <strong>$10.00</strong></span>
+                                </button>
+                                <button onclick="addManualServiceRow('DT')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                                    <i class="fas fa-exchange-alt" style="color: #7c3aed; width: 16px;"></i>
+                                    <span>Design Transfer — <strong>$50.00</strong></span>
                                 </button>
                             </div>
                         </div>
@@ -937,6 +947,18 @@
                 <button class="btn-action btn-secondary-action" onclick="closeLogoModal()" style="background: #6c757d;">Cancel</button>
                 <button class="btn-action btn-primary-action" onclick="applyCustomLogo()">Apply</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Import Progress Overlay -->
+    <div class="import-progress-overlay" id="import-progress-overlay">
+        <div class="import-progress-card">
+            <h3 id="import-progress-title">Importing Order...</h3>
+            <p class="import-progress-status" id="import-progress-status">Preparing...</p>
+            <div class="import-progress-bar-container">
+                <div class="import-progress-bar" id="import-progress-bar"></div>
+            </div>
+            <p class="import-progress-detail" id="import-progress-detail"></p>
         </div>
     </div>
 
@@ -2979,7 +3001,7 @@ Company:Absher Construction Company
             // Service items to create as service product rows (2026-02 refactor)
             const SERVICE_STYLE_NUMBERS = [
                 'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
-                '3D-EMB', 'Laser Patch',
+                '3D-EMB', 'Laser Patch', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
                 // Legacy backward-compat (old quotes):
                 'FB', 'MONOGRAM', 'AS-GARM'
             ];
@@ -3669,7 +3691,7 @@ Company:Absher Construction Company
                     title="Double-click to override price">-</td>
                 <td class="cell-total" id="row-total-${rowId}">-</td>
                 <td class="cell-actions">
-                    <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; font-size: 13px; display: none;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#94a3b8'">
+                    <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #d1d5db; cursor: not-allowed; padding: 4px; font-size: 13px; opacity: 0.5;" disabled onmouseover="if(!this.disabled)this.style.color='#3b82f6'" onmouseout="if(!this.disabled)this.style.color='#94a3b8'"
                         <i class="fas fa-copy"></i>
                     </button>
                     <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
@@ -3735,6 +3757,11 @@ Company:Absher Construction Company
                 'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
                 'NAME': { description: 'Individual Name', icon: 'fa-id-badge', isCap: false },
                 'WEIGHT': { description: 'Weight', icon: 'fa-weight-hanging', isCap: false },
+                'SEG': { description: 'Sewing (Garment)', icon: 'fa-scissors', isCap: false },
+                'SECC': { description: 'Sewing (Cap)', icon: 'fa-scissors', isCap: true },
+                'DT': { description: 'Design Transfer', icon: 'fa-exchange-alt', isCap: false },
+                'CTR-GARMT': { description: 'Contract (Garment)', icon: 'fa-file-contract', isCap: false },
+                'CTR-CAP': { description: 'Contract (Cap)', icon: 'fa-file-contract', isCap: true },
                 'AS-Garm': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
                 'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
                 'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
@@ -3857,7 +3884,10 @@ Company:Absher Construction Company
                 'Monogram': { unitPrice: 12.50, quantity: 1 },
                 'NAME': { unitPrice: 12.50, quantity: 1 },
                 'WEIGHT': { unitPrice: 6.25, quantity: 1 },
-                'SEG': { unitPrice: 10.00, quantity: 1 }
+                'SEG': { unitPrice: 10.00, quantity: 1 },
+                'DT': { unitPrice: 50.00, quantity: 1 },
+                'CTR-GARMT': { unitPrice: 0, quantity: 1 },
+                'CTR-CAP': { unitPrice: 0, quantity: 1 }
             };
 
             const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };
@@ -4051,9 +4081,14 @@ Company:Absher Construction Company
                     row.dataset.style = styleNumber;
                     row.dataset.productName = cleanTitle || styleNumber;
 
-                    // Show "duplicate row" button now that style is loaded
+                    // Enable "duplicate row" button now that style is loaded
                     const dupBtn = row.querySelector('.btn-duplicate-row');
-                    if (dupBtn) dupBtn.style.display = '';
+                    if (dupBtn) {
+                        dupBtn.disabled = false;
+                        dupBtn.style.color = '#94a3b8';
+                        dupBtn.style.cursor = 'pointer';
+                        dupBtn.style.opacity = '1';
+                    }
 
                 } else {
                     // SanMar product not found — check Non-SanMar Products database
@@ -4117,9 +4152,14 @@ Company:Absher Construction Company
             if (addBtn) addBtn.remove();
             delete row.dataset.notFound;
 
-            // Show "duplicate row" button for non-SanMar products too
+            // Enable "duplicate row" button for non-SanMar products too
             const dupBtn = row.querySelector('.btn-duplicate-row');
-            if (dupBtn) dupBtn.style.display = '';
+            if (dupBtn) {
+                dupBtn.disabled = false;
+                dupBtn.style.color = '#94a3b8';
+                dupBtn.style.cursor = 'pointer';
+                dupBtn.style.opacity = '1';
+            }
 
             // Detect cap vs garment
             const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');
@@ -7155,6 +7195,17 @@ Company:Absher Construction Company
                 return;
             }
 
+            // Validate non-SanMar products have pricing set
+            const zeroPriceRows = products.filter(p => {
+                const row = document.getElementById(`row-${p.rowId}`);
+                return row && row.dataset.nonSanmar === 'true' && p.sellPriceOverride <= 0;
+            });
+            if (zeroPriceRows.length > 0) {
+                const styleList = zeroPriceRows.map(p => p.style).join(', ');
+                showToast(`Non-SanMar product(s) have $0 pricing: ${styleList}. Double-click the price cell to set a price.`, 'error', 6000);
+                return;
+            }
+
             // Get save button for loading state
             const saveBtn = document.querySelector('.btn-save-quote');
             const originalText = saveBtn?.innerHTML;
@@ -8805,6 +8856,28 @@ Company:Absher Construction Company
         }
 
         // ============================================================
+        // IMPORT PROGRESS INDICATOR
+        // ============================================================
+
+        function updateImportProgress(step, total, message, detail = '') {
+            const overlay = document.getElementById('import-progress-overlay');
+            const bar = document.getElementById('import-progress-bar');
+            const status = document.getElementById('import-progress-status');
+            const detailEl = document.getElementById('import-progress-detail');
+            if (!overlay) return;
+            overlay.classList.add('active');
+            const pct = total > 0 ? Math.round((step / total) * 100) : 0;
+            bar.style.width = pct + '%';
+            status.textContent = message;
+            detailEl.textContent = detail;
+        }
+
+        function hideImportProgress() {
+            const overlay = document.getElementById('import-progress-overlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        // ============================================================
         // SHOPWORKS IMPORT MODAL FUNCTIONS
         // ============================================================
 
@@ -9093,16 +9166,18 @@ Company:Absher Construction Company
             let productsHtml = '';
             if (data.products.length > 0) {
                 productsHtml = '<h5>Products (' + data.products.length + ')</h5><div class="preview-products-list">';
-                for (const product of data.products) {
+                data.products.forEach((product, idx) => {
                     const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
                     productsHtml += `
                         <div class="preview-product-item">
+                            <input type="checkbox" class="product-include-check" data-product-index="${idx}" checked
+                                   style="flex-shrink:0; width:16px; height:16px; cursor:pointer;" title="Uncheck to exclude from import">
                             <span class="preview-product-style">${escapeHtml(product.partNumber)}</span>
                             <span class="preview-product-desc">${escapeHtml(product.description || '')}</span>
                             <span class="preview-product-qty">Qty: ${totalQty}</span>
                         </div>
                     `;
-                }
+                });
                 productsHtml += '</div>';
             }
 
@@ -9193,6 +9268,20 @@ Company:Absher Construction Company
             if (data.services.monograms.length > 0) {
                 const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
                 servicesHtml += `<span class="preview-service-badge"><i class="fas fa-font"></i> Monograms: ${totalNames} names</span>`;
+            }
+            if (data.services.designTransfer && data.services.designTransfer.length > 0) {
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-exchange-alt"></i> Design Transfer: $${data.services.designTransfer.reduce((s, dt) => s + (dt.unitPrice || 50), 0).toFixed(2)}</span>`;
+            }
+            if (data.services.contract && data.services.contract.length > 0) {
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-file-contract"></i> Contract: ${data.services.contract.length} item(s)</span>`;
+            }
+            if (data.services.sewing && data.services.sewing.length > 0) {
+                const totalSewQty = data.services.sewing.reduce((sum, s) => sum + (s.quantity || 0), 0);
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-scissors"></i> Sewing: ${totalSewQty} items</span>`;
+            }
+            if (data.services.weights && data.services.weights.length > 0) {
+                const totalWeightQty = data.services.weights.reduce((sum, w) => sum + (w.quantity || 0), 0);
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-weight-hanging"></i> Weight: ${totalWeightQty} items</span>`;
             }
             if (data.services.rush) {
                 servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
@@ -9304,11 +9393,27 @@ Company:Absher Construction Company
             const data = pendingShopWorksImport;
             const btn = document.getElementById('btn-confirm-import');
 
+            // Filter products by exclude checkboxes
+            const excludedIndices = new Set();
+            document.querySelectorAll('.product-include-check:not(:checked)').forEach(cb => {
+                excludedIndices.add(parseInt(cb.dataset.productIndex));
+            });
+            if (excludedIndices.size > 0) {
+                data.products = data.products.filter((_, idx) => !excludedIndices.has(idx));
+            }
+
             // Show loading state
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Importing...';
 
             try {
+                // Calculate total steps for progress
+                const totalProducts = (data.products?.length || 0) + (data.customProducts?.length || 0);
+                const totalSteps = totalProducts + 5; // +5 for customer, services, CRM, validation, cleanup
+                let currentStep = 0;
+
+                updateImportProgress(currentStep, totalSteps, 'Setting up customer info...', '');
+
                 // 1. Populate customer info
                 if (data.customer.contactName) {
                     document.getElementById('customer-name').value = data.customer.contactName;
@@ -9717,6 +9822,8 @@ Company:Absher Construction Company
                 }
 
                 // 11. Import products (deferred from step 8)
+                currentStep++;
+                updateImportProgress(currentStep, totalSteps, 'Importing products...', `0 of ${productResults.length}`);
                 let productsImported = 0;
                 for (let i = 0; i < productResults.length; i++) {
                     const prodResult = productResults[i];
@@ -9726,6 +9833,8 @@ Company:Absher Construction Company
                     } catch (err) {
                         console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
                     }
+                    currentStep++;
+                    updateImportProgress(currentStep, totalSteps, 'Importing products...', `${i + 1} of ${productResults.length}: ${prodResult.partNumber || 'product'}`);
                     // Small delay between imports to reduce API rate limiting
                     if (i < productResults.length - 1) {
                         await new Promise(resolve => setTimeout(resolve, 150));
@@ -9733,6 +9842,8 @@ Company:Absher Construction Company
                 }
 
                 // 12. Process service results
+                currentStep++;
+                updateImportProgress(currentStep, totalSteps, 'Processing services...', '');
                 if (serviceResults && serviceResults.length > 0) {
                     for (const result of serviceResults) {
                         const typeUpper = result.type.toUpperCase();
@@ -9846,15 +9957,53 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 16. Capture sewing service items (SEG) into notes — no dedicated UI for these
+                // 16. Create service rows for sewing items (SEG/SECC)
                 if (data.services.sewing && data.services.sewing.length > 0) {
-                    const notesEl = document.getElementById('notes');
-                    if (notesEl) {
-                        const sewingNotes = data.services.sewing.map(s =>
-                            `SEG: ${s.description} — Qty: ${s.quantity}, $${s.unitPrice.toFixed(2)}/ea`
-                        ).join('\n');
-                        notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
-                            '--- Sewing Services ---\n' + sewingNotes;
+                    for (const s of data.services.sewing) {
+                        const sewPartNumber = s.partNumber || (s.isCap ? 'SECC' : 'SEG');
+                        createServiceProductRow(sewPartNumber, {
+                            quantity: s.quantity || 0,
+                            unitPrice: s.unitPrice || 10.00,
+                            total: (s.quantity || 0) * (s.unitPrice || 10.00),
+                            isCap: s.isCap || false
+                        });
+                    }
+                }
+
+                // 16b. Create service rows for weight items
+                if (data.services.weights && data.services.weights.length > 0) {
+                    for (const w of data.services.weights) {
+                        createServiceProductRow('WEIGHT', {
+                            quantity: w.quantity || 0,
+                            unitPrice: w.unitPrice || 6.25,
+                            total: (w.quantity || 0) * (w.unitPrice || 6.25),
+                            isCap: false
+                        });
+                    }
+                }
+
+                // 16c. Create service rows for design transfer items
+                if (data.services.designTransfer && data.services.designTransfer.length > 0) {
+                    for (const dt of data.services.designTransfer) {
+                        createServiceProductRow('DT', {
+                            quantity: dt.quantity || 1,
+                            unitPrice: dt.unitPrice || 50.00,
+                            total: (dt.quantity || 1) * (dt.unitPrice || 50.00),
+                            isCap: false
+                        });
+                    }
+                }
+
+                // 16d. Create service rows for contract items
+                if (data.services.contract && data.services.contract.length > 0) {
+                    for (const ctr of data.services.contract) {
+                        const ctrPN = ctr.isCap ? 'CTR-CAP' : 'CTR-GARMT';
+                        createServiceProductRow(ctrPN, {
+                            quantity: ctr.quantity || 1,
+                            unitPrice: ctr.unitPrice || 0,
+                            total: (ctr.quantity || 1) * (ctr.unitPrice || 0),
+                            isCap: ctr.isCap || false
+                        });
                     }
                 }
 
@@ -9882,11 +10031,12 @@ Company:Absher Construction Company
 
                 // 18. Catch-all: dump any unprocessed service data into notes
                 const handledServiceKeys = [
-                    'digitizing', 'digitizingCodes', 'digitizingCount',
+                    'digitizing', 'digitizingCodes', 'digitizingCount', 'digitizingFees',
                     'patchSetup', 'additionalLogo', 'additionalLogos',
                     'artCharges', 'graphicDesign', 'monograms',
                     'rush', 'ltmFee', 'sewing', 'additionalStitches',
-                    'shipping'
+                    'shipping', 'weights',
+                    'designTransfer', 'contract'
                 ];
                 const unhandled = Object.entries(data.services || {})
                     .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
@@ -9968,7 +10118,23 @@ Company:Absher Construction Company
                     showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
                 }
 
+                // Flag non-SanMar products with $0 pricing
+                document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
+                    const sellPrice = parseFloat(nsRow.dataset.sellPrice) || 0;
+                    if (sellPrice <= 0) {
+                        nsRow.classList.add('price-warning');
+                        const priceCell = nsRow.querySelector('.cell-price');
+                        if (priceCell) {
+                            priceCell.innerHTML = '<span style="color:#dc2626;" title="Double-click to set price">$0.00 &#9888;</span>';
+                        }
+                    }
+                });
+
+                // Finalize progress
+                updateImportProgress(totalSteps, totalSteps, 'Import complete!', '');
+
                 // Close modal and show success
+                hideImportProgress();
                 closeShopWorksImportModal();
 
                 const summary = [];
@@ -9996,6 +10162,7 @@ Company:Absher Construction Company
                 console.error('Import failed:', error);
                 showToast('Import failed: ' + error.message, 'error');
             } finally {
+                hideImportProgress();
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
             }

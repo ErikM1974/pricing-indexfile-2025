@@ -367,6 +367,33 @@ body {
     font-style: italic;
 }
 
+/* Import Notes */
+.audit-import-notes {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-sm);
+}
+
+.audit-import-notes h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #92400e;
+}
+
+.import-notes-list {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.import-notes-list li {
+    font-size: 13px;
+    color: #78350f;
+    margin-bottom: 4px;
+}
+
 /* Actions */
 .audit-actions {
     display: flex;
