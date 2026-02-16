@@ -944,8 +944,12 @@ class EmbroideryPricingCalculator {
         }
 
         // If no standard sizes found, use the first available size with valid price
+        // (Expected for OSFA items like beanies, bags, etc. — not a warning)
         if (standardBasePrice === 0) {
-            console.warn(`[EmbroideryPricingCalculator] No standard sizes found for ${product.style}, using alternative base`);
+            const hasOSFA = priceData.basePrices['OSFA'] > 0 || priceData.basePrices['OSFM'] > 0;
+            if (!hasOSFA) {
+                console.warn(`[EmbroideryPricingCalculator] No standard sizes found for ${product.style}, using alternative base`);
+            }
 
             // Find sizes with valid prices (filter out $0 discontinued sizes)
             const availableSizes = Object.entries(priceData.basePrices)

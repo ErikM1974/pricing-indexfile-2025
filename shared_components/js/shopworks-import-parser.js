@@ -1006,9 +1006,11 @@ class ShopWorksImportParser {
                 item.partNumber = extracted.cleanedPartNumber;
             }
 
-            // Handle old caps with no _OSFA suffix where sizes came from "(Other)" columns
+            // Handle old caps/beanies with no _OSFA suffix where sizes came from "(Other)" columns
             // e.g., Richardson 112 with "S (Other): 12" → remap to 112_OSFA with OSFA size
-            if (!extracted.size && hasOtherSizes && this._isCapFromDescription(item.description)
+            // Includes flat headwear (beanies) which are OSFA but use garment pricing
+            if (!extracted.size && hasOtherSizes
+                && (this._isCapFromDescription(item.description) || this._isFlatHeadwear(item.description))
                 && this.classifyPartNumber(item.partNumber) === 'product') {
                 item.sizes = { 'OSFA': item.quantity };
                 item.partNumber = item.partNumber + '_OSFA';
@@ -1627,11 +1629,27 @@ class ShopWorksImportParser {
     }
 
     /**
-     * Check if description indicates a cap
+     * Check if description indicates flat headwear (beanies, knit caps)
+     * These are OSFA products but use garment pricing, NOT cap pricing
+     */
+    _isFlatHeadwear(description) {
+        if (!description) return false;
+        const desc = description.toLowerCase();
+        const flatKeywords = ['beanie', 'knit cap', 'watch cap', 'winter hat', 'toboggan'];
+        return flatKeywords.some(kw => desc.includes(kw));
+    }
+
+    /**
+     * Check if description indicates a cap (structured caps only, NOT beanies)
      */
     _isCapFromDescription(description) {
         if (!description) return false;
         const desc = description.toLowerCase();
+
+        // Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing
+        if (this._isFlatHeadwear(description)) {
+            return false;
+        }
 
         // ShopWorks DECG prefix: "Di. Embroider Cap" may describe non-cap garments
         // e.g., "Di. Embroider Cap - T-shirt" = garment, "Di. Embroider Cap - Front" = actual cap
@@ -1647,8 +1665,8 @@ class ShopWorksImportParser {
         // "Di. Embroider Garms" = always garment
         if (desc.startsWith('di.') && desc.includes('garms')) return false;
 
-        // Standard cap detection
-        return desc.includes('cap') || desc.includes('hat') || desc.includes('beanie');
+        // Standard cap detection (beanies already excluded above)
+        return desc.includes('cap') || desc.includes('hat');
     }
 
     /**

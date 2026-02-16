@@ -308,8 +308,8 @@ Before 2026-02-10, upcharges were baked into per-piece cap price. Now:
 
 ### Testing OSFA Products
 Use these styles for testing OSFA behavior:
-- **CP90** - Port & Company Beanie (OSFA only) ✅
-- **CP91** - Port & Company Beanie (OSFA only) ✅
+- **CP90** - Port & Company Beanie (OSFA only, priced as GARMENT not cap) ✅
+- **CP91** - Port & Company Beanie (OSFA only, priced as GARMENT not cap) ✅
 - **CP80** - Port Authority Cap (OSFA only)
 - **BG100** - Port Authority Tote (OSFA only)
 
@@ -339,12 +339,13 @@ Use these styles for testing child row behavior:
 
 ## Additional Known Issues / Fixes Applied
 
-### 9. Cap Products Warning (FIXED - Jan 2026)
+### 9. Cap Products Warning (FIXED - Jan 2026, UPDATED Feb 2026)
 - **Problem**: Caps (C112, CP80, NE1000) allowed without warning in garment builder
 - **Solution**: Added `isCapProduct()` detection with warning toast
 - **Behavior**: Warning shown but entry allowed (user may need to quote cap embroidery)
-- **Patterns**: `/^C[P0-9]/`, `NE*` prefix, title keywords (CAP, HAT, BEANIE, SNAPBACK)
-- **File**: `quote-builders/embroidery-quote-builder.html:2322-2325`
+- **Patterns**: `/^C[P0-9]/`, `NE*` prefix, title keywords (CAP, HAT, SNAPBACK)
+- **Flat headwear exclusion** (Feb 2026): `ProductCategoryFilter.isFlatHeadwear()` runs FIRST — beanies, knit caps, watch caps return `false` from `isCapProduct()` and use garment pricing
+- **File**: `quote-builders/embroidery-quote-builder.html`
 
 ### 10. Extended Sizes Fallback Fixed (FIXED - Jan 2026)
 - **Problem**: API failure/no data returned ALL 47 sizes instead of empty
@@ -702,6 +703,11 @@ const categoryName = colorsData.CATEGORY_NAME || '';
 const isCap = categoryName.toLowerCase() === 'caps';
 ```
 
+**Priority Check — Flat Headwear Exclusion (Feb 2026):**
+`ProductCategoryFilter.isFlatHeadwear()` runs BEFORE all cap checks.
+Keywords: `beanie`, `knit`, `knit cap`, `watch cap`, `winter hat`, `toboggan`
+If matched → `isCapProduct()` returns `false` → garment pricing used.
+
 **Fallback Method (Pattern Matching):**
 ```javascript
 // Style patterns
@@ -710,7 +716,8 @@ const isCap = categoryName.toLowerCase() === 'caps';
 /^\d{2,3}$/ // Richardson numeric (99, 110, 112)
 
 // Title keywords (case-insensitive)
-CAP, HAT, BEANIE, SNAPBACK, TRUCKER, RICHARDSON
+CAP, HAT, SNAPBACK, TRUCKER, RICHARDSON
+// NOTE: BEANIE removed — caught by flat headwear exclusion above
 ```
 
 ### Mixed Quote Handling

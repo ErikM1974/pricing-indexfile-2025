@@ -687,6 +687,11 @@ describe('Batch 12 — Cross-order validation', () => {
         // Standard cap detection still works
         expect(parser._isCapFromDescription('Richardson Trucker Cap')).toBe(true);
         expect(parser._isCapFromDescription('Nike Dri-FIT Hat')).toBe(true);
-        expect(parser._isCapFromDescription('Carhartt Beanie')).toBe(true);
+        // Beanies are flat headwear, NOT caps — use garment pricing
+        expect(parser._isCapFromDescription('Carhartt Beanie')).toBe(false);
+        // But _isFlatHeadwear correctly identifies them
+        expect(parser._isFlatHeadwear('Carhartt Beanie')).toBe(true);
+        expect(parser._isFlatHeadwear('Port & Company Knit Cap')).toBe(true);
+        expect(parser._isFlatHeadwear('Richardson Trucker Cap')).toBe(false);
     });
 });

@@ -531,6 +531,7 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Core Dependencies -->
+    <script src="/shared_components/js/product-category-filter.js"></script>
     <script src="/shared_components/js/quote-builder-utils.js?v=20260130"></script>
     <script src="/shared_components/js/dtg-pricing-service.js"></script>
     <script src="/shared_components/js/dtg-quote-service.js"></script>
@@ -2581,6 +2582,13 @@
          * @returns {boolean} True if cap/hat
          */
         function isCapProduct(style, productTitle = '', categoryName = '') {
+            // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing
+            if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {
+                if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {
+                    return false;
+                }
+            }
+
             // BEST METHOD: Check CATEGORY_NAME from SanMar API
             // SanMar categorizes all caps/hats under "Caps" category
             if (categoryName && categoryName.toLowerCase() === 'caps') {

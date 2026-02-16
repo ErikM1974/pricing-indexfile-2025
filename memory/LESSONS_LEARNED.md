@@ -1935,6 +1935,17 @@ for (let i = 0; i < items.length; i += batchSize) {
 
 ---
 
+## Bug: Beanies Priced as Caps in Quote Builder but as Garments on Calculator Pages (2026-02-16)
+**Date:** 2026-02-16
+**Project:** [Pricing Index]
+**Symptoms:** CP90 (Port & Company Knit Cap / beanie) showed different prices on the embroidery calculator page vs the embroidery quote builder. Calculator used garment/flat pricing; quote builder used cap pricing with CeilDollar rounding and cap tiers.
+**Root cause:** Calculator pages used `ProductCategoryFilter.isFlatHeadwear()` to detect beanies and route them to flat embroidery. Quote builders had their own `isCapProduct()` function that caught beanies via SanMar `CATEGORY_NAME: 'Caps'`, style regex `/^C[P0-9]/`, and "BEANIE" title keyword — with no flat headwear exclusion.
+**Solution:** Added `ProductCategoryFilter.isFlatHeadwear()` as priority check at top of `isCapProduct()` in all 4 quote builders (EMB, DTG, SP). Added `product-category-filter.js` script tag to each. Updated parser `_isCapFromDescription()` with flat headwear exclusion + new `_isFlatHeadwear()` helper. Refactored OSFA setup in ShopWorks import to be independent of `isCap` flag. Bonus: DTG builder no longer rejects beanies (was blocking them as "caps").
+**Prevention:** Any product categorization must use `ProductCategoryFilter` as single source of truth. Never duplicate keyword lists across files. When adding new product type detection, check all 3 systems (calculators, quote builders, parser).
+**Files:** `quote-builders/embroidery-quote-builder.html`, `quote-builders/dtg-quote-builder.html`, `quote-builders/screenprint-quote-builder.html`, `shared_components/js/shopworks-import-parser.js`, `shared_components/js/product-category-filter.js` (unchanged, already correct)
+
+---
+
 # Template for New Entries
 
 ```markdown

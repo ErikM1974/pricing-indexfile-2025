@@ -1688,6 +1688,7 @@ Company:Absher Construction Company
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/product-category-filter.js"></script>
     <script src="/shared_components/js/quote-builder-utils.js?v=20260130"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
@@ -4746,6 +4747,14 @@ Company:Absher Construction Company
          * @returns {boolean} True if cap/hat
          */
         function isCapProduct(style, productTitle = '', categoryName = '') {
+            // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing
+            // Matches ProductCategoryFilter used by calculator pages
+            if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {
+                if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {
+                    return false;
+                }
+            }
+
             // BEST METHOD: Check CATEGORY_NAME from SanMar API
             // SanMar categorizes all caps/hats under "Caps" category
             if (categoryName && categoryName.toLowerCase() === 'caps') {
@@ -10692,24 +10701,24 @@ Company:Absher Construction Company
                     row.dataset.isCap = 'true';
                     const capBadge = document.getElementById(`cap-badge-${rowId}`);
                     if (capBadge) capBadge.style.display = 'inline-flex';
-
-                    // Check if sizes are OSFA — set up OSFA-only mode
-                    const hasOSFA = product.sizes && product.sizes['OSFA'];
-                    if (hasOSFA) {
-                        row.dataset.sizeCategory = 'osfa-only';
-                        row.dataset.isOsfaOnly = 'true';
-                        row.dataset.osfaQty = product.sizes['OSFA'];
-                        row.dataset.availableSizes = JSON.stringify(['OSFA']);
-                        row.dataset.capSizes = JSON.stringify(['OSFA']);
-                        const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
-                        if (qtyDisplay) qtyDisplay.textContent = product.sizes['OSFA'];
-                    } else {
-                        // Cap with standard sizes (S, M, L, etc.) — enable all size inputs
-                        row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
-                    }
                 } else {
                     row.dataset.isCap = 'false';
-                    // Enable standard garment sizes (S-3XL)
+                }
+
+                // OSFA detection — works for caps, beanies, bags (independent of isCap)
+                const hasOSFA = product.sizes && product.sizes['OSFA'];
+                const sizeKeys = product.sizes ? Object.keys(product.sizes) : [];
+                const isOsfaOnly = hasOSFA && sizeKeys.length === 1;
+                if (isOsfaOnly) {
+                    row.dataset.sizeCategory = 'osfa-only';
+                    row.dataset.isOsfaOnly = 'true';
+                    row.dataset.osfaQty = product.sizes['OSFA'];
+                    row.dataset.availableSizes = JSON.stringify(['OSFA']);
+                    if (isCap) row.dataset.capSizes = JSON.stringify(['OSFA']);
+                    const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
+                    if (qtyDisplay) qtyDisplay.textContent = product.sizes['OSFA'];
+                } else {
+                    // Standard sizes (S, M, L, etc.) — enable all size inputs
                     row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
                 }
 

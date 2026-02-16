@@ -176,7 +176,14 @@ class EmbroideryQuoteService {
                 // 5xx or 429 — retry
                 lastError = new Error(`HTTP ${response.status}`);
                 if (attempt < maxRetries) {
-                    const delay = 1000 * Math.pow(2, attempt);
+                    let delay = 1000 * Math.pow(2, attempt);
+                    // For 429, respect Retry-After header (capped at 10s to avoid hanging)
+                    if (response.status === 429) {
+                        const retryAfter = parseInt(response.headers.get('Retry-After')) || 0;
+                        if (retryAfter > 0) {
+                            delay = Math.min(retryAfter * 1000, 10000);
+                        }
+                    }
                     console.warn(`[EmbroideryQuoteService] Retry ${attempt + 1}/${maxRetries} after ${response.status} for ${url} (waiting ${delay}ms)`);
                     await new Promise(r => setTimeout(r, delay));
                 } else {
