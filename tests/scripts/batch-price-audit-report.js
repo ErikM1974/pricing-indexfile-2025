@@ -3,15 +3,17 @@
  * Batch Price Audit Report — Service Pricing Analysis
  *
  * Loads all batch fixture files, compares ShopWorks prices vs 2026 API prices
- * for service items (DECG, AL, Monogram, DD, etc.), and outputs 3 reports:
+ * for service items (DECG, AL, Monogram, DD, etc.), and outputs 4 reports:
  *   A) Per-order summary
  *   B) Service item breakdown (REVIEW/MISMATCH only)
  *   C) Aggregated by rep + service type
+ *   D) Revenue impact summary (total dollars left on the table)
  *
  * Usage:
  *   node tests/scripts/batch-price-audit-report.js
  *   node tests/scripts/batch-price-audit-report.js --rep "Nika"
  *   node tests/scripts/batch-price-audit-report.js --service DECG
+ *   node tests/scripts/batch-price-audit-report.js --html     (generates dashboard HTML)
  */
 const path = require('path');
 const fs = require('fs');
@@ -44,6 +46,7 @@ const ShopWorksImportParser = require('../../shared_components/js/shopworks-impo
 const args = process.argv.slice(2);
 const repFilter = args.includes('--rep') ? args[args.indexOf('--rep') + 1] : null;
 const serviceFilter = args.includes('--service') ? args[args.indexOf('--service') + 1]?.toUpperCase() : null;
+const generateHTML = args.includes('--html');
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 function currency(val) {
@@ -145,8 +148,9 @@ function analyzeOrder(orderText, parser, serviceCodeMap) {
     if (result.decgItems && result.decgItems.length > 0) {
         for (const decg of result.decgItems) {
             const swPrice = decg.unitPrice || 0;
-            const apiPrice = decg.calculatedUnitPrice || 0;
             const qty = decg.quantity || 1;
+            // Use hardcoded 2026 tier prices (calculatedUnitPrice is 0 in fixture-only mode)
+            const apiPrice = getDECGTierPrice(qty, decg.isCap);
             const ltmFee = decg.ltmFee || 0;
             const allInApi = apiPrice + (ltmFee / qty);
 
@@ -171,28 +175,21 @@ function analyzeOrder(orderText, parser, serviceCodeMap) {
     }
     for (const al of alItems) {
         const swPrice = al.unitPrice || 0;
-        // AL 2026 pricing: use service code map if available
-        let apiPrice = 0;
-        const alCode = serviceCodeMap['AL-1-7'] || serviceCodeMap['AL-8-23'];
-        // For AL, we need tier-based lookup
         const alQty = al.quantity || 1;
-        const alTierKey = getALTierKey(alQty);
-        const alRecord = serviceCodeMap[alTierKey];
-        if (alRecord && alRecord.SellPrice != null) {
-            apiPrice = parseFloat(alRecord.SellPrice);
-        } else {
-            // Fallback AL prices
-            apiPrice = getALFallbackPrice(alQty, false);
-        }
+        const isCap = al.isCap || false;
+        // AL uses tier-based pricing — service code map doesn't have AL tier keys,
+        // so always use hardcoded 2026 tier prices directly
+        const apiPrice = getALFallbackPrice(alQty, isCap);
+        const tierLabel = getALTierKey(alQty);
 
         serviceComparisons.push({
-            type: 'AL',
+            type: isCap ? 'AL-CAP' : 'AL',
             qty: alQty,
             swPerUnit: swPrice,
             apiPerUnit: apiPrice,
             apiAllIn: apiPrice,
             ltmFee: 0,
-            tier: alTierKey,
+            tier: tierLabel,
             delta: swPrice - apiPrice,
             deltaPct: apiPrice > 0 ? ((swPrice - apiPrice) / apiPrice) * 100 : 0
         });
@@ -343,12 +340,24 @@ function analyzeOrder(orderText, parser, serviceCodeMap) {
     // Calculate order-level SW subtotal vs our subtotal (products only)
     const swSubtotal = result.orderSummary?.subtotal || 0;
 
+    // --- LTM impact tracking ---
+    // Count total product qty across garments, caps, and DECG items
+    const totalProductQty = (result.products || []).reduce((sum, p) => sum + (p.totalQuantity || 0), 0)
+        + (result.decgItems || []).reduce((sum, d) => sum + (d.quantity || 0), 0);
+    // Check if ShopWorks order had an LTM fee
+    const hasLTMFee = (result.services?.ltm && result.services.ltm.amount > 0)
+        || (result.orderSummary?.fees || []).some(f => /ltm|less than min/i.test(f.description || ''));
+    const ltmNeeded = totalProductQty > 0 && totalProductQty <= 7;
+
     return {
         orderNum,
         company,
         rep,
         swSubtotal,
-        serviceComparisons
+        serviceComparisons,
+        totalProductQty,
+        ltmNeeded,
+        ltmPresent: hasLTMFee
     };
 }
 
@@ -361,9 +370,21 @@ function getALTierKey(qty) {
 }
 
 function getALFallbackPrice(qty, isCap) {
-    // Fallback AL garment prices (2026)
-    const garmentTiers = { '1-7': 8.00, '8-23': 7.00, '24-47': 6.00, '48-71': 5.50, '72+': 5.00 };
-    const capTiers = { '1-7': 8.00, '8-23': 7.00, '24-47': 6.00, '48-71': 5.50, '72+': 5.00 };
+    // 2026 AL tier prices (garment vs cap)
+    const garmentTiers = { '1-7': 10.00, '8-23': 9.00, '24-47': 8.00, '48-71': 7.50, '72+': 7.00 };
+    const capTiers = { '1-7': 6.50, '8-23': 6.00, '24-47': 5.75, '48-71': 5.50, '72+': 5.25 };
+    const tiers = isCap ? capTiers : garmentTiers;
+    if (qty <= 7) return tiers['1-7'];
+    if (qty <= 23) return tiers['8-23'];
+    if (qty <= 47) return tiers['24-47'];
+    if (qty <= 71) return tiers['48-71'];
+    return tiers['72+'];
+}
+
+function getDECGTierPrice(qty, isCap) {
+    // 2026 DECG/DECC tier prices
+    const garmentTiers = { '1-7': 28, '8-23': 26, '24-47': 24, '48-71': 22, '72+': 20 };
+    const capTiers = { '1-7': 22.50, '8-23': 21, '24-47': 19, '48-71': 17.50, '72+': 16 };
     const tiers = isCap ? capTiers : garmentTiers;
     if (qty <= 7) return tiers['1-7'];
     if (qty <= 23) return tiers['8-23'];
@@ -592,7 +613,497 @@ async function main() {
     }
 
     console.log('─'.repeat(78));
+
+    // ── REPORT D: Revenue Impact Summary ─────────────────────────────────────
+    console.log('\n' + '═'.repeat(78));
+    console.log('  REPORT D: Revenue Impact Summary');
+    console.log('═'.repeat(78));
+
+    // Aggregate undercharges by service type
+    const impactByType = {};
+    for (const r of results) {
+        for (const s of r.serviceComparisons) {
+            if (serviceFilter && s.type !== serviceFilter) continue;
+            // Only count undercharges (SW charged less than 2026 price)
+            // delta = swPrice - apiPrice, negative means undercharged
+            if (s.delta < 0) {
+                const t = s.type;
+                if (!impactByType[t]) impactByType[t] = { items: 0, orderSet: new Set(), totalDollars: 0 };
+                impactByType[t].items += s.qty;
+                impactByType[t].orderSet.add(r.orderNum);
+                // Revenue gap = qty × (2026 price - SW price) per unit
+                impactByType[t].totalDollars += s.qty * Math.abs(s.delta);
+            }
+        }
+    }
+
+    // LTM impact
+    let ltmMissingCount = 0;
+    const ltmMissingOrders = [];
+    for (const r of results) {
+        if (r.ltmNeeded && !r.ltmPresent) {
+            ltmMissingCount++;
+            ltmMissingOrders.push(r.orderNum);
+        }
+    }
+    const ltmRevenue = ltmMissingCount * 50;
+
+    let grandTotalGap = 0;
+    let grandTotalOrders = new Set();
+
+    // Print each service type impact
+    const sortedTypes = Object.keys(impactByType).sort((a, b) => impactByType[b].totalDollars - impactByType[a].totalDollars);
+    for (const t of sortedTypes) {
+        const imp = impactByType[t];
+        const avgPerOrder = imp.orderSet.size > 0 ? imp.totalDollars / imp.orderSet.size : 0;
+        grandTotalGap += imp.totalDollars;
+        for (const o of imp.orderSet) grandTotalOrders.add(o);
+
+        console.log(`\n  ${t} Underpricing:`);
+        console.log(`    ${imp.items} items across ${imp.orderSet.size} orders`);
+        console.log(`    Total $ left on table: ${currency(imp.totalDollars)}`);
+        console.log(`    Avg per order: ${currency(avgPerOrder)}`);
+    }
+
+    if (ltmMissingCount > 0) {
+        grandTotalGap += ltmRevenue;
+        for (const o of ltmMissingOrders) grandTotalOrders.add(o);
+
+        console.log(`\n  LTM Fee Not Applied:`);
+        console.log(`    ${ltmMissingCount} orders with <=7 pieces, no LTM charged`);
+        console.log(`    Potential revenue: ${currency(ltmRevenue)} ($50 x ${ltmMissingCount} orders)`);
+    } else if (!serviceFilter) {
+        console.log(`\n  LTM Fee Not Applied:`);
+        console.log(`    All small orders (<= 7 pcs) had LTM — none missing`);
+    }
+
+    // Also show overcharges summary (where SW charged more than 2026)
+    let overchargeTotal = 0;
+    let overchargeItems = 0;
+    for (const r of results) {
+        for (const s of r.serviceComparisons) {
+            if (serviceFilter && s.type !== serviceFilter) continue;
+            if (s.delta > 0 && s.apiPerUnit > 0) {
+                overchargeTotal += s.qty * s.delta;
+                overchargeItems++;
+            }
+        }
+    }
+    if (overchargeItems > 0) {
+        console.log(`\n  Overcharges (SW > 2026):`);
+        console.log(`    ${overchargeItems} items — total overcharged: ${currency(overchargeTotal)}`);
+    }
+
+    console.log('\n  ' + '─'.repeat(57));
+    console.log(`  TOTAL ESTIMATED REVENUE GAP: \x1b[31m${currency(grandTotalGap)}\x1b[0m across ${grandTotalOrders.size} orders`);
+    console.log('  ' + '═'.repeat(57));
+
+    // ── Generate HTML report if --html flag ──────────────────────────────────
+    if (generateHTML) {
+        const htmlData = {
+            results,
+            aggMap,
+            impactByType,
+            sortedTypes,
+            ltmMissingCount,
+            ltmMissingOrders,
+            ltmRevenue,
+            grandTotalGap,
+            grandTotalOrders: grandTotalOrders.size,
+            overchargeTotal,
+            overchargeItems,
+            totalOrders,
+            ordersWithIssues,
+            issueCount
+        };
+        const htmlPath = generateHTMLReport(htmlData);
+        console.log(`\n  HTML report generated: ${htmlPath}`);
+    }
+
     console.log('\n  Done.\n');
+}
+
+// ── HTML Report Generator ────────────────────────────────────────────────────
+function esc(str) {
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function generateHTMLReport(data) {
+    const {
+        results, aggMap, impactByType, sortedTypes,
+        ltmMissingCount, ltmMissingOrders, ltmRevenue,
+        grandTotalGap, grandTotalOrders,
+        overchargeTotal, overchargeItems,
+        totalOrders, ordersWithIssues, issueCount
+    } = data;
+
+    const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Build Report A rows
+    const reportARows = results.map(r => {
+        const svcCount = r.serviceComparisons.length;
+        let worstFlag = 'OK', worstDelta = 0;
+        for (const s of r.serviceComparisons) {
+            const f = flag(s.deltaPct);
+            if (f === 'MISMATCH') { worstFlag = 'MISMATCH'; worstDelta = s.deltaPct; }
+            else if (f === 'REVIEW' && worstFlag !== 'MISMATCH') { worstFlag = 'REVIEW'; worstDelta = s.deltaPct; }
+            if (Math.abs(s.deltaPct) > Math.abs(worstDelta)) worstDelta = s.deltaPct;
+        }
+        const ltmNote = r.ltmNeeded && !r.ltmPresent ? ' *' : '';
+        return `<tr class="flag-${worstFlag.toLowerCase()}">
+            <td>${esc(r.orderNum)}</td>
+            <td>${esc(r.batch)}</td>
+            <td>${esc(r.company)}</td>
+            <td>${esc(r.rep)}</td>
+            <td class="num">${svcCount}</td>
+            <td class="num">${r.totalProductQty}${ltmNote}</td>
+            <td><span class="badge badge-${worstFlag.toLowerCase()}">${worstFlag}${worstFlag !== 'OK' ? ' ' + pct(worstDelta) : ''}</span></td>
+        </tr>`;
+    }).join('\n');
+
+    // Build Report B rows
+    const reportBRows = [];
+    for (const r of results) {
+        for (const s of r.serviceComparisons) {
+            const f = flag(s.deltaPct);
+            if (f === 'OK') continue;
+            let note = '';
+            if (s.ltmFee > 0) note = `incl $${s.ltmFee} LTM`;
+            if (s.tier) note += (note ? ', ' : '') + `tier ${s.tier}`;
+            reportBRows.push(`<tr class="flag-${f.toLowerCase()}">
+                <td>${esc(r.orderNum)}</td>
+                <td>${esc(r.company)}</td>
+                <td>${esc(r.rep)}</td>
+                <td>${esc(s.type)}</td>
+                <td class="num">${s.qty}</td>
+                <td class="num">${currency(s.swPerUnit)}</td>
+                <td class="num">${currency(s.apiPerUnit)}</td>
+                <td class="num ${s.delta < 0 ? 'negative' : s.delta > 0 ? 'positive' : ''}">${currency(s.delta)}</td>
+                <td class="num">${pct(s.deltaPct)}</td>
+                <td><span class="badge badge-${f.toLowerCase()}">${f}</span></td>
+                <td class="note">${esc(note)}</td>
+            </tr>`);
+        }
+    }
+
+    // Build Report C rows
+    const reportCRows = [];
+    const sortedReps = Object.keys(aggMap).sort();
+    for (const rep of sortedReps) {
+        const serviceTypes = Object.keys(aggMap[rep]).sort();
+        for (const svcType of serviceTypes) {
+            if (svcType === '(none)') continue;
+            const agg = aggMap[rep][svcType];
+            const orders = agg.orderSet.size;
+            const items = agg.items;
+            const avgDelta = agg.deltas.length > 0 ? agg.deltas.reduce((a, b) => a + b, 0) / agg.deltas.length : 0;
+            const worstDelta = agg.worstDelta;
+            const worstF = items > 0 ? flag(worstDelta) : 'N/A';
+            // Calculate $ impact for this rep+service combo
+            let repSvcDollars = 0;
+            for (const r of results) {
+                if ((r.rep || '(unknown)') !== rep) continue;
+                for (const s of r.serviceComparisons) {
+                    if (s.type !== svcType) continue;
+                    if (s.delta < 0) repSvcDollars += s.qty * Math.abs(s.delta);
+                }
+            }
+            reportCRows.push(`<tr class="flag-${worstF.toLowerCase()}">
+                <td>${esc(rep)}</td>
+                <td>${esc(svcType)}</td>
+                <td class="num">${orders}</td>
+                <td class="num">${items}</td>
+                <td class="num">${pct(avgDelta)}</td>
+                <td class="num">${pct(worstDelta)}</td>
+                <td class="num ${repSvcDollars > 0 ? 'negative' : ''}">${repSvcDollars > 0 ? currency(repSvcDollars) : '—'}</td>
+                <td><span class="badge badge-${worstF.toLowerCase()}">${worstF}</span></td>
+            </tr>`);
+        }
+    }
+
+    // Build impact cards
+    const impactCards = sortedTypes.map(t => {
+        const imp = impactByType[t];
+        const avgPerOrder = imp.orderSet.size > 0 ? imp.totalDollars / imp.orderSet.size : 0;
+        return `<div class="impact-card">
+            <div class="impact-type">${esc(t)}</div>
+            <div class="impact-amount">${currency(imp.totalDollars)}</div>
+            <div class="impact-detail">${imp.items} items across ${imp.orderSet.size} orders</div>
+            <div class="impact-detail">Avg ${currency(avgPerOrder)} per order</div>
+        </div>`;
+    }).join('\n');
+
+    // Training tips — context-specific advice
+    const tips = [];
+    if (impactByType['DECG']) {
+        tips.push({
+            icon: 'fa-shirt',
+            title: 'Customer-Supplied Garment Embroidery (DECG)',
+            body: `Our 2026 DECG price is <strong>$20–$28/pc</strong> depending on qty tier. Many orders were charged $15–$20.
+            <strong>Action:</strong> When a customer brings their own garments, use the quote builder — it calculates the correct tier automatically.`
+        });
+    }
+    if (impactByType['AL'] || impactByType['AL-CAP']) {
+        const alTotal = (impactByType['AL']?.totalDollars || 0) + (impactByType['AL-CAP']?.totalDollars || 0);
+        tips.push({
+            icon: 'fa-clone',
+            title: 'Additional Logo Locations (AL)',
+            body: `AL pricing gap: <strong>${currency(alTotal)}</strong>. 2026 garment AL is <strong>$7–$10/pc</strong> by tier, caps are <strong>$5.25–$6.50</strong>.
+            Old pricing was $5–$8, sometimes lower. <strong>Action:</strong> Always add AL as a separate line — the builder calculates the tier price.`
+        });
+    }
+    if (ltmMissingCount > 0) {
+        tips.push({
+            icon: 'fa-coins',
+            title: `Less Than Minimum (LTM) Fee — ${ltmMissingCount} Orders Missing`,
+            body: `Orders with <strong>7 or fewer pieces</strong> should include a <strong>$50 LTM fee</strong>. That's ${currency(ltmRevenue)} in missed revenue.
+            <strong>Action:</strong> The quote builder adds LTM automatically — baked into per-piece price. Just double-check orders under 8 pcs.`
+        });
+    }
+    if (impactByType['DD']) {
+        tips.push({
+            icon: 'fa-pencil-ruler',
+            title: 'Digitizing (DD)',
+            body: `Standard digitizing is <strong>$100</strong> in 2026, revisions (DDE/DDT/DGT) are <strong>$50</strong>. Some orders charged $50 for a full DD.
+            <strong>Action:</strong> New designs = DD ($100). Revisions to existing = DDE/DDT ($50). The Service Price Cheat Sheet has all codes.`
+        });
+    }
+    if (impactByType['GRT-50']) {
+        tips.push({
+            icon: 'fa-paint-roller',
+            title: 'Patch Setup Fee (GRT-50) Missing',
+            body: `${impactByType['GRT-50'].orderSet.size} orders were missing the <strong>$50 patch setup fee</strong>.
+            <strong>Action:</strong> Every laser patch or embroidered patch order needs a GRT-50 setup fee. The builder adds it automatically.`
+        });
+    }
+
+    const tipsHTML = tips.map(t => `
+        <div class="tip-card">
+            <div class="tip-header"><i class="fas ${t.icon}"></i> ${t.title}</div>
+            <div class="tip-body">${t.body}</div>
+        </div>
+    `).join('\n');
+
+    // 2026 tier reference tables
+    const tierRefHTML = `
+        <div class="tier-tables">
+            <div class="tier-table">
+                <h4>DECG Garment Tiers</h4>
+                <table><thead><tr><th>Qty</th><th>Price/pc</th></tr></thead><tbody>
+                <tr><td>1–7</td><td>$28.00</td></tr>
+                <tr><td>8–23</td><td>$26.00</td></tr>
+                <tr><td>24–47</td><td>$24.00</td></tr>
+                <tr><td>48–71</td><td>$22.00</td></tr>
+                <tr><td>72+</td><td>$20.00</td></tr>
+                </tbody></table>
+            </div>
+            <div class="tier-table">
+                <h4>DECG Cap Tiers</h4>
+                <table><thead><tr><th>Qty</th><th>Price/pc</th></tr></thead><tbody>
+                <tr><td>1–7</td><td>$22.50</td></tr>
+                <tr><td>8–23</td><td>$21.00</td></tr>
+                <tr><td>24–47</td><td>$19.00</td></tr>
+                <tr><td>48–71</td><td>$17.50</td></tr>
+                <tr><td>72+</td><td>$16.00</td></tr>
+                </tbody></table>
+            </div>
+            <div class="tier-table">
+                <h4>AL Garment Tiers</h4>
+                <table><thead><tr><th>Qty</th><th>Price/pc</th></tr></thead><tbody>
+                <tr><td>1–7</td><td>$10.00</td></tr>
+                <tr><td>8–23</td><td>$9.00</td></tr>
+                <tr><td>24–47</td><td>$8.00</td></tr>
+                <tr><td>48–71</td><td>$7.50</td></tr>
+                <tr><td>72+</td><td>$7.00</td></tr>
+                </tbody></table>
+            </div>
+            <div class="tier-table">
+                <h4>AL Cap Tiers</h4>
+                <table><thead><tr><th>Qty</th><th>Price/pc</th></tr></thead><tbody>
+                <tr><td>1–7</td><td>$6.50</td></tr>
+                <tr><td>8–23</td><td>$6.00</td></tr>
+                <tr><td>24–47</td><td>$5.75</td></tr>
+                <tr><td>48–71</td><td>$5.50</td></tr>
+                <tr><td>72+</td><td>$5.25</td></tr>
+                </tbody></table>
+            </div>
+            <div class="tier-table">
+                <h4>Fixed-Price Services</h4>
+                <table><thead><tr><th>Code</th><th>Price</th></tr></thead><tbody>
+                <tr><td>DD (New Digitizing)</td><td>$100.00</td></tr>
+                <tr><td>DDE/DDT (Revision)</td><td>$50.00</td></tr>
+                <tr><td>Monogram</td><td>$12.50</td></tr>
+                <tr><td>NAME</td><td>$12.50</td></tr>
+                <tr><td>SEG (Sewing)</td><td>$10.00</td></tr>
+                <tr><td>WEIGHT</td><td>$6.25</td></tr>
+                <tr><td>GRT-50 (Patch Setup)</td><td>$50.00</td></tr>
+                <tr><td>GRT-75 (Design Prep)</td><td>$75.00/hr</td></tr>
+                <tr><td>LTM (≤7 pcs)</td><td>$50.00</td></tr>
+                </tbody></table>
+            </div>
+        </div>
+    `;
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Audit Report — NWCA 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/dashboards/reports/price-audit-report.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/staff-dashboard.html" class="back-link"><i class="fas fa-arrow-left"></i> Staff Dashboard</a>
+                <h1><i class="fas fa-chart-bar"></i> Price Audit Report</h1>
+                <p class="subtitle">ShopWorks 2025 vs 2026 Pricing — ${now} — ${totalOrders} Orders Analyzed</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Revenue Impact Hero -->
+        <section class="hero-section">
+            <div class="hero-grid">
+                <div class="hero-card hero-gap">
+                    <div class="hero-label">Estimated Revenue Gap</div>
+                    <div class="hero-value">${currency(grandTotalGap)}</div>
+                    <div class="hero-detail">across ${grandTotalOrders} of ${totalOrders} orders</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-label">Orders with Issues</div>
+                    <div class="hero-value">${ordersWithIssues}</div>
+                    <div class="hero-detail">${(ordersWithIssues / totalOrders * 100).toFixed(0)}% of all orders</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-label">Service Items Off</div>
+                    <div class="hero-value">${issueCount}</div>
+                    <div class="hero-detail">REVIEW or MISMATCH</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-label">LTM Fees Missing</div>
+                    <div class="hero-value">${ltmMissingCount}</div>
+                    <div class="hero-detail">${currency(ltmRevenue)} potential</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Impact Breakdown -->
+        <section class="section">
+            <h2><i class="fas fa-dollar-sign"></i> Revenue Gap by Service Type</h2>
+            <div class="impact-grid">
+                ${impactCards}
+                ${ltmMissingCount > 0 ? `<div class="impact-card impact-ltm">
+                    <div class="impact-type">LTM Fee (≤7 pcs)</div>
+                    <div class="impact-amount">${currency(ltmRevenue)}</div>
+                    <div class="impact-detail">${ltmMissingCount} orders, no $50 LTM</div>
+                </div>` : ''}
+            </div>
+            ${overchargeItems > 0 ? `<p class="overcharge-note"><i class="fas fa-info-circle"></i> Note: ${overchargeItems} items were <em>overcharged</em> by ${currency(overchargeTotal)} total (SW price > 2026 price). This partially offsets the gap above.</p>` : ''}
+        </section>
+
+        <!-- Training Tips -->
+        <section class="section tips-section">
+            <h2><i class="fas fa-graduation-cap"></i> What to Change — Training Notes</h2>
+            <div class="tips-grid">
+                ${tipsHTML}
+            </div>
+        </section>
+
+        <!-- 2026 Tier Reference -->
+        <section class="section">
+            <h2><i class="fas fa-table"></i> 2026 Price Reference</h2>
+            ${tierRefHTML}
+        </section>
+
+        <!-- Report C: By Rep -->
+        <section class="section">
+            <h2><i class="fas fa-users"></i> Report: By Rep &amp; Service Type</h2>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr>
+                        <th>Rep</th><th>Service</th><th class="num">Orders</th><th class="num">Items</th>
+                        <th class="num">Avg Delta</th><th class="num">Worst Delta</th><th class="num">$ Under</th><th>Status</th>
+                    </tr></thead>
+                    <tbody>${reportCRows.join('\n')}</tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Report B: Item Breakdown -->
+        <section class="section">
+            <h2><i class="fas fa-list"></i> Report: All Pricing Discrepancies</h2>
+            <p class="section-note">Showing ${reportBRows.length} items flagged REVIEW or MISMATCH (${reportBRows.length === 0 ? 'none found' : 'sorted by order'})</p>
+            <div class="table-wrapper">
+                <table class="data-table" id="discrepancy-table">
+                    <thead><tr>
+                        <th>Order</th><th>Company</th><th>Rep</th><th>Type</th><th class="num">Qty</th>
+                        <th class="num">SW/pc</th><th class="num">2026/pc</th><th class="num">Delta</th>
+                        <th class="num">Delta%</th><th>Flag</th><th>Note</th>
+                    </tr></thead>
+                    <tbody>${reportBRows.join('\n')}</tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Report A: Per-Order -->
+        <section class="section">
+            <h2><i class="fas fa-clipboard-list"></i> Report: All ${totalOrders} Orders</h2>
+            <div class="table-wrapper">
+                <table class="data-table" id="order-table">
+                    <thead><tr>
+                        <th>Order</th><th>Batch</th><th>Company</th><th>Rep</th>
+                        <th class="num">Svcs</th><th class="num">Qty</th><th>Status</th>
+                    </tr></thead>
+                    <tbody>${reportARows}</tbody>
+                </table>
+            </div>
+            <p class="section-note">* = LTM fee needed but not present</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Generated ${now} from ${totalOrders} ShopWorks orders (batches 2–13) &bull; NWCA 2026 Pricing Audit</p>
+    </footer>
+
+    <script>
+        // Simple table filter by rep name
+        document.querySelectorAll('.data-table').forEach(table => {
+            const headers = table.querySelectorAll('th');
+            headers.forEach((th, idx) => {
+                th.style.cursor = 'pointer';
+                th.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    const isNum = th.classList.contains('num');
+                    const dir = th.dataset.sortDir === 'asc' ? 'desc' : 'asc';
+                    th.dataset.sortDir = dir;
+                    rows.sort((a, b) => {
+                        let aVal = a.children[idx]?.textContent?.trim() || '';
+                        let bVal = b.children[idx]?.textContent?.trim() || '';
+                        if (isNum) {
+                            aVal = parseFloat(aVal.replace(/[^\\d.\\-]/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/[^\\d.\\-]/g, '')) || 0;
+                            return dir === 'asc' ? aVal - bVal : bVal - aVal;
+                        }
+                        return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    });
+                    rows.forEach(r => tbody.appendChild(r));
+                });
+            });
+        });
+    </script>
+</body>
+</html>`;
+
+    const outPath = path.join(__dirname, '..', '..', 'dashboards', 'reports', 'price-audit-report.html');
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    fs.writeFileSync(outPath, html, 'utf8');
+    return outPath;
 }
 
 main().catch(err => {

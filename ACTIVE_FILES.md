@@ -442,6 +442,12 @@ cap-embroidery-fix.css
 | `/shared_components/js/production-schedule-stats.js` | Precomputed turnaround stats from 819 records | ✅ Active |
 | `/shared_components/js/production-schedule-predictor.js` | Prediction engine for turnaround times | ✅ Active |
 
+### Dashboard Reports
+| File | Purpose | Status |
+|------|---------|--------|
+| `/dashboards/reports/price-audit-report.html` | **NEW** Price audit report — SW 2025 vs 2026 pricing comparison for rep training (2026-02-15) | ✅ Active |
+| `/dashboards/reports/price-audit-report.css` | **NEW** Styles for price audit report page (2026-02-15) | ✅ Active |
+
 ### Employee Bundle Pages
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
@@ -624,7 +630,7 @@ cap-embroidery-fix.css
 | `/tests/scripts/cleanup-embroidery-costs.js` | **NEW** Delete duplicates, add missing DECG-FB 1-7 (2026-02-04) | ✅ Active |
 | `/tests/scripts/update-ctr-pricing-linear.js` | **NEW** Update CTR pricing with linear $/1K model (2026-02-04) | ✅ Active |
 | `/tests/scripts/sync-shopworks-service-codes.js` | **NEW** Sync all 28 ShopWorks service codes to Caspio (2026-02-14) | ✅ Active |
-| `/tests/scripts/batch-price-audit-report.js` | **NEW** Batch service pricing audit — compares SW vs 2026 prices across all fixtures (2026-02-15) | ✅ Active |
+| `/tests/scripts/batch-price-audit-report.js` | **NEW** Batch service pricing audit — compares SW vs 2026 prices across all fixtures. `--html` generates dashboard report (2026-02-15) | ✅ Active |
 
 **Run:** `node tests/scripts/seed-classified-items.js`
 
