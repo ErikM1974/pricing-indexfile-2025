@@ -8,8 +8,8 @@
  * - Service items (digitizing, additional logo, monograms, etc.)
  * - Customer-supplied garments (DECG) and caps (DECC)
  *
- * @version 1.17.0 - Full ShopWorks service parts cross-reference (SECC fix, DDE/DDT/DT/CTR/CDP)
- * @date 2026-02-14
+ * @version 1.19.0 - Description-based sewing detection (empty PN), case-insensitive state parsing
+ * @date 2026-02-15
  */
 
 class ShopWorksImportParser {
@@ -39,7 +39,10 @@ class ShopWorksImportParser {
             'LG': 'L',
             'L': 'L',
             'XL': 'XL',
+            'MR': 'M',         // Medium Regular (from _MR suffix, e.g., SP24_MR)
+            'LR': 'L',         // Large Regular (from _LR suffix, e.g., SP24_LR)
             'XLR': 'XL',       // XL Regular (from _XLR suffix)
+            '2XLR': '2XL',     // 2XL Regular (from _2XLR suffix, e.g., SP24_2XLR)
             'XXL': '2XL',
             '2XL': '2XL',
             '2X': '2XL',       // From _2X suffix extraction
@@ -64,6 +67,7 @@ class ShopWorksImportParser {
             'M/L': 'M/L',      // From _M/L suffix (New Era, Nike caps)
             'L/XL': 'L/XL',
             'LG/XL': 'L/XL',   // From _LG/XL suffix (Richardson caps)
+            '4/5X': '4XL/5XL', // Combo size (e.g., CSV102_4/5X safety vests)
             // Extra small
             'XXS': 'XXS',
             '2XS': 'XXS',      // Alternate notation for XXS
@@ -184,10 +188,11 @@ class ShopWorksImportParser {
             '_XXS', '_2XS', '_XS',
             // Tall sizes (longer suffixes first)
             '_2XLT', '_3XLT', '_4XLT', '_5XLT', '_XLT', '_XST', '_LT', '_MT', '_ST',
-            // Regular fit suffixes (e.g., SP24_XLR → XL Regular)
-            '_XLR',
+            // Regular fit suffixes (e.g., SP24_MR, SP24_LR, SP24_XLR, SP24_2XLR)
+            // _2XLR must come before _XLR and _LR to prevent false match
+            '_2XLR', '_XLR', '_MR', '_LR',
             // One size / size ranges
-            '_OSFA', '_SM/MD', '_LG/XL', '_S/M', '_M/L', '_L/XL',
+            '_OSFA', '_4/5X', '_SM/MD', '_LG/XL', '_S/M', '_M/L', '_L/XL',
             // Infant / toddler
             '_24M', '_18M', '_12M', '_06M', '_NB', '_2T', '_3T', '_4T', '_5T'
         ];
@@ -689,8 +694,8 @@ class ShopWorksImportParser {
             const trimmed = line.trim();
             if (!trimmed || /^Order Summary$/i.test(trimmed)) continue;
 
-            // Match "Label: $XX.XX" or "Label: XX.XX" or "Label:" (empty value) patterns
-            const match = trimmed.match(/^(.+?):\s*\$?([\d,]*\.?\d*)$/);
+            // Match "Label: $XX.XX" or "Label: XX.XX" or "Label: -$XX.XX" or "Label:" (empty value)
+            const match = trimmed.match(/^(.+?):\s*(-?\$?[\d,]*\.?\d*)$/);
             if (!match) {
                 result.unmatchedLines.push({ section: 'OrderSummary', line: trimmed });
                 continue;
@@ -699,7 +704,7 @@ class ShopWorksImportParser {
             if (!match[2]) continue;
 
             const label = match[1].trim().toLowerCase();
-            const value = parseFloat(match[2].replace(/,/g, '')) || 0;
+            const value = parseFloat(match[2].replace(/[$,]/g, '')) || 0;
 
             if (label === 'subtotal' || label === 'sub total') {
                 result.orderSummary.subtotal = value;
@@ -817,11 +822,20 @@ class ShopWorksImportParser {
                 }
 
                 // State + ZIP is second-to-last (before country if present)
-                const stateZipIdx = parts.length - 1 - countryOffset;
-                const stateZipStr = parts[stateZipIdx] ? parts[stateZipIdx].trim() : '';
+                let stateZipIdx = parts.length - 1 - countryOffset;
+                let stateZipStr = (parts[stateZipIdx] || '').trim().toUpperCase();
 
                 // Parse "WA 98338" or "WA 98338-9356"
-                const stateZipMatch = stateZipStr.match(/^([A-Z]{2})\s+(\d{5})(?:-\d{4})?$/);
+                let stateZipMatch = stateZipStr.match(/^([A-Z]{2})\s+(\d{5})(?:-\d{4})?$/);
+
+                // Retry without country offset if state+zip didn't match
+                // (e.g., "Graham, WA" — "WA" mistaken for country code)
+                if (!stateZipMatch && countryOffset > 0) {
+                    countryOffset = 0;
+                    stateZipIdx = parts.length - 1;
+                    stateZipStr = (parts[stateZipIdx] || '').trim().toUpperCase();
+                    stateZipMatch = stateZipStr.match(/^([A-Z]{2})\s+(\d{5})(?:-\d{4})?$/);
+                }
 
                 if (stateZipMatch) {
                     shipping.state = stateZipMatch[1];
@@ -849,6 +863,22 @@ class ShopWorksImportParser {
                         shipping.street = parts[0].trim();
                     }
                 }
+
+                // Fallback: state-only with no ZIP (e.g., "Customer Pickup, Graham, WA")
+                if (!stateZipMatch) {
+                    const stateOnly = stateZipStr.match(/^([A-Z]{2})$/);
+                    if (stateOnly) {
+                        shipping.state = stateOnly[1];
+                        const cityIdx = stateZipIdx - 1;
+                        if (cityIdx >= 1) {
+                            shipping.city = parts[cityIdx].trim();
+                        }
+                        const streetParts = parts.slice(1, cityIdx);
+                        if (streetParts.length > 0) {
+                            shipping.street = streetParts.join(', ').trim();
+                        }
+                    }
+                }
             }
 
             console.log(`[ShopWorksImportParser] Shipping parsed: ${shipping.street}, ${shipping.city}, ${shipping.state} ${shipping.zip}`);
@@ -862,23 +892,30 @@ class ShopWorksImportParser {
      */
     _parsePackageTracking(text, result) {
         const lines = text.split('\n');
-        let carrier = null;
-        let trackingNumber = null;
+        const entries = [];
+        let currentCarrier = null;
 
         for (const line of lines) {
             const trimmed = line.trim();
             if (trimmed.startsWith('Carrier:')) {
-                carrier = trimmed.replace('Carrier:', '').trim();
+                currentCarrier = trimmed.replace('Carrier:', '').trim();
             } else if (trimmed.startsWith('Tracking #:')) {
-                trackingNumber = trimmed.replace('Tracking #:', '').trim();
+                const trackingNumber = trimmed.replace('Tracking #:', '').trim();
+                entries.push({
+                    carrier: currentCarrier || '',
+                    trackingNumber: trackingNumber || ''
+                });
+                currentCarrier = null;
             }
         }
 
-        if (carrier || trackingNumber) {
-            result.packageTracking = {
-                carrier: carrier || '',
-                trackingNumber: trackingNumber || ''
-            };
+        // If we have a carrier but no tracking number yet, still record it
+        if (currentCarrier && entries.length === 0) {
+            entries.push({ carrier: currentCarrier, trackingNumber: '' });
+        }
+
+        if (entries.length > 0) {
+            result.packageTracking = entries;
         }
     }
 
@@ -1007,7 +1044,17 @@ class ShopWorksImportParser {
     _classifyAndAddItem(item, result) {
         const type = this.classifyPartNumber(item.partNumber);
 
-        switch (type) {
+        // Description-based reclassification for empty-PN items with pricing
+        // e.g., Description:"Sew-on" with no part number but has unitPrice and quantity
+        let classification = type;
+        if (classification === 'comment' && item.unitPrice > 0 && item.quantity > 0) {
+            const descLower = (item.description || '').toLowerCase().trim();
+            if (/^sew[\s-]?on/i.test(descLower)) {
+                classification = 'sewing';
+            }
+        }
+
+        switch (classification) {
             case 'digitizing':
                 result.services.digitizing = true;
                 result.services.digitizingCount++;
@@ -1069,10 +1116,35 @@ class ShopWorksImportParser {
             case 'al':
                 // Additional Logo - parse position from description
                 const position = this._parseALPosition(item.description);
-                // Support multiple additional logos
                 if (!result.services.additionalLogos) {
                     result.services.additionalLogos = [];
                 }
+
+                // Detect potential Full Back mislabeled as AL
+                // "Back" position at ≥$40 → auto-reclassify as DECG-FB
+                // "Back" position at ≥$10 → warning only, keep as AL
+                if (position === 'Back' && item.unitPrice >= 40) {
+                    result.warnings.push(
+                        `AL item "${item.description}" at $${item.unitPrice}/pc reclassified as Full Back (DECG-FB). ` +
+                        `Price exceeds $40 threshold for standard AL.`
+                    );
+                    result.services.additionalLogos.push({
+                        position: 'Full Back',
+                        type: 'fb',
+                        quantity: item.quantity,
+                        description: item.description,
+                        reclassifiedFromAL: true
+                    });
+                    break;
+                }
+
+                if (position === 'Back' && item.unitPrice >= 10) {
+                    result.warnings.push(
+                        `AL item "${item.description}" at $${item.unitPrice}/pc may be Full Back (DECG-FB). ` +
+                        `Standard AL tier price is $5-$8. Review in import modal.`
+                    );
+                }
+
                 result.services.additionalLogos.push({
                     position: position,
                     type: 'al',
@@ -1291,6 +1363,15 @@ class ShopWorksImportParser {
 
             case 'product':
             default:
+                // Guard: zero-price + zero-quantity items are descriptive notes, not real products
+                // e.g., "Left Chest" (placement used as PN), info-only lines
+                if (!item.unitPrice && !item.quantity) {
+                    if (item.description) {
+                        result.notes.push(item.description);
+                    }
+                    break;
+                }
+
                 // Regular product - check if non-SanMar first
                 const cleanedPartNumber = this.cleanPartNumber(item.partNumber);
                 const isNonSanMar = this._isNonSanMarProduct(cleanedPartNumber);
@@ -1551,6 +1632,22 @@ class ShopWorksImportParser {
     _isCapFromDescription(description) {
         if (!description) return false;
         const desc = description.toLowerCase();
+
+        // ShopWorks DECG prefix: "Di. Embroider Cap" may describe non-cap garments
+        // e.g., "Di. Embroider Cap - T-shirt" = garment, "Di. Embroider Cap - Front" = actual cap
+        const decgPrefixMatch = desc.match(/^di\.\s*embroider\s+cap\s*[-\u2013]\s*/);
+        if (decgPrefixMatch) {
+            const afterPrefix = desc.slice(decgPrefixMatch[0].length);
+            const nonCapGarments = ['t-shirt', 'tshirt', 'shirt', 'jacket', 'hoodie',
+                                    'sweatshirt', 'vest', 'polo', 'fleece'];
+            if (nonCapGarments.some(g => afterPrefix.includes(g))) return false;
+            return true; // "Di. Embroider Cap - Front" etc. = actual cap
+        }
+
+        // "Di. Embroider Garms" = always garment
+        if (desc.startsWith('di.') && desc.includes('garms')) return false;
+
+        // Standard cap detection
         return desc.includes('cap') || desc.includes('hat') || desc.includes('beanie');
     }
 

@@ -194,19 +194,28 @@ class QuoteViewPage {
                     document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
                 }
 
-                // Tracking info
+                // Tracking info (supports comma-separated multiple tracking numbers)
                 const carrier = this.quoteData.Carrier || '';
                 const trackingNum = this.quoteData.TrackingNumber || '';
                 if (carrier || trackingNum) {
                     const trackingEl = document.getElementById('ship-to-tracking');
                     if (trackingEl) {
-                        const trackingLink = this.getTrackingLink(carrier, trackingNum);
-                        if (trackingLink) {
-                            trackingEl.innerHTML = `Tracking: <a href="${this.escapeHtml(trackingLink)}" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">${this.escapeHtml(trackingNum)}</a>${carrier ? ' (' + this.escapeHtml(carrier) + ')' : ''}`;
-                        } else {
-                            trackingEl.textContent = `Tracking: ${trackingNum}${carrier ? ' (' + carrier + ')' : ''}`;
+                        const carriers = carrier.split(',').map(s => s.trim());
+                        const trackingNums = trackingNum.split(',').map(s => s.trim());
+                        const fragments = trackingNums.map((tn, i) => {
+                            if (!tn) return '';
+                            const c = carriers[i] || carriers[0] || '';
+                            const link = this.getTrackingLink(c, tn);
+                            const carrierLabel = c ? ' (' + this.escapeHtml(c) + ')' : '';
+                            if (link) {
+                                return `<a href="${this.escapeHtml(link)}" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">${this.escapeHtml(tn)}</a>${carrierLabel}`;
+                            }
+                            return `${this.escapeHtml(tn)}${carrierLabel}`;
+                        }).filter(f => f);
+                        if (fragments.length) {
+                            trackingEl.innerHTML = 'Tracking: ' + fragments.join('<br>Tracking: ');
+                            trackingEl.style.display = 'block';
                         }
-                        trackingEl.style.display = 'block';
                     }
                 }
 
@@ -2162,11 +2171,15 @@ class QuoteViewPage {
                 yPos += 5;
             }
             if (this.quoteData.Carrier || this.quoteData.TrackingNumber) {
-                const pdfTrack = this.quoteData.TrackingNumber || '';
-                const pdfCarrier = this.quoteData.Carrier || '';
-                const trackText = pdfCarrier ? `Tracking: ${pdfTrack} (${pdfCarrier})` : `Tracking: ${pdfTrack}`;
-                pdf.text(trackText, margin, yPos);
-                yPos += 5;
+                const pdfCarriers = (this.quoteData.Carrier || '').split(',').map(s => s.trim());
+                const pdfTrackNums = (this.quoteData.TrackingNumber || '').split(',').map(s => s.trim());
+                pdfTrackNums.forEach((tn, i) => {
+                    if (!tn) return;
+                    const c = pdfCarriers[i] || pdfCarriers[0] || '';
+                    const trackText = c ? `Tracking: ${tn} (${c})` : `Tracking: ${tn}`;
+                    pdf.text(trackText, margin, yPos);
+                    yPos += 5;
+                });
             }
         }
 

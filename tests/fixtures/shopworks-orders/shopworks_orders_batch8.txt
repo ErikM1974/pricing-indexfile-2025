@@ -1,0 +1,713 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 8)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136114
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2136
+Company:Old Cannery Furniture
+**************************************************************************
+Order Information
+Date Order Placed:4/17/2025
+Req. Ship Date:5/8/2025
+Drop Dead Date:
+Date Order Shipped:5/9/2025
+Date Order Invoiced:5/8/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Heather Smith
+Phone:253-863-0422 ext. 182
+Fax:
+Email:hsmith@oldcannery.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Old Cannery Furniture, 13608 Cannery Way, Sumner, WA 98390-1535
+**************************************************************************
+Design Information
+Design #:28817 - Old Cannery- Furniture Warehouse
+**************************************************************************
+Items Purchased
+Item 1 of 10
+Part Number:J325
+Description:Port Authority Core Soft Shell Vest, Dress Blue Nvy
+Unit Price:43.00
+Line Item Price:1,075.00
+Item Quantity:25
+Adult:Quantity
+S (Other):10
+M:15
+Item 2 of 10
+Part Number:L152_4X
+Description:Port Authority Womens Accord Microfleece Vest, Navy
+Unit Price:38.00
+Line Item Price:38.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 3 of 10
+Part Number:LNEA122_2X
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, True Navy Hthr
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 4 of 10
+Part Number:LNEA122_4X
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, True Navy Hthr
+Unit Price:48.00
+Line Item Price:48.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 5 of 10
+Part Number:LNEA122_2X
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, Black Heather
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 6 of 10
+Part Number:LNEA122_4X
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, Black Heather
+Unit Price:48.00
+Line Item Price:48.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 7 of 10
+Part Number:LNEA122_4X
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, Shadow Grey He
+Unit Price:48.00
+Line Item Price:48.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 8 of 10
+Part Number:L853_XXL
+Description:Port Authority Women's Puffer Vest, DeepBlack
+Unit Price:55.00
+Line Item Price:55.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 9 of 10
+Part Number:L853_4X
+Description:Port Authority Women's Puffer Vest, DeepBlack
+Unit Price:57.00
+Line Item Price:57.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 10 of 10
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:15.00
+Line Item Price:45.00
+Item Quantity:3
+Adult:Quantity
+S (Other):3
+**************************************************************************
+Order Summary
+Subtotal:1,506.00
+Sales Tax:152.11
+Shipping:
+Total:1,658.11
+Paid To Date:1,658.11
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136117
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:10555
+Company:Better Builders LLC
+**************************************************************************
+Order Information
+Date Order Placed:4/17/2025
+Req. Ship Date:5/8/2025
+Drop Dead Date:5/2/2025
+Date Order Shipped:5/1/2025
+Date Order Invoiced:5/1/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Eli Hare
+Phone:425-233-7753
+Fax:
+Email:elih@betterbuilders.com
+**************************************************************************
+Shipping Information
+Ship Method:FEDEX GRD
+Ship Address:Better Builders , 5606 California Ave SW, Seattle, WA 98136
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130342337667
+Carrier:UPS
+Tracking #:1Z9033130341597870
+**************************************************************************
+Design Information
+Design #:32418.01 - Better Builders- with backgroud fill
+Design #:32418.02 - Better Builders- with backgroud fill
+**************************************************************************
+Items Purchased
+Item 1 of 11
+Part Number:18500
+Description:Gildan - Heavy Blend Hooded Sweatshirt, Forest
+Unit Price:30.00
+Line Item Price:300.00
+Item Quantity:10
+Adult:Quantity
+S (Other):2
+M:2
+LG:2
+XL:4
+Item 2 of 11
+Part Number:18500_2X
+Description:Gildan - Heavy Blend Hooded Sweatshirt, Forest
+Unit Price:32.00
+Line Item Price:64.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 3 of 11
+Part Number:18500
+Description:Gildan - Heavy Blend Hooded Sweatshirt, Black
+Unit Price:30.00
+Line Item Price:300.00
+Item Quantity:10
+Adult:Quantity
+S (Other):2
+M:2
+LG:2
+XL:4
+Item 4 of 11
+Part Number:18500_2X
+Description:Gildan - Heavy Blend Hooded Sweatshirt, Black
+Unit Price:32.00
+Line Item Price:64.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 5 of 11
+Part Number:K100
+Description:Port Authority Core Classic Pique Polo, Graphite
+Unit Price:20.00
+Line Item Price:180.00
+Item Quantity:9
+Adult:Quantity
+LG:2
+XL:7
+Item 6 of 11
+Part Number:K100
+Description:Port Authority Core Classic Pique Polo, Deep For Green
+Unit Price:20.00
+Line Item Price:180.00
+Item Quantity:9
+Adult:Quantity
+LG:2
+XL:7
+Item 7 of 11
+Part Number:K528
+Description:Port Authority Performance Fine Jacquard Polo, Green Glen
+Unit Price:28.00
+Line Item Price:196.00
+Item Quantity:7
+Adult:Quantity
+LG:2
+XL:5
+Item 8 of 11
+Part Number:K528
+Description:Port Authority Performance Fine Jacquard Polo, Grey Smoke
+Unit Price:28.00
+Line Item Price:84.00
+Item Quantity:3
+Adult:Quantity
+XL:3
+Item 9 of 11
+Part Number:CT105298_OSFA
+Description:Carhartt Canvas Mesh Back Cap, Moss
+Unit Price:37.00
+Line Item Price:222.00
+Item Quantity:6
+Adult:Quantity
+XXXL (Other):6
+Item 10 of 11
+Part Number:PC55
+Description:Port  Company - Core Blend Tee, Dark Hthr Grey
+Unit Price:15.00
+Line Item Price:90.00
+Item Quantity:6
+Adult:Quantity
+LG:6
+Item 11 of 11
+Part Number:PC55_2X
+Description:Port  Company - Core Blend Tee, Dark Hthr Grey
+Unit Price:17.00
+Line Item Price:102.00
+Item Quantity:6
+Adult:Quantity
+XXL:6
+**************************************************************************
+Order Summary
+Subtotal:1,782.00
+Sales Tax:186.20
+Shipping:61.52
+Total:2,029.72
+Paid To Date:2,029.72
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136126
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12420
+Company:Contractors Roof Service INC
+**************************************************************************
+Order Information
+Date Order Placed:4/17/2025
+Req. Ship Date:5/30/2025
+Drop Dead Date:
+Date Order Shipped:6/2/2025
+Date Order Invoiced:5/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jeff Rankin
+Phone:253-858-3044
+Fax:
+Email:jeffrankin@crsroofing.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Contractors Roof Service INC, 4600 Neel Court NW, Gig Harbor, WA 98335
+**************************************************************************
+Design Information
+Design #:39102 - CSR Roofing Service - Patch 
+Design #:39103 - ETS. 1992
+**************************************************************************
+Items Purchased
+Item 1 of 6
+Part Number:SP24_MR
+Description:Red Kap Short Sleeve Industrial Work Shirt, Black
+Unit Price:27.00
+Line Item Price:270.00
+Item Quantity:10
+Adult:Quantity
+XXXL (Other):10
+Item 2 of 6
+Part Number:SP24_LR
+Description:Red Kap Short Sleeve Industrial Work Shirt, Black
+Unit Price:27.00
+Line Item Price:540.00
+Item Quantity:20
+Adult:Quantity
+XXXL (Other):20
+Item 3 of 6
+Part Number:SP24_XLR
+Description:Red Kap Short Sleeve Industrial Work Shirt, Black
+Unit Price:27.00
+Line Item Price:540.00
+Item Quantity:20
+Adult:Quantity
+XXXL (Other):20
+Item 4 of 6
+Part Number:SP24_2XLR
+Description:Red Kap Short Sleeve Industrial Work Shirt, Black
+Unit Price:29.00
+Line Item Price:290.00
+Item Quantity:10
+Adult:Quantity
+XXXL (Other):10
+Item 5 of 6
+Part Number:AL
+Description:Additional Logo 1992
+Unit Price:5.50
+Line Item Price:330.00
+Item Quantity:60
+Adult:Quantity
+S (Other):60
+Item 6 of 6
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:2,020.00
+Sales Tax:204.02
+Shipping:
+Total:2,224.02
+Paid To Date:2,224.02
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136148
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12941
+Company:Cedar Wellness Center
+**************************************************************************
+Order Information
+Date Order Placed:4/21/2025
+Req. Ship Date:5/5/2025
+Drop Dead Date:
+Date Order Shipped:5/9/2025
+Date Order Invoiced:5/6/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Abigail Davis
+Phone:307-690-1475
+Fax:
+Email:abby@ots.health
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Cedar Wellness Center,  
+**************************************************************************
+Design Information
+Design #:37897 - Cedar Wellness
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:25.00
+Line Item Price:100.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+Item 2 of 2
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:25.00
+Line Item Price:100.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+**************************************************************************
+Order Summary
+Subtotal:200.00
+Sales Tax:0.00
+Shipping:
+Total:200.00
+Paid To Date:200.00
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136151
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13305
+Company:Dual Security Solutions 
+**************************************************************************
+Order Information
+Date Order Placed:4/21/2025
+Req. Ship Date:5/5/2025
+Drop Dead Date:
+Date Order Shipped:5/13/2025
+Date Order Invoiced:5/12/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Austin Dawson
+Phone:
+Fax:
+Email:dualsolutionsllc@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Dual Security Solutions , 6410 94th ST E, Puyallup , WA 98371
+**************************************************************************
+Design Information
+Design #:39073 - Dual Security Solutions 
+Design #:39097 - Dual Security (Leather Patch)
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 5
+Part Number:CT102286
+Description:Carhartt Gilliam Vest, Moss
+Unit Price:136.00
+Line Item Price:136.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 3 of 5
+Part Number:J850
+Description:Port Authority  Packable Puffy Jacket, Deep Black 
+Unit Price:87.00
+Line Item Price:87.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 4 of 5
+Part Number:CT105298_OSFA
+Description:Carhartt Canvas Mesh Back Cap, Black
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 5 of 5
+Part Number:CT105298_OSFA
+Description:Carhartt Canvas Mesh Back Cap, CarharttBr
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+**************************************************************************
+Order Summary
+Subtotal:393.00
+Sales Tax:39.69
+Shipping:
+Total:432.69
+Paid To Date:432.69
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136157
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12131
+Company:Button Veterinary Hospital 
+**************************************************************************
+Order Information
+Date Order Placed:4/22/2025
+Req. Ship Date:4/24/2025
+Drop Dead Date:4/24/2025
+Date Order Shipped:4/24/2025
+Date Order Invoiced:4/24/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Danielle  Jenien
+Phone:253-381-4052
+Fax:
+Email:Kidhester@comcast.net
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Button Veterinary Hospital , 2909 South M ST , Tacoma , WA 98409
+**************************************************************************
+Design Information
+Design #:33672 - Button Veterinary
+**************************************************************************
+Items Purchased
+Item 1 of 6
+Part Number:LNEA122
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, True Navy Hthr
+Unit Price:68.00
+Line Item Price:68.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 2 of 6
+Part Number:NEA122
+Description:New Era  Ladies Sueded Cotton Blend Full-Zip Hoodie, True Navy Hthr
+Unit Price:68.00
+Line Item Price:68.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 3 of 6
+Part Number:Name
+Description:Barb
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 4 of 6
+Part Number:Name
+Description:Tayler
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 5 of 6
+Part Number:
+Description:Font - Krone - Upper Lower case - White - RC
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 6 of 6
+Part Number:
+Description:Restocking fee 
+Unit Price:25.00
+Line Item Price:25.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:186.00
+Sales Tax:18.79
+Shipping:
+Total:204.79
+Paid To Date:204.79
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136166
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12889
+Company:Head & Malesis Insurance Agencies
+**************************************************************************
+Order Information
+Date Order Placed:4/22/2025
+Req. Ship Date:5/6/2025
+Drop Dead Date:
+Date Order Shipped:5/12/2025
+Date Order Invoiced:5/12/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Kelsie Stroud
+Phone:253-939-0580
+Fax:
+Email:kelsie@headandmalesis.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Head & Malesis Insurance Agencies,  
+**************************************************************************
+Design Information
+Design #:37698.01 - Head and Malesis - Color logo
+Design #:37698 - Head and Malesis - Color logo
+Design #:37698.04 - Head and Malesis - Color logo
+Design #:37698.03 - Head and Malesis - Color logo
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:600.00
+Item Quantity:30
+Adult:Quantity
+S (Other):30
+**************************************************************************
+Order Summary
+Subtotal:600.00
+Sales Tax:60.60
+Shipping:
+Total:660.60
+Paid To Date:660.60
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136184
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8056
+Company:Sound Retina
+**************************************************************************
+Order Information
+Date Order Placed:4/23/2025
+Req. Ship Date:4/30/2025
+Drop Dead Date:
+Date Order Shipped:4/30/2025
+Date Order Invoiced:4/29/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Tawny 
+Phone:
+Fax:
+Email:Tawny@soundretina.com
+**************************************************************************
+Design Information
+Design #:17149.02 - J1114, LC, Sound Retina
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:80.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+**************************************************************************
+Order Summary
+Subtotal:80.00
+Sales Tax:8.08
+Shipping:
+Total:88.08
+Paid To Date:88.08
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 8
+================================================================================

@@ -31,6 +31,35 @@ Add new entries at the top of the relevant category.
 
 # API & Data Flow
 
+## Pattern: Fee Items Catch-All for Quote Display (2026-02-14)
+**Date:** 2026-02-14
+**Project:** [Pricing Index]
+**Problem:** Fee items saved as `quote_items` with `EmbellishmentType='fee'` (Monogram, NAME, WEIGHT, SEG, DT, etc.) were persisted correctly but never rendered in quote-view or PDF. Only session-level fees (tax, shipping, stitch surcharges) rendered because they had explicit rendering code.
+**Root cause:** `renderFeeRows()` had hardcoded rendering for specific fee types (stitch surcharge, AL, digitizing, rush, etc.) but no catch-all for unknown/new fee types. Every new fee type required explicit rendering code.
+**Solution:** Added a `handledFeeStyleNumbers` Set containing all explicitly rendered part numbers. After all explicit rendering, a catch-all loop processes remaining `EmbellishmentType='fee'` items not in the Set. Applied to both web view (`renderFeeRows()`) and PDF (`renderPdfFeeRows()`).
+**Prevention:** When adding new fee types, they automatically appear via the catch-all. Only add explicit rendering if the fee needs special formatting (e.g., percentage display, clickable links).
+
+---
+
+## Pattern: Service Row Promotion from Notes to Product Table (2026-02-14)
+**Date:** 2026-02-14
+**Project:** [Pricing Index]
+**Problem:** During ShopWorks import, Weight and Sewing services were dumped into the notes textarea as text. They weren't visible in the product table and weren't saved as fee line items.
+**Root cause:** `confirmShopWorksImport()` had handling for some services (digitizing, rush, art) but Weight/Sewing/DT/Contract fell through to a catch-all that appended to notes.
+**Solution:** Added `createServiceProductRow()` calls for sewing, weight, DT, and contract items. Added their keys to `handledServiceKeys` array so they don't fall to the catch-all. Extended `SERVICE_META` with metadata for each new type (description, icon, isCap flag, default price).
+**Prevention:** When the parser adds a new service type, always (1) add to `SERVICE_META`, (2) add import handling in `confirmShopWorksImport()`, (3) add to `handledServiceKeys`, (4) add to `SERVICE_STYLE_NUMBERS`.
+
+---
+
+## Pattern: DOM Decoupling for Reusable Functions (2026-02-14)
+**Date:** 2026-02-14
+**Project:** [Pricing Index]
+**Problem:** `generateProfessionalQuoteHTML()` and `sendQuoteEmail()` read `document.getElementById('shipping-fee')` and `document.getElementById('tax-rate-input')` directly. This couples them to the embroidery builder DOM, making them unusable from other contexts (e.g., quote-view resend, batch processing).
+**Solution:** Added `options = {}` parameter with `options.shippingFee` and `options.taxRate`. Uses nullish coalescing `??` to fall back to DOM reads when options not provided. Backward-compatible — existing callers work unchanged.
+**Prevention:** When a function reads from the DOM, consider whether it might be called from another context. If so, accept the values as parameters with DOM as fallback via `??`.
+
+---
+
 ## Fix: resetQuote() crash + stale patch setup checkbox (2026-02-11)
 **Date:** 2026-02-11
 **Project:** [Pricing Index]
@@ -905,6 +934,46 @@ TotalAmount: parseFloat((
 ---
 
 # Order Processing & ShopWorks
+
+## Bug: "Sew-on" Description with Empty PN Bypasses Alias System
+**Date:** 2026-02-15
+**Project:** [Pricing Index]
+**Problem:** Order #136562 (Fire Buffs) has `Part Number:` empty, `Description:Sew-on`, `Unit Price:12.50`, `Qty:2`. The `SERVICE_CODE_ALIASES` map has `'SEW-ON': 'SEG'`, but aliases are only applied to non-empty part numbers. Empty PN → `classifyPartNumber('')` → `'comment'` → `customProducts[]` ("Priced item with no part number") instead of `services.sewing[]`.
+**Root Cause:** The alias system (`SERVICE_CODE_ALIASES`) checks the part number string, not the description. When PN is empty, the entire alias/classification pipeline is bypassed — `classifyPartNumber('')` immediately returns `'comment'`.
+**Solution:** Added description-based reclassification in `_classifyAndAddItem()` before the switch statement. When classification is `'comment'` AND item has pricing AND description matches `/^sew[\s-]?on/i`, override classification to `'sewing'`. The existing sewing case handler then assigns `partNumber: 'SEG'` and uses `this.SEWING_PRICE` ($10 API-driven).
+**Prevention:** When encountering service items with empty part numbers but recognizable descriptions, add description-based fallback detection. The alias system only works for non-empty PNs.
+
+---
+
+## Bug: Lowercase State Abbreviation Fails Ship Address Parsing
+**Date:** 2026-02-15
+**Project:** [Pricing Index]
+**Problem:** Order #136566 (Vadis) has ship address `Sumner, Wa 98390`. The `_parseShippingInfo()` regex at line 829 uses `[A-Z]{2}` (uppercase only), so "Wa" doesn't match. State and ZIP extraction fails silently.
+**Root Cause:** The regex `^([A-Z]{2})\s+(\d{5})(?:-\d{4})?$` is case-sensitive. ShopWorks data entry sometimes uses mixed-case state abbreviations.
+**Solution:** Added `.toUpperCase()` to `stateZipStr` before the regex match at both the initial parse (line 826) and the retry path (line 836).
+**Prevention:** When parsing user-entered or external-system strings for pattern matching, always normalize case first. Address data is especially prone to inconsistent casing.
+
+---
+
+## Bug: DECG "Di. Embroider Cap" Prefix Falsely Classifying Garments as Caps
+**Date:** 2026-02-15
+**Project:** [Pricing Index]
+**Problem:** ShopWorks uses "Di. Embroider Cap" as a service name prefix for DECG items, even when the garment is NOT a cap. E.g., "Di. Embroider Cap - T-shirt - Small Logo" and "Di. Embroider Cap - Jacket - Big Logo" both contain "cap" in the string, causing `_isCapFromDescription()` to return `true` for garments.
+**Root Cause:** `_isCapFromDescription()` did a simple `desc.includes('cap')` check with no awareness that "Di. Embroider Cap" is a ShopWorks service prefix, not a garment type. The actual garment type appears after the dash.
+**Solution:** Added regex match for `^di\.\s*embroider\s+cap\s*[-–]\s*` prefix. When matched, parse the text after the prefix and check against a `nonCapGarments` list (t-shirt, jacket, hoodie, vest, etc.). If a non-cap garment is found after the prefix → `false`. If only location terms (Front, Back, Side) → `true` (actual cap). Also added explicit guard for "Di. Embroider Garms" → always `false`.
+**Prevention:** When parsing ShopWorks descriptions for garment type detection, always account for the service name prefix which may contain misleading keywords. Test with real order data that has mixed cap/garment DECG items.
+
+---
+
+## Bug: `_4/5X` Combo Size Suffix Missing from Parser
+**Date:** 2026-02-15
+**Project:** [Pricing Index]
+**Problem:** Order #136479 had `CSV102_4/5X` — a Cornerstone safety vest in combo size 4XL/5XL. Parser didn't extract this suffix, leaving `_4/5X` in the part number.
+**Root Cause:** `SIZE_SUFFIXES` array and `SIZE_MAP` didn't include the `_4/5X` combo size pattern. Safety vests use combined sizes (one vest fits 4XL-5XL).
+**Solution:** Added `'4/5X': '4XL/5XL'` to `SIZE_MAP` and `'_4/5X'` to `SIZE_SUFFIXES` (in the size-ranges section). No false-match risk since `CSV102_4/5X.endsWith('_5X')` is false (last chars are `/5X` not `_5X`), and `_4/5X` is checked before `_5X` in the suffixes array.
+**Prevention:** When encountering new ShopWorks size suffixes in batch testing, add both to `SIZE_MAP` (for normalization) and `SIZE_SUFFIXES` (for extraction). Test that the new suffix doesn't create false matches with shorter existing suffixes.
+
+---
 
 ## Gap: ShopWorks Parser Silently Dropped Paid To Date, Balance, and Note Sections
 **Date:** 2026-02-12
@@ -1805,6 +1874,17 @@ for (let i = 0; i < items.length; i += batchSize) {
 
 # Business Insights
 
+## Insight: DECG Upsell Opportunity — Sell SanMar Product + Service Instead
+**Date:** 2026-02-15
+**Project:** [Pricing Index]
+**Analysis:** Across 104 ShopWorks orders (13 batches, May 2025 data), 22 DECG (customer-supplied garment) instances were identified. In most cases, reps charged $15-25/piece flat instead of the 2026 tiered rates ($20-28/pc). Estimated $800-1,500 left on the table from underpricing alone.
+**Bigger Opportunity:** Many DECG customers could have been sold equivalent SanMar products + embroidery, yielding higher margin on both product markup AND service. DECG captures only service revenue; selling the garment captures product margin too.
+**When DECG is appropriate:** Customer insists on specific brand (Nike, Patagonia, lululemon), item not in SanMar catalog, corporate uniform requirements.
+**Upsell script:** "We can source a comparable [product type] and handle the embroidery as a package — often at a better price than buying separately. Want me to pull some options?"
+**Prevention:** Training document created at `/memory/REP_TRAINING_PRICING_GAP_ANALYSIS.md` with rep-specific coaching for Nika Lao and Taneisha Clark. DECG/AL tier cards should be printed for desk reference.
+
+---
+
 ## Insight: LTM Fee Revenue Opportunity - $43K Annually
 **Date:** 2026-02-02
 **Project:** [Pricing Index]
@@ -1831,6 +1911,16 @@ for (let i = 0; i < items.length; i += batchSize) {
 **Files:**
 - Analysis script: `tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis`
 - Report: `tests/reports/ltm-analysis.json`
+
+---
+
+## Insight: ShopWorks Data Entry Quality — 98+ Parser Workarounds
+**Date:** 2026-02-15
+**Project:** [Pricing Index]
+**Analysis:** After auditing 104 ShopWorks orders across 13 batches, the parser accumulated 98+ workarounds for messy data entry: 13 service code aliases, description-based service detection, separator/label suppression, address typo handling, combo size splitting, and legacy part number mapping. Messy data entry is the #1 source of parser complexity.
+**Root causes:** Empty part numbers on priced items, "Transfer"/"EMB"/person names entered as line items, lowercase state abbreviations, mixed decoration types on one order, AL used when Full Back was intended, legacy/wrong service codes.
+**Solution:** Created comprehensive data entry guide at `/memory/SHOPWORKS_DATA_ENTRY_GUIDE.md` with STOP/START/CHECKLIST structure. Added summary section to `/memory/REP_TRAINING_PRICING_GAP_ANALYSIS.md`. Target audience: Nika Lao, Taneisha Clark.
+**Prevention:** Print the Pre-Submit Checklist and alias reference card for rep desks. Review with Service Price Cheat Sheet (`/calculators/service-price-cheat-sheet.html`).
 
 ---
 

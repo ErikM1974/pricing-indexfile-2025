@@ -1,0 +1,685 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 11)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136408
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13319
+Company:Brett Skaloud
+**************************************************************************
+Order Information
+Date Order Placed:5/12/2025
+Req. Ship Date:5/27/2025
+Drop Dead Date:
+Date Order Shipped:5/30/2025
+Date Order Invoiced:5/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Brett  Skaloud
+Phone:309-585-5681
+Fax:
+Email:brettskaloud@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Brett Skaloud, 1103 NE 55th St, Seattle , WA 98105
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130341179072
+**************************************************************************
+Design Information
+Design #:39145 - TUTHDR20
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DT630_OSFA
+Description:District Super Soft Mesh Back Cap., Olive/Khaki
+Unit Price:18.00
+Line Item Price:360.00
+Item Quantity:20
+Adult:Quantity
+XXXL (Other):20
+**************************************************************************
+Order Summary
+Subtotal:360.00
+Sales Tax:38.88
+Shipping:24.96
+Total:423.84
+Paid To Date:423.84
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136409
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:7881
+Company:Cintas
+**************************************************************************
+Order Information
+Date Order Placed:5/12/2025
+Req. Ship Date:5/16/2025
+Drop Dead Date:
+Date Order Shipped:5/16/2025
+Date Order Invoiced:5/15/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Noelle Brown
+Phone:253-231-8291
+Fax:
+Email:BrownN3@cintas.com
+**************************************************************************
+Design Information
+Design #:39146 - Tacoma Pump & Drilling 
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:Design Prep
+Description:Design Prep Fee
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:15.00
+Line Item Price:300.00
+Item Quantity:20
+Adult:Quantity
+S (Other):20
+**************************************************************************
+Order Summary
+Subtotal:350.00
+Sales Tax:35.35
+Shipping:
+Total:385.35
+Paid To Date:770.70
+Balance:-385.35
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136417
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:7142
+Company:Pacific Home Electric
+**************************************************************************
+Order Information
+Date Order Placed:5/13/2025
+Req. Ship Date:5/27/2025
+Drop Dead Date:
+Date Order Shipped:11/11/2025
+Date Order Invoiced:5/29/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Troy Mobley
+Phone:253-617-9288
+Fax:
+Email:troy@pacifichomeelectric.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Pacific Home Electric, 8411 110th St Ct East, Puyallup, WA 98373
+**************************************************************************
+Design Information
+Design #:39149 - Pcific Home Electric 
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 3
+Part Number:K500
+Description:Port Authority Silk Touch Polo, Black
+Unit Price:35.00
+Line Item Price:210.00
+Item Quantity:6
+Adult:Quantity
+LG:6
+Item 3 of 3
+Part Number:112
+Description:Richardson Trucker Cap with Mesh Snap Back, Black
+Unit Price:
+Line Item Price:0.00
+Item Quantity:12
+Adult:Quantity
+S (Other):12
+**************************************************************************
+Order Summary
+Subtotal:310.00
+Sales Tax:31.31
+Shipping:
+Total:341.31
+Paid To Date:341.31
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136420
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2054
+Company:Art Morrison Enterprises
+**************************************************************************
+Order Information
+Date Order Placed:5/13/2025
+Req. Ship Date:5/27/2025
+Drop Dead Date:5/28/2025
+Date Order Shipped:5/22/2025
+Date Order Invoiced:5/20/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Lisa Jones
+Phone:
+Fax:
+Email:lisaj@artmorrison.com
+**************************************************************************
+Design Information
+Design #:2445.01 - Morrison Performance AM Quality - New Logo 
+Design #:39163 - AME
+Design #:2445.03 - Morrison Performance AM Quality - New Logo 
+**************************************************************************
+Items Purchased
+Item 1 of 7
+Part Number:
+Description:Grey Logo
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 2 of 7
+Part Number:TM1MW450
+Description:Travismathew Monterey Chest Stripe Polo, Black
+Unit Price:90.00
+Line Item Price:540.00
+Item Quantity:6
+Adult:Quantity
+LG:6
+Item 3 of 7
+Part Number:TM1WX002
+Description:Travismathew Ladies Coto Performance Polo, QuiShaG/Bk
+Unit Price:78.00
+Line Item Price:312.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+Item 4 of 7
+Part Number:
+Description:White Logo
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 5 of 7
+Part Number:883681
+Description:Nike Dri-Fit Legacy Polo, Black
+Unit Price:60.00
+Line Item Price:900.00
+Item Quantity:15
+Adult:Quantity
+LG:6
+XL:9
+Item 6 of 7
+Part Number:883681_2X
+Description:Nike Dri-Fit Legacy Polo, Black
+Unit Price:62.00
+Line Item Price:372.00
+Item Quantity:6
+Adult:Quantity
+XXL:6
+Item 7 of 7
+Part Number:AL
+Description:Additional Logo "AM"
+Unit Price:5.00
+Line Item Price:155.00
+Item Quantity:31
+Adult:Quantity
+S (Other):31
+**************************************************************************
+Order Summary
+Subtotal:2,279.00
+Sales Tax:0.00
+Shipping:
+Total:2,279.00
+Paid To Date:2,279.00
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136429
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2608
+Company:CCNW Commercial Construction Northwest
+**************************************************************************
+Order Information
+Date Order Placed:5/13/2025
+Req. Ship Date:6/18/2025
+Drop Dead Date:
+Date Order Shipped:6/18/2025
+Date Order Invoiced:6/17/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Michelle  Eyer
+Phone:253-952-0426
+Fax:
+Email:Michelle@ccnwinc.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Commercial Construction Northwest, 104 Meridian Ave East, Milton, WA 98354
+**************************************************************************
+Design Information
+Design #:39156 - CCNW Safety Jacket
+Design #:39183 - CCNW - Commercial Construction NW
+Design #:8257.03 - 
+Design #:8257.01 - 
+**************************************************************************
+Items Purchased
+Item 1 of 8
+Part Number:J304
+Description:Port Authority All-Season Ii Jacket, Black/Black
+Unit Price:86.00
+Line Item Price:602.00
+Item Quantity:7
+Adult:Quantity
+M:2
+LG:2
+XL:3
+Item 2 of 8
+Part Number:J26112
+Description:Ansi 107 Class 3 - With 2" Silver Reflective Tape - Material And Seams Are 100% Waterproof - Insulated Polyester Quilted Liner - Zipper Fly Front With Elastic Waist And Sleeve Cuffs - Roll-A-Way Hood In Collar - 5 Exterior And 3 Interior Pockets - Mic Tabs, Yellow
+Unit Price:85.66
+Line Item Price:1,370.56
+Item Quantity:16
+Adult:Quantity
+LG:9
+XL:7
+Item 3 of 8
+Part Number:J26112_2X
+Description:Ansi 107 Class 3 - With 2" Silver Reflective Tape - Material And Seams Are 100% Waterproof - Insulated Polyester Quilted Liner - Zipper Fly Front With Elastic Waist And Sleeve Cuffs - Roll-A-Way Hood In Collar - 5 Exterior And 3 Interior Pockets - Mic Tabs, Yellow
+Unit Price:87.66
+Line Item Price:788.94
+Item Quantity:9
+Adult:Quantity
+XXL:9
+Item 4 of 8
+Part Number:J26112_3X
+Description:Ansi 107 Class 3 - With 2" Silver Reflective Tape - Material And Seams Are 100% Waterproof - Insulated Polyester Quilted Liner - Zipper Fly Front With Elastic Waist And Sleeve Cuffs - Roll-A-Way Hood In Collar - 5 Exterior And 3 Interior Pockets - Mic Tabs, Yellow
+Unit Price:88.66
+Line Item Price:443.30
+Item Quantity:5
+Adult:Quantity
+XXXL (Other):5
+Item 5 of 8
+Part Number:AL
+Description:Additional Logo Back Logo 
+Unit Price:12.50
+Line Item Price:375.00
+Item Quantity:30
+Adult:Quantity
+S (Other):30
+Item 6 of 8
+Part Number:PC90H
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, Charcoal
+Unit Price:34.90
+Line Item Price:314.10
+Item Quantity:9
+Adult:Quantity
+LG:5
+XL:4
+Item 7 of 8
+Part Number:
+Description:Transfer S. Vest 
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 8 of 8
+Part Number:
+Description:
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+**************************************************************************
+Order Summary
+Subtotal:3,906.40
+Sales Tax:394.55
+Shipping:
+Total:4,300.95
+Paid To Date:4,300.95
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136441
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12354
+Company:410 Dental 
+**************************************************************************
+Order Information
+Date Order Placed:5/14/2025
+Req. Ship Date:5/28/2025
+Drop Dead Date:
+Date Order Shipped:5/28/2025
+Date Order Invoiced:5/23/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Melissa  Marroquim
+Phone:253-891-0977
+Fax:
+Email:Melissa@410Dental.com
+**************************************************************************
+Design Information
+Design #:34915 - 410 Dental 
+Design #:34915.01 - 410 Dental 
+**************************************************************************
+Items Purchased
+Item 1 of 8
+Part Number:LST980
+Description:Sport-Tek Womens Hooded Soft Shell Jacket, DeepBlack
+Unit Price:57.00
+Line Item Price:57.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 2 of 8
+Part Number:CTK288
+Description:Carhartt Midweight Hooded Logo Sweatshirt, Black
+Unit Price:76.00
+Line Item Price:76.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 3 of 8
+Part Number:CJ1614
+Description:Nike Club Fleece Crew, White
+Unit Price:66.00
+Line Item Price:66.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 4 of 8
+Part Number:CJ1614
+Description:Nike Club Fleece Crew, Royal
+Unit Price:66.00
+Line Item Price:66.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 5 of 8
+Part Number:CT102788
+Description:Carhartt Womens Clarksburg Full-Zip Hoodie, Navy
+Unit Price:71.00
+Line Item Price:71.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 6 of 8
+Part Number:CT102788
+Description:Carhartt Womens Clarksburg Full-Zip Hoodie, Carbon Heather
+Unit Price:71.00
+Line Item Price:71.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 7 of 8
+Part Number:CT102788
+Description:Carhartt Womens Clarksburg Full-Zip Hoodie, Black
+Unit Price:71.00
+Line Item Price:71.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 8 of 8
+Part Number:CT102788
+Description:Carhartt Womens Clarksburg Full-Zip Hoodie, Black
+Unit Price:71.00
+Line Item Price:71.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:549.00
+Sales Tax:55.45
+Shipping:
+Total:604.45
+Paid To Date:604.45
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136443
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8902
+Company:MaxCare of Washington Inc
+**************************************************************************
+Order Information
+Date Order Placed:5/14/2025
+Req. Ship Date:5/16/2025
+Drop Dead Date:5/16/2025
+Date Order Shipped:5/28/2025
+Date Order Invoiced:5/22/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Emily Carlile
+Phone:253-740-4342
+Fax:
+Email:ecarlile@maxcare247.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:MaxCare of Washington Inc, 16208 60th Street East, Sumner, WA 98390
+**************************************************************************
+Design Information
+Design #:20376 - MaxCare of Washington - L/C
+Design #:37847 - Maxcare , CORE
+Design #:20377.02 - 
+**************************************************************************
+Items Purchased
+Item 1 of 10
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:60.00
+Item Quantity:3
+Adult:Quantity
+S (Other):3
+Item 2 of 10
+Part Number:AL
+Description:Additional Logo 
+Unit Price:8.50
+Line Item Price:17.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 3 of 10
+Part Number:779795
+Description:Nike Dri-Fit Stretch 1/2-Zip Cover-Up, DkGy/ClGy/Volt
+Unit Price:96.00
+Line Item Price:96.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 4 of 10
+Part Number:779795
+Description:Nike Dri-Fit Stretch 1/2-Zip Cover-Up, Black/Dk Grey
+Unit Price:96.00
+Line Item Price:96.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 5 of 10
+Part Number:779796
+Description:Nike Ladies Dri-Fit Stretch 1/2-Zip Cover-Up, Black/Dk Grey
+Unit Price:96.00
+Line Item Price:96.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 6 of 10
+Part Number:NKDX6720
+Description:Nike Women's Club Fleece Sleeve Swoosh 1/2-Zip, Anthracite
+Unit Price:71.00
+Line Item Price:71.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 7 of 10
+Part Number:LST650
+Description:Sport-Tek Womens Micropique Sport-Wick Polo, Black
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 8 of 10
+Part Number:LST650
+Description:Sport-Tek Womens Micropique Sport-Wick Polo, Grey Concrete
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 9 of 10
+Part Number:AL
+Description:Additional Logo 
+Unit Price:8.50
+Line Item Price:34.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+Item 10 of 10
+Part Number:
+Description:Two polos get both sleeve logos
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+**************************************************************************
+Order Summary
+Subtotal:540.00
+Sales Tax:54.54
+Shipping:
+Total:594.54
+Paid To Date:594.54
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136449
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12758
+Company:lululemon
+**************************************************************************
+Order Information
+Date Order Placed:5/14/2025
+Req. Ship Date:5/28/2025
+Drop Dead Date:
+Date Order Shipped:5/23/2025
+Date Order Invoiced:5/22/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Mara Curry 
+Phone:
+Fax:
+Email:maracurry@lululemon.com
+**************************************************************************
+Design Information
+Design #:39162 - Women in Tech
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DGT-001
+Description:Digitizing fee for converting artwork into an embroidery-friendly format
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:520.00
+Item Quantity:26
+Adult:Quantity
+S (Other):26
+**************************************************************************
+Order Summary
+Subtotal:620.00
+Sales Tax:62.62
+Shipping:
+Total:682.62
+Paid To Date:682.62
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 11
+================================================================================

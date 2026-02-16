@@ -1151,6 +1151,7 @@ Company:Absher Construction Company
                                     <th>ShopWorks</th>
                                     <th>API Price</th>
                                     <th>Custom</th>
+                                    <th>Delta</th>
                                 </tr>
                             </thead>
                             <tbody id="spr-table-body">
@@ -1283,6 +1284,21 @@ Company:Absher Construction Company
         .spr-type-decc { background: #cffafe; color: #155e75; }
         .spr-type-cb { background: #dbeafe; color: #1e40af; }
         .spr-type-cs { background: #dbeafe; color: #1e40af; }
+        /* Delta badges for price comparison */
+        .spr-delta-badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 600; margin-left: 6px; white-space: nowrap; }
+        .spr-delta-badge.ok { background: #dcfce7; color: #166534; }
+        .spr-delta-badge.review { background: #fef3c7; color: #92400e; }
+        .spr-delta-badge.mismatch { background: #fee2e2; color: #991b1b; }
+        .spr-delta-warning {
+            padding: 8px 12px; margin-bottom: 10px; border-radius: 6px;
+            background: #fffbeb; border: 1px solid #fde68a;
+            font-size: 12px; color: #92400e;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .spr-delta-warning i { color: #f59e0b; }
+        .spr-decg-detail { font-size: 11px; color: #64748b; padding: 4px 10px 4px 28px; }
+        .spr-decg-detail td { padding: 3px 8px; border-bottom: none; font-size: 11px; }
+        .spr-decg-detail .detail-label { color: #94a3b8; }
         .spr-stitch-input {
             width: 75px;
             padding: 5px 6px;
@@ -1402,22 +1418,31 @@ Company:Absher Construction Company
                 </p>
                 <input type="hidden" id="ns-modal-row-id" value="">
                 <div class="ns-form-grid">
-                    <div class="ns-form-group">
+                    <div class="ns-form-group ns-full-width">
                         <label>Style Number</label>
                         <input type="text" id="ns-style-number" readonly class="ns-input ns-input-readonly">
                     </div>
                     <div class="ns-form-group">
                         <label>Brand <span class="ns-required">*</span></label>
-                        <input type="text" id="ns-brand" class="ns-input" placeholder="e.g. Edwards">
+                        <input type="text" id="ns-brand" class="ns-input" placeholder="e.g. Under Armour" oninput="validateNsModalFields()">
+                    </div>
+                    <div class="ns-form-group">
+                        <label>Sell Price ($) <span class="ns-required">*</span></label>
+                        <input type="number" id="ns-sell-price" class="ns-input" step="0.01" min="0.01" placeholder="29.50" oninput="validateNsModalFields()">
                     </div>
                     <div class="ns-form-group ns-full-width">
                         <label>Product Name <span class="ns-required">*</span></label>
-                        <input type="text" id="ns-product-name" class="ns-input" placeholder="e.g. Kitchen Skull Cap">
+                        <input type="text" id="ns-product-name" class="ns-input" placeholder="e.g. Performance Polo" oninput="validateNsModalFields()">
                     </div>
+                </div>
+                <button type="button" class="ns-more-options-toggle" onclick="toggleNsMoreOptions(this)">
+                    <i class="fas fa-chevron-right"></i> More Options
+                </button>
+                <div class="ns-more-options-section" id="ns-more-options">
                     <div class="ns-form-group">
                         <label>Category</label>
                         <select id="ns-category" class="ns-input">
-                            <option value="">Select...</option>
+                            <option value="">Auto-detect</option>
                             <option value="Caps">Caps</option>
                             <option value="T-Shirts">T-Shirts</option>
                             <option value="Polos/Knits">Polos/Knits</option>
@@ -1429,10 +1454,6 @@ Company:Absher Construction Company
                         </select>
                     </div>
                     <div class="ns-form-group">
-                        <label>Sell Price ($)</label>
-                        <input type="number" id="ns-sell-price" class="ns-input" step="0.01" min="0" placeholder="15.50">
-                    </div>
-                    <div class="ns-form-group ns-full-width">
                         <label>Default Colors <small>(comma-separated)</small></label>
                         <input type="text" id="ns-default-colors" class="ns-input" placeholder="e.g. Black, White, Navy">
                     </div>
@@ -1444,7 +1465,7 @@ Company:Absher Construction Company
             </div>
             <div class="shopworks-import-footer">
                 <button class="btn-cancel-import" onclick="closeAddNonSanmarModal()">Cancel</button>
-                <button class="btn-parse-import" id="btn-save-nonsanmar" onclick="saveNonSanmarProduct()">
+                <button class="btn-parse-import" id="btn-save-nonsanmar" onclick="saveNonSanmarProduct()" disabled title="Fill Brand, Product Name, and Sell Price">
                     <i class="fas fa-save"></i> Save & Apply
                 </button>
             </div>
@@ -1491,27 +1512,25 @@ Company:Absher Construction Company
             background: #f1f5f9;
             color: #64748b;
         }
-        /* "Add" button in product row */
+        /* "Add Product" button in product row */
         .btn-add-nonsanmar {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            margin-left: 6px;
+            gap: 5px;
+            padding: 5px 12px;
             background: #7c3aed;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 11px;
+            border-radius: 5px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            vertical-align: middle;
         }
         .btn-add-nonsanmar:hover {
             background: #6d28d9;
         }
         .btn-add-nonsanmar i {
-            font-size: 10px;
+            font-size: 12px;
         }
         /* Non-SanMar badge on row */
         .non-sanmar-badge {
@@ -1525,6 +1544,142 @@ Company:Absher Construction Company
             font-weight: 600;
             text-transform: uppercase;
             vertical-align: middle;
+        }
+
+        /* Import Summary Banner */
+        .import-summary-banner {
+            margin: 8px 0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 13px;
+            line-height: 1.5;
+            position: relative;
+            animation: bannerSlideIn 0.3s ease-out;
+        }
+        @keyframes bannerSlideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .import-summary-banner.banner-success {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+        .import-summary-banner.banner-warning {
+            background: #fffbeb;
+            border-color: #fcd34d;
+        }
+        .import-summary-banner .banner-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #1e293b;
+        }
+        .import-summary-banner .banner-detail {
+            color: #475569;
+            font-size: 12px;
+        }
+        .import-summary-banner .banner-ns-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 0;
+            cursor: pointer;
+        }
+        .import-summary-banner .banner-ns-item:hover {
+            text-decoration: underline;
+        }
+        .import-summary-banner .banner-ns-item .ns-price-ok {
+            color: #16a34a;
+        }
+        .import-summary-banner .banner-ns-item .ns-price-warn {
+            color: #dc2626;
+        }
+        .import-summary-banner .btn-dismiss-banner {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .import-summary-banner .btn-dismiss-banner:hover {
+            background: rgba(0,0,0,0.05);
+            color: #475569;
+        }
+
+        /* Simplified Modal — collapsible section */
+        .ns-more-options-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: #7c3aed;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 0 4px;
+            margin-top: 4px;
+        }
+        .ns-more-options-toggle:hover {
+            color: #5b21b6;
+        }
+        .ns-more-options-toggle i {
+            transition: transform 0.2s;
+        }
+        .ns-more-options-toggle.expanded i {
+            transform: rotate(90deg);
+        }
+        .ns-more-options-section {
+            display: none;
+            padding-top: 8px;
+        }
+        .ns-more-options-section.visible {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Non-SanMar price edit affordance */
+        .ns-price-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .ns-price-display .fa-pencil-alt {
+            font-size: 10px;
+            color: #94a3b8;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        .ns-price-display:hover .fa-pencil-alt {
+            opacity: 1;
+            color: #7c3aed;
+        }
+        .ns-price-zero {
+            background: #fef2f2 !important;
+        }
+        .ns-price-zero .ns-price-display {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        /* Larger "Add Product" button */
+        .btn-add-nonsanmar-block {
+            display: block;
+            margin-top: 6px;
+        }
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(124, 58, 237, 0); }
+        }
+        .btn-add-nonsanmar.pulse {
+            animation: btnPulse 1.5s ease-in-out 3;
         }
     </style>
 
@@ -4113,15 +4268,20 @@ Company:Absher Construction Company
                     row.dataset.style = styleNumber;
                     row.dataset.notFound = 'true';
 
-                    // Add "Add" button next to the description
+                    // Add "Add Product" button below the description
                     const descCell = descInput.closest('td') || descInput.parentElement;
                     if (descCell && !descCell.querySelector('.btn-add-nonsanmar')) {
+                        const btnWrap = document.createElement('div');
+                        btnWrap.className = 'btn-add-nonsanmar-block';
                         const addBtn = document.createElement('button');
-                        addBtn.className = 'btn-add-nonsanmar';
+                        addBtn.className = 'btn-add-nonsanmar pulse';
                         addBtn.title = 'Add to Non-SanMar database';
-                        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add';
+                        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Product';
                         addBtn.onclick = () => showAddNonSanmarModal(rowId);
-                        descCell.appendChild(addBtn);
+                        btnWrap.appendChild(addBtn);
+                        descCell.appendChild(btnWrap);
+                        // Stop pulse animation after 5s
+                        setTimeout(() => addBtn.classList.remove('pulse'), 5000);
                     }
                 }
             } catch (error) {
@@ -4213,6 +4373,32 @@ Company:Absher Construction Company
                 badge.textContent = 'Custom';
                 badge.title = 'Non-SanMar product — sell price override';
                 styleCell.appendChild(badge);
+            }
+
+            // Remove any btn-add-nonsanmar-block wrapper too
+            const addBtnBlock = row.querySelector('.btn-add-nonsanmar-block');
+            if (addBtnBlock) addBtnBlock.remove();
+
+            // Add pencil icon to price cell for inline editing
+            updateNonSanmarPriceCell(row, rowId);
+        }
+
+        /**
+         * Update the price cell display for non-SanMar rows with pencil edit affordance.
+         * Shows pencil icon for priced items, warning icon for $0 items.
+         */
+        function updateNonSanmarPriceCell(row, rowId) {
+            const priceCell = document.getElementById(`row-price-${rowId}`);
+            if (!priceCell) return;
+
+            const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
+            if (sellPrice > 0) {
+                priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+                priceCell.classList.remove('ns-price-zero');
+            } else {
+                priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt"></i></span>`;
+                priceCell.classList.add('ns-price-zero');
+                row.classList.add('price-warning');
             }
         }
 
@@ -5991,8 +6177,10 @@ Company:Absher Construction Company
 
             // Don't allow override on empty product rows (no style or no quantities yet)
             // Child rows inherit style/color from parent, so allow them through
+            // Non-SanMar rows may not have color set yet, but should still allow price edit
             const isChildRow = row.classList.contains('child-row');
-            if (row.dataset.productType !== 'service' && !isChildRow && (!row.dataset.style || !row.dataset.color)) return;
+            const isNonSanmar = row.dataset.nonSanmar === 'true';
+            if (row.dataset.productType !== 'service' && !isChildRow && !isNonSanmar && (!row.dataset.style || !row.dataset.color)) return;
 
             const priceCell = document.getElementById(`row-price-${rowId}`);
             if (!priceCell) return;
@@ -6328,8 +6516,14 @@ Company:Absher Construction Company
                                         // Display unit price (LTM built into per-piece price when applicable)
                                         const displayPrice = standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0;
                                         const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                                        const isNsRow = parentRow.dataset.nonSanmar === 'true';
 
-                                        if (hasOverride) {
+                                        if (isNsRow) {
+                                            // Non-SanMar: pencil icon, no clear button (price override IS the price)
+                                            priceCell.classList.remove('price-overridden');
+                                            priceCell.classList.remove('ns-price-zero');
+                                            priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${displayPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+                                        } else if (hasOverride) {
                                             priceCell.classList.add('price-overridden');
                                             priceCell.innerHTML = `<span class="price-override-wrapper">$${displayPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
                                         } else {
@@ -8287,6 +8481,7 @@ Company:Absher Construction Company
                 if (serviceItems.length > 0) {
                     servicesSection.style.display = '';
                     let html = '';
+                    let issueCount = 0;
 
                     serviceItems.forEach((item, idx) => {
                         const typeUpper = (item.type || '').toUpperCase();
@@ -8296,6 +8491,20 @@ Company:Absher Construction Company
                         const apiPrice = item.apiPrice;
                         const swAvail = swPrice != null && swPrice > 0;
                         const apiAvail = apiPrice != null;
+
+                        // Delta calculation
+                        let deltaBadgeHtml = '';
+                        if (swAvail && apiAvail && apiPrice > 0) {
+                            const deltaPct = ((swPrice - apiPrice) / apiPrice) * 100;
+                            const absPct = Math.abs(deltaPct);
+                            const deltaAmt = Math.abs(swPrice - apiPrice);
+                            let cls, label;
+                            if (absPct <= 5) { cls = 'ok'; label = 'OK'; }
+                            else if (absPct <= 15) { cls = 'review'; label = (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(0) + '%'; issueCount++; }
+                            else { cls = 'mismatch'; label = (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(0) + '%'; issueCount++; }
+                            const tooltip = cls !== 'ok' ? ` title="$${deltaAmt.toFixed(2)} difference"` : '';
+                            deltaBadgeHtml = `<span class="spr-delta-badge ${cls}"${tooltip}>${label}</span>`;
+                        }
 
                         let defaultSel = apiAvail ? 'api' : (swAvail ? 'sw' : 'custom');
 
@@ -8329,8 +8538,42 @@ Company:Absher Construction Company
                         html += `<label><input type="radio" name="spr-source-${idx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprSourceChange(${idx})">`;
                         html += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-custom-${idx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomServiceFocus(${idx})" oninput="onSprCustomServiceFocus(${idx})"></label>`;
                         html += `</td>`;
+
+                        html += `<td style="text-align:center;">${deltaBadgeHtml}</td>`;
                         html += `</tr>`;
+
+                        // DECG/DECC per-item detail row (expandable if aggregated)
+                        if ((typeUpper === 'DECG' || typeUpper === 'DECC') && item._sourceItems && item._sourceItems.length > 1) {
+                            html += `<tr class="spr-decg-detail"><td colspan="7">`;
+                            html += `<details><summary style="cursor:pointer; font-size:11px; color:#64748b;">${item._sourceItems.length} individual items</summary>`;
+                            html += `<table style="width:100%; margin-top:4px;">`;
+                            for (const si of item._sourceItems) {
+                                const siSw = si.unitPrice || 0;
+                                const siApi = item.apiPrice || 0;
+                                const siDelta = siApi > 0 ? ((siSw - siApi) / siApi * 100) : 0;
+                                const siCls = Math.abs(siDelta) <= 5 ? 'ok' : Math.abs(siDelta) <= 15 ? 'review' : 'mismatch';
+                                html += `<tr>`;
+                                html += `<td class="detail-label">Qty ${si.quantity || 1}</td>`;
+                                html += `<td>SW: $${siSw.toFixed(2)}</td>`;
+                                html += `<td>API: $${siApi.toFixed(2)}</td>`;
+                                html += `<td><span class="spr-delta-badge ${siCls}">${siDelta >= 0 ? '+' : ''}${siDelta.toFixed(0)}%</span></td>`;
+                                html += `</tr>`;
+                            }
+                            html += `</table></details></td></tr>`;
+                        }
                     });
+
+                    // Insert warning banner if there are pricing issues
+                    const warningEl = document.getElementById('spr-delta-warning');
+                    if (warningEl) warningEl.remove();
+                    if (issueCount > 0) {
+                        const warningDiv = document.createElement('div');
+                        warningDiv.id = 'spr-delta-warning';
+                        warningDiv.className = 'spr-delta-warning';
+                        warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${issueCount} service item${issueCount > 1 ? 's have' : ' has'} significant price differences from 2026 pricing</span>`;
+                        const tableWrapper = servicesSection.querySelector('.spr-table-wrapper');
+                        servicesSection.insertBefore(warningDiv, tableWrapper);
+                    }
 
                     tbody.innerHTML = html;
                 } else {
@@ -8940,9 +9183,18 @@ Company:Absher Construction Company
                 document.getElementById('ns-available-sizes').value = 'S,M,L,XL,2XL,3XL';
             }
 
+            // Collapse "More Options" by default
+            const moreSection = document.getElementById('ns-more-options');
+            const moreToggle = document.querySelector('.ns-more-options-toggle');
+            if (moreSection) moreSection.classList.remove('visible');
+            if (moreToggle) moreToggle.classList.remove('expanded');
+
             // Show modal
             const modal = document.getElementById('add-nonsanmar-modal');
             modal.classList.add('active');
+
+            // Validate fields (enables/disables Save button)
+            validateNsModalFields();
 
             // Focus the brand field (first editable field)
             setTimeout(() => document.getElementById('ns-brand').focus(), 100);
@@ -8954,6 +9206,111 @@ Company:Absher Construction Company
         function closeAddNonSanmarModal() {
             const modal = document.getElementById('add-nonsanmar-modal');
             modal.classList.remove('active');
+        }
+
+        /**
+         * Toggle "More Options" collapsible in the Add Non-SanMar modal
+         */
+        function toggleNsMoreOptions(btn) {
+            const section = document.getElementById('ns-more-options');
+            const isExpanded = section.classList.toggle('visible');
+            btn.classList.toggle('expanded', isExpanded);
+        }
+
+        /**
+         * Live validation for the 3 required fields in the Non-SanMar modal.
+         * Enables/disables the Save button.
+         */
+        function validateNsModalFields() {
+            const brand = document.getElementById('ns-brand').value.trim();
+            const name = document.getElementById('ns-product-name').value.trim();
+            const price = parseFloat(document.getElementById('ns-sell-price').value);
+            const saveBtn = document.getElementById('btn-save-nonsanmar');
+            const isValid = brand && name && price > 0;
+            saveBtn.disabled = !isValid;
+            saveBtn.title = isValid ? '' : 'Fill Brand, Product Name, and Sell Price';
+        }
+
+        /**
+         * Show a post-import summary banner above the product table.
+         * Lists non-SanMar products with price status indicators.
+         */
+        function showImportSummaryBanner(sanMarCount, nonSanMarItems) {
+            // Remove any existing banner
+            const existing = document.getElementById('import-summary-banner');
+            if (existing) existing.remove();
+
+            const totalProducts = sanMarCount + nonSanMarItems.length;
+            if (totalProducts === 0) return;
+
+            const hasZeroPrice = nonSanMarItems.some(item => !item.price || item.price <= 0);
+            const bannerClass = hasZeroPrice ? 'banner-warning' : 'banner-success';
+
+            let html = `<div class="banner-title">Import Complete: ${totalProducts} product${totalProducts !== 1 ? 's' : ''} imported</div>`;
+            html += `<div class="banner-detail">`;
+            if (sanMarCount > 0) {
+                html += `&#8226; ${sanMarCount} SanMar product${sanMarCount !== 1 ? 's' : ''} &mdash; priced automatically<br>`;
+            }
+            if (nonSanMarItems.length > 0) {
+                const zeroCount = nonSanMarItems.filter(i => !i.price || i.price <= 0).length;
+                if (zeroCount > 0) {
+                    html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; <strong>${zeroCount} need${zeroCount !== 1 ? '' : 's'} pricing</strong><br>`;
+                } else {
+                    html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; using ShopWorks prices<br>`;
+                }
+                for (const item of nonSanMarItems) {
+                    const priceOk = item.price && item.price > 0;
+                    const icon = priceOk
+                        ? '<span class="ns-price-ok">&#10003;</span>'
+                        : '<span class="ns-price-warn">&#9888;</span>';
+                    const priceStr = priceOk ? `$${item.price.toFixed(2)}` : '$0.00';
+                    html += `<div class="banner-ns-item" data-row-id="${item.rowId}" onclick="scrollToProductRow(${item.rowId})">`;
+                    html += `&nbsp;&nbsp;&#9656; ${escapeHtml(item.style)} (${escapeHtml(item.description)}) &mdash; ${priceStr} ${icon}`;
+                    html += `</div>`;
+                }
+            }
+            html += `</div>`;
+            html += `<button class="btn-dismiss-banner" onclick="dismissImportBanner()" title="Dismiss">Dismiss</button>`;
+
+            const banner = document.createElement('div');
+            banner.id = 'import-summary-banner';
+            banner.className = `import-summary-banner ${bannerClass}`;
+            banner.innerHTML = html;
+
+            // Insert before the product table
+            const productTable = document.getElementById('product-table');
+            if (productTable && productTable.parentElement) {
+                productTable.parentElement.insertBefore(banner, productTable);
+            }
+
+            // Auto-dismiss after 30s (unless there are $0 products)
+            if (!hasZeroPrice) {
+                setTimeout(() => dismissImportBanner(), 30000);
+            }
+        }
+
+        /**
+         * Dismiss the import summary banner
+         */
+        function dismissImportBanner() {
+            const banner = document.getElementById('import-summary-banner');
+            if (banner) {
+                banner.style.transition = 'opacity 0.2s';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 200);
+            }
+        }
+
+        /**
+         * Scroll to a specific product row and briefly highlight it
+         */
+        function scrollToProductRow(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            row.style.transition = 'background 0.3s';
+            row.style.background = '#ede9fe';
+            setTimeout(() => { row.style.background = ''; }, 1500);
         }
 
         /**
@@ -8978,6 +9335,11 @@ Company:Absher Construction Company
             if (!productName) {
                 showToast('Product Name is required', 'error');
                 document.getElementById('ns-product-name').focus();
+                return;
+            }
+            if (!sellPrice || sellPrice <= 0) {
+                showToast('Sell Price is required — cannot save a $0 product', 'error');
+                document.getElementById('ns-sell-price').focus();
                 return;
             }
 
@@ -10095,8 +10457,8 @@ Company:Absher Construction Company
                     orderNotes: data.orderNotes || '',
                     swTotal: data.orderSummary?.total || 0,
                     swSubtotal: data.orderSummary?.subtotal || 0,
-                    carrier: data.packageTracking?.carrier || '',
-                    trackingNumber: data.packageTracking?.trackingNumber || '',
+                    carrier: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.carrier).filter(Boolean).join(', ') : '',
+                    trackingNumber: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.trackingNumber).filter(Boolean).join(', ') : '',
                     parsedServices: {
                         additionalLogos: data.services?.additionalLogos || [],
                         monograms: data.services?.monograms || [],
@@ -10118,16 +10480,23 @@ Company:Absher Construction Company
                     showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
                 }
 
-                // Flag non-SanMar products with $0 pricing
+                // Flag non-SanMar products with $0 pricing + collect for summary banner
+                const nonSanMarBannerItems = [];
                 document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
+                    const nsRowId = parseInt(nsRow.dataset.rowId);
                     const sellPrice = parseFloat(nsRow.dataset.sellPrice) || 0;
-                    if (sellPrice <= 0) {
-                        nsRow.classList.add('price-warning');
-                        const priceCell = nsRow.querySelector('.cell-price');
-                        if (priceCell) {
-                            priceCell.innerHTML = '<span style="color:#dc2626;" title="Double-click to set price">$0.00 &#9888;</span>';
-                        }
-                    }
+                    const nsStyle = nsRow.dataset.style || '';
+                    const nsDesc = nsRow.dataset.productName || nsRow.querySelector('[data-field="description"]')?.value || '';
+
+                    nonSanMarBannerItems.push({
+                        rowId: nsRowId,
+                        style: nsStyle,
+                        description: nsDesc,
+                        price: sellPrice
+                    });
+
+                    // Update price cell with pencil icon affordance
+                    updateNonSanmarPriceCell(nsRow, nsRowId);
                 });
 
                 // Finalize progress
@@ -10136,6 +10505,17 @@ Company:Absher Construction Company
                 // Close modal and show success
                 hideImportProgress();
                 closeShopWorksImportModal();
+
+                // Show import summary banner (non-SanMar detail)
+                const sanMarProductCount = productsImported - nonSanMarBannerItems.filter(i =>
+                    productResults.some(pr => pr.partNumber === i.style)
+                ).length;
+                // Count SanMar vs non-SanMar among all imported product rows
+                const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
+                const sanMarRowCount = Array.from(allImportedRows).filter(r => r.dataset.nonSanmar !== 'true').length;
+                if (nonSanMarBannerItems.length > 0) {
+                    showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);
+                }
 
                 const summary = [];
                 if (productsImported > 0) {

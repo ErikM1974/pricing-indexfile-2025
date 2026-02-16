@@ -1,0 +1,1148 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 10)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136244
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11392
+Company:Patriot Fire Protection
+**************************************************************************
+Order Information
+Date Order Placed:4/28/2025
+Req. Ship Date:6/9/2025
+Drop Dead Date:
+Date Order Shipped:6/10/2025
+Date Order Invoiced:6/10/2025
+Purchase Order #:Office
+Terms:Net 10
+Ordered by:Sierra Parks
+Phone:253-284-3413
+Fax:
+Email:sierra.parks@patriotfire.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Patriot Fire Protection, 2707 70th Ave E, Tacoma, WA 98424
+**************************************************************************
+Design Information
+Design #:29988 - Patriot Fire Protection
+Design #:29988.06 - Patriot Fire Protection
+Design #:29988.01 - 
+Design #:29988.1 - Patriot Fire Protection
+Design #:29988.14 - Patriot Fire Protection
+**************************************************************************
+Items Purchased
+Item 1 of 41
+Part Number:DT6101
+Description:District Womens V.i.t. Fleece Hoodie, FlntBluHtr
+Unit Price:29.00
+Line Item Price:29.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 41
+Part Number:TM1LD002
+Description:Travismathew Ladies Cold Bay Vest, Black
+Unit Price:107.00
+Line Item Price:107.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 3 of 41
+Part Number:PC145_2X
+Description:Port  Company  Crystal Tie-Dye Tee, Black
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 4 of 41
+Part Number:PC145_2X
+Description:(white logo) Port  Company  Crystal Tie-Dye Tee, BrtPink
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 5 of 41
+Part Number:1717_2X
+Description:(white logo)Comfort Colors  Heavyweight Ring Spun Tee, Butter
+Unit Price:23.00
+Line Item Price:23.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 6 of 41
+Part Number:64000
+Description:Gildan Softstyle T-Shirt, LightPink
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 7 of 41
+Part Number:64000
+Description:(white logo) Gildan Softstyle T-Shirt, Dark Chocolate
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 8 of 41
+Part Number:CT100617
+Description:(black logo) Carhartt  Rain Defender  Paxton Heavyweight Hooded Zip Mock Sweatshirt, New Navy
+Unit Price:81.00
+Line Item Price:81.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 9 of 41
+Part Number:L575
+Description:Port Authority Womens Crossover Raglan Polo, Regatta Blue
+Unit Price:26.00
+Line Item Price:26.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 10 of 41
+Part Number:L540
+Description:Port Authority Womens Silk Touch Performance Polo, Maroon
+Unit Price:22.00
+Line Item Price:22.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 11 of 41
+Part Number:NF0A8BUR
+Description:The North Face Womens Highest Peak Full-Zip Fleece Jacket, GdnaW/Grvl
+Unit Price:152.00
+Line Item Price:152.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 12 of 41
+Part Number:LPC54
+Description:Port  Company Ladies Core Cotton Tee, Jet Black
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 13 of 41
+Part Number:LPC54
+Description:Port  Company Ladies Core Cotton Tee, Royal
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 14 of 41
+Part Number:LPC54
+Description:Port  Company Ladies Core Cotton Tee, Ash
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 15 of 41
+Part Number:LPC54
+Description:Port  Company Ladies Core Cotton Tee, Athl Maroon
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 16 of 41
+Part Number:LPC54
+Description:Port  Company Ladies Core Cotton Tee, Light Blue
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 17 of 41
+Part Number:NKDC1991
+Description:Nike Ladies Dri-Fit Micro Pique 2.0 Polo, UrbanLilac
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 18 of 41
+Part Number:NKDC1991
+Description:Nike Ladies Dri-Fit Micro Pique 2.0 Polo, Navy
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 19 of 41
+Part Number:NKDC1991
+Description:Nike Ladies Dri-Fit Micro Pique 2.0 Polo, Black
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 20 of 41
+Part Number:545322
+Description:Nike Ladies Long Sleeve Dri-Fit Stretch Tech Polo, Blue Sapphire
+Unit Price:63.00
+Line Item Price:63.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 21 of 41
+Part Number:LNEA541
+Description:New Era Ladies Sts 1/2-Zip, Black
+Unit Price:46.00
+Line Item Price:46.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 22 of 41
+Part Number:S6000
+Description:Champion  Powerblend Crewneck Sweatshirt, Navy
+Unit Price:30.00
+Line Item Price:30.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 23 of 41
+Part Number:1717
+Description:Comfort Colors  Heavyweight Ring Spun Tee, White
+Unit Price:21.00
+Line Item Price:21.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 24 of 41
+Part Number:85800
+Description:Gildan Hammer Pique Polo, Navy
+Unit Price:21.00
+Line Item Price:21.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 25 of 41
+Part Number:CT89098101_OSFA
+Description:Carhartt  Waist Pack., Black
+Unit Price:44.00
+Line Item Price:44.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 26 of 41
+Part Number:DT141
+Description:District Womens Perfect Tri Midi Long Sleeve Tee, MilGrnFst
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 27 of 41
+Part Number:DT141
+Description:District Womens Perfect Tri Midi Long Sleeve Tee, Black
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 28 of 41
+Part Number:BC6482
+Description:BELLA+CANVAS® Women's Jersey Crop Tee, Black
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 29 of 41
+Part Number:BC6482
+Description:BELLA+CANVAS® Women's Jersey Crop Tee, Black
+Unit Price:19.00
+Line Item Price:19.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 30 of 41
+Part Number:CT105294
+Description:Carhartt Midweight 1/4-Zip Mock Neck Sweatshirt, HthrGrey
+Unit Price:64.00
+Line Item Price:128.00
+Item Quantity:2
+Adult:Quantity
+LG:1
+XL:1
+Item 31 of 41
+Part Number:CJ1611
+Description:Nike Club Fleece Pullover Hoodie, Black
+Unit Price:67.00
+Line Item Price:67.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 32 of 41
+Part Number:K820_2X
+Description:Port Authority Breakwater 1/4-Zip Pullover, GreySteel
+Unit Price:38.00
+Line Item Price:38.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 33 of 41
+Part Number:1745_2X
+Description:Comfort Colors Adult Heavyweight Color Blast T-Shirt, Smoke
+Unit Price:23.00
+Line Item Price:23.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 34 of 41
+Part Number:5000_2X
+Description:Gildan - Heavy Cotton 100 Cotton T-Shirt, Tweed
+Unit Price:16.00
+Line Item Price:16.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 35 of 41
+Part Number:1545_2X
+Description:Comfort Colors Color Blast Crewneck Sweatshirt, Smoke
+Unit Price:48.00
+Line Item Price:48.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 36 of 41
+Part Number:1580_2X
+Description:Comfort Colors Adult Quarter-Zip Sweatshirt, Pepper
+Unit Price:52.00
+Line Item Price:52.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 37 of 41
+Part Number:CTK121
+Description:Carhartt  Midweight Hooded Sweatshirt, Carbon Heather
+Unit Price:66.00
+Line Item Price:66.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 38 of 41
+Part Number:OR322218_XXL
+Description:LIMITED EDITION Outdoor Research Women's Coldsnap Hooded Down Vest, Black
+Unit Price:191.00
+Line Item Price:191.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 39 of 41
+Part Number:CT105294_2X
+Description:Carhartt Midweight 1/4-Zip Mock Neck Sweatshirt, Black
+Unit Price:66.00
+Line Item Price:66.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 40 of 41
+Part Number:LNEA530
+Description:(black logo) New Era  Ladies Performance Terry Full-Zip Cowl, Dusty Mauve He
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 41 of 41
+Part Number:85800
+Description:Gildan Hammer Pique Polo, RngSpunSpG
+Unit Price:21.00
+Line Item Price:21.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:1,795.00
+Sales Tax:181.30
+Shipping:
+Total:1,976.30
+Paid To Date:1,976.30
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136257
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:3409
+Company:Little Wheels QMA
+**************************************************************************
+Order Information
+Date Order Placed:4/30/2025
+Req. Ship Date:5/7/2025
+Drop Dead Date:
+Date Order Shipped:5/9/2025
+Date Order Invoiced:5/6/2025
+Purchase Order #:Champion
+Terms:COD 
+Ordered by:Melanie  Deaver
+Phone:253-332-2940
+Fax:
+Email:deaver5@comcast.net
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Little Wheels, Customer Pickup, Graham, WA 
+**************************************************************************
+Design Information
+Design #:32446 - Little Wheels QMA - Champion
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:AL
+Description:Additional Logo 
+Unit Price:120.00
+Line Item Price:240.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 2 of 3
+Part Number:Monogram
+Description:Left Chest Names Whitney Gates ---Heavy Honda 
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 3 of 3
+Part Number:J317_2X
+Description:Port Authority Core Soft Shell Jacket, Black
+Unit Price:43.99
+Line Item Price:87.98
+Item Quantity:2
+Adult:Quantity
+XXL:2
+**************************************************************************
+Order Summary
+Subtotal:352.98
+Sales Tax:35.65
+Shipping:
+Total:388.63
+Paid To Date:388.63
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136271
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13316
+Company:Custom Trucks NW
+**************************************************************************
+Order Information
+Date Order Placed:4/30/2025
+Req. Ship Date:5/14/2025
+Drop Dead Date:
+Date Order Shipped:6/2/2025
+Date Order Invoiced:5/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Elizabeth  Rudkin 
+Phone:253-534-5617
+Fax:
+Email:elizabeth@customtrucksnw.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Custom Truck NW, 300 Valley Ave NE, Puyallup , WA 98372
+**************************************************************************
+Design Information
+Design #:39112 - Custom Truck NW
+Design #:39113 - Custom Truck NW - Patch 
+Design #:39114 - Custom Truck NW - Left Panel
+**************************************************************************
+Items Purchased
+Item 1 of 16
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 16
+Part Number:112
+Description:Richardson Trucker Cap with Mesh Snap Back - Left Panel, Black/Charcoal
+Unit Price:18.70
+Line Item Price:467.50
+Item Quantity:25
+Adult:Quantity
+S (Other):25
+Item 3 of 16
+Part Number:112
+Description:Richardson Trucker Cap with Mesh Snap Back - Patch, Black/Charcoal
+Unit Price:20.70
+Line Item Price:517.50
+Item Quantity:25
+Adult:Quantity
+S (Other):25
+Item 4 of 16
+Part Number:K110
+Description:Port Authority Dry Zone Uv Micro-Mesh Polo, Deep Black
+Unit Price:23.00
+Line Item Price:368.00
+Item Quantity:16
+Adult:Quantity
+LG:4
+XL:12
+Item 5 of 16
+Part Number:K110_2X
+Description:Port Authority Dry Zone Uv Micro-Mesh Polo, Deep Black
+Unit Price:25.00
+Line Item Price:250.00
+Item Quantity:10
+Adult:Quantity
+XXL:10
+Item 6 of 16
+Part Number:ST850
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Black
+Unit Price:39.00
+Line Item Price:507.00
+Item Quantity:13
+Adult:Quantity
+LG:8
+XL:5
+Item 7 of 16
+Part Number:ST850_2X
+Description:Sport-Tek Sport-Wick Stretch 1/4-Zip Pullover, Black
+Unit Price:41.00
+Line Item Price:82.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 8 of 16
+Part Number:CTK121
+Description:Carhartt  Midweight Hooded Sweatshirt, Black
+Unit Price:62.00
+Line Item Price:1,240.00
+Item Quantity:20
+Adult:Quantity
+S (Other):5
+M:5
+LG:5
+XL:5
+Item 9 of 16
+Part Number:CTK121_2X
+Description:Carhartt  Midweight Hooded Sweatshirt, Black
+Unit Price:64.00
+Line Item Price:64.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 10 of 16
+Part Number:TM1WW003
+Description:Travismathew Ladies Crestview 1/4-Zip, Black
+Unit Price:83.00
+Line Item Price:498.00
+Item Quantity:6
+Adult:Quantity
+S (Other):2
+M:2
+LG:2
+Item 11 of 16
+Part Number:
+Description:Added On 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 12 of 16
+Part Number:
+Description:Laser - Custoemer's Supplies 3"
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 13 of 16
+Part Number:K110
+Description:Port Authority Dry Zone Uv Micro-Mesh Polo, Deep Black
+Unit Price:23.00
+Line Item Price:230.00
+Item Quantity:10
+Adult:Quantity
+LG:10
+Item 14 of 16
+Part Number:TM1MU410
+Description:Travismathew Coto Performance Polo, Black
+Unit Price:73.00
+Line Item Price:730.00
+Item Quantity:10
+Adult:Quantity
+LG:10
+Item 15 of 16
+Part Number:112
+Description:Richardson Trucker Cap with Mesh Snap Back - Left Panel, Black/Charcoal
+Unit Price:18.70
+Line Item Price:935.00
+Item Quantity:50
+Adult:Quantity
+S (Other):50
+Item 16 of 16
+Part Number:CTK121
+Description:Carhartt  Midweight Hooded Sweatshirt, Black
+Unit Price:62.00
+Line Item Price:930.00
+Item Quantity:15
+Adult:Quantity
+S (Other):5
+LG:10
+**************************************************************************
+Order Summary
+Subtotal:6,944.00
+Sales Tax:701.34
+Shipping:
+Total:7,645.34
+Paid To Date:7,645.34
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136303
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12557
+Company:City Of Bonney Lake - Public Works Dept. 
+**************************************************************************
+Order Information
+Date Order Placed:5/5/2025
+Req. Ship Date:5/19/2025
+Drop Dead Date:
+Date Order Shipped:6/6/2025
+Date Order Invoiced:6/5/2025
+Purchase Order #:2025PPE
+Terms:COD 
+Ordered by:Mikki   Withers
+Phone:253-447-4319
+Fax:
+Email:WithersM@bonneylake.gov
+**************************************************************************
+Design Information
+Design #:36679 - City Of Bonney Lake 
+Design #:39127 - Park Ambassador 
+Design #:36748 - City Of Bonney Lake - Public Work 
+**************************************************************************
+Items Purchased
+Item 1 of 23
+Part Number:
+Description:Park Ambassador - Left Chest and Back
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 2 of 23
+Part Number:K240
+Description:Port Authority Wearever Performance Pique Polo, DpForGrn
+Unit Price:27.00
+Line Item Price:351.00
+Item Quantity:13
+Adult:Quantity
+M:3
+LG:5
+XL:5
+Item 3 of 23
+Part Number:K240_2X
+Description:Port Authority Wearever Performance Pique Polo, DpForGrn
+Unit Price:29.00
+Line Item Price:87.00
+Item Quantity:3
+Adult:Quantity
+XXL:3
+Item 4 of 23
+Part Number:AL
+Description:Additional Logo - Park Ambassador - Back transfer 
+Unit Price:12.50
+Line Item Price:200.00
+Item Quantity:16
+Adult:Quantity
+S (Other):16
+Item 5 of 23
+Part Number:
+Description:Office T-shirt - EMB - Left Chest ONLY 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 6 of 23
+Part Number:PC55
+Description:Port  Company - Core Blend Tee, TrueNavy
+Unit Price:17.00
+Line Item Price:68.00
+Item Quantity:4
+Adult:Quantity
+LG:3
+XL:1
+Item 7 of 23
+Part Number:PC55_2X
+Description:Port  Company - Core Blend Tee, TrueNavy
+Unit Price:19.00
+Line Item Price:57.00
+Item Quantity:3
+Adult:Quantity
+XXL:3
+Item 8 of 23
+Part Number:PC55
+Description:Port  Company - Core Blend Tee, Jet Black
+Unit Price:17.00
+Line Item Price:34.00
+Item Quantity:2
+Adult:Quantity
+LG:2
+Item 9 of 23
+Part Number:PC55
+Description:Port  Company - Core Blend Tee, Dark Green
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 10 of 23
+Part Number:PC55
+Description:Port  Company - Core Blend Tee, BlkHthr
+Unit Price:17.00
+Line Item Price:17.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 11 of 23
+Part Number:PC61LS
+Description:Port  Company - Long Sleeve Essential Tee, Jet Black
+Unit Price:19.00
+Line Item Price:38.00
+Item Quantity:2
+Adult:Quantity
+M:1
+LG:1
+Item 12 of 23
+Part Number:PC61LS_2X
+Description:Port  Company - Long Sleeve Essential Tee, Jet Black
+Unit Price:21.00
+Line Item Price:63.00
+Item Quantity:3
+Adult:Quantity
+XXL:3
+Item 13 of 23
+Part Number:
+Description:Office Hoodie - EMB - Left Chest ONLY 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 14 of 23
+Part Number:PC90H
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, Cardinal
+Unit Price:36.00
+Line Item Price:72.00
+Item Quantity:2
+Adult:Quantity
+LG:1
+XL:1
+Item 15 of 23
+Part Number:PC90H
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, Royal
+Unit Price:36.00
+Line Item Price:72.00
+Item Quantity:2
+Adult:Quantity
+LG:2
+Item 16 of 23
+Part Number:PC90H
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, Dark Green
+Unit Price:36.00
+Line Item Price:36.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 17 of 23
+Part Number:PC90H
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, BlkHthr
+Unit Price:36.00
+Line Item Price:36.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 18 of 23
+Part Number:PC90H_2X
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, BlkHthr
+Unit Price:38.00
+Line Item Price:114.00
+Item Quantity:3
+Adult:Quantity
+XXL:3
+Item 19 of 23
+Part Number:PC90H
+Description:Port  Company -  Essential Fleece Pullover Hooded Sweatshirt, Dk Choc Brown
+Unit Price:36.00
+Line Item Price:36.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 20 of 23
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:25.00
+Line Item Price:75.00
+Item Quantity:3
+Adult:Quantity
+S (Other):3
+Item 21 of 23
+Part Number:Name
+Description:Jason M.
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 22 of 23
+Part Number:Name
+Description:Colby W.
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 23 of 23
+Part Number:Name
+Description:Matt O.
+Unit Price:12.50
+Line Item Price:12.50
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:1,410.50
+Sales Tax:142.46
+Shipping:
+Total:1,552.96
+Paid To Date:1,552.96
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136318
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:7753
+Company:UW Naval ROTC
+**************************************************************************
+Order Information
+Date Order Placed:5/6/2025
+Req. Ship Date:5/20/2025
+Drop Dead Date:
+Date Order Shipped:6/3/2025
+Date Order Invoiced:5/29/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jon-Paul Mickle
+Phone:318-505-3158
+Fax:
+Email:jpmickle@uw.edu
+**************************************************************************
+Design Information
+Design #:16056 - J220, LC - UW NROTC
+Design #:16128 -  J164, LS - US Navy
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DECG
+Description:Di. Embroider Garms (polos)
+Unit Price:20.00
+Line Item Price:20.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:AL
+Description:Additional Logo US NAVY (Gold)
+Unit Price:20.00
+Line Item Price:20.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:40.00
+Sales Tax:4.04
+Shipping:
+Total:44.04
+Paid To Date:44.04
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136350
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13318
+Company:Rainier Family Wealth
+**************************************************************************
+Order Information
+Date Order Placed:5/7/2025
+Req. Ship Date:5/16/2025
+Drop Dead Date:5/16/2025
+Date Order Shipped:5/15/2025
+Date Order Invoiced:5/14/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jun Chea
+Phone:253-973-7744
+Fax:
+Email:jun@rainierfw.com
+**************************************************************************
+Design Information
+Design #:39134 - Rainer Family Wealth 
+Design #:39138 - Rainer Family Wealth Circle logo 2.5 
+Design #:39138.01 - Rainer Family Wealth Circle logo 2.5 
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 5
+Part Number:DECG
+Description:Di. Embroider Garms - NF Fleece Jacket - Back Of the Neck  Full Logo - All white 
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 3 of 5
+Part Number:DECG
+Description:Di. Embroider Garms NF Skyline - R/S All white Circle Logo 
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 4 of 5
+Part Number:DECG
+Description:Di. Embroider Garms Patagonia Rain Jacket - R/S - All White logo Circle Logo
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 5 of 5
+Part Number:DECG
+Description:Di. Embroider Garms Patagonia Rain Jacket - R/S - logo Circle Logo
+Unit Price:35.00
+Line Item Price:350.00
+Item Quantity:10
+Adult:Quantity
+S (Other):10
+**************************************************************************
+Order Summary
+Subtotal:555.00
+Sales Tax:56.06
+Shipping:
+Total:611.06
+Paid To Date:611.06
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136359
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:11942
+Company:Sherlock Investments
+**************************************************************************
+Order Information
+Date Order Placed:5/8/2025
+Req. Ship Date:6/13/2025
+Drop Dead Date:
+Date Order Shipped:6/17/2025
+Date Order Invoiced:6/17/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Aaron  Beal
+Phone:360-434-2420
+Fax:
+Email:aaron@sherlockinvestments.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Sherlock Self Storage- Duvall, 14441 Main Street NE, Duvall, WA 98019
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130341829388
+**************************************************************************
+Design Information
+Design #:32534.01 - Sherlock Self Storage
+Design #:32534.02 - Sherlock Self Storage
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:Monogram
+Description:Names on Garments- Charlee
+Unit Price:12.50
+Line Item Price:37.50
+Item Quantity:3
+Adult:Quantity
+S (Other):3
+Item 2 of 3
+Part Number:LPC099V
+Description:Port  Company Ladies Beach Wash Garment-Dyed V-Neck Tee, Coal
+Unit Price:25.00
+Line Item Price:50.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 3 of 3
+Part Number:DT671
+Description:District  Womens Featherweight French Terry  Hoodie, Washed Coal
+Unit Price:34.00
+Line Item Price:34.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:121.50
+Sales Tax:14.54
+Shipping:22.42
+Total:158.46
+Paid To Date:158.46
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136386
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:9342
+Company:Holt Services
+**************************************************************************
+Order Information
+Date Order Placed:5/12/2025
+Req. Ship Date:11/28/2025
+Drop Dead Date:
+Date Order Shipped:6/16/2025
+Date Order Invoiced:6/13/2025
+Purchase Order #:32013
+Terms:COD 
+Ordered by:Matt Houser 
+Phone:206-573-2025
+Fax:
+Email:mhouser@holtservicesinc.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Holt Services, 10621 Todd Rd. East, Edgewood, WA 98372
+**************************************************************************
+Design Information
+Design #:30031.05 - Holt Services
+Design #:37744.01 - EMPLOYEE OWNED 
+Design #:30031.04 - Holt Services
+Design #:37744 - EMPLOYEE OWNED 
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:C112_OSFA
+Description:Port Authority Snapback Trucker Cap, Wdlnd Camo/Blk
+Unit Price:15.00
+Line Item Price:1,500.00
+Item Quantity:100
+Adult:Quantity
+XXXL (Other):100
+Item 2 of 3
+Part Number:C112_OSFA
+Description:Port Authority Snapback Trucker Cap, Black
+Unit Price:15.00
+Line Item Price:1,500.00
+Item Quantity:100
+Adult:Quantity
+XXXL (Other):100
+Item 3 of 3
+Part Number:AL
+Description:Additional Logo 
+Unit Price:5.00
+Line Item Price:1,000.00
+Item Quantity:200
+Adult:Quantity
+S (Other):200
+**************************************************************************
+Order Summary
+Subtotal:4,000.00
+Sales Tax:404.00
+Shipping:
+Total:4,404.00
+Paid To Date:4,404.00
+Balance:0.00
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 10
+================================================================================

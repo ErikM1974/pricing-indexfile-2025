@@ -903,9 +903,9 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
                 SWTotal: parsed.orderSummary.total || 0,
                 SWSubtotal: parsed.orderSummary.subtotal || 0,
                 PriceAuditJSON: JSON.stringify(result.priceAudit || {}),
-                // Package tracking (2026-02-14)
-                Carrier: parsed.packageTracking?.carrier || '',
-                TrackingNumber: parsed.packageTracking?.trackingNumber || ''
+                // Package tracking (2026-02-14) — array of {carrier, trackingNumber}
+                Carrier: Array.isArray(parsed.packageTracking) ? parsed.packageTracking.map(t => t.carrier).filter(Boolean).join(', ') : '',
+                TrackingNumber: Array.isArray(parsed.packageTracking) ? parsed.packageTracking.map(t => t.trackingNumber).filter(Boolean).join(', ') : ''
             };
 
             // Save session

@@ -144,8 +144,10 @@
 │   ├── contract-calculator-template.md
 │   └── specialty-calculator-template.md
 │
+├── REP_TRAINING_PRICING_GAP_ANALYSIS.md  # **NEW** 2025 vs 2026 pricing gaps — Nika/Taylar training (2026-02-15)
+├── SHOPWORKS_DATA_ENTRY_GUIDE.md         # **NEW** Data entry standards — STOP/START/CHECKLIST for reps (2026-02-15)
 ├── /training/                        # Staff Training Materials
-│   └── EMBROIDERY_PRICING_SALES_TRAINING.md  # **NEW** Sales rep training (Taneisha, Ruthie)
+│   └── EMBROIDERY_PRICING_SALES_TRAINING.md  # Sales rep training (Taneisha, Ruthie)
 │
 └── MANUAL_CALCULATOR_*.md            # Manual calculator guide (3 parts)
 ```
@@ -199,6 +201,8 @@
 | Document | Audience |
 |----------|----------|
 | **Embroidery Pricing Training** | [training/EMBROIDERY_PRICING_SALES_TRAINING.md](./training/EMBROIDERY_PRICING_SALES_TRAINING.md) - Taneisha, Ruthie |
+| **Pricing Gap Analysis** | [REP_TRAINING_PRICING_GAP_ANALYSIS.md](./REP_TRAINING_PRICING_GAP_ANALYSIS.md) - 2025 vs 2026 pricing gaps, rep-specific patterns (Nika, Taylar) |
+| **ShopWorks Data Entry Guide** | [SHOPWORKS_DATA_ENTRY_GUIDE.md](./SHOPWORKS_DATA_ENTRY_GUIDE.md) - STOP/START/CHECKLIST for clean data entry (print for rep desks) |
 
 ### Rep CRM Dashboards
 | Guide | Description |

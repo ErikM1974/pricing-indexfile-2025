@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ShopWorks Data Entry Guide | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Page styles -->
+    <link rel="stylesheet" href="/pages/data-entry-guide.css">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="breadcrumb">
+                        <a href="/staff-dashboard.html">Staff Dashboard</a>
+                        <span>/</span>
+                        <span>Data Entry Guide</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <a href="/calculators/service-price-cheat-sheet.html" class="btn-link">
+                        <i class="fas fa-tags"></i> Service Prices
+                    </a>
+                    <button class="btn-print" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Title -->
+        <div class="page-title">
+            <i class="fas fa-clipboard-check"></i> ShopWorks Data Entry Guide
+        </div>
+        <p class="page-subtitle">Clean data entry = clean quotes = correct revenue tracking. For Nika Lao &amp; Taneisha Clark.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             SECTION 1: STOP — Bad Habits to Break
+             ═══════════════════════════════════════════════════════════════ -->
+        <div class="section-divider stop-theme">
+            <i class="fas fa-hand-paper"></i> STOP — Bad Habits to Break
+        </div>
+
+        <!-- Stop 1: Separator labels -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">1</span> Stop using separator labels as line items</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> Entering "Transfer", "EMB", "Embroidery", or "DTF" as line items with a blank part number. These aren't services &mdash; they're labels that confuse the system.
+                </div>
+                <div class="real-examples">
+                    <strong>Real examples:</strong>
+                    <ul>
+                        <li>Order #136554 (Cardinal Baths): "Transfer" entered as a line item separator</li>
+                        <li>Order #136557 (Cosco Fire): "Embroidery" and "Transfer" labels mixed as items</li>
+                        <li>Order #136479: "EMB" as a standalone item</li>
+                    </ul>
+                </div>
+                <div class="do-this">
+                    <i class="fas fa-check-circle"></i> <strong>Do this instead:</strong> Put placement/method notes in the ShopWorks <strong>Notes</strong> field at the bottom of the order.
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop 2: Person names -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">2</span> Stop using person names as line item dividers</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> Entering "Michael Bunce - Tonal Logo" or "Chad Matthew - Tonal Logo" as line items with blank part numbers to group products by person.
+                </div>
+                <div class="real-examples">
+                    <strong>Real example:</strong>
+                    <ul>
+                        <li>Order #136556 (Cosco Fire #1): Multiple person-name dividers between product groups</li>
+                    </ul>
+                </div>
+                <div class="do-this">
+                    <i class="fas fa-check-circle"></i> <strong>Do this instead:</strong> Use a single note in the Notes field: "Michael: items 1-3, Chad: items 4-6".
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop 3: Blank part numbers -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">3</span> Stop leaving Part Number blank on priced items</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> Entering a service description with a price but no part number. The system can't track revenue or classify the service correctly.
+                </div>
+                <div class="real-examples">
+                    <strong>Real examples:</strong>
+                    <ul>
+                        <li>Order #136562 (Fire Buffs): "Sew-on" at $12.50 with empty PN &mdash; should be <code>SEG</code></li>
+                        <li>Order #136271: "Laser - Customer's Supplies" at $12.50 with empty PN</li>
+                    </ul>
+                </div>
+                <div class="do-this">
+                    <i class="fas fa-check-circle"></i> <strong>Do this instead:</strong> Every priced line item needs a part number. See the Service Code Reference below.
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop 4: Legacy codes -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">4</span> Stop using legacy/wrong service codes</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> Typing old codes or typos that the system has to guess about. The parser fixes 13 known typos automatically, but don't rely on it.
+                </div>
+                <div class="real-examples">
+                    <strong>Real examples:</strong> "AONOGRAM" (typo), "EJB" (legacy), "SETUP FEE" (vague), "NAMES" (wrong)
+                </div>
+                <div class="do-this">
+                    <i class="fas fa-check-circle"></i> <strong>Do this instead:</strong> Use the exact codes from the Service Code Reference. See the Alias Reference at the bottom for what the system auto-corrects.
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop 5: Mixing decoration types -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">5</span> Stop mixing decoration types on one order</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> Same ShopWorks order has both "Transfer" items and "Embroidery" items. The quote builder can only generate one type of quote per order.
+                </div>
+                <div class="do-this">
+                    <i class="fas fa-check-circle"></i> <strong>Do this instead:</strong> Create separate ShopWorks orders &mdash; one per decoration method. If a customer needs embroidery AND transfers, that's two orders.
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop 6: AL vs Full Back -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">6</span> Stop entering AL when you mean Full Back</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> Using AL (Additional Logo) at $40-120/piece. AL is for small secondary logos ($7-10/pc). If the price is that high, it's a Full Back embroidery job.
+                </div>
+                <div class="real-examples">
+                    <strong>Real examples:</strong>
+                    <ul>
+                        <li>Order #136257 (Little Wheels QMA): AL at <strong>$120/pc</strong> &mdash; this is not an Additional Logo</li>
+                        <li>Order #136429 (CCNW Commercial): AL at $12.50 &mdash; likely a Full Back job</li>
+                    </ul>
+                </div>
+                <div class="al-vs-fb-table">
+                    <table class="ref-table compact-table">
+                        <thead>
+                            <tr><th>What It Is</th><th>Part Number</th><th>Price Range</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Small secondary logo</td><td><code>AL</code></td><td>$7-10/pc</td></tr>
+                            <tr><td>Full back embroidery</td><td><code>DECG-FB</code></td><td>Stitch-count based</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stop 7: Address formatting -->
+        <div class="ref-card">
+            <div class="ref-card-header stop-header">
+                <h2><span class="stop-number">7</span> Stop entering addresses with lowercase states or typos</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="bad-example">
+                    <strong>What's wrong:</strong> "Wa" instead of "WA", "Antt:" instead of "Attn:". The tax lookup system needs a clean uppercase state code to determine the correct tax rate.
+                </div>
+                <div class="do-this">
+                    <i class="fas fa-check-circle"></i> <strong>Do this instead:</strong> Always use 2-letter uppercase state codes (WA, OR, CA, AK). Spell "Attn:" correctly. Include the full 5-digit ZIP code.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             SECTION 2: START — Correct Practices
+             ═══════════════════════════════════════════════════════════════ -->
+        <div class="section-divider start-theme">
+            <i class="fas fa-play-circle"></i> START — Correct Practices
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header start-header">
+                <h2><span class="start-number">1</span> Always provide a Part Number for every priced line item</h2>
+            </div>
+            <div class="ref-card-body">
+                <p>No exceptions. If a line item has a dollar amount, it needs a part number. Refer to the Service Code Reference below.</p>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header start-header">
+                <h2><span class="start-number">2</span> Use the Notes field for non-product information</h2>
+            </div>
+            <div class="ref-card-body">
+                <p>The ShopWorks Notes field (bottom of the order) is for:</p>
+                <ul class="notes-list">
+                    <li>Placement instructions ("Left Chest", "Back Logo")</li>
+                    <li>Person name groupings ("Michael: items 1-3")</li>
+                    <li>Method labels ("This section is Transfer")</li>
+                    <li>Special instructions ("Rush &mdash; need by Friday")</li>
+                </ul>
+                <p><strong>None of these should be line items.</strong></p>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header start-header">
+                <h2><span class="start-number">3</span> Follow the address format</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="address-format">
+                    <code>Company Name, Street Address, City, ST ZIP</code>
+                </div>
+                <ul class="notes-list">
+                    <li><strong>State:</strong> Always 2-letter uppercase (WA, OR, CA, AK &mdash; not "Wa")</li>
+                    <li><strong>ZIP:</strong> Always 5-digit (or 5+4 with dash: 98402-1234)</li>
+                    <li><strong>Attn:</strong> Spell it correctly if needed ("Attn: John Smith")</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header start-header">
+                <h2><span class="start-number">4</span> One decoration type per order</h2>
+            </div>
+            <div class="ref-card-body">
+                <ul class="notes-list">
+                    <li>Embroidery order &rarr; only embroidery items</li>
+                    <li>Transfer order &rarr; only transfer items</li>
+                    <li>DTG order &rarr; only DTG items</li>
+                    <li>If customer needs both &rarr; create two separate orders</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header start-header">
+                <h2><span class="start-number">5</span> Complete Design Numbers</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="address-format">
+                    <code>Design #:XXXXX - [full description]</code>
+                </div>
+                <ul class="notes-list">
+                    <li>Include the design name so the quote builder can display it</li>
+                    <li>Don't leave trailing dashes with no description</li>
+                    <li>Example: <code>Design #:39186 - Roadmen Car Club back logo</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header start-header">
+                <h2><span class="start-number">6</span> Correct size suffixes on part numbers</h2>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table compact-table">
+                    <thead>
+                        <tr><th>Size</th><th>Suffix</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2XL</td><td><code>_2X</code></td><td>PC54_2X</td></tr>
+                        <tr><td>3XL</td><td><code>_3X</code></td><td>PC54_3X</td></tr>
+                        <tr><td>4XL</td><td><code>_4X</code></td><td>PC54_4X</td></tr>
+                        <tr><td>5XL</td><td><code>_5X</code></td><td>&mdash;</td></tr>
+                        <tr><td>6XL</td><td><code>_6X</code></td><td>&mdash;</td></tr>
+                        <tr><td>One size</td><td><code>_OSFA</code></td><td>CP90_OSFA</td></tr>
+                    </tbody>
+                </table>
+                <div class="tier-note">
+                    <i class="fas fa-info-circle"></i>
+                    Don't combine sizes: <code>_4/5X</code> should be separate items for 4XL and 5XL.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             SECTION 3: Service Code Reference (API-driven)
+             ═══════════════════════════════════════════════════════════════ -->
+        <div class="section-divider ref-theme">
+            <i class="fas fa-tags"></i> Service Code Reference
+        </div>
+
+        <div class="ref-card" id="service-codes-card">
+            <div class="ref-card-header">
+                <h2><i class="fas fa-dollar-sign"></i> Fixed-Price Services</h2>
+                <span class="source-badge" id="price-source"></span>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table" id="service-codes-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Part Number</th>
+                            <th class="price-col">2026 Price</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-codes-tbody">
+                        <tr><td colspan="4" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading prices...</td></tr>
+                    </tbody>
+                </table>
+                <div class="tier-note">
+                    <i class="fas fa-info-circle"></i>
+                    For tier-based pricing (DECG, AL, stitch surcharges), see the
+                    <a href="/calculators/service-price-cheat-sheet.html">Service Price Cheat Sheet</a>.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             SECTION 4: Pre-Submit Checklist
+             ═══════════════════════════════════════════════════════════════ -->
+        <div class="section-divider checklist-theme">
+            <i class="fas fa-tasks"></i> Pre-Submit Checklist
+        </div>
+
+        <div class="ref-card checklist-card">
+            <div class="ref-card-header">
+                <h2><i class="fas fa-clipboard-list"></i> Check Before Saving Every Order</h2>
+            </div>
+            <div class="ref-card-body">
+                <div class="checklist-grid">
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>Every line item has a Part Number (no blank PNs on priced items)</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>No separator/label rows (Transfer, EMB, person names &rarr; moved to Notes)</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>Correct service codes used (DD not "SETUP FEE", SEG not "Sew-on")</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>Ship-to address: uppercase state + 5-digit ZIP</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>One decoration type per order</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>Design number has full description (no trailing dash)</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>AL pricing is $7-10/pc range (if higher &rarr; probably Full Back, use DECG-FB)</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>DECG pricing follows tier card (not flat $15-20)</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>Digitizing is DD = $100 (not $50, not $150)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             SECTION 5: Alias Reference Table
+             ═══════════════════════════════════════════════════════════════ -->
+        <div class="section-divider ref-theme">
+            <i class="fas fa-exchange-alt"></i> Alias Reference
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h2><i class="fas fa-spell-check"></i> Auto-Corrected Aliases</h2>
+            </div>
+            <div class="ref-card-body">
+                <p class="alias-intro">The parser auto-corrects these, but entering the correct code saves time and avoids warnings:</p>
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th>What Reps Type</th>
+                            <th>Parser Maps To</th>
+                            <th>What You Should Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>AONOGRAM</td><td>MONOGRAM</td><td><code>Monogram</code></td></tr>
+                        <tr><td>NNAME / NNAMES</td><td>NAME</td><td><code>NAME</code></td></tr>
+                        <tr><td>NAMES</td><td>MONOGRAM</td><td><code>Monogram</code></td></tr>
+                        <tr><td>EJB</td><td>FB</td><td><code>DECG-FB</code></td></tr>
+                        <tr><td>FLAG</td><td>AL</td><td><code>AL</code></td></tr>
+                        <tr><td>SETUP</td><td>GRT-50</td><td><code>GRT-50</code></td></tr>
+                        <tr><td>SETUP FEE</td><td>DD</td><td><code>DD</code></td></tr>
+                        <tr><td>DESIGN PREP</td><td>GRT-75</td><td><code>GRT-75</code></td></tr>
+                        <tr><td>EXCESS STITCH</td><td>AS-GARM</td><td><code>AS-Garm</code></td></tr>
+                        <tr><td>SEW / SEW-ON</td><td>SEG</td><td><code>SEG</code></td></tr>
+                        <tr><td>COLOR CHG</td><td>COLOR CHANGE</td><td><em>(rare &mdash; ask Erik)</em></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="page-footer">
+            <p>
+                Service prices loaded from API on page load. Last loaded: <span id="load-timestamp">&mdash;</span>
+            </p>
+            <p>
+                <a href="/calculators/service-price-cheat-sheet.html"><i class="fas fa-tags"></i> Full Service Price Cheat Sheet</a>
+                &nbsp;&middot;&nbsp;
+                <a href="/staff-dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/pages/data-entry-guide.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+**************
+Order #: 99999
+Salesperson: Test Rep
+Email: test@nwcustomapparel.com
+**************
+Customer #: 10001
+Company: Test Company
+**************
+Order Information
+Ordered by: Test User
+Email: test@test.com
+Date Order Placed: 01/01/2026
+Terms: COD
+**************
+Items Purchased
+Item 1 of 2
+
+Part Number: AL
+Description: Additional Logo Back Logo
+Item Quantity: 10
+Unit Price:45.00
+Adult:Quantity
+S:10
+
+Item 2 of 2
+
+Part Number: AL
+Description: Additional Logo Back Logo
+Item Quantity: 5
+Unit Price:12.50
+Adult:Quantity
+S:5
+
+**************
+Sub Total:575.00
+Sales Tax:0.00
+Total:575.00

@@ -1,0 +1,624 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 12)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136462
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13322
+Company:Elevate Home Renovations 
+**************************************************************************
+Order Information
+Date Order Placed:5/14/2025
+Req. Ship Date:6/6/2025
+Drop Dead Date:6/6/2025
+Date Order Shipped:6/5/2025
+Date Order Invoiced:5/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Karisa Lyons 
+Phone:253-709-9589
+Fax:
+Email:karisalyons@yahoo.com
+**************************************************************************
+Design Information
+Design #:39207 - Elevate Home Renovations 
+Design #:39207.01 - Elevate Home Renovations 
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:DGT-001
+Description:Digitizing fee for converting artwork into an embroidery-friendly format
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 5
+Part Number:PC850H
+Description:Port  Company Fan Favorite Fleece Pullover Hooded Sweatshirt, Team Navy
+Unit Price:37.00
+Line Item Price:74.00
+Item Quantity:2
+Adult:Quantity
+LG:2
+Item 3 of 5
+Part Number:OG138
+Description:Ogio  Limit Polo, Blacktop
+Unit Price:46.00
+Line Item Price:92.00
+Item Quantity:2
+Adult:Quantity
+LG:2
+Item 4 of 5
+Part Number:PC850
+Description:Port  Company Fan Favorite Fleece Crewneck Sweatshirt, Jet Black
+Unit Price:33.00
+Line Item Price:33.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 5 of 5
+Part Number:PC850_2X
+Description:Port  Company Fan Favorite Fleece Crewneck Sweatshirt, Jet Black
+Unit Price:35.00
+Line Item Price:35.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+**************************************************************************
+Order Summary
+Subtotal:334.00
+Sales Tax:33.73
+Shipping:
+Total:367.73
+Paid To Date:367.73
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136479
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13298
+Company:Blas Lawn Care
+**************************************************************************
+Order Information
+Date Order Placed:5/15/2025
+Req. Ship Date:5/29/2025
+Drop Dead Date:
+Date Order Shipped:6/12/2025
+Date Order Invoiced:6/13/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Blas Lopec
+Phone:425-399-3227
+Fax:
+Email:lblas0702@gmail.com
+**************************************************************************
+Design Information
+Design #:39111 - Blas Lawn Care
+Design #:39037 - Blas Lawn Care
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:J851_4X
+Description:Port Authority  Packable Puffy Vest, Reg Bl/RB Navy
+Unit Price:62.00
+Line Item Price:62.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 2 of 5
+Part Number:J851_4X
+Description:Port Authority  Packable Puffy Vest, Sterl Gry/Grph
+Unit Price:62.00
+Line Item Price:62.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 3 of 5
+Part Number:
+Description:DTF
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 4 of 5
+Part Number:CSV102_L/XL
+Description:Cornerstone  Ansi 107 Class 2 Mesh Zippered Vest, SftyOrg
+Unit Price:40.20
+Line Item Price:40.20
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 5 of 5
+Part Number:CSV102_4/5X
+Description:Cornerstone  Ansi 107 Class 2 Mesh Zippered Vest, SftyOrg
+Unit Price:40.20
+Line Item Price:40.20
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+**************************************************************************
+Order Summary
+Subtotal:204.40
+Sales Tax:20.64
+Shipping:
+Total:225.04
+Paid To Date:225.04
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136496
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13234
+Company:Troutlodge
+**************************************************************************
+Order Information
+Date Order Placed:5/19/2025
+Req. Ship Date:5/23/2025
+Drop Dead Date:5/23/2025
+Date Order Shipped:5/27/2025
+Date Order Invoiced:5/20/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Melissa Bresler
+Phone:
+Fax:
+Email:Melissa.Bresler@hendrix-genetics.com
+**************************************************************************
+Design Information
+Design #:38833 - Troutlodge
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:25.00
+Line Item Price:100.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+**************************************************************************
+Order Summary
+Subtotal:100.00
+Sales Tax:10.10
+Shipping:
+Total:110.10
+Paid To Date:110.10
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136513
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:6605
+Company:City of Unalaska
+**************************************************************************
+Order Information
+Date Order Placed:5/19/2025
+Req. Ship Date:6/2/2025
+Drop Dead Date:
+Date Order Shipped:6/9/2025
+Date Order Invoiced:6/9/2025
+Purchase Order #:Names
+Terms:Net 30
+Ordered by:Rubilyn Warden
+Phone:907-581-1307
+Fax:
+Email:rwarden@ci.unalaska.ak.us
+**************************************************************************
+Shipping Information
+Ship Method:Priority Mail
+Ship Address:City of Unalaska, PO Box 610, Unalaska, AK 99685
+**************************************************************************
+Design Information
+Design #:12007 - P2776 L/C City of Unalaska Roads
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:SRJ754
+Description:Port Authority Enhanced Visibility Challenger Jacket With Reflective Taping., Safety Yellow
+Unit Price:80.00
+Line Item Price:480.00
+Item Quantity:6
+Adult:Quantity
+S (Other):1
+LG:3
+XL:2
+Item 2 of 5
+Part Number:SRJ754_2X
+Description:Port Authority Enhanced Visibility Challenger Jacket With Reflective Taping., Safety Yellow
+Unit Price:82.00
+Line Item Price:82.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 3 of 5
+Part Number:SRJ754_3X
+Description:Port Authority Enhanced Visibility Challenger Jacket With Reflective Taping., Safety Yellow
+Unit Price:83.00
+Line Item Price:166.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 4 of 5
+Part Number:SRJ754_4X
+Description:Port Authority Enhanced Visibility Challenger Jacket With Reflective Taping., Safety Yellow
+Unit Price:84.00
+Line Item Price:84.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 5 of 5
+Part Number:Monogram
+Description:Dir. Embroider Names on Garments
+Unit Price:12.50
+Line Item Price:125.00
+Item Quantity:10
+Adult:Quantity
+S (Other):10
+**************************************************************************
+Order Summary
+Subtotal:937.00
+Sales Tax:0.00
+Shipping:132.17
+Total:1,069.17
+Paid To Date:1,069.17
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136515
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12843
+Company:Gate Service and Technology 
+**************************************************************************
+Order Information
+Date Order Placed:5/19/2025
+Req. Ship Date:6/2/2025
+Drop Dead Date:
+Date Order Shipped:6/9/2025
+Date Order Invoiced:6/3/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Rachel Robertson
+Phone:253-281-2504
+Fax:
+Email:rachel@teamgst.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Gate Service and Technology , 8021 Portland Ave E Suite B, Tacoma , WA 98404
+**************************************************************************
+Design Information
+Design #:37465.03 - Team GST Big logo
+Design #:37465.01 - Team GST Big logo
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:DECG
+Description:Di. Embroider Cap - Front - Small Logo 
+Unit Price:25.00
+Line Item Price:25.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 3
+Part Number:DECG
+Description:Di. Embroider Cap - T-shirt - Small Logo 
+Unit Price:25.00
+Line Item Price:50.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 3 of 3
+Part Number:DECG
+Description:Di. Embroider Cap - Jacket - Big Logo 
+Unit Price:25.00
+Line Item Price:25.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:100.00
+Sales Tax:10.10
+Shipping:
+Total:110.10
+Paid To Date:110.10
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136520
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:10428
+Company:Tacoma Longshoremen Credit Union 
+**************************************************************************
+Order Information
+Date Order Placed:5/19/2025
+Req. Ship Date:5/30/2025
+Drop Dead Date:
+Date Order Shipped:6/6/2025
+Date Order Invoiced:6/5/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Bill Syrovatka
+Phone:253-279-7755
+Fax:
+Email:vatka10@gmail.com
+**************************************************************************
+Design Information
+Design #:39194 - ILWU 23
+Design #:39226 - ILWU 2023 Text Logo 
+**************************************************************************
+Items Purchased
+Item 1 of 5
+Part Number:DECG
+Description:Di. Embroider Garms  S.Orange Vests
+Unit Price:20.00
+Line Item Price:80.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+Item 2 of 5
+Part Number:110_L/XL
+Description:R-FLEX TRUCKER, Heather Grey/White
+Unit Price:30.00
+Line Item Price:60.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 3 of 5
+Part Number:112
+Description:Richardson Trucker Cap with Mesh Snap Back, Heather Grey/White
+Unit Price:28.00
+Line Item Price:112.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+Item 4 of 5
+Part Number:
+Description:ILWU 23 Text Logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 5 of 5
+Part Number:112
+Description:Richardson Trucker Cap with Mesh Snap Back, Heather Grey/White
+Unit Price:28.00
+Line Item Price:112.00
+Item Quantity:4
+Adult:Quantity
+S (Other):4
+**************************************************************************
+Order Summary
+Subtotal:364.00
+Sales Tax:36.76
+Shipping:
+Total:400.76
+Paid To Date:400.76
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136525
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:8192
+Company:Puget Systems
+**************************************************************************
+Order Information
+Date Order Placed:5/20/2025
+Req. Ship Date:5/27/2025
+Drop Dead Date:5/27/2025
+Date Order Shipped:5/27/2025
+Date Order Invoiced:5/27/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Maria  Rosero 
+Phone:
+Fax:
+Email:mrosero@pugetsystems.com
+**************************************************************************
+Design Information
+Design #:37687 - Puget Systems 
+Design #:37723.01 - Icon 
+**************************************************************************
+Items Purchased
+Item 1 of 9
+Part Number:TM1WW001
+Description:Travismathew Ladies Oceanside Solid Polo, BlueNights
+Unit Price:86.00
+Line Item Price:86.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 2 of 9
+Part Number:TM1WW001
+Description:Travismathew Ladies Oceanside Solid Polo, QuiShaGrey
+Unit Price:86.00
+Line Item Price:86.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 3 of 9
+Part Number:TM1WW001
+Description:Travismathew Ladies Oceanside Solid Polo, White
+Unit Price:86.00
+Line Item Price:86.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 4 of 9
+Part Number:EB545
+Description:Eddie Bauer Ladies Stretch Soft Shell Jacket - Icon Logo , DeepBlack
+Unit Price:82.00
+Line Item Price:82.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 5 of 9
+Part Number:
+Description:Sample - No logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 6 of 9
+Part Number:BB18000
+Description:Brooks Brothers Wrinkle-Free Stretch Pinpoint Shirt, DeepBlack
+Unit Price:
+Line Item Price:0.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 7 of 9
+Part Number:OG1002
+Description:Ogio  Commuter Woven Shirt, White
+Unit Price:
+Line Item Price:0.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 8 of 9
+Part Number:MM2000
+Description:MercerMettle Long Sleeve Stretch Woven Shirt, NightNavy
+Unit Price:
+Line Item Price:0.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 9 of 9
+Part Number:838964
+Description:Nike Dri-Fit Embossed Tri-Blade Polo, Black
+Unit Price:
+Line Item Price:0.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+**************************************************************************
+Order Summary
+Subtotal:340.00
+Sales Tax:34.34
+Shipping:
+Total:374.34
+Paid To Date:374.34
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136526
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13331
+Company:Tyler Ford
+**************************************************************************
+Order Information
+Date Order Placed:5/20/2025
+Req. Ship Date:6/6/2025
+Drop Dead Date:
+Date Order Shipped:6/6/2025
+Date Order Invoiced:6/5/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Tyler Ford
+Phone:206-310-3176
+Fax:
+Email:ctford123@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Tyler Ford,  
+**************************************************************************
+Design Information
+Design #:39186 - Roadmen Car Club
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:150.00
+Line Item Price:150.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:175.00
+Line Item Price:175.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+**************************************************************************
+Order Summary
+Subtotal:325.00
+Sales Tax:32.83
+Shipping:
+Total:357.83
+Paid To Date:357.83
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 12
+================================================================================

@@ -47,6 +47,9 @@
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
 | `/pages/embroidery-contract-pricing.html` | **NEW** Shareable contract embroidery pricing page | embroidery-contract-pricing.js, embroidery-contract-pricing.css | ✅ Active |
+| `/pages/data-entry-guide.html` | **NEW** ShopWorks data entry guide with API-driven service prices | data-entry-guide.js, data-entry-guide.css, app-config.js | ✅ Active |
+| `/pages/data-entry-guide.js` | **NEW** API price fetching for data entry guide | /api/service-codes | ✅ Active |
+| `/pages/data-entry-guide.css` | **NEW** Data entry guide styles (print-friendly) | — | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 
@@ -56,6 +59,13 @@
 | `/calculators/manual-pricing.html` | Unified manual pricing — all 5 methods on one page | manual-pricing.js, manual-pricing.css, all 5 pricing services | ✅ Active |
 | `/calculators/manual-pricing.js` | Page logic — orchestrates DTG/DTF/EMB/CAP/SP pricing services | All 5 *-pricing-service.js files | ✅ Active |
 | `/calculators/manual-pricing.css` | Page styles — extends manual-calculator-styles.css | manual-calculator-styles.css | ✅ Active |
+
+### Service Price Cheat Sheet
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/service-price-cheat-sheet.html` | Printable service price reference — all embroidery service prices | service-price-cheat-sheet.js, .css, app-config.js | ✅ Active |
+| `/calculators/service-price-cheat-sheet.js` | API-driven price fetching and rendering | /api/service-codes, /api/decg-pricing, /api/al-pricing | ✅ Active |
+| `/calculators/service-price-cheat-sheet.css` | Page styles with print-friendly layout | — | ✅ Active |
 
 ### Compare Pricing by Style
 | File | Purpose | Dependencies | Status |
@@ -614,6 +624,7 @@ cap-embroidery-fix.css
 | `/tests/scripts/cleanup-embroidery-costs.js` | **NEW** Delete duplicates, add missing DECG-FB 1-7 (2026-02-04) | ✅ Active |
 | `/tests/scripts/update-ctr-pricing-linear.js` | **NEW** Update CTR pricing with linear $/1K model (2026-02-04) | ✅ Active |
 | `/tests/scripts/sync-shopworks-service-codes.js` | **NEW** Sync all 28 ShopWorks service codes to Caspio (2026-02-14) | ✅ Active |
+| `/tests/scripts/batch-price-audit-report.js` | **NEW** Batch service pricing audit — compares SW vs 2026 prices across all fixtures (2026-02-15) | ✅ Active |
 
 **Run:** `node tests/scripts/seed-classified-items.js`
 

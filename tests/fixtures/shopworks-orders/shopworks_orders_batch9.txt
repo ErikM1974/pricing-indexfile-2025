@@ -1,0 +1,572 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 9)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136187
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:943
+Company:Good Samaritan Hospital
+**************************************************************************
+Order Information
+Date Order Placed:4/23/2025
+Req. Ship Date:5/2/2025
+Drop Dead Date:5/2/2025
+Date Order Shipped:5/2/2025
+Date Order Invoiced:5/1/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Sheryl G. McIntire
+Phone:
+Fax:
+Email:Sheryl.McIntire@multicare.org
+**************************************************************************
+Design Information
+Design #:39077 - Quality A
+**************************************************************************
+Items Purchased
+Item 1 of 2
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 2
+Part Number:PC54R
+Description:Port  Company Core Cotton Ringer Tee, Hthr Navy/Navy
+Unit Price:21.00
+Line Item Price:189.00
+Item Quantity:9
+Adult:Quantity
+S (Other):4
+XL:5
+**************************************************************************
+Order Summary
+Subtotal:289.00
+Sales Tax:29.19
+Shipping:
+Total:318.19
+Paid To Date:318.19
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136205
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:1240
+Company:D.L. Henricksen
+**************************************************************************
+Order Information
+Date Order Placed:4/24/2025
+Req. Ship Date:5/2/2025
+Drop Dead Date:5/2/2025
+Date Order Shipped:5/6/2025
+Date Order Invoiced:5/1/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Don Henricksen
+Phone:253-922-5566
+Fax:253-922-2178
+Email:don@dlhenricksen.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:D.L. Henricksen, 6005 20th St E, Tacoma, WA 98424-2033
+**************************************************************************
+Design Information
+Design #:14566.06 - P5035, D.L Henricksen Est. 1948
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:1379757
+Description:Under Armour Men's Rival Fleece, Red/White
+Unit Price:68.50
+Line Item Price:2,055.00
+Item Quantity:30
+Adult:Quantity
+LG:15
+XL:15
+**************************************************************************
+Order Summary
+Subtotal:2,055.00
+Sales Tax:207.56
+Shipping:
+Total:2,262.56
+Paid To Date:2,262.56
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136209
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13222
+Company:Iron Horse Racing
+**************************************************************************
+Order Information
+Date Order Placed:4/24/2025
+Req. Ship Date:5/8/2025
+Drop Dead Date:
+Date Order Shipped:
+Date Order Invoiced:5/7/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Darrell Hurst
+Phone:425-305-9540
+Fax:
+Email:darrell.hurst@weidner.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Iron Horse Racing, 18021 Issaquah Hobart Rd SE, Issaquah, WA 98072
+**************************************************************************
+Design Information
+Design #:38797 - Ironhorse Racing
+Design #:38798 - Ford Logo
+Design #:38843 - Canada Flag 
+Design #:38844 - USA Flag
+**************************************************************************
+Items Purchased
+Item 1 of 9
+Part Number:CSW175
+Description:Cornerstone Short Sleeve Select Ripstop Shirt, Black
+Unit Price:44.00
+Line Item Price:132.00
+Item Quantity:3
+Adult:Quantity
+XL:3
+Item 2 of 9
+Part Number:Monogram
+Description:Dir. Embroider Names - John
+Unit Price:12.50
+Line Item Price:37.50
+Item Quantity:3
+Adult:Quantity
+XL:3
+Item 3 of 9
+Part Number:AL
+Description:Additional Logo on Back Yoke- Ford
+Unit Price:8.00
+Line Item Price:72.00
+Item Quantity:9
+Adult:Quantity
+S (Other):9
+Item 4 of 9
+Part Number:AL
+Description:Additional Logo- Canada Flag
+Unit Price:8.00
+Line Item Price:72.00
+Item Quantity:9
+Adult:Quantity
+S (Other):9
+Item 5 of 9
+Part Number:AL
+Description:Additional Logo- USA Flag
+Unit Price:8.00
+Line Item Price:72.00
+Item Quantity:9
+Adult:Quantity
+S (Other):9
+Item 6 of 9
+Part Number:Monogram
+Description:Dir. Embroider Names Saundra - 25/14
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 7 of 9
+Part Number:Monogram
+Description:Dir. Embroider Names Ruth - 35/18
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 8 of 9
+Part Number:Monogram
+Description:Dir. Embroider Names Chanse - 7XL
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+Item 9 of 9
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:120.00
+Item Quantity:6
+Adult:Quantity
+S (Other):6
+**************************************************************************
+Order Summary
+Subtotal:580.50
+Sales Tax:58.63
+Shipping:
+Total:639.13
+Paid To Date:639.13
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136217
+Company:NORTHWEST EMBROIDERY INC
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13130
+Company:Kustom
+**************************************************************************
+Order Information
+Date Order Placed:4/24/2025
+Req. Ship Date:5/8/2025
+Drop Dead Date:
+Date Order Shipped:5/7/2025
+Date Order Invoiced:5/7/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Zakary Porter
+Phone:253-518-6030
+Fax:
+Email:zakary.porter@kustom.us
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Kustom, 901 W Main St STE A , Auburn , WA 98001
+**************************************************************************
+Design Information
+Design #:38510 - Kustom Logo Emb
+**************************************************************************
+Items Purchased
+Item 1 of 6
+Part Number:799802
+Description:Nike Dri-Fit Players Modern Fit Polo - Original price $59.00, Black
+Unit Price:29.50
+Line Item Price:796.50
+Item Quantity:27
+Adult:Quantity
+S (Other):1
+M:8
+LG:8
+XL:10
+Item 2 of 6
+Part Number:799802_2X
+Description:Nike Dri-Fit Players Modern Fit Polo Original price $61.00, Black
+Unit Price:31.50
+Line Item Price:157.50
+Item Quantity:5
+Adult:Quantity
+XXL:5
+Item 3 of 6
+Part Number:799802_3X
+Description:Nike Dri-Fit Players Modern Fit Polo Original price $62.00, Black
+Unit Price:33.50
+Line Item Price:100.50
+Item Quantity:3
+Adult:Quantity
+XXXL (Other):3
+Item 4 of 6
+Part Number:
+Description:Added-on 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 5 of 6
+Part Number:799802_3X
+Description:Nike Dri-Fit Players Modern Fit Polo, Anthracite
+Unit Price:62.00
+Line Item Price:124.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+Item 6 of 6
+Part Number:799802_3X
+Description:Nike Dri-Fit Players Modern Fit Polo , Black
+Unit Price:62.00
+Line Item Price:124.00
+Item Quantity:2
+Adult:Quantity
+XXXL (Other):2
+**************************************************************************
+Order Summary
+Subtotal:1,302.50
+Sales Tax:131.55
+Shipping:
+Total:1,434.05
+Paid To Date:1,434.05
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136226
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2715
+Company:Spartan Band Association
+**************************************************************************
+Order Information
+Date Order Placed:4/25/2025
+Req. Ship Date:5/9/2025
+Drop Dead Date:
+Date Order Shipped:5/9/2025
+Date Order Invoiced:5/7/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Tom Fuge
+Phone:253-678-4328
+Fax:
+Email:Tafuge@gmail.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Spartan Band Association, 7216 194th Ave E,, Sumner , WA 98391
+**************************************************************************
+Design Information
+Design #:274 - W2279 L/C Sumner Spartan Band (with horn)
+Design #:274.01 - 
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:DECG
+Description:Di. Embroider Garms , Black
+Unit Price:25.00
+Line Item Price:50.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+**************************************************************************
+Order Summary
+Subtotal:50.00
+Sales Tax:5.05
+Shipping:
+Total:55.05
+Paid To Date:55.05
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136230
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2575
+Company:Northwest Indian Fisheries Commission
+**************************************************************************
+Order Information
+Date Order Placed:4/25/2025
+Req. Ship Date:5/16/2025
+Drop Dead Date:
+Date Order Shipped:5/20/2025
+Date Order Invoiced:5/14/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Alice Johnstone
+Phone:360-438-1180
+Fax:
+Email:ajohnstone@nwifc.org
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:NW Indian Fisheries Commission, 6730 Martin Way East, Olympia, WA 98516
+**************************************************************************
+Design Information
+Design #:38672 - NIFC Full Text with Whale
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:CP90_OSFA
+Description:Port  Companyknit Cap, Black
+Unit Price:12.00
+Line Item Price:1,140.00
+Item Quantity:95
+Adult:Quantity
+XXXL (Other):95
+**************************************************************************
+Order Summary
+Subtotal:1,140.00
+Sales Tax:0.00
+Shipping:
+Total:1,140.00
+Paid To Date:1,140.00
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136231
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:4461
+Company:Veneer Chip Transport, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:4/25/2025
+Req. Ship Date:5/15/2025
+Drop Dead Date:
+Date Order Shipped:5/16/2025
+Date Order Invoiced:5/15/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:James Lucich
+Phone:922-1911 x12
+Fax:C253-606-0180
+Email:jameslucich@veneerchip.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Veneer Chip Transport, Inc., 2205  Pacific Highway East, Fife, WA 98424
+**************************************************************************
+Design Information
+Design #:38400 - VCT 3 Colors 3"
+**************************************************************************
+Items Purchased
+Item 1 of 4
+Part Number:MCK09321
+Description:Mens Cb Drytec S/S Advantage Polo, Black
+Unit Price:50.00
+Line Item Price:100.00
+Item Quantity:2
+Adult:Quantity
+XL:2
+Item 2 of 4
+Part Number:MCK09321_2X
+Description:Mens Cb Drytec S/S Advantage Polo, Black
+Unit Price:52.00
+Line Item Price:520.00
+Item Quantity:10
+Adult:Quantity
+XXL:10
+Item 3 of 4
+Part Number:CT105291
+Description:Carhartt Force Solid Long Sleeve Shirt, Black
+Unit Price:66.00
+Line Item Price:264.00
+Item Quantity:4
+Adult:Quantity
+LG:2
+XL:2
+Item 4 of 4
+Part Number:CT105291_2X
+Description:Carhartt Force Solid Long Sleeve Shirt, Black
+Unit Price:68.00
+Line Item Price:408.00
+Item Quantity:6
+Adult:Quantity
+XXL:6
+**************************************************************************
+Order Summary
+Subtotal:1,292.00
+Sales Tax:130.49
+Shipping:
+Total:1,422.49
+Paid To Date:1,422.49
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136232
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12758
+Company:lululemon
+**************************************************************************
+Order Information
+Date Order Placed:4/25/2025
+Req. Ship Date:4/30/2025
+Drop Dead Date:4/30/2025
+Date Order Shipped:5/1/2025
+Date Order Invoiced:4/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Holly Yoon
+Phone:425-478-8479
+Fax:
+Email:hyoon@lululemon.com
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:20.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 3
+Part Number:Left Chest 
+Description:World's Best J.D
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 3 of 3
+Part Number:
+Description:Natural White
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+**************************************************************************
+Order Summary
+Subtotal:20.00
+Sales Tax:2.02
+Shipping:
+Total:22.02
+Paid To Date:22.02
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 9
+================================================================================

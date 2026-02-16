@@ -1,0 +1,774 @@
+================================================================================
+SHOPWORKS ORDER EXPORT - SAMPLE DATA FOR FIELD MAPPING & PARSING (BATCH 13)
+8 Orders from Northwest Custom Apparel
+================================================================================
+
+==================== ORDER 1 ====================
+**************************************************************************
+Order #:136530
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:2705
+Company:New Dimension Lawn & Landscape, Inc.
+**************************************************************************
+Order Information
+Date Order Placed:5/20/2025
+Req. Ship Date:7/18/2025
+Drop Dead Date:
+Date Order Shipped:7/15/2025
+Date Order Invoiced:7/14/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jon Kessler
+Phone:949-315-1625
+Fax:
+Email:Sales@ndll.net
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:New Dimension Lawn & Landscape, Inc., 8504 Canyon RD East, Puyallup, WA 98371
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130340812361
+**************************************************************************
+Design Information
+Design #:230 - T3551 New Dimension Lawn & Landscape, Inc.
+**************************************************************************
+Items Purchased
+Item 1 of 3
+Part Number:STC43_OSFA
+Description:Sport-Tek  Yp Classics  Curve Bill Snapback Cap, True Red
+Unit Price:17.00
+Line Item Price:3,400.00
+Item Quantity:200
+Adult:Quantity
+XXXL (Other):200
+Item 2 of 3
+Part Number:C115_OSFA
+Description:Port Authority Snapback Five-Panel Trucker Cap, FlameRd/Wh
+Unit Price:14.00
+Line Item Price:350.00
+Item Quantity:25
+Adult:Quantity
+XXXL (Other):25
+Item 3 of 3
+Part Number:CP90_OSFA
+Description:Port  Companyknit Cap, Athletic Red
+Unit Price:11.00
+Line Item Price:1,100.00
+Item Quantity:100
+Adult:Quantity
+XXXL (Other):100
+**************************************************************************
+Order Summary
+Subtotal:4,850.00
+Sales Tax:489.85
+Shipping:
+Total:5,339.85
+Paid To Date:5,339.85
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 2 ====================
+**************************************************************************
+Order #:136546
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13335
+Company:Ikonika
+**************************************************************************
+Order Information
+Date Order Placed:5/21/2025
+Req. Ship Date:5/30/2025
+Drop Dead Date:5/30/2025
+Date Order Shipped:5/30/2025
+Date Order Invoiced:5/30/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jon Edwards
+Phone:425-654-9625
+Fax:
+Email:jon@ikonika.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Ikonika, 5113 Pacific Hwy E, Suite 2, Fife, WA 98027
+**************************************************************************
+Design Information
+Design #:39196 - Ikonika
+Design #:39196.03 - Ikonika
+Design #:39196.02 - Ikonika
+Design #:39196.01 - Ikonika
+**************************************************************************
+Items Purchased
+Item 1 of 6
+Part Number:DD
+Description:Digitizing Setup
+Unit Price:100.00
+Line Item Price:100.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 6
+Part Number:B8210
+Description:Burnside Mens Plaid Flannel Shirt, Charcoal/Black
+Unit Price:45.90
+Line Item Price:229.50
+Item Quantity:5
+Adult:Quantity
+M:5
+Item 3 of 6
+Part Number:NE205_OSFA
+Description:New Era Snapback Trucker Cap, Black/Black
+Unit Price:23.00
+Line Item Price:460.00
+Item Quantity:20
+Adult:Quantity
+XXXL (Other):20
+Item 4 of 6
+Part Number:NE205_OSFA
+Description:New Era Snapback Trucker Cap, Black/White
+Unit Price:23.00
+Line Item Price:230.00
+Item Quantity:10
+Adult:Quantity
+XXXL (Other):10
+Item 5 of 6
+Part Number:NE205_OSFA
+Description:New Era Snapback Trucker Cap, Grey/Grey
+Unit Price:23.00
+Line Item Price:230.00
+Item Quantity:10
+Adult:Quantity
+XXXL (Other):10
+Item 6 of 6
+Part Number:DECG
+Description:Di. Embroider Garms 
+Unit Price:20.00
+Line Item Price:200.00
+Item Quantity:10
+Adult:Quantity
+S (Other):10
+**************************************************************************
+Order Summary
+Subtotal:1,449.50
+Sales Tax:146.40
+Shipping:
+Total:1,595.90
+Paid To Date:1,595.90
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 3 ====================
+**************************************************************************
+Order #:136554
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:13336
+Company:Cardinal Baths
+**************************************************************************
+Order Information
+Date Order Placed:5/21/2025
+Req. Ship Date:6/4/2025
+Drop Dead Date:
+Date Order Shipped:6/4/2025
+Date Order Invoiced:6/3/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Patrick Popowski 
+Phone:302-670-2666
+Fax:
+Email:patrick@cardinalbaths.com
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Cardinal Baths, 3003 SW 349th PL , Federal Way , WA 98023
+**************************************************************************
+Design Information
+Design #:39192 - Cardinal Baths 
+Design #:39193 - Cardinal Baths
+**************************************************************************
+Items Purchased
+Item 1 of 10
+Part Number:GRT-50
+Description:Logo Mockup & Print Review. 
+Unit Price:150.00
+Line Item Price:150.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 10
+Part Number:
+Description:Transfer 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 3 of 10
+Part Number:PC54
+Description:Port  Company - Core Cotton Tee, Ath Heather
+Unit Price:22.00
+Line Item Price:66.00
+Item Quantity:3
+Adult:Quantity
+M:2
+LG:1
+Item 4 of 10
+Part Number:PC54_2X
+Description:Port  Company - Core Cotton Tee, Ath Heather
+Unit Price:24.00
+Line Item Price:24.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 5 of 10
+Part Number:PC78H
+Description:Port  Company - Core Fleece Pullover Hooded Sweatshirt, Athletic Hthr
+Unit Price:34.20
+Line Item Price:34.20
+Item Quantity:1
+Adult:Quantity
+M:1
+Item 6 of 10
+Part Number:
+Description:EMB
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 7 of 10
+Part Number:NKDC1963
+Description:Nike Dri-Fit Micro Pique 2.0 Polo, Black
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 8 of 10
+Part Number:NKDC1963_2X
+Description:Nike Dri-Fit Micro Pique 2.0 Polo, Black
+Unit Price:53.00
+Line Item Price:53.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+Item 9 of 10
+Part Number:NKDC1963_2XLT
+Description:Nike Dri-Fit Micro Pique 2.0 Polo, Black
+Unit Price:51.00
+Line Item Price:51.00
+Item Quantity:1
+Adult:Quantity
+XXXL (Other):1
+Item 10 of 10
+Part Number:NKDC1991
+Description:Nike Ladies Dri-Fit Micro Pique 2.0 Polo, Black
+Unit Price:50.00
+Line Item Price:100.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+**************************************************************************
+Order Summary
+Subtotal:528.20
+Sales Tax:53.35
+Shipping:
+Total:581.55
+Paid To Date:581.55
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 4 ====================
+**************************************************************************
+Order #:136556
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:10928
+Company:Cosco Fire Protection
+**************************************************************************
+Order Information
+Date Order Placed:5/21/2025
+Req. Ship Date:6/4/2025
+Drop Dead Date:
+Date Order Shipped:6/4/2025
+Date Order Invoiced:6/4/2025
+Purchase Order #:
+Terms:Net 10
+Ordered by:Katie Jackson 
+Phone:206-438-3357
+Fax:
+Email:kjackson@coscofire.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Cosco Fire Protection, 4308 S 131ST PL, Tukwila, WA 98168-3200
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130340484396
+**************************************************************************
+Design Information
+Design #:27798.06 - Cosco Fire
+**************************************************************************
+Items Purchased
+Item 1 of 14
+Part Number:
+Description:Michael Bunce - Tonal Logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 2 of 14
+Part Number:TM1MU410
+Description:Travismathew Coto Performance Polo, BerylGrnHt
+Unit Price:80.00
+Line Item Price:80.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 3 of 14
+Part Number:TMA41462
+Description:TravisMathew Glenview Stripe Polo, StellarBlu
+Unit Price:95.00
+Line Item Price:95.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 4 of 14
+Part Number:TM1MY402
+Description:Travismathew Coastal Chest Stripe Polo, OpalBluHtr
+Unit Price:92.00
+Line Item Price:92.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 5 of 14
+Part Number:TM1MW451
+Description:Travismathew Auckland Slub Polo, BlueNights
+Unit Price:94.00
+Line Item Price:94.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 6 of 14
+Part Number:TM1MU410
+Description:Travismathew Coto Performance Polo, BerylGrnHt
+Unit Price:80.00
+Line Item Price:80.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 7 of 14
+Part Number:TM1MZ339
+Description:Travismathew Coveside 1/4-Zip, DkGyHthr
+Unit Price:114.00
+Line Item Price:114.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 8 of 14
+Part Number:
+Description:Chad Matthew - Tonal Logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 9 of 14
+Part Number:TM1MY402
+Description:Travismathew Coastal Chest Stripe Polo, OpalBluHtr
+Unit Price:92.00
+Line Item Price:92.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 10 of 14
+Part Number:TM1MY402
+Description:Travismathew Coastal Chest Stripe Polo, QuiShaGyHt
+Unit Price:92.00
+Line Item Price:92.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 11 of 14
+Part Number:TM1MU410
+Description:Travismathew Coto Performance Polo, FederalBlu
+Unit Price:80.00
+Line Item Price:80.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 12 of 14
+Part Number:TM1MU410
+Description:Travismathew Coto Performance Polo, BerylGrnHt
+Unit Price:80.00
+Line Item Price:80.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 13 of 14
+Part Number:TM1MU420
+Description:Travismathew Newport Full-Zip Fleece, Black
+Unit Price:129.00
+Line Item Price:129.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+Item 14 of 14
+Part Number:TM1MW452
+Description:Travismathew Crestview 1/4-Zip, VtgIdgHthr
+Unit Price:92.00
+Line Item Price:92.00
+Item Quantity:1
+Adult:Quantity
+LG:1
+**************************************************************************
+Order Summary
+Subtotal:1,120.00
+Sales Tax:114.93
+Shipping:17.95
+Total:1,252.88
+Paid To Date:1,252.88
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 5 ====================
+**************************************************************************
+Order #:136557
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:10928
+Company:Cosco Fire Protection
+**************************************************************************
+Order Information
+Date Order Placed:5/21/2025
+Req. Ship Date:6/4/2025
+Drop Dead Date:
+Date Order Shipped:6/9/2025
+Date Order Invoiced:6/9/2025
+Purchase Order #:25SC1216
+Terms:Net 10
+Ordered by:Katie Jackson 
+Phone:206-438-3357
+Fax:
+Email:kjackson@coscofire.com
+**************************************************************************
+Shipping Information
+Ship Method:UPS
+Ship Address:Cosco Fire Protection, Antt: Dranden Brown , 1207 Sanford Ave , Richland , WA 99354
+**************************************************************************
+Package Tracking Information
+Carrier:UPS
+Tracking #:1Z9033130342287542
+**************************************************************************
+Design Information
+Design #:35366 - Cosco Fire Protection 
+Design #:27798 - Cosco Fire
+**************************************************************************
+Items Purchased
+Item 1 of 8
+Part Number:
+Description:Transfer 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 2 of 8
+Part Number:CS203
+Description:Cornerstone  Ansi 107 Class 3 Mesh Long Sleeve Tee, SftyOrg
+Unit Price:42.30
+Line Item Price:169.20
+Item Quantity:4
+Adult:Quantity
+LG:2
+XL:2
+Item 3 of 8
+Part Number:CS203_2X
+Description:Cornerstone  Ansi 107 Class 3 Mesh Long Sleeve Tee, SftyOrg
+Unit Price:44.30
+Line Item Price:177.20
+Item Quantity:4
+Adult:Quantity
+XXL:4
+Item 4 of 8
+Part Number:
+Description:Embroidery 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+Item 5 of 8
+Part Number:CT105291
+Description:Carhartt Force Solid Long Sleeve Shirt, DarkKhaki
+Unit Price:73.00
+Line Item Price:73.00
+Item Quantity:1
+Adult:Quantity
+XL:1
+Item 6 of 8
+Part Number:CT105291_2X
+Description:Carhartt Force Solid Long Sleeve Shirt, DarkKhaki
+Unit Price:75.00
+Line Item Price:150.00
+Item Quantity:2
+Adult:Quantity
+XXL:2
+Item 7 of 8
+Part Number:CT105291
+Description:Carhartt Force Solid Long Sleeve Shirt, BurntOlive
+Unit Price:73.00
+Line Item Price:146.00
+Item Quantity:2
+Adult:Quantity
+M:1
+LG:1
+Item 8 of 8
+Part Number:CT105291_2X
+Description:Carhartt Force Solid Long Sleeve Shirt, Steel
+Unit Price:75.00
+Line Item Price:75.00
+Item Quantity:1
+Adult:Quantity
+XXL:1
+**************************************************************************
+Order Summary
+Subtotal:790.40
+Sales Tax:82.55
+Shipping:26.95
+Total:899.90
+Paid To Date:899.90
+Balance:0.00
+**************************************************************************
+Note
+Billing Questions? accounting@nwcustomapparel.com
+**************************************************************************
+
+==================== ORDER 6 ====================
+**************************************************************************
+Order #:136562
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12334
+Company:Fire Buffs
+**************************************************************************
+Order Information
+Date Order Placed:5/22/2025
+Req. Ship Date:6/5/2025
+Drop Dead Date:
+Date Order Shipped:5/29/2025
+Date Order Invoiced:5/27/2025
+Purchase Order #:
+Terms:Card# 5619
+Ordered by:Dave  Lambing
+Phone:253-778-6815
+Fax:
+Email:quartermaster@tacomafirebuffbattalion.org
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:
+Description:Sew-on
+Unit Price:12.50
+Line Item Price:25.00
+Item Quantity:2
+Adult:Quantity
+S (Other):2
+**************************************************************************
+Order Summary
+Subtotal:25.00
+Sales Tax:2.53
+Shipping:
+Total:27.53
+Paid To Date:27.53
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 7 ====================
+**************************************************************************
+Order #:136566
+Company:Northwest Custom Apparel
+Salesperson:Taylar Hanson
+Phone:
+Fax:
+Email:taylar@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:6218
+Company:Vadis
+**************************************************************************
+Order Information
+Date Order Placed:5/22/2025
+Req. Ship Date:6/5/2025
+Drop Dead Date:
+Date Order Shipped:5/30/2025
+Date Order Invoiced:5/29/2025
+Purchase Order #:
+Terms:COD 
+Ordered by:Jed Rains
+Phone:253-863-5173 ex314
+Fax:
+Email:jed.rains@vadis.org
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:Vadis, 1701 Elm Street East, Sumner, Wa 98390
+**************************************************************************
+Design Information
+Design #:38735 - Vadis Lion
+**************************************************************************
+Items Purchased
+Item 1 of 1
+Part Number:K510
+Description:Port Authority Stain-Release Polo, Black
+Unit Price:29.00
+Line Item Price:87.00
+Item Quantity:3
+Adult:Quantity
+M:3
+**************************************************************************
+Order Summary
+Subtotal:87.00
+Sales Tax:8.79
+Shipping:
+Total:95.79
+Paid To Date:95.79
+Balance:0.00
+**************************************************************************
+
+==================== ORDER 8 ====================
+**************************************************************************
+Order #:136571
+Company:Northwest Custom Apparel
+Salesperson:Nika Lao
+Phone:
+Fax:
+Email:nika@nwcustomapparel.com
+**************************************************************************
+Your Company Information
+Customer #:12899
+Company:Port Of Seattle - Aviation Sec Dept. 
+**************************************************************************
+Order Information
+Date Order Placed:5/22/2025
+Req. Ship Date:7/16/2025
+Drop Dead Date:
+Date Order Shipped:7/28/2025
+Date Order Invoiced:7/10/2025
+Purchase Order #:0000299511
+Terms:Net 30
+Ordered by:Seth  Miller 
+Phone:206-495-2992
+Fax:
+Email:Miller.S@portseattle.org
+**************************************************************************
+Shipping Information
+Ship Method:Customer Pickup
+Ship Address:PORT OF SEATTLE ACCOUNTS PAYABLE, PO BOX 1209, Seattle , WA 98111
+**************************************************************************
+Design Information
+Design #:39197 - SEA - Aviation Security Training Operations Specialist 
+Design #:39298 - SEA - Aviation Security Training Operations Specialist  
+**************************************************************************
+Items Purchased
+Item 1 of 7
+Part Number:DGT-002
+Description:Fee for revising existing digitized designs to meet new specifications
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 2 of 7
+Part Number:CS410
+Description:Cornerstone - Select Snag-Proof Tactical Polo, Charcoal
+Unit Price:33.00
+Line Item Price:1,716.00
+Item Quantity:52
+Adult:Quantity
+M:16
+LG:20
+XL:16
+Item 3 of 7
+Part Number:CS410_2X
+Description:Cornerstone - Select Snag-Proof Tactical Polo, Charcoal
+Unit Price:35.00
+Line Item Price:420.00
+Item Quantity:12
+Adult:Quantity
+XXL:12
+Item 4 of 7
+Part Number:GRT-50
+Description:Logo Mockup & Print Review. Includes a mockup of your logo on the ordered products for preview, and a print readiness check for clarity and sizing.
+Unit Price:50.00
+Line Item Price:50.00
+Item Quantity:1
+Adult:Quantity
+S (Other):1
+Item 5 of 7
+Part Number:1517
+Description:ONYX Standard Safety Vest w/Contrasting Trim, Black
+Unit Price:50.75
+Line Item Price:812.00
+Item Quantity:16
+Adult:Quantity
+M:2
+LG:7
+XL:7
+Item 6 of 7
+Part Number:1517_2X
+Description:ONYX Standard Safety Vest w/Contrasting Trim, Black
+Unit Price:50.75
+Line Item Price:203.00
+Item Quantity:4
+Adult:Quantity
+XXL:4
+Item 7 of 7
+Part Number:
+Description:Left Chest and Back Logo 
+Unit Price:
+Line Item Price:
+Item Quantity:
+Adult:Quantity
+**************************************************************************
+Order Summary
+Subtotal:3,251.00
+Sales Tax:328.35
+Shipping:
+Total:3,579.35
+Paid To Date:3,579.35
+Balance:0.00
+**************************************************************************
+
+================================================================================
+END OF SAMPLE DATA - BATCH 13
+================================================================================
