@@ -45,6 +45,16 @@
         </button>
     </div>
 
+    <!-- New Feature Announcement — auto-expires March 1 2026 -->
+    <div class="feature-announce-banner" id="featureAnnounceBanner">
+        <span><i class="fas fa-sparkles"></i> <strong>New Tool:</strong> Search our 39,000+ digitized designs by company, stitch count, or design number.
+            <a href="/dashboards/digitized-designs.html">Try it now &rarr;</a>
+        </span>
+        <button class="feature-announce-close" onclick="dismissFeatureAnnounce()" aria-label="Dismiss">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <div class="dashboard-container">
         <!-- =====================================================
              SIDEBAR NAVIGATION (Preserved from original)
@@ -287,10 +297,7 @@
                                 <span class="tool-category-title">Ask Barnaby</span>
                             </div>
                             <div class="tool-buttons">
-                                <div class="emb-stack">
-                                    <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn emb-group">Emb / Cap / Patch</a>
-                                    <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn emb-group">Additional Logo</a>
-                                </div>
+                                <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn">Emb / Cap / Patch</a>
                                 <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn">DTG</a>
                                 <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn">Screen Print</a>
                                 <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn">DTF</a>
@@ -312,6 +319,7 @@
                                 <a href="/calculators/manual-pricing.html" class="tool-btn">Manual Pricing 2026</a>
                                 <a href="/calculators/compare-pricing.html" class="tool-btn">Compare by Style</a>
                                 <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn">Service Prices</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn">Additional Logo</a>
                             </div>
                         </div>
 
@@ -321,7 +329,7 @@
                                 <div class="tool-category-icon">
                                     <i class="fas fa-handshake"></i>
                                 </div>
-                                <span class="tool-category-title">Contract-Ruthie-'26</span>
+                                <span class="tool-category-title">Contract Pricing</span>
                             </div>
                             <div class="tool-buttons">
                                 <a href="/calculators/dtg-contract/" class="tool-btn">Contract DTG</a>
@@ -366,13 +374,18 @@
                                 <div class="tool-category-icon">
                                     <i class="fas fa-palette"></i>
                                 </div>
-                                <span class="tool-category-title">Artwork</span>
+                                <span class="tool-category-title">Artwork & Designs</span>
                             </div>
                             <div class="tool-buttons">
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn">AE Portal</a>
                                 <a href="/dashboards/art-hub-steve.html" class="tool-btn">Steve Portal</a>
                                 <a href="/dashboards/art-hub-ruth.html" class="tool-btn">Ruth Portal</a>
                                 <a href="/art-invoices-dashboard.html" class="tool-btn">Art Dashboard</a>
+                                <a href="/dashboards/digitized-designs.html" class="tool-btn feature-spotlight" id="digitizedDesignBtn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-color: #7c3aed;">
+                                    <i class="fas fa-th-list"></i> Digitized Design Master List 2026
+                                    <span class="new-badge">NEW</span>
+                                </a>
+                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn">Monogram Dashboard</a>
                             </div>
                         </div>
 
@@ -387,9 +400,6 @@
                             <div class="tool-buttons">
                                 <a href="/calculators/digitizingform.html" class="tool-btn">Digitizing</a>
                                 <a href="/calculators/purchasingform.html" class="tool-btn">Purchasing</a>
-                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-color: #7c3aed;">
-                                    <i class="fas fa-th-list"></i> Monogram Dashboard
-                                </a>
                             </div>
                         </div>
 
@@ -403,7 +413,6 @@
                             </div>
                             <div class="tool-buttons">
                                 <a href="/pages/data-entry-guide.html" class="tool-btn">Data Entry Guide</a>
-                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn">Service Prices</a>
                                 <a href="/dashboards/reports/price-audit-report.html" class="tool-btn">Price Audit Report</a>
                             </div>
                         </div>
@@ -914,6 +923,36 @@
                 sessionStorage.setItem('priceAlertDismissed_2026', 'true');
             }
         }
+
+        // Feature Announcement — Digitized Design Master List (expires March 1 2026)
+        function dismissFeatureAnnounce() {
+            const banner = document.getElementById('featureAnnounceBanner');
+            if (banner) {
+                banner.classList.add('hidden');
+                sessionStorage.setItem('featureAnnounceDismissed', 'true');
+            }
+        }
+
+        (function checkFeatureSpotlightExpiry() {
+            const expired = new Date() > new Date('2026-03-01');
+            const dismissed = sessionStorage.getItem('featureAnnounceDismissed') === 'true';
+
+            // Hide announcement if expired or dismissed
+            if (expired || dismissed) {
+                const banner = document.getElementById('featureAnnounceBanner');
+                if (banner) banner.classList.add('hidden');
+            }
+
+            // Remove spotlight glow + badge if expired
+            if (expired) {
+                const btn = document.getElementById('digitizedDesignBtn');
+                if (btn) {
+                    btn.classList.remove('feature-spotlight');
+                    const badge = btn.querySelector('.new-badge');
+                    if (badge) badge.remove();
+                }
+            }
+        })();
 
         // =====================================================
         // CELEBRATION DROPDOWN FUNCTIONS

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Digitized Design Master List 2026 - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard-dark.css">
+    <style>
+        /* === Base === */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #2a3033;
+        }
+
+        /* === Header === */
+        .minimal-header {
+            background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .logo { height: 40px; filter: brightness(0) invert(1); }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 18px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: white;
+            color: #2e5827;
+            border-color: white;
+        }
+
+        /* === Page Layout === */
+        .content-container {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 24px;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a2332;
+            margin-bottom: 20px;
+            letter-spacing: -0.3px;
+        }
+
+        .caspio-container {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+            min-height: 400px;
+        }
+
+        /* === Hide Caspio's own header (we have our own h1) === */
+        .caspio-container header {
+            display: none !important;
+        }
+
+        .page-subtitle {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #8d959c;
+            margin-top: -14px;
+            margin-bottom: 20px;
+        }
+
+        /* === Search Form === */
+        .caspio-container .cbFormTextField,
+        .caspio-container input[type="text"] {
+            width: 100% !important;
+            max-width: 400px !important;
+            padding: 10px 14px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-family: inherit !important;
+            color: #2a3033 !important;
+            background: #fafafa !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+            box-sizing: border-box !important;
+        }
+
+        .caspio-container .cbFormTextField:focus,
+        .caspio-container input[type="text"]:focus {
+            border-color: #4cb354 !important;
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15) !important;
+            outline: none !important;
+            background: #fff !important;
+        }
+
+        .caspio-container .cbFormSelect,
+        .caspio-container select {
+            width: 100% !important;
+            max-width: 600px !important;
+            padding: 10px 14px 13px !important;
+            line-height: 1.5 !important;
+            height: auto !important;
+            min-height: 44px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-family: inherit !important;
+            color: #2a3033 !important;
+            background: #fafafa !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+            box-sizing: border-box !important;
+            cursor: pointer;
+        }
+
+        .caspio-container .cbFormSelect:focus,
+        .caspio-container select:focus {
+            border-color: #4cb354 !important;
+            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15) !important;
+            outline: none !important;
+        }
+
+        .caspio-container .cbFormLabelCell,
+        .caspio-container label {
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            color: #53565a !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            margin-bottom: 6px !important;
+        }
+
+        /* Search Button */
+        .caspio-container .cbSearchButton,
+        .caspio-container input[type="submit"] {
+            background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 32px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            font-family: inherit !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+            box-shadow: 0 2px 4px rgba(76, 179, 84, 0.25) !important;
+            letter-spacing: 0.3px !important;
+        }
+
+        .caspio-container .cbSearchButton:hover,
+        .caspio-container input[type="submit"]:hover {
+            background: linear-gradient(135deg, #409a47 0%, #357a3b 100%) !important;
+            box-shadow: 0 4px 8px rgba(76, 179, 84, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Hide duplicate mobile search button */
+        .cbSearchButtonContainer.cbSearchButtonContainerM {
+            display: none !important;
+        }
+
+        /* === Result Cards — Grid Layout === */
+        .caspio-container section.cbColumnarReport,
+        .caspio-container [id^="GridCtnr_"] section {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+            gap: 20px !important;
+            padding: 8px 0 !important;
+        }
+
+        .caspio-container .cbResultSetListViewTableOddCell,
+        .caspio-container .cbResultSetListViewTableEvenCell,
+        .caspio-container [data-cb-name="data-row"] {
+            background: #fff !important;
+            border: 1px solid #e5e7eb !important;
+            border-left: 4px solid #4cb354 !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+        }
+
+        .caspio-container .cbResultSetListViewTableOddCell:hover,
+        .caspio-container .cbResultSetListViewTableEvenCell:hover,
+        .caspio-container [data-cb-name="data-row"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1) !important;
+        }
+
+        /* === Restructured Card Sections === */
+        .caspio-container [data-cb-name="data-row"].restructured dl { display: none !important; }
+
+        .card-header { margin-bottom: 12px; }
+        .card-header h3 {
+            margin: 0 0 2px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2e5827;
+        }
+        .card-header h3 span { color: #8d959c; font-weight: 400; font-size: 14px; margin-left: 4px; }
+        .card-header .card-description {
+            margin: 0;
+            font-size: 14px;
+            color: #53565a;
+            font-weight: 500;
+        }
+
+        .card-image {
+            text-align: center;
+            padding: 12px 0;
+            min-height: 40px;
+        }
+        .card-image img {
+            max-width: 240px;
+            max-height: 240px;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            object-fit: contain;
+        }
+        .card-image img:hover { opacity: 0.85; transform: scale(1.02); }
+        .card-image .no-image {
+            display: inline-block;
+            padding: 24px 32px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            color: #b0b0b0;
+            font-size: 13px;
+            font-style: italic;
+        }
+        .card-image .mockup-link {
+            display: inline-block;
+            margin-top: 8px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .card-image .mockup-link:hover { background: #4cb354; color: white; }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 4px 12px;
+            padding: 12px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+        .card-meta .meta-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8d959c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .card-meta .meta-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2a3033;
+        }
+
+        .card-details-toggle {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            border-top: 1px solid #f0f0f0;
+            padding: 8px 0 0;
+            margin-top: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8d959c;
+            text-align: left;
+            transition: color 0.2s;
+            font-family: inherit;
+        }
+        .card-details-toggle:hover { color: #4cb354; }
+        .card-details-toggle::before { content: '\25B8  '; }
+        .card-details-toggle.open::before { content: '\25BE  '; }
+
+        .card-details {
+            display: none;
+            grid-template-columns: auto 1fr;
+            gap: 3px 12px;
+            padding-top: 8px;
+        }
+        .card-details.open { display: grid; }
+        .card-details .meta-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #b0b8c0;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .card-details .meta-value {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* === Sort Dropdown === */
+        .caspio-container .cbResultSetNavigationDDown,
+        .caspio-container .cbResultSetNavigationDDown select {
+            padding: 6px 12px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            font-size: 13px !important;
+            font-family: inherit !important;
+            color: #53565a !important;
+            background: #fafafa !important;
+        }
+
+        /* === Pagination === */
+        .caspio-container .cbResultSetNavigationTable {
+            margin-top: 16px !important;
+            font-size: 13px !important;
+            color: #64748b !important;
+        }
+
+        .caspio-container .cbResultSetNavigationLinks a {
+            display: inline-block !important;
+            padding: 4px 12px !important;
+            margin: 0 2px !important;
+            border-radius: 6px !important;
+            text-decoration: none !important;
+            color: #53565a !important;
+            font-weight: 500 !important;
+            transition: all 0.2s !important;
+        }
+
+        .caspio-container .cbResultSetNavigationLinks a:hover {
+            background: #e8f5e9 !important;
+            color: #2e7d32 !important;
+        }
+
+        .caspio-container .cbResultSetNavigationLinks strong,
+        .caspio-container .cbResultSetNavigationLinks .current {
+            display: inline-block !important;
+            padding: 4px 12px !important;
+            margin: 0 2px !important;
+            border-radius: 6px !important;
+            background: #4cb354 !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
+
+        /* === Records Footer === */
+        .caspio-container .cbResultSetNavigationTable td {
+            padding: 8px 4px !important;
+            color: #8d959c !important;
+            font-size: 13px !important;
+        }
+
+        /* === Image Modal (existing) === */
+        .image-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .image-modal-overlay.active { display: flex; }
+
+        .image-modal-overlay img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            cursor: default;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .caspio-container section.cbColumnarReport,
+            .caspio-container [id^="GridCtnr_"] section {
+                grid-template-columns: 1fr !important;
+            }
+
+            .caspio-container {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="minimal-header">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+        <a href="/staff-dashboard.html" class="back-link">Back to Dashboard</a>
+    </div>
+
+    <div class="content-container">
+        <h1 class="page-title">Digitized Design Master List 2026</h1>
+        <div class="caspio-container">
+            <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500091d2864405df4b1db655/emb"></script>
+        </div>
+    </div>
+    <div class="image-modal-overlay" id="image-modal">
+        <img src="" alt="Design preview">
+    </div>
+
+    <script>
+        (function() {
+            var modal = document.getElementById('image-modal');
+            var modalImg = modal.querySelector('img');
+            var container = document.querySelector('.caspio-container');
+
+            /* Image modal — click thumbnail to enlarge */
+            container.addEventListener('click', function(e) {
+                var img = e.target.closest('img');
+                if (img && !img.classList.contains('broken-image') && !e.target.closest('.mockup-link')) {
+                    modalImg.src = img.src;
+                    modal.classList.add('active');
+                }
+            });
+
+            modal.addEventListener('click', function(e) {
+                if (e.target !== modalImg) {
+                    modal.classList.remove('active');
+                    modalImg.src = '';
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    modal.classList.remove('active');
+                    modalImg.src = '';
+                }
+            });
+
+            /* Extract "Updated" date from Caspio header before CSS hides it */
+            function extractUpdatedDate() {
+                var headerEl = container.querySelector('header');
+                if (!headerEl) return;
+                var text = headerEl.textContent || '';
+                var match = text.match(/Updated\s+(.+)/i);
+                if (match) {
+                    var subtitle = document.querySelector('.page-subtitle');
+                    if (!subtitle) {
+                        subtitle = document.createElement('span');
+                        subtitle.className = 'page-subtitle';
+                        var pageTitle = document.querySelector('.page-title');
+                        if (pageTitle) pageTitle.after(subtitle);
+                    }
+                    subtitle.textContent = 'Last updated ' + match[1].trim();
+                }
+            }
+
+            /* === Card Restructure === */
+            var PRIMARY_FIELDS = ['Company', 'Stitch Count', 'Color Changes', 'Date Modified'];
+            var DETAIL_FIELDS = ['Cust_ID', 'Width Inches', 'Height Inches', 'DST Filename', 'Has EMB'];
+
+            function escapeHtml(str) {
+                var d = document.createElement('div');
+                d.textContent = str;
+                return d.innerHTML;
+            }
+
+            function formatStitchCount(val) {
+                var n = parseInt(val, 10);
+                return isNaN(n) ? val : n.toLocaleString();
+            }
+
+            function extractFields(dl) {
+                var fields = {};
+                var dts = dl.querySelectorAll('dt');
+                dts.forEach(function(dt) {
+                    var label = dt.textContent.trim();
+                    var dd = dt.nextElementSibling;
+                    if (!dd) return;
+                    fields[label] = {
+                        text: dd.textContent.trim(),
+                        html: dd.innerHTML,
+                        el: dd
+                    };
+                });
+                return fields;
+            }
+
+            function buildCard(fields, dl) {
+                var designNum = fields['Design Number'] ? fields['Design Number'].text : '';
+                var description = fields['Design Description'] ? fields['Design Description'].text : '';
+                var company = fields['Company'] ? fields['Company'].text : '';
+
+                /* Find image and mockup link by scanning the entire dl
+                   (Caspio puts img in an orphan dd with no dt) */
+                var imgSrc = '';
+                var mockupHref = '';
+                var linkEl = dl.querySelector('a.cbResultSetDataLink');
+                if (linkEl) mockupHref = linkEl.href;
+                var allImgs = dl.querySelectorAll('img');
+                for (var i = 0; i < allImgs.length; i++) {
+                    var img = allImgs[i];
+                    if (img.src && img.src !== window.location.href && img.naturalWidth !== 0) {
+                        imgSrc = img.src;
+                        break;
+                    }
+                }
+                /* Fallback: check if link href points to an image */
+                if (!imgSrc && mockupHref) {
+                    imgSrc = mockupHref;
+                }
+
+                var html = '';
+
+                /* Header */
+                html += '<div class="card-header">';
+                html += '<h3>#' + escapeHtml(designNum);
+                if (company) html += ' <span>' + escapeHtml(company) + '</span>';
+                html += '</h3>';
+                if (description) html += '<p class="card-description">' + escapeHtml(description) + '</p>';
+                html += '</div>';
+
+                /* Image */
+                html += '<div class="card-image">';
+                if (imgSrc) {
+                    html += '<img src="' + escapeHtml(imgSrc) + '" alt="Design ' + escapeHtml(designNum) + '" onerror="this.parentElement.innerHTML=\'<span class=no-image>No preview</span>\'">';
+                    if (mockupHref) {
+                        html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" class="mockup-link">View Full Mockup</a>';
+                    }
+                } else {
+                    html += '<span class="no-image">No preview available</span>';
+                }
+                html += '</div>';
+
+                /* Primary metadata */
+                html += '<div class="card-meta">';
+                PRIMARY_FIELDS.forEach(function(label) {
+                    var f = fields[label];
+                    if (!f) return;
+                    var val = f.text;
+                    if (label === 'Stitch Count') val = formatStitchCount(val);
+                    html += '<span class="meta-label">' + escapeHtml(label) + '</span>';
+                    html += '<span class="meta-value">' + escapeHtml(val) + '</span>';
+                });
+                html += '</div>';
+
+                /* Collapsible details */
+                var hasDetails = DETAIL_FIELDS.some(function(l) { return fields[l]; });
+                if (hasDetails) {
+                    html += '<button class="card-details-toggle" type="button">Details</button>';
+                    html += '<div class="card-details">';
+                    DETAIL_FIELDS.forEach(function(label) {
+                        var f = fields[label];
+                        if (!f) return;
+                        var displayLabel = label;
+                        if (label === 'Width Inches') displayLabel = 'Width';
+                        if (label === 'Height Inches') displayLabel = 'Height';
+                        if (label === 'DST Filename') displayLabel = 'DST File';
+                        var val = f.text;
+                        if (label === 'Width Inches' || label === 'Height Inches') val += '"';
+                        html += '<span class="meta-label">' + escapeHtml(displayLabel) + '</span>';
+                        html += '<span class="meta-value">' + escapeHtml(val) + '</span>';
+                    });
+                    html += '</div>';
+                }
+
+                return html;
+            }
+
+            function restructureCards() {
+                var rows = container.querySelectorAll('[data-cb-name="data-row"]:not(.restructured)');
+                if (!rows.length) return;
+
+                rows.forEach(function(row) {
+                    var dl = row.querySelector('dl.cbResultSetPanelDataContainer');
+                    if (!dl) return;
+
+                    var fields = extractFields(dl);
+                    if (!fields['Design Number']) return;
+
+                    var cardHtml = buildCard(fields, dl);
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'card-content';
+                    wrapper.innerHTML = cardHtml;
+                    row.appendChild(wrapper);
+                    row.classList.add('restructured');
+                });
+
+                /* Wire up details toggles */
+                container.querySelectorAll('.card-details-toggle:not([data-wired])').forEach(function(btn) {
+                    btn.setAttribute('data-wired', '1');
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        this.classList.toggle('open');
+                        var details = this.nextElementSibling;
+                        if (details) details.classList.toggle('open');
+                    });
+                });
+            }
+
+            /* Observe DOM for Caspio content loading */
+            var debounceTimer;
+            var observer = new MutationObserver(function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    extractUpdatedDate();
+                    restructureCards();
+                }, 100);
+            });
+            observer.observe(container, { childList: true, subtree: true });
+
+            /* Immediate + safety fallbacks for content already rendered */
+            extractUpdatedDate();
+            restructureCards();
+            setTimeout(function() { extractUpdatedDate(); restructureCards(); }, 500);
+            setTimeout(function() { extractUpdatedDate(); restructureCards(); }, 2000);
+        })();
+    </script>
+</body>
+</html>

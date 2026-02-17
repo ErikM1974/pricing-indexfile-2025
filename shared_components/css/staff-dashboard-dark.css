@@ -235,6 +235,80 @@ body {
 }
 
 /* =====================================================
+   FEATURE SPOTLIGHT (auto-expires — see JS)
+   ===================================================== */
+.feature-spotlight {
+    position: relative;
+    animation: spotlight-pulse 2s ease-in-out infinite;
+}
+
+@keyframes spotlight-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(139, 92, 246, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.3); }
+}
+
+.feature-spotlight .new-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #10b981;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Feature announcement banner */
+.feature-announce-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    color: #ffffff !important;
+    font-size: 0.88rem;
+    position: relative;
+    z-index: 99;
+    text-align: center;
+}
+
+.feature-announce-banner a {
+    color: #fff;
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.feature-announce-banner a:hover {
+    color: #e0e7ff;
+}
+
+.feature-announce-banner .feature-announce-close {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #ffffff !important;
+    cursor: pointer;
+    padding: 4px 8px;
+    opacity: 0.8;
+}
+
+.feature-announce-banner .feature-announce-close:hover {
+    opacity: 1;
+}
+
+.feature-announce-banner.hidden {
+    display: none;
+}
+
+/* =====================================================
    SIDEBAR - DARK NAVY THEME
    ===================================================== */
 .sidebar {

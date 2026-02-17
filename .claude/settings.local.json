@@ -111,7 +111,8 @@
       "Bash(for f in shared_components/js/embroidery-*.js)",
       "Bash(del \"C:\\\\Users\\\\erik\\\\OneDrive - Northwest Custom Apparel\\\\2025\\\\Pricing Index File 2025\\\\tests\\\\check-record.js\")",
       "Bash(copy:*)",
-      "Bash(PKID=1398:*)"
+      "Bash(PKID=1398:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": [],

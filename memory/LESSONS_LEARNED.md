@@ -1946,6 +1946,21 @@ for (let i = 0; i < items.length; i += batchSize) {
 
 ---
 
+## Pattern: Caspio DataPage Host-Page Styling
+**Date:** 2026-02
+**Project:** [All]
+**Description:** How to style/restructure Caspio DataPage results from the host page without modifying the DataPage in Caspio.
+**Pattern:**
+1. **Caspio `<script>` embeds inject HTML into the host DOM (NOT an iframe)** — host page CSS/JS can target all Caspio elements directly via `document.querySelector()`
+2. **Key CSS class names**: `cbResultSetPanelDataContainer` (dl), `cbResultSetListViewDataLabel` (dt), `cbResultSetData` (dd), `cbResultSetDataLink` (links), `cbSearchButton`, `cbFormTextField`, `cbFormSelect`. Data attribute: `[data-cb-name="data-row"]` (result cards)
+3. **Use `!important`** on CSS overrides — Caspio inlines its own styles
+4. **MutationObserver pattern** for detecting async Caspio rendering: observe container for `{ childList: true, subtree: true }`, debounce 100ms. PLUS immediate call + `setTimeout(500)` + `setTimeout(2000)` fallbacks for content already rendered or slow search re-renders
+5. **Caspio orphan `<dd>` quirk**: Image/file fields render as standalone `<dd>` with no preceding `<dt>`. Don't rely on dt→dd pair extraction for images — scan the `dl` element directly for `img` or `a` tags
+6. **Workflow split**: Erik builds/deploys DataPage in Caspio (data fields, search criteria, HTML blocks). All visual styling, layout restructuring, modals, responsive design is done on the host page. No need to re-deploy the DataPage for CSS-only changes.
+**Files:** `dashboards/digitized-designs.html` (reference implementation), 50 pages total use Caspio embeds
+
+---
+
 # Template for New Entries
 
 ```markdown
