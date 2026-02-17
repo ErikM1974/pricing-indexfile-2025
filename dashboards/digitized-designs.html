@@ -199,6 +199,27 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.1) !important;
         }
 
+        /* === AS Surcharge Badge === */
+        .as-surcharge-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .as-surcharge-badge.warn {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .as-surcharge-badge.none {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #d1fae5;
+            font-weight: 500;
+        }
+
         /* === Restructured Card Sections === */
         .caspio-container [data-cb-name="data-row"].restructured dl { display: none !important; }
 
@@ -470,8 +491,8 @@
             }
 
             /* === Card Restructure === */
-            var PRIMARY_FIELDS = ['Company', 'Stitch Count', 'Color Changes', 'Date Modified'];
-            var DETAIL_FIELDS = ['Cust_ID', 'Width Inches', 'Height Inches', 'DST Filename', 'Has EMB'];
+            var PRIMARY_FIELDS = ['Stitch Tier', 'Company', 'Stitch Count', 'Color Changes', 'Date Modified'];
+            var DETAIL_FIELDS = ['Cust_ID', 'Width Inches', 'Height Inches', 'DST Filename', 'Has EMB', 'Over 4 Thread Color Charge'];
 
             function escapeHtml(str) {
                 var d = document.createElement('div');
@@ -534,6 +555,15 @@
                 if (description) html += '<p class="card-description">' + escapeHtml(description) + '</p>';
                 html += '</div>';
 
+                /* AS Surcharge badge — prominent */
+                var asField = fields['AS-Garm & AS-CAP'];
+                var asVal = asField ? parseFloat(asField.text) : 0;
+                if (asVal > 0) {
+                    html += '<div class="as-surcharge-badge warn">Stitch Surcharge: $' + asVal.toFixed(2) + '</div>';
+                } else {
+                    html += '<div class="as-surcharge-badge none">No Stitch Surcharge</div>';
+                }
+
                 /* Image */
                 html += '<div class="card-image">';
                 if (imgSrc) {
@@ -570,8 +600,10 @@
                         if (label === 'Width Inches') displayLabel = 'Width';
                         if (label === 'Height Inches') displayLabel = 'Height';
                         if (label === 'DST Filename') displayLabel = 'DST File';
+                        if (label === 'Over 4 Thread Color Charge') displayLabel = 'Color Surcharge';
                         var val = f.text;
                         if (label === 'Width Inches' || label === 'Height Inches') val += '"';
+                        if (label === 'Over 4 Thread Color Charge') { var n = parseFloat(val); val = isNaN(n) ? val : '$' + n.toFixed(2); }
                         html += '<span class="meta-label">' + escapeHtml(displayLabel) + '</span>';
                         html += '<span class="meta-value">' + escapeHtml(val) + '</span>';
                     });
