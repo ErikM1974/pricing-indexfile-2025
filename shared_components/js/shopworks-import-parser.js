@@ -489,6 +489,7 @@ class ShopWorksImportParser {
             paymentTerms: null,
             notes: [],              // Comment rows
             designNumbers: [],      // Design references (e.g., "#39719.01 — Absher Logo")
+            designNumbersRaw: [],   // Base numeric design numbers for API lookup (e.g., ["29988", "39112"])
             warnings: [],           // Import warnings
             reviewItems: [],        // Invalid/skipped items with data for user review
             unmatchedLines: [],     // Lines in known sections that didn't match any field pattern
@@ -747,6 +748,8 @@ class ShopWorksImportParser {
      */
     _parseDesignInfo(text, result) {
         const lines = text.split('\n');
+        const seenBaseNumbers = new Set();
+        if (!result.designNumbersRaw) result.designNumbersRaw = [];
         for (const line of lines) {
             const trimmed = line.trim();
             if (!trimmed || /^Design Information$/i.test(trimmed)) continue;
@@ -759,7 +762,13 @@ class ShopWorksImportParser {
                 const entry = `Design #${designNum} — ${designName}`;
                 result.notes.push(entry);
                 result.designNumbers.push(entry);
-                console.log(`[ShopWorksImportParser] Design info: #${designNum} — ${designName}`);
+                // Extract base design number (strip .xx suffix) for API lookup
+                const baseNum = String(Math.floor(parseFloat(designNum)));
+                if (!seenBaseNumbers.has(baseNum)) {
+                    seenBaseNumbers.add(baseNum);
+                    result.designNumbersRaw.push(baseNum);
+                }
+                console.log(`[ShopWorksImportParser] Design info: #${designNum} — ${designName} (base: ${baseNum})`);
                 continue;
             }
 
@@ -769,7 +778,12 @@ class ShopWorksImportParser {
                 const entry = `Design #${simpleMatch[1]}`;
                 result.notes.push(entry);
                 result.designNumbers.push(entry);
-                console.log(`[ShopWorksImportParser] Design info: #${simpleMatch[1]}`);
+                const baseNum = String(Math.floor(parseFloat(simpleMatch[1])));
+                if (!seenBaseNumbers.has(baseNum)) {
+                    seenBaseNumbers.add(baseNum);
+                    result.designNumbersRaw.push(baseNum);
+                }
+                console.log(`[ShopWorksImportParser] Design info: #${simpleMatch[1]} (base: ${baseNum})`);
             }
         }
     }

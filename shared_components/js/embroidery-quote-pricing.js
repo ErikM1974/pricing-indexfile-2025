@@ -819,6 +819,18 @@ class EmbroideryPricingCalculator {
     }
 
     /**
+     * Get Full Back per-piece price from design-specific tier pricing
+     * Tiers match standard embroidery: 1-7, 8-23, 24-47, 48-71, 72+
+     */
+    _getFBTierPrice(tiers, quantity) {
+        if (quantity >= 72) return tiers.fbPrice72plus;
+        if (quantity >= 48) return tiers.fbPrice48_71;
+        if (quantity >= 24) return tiers.fbPrice24_47;
+        if (quantity >= 8)  return tiers.fbPrice8_23;
+        return tiers.fbPrice1_7;
+    }
+
+    /**
      * Get embroidery cost for tier
      */
     getEmbroideryCost(tier) {
@@ -1396,13 +1408,20 @@ class EmbroideryPricingCalculator {
         // Full Back: ALL stitches charged at per-1K rate (min 25K) — separate DECG-FB pricing
         // Other positions: flat tier surcharge (0-10K=$0, Mid=$4, Large=$10)
         let primaryAdditionalStitchCost = 0;
-        let primaryFullBackStitchCost = 0; // Separate tracking for Full Back (ALL stitches)
+        let primaryFullBackStitchCost = 0; // Separate tracking for Full Back
+        let primaryFBUsedTierPricing = false; // Track if design-specific tier pricing was used
         if (garmentProducts.length > 0) {
             garmentPrimaryLogos.forEach(logo => {
                 if (logo.position === 'Full Back') {
-                    // Full Back: charge for ALL stitches (min 25K)
                     const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount);
-                    primaryFullBackStitchCost += (fbStitchCount / 1000) * this.additionalStitchRate;
+                    if (logo.fbPriceTiers && logo.fbPriceTiers.fbPrice1_7 > 0) {
+                        // Design-specific tier pricing — price varies by quantity
+                        primaryFullBackStitchCost += this._getFBTierPrice(logo.fbPriceTiers, garmentQuantity);
+                        primaryFBUsedTierPricing = true;
+                    } else {
+                        // Formula-based: $1.25 per 1,000 stitches (min 25K)
+                        primaryFullBackStitchCost += (fbStitchCount / 1000) * this.additionalStitchRate;
+                    }
                 } else {
                     // Other positions: flat tier surcharge (Mid $4, Large $10)
                     primaryAdditionalStitchCost += this.getStitchSurcharge(logo.stitchCount);
@@ -1539,20 +1558,30 @@ class EmbroideryPricingCalculator {
                         if (quantity > 0) {
                             const isFullBack = logo.position === 'Full Back';
 
-                            // FULL BACK: Special pricing - $1.25 per 1,000 stitches (all stitches, min 25K)
-                            // No tier cost, no base included - pure stitch-based pricing
+                            // FULL BACK: Use design-specific tier pricing if available,
+                            // otherwise fall back to formula ($1.25 per 1,000 stitches)
                             if (isFullBack) {
-                                const fbStitchRate = this.additionalStitchRate; // $1.25/1K
                                 const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount); // Min 25K
-                                const unitPrice = (fbStitchCount / 1000) * fbStitchRate;
+                                let unitPrice;
+                                let description;
+
+                                if (logo.fbPriceTiers && logo.fbPriceTiers.fbPrice1_7 > 0) {
+                                    // Design-specific tier pricing from Digitized Designs Master
+                                    unitPrice = this._getFBTierPrice(logo.fbPriceTiers, quantity);
+                                    description = `FB Full Back (${fbStitchCount/1000}K st, tier pricing)`;
+                                } else {
+                                    // Formula-based pricing
+                                    const fbStitchRate = this.additionalStitchRate; // $1.25/1K
+                                    unitPrice = (fbStitchCount / 1000) * fbStitchRate;
+                                    description = `FB Full Back (${fbStitchCount/1000}K stitches)`;
+                                }
+
                                 const total = unitPrice * quantity;
-
-
                                 const partNumber = 'DECG-FB';
 
                                 additionalServices.push({
                                     type: 'additional_logo',
-                                    description: `FB Full Back (${fbStitchCount/1000}K stitches)`,
+                                    description: description,
                                     partNumber: partNumber,
                                     quantity: quantity,
                                     unitPrice: unitPrice,

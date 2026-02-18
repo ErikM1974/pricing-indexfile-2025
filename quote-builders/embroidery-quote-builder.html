@@ -8595,30 +8595,126 @@ Company:Absher Construction Company
                 if (embConfigOptions) {
                     embConfigSection.style.display = '';
 
-                    // Design info banner
+                    // Design info banner — enhanced with stitch count lookup
                     const designBanner = document.getElementById('spr-design-info-banner');
-                    if (embConfigOptions.designInfo) {
+                    const lookup = embConfigOptions.designLookup;
+                    let autoGarmentTier = '8000';
+                    let autoGarmentPosition = 'Left Chest';
+                    let autoGarmentStitchCount = 8000;
+                    let autoCapTier = '8000';
+                    let hasFullBack = false;
+
+                    if (lookup && lookup.designs && Object.keys(lookup.designs).length > 0) {
+                        // Build design info HTML with stitch counts
+                        let bannerHtml = '';
+                        let maxStitchCount = 0;
+                        let maxStitchTier = 'Standard';
+                        let maxAsSurcharge = 0;
+                        let fbPriceTiersFromLookup = null;
+
+                        for (const [designNum, info] of Object.entries(lookup.designs)) {
+                            const sc = info.maxStitchCount;
+                            const tier = info.maxStitchTier || 'Standard';
+                            const surcharge = info.maxAsSurcharge || 0;
+                            const scFormatted = sc.toLocaleString();
+
+                            let tierBadge = '';
+                            if (tier === 'Full Back') {
+                                tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                                hasFullBack = true;
+                                // Extract FB tier pricing if available
+                                if (info.hasFBPricing && !fbPriceTiersFromLookup) {
+                                    const fbVariant = info.variants.find(v => v.fbPrice1_7 > 0);
+                                    if (fbVariant) {
+                                        fbPriceTiersFromLookup = {
+                                            fbPrice1_7: fbVariant.fbPrice1_7,
+                                            fbPrice8_23: fbVariant.fbPrice8_23,
+                                            fbPrice24_47: fbVariant.fbPrice24_47,
+                                            fbPrice48_71: fbVariant.fbPrice48_71,
+                                            fbPrice72plus: fbVariant.fbPrice72plus
+                                        };
+                                    }
+                                }
+                            } else if (surcharge > 0) {
+                                tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${tier} +$${surcharge}/pc</span>`;
+                            } else {
+                                tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                            }
+
+                            bannerHtml += `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;">`;
+                            bannerHtml += `<strong>#${escapeHtml(designNum)}</strong>`;
+                            bannerHtml += `<span style="color:#475569;">${escapeHtml(info.company || '')}</span>`;
+                            bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+                            bannerHtml += tierBadge;
+                            if (info.variants && info.variants.length > 1) {
+                                bannerHtml += `<span style="color:#94a3b8;font-size:11px;">(${info.variants.length} variants)</span>`;
+                            }
+                            bannerHtml += `</div>`;
+
+                            if (sc > maxStitchCount) {
+                                maxStitchCount = sc;
+                                maxStitchTier = tier;
+                                maxAsSurcharge = surcharge;
+                            }
+                        }
+
+                        // Show not-found designs
+                        if (lookup.notFound && lookup.notFound.length > 0) {
+                            bannerHtml += `<div style="color:#94a3b8;font-size:11px;padding-top:4px;">Not in database: ${lookup.notFound.map(n => '#' + n).join(', ')}</div>`;
+                        }
+
                         designBanner.style.display = '';
-                        document.getElementById('spr-design-info-text').textContent = embConfigOptions.designInfo;
+                        designBanner.style.background = '#eff6ff';
+                        designBanner.innerHTML = `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>${bannerHtml}`;
+
+                        // Auto-determine garment tier from max stitch count
+                        autoGarmentStitchCount = maxStitchCount;
+                        if (hasFullBack || maxStitchCount >= 25000) {
+                            autoGarmentTier = '25000';
+                            autoGarmentPosition = 'Full Back';
+                            embConfigOptions.fbPriceTiers = fbPriceTiersFromLookup;
+                        } else {
+                            autoGarmentTier = mapStitchCountToTierValue(maxStitchCount, '');
+                        }
+
+                        // For caps, use smallest variant stitch count (cap designs are usually smaller)
+                        let minCapStitch = Infinity;
+                        for (const info of Object.values(lookup.designs)) {
+                            for (const v of info.variants) {
+                                if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                            }
+                        }
+                        if (minCapStitch < Infinity && minCapStitch !== maxStitchCount) {
+                            autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+                        }
+
+                    } else if (embConfigOptions.designInfo) {
+                        // Fallback: show simple design text if lookup had no results
+                        designBanner.style.display = '';
+                        designBanner.innerHTML = `<i class="fas fa-palette" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
                     } else {
                         designBanner.style.display = 'none';
                     }
 
-                    // Garment config
+                    // Garment config — auto-set from design lookup
                     const garmentConfig = document.getElementById('spr-garment-config');
                     garmentConfig.style.display = embConfigOptions.hasGarments ? '' : 'none';
                     if (embConfigOptions.hasGarments) {
-                        document.getElementById('spr-garment-position').value = 'Left Chest';
-                        document.getElementById('spr-garment-stitch-tier').value = '8000';
+                        document.getElementById('spr-garment-position').value = autoGarmentPosition;
+                        document.getElementById('spr-garment-stitch-tier').value = autoGarmentTier;
                         document.getElementById('spr-garment-digitizing').checked = embConfigOptions.digitizing || false;
+                        // Sync Full Back UI if auto-detected
+                        if (autoGarmentPosition === 'Full Back') {
+                            onSprGarmentPositionChange();
+                        }
                     }
 
-                    // Cap config
+                    // Cap config — auto-set from design lookup
                     const capConfig = document.getElementById('spr-cap-config');
                     capConfig.style.display = embConfigOptions.hasCaps ? '' : 'none';
                     if (embConfigOptions.hasCaps) {
                         document.getElementById('spr-cap-embellishment').value = 'embroidery';
-                        document.getElementById('spr-cap-stitch-tier').value = '8000';
+                        document.getElementById('spr-cap-stitch-tier').value = autoCapTier;
                         document.getElementById('spr-cap-stitch-tier-wrapper').style.display = '';
                         document.getElementById('spr-cap-digitizing').checked = embConfigOptions.digitizing || false;
                     }
@@ -8907,7 +9003,8 @@ Company:Absher Construction Company
                     capEmbellishment: document.getElementById('spr-cap-embellishment')?.value || 'embroidery',
                     capStitchTier: parseInt(document.getElementById('spr-cap-stitch-tier')?.value) || 8000,
                     capDigitizing: document.getElementById('spr-cap-digitizing')?.checked || false,
-                    ltmEnabled: document.getElementById('spr-ltm-enabled')?.checked ?? true
+                    ltmEnabled: document.getElementById('spr-ltm-enabled')?.checked ?? true,
+                    fbPriceTiers: embConfigOptions?.fbPriceTiers || null
                 };
             }
 
@@ -10115,13 +10212,37 @@ Company:Absher Construction Company
                     }
                 }
 
+                // Look up design stitch counts from Digitized Designs database
+                let designLookup = null;
+                if (data.designNumbersRaw && data.designNumbersRaw.length > 0) {
+                    currentStep++;
+                    updateImportProgress(currentStep, totalSteps, 'Looking up design stitch counts...', data.designNumbersRaw.join(', '));
+                    try {
+                        const lookupUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/lookup?designs=${encodeURIComponent(data.designNumbersRaw.join(','))}`;
+                        const lookupResp = await Promise.race([
+                            fetch(lookupUrl),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+                        ]);
+                        if (lookupResp.ok) {
+                            const lookupData = await lookupResp.json();
+                            if (lookupData.success) {
+                                designLookup = lookupData;
+                                console.log(`[ShopWorks Import] Design lookup: found ${lookupData.count} designs, ${lookupData.notFound?.length || 0} not found`);
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('[ShopWorks Import] Design stitch lookup failed (will use manual selection):', err.message);
+                    }
+                }
+
                 const embConfigOptions = {
                     hasGarments: hasGarmentProducts,
                     hasCaps: hasCapProducts,
                     totalQty: totalProductQtyForConfig,
                     digitizing: data.services.digitizing || false,
                     designInfo: designInfo,
-                    allProductsHaveSwPrice: allProductsHaveSwPrice
+                    allProductsHaveSwPrice: allProductsHaveSwPrice,
+                    designLookup: designLookup
                 };
 
                 // Show pricing review modal with embroidery config
@@ -10162,6 +10283,10 @@ Company:Absher Construction Company
                         const fbInput = document.getElementById('fb-stitch-count');
                         if (fbField) fbField.style.display = '';
                         if (fbInput) fbInput.value = embConfig.garmentStitchTier;
+                        // Attach design-specific FB tier pricing for pricing engine
+                        primaryLogo.fbPriceTiers = embConfig.fbPriceTiers || null;
+                    } else {
+                        primaryLogo.fbPriceTiers = null;
                     }
 
                     // Cap config
@@ -10474,7 +10599,8 @@ Company:Absher Construction Company
                         weights: data.services?.weights || [],
                         digitizingFees: data.services?.digitizingFees || [],
                         decgItems: data.decgItems || []
-                    }
+                    },
+                    designLookup: designLookup || null
                 };
 
                 // Post-import validation: detect silently dropped rows

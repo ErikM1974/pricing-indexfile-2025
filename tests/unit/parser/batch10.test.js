@@ -60,6 +60,12 @@ describe('Batch 10 — Order 1 (#136244): Patriot Fire — 41 items, 5 designs',
         expect(result.designNumbers[0]).toContain('29988');
     });
 
+    test('extracts deduplicated base design numbers for API lookup', () => {
+        expect(result.designNumbersRaw).toBeDefined();
+        // 29988, 29988.06, 29988.01, 29988.1, 29988.14 all map to base "29988"
+        expect(result.designNumbersRaw).toEqual(['29988']);
+    });
+
     test('extracts 41 products (all items are products)', () => {
         expect(result.products).toHaveLength(41);
     });
@@ -200,6 +206,10 @@ describe('Batch 10 — Order 3 (#136271): Custom Trucks NW — Richardson, laser
     test('3 design numbers', () => {
         expect(result.designNumbers).toHaveLength(3);
         expect(result.designNumbers[0]).toContain('39112');
+    });
+
+    test('3 distinct base design numbers for API lookup', () => {
+        expect(result.designNumbersRaw).toEqual(['39112', '39113', '39114']);
     });
 
     test('extracts 13 products (excluding DD, Added On, laser)', () => {

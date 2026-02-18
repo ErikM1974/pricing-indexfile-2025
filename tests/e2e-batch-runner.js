@@ -379,6 +379,7 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
         productCount: 0,
         nonSanMarProducts: [],
         services: [],
+        designLookup: null,
         ourTotal: 0,
         swTotal: 0,
         swSubtotal: 0,
@@ -510,6 +511,74 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
         const mergedProducts = Array.from(productMap.values()).filter(p => p.totalQuantity > 0);
         result.productCount = mergedProducts.length;
 
+        // ── STEP 3b: DESIGN STITCH COUNT LOOKUP ───────────────────────────
+        let designLookupData = null;
+        let autoGarmentStitchCount = 8000;
+        let autoCapStitchCount = 5000;
+        let autoGarmentPosition = 'Left Chest';
+        let fbPriceTiers = null;
+
+        if (parsed.designNumbersRaw && parsed.designNumbersRaw.length > 0) {
+            try {
+                const lookupUrl = `${BASE_URL}/api/digitized-designs/lookup?designs=${encodeURIComponent(parsed.designNumbersRaw.join(','))}`;
+                const lookupResp = await fetchJSON(lookupUrl);
+                if (lookupResp.success && lookupResp.designs) {
+                    designLookupData = lookupResp;
+                    result.designLookup = lookupResp;
+
+                    // Determine garment stitch count from max across all designs
+                    let maxStitch = 0;
+                    let maxTier = 'Standard';
+                    let minStitch = Infinity;
+
+                    for (const info of Object.values(lookupResp.designs)) {
+                        if (info.maxStitchCount > maxStitch) {
+                            maxStitch = info.maxStitchCount;
+                            maxTier = info.maxStitchTier;
+                        }
+                        for (const v of info.variants) {
+                            if (v.stitchCount < minStitch) minStitch = v.stitchCount;
+                        }
+                    }
+
+                    if (maxStitch > 0) {
+                        autoGarmentStitchCount = maxStitch;
+                        if (maxTier === 'Full Back' || maxStitch >= 25000) {
+                            autoGarmentPosition = 'Full Back';
+                            // Extract FB tier pricing from the design with FB pricing
+                            for (const info of Object.values(lookupResp.designs)) {
+                                if (info.hasFBPricing) {
+                                    const fbVariant = info.variants.find(v => v.fbPrice1_7 > 0);
+                                    if (fbVariant) {
+                                        fbPriceTiers = {
+                                            fbPrice1_7: fbVariant.fbPrice1_7,
+                                            fbPrice8_23: fbVariant.fbPrice8_23,
+                                            fbPrice24_47: fbVariant.fbPrice24_47,
+                                            fbPrice48_71: fbVariant.fbPrice48_71,
+                                            fbPrice72plus: fbVariant.fbPrice72plus
+                                        };
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (minStitch < Infinity && minStitch !== maxStitch) {
+                        autoCapStitchCount = minStitch;
+                    }
+
+                    const designSummary = Object.entries(lookupResp.designs)
+                        .map(([dn, info]) => `#${dn}(${info.maxStitchCount.toLocaleString()} st, ${info.maxStitchTier})`)
+                        .join(', ');
+                    const notFoundStr = lookupResp.notFound?.length > 0 ? ` | Not found: ${lookupResp.notFound.join(',')}` : '';
+                    console.log(`  Design lookup: ${designSummary}${notFoundStr}`);
+                }
+            } catch (err) {
+                result.warnings.push(`Design lookup failed: ${err.message}`);
+                console.log(`  Design lookup failed (using defaults): ${err.message}`);
+            }
+        }
+
         // ── STEP 4: BUILD LOGO CONFIGURATION ────────────────────────────
         const garmentProducts = mergedProducts.filter(p => !p.isCap);
         const capProductsList = mergedProducts.filter(p => p.isCap);
@@ -517,12 +586,13 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
         const capQty = capProductsList.reduce((s, p) => s + p.totalQuantity, 0);
 
         const primaryGarmentLogo = garmentQty > 0 ? {
-            id: 'primary', position: 'Left Chest', stitchCount: 8000,
-            needsDigitizing: parsed.services.digitizing, isPrimary: true
+            id: 'primary', position: autoGarmentPosition, stitchCount: autoGarmentStitchCount,
+            needsDigitizing: parsed.services.digitizing, isPrimary: true,
+            fbPriceTiers: autoGarmentPosition === 'Full Back' ? fbPriceTiers : null
         } : null;
 
         const primaryCapLogo = capQty > 0 ? {
-            id: 'cap-primary', position: 'Cap Front', stitchCount: 5000,
+            id: 'cap-primary', position: 'Cap Front', stitchCount: autoCapStitchCount,
             needsDigitizing: parsed.services.digitizing && parsed.services.digitizingCount > 1,
             isPrimary: true, embellishmentType: 'embroidery'
         } : null;
@@ -540,9 +610,9 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
                         stitchCount: 5000, needsDigitizing: false, isPrimary: false
                     });
                 } else if (al.type === 'fb') {
-                    // Full back — garment AL
+                    // Full back — garment AL (with design-specific tier pricing if available)
                     garmentALLogos.push({
-                        id: `garment-al-fb`, position: 'Full Back',
+                        id: `garment-al-fb`, position: 'Full Back', fbPriceTiers: fbPriceTiers,
                         stitchCount: 25000, needsDigitizing: false, isPrimary: false
                     });
                 } else {
@@ -1297,6 +1367,15 @@ async function main() {
             const parts = [`${result.productCount} product(s)`];
             if (result.services.length > 0) parts.push(result.services.join(', '));
             if (result.nonSanMarProducts.length > 0) parts.push(`${result.nonSanMarProducts.length} non-SanMar`);
+            if (result.designLookup && result.designLookup.designs) {
+                const dKeys = Object.keys(result.designLookup.designs);
+                const dInfo = dKeys.map(dn => {
+                    const d = result.designLookup.designs[dn];
+                    const sc = d.maxStitchCount ? `${(d.maxStitchCount / 1000).toFixed(1)}K` : '?';
+                    return `#${dn}(${sc} ${d.maxStitchTier || '?'})`;
+                });
+                parts.push(`Designs: ${dInfo.join(', ')}`);
+            }
             console.log(`    ${parts.join(' | ')}`);
 
             if (doSave && result.quoteId) {
@@ -1381,6 +1460,49 @@ async function main() {
         );
     } else {
         console.log('\n  All products are SanMar.');
+    }
+
+    // Design lookup summary
+    const ordersWithDesigns = results.filter(r => r.designLookup && r.designLookup.designs && Object.keys(r.designLookup.designs).length > 0);
+    const ordersWithDesignWarnings = results.filter(r => r.warnings.some(w => typeof w === 'string' && w.includes('Design lookup failed')));
+    if (ordersWithDesigns.length > 0 || ordersWithDesignWarnings.length > 0) {
+        console.log(`\n  DESIGN STITCH LOOKUP`);
+        console.log('  ' + '─'.repeat(66));
+        if (ordersWithDesigns.length > 0) {
+            const allDesigns = [];
+            for (const r of ordersWithDesigns) {
+                for (const [dn, info] of Object.entries(r.designLookup.designs)) {
+                    allDesigns.push({
+                        designNumber: dn,
+                        orderId: r.orderId || r.orderIndex,
+                        maxStitchCount: info.maxStitchCount,
+                        tier: info.maxStitchTier || 'Standard',
+                        surcharge: info.maxAsSurcharge || 0,
+                        variants: info.variants ? info.variants.length : 0
+                    });
+                }
+            }
+            printTable(
+                ['Design #', 'Order', 'Stitches', 'Tier', 'Surcharge', 'Variants'],
+                allDesigns.map(d => [
+                    d.designNumber,
+                    `#${d.orderId}`,
+                    d.maxStitchCount.toLocaleString(),
+                    d.tier,
+                    d.surcharge > 0 ? `+$${d.surcharge}/pc` : '$0',
+                    d.variants
+                ])
+            );
+            console.log(`  ${ordersWithDesigns.length}/${successful.length} orders had designs looked up.`);
+        }
+        if (ordersWithDesignWarnings.length > 0) {
+            console.log(`  ${ordersWithDesignWarnings.length} order(s) had design lookup failures (fell back to defaults).`);
+        }
+        const notFoundOrders = results.filter(r => r.designLookup && r.designLookup.notFound && r.designLookup.notFound.length > 0);
+        if (notFoundOrders.length > 0) {
+            const allNotFound = notFoundOrders.flatMap(r => r.designLookup.notFound.map(n => `#${n} (order ${r.orderId || r.orderIndex})`));
+            console.log(`  Not found in DB: ${allNotFound.join(', ')}`);
+        }
     }
 
     // ── PRICING AUDIT ────────────────────────────────────────────────────
