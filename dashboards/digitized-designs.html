@@ -296,6 +296,48 @@
         }
         .card-images .mockup-link:hover { background: #4cb354; color: white; }
 
+        /* === Full Back Pricing Grid === */
+        .fb-pricing {
+            background: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+        .fb-pricing-title {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .fb-pricing-grid {
+            display: flex;
+            gap: 4px;
+        }
+        .fb-tier {
+            flex: 1;
+            text-align: center;
+            background: white;
+            border-radius: 4px;
+            padding: 4px 2px;
+        }
+        .fb-tier-qty {
+            display: block;
+            font-size: 9px;
+            color: #8d959c;
+            font-weight: 600;
+        }
+        .fb-tier-price {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2e5827;
+        }
+
         .card-meta {
             display: grid;
             grid-template-columns: auto 1fr;
@@ -511,6 +553,13 @@
             /* === Card Restructure === */
             var PRIMARY_FIELDS = ['Stitch Tier', 'Company', 'Stitch Count', 'Color Changes', 'Date Modified'];
             var DETAIL_FIELDS = ['Cust_ID', 'Width Inches', 'Height Inches', 'DST Filename', 'Has EMB', 'Over 4 Thread Color Charge'];
+            var FB_PRICE_FIELDS = [
+                { key: 'FB Price 1 7', label: '1-7' },
+                { key: 'FB Price 8 23', label: '8-23' },
+                { key: 'FB Price 24 47', label: '24-47' },
+                { key: 'FB Price 48 71', label: '48-71' },
+                { key: 'FB Price 72plus', label: '72+' }
+            ];
 
             function escapeHtml(str) {
                 var d = document.createElement('div');
@@ -598,6 +647,23 @@
                     html += '<span class="no-image">No preview available</span>';
                 }
                 html += '</div>';
+
+                /* Full Back pricing table — only if at least one tier has a price */
+                var hasFB = FB_PRICE_FIELDS.some(function(t) {
+                    var f = fields[t.key];
+                    return f && parseFloat(f.text) > 0;
+                });
+                if (hasFB) {
+                    html += '<div class="fb-pricing"><span class="fb-pricing-title">Full Back Pricing</span>';
+                    html += '<div class="fb-pricing-grid">';
+                    FB_PRICE_FIELDS.forEach(function(t) {
+                        var f = fields[t.key];
+                        var val = f ? parseFloat(f.text) : 0;
+                        html += '<div class="fb-tier"><span class="fb-tier-qty">' + t.label + '</span>';
+                        html += '<span class="fb-tier-price">' + (val > 0 ? '$' + val.toFixed(2) : '\u2014') + '</span></div>';
+                    });
+                    html += '</div></div>';
+                }
 
                 /* Primary metadata */
                 html += '<div class="card-meta">';
