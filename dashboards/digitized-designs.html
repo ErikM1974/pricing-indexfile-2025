@@ -238,14 +238,23 @@
             font-weight: 500;
         }
 
-        .card-image {
-            text-align: center;
+        /* === Card Images (dual or single) === */
+        .card-images {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
             padding: 12px 0;
             min-height: 40px;
         }
-        .card-image img {
-            max-width: 240px;
-            max-height: 240px;
+        .card-images.single { justify-content: center; }
+        .card-image-item {
+            flex: 1;
+            text-align: center;
+            min-width: 0;
+        }
+        .card-image-item img {
+            max-width: 100%;
+            max-height: 200px;
             width: auto;
             height: auto;
             border-radius: 8px;
@@ -254,8 +263,17 @@
             transition: opacity 0.2s, transform 0.2s;
             object-fit: contain;
         }
-        .card-image img:hover { opacity: 0.85; transform: scale(1.02); }
-        .card-image .no-image {
+        .card-image-item img:hover { opacity: 0.85; transform: scale(1.02); }
+        .image-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: #8d959c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .card-images .no-image {
             display: inline-block;
             padding: 24px 32px;
             background: #f5f5f5;
@@ -264,7 +282,7 @@
             font-size: 13px;
             font-style: italic;
         }
-        .card-image .mockup-link {
+        .card-images .mockup-link {
             display: inline-block;
             margin-top: 8px;
             background: #e8f5e9;
@@ -276,7 +294,7 @@
             text-decoration: none;
             transition: all 0.2s;
         }
-        .card-image .mockup-link:hover { background: #4cb354; color: white; }
+        .card-images .mockup-link:hover { background: #4cb354; color: white; }
 
         .card-meta {
             display: grid;
@@ -526,24 +544,20 @@
                 var description = fields['Design Description'] ? fields['Design Description'].text : '';
                 var company = fields['Company'] ? fields['Company'].text : '';
 
-                /* Find image and mockup link by scanning the entire dl
-                   (Caspio puts img in an orphan dd with no dt) */
-                var imgSrc = '';
+                /* Collect ALL images from dl — DST preview + mockup
+                   (Caspio puts each img in an orphan dd with no dt) */
+                var imgSrcs = [];
                 var mockupHref = '';
                 var linkEl = dl.querySelector('a.cbResultSetDataLink');
                 if (linkEl) mockupHref = linkEl.href;
                 var allImgs = dl.querySelectorAll('img');
                 for (var i = 0; i < allImgs.length; i++) {
                     var img = allImgs[i];
-                    if (img.src && img.src !== window.location.href && img.naturalWidth !== 0) {
-                        imgSrc = img.src;
-                        break;
+                    if (img.src && img.src !== window.location.href) {
+                        imgSrcs.push(img.src);
                     }
                 }
-                /* Fallback: check if link href points to an image */
-                if (!imgSrc && mockupHref) {
-                    imgSrc = mockupHref;
-                }
+                if (!imgSrcs.length && mockupHref) imgSrcs.push(mockupHref);
 
                 var html = '';
 
@@ -564,13 +578,22 @@
                     html += '<div class="as-surcharge-badge none">No Stitch Surcharge</div>';
                 }
 
-                /* Image */
-                html += '<div class="card-image">';
-                if (imgSrc) {
-                    html += '<img src="' + escapeHtml(imgSrc) + '" alt="Design ' + escapeHtml(designNum) + '" onerror="this.parentElement.innerHTML=\'<span class=no-image>No preview</span>\'">';
-                    if (mockupHref) {
-                        html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" class="mockup-link">View Full Mockup</a>';
-                    }
+                /* Images — side by side if two, centered if one */
+                var errHandler = 'onerror="this.style.display=\'none\'"';
+                html += '<div class="card-images' + (imgSrcs.length <= 1 ? ' single' : '') + '">';
+                if (imgSrcs.length >= 2) {
+                    html += '<div class="card-image-item"><span class="image-label">DST Preview</span>';
+                    html += '<img src="' + escapeHtml(imgSrcs[0]) + '" alt="DST ' + escapeHtml(designNum) + '" ' + errHandler + '>';
+                    html += '</div>';
+                    html += '<div class="card-image-item"><span class="image-label">Mockup</span>';
+                    html += '<img src="' + escapeHtml(imgSrcs[1]) + '" alt="Mockup ' + escapeHtml(designNum) + '" ' + errHandler + '>';
+                    if (mockupHref) html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" class="mockup-link">View Full</a>';
+                    html += '</div>';
+                } else if (imgSrcs.length === 1) {
+                    html += '<div class="card-image-item">';
+                    html += '<img src="' + escapeHtml(imgSrcs[0]) + '" alt="Design ' + escapeHtml(designNum) + '" ' + errHandler + '>';
+                    if (mockupHref) html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" class="mockup-link">View Full Mockup</a>';
+                    html += '</div>';
                 } else {
                     html += '<span class="no-image">No preview available</span>';
                 }
