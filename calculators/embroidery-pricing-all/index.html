@@ -38,22 +38,22 @@
 
         <!-- Tab Navigation -->
         <div class="tab-navigation">
-            <button class="tab-btn contract active" data-tab="contract" onclick="switchTab('contract')">
+            <button class="tab-btn active" data-tab="contract" onclick="switchTab('contract')">
                 <i class="fas fa-industry"></i>
                 Contract-Ruthie
                 <span class="tab-subtitle">Production/Partners</span>
             </button>
-            <button class="tab-btn al-retail" data-tab="al-retail" onclick="switchTab('al-retail')">
+            <button class="tab-btn" data-tab="al-retail" onclick="switchTab('al-retail')">
                 <i class="fas fa-tag"></i>
                 Add Logo
                 <span class="tab-subtitle">NWCA Garments</span>
             </button>
-            <button class="tab-btn stitch-charges" data-tab="stitch-charges" onclick="switchTab('stitch-charges')">
+            <button class="tab-btn" data-tab="stitch-charges" onclick="switchTab('stitch-charges')">
                 <i class="fas fa-layer-group"></i>
                 Additional Stitch Charges
                 <span class="tab-subtitle">Surcharges &gt; 10K Stitches</span>
             </button>
-            <button class="tab-btn decg-retail" data-tab="decg-retail" onclick="switchTab('decg-retail')">
+            <button class="tab-btn" data-tab="decg-retail" onclick="switchTab('decg-retail')">
                 <i class="fas fa-box-open"></i>
                 Customer-Supplied
                 <span class="tab-subtitle">Customer's Own Items</span>
@@ -62,7 +62,7 @@
 
         <!-- Tab Content: CONTRACT (Production/Ruthie) -->
         <div id="tab-contract" class="tab-content active">
-            <div class="use-case-banner contract">
+            <div class="use-case-banner">
                 <i class="fas fa-info-circle"></i>
                 <div>
                     <strong>Contract Pricing:</strong> For established wholesale partners and production accounts (e.g., ad-specialty distributors who supply their own blanks).
@@ -228,7 +228,7 @@
         <!-- Tab Content: AL RETAIL (Additional Logo) -->
         <div id="tab-al-retail" class="tab-content">
             <!-- Collapsible: Pricing Decision Guide -->
-            <details class="info-disclosure al-retail">
+            <details class="info-disclosure">
                 <summary>
                     <i class="fas fa-question-circle"></i>
                     Which Tab Should I Use?
@@ -261,7 +261,7 @@
             </details>
 
             <!-- Collapsible: Add Logo Info + Eligibility (combined) -->
-            <details class="info-disclosure al-retail">
+            <details class="info-disclosure">
                 <summary>
                     <i class="fas fa-exclamation-triangle"></i>
                     Add Logo Eligibility & Pricing Info
@@ -333,7 +333,7 @@
             </div>
 
             <!-- ShopWorks Part Numbers Reference Card -->
-            <div class="shopworks-ref-card al-retail">
+            <div class="shopworks-ref-card">
                 <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
                 <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
                 <span class="ref-item"><span class="ref-code">AL</span> Garments</span>
@@ -350,7 +350,7 @@
                 <!-- Garment AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Garment Additional Logo <span class="part-number-badge al-retail">AL</span></h3>
+                        <h3><i class="fas fa-tshirt"></i> Garment Additional Logo <span class="part-number-badge">AL</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="alRetailGarmentsMatrix" class="pricing-matrix simple">
@@ -370,7 +370,7 @@
                 <!-- Cap AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Cap Additional Logo <span class="part-number-badge al-retail">AL-CAP</span></h3>
+                        <h3><i class="fas fa-hat-cowboy"></i> Cap Additional Logo <span class="part-number-badge">AL-CAP</span></h3>
                         <div class="matrix-meta">Base 5K stitches</div>
                     </div>
                     <table id="alRetailCapsMatrix" class="pricing-matrix simple">
@@ -392,7 +392,7 @@
             <div class="matrix-card full-width">
                 <div class="matrix-header">
                     <h3><i class="fas fa-expand"></i> Full Back Additional Logo (25K+ Stitches)
-                        <span class="part-number-badge al-retail">DECG-FB</span>
+                        <span class="part-number-badge">DECG-FB</span>
                     </h3>
                     <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
                 </div>
@@ -470,66 +470,6 @@
                     </div>
                 </div>
 
-                <!-- Customer Surcharge List -->
-                <button class="es-cust-btn" onclick="openCustPanel()">
-                    Customer Surcharge List <span class="es-btn-count">107 designs</span>
-                </button>
-
-                <!-- Overlay -->
-                <div class="es-overlay" id="custOverlay" onclick="closeCustPanel()"></div>
-
-                <!-- Slide-out Panel -->
-                <div class="es-panel" id="custPanel">
-                    <div class="es-panel-header">
-                        <div class="es-panel-top">
-                            <div>
-                                <div class="es-panel-title">Customer Surcharge List</div>
-                                <div class="es-panel-subtitle">Existing customers get a reduced rate through Dec 2026. Full tier pricing starts Jan 2027.</div>
-                            </div>
-                            <button class="es-close-btn" onclick="closeCustPanel()">&#10005;</button>
-                        </div>
-                        <div class="es-search-row">
-                            <input class="es-search" id="custSearch" type="text" placeholder="Search customer or design..." oninput="esCustFilterTable()">
-                        </div>
-                        <div class="es-filters">
-                            <button class="es-filter-btn active" data-filter="rep" data-val="all" onclick="esCustToggleFilter(this)">All Reps</button>
-                            <button class="es-filter-btn" data-filter="rep" data-val="Nika Lao" onclick="esCustToggleFilter(this)">Nika <span style="opacity:0.5">73</span></button>
-                            <button class="es-filter-btn" data-filter="rep" data-val="Taneisha Clark" onclick="esCustToggleFilter(this)">Taneisha <span style="opacity:0.5">28</span></button>
-                            <button class="es-filter-btn" data-filter="rep" data-val="House" onclick="esCustToggleFilter(this)">House <span style="opacity:0.5">6</span></button>
-                            <div class="es-filter-sep"></div>
-                            <button class="es-filter-btn active" data-filter="tier" data-val="all" onclick="esCustToggleFilter(this)">All Tiers</button>
-                            <button class="es-filter-btn" data-filter="tier" data-val="Full Back" onclick="esCustToggleFilter(this)">Full Back</button>
-                            <button class="es-filter-btn" data-filter="tier" data-val="Large" onclick="esCustToggleFilter(this)">Large</button>
-                            <button class="es-filter-btn" data-filter="tier" data-val="Mid" onclick="esCustToggleFilter(this)">Mid</button>
-                        </div>
-                        <div class="es-result-count" id="resultCount"></div>
-                    </div>
-                    <div class="es-panel-body">
-                        <table class="es-cust-table">
-                            <thead>
-                                <tr>
-                                    <th>Rep</th>
-                                    <th>Customer</th>
-                                    <th>Design</th>
-                                    <th>Stitches</th>
-                                    <th>Tier</th>
-                                    <th class="es-tooltip" data-tip="Reduced rate for existing customers. Expires Dec 31, 2026 — then switches to Full Price.">GF Price</th>
-                                    <th>Full Price</th>
-                                    <th>Savings</th>
-                                </tr>
-                            </thead>
-                            <tbody id="custBody"></tbody>
-                        </table>
-                        <div class="es-no-results" id="noResults" style="display:none">
-                            <div class="es-no-results-icon">?</div>
-                            <div class="es-no-results-text">No matches found</div>
-                        </div>
-                    </div>
-                    <div class="es-panel-footer">
-                        GF Price = reduced grandfather rate for existing customers · Use through Dec 2026 · Full Price takes effect Jan 2027
-                    </div>
-                </div>
-
                 <!-- Full Back Toggle -->
                 <div class="es-fullback" onclick="document.getElementById('esFbPanel').classList.toggle('open'); this.classList.toggle('open')">
                     <div class="es-fullback-left">
@@ -573,40 +513,13 @@
                     </div>
                 </div>
 
-                <!-- Quick Ref -->
-                <div class="es-ref">
-                    <h3>Quick Reference</h3>
-                    <div class="es-table-wrap">
-                        <table class="es-table">
-                            <thead>
-                                <tr>
-                                    <th>Stitch Count</th>
-                                    <th>Tier</th>
-                                    <th>Line Item</th>
-                                    <th>Add to Quote</th>
-                                </tr>
-                            </thead>
-                            <tbody id="esQuickRefBody">
-                                <!-- Populated by JS from STITCH_CHARGE_DATA -->
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Key Account Surcharge List -->
+                <div class="es-section-hdr">
+                    <span class="es-section-hdr-title">Key Account Surcharge List</span>
+                    <span class="es-count-badge">8 accounts</span>
                 </div>
-
-                <!-- Notes -->
-                <div class="es-notes">
-                    <h3>Reminders</h3>
-                    <ul>
-                        <li>Stitch count is <strong>per logo location</strong>, not per order</li>
-                        <li>AS line item quantity = same as garment/cap quantity</li>
-                        <li>Caps rarely exceed 10K — check with Ruthie if unsure</li>
-                        <li>Additional locations (2nd/3rd logo) use <strong>AL</strong> or <strong>AL-CAP</strong> line items — separate pricing</li>
-                        <li>Grandfather pricing applies to existing customers through Dec 2026 — check the surcharge customer list</li>
-                    </ul>
-                </div>
-
-                <div class="es-footer">
-                    NWCA Staff Reference · Effective Feb 2026
+                <div class="es-account-list" id="accountList">
+                    <!-- Populated by JS -->
                 </div>
 
             </div>
@@ -615,7 +528,7 @@
         <!-- Tab Content: DECG RETAIL (Customer-Supplied) -->
         <div id="tab-decg-retail" class="tab-content">
             <!-- Collapsible: Customer-Supplied Info (combined) -->
-            <details class="info-disclosure decg">
+            <details class="info-disclosure">
                 <summary>
                     <i class="fas fa-info-circle"></i>
                     Customer-Supplied Pricing Info
@@ -701,7 +614,7 @@
             </div>
 
             <!-- ShopWorks Part Numbers Reference Card -->
-            <div class="shopworks-ref-card decg-retail">
+            <div class="shopworks-ref-card">
                 <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
                 <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
                 <span class="ref-item"><span class="ref-code">DECG</span> Garments</span>
@@ -718,7 +631,7 @@
                 <!-- DECG Garments -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> DECG Garments <span class="part-number-badge decg-retail">DECG</span></h3>
+                        <h3><i class="fas fa-tshirt"></i> DECG Garments <span class="part-number-badge">DECG</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="decgRetailGarmentsMatrix" class="pricing-matrix simple">
@@ -738,7 +651,7 @@
                 <!-- DECG Caps -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> DECG Caps <span class="part-number-badge decg-retail">DECC</span></h3>
+                        <h3><i class="fas fa-hat-cowboy"></i> DECG Caps <span class="part-number-badge">DECC</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="decgRetailCapsMatrix" class="pricing-matrix simple">
@@ -766,7 +679,7 @@
             <div class="matrix-card full-width">
                 <div class="matrix-header">
                     <h3><i class="fas fa-expand"></i> Full Back (25K+ Stitches)
-                        <span class="part-number-badge decg-retail">DECG-FB</span>
+                        <span class="part-number-badge">DECG-FB</span>
                     </h3>
                     <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
                 </div>
@@ -789,10 +702,6 @@
 
         </div>
 
-        <!-- Footer -->
-        <footer class="page-footer">
-            <p>Pricing effective February 2026 | Contract pricing targets $100/hr billing rate</p>
-        </footer>
     </div>
 
     <!-- Hidden Print Container (for Contract Pricing PDF) -->

@@ -1961,6 +1961,17 @@ for (let i = 0; i < items.length; i += batchSize) {
 
 ---
 
+## Bug: Full Back Tier Pricing Only Applied to AL Path, Not Primary Logo (2026-02-18)
+**Date:** 2026-02-18
+**Project:** [Pricing Index]
+**Symptoms:** After implementing FB tier pricing from Digitized Designs Master, batch 10 order #136257 (design #32446, 154K stitches, 2 pcs) still showed $192.75/pc (formula) instead of $186/pc (1-7 tier). Total unchanged at $656.74.
+**Root cause:** The pricing engine has TWO separate Full Back code paths: (1) Primary logo at ~line 1414 where `primaryFullBackStitchCost` is calculated and later multiplied by `garmentQuantity`, and (2) AL Full Back at ~line 1556 which creates a separate `DECG-FB` fee item. Only the AL path was updated — the primary path still used the hardcoded `(stitchCount / 1000) * $1.25` formula.
+**Solution:** Updated both code paths to check `logo.fbPriceTiers` before falling back to formula. Added `_getFBTierPrice(tiers, quantity)` helper method. Primary path uses `garmentQuantity` for tier lookup (total across all products); AL path uses per-product `quantity`. After fix: $641.88 (correct — $13.50 savings + $1.36 tax = $14.86 reduction).
+**Prevention:** When modifying pricing behavior for any feature, search for ALL code paths that calculate that feature's price. The pricing engine has primary logo calculations (early in `calculatePricing()`) AND additional logo calculations (later loop) — both must be checked. Use grep for the specific variable/formula being changed.
+**Files:** `shared_components/js/embroidery-quote-pricing.js` (lines ~1414 and ~1556)
+
+---
+
 # Template for New Entries
 
 ```markdown
