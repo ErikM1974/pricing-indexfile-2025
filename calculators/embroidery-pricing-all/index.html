@@ -513,6 +513,17 @@
                     </div>
                 </div>
 
+                <!-- Affected Customers Section -->
+                <div class="es-section-hdr" style="margin-top: 32px;">
+                    <span class="es-section-hdr-title">Affected Customers</span>
+                    <span class="es-count-badge">235 total</span>
+                </div>
+
+                <button class="es-view-all-btn" id="openSurchargeModal">
+                    <i class="fas fa-users"></i> View All Surcharge Accounts
+                    <span class="es-view-all-count" id="scBtnCount">227</span>
+                </button>
+
                 <!-- Key Account Surcharge List -->
                 <div class="es-section-hdr">
                     <span class="es-section-hdr-title">Key Account Surcharge List</span>
@@ -787,6 +798,64 @@
 
         <div class="print-footer">
             <p>Pricing effective February 2026</p>
+        </div>
+    </div>
+
+    <!-- Surcharge Customer Modal -->
+    <div class="sc-modal-overlay" id="scModal">
+        <div class="sc-modal">
+            <div class="sc-modal-header">
+                <div class="sc-modal-title">
+                    <h2>Stitch Surcharge — All Customer Accounts</h2>
+                    <p class="sc-modal-subtitle">Excludes top 8 key accounts shown on main tab</p>
+                </div>
+                <div class="sc-modal-stats">
+                    <div class="sc-stat"><span class="sc-stat-num" id="scStatTotal">—</span><span class="sc-stat-label">Accounts</span></div>
+                    <div class="sc-stat"><span class="sc-stat-num sc-stat-mid" id="scStatMid">—</span><span class="sc-stat-label">Mid +$4</span></div>
+                    <div class="sc-stat"><span class="sc-stat-num sc-stat-large" id="scStatLarge">—</span><span class="sc-stat-label">Large +$10</span></div>
+                </div>
+                <button class="sc-modal-close" id="scModalClose" title="Close">&times;</button>
+            </div>
+            <div class="sc-modal-controls">
+                <div class="sc-search-wrap">
+                    <i class="fas fa-search sc-search-icon"></i>
+                    <input class="sc-search-input" id="scSearch" type="text" placeholder="Search company, contact, or email...">
+                </div>
+                <span class="sc-filter-label">Tier</span>
+                <div class="sc-filter-group" id="scTierFilters">
+                    <button class="sc-filter-btn active" data-filter="all">All</button>
+                    <button class="sc-filter-btn" data-filter="Mid">Mid +$4</button>
+                    <button class="sc-filter-btn" data-filter="Large">Large +$10</button>
+                    <button class="sc-filter-btn" data-filter="Both">Mixed</button>
+                </div>
+                <span class="sc-filter-label">Rep</span>
+                <div class="sc-filter-group" id="scRepFilters">
+                    <button class="sc-filter-btn active" data-rep="all">All</button>
+                    <button class="sc-filter-btn" data-rep="Nika Lao">Nika</button>
+                    <button class="sc-filter-btn" data-rep="Taneisha Clark">Taneisha</button>
+                    <button class="sc-filter-btn" data-rep="unassigned">House</button>
+                </div>
+                <span class="sc-results-count" id="scResultsCount"></span>
+            </div>
+            <div class="sc-modal-body">
+                <table class="sc-table" id="scTable">
+                    <thead>
+                        <tr>
+                            <th data-col="id" class="sc-sortable"># <span class="sc-sort-arrow">&#8597;</span></th>
+                            <th data-col="company" class="sc-sortable">Company <span class="sc-sort-arrow">&#8597;</span></th>
+                            <th>Contact</th>
+                            <th data-col="rep" class="sc-sortable">Rep <span class="sc-sort-arrow">&#8597;</span></th>
+                            <th data-col="tier" class="sc-sortable">Tier <span class="sc-sort-arrow">&#8597;</span></th>
+                            <th>Logo / Design Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scTbody"></tbody>
+                </table>
+                <div class="sc-empty-state" id="scEmptyState" style="display:none">
+                    <h3>No matching accounts</h3>
+                    <p>Try adjusting your search or filters</p>
+                </div>
+            </div>
         </div>
     </div>
 
