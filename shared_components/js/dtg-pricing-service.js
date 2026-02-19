@@ -664,6 +664,56 @@ class DTGPricingService {
     }
 
     /**
+     * Calculate price from raw pricing data object (as returned by the DTG product bundle endpoint).
+     * Accepts the inner "pricing" sub-object (with tiers, costs, sizes fields).
+     * Handles both single locations (e.g. 'LC') and combo locations (e.g. 'LC_FB').
+     *
+     * Used by dtg-pricing.html to delegate its inline formula so rounding
+     * changes only need to happen in one place.
+     *
+     * @param {Object} rawPricing - The pricingData.pricing object from the page ({ tiers, costs, sizes })
+     * @param {string} locationCode - e.g. 'LC', 'FF', 'LC_FB'
+     * @param {string} tierLabel - e.g. '24-47', '48-71', '72+'
+     * @returns {number} Final price rounded up to nearest $0.50
+     */
+    calculatePriceFromRawData(rawPricing, locationCode, tierLabel) {
+        const { tiers, costs, sizes } = rawPricing;
+
+        // Find the tier data
+        const tier = (tiers || []).find(t => t.TierLabel === tierLabel);
+        if (!tier) {
+            throw new Error(`Tier data not available for ${tierLabel}`);
+        }
+
+        // Get valid garment prices — support both 'price' and 'maxCasePrice' field names
+        const validPrices = (sizes || [])
+            .filter(s => (s.price > 0 || s.maxCasePrice > 0))
+            .map(s => s.price || s.maxCasePrice);
+
+        if (validPrices.length === 0) {
+            throw new Error('No valid garment prices in API data');
+        }
+
+        const baseGarmentCost = Math.min(...validPrices);
+        const garmentWithMargin = baseGarmentCost / tier.MarginDenominator;
+
+        // Sum print costs for all location codes (handles combos via '_' split)
+        const locationCodes = locationCode.split('_');
+        let totalPrintCost = 0;
+        locationCodes.forEach(code => {
+            const costEntry = (costs || []).find(c =>
+                c.PrintLocationCode === code && c.TierLabel === tierLabel
+            );
+            if (!costEntry || !costEntry.PrintCost) {
+                throw new Error(`Print cost data missing for ${code} at tier ${tierLabel}`);
+            }
+            totalPrintCost += parseFloat(costEntry.PrintCost);
+        });
+
+        return Math.ceil((garmentWithMargin + totalPrintCost) * 2) / 2;
+    }
+
+    /**
      * Clear cache (useful for testing)
      */
     clearCache() {

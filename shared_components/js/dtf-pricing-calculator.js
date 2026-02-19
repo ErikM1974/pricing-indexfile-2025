@@ -693,85 +693,61 @@ class DTFPricingCalculator {
             };
         }
 
-        // Step 1: Garment cost with margin (from API tier - NO FALLBACK)
-        const marginDenominator = tierData.marginDenominator;
-        if (!marginDenominator || marginDenominator === 0) {
-            console.error('[DTF Calculator] Invalid margin denominator from API');
-            return { error: 'Invalid margin data', unitPrice: 0, totalOrder: 0 };
+        // Build sizeKeys array from selected locations (for the shared service)
+        const sizeKeys = Array.from(this.currentData.selectedLocations).map(locationValue => {
+            const loc = DTFConfig.transferLocations.find(l => l.value === locationValue);
+            return loc ? loc.size : null;
+        }).filter(Boolean);
+
+        // Delegate the formula to DTFPricingService — single source of truth for rounding
+        let pricing;
+        try {
+            pricing = this.pricingService.calculatePriceForQuantity(
+                garmentCost, this.apiData, sizeKeys, quantity
+            );
+        } catch (err) {
+            console.error('[DTF Calculator] Pricing calculation error:', err);
+            return {
+                error: err.message,
+                unitPrice: 0,
+                totalOrder: 0,
+                quantity,
+                locationCount: this.currentData.selectedLocations.size
+            };
         }
-        const garmentWithMargin = garmentCost / marginDenominator;
 
-        // Step 2: Calculate transfer costs for all selected locations
-        let totalTransferCost = 0;
+        // Build per-location breakdown (needs DTFConfig location labels — not available in service)
         const transferDetails = [];
-
         this.currentData.selectedLocations.forEach(locationValue => {
             const location = DTFConfig.transferLocations.find(l => l.value === locationValue);
             if (!location) return;
-
-            const sizeKey = location.size;
-            const transferPrice = this.getTransferPrice(sizeKey, quantity);
-
-            totalTransferCost += transferPrice;
             transferDetails.push({
                 location: location.label,
-                size: sizeKey,
-                price: transferPrice
+                size: location.size,
+                price: this.getTransferPrice(location.size, quantity)
             });
         });
 
-        // Step 3: Labor cost (from API - NO FALLBACK)
-        const locationCount = this.currentData.selectedLocations.size;
-        if (this.laborCostPerLocation === undefined || this.laborCostPerLocation === null) {
-            console.error('[DTF Calculator] No labor cost data from API');
-            return { error: 'No labor cost data', unitPrice: 0, totalOrder: 0 };
-        }
-        const totalLaborCost = this.laborCostPerLocation * locationCount;
-
-        // Step 4: Freight (from API)
-        const freightPerTransfer = this.getFreightPerTransfer(quantity);
-        const totalFreightCost = freightPerTransfer * locationCount;
-
-        // Step 5: LTM Fee (from API tier data, distributed per unit)
-        // ltmFee can be 0 for 24+ qty tiers - this is valid API data
-        const ltmFee = tierData.ltmFee || 0;
-        // Floor to cents like dtf-quote-pricing.js: Math.floor((ltmFee / qty) * 100) / 100
-        const ltmFeePerUnit = (ltmFee > 0 && quantity > 0)
-            ? Math.floor((ltmFee / quantity) * 100) / 100
-            : 0;
-
-        // Step 6: Subtotal before rounding
-        const subtotalBeforeRounding =
-            garmentWithMargin +
-            totalTransferCost +
-            totalLaborCost +
-            totalFreightCost +
-            ltmFeePerUnit;
-
-        // Step 7: Round UP to nearest $0.50 (HalfDollarCeil)
-        const finalUnitPrice = this.roundHalfDollarCeil(subtotalBeforeRounding);
-
-        // Total order calculation
-        const totalOrder = finalUnitPrice * quantity;
+        const totalOrder = pricing.finalUnitPrice * quantity;
 
         return {
             quantity,
             garmentCost,
-            garmentWithMargin,
-            marginDenominator,
+            garmentWithMargin: pricing.garmentWithMargin,
+            marginDenominator: pricing.marginDenominator,
             transferDetails,
-            totalTransferCost,
+            totalTransferCost: pricing.totalTransferCost,
             laborCostPerLocation: this.laborCostPerLocation,
-            totalLaborCost,
-            freightPerTransfer,
-            totalFreightCost,
-            locationCount,
-            ltmFee,
-            ltmFeePerUnit,
-            subtotalBeforeRounding,
-            finalUnitPrice,
+            totalLaborCost: pricing.totalLaborCost,
+            freightPerTransfer: pricing.freightPerTransfer,
+            totalFreightCost: pricing.totalFreightCost,
+            locationCount: pricing.locationCount,
+            ltmFee: pricing.ltmFee,
+            ltmFeePerUnit: pricing.ltmFeePerUnit,
+            subtotalBeforeRounding: pricing.subtotalBeforeRounding,
+            finalUnitPrice: pricing.finalUnitPrice,
             totalOrder,
-            tierLabel: tierData.tierLabel
+            tierLabel: pricing.tierLabel
         };
     }
 

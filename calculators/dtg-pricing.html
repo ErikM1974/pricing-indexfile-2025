@@ -1629,11 +1629,15 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="/shared_components/js/dtg-pricing-service.js"></script>
     <script src="/shared_components/js/universal-pricing-grid.js"></script>
     <script src="/shared_components/js/manual-mode-indicator.js"></script>
     <script>
         // 🚀 NUCLEAR SOLUTION: Simple DTG Pricing - Following Cap Embroidery Pattern
         console.log('🎯 DTG Pricing Page - Simple Layout (Nuclear Solution)');
+
+        // Shared pricing service instance — formula delegates here so rounding is consistent
+        const dtgCalcHelper = new DTGPricingService();
 
         // State
         let currentProduct = null;
@@ -2206,121 +2210,21 @@
 
             if (isCombo) {
                 // For combo locations, calculate using API data
-                return getDTGPriceForComboLocation(locationCode, apiTierLabel, tier);
+                return getDTGPriceForComboLocation(locationCode, apiTierLabel);
             }
 
             // Single location - calculate price using API data
-            return getDTGPriceForSingleLocation(locationCode, apiTierLabel, tier);
+            return getDTGPriceForSingleLocation(locationCode, apiTierLabel);
         }
 
-        // Helper function for combo location pricing - API DATA ONLY
-        function getDTGPriceForComboLocation(locationCode, tierLabel, tier) {
-            // Split combo location code (e.g., 'LC_FB' -> ['LC', 'FB'])
-            const [firstLocation, secondLocation] = locationCode.split('_');
-
-            // Get the already-calculated price for the first location (includes margin + first print cost)
-            let basePrice = getDTGPriceForSingleLocation(firstLocation, tierLabel, tier);
-
-            // Add the raw print cost for the second location (no margin applied)
-            const secondCost = pricingData.pricing.costs?.find(c =>
-                c.PrintLocationCode === secondLocation && c.TierLabel === tierLabel
-            );
-
-            if (!secondCost || !secondCost.PrintCost) {
-                console.error(`❌ Print cost not found for ${secondLocation} at tier ${tierLabel}`);
-                throw new Error(`Print cost data missing for ${secondLocation}`);
-            }
-
-            basePrice += parseFloat(secondCost.PrintCost);
-            // Round to nearest half dollar
-            basePrice = Math.ceil(basePrice * 2) / 2;
-
-            return basePrice;
+        // Helper function for combo location pricing — delegates to shared service
+        function getDTGPriceForComboLocation(locationCode, tierLabel) {
+            return dtgCalcHelper.calculatePriceFromRawData(pricingData.pricing, locationCode, tierLabel);
         }
 
-        // Helper function for single location pricing - API DATA ONLY
-        function getDTGPriceForSingleLocation(locationCode, tierLabel, tier) {
-            console.log(`🔍 DEBUG getDTGPriceForSingleLocation START:`, {
-                locationCode,
-                tierLabel,
-                tierMarginDenom: tier.MarginDenominator,
-                totalCostsAvailable: pricingData.pricing.costs?.length || 0,
-                totalSizesAvailable: pricingData.pricing.sizes?.length || 0
-            });
-
-            // Get decoration cost from API
-            const costData = pricingData.pricing.costs?.find(c =>
-                c.PrintLocationCode === locationCode && c.TierLabel === tierLabel
-            );
-
-            console.log(`🔍 DEBUG: Looking for location='${locationCode}', tier='${tierLabel}'`);
-            console.log(`🔍 DEBUG: Found costData:`, costData);
-            console.log(`🔍 DEBUG: Print cost from costData:`, costData?.PrintCost);
-
-            // Show all available costs for this location
-            const allLocationCosts = pricingData.pricing.costs?.filter(c =>
-                c.PrintLocationCode === locationCode
-            );
-            console.log(`🔍 DEBUG: All costs for location '${locationCode}':`,
-                allLocationCosts?.map(c => ({
-                    tier: c.TierLabel,
-                    cost: c.PrintCost
-                }))
-            );
-
-            if (!costData || !costData.PrintCost) {
-                console.error(`❌ Print cost not found for ${locationCode} at tier ${tierLabel}`);
-                throw new Error(`Print cost data missing for ${locationCode}`);
-            }
-
-            // Get base garment cost from API
-            if (!pricingData.pricing.sizes || pricingData.pricing.sizes.length === 0) {
-                console.error('❌ Size pricing data not available');
-                throw new Error('Size pricing data missing from API');
-            }
-
-            // Get base garment cost from sizes (supports both 'price' and 'maxCasePrice')
-            // Regular DTG uses 'maxCasePrice', manual mode uses 'price'
-            const validPrices = pricingData.pricing.sizes
-                .filter(s => (s.price > 0 || s.maxCasePrice > 0))
-                .map(s => s.price || s.maxCasePrice);
-
-            console.log(`🔍 DEBUG: Valid prices found:`, validPrices);
-
-            if (validPrices.length === 0) {
-                console.error('❌ No valid garment prices found');
-                throw new Error('No valid garment prices in API data');
-            }
-
-            const baseGarmentCost = Math.min(...validPrices);
-            console.log(`🔍 DEBUG: Base garment cost (minimum):`, baseGarmentCost);
-
-            // Validate tier has margin denominator
-            if (!tier.MarginDenominator) {
-                console.error(`❌ Margin denominator missing for tier ${tierLabel}`);
-                throw new Error(`Tier ${tierLabel} missing margin data`);
-            }
-
-            // Calculate price using API data ONLY
-            const marginDenominator = tier.MarginDenominator;
-            const decorationCost = parseFloat(costData.PrintCost);
-            const garmentWithMargin = baseGarmentCost / marginDenominator;
-            const calculatedPrice = garmentWithMargin + decorationCost;
-
-            console.log(`🔍 DEBUG: Price calculation breakdown:`, {
-                baseGarmentCost,
-                marginDenominator,
-                garmentWithMargin: garmentWithMargin.toFixed(2),
-                decorationCost,
-                calculatedPrice: calculatedPrice.toFixed(2),
-                roundedPrice: Math.ceil(calculatedPrice * 2) / 2
-            });
-
-            // Round to nearest half dollar
-            const finalPrice = Math.ceil(calculatedPrice * 2) / 2;
-            console.log(`🔍 DEBUG getDTGPriceForSingleLocation RESULT: $${finalPrice}`);
-
-            return finalPrice;
+        // Helper function for single location pricing — delegates to shared service
+        function getDTGPriceForSingleLocation(locationCode, tierLabel) {
+            return dtgCalcHelper.calculatePriceFromRawData(pricingData.pricing, locationCode, tierLabel);
         }
 
         // ========================================

@@ -337,6 +337,100 @@ class DTFPricingService {
     }
 
     /**
+     * Calculate the final unit price for a DTF order given garment cost, data, size keys, and quantity.
+     * This is the single authoritative formula so rounding/order-of-operations changes
+     * only need to happen here — dtf-pricing-calculator.js delegates to this method.
+     *
+     * Formula (matches dtf-pricing-calculator.js calculatePricing):
+     *   PRICE = HalfDollarCeil(
+     *     (garmentCost / marginDenominator)
+     *     + SUM(transferCost per sizeKey)
+     *     + (laborCostPerLocation × locationCount)
+     *     + (freightPerTransfer × locationCount)
+     *     + Math.floor((ltmFee / quantity) * 100) / 100
+     *   )
+     *
+     * @param {number} garmentCost - Base garment cost (before margin markup)
+     * @param {Object} data - Transformed data from fetchPricingData() (pricingTiers, transferSizes, freightTiers, laborCostPerLocation)
+     * @param {string[]} sizeKeys - Array of transfer size keys, one per selected location (e.g. ['medium', 'large'])
+     * @param {number} quantity - Order quantity
+     * @returns {Object} { finalUnitPrice, garmentWithMargin, marginDenominator, totalTransferCost,
+     *                     totalLaborCost, freightPerTransfer, totalFreightCost, locationCount,
+     *                     ltmFee, ltmFeePerUnit, subtotalBeforeRounding, tierLabel }
+     */
+    calculatePriceForQuantity(garmentCost, data, sizeKeys, quantity) {
+        const locationCount = sizeKeys.length;
+
+        // Find margin tier
+        const marginTier = (data.pricingTiers || []).find(t =>
+            quantity >= t.minQuantity && quantity <= t.maxQuantity
+        );
+        if (!marginTier) {
+            throw new Error(`No pricing tier found for quantity ${quantity}`);
+        }
+
+        const marginDenominator = marginTier.marginDenominator;
+        const garmentWithMargin = garmentCost / marginDenominator;
+
+        // Sum transfer costs for each selected location size
+        let totalTransferCost = 0;
+        sizeKeys.forEach(sizeKey => {
+            const sizeData = data.transferSizes?.[sizeKey];
+            if (!sizeData) {
+                throw new Error(`Unknown transfer size key: ${sizeKey}`);
+            }
+            const transferTier = sizeData.pricingTiers.find(t =>
+                quantity >= t.minQty && quantity <= t.maxQty
+            );
+            if (!transferTier) {
+                throw new Error(`No transfer pricing tier for size '${sizeKey}' at quantity ${quantity}`);
+            }
+            totalTransferCost += transferTier.unitPrice;
+        });
+
+        // Labor cost (one per location)
+        const laborCostPerLocation = data.laborCostPerLocation || 0;
+        const totalLaborCost = laborCostPerLocation * locationCount;
+
+        // Freight cost (one per location)
+        const freightTier = (data.freightTiers || []).find(t =>
+            quantity >= t.minQty && quantity <= t.maxQty
+        );
+        const freightPerTransfer = freightTier ? freightTier.costPerTransfer : 0;
+        const totalFreightCost = freightPerTransfer * locationCount;
+
+        // LTM fee distributed per unit (floor to cents, matching dtf-pricing-calculator.js)
+        const ltmFee = marginTier.ltmFee || 0;
+        const ltmFeePerUnit = (ltmFee > 0 && quantity > 0)
+            ? Math.floor((ltmFee / quantity) * 100) / 100
+            : 0;
+
+        const subtotalBeforeRounding =
+            garmentWithMargin +
+            totalTransferCost +
+            totalLaborCost +
+            totalFreightCost +
+            ltmFeePerUnit;
+
+        const finalUnitPrice = Math.ceil(subtotalBeforeRounding * 2) / 2;
+
+        return {
+            finalUnitPrice,
+            garmentWithMargin,
+            marginDenominator,
+            totalTransferCost,
+            totalLaborCost,
+            freightPerTransfer,
+            totalFreightCost,
+            locationCount,
+            ltmFee,
+            ltmFeePerUnit,
+            subtotalBeforeRounding,
+            tierLabel: marginTier.tierLabel
+        };
+    }
+
+    /**
      * Get transfer price for a specific size and quantity - REQUIRES API DATA
      * @throws {Error} if API data not loaded
      */
