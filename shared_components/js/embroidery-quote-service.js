@@ -339,7 +339,10 @@ class EmbroideryQuoteService {
                 PriceAuditJSON: customerData.priceAuditJSON || '',
                 // Package tracking (2026-02-14)
                 Carrier: customerData.carrier || '',
-                TrackingNumber: customerData.trackingNumber || ''
+                TrackingNumber: customerData.trackingNumber || '',
+                // Design assignments (2026-02-19)
+                GarmentDesignNumber: customerData.garmentDesignNumber || '',
+                CapDesignNumber: customerData.capDesignNumber || ''
             };
 
             // Save session
@@ -1401,6 +1404,9 @@ class EmbroideryQuoteService {
                 // Package tracking (2026-02-14)
                 Carrier: customerData.carrier || '',
                 TrackingNumber: customerData.trackingNumber || '',
+                // Design assignments (2026-02-19)
+                GarmentDesignNumber: customerData.garmentDesignNumber || '',
+                CapDesignNumber: customerData.capDesignNumber || '',
                 // Revision tracking (fields added to Caspio 2026-01-15)
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),

@@ -2762,6 +2762,10 @@ Company:Absher Construction Company
                     if (fbField) fbField.style.display = '';
                     if (fbInput) fbInput.value = draft.primaryLogo.stitchCount || 25000;
                 }
+                // Restore design number label on card header
+                if (draft.primaryLogo.designNumber) {
+                    updateLogoCardHeader('garment', draft.primaryLogo.designNumber);
+                }
             }
 
             // Restore cap primary logo if present
@@ -2774,6 +2778,10 @@ Company:Absher Construction Company
                 );
                 const capDigitizingEl = document.getElementById('cap-primary-digitizing');
                 if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
+                // Restore design number label on card header
+                if (draft.capPrimaryLogo.designNumber) {
+                    updateLogoCardHeader('cap', draft.capPrimaryLogo.designNumber);
+                }
             }
 
             // Restore LTM override state
@@ -3142,6 +3150,16 @@ Company:Absher Construction Company
                     if (container) container.classList.add('checked');
                 }
                 capPrimaryLogo.needsDigitizing = true;
+            }
+
+            // Design number assignments (2026-02-19)
+            if (session.GarmentDesignNumber) {
+                primaryLogo.designNumber = session.GarmentDesignNumber;
+                updateLogoCardHeader('garment', session.GarmentDesignNumber);
+            }
+            if (session.CapDesignNumber) {
+                capPrimaryLogo.designNumber = session.CapDesignNumber;
+                updateLogoCardHeader('cap', session.CapDesignNumber);
             }
         }
 
@@ -3543,6 +3561,19 @@ Company:Absher Construction Company
         // ============================================================
         // PRIMARY LOGO HANDLERS
         // ============================================================
+
+        function updateLogoCardHeader(type, designNumber) {
+            const cardId = type === 'garment' ? 'garment-logo-card' : 'cap-logo-card';
+            const baseTitle = type === 'garment' ? 'Primary Logo' : 'Cap Front Logo';
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const titleEl = card.querySelector('.logo-card-title');
+            if (titleEl) {
+                titleEl.textContent = designNumber
+                    ? `${baseTitle} — Design #${designNumber}`
+                    : baseTitle;
+            }
+        }
 
         function setupPrimaryLogoHandlers() {
             // Position and tier dropdown handled by inline onchange handlers
@@ -7529,6 +7560,9 @@ Company:Absher Construction Company
                     // Package tracking (2026-02-14)
                     carrier: lastImportMetadata?.carrier || '',
                     trackingNumber: lastImportMetadata?.trackingNumber || '',
+                    // Design assignments (2026-02-19)
+                    garmentDesignNumber: primaryLogo.designNumber || '',
+                    capDesignNumber: (typeof capPrimaryLogo !== 'undefined' ? capPrimaryLogo.designNumber : '') || '',
                     // ShopWorks pricing audit (2026-02-13)
                     swTotal: lastImportMetadata?.swTotal ?? 0,
                     swSubtotal: lastImportMetadata?.swSubtotal ?? 0,
@@ -7910,6 +7944,14 @@ Company:Absher Construction Company
             primaryLogo.position = 'Left Chest';
             primaryLogo.stitchCount = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             primaryLogo.needsDigitizing = false;
+            primaryLogo.designNumber = null;
+            primaryLogo.designName = null;
+            updateLogoCardHeader('garment', null);
+            if (typeof capPrimaryLogo !== 'undefined') {
+                capPrimaryLogo.designNumber = null;
+                capPrimaryLogo.designName = null;
+                updateLogoCardHeader('cap', null);
+            }
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             document.getElementById('primary-digitizing').checked = false;
@@ -8592,7 +8634,7 @@ Company:Absher Construction Company
                 if (embConfigOptions) {
                     embConfigSection.style.display = '';
 
-                    // Design info banner — enhanced with stitch count lookup
+                    // Design info banner — enhanced with stitch count lookup + per-design assignment
                     const designBanner = document.getElementById('spr-design-info-banner');
                     const lookup = embConfigOptions.designLookup;
                     let autoGarmentTier = '8000';
@@ -8601,92 +8643,275 @@ Company:Absher Construction Company
                     let autoCapTier = '8000';
                     let hasFullBack = false;
 
-                    if (lookup && lookup.designs && Object.keys(lookup.designs).length > 0) {
-                        // Build design info HTML with stitch counts
+                    // Build unified design list from parser + DB lookup
+                    const rawDesignNums = embConfigOptions.designNumbersRaw || [];
+                    const rawDesignLabels = embConfigOptions.designNumbers || [];
+                    const designEntries = []; // { num, label, dbInfo (or null), inDb }
+
+                    for (let di = 0; di < rawDesignNums.length; di++) {
+                        const num = rawDesignNums[di];
+                        const label = rawDesignLabels[di] || `Design #${num}`;
+                        const dbInfo = lookup?.designs?.[num] || null;
+                        designEntries.push({ num, label, dbInfo, inDb: !!dbInfo });
+                    }
+                    // Also include DB-found designs not in parser list (rare edge case)
+                    if (lookup?.designs) {
+                        for (const [num, info] of Object.entries(lookup.designs)) {
+                            if (!designEntries.find(d => d.num === num)) {
+                                designEntries.push({ num, label: `Design #${num}`, dbInfo: info, inDb: true });
+                            }
+                        }
+                    }
+
+                    // Extract FB price tiers from first Full Back design found
+                    let fbPriceTiersFromLookup = null;
+
+                    if (designEntries.length > 0) {
                         let bannerHtml = '';
-                        let maxStitchCount = 0;
-                        let maxStitchTier = 'Standard';
-                        let maxAsSurcharge = 0;
-                        let fbPriceTiersFromLookup = null;
+                        const showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
 
-                        for (const [designNum, info] of Object.entries(lookup.designs)) {
-                            const sc = info.maxStitchCount;
-                            const tier = info.maxStitchTier || 'Standard';
-                            const surcharge = info.maxAsSurcharge || 0;
-                            const scFormatted = sc.toLocaleString();
+                        if (showAssignment) {
+                            bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group" style="margin-right:4px;"></i>Design Logo Assignment</div>`;
+                        }
 
-                            let tierBadge = '';
-                            if (tier === 'Full Back') {
-                                tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
-                                hasFullBack = true;
-                                // Extract FB tier pricing if available
-                                if (info.hasFBPricing && !fbPriceTiersFromLookup) {
-                                    const fbVariant = info.variants.find(v => v.fbPrice1_7 > 0);
-                                    if (fbVariant) {
-                                        fbPriceTiersFromLookup = {
-                                            fbPrice1_7: fbVariant.fbPrice1_7,
-                                            fbPrice8_23: fbVariant.fbPrice8_23,
-                                            fbPrice24_47: fbVariant.fbPrice24_47,
-                                            fbPrice48_71: fbVariant.fbPrice48_71,
-                                            fbPrice72plus: fbVariant.fbPrice72plus
-                                        };
-                                    }
-                                }
-                            } else if (surcharge > 0) {
-                                tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${tier} +$${surcharge}/pc</span>`;
+                        // Smart auto-assign defaults
+                        // Sort by stitch count descending for DB-found designs
+                        const sortedEntries = [...designEntries];
+                        if (sortedEntries.every(e => e.inDb)) {
+                            sortedEntries.sort((a, b) => (b.dbInfo?.maxStitchCount || 0) - (a.dbInfo?.maxStitchCount || 0));
+                        }
+                        const defaultAssignments = {};
+                        if (showAssignment) {
+                            if (embConfigOptions.hasGarments && embConfigOptions.hasCaps) {
+                                // First/highest → garment, second/lowest → cap
+                                defaultAssignments[sortedEntries[0].num] = 'garment';
+                                if (sortedEntries.length >= 2) defaultAssignments[sortedEntries[1].num] = 'cap';
+                                for (let i = 2; i < sortedEntries.length; i++) defaultAssignments[sortedEntries[i].num] = 'none';
+                            } else if (embConfigOptions.hasGarments) {
+                                sortedEntries.forEach(e => { defaultAssignments[e.num] = 'garment'; });
                             } else {
-                                tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
-                            }
-
-                            bannerHtml += `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;">`;
-                            bannerHtml += `<strong>#${escapeHtml(designNum)}</strong>`;
-                            bannerHtml += `<span style="color:#475569;">${escapeHtml(info.company || '')}</span>`;
-                            bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
-                            bannerHtml += tierBadge;
-                            if (info.variants && info.variants.length > 1) {
-                                bannerHtml += `<span style="color:#94a3b8;font-size:11px;">(${info.variants.length} variants)</span>`;
-                            }
-                            bannerHtml += `</div>`;
-
-                            if (sc > maxStitchCount) {
-                                maxStitchCount = sc;
-                                maxStitchTier = tier;
-                                maxAsSurcharge = surcharge;
+                                sortedEntries.forEach(e => { defaultAssignments[e.num] = 'cap'; });
                             }
                         }
 
-                        // Show not-found designs
-                        if (lookup.notFound && lookup.notFound.length > 0) {
-                            bannerHtml += `<div style="color:#94a3b8;font-size:11px;padding-top:4px;">Not in database: ${lookup.notFound.map(n => '#' + n).join(', ')}</div>`;
+                        // Track max stitch for garment auto-tier and FB detection
+                        let maxStitchCount = 0;
+                        let maxStitchTier = 'Standard';
+                        let maxAsSurcharge = 0;
+
+                        for (const entry of designEntries) {
+                            const { num, label, dbInfo, inDb } = entry;
+
+                            bannerHtml += `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;flex-wrap:wrap;">`;
+                            bannerHtml += `<strong>#${escapeHtml(num)}</strong>`;
+
+                            if (inDb) {
+                                const sc = dbInfo.maxStitchCount;
+                                const tier = dbInfo.maxStitchTier || 'Standard';
+                                const surcharge = dbInfo.maxAsSurcharge || 0;
+                                const scFormatted = sc.toLocaleString();
+
+                                bannerHtml += `<span style="color:#475569;">${escapeHtml(dbInfo.company || '')}</span>`;
+                                bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+
+                                let tierBadge = '';
+                                if (tier === 'Full Back') {
+                                    tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                                    if (!fbPriceTiersFromLookup && dbInfo.hasFBPricing) {
+                                        const fbVariant = dbInfo.variants.find(v => v.fbPrice1_7 > 0);
+                                        if (fbVariant) {
+                                            fbPriceTiersFromLookup = {
+                                                fbPrice1_7: fbVariant.fbPrice1_7,
+                                                fbPrice8_23: fbVariant.fbPrice8_23,
+                                                fbPrice24_47: fbVariant.fbPrice24_47,
+                                                fbPrice48_71: fbVariant.fbPrice48_71,
+                                                fbPrice72plus: fbVariant.fbPrice72plus
+                                            };
+                                        }
+                                    }
+                                } else if (surcharge > 0) {
+                                    tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+                                } else {
+                                    tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                                }
+                                bannerHtml += tierBadge;
+
+                                if (dbInfo.variants && dbInfo.variants.length > 1) {
+                                    bannerHtml += `<span style="color:#94a3b8;font-size:11px;">(${dbInfo.variants.length} variants)</span>`;
+                                }
+                            } else {
+                                // Extract name from label (format: "Design #XXXXX — Name...")
+                                const nameMatch = label.match(/—\s*(.+)/);
+                                if (nameMatch) {
+                                    bannerHtml += `<span style="color:#475569;">${escapeHtml(nameMatch[1].trim())}</span>`;
+                                }
+                                bannerHtml += '<span style="background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Not in database</span>';
+                            }
+
+                            // Assignment dropdown (only for 2+ designs)
+                            if (showAssignment) {
+                                const defaultVal = defaultAssignments[num] || 'garment';
+                                bannerHtml += `<select id="spr-design-assign-${escapeHtml(num)}" data-design-num="${escapeHtml(num)}" class="spr-design-assign" style="margin-left:auto;padding:2px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;">`;
+                                if (embConfigOptions.hasGarments) bannerHtml += `<option value="garment"${defaultVal === 'garment' ? ' selected' : ''}>Garment Logo</option>`;
+                                if (embConfigOptions.hasCaps) bannerHtml += `<option value="cap"${defaultVal === 'cap' ? ' selected' : ''}>Cap Logo</option>`;
+                                bannerHtml += `<option value="both"${defaultVal === 'both' ? ' selected' : ''}>Both</option>`;
+                                bannerHtml += `<option value="none"${defaultVal === 'none' ? ' selected' : ''}>None (skip)</option>`;
+                                bannerHtml += `</select>`;
+                            }
+
+                            bannerHtml += `</div>`;
                         }
 
                         designBanner.style.display = '';
                         designBanner.style.background = '#eff6ff';
-                        designBanner.innerHTML = `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>${bannerHtml}`;
+                        const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>';
+                        designBanner.innerHTML = headerText + bannerHtml;
 
-                        // Auto-determine garment tier from max stitch count
-                        autoGarmentStitchCount = maxStitchCount;
-                        if (hasFullBack || maxStitchCount >= 25000) {
-                            autoGarmentTier = '25000';
-                            autoGarmentPosition = 'Full Back';
-                            embConfigOptions.fbPriceTiers = fbPriceTiersFromLookup;
-                        } else {
-                            autoGarmentTier = mapStitchCountToTierValue(maxStitchCount, '');
-                        }
+                        // Function to recalculate auto-tiers from assignment dropdowns
+                        function _recalcDesignAssignments() {
+                            let garmentDesignNum = null;
+                            let capDesignNum = null;
 
-                        // For caps, use smallest variant stitch count (cap designs are usually smaller)
-                        let minCapStitch = Infinity;
-                        for (const info of Object.values(lookup.designs)) {
-                            for (const v of info.variants) {
-                                if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                            if (showAssignment) {
+                                const selects = designBanner.querySelectorAll('.spr-design-assign');
+                                selects.forEach(sel => {
+                                    const dNum = sel.dataset.designNum;
+                                    const val = sel.value;
+                                    if (val === 'garment' || val === 'both') {
+                                        if (!garmentDesignNum) garmentDesignNum = dNum;
+                                    }
+                                    if (val === 'cap' || val === 'both') {
+                                        if (!capDesignNum) capDesignNum = dNum;
+                                    }
+                                });
+                            } else if (designEntries.length === 1) {
+                                // Single design — assign to whatever types exist
+                                garmentDesignNum = designEntries[0].num;
+                                capDesignNum = designEntries[0].num;
                             }
+
+                            // Store assignment on embConfigOptions for later retrieval
+                            embConfigOptions._garmentDesignNum = garmentDesignNum;
+                            embConfigOptions._capDesignNum = capDesignNum;
+
+                            // Auto-set garment tier from assigned design
+                            autoGarmentTier = '8000';
+                            autoGarmentPosition = 'Left Chest';
+                            autoGarmentStitchCount = 8000;
+                            hasFullBack = false;
+                            embConfigOptions.fbPriceTiers = null;
+
+                            if (garmentDesignNum) {
+                                const gInfo = lookup?.designs?.[garmentDesignNum];
+                                if (gInfo) {
+                                    const sc = gInfo.maxStitchCount;
+                                    const tier = gInfo.maxStitchTier || 'Standard';
+                                    autoGarmentStitchCount = sc;
+                                    if (tier === 'Full Back' || sc >= 25000) {
+                                        autoGarmentTier = '25000';
+                                        autoGarmentPosition = 'Full Back';
+                                        hasFullBack = true;
+                                        // Set FB price tiers from this specific design
+                                        if (gInfo.hasFBPricing) {
+                                            const fbVariant = gInfo.variants.find(v => v.fbPrice1_7 > 0);
+                                            if (fbVariant) {
+                                                embConfigOptions.fbPriceTiers = {
+                                                    fbPrice1_7: fbVariant.fbPrice1_7,
+                                                    fbPrice8_23: fbVariant.fbPrice8_23,
+                                                    fbPrice24_47: fbVariant.fbPrice24_47,
+                                                    fbPrice48_71: fbVariant.fbPrice48_71,
+                                                    fbPrice72plus: fbVariant.fbPrice72plus
+                                                };
+                                            }
+                                        }
+                                    } else {
+                                        autoGarmentTier = mapStitchCountToTierValue(sc, '');
+                                    }
+                                }
+                            }
+
+                            // Auto-set cap tier from assigned design
+                            autoCapTier = '8000';
+                            if (capDesignNum) {
+                                const cInfo = lookup?.designs?.[capDesignNum];
+                                if (cInfo) {
+                                    // For caps, use smallest variant stitch count
+                                    let minCapStitch = Infinity;
+                                    for (const v of cInfo.variants) {
+                                        if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                                    }
+                                    if (minCapStitch < Infinity) {
+                                        autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+                                    }
+                                }
+                            }
+
+                            // Update the garment/cap tier dropdowns in the modal
+                            const gTierEl = document.getElementById('spr-garment-stitch-tier');
+                            const gPosEl = document.getElementById('spr-garment-position');
+                            const cTierEl = document.getElementById('spr-cap-stitch-tier');
+                            if (gTierEl) gTierEl.value = autoGarmentTier;
+                            if (gPosEl) gPosEl.value = autoGarmentPosition;
+                            if (cTierEl) cTierEl.value = autoCapTier;
                         }
-                        if (minCapStitch < Infinity && minCapStitch !== maxStitchCount) {
-                            autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+
+                        // Wire up onchange for assignment dropdowns
+                        if (showAssignment) {
+                            setTimeout(() => {
+                                const selects = designBanner.querySelectorAll('.spr-design-assign');
+                                selects.forEach(sel => {
+                                    sel.addEventListener('change', _recalcDesignAssignments);
+                                });
+                            }, 0);
+                        }
+
+                        // Run initial assignment calculation
+                        // (for single-design or initial defaults — sets autoGarmentTier/autoCapTier)
+                        // Defer to after DOM update if using assignment dropdowns
+                        if (!showAssignment) {
+                            // Legacy single-design or no-assignment path
+                            for (const entry of designEntries) {
+                                if (entry.inDb) {
+                                    const sc = entry.dbInfo.maxStitchCount;
+                                    const tier = entry.dbInfo.maxStitchTier || 'Standard';
+                                    if (sc > maxStitchCount) {
+                                        maxStitchCount = sc;
+                                        maxStitchTier = tier;
+                                        maxAsSurcharge = entry.dbInfo.maxAsSurcharge || 0;
+                                    }
+                                }
+                            }
+                            autoGarmentStitchCount = maxStitchCount || 8000;
+                            if (maxStitchTier === 'Full Back' || maxStitchCount >= 25000) {
+                                autoGarmentTier = '25000';
+                                autoGarmentPosition = 'Full Back';
+                                hasFullBack = true;
+                                embConfigOptions.fbPriceTiers = fbPriceTiersFromLookup;
+                            } else if (maxStitchCount > 0) {
+                                autoGarmentTier = mapStitchCountToTierValue(maxStitchCount, '');
+                            }
+                            // Cap tier: use smallest variant
+                            let minCapStitch = Infinity;
+                            for (const entry of designEntries) {
+                                if (entry.inDb) {
+                                    for (const v of entry.dbInfo.variants) {
+                                        if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                                    }
+                                }
+                            }
+                            if (minCapStitch < Infinity && minCapStitch !== maxStitchCount) {
+                                autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+                            }
+                            // Store single design assignment
+                            embConfigOptions._garmentDesignNum = designEntries[0]?.num || null;
+                            embConfigOptions._capDesignNum = designEntries[0]?.num || null;
+                        } else {
+                            // Use default assignments to set initial tiers
+                            setTimeout(_recalcDesignAssignments, 0);
                         }
 
                     } else if (embConfigOptions.designInfo) {
-                        // Fallback: show simple design text if lookup had no results
+                        // Fallback: show simple design text if lookup had no results and no raw design numbers
                         designBanner.style.display = '';
                         designBanner.innerHTML = `<i class="fas fa-palette" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
                     } else {
@@ -8993,6 +9218,41 @@ Company:Absher Construction Company
             // Collect embroidery config if section was shown
             let embConfig = null;
             if (_sprEmbConfigOptions) {
+                // Resolve design assignments from dropdowns
+                let garmentDesignNumber = null;
+                let garmentDesignName = null;
+                let capDesignNumber = null;
+                let capDesignName = null;
+
+                if (_sprEmbConfigOptions._garmentDesignNum || _sprEmbConfigOptions._capDesignNum) {
+                    // Read from assignment state (set by _recalcDesignAssignments or single-design path)
+                    const assignSelects = document.querySelectorAll('.spr-design-assign');
+                    if (assignSelects.length > 0) {
+                        // Multi-design: read from dropdowns
+                        assignSelects.forEach(sel => {
+                            const dNum = sel.dataset.designNum;
+                            const val = sel.value;
+                            const entry = (_sprEmbConfigOptions.designNumbers || []).find(l => l.includes('#' + dNum));
+                            const nameMatch = entry ? entry.match(/—\s*(.+)/) : null;
+                            const dName = nameMatch ? nameMatch[1].trim() : '';
+                            if (val === 'garment' || val === 'both') {
+                                if (!garmentDesignNumber) { garmentDesignNumber = dNum; garmentDesignName = dName; }
+                            }
+                            if (val === 'cap' || val === 'both') {
+                                if (!capDesignNumber) { capDesignNumber = dNum; capDesignName = dName; }
+                            }
+                        });
+                    } else {
+                        // Single design: assign to whatever types exist
+                        const singleNum = _sprEmbConfigOptions._garmentDesignNum;
+                        const singleEntry = (_sprEmbConfigOptions.designNumbers || []).find(l => l.includes('#' + singleNum));
+                        const singleNameMatch = singleEntry ? singleEntry.match(/—\s*(.+)/) : null;
+                        const singleName = singleNameMatch ? singleNameMatch[1].trim() : '';
+                        if (_sprEmbConfigOptions.hasGarments) { garmentDesignNumber = singleNum; garmentDesignName = singleName; }
+                        if (_sprEmbConfigOptions.hasCaps) { capDesignNumber = singleNum; capDesignName = singleName; }
+                    }
+                }
+
                 embConfig = {
                     garmentPosition: document.getElementById('spr-garment-position')?.value || 'Left Chest',
                     garmentStitchTier: parseInt(document.getElementById('spr-garment-stitch-tier')?.value) || 8000,
@@ -9001,7 +9261,11 @@ Company:Absher Construction Company
                     capStitchTier: parseInt(document.getElementById('spr-cap-stitch-tier')?.value) || 8000,
                     capDigitizing: document.getElementById('spr-cap-digitizing')?.checked || false,
                     ltmEnabled: document.getElementById('spr-ltm-enabled')?.checked ?? true,
-                    fbPriceTiers: embConfigOptions?.fbPriceTiers || null
+                    fbPriceTiers: _sprEmbConfigOptions?.fbPriceTiers || null,
+                    garmentDesignNumber: garmentDesignNumber,
+                    garmentDesignName: garmentDesignName,
+                    capDesignNumber: capDesignNumber,
+                    capDesignName: capDesignName
                 };
             }
 
@@ -10239,10 +10503,13 @@ Company:Absher Construction Company
                     digitizing: data.services.digitizing || false,
                     designInfo: designInfo,
                     allProductsHaveSwPrice: allProductsHaveSwPrice,
-                    designLookup: designLookup
+                    designLookup: designLookup,
+                    designNumbers: data.designNumbers || [],
+                    designNumbersRaw: data.designNumbersRaw || []
                 };
 
                 // Show pricing review modal with embroidery config
+                hideImportProgress();  // overlay (z-index 10001) blocks modal (z-index 10000)
                 let reviewResults = null;
                 if (productReviewItems.length > 0 || serviceReviewItems.length > 0 || embConfigOptions.hasGarments || embConfigOptions.hasCaps) {
                     reviewResults = await showServicePricingReview(serviceReviewItems, productReviewItems, embConfigOptions);
@@ -10311,6 +10578,18 @@ Company:Absher Construction Company
                     if (ltmCheckbox) {
                         ltmCheckbox.checked = embConfig.ltmEnabled;
                         document.getElementById('ltm-status-label').textContent = embConfig.ltmEnabled ? 'Applied' : 'Waived';
+                    }
+
+                    // Store design number assignments on logo objects + update card headers
+                    if (embConfig.garmentDesignNumber) {
+                        primaryLogo.designNumber = embConfig.garmentDesignNumber;
+                        primaryLogo.designName = embConfig.garmentDesignName || '';
+                        updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
+                    }
+                    if (embConfig.capDesignNumber) {
+                        capPrimaryLogo.designNumber = embConfig.capDesignNumber;
+                        capPrimaryLogo.designName = embConfig.capDesignName || '';
+                        updateLogoCardHeader('cap', embConfig.capDesignNumber);
                     }
                 }
 

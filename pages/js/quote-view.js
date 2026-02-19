@@ -786,6 +786,16 @@ class QuoteViewPage {
 
         // Only show stitches and embroidery-specific fields for embroidery quotes
         if (isEmbroideryQuote) {
+            // Design number assignments (2026-02-19)
+            const garmentDesign = this.quoteData?.GarmentDesignNumber;
+            const capDesign = this.quoteData?.CapDesignNumber;
+            if (garmentDesign) {
+                html += `<div class="emb-detail"><span class="emb-label">Garment Design:</span> <span class="emb-value">#${this.escapeHtml(garmentDesign)}</span></div>`;
+            }
+            if (capDesign && capDesign !== garmentDesign) {
+                html += `<div class="emb-detail"><span class="emb-label">Cap Design:</span> <span class="emb-value">#${this.escapeHtml(capDesign)}</span></div>`;
+            }
+
             const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
             const digitizing = this.quoteData?.DigitizingFee || 0;
             const addlLocation = this.quoteData?.AdditionalLogoLocation || '';
@@ -2280,10 +2290,16 @@ class QuoteViewPage {
                 const capStitches = parseInt(this.quoteData?.CapStitchCount) || 0;
                 const capDigitizing = parseFloat(this.quoteData?.CapDigitizingFee) || 0;
 
+                // Design number assignments for PDF (2026-02-19)
+                const pdfGarmentDesign = this.quoteData?.GarmentDesignNumber || '';
+                const pdfCapDesign = this.quoteData?.CapDesignNumber || '';
+                const hasDesignNumbers = pdfGarmentDesign || (pdfCapDesign && pdfCapDesign !== pdfGarmentDesign);
+
                 // Calculate box height: base 22mm, add 6mm for each extra row
                 const hasAddlLogo = addlLocation || addlStitches > 0;
                 const hasCapLogo = capQtyPdf > 0 && (capLocation || capStitches > 0);
                 let boxHeight = 22;
+                if (hasDesignNumbers) boxHeight += 6;
                 if (hasAddlLogo) boxHeight += 6;
                 if (hasCapLogo) boxHeight += 6;
 
@@ -2298,16 +2314,29 @@ class QuoteViewPage {
                 pdf.setFontSize(8);
                 pdf.setFont('helvetica', 'normal');
 
+                // Design number row (if present)
+                let designRowOffset = 0;
+                if (hasDesignNumbers) {
+                    let designText = '';
+                    if (pdfGarmentDesign) designText += `Garment Design: #${pdfGarmentDesign}`;
+                    if (pdfCapDesign && pdfCapDesign !== pdfGarmentDesign) {
+                        if (designText) designText += '    ';
+                        designText += `Cap Design: #${pdfCapDesign}`;
+                    }
+                    pdf.text(designText, margin + 3, yPos + 11);
+                    designRowOffset = 6;
+                }
+
                 // Row 1: Location and Stitch Count
-                pdf.text(`Location: ${location}`, margin + 3, yPos + 11);
-                pdf.text(`Stitch Count: ${stitches.toLocaleString()}`, margin + 70, yPos + 11);
+                pdf.text(`Location: ${location}`, margin + 3, yPos + 11 + designRowOffset);
+                pdf.text(`Stitch Count: ${stitches.toLocaleString()}`, margin + 70, yPos + 11 + designRowOffset);
 
                 // Row 2: Digitizing and Additional Charges
                 if (digitizing > 0) {
-                    pdf.text(`Digitizing Fee: ${this.formatCurrency(digitizing)}`, margin + 3, yPos + 17);
+                    pdf.text(`Digitizing Fee: ${this.formatCurrency(digitizing)}`, margin + 3, yPos + 17 + designRowOffset);
                 }
                 if (additionalStitchCharge > 0) {
-                    pdf.text(`Add'l Stitch Charge: ${this.formatCurrency(additionalStitchCharge)}`, margin + 70, yPos + 17);
+                    pdf.text(`Add'l Stitch Charge: ${this.formatCurrency(additionalStitchCharge)}`, margin + 70, yPos + 17 + designRowOffset);
                 }
 
                 // Row 3: Additional Logo (if present)
@@ -2315,12 +2344,12 @@ class QuoteViewPage {
                     const addlText = addlLocation
                         ? `Additional Logo: ${addlLocation} (${addlStitches.toLocaleString()} stitches)`
                         : `Additional Logo: ${addlStitches.toLocaleString()} stitches`;
-                    pdf.text(addlText, margin + 3, yPos + 23);
+                    pdf.text(addlText, margin + 3, yPos + 23 + designRowOffset);
                 }
 
                 // Row 4: Cap Logo (if present)
                 if (hasCapLogo) {
-                    const capRowY = hasAddlLogo ? 29 : 23;
+                    const capRowY = (hasAddlLogo ? 29 : 23) + designRowOffset;
                     let capText = capLocation
                         ? `Cap Logo: ${capLocation} (${capStitches.toLocaleString()} stitches)`
                         : `Cap Logo: ${capStitches.toLocaleString()} stitches`;
