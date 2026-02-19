@@ -556,7 +556,7 @@ class EmbroideryQuoteService {
                 }
             }
 
-            // Save manual service items (Monogram/NAME/WEIGHT from "Add Service" button)
+            // Save manual service items (Monogram/Name-Number/WEIGHT from "Add Service" button)
             if (pricingResults.manualServiceItems && pricingResults.manualServiceItems.length > 0) {
                 for (const svc of pricingResults.manualServiceItems) {
                     const svcTotal = svc.unitPrice * svc.totalQuantity;
@@ -1612,7 +1612,7 @@ class EmbroideryQuoteService {
                 }
             }
 
-            // Save manual service items (Monogram/NAME/WEIGHT from "Add Service" button)
+            // Save manual service items (Monogram/Name-Number/WEIGHT from "Add Service" button)
             if (pricingResults.manualServiceItems && pricingResults.manualServiceItems.length > 0) {
                 for (const svc of pricingResults.manualServiceItems) {
                     const svcTotal = svc.unitPrice * svc.totalQuantity;

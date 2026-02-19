@@ -135,18 +135,6 @@ const SHOPWORKS_SERVICE_CODES = [
         PerUnit: 'each',
         Notes: 'Monogram/name embroidery. SW cost $7, 2026 sell $12.50.'
     },
-    {
-        ServiceCode: 'NAME',
-        ServiceType: 'EMBROIDERY',
-        DisplayName: 'Names on Garments',
-        Category: 'Service',
-        PricingMethod: 'FIXED',
-        TierLabel: '',
-        UnitCost: 7.00,
-        SellPrice: 12.50,
-        PerUnit: 'each',
-        Notes: 'Individual name embroidery (same price as Monogram). SW cost $7, 2026 sell $12.50.'
-    },
     // ── Name & Number Combo ──
     {
         ServiceCode: 'Name/Number',
@@ -353,38 +341,14 @@ const SHOPWORKS_SERVICE_CODES = [
     {
         ServiceCode: 'CDP',
         ServiceType: 'DIGITAL_PRINT',
-        DisplayName: 'Digital Print (supplied)',
+        DisplayName: 'Digital Print (DTG)',
         Category: 'Service',
         PricingMethod: 'PASSTHROUGH',
         TierLabel: '',
         UnitCost: 2.00,
         SellPrice: 0,
         PerUnit: 'each',
-        Notes: 'Customer-supplied digital print. Track only.'
-    },
-    {
-        ServiceCode: 'CDP 5x5',
-        ServiceType: 'DIGITAL_PRINT',
-        DisplayName: 'Digital Print ≤5"',
-        Category: 'Service',
-        PricingMethod: 'PASSTHROUGH',
-        TierLabel: '',
-        UnitCost: 2.00,
-        SellPrice: 0,
-        PerUnit: 'each',
-        Notes: 'Digital print up to 5 inches. Track only.'
-    },
-    {
-        ServiceCode: 'CDP 5x5-10',
-        ServiceType: 'DIGITAL_PRINT',
-        DisplayName: 'Digital Print 5"-10"',
-        Category: 'Service',
-        PricingMethod: 'PASSTHROUGH',
-        TierLabel: '',
-        UnitCost: 2.00,
-        SellPrice: 0,
-        PerUnit: 'each',
-        Notes: 'Digital print 5 to 10 inches. Track only.'
+        Notes: 'DTG digital print. Pass-through pricing.'
     },
     {
         ServiceCode: 'Pallet',

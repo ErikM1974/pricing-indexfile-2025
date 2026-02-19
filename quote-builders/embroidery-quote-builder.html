@@ -468,9 +468,9 @@
                                     <i class="fas fa-font" style="color: #f59e0b; width: 16px;"></i>
                                     <span>Monogram / Name — <strong>$12.50</strong></span>
                                 </button>
-                                <button onclick="addManualServiceRow('NAME')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                                <button onclick="addManualServiceRow('Name/Number')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
                                     <i class="fas fa-id-badge" style="color: #6366f1; width: 16px;"></i>
-                                    <span>Individual Name — <strong>$12.50</strong></span>
+                                    <span>Name / Number — <strong>$15.00</strong></span>
                                 </button>
                                 <button onclick="addManualServiceRow('SEG')" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; border: none; background: none; cursor: pointer; font-size: 13px; color: #334155; text-align: left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
                                     <i class="fas fa-tape" style="color: #ef4444; width: 16px;"></i>
@@ -3153,9 +3153,9 @@ Company:Absher Construction Company
             // Service items to create as service product rows (2026-02 refactor)
             const SERVICE_STYLE_NUMBERS = [
                 'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
-                '3D-EMB', 'Laser Patch', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
+                '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
                 // Legacy backward-compat (old quotes):
-                'FB', 'MONOGRAM', 'AS-GARM'
+                'FB', 'MONOGRAM', 'AS-GARM', 'NAME'
             ];
 
             // Separate service items from regular products
@@ -3907,7 +3907,8 @@ Company:Absher Construction Company
                 'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
                 'Monogram': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
                 'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
-                'NAME': { description: 'Individual Name', icon: 'fa-id-badge', isCap: false },
+                'Name/Number': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false },
+                'NAME': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false }, // Legacy
                 'WEIGHT': { description: 'Weight', icon: 'fa-weight-hanging', isCap: false },
                 'SEG': { description: 'Sewing (Garment)', icon: 'fa-scissors', isCap: false },
                 'SECC': { description: 'Sewing (Cap)', icon: 'fa-scissors', isCap: true },
@@ -4023,7 +4024,7 @@ Company:Absher Construction Company
         }
 
         /**
-         * Add a manual service row (Monogram, NAME, WEIGHT)
+         * Add a manual service row (Monogram, Name/Number, WEIGHT)
          * Called from the "Add Service" dropdown
          */
         function addManualServiceRow(serviceType) {
@@ -4034,7 +4035,7 @@ Company:Absher Construction Company
             // Default prices per service type
             const SERVICE_DEFAULTS = {
                 'Monogram': { unitPrice: 12.50, quantity: 1 },
-                'NAME': { unitPrice: 12.50, quantity: 1 },
+                'Name/Number': { unitPrice: 15.00, quantity: 1 },
                 'WEIGHT': { unitPrice: 6.25, quantity: 1 },
                 'SEG': { unitPrice: 10.00, quantity: 1 },
                 'DT': { unitPrice: 50.00, quantity: 1 },
@@ -7454,7 +7455,7 @@ Company:Absher Construction Company
                     pricing.grandTotal += decgServiceTotal;
                 }
 
-                // Include manual service items (Monogram/NAME/WEIGHT) in grandTotal
+                // Include manual service items (Monogram/Name-Number/WEIGHT) in grandTotal
                 if (manualServiceItems.length > 0) {
                     const manualServiceTotal = manualServiceItems.reduce((sum, si) => sum + (si.unitPrice * si.totalQuantity), 0);
                     pricing.subtotal += manualServiceTotal;
@@ -7629,7 +7630,7 @@ Company:Absher Construction Company
                 pricing.capEmbellishmentType = getCapEmbellishmentType();
                 // Attach DECG items to pricing for service to access
                 pricing.decgItems = decgItems;
-                // Attach manual service items (Monogram/NAME/WEIGHT) for saving
+                // Attach manual service items (Monogram/Name-Number/WEIGHT) for saving
                 pricing.manualServiceItems = manualServiceItems;
 
                 let result;

@@ -44,7 +44,8 @@ const SERVICE_CODE_PATTERNS = {
         'RUSH',      // Rush fee
         'ART',       // Art/design fee
         'EJB',       // Full back alias
-        'NAME',      // Name personalization
+        'Name/Number', // Name & Number ($15)
+        'NAME',      // Name personalization (legacy)
         'MONOGRAM',  // Monogram personalization
         // Screen print service codes
         'SPRESET',   // Screen Reset Charge
@@ -57,7 +58,8 @@ const SERVICE_CODE_PATTERNS = {
     prefixed: [
         'DGT-',      // DGT-001, DGT-002, etc. digitizing fees (legacy, being deprecated)
         'MONOGRAM',  // Monogram variants
-        'NAME'       // Name variants
+        'Name/Number', // Name & Number variants
+        'NAME'       // Name variants (legacy)
     ],
     aliases: {
         'AONOGRAM': 'Monogram',

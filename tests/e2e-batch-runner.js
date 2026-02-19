@@ -245,7 +245,7 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessio
         const validFeePNs = new Set([
             'AS-Garm', 'AS-CAP', 'DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
             'DISCOUNT', '3D-EMB', 'Laser Patch', 'SHIP', 'TAX',
-            'Monogram', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT',
+            'Monogram', 'Name/Number', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT',
             'CTR-GARMT', 'CTR-CAP'
         ]);
         const unknownFees = [...feePartNumbers].filter(pn => !validFeePNs.has(pn));
@@ -316,7 +316,7 @@ async function cleanupQuote(quoteId) {
 // ── Known Service Codes (defense-in-depth: catch misclassified services) ────
 
 const SERVICE_CODES = new Set([
-    'MONOGRAM', 'NAME', 'NAMES', 'WEIGHT', 'AL', 'DD', 'FB', 'CB', 'CS',
+    'MONOGRAM', 'Name/Number', 'NAME', 'NAMES', 'WEIGHT', 'AL', 'DD', 'FB', 'CB', 'CS',
     'GRT-50', 'GRT-75', 'RUSH', 'ART', 'LTM', 'SEG', 'SHIP',
     'SHIPPING', 'FREIGHT', 'DECG', 'DECC', 'AS-GARM', 'AS-CAP',
     'DGT-001', 'DGT-002', 'DGT-003', 'DGT-004'

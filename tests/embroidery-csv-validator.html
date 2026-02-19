@@ -719,25 +719,26 @@
 const KNOWN_FEES = new Set([
     'DD', 'DECG', 'DECC', 'AL', 'MONOGRAM', 'AS-GARM', 'AS-CAP',
     'RUSH', 'SAMPLE', 'LTM', 'GRT-50', 'GRT-75', 'DISCOUNT',
-    'DGT-001', 'NAME'
+    'DGT-001', 'Name/Number', 'NAME'
 ]);
 
 const FEE_PRICE_RANGES = {
-    'DD':       { min: 25, max: 300, label: 'Digitizing' },
-    'DECG':     { min: 5, max: 200, label: 'Customer Garment' },
-    'DECC':     { min: 5, max: 200, label: 'Customer Cap' },
-    'AL':       { min: 0.50, max: 100, label: 'Additional Location' },
-    'MONOGRAM': { min: 1, max: 100, label: 'Monogram' },
-    'AS-GARM':  { min: 0.01, max: 500, label: 'Garment Stitch Charge' },
-    'AS-CAP':   { min: 0.01, max: 500, label: 'Cap Stitch Charge' },
-    'GRT-50':   { min: 25, max: 100, label: 'Garment Setup $50' },
-    'GRT-75':   { min: 50, max: 100, label: 'Garment Setup $75' },
-    'RUSH':     { min: 10, max: 1000, label: 'Rush Fee' },
-    'SAMPLE':   { min: 5, max: 200, label: 'Sample' },
-    'LTM':      { min: 10, max: 100, label: 'Less Than Minimum' },
-    'DISCOUNT': { min: -100000, max: 0, label: 'Discount' },
-    'DGT-001':  { min: 25, max: 300, label: 'Digitizing' },
-    'NAME':     { min: 1, max: 100, label: 'Name/Personalization' }
+    'DD':           { min: 25, max: 300, label: 'Digitizing' },
+    'DECG':         { min: 5, max: 200, label: 'Customer Garment' },
+    'DECC':         { min: 5, max: 200, label: 'Customer Cap' },
+    'AL':           { min: 0.50, max: 100, label: 'Additional Location' },
+    'MONOGRAM':     { min: 1, max: 100, label: 'Monogram' },
+    'AS-GARM':      { min: 0.01, max: 500, label: 'Garment Stitch Charge' },
+    'AS-CAP':       { min: 0.01, max: 500, label: 'Cap Stitch Charge' },
+    'GRT-50':       { min: 25, max: 100, label: 'Garment Setup $50' },
+    'GRT-75':       { min: 50, max: 100, label: 'Garment Setup $75' },
+    'RUSH':         { min: 10, max: 1000, label: 'Rush Fee' },
+    'SAMPLE':       { min: 5, max: 200, label: 'Sample' },
+    'LTM':          { min: 10, max: 100, label: 'Less Than Minimum' },
+    'DISCOUNT':     { min: -100000, max: 0, label: 'Discount' },
+    'DGT-001':      { min: 25, max: 300, label: 'Digitizing' },
+    'Name/Number':  { min: 1, max: 100, label: 'Name & Number' },
+    'NAME':         { min: 1, max: 100, label: 'Name/Personalization (legacy)' }
 };
 
 // Suffix -> which ShopWorks column(s) should have quantity

@@ -14,7 +14,7 @@
         { service: 'Digitizing (Edit)',   pn: 'DDE',          price: 50.00,  notes: 'Design revision' },
         { service: 'Digitizing (Text)',   pn: 'DDT',          price: 50.00,  notes: 'Text-only design' },
         { service: 'Monogram',            pn: 'Monogram',     price: 12.50,  notes: 'Per piece' },
-        { service: 'Name',               pn: 'NAME',         price: 12.50,  notes: 'Per piece' },
+        { service: 'Name & Number',      pn: 'Name/Number',  price: 15.00,  notes: 'Per piece' },
         { service: 'Sewing (Garment)',    pn: 'SEG',          price: 10.00,  notes: 'Per piece' },
         { service: 'Sewing (Cap)',        pn: 'SECC',         price: 10.00,  notes: 'Per piece' },
         { service: 'Design Transfer',     pn: 'DT',           price: 50.00,  notes: 'One-time fee' },

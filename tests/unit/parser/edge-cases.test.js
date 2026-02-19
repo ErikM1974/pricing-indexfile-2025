@@ -91,7 +91,7 @@ describe('classifyPartNumber() — service codes', () => {
         expect(parser.classifyPartNumber('CDP')).toBe('digital-print');
     });
 
-    test('CDP 5x5 → digital-print', () => {
+    test('CDP 5x5 → digital-print (aliased to CDP)', () => {
         expect(parser.classifyPartNumber('CDP 5x5')).toBe('digital-print');
     });
 
@@ -103,7 +103,11 @@ describe('classifyPartNumber() — service codes', () => {
         expect(parser.classifyPartNumber('MONOGRAM')).toBe('monogram');
     });
 
-    test('NAME → monogram', () => {
+    test('Name/Number → monogram', () => {
+        expect(parser.classifyPartNumber('Name/Number')).toBe('monogram');
+    });
+
+    test('NAME → monogram (aliased to Name/Number)', () => {
         expect(parser.classifyPartNumber('NAME')).toBe('monogram');
     });
 

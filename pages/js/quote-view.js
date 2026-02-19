@@ -1019,7 +1019,7 @@ class QuoteViewPage {
         }
 
         // 11. Catch-all: render any remaining fee items not already handled above
-        // Covers: Monogram, NAME, WEIGHT, SEG, SECC, DT, CTR-GARMT, CTR-CAP, etc.
+        // Covers: Monogram, Name/Number, WEIGHT, SEG, SECC, DT, CTR-GARMT, CTR-CAP, etc.
         const handledFeeStyleNumbers = new Set([
             'AS-GARM', 'AS-Garm', 'AS-CAP', 'AL-GARM', 'AL', 'AL-CAP', 'CB', 'CS',
             'DD', 'DD-CAP', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',

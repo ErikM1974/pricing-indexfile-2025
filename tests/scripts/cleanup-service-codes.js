@@ -2,8 +2,9 @@
  * Cleanup Service Codes in Caspio — One-Time Migration Script
  *
  * Operations:
- *   DELETE 10 records: DGT-001, DGT-002, DGT-003, Name (lowercase dup),
- *                      CAP-DISCOUNT, emblem, Transfer, Shipping, ART, WEIGHT
+ *   DELETE 13 records: DGT-001, DGT-002, DGT-003, Name (lowercase dup), NAME,
+ *                      CAP-DISCOUNT, emblem, Transfer, Shipping, ART, WEIGHT,
+ *                      CDP 5x5, CDP 5x5-10
  *   UPDATE 2 records:  SPRESET ($25→$30), SPSU ($50→$30)
  *   RENAME 1 record:   HEAVYWEIGHT-SURCHARGE → HW-SURCHG (delete old + insert new)
  *   INSERT if missing: HW-SURCHG, Name/Number, SPSU
@@ -17,15 +18,17 @@ const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
 const CODES_TO_DELETE = [
     'DGT-001', 'DGT-002', 'DGT-003',
-    'CAP-DISCOUNT', 'emblem', 'Transfer', 'Shipping', 'WEIGHT'
+    'CAP-DISCOUNT', 'emblem', 'Transfer', 'Shipping', 'WEIGHT',
+    'NAME',          // Replaced by Name/Number ($15)
+    'CDP 5x5',       // Consolidated into CDP
+    'CDP 5x5-10'     // Consolidated into CDP
 ];
 
 // Name (lowercase) and ART (uppercase $0) are duplicates — delete by matching
-// Note: 'Name' must be lowercase-exact (not 'NAME' which we keep)
 // ART ($0 passthrough) must be distinguished from Art ($75/hr) by SellPrice
 const DUPLICATE_DELETES = [
-    // 'Name' (PK=19, cost=$6.25) is the lowercase duplicate — keep 'NAME' (PK=204, cost=$7)
-    { code: 'Name', matchFn: (rec) => rec.ServiceCode === 'Name' && rec.PK_ID !== 204 },
+    // 'Name' (PK=19, cost=$6.25) is the lowercase duplicate — both 'Name' and 'NAME' replaced by Name/Number
+    { code: 'Name', matchFn: (rec) => rec.ServiceCode === 'Name' },
     { code: 'ART', matchFn: (rec) => rec.ServiceCode === 'ART' && (rec.SellPrice === 0 || rec.SellPrice === null) }
 ];
 

@@ -303,7 +303,7 @@ async function verifyQuote(quoteId, expectedProducts, expectedTotal, savedSessio
         const validFeePNs = new Set([
             'AS-Garm', 'AS-CAP', 'DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
             'DISCOUNT', '3D-EMB', 'Laser Patch', 'SHIP', 'TAX',
-            'Monogram', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT',
+            'Monogram', 'Name/Number', 'NAME', 'WEIGHT', 'SEG', 'SECC', 'DT',
             'CTR-GARMT', 'CTR-CAP'
         ]);
         const unknownFees = [...feePartNumbers].filter(pn => !validFeePNs.has(pn));

@@ -118,8 +118,9 @@ class ShopWorksImportParser {
         // Updated 2026-02-03: Added COLOR CHG from order classification analysis
         this.SERVICE_CODE_ALIASES = {
             'AONOGRAM': 'MONOGRAM',    // Common typo
-            'NNAME': 'NAME',           // Common typo
-            'NNAMES': 'NAME',          // Common typo
+            'NNAME': 'Name/Number',    // Common typo → Name/Number
+            'NNAMES': 'Name/Number',   // Common typo → Name/Number
+            'NAME': 'Name/Number',     // Legacy NAME → Name/Number ($15)
             'NAMES': 'MONOGRAM',       // Plural "names" = monogramming
             'EJB': 'FB',               // Legacy code for Embroidered Jacket Back
             'FLAG': 'AL',              // Legacy code
@@ -136,6 +137,8 @@ class ShopWorksImportParser {
             'NAME DROP': 'MONOGRAM',   // Space variant
             'NAMEDROP': 'MONOGRAM',    // No separator variant
             'HEAVYWEIGHT-SURCHARGE': 'HW-SURCHG', // Renamed for ShopWorks compat
+            'CDP 5x5': 'CDP',         // Consolidated → CDP
+            'CDP 5x5-10': 'CDP',      // Consolidated → CDP
             'DGT-001': 'DD',          // Legacy → DD
             'DGT-002': 'DDE',         // Legacy → DDE
             'DGT-003': 'DDT'          // Legacy → DDT
@@ -1512,7 +1515,8 @@ class ShopWorksImportParser {
         }
 
         // Monogram/Names (includes typo variants via aliases)
-        if (pn === 'MONOGRAM' || pn === 'NAME' || pn === 'NAMES') {
+        const pnUpper = pn.toUpperCase();
+        if (pnUpper === 'MONOGRAM' || pnUpper === 'NAME/NUMBER' || pnUpper === 'NAMES') {
             return 'monogram';
         }
 

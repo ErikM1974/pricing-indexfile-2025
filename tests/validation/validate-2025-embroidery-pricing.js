@@ -81,9 +81,9 @@ const SERVICE_CODE_PATTERNS = {
     exact: [
         'DECG', 'DECC', 'AL', 'DD', 'DDE', 'DDT', 'DD-CAP',
         'FB', 'LTM', 'GRT-50', 'GRT-75', 'RUSH', 'ART', 'EJB',
-        'NAME', 'MONOGRAM', 'SPRESET', 'SPSU', 'FILM', 'PMS', 'MBF'
+        'Name/Number', 'NAME', 'MONOGRAM', 'SPRESET', 'SPSU', 'FILM', 'PMS', 'MBF'
     ],
-    prefixed: ['DGT-', 'MONOGRAM', 'NAME'],
+    prefixed: ['DGT-', 'MONOGRAM', 'Name/Number', 'NAME'],
     aliases: {
         'AONOGRAM': 'Monogram',
         'NNAME': 'Name',

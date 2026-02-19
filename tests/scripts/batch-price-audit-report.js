@@ -933,7 +933,7 @@ function generateHTMLReport(data) {
                 <tr><td>DD (New Digitizing)</td><td>$100.00</td></tr>
                 <tr><td>DDE/DDT (Revision)</td><td>$50.00</td></tr>
                 <tr><td>Monogram</td><td>$12.50</td></tr>
-                <tr><td>NAME</td><td>$12.50</td></tr>
+                <tr><td>Name/Number</td><td>$15.00</td></tr>
                 <tr><td>SEG (Sewing)</td><td>$10.00</td></tr>
                 <tr><td>WEIGHT</td><td>$6.25</td></tr>
                 <tr><td>GRT-50 (Patch Setup)</td><td>$50.00</td></tr>

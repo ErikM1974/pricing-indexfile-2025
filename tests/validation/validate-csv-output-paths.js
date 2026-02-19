@@ -36,7 +36,7 @@ const EMBROIDERY_ORDER_TYPES = new Set(['Custom Embroidery', 'Caps']);
 // Known fee/service codes (not products)
 const KNOWN_FEES = new Set([
     'DD', 'DDE', 'DDT', 'DD-CAP', 'DECG', 'DECC',
-    'AL', 'FB', 'EJB', 'NAME', 'MONOGRAM',
+    'AL', 'FB', 'EJB', 'Name/Number', 'NAME', 'MONOGRAM',
     'AS-GARM', 'AS-CAP', 'GRT-50', 'GRT-75',
     'RUSH', 'SAMPLE', 'LTM', 'DISCOUNT', 'ART',
     'DGT-001', 'MBF', 'LTM752', 'LTM754',
@@ -45,7 +45,7 @@ const KNOWN_FEES = new Set([
 ]);
 
 // Fee prefixes
-const FEE_PREFIXES = ['DGT-', 'MONOGRAM', 'NAME'];
+const FEE_PREFIXES = ['DGT-', 'MONOGRAM', 'Name/Number', 'NAME'];
 
 // Part number suffix → size column mapping (from shopworks-guide-generator.js)
 const SUFFIX_TO_SIZE = {
@@ -78,7 +78,7 @@ const VALID_FEE_PART_NUMBERS = new Set([
     'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE', 'DISCOUNT',
     'DECG', 'DECC', 'AL', 'LTM', 'LTM752', 'LTM754',
     'ART', 'FB', 'EJB',
-    'NAME', 'MONOGRAM', 'MBF',
+    'Name/Number', 'NAME', 'MONOGRAM', 'MBF',
     'DGT-001', 'DGT-002', 'DGT-003', 'DGT-004',
     'SPSU', 'SPRESET', 'FILM', 'PMS',
     'SETUP', 'NNAME', 'AONOGRAM', 'WEIGHT'
@@ -653,6 +653,7 @@ function validateSavePath(order) {
         const isValid = VALID_FEE_PART_NUMBERS.has(code) ||
                          code.startsWith('DGT-') ||
                          code.startsWith('NAME') ||
+                         code === 'NAME/NUMBER' ||
                          code.startsWith('MONOGRAM');
         if (!isValid) {
             issues.push(`Fee "${code}" is not a valid ShopWorks part number`);
