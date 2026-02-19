@@ -97,6 +97,38 @@
             <!-- GARMENT MODE CARDS -->
             <div id="garmentCards">
 
+                <!-- Embroidery Card -->
+                <div class="method-card" id="embCard">
+                    <div class="method-card-header">
+                        <h3 class="method-card-title">
+                            <span class="method-icon emb"><i class="fas fa-needle"></i></span>
+                            Embroidery
+                        </h3>
+                        <div class="method-card-controls">
+                            <div class="ltm-qty-picker">
+                                <label for="embLtmQty">1-7 qty:</label>
+                                <select id="embLtmQty" class="method-select ltm-select" onchange="compareCalc.onEmbLTMQtyChange()">
+                                    <option value="1">1 pc</option>
+                                    <option value="2">2 pcs</option>
+                                    <option value="3" selected>3 pcs</option>
+                                    <option value="4">4 pcs</option>
+                                    <option value="5">5 pcs</option>
+                                    <option value="6">6 pcs</option>
+                                    <option value="7">7 pcs</option>
+                                </select>
+                                <select id="embStitchTier" class="method-select" onchange="compareCalc.onEmbStitchTierChange()">
+                                    <option value="0">Standard (8K)</option>
+                                    <option value="4">Mid (+$4/pc, 15K)</option>
+                                    <option value="10">Large (+$10/pc, 25K)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="method-card-body" id="embBody">
+                        <div class="card-placeholder">Enter a style number and click Look Up</div>
+                    </div>
+                </div>
+
                 <!-- DTG Card -->
                 <div class="method-card" id="dtgCard">
                     <div class="method-card-header">
@@ -106,13 +138,23 @@
                         </h3>
                         <div class="method-card-controls">
                             <select id="dtgLocation" class="method-select" onchange="compareCalc.onDTGLocationChange()">
-                                <!-- Populated by JS -->
+                                <!-- Populated by JS: front locations only (LC, FF, JF) -->
                             </select>
                             <div class="ltm-qty-picker">
                                 <label for="dtgLtmQty">LTM qty:</label>
                                 <input type="number" id="dtgLtmQty" class="method-select ltm-qty-input"
                                        min="1" max="23" value="12"
                                        onchange="compareCalc.onDTGLtmQtyChange()">
+                            </div>
+                            <div class="sp-extra-controls">
+                                <label class="sp-toggle-label">
+                                    <input type="checkbox" id="dtgSecondLocation" onchange="compareCalc.onDTGSecondLocationChange()">
+                                    + Back location:
+                                </label>
+                                <select id="dtgSecondLocationSelect" class="method-select" style="display:none"
+                                        onchange="compareCalc.onDTGSecondLocationSelectChange()">
+                                    <!-- Populated by JS: back locations only (FB, JB) -->
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -140,37 +182,21 @@
                                        min="10" max="23" value="12"
                                        onchange="compareCalc.onDTFLtmQtyChange()">
                             </div>
-                        </div>
-                    </div>
-                    <div class="method-card-body" id="dtfBody">
-                        <div class="card-placeholder">Enter a style number and click Look Up</div>
-                    </div>
-                </div>
-
-                <!-- Embroidery Card -->
-                <div class="method-card" id="embCard">
-                    <div class="method-card-header">
-                        <h3 class="method-card-title">
-                            <span class="method-icon emb"><i class="fas fa-needle"></i></span>
-                            Embroidery
-                        </h3>
-                        <div class="method-card-controls">
-                            <div class="ltm-qty-picker">
-                                <label for="embLtmQty">1-7 qty:</label>
-                                <select id="embLtmQty" class="method-select ltm-select" onchange="compareCalc.onEmbLTMQtyChange()">
-                                    <option value="1">1 pc</option>
-                                    <option value="2">2 pcs</option>
-                                    <option value="3" selected>3 pcs</option>
-                                    <option value="4">4 pcs</option>
-                                    <option value="5">5 pcs</option>
-                                    <option value="6">6 pcs</option>
-                                    <option value="7">7 pcs</option>
+                            <div class="sp-extra-controls">
+                                <label class="sp-toggle-label">
+                                    <input type="checkbox" id="dtfSecondLocation" onchange="compareCalc.onDTFSecondLocationChange()">
+                                    2nd location:
+                                </label>
+                                <select id="dtfSecondTransferSize" class="method-select" style="display:none"
+                                        onchange="compareCalc.onDTFSecondLocationChange()">
+                                    <option value="small">Small (5" x 5")</option>
+                                    <option value="medium" selected>Medium (9" x 12")</option>
+                                    <option value="large">Large (12" x 16.5")</option>
                                 </select>
-                                <span class="text-muted" style="font-size: 0.75rem; margin-left: 0.5rem;">8K stitches</span>
                             </div>
                         </div>
                     </div>
-                    <div class="method-card-body" id="embBody">
+                    <div class="method-card-body" id="dtfBody">
                         <div class="card-placeholder">Enter a style number and click Look Up</div>
                     </div>
                 </div>
@@ -191,6 +217,20 @@
                                 <input type="number" id="spLtmQty" class="method-select ltm-qty-input"
                                        min="24" max="71" value="36"
                                        onchange="compareCalc.onSPLtmQtyChange()">
+                            </div>
+                            <div class="sp-extra-controls">
+                                <label class="sp-toggle-label">
+                                    <input type="checkbox" id="spDarkGarment" onchange="compareCalc.onSPDarkGarmentChange()">
+                                    Dark garment
+                                </label>
+                                <label class="sp-toggle-label">
+                                    <input type="checkbox" id="spSecondLocation" onchange="compareCalc.onSPSecondLocationChange()">
+                                    2nd location:
+                                </label>
+                                <select id="spSecondColors" class="method-select" style="display:none"
+                                        onchange="compareCalc.onSPSecondLocationColorsChange()">
+                                    <!-- Populated by JS (same options as spColors) -->
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -222,7 +262,11 @@
                                     <option value="6">6 pcs</option>
                                     <option value="7">7 pcs</option>
                                 </select>
-                                <span class="text-muted" style="font-size: 0.75rem; margin-left: 0.5rem;">8K stitches</span>
+                                <select id="capEmbStitchTier" class="method-select" onchange="compareCalc.onCapEmbStitchTierChange()">
+                                    <option value="0">Standard (8K)</option>
+                                    <option value="4">Mid (+$4/pc, 15K)</option>
+                                    <option value="10">Large (+$10/pc, 25K)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -233,6 +277,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Shared utilities -->
+    <script src="/shared_components/js/product-category-filter.js"></script>
 
     <!-- Pricing Service Dependencies -->
     <script src="/shared_components/js/dtg-pricing-service.js"></script>

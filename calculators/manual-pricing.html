@@ -102,13 +102,23 @@
                         </h3>
                         <div class="method-card-controls">
                             <select id="dtgLocation" class="method-select" onchange="manualCalc.onDTGLocationChange()">
-                                <!-- Populated by JS -->
+                                <!-- Populated by JS: front locations only (LC, FF, JF) -->
                             </select>
                             <div class="ltm-qty-picker">
                                 <label for="dtgLtmQty">LTM qty:</label>
                                 <input type="number" id="dtgLtmQty" class="method-select ltm-qty-input"
                                        min="1" max="23" value="12"
                                        onchange="manualCalc.onDTGLtmQtyChange()">
+                            </div>
+                            <div class="sp-extra-controls">
+                                <label class="sp-toggle-label">
+                                    <input type="checkbox" id="dtgSecondLocation" onchange="manualCalc.onDTGSecondLocationChange()">
+                                    + Back location:
+                                </label>
+                                <select id="dtgSecondLocationSelect" class="method-select" style="display:none"
+                                        onchange="manualCalc.onDTGSecondLocationSelectChange()">
+                                    <!-- Populated by JS: back locations only (FB, JB) -->
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -135,6 +145,18 @@
                                 <input type="number" id="dtfLtmQty" class="method-select ltm-qty-input"
                                        min="10" max="23" value="12"
                                        onchange="manualCalc.onDTFLtmQtyChange()">
+                            </div>
+                            <div class="sp-extra-controls">
+                                <label class="sp-toggle-label">
+                                    <input type="checkbox" id="dtfSecondLocation" onchange="manualCalc.onDTFSecondLocationChange()">
+                                    2nd location:
+                                </label>
+                                <select id="dtfSecondTransferSize" class="method-select" style="display:none"
+                                        onchange="manualCalc.onDTFSecondLocationChange()">
+                                    <option value="small">Small (5" x 5")</option>
+                                    <option value="medium" selected>Medium (9" x 12")</option>
+                                    <option value="large">Large (12" x 16.5")</option>
+                                </select>
                             </div>
                         </div>
                     </div>

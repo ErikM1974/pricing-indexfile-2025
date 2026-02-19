@@ -130,13 +130,21 @@ class ShopWorksImportParser {
             // SECC is cap sewing (NOT DECC) — separate service from customer-supplied caps
             'SEW': 'SEG',              // Alias Sew → SEG (sewing)
             'SEW-ON': 'SEG',           // Alias Sew-on → SEG (sewing)
-            'COLOR CHG': 'COLOR CHANGE' // Typo for color change service
+            'COLOR CHG': 'COLOR CHANGE', // Typo for color change service
+            'NAME_DROP': 'MONOGRAM',   // Reps manually typing — normalize to Monogram
+            'NAME_DROP_BIG': 'MONOGRAM', // Reps manually typing — normalize to Monogram
+            'NAME DROP': 'MONOGRAM',   // Space variant
+            'NAMEDROP': 'MONOGRAM',    // No separator variant
+            'HEAVYWEIGHT-SURCHARGE': 'HW-SURCHG', // Renamed for ShopWorks compat
+            'DGT-001': 'DD',          // Legacy → DD
+            'DGT-002': 'DDE',         // Legacy → DDE
+            'DGT-003': 'DDT'          // Legacy → DDT
         };
 
         // Invalid part numbers to skip
         this.INVALID_PARTS = [
             'GIFT CODE', 'DISCOUNT', 'TEST',
-            'SPSU', 'TAX', 'TOTAL'
+            'TAX', 'TOTAL'
         ];
 
         // Weight service pricing (fallback)
@@ -173,7 +181,7 @@ class ShopWorksImportParser {
         this.MONOGRAM_PRICE = 12.50;
 
         // Known service item patterns
-        this.DIGITIZING_CODES = ['DD', 'DDE', 'DDT', 'DGT-001', 'DGT-002', 'DGT-003'];
+        this.DIGITIZING_CODES = ['DD', 'DDE', 'DDT'];
         this.PATCH_SETUP_CODES = ['GRT-50'];
         this.GRAPHIC_DESIGN_CODES = ['GRT-75'];
 
@@ -303,8 +311,8 @@ class ShopWorksImportParser {
             console.log('[ShopWorksImportParser] CAP_DISCOUNT from API:', this.CAP_DISCOUNT);
         }
 
-        // Get HEAVYWEIGHT_SURCHARGE from API (2026-02-01 pricing audit)
-        const heavyRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'HEAVYWEIGHT-SURCHARGE');
+        // Get HEAVYWEIGHT_SURCHARGE from API (HW-SURCHG is new name, HEAVYWEIGHT-SURCHARGE is legacy)
+        const heavyRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'HW-SURCHG' || sc.ServiceCode === 'HEAVYWEIGHT-SURCHARGE');
         if (heavyRecord && heavyRecord.SellPrice) {
             this.HEAVYWEIGHT_SURCHARGE = heavyRecord.SellPrice;
             console.log('[ShopWorksImportParser] HEAVYWEIGHT_SURCHARGE from API:', this.HEAVYWEIGHT_SURCHARGE);
@@ -1349,6 +1357,17 @@ class ShopWorksImportParser {
                 });
                 break;
 
+            case 'screen-print-fee':
+                // SPRESET, SPSU, HW-SURCHG — screen print related fees
+                if (!result.services.screenPrintFees) result.services.screenPrintFees = [];
+                result.services.screenPrintFees.push({
+                    partNumber: item.partNumber,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice || 0,
+                    description: item.description || item.partNumber
+                });
+                break;
+
             case 'invalid':
                 // Invalid/skipped items - add to warnings AND reviewItems for user review
                 result.warnings.push(`Skipped invalid item: ${item.partNumber}`);
@@ -1428,7 +1447,7 @@ class ShopWorksImportParser {
     /**
      * Classify a part number by type
      * @param {string} partNumber - The part number to classify
-     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'sewing', 'design-transfer', 'contract', 'digital-print', 'invalid', 'comment'
+     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'sewing', 'design-transfer', 'contract', 'digital-print', 'screen-print-fee', 'invalid', 'comment'
      */
     classifyPartNumber(partNumber) {
         if (!partNumber || partNumber.trim() === '') {
@@ -1550,6 +1569,16 @@ class ShopWorksImportParser {
         // Shipping / Freight
         if (pn === 'SHIPPING' || pn === 'FREIGHT' || pn === 'SHIP') {
             return 'shipping';
+        }
+
+        // Screen print fees (SPRESET = reset, SPSU = set up)
+        if (pn === 'SPRESET' || pn === 'SPSU') {
+            return 'screen-print-fee';
+        }
+
+        // Heavyweight garment surcharge
+        if (pn === 'HW-SURCHG') {
+            return 'screen-print-fee';
         }
 
         // Everything else is a product

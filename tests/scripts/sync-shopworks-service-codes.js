@@ -1,7 +1,7 @@
 /**
  * Sync ShopWorks Service Codes to Caspio Service_Codes Table
  *
- * Master cross-reference of ALL 32 ShopWorks service part numbers
+ * Master cross-reference of ALL ShopWorks service part numbers
  * with correct 2026 sell prices. Idempotent: safe to run anytime.
  *
  * Usage:
@@ -9,7 +9,7 @@
  *   node tests/scripts/sync-shopworks-service-codes.js --live    # actually write to Caspio
  *
  * What it does:
- *   1. Defines all 28 ShopWorks service codes with UnitCost + SellPrice
+ *   1. Defines all ShopWorks service codes with UnitCost + SellPrice
  *   2. Fetches existing Service_Codes from Caspio
  *   3. Inserts missing codes, updates codes with wrong SellPrice
  *   4. Reports: inserted / updated / unchanged / failed
@@ -18,7 +18,7 @@
 const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
 // ============================================
-// MASTER SHOPWORKS SERVICE CODES (28 total)
+// MASTER SHOPWORKS SERVICE CODES
 // ============================================
 const SHOPWORKS_SERVICE_CODES = [
     // ── Sewing ──
@@ -147,55 +147,31 @@ const SHOPWORKS_SERVICE_CODES = [
         PerUnit: 'each',
         Notes: 'Individual name embroidery (same price as Monogram). SW cost $7, 2026 sell $12.50.'
     },
-    // ── Digitizing Variants ──
+    // ── Name & Number Combo ──
     {
-        ServiceCode: 'DGT-001',
-        ServiceType: 'DIGITIZING',
-        DisplayName: 'Digitizing - New Design',
-        Category: 'Setup',
-        PricingMethod: 'FIXED',
-        TierLabel: '',
-        UnitCost: 75.00,
-        SellPrice: 100.00,
-        PerUnit: 'each',
-        Notes: 'New design digitizing (same as DD). SW cost $75, 2026 sell $100.'
-    },
-    {
-        ServiceCode: 'DGT-002',
-        ServiceType: 'DIGITIZING',
-        DisplayName: 'Digitizing - Revision',
-        Category: 'Setup',
-        PricingMethod: 'FIXED',
-        TierLabel: '',
-        UnitCost: 25.00,
-        SellPrice: 50.00,
-        PerUnit: 'each',
-        Notes: 'Digitizing revision (same as DDE). SW cost $25, 2026 sell $50.'
-    },
-    {
-        ServiceCode: 'DGT-003',
-        ServiceType: 'DIGITIZING',
-        DisplayName: 'Digitizing - Text Only',
-        Category: 'Setup',
-        PricingMethod: 'FIXED',
-        TierLabel: '',
-        UnitCost: 25.00,
-        SellPrice: 50.00,
-        PerUnit: 'each',
-        Notes: 'Text-only digitizing (same as DDT). SW cost $25, 2026 sell $50.'
-    },
-    // ── Weight ──
-    {
-        ServiceCode: 'WEIGHT',
-        ServiceType: 'FEE',
-        DisplayName: 'Per-Person Weight',
+        ServiceCode: 'Name/Number',
+        ServiceType: 'EMBROIDERY',
+        DisplayName: 'Name & Number Combo',
         Category: 'Service',
         PricingMethod: 'FIXED',
         TierLabel: '',
-        UnitCost: 0,
-        SellPrice: 6.25,
+        UnitCost: 7.50,
+        SellPrice: 15.00,
         PerUnit: 'each',
-        Notes: 'Per-person weight (wrestling singlets etc.). 2026 sell $6.25.'
+        Notes: 'Name + number combo embroidery. SW cost $7.50, 2026 sell $15.'
+    },
+    // ── Heavyweight Surcharge ──
+    {
+        ServiceCode: 'HW-SURCHG',
+        ServiceType: 'FEE',
+        DisplayName: 'Heavyweight Garment Surcharge',
+        Category: 'Fee',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 5.00,
+        SellPrice: 10.00,
+        PerUnit: 'each',
+        Notes: 'Heavyweight garment surcharge. SW cost $5, 2026 sell $10.'
     },
     // ── Additional Logos (tiered — no SellPrice, driven by Embroidery_Costs) ──
     {
@@ -421,6 +397,31 @@ const SHOPWORKS_SERVICE_CODES = [
         SellPrice: 0,
         PerUnit: 'each',
         Notes: 'Pallet change fee. Track only.'
+    },
+    // ── Screen Print ──
+    {
+        ServiceCode: 'SPRESET',
+        ServiceType: 'FEE',
+        DisplayName: 'Screen Reset Charge',
+        Category: 'Fee',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 15.00,
+        SellPrice: 30.00,
+        PerUnit: 'each',
+        Notes: 'Screen print reset charge. SW cost $15, 2026 sell $30.'
+    },
+    {
+        ServiceCode: 'SPSU',
+        ServiceType: 'FEE',
+        DisplayName: 'Screen Print Set Up',
+        Category: 'Fee',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 15.00,
+        SellPrice: 30.00,
+        PerUnit: 'each',
+        Notes: 'Screen print set up charge. SW cost $15, 2026 sell $30.'
     }
 ];
 

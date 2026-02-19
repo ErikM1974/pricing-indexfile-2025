@@ -286,6 +286,57 @@ class DTFPricingService {
     }
 
     /**
+     * Calculate per-tier base price for DTF transfers (single or dual location).
+     * Does NOT include LTM distribution — consumers add (ltmFee / userSelectedQty).
+     *
+     * @param {number} garmentCost - Base garment cost (before margin markup)
+     * @param {Object} data - From fetchPricingData()
+     * @param {string} primarySizeKey - 'small' | 'medium' | 'large'
+     * @param {string|null} secondarySizeKey - Optional 2nd-location size key
+     * @returns {Array<{ label, isLTM, ltmFee, basePrice }>}
+     */
+    calculateAllTierPrices(garmentCost, data, primarySizeKey, secondarySizeKey = null) {
+        const transferSize = data.transferSizes[primarySizeKey];
+        if (!transferSize) return [];
+
+        return transferSize.pricingTiers.map(transferTier => {
+            const repQty = transferTier.minQty;
+
+            const marginTier = data.pricingTiers.find(t =>
+                repQty >= t.minQuantity && repQty <= t.maxQuantity
+            );
+            const marginDenom = marginTier ? marginTier.marginDenominator : 0.57;
+
+            const freightTier = data.freightTiers.find(t =>
+                repQty >= t.minQty && repQty <= t.maxQty
+            );
+            const freight = freightTier ? freightTier.costPerTransfer : 0;
+
+            let secondTransferPrice = 0;
+            if (secondarySizeKey && data.transferSizes[secondarySizeKey]) {
+                const secondTier = data.transferSizes[secondarySizeKey].pricingTiers.find(t =>
+                    repQty >= t.minQty && repQty <= t.maxQty
+                );
+                secondTransferPrice = secondTier ? secondTier.unitPrice : 0;
+            }
+            const locationCount = secondarySizeKey ? 2 : 1;
+
+            const rawTotal = (garmentCost / marginDenom)
+                + transferTier.unitPrice
+                + secondTransferPrice
+                + data.laborCostPerLocation * locationCount
+                + freight * locationCount;
+
+            return {
+                label: transferTier.range || `${transferTier.minQty}-${transferTier.maxQty}`,
+                isLTM: !!(marginTier && marginTier.ltmFee > 0),
+                ltmFee: marginTier ? (marginTier.ltmFee || 0) : 0,
+                basePrice: Math.ceil(rawTotal * 2) / 2
+            };
+        });
+    }
+
+    /**
      * Get transfer price for a specific size and quantity - REQUIRES API DATA
      * @throws {Error} if API data not loaded
      */

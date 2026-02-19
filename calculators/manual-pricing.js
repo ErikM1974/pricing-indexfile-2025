@@ -97,6 +97,15 @@ class ManualPricingCalculator {
         // Show cards container
         document.getElementById('methodCards').style.display = 'block';
 
+        // Reset DTG secondary location
+        document.getElementById('dtgSecondLocation').checked = false;
+        document.getElementById('dtgSecondLocationSelect').innerHTML = '';
+        document.getElementById('dtgSecondLocationSelect').style.display = 'none';
+
+        // Reset DTF secondary location
+        document.getElementById('dtfSecondLocation').checked = false;
+        document.getElementById('dtfSecondTransferSize').style.display = 'none';
+
         if (this.currentItemType === 'garment') {
             this.showLoading('dtgBody');
             this.showLoading('dtfBody');
@@ -143,15 +152,33 @@ class ManualPricingCalculator {
         const data = await this.services.dtg.generateManualPricingData(cost);
         this.cachedData.dtg = data;
 
-        // Populate location dropdown from data
+        // PRIMARY dropdown: front locations only
         const select = document.getElementById('dtgLocation');
         if (select.options.length === 0) {
             const locations = data.pricing.locations || this.services.dtg.locations || [];
-            locations.forEach(loc => {
+            const frontLocs = locations.filter(loc =>
+                !loc.code.includes('_') && !loc.name.toLowerCase().includes('back')
+            );
+            frontLocs.forEach(loc => {
                 const opt = document.createElement('option');
                 opt.value = loc.code;
                 opt.textContent = loc.name;
                 select.appendChild(opt);
+            });
+        }
+
+        // SECONDARY dropdown: back locations only
+        const secondSelect = document.getElementById('dtgSecondLocationSelect');
+        if (secondSelect.options.length === 0) {
+            const locations = data.pricing.locations || this.services.dtg.locations || [];
+            const backLocs = locations.filter(loc =>
+                !loc.code.includes('_') && loc.name.toLowerCase().includes('back')
+            );
+            backLocs.forEach(loc => {
+                const opt = document.createElement('option');
+                opt.value = loc.code;
+                opt.textContent = loc.name;
+                secondSelect.appendChild(opt);
             });
         }
 
@@ -162,61 +189,27 @@ class ManualPricingCalculator {
         const data = this.cachedData.dtg;
         if (!data) return;
 
-        const locationCode = document.getElementById('dtgLocation').value || 'LC';
-        const { tiers, costs, sizes, upcharges } = data.pricing;
-
-        // Build table rows for each tier
+        const { sizes } = data.pricing;
         const sizeLabels = sizes.map(s => s.size);
-        const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
-
-        // LTM distribution
         const ltmQty = parseInt(document.getElementById('dtgLtmQty')?.value || 12);
-        const LTM_FEE = 50;
-        const ltmPerUnit = Math.floor((LTM_FEE / ltmQty) * 100) / 100;
+        const ltmPerUnit = Math.floor((50 / ltmQty) * 100) / 100;
 
-        // Build a synthetic "1-23" tier using 24-47 pricing
-        const tier2447 = tiers.find(t => t.TierLabel === '24-47');
-        const allTiers = [];
-        if (tier2447) {
-            allTiers.push({ ...tier2447, TierLabel: '1-23', displayLabel: '1-23', isLTM: true });
-        }
-        tiers.forEach(t => {
-            allTiers.push({ ...t, displayLabel: t.TierLabel, isLTM: false });
-        });
+        const primaryCode = document.getElementById('dtgLocation').value || 'LC';
+        const secondEnabled = document.getElementById('dtgSecondLocation')?.checked || false;
+        const secondCode = document.getElementById('dtgSecondLocationSelect')?.value || '';
+        const locationCode = secondEnabled && secondCode ? `${primaryCode}_${secondCode}` : primaryCode;
 
-        const rows = [];
-        const locationCodes = locationCode.split('_');
-
-        allTiers.forEach(tier => {
-            // Find print cost for this location and tier (use the real tier label for cost lookup)
-            const lookupTier = tier.isLTM ? '24-47' : tier.TierLabel;
-            let totalPrintCost = 0;
-            locationCodes.forEach(code => {
-                const costEntry = costs.find(c =>
-                    c.PrintLocationCode === code && c.TierLabel === lookupTier
-                );
-                if (costEntry) {
-                    totalPrintCost += parseFloat(costEntry.PrintCost);
-                }
-            });
-
-            const markedUp = baseGarmentCost / tier.MarginDenominator;
-            const basePrice = markedUp + totalPrintCost;
-            const roundedBase = Math.ceil(basePrice * 2) / 2;
-
-            const sizePrices = {};
-            sizeLabels.forEach(size => {
-                const upcharge = parseFloat(upcharges[size] || 0);
-                sizePrices[size] = roundedBase + upcharge + (tier.isLTM ? ltmPerUnit : 0);
-            });
-
-            rows.push({
-                label: tier.displayLabel,
-                isLTM: tier.isLTM,
-                ltmPerUnit: tier.isLTM ? ltmPerUnit : 0,
-                prices: sizePrices
-            });
-        });
+        const tierRows = this.services.dtg.calculateAllTierPricesForLocation(data.pricing, locationCode);
+        const rows = tierRows.map(row => ({
+            label: row.label,
+            isLTM: row.isLTM,
+            ltmPerUnit: row.isLTM ? ltmPerUnit : 0,
+            prices: Object.fromEntries(
+                Object.entries(row.basePrices).map(([size, price]) => [
+                    size, price + (row.isLTM ? ltmPerUnit : 0)
+                ])
+            )
+        }));
 
         this.renderPricingTable('dtgBody', sizeLabels, rows, {
             ltmNote: `1-23 prices include $50 LTM fee (${ltmQty} pcs). Tiers 24+ are standard pricing (no LTM).`
@@ -230,6 +223,17 @@ class ManualPricingCalculator {
     }
 
     onDTGLtmQtyChange() {
+        if (this.cachedData.dtg) this.renderDTG();
+    }
+
+    onDTGSecondLocationChange() {
+        const enabled = document.getElementById('dtgSecondLocation').checked;
+        const secondEl = document.getElementById('dtgSecondLocationSelect');
+        if (secondEl) secondEl.style.display = enabled ? '' : 'none';
+        if (this.cachedData.dtg) this.renderDTG();
+    }
+
+    onDTGSecondLocationSelectChange() {
         if (this.cachedData.dtg) this.renderDTG();
     }
 
@@ -256,39 +260,21 @@ class ManualPricingCalculator {
             return;
         }
 
+        const secondEnabled = document.getElementById('dtfSecondLocation')?.checked || false;
+        const secondSizeKey = document.getElementById('dtfSecondTransferSize')?.value || 'medium';
         const ltmQty = parseInt(document.getElementById('dtfLtmQty')?.value || 12);
 
-        const rows = [];
-        transferSize.pricingTiers.forEach(transferTier => {
-            // Find margin tier for representative quantity
-            const repQty = transferTier.minQty;
-            const marginTier = data.pricingTiers.find(t =>
-                repQty >= t.minQuantity && repQty <= t.maxQuantity
-            );
-            const marginDenom = marginTier ? marginTier.marginDenominator : 0.57;
-
-            // Find freight for this quantity range
-            const freightTier = data.freightTiers.find(t =>
-                repQty >= t.minQty && repQty <= t.maxQty
-            );
-            const freight = freightTier ? freightTier.costPerTransfer : 0;
-
-            const garmentSell = this.currentCost / marginDenom;
-            const rawTotal = garmentSell + transferTier.unitPrice + data.laborCostPerLocation + freight;
-            const finalPrice = Math.ceil(rawTotal * 2) / 2;
-
-            const isLTM = marginTier && marginTier.ltmFee > 0;
-            const tierLtmPerUnit = (isLTM && marginTier.ltmFee > 0)
-                ? Math.floor((marginTier.ltmFee / ltmQty) * 100) / 100
-                : 0;
-            let displayPrice = finalPrice + tierLtmPerUnit;
-
-            rows.push({
-                label: transferTier.range || `${transferTier.minQty}-${transferTier.maxQty}`,
-                isLTM: isLTM,
-                ltmPerUnit: tierLtmPerUnit,
-                prices: { 'Price': displayPrice }
-            });
+        const tierRows = this.services.dtf.calculateAllTierPrices(
+            this.currentCost, data, sizeKey, secondEnabled ? secondSizeKey : null
+        );
+        const rows = tierRows.map(row => {
+            const ltmPerUnit = row.isLTM ? Math.floor((row.ltmFee / ltmQty) * 100) / 100 : 0;
+            return {
+                label: row.label,
+                isLTM: row.isLTM,
+                ltmPerUnit,
+                prices: { 'Price': row.basePrice + ltmPerUnit }
+            };
         });
 
         this.renderPricingTable('dtfBody', ['Price'], rows, {
@@ -304,6 +290,13 @@ class ManualPricingCalculator {
     }
 
     onDTFLtmQtyChange() {
+        if (this.cachedData.dtf) this.renderDTF();
+    }
+
+    onDTFSecondLocationChange() {
+        const enabled = document.getElementById('dtfSecondLocation').checked;
+        const sizeEl = document.getElementById('dtfSecondTransferSize');
+        if (sizeEl) sizeEl.style.display = enabled ? '' : 'none';
         if (this.cachedData.dtf) this.renderDTF();
     }
 

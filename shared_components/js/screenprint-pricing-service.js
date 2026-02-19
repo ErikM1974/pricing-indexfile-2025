@@ -56,6 +56,8 @@
  * - Verify prices match exactly: $29.85/piece
  */
 
+const SCREEN_SETUP_FEE_PER_SCREEN = 30; // $30 per screen — single source of truth
+
 class ScreenPrintPricingService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
@@ -552,6 +554,9 @@ class ScreenPrintPricingService {
             garmentSellingPrices: calculatedData.garmentSellingPrices,
             printCosts: calculatedData.printCosts,
             finalPrices: calculatedData.finalPrices,
+
+            // Screen setup fee per screen (single source of truth)
+            screenSetupFeePerScreen: SCREEN_SETUP_FEE_PER_SCREEN,
 
             // Transformed for compatibility
             primaryLocationPricing: primaryLocationPricing,

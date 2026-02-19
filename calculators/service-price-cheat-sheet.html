@@ -39,7 +39,7 @@
         <div class="page-title">
             <i class="fas fa-tags"></i> Service Price Reference 2026
         </div>
-        <p class="page-subtitle">Quick reference for all embroidery service prices. All prices API-driven from current database.</p>
+        <p class="page-subtitle">Quick reference for all service prices. All prices API-driven from current database.</p>
 
         <!-- Section 1: Fixed-Price Services -->
         <div class="ref-card" id="fixed-services-card">
@@ -64,106 +64,25 @@
             </div>
         </div>
 
-        <!-- Section 2: DECG Tier Table -->
-        <div class="ref-card" id="decg-card">
+        <!-- Section 2: Other Services -->
+        <div class="ref-card" id="other-services-card">
             <div class="ref-card-header">
-                <h2><i class="fas fa-hand-holding"></i> Customer-Supplied Decoration (DECG / DECC)</h2>
-                <span class="source-badge" id="decg-source"></span>
+                <h2><i class="fas fa-cogs"></i> Other Services</h2>
             </div>
             <div class="ref-card-body">
-                <div class="tier-tables-row">
-                    <div class="tier-table-wrap">
-                        <h3>Garment (DECG)</h3>
-                        <table class="ref-table tier-table" id="decg-garment-table">
-                            <thead>
-                                <tr><th>Tier</th><th class="price-col">Per Piece</th></tr>
-                            </thead>
-                            <tbody id="decg-garment-tbody">
-                                <tr><td colspan="2" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tier-table-wrap">
-                        <h3>Cap (DECC)</h3>
-                        <table class="ref-table tier-table" id="decc-cap-table">
-                            <thead>
-                                <tr><th>Tier</th><th class="price-col">Per Piece</th></tr>
-                            </thead>
-                            <tbody id="decc-cap-tbody">
-                                <tr><td colspan="2" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tier-note">
-                    <i class="fas fa-info-circle"></i>
-                    Qty 1-7: Add $50 LTM fee (divided across pieces). Base stitch count: 8K. Extra stitches: +$1.25/K garment, +$1.00/K cap.
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 3: AL Tier Table -->
-        <div class="ref-card" id="al-card">
-            <div class="ref-card-header">
-                <h2><i class="fas fa-layer-group"></i> Additional Location (AL)</h2>
-                <span class="source-badge" id="al-source"></span>
-            </div>
-            <div class="ref-card-body">
-                <div class="tier-tables-row">
-                    <div class="tier-table-wrap">
-                        <h3>Garment</h3>
-                        <table class="ref-table tier-table" id="al-garment-table">
-                            <thead>
-                                <tr><th>Tier</th><th class="price-col">Per Piece</th></tr>
-                            </thead>
-                            <tbody id="al-garment-tbody">
-                                <tr><td colspan="2" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tier-table-wrap">
-                        <h3>Cap</h3>
-                        <table class="ref-table tier-table" id="al-cap-table">
-                            <thead>
-                                <tr><th>Tier</th><th class="price-col">Per Piece</th></tr>
-                            </thead>
-                            <tbody id="al-cap-tbody">
-                                <tr><td colspan="2" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tier-note">
-                    <i class="fas fa-info-circle"></i>
-                    AL uses standard stitch base (8K garment, 5K cap). Stitch surcharges apply per tier above.
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 4: Stitch Surcharges -->
-        <div class="ref-card" id="stitch-card">
-            <div class="ref-card-header">
-                <h2><i class="fas fa-ruler"></i> Stitch Surcharges</h2>
-            </div>
-            <div class="ref-card-body">
-                <table class="ref-table" id="stitch-table">
+                <table class="ref-table" id="other-services-table">
                     <thead>
                         <tr>
-                            <th>Stitch Range</th>
-                            <th>Tier Name</th>
-                            <th class="price-col">Surcharge</th>
+                            <th>Service</th>
+                            <th>Part Number(s)</th>
+                            <th class="price-col">Price</th>
+                            <th>Notes</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr><td>&le;10K</td><td>Standard</td><td class="price-col">$0.00</td></tr>
-                        <tr><td>10K &ndash; 15K</td><td>Mid</td><td class="price-col">$4.00</td></tr>
-                        <tr><td>15K &ndash; 25K</td><td>Large</td><td class="price-col">$10.00</td></tr>
+                    <tbody id="other-services-tbody">
+                        <tr><td colspan="4" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
                     </tbody>
                 </table>
-                <div class="tier-note">
-                    <i class="fas fa-info-circle"></i>
-                    Stitch surcharge is per piece, added to the base embroidery price. Full Back (25K+) uses the Large surcharge.
-                </div>
             </div>
         </div>
 

@@ -4896,7 +4896,7 @@
             const setupFeeTotal = document.getElementById('setup-fee-total');
             if (setupFeeRow && printConfig) {
                 const screens = printConfig.totalScreens || 1;
-                const fee = screens * 30;
+                const fee = screens * SCREEN_FEE;
                 setupScreensLabel.textContent = screens + ' screen' + (screens > 1 ? 's' : '');
                 setupFeeUnit.textContent = '$' + fee.toFixed(2);
                 setupFeeTotal.textContent = '$' + fee.toFixed(2);

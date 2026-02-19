@@ -1972,6 +1972,17 @@ for (let i = 0; i < items.length; i += batchSize) {
 
 ---
 
+## Bug: compare-pricing.html Had Broken Custom Cap Detection — Beanies Showed Cap Pricing (2026-02-19)
+**Date:** 2026-02-19
+**Project:** [Pricing Index]
+**Symptoms:** Looking up CP90 (Port & Company Beanie) on the Compare Pricing page showed Cap Embroidery pricing only, instead of the 4 garment method cards (DTG, DTF, Embroidery, Screen Print).
+**Root cause:** `compare-pricing.js` had its own inline `isCap` detection that checked `category.includes('beanie')` → `isCap = true`. This diverged from `ProductCategoryFilter.isStructuredCap()` (the single source of truth), which correctly returns `false` for flat headwear.
+**Solution:** Added `product-category-filter.js` script tag to `compare-pricing.html`. Replaced inline detection with `ProductCategoryFilter.isStructuredCap(product)` with a safe fallback for cases where the script isn't loaded.
+**Prevention:** Any page that distinguishes garment vs cap MUST load `product-category-filter.js` and call `isStructuredCap()`. Never duplicate the cap detection logic inline — it will inevitably diverge from the source of truth.
+**Files:** `calculators/compare-pricing.html`, `calculators/compare-pricing.js`
+
+---
+
 # Template for New Entries
 
 ```markdown

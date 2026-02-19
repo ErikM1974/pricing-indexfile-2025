@@ -1,127 +1,361 @@
 /**
- * Cleanup Service_Codes Table - Remove Duplicates
+ * Cleanup Service Codes in Caspio — One-Time Migration Script
  *
- * Removes service codes that are duplicated in Embroidery_Costs table.
+ * Operations:
+ *   DELETE 10 records: DGT-001, DGT-002, DGT-003, Name (lowercase dup),
+ *                      CAP-DISCOUNT, emblem, Transfer, Shipping, ART, WEIGHT
+ *   UPDATE 2 records:  SPRESET ($25→$30), SPSU ($50→$30)
+ *   RENAME 1 record:   HEAVYWEIGHT-SURCHARGE → HW-SURCHG (delete old + insert new)
+ *   INSERT if missing: HW-SURCHG, Name/Number, SPSU
  *
- * Usage: node tests/scripts/cleanup-service-codes.js
- *
- * Created: 2026-02-04
+ * Usage:
+ *   node tests/scripts/cleanup-service-codes.js          # dry-run (default)
+ *   node tests/scripts/cleanup-service-codes.js --live    # actually write to Caspio
  */
 
-const API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
-// Service codes to DELETE (duplicated in Embroidery_Costs)
 const CODES_TO_DELETE = [
-    'AL',              // Duplicated in Embroidery_Costs AL ItemType
-    'CB',              // Deprecated - use AL-CAP
-    'CS',              // Deprecated - use AL-CAP
-    'FB',              // Duplicated in Embroidery_Costs FB ItemType
-    'CEMB',            // Same as Shirt ItemType
-    'CEMB-CAP',        // Same as Cap ItemType
-    'DECG',            // Duplicated in DECG-Garmt
-    'DECC',            // Duplicated in DECG-Cap
-    'STITCH-RATE',     // Embedded in calculations
-    'CAP-STITCH-RATE', // Embedded in calculations
-    'PUFF-UPCHARGE',   // Same as 3D-Puff
-    'PATCH-UPCHARGE',  // Same as Patch
-    'AS-GARM',         // Same as STITCH-RATE
-    'AS-CAP'           // Same as CAP-STITCH-RATE
+    'DGT-001', 'DGT-002', 'DGT-003',
+    'CAP-DISCOUNT', 'emblem', 'Transfer', 'Shipping', 'WEIGHT'
 ];
+
+// Name (lowercase) and ART (uppercase $0) are duplicates — delete by matching
+// Note: 'Name' must be lowercase-exact (not 'NAME' which we keep)
+// ART ($0 passthrough) must be distinguished from Art ($75/hr) by SellPrice
+const DUPLICATE_DELETES = [
+    // 'Name' (PK=19, cost=$6.25) is the lowercase duplicate — keep 'NAME' (PK=204, cost=$7)
+    { code: 'Name', matchFn: (rec) => rec.ServiceCode === 'Name' && rec.PK_ID !== 204 },
+    { code: 'ART', matchFn: (rec) => rec.ServiceCode === 'ART' && (rec.SellPrice === 0 || rec.SellPrice === null) }
+];
+
+const CODES_TO_UPDATE = {
+    'SPRESET': { SellPrice: 30.00, UnitCost: 15.00, DisplayName: 'Screen Reset Charge' },
+    'SPSU': { SellPrice: 30.00, UnitCost: 15.00, DisplayName: 'Screen Print Set Up' }
+};
+
+const RENAME_OLD = 'HEAVYWEIGHT-SURCHARGE';
+const RENAME_NEW = {
+    ServiceCode: 'HW-SURCHG',
+    ServiceType: 'FEE',
+    DisplayName: 'Heavyweight Garment Surcharge',
+    Category: 'Fee',
+    PricingMethod: 'FIXED',
+    TierLabel: '',
+    UnitCost: 5.00,
+    SellPrice: 10.00,
+    PerUnit: 'each',
+    Notes: 'Heavyweight garment surcharge. SW cost $5, 2026 sell $10.'
+};
+
+const CODES_TO_INSERT_IF_MISSING = [
+    {
+        ServiceCode: 'Name/Number',
+        ServiceType: 'EMBROIDERY',
+        DisplayName: 'Name & Number Combo',
+        Category: 'Service',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 7.50,
+        SellPrice: 15.00,
+        PerUnit: 'each',
+        Notes: 'Name + number combo embroidery. SW cost $7.50, 2026 sell $15.'
+    },
+    {
+        ServiceCode: 'HW-SURCHG',
+        ServiceType: 'FEE',
+        DisplayName: 'Heavyweight Garment Surcharge',
+        Category: 'Fee',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 5.00,
+        SellPrice: 10.00,
+        PerUnit: 'each',
+        Notes: 'Heavyweight garment surcharge. SW cost $5, 2026 sell $10.'
+    },
+    {
+        ServiceCode: 'SPSU',
+        ServiceType: 'FEE',
+        DisplayName: 'Screen Print Set Up',
+        Category: 'Fee',
+        PricingMethod: 'FIXED',
+        TierLabel: '',
+        UnitCost: 15.00,
+        SellPrice: 30.00,
+        PerUnit: 'each',
+        Notes: 'Screen print set up charge. SW cost $15, 2026 sell $30.'
+    }
+];
+
+// ── Helpers ──
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function main() {
-    console.log('='.repeat(60));
-    console.log('SERVICE_CODES CLEANUP - Remove Duplicates');
-    console.log('='.repeat(60));
-    console.log('');
-
-    // Fetch all service codes
-    console.log('Fetching service codes from API...');
-    const resp = await fetch(`${API}/api/service-codes`);
+async function fetchExisting() {
+    const resp = await fetch(`${API_BASE_URL}/api/service-codes?refresh=true`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
+    if (!data.success) throw new Error('API returned success=false');
+    return data.data;
+}
 
-    const records = data.records || data.data || [];
-    if (records.length === 0) {
-        console.log('Error: No records in response');
-        console.log(JSON.stringify(data, null, 2));
-        return;
+async function deleteRecord(pkId) {
+    const resp = await fetch(`${API_BASE_URL}/api/service-codes/${pkId}`, { method: 'DELETE' });
+    return { status: resp.status, data: await resp.json() };
+}
+
+async function updateRecord(pkId, fields) {
+    const resp = await fetch(`${API_BASE_URL}/api/service-codes/${pkId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields)
+    });
+    return { status: resp.status, data: await resp.json() };
+}
+
+async function insertRecord(record) {
+    const resp = await fetch(`${API_BASE_URL}/api/service-codes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+    });
+    return { status: resp.status, data: await resp.json() };
+}
+
+// ── Main ──
+
+async function main() {
+    const isLive = process.argv.includes('--live');
+
+    console.log('='.repeat(60));
+    console.log('CLEANUP SERVICE CODES — ONE-TIME MIGRATION');
+    console.log(`Mode: ${isLive ? '*** LIVE (writing to Caspio) ***' : 'DRY-RUN (read-only)'}`);
+    console.log('='.repeat(60));
+    console.log('');
+
+    const results = { deleted: 0, updated: 0, inserted: 0, skipped: 0, failed: 0 };
+
+    console.log('Fetching existing service codes...');
+    let existing;
+    try {
+        existing = await fetchExisting();
+        console.log(`  Found ${existing.length} records`);
+    } catch (err) {
+        console.error(`  FATAL: ${err.message}`);
+        process.exit(1);
     }
 
-    console.log(`Total records in table: ${records.length}`);
+    // Build lookup
+    const byCode = {};
+    for (const rec of existing) {
+        const key = rec.ServiceCode;
+        if (!byCode[key]) byCode[key] = [];
+        byCode[key].push(rec);
+    }
+
     console.log('');
 
-    // Find records to delete
-    const toDelete = records.filter(r => CODES_TO_DELETE.includes(r.ServiceCode));
-    console.log(`Records to delete: ${toDelete.length}`);
-    console.log('');
-
-    // Group by service code for display
-    const grouped = {};
-    toDelete.forEach(r => {
-        if (!grouped[r.ServiceCode]) grouped[r.ServiceCode] = [];
-        grouped[r.ServiceCode].push(r);
-    });
-
-    console.log('By ServiceCode:');
-    Object.entries(grouped).forEach(([code, recs]) => {
-        console.log(`  ${code}: ${recs.length} records`);
-    });
-    console.log('');
-
-    // Delete each record (hard delete)
-    console.log('Deleting records...');
-    console.log('');
-
-    let deleted = 0;
-    let failed = 0;
-
-    for (const record of toDelete) {
-        const label = `${record.ServiceCode}|${record.TierLabel || 'ALL'}`;
-        try {
-            const delResp = await fetch(`${API}/api/service-codes/${record.PK_ID}?hard=true`, {
-                method: 'DELETE'
-            });
-            const delData = await delResp.json();
-
-            if (delData.success) {
-                console.log(`  ✅ Deleted: ${label} (PK_ID=${record.PK_ID})`);
-                deleted++;
-            } else {
-                console.log(`  ❌ Failed: ${label} - ${delData.error || 'Unknown error'}`);
-                failed++;
-            }
-        } catch (err) {
-            console.log(`  ❌ Error: ${label} - ${err.message}`);
-            failed++;
+    // ── Phase 1: DELETE exact-match codes ──
+    console.log('--- PHASE 1: DELETE codes ---');
+    for (const code of CODES_TO_DELETE) {
+        const recs = byCode[code];
+        if (!recs || recs.length === 0) {
+            console.log(`  [skip] ${code} — not found in Caspio`);
+            results.skipped++;
+            continue;
         }
-
-        // Small delay to avoid rate limiting
-        await sleep(200);
+        for (const rec of recs) {
+            if (isLive) {
+                try {
+                    const { status } = await deleteRecord(rec.PK_ID);
+                    if (status === 200 || status === 204) {
+                        console.log(`  [DEL]  ${code} (PK_ID=${rec.PK_ID}) — DELETED`);
+                        results.deleted++;
+                    } else {
+                        console.log(`  [FAIL] ${code} (PK_ID=${rec.PK_ID}) — HTTP ${status}`);
+                        results.failed++;
+                    }
+                    await sleep(500);
+                } catch (err) {
+                    console.log(`  [ERR]  ${code} — ${err.message}`);
+                    results.failed++;
+                }
+            } else {
+                console.log(`  [DEL]  ${code} (PK_ID=${rec.PK_ID}, sell=$${rec.SellPrice}) — WOULD DELETE`);
+                results.deleted++;
+            }
+        }
     }
 
+    // ── Phase 1b: DELETE duplicates by custom matcher ──
+    for (const dup of DUPLICATE_DELETES) {
+        const matches = existing.filter(dup.matchFn);
+        if (matches.length === 0) {
+            console.log(`  [skip] ${dup.code} (duplicate) — no matching record found`);
+            results.skipped++;
+            continue;
+        }
+        for (const rec of matches) {
+            if (isLive) {
+                try {
+                    const { status } = await deleteRecord(rec.PK_ID);
+                    if (status === 200 || status === 204) {
+                        console.log(`  [DEL]  ${rec.ServiceCode} (PK_ID=${rec.PK_ID}, sell=$${rec.SellPrice}) — DELETED (duplicate)`);
+                        results.deleted++;
+                    } else {
+                        console.log(`  [FAIL] ${rec.ServiceCode} (PK_ID=${rec.PK_ID}) — HTTP ${status}`);
+                        results.failed++;
+                    }
+                    await sleep(500);
+                } catch (err) {
+                    console.log(`  [ERR]  ${rec.ServiceCode} — ${err.message}`);
+                    results.failed++;
+                }
+            } else {
+                console.log(`  [DEL]  ${rec.ServiceCode} (PK_ID=${rec.PK_ID}, sell=$${rec.SellPrice}) — WOULD DELETE (duplicate)`);
+                results.deleted++;
+            }
+        }
+    }
+
+    console.log('');
+
+    // ── Phase 2: UPDATE pricing ──
+    console.log('--- PHASE 2: UPDATE pricing ---');
+    for (const [code, newFields] of Object.entries(CODES_TO_UPDATE)) {
+        const recs = byCode[code];
+        if (!recs || recs.length === 0) {
+            console.log(`  [skip] ${code} — not found (will be inserted in phase 4)`);
+            results.skipped++;
+            continue;
+        }
+        // Update the base record (no TierLabel)
+        const baseRec = recs.find(r => !r.TierLabel) || recs[0];
+        if (baseRec.SellPrice === newFields.SellPrice && baseRec.UnitCost === newFields.UnitCost) {
+            console.log(`  [ok]   ${code} — already at sell=$${newFields.SellPrice}, cost=$${newFields.UnitCost}`);
+            results.skipped++;
+            continue;
+        }
+        if (isLive) {
+            try {
+                const { status } = await updateRecord(baseRec.PK_ID, newFields);
+                if (status === 200) {
+                    console.log(`  [UPD]  ${code} — sell: $${baseRec.SellPrice}→$${newFields.SellPrice}, cost: $${baseRec.UnitCost}→$${newFields.UnitCost}`);
+                    results.updated++;
+                } else {
+                    console.log(`  [FAIL] ${code} — HTTP ${status}`);
+                    results.failed++;
+                }
+                await sleep(500);
+            } catch (err) {
+                console.log(`  [ERR]  ${code} — ${err.message}`);
+                results.failed++;
+            }
+        } else {
+            console.log(`  [UPD]  ${code} — sell: $${baseRec.SellPrice}→$${newFields.SellPrice}, cost: $${baseRec.UnitCost}→$${newFields.UnitCost} — WOULD UPDATE`);
+            results.updated++;
+        }
+    }
+
+    console.log('');
+
+    // ── Phase 3: RENAME (delete old + insert new) ──
+    console.log('--- PHASE 3: RENAME ---');
+    const oldRecs = byCode[RENAME_OLD];
+    if (oldRecs && oldRecs.length > 0) {
+        for (const rec of oldRecs) {
+            if (isLive) {
+                try {
+                    const { status } = await deleteRecord(rec.PK_ID);
+                    if (status === 200 || status === 204) {
+                        console.log(`  [DEL]  ${RENAME_OLD} (PK_ID=${rec.PK_ID}) — DELETED for rename`);
+                        results.deleted++;
+                    } else {
+                        console.log(`  [FAIL] ${RENAME_OLD} delete — HTTP ${status}`);
+                        results.failed++;
+                    }
+                    await sleep(500);
+                } catch (err) {
+                    console.log(`  [ERR]  ${RENAME_OLD} — ${err.message}`);
+                    results.failed++;
+                }
+            } else {
+                console.log(`  [DEL]  ${RENAME_OLD} (PK_ID=${rec.PK_ID}) — WOULD DELETE for rename`);
+                results.deleted++;
+            }
+        }
+    } else {
+        console.log(`  [skip] ${RENAME_OLD} — not found (new code may already exist)`);
+    }
+
+    console.log('');
+
+    // ── Phase 4: INSERT if missing ──
+    console.log('--- PHASE 4: INSERT if missing ---');
+    // Re-fetch after deletes/updates to avoid stale data in live mode
+    let currentCodes;
+    if (isLive) {
+        await sleep(1000);
+        currentCodes = await fetchExisting();
+    } else {
+        currentCodes = existing;
+    }
+
+    const currentByCode = {};
+    for (const rec of currentCodes) {
+        if (!currentByCode[rec.ServiceCode]) currentByCode[rec.ServiceCode] = [];
+        currentByCode[rec.ServiceCode].push(rec);
+    }
+
+    for (const newRec of CODES_TO_INSERT_IF_MISSING) {
+        const existingRecs = currentByCode[newRec.ServiceCode];
+        if (existingRecs && existingRecs.length > 0) {
+            console.log(`  [skip] ${newRec.ServiceCode} — already exists (sell=$${existingRecs[0].SellPrice})`);
+            results.skipped++;
+            continue;
+        }
+        if (isLive) {
+            try {
+                const { status, data } = await insertRecord(newRec);
+                if (status === 201) {
+                    console.log(`  [INS]  ${newRec.ServiceCode} — INSERTED (sell=$${newRec.SellPrice})`);
+                    results.inserted++;
+                } else {
+                    console.log(`  [FAIL] ${newRec.ServiceCode} — HTTP ${status}: ${data.error || JSON.stringify(data)}`);
+                    results.failed++;
+                }
+                await sleep(500);
+            } catch (err) {
+                console.log(`  [ERR]  ${newRec.ServiceCode} — ${err.message}`);
+                results.failed++;
+            }
+        } else {
+            console.log(`  [INS]  ${newRec.ServiceCode} — WOULD INSERT (sell=$${newRec.SellPrice}, cost=$${newRec.UnitCost})`);
+            results.inserted++;
+        }
+    }
+
+    // ── Summary ──
     console.log('');
     console.log('='.repeat(60));
     console.log('SUMMARY');
+    console.log(`  Deleted:  ${results.deleted}`);
+    console.log(`  Updated:  ${results.updated}`);
+    console.log(`  Inserted: ${results.inserted}`);
+    console.log(`  Skipped:  ${results.skipped}`);
+    console.log(`  Failed:   ${results.failed}`);
     console.log('='.repeat(60));
-    console.log(`Deleted: ${deleted}`);
-    console.log(`Failed: ${failed}`);
-    console.log(`Remaining in table: ${records.length - deleted}`);
-    console.log('');
 
-    // List what was kept
-    const kept = records.filter(r => !CODES_TO_DELETE.includes(r.ServiceCode));
-    console.log('Records KEPT (unique to Service_Codes):');
-    const keptCodes = [...new Set(kept.map(r => r.ServiceCode))];
-    keptCodes.forEach(code => {
-        const count = kept.filter(r => r.ServiceCode === code).length;
-        console.log(`  ${code}: ${count} record(s)`);
-    });
-
-    console.log('');
-    console.log('Done!');
+    if (!isLive && (results.deleted > 0 || results.updated > 0 || results.inserted > 0)) {
+        console.log('');
+        console.log('Run with --live to apply changes:');
+        console.log('  node tests/scripts/cleanup-service-codes.js --live');
+    }
 }
 
-main().catch(console.error);
+main().catch(err => {
+    console.error('Fatal error:', err);
+    process.exit(1);
+});

@@ -94,14 +94,16 @@ class ComparePricingCalculator {
         }
         const baseCost = Math.min(...prices);
 
-        // Auto-detect garment vs cap
-        const category = (product.CATEGORY_NAME || product.categoryName || '').toLowerCase();
-        const title = (product.PRODUCT_TITLE || product.productTitle || product.name || '').toLowerCase();
-        const isCap = category.includes('cap') || category.includes('headwear') ||
-                       category.includes('hat') || category.includes('beanie') ||
-                       category.includes('visor') ||
-                       title.includes(' cap') || title.includes(' hat') ||
-                       title.includes('beanie') || title.includes('visor');
+        // Auto-detect garment vs cap — use ProductCategoryFilter as single source of truth
+        // (handles flat headwear like CP90 beanie correctly: isCap = false for flat headwear)
+        let isCap;
+        if (window.ProductCategoryFilter) {
+            isCap = ProductCategoryFilter.isStructuredCap(product);
+        } else {
+            const category = (product.CATEGORY_NAME || product.categoryName || '').toLowerCase();
+            const title = (product.PRODUCT_TITLE || product.productTitle || product.name || '').toLowerCase();
+            isCap = category.includes('cap') || category.includes('headwear') || title.includes(' cap');
+        }
 
         return {
             name: product.PRODUCT_TITLE || product.productTitle || product.name || styleNumber,
@@ -161,6 +163,16 @@ class ComparePricingCalculator {
         this.cachedData = { dtg: null, dtf: null, emb: null, capEmb: null, sp: null };
         document.getElementById('dtgLocation').innerHTML = '';
         document.getElementById('spColors').innerHTML = '';
+        document.getElementById('spSecondColors').innerHTML = '';
+
+        // Reset DTG secondary location
+        document.getElementById('dtgSecondLocation').checked = false;
+        document.getElementById('dtgSecondLocationSelect').innerHTML = '';
+        document.getElementById('dtgSecondLocationSelect').style.display = 'none';
+
+        // Reset DTF secondary location
+        document.getElementById('dtfSecondLocation').checked = false;
+        document.getElementById('dtfSecondTransferSize').style.display = 'none';
 
         // Step 1: Fetch product info to get base cost and auto-detect type
         let productInfo;
@@ -226,15 +238,33 @@ class ComparePricingCalculator {
         // but renderDTG() expects data.pricing.* wrapper
         this.cachedData.dtg = { pricing: data };
 
-        // Populate location dropdown from data
+        // Populate PRIMARY dropdown: front locations only (no '_', no 'back' in name)
         const select = document.getElementById('dtgLocation');
         if (select.options.length === 0) {
             const locations = data.locations || this.services.dtg.locations || [];
-            locations.forEach(loc => {
+            const frontLocs = locations.filter(loc =>
+                !loc.code.includes('_') && !loc.name.toLowerCase().includes('back')
+            );
+            frontLocs.forEach(loc => {
                 const opt = document.createElement('option');
                 opt.value = loc.code;
                 opt.textContent = loc.name;
                 select.appendChild(opt);
+            });
+        }
+
+        // Populate SECONDARY dropdown: back locations only
+        const secondSelect = document.getElementById('dtgSecondLocationSelect');
+        if (secondSelect.options.length === 0) {
+            const locations = data.locations || this.services.dtg.locations || [];
+            const backLocs = locations.filter(loc =>
+                !loc.code.includes('_') && loc.name.toLowerCase().includes('back')
+            );
+            backLocs.forEach(loc => {
+                const opt = document.createElement('option');
+                opt.value = loc.code;
+                opt.textContent = loc.name;
+                secondSelect.appendChild(opt);
             });
         }
 
@@ -245,59 +275,28 @@ class ComparePricingCalculator {
         const data = this.cachedData.dtg;
         if (!data) return;
 
-        const locationCode = document.getElementById('dtgLocation').value || 'LC';
-        const { tiers, costs, sizes, upcharges } = data.pricing;
-
+        const primaryCode = document.getElementById('dtgLocation').value || 'LC';
+        const secondEnabled = document.getElementById('dtgSecondLocation')?.checked || false;
+        const secondCode = document.getElementById('dtgSecondLocationSelect')?.value || '';
+        const locationCode = secondEnabled && secondCode ? `${primaryCode}_${secondCode}` : primaryCode;
+        const { sizes } = data.pricing;
         const sizeLabels = sizes.map(s => s.size);
-        const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
-
-        // LTM distribution
         const ltmQty = parseInt(document.getElementById('dtgLtmQty')?.value || 12);
-        const LTM_FEE = 50;
-        const ltmPerUnit = Math.floor((LTM_FEE / ltmQty) * 100) / 100;
+        const ltmPerUnit = Math.floor((50 / ltmQty) * 100) / 100;
 
-        // Build a synthetic "1-23" tier using 24-47 pricing
-        const tier2447 = tiers.find(t => t.TierLabel === '24-47');
-        const allTiers = [];
-        if (tier2447) {
-            allTiers.push({ ...tier2447, TierLabel: '1-23', displayLabel: '1-23', isLTM: true });
-        }
-        tiers.forEach(t => {
-            allTiers.push({ ...t, displayLabel: t.TierLabel, isLTM: false });
-        });
+        // (primaryCode / secondEnabled / secondCode / locationCode already read above this block)
 
-        const rows = [];
-        const locationCodes = locationCode.split('_');
-
-        allTiers.forEach(tier => {
-            const lookupTier = tier.isLTM ? '24-47' : tier.TierLabel;
-            let totalPrintCost = 0;
-            locationCodes.forEach(code => {
-                const costEntry = costs.find(c =>
-                    c.PrintLocationCode === code && c.TierLabel === lookupTier
-                );
-                if (costEntry) {
-                    totalPrintCost += parseFloat(costEntry.PrintCost);
-                }
-            });
-
-            const markedUp = baseGarmentCost / tier.MarginDenominator;
-            const basePrice = markedUp + totalPrintCost;
-            const roundedBase = Math.ceil(basePrice * 2) / 2;
-
-            const sizePrices = {};
-            sizeLabels.forEach(size => {
-                const upcharge = parseFloat(upcharges[size] || 0);
-                sizePrices[size] = roundedBase + upcharge + (tier.isLTM ? ltmPerUnit : 0);
-            });
-
-            rows.push({
-                label: tier.displayLabel,
-                isLTM: tier.isLTM,
-                ltmPerUnit: tier.isLTM ? ltmPerUnit : 0,
-                prices: sizePrices
-            });
-        });
+        const tierRows = this.services.dtg.calculateAllTierPricesForLocation(data.pricing, locationCode);
+        const rows = tierRows.map(row => ({
+            label: row.label,
+            isLTM: row.isLTM,
+            ltmPerUnit: row.isLTM ? ltmPerUnit : 0,
+            prices: Object.fromEntries(
+                Object.entries(row.basePrices).map(([size, price]) => [
+                    size, price + (row.isLTM ? ltmPerUnit : 0)
+                ])
+            )
+        }));
 
         this.renderPricingTable('dtgBody', sizeLabels, rows, {
             ltmNote: `1-23 prices include $50 LTM fee (${ltmQty} pcs). Tiers 24+ are standard pricing (no LTM).`
@@ -311,6 +310,17 @@ class ComparePricingCalculator {
     }
 
     onDTGLtmQtyChange() {
+        if (this.cachedData.dtg) this.renderDTG();
+    }
+
+    onDTGSecondLocationChange() {
+        const enabled = document.getElementById('dtgSecondLocation').checked;
+        const secondEl = document.getElementById('dtgSecondLocationSelect');
+        if (secondEl) secondEl.style.display = enabled ? '' : 'none';
+        if (this.cachedData.dtg) this.renderDTG();
+    }
+
+    onDTGSecondLocationSelectChange() {
         if (this.cachedData.dtg) this.renderDTG();
     }
 
@@ -336,42 +346,28 @@ class ComparePricingCalculator {
             return;
         }
 
+        const secondEnabled = document.getElementById('dtfSecondLocation')?.checked || false;
+        const secondSizeKey = document.getElementById('dtfSecondTransferSize')?.value || 'medium';
         const ltmQty = parseInt(document.getElementById('dtfLtmQty')?.value || 12);
 
-        const rows = [];
-        transferSize.pricingTiers.forEach(transferTier => {
-            const repQty = transferTier.minQty;
-            const marginTier = data.pricingTiers.find(t =>
-                repQty >= t.minQuantity && repQty <= t.maxQuantity
-            );
-            const marginDenom = marginTier ? marginTier.marginDenominator : 0.57;
-
-            const freightTier = data.freightTiers.find(t =>
-                repQty >= t.minQty && repQty <= t.maxQty
-            );
-            const freight = freightTier ? freightTier.costPerTransfer : 0;
-
-            // Use base cost from product info for garment markup
-            const garmentSell = this.currentCost / marginDenom;
-            const rawTotal = garmentSell + transferTier.unitPrice + data.laborCostPerLocation + freight;
-            const finalPrice = Math.ceil(rawTotal * 2) / 2;
-
-            const isLTM = marginTier && marginTier.ltmFee > 0;
-            const tierLtmPerUnit = (isLTM && marginTier.ltmFee > 0)
-                ? Math.floor((marginTier.ltmFee / ltmQty) * 100) / 100
-                : 0;
-            let displayPrice = finalPrice + tierLtmPerUnit;
-
-            rows.push({
-                label: transferTier.range || `${transferTier.minQty}-${transferTier.maxQty}`,
-                isLTM: isLTM,
-                ltmPerUnit: tierLtmPerUnit,
-                prices: { 'Price': displayPrice }
-            });
+        const tierRows = this.services.dtf.calculateAllTierPrices(
+            this.currentCost, data, sizeKey, secondEnabled ? secondSizeKey : null
+        );
+        const rows = tierRows.map(row => {
+            const ltmPerUnit = row.isLTM ? Math.floor((row.ltmFee / ltmQty) * 100) / 100 : 0;
+            return {
+                label: row.label,
+                isLTM: row.isLTM,
+                ltmPerUnit,
+                prices: { 'Price': row.basePrice + ltmPerUnit }
+            };
         });
 
+        const ltmTier = data.pricingTiers?.find(t => t.ltmFee > 0);
+        const ltmRange = ltmTier ? `${ltmTier.minQuantity}-${ltmTier.maxQuantity}` : '10-23';
+
         this.renderPricingTable('dtfBody', ['Price'], rows, {
-            ltmNote: `10-23 prices include $50 LTM fee (${ltmQty} pcs). Tiers 24+ are standard pricing (no LTM).`,
+            ltmNote: `${ltmRange} prices include $50 LTM fee (${ltmQty} pcs). Tiers 24+ are standard pricing (no LTM).`,
             singleColumn: true
         });
     }
@@ -383,6 +379,13 @@ class ComparePricingCalculator {
     }
 
     onDTFLtmQtyChange() {
+        if (this.cachedData.dtf) this.renderDTF();
+    }
+
+    onDTFSecondLocationChange() {
+        const enabled = document.getElementById('dtfSecondLocation').checked;
+        const sizeEl = document.getElementById('dtfSecondTransferSize');
+        if (sizeEl) sizeEl.style.display = enabled ? '' : 'none';
         if (this.cachedData.dtf) this.renderDTF();
     }
 
@@ -412,6 +415,8 @@ class ComparePricingCalculator {
             (a.MinQuantity || 0) - (b.MinQuantity || 0)
         );
 
+        const stitchSurcharge = parseFloat(document.getElementById('embStitchTier')?.value || 0);
+
         const rows = [];
         sortedTierData.forEach(tier => {
             const tierLabel = tier.TierLabel;
@@ -429,6 +434,15 @@ class ComparePricingCalculator {
                 sizePrices[size] = price;
             });
 
+            // Apply stitch surcharge to all tiers
+            if (stitchSurcharge > 0) {
+                uniqueSizes.forEach(size => {
+                    if (sizePrices[size] != null) {
+                        sizePrices[size] = parseFloat((sizePrices[size] + stitchSurcharge).toFixed(2));
+                    }
+                });
+            }
+
             rows.push({
                 label: tierLabel,
                 isLTM: isLTM,
@@ -437,12 +451,18 @@ class ComparePricingCalculator {
             });
         });
 
-        this.renderPricingTable('embBody', uniqueSizes, rows, {
-            ltmNote: `1-7 prices include $50 LTM fee (${ltmQty} pcs). Tiers 8+ are standard pricing (no LTM).`
-        });
+        const ltmNote = stitchSurcharge > 0
+            ? `1-7 prices include $50 LTM fee (${ltmQty} pcs). +$${stitchSurcharge}/pc stitch surcharge applied to all tiers. Tiers 8+ are standard pricing (no LTM).`
+            : `1-7 prices include $50 LTM fee (${ltmQty} pcs). Tiers 8+ are standard pricing (no LTM).`;
+
+        this.renderPricingTable('embBody', uniqueSizes, rows, { ltmNote });
     }
 
     onEmbLTMQtyChange() {
+        if (this.cachedData.emb) this.renderEmbroidery();
+    }
+
+    onEmbStitchTierChange() {
         if (this.cachedData.emb) this.renderEmbroidery();
     }
 
@@ -472,6 +492,8 @@ class ComparePricingCalculator {
             (a.MinQuantity || 0) - (b.MinQuantity || 0)
         );
 
+        const stitchSurcharge = parseFloat(document.getElementById('capEmbStitchTier')?.value || 0);
+
         const rows = [];
         sortedTierData.forEach(tier => {
             const tierLabel = tier.TierLabel;
@@ -489,6 +511,15 @@ class ComparePricingCalculator {
                 sizePrices[size] = price;
             });
 
+            // Apply stitch surcharge to all tiers
+            if (stitchSurcharge > 0) {
+                uniqueSizes.forEach(size => {
+                    if (sizePrices[size] != null) {
+                        sizePrices[size] = parseFloat((sizePrices[size] + stitchSurcharge).toFixed(2));
+                    }
+                });
+            }
+
             rows.push({
                 label: tierLabel,
                 isLTM: isLTM,
@@ -497,12 +528,18 @@ class ComparePricingCalculator {
             });
         });
 
-        this.renderPricingTable('capEmbBody', uniqueSizes, rows, {
-            ltmNote: `1-7 prices include $50 LTM fee (${ltmQty} pcs). Tiers 8+ are standard pricing (no LTM).`
-        });
+        const ltmNote = stitchSurcharge > 0
+            ? `1-7 prices include $50 LTM fee (${ltmQty} pcs). +$${stitchSurcharge}/pc stitch surcharge applied to all tiers. Tiers 8+ are standard pricing (no LTM).`
+            : `1-7 prices include $50 LTM fee (${ltmQty} pcs). Tiers 8+ are standard pricing (no LTM).`;
+
+        this.renderPricingTable('capEmbBody', uniqueSizes, rows, { ltmNote });
     }
 
     onCapEmbLTMQtyChange() {
+        if (this.cachedData.capEmb) this.renderCapEmbroidery();
+    }
+
+    onCapEmbStitchTierChange() {
         if (this.cachedData.capEmb) this.renderCapEmbroidery();
     }
 
@@ -514,7 +551,7 @@ class ComparePricingCalculator {
         const data = await this.services.sp.fetchPricingData(style);
         this.cachedData.sp = data;
 
-        // Populate color dropdown
+        // Populate primary color dropdown
         const select = document.getElementById('spColors');
         if (select.options.length === 0 && data.availableColorCounts) {
             data.availableColorCounts.forEach(count => {
@@ -522,6 +559,17 @@ class ComparePricingCalculator {
                 opt.value = count;
                 opt.textContent = count === 1 ? '1 Color' : `${count} Colors`;
                 select.appendChild(opt);
+            });
+        }
+
+        // Populate second location color dropdown (same options)
+        const secondSelect = document.getElementById('spSecondColors');
+        if (secondSelect.options.length === 0 && data.availableColorCounts) {
+            data.availableColorCounts.forEach(count => {
+                const opt = document.createElement('option');
+                opt.value = count;
+                opt.textContent = count === 1 ? '1 Color' : `${count} Colors`;
+                secondSelect.appendChild(opt);
             });
         }
 
@@ -534,6 +582,11 @@ class ComparePricingCalculator {
 
         const ltmQty = parseInt(document.getElementById('spLtmQty')?.value || 36);
         const colorCount = document.getElementById('spColors').value || '1';
+        const isDarkGarment = document.getElementById('spDarkGarment')?.checked || false;
+        const secondLocationEnabled = document.getElementById('spSecondLocation')?.checked || false;
+        const secondColorCount = document.getElementById('spSecondColors')?.value || '1';
+        const additionalPrices = secondLocationEnabled ? data.finalPrices?.AdditionalLocation : null;
+        const screenFee = data.screenSetupFeePerScreen || 30;
         const primaryPrices = data.finalPrices.PrimaryLocation;
         const uniqueSizes = data.uniqueSizes || [];
 
@@ -541,7 +594,9 @@ class ComparePricingCalculator {
         let matchingTierLabel = null;
         let matchingLtmFee = 0;
         if (data.tierData) {
-            for (const [label, td] of Object.entries(data.tierData)) {
+            const sortedTierEntries = Object.entries(data.tierData)
+                .sort(([, a], [, b]) => a.MinQuantity - b.MinQuantity);
+            for (const [label, td] of sortedTierEntries) {
                 if (ltmQty >= td.MinQuantity && ltmQty <= td.MaxQuantity && td.LTM_Fee > 0) {
                     matchingTierLabel = label;
                     matchingLtmFee = td.LTM_Fee;
@@ -575,6 +630,18 @@ class ComparePricingCalculator {
                 sizePrices[size] = price;
             });
 
+            // Add second location price to each size
+            if (additionalPrices) {
+                const additionalColorPrices = additionalPrices[tierLabel]?.[secondColorCount];
+                if (additionalColorPrices) {
+                    uniqueSizes.forEach(size => {
+                        if (sizePrices[size] != null && additionalColorPrices[size] != null) {
+                            sizePrices[size] = parseFloat((sizePrices[size] + additionalColorPrices[size]).toFixed(2));
+                        }
+                    });
+                }
+            }
+
             rows.push({
                 label: tierLabel,
                 isLTM: isLTM,
@@ -583,6 +650,19 @@ class ComparePricingCalculator {
             });
         });
 
+        // Build setup fee note when dark garment or second location is active
+        let setupNote = null;
+        if (isDarkGarment || secondLocationEnabled) {
+            const frontColors = parseInt(colorCount);
+            const frontScreens = frontColors + (isDarkGarment ? 1 : 0);
+            const backColors = secondLocationEnabled ? parseInt(secondColorCount) : 0;
+            const backScreens = backColors > 0 ? backColors + (isDarkGarment ? 1 : 0) : 0;
+            const totalFee = (frontScreens + backScreens) * screenFee;
+            const parts = [`Front: ${frontScreens} screen${frontScreens !== 1 ? 's' : ''}`];
+            if (backScreens > 0) parts.push(`2nd location: ${backScreens} screen${backScreens !== 1 ? 's' : ''}`);
+            setupNote = `Screen setup: ${parts.join(' + ')} × $${screenFee} = $${totalFee} (one-time)`;
+        }
+
         let ltmNote;
         if (matchingTierLabel && matchingLtmFee > 0) {
             ltmNote = `${matchingTierLabel} prices include $${matchingLtmFee} LTM fee (${ltmQty} pcs). Tiers 72+ are standard pricing (no LTM).`;
@@ -590,7 +670,7 @@ class ComparePricingCalculator {
             ltmNote = 'Tiers 72+ are standard pricing (no LTM).';
         }
 
-        this.renderPricingTable('spBody', uniqueSizes, rows, { ltmNote });
+        this.renderPricingTable('spBody', uniqueSizes, rows, { ltmNote, setupNote });
     }
 
     onSPColorChange() {
@@ -600,6 +680,21 @@ class ComparePricingCalculator {
     }
 
     onSPLtmQtyChange() {
+        if (this.cachedData.sp) this.renderScreenPrint();
+    }
+
+    onSPDarkGarmentChange() {
+        if (this.cachedData.sp) this.renderScreenPrint();
+    }
+
+    onSPSecondLocationChange() {
+        const enabled = document.getElementById('spSecondLocation').checked;
+        const secondColorsEl = document.getElementById('spSecondColors');
+        if (secondColorsEl) secondColorsEl.style.display = enabled ? '' : 'none';
+        if (this.cachedData.sp) this.renderScreenPrint();
+    }
+
+    onSPSecondLocationColorsChange() {
         if (this.cachedData.sp) this.renderScreenPrint();
     }
 
@@ -664,6 +759,11 @@ class ComparePricingCalculator {
         // LTM note
         if (hasLTM && options.ltmNote) {
             html += `<div class="ltm-note"><i class="fas fa-info-circle"></i> ${escapeHtml(options.ltmNote)}</div>`;
+        }
+
+        // Setup fee note (dark garment / second location)
+        if (options?.setupNote) {
+            html += `<p class="pricing-note setup-fee-note"><i class="fas fa-layer-group"></i> ${escapeHtml(options.setupNote)}</p>`;
         }
 
         body.innerHTML = html;

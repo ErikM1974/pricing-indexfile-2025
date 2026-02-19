@@ -428,6 +428,49 @@ class DTGPricingService {
     }
 
     /**
+     * Calculate per-tier, per-size base prices for a given print location.
+     * Handles combined locations (e.g. "LC_FB" → splits by "_" and sums costs).
+     * Does NOT include LTM distribution — consumers add (50 / userSelectedQty) themselves.
+     *
+     * @param {Object} data - From fetchPricingData(): { tiers, costs, sizes, upcharges }
+     * @param {string} locationCode - e.g. 'LC', 'FF', 'LC_FB'
+     * @returns {Array<{ label, isLTM, basePrices: {size: price} }>}
+     */
+    calculateAllTierPricesForLocation(data, locationCode) {
+        const { tiers, costs, sizes, upcharges } = data;
+        const sizeLabels = sizes.map(s => s.size);
+        const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
+        const locationCodes = (locationCode || 'LC').split('_');
+
+        // Build synthetic '1-23' LTM tier from '24-47' data
+        const tier2447 = tiers.find(t => t.TierLabel === '24-47');
+        const allTiers = [];
+        if (tier2447) {
+            allTiers.push({ ...tier2447, TierLabel: '1-23', displayLabel: '1-23', isLTM: true });
+        }
+        tiers.forEach(t => allTiers.push({ ...t, displayLabel: t.TierLabel, isLTM: false }));
+
+        return allTiers.map(tier => {
+            const lookupTier = tier.isLTM ? '24-47' : tier.TierLabel;
+            let totalPrintCost = 0;
+            locationCodes.forEach(code => {
+                const costEntry = costs.find(c =>
+                    c.PrintLocationCode === code && c.TierLabel === lookupTier
+                );
+                if (costEntry) totalPrintCost += parseFloat(costEntry.PrintCost);
+            });
+            const roundedBase = Math.ceil(
+                (baseGarmentCost / tier.MarginDenominator + totalPrintCost) * 2
+            ) / 2;
+            const basePrices = {};
+            sizeLabels.forEach(size => {
+                basePrices[size] = roundedBase + parseFloat(upcharges[size] || 0);
+            });
+            return { label: tier.displayLabel, isLTM: tier.isLTM, basePrices };
+        });
+    }
+
+    /**
      * Get the appropriate tier for a quantity
      * @private
      */
