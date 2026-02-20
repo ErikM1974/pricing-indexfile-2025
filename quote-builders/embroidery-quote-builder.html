@@ -1689,9 +1689,9 @@ Company:Absher Construction Company
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
-    <script src="/shared_components/js/embroidery-quote-pricing.js?v=20251219-no-monogram"></script>
+    <script src="/shared_components/js/embroidery-quote-pricing.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/embroidery-quote-service.js?v=20260114-totalamount-fix"></script>
-    <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
+    <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
@@ -1710,7 +1710,7 @@ Company:Absher Construction Company
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
 
     <!-- ShopWorks Import Parser -->
-    <script src="/shared_components/js/shopworks-import-parser.js?v=20260204-decg-error"></script>
+    <script src="/shared_components/js/shopworks-import-parser.js?v=20260220-xxl-fix"></script>
 
     <!-- Power Quote Controller -->
     <script>
@@ -2192,8 +2192,10 @@ Company:Absher Construction Company
                         const suffix = sku.ID_Product.split('_').pop();
                         // Map suffix back to size name (reverse of SIZE_TO_SUFFIX)
                         const suffixToSize = {
-                            // Extended large
-                            '2X': '2XL', '3X': '3XL', '4X': '4XL', '5X': '5XL', '6X': '6XL',
+                            // Extended large (short-form AND full-form suffixes)
+                            '2X': '2XL', '2XL': '2XL', '3X': '3XL', '3XL': '3XL',
+                            '4X': '4XL', '4XL': '4XL', '5X': '5XL', '5XL': '5XL',
+                            '6X': '6XL', '6XL': '6XL',
                             '7XL': '7XL', '8XL': '8XL', '9XL': '9XL', '10XL': '10XL',
                             // Extra small
                             'XS': 'XS', 'XXS': 'XXS', '2XS': '2XS', 'XXL': 'XXL',
@@ -5730,17 +5732,19 @@ Company:Absher Construction Company
                 return;
             }
 
-            // IMPORTANT: Handle 2XL child row FIRST (before quantity calculation)
+            // IMPORTANT: Handle 2XL/XXL child row FIRST (before quantity calculation)
             // This ensures the 2XL input is disabled before we sum enabled inputs,
             // preventing the 2XL value from being counted twice (in parent AND child)
             // Bug fix: 2026-01-14 - Parent row showed 16 instead of 14 for S/M/L/XL
             const xxlInput = row.querySelector('[data-size="2XL"]');
             if (xxlInput) {
                 const qty = parseInt(xxlInput.value) || 0;
-                const existingChildId = childRowMap[rowId]?.['2XL'];
+                // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
+                const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
+                const existingChildSize = childRowMap[rowId]?.['2XL'] ? '2XL' : (childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
 
                 if (qty > 0) {
-                    // Need a child row for 2XL
+                    // Need a child row for 2XL (or XXL if that's what exists)
                     if (existingChildId) {
                         updateChildRow(existingChildId, qty);
                     } else {
@@ -5752,9 +5756,9 @@ Company:Absher Construction Company
                     xxlInput.style.background = '#f5f5f5';
                     xxlInput.style.color = '#999';
                 } else {
-                    // Remove child row if it exists
+                    // Remove child row if it exists (could be 2XL or XXL)
                     if (existingChildId) {
-                        removeChildRow(rowId, '2XL');
+                        removeChildRow(rowId, existingChildSize);
                     }
                     // Re-enable 2XL input in parent
                     xxlInput.disabled = false;
@@ -5928,9 +5932,9 @@ Company:Absher Construction Company
             childRow.dataset.colorManuallySet = 'false';  // Track if user manually changed color
 
             // Determine which column this size goes to:
-            // - Size05 (XXL column): only 2XL
+            // - Size05 (XXL column): 2XL and XXL (both map to Size05 in ShopWorks)
             // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL, pants sizes, shorts sizes
-            const isSize05 = size === '2XL';
+            const isSize05 = size === '2XL' || size === 'XXL';
             const isPantsSize = /^\d{4}$/.test(size);  // 4-digit pants sizes like 3032
             const isShortsSize = /^W\d{2}$/.test(size);  // Waist-only shorts sizes like W30
             const isSize06 = SIZE06_EXTENDED_SIZES.includes(size) || isPantsSize || isShortsSize;
@@ -9849,7 +9853,8 @@ Company:Absher Construction Company
                     if (qty > 0) {
                         let internalSize = size;
                         if (size === 'LG') internalSize = 'L';
-                        if (size === 'XXL' || size === '2X') internalSize = '2XL';
+                        if (size === '2X') internalSize = '2XL';
+                        // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
 
                         const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
                         if (sizeInput && !sizeInput.disabled) {
@@ -10661,12 +10666,38 @@ Company:Absher Construction Company
                     }
                 }
 
-                // 11. Import products (deferred from step 8)
+                // 11. Pre-merge extended-size products before import
+                // Parser returns LST700 and LST700_3XL as separate products — merge their sizes
+                // so importProductRow creates ONE parent row with proper child rows
+                const mergedProductResults = [];
+                const baseMap = new Map(); // "PARTNUM|COLOR" → index in mergedProductResults
+
+                for (const prodResult of productResults) {
+                    const product = prodResult._importData;
+                    const key = `${(product.partNumber || '').toUpperCase()}|${(product.color || '').toUpperCase()}`;
+
+                    if (baseMap.has(key)) {
+                        // Merge sizes into existing entry
+                        const baseProduct = mergedProductResults[baseMap.get(key)]._importData;
+                        for (const [size, qty] of Object.entries(product.sizes || {})) {
+                            baseProduct.sizes[size] = (baseProduct.sizes[size] || 0) + qty;
+                        }
+                    } else {
+                        baseMap.set(key, mergedProductResults.length);
+                        // Deep copy to avoid mutating original
+                        mergedProductResults.push({
+                            ...prodResult,
+                            _importData: { ...product, sizes: { ...(product.sizes || {}) } }
+                        });
+                    }
+                }
+
+                // 12. Import products (deferred from step 8)
                 currentStep++;
-                updateImportProgress(currentStep, totalSteps, 'Importing products...', `0 of ${productResults.length}`);
+                updateImportProgress(currentStep, totalSteps, 'Importing products...', `0 of ${mergedProductResults.length}`);
                 let productsImported = 0;
-                for (let i = 0; i < productResults.length; i++) {
-                    const prodResult = productResults[i];
+                for (let i = 0; i < mergedProductResults.length; i++) {
+                    const prodResult = mergedProductResults[i];
                     try {
                         await importProductRow(prodResult._importData, prodResult.overridePrice || 0);
                         productsImported++;
@@ -10674,9 +10705,9 @@ Company:Absher Construction Company
                         console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
                     }
                     currentStep++;
-                    updateImportProgress(currentStep, totalSteps, 'Importing products...', `${i + 1} of ${productResults.length}: ${prodResult.partNumber || 'product'}`);
+                    updateImportProgress(currentStep, totalSteps, 'Importing products...', `${i + 1} of ${mergedProductResults.length}: ${prodResult.partNumber || 'product'}`);
                     // Small delay between imports to reduce API rate limiting
-                    if (i < productResults.length - 1) {
+                    if (i < mergedProductResults.length - 1) {
                         await new Promise(resolve => setTimeout(resolve, 150));
                     }
                 }
@@ -11285,7 +11316,8 @@ Company:Absher Construction Company
                     // Map imported size to our internal format
                     let internalSize = size;
                     if (size === 'LG') internalSize = 'L';
-                    if (size === 'XXL' || size === '2X') internalSize = '2XL';
+                    if (size === '2X') internalSize = '2XL';
+                    // XXL stays as 'XXL' — distinct size for Ladies/Womens products (589 products use _XXL, not _2XL)
                     if (size === 'XXXL' || size === '3X') internalSize = '3XL';
                     if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
                     if (size === '5X') internalSize = '5XL';
@@ -11317,9 +11349,9 @@ Company:Absher Construction Company
                         // Use the existing extended size function to create child row
                         createOrUpdateExtendedChildRow(rowId, internalSize, qty);
 
-                        // For 2XL: Also set parent row's 2XL input so onSizeChange doesn't remove the child row
+                        // For 2XL/XXL: Also set parent row's 2XL input so onSizeChange doesn't remove the child row
                         // onSizeChange checks parent input value and removes child row if value=0
-                        if (internalSize === '2XL') {
+                        if (internalSize === '2XL' || internalSize === 'XXL') {
                             const parentXxlInput = row.querySelector('[data-size="2XL"]');
                             if (parentXxlInput) {
                                 parentXxlInput.value = qty;

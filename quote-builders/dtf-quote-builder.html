@@ -533,7 +533,7 @@
 
     <!-- DTF Quote Builder Scripts (4 files - consolidated architecture) -->
     <!-- Shared Quote Builder Components (2026 Consolidation) -->
-    <script src="/shared_components/js/extended-sizes-config.js?v=20260107"></script>
+    <script src="/shared_components/js/extended-sizes-config.js?v=20260220-xxl-fix"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
@@ -1129,7 +1129,8 @@
             console.log(`[DEBUG onSizeChange] 2XL input:`, xxlInput ? `value=${xxlInput.value}, disabled=${xxlInput.disabled}` : 'not found');
             if (xxlInput && !xxlInput.disabled) {
                 const qty = parseInt(xxlInput.value) || 0;
-                const existingChildId = childRowMap[rowId]?.['2XL'];
+                // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
+                const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
                 console.log(`[DEBUG onSizeChange] 2XL qty=${qty}, existingChildId=${existingChildId}`);
 
                 if (qty > 0 && !existingChildId) {

@@ -536,7 +536,7 @@
     <script src="/shared_components/js/dtg-pricing-service.js"></script>
     <script src="/shared_components/js/dtg-quote-service.js"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
-    <script src="/shared_components/js/sku-validation-service.js?v=20260104"></script>
+    <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
@@ -777,8 +777,10 @@
                         const suffix = sku.ID_Product.split('_').pop();
                         // Map suffix back to size name (reverse of SIZE_TO_SUFFIX)
                         const suffixToSize = {
-                            // Extended large
-                            '2X': '2XL', '3X': '3XL', '4X': '4XL', '5X': '5XL', '6X': '6XL',
+                            // Extended large (short-form AND full-form suffixes)
+                            '2X': '2XL', '2XL': '2XL', '3X': '3XL', '3XL': '3XL',
+                            '4X': '4XL', '4XL': '4XL', '5X': '5XL', '5XL': '5XL',
+                            '6X': '6XL', '6XL': '6XL',
                             '7XL': '7XL', '8XL': '8XL', '9XL': '9XL', '10XL': '10XL',
                             // Extra small
                             'XS': 'XS', 'XXS': 'XXS', '2XS': '2XS', 'XXL': 'XXL',
@@ -1482,8 +1484,8 @@
             // Set size quantities
             for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
                 if (qty > 0) {
-                    // Normalize size name (XXL -> 2XL, etc.)
-                    const normalizedSize = size === 'XXL' ? '2XL' : size;
+                    // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
+                    const normalizedSize = size;
 
                     // Standard sizes go directly in the row
                     if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
@@ -3696,15 +3698,17 @@
             // Update parent row quantity display
             document.getElementById(`row-qty-${rowId}`).textContent = total;
 
-            // Handle 2XL size (has direct input) - create/update/remove child rows
+            // Handle 2XL/XXL size (has direct input) - create/update/remove child rows
             // Note: Size06 sizes (XS, 3XL, 4XL, 5XL, 6XL) are handled by the Extended Size Picker popup
             const xxlInput = row.querySelector('[data-size="2XL"]');
             if (xxlInput) {
                 const qty = parseInt(xxlInput.value) || 0;
-                const existingChildId = childRowMap[rowId]?.['2XL'];
+                // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
+                const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
+                const existingChildSize = childRowMap[rowId]?.['2XL'] ? '2XL' : (childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
 
                 if (qty > 0) {
-                    // Need a child row for 2XL
+                    // Need a child row for 2XL (or XXL if that's what exists)
                     if (existingChildId) {
                         updateChildRow(existingChildId, qty);
                     } else {
@@ -3728,9 +3732,9 @@
                     });
                     document.getElementById(`row-qty-${rowId}`).textContent = newTotal;
                 } else {
-                    // Remove child row if it exists
+                    // Remove child row if it exists (could be 2XL or XXL)
                     if (existingChildId) {
-                        removeChildRow(rowId, '2XL');
+                        removeChildRow(rowId, existingChildSize);
                     }
                     // Re-enable 2XL input in parent
                     xxlInput.disabled = false;
@@ -3807,9 +3811,9 @@
             childRow.dataset.colorManuallySet = 'false';  // Track if user manually changed color
 
             // Determine which column this size goes to:
-            // - Size05 (XXL column): only 2XL
+            // - Size05 (XXL column): 2XL and XXL (both map to Size05 in ShopWorks)
             // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL, pants sizes, shorts sizes
-            const isSize05 = size === '2XL';
+            const isSize05 = size === '2XL' || size === 'XXL';
             const isPantsSize = /^\d{4}$/.test(size);  // 4-digit pants sizes like 3032
             const isShortsSize = /^W\d{2}$/.test(size);  // Waist-only shorts sizes like W30
             const isSize06 = SIZE06_EXTENDED_SIZES.includes(size) || isPantsSize || isShortsSize;
