@@ -803,9 +803,11 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
                 swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
                 delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
         });
+        const DGT_TO_SERVICE = { 'DGT-001': 'DD', 'DGT-002': 'DDE', 'DGT-003': 'DDT' };
         (parsed.services.digitizingFees || []).forEach(df => {
             const swU = parseFloat(df.amount || df.unitPrice || 0);
-            const ourU = serviceCodeMap[df.code]?.SellPrice || serviceCodeMap['DD']?.SellPrice || 100;
+            const mappedCode = DGT_TO_SERVICE[df.code] || df.code;
+            const ourU = serviceCodeMap[mappedCode]?.SellPrice || serviceCodeMap[df.code]?.SellPrice || serviceCodeMap['DD']?.SellPrice || 100;
             const d = ourU - swU;
             const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
             auditProducts.push({ style: df.code || 'DD', color: 'Service', qty: 1,
@@ -1336,8 +1338,8 @@ async function main() {
     // Process each order (with delay between live saves to avoid rate limiting)
     const results = [];
     for (let i = 0; i < orderTexts.length; i++) {
-        // Rate limit delay: 8s between orders in live mode to avoid 429
-        if (doSave && i > 0) await new Promise(r => setTimeout(r, 8000));
+        // Rate limit delay: 8s between live saves, 2s between dry-run orders
+        if (i > 0) await new Promise(r => setTimeout(r, doSave ? 8000 : 6000));
 
         const orderNum = i + 1;
         process.stdout.write(`  Processing order ${orderNum}/${orderTexts.length}...`);

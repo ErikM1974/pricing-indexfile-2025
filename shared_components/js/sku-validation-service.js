@@ -75,21 +75,21 @@ class SKUValidationService {
         'L': '',
         'XL': '',
 
-        // Extended sizes - ShopWorks format
+        // Extended sizes - ShopWorks full-form format (per Feb 2026 pricelist)
         'XS': '_XS',
-        '2XL': '_2X',      // CORRECT: ShopWorks uses _2X
-        '3XL': '_3X',      // CORRECT: ShopWorks uses _3X
-        '4XL': '_4X',
-        '5XL': '_5X',
-        '6XL': '_6X',
-        '7XL': '_7X',      // Extra-extended (S608ES, K500ES)
-        '8XL': '_8X',      // Extra-extended
-        '9XL': '_9X',      // Extra-extended
-        '10XL': '_10X',    // Extra-extended
+        '2XL': '_2XL',     // 2,125 products use _2XL (full form)
+        '3XL': '_3XL',     // 2,448 products use _3XL (full form)
+        '4XL': '_4XL',
+        '5XL': '_5XL',
+        '6XL': '_6XL',
+        '7XL': '_7XL',     // Extra-extended (S608ES, K500ES)
+        '8XL': '_8XL',     // Extra-extended
+        '9XL': '_9XL',     // Extra-extended
+        '10XL': '_10XL',   // Extra-extended
 
-        // Aliases for extended sizes (XXL = 2XL, XXXL = 3XL)
-        'XXL': '_2X',      // 594 styles use XXL - maps to same as 2XL
-        'XXXL': '_3X',     // Maps to same as 3XL
+        // Ladies/Womens sizes — DISTINCT from standard 2XL/3XL (zero overlap)
+        'XXL': '_XXL',     // 589 styles use _XXL (ladies/womens 2XL equivalent)
+        'XXXL': '_XXXL',   // 6 Outdoor Research products
         'XXS': '_XXS',     // Extra-extra small (18 styles)
         '2XS': '_2XS',     // Alternative extra-extra small (15 styles)
 

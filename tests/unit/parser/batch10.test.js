@@ -92,10 +92,11 @@ describe('Batch 10 — Order 1 (#136244): Patriot Fire — 41 items, 5 designs',
         expect(waistPack.sizes).toHaveProperty('OSFA');
     });
 
-    test('OR322218_XXL → base OR322218, size 2XL', () => {
+    test('OR322218_XXL → base OR322218, size XXL', () => {
         const vest = result.products.find(p => p.partNumber === 'OR322218');
         expect(vest).toBeDefined();
-        expect(vest.sizes).toHaveProperty('2XL');
+        // XXL is DISTINCT from 2XL in ShopWorks (589 ladies/OR products use _XXL suffix)
+        expect(vest.sizes).toHaveProperty('XXL');
     });
 
     test('Customer Pickup ship method', () => {

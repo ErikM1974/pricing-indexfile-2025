@@ -4,7 +4,7 @@
  * Features:
  * - sessionStorage caching with TTL (Time-To-Live)
  * - Automatic cache invalidation
- * - Multi-SKU support (PC54, PC54_2X, PC54_3X)
+ * - Multi-SKU support (PC54, PC54_2XL, PC54_3XL)
  * - Cache hit/miss tracking
  *
  * Solves the problem: 15+ redundant API calls on page load
@@ -79,7 +79,7 @@ class InventoryService {
     }
 
     /**
-     * Fetch multi-SKU inventory (PC54, PC54_2X, PC54_3X) with caching
+     * Fetch multi-SKU inventory (PC54, PC54_2XL, PC54_3XL) with caching
      * @param {string} color - Color name
      * @returns {Promise<Object>} Combined inventory data
      */
@@ -105,8 +105,8 @@ class InventoryService {
         try {
             const [standard, twoXL, threeXL] = await Promise.all([
                 this.fetchFromAPI('PC54', color),
-                this.fetchFromAPI('PC54_2X', color),
-                this.fetchFromAPI('PC54_3X', color)
+                this.fetchFromAPI('PC54_2XL', color),
+                this.fetchFromAPI('PC54_3XL', color)
             ]);
 
             const combined = {

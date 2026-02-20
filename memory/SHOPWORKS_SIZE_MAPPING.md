@@ -663,9 +663,9 @@ The complete mapping is in `shared_components/js/sku-validation-service.js`.
 |----------|-------|---------------|
 | **Standard** | S, M, L, XL | (no suffix - base product) |
 | **Extra-small** | XS, XXS, 2XS | `_XS`, `_XXS`, `_2XS` |
-| **Extended** | 2XL-6XL | `_2X`, `_3X`, `_4X`, `_5X`, `_6X` |
-| **Extra-extended** | 7XL-10XL | `_7X`, `_8X`, `_9X`, `_10X` |
-| **Aliases** | XXL, XXXL | → `_2X`, `_3X` |
+| **Extended** | 2XL-6XL | `_2XL`, `_3XL`, `_4XL`, `_5XL`, `_6XL` |
+| **Extra-extended** | 7XL-10XL | `_7XL`, `_8XL`, `_9XL`, `_10XL` |
+| **Ladies/XXL** | XXL, XXXL | `_XXL`, `_XXXL` (DISTINCT — not aliases) |
 | **Tall** | LT, XLT, 2XLT-4XLT, MT, ST, XST | `_LT`, `_XLT`, etc. |
 | **Long** | LL, ML, XLL, 2XLL, 3XLL | `_LL`, `_ML`, etc. |
 | **Short** | LS, MS, XLS, 2XLS, 3XLS | `_LS`, `_MS`, etc. |
@@ -686,7 +686,7 @@ These sizes were missing from the original mapping and have been added:
 
 ```javascript
 // Extra-extended (large workwear)
-'7XL': '_7X', '8XL': '_8X', '9XL': '_9X', '10XL': '_10X',
+'7XL': '_7XL', '8XL': '_8XL', '9XL': '_9XL', '10XL': '_10XL',
 
 // Waist-only shorts (PT66, CT103542)
 'W30': '_W30', 'W31': '_W31', 'W32': '_W32', 'W33': '_W33',
@@ -704,8 +704,8 @@ These sizes were missing from the original mapping and have been added:
 // Missing tall variants
 'MT': '_MT', 'ST': '_ST', 'XST': '_XST',
 
-// Aliases
-'XXL': '_2X', 'XXXL': '_3X', 'XXS': '_XXS',
+// Ladies/Distinct (NOT aliases — XXL and XXXL are separate products)
+'XXL': '_XXL', 'XXXL': '_XXXL', 'XXS': '_XXS',
 
 // Missing infant
 '1824': '_1824', '306': '_306', '612': '_612'
@@ -745,17 +745,22 @@ If you update `SIZE_TO_SUFFIX` in sku-validation-service.js, also update the map
 **Purpose:** Ensure generated inventorySku values match ShopWorks exactly
 **Validated:** 2026-01-04
 
-### Critical Discovery: XXL Suffix Mismatch
+### Critical Discovery: Full-Form Suffixes (Updated Feb 2026)
 
-ShopWorks uses **THREE different suffixes** for extended sizes:
+**Feb 2026 ShopWorks Pricelist** (15,171 rows) uses **ONLY full-form suffixes**:
 
 | Suffix | Count | Used By |
 |--------|-------|---------|
-| `_2X` | 2,094 | Most unisex/men's products |
-| `_XXL` | 586 | Ladies products, District, Cornerstone |
-| `_2XL` | 35 | Newer brands (Mercer+Mettle, TravisMathew) |
+| `_2XL` | 2,125 | Standard unisex/men's products |
+| `_XXL` | 589 | Ladies products, District, Cornerstone, Outdoor Research |
+| `_3XL` | 2,448 | Standard extended |
+| `_4XL` | 2,143 | Standard extended |
 
-**Problem:** The original mapping had `'XXL': '_2X'` which is **WRONG** for 586 products.
+**Key:** `_2X`, `_3X`, `_4X` short forms have **ZERO** products in the Feb 2026 pricelist.
+XXL and 2XL are **completely distinct** (zero overlap). Both map to Size05.
+Combo suffixes use slashes: `_S/M` (69), `_M/L` (36), `_L/XL` (67) — NOT `_SM`/`_ML`/`_LXL`.
+
+**Fixed 2026-02-20:** All 13 files updated to use full-form suffixes. Old `_2X` etc. kept in parser for backward compat with saved quotes.
 
 ### XXL_STYLES Set (442 Active Styles)
 

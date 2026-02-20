@@ -39,18 +39,27 @@ const EXTENDED_SIZE_ORDER = [
     // Extra small
     'XXS', '2XS', 'XS', 'XS/S',
     // Combo sizes
-    'S/M', 'M/L', 'L/XL', 'X/2X', 'S/XL',
+    'SM', 'S/M', 'M/L', 'L/XL', 'X/2X', 'S/XL', '2/3X', '3/4X', '4/5X', '2-5X', 'C/Y', 'T/C',
     // Plus sizes (2XL through 10XL)
-    // Note: XXXL is alias for 3XL, placed immediately after for consistent sorting
     '2XL', 'XXL', '3XL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
     // Tall sizes
     'ST', 'MT', 'XST', 'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT',
+    // Regular fit (e.g., CS10, SP14, SP24)
+    'SR', 'MR', 'LR', 'XLR', '2XLR', '3XLR', '4XLR', '5XLR', '6XLR',
+    // Long inseam
+    'ML', 'LL', 'XLL', '2XLL', '3XLL',
+    // Short inseam
+    'SS', 'MS', 'LS', 'XLS', '2XLS', '3XLS',
+    // Petite
+    'SP', 'MP', 'LP', 'XLP', '2XLP', 'XSP', '2XSP',
     // Big sizes
     'LB', 'XLB', '2XLB',
     // Youth sizes
     'YXS', 'YS', 'YM', 'YL', 'YXL',
     // Toddler sizes
     '2T', '3T', '4T', '5T', '5/6T', '6T',
+    // Infant sizes
+    'NB', '06M', '12M', '18M', '24M', '0306', '0612', '1218', '1824',
     // One size fits all
     'OSFA', 'OSFM'
 ];
@@ -59,15 +68,15 @@ const EXTENDED_SIZE_ORDER = [
  * Size to Part Number Suffix Mapping
  * Used to generate ShopWorks-compatible part numbers.
  *
- * Example: Style PC61 + Size 3XL = PC61_3X
+ * Example: Style PC61 + Size 3XL = PC61_3XL
  *
  * CRITICAL: Standard sizes (S, M, L, XL) have empty suffix
  * because they use the base style number.
  *
- * NOTE: 2XL and XXL are DIFFERENT sizes in some product lines:
- * - 2XL: Standard plus size (most common)
- * - XXL: Some brands use this instead of 2XL
- * Both map to '_2X' for backward compatibility.
+ * NOTE: 2XL and XXL are DISTINCT in ShopWorks (zero overlap):
+ * - 2XL (_2XL): Standard plus size (2,125 products)
+ * - XXL (_XXL): Ladies/Womens plus size (589 products, e.g., District, Cornerstone)
+ * Both use Size05 field but have different suffixes.
  */
 const SIZE_TO_SUFFIX = {
     // Standard sizes (no suffix - use base style)
@@ -76,14 +85,14 @@ const SIZE_TO_SUFFIX = {
     'L': '',
     'XL': '',
 
-    // Plus sizes
-    '2XL': '_2X',
-    'XXL': '_2X',      // Alias for 2XL (most products treat XXL as 2XL)
-    '3XL': '_3X',
-    'XXXL': '_3X',     // Alias for 3XL
-    '4XL': '_4X',
-    '5XL': '_5X',
-    '6XL': '_6X',
+    // Plus sizes (full form per ShopWorks pricelist — _2X/_3X/_4X do NOT exist)
+    '2XL': '_2XL',
+    'XXL': '_XXL',     // DISTINCT from 2XL — 589 ladies/womens products use _XXL, 0 overlap with _2XL
+    '3XL': '_3XL',
+    'XXXL': '_XXXL',   // 6 Outdoor Research products
+    '4XL': '_4XL',
+    '5XL': '_5XL',
+    '6XL': '_6XL',
     '7XL': '_7XL',
     '8XL': '_8XL',
     '9XL': '_9XL',
@@ -98,13 +107,20 @@ const SIZE_TO_SUFFIX = {
     'OSFA': '_OSFA',
     'OSFM': '_OSFM',
 
-    // Combo sizes
+    // Combo sizes (with slashes per ShopWorks pricelist)
     'S/M': '_S/M',
     'M/L': '_M/L',
     'L/XL': '_L/XL',
     'XS/S': '_XS/S',
     'X/2X': '_X/2X',
     'S/XL': '_S/XL',
+    '2/3X': '_2/3X',
+    '3/4X': '_3/4X',
+    '4/5X': '_4/5X',
+    '2-5X': '_2-5X',
+    'C/Y': '_C/Y',
+    'T/C': '_T/C',
+    'SM': '_SM',       // 1 product (style 212)
 
     // Tall sizes
     'ST': '_ST',
@@ -117,6 +133,41 @@ const SIZE_TO_SUFFIX = {
     '4XLT': '_4XLT',
     '5XLT': '_5XLT',
     '6XLT': '_6XLT',
+
+    // Regular fit (e.g., CS10, CS20, SP14, SP24)
+    'SR': '_SR',
+    'MR': '_MR',
+    'LR': '_LR',
+    'XLR': '_XLR',
+    '2XLR': '_2XLR',
+    '3XLR': '_3XLR',
+    '4XLR': '_4XLR',
+    '5XLR': '_5XLR',
+    '6XLR': '_6XLR',
+
+    // Long inseam (e.g., CS10LONG, CS20LONG)
+    'ML': '_ML',
+    'LL': '_LL',
+    'XLL': '_XLL',
+    '2XLL': '_2XLL',
+    '3XLL': '_3XLL',
+
+    // Short inseam (e.g., CTS106672, WW3150S)
+    'SS': '_SS',
+    'MS': '_MS',
+    'LS': '_LS',
+    'XLS': '_XLS',
+    '2XLS': '_2XLS',
+    '3XLS': '_3XLS',
+
+    // Petite (e.g., WW4550P, WW4750P)
+    'SP': '_SP',
+    'MP': '_MP',
+    'LP': '_LP',
+    'XLP': '_XLP',
+    '2XLP': '_2XLP',
+    'XSP': '_XSP',
+    '2XSP': '_2XSP',
 
     // Big sizes
     'LB': '_LB',
@@ -136,7 +187,18 @@ const SIZE_TO_SUFFIX = {
     '4T': '_4T',
     '5T': '_5T',
     '5/6T': '_5/6T',
-    '6T': '_6T'
+    '6T': '_6T',
+
+    // Infant sizes
+    'NB': '_NB',
+    '06M': '_06M',
+    '12M': '_12M',
+    '18M': '_18M',
+    '24M': '_24M',
+    '0306': '_0306',
+    '0612': '_0612',
+    '1218': '_1218',
+    '1824': '_1824'
 };
 
 /**
@@ -150,12 +212,17 @@ const STANDARD_SIZES = ['S', 'M', 'L', 'XL'];
  */
 const SIZE_CATEGORIES = {
     extraSmall: ['XXS', '2XS', 'XS', 'XS/S'],
-    combo: ['S/M', 'M/L', 'L/XL', 'X/2X', 'S/XL'],
-    plus: ['2XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL'],
+    combo: ['SM', 'S/M', 'M/L', 'L/XL', 'X/2X', 'S/XL', '2/3X', '3/4X', '4/5X', '2-5X', 'C/Y', 'T/C'],
+    plus: ['2XL', 'XXL', '3XL', 'XXXL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL'],
     tall: ['ST', 'MT', 'XST', 'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT'],
+    regular: ['SR', 'MR', 'LR', 'XLR', '2XLR', '3XLR', '4XLR', '5XLR', '6XLR'],
+    long: ['ML', 'LL', 'XLL', '2XLL', '3XLL'],
+    short: ['SS', 'MS', 'LS', 'XLS', '2XLS', '3XLS'],
+    petite: ['SP', 'MP', 'LP', 'XLP', '2XLP', 'XSP', '2XSP'],
     big: ['LB', 'XLB', '2XLB'],
     youth: ['YXS', 'YS', 'YM', 'YL', 'YXL'],
     toddler: ['2T', '3T', '4T', '5T', '5/6T', '6T'],
+    infant: ['NB', '06M', '12M', '18M', '24M', '0306', '0612', '1218', '1824'],
     oneSize: ['OSFA', 'OSFM']
 };
 
@@ -168,7 +235,7 @@ const SIZE05_SIZES = ['2XL', 'XXL'];
 /**
  * Get the part number suffix for a size
  * @param {string} size - The size (e.g., '3XL')
- * @returns {string} The suffix (e.g., '_3X') or empty string
+ * @returns {string} The suffix (e.g., '_3XL') or empty string
  */
 function getSizeSuffix(size) {
     return SIZE_TO_SUFFIX[size] || '';

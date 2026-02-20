@@ -22,17 +22,18 @@ class ShopWorksGuideGenerator {
             'XL': '',
             // Extra Small and XXL oversizes
             'XS': '_XS',
-            'XXL': '_XXL',  // Port & Co uses _XXL
-            // Oversizes: _2X format
-            '2XL': '_2X',   // Some brands use _2X (same as XXL)
-            '3XL': '_3X',
-            '4XL': '_4X',
-            '5XL': '_5X',
-            '6XL': '_6X',
-            '7XL': '_7X',
-            '8XL': '_8X',
-            '9XL': '_9X',
-            '10XL': '_10X',
+            'XXL': '_XXL',  // Ladies/Womens 2XL (589 products, distinct from _2XL)
+            // Oversizes: full form per ShopWorks pricelist (_2X/_3X do NOT exist)
+            '2XL': '_2XL',
+            '3XL': '_3XL',
+            '4XL': '_4XL',
+            '5XL': '_5XL',
+            '6XL': '_6XL',
+            'XXXL': '_XXXL',
+            '7XL': '_7XL',
+            '8XL': '_8XL',
+            '9XL': '_9XL',
+            '10XL': '_10XL',
             // Tall sizes: Keep full suffix
             'LT': 'T_LT',
             'XLT': 'T_XLT',

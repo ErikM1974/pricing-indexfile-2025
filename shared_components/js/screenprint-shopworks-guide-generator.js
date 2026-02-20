@@ -3,7 +3,7 @@
  * Extends the base ShopWorksGuideGenerator for screen print-specific features
  *
  * Key Features:
- * - Uses parent class multi-line sizing (oversize suffixes: _2X, _3X, _4X)
+ * - Uses parent class multi-line sizing (oversize suffixes: _2XL, _3XL, _4XL)
  * - Adds SPSU (Screen Print Setup) line items: $30.00 per setup
  * - Adds SPRESET (Screen Print Reset) line items: $25.00 per reset
  * - Enhances descriptions with print location details
@@ -90,7 +90,7 @@ class ScreenPrintShopWorksGuideGenerator extends ShopWorksGuideGenerator {
         // Get standard product lines from parent class (added AFTER SPSU)
         // This handles:
         // - Separating standard sizes (S/M/L/XL) on one line
-        // - Creating separate lines for oversizes with suffixes (_2X, _3X, _4X)
+        // - Creating separate lines for oversizes with suffixes (_2XL, _3XL, _4XL)
         console.log('[ScreenPrintShopWorksGuide] Calling parent parseQuoteIntoLineItems...');
         const productItems = super.parseQuoteIntoLineItems(quoteData);
 

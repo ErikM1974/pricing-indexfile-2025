@@ -1005,7 +1005,7 @@ const StaffDashboardService = (function() {
 
     /**
      * Check if a part number matches a tracked style
-     * Handles size variations like CT104670_2X, EB550_3X
+     * Handles size variations like CT104670_2XL, EB550_3XL
      * @param {string} partNumber - The part number from line item
      * @param {string} trackedStyle - The base style to match
      * @returns {boolean}

@@ -23,21 +23,21 @@ const SIZE_TO_SUFFIX = {
     'L': '',
     'XL': '',
 
-    // Extended sizes - ShopWorks format
+    // Extended sizes - ShopWorks full-form suffixes (updated Feb 2026)
     'XS': '_XS',
-    '2XL': '_2X',
-    '3XL': '_3X',
-    '4XL': '_4X',
-    '5XL': '_5X',
-    '6XL': '_6X',
-    '7XL': '_7X',
-    '8XL': '_8X',
-    '9XL': '_9X',
-    '10XL': '_10X',
+    '2XL': '_2XL',
+    '3XL': '_3XL',
+    '4XL': '_4XL',
+    '5XL': '_5XL',
+    '6XL': '_6XL',
+    '7XL': '_7XL',
+    '8XL': '_8XL',
+    '9XL': '_9XL',
+    '10XL': '_10XL',
 
-    // Aliases for extended sizes
-    'XXL': '_2X',
-    'XXXL': '_3X',
+    // Ladies/distinct sizes (NOT aliases)
+    'XXL': '_XXL',
+    'XXXL': '_XXXL',
     'XXS': '_XXS',
     '2XS': '_2XS',
 

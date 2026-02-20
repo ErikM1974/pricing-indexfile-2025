@@ -159,10 +159,10 @@ describe('Batch 12 — Order 2 (#136479): Blas Lawn Care — _4/5X combo size, D
     });
 
     test('CSV102_4/5X — combo size suffix extracted', () => {
-        // The _4/5X suffix should be extracted, giving partNumber='CSV102' and size='4XL/5XL'
+        // The _4/5X suffix should be extracted, giving partNumber='CSV102' and size='4/5X'
         const csv = result.products.filter(p => p.partNumber === 'CSV102');
         expect(csv.length).toBeGreaterThanOrEqual(2);
-        const has45X = csv.some(p => p.sizes && p.sizes['4XL/5XL']);
+        const has45X = csv.some(p => p.sizes && p.sizes['4/5X']);
         expect(has45X).toBe(true);
     });
 

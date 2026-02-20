@@ -1197,15 +1197,8 @@ class QuoteViewPage {
                 const sizeData = {};
                 sizeData[size] = allSizes[size].qty;
 
-                // Determine style suffix based on size type
-                let suffix;
-                if (size === '2XL') {
-                    suffix = '_2X';
-                } else if (['OSFA', 'S/M', 'M/L', 'L/XL', 'ONE SIZE', 'ADJ'].includes(size)) {
-                    suffix = `_${size.replace('/', '-')}`;  // OSFA → _OSFA, S/M → _S-M
-                } else {
-                    suffix = `_${size.replace('XL', 'X')}`;  // 3XL → _3X
-                }
+                // Determine style suffix — ShopWorks uses full-form suffixes
+                const suffix = `_${size}`;  // 2XL → _2XL, 3XL → _3XL, S/M → _S/M, OSFA → _OSFA
 
                 rows.push({
                     style: `${productGroup.styleNumber}${suffix}`,
