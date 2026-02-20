@@ -1203,6 +1203,14 @@ Same fix applied to `calculateCapProductPrice()` (lines 646-667).
 
 # Code Organization
 
+## Fix: Variable Scoping in Review Modal — embConfigOptions vs _sprEmbConfigOptions (2026-02-19)
+**Date:** 2026-02-19
+**Project:** [Pricing Index]
+**Problem:** Clicking "Apply & Import" in the ShopWorks review modal threw `ReferenceError: embConfigOptions is not defined`, preventing products from loading into the table.
+**Root cause:** `applyServicePricingReview()` referenced `embConfigOptions` (a local variable inside `showServicePricingReview()`) but runs in the module scope where only `_sprEmbConfigOptions` exists. The review modal stores its config copy in `_sprEmbConfigOptions` specifically so `applyServicePricingReview()` can access it after the modal closes.
+**Solution:** Changed `embConfigOptions?.fbPriceTiers` to `_sprEmbConfigOptions?.fbPriceTiers` on the single affected line.
+**Prevention:** In the embroidery builder's large single-file architecture, always verify which scope a function runs in before referencing variables. `showServicePricingReview()` owns `embConfigOptions` locally; everything outside uses `_sprEmbConfigOptions`.
+
 ## Fix: Console Spam from collectProductsFromTable Iterating Fee Rows (2026-02-11)
 **Date:** 2026-02-11
 **Project:** [Pricing Index]

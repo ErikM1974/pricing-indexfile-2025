@@ -8643,22 +8643,24 @@ Company:Absher Construction Company
                     let autoCapTier = '8000';
                     let hasFullBack = false;
 
-                    // Build unified design list from parser + DB lookup
+                    // Build unified design list from parser + DB lookup + fallback
                     const rawDesignNums = embConfigOptions.designNumbersRaw || [];
                     const rawDesignLabels = embConfigOptions.designNumbers || [];
-                    const designEntries = []; // { num, label, dbInfo (or null), inDb }
+                    const fallbackDesigns = lookup?.fallbackDesigns || {};
+                    const designEntries = []; // { num, label, dbInfo (or null), inDb, fallbackInfo (or null) }
 
                     for (let di = 0; di < rawDesignNums.length; di++) {
                         const num = rawDesignNums[di];
                         const label = rawDesignLabels[di] || `Design #${num}`;
                         const dbInfo = lookup?.designs?.[num] || null;
-                        designEntries.push({ num, label, dbInfo, inDb: !!dbInfo });
+                        const fallbackInfo = !dbInfo ? (fallbackDesigns[num] || null) : null;
+                        designEntries.push({ num, label, dbInfo, inDb: !!dbInfo, fallbackInfo });
                     }
                     // Also include DB-found designs not in parser list (rare edge case)
                     if (lookup?.designs) {
                         for (const [num, info] of Object.entries(lookup.designs)) {
                             if (!designEntries.find(d => d.num === num)) {
-                                designEntries.push({ num, label: `Design #${num}`, dbInfo: info, inDb: true });
+                                designEntries.push({ num, label: `Design #${num}`, dbInfo: info, inDb: true, fallbackInfo: null });
                             }
                         }
                     }
@@ -8700,7 +8702,7 @@ Company:Absher Construction Company
                         let maxAsSurcharge = 0;
 
                         for (const entry of designEntries) {
-                            const { num, label, dbInfo, inDb } = entry;
+                            const { num, label, dbInfo, inDb, fallbackInfo } = entry;
 
                             bannerHtml += `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;flex-wrap:wrap;">`;
                             bannerHtml += `<strong>#${escapeHtml(num)}</strong>`;
@@ -8739,8 +8741,53 @@ Company:Absher Construction Company
                                 if (dbInfo.variants && dbInfo.variants.length > 1) {
                                     bannerHtml += `<span style="color:#94a3b8;font-size:11px;">(${dbInfo.variants.length} variants)</span>`;
                                 }
+                            } else if (fallbackInfo && fallbackInfo.hasStitchData) {
+                                // Fallback WITH stitch data — treat like master hit
+                                const sc = fallbackInfo.stitchCount;
+                                const tier = fallbackInfo.stitchTier || 'Standard';
+                                const surcharge = fallbackInfo.asSurcharge || 0;
+                                const scFormatted = sc.toLocaleString();
+
+                                bannerHtml += `<span style="color:#475569;">${escapeHtml(fallbackInfo.companyName || '')}</span>`;
+                                bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+
+                                let tierBadge = '';
+                                if (tier === 'Full Back') {
+                                    tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                                } else if (surcharge > 0) {
+                                    tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+                                } else {
+                                    tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                                }
+                                bannerHtml += tierBadge;
+                                if (fallbackInfo.threadColors) {
+                                    bannerHtml += `<span style="color:#94a3b8;font-size:11px;" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+                                }
+
+                                // Promote fallback to dbInfo-like shape for auto-tier logic
+                                entry.inDb = true;
+                                entry.dbInfo = {
+                                    maxStitchCount: sc,
+                                    maxStitchTier: tier,
+                                    maxAsSurcharge: surcharge,
+                                    company: fallbackInfo.companyName,
+                                    hasFBPricing: false,
+                                    variants: [{ stitchCount: sc, stitchTier: tier, asSurcharge: surcharge }]
+                                };
+                            } else if (fallbackInfo) {
+                                // Fallback WITHOUT stitch data — name/company/colors only
+                                if (fallbackInfo.companyName) {
+                                    bannerHtml += `<span style="color:#475569;">${escapeHtml(fallbackInfo.companyName)}</span>`;
+                                }
+                                if (fallbackInfo.designName) {
+                                    bannerHtml += `<span style="color:#64748b;font-size:11px;">${escapeHtml(fallbackInfo.designName)}</span>`;
+                                }
+                                bannerHtml += '<span style="background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">No stitch data</span>';
+                                if (fallbackInfo.threadColors) {
+                                    bannerHtml += `<span style="color:#94a3b8;font-size:11px;" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+                                }
                             } else {
-                                // Extract name from label (format: "Design #XXXXX — Name...")
+                                // Not found in either table
                                 const nameMatch = label.match(/—\s*(.+)/);
                                 if (nameMatch) {
                                     bannerHtml += `<span style="color:#475569;">${escapeHtml(nameMatch[1].trim())}</span>`;
@@ -8802,7 +8849,7 @@ Company:Absher Construction Company
                             embConfigOptions.fbPriceTiers = null;
 
                             if (garmentDesignNum) {
-                                const gInfo = lookup?.designs?.[garmentDesignNum];
+                                const gInfo = lookup?.designs?.[garmentDesignNum] || designEntries.find(e => e.num === garmentDesignNum)?.dbInfo;
                                 if (gInfo) {
                                     const sc = gInfo.maxStitchCount;
                                     const tier = gInfo.maxStitchTier || 'Standard';
@@ -8833,7 +8880,7 @@ Company:Absher Construction Company
                             // Auto-set cap tier from assigned design
                             autoCapTier = '8000';
                             if (capDesignNum) {
-                                const cInfo = lookup?.designs?.[capDesignNum];
+                                const cInfo = lookup?.designs?.[capDesignNum] || designEntries.find(e => e.num === capDesignNum)?.dbInfo;
                                 if (cInfo) {
                                     // For caps, use smallest variant stitch count
                                     let minCapStitch = Infinity;
@@ -10493,6 +10540,27 @@ Company:Absher Construction Company
                         }
                     } catch (err) {
                         console.warn('[ShopWorks Import] Design stitch lookup failed (will use manual selection):', err.message);
+                    }
+
+                    // Fallback: look up not-found designs in ShopWorks_Designs table
+                    if (designLookup?.notFound?.length > 0) {
+                        try {
+                            const fallbackUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/fallback?designs=${encodeURIComponent(designLookup.notFound.join(','))}`;
+                            const fbResp = await Promise.race([
+                                fetch(fallbackUrl),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                            ]);
+                            if (fbResp.ok) {
+                                const fbData = await fbResp.json();
+                                if (fbData.success && fbData.count > 0) {
+                                    designLookup.fallbackDesigns = fbData.designs;
+                                    designLookup.notFound = fbData.notFound; // update to truly-not-found
+                                    console.log(`[ShopWorks Import] Fallback lookup: found ${fbData.count} in ShopWorks table, ${fbData.notFound.length} truly not found`);
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('[ShopWorks Import] Fallback design lookup failed (non-critical):', err.message);
+                        }
                     }
                 }
 
