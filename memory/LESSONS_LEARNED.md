@@ -1095,6 +1095,32 @@ Plus, CRM sync may be stale if not run recently.
 
 # Multi-SKU Products & Sizes
 
+## DONE: Changed _2XL to _2X in ALL quote builders and shared components
+**Date:** 2026-02-21
+**Project:** [Pricing Index]
+**Status:** DONE — all 12 files updated, verified via grep + 96 parser tests passing
+**Problem:** SanMar's live API rejects `_2XL` but accepts `_2X` for 2XL products. This was discovered and fixed in the InkSoft Transform project (sanmar_converter.py, transform.py, app.js). The Pricing Index project still uses `_2XL` in many files.
+**What needs changing:** Every `'2XL': '_2XL'` mapping needs to become `'2XL': '_2X'`. Only the 2XL→_2X mapping changes — all other sizes (_3XL, _4XL, _XXL, _2XLT, _2XLB, etc.) stay the same.
+**Files that need the fix (code that GENERATES part numbers):**
+1. `shared_components/js/extended-sizes-config.js` — line 89 (CENTRAL config, fix here first)
+2. `shared_components/js/quote-builder-core.js` — line 355
+3. `shared_components/js/embroidery-quote-pricing.js` — line 1304
+4. `shared_components/js/embroidery-quote-invoice.js` — line 1389
+5. `shared_components/js/shopworks-guide-generator.js` — line 27
+6. `shared_components/js/sku-validation-service.js` — line 80
+7. `quote-builders/embroidery-quote-builder.html` — line 2134
+8. `quote-builders/dtg-quote-builder.html` — line 719
+9. `quote-builders/screenprint-quote-builder.html` — line 849
+10. `pages/js/quote-view.js` — line 1201
+11. `pages/js/services/InventoryService.js` — line 108 (hardcoded PC54_2XL)
+12. `tests/unit/csv-validation-report.js` — line 28
+**Files to NOT change (suffix stripping — keep _2XL for backward compat):**
+- `shared_components/js/shopworks-import-parser.js` — reads/strips suffixes, needs both _2X and _2XL
+**Evidence:** PC61_2XL → ERROR, PC61_2X → ✅ $3.75 (tested in ShopWorks "Get Cost from SANMAR")
+**Reference:** See `Python Inksoft/memories/LESSONS_LEARNED.md` for full details
+
+---
+
 ## Bug: Shopworks_Integration Table Does Not Exist — Extended Sizes Broken
 **Date:** 2026-02-06
 **Project:** [caspio-proxy]

@@ -23,9 +23,9 @@ const SIZE_TO_SUFFIX = {
     'L': '',
     'XL': '',
 
-    // Extended sizes - ShopWorks full-form suffixes (updated Feb 2026)
+    // Extended sizes - ShopWorks suffixes (corrected Feb 2026: _2X, not _2XL)
     'XS': '_XS',
-    '2XL': '_2XL',
+    '2XL': '_2X',
     '3XL': '_3XL',
     '4XL': '_4XL',
     '5XL': '_5XL',

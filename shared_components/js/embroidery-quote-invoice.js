@@ -1386,7 +1386,7 @@ class EmbroideryInvoiceGenerator {
 
         // Map size names to style suffixes
         const suffixMap = {
-            '2XL': '_2XL',
+            '2XL': '_2X',
             'XXL': '_XXL',
             '3XL': '_3XL',
             'XXXL': '_XXXL',

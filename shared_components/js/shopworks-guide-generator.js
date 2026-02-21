@@ -22,9 +22,9 @@ class ShopWorksGuideGenerator {
             'XL': '',
             // Extra Small and XXL oversizes
             'XS': '_XS',
-            'XXL': '_XXL',  // Ladies/Womens 2XL (589 products, distinct from _2XL)
-            // Oversizes: full form per ShopWorks pricelist (_2X/_3X do NOT exist)
-            '2XL': '_2XL',
+            'XXL': '_XXL',  // Ladies/Womens 2XL (589 products, distinct from _2X)
+            // Oversizes: _2X per ShopWorks; _3XL/_4XL are full-form
+            '2XL': '_2X',
             '3XL': '_3XL',
             '4XL': '_4XL',
             '5XL': '_5XL',

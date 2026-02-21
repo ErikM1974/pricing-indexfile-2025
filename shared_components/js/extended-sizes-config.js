@@ -74,7 +74,7 @@ const EXTENDED_SIZE_ORDER = [
  * because they use the base style number.
  *
  * NOTE: 2XL and XXL are DISTINCT in ShopWorks (zero overlap):
- * - 2XL (_2XL): Standard plus size (2,125 products)
+ * - 2XL (_2X): Standard plus size (2,123 products)
  * - XXL (_XXL): Ladies/Womens plus size (589 products, e.g., District, Cornerstone)
  * Both use Size05 field but have different suffixes.
  */
@@ -85,9 +85,9 @@ const SIZE_TO_SUFFIX = {
     'L': '',
     'XL': '',
 
-    // Plus sizes (full form per ShopWorks pricelist — _2X/_3X/_4X do NOT exist)
-    '2XL': '_2XL',
-    'XXL': '_XXL',     // DISTINCT from 2XL — 589 ladies/womens products use _XXL, 0 overlap with _2XL
+    // Plus sizes — _2X per ShopWorks pricelist; _3XL/_4XL are full-form
+    '2XL': '_2X',
+    'XXL': '_XXL',     // DISTINCT from 2XL — 589 ladies/womens products use _XXL, 0 overlap with _2X
     '3XL': '_3XL',
     'XXXL': '_XXXL',   // 6 Outdoor Research products
     '4XL': '_4XL',

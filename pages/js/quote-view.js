@@ -1197,8 +1197,9 @@ class QuoteViewPage {
                 const sizeData = {};
                 sizeData[size] = allSizes[size].qty;
 
-                // Determine style suffix — ShopWorks uses full-form suffixes
-                const suffix = `_${size}`;  // 2XL → _2XL, 3XL → _3XL, S/M → _S/M, OSFA → _OSFA
+                // Determine style suffix — ShopWorks uses _2X (not _2XL) for 2XL
+                const SUFFIX_OVERRIDES = { '2XL': '_2X' };
+                const suffix = SUFFIX_OVERRIDES[size] || `_${size}`;
 
                 rows.push({
                     style: `${productGroup.styleNumber}${suffix}`,

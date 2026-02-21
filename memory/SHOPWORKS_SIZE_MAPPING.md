@@ -745,22 +745,23 @@ If you update `SIZE_TO_SUFFIX` in sku-validation-service.js, also update the map
 **Purpose:** Ensure generated inventorySku values match ShopWorks exactly
 **Validated:** 2026-01-04
 
-### Critical Discovery: Full-Form Suffixes (Updated Feb 2026)
+### Critical Discovery: 2XL Uses `_2X` (Corrected Feb 2026)
 
-**Feb 2026 ShopWorks Pricelist** (15,171 rows) uses **ONLY full-form suffixes**:
+**Feb 2026 ShopWorks Pricelist** (15,171 rows) — suffix format varies by size:
 
 | Suffix | Count | Used By |
 |--------|-------|---------|
-| `_2XL` | 2,125 | Standard unisex/men's products |
+| `_2X`  | 2,123 | Standard unisex/men's 2XL products (**short form**) |
 | `_XXL` | 589 | Ladies products, District, Cornerstone, Outdoor Research |
-| `_3XL` | 2,448 | Standard extended |
-| `_4XL` | 2,143 | Standard extended |
+| `_3XL` | 2,448 | Standard extended (**full form**) |
+| `_4XL` | 2,143 | Standard extended (**full form**) |
 
-**Key:** `_2X`, `_3X`, `_4X` short forms have **ZERO** products in the Feb 2026 pricelist.
+**Key:** Only 2XL uses short form (`_2X`). 3XL/4XL use full form (`_3XL`/`_4XL`). `_2XL` has ZERO products.
+SanMar API confirms: `PC61_2X` returns $3.75, `PC61_2XL` returns ERROR.
 XXL and 2XL are **completely distinct** (zero overlap). Both map to Size05.
 Combo suffixes use slashes: `_S/M` (69), `_M/L` (36), `_L/XL` (67) — NOT `_SM`/`_ML`/`_LXL`.
 
-**Fixed 2026-02-20:** All 13 files updated to use full-form suffixes. Old `_2X` etc. kept in parser for backward compat with saved quotes.
+**Fixed 2026-02-21:** All 12 code files corrected: `'2XL': '_2XL'` → `'2XL': '_2X'`. Parser keeps both `_2X` and `_2XL` for backward compat with saved quotes.
 
 ### XXL_STYLES Set (442 Active Styles)
 

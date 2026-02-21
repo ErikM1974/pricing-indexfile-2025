@@ -75,9 +75,9 @@ class SKUValidationService {
         'L': '',
         'XL': '',
 
-        // Extended sizes - ShopWorks full-form format (per Feb 2026 pricelist)
+        // Extended sizes - ShopWorks format (per Feb 2026 pricelist)
         'XS': '_XS',
-        '2XL': '_2XL',     // 2,125 products use _2XL (full form)
+        '2XL': '_2X',      // 2,123 products use _2X
         '3XL': '_3XL',     // 2,448 products use _3XL (full form)
         '4XL': '_4XL',
         '5XL': '_5XL',

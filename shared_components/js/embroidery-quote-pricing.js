@@ -1301,7 +1301,7 @@ class EmbroideryPricingCalculator {
         const suffixMap = {
             'S': '', 'M': '', 'L': '', 'XL': '',
             'XS': '_XS',
-            '2XL': '_2XL', 'XXL': '_XXL', '3XL': '_3XL', '4XL': '_4XL',
+            '2XL': '_2X', 'XXL': '_XXL', '3XL': '_3XL', '4XL': '_4XL',
             '5XL': '_5XL', '6XL': '_6XL', 'XXXL': '_XXXL',
             'LT': '_LT', 'XLT': '_XLT',
             '2XLT': '_2XLT', '3XLT': '_3XLT',
