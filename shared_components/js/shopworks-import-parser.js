@@ -553,7 +553,8 @@ class ShopWorksImportParser {
                 artCharges: null,        // { amount }
                 patchSetup: false,
                 graphicDesign: null,     // { hours, amount }
-                shipping: null           // { amount, description }
+                shipping: null,          // { amount, description }
+                capEmbellishments: []    // 3D-EMB, Laser Patch upcharges
             },
             orderSummary: {
                 subtotal: null,
@@ -1446,6 +1447,18 @@ class ShopWorksImportParser {
                 });
                 break;
 
+            case 'cap-embellishment':
+                // 3D-EMB (3D Puff) or Laser Patch — cap embellishment upcharges
+                result.services.capEmbellishments.push({
+                    partNumber: item.partNumber.toUpperCase() === 'LASER PATCH' ? 'Laser Patch' : '3D-EMB',
+                    type: item.partNumber.toUpperCase() === 'LASER PATCH' ? 'laser-patch' : '3d-puff',
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice || 0,
+                    total: (item.unitPrice || 0) * (item.quantity || 0),
+                    description: item.description
+                });
+                break;
+
             case 'invalid':
                 // Invalid/skipped items - add to warnings AND reviewItems for user review
                 result.warnings.push(`Skipped invalid item: ${item.partNumber}`);
@@ -1525,7 +1538,7 @@ class ShopWorksImportParser {
     /**
      * Classify a part number by type
      * @param {string} partNumber - The part number to classify
-     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'sewing', 'design-transfer', 'contract', 'digital-print', 'screen-print-fee', 'invalid', 'comment'
+     * @returns {string} Type: 'product', 'digitizing', 'decg', 'decc', 'al', 'fb', 'cb', 'monogram', 'rush', 'art', 'patch-setup', 'graphic-design', 'setup-fee', 'ltm', 'sewing', 'design-transfer', 'contract', 'digital-print', 'screen-print-fee', 'cap-embellishment', 'invalid', 'comment'
      */
     classifyPartNumber(partNumber) {
         if (!partNumber || partNumber.trim() === '') {
@@ -1638,6 +1651,11 @@ class ShopWorksImportParser {
         // Cap Side logo (same pricing as Cap Back)
         if (pn === 'CS') {
             return 'cs';
+        }
+
+        // Cap embellishment upcharges (3D Puff, Laser Patch)
+        if (pn === '3D-EMB' || pn === 'LASER PATCH') {
+            return 'cap-embellishment';
         }
 
         // Additional stitches (garment or cap) - manual pricing
@@ -2024,6 +2042,10 @@ class ShopWorksImportParser {
         if (totalMonograms > 0) services.push(`Monograms (${totalMonograms})`);
         const totalWeights = parseResult.services.weights?.reduce((sum, w) => sum + w.quantity, 0) || 0;
         if (totalWeights > 0) services.push(`Weight (${totalWeights})`);
+        if (parseResult.services.capEmbellishments?.length > 0) {
+            const types = parseResult.services.capEmbellishments.map(ce => ce.partNumber);
+            services.push(`Cap Embellishment: ${types.join(', ')}`);
+        }
 
         // Separate DECG and DECC counts
         const decgGarments = parseResult.decgItems.filter(d => d.serviceType === 'decg').length;
@@ -2052,4 +2074,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.16.0 - Weight service type, _XLR suffix, expanded non-SanMar patterns');
+console.log('[ShopWorksImportParser] Module loaded v1.20.0 - 3D-EMB & Laser Patch cap embellishment recognition');

@@ -1248,6 +1248,24 @@ const customerService = new ManageOrdersCustomerService();
 const customers = await customerService.getCustomers();
 ```
 
+### Future: Embroidery Quote Builder → ShopWorks PUSH
+
+**Status:** Planned (as of 2026-02-22). Will add "Push to ShopWorks" button on saved embroidery quotes.
+
+**Critical requirements (from 3-Day Tees experience):**
+- `sts_EnableTax01-04: 1` on EVERY line item (including fee items like DD, AS-Garm, etc.)
+- `id_Integration` for correct size mapping (use OnSite integration ID)
+- Size values must match OnSite translation table exactly
+- Use `CATALOG_COLOR` (not `COLOR_NAME`) for inventory matching
+- `ExtOrderID` with unique prefix: `NWCA-EMB-{quoteId}` (e.g., `NWCA-EMB-EMB-0222-001`)
+- Date format: `MM/DD/YYYY` (not ISO)
+- Design array with `StitchesTotal`, location info from embroidery config
+- Shipping address from quote Ship To fields (already parsed/saved)
+- Set `TaxTotal: 0` to let OnSite calculate tax (we store rate for display only)
+- Transform `quote_sessions` + `quote_items` → ManageOrders `ExternalOrderJson` format
+- Reuse existing auth from `manageorders-push-auth.js` in caspio-proxy
+- Backend route: `POST /api/manageorders/push-embroidery` in caspio-proxy
+
 ---
 
 ## caspio-pricing-proxy

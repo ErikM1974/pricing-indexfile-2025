@@ -10096,6 +10096,10 @@ Company:Absher Construction Company
                 const totalWeightQty = data.services.weights.reduce((sum, w) => sum + (w.quantity || 0), 0);
                 servicesHtml += `<span class="preview-service-badge"><i class="fas fa-weight-hanging"></i> Weight: ${totalWeightQty} items</span>`;
             }
+            if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
+                const ceTypes = data.services.capEmbellishments.map(ce => ce.partNumber).join(', ');
+                servicesHtml += `<span class="preview-service-badge"><i class="fas fa-hat-cowboy"></i> Cap Embellishment: ${escapeHtml(ceTypes)}</span>`;
+            }
             if (data.services.rush) {
                 servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
             }
@@ -10944,6 +10948,16 @@ Company:Absher Construction Company
                     }
                 }
 
+                // 16e. Auto-set cap embellishment type if detected (3D-EMB or Laser Patch)
+                if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
+                    const ce = data.services.capEmbellishments[0]; // Use first detected type
+                    const capEmbEl = document.getElementById('cap-embellishment-type');
+                    if (capEmbEl && ce.type) {
+                        capEmbEl.value = ce.type;
+                        handleCapEmbellishmentChange();
+                    }
+                }
+
                 // 17. Import checked review items as notes (invalid items, AS-GARM/CAP, LTM)
                 if (data._allReviewItems && data._allReviewItems.length > 0) {
                     const checkedItems = [];
@@ -10973,7 +10987,8 @@ Company:Absher Construction Company
                     'artCharges', 'graphicDesign', 'monograms',
                     'rush', 'ltmFee', 'sewing', 'additionalStitches',
                     'shipping', 'weights',
-                    'designTransfer', 'contract'
+                    'designTransfer', 'contract',
+                    'capEmbellishments'
                 ];
                 const unhandled = Object.entries(data.services || {})
                     .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
