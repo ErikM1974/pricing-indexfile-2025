@@ -572,6 +572,34 @@ async function processOrder(orderText, orderIndex, calc, doSave, noCleanup, serv
                         .join(', ');
                     const notFoundStr = lookupResp.notFound?.length > 0 ? ` | Not found: ${lookupResp.notFound.join(',')}` : '';
                     console.log(`  Design lookup: ${designSummary}${notFoundStr}`);
+
+                    // Fallback: look up not-found designs in ShopWorks_Designs table
+                    if (lookupResp.notFound?.length > 0) {
+                        try {
+                            const fallbackUrl = `${BASE_URL}/api/digitized-designs/fallback?designs=${encodeURIComponent(lookupResp.notFound.join(','))}`;
+                            const fbResp = await fetchJSON(fallbackUrl);
+                            if (fbResp.success && fbResp.designs) {
+                                designLookupData.fallbackDesigns = fbResp.designs;
+                                // Merge fallback designs into main designs for tier auto-set
+                                for (const [dn, info] of Object.entries(fbResp.designs)) {
+                                    if (!lookupResp.designs[dn]) {
+                                        lookupResp.designs[dn] = info;
+                                    }
+                                }
+                                lookupResp.notFound = fbResp.notFound || [];
+                                const fbSummary = Object.entries(fbResp.designs)
+                                    .map(([dn, info]) => `#${dn}(${(info.maxStitchCount || info.stitchCount || 0).toLocaleString()} st)`)
+                                    .join(', ');
+                                if (fbSummary) console.log(`  Fallback lookup: ${fbSummary}`);
+                                if (fbResp.notFound?.length > 0) {
+                                    console.log(`  Still not found: ${fbResp.notFound.join(', ')}`);
+                                }
+                            }
+                        } catch (fbErr) {
+                            // Non-critical — continue with defaults for these designs
+                            result.warnings.push(`Fallback design lookup failed: ${fbErr.message}`);
+                        }
+                    }
                 }
             } catch (err) {
                 result.warnings.push(`Design lookup failed: ${err.message}`);
@@ -1477,10 +1505,11 @@ async function main() {
                     allDesigns.push({
                         designNumber: dn,
                         orderId: r.orderId || r.orderIndex,
-                        maxStitchCount: info.maxStitchCount,
-                        tier: info.maxStitchTier || 'Standard',
-                        surcharge: info.maxAsSurcharge || 0,
-                        variants: info.variants ? info.variants.length : 0
+                        maxStitchCount: info.maxStitchCount || info.stitchCount || 0,
+                        tier: info.maxStitchTier || info.stitchTier || 'Standard',
+                        surcharge: info.maxAsSurcharge || info.asSurcharge || 0,
+                        variants: info.variants ? info.variants.length : 0,
+                        isFallback: !!info.hasStitchData === false && !info.maxStitchCount
                     });
                 }
             }
