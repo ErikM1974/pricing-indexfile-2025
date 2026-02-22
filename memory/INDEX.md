@@ -26,6 +26,7 @@
 ├── DTG_PRICING_CONSISTENCY.md        # DTG pricing consistency
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator
 ├── SHOPWORKS_EDP_INTEGRATION.md      # ShopWorks EDP integration
+├── SANMAR_API_REFERENCE.md           # SanMar SOAP API — endpoints, size/color mapping, warehouses
 ├── SHOPWORKS_SIZE_MAPPING.md         # SanMar→ShopWorks data transformation
 ├── SHOPWORKS_EXTENDED_SKU_PATTERNS.md # Extended SKU patterns
 ├── PRODUCT_SKU_PATTERNS.md           # Product SKU patterns reference
@@ -163,6 +164,7 @@
 | ManageOrders PULL (detail) | [MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md) → [/manageorders/](./manageorders/) |
 | ManageOrders PUSH (detail) | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |
 | **CRM/Order Entry System** | **[MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md)** - Field glossary, capabilities |
+| **SanMar API Reference** | **[SANMAR_API_REFERENCE.md](./SANMAR_API_REFERENCE.md)** - SOAP API endpoints, size/color mapping, warehouses |
 
 ### Pricing References
 | Need | Start Here |

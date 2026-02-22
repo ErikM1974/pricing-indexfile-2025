@@ -35,11 +35,14 @@ const tests = [
     { style: 'OR322226', size: 'XXL', expected: 'OR322226_XXL', note: 'Outdoor Research' },
 
     // ==============================================
-    // Non-XXL products (should return _2X)
+    // Non-XXL_STYLES products — XXL is its own size (NOT an alias for 2XL)
+    // XXL input → _XXL suffix universally. For unisex products, 2XL → _2X.
+    // PC54 doesn't carry XXL size in SanMar — but if the input says XXL,
+    // the code correctly maps it to _XXL (not _2X).
     // ==============================================
-    { style: 'PC54', size: 'XXL', expected: 'PC54_2X', note: 'Unisex tee - normal _2X' },
-    { style: 'G500', size: 'XXL', expected: 'G500_2X', note: 'Gildan - normal _2X' },
-    { style: 'ST350', size: 'XXL', expected: 'ST350_2X', note: 'Sport-Tek (not Ladies)' },
+    { style: 'PC54', size: 'XXL', expected: 'PC54_XXL', note: 'XXL always maps to _XXL (distinct from 2XL→_2X)' },
+    { style: 'G500', size: 'XXL', expected: 'G500_XXL', note: 'XXL always maps to _XXL' },
+    { style: 'ST350', size: 'XXL', expected: 'ST350_XXL', note: 'XXL always maps to _XXL' },
 
     // ==============================================
     // Lowercase suffix tests
@@ -49,8 +52,8 @@ const tests = [
     { style: 'OR322226', size: 'XXXL', expected: 'OR322226_xxxl', note: 'Lowercase _xxxl' },
     { style: 'OR322227', size: 'XXXL', expected: 'OR322227_xxxl', note: 'Lowercase _xxxl' },
 
-    // Other products should use uppercase XXXL → _3X
-    { style: 'PC54', size: 'XXXL', expected: 'PC54_3X', note: 'Normal XXXL → _3X' },
+    // Non-LOWERCASE_XXXL products — XXXL is its own size (NOT an alias for 3XL)
+    { style: 'PC54', size: 'XXXL', expected: 'PC54_XXXL', note: 'XXXL maps to _XXXL (distinct from 3XL→_3XL)' },
 
     // ==============================================
     // Infant sizes (new 4-digit with leading zeros)
@@ -80,12 +83,12 @@ const tests = [
     { style: 'PT66', size: 'W38', expected: 'PT66_W38', note: 'Shorts waist 38' },
 
     // ==============================================
-    // Extended sizes
+    // Extended sizes — 2XL uses SHORT form _2X, all others use FULL form
     // ==============================================
-    { style: 'PC54', size: '2XL', expected: 'PC54_2X', note: '2XL → _2X' },
-    { style: 'PC54', size: '3XL', expected: 'PC54_3X', note: '3XL → _3X' },
-    { style: 'PC54', size: '4XL', expected: 'PC54_4X', note: '4XL → _4X' },
-    { style: 'S608ES', size: '7XL', expected: 'S608ES_7X', note: '7XL → _7X' },
+    { style: 'PC54', size: '2XL', expected: 'PC54_2X', note: '2XL → _2X (short form, 2123 products)' },
+    { style: 'PC54', size: '3XL', expected: 'PC54_3XL', note: '3XL → _3XL (full form, 2448 products)' },
+    { style: 'PC54', size: '4XL', expected: 'PC54_4XL', note: '4XL → _4XL (full form)' },
+    { style: 'S608ES', size: '7XL', expected: 'S608ES_7XL', note: '7XL → _7XL (full form)' },
 ];
 
 console.log('SKU Validation Fixes Test\n');

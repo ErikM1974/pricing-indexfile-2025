@@ -4,8 +4,8 @@
  * Validates SKUs against ShopWorks inventory and provides
  * SanMar to ShopWorks SKU transformation.
  *
- * CRITICAL: ShopWorks uses _2X/_3X suffix format (NOT _2XL/_3XL)
- * Verified from actual shopworksparts.csv file from ShopWorks.
+ * CRITICAL: Only 2XL uses short form _2X. All others use full form (_3XL, _4XL, etc.)
+ * Verified from Feb 2026 ShopWorks Import CSV (15,152 rows). See SHOPWORKS_SIZE_MAPPING.md.
  *
  * @author Claude Code
  * @version 1.0.0
