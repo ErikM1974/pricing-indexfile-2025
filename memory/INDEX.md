@@ -34,6 +34,7 @@
 ├── MANAGEORDERS_INTEGRATION.md       # ManageOrders PULL API (11 endpoints)
 ├── MANAGEORDERS_PUSH_WEBSTORE.md     # ManageOrders PUSH API (4 endpoints)
 ├── MANAGEORDERS_COMPLETE_REFERENCE.md # **MASTER** - Complete API reference (all 3 projects)
+├── MANAGEORDERS_API_GUIDE_OFFICIAL.md # Official PDF field lists — all PUSH objects (Order, Customer, Design, Line Item, etc.)
 ├── SANMAR_TO_SHOPWORKS_GUIDE.md      # Transform Sanmar→ShopWorks
 ├── STAFF_DIRECTORY.md                # Staff contact information
 ├── STAFF_DASHBOARD_DATA_GUIDE.md     # Staff dashboard data processing
@@ -165,6 +166,7 @@
 | ManageOrders PUSH (detail) | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |
 | **CRM/Order Entry System** | **[MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md)** - Field glossary, capabilities |
 | **SanMar API Reference** | **[SANMAR_API_REFERENCE.md](./SANMAR_API_REFERENCE.md)** - SOAP API endpoints, size/color mapping, warehouses |
+| **ManageOrders Official Fields** | **[MANAGEORDERS_API_GUIDE_OFFICIAL.md](./MANAGEORDERS_API_GUIDE_OFFICIAL.md)** - All PUSH object field lists from official PDF |
 
 ### Pricing References
 | Need | Start Here |

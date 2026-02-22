@@ -2,7 +2,7 @@
 
 The definitive guide to ShopWorks ManageOrders API usage across all NWCA projects. This document covers every field, endpoint, pattern, and gotcha discovered from production use.
 
-**Last Updated:** 2026-01-11
+**Last Updated:** 2026-02-22
 **Applies To:** Pricing Index File 2025, caspio-pricing-proxy, Python Inksoft
 
 ---
@@ -82,6 +82,10 @@ ManageOrders is ShopWorks OnSite 7's REST API for order management. It has TWO d
 | Environment | PULL API | PUSH API | Proxy |
 |-------------|----------|----------|-------|
 | Production | `https://manageordersapi.com/v1` | `https://manageordersapi.com/onsite` | `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com` |
+
+**Official Swagger Documentation:**
+- PULL API: `https://app.swaggerhub.com/apis-docs/ShopWorks/ManageOrdersAPI/1.0.0`
+- PUSH API: `https://app.swaggerhub.com/apis-docs/ShopWorks/OnSiteExternalAPI/1.0.0`
 
 ## Authentication Flow
 
@@ -474,6 +478,25 @@ Content-Type: application/json
 }]
 ```
 
+**Official API Guide (v05.22.24) also documents an address-based tracking structure:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `APISource` | string | Filters tracking records in PULL API |
+| `ExtOrderID` | string | External order ID (must match existing order) |
+| `Name` | string | Shipping contact name |
+| `Address01` | string | Street address line 1 |
+| `Address02` | string | Street address line 2 |
+| `City` | string | City |
+| `State` | string | State/province |
+| `Zip` | string | Postal code |
+| `Country` | string | Country |
+| `Tracking` | string | Tracking number |
+| `Weight` | string | Package weight |
+| `Date_Shipped` | string | Ship date (**MM/DD/YYYY** format) |
+
+**Note:** The Swagger spec and the official PDF show slightly different field sets. The Swagger version (above) uses `TrackingNumber`/`ShippingMethod`/`Cost`/`CustomField01-05`. The PDF version uses `Tracking`/`Name`/`Address`/`Date_Shipped`. Both are valid — use whichever matches your OnSite version (v12 required for tracking push).
+
 **Use Case:** Push tracking numbers to OnSite after shipping orders.
 
 ---
@@ -503,6 +526,7 @@ Retrieve tracking information by upload date/time range.
 
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
+| `APISource` | string | No | Filters orders in PULL API. Set in OnSite API Integration Settings | `"NWCA"` |
 | `ExtOrderID` | string | **YES** | External order identifier | `"NWCA-3DT-010125-12345"` |
 | `ExtSource` | string | **YES** | Source system identifier | `"NWCA"`, `"InkSoft"` |
 | `ExtCustomerID` | string | No | External customer ID | `"0"` (webstore) or user ID |
@@ -788,10 +812,10 @@ OnSite has 6 size columns (Size01-Size06). The mapping depends on product type.
 | SKU | Size01 | Size02 | Size03 | Size04 | Size05 | Size06 |
 |-----|--------|--------|--------|--------|--------|--------|
 | PC54 | S | M | L | XL | - | - |
-| PC54_2X | S | M | L | XL | **2XL** | - |
-| PC54_3X | S | M | L | XL | 2XL | **3XL** |
+| PC54_2X | - | - | - | - | **2XL** | - |
+| PC54_3XL | - | - | - | - | - | **3XL** |
 
-**PC54_2X uses Size05 for 2XL, NOT Size06!**
+**PC54_2X uses Size05 for 2XL, NOT Size06!** Each extended-size SKU only has ONE active size column.
 
 ---
 
@@ -799,21 +823,28 @@ OnSite has 6 size columns (Size01-Size06). The mapping depends on product type.
 
 When creating line items, append the correct modifier to the base PartNumber:
 
-| Size | Modifier | Example |
-|------|----------|---------|
-| S, M, L, XL | (none) | `PC54` |
-| 2XL | `_2X` | `PC54_2X` |
-| 3XL | `_3X` | `PC54_3X` |
-| 4XL | `_4X` | `PC54_4X` |
-| 5XL | `_5X` | `PC54_5X` |
-| 6XL | `_6X` | `PC54_6X` |
-| XXL | `_XXL` | `G500_XXL` |
-| XS | `_XS` | `BC3001_XS` |
-| OSFA | `_OSFA` | `C112_OSFA` |
-| LT, XLT, 2XLT | `_LT`, `_XLT`, `_2XLT` | Tall sizes |
-| YS, YM, YL | `_YS`, `_YM`, `_YL` | Youth sizes |
+| Size | Modifier | Example | Notes |
+|------|----------|---------|-------|
+| S, M, L, XL | (none) | `PC54` | Base SKU, Size01-04 |
+| 2XL | `_2X` | `PC54_2X` | **Short form** (2,123 products) |
+| XXL | `_XXL` | `L500_XXL` | Ladies/Womens ONLY (589 products, DISTINCT from 2XL) |
+| 3XL | `_3XL` | `PC54_3XL` | **Full form** (2,446 products) |
+| 4XL | `_4XL` | `PC54_4XL` | **Full form** |
+| 5XL | `_5XL` | `S608ES_5XL` | Full form |
+| 6XL | `_6XL` | `S608ES_6XL` | Full form |
+| 7XL | `_7XL` | `S608ES_7XL` | Full form |
+| XS | `_XS` | `BC3001_XS` | |
+| OSFA | `_OSFA` | `C112_OSFA` | Caps, bags, towels |
+| LT, XLT, 2XLT, 3XLT, 4XLT | `_LT`, `_XLT`, `_2XLT`, `_3XLT`, `_4XLT` | Tall sizes | |
+| YS, YM, YL, YXL | `_YS`, `_YM`, `_YL`, `_YXL` | Youth sizes | |
+| S/M, M/L, L/XL | `_S/M`, `_M/L`, `_L/XL` | Flexfit caps | Slashes, not concatenated |
+| 4/5X | `_4/5X` | Safety vests | CornerStone only (8 products) |
 
-**IMPORTANT:** Use `_2X` NOT `_2XL`. ShopWorks is very particular about this format.
+**CRITICAL SIZE RULES (verified Feb 2026 from 15,152-row ShopWorks CSV):**
+- **Only 2XL uses short form:** `_2X` (NOT `_2XL` — zero products use `_2XL`)
+- **All others use full form:** `_3XL`, `_4XL`, `_5XL`, `_6XL`, `_7XL`
+- **XXL ≠ 2XL:** XXL is ladies/womens (`_XXL`), 2XL is men's/unisex (`_2X`). Zero overlap. Both use Size05.
+- **Size values in PUSH API** must match entries in the OnSite ManageOrders API Integration size translation table.
 
 ---
 
@@ -1550,7 +1581,7 @@ const customers = await response.json();
 | "Order not found" | Wrong ExtOrderID format | Check prefix (NWCA-, NWCA-TEST-, etc.) |
 | "Auth failed" | Token expired | Check 60-second buffer, force refresh |
 | "Gift certs merged" | In Payments array | Move to LinesOE with unique PartNumber |
-| "Size modifier wrong" | Using _2XL | Use _2X format |
+| "Size modifier wrong" | Using _2XL | Use _2X (only 2XL is short form; 3XL+ use full form _3XL/_4XL) |
 
 ---
 
