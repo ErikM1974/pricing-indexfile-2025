@@ -601,7 +601,7 @@ class EmbroideryQuoteService {
             }
 
             // Save fee/charge items as line items (ShopWorks part numbers)
-            const feeResult = await this._saveFeeLineItems(quoteID, lineNumber, sessionData, pricingResults);
+            const feeResult = await this._saveFeeLineItems(quoteID, lineNumber, sessionData, pricingResults, customerData);
             lineNumber = feeResult.lineNumber;
             totalItems += feeResult.totalItems;
             failedItems += feeResult.failedItems;
@@ -629,7 +629,7 @@ class EmbroideryQuoteService {
      * Called by both saveQuote() and updateQuote() to avoid duplication.
      * Only saves fees with non-zero values.
      */
-    async _saveFeeLineItems(quoteID, startLineNumber, sessionData, pricingResults) {
+    async _saveFeeLineItems(quoteID, startLineNumber, sessionData, pricingResults, customerData = {}) {
         let lineNumber = startLineNumber;
         let failedItems = 0;
         let totalItems = 0;
@@ -688,6 +688,25 @@ class EmbroideryQuoteService {
                 FinalUnitPrice: sessionData.CapDigitizing,
                 LineTotal: sessionData.CapDigitizing
             });
+        }
+
+        // Non-DD digitizing fees (DGT-001, DGT-002, DGT-003, DDE, DDT, etc.)
+        // These are captured by the parser in digitizingFees[] and passed via customerData
+        const digitizingFees = customerData.digitizingFees || [];
+        for (const dgtFee of digitizingFees) {
+            // Skip standard DD — already handled above via GarmentDigitizing/CapDigitizing
+            if (!dgtFee.code || dgtFee.code === 'DD') continue;
+            const amount = parseFloat(dgtFee.amount) || 0;
+            if (amount > 0) {
+                feeItems.push({
+                    StyleNumber: dgtFee.code,
+                    ProductName: dgtFee.description || `Digitizing Fee (${dgtFee.code})`,
+                    Quantity: 1,
+                    BaseUnitPrice: amount,
+                    FinalUnitPrice: amount,
+                    LineTotal: amount
+                });
+            }
         }
 
         // Art/Setup (GRT-50)
@@ -1660,7 +1679,7 @@ class EmbroideryQuoteService {
             }
 
             // Save fee/charge items as line items (ShopWorks part numbers)
-            const feeResult = await this._saveFeeLineItems(quoteId, lineNumber, sessionData, pricingResults);
+            const feeResult = await this._saveFeeLineItems(quoteId, lineNumber, sessionData, pricingResults, customerData);
             lineNumber = feeResult.lineNumber;
             totalItems += feeResult.totalItems;
             failedItems += feeResult.failedItems;

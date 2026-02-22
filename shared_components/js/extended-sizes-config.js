@@ -233,12 +233,39 @@ const SIZE_CATEGORIES = {
 const SIZE05_SIZES = ['2XL', 'XXL'];
 
 /**
+ * Normalize ShopWorks "R" (Regular fit) size variants to their base size.
+ * ShopWorks uses XLR, 2XLR, etc. as notation for "XL Regular" — these are
+ * the same as XL, 2XL, etc. and should not be treated as distinct sizes.
+ * The parser (SIZE_MAP) already normalizes XLR→XL; this ensures the
+ * extended-sizes-config agrees.
+ *
+ * @param {string} size - The size to normalize
+ * @returns {string} Normalized size (e.g., 'XLR' → 'XL', '2XLR' → '2XL')
+ */
+function normalizeRegularFitSize(size) {
+    if (!size) return size;
+    // Map "R" suffix regular-fit variants to their base size
+    // XLR→XL, 2XLR→2XL, 3XLR→3XL, 4XLR→4XL, 5XLR→5XL, 6XLR→6XL
+    const match = size.match(/^(\d*X?L)R$/i);
+    if (match) return match[1].toUpperCase();
+    // Also handle SR→S, MR→M, LR→L
+    const simpleMatch = size.match(/^([SML])R$/i);
+    if (simpleMatch) return simpleMatch[1].toUpperCase();
+    return size;
+}
+
+/**
  * Get the part number suffix for a size
  * @param {string} size - The size (e.g., '3XL')
  * @returns {string} The suffix (e.g., '_3XL') or empty string
  */
 function getSizeSuffix(size) {
-    return SIZE_TO_SUFFIX[size] || '';
+    // Normalize regular-fit variants (XLR→XL, etc.) before lookup
+    const normalized = normalizeRegularFitSize(size);
+    // Use ?? (not ||) because empty string '' is a valid suffix (standard sizes like XL)
+    const normalizedSuffix = SIZE_TO_SUFFIX[normalized];
+    if (normalizedSuffix !== undefined) return normalizedSuffix;
+    return SIZE_TO_SUFFIX[size] ?? '';
 }
 
 /**
@@ -258,7 +285,8 @@ function getPartNumber(baseStyle, size) {
  * @returns {boolean} True if extended size
  */
 function isExtendedSize(size) {
-    return !STANDARD_SIZES.includes(size);
+    const normalized = normalizeRegularFitSize(size);
+    return !STANDARD_SIZES.includes(normalized);
 }
 
 /**
@@ -276,8 +304,12 @@ function isSize05(size) {
  * @returns {number} Sort index (lower = earlier)
  */
 function getSizeSortIndex(size) {
-    const index = EXTENDED_SIZE_ORDER.indexOf(size);
-    return index !== -1 ? index : 999; // Unknown sizes go at end
+    const normalized = normalizeRegularFitSize(size);
+    const index = EXTENDED_SIZE_ORDER.indexOf(normalized);
+    if (index !== -1) return index;
+    // Fallback: try original size (for sizes still in EXTENDED_SIZE_ORDER)
+    const origIndex = EXTENDED_SIZE_ORDER.indexOf(size);
+    return origIndex !== -1 ? origIndex : 999; // Unknown sizes go at end
 }
 
 /**
@@ -397,6 +429,7 @@ if (typeof module !== 'undefined' && module.exports) {
         STANDARD_SIZES,
         SIZE_CATEGORIES,
         SIZE05_SIZES,
+        normalizeRegularFitSize,
         getSizeSuffix,
         getPartNumber,
         isExtendedSize,
@@ -416,6 +449,7 @@ window.ExtendedSizesConfig = {
     STANDARD_SIZES,
     SIZE_CATEGORIES,
     SIZE05_SIZES,
+    normalizeRegularFitSize,
     getSizeSuffix,
     getPartNumber,
     isExtendedSize,

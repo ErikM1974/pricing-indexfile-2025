@@ -107,9 +107,10 @@
 |-------------|------------------|------|
 | S, M, L, XL | (none - base) | No suffix for standard sizes |
 | XS | `_XS` | Add underscore prefix |
-| 2XL | `_2XL` | Add underscore prefix |
-| 3XL | `_3XL` | Add underscore prefix |
-| 4XL-6XL | `_4XL` to `_6XL` | Add underscore prefix |
+| 2XL | `_2X` | **Short form** (NOT `_2XL` — zero products use `_2XL`) |
+| XXL | `_XXL` | Ladies/Womens only (DISTINCT from `_2X`, both Size05) |
+| 3XL | `_3XL` | Full form |
+| 4XL-6XL | `_4XL` to `_6XL` | Full form |
 | LT, XLT | `_LT`, `_XLT` | Add underscore prefix |
 | 2XLT-4XLT | `_2XLT` to `_4XLT` | Add underscore prefix |
 | OSFA | `_OSFA` | Add underscore prefix |
@@ -129,14 +130,18 @@ function sanmarToShopWorksId(style, size) {
         return style;
     }
 
-    // All other sizes get underscore suffix
-    return `${style}_${size}`;
+    // 2XL uses short form _2X (NOT _2XL)
+    // XXL uses _XXL (ladies only, DISTINCT from _2X)
+    // See SIZE_TO_SUFFIX in extended-sizes-config.js for full mapping
+    const suffix = ExtendedSizesConfig.getSizeSuffix(size);
+    return suffix ? `${style}${suffix}` : style;
 }
 
 // Example usage:
 sanmarToShopWorksId('PC61', 'M')    // Returns: 'PC61'
-sanmarToShopWorksId('PC61', '2XL')  // Returns: 'PC61_2XL'
-sanmarToShopWorksId('PC61', '3XL')  // Returns: 'PC61_3XL'
+sanmarToShopWorksId('PC61', '2XL')  // Returns: 'PC61_2X'  (short form!)
+sanmarToShopWorksId('LPC54', 'XXL') // Returns: 'LPC54_XXL' (ladies)
+sanmarToShopWorksId('PC61', '3XL')  // Returns: 'PC61_3XL'  (full form)
 sanmarToShopWorksId('C950', 'OSFA') // Returns: 'C950_OSFA'
 ```
 
@@ -200,7 +205,7 @@ PC61, M, Navy, $4.62
 **ShopWorks Import (grouped by size):**
 ```
 ID_Product: PC61        → Base (S/M/L/XL) at $4.62
-ID_Product: PC61_2XL    → 2XL variant at $5.43
+ID_Product: PC61_2X     → 2XL variant at $5.43  (short form _2X, NOT _2XL)
 ID_Product: PC61_3XL    → 3XL variant at $6.06
 ID_Product: PC61_4XL    → 4XL variant at $6.06
 ID_Product: PC61_XS     → XS variant at $4.62
@@ -230,8 +235,8 @@ The `ID_Product` column uses underscore to separate style code from size suffix.
 | ID_Product | Type | Represents |
 |------------|------|------------|
 | `PC61` | Base (no suffix) | S, M, L, XL sizes |
-| `PC61_2XL` | Variant | 2XL only |
-| `PC61_3XL` | Variant | 3XL only |
+| `PC61_2X` | Variant | 2XL only (**short form** `_2X`, NOT `_2XL`) |
+| `PC61_3XL` | Variant | 3XL only (full form) |
 | `PC61_XS` | Variant | XS only |
 
 **IMPORTANT: S, M, L, XL are NEVER explicit suffixes** - they're represented by the base product code (no underscore).
@@ -244,24 +249,26 @@ The `ID_Product` column uses underscore to separate style code from size suffix.
 
 | Pattern | CSV Format | Count | Product Type |
 |---------|-----------|-------|--------------|
-| **Pattern 1** | `1,1,1,1,1,` | 10,222 | Size variants (_3XL, _XS, _OSFA, etc.) |
-| **Pattern 2** | `,,,,1,1` | 3,147 | **BASE products** (no suffix) |
-| **Pattern 3** | `1,1,1,1,,1` | 2,313 | **_2XL variants ONLY** |
+| **Pattern 1** | `1,1,1,1,1,` | ~10,006 | Size06 variants (_3XL, _XS, _OSFA, etc.) |
+| **Pattern 2** | `,,,,1,1` | ~3,022 | **BASE products** (no suffix, Size01-04 enabled) |
+| **Pattern 3** | `1,1,1,1,,1` | ~2,712 | **Size05 variants** (`_2X` and `_XXL` ONLY) |
 
 ### Column Mapping
 
 | Column | Maps To | Used By Base | Used By Variants |
 |--------|---------|--------------|------------------|
-| sts_LimitSize01 | XS | No | Yes |
-| sts_LimitSize02 | S | No | Yes |
-| sts_LimitSize03 | M | No | Yes |
-| sts_LimitSize04 | L | No | Yes |
-| sts_LimitSize05 | XL | Yes | Yes (except _2XL) |
-| sts_LimitSize06 | 2XL | Yes | Yes (_2XL only) |
+| sts_LimitSize01 | XS | No (disabled) | Yes (disabled) |
+| sts_LimitSize02 | S | No (disabled) | Yes (disabled) |
+| sts_LimitSize03 | M | No (disabled) | Yes (disabled) |
+| sts_LimitSize04 | L | No (disabled) | Yes (disabled) |
+| sts_LimitSize05 | XL/2XL | Yes (disabled) | No (enabled) for `_2X`/`_XXL` |
+| sts_LimitSize06 | Extended | Yes (disabled) | No (enabled) for all other extended |
 
-### Why _2XL Skips Size05
+**Note:** `1` = disabled (limit/hide), empty = enabled (show). Confusing but confirmed.
 
-The `_2XL` variant uses Pattern 3 (`1,1,1,1,,1`) which **disables Size05** to avoid conflicts with the base product's XL representation.
+### Why _2X/_XXL Use Size05 (Not Size06)
+
+The `_2X` and `_XXL` variants use Pattern 3 (`1,1,1,1,,1`) which **enables Size05 only**. All other extended sizes (3XL, 4XL, XS, OSFA, etc.) use Pattern 1 which **enables Size06 only**. This keeps 2XL pricing in its own column separate from 3XL+ extended sizes.
 
 ---
 
@@ -271,13 +278,13 @@ The `_2XL` variant uses Pattern 3 (`1,1,1,1,,1`) which **disables Size05** to av
 
 | Suffix | Count | Notes |
 |--------|-------|-------|
-| `_3XL` | 2,502 | Most common variant |
-| `_XS` | 2,396 | Second most common |
-| `_2XL` | 2,199 | Uses special Pattern 3 |
-| `_4XL` | 2,176 | |
-| `_XXL` | 594 | Alternative 2XL notation |
-| `_5XL` | 185 | |
-| `_6XL` | 105 | |
+| `_3XL` | 2,446 | Most common variant (full form) |
+| `_XS` | 2,327 | Second most common |
+| `_2X` | 2,123 | Men's/Unisex 2XL (**short form**, NOT `_2XL`) |
+| `_4XL` | 2,141 | Full form |
+| `_XXL` | 589 | Ladies/Womens 2XL (DISTINCT from `_2X`) |
+| `_5XL` | 171 | |
+| `_6XL` | 103 | |
 | `_XXXL` | 6 | Rare |
 | `_XXS` | 18 | |
 | `_2XS` | 15 | |
@@ -527,7 +534,7 @@ async function detectProductSizes(styleNumber) {
 
 This mapping enables proper size detection in quote builders:
 
-1. **Standard products**: Base SKU + _2XL, _3XL, _4XL, _XS variants
+1. **Standard products**: Base SKU + _2X, _3XL, _4XL, _XS variants
 2. **OSFA products**: Single `_OSFA` SKU -> Show qty-only input
 3. **Combo sizes**: `_S/M`, `_M/L`, `_L/XL` -> Show combo columns
 4. **Tall products**: `_LT`, `_XLT`, `_2XLT`+ -> Show tall columns
@@ -663,7 +670,7 @@ The complete mapping is in `shared_components/js/sku-validation-service.js`.
 |----------|-------|---------------|
 | **Standard** | S, M, L, XL | (no suffix - base product) |
 | **Extra-small** | XS, XXS, 2XS | `_XS`, `_XXS`, `_2XS` |
-| **Extended** | 2XL-6XL | `_2XL`, `_3XL`, `_4XL`, `_5XL`, `_6XL` |
+| **Extended** | 2XL-6XL | `_2X`, `_3XL`, `_4XL`, `_5XL`, `_6XL` (2XL is short form!) |
 | **Extra-extended** | 7XL-10XL | `_7XL`, `_8XL`, `_9XL`, `_10XL` |
 | **Ladies/XXL** | XXL, XXXL | `_XXL`, `_XXXL` (DISTINCT — not aliases) |
 | **Tall** | LT, XLT, 2XLT-4XLT, MT, ST, XST | `_LT`, `_XLT`, etc. |
@@ -762,6 +769,30 @@ XXL and 2XL are **completely distinct** (zero overlap). Both map to Size05.
 Combo suffixes use slashes: `_S/M` (69), `_M/L` (36), `_L/XL` (67) — NOT `_SM`/`_ML`/`_LXL`.
 
 **Fixed 2026-02-21:** All 12 code files corrected: `'2XL': '_2XL'` → `'2XL': '_2X'`. Parser keeps both `_2X` and `_2XL` for backward compat with saved quotes.
+
+### normalizeRegularFitSize() — XLR Normalization (Feb 2026)
+
+ShopWorks uses `XLR`, `2XLR`, `SR`, `MR`, `LR` as "Regular fit" notation (e.g., `SP24_XLR`). These are NOT distinct sizes — they're the same as XL, 2XL, S, M, L. Added `normalizeRegularFitSize()` in `extended-sizes-config.js` (Fix 6 from E2E testing):
+
+```javascript
+function normalizeRegularFitSize(size) {
+    if (!size) return size;
+    const match = size.match(/^(\d*X?L)R$/i);  // XLR→XL, 2XLR→2XL
+    if (match) return match[1].toUpperCase();
+    const simpleMatch = size.match(/^([SML])R$/i);  // SR→S, MR→M, LR→L
+    if (simpleMatch) return simpleMatch[1].toUpperCase();
+    return size;
+}
+```
+
+Called by `getSizeSuffix()`, `isExtendedSize()`, and `getSizeSortIndex()` before any lookup. Uses explicit `undefined` check (not `||`) because empty string `''` is a valid suffix for standard sizes like XL.
+
+### Feb 2026 CSV Re-Analysis
+
+Full re-analysis of both CSV files performed 2026-02-22:
+- **ShopWorks Import CSV**: 15,152 rows (down from 15,682 in Jan — discontinued products removed)
+- **SanMar Bulk CSV**: 157,164 rows (down from 169,041 in Jan)
+- **Result**: Code correctly handles all mappings. 0 gaps in size suffix coverage. All 8 E2E test fixes verified.
 
 ### XXL_STYLES Set (442 Active Styles)
 

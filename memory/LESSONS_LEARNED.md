@@ -1095,6 +1095,26 @@ Plus, CRM sync may be stale if not run recently.
 
 # Multi-SKU Products & Sizes
 
+## Fix: XLR Regular-Fit Size Suffix Normalization (2026-02-22)
+**Date:** 2026-02-22
+**Project:** [Pricing Index]
+**Problem:** ShopWorks uses `_XLR` suffix for "XL Regular fit" (e.g., `SP24_XLR`). Parser `SIZE_MAP` correctly strips this to `XL`, but `extended-sizes-config.js` had no equivalent normalization — `getSizeSuffix('XLR')` returned `'_XLR'` instead of `''` (empty = standard size).
+**Root cause:** `SIZE_TO_SUFFIX` maps `'XL': ''` (standard, no suffix) but had no entry for `'XLR'`. Without normalization, XLR was treated as an unknown extended size.
+**Solution:** Added `normalizeRegularFitSize()` to `extended-sizes-config.js`. Regex-based: `XLR→XL`, `2XLR→2XL`, `SR→S`, `MR→M`, `LR→L`. Called by `getSizeSuffix()`, `isExtendedSize()`, and `getSizeSortIndex()` before any lookup.
+**Prevention:** Any new "fit variant" suffixes (e.g., Slim, Relaxed) should be added to `normalizeRegularFitSize()`, not to `SIZE_TO_SUFFIX`. Keep the mapping table clean — only actual distinct sizes belong there.
+
+---
+
+## Fix: getSizeSuffix() Falsy-Zero Bug — `||` vs `undefined` Check (2026-02-22)
+**Date:** 2026-02-22
+**Project:** [Pricing Index]
+**Problem:** After adding `normalizeRegularFitSize()`, `getSizeSuffix('XLR')` still returned `'_XLR'`. The normalization worked (`XLR→XL`) and `SIZE_TO_SUFFIX['XL']` returned `''` (empty string = standard size, no suffix), but the code fell through to the fallback.
+**Root cause:** Code used `||` operator: `SIZE_TO_SUFFIX[normalized] || SIZE_TO_SUFFIX[size]`. Empty string `''` is falsy in JavaScript, so `||` treated a valid lookup result as a miss and fell through to the original `'XLR'` lookup.
+**Solution:** Changed to explicit `undefined` check: `if (normalizedSuffix !== undefined) return normalizedSuffix;`. Only falls through to original-size lookup when the normalized size truly has no mapping.
+**Prevention:** **Never use `||` when `0`, `''`, or `false` are valid values.** Use `??` (nullish coalescing) or explicit `!== undefined` check. This is the same class of bug as the `taxRate || 0.101` falsy-zero issue (fixed 2026-02-11). Added to gotchas in MEMORY.md.
+
+---
+
 ## DONE: Changed _2XL to _2X in ALL quote builders and shared components
 **Date:** 2026-02-21
 **Project:** [Pricing Index]

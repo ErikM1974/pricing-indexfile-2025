@@ -1176,6 +1176,8 @@ class ShopWorksImportParser {
 
             case 'patch-setup':
                 result.services.patchSetup = true;
+                // Store the GRT-50 amount for art charge fee persistence
+                result.services.grt50Amount = item.unitPrice || 150;
                 break;
 
             case 'graphic-design':

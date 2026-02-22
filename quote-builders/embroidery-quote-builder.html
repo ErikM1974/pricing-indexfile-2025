@@ -4810,10 +4810,12 @@ Company:Absher Construction Company
                 return true;
             }
 
-            // Check title keywords
-            if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
-                titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||
-                titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {
+            // Check title keywords — but first strip DECG/service prefixes so
+            // "Di. Embroider Cap - T-shirt" doesn't match on "Cap" in the prefix
+            const strippedTitle = titleUpper.replace(/^DI\.\s*EMBROIDER\s+(CAP|GARMENT)\s*-\s*/i, '');
+            if (strippedTitle.includes('CAP') || strippedTitle.includes('HAT') ||
+                strippedTitle.includes('BEANIE') || strippedTitle.includes('SNAPBACK') ||
+                strippedTitle.includes('TRUCKER') || strippedTitle.includes('RICHARDSON')) {
                 return true;
             }
 
@@ -7484,7 +7486,8 @@ Company:Absher Construction Company
                 }
 
                 // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
-                if (decgItems.length > 0) {
+                // Only for mixed orders (products + DECG). DECG-only path above already initialized correctly.
+                if (decgItems.length > 0 && products.length > 0) {
                     const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
                     pricing.subtotal += decgServiceTotal;
                     pricing.grandTotal += decgServiceTotal;
@@ -7540,6 +7543,7 @@ Company:Absher Construction Company
                     // Frozen tax & design data for Caspio (2026-02-12)
                     designNumbers: lastImportMetadata?.designNumbers || [],
                     digitizingCodes: lastImportMetadata?.digitizingCodes || [],
+                    digitizingFees: lastImportMetadata?.parsedServices?.digitizingFees || [],
                     taxRate: (() => {
                         const includeTax = document.getElementById('include-tax')?.checked;
                         if (!includeTax) return 0;
@@ -9847,17 +9851,45 @@ Company:Absher Construction Company
                 }
             }
 
-            // Set sizes from import data
+            // Set sizes from import data — including extended sizes as child rows
             if (importData.sizes) {
+                const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
+
                 for (const [size, qty] of Object.entries(importData.sizes)) {
                     if (qty > 0) {
                         let internalSize = size;
                         if (size === 'LG') internalSize = 'L';
                         if (size === '2X') internalSize = '2XL';
+                        if (size === 'XXXL' || size === '3X') internalSize = '3XL';
+                        if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
+                        if (size === '5X') internalSize = '5XL';
+                        if (size === '6X') internalSize = '6XL';
                         // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
 
                         const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
-                        if (sizeInput && !sizeInput.disabled) {
+                        const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
+                                              (sizeInput && sizeInput.disabled);
+
+                        if (needsChildRow) {
+                            // Create child row for extended sizes (mirrors SanMar import path)
+                            createOrUpdateExtendedChildRow(rowId, internalSize, qty);
+
+                            // Set per-size sell price override on child row if available
+                            if (importData.sellPriceOverrides && importData.sellPriceOverrides[size]) {
+                                const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                                if (childRow) {
+                                    childRow.dataset.sellPrice = importData.sellPriceOverrides[size].toString();
+                                }
+                            }
+
+                            // For 2XL/XXL: set parent row input so onSizeChange doesn't remove the child row
+                            if (internalSize === '2XL' || internalSize === 'XXL') {
+                                const parentXxlInput = row.querySelector('[data-size="2XL"]');
+                                if (parentXxlInput) {
+                                    parentXxlInput.value = qty;
+                                }
+                            }
+                        } else if (sizeInput && !sizeInput.disabled) {
                             sizeInput.value = qty;
                         }
                     }
@@ -10218,11 +10250,15 @@ Company:Absher Construction Company
                             const results = await window.customerLookupInstance.search(data.customer.email);
 
                             if (results.length > 0) {
-                                // Auto-populate from first CRM match
+                                // Auto-populate from first CRM match — only fill empty fields
+                                // Parser already populated these during import; CRM supplements, doesn't replace
                                 const contact = results[0];
-                                document.getElementById('customer-name').value = contact.ct_NameFull || data.customer.contactName || '';
-                                document.getElementById('customer-email').value = contact.ContactNumbersEmail || data.customer.email || '';
-                                document.getElementById('company-name').value = contact.CustomerCompanyName || data.customer.company || '';
+                                const nameEl = document.getElementById('customer-name');
+                                const emailEl = document.getElementById('customer-email');
+                                const companyEl = document.getElementById('company-name');
+                                if (!nameEl.value.trim()) nameEl.value = contact.ct_NameFull || data.customer.contactName || '';
+                                if (!emailEl.value.trim()) emailEl.value = contact.ContactNumbersEmail || data.customer.email || '';
+                                if (!companyEl.value.trim()) companyEl.value = contact.CustomerCompanyName || data.customer.company || '';
                                 showToast('Customer info loaded from CRM', 'success');
                             } else {
                                 // Show that lookup ran but found nothing - not an error
@@ -10253,13 +10289,26 @@ Company:Absher Construction Company
 
                 // 3. Digitizing is now configured in the Review Import Pricing modal (embroidery config section)
 
-                // 4. Handle patch setup
+                // 4. Handle patch setup + GRT-50 art charge fee
                 if (data.services.patchSetup) {
                     const patchSetupCheckbox = document.getElementById('cap-patch-setup');
                     if (patchSetupCheckbox) {
                         patchSetupCheckbox.checked = true;
                         const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
                         if (wrapper) wrapper.classList.add('checked');
+                    }
+                    // Also set art charge input so GRT-50 fee is persisted on save
+                    // (_saveFeeLineItems saves GRT-50 only when ArtCharge > 0)
+                    const grt50Amount = data.services.grt50Amount || 150;
+                    const artToggle = document.getElementById('art-charge-toggle');
+                    const artInput = document.getElementById('art-charge');
+                    if (artToggle && artInput) {
+                        artToggle.checked = true;
+                        artInput.disabled = false;
+                        artInput.value = grt50Amount.toFixed(2);
+                        const artWrapper = document.getElementById('art-charge-wrapper');
+                        if (artWrapper) artWrapper.style.opacity = '1';
+                        updateArtworkCharges();
                     }
                 }
 
@@ -10678,17 +10727,34 @@ Company:Absher Construction Company
 
                     if (baseMap.has(key)) {
                         // Merge sizes into existing entry
-                        const baseProduct = mergedProductResults[baseMap.get(key)]._importData;
+                        const mergedEntry = mergedProductResults[baseMap.get(key)];
+                        const baseProduct = mergedEntry._importData;
                         for (const [size, qty] of Object.entries(product.sizes || {})) {
                             baseProduct.sizes[size] = (baseProduct.sizes[size] || 0) + qty;
+                        }
+                        // Preserve per-size sell price overrides from extended-size variants
+                        // e.g., CC8C_2X has a different sell price than CC8C base
+                        if (prodResult.overridePrice > 0) {
+                            if (!mergedEntry.sellPriceOverrides) mergedEntry.sellPriceOverrides = {};
+                            for (const size of Object.keys(product.sizes || {})) {
+                                mergedEntry.sellPriceOverrides[size] = prodResult.overridePrice;
+                            }
                         }
                     } else {
                         baseMap.set(key, mergedProductResults.length);
                         // Deep copy to avoid mutating original
-                        mergedProductResults.push({
+                        const entry = {
                             ...prodResult,
                             _importData: { ...product, sizes: { ...(product.sizes || {}) } }
-                        });
+                        };
+                        // Store base product's override price for its sizes too
+                        if (prodResult.overridePrice > 0) {
+                            entry.sellPriceOverrides = {};
+                            for (const size of Object.keys(product.sizes || {})) {
+                                entry.sellPriceOverrides[size] = prodResult.overridePrice;
+                            }
+                        }
+                        mergedProductResults.push(entry);
                     }
                 }
 
@@ -10699,7 +10765,7 @@ Company:Absher Construction Company
                 for (let i = 0; i < mergedProductResults.length; i++) {
                     const prodResult = mergedProductResults[i];
                     try {
-                        await importProductRow(prodResult._importData, prodResult.overridePrice || 0);
+                        await importProductRow(prodResult._importData, prodResult.overridePrice || 0, prodResult.sellPriceOverrides || null);
                         productsImported++;
                     } catch (err) {
                         console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
@@ -11077,7 +11143,7 @@ Company:Absher Construction Company
         /**
          * Import a single product row from ShopWorks data
          */
-        async function importProductRow(product, sellPriceOverride = 0) {
+        async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrides = null) {
             const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
 
             // Add a new row
@@ -11139,7 +11205,8 @@ Company:Absher Construction Company
                 // Non-SanMar row — use simplified color/size import
                 await reImportNonSanmarRow(row, rowId, {
                     color: product.color,
-                    sizes: product.sizes
+                    sizes: product.sizes,
+                    sellPriceOverrides: sellPriceOverrides
                 });
                 return row;
             }
@@ -11236,7 +11303,8 @@ Company:Absher Construction Company
 
                 await reImportNonSanmarRow(row, rowId, {
                     color: importColor,
-                    sizes: product.sizes
+                    sizes: product.sizes,
+                    sellPriceOverrides: sellPriceOverrides
                 });
 
                 // Trigger size change to update qty display and pricing
@@ -11348,6 +11416,21 @@ Company:Absher Construction Company
                     if (needsChildRow) {
                         // Use the existing extended size function to create child row
                         createOrUpdateExtendedChildRow(rowId, internalSize, qty);
+
+                        // Set per-size sell price override on child row if available
+                        // recalculatePricing() already reads childRow.dataset.sellPrice (lines 6683-6710)
+                        if (sellPriceOverrides && sellPriceOverrides[size]) {
+                            const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                            if (childRow) {
+                                childRow.dataset.sellPrice = sellPriceOverrides[size].toString();
+                            }
+                        } else if (sellPriceOverride > 0) {
+                            // Fallback: use the flat override for all child rows
+                            const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                            if (childRow) {
+                                childRow.dataset.sellPrice = sellPriceOverride.toString();
+                            }
+                        }
 
                         // For 2XL/XXL: Also set parent row's 2XL input so onSizeChange doesn't remove the child row
                         // onSizeChange checks parent input value and removes child row if value=0
