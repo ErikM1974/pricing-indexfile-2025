@@ -4187,7 +4187,12 @@ Company:Absher Construction Company
                     return;
                 }
 
-                results.innerHTML = data.results.map(d => {
+                // Show fuzzy search indicator if active
+                if (data.fuzzyEnabled) {
+                    results.innerHTML = '<div class="design-search-fuzzy-note"><i class="fas fa-magic"></i> Showing fuzzy matches — results ranked by relevance</div>';
+                }
+
+                results.innerHTML += data.results.map(d => {
                     const dn = escapeHtml(d.designNumber);
                     const hasStitch = d.maxStitchCount > 0;
                     const stitchStr = hasStitch ? d.maxStitchCount.toLocaleString() : '';
@@ -4213,6 +4218,11 @@ Company:Absher Construction Company
                     if (sources.includes('artrequests')) sourceBadges += '<span class="design-source-badge source-art" title="Has art request with mockup">Art Request</span>';
                     if (d.hasImage || d.artworkUrl) sourceBadges += '<span class="design-source-badge source-image" title="Has design image">Has Image</span>';
 
+                    // Relevance score indicator for fuzzy matches
+                    const scoreHtml = (data.fuzzyEnabled && typeof d.relevanceScore === 'number')
+                        ? '<span class="design-relevance-score" title="Match relevance">' + d.relevanceScore + '%</span>'
+                        : '';
+
                     // Determine the initial thumbnail: artworkUrl or thumbnail, or placeholder
                     const previewUrl = d.artworkUrl || d.thumbnailUrl || null;
                     const thumbHtml = previewUrl
@@ -4228,6 +4238,7 @@ Company:Absher Construction Company
                                 <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                                     <div class="design-result-number">#${dn}</div>
                                     ${sourceBadges}
+                                    ${scoreHtml}
                                 </div>
                                 <div class="design-result-company">${escapeHtml(d.company || 'Unknown')}</div>
                                 ${d.designName ? '<div class="design-result-name">' + escapeHtml(d.designName) + '</div>' : ''}

@@ -3304,6 +3304,32 @@ td.size-disabled input {
     color: #065f46;
 }
 
+/* Fuzzy search indicator */
+.design-search-fuzzy-note {
+    font-size: 11px;
+    color: #7c3aed;
+    background: #f5f3ff;
+    border: 1px solid #ede9fe;
+    border-radius: 6px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.design-search-fuzzy-note i {
+    font-size: 12px;
+}
+
+/* Relevance score badge */
+.design-relevance-score {
+    font-size: 9px;
+    color: #9ca3af;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
 .design-search-empty {
     text-align: center;
     padding: 32px 16px;
