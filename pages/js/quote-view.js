@@ -77,7 +77,8 @@ class QuoteViewPage {
 
         // Check if staff mode
         const urlParams = new URLSearchParams(window.location.search);
-        this.isStaff = urlParams.get('staff') === 'true';
+        this.isStaff = urlParams.get('staff') === 'true'
+            || (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn());
 
         // Load quote data
         await this.loadQuote();
