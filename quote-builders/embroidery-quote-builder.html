@@ -94,6 +94,25 @@
                             <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
+                            <!-- Design Number Lookup Row -->
+                            <div class="design-number-row" id="garment-design-row">
+                                <div class="design-number-input-group">
+                                    <label class="design-number-label">Design #</label>
+                                    <input type="text" id="garment-design-number" class="design-number-input"
+                                           placeholder="e.g. 29988" maxlength="10"
+                                           onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
+                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number">
+                                        <i class="fas fa-search"></i> Lookup
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #">
+                                        <i class="fas fa-database"></i> Search
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
+                            </div>
                             <div class="logo-form-row">
                                 <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
@@ -161,6 +180,25 @@
                             <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
+                            <!-- Design Number Lookup Row (Cap) -->
+                            <div class="design-number-row" id="cap-design-row">
+                                <div class="design-number-input-group">
+                                    <label class="design-number-label">Design #</label>
+                                    <input type="text" id="cap-design-number" class="design-number-input"
+                                           placeholder="e.g. 29988" maxlength="10"
+                                           onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
+                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number">
+                                        <i class="fas fa-search"></i> Lookup
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #">
+                                        <i class="fas fa-database"></i> Search
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
+                            </div>
                             <!-- Embellishment Type Selection -->
                             <div class="logo-form-row cap-embellishment-row">
                                 <div class="logo-form-field">
@@ -1467,6 +1505,44 @@ Company:Absher Construction Company
             </div>
         </div>
     </div>
+
+    <!-- Design Search Modal -->
+    <div class="shopworks-import-modal" id="design-search-modal">
+        <div class="shopworks-import-content" style="max-width: 640px;">
+            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
+                <h3><i class="fas fa-database"></i> Find Existing Design</h3>
+                <button class="shopworks-import-close" onclick="closeDesignSearchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="shopworks-import-body" style="padding: 16px;">
+                <div class="design-search-input-row">
+                    <input type="text" id="design-search-input" class="design-search-field"
+                           placeholder="Search by company name or design number..."
+                           oninput="onDesignSearchInput()"
+                           onkeydown="if(event.key==='Enter'){runDesignSearch();}">
+                    <button type="button" class="design-btn design-btn-lookup" onclick="runDesignSearch()" id="design-search-go">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div class="design-search-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Type a company name (e.g. "Aaberg") or design number to find existing designs
+                </div>
+                <div id="design-search-results" class="design-search-results">
+                    <!-- Results populated by JS -->
+                </div>
+                <div id="design-search-empty" class="design-search-empty" style="display:none;">
+                    <i class="fas fa-search"></i>
+                    <p>No designs found. Try a different search term.</p>
+                </div>
+                <div id="design-search-loading" class="design-search-loading" style="display:none;">
+                    <i class="fas fa-spinner fa-spin"></i> Searching...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <style>
         /* Non-SanMar Modal Styles */
         .ns-form-grid {
@@ -2764,9 +2840,15 @@ Company:Absher Construction Company
                     if (fbField) fbField.style.display = '';
                     if (fbInput) fbInput.value = draft.primaryLogo.stitchCount || 25000;
                 }
-                // Restore design number label on card header
+                // Restore design number label on card header + input field
                 if (draft.primaryLogo.designNumber) {
                     updateLogoCardHeader('garment', draft.primaryLogo.designNumber);
+                    const gDesignInput = document.getElementById('garment-design-number');
+                    if (gDesignInput) gDesignInput.value = draft.primaryLogo.designNumber;
+                    const gClearBtn = document.getElementById('garment-design-clear');
+                    if (gClearBtn) gClearBtn.style.display = 'inline-flex';
+                    // Trigger lookup to show design info badge
+                    lookupDesignNumber('garment');
                 }
             }
 
@@ -2780,9 +2862,14 @@ Company:Absher Construction Company
                 );
                 const capDigitizingEl = document.getElementById('cap-primary-digitizing');
                 if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
-                // Restore design number label on card header
+                // Restore design number label on card header + input field
                 if (draft.capPrimaryLogo.designNumber) {
                     updateLogoCardHeader('cap', draft.capPrimaryLogo.designNumber);
+                    const cDesignInput = document.getElementById('cap-design-number');
+                    if (cDesignInput) cDesignInput.value = draft.capPrimaryLogo.designNumber;
+                    const cClearBtn = document.getElementById('cap-design-clear');
+                    if (cClearBtn) cClearBtn.style.display = 'inline-flex';
+                    lookupDesignNumber('cap');
                 }
             }
 
@@ -3173,10 +3260,20 @@ Company:Absher Construction Company
             if (session.GarmentDesignNumber) {
                 primaryLogo.designNumber = session.GarmentDesignNumber;
                 updateLogoCardHeader('garment', session.GarmentDesignNumber);
+                const gDesignInput = document.getElementById('garment-design-number');
+                if (gDesignInput) gDesignInput.value = session.GarmentDesignNumber;
+                const gClearBtn = document.getElementById('garment-design-clear');
+                if (gClearBtn) gClearBtn.style.display = 'inline-flex';
+                lookupDesignNumber('garment');
             }
             if (session.CapDesignNumber) {
                 capPrimaryLogo.designNumber = session.CapDesignNumber;
                 updateLogoCardHeader('cap', session.CapDesignNumber);
+                const cDesignInput = document.getElementById('cap-design-number');
+                if (cDesignInput) cDesignInput.value = session.CapDesignNumber;
+                const cClearBtn = document.getElementById('cap-design-clear');
+                if (cClearBtn) cClearBtn.style.display = 'inline-flex';
+                lookupDesignNumber('cap');
             }
         }
 
@@ -3590,6 +3687,300 @@ Company:Absher Construction Company
                     ? `${baseTitle} — Design #${designNumber}`
                     : baseTitle;
             }
+        }
+
+        // ============================================================
+        // DESIGN NUMBER LOOKUP / SEARCH
+        // ============================================================
+
+        let _designSearchTarget = 'garment'; // Which logo card the search modal targets
+        let _designSearchDebounce = null;
+
+        /**
+         * Look up a design number from the input field
+         * @param {string} type - 'garment' or 'cap'
+         */
+        async function lookupDesignNumber(type) {
+            const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
+            const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
+            const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+            const input = document.getElementById(inputId);
+            const infoBadge = document.getElementById(infoId);
+            const clearBtn = document.getElementById(clearId);
+            if (!input) return;
+
+            const designNum = input.value.trim().replace(/[^\d]/g, '');
+            if (!designNum || designNum.length < 1) {
+                showToast('Enter a design number to look up', 'warning');
+                input.focus();
+                return;
+            }
+
+            // Show loading state
+            infoBadge.style.display = 'block';
+            infoBadge.className = 'design-info-badge design-info-loading';
+            infoBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Looking up design #' + escapeHtml(designNum) + '...';
+
+            try {
+                const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+                    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                const resp = await fetch(`${apiBase}/api/digitized-designs/lookup?designs=${designNum}`);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+
+                if (data.success && data.designs && data.designs[designNum]) {
+                    const design = data.designs[designNum];
+                    applyDesignToCard(type, designNum, design);
+                } else {
+                    // Not found in master — try fallback
+                    const fbResp = await fetch(`${apiBase}/api/digitized-designs/fallback?designs=${designNum}`);
+                    if (fbResp.ok) {
+                        const fbData = await fbResp.json();
+                        if (fbData.success && fbData.designs && fbData.designs[designNum]) {
+                            const fbDesign = fbData.designs[designNum];
+                            applyDesignToCard(type, designNum, {
+                                company: fbDesign.companyName || '',
+                                maxStitchCount: fbDesign.stitchCount || 0,
+                                maxStitchTier: fbDesign.stitchTier || 'Standard',
+                                variants: [{ designDescription: fbDesign.designName || '' }]
+                            });
+                            return;
+                        }
+                    }
+                    // Truly not found
+                    infoBadge.className = 'design-info-badge design-info-warning';
+                    infoBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Design #' + escapeHtml(designNum) +
+                        ' not found in database. A new design will be created in ShopWorks.';
+                    // Still set the number — user might know it exists in ShopWorks
+                    setDesignNumberOnLogo(type, designNum);
+                    clearBtn.style.display = 'inline-flex';
+                }
+            } catch (err) {
+                console.error('Design lookup failed:', err);
+                infoBadge.className = 'design-info-badge design-info-error';
+                infoBadge.innerHTML = '<i class="fas fa-times-circle"></i> Lookup failed: ' + escapeHtml(err.message);
+            }
+        }
+
+        /**
+         * Apply a found design to the logo card
+         */
+        function applyDesignToCard(type, designNum, design) {
+            const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
+            const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+            const infoBadge = document.getElementById(infoId);
+            const clearBtn = document.getElementById(clearId);
+
+            const stitchStr = design.maxStitchCount ? design.maxStitchCount.toLocaleString() + ' stitches' : '';
+            const tierBadge = design.maxStitchTier || 'Standard';
+            const company = design.company || '';
+            const parts = [company, stitchStr, tierBadge].filter(Boolean);
+
+            infoBadge.className = 'design-info-badge design-info-found';
+            infoBadge.innerHTML = '<i class="fas fa-check-circle"></i> ' + escapeHtml(parts.join(' · '));
+            infoBadge.style.display = 'block';
+            clearBtn.style.display = 'inline-flex';
+
+            // Set design number on the logo object
+            setDesignNumberOnLogo(type, designNum);
+            updateLogoCardHeader(type, designNum);
+
+            // Auto-set stitch tier dropdown if we have stitch info
+            if (design.maxStitchCount && design.maxStitchCount > 0) {
+                autoSetStitchTier(type, design.maxStitchCount, design.maxStitchTier);
+            }
+
+            showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
+        }
+
+        /**
+         * Set design number on the appropriate logo object
+         */
+        function setDesignNumberOnLogo(type, designNum) {
+            if (type === 'garment') {
+                primaryLogo.designNumber = designNum;
+            } else if (type === 'cap') {
+                if (typeof capPrimaryLogo !== 'undefined') {
+                    capPrimaryLogo.designNumber = designNum;
+                }
+            }
+        }
+
+        /**
+         * Auto-set stitch tier dropdown from design data
+         */
+        function autoSetStitchTier(type, stitchCount, tierName) {
+            const dropdownId = type === 'garment' ? 'primary-stitches' : 'cap-primary-stitches';
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+
+            // Map stitch count to tier value (reuse existing logic)
+            let tierValue;
+            if (stitchCount >= 25000) {
+                tierValue = '25000';
+            } else if (stitchCount > 15000) {
+                tierValue = '18000';
+            } else if (stitchCount > 10000) {
+                tierValue = '12000';
+            } else {
+                tierValue = '8000';
+            }
+
+            dropdown.value = tierValue;
+            // Trigger change events
+            if (type === 'garment') {
+                if (typeof onPrimaryStitchTierChange === 'function') onPrimaryStitchTierChange();
+                // Handle Full Back position auto-select
+                if (stitchCount >= 25000) {
+                    const posDropdown = document.getElementById('primary-position');
+                    if (posDropdown && posDropdown.value !== 'Full Back') {
+                        posDropdown.value = 'Full Back';
+                        if (typeof onPrimaryPositionChange === 'function') onPrimaryPositionChange();
+                    }
+                }
+            } else {
+                if (typeof onCapStitchTierChange === 'function') onCapStitchTierChange();
+            }
+        }
+
+        /**
+         * Clear design number from a logo card
+         * @param {string} type - 'garment' or 'cap'
+         */
+        function clearDesignNumber(type) {
+            const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
+            const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
+            const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+
+            const input = document.getElementById(inputId);
+            const infoBadge = document.getElementById(infoId);
+            const clearBtn = document.getElementById(clearId);
+
+            if (input) input.value = '';
+            if (infoBadge) { infoBadge.style.display = 'none'; infoBadge.innerHTML = ''; }
+            if (clearBtn) clearBtn.style.display = 'none';
+
+            // Clear the design number on the logo object
+            setDesignNumberOnLogo(type, null);
+            updateLogoCardHeader(type, null);
+            showToast('Design unlinked', 'info');
+        }
+
+        /**
+         * Open the design search modal
+         * @param {string} type - 'garment' or 'cap'
+         */
+        function openDesignSearchModal(type) {
+            _designSearchTarget = type;
+            const modal = document.getElementById('design-search-modal');
+            const searchInput = document.getElementById('design-search-input');
+            const results = document.getElementById('design-search-results');
+            const empty = document.getElementById('design-search-empty');
+            const loading = document.getElementById('design-search-loading');
+
+            if (results) results.innerHTML = '';
+            if (empty) empty.style.display = 'none';
+            if (loading) loading.style.display = 'none';
+            if (searchInput) searchInput.value = '';
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+            }
+            // Focus search input after animation
+            setTimeout(() => { if (searchInput) searchInput.focus(); }, 100);
+        }
+
+        /**
+         * Close the design search modal
+         */
+        function closeDesignSearchModal() {
+            const modal = document.getElementById('design-search-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+        }
+
+        /**
+         * Debounced search input handler
+         */
+        function onDesignSearchInput() {
+            clearTimeout(_designSearchDebounce);
+            _designSearchDebounce = setTimeout(() => {
+                const input = document.getElementById('design-search-input');
+                if (input && input.value.trim().length >= 2) {
+                    runDesignSearch();
+                }
+            }, 400);
+        }
+
+        /**
+         * Execute design search
+         */
+        async function runDesignSearch() {
+            const input = document.getElementById('design-search-input');
+            const results = document.getElementById('design-search-results');
+            const empty = document.getElementById('design-search-empty');
+            const loading = document.getElementById('design-search-loading');
+            if (!input) return;
+
+            const q = input.value.trim();
+            if (q.length < 2) return;
+
+            results.innerHTML = '';
+            empty.style.display = 'none';
+            loading.style.display = 'flex';
+
+            try {
+                const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+                    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                const resp = await fetch(`${apiBase}/api/digitized-designs/search?q=${encodeURIComponent(q)}&limit=20`);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+
+                loading.style.display = 'none';
+
+                if (!data.success || !data.results || data.results.length === 0) {
+                    empty.style.display = 'flex';
+                    return;
+                }
+
+                results.innerHTML = data.results.map(d => {
+                    const stitchStr = d.maxStitchCount ? d.maxStitchCount.toLocaleString() : '—';
+                    const tierClass = (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
+                    return `
+                        <div class="design-search-result-item" onclick="selectDesignFromSearch('${escapeHtml(d.designNumber)}')">
+                            <div class="design-result-number">#${escapeHtml(d.designNumber)}</div>
+                            <div class="design-result-company">${escapeHtml(d.company || 'Unknown')}</div>
+                            <div class="design-result-meta">
+                                <span class="design-result-stitch">${stitchStr} stitches</span>
+                                <span class="design-tier-badge tier-${escapeHtml(tierClass)}">${escapeHtml(d.maxStitchTier || 'Standard')}</span>
+                                ${d.variantCount > 1 ? '<span class="design-result-variants">' + d.variantCount + ' variants</span>' : ''}
+                            </div>
+                        </div>`;
+                }).join('');
+
+                if (data.totalMatches > data.count) {
+                    results.innerHTML += `<div class="design-search-more">${data.totalMatches - data.count} more results — refine your search</div>`;
+                }
+
+            } catch (err) {
+                loading.style.display = 'none';
+                console.error('Design search failed:', err);
+                results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle"></i> Search failed: ' + escapeHtml(err.message) + '</div>';
+            }
+        }
+
+        /**
+         * Select a design from the search modal results
+         * @param {string} designNum
+         */
+        function selectDesignFromSearch(designNum) {
+            closeDesignSearchModal();
+            const inputId = _designSearchTarget === 'garment' ? 'garment-design-number' : 'cap-design-number';
+            const input = document.getElementById(inputId);
+            if (input) input.value = designNum;
+            lookupDesignNumber(_designSearchTarget);
         }
 
         function setupPrimaryLogoHandlers() {
@@ -8059,10 +8450,23 @@ Company:Absher Construction Company
             primaryLogo.designNumber = null;
             primaryLogo.designName = null;
             updateLogoCardHeader('garment', null);
+            // Clear design number inputs
+            const gDesignInput = document.getElementById('garment-design-number');
+            if (gDesignInput) gDesignInput.value = '';
+            const gDesignInfo = document.getElementById('garment-design-info');
+            if (gDesignInfo) { gDesignInfo.style.display = 'none'; gDesignInfo.innerHTML = ''; }
+            const gDesignClear = document.getElementById('garment-design-clear');
+            if (gDesignClear) gDesignClear.style.display = 'none';
             if (typeof capPrimaryLogo !== 'undefined') {
                 capPrimaryLogo.designNumber = null;
                 capPrimaryLogo.designName = null;
                 updateLogoCardHeader('cap', null);
+                const cDesignInput = document.getElementById('cap-design-number');
+                if (cDesignInput) cDesignInput.value = '';
+                const cDesignInfo = document.getElementById('cap-design-info');
+                if (cDesignInfo) { cDesignInfo.style.display = 'none'; cDesignInfo.innerHTML = ''; }
+                const cDesignClear = document.getElementById('cap-design-clear');
+                if (cDesignClear) cDesignClear.style.display = 'none';
             }
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
@@ -10810,16 +11214,27 @@ Company:Absher Construction Company
                         document.getElementById('ltm-status-label').textContent = embConfig.ltmEnabled ? 'Applied' : 'Waived';
                     }
 
-                    // Store design number assignments on logo objects + update card headers
+                    // Store design number assignments on logo objects + update card headers + input fields
                     if (embConfig.garmentDesignNumber) {
                         primaryLogo.designNumber = embConfig.garmentDesignNumber;
                         primaryLogo.designName = embConfig.garmentDesignName || '';
                         updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
+                        const gdi = document.getElementById('garment-design-number');
+                        if (gdi) gdi.value = embConfig.garmentDesignNumber;
+                        const gcb = document.getElementById('garment-design-clear');
+                        if (gcb) gcb.style.display = 'inline-flex';
+                        // Show info badge via lookup
+                        lookupDesignNumber('garment');
                     }
                     if (embConfig.capDesignNumber) {
                         capPrimaryLogo.designNumber = embConfig.capDesignNumber;
                         capPrimaryLogo.designName = embConfig.capDesignName || '';
                         updateLogoCardHeader('cap', embConfig.capDesignNumber);
+                        const cdi = document.getElementById('cap-design-number');
+                        if (cdi) cdi.value = embConfig.capDesignNumber;
+                        const ccb = document.getElementById('cap-design-clear');
+                        if (ccb) ccb.style.display = 'inline-flex';
+                        lookupDesignNumber('cap');
                     }
                 }
 
