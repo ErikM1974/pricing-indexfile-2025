@@ -3310,3 +3310,148 @@ td.size-disabled input {
         gap: 4px;
     }
 }
+
+/* ============================================================
+   CUSTOMER INFO SECTION (Sidebar Top)
+   ============================================================ */
+
+.customer-info-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.section-header-compact {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-header-compact i {
+    font-size: 14px;
+    color: #6366f1;
+}
+
+.customer-info-body {
+    padding: 12px 14px;
+}
+
+.customer-info-body label {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.customer-info-body input,
+.customer-info-body select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.customer-info-body input:focus,
+.customer-info-body select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    outline: none;
+}
+
+.customer-lookup-divider {
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+    margin: 8px 0;
+    position: relative;
+}
+
+.customer-lookup-divider::before,
+.customer-lookup-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 50px);
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.customer-lookup-divider::before {
+    left: 0;
+}
+
+.customer-lookup-divider::after {
+    right: 0;
+}
+
+/* ============================================================
+   DESIGN CONFIGURATION SECTION (Sidebar, below Customer)
+   ============================================================ */
+
+.design-config-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.design-config-body {
+    padding: 10px 14px;
+}
+
+.design-lookup-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.design-lookup-row:last-child {
+    margin-bottom: 0;
+}
+
+.design-row-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.design-row-label i {
+    font-size: 12px;
+    color: #6366f1;
+    width: 16px;
+    text-align: center;
+}
+
+/* Make design buttons smaller in sidebar context */
+.design-config-section .design-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.design-config-section .design-number-input {
+    width: 90px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.design-config-section .design-info-badge {
+    margin-top: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+}

@@ -94,25 +94,6 @@
                             <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
-                            <!-- Design Number Lookup Row -->
-                            <div class="design-number-row" id="garment-design-row">
-                                <div class="design-number-input-group">
-                                    <label class="design-number-label">Design #</label>
-                                    <input type="text" id="garment-design-number" class="design-number-input"
-                                           placeholder="e.g. 29988" maxlength="10"
-                                           onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
-                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number">
-                                        <i class="fas fa-search"></i> Lookup
-                                    </button>
-                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #">
-                                        <i class="fas fa-database"></i> Search
-                                    </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" style="display:none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
-                            </div>
                             <div class="logo-form-row">
                                 <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
@@ -180,25 +161,6 @@
                             <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
-                            <!-- Design Number Lookup Row (Cap) -->
-                            <div class="design-number-row" id="cap-design-row">
-                                <div class="design-number-input-group">
-                                    <label class="design-number-label">Design #</label>
-                                    <input type="text" id="cap-design-number" class="design-number-input"
-                                           placeholder="e.g. 29988" maxlength="10"
-                                           onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
-                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number">
-                                        <i class="fas fa-search"></i> Lookup
-                                    </button>
-                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #">
-                                        <i class="fas fa-database"></i> Search
-                                    </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" style="display:none;">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
-                            </div>
                             <!-- Embellishment Type Selection -->
                             <div class="logo-form-row cap-embellishment-row">
                                 <div class="logo-form-field">
@@ -566,6 +528,104 @@
 
             <!-- Scrollable content area -->
             <div class="sidebar-scroll-container">
+
+                <!-- Customer Info Section (always visible, top of sidebar) -->
+                <div class="customer-info-section" id="customer-info-section">
+                    <div class="section-header-compact">
+                        <i class="fas fa-user"></i> Customer
+                    </div>
+                    <div class="customer-info-body">
+                        <!-- Customer Lookup -->
+                        <div class="customer-field customer-lookup-container">
+                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                        <div class="customer-lookup-divider">or enter manually</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                            <div class="customer-field" style="grid-column: span 2;">
+                                <label style="font-size: 11px; color: #64748b; display: block;">Name *</label>
+                                <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            </div>
+                            <div class="customer-field" style="grid-column: span 2;">
+                                <label style="font-size: 11px; color: #64748b; display: block;">Email *</label>
+                                <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            </div>
+                            <div class="customer-field">
+                                <label style="font-size: 11px; color: #64748b; display: block;">Company</label>
+                                <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            </div>
+                            <div class="customer-field">
+                                <label style="font-size: 11px; color: #64748b; display: block;">Customer #</label>
+                                <input type="text" id="customer-number" placeholder="ShopWorks ID" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            </div>
+                            <div class="customer-field">
+                                <label style="font-size: 11px; color: #64748b; display: block;">Phone</label>
+                                <input type="tel" id="customer-phone" placeholder="(XXX) XXX-XXXX" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            </div>
+                            <div class="customer-field">
+                                <label style="font-size: 11px; color: #64748b; display: block;">Sales Rep</label>
+                                <select id="sales-rep" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white; box-sizing: border-box;">
+                                    <option value="sales@nwcustomapparel.com">General Sales</option>
+                                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                    <option value="art@nwcustomapparel.com">Steve Deland</option>
+                                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Design Configuration Section (always visible) -->
+                <div class="design-config-section" id="design-config-section">
+                    <div class="section-header-compact">
+                        <i class="fas fa-palette"></i> Design
+                    </div>
+                    <div class="design-config-body">
+                        <!-- Garment Design -->
+                        <div class="design-lookup-row" id="top-garment-design-row">
+                            <label class="design-row-label"><i class="fas fa-tshirt"></i> Garment</label>
+                            <div class="design-number-input-group">
+                                <input type="text" id="garment-design-number" class="design-number-input"
+                                       placeholder="Design #" maxlength="10"
+                                       onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
+                                <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #">
+                                    <i class="fas fa-database"></i>
+                                </button>
+                                <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" style="display:none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
+                        </div>
+                        <!-- Cap Design -->
+                        <div class="design-lookup-row" id="top-cap-design-row">
+                            <label class="design-row-label"><i class="fas fa-hat-cowboy"></i> Cap</label>
+                            <div class="design-number-input-group">
+                                <input type="text" id="cap-design-number" class="design-number-input"
+                                       placeholder="Design #" maxlength="10"
+                                       onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
+                                <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #">
+                                    <i class="fas fa-database"></i>
+                                </button>
+                                <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" style="display:none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Pricing Panel -->
                 <div class="pricing-panel">
                 <div class="pricing-title">
@@ -754,10 +814,6 @@
                                     <input type="text" id="order-number" placeholder="ShopWorks Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                                 </div>
                                 <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Customer #</label>
-                                    <input type="text" id="customer-number" placeholder="Customer ID" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                                <div>
                                     <label style="font-size: 11px; color: #64748b; display: block;">Ship Method</label>
                                     <input type="text" id="ship-method" placeholder="e.g. UPS Ground" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                                 </div>
@@ -877,44 +933,6 @@
                     <i id="save-share-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s; transform: rotate(180deg);"></i>
                 </div>
                 <div id="save-share-content" style="display: none; margin-top: 12px;">
-                    <div class="customer-fields" style="display: flex; flex-direction: column; gap: 10px;">
-                        <!-- Customer Lookup -->
-                        <div class="customer-field customer-lookup-container">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;"><i class="fas fa-search" style="margin-right: 4px;"></i> Find Customer</label>
-                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                        <div class="customer-lookup-divider">or enter manually</div>
-                        <div class="customer-field">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Name *</label>
-                            <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                        <div class="customer-field">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Email *</label>
-                            <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                        <div class="customer-field">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Company</label>
-                            <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                        <div class="customer-field">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Phone</label>
-                            <input type="tel" id="customer-phone" placeholder="(XXX) XXX-XXXX" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                        <div class="customer-field">
-                            <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Sales Rep</label>
-                            <select id="sales-rep" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white; box-sizing: border-box;">
-                                <option value="sales@nwcustomapparel.com">General Sales</option>
-                                <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                                <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                                <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                                <option value="art@nwcustomapparel.com">Steve Deland</option>
-                                <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                            </select>
-                        </div>
-                    </div>
                     <!-- Special Notes (collapsible) -->
                     <div class="notes-section collapsed" id="notes-section">
                         <div class="notes-header" onclick="toggleNotesSection()">
@@ -2908,7 +2926,7 @@ Company:Absher Construction Company
             if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = draft.dropDeadDate;
             if (draft.paymentTerms) document.getElementById('payment-terms').value = draft.paymentTerms;
             // Auto-expand Order Details panel if any field restored
-            if (draft.poNumber || draft.orderNumber || draft.customerNumber || draft.shipMethod ||
+            if (draft.poNumber || draft.orderNumber || draft.shipMethod ||
                 draft.dateOrderPlaced || draft.reqShipDate || draft.dropDeadDate || draft.paymentTerms) {
                 const odContent = document.getElementById('order-details-content');
                 const odChevron = document.getElementById('order-details-chevron');
@@ -3595,12 +3613,40 @@ Company:Absher Construction Company
                         document.getElementById('customer-name').value = contact.ct_NameFull || '';
                         document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
                         document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                        // Fill customer number (ShopWorks ID)
+                        document.getElementById('customer-number').value = contact.id_Customer || '';
+                        // Phone — API may not return phone, clear if empty
+                        const phoneInput = document.getElementById('customer-phone');
+                        if (phoneInput) phoneInput.value = contact.Phone || '';
+                        // Auto-fill Ship To from contact address
+                        if (contact.State) {
+                            const stateInput = document.getElementById('ship-state');
+                            if (stateInput) stateInput.value = contact.State;
+                        }
+                        if (contact.City) {
+                            const cityInput = document.getElementById('ship-city');
+                            if (cityInput) cityInput.value = contact.City;
+                        }
+                        if (contact.Zip) {
+                            const zipInput = document.getElementById('ship-zip');
+                            if (zipInput) {
+                                zipInput.value = contact.Zip;
+                                lookupTaxRate(); // Auto-trigger tax lookup
+                            }
+                        }
+                        if (contact.Address) {
+                            const addrInput = document.getElementById('ship-address');
+                            if (addrInput) addrInput.value = contact.Address;
+                        }
                         showToast('Customer info loaded', 'success');
                     },
                     onClear: () => {
                         document.getElementById('customer-name').value = '';
                         document.getElementById('customer-email').value = '';
                         document.getElementById('company-name').value = '';
+                        document.getElementById('customer-number').value = '';
+                        const phoneInput = document.getElementById('customer-phone');
+                        if (phoneInput) phoneInput.value = '';
                     }
                 });
             }
@@ -3730,7 +3776,7 @@ Company:Absher Construction Company
 
                 if (data.success && data.designs && data.designs[designNum]) {
                     const design = data.designs[designNum];
-                    applyDesignToCard(type, designNum, design);
+                    await applyDesignToCard(type, designNum, design);
                 } else {
                     // Not found in master — try fallback
                     const fbResp = await fetch(`${apiBase}/api/digitized-designs/fallback?designs=${designNum}`);
@@ -3738,7 +3784,7 @@ Company:Absher Construction Company
                         const fbData = await fbResp.json();
                         if (fbData.success && fbData.designs && fbData.designs[designNum]) {
                             const fbDesign = fbData.designs[designNum];
-                            applyDesignToCard(type, designNum, {
+                            await applyDesignToCard(type, designNum, {
                                 company: fbDesign.companyName || '',
                                 maxStitchCount: fbDesign.stitchCount || 0,
                                 maxStitchTier: fbDesign.stitchTier || 'Standard',
@@ -3765,7 +3811,7 @@ Company:Absher Construction Company
         /**
          * Apply a found design to the logo card
          */
-        function applyDesignToCard(type, designNum, design) {
+        async function applyDesignToCard(type, designNum, design) {
             const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
             const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
             const infoBadge = document.getElementById(infoId);
@@ -3796,10 +3842,15 @@ Company:Absher Construction Company
                 if (design.customerId) {
                     // Direct customer ID from design master table
                     customerInput.value = design.customerId;
+                    // Also fill company name if empty
+                    const companyInput = document.getElementById('company-name');
+                    if (companyInput && !companyInput.value.trim() && company) {
+                        companyInput.value = company;
+                    }
                     showToast('Customer # ' + design.customerId + ' auto-set from design database', 'info');
                 } else if (company) {
-                    // Fallback: search company contacts by company name
-                    autoFillCustomerFromCompany(company);
+                    // Fallback: search company contacts by company name (AWAITED to prevent race condition)
+                    await autoFillCustomerFromCompany(company);
                 }
             }
 
@@ -3847,6 +3898,39 @@ Company:Absher Construction Company
                     const isCloseMatch = exactMatch || matchName.includes(firstWord.toLowerCase());
                     if (isCloseMatch && !customerInput.value.trim()) {
                         customerInput.value = bestMatch.id_Customer;
+                        // Also fill other customer fields if empty
+                        const companyInput = document.getElementById('company-name');
+                        if (companyInput && !companyInput.value.trim() && bestMatch.CustomerCompanyName) {
+                            companyInput.value = bestMatch.CustomerCompanyName;
+                        }
+                        const nameInput = document.getElementById('customer-name');
+                        if (nameInput && !nameInput.value.trim() && bestMatch.ct_NameFull) {
+                            nameInput.value = bestMatch.ct_NameFull;
+                        }
+                        const emailInput = document.getElementById('customer-email');
+                        if (emailInput && !emailInput.value.trim() && bestMatch.ContactNumbersEmail) {
+                            emailInput.value = bestMatch.ContactNumbersEmail;
+                        }
+                        // Auto-fill Ship To address if available
+                        if (bestMatch.State) {
+                            const stateInput = document.getElementById('ship-state');
+                            if (stateInput && !stateInput.value) stateInput.value = bestMatch.State;
+                        }
+                        if (bestMatch.City) {
+                            const cityInput = document.getElementById('ship-city');
+                            if (cityInput && !cityInput.value.trim()) cityInput.value = bestMatch.City;
+                        }
+                        if (bestMatch.Zip) {
+                            const zipInput = document.getElementById('ship-zip');
+                            if (zipInput && !zipInput.value.trim()) {
+                                zipInput.value = bestMatch.Zip;
+                                lookupTaxRate(); // Auto-trigger tax lookup
+                            }
+                        }
+                        if (bestMatch.Address) {
+                            const addrInput = document.getElementById('ship-address');
+                            if (addrInput && !addrInput.value.trim()) addrInput.value = bestMatch.Address;
+                        }
                         showToast('Customer # ' + bestMatch.id_Customer + ' auto-set from ' +
                             escapeHtml(bestMatch.CustomerCompanyName || companyName), 'info');
                     }
@@ -4039,12 +4123,12 @@ Company:Absher Construction Company
          * Select a design from the search modal results
          * @param {string} designNum
          */
-        function selectDesignFromSearch(designNum) {
+        async function selectDesignFromSearch(designNum) {
             closeDesignSearchModal();
             const inputId = _designSearchTarget === 'garment' ? 'garment-design-number' : 'cap-design-number';
             const input = document.getElementById(inputId);
             if (input) input.value = designNum;
-            lookupDesignNumber(_designSearchTarget);
+            await lookupDesignNumber(_designSearchTarget);
         }
 
         function setupPrimaryLogoHandlers() {
@@ -10832,9 +10916,38 @@ Company:Absher Construction Company
                                 const nameEl = document.getElementById('customer-name');
                                 const emailEl = document.getElementById('customer-email');
                                 const companyEl = document.getElementById('company-name');
+                                const custNumEl = document.getElementById('customer-number');
+                                const phoneEl = document.getElementById('customer-phone');
                                 if (!nameEl.value.trim()) nameEl.value = contact.ct_NameFull || data.customer.contactName || '';
                                 if (!emailEl.value.trim()) emailEl.value = contact.ContactNumbersEmail || data.customer.email || '';
                                 if (!companyEl.value.trim()) companyEl.value = contact.CustomerCompanyName || data.customer.company || '';
+                                // Fill customer # (ShopWorks ID) from CRM if empty
+                                if (custNumEl && !custNumEl.value.trim() && contact.id_Customer) {
+                                    custNumEl.value = contact.id_Customer;
+                                }
+                                if (phoneEl && !phoneEl.value.trim() && contact.Phone) {
+                                    phoneEl.value = contact.Phone;
+                                }
+                                // Auto-fill Ship To from CRM contact address
+                                if (contact.State) {
+                                    const stateInput = document.getElementById('ship-state');
+                                    if (stateInput && !stateInput.value) stateInput.value = contact.State;
+                                }
+                                if (contact.City) {
+                                    const cityInput = document.getElementById('ship-city');
+                                    if (cityInput && !cityInput.value.trim()) cityInput.value = contact.City;
+                                }
+                                if (contact.Zip) {
+                                    const zipInput = document.getElementById('ship-zip');
+                                    if (zipInput && !zipInput.value.trim()) {
+                                        zipInput.value = contact.Zip;
+                                        lookupTaxRate(); // Auto-trigger tax lookup
+                                    }
+                                }
+                                if (contact.Address) {
+                                    const addrInput = document.getElementById('ship-address');
+                                    if (addrInput && !addrInput.value.trim()) addrInput.value = contact.Address;
+                                }
                                 showToast('Customer info loaded from CRM', 'success');
                             } else {
                                 // Show that lookup ran but found nothing - not an error
@@ -10846,16 +10959,7 @@ Company:Absher Construction Company
                         }
                     }
 
-                    // Auto-expand the save/share panel so user can see the populated field
-                    const saveShareContent = document.getElementById('save-share-content');
-                    const saveShareHeader = document.querySelector('.save-share-section .section-header');
-                    if (saveShareContent && saveShareContent.style.display === 'none') {
-                        saveShareContent.style.display = 'block';
-                        if (saveShareHeader) {
-                            const icon = saveShareHeader.querySelector('.toggle-icon');
-                            if (icon) icon.classList.add('expanded');
-                        }
-                    }
+                    // Customer section is now always visible at top of sidebar — no need to expand
                 }
 
                 // 2. Select sales rep by email
