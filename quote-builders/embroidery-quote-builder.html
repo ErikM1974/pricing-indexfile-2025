@@ -3790,16 +3790,71 @@ Company:Absher Construction Company
                 autoSetStitchTier(type, design.maxStitchCount, design.maxStitchTier);
             }
 
-            // Auto-fill Customer # from design database if not already set
-            if (design.customerId) {
-                const customerInput = document.getElementById('customer-number');
-                if (customerInput && !customerInput.value.trim()) {
+            // Auto-fill Customer # from design database or company contacts lookup
+            const customerInput = document.getElementById('customer-number');
+            if (customerInput && !customerInput.value.trim()) {
+                if (design.customerId) {
+                    // Direct customer ID from design master table
                     customerInput.value = design.customerId;
                     showToast('Customer # ' + design.customerId + ' auto-set from design database', 'info');
+                } else if (company) {
+                    // Fallback: search company contacts by company name
+                    autoFillCustomerFromCompany(company);
                 }
             }
 
             showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
+        }
+
+        /**
+         * Auto-fill Customer # by searching company contacts API.
+         * Called when design lookup returns a company name but no Customer_ID.
+         * Searches Company_Contacts_Merge_ODBC for matching company → fills id_Customer.
+         */
+        async function autoFillCustomerFromCompany(companyName) {
+            const customerInput = document.getElementById('customer-number');
+            if (!customerInput || customerInput.value.trim()) return; // Already has value
+
+            try {
+                const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+                    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+                // The contacts search API strips apostrophes from the query,
+                // so "Aaberg's Rentals" → "Aabergs Rentals" which won't match.
+                // Use the first word as search term for reliable matching.
+                const firstWord = companyName.trim().split(/[\s']/)[0];
+                const searchTerm = firstWord.length >= 2 ? firstWord : companyName.replace(/'/g, '');
+                if (searchTerm.length < 2) return;
+
+                const resp = await fetch(`${apiBase}/api/company-contacts/search?q=${encodeURIComponent(searchTerm)}&limit=5`);
+                if (!resp.ok) return; // Silent fail — user can fill manually
+
+                const data = await resp.json();
+                const contacts = data.contacts || [];
+                if (contacts.length === 0) return;
+
+                // Find best match — exact company name match (case-insensitive)
+                const fullNameLower = companyName.toLowerCase().trim();
+                const exactMatch = contacts.find(c =>
+                    (c.CustomerCompanyName || '').toLowerCase().trim() === fullNameLower
+                );
+                // Also check if first result's company contains our search term
+                const bestMatch = exactMatch || contacts[0];
+
+                // Only auto-fill if company name is a close match
+                if (bestMatch && bestMatch.id_Customer) {
+                    const matchName = (bestMatch.CustomerCompanyName || '').toLowerCase();
+                    const isCloseMatch = exactMatch || matchName.includes(firstWord.toLowerCase());
+                    if (isCloseMatch && !customerInput.value.trim()) {
+                        customerInput.value = bestMatch.id_Customer;
+                        showToast('Customer # ' + bestMatch.id_Customer + ' auto-set from ' +
+                            escapeHtml(bestMatch.CustomerCompanyName || companyName), 'info');
+                    }
+                }
+            } catch (err) {
+                // Silent fail — customer # can be filled manually
+                console.warn('Auto-fill customer from company failed:', err.message);
+            }
         }
 
         /**
