@@ -61,7 +61,9 @@ Add new entries at the top of the relevant category.
 
 **Solution:** When `GarmentDesignNumber`/`CapDesignNumber` is a known numeric ID (from `Digitized_Designs_Master_2026` lookup), transformer sends `{id_Design: parseInt(designNumber)}`. Falls back to full design block when no design number is available (for new/unknown designs). Verified on PSOMAS order (design #38889).
 
-**Prevention:** Always prefer linking to existing ShopWorks records by ID rather than creating new records with full detail blocks. Study live InkSoft order payloads for the simplest working pattern. `[caspio-proxy]`
+**Updated 2026-02-23:** `buildDesigns()` simplified further — when no numeric design ID is known, sends `Designs: []` (empty array) instead of creating a new design with `id_Design: 0`. Art notes include "NO DESIGN LINKED - Assign design manually in ShopWorks" warning. The old fallback created orphan placeholder designs that cluttered ShopWorks.
+
+**Prevention:** Always prefer linking to existing ShopWorks records by ID rather than creating new records with full detail blocks. When no ID is available, send empty arrays and let humans handle it — don't auto-create placeholder records. `[caspio-proxy]`
 
 ---
 
