@@ -29,6 +29,18 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: ManageOrders OnSite Integrations All Share `/onsite` URL (2026-02-22)
+
+**Problem:** Embroidery PUSH health check returned 403 Forbidden from `manageordersapi.com/embroidery/signin`. The credentials were correct (same as working 3-Day Tees integration).
+
+**Root Cause:** All ManageOrders OnSite integrations share the **same base URL** (`manageordersapi.com/onsite`). There is no `/embroidery` endpoint — the Swagger docs and OnSite admin both show `/onsite`. Different integrations are distinguished by `ExtSource` and `id_Customer` fields in the order payload, not by different URL paths. We incorrectly assumed each integration name mapped to a unique URL path.
+
+**Solution:** Changed `EMB_BASE_URL` from `https://manageordersapi.com/embroidery` to `https://manageordersapi.com/onsite` in `config/manageorders-emb-config.js`.
+
+**Prevention:** When creating new OnSite integrations, always verify the URL from the ShopWorks OnSite admin settings page. Don't infer URL paths from integration names. `[caspio-proxy]`
+
+---
+
 # API & Data Flow
 
 ## Pattern: Fee Items Catch-All for Quote Display (2026-02-14)

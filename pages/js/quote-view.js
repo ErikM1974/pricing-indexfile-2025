@@ -75,11 +75,20 @@ class QuoteViewPage {
         // Set current year in footer
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
+        // Check if staff mode
+        const urlParams = new URLSearchParams(window.location.search);
+        this.isStaff = urlParams.get('staff') === 'true';
+
         // Load quote data
         await this.loadQuote();
 
         // Setup event listeners
         this.setupEventListeners();
+
+        // Setup push-to-ShopWorks button (staff only, EMB quotes only)
+        if (this.isStaff && this.quoteId && this.quoteId.startsWith('EMB')) {
+            this.setupPushButton();
+        }
     }
 
     getQuoteIdFromUrl() {
@@ -3227,6 +3236,145 @@ class QuoteViewPage {
         console.groupEnd();
 
         console.groupEnd(); // End main group
+    }
+
+    // =====================================================
+    // Push to ShopWorks (Staff Only)
+    // =====================================================
+
+    /**
+     * Setup the Push to ShopWorks button (staff-only, EMB quotes only)
+     */
+    setupPushButton() {
+        const btn = document.getElementById('push-shopworks-btn');
+        if (!btn) return;
+
+        // Show the button
+        btn.style.display = '';
+
+        // If already pushed, show the pushed state
+        if (this.quoteData && this.quoteData.PushedToShopWorks) {
+            this.setPushButtonPushedState(this.quoteData.PushedToShopWorks);
+        }
+
+        // Click handler
+        btn.addEventListener('click', () => this.handlePushClick());
+    }
+
+    /**
+     * Handle push button click — show confirmation, then push
+     */
+    async handlePushClick() {
+        const btn = document.getElementById('push-shopworks-btn');
+        if (!btn || btn.disabled) return;
+
+        const extOrderId = `NWCA-EMB-${this.quoteId}`;
+        const totalAmount = this.quoteData.TotalAmount
+            ? `$${parseFloat(this.quoteData.TotalAmount).toFixed(2)}`
+            : 'N/A';
+        const itemCount = this.items.filter(i => i.EmbellishmentType === 'embroidery').length;
+
+        const confirmed = confirm(
+            `Push to ShopWorks?\n\n` +
+            `Quote: ${this.quoteId}\n` +
+            `Customer: ${this.quoteData.CompanyName || this.quoteData.CustomerName || 'N/A'}\n` +
+            `Products: ${itemCount} item(s)\n` +
+            `Total: ${totalAmount}\n` +
+            `ExtOrderID: ${extOrderId}\n\n` +
+            `This will create a new order in ShopWorks OnSite.`
+        );
+
+        if (!confirmed) return;
+
+        // Set loading state
+        const label = document.getElementById('push-shopworks-label');
+        const originalText = label.textContent;
+        label.textContent = 'Pushing...';
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/api/embroidery-push/push-quote`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    quoteId: this.quoteId,
+                    isTest: false,
+                    force: false,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // 409 = already pushed
+                if (response.status === 409) {
+                    this.setPushButtonPushedState(data.pushedAt);
+                    this.showPushToast('Already pushed to ShopWorks', 'info');
+                    return;
+                }
+                throw new Error(data.error || data.details || `HTTP ${response.status}`);
+            }
+
+            // Success
+            this.setPushButtonPushedState(data.timestamp);
+            this.showPushToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
+
+        } catch (error) {
+            console.error('[QuoteView] Push error:', error);
+            label.textContent = originalText;
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            this.showPushToast(`Push failed: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * Set the push button to "already pushed" state
+     */
+    setPushButtonPushedState(timestamp) {
+        const btn = document.getElementById('push-shopworks-btn');
+        const label = document.getElementById('push-shopworks-label');
+        if (!btn || !label) return;
+
+        const dateStr = timestamp ? this.formatDate(timestamp) : '';
+        label.textContent = dateStr ? `Pushed ${dateStr}` : 'Pushed';
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.background = '#28a745';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#28a745';
+    }
+
+    /**
+     * Show a toast notification for push results
+     */
+    showPushToast(message, type = 'info') {
+        // Remove existing toast
+        const existing = document.getElementById('push-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.id = 'push-toast';
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+            padding: 14px 24px; border-radius: 8px; font-size: 14px;
+            color: #fff; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInRight 0.3s ease-out;
+        `;
+
+        if (type === 'success') toast.style.background = '#28a745';
+        else if (type === 'error') toast.style.background = '#dc3545';
+        else toast.style.background = '#17a2b8';
+
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.3s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
     }
 }
 

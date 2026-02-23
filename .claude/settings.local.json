@@ -124,7 +124,10 @@
       "Bash(for f in gift-code customer-pickup same-style-diff-colors al-back-logo-reclassify)",
       "Bash(do echo \"=== $f ===\")",
       "Bash(pip install:*)",
-      "Bash(shopworks \")"
+      "Bash(shopworks \")",
+      "Bash(manageorders \")",
+      "Bash(where:*)",
+      "Bash(pdftotext:*)"
     ],
     "deny": [],
     "ask": [],

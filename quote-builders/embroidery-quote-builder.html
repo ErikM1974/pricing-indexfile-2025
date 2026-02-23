@@ -893,6 +893,10 @@
                     <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
+                    <!-- Push to ShopWorks (shown after save) -->
+                    <button id="emb-push-shopworks-btn" onclick="pushToShopWorks()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: #1a5276; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                        <i class="fas fa-upload"></i> <span id="emb-push-shopworks-label">Push to ShopWorks</span>
+                    </button>
                 </div>
             </div>
 
@@ -3002,6 +3006,21 @@ Company:Absher Construction Company
                 recalculatePricing();
 
                 showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+
+                // Show push button for existing quotes
+                showPushButton(quoteId);
+
+                // Check if already pushed
+                if (session.PushedToShopWorks) {
+                    const pushBtn = document.getElementById('emb-push-shopworks-btn');
+                    const pushLabel = document.getElementById('emb-push-shopworks-label');
+                    if (pushBtn && pushLabel) {
+                        pushLabel.textContent = 'Already Pushed';
+                        pushBtn.disabled = true;
+                        pushBtn.style.opacity = '0.6';
+                        pushBtn.style.background = '#28a745';
+                    }
+                }
 
             } catch (error) {
                 console.error('[EditMode] Error loading quote:', error);
@@ -7724,6 +7743,9 @@ Company:Absher Construction Company
                             showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
                         }
                     }
+
+                    // Show Push to ShopWorks button after successful save
+                    showPushButton(result.quoteID);
                 } else {
                     throw new Error(result?.error || 'Failed to save quote');
                 }
@@ -7743,6 +7765,92 @@ Company:Absher Construction Company
         // Legacy function - redirects to saveAndGetLink
         async function saveQuote() {
             return saveAndGetLink();
+        }
+
+        // =====================================================
+        // Push to ShopWorks
+        // =====================================================
+
+        let _pushQuoteId = null;
+
+        function showPushButton(quoteId) {
+            _pushQuoteId = quoteId;
+            const btn = document.getElementById('emb-push-shopworks-btn');
+            if (btn) {
+                btn.style.display = '';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.background = '#1a5276';
+                const label = document.getElementById('emb-push-shopworks-label');
+                if (label) label.textContent = 'Push to ShopWorks';
+            }
+        }
+
+        async function pushToShopWorks() {
+            const btn = document.getElementById('emb-push-shopworks-btn');
+            const label = document.getElementById('emb-push-shopworks-label');
+            if (!btn || btn.disabled || !_pushQuoteId) return;
+
+            const customerName = document.getElementById('customer-name')?.value?.trim() || '';
+            const companyName = document.getElementById('company-name')?.value?.trim() || '';
+            const displayName = companyName || customerName || 'N/A';
+
+            const confirmed = confirm(
+                `Push to ShopWorks?\n\n` +
+                `Quote: ${_pushQuoteId}\n` +
+                `Customer: ${displayName}\n` +
+                `ExtOrderID: NWCA-EMB-${_pushQuoteId}\n\n` +
+                `This will create a new order in ShopWorks OnSite.`
+            );
+
+            if (!confirmed) return;
+
+            // Loading state
+            const originalText = label.textContent;
+            label.textContent = 'Pushing...';
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+
+            try {
+                const apiBase = typeof APP_CONFIG !== 'undefined'
+                    ? APP_CONFIG.API.BASE_URL
+                    : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+                const response = await fetch(`${apiBase}/api/embroidery-push/push-quote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        quoteId: _pushQuoteId,
+                        isTest: false,
+                        force: false,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (response.status === 409) {
+                        // Already pushed
+                        label.textContent = 'Already Pushed';
+                        btn.style.background = '#28a745';
+                        showToast('Already pushed to ShopWorks', 'info');
+                        return;
+                    }
+                    throw new Error(data.error || data.details || `HTTP ${response.status}`);
+                }
+
+                // Success
+                label.textContent = 'Pushed ✓';
+                btn.style.background = '#28a745';
+                showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
+
+            } catch (error) {
+                console.error('[Embroidery] Push error:', error);
+                label.textContent = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                showToast(`Push failed: ${error.message}`, 'error');
+            }
         }
 
         async function emailQuote() {
