@@ -754,43 +754,51 @@
                         </div>
                     </div>
                     <!-- Ship To Address (for WA DOR tax rate lookup) -->
-                    <div style="margin-bottom: 10px; padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;">
+                    <div id="ship-to-panel" style="margin-bottom: 10px; padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;">
                         <label style="font-size: 12px; color: #0369a1; margin-bottom: 6px; display: block; font-weight: 600;">
                             <i class="fas fa-map-marker-alt" style="margin-right: 4px;"></i>Ship To
                         </label>
-                        <input type="text" id="ship-address" placeholder="Street address"
-                               style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-bottom: 6px;">
-                        <div style="display: flex; gap: 6px;">
-                            <input type="text" id="ship-city" placeholder="City"
-                                   style="flex: 2; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                            <select id="ship-state" onchange="onShipStateChange()"
-                                    style="width: 58px; padding: 6px 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white;">
-                                <option value="WA" selected>WA</option>
-                                <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-                                <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-                                <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
-                                <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
-                                <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
-                                <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
-                                <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
-                                <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
-                                <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
-                                <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
-                                <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
-                                <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
-                                <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
-                                <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
-                                <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-                                <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
-                                <option value="WI">WI</option><option value="WY">WY</option>
-                            </select>
-                            <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
-                                   onblur="onShipZipBlur()"
-                                   style="width: 72px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
-                                    style="padding: 6px 10px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
-                                <i class="fas fa-search"></i>
-                            </button>
+                        <!-- Pickup notice (hidden by default, shown when Customer Pickup selected) -->
+                        <div id="pickup-notice" style="display: none; padding: 8px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; font-size: 12px; color: #92400e; margin-bottom: 6px;">
+                            <i class="fas fa-store" style="margin-right: 4px;"></i>
+                            Customer Pickup — NW Custom Apparel, Milton, WA 98354
+                        </div>
+                        <!-- Address fields (hidden when Customer Pickup) -->
+                        <div id="ship-address-fields">
+                            <input type="text" id="ship-address" placeholder="Street address"
+                                   style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-bottom: 6px;">
+                            <div style="display: flex; gap: 6px;">
+                                <input type="text" id="ship-city" placeholder="City"
+                                       style="flex: 2; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <select id="ship-state" onchange="onShipStateChange()"
+                                        style="width: 58px; padding: 6px 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white;">
+                                    <option value="WA" selected>WA</option>
+                                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                                    <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                                    <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
+                                    <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
+                                    <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
+                                    <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
+                                    <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+                                    <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
+                                    <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
+                                    <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
+                                    <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                                    <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
+                                    <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
+                                    <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
+                                    <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+                                    <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
+                                    <option value="WI">WI</option><option value="WY">WY</option>
+                                </select>
+                                <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
+                                       onblur="onShipZipBlur()"
+                                       style="width: 72px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
+                                        style="padding: 6px 10px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
                         <div id="tax-lookup-status" style="font-size: 11px; margin-top: 4px; color: #64748b; min-height: 16px;"></div>
                     </div>
@@ -815,7 +823,16 @@
                                 </div>
                                 <div>
                                     <label style="font-size: 11px; color: #64748b; display: block;">Ship Method</label>
-                                    <input type="text" id="ship-method" placeholder="e.g. UPS Ground" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                    <select id="ship-method" onchange="onShipMethodChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; background: white;">
+                                        <option value="">-- Select --</option>
+                                        <option value="UPS Ground" selected>UPS Ground</option>
+                                        <option value="Customer Pickup">Customer Pickup</option>
+                                        <option value="USPS Priority Mail">USPS Priority Mail</option>
+                                        <option value="UPS 2nd Day">UPS 2nd Day</option>
+                                        <option value="Sales Rep Deliver">Sales Rep Deliver</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-top: 4px;">
                                 </div>
                                 <div>
                                     <label style="font-size: 11px; color: #64748b; display: block;">Date Placed</label>
@@ -2792,6 +2809,7 @@ Company:Absher Construction Company
                 orderNumber: document.getElementById('order-number')?.value || '',
                 customerNumber: document.getElementById('customer-number')?.value || '',
                 shipMethod: document.getElementById('ship-method')?.value || '',
+                shipMethodOther: document.getElementById('ship-method-other')?.value || '',
                 dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
                 reqShipDate: document.getElementById('req-ship-date')?.value || '',
                 dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
@@ -2920,7 +2938,13 @@ Company:Absher Construction Company
             if (draft.poNumber) document.getElementById('po-number').value = draft.poNumber;
             if (draft.orderNumber) document.getElementById('order-number').value = draft.orderNumber;
             if (draft.customerNumber) document.getElementById('customer-number').value = draft.customerNumber;
-            if (draft.shipMethod) document.getElementById('ship-method').value = draft.shipMethod;
+            if (draft.shipMethod) {
+                document.getElementById('ship-method').value = draft.shipMethod;
+                if (draft.shipMethod === 'Other' && draft.shipMethodOther) {
+                    document.getElementById('ship-method-other').value = draft.shipMethodOther;
+                }
+                onShipMethodChange();
+            }
             if (draft.dateOrderPlaced) document.getElementById('date-order-placed').value = draft.dateOrderPlaced;
             if (draft.reqShipDate) document.getElementById('req-ship-date').value = draft.reqShipDate;
             if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = draft.dropDeadDate;
@@ -7916,6 +7940,39 @@ Company:Absher Construction Company
         }
 
         /**
+         * Handle ship method dropdown change.
+         * When "Customer Pickup" selected, hide address fields and auto-set Milton, WA for tax.
+         * When "Other" selected, show custom text input.
+         */
+        function onShipMethodChange() {
+            const method = document.getElementById('ship-method').value;
+            const addressFields = document.getElementById('ship-address-fields');
+            const pickupNotice = document.getElementById('pickup-notice');
+            const otherInput = document.getElementById('ship-method-other');
+
+            if (method === 'Customer Pickup') {
+                // Hide address fields, show pickup notice
+                if (addressFields) addressFields.style.display = 'none';
+                if (pickupNotice) pickupNotice.style.display = 'block';
+                if (otherInput) otherInput.style.display = 'none';
+                // Auto-set Milton, WA 98354 for tax lookup (NW Custom Apparel shop location)
+                document.getElementById('ship-address').value = '';
+                document.getElementById('ship-city').value = 'Milton';
+                document.getElementById('ship-state').value = 'WA';
+                document.getElementById('ship-zip').value = '98354';
+                lookupTaxRate();
+            } else {
+                // Show address fields, hide pickup notice
+                if (addressFields) addressFields.style.display = '';
+                if (pickupNotice) pickupNotice.style.display = 'none';
+                // Show/hide Other text input
+                if (otherInput) {
+                    otherInput.style.display = (method === 'Other') ? 'block' : 'none';
+                }
+            }
+        }
+
+        /**
          * Update tax calculation based on toggle state
          * Uses shared calculateDiscountableSubtotal() for consistent discount math
          * Called after pricing updates and when any charge input changes
@@ -8089,7 +8146,11 @@ Company:Absher Construction Company
                     shipToCity: document.getElementById('ship-city')?.value?.trim() || '',
                     shipToState: document.getElementById('ship-state')?.value || '',
                     shipToZip: document.getElementById('ship-zip')?.value?.trim() || '',
-                    shipMethod: document.getElementById('ship-method')?.value?.trim() || '',
+                    shipMethod: (() => {
+                        const sel = document.getElementById('ship-method')?.value || '';
+                        if (sel === 'Other') return document.getElementById('ship-method-other')?.value?.trim() || 'Other';
+                        return sel;
+                    })(),
                     dateOrderPlaced: document.getElementById('date-order-placed')?.value?.trim() || '',
                     reqShipDate: document.getElementById('req-ship-date')?.value?.trim() || '',
                     dropDeadDate: document.getElementById('drop-dead-date')?.value?.trim() || '',
@@ -8701,7 +8762,9 @@ Company:Absher Construction Company
             document.getElementById('po-number').value = '';
             document.getElementById('order-number').value = '';
             document.getElementById('customer-number').value = '';
-            document.getElementById('ship-method').value = '';
+            document.getElementById('ship-method').value = 'UPS Ground';
+            document.getElementById('ship-method-other').value = '';
+            onShipMethodChange();
             document.getElementById('date-order-placed').value = '';
             document.getElementById('req-ship-date').value = '';
             document.getElementById('drop-dead-date').value = '';
@@ -11033,7 +11096,22 @@ Company:Absher Construction Company
                 if (data.purchaseOrderNumber) document.getElementById('po-number').value = data.purchaseOrderNumber;
                 if (data.orderId) document.getElementById('order-number').value = data.orderId;
                 if (data.customer.customerId) document.getElementById('customer-number').value = data.customer.customerId;
-                if (data.shipping?.method) document.getElementById('ship-method').value = data.shipping.method;
+                if (data.shipping?.method) {
+                    const shipMethodEl = document.getElementById('ship-method');
+                    const importedMethod = data.shipping.method;
+                    // Check if imported value matches a predefined dropdown option
+                    const matchingOption = Array.from(shipMethodEl.options).find(
+                        opt => opt.value.toLowerCase() === importedMethod.toLowerCase()
+                    );
+                    if (matchingOption) {
+                        shipMethodEl.value = matchingOption.value;
+                    } else {
+                        // Non-standard method — use "Other" with text input
+                        shipMethodEl.value = 'Other';
+                        document.getElementById('ship-method-other').value = importedMethod;
+                    }
+                    onShipMethodChange();
+                }
                 if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
                 if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = data.dateOrderPlaced;
                 if (data.reqShipDate) document.getElementById('req-ship-date').value = data.reqShipDate;
