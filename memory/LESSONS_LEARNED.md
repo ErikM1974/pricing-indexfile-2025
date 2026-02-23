@@ -41,6 +41,30 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Discovery: ManageOrders Push API Does NOT Support Tax Fields (2026-02-22)
+
+**Problem:** EMB push sent `Tax[]` array, `TaxTotal`, `coa_AccountSalesTax01`, `_effective_tax_rate`, `sts_EnableTax01-04`, and `sts_TaxOverride` — all were stripped by OnSite. `TaxTotal` reset to 0 in OnSite response. Live InkSoft orders (Skyline Properties #52521, WA Hospitality #52520) had these fields preserved.
+
+**Root Cause:** OnSite has two integration types: **ManageOrders** and **InkSoft**. The ManageOrders Push API Swagger schema does NOT include `Tax[]`, `coa_AccountSalesTax01`, `_effective_tax_rate`, `sts_EnableTax01-04`, or `sts_TaxOverride`. These are InkSoft-specific extensions. Only `TaxTotal` is in the official schema but OnSite resets it for ManageOrders-type integrations. InkSoft-type integrations preserve all tax fields because they use a different field mapping.
+
+**Solution:** Code still sends all tax data (future-proofed). **Notes On Order** has `Tax Account: 2200 (WA Sales Tax 10.1%)` and `Expected Tax: $50.50` as manual fallback for staff to set tax on the ShopWorks order.
+
+**Prevention:** When building ManageOrders integrations, only rely on fields in the official Swagger spec. Non-Swagger fields will be silently stripped. For tax specifically, use Notes On Order as the reliable mechanism until ShopWorks adds tax field support to ManageOrders integrations. `[caspio-proxy]`
+
+---
+
+## Pattern: Simple Design Linking via {id_Design: N} (2026-02-22)
+
+**Problem:** EMB push created duplicate designs in ShopWorks when pushing orders for existing digitized designs. The full design block (`ExtDesignID`, `DesignName`, `Locations`, etc.) caused ShopWorks to create new designs.
+
+**Root Cause:** InkSoft web orders use a simple pattern: just `{id_Design: N}` with the numeric design ID. ShopWorks links to the existing design record without creating duplicates.
+
+**Solution:** When `GarmentDesignNumber`/`CapDesignNumber` is a known numeric ID (from `Digitized_Designs_Master_2026` lookup), transformer sends `{id_Design: parseInt(designNumber)}`. Falls back to full design block when no design number is available (for new/unknown designs). Verified on PSOMAS order (design #38889).
+
+**Prevention:** Always prefer linking to existing ShopWorks records by ID rather than creating new records with full detail blocks. Study live InkSoft order payloads for the simplest working pattern. `[caspio-proxy]`
+
+---
+
 # API & Data Flow
 
 ## Pattern: Fee Items Catch-All for Quote Display (2026-02-14)
