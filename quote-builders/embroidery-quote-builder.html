@@ -3790,6 +3790,15 @@ Company:Absher Construction Company
                 autoSetStitchTier(type, design.maxStitchCount, design.maxStitchTier);
             }
 
+            // Auto-fill Customer # from design database if not already set
+            if (design.customerId) {
+                const customerInput = document.getElementById('customer-number');
+                if (customerInput && !customerInput.value.trim()) {
+                    customerInput.value = design.customerId;
+                    showToast('Customer # ' + design.customerId + ' auto-set from design database', 'info');
+                }
+            }
+
             showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
         }
 
