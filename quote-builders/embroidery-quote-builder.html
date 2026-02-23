@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Embroidery Quote Builder Styles (External CSS - Extracted January 2026) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260210">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260223">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260127">
@@ -603,6 +603,9 @@
                                 </button>
                             </div>
                             <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
+                            <div class="design-thumbnail-preview" id="garment-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
+                                <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
+                            </div>
                         </div>
                         <!-- Cap Design -->
                         <div class="design-lookup-row" id="top-cap-design-row">
@@ -622,6 +625,9 @@
                                 </button>
                             </div>
                             <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
+                            <div class="design-thumbnail-preview" id="cap-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
+                                <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1820,6 +1826,9 @@ Company:Absher Construction Company
     <!-- Product Thumbnail Modal (click to enlarge) -->
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260129"></script>
 
+    <!-- Design Thumbnail Service (fetch artwork images from Shopworks_Thumbnail_Report) -->
+    <script src="/shared_components/js/design-thumbnail-service.js?v=20260223"></script>
+
     <!-- ShopWorks Import Parser -->
     <script src="/shared_components/js/shopworks-import-parser.js?v=20260220-xxl-fix"></script>
 
@@ -2883,6 +2892,10 @@ Company:Absher Construction Company
                     if (gDesignInput) gDesignInput.value = draft.primaryLogo.designNumber;
                     const gClearBtn = document.getElementById('garment-design-clear');
                     if (gClearBtn) gClearBtn.style.display = 'inline-flex';
+                    // Show cached thumbnail immediately (before lookup refreshes it)
+                    if (draft.primaryLogo.thumbnailUrl) {
+                        showDesignThumbnail('garment', draft.primaryLogo.thumbnailUrl);
+                    }
                     // Trigger lookup to show design info badge
                     lookupDesignNumber('garment');
                 }
@@ -2905,6 +2918,10 @@ Company:Absher Construction Company
                     if (cDesignInput) cDesignInput.value = draft.capPrimaryLogo.designNumber;
                     const cClearBtn = document.getElementById('cap-design-clear');
                     if (cClearBtn) cClearBtn.style.display = 'inline-flex';
+                    // Show cached thumbnail immediately (before lookup refreshes it)
+                    if (draft.capPrimaryLogo.thumbnailUrl) {
+                        showDesignThumbnail('cap', draft.capPrimaryLogo.thumbnailUrl);
+                    }
                     lookupDesignNumber('cap');
                 }
             }
@@ -3879,6 +3896,50 @@ Company:Absher Construction Company
             }
 
             showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
+
+            // Fetch and display design thumbnail (non-blocking)
+            if (typeof DesignThumbnailService !== 'undefined') {
+                DesignThumbnailService.fetchThumbnail(designNum).then(imageUrl => {
+                    showDesignThumbnail(type, imageUrl);
+                    // Store on logo object for draft save
+                    if (type === 'garment') {
+                        primaryLogo.thumbnailUrl = imageUrl || null;
+                    } else if (typeof capPrimaryLogo !== 'undefined') {
+                        capPrimaryLogo.thumbnailUrl = imageUrl || null;
+                    }
+                });
+            }
+        }
+
+        /**
+         * Show or hide a design thumbnail in the logo card area
+         * @param {string} type - 'garment' or 'cap'
+         * @param {string|null} imageUrl - URL to the thumbnail image, or null
+         */
+        function showDesignThumbnail(type, imageUrl) {
+            const thumbDiv = document.getElementById(type === 'garment' ? 'garment-design-thumbnail' : 'cap-design-thumbnail');
+            if (!thumbDiv) return;
+            if (imageUrl) {
+                const img = thumbDiv.querySelector('.design-thumb-img');
+                img.src = imageUrl;
+                thumbDiv.style.display = 'block';
+            } else {
+                thumbDiv.style.display = 'none';
+            }
+        }
+
+        /**
+         * Open full-size thumbnail in a modal overlay
+         * @param {HTMLElement} thumbnailDiv - The .design-thumbnail-preview div that was clicked
+         */
+        function openThumbnailFullSize(thumbnailDiv) {
+            const img = thumbnailDiv.querySelector('img');
+            if (!img || !img.src) return;
+            const overlay = document.createElement('div');
+            overlay.className = 'thumb-modal-overlay';
+            overlay.innerHTML = '<img src="' + escapeHtml(img.src) + '" alt="Design full size">';
+            overlay.addEventListener('click', () => overlay.remove());
+            document.body.appendChild(overlay);
         }
 
         /**
@@ -4035,6 +4096,15 @@ Company:Absher Construction Company
             // Clear the design number on the logo object
             setDesignNumberOnLogo(type, null);
             updateLogoCardHeader(type, null);
+
+            // Hide design thumbnail and clear cached URL
+            showDesignThumbnail(type, null);
+            if (type === 'garment') {
+                primaryLogo.thumbnailUrl = null;
+            } else if (typeof capPrimaryLogo !== 'undefined') {
+                capPrimaryLogo.thumbnailUrl = null;
+            }
+
             showToast('Design unlinked', 'info');
         }
 
@@ -4106,7 +4176,7 @@ Company:Absher Construction Company
             try {
                 const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
                     || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-                const resp = await fetch(`${apiBase}/api/digitized-designs/search?q=${encodeURIComponent(q)}&limit=20`);
+                const resp = await fetch(`${apiBase}/api/digitized-designs/search-all?q=${encodeURIComponent(q)}&limit=20`);
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json();
 
@@ -4118,22 +4188,73 @@ Company:Absher Construction Company
                 }
 
                 results.innerHTML = data.results.map(d => {
-                    const stitchStr = d.maxStitchCount ? d.maxStitchCount.toLocaleString() : '—';
-                    const tierClass = (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
+                    const dn = escapeHtml(d.designNumber);
+                    const hasStitch = d.maxStitchCount > 0;
+                    const stitchStr = hasStitch ? d.maxStitchCount.toLocaleString() : '';
+                    const tierClass = hasStitch ? (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-') : '';
+
+                    // Build stitch/tier display or "No stitch data" fallback
+                    let metaHtml = '';
+                    if (hasStitch) {
+                        metaHtml += '<span class="design-result-stitch">' + stitchStr + ' stitches</span>';
+                        metaHtml += '<span class="design-tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(d.maxStitchTier || 'Standard') + '</span>';
+                    }
+                    if (d.variantCount > 1) {
+                        metaHtml += '<span class="design-result-variants">' + d.variantCount + ' variants</span>';
+                    }
+                    if (d.placement) {
+                        metaHtml += '<span class="design-result-placement" title="Placement">' + escapeHtml(d.placement) + '</span>';
+                    }
+
+                    // Source badges
+                    const sources = d.sources || [];
+                    let sourceBadges = '';
+                    if (sources.includes('master')) sourceBadges += '<span class="design-source-badge source-master" title="Digitized design with stitch data">Digitized</span>';
+                    if (sources.includes('artrequests')) sourceBadges += '<span class="design-source-badge source-art" title="Has art request with mockup">Art Request</span>';
+                    if (d.hasImage || d.artworkUrl) sourceBadges += '<span class="design-source-badge source-image" title="Has design image">Has Image</span>';
+
+                    // Determine the initial thumbnail: artworkUrl or thumbnail, or placeholder
+                    const previewUrl = d.artworkUrl || d.thumbnailUrl || null;
+                    const thumbHtml = previewUrl
+                        ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
+                        : '<i class="fas fa-image"></i>';
+
                     return `
-                        <div class="design-search-result-item" onclick="selectDesignFromSearch('${escapeHtml(d.designNumber)}')">
-                            <div class="design-result-number">#${escapeHtml(d.designNumber)}</div>
-                            <div class="design-result-company">${escapeHtml(d.company || 'Unknown')}</div>
-                            <div class="design-result-meta">
-                                <span class="design-result-stitch">${stitchStr} stitches</span>
-                                <span class="design-tier-badge tier-${escapeHtml(tierClass)}">${escapeHtml(d.maxStitchTier || 'Standard')}</span>
-                                ${d.variantCount > 1 ? '<span class="design-result-variants">' + d.variantCount + ' variants</span>' : ''}
+                        <div class="design-search-result-item" onclick="selectDesignFromSearch('${dn}')" style="display:flex; align-items:center; gap:10px;">
+                            <div class="design-search-thumb" id="search-thumb-${dn}">
+                                ${thumbHtml}
+                            </div>
+                            <div style="flex:1; min-width:0;">
+                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                    <div class="design-result-number">#${dn}</div>
+                                    ${sourceBadges}
+                                </div>
+                                <div class="design-result-company">${escapeHtml(d.company || 'Unknown')}</div>
+                                ${d.designName ? '<div class="design-result-name">' + escapeHtml(d.designName) + '</div>' : ''}
+                                <div class="design-result-meta">${metaHtml || '<span style="color:#94a3b8; font-size:11px;">No stitch data</span>'}</div>
                             </div>
                         </div>`;
                 }).join('');
 
                 if (data.totalMatches > data.count) {
                     results.innerHTML += `<div class="design-search-more">${data.totalMatches - data.count} more results — refine your search</div>`;
+                }
+
+                // Also fetch thumbnails from thumbnail service for designs that didn't come with images
+                if (typeof DesignThumbnailService !== 'undefined') {
+                    const designNums = data.results
+                        .filter(d => !d.artworkUrl && !d.thumbnailUrl)
+                        .map(d => d.designNumber);
+                    if (designNums.length > 0) {
+                        DesignThumbnailService.fetchThumbnailsBatch(designNums).then(thumbMap => {
+                            for (const [thumbDn, url] of Object.entries(thumbMap)) {
+                                const slot = document.getElementById('search-thumb-' + thumbDn);
+                                if (slot && url && !slot.querySelector('img')) {
+                                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(thumbDn) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">';
+                                }
+                            }
+                        });
+                    }
                 }
 
             } catch (err) {
@@ -8658,6 +8779,7 @@ Company:Absher Construction Company
             primaryLogo.needsDigitizing = false;
             primaryLogo.designNumber = null;
             primaryLogo.designName = null;
+            primaryLogo.thumbnailUrl = null;
             updateLogoCardHeader('garment', null);
             // Clear design number inputs
             const gDesignInput = document.getElementById('garment-design-number');
@@ -8666,9 +8788,11 @@ Company:Absher Construction Company
             if (gDesignInfo) { gDesignInfo.style.display = 'none'; gDesignInfo.innerHTML = ''; }
             const gDesignClear = document.getElementById('garment-design-clear');
             if (gDesignClear) gDesignClear.style.display = 'none';
+            showDesignThumbnail('garment', null);
             if (typeof capPrimaryLogo !== 'undefined') {
                 capPrimaryLogo.designNumber = null;
                 capPrimaryLogo.designName = null;
+                capPrimaryLogo.thumbnailUrl = null;
                 updateLogoCardHeader('cap', null);
                 const cDesignInput = document.getElementById('cap-design-number');
                 if (cDesignInput) cDesignInput.value = '';
@@ -8676,7 +8800,10 @@ Company:Absher Construction Company
                 if (cDesignInfo) { cDesignInfo.style.display = 'none'; cDesignInfo.innerHTML = ''; }
                 const cDesignClear = document.getElementById('cap-design-clear');
                 if (cDesignClear) cDesignClear.style.display = 'none';
+                showDesignThumbnail('cap', null);
             }
+            // Clear thumbnail cache
+            if (typeof DesignThumbnailService !== 'undefined') DesignThumbnailService.clearCache();
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             document.getElementById('primary-digitizing').checked = false;
@@ -9432,6 +9559,7 @@ Company:Absher Construction Company
                             const { num, label, dbInfo, inDb, fallbackInfo } = entry;
 
                             bannerHtml += `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;flex-wrap:wrap;">`;
+                            bannerHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
                             bannerHtml += `<strong>#${escapeHtml(num)}</strong>`;
 
                             if (inDb) {
@@ -9540,6 +9668,22 @@ Company:Absher Construction Company
                         designBanner.style.background = '#eff6ff';
                         const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>';
                         designBanner.innerHTML = headerText + bannerHtml;
+
+                        // Fetch design thumbnails for the banner (non-blocking)
+                        if (typeof DesignThumbnailService !== 'undefined' && designEntries.length > 0) {
+                            const sprDesignNums = designEntries.map(e => e.num);
+                            DesignThumbnailService.fetchThumbnailsBatch(sprDesignNums).then(thumbMap => {
+                                for (const [dn, url] of Object.entries(thumbMap)) {
+                                    if (url) {
+                                        const slot = document.getElementById('spr-thumb-' + dn);
+                                        if (slot) {
+                                            slot.innerHTML = '<img src="' + escapeHtml(url) + '" class="spr-design-thumb" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.style.display=\'none\'">';
+                                            slot.style.display = 'inline-block';
+                                        }
+                                    }
+                                }
+                            });
+                        }
 
                         // Function to recalculate auto-tiers from assignment dropdowns
                         function _recalcDesignAssignments() {

@@ -796,14 +796,24 @@ class QuoteViewPage {
 
         // Only show stitches and embroidery-specific fields for embroidery quotes
         if (isEmbroideryQuote) {
-            // Design number assignments (2026-02-19)
+            // Design number assignments (2026-02-19) + thumbnails (2026-02-23)
             const garmentDesign = this.quoteData?.GarmentDesignNumber;
             const capDesign = this.quoteData?.CapDesignNumber;
             if (garmentDesign) {
-                html += `<div class="emb-detail"><span class="emb-label">Garment Design:</span> <span class="emb-value">#${this.escapeHtml(garmentDesign)}</span></div>`;
+                html += `<div class="emb-detail" style="display:flex;align-items:center;gap:8px;">
+                    <span id="qv-garment-thumb" style="display:none;"></span>
+                    <span><span class="emb-label">Garment Design:</span> <span class="emb-value">#${this.escapeHtml(garmentDesign)}</span></span>
+                </div>`;
             }
             if (capDesign && capDesign !== garmentDesign) {
-                html += `<div class="emb-detail"><span class="emb-label">Cap Design:</span> <span class="emb-value">#${this.escapeHtml(capDesign)}</span></div>`;
+                html += `<div class="emb-detail" style="display:flex;align-items:center;gap:8px;">
+                    <span id="qv-cap-thumb" style="display:none;"></span>
+                    <span><span class="emb-label">Cap Design:</span> <span class="emb-value">#${this.escapeHtml(capDesign)}</span></span>
+                </div>`;
+            }
+            // Fetch design thumbnails for quote view (non-blocking)
+            if (garmentDesign || capDesign) {
+                this._loadQuoteViewThumbnails(garmentDesign, capDesign);
             }
 
             const stitches = this.quoteData?.StitchCount || this.quoteData?.Stitches || '8000';
@@ -3020,6 +3030,78 @@ class QuoteViewPage {
     formatCurrency(amount) {
         const num = parseFloat(amount) || 0;
         return '$' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    /**
+     * Load design thumbnails for quote view (non-blocking, fire-and-forget)
+     * Uses direct fetch since quote-view doesn't load DesignThumbnailService
+     */
+    _loadQuoteViewThumbnails(garmentDesign, capDesign) {
+        const designs = [];
+        if (garmentDesign && /^\d+$/.test(String(garmentDesign).trim())) {
+            designs.push(String(garmentDesign).trim());
+        }
+        if (capDesign && /^\d+$/.test(String(capDesign).trim()) && capDesign !== garmentDesign) {
+            designs.push(String(capDesign).trim());
+        }
+        if (designs.length === 0) return;
+
+        const url = `${this.apiBaseUrl}/api/thumbnails/by-designs?ids=${designs.join(',')}`;
+        fetch(url)
+            .then(resp => {
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                return resp.json();
+            })
+            .then(data => {
+                const thumbnails = data.thumbnails || {};
+                // Garment thumbnail
+                if (garmentDesign && thumbnails[String(garmentDesign).trim()]) {
+                    const entry = thumbnails[String(garmentDesign).trim()];
+                    if (entry.found && entry.imageUrl) {
+                        this._showQuoteViewThumb('qv-garment-thumb', entry.imageUrl);
+                    }
+                }
+                // Cap thumbnail
+                if (capDesign && capDesign !== garmentDesign && thumbnails[String(capDesign).trim()]) {
+                    const entry = thumbnails[String(capDesign).trim()];
+                    if (entry.found && entry.imageUrl) {
+                        this._showQuoteViewThumb('qv-cap-thumb', entry.imageUrl);
+                    }
+                }
+            })
+            .catch(err => {
+                console.warn('[QuoteView] Thumbnail fetch failed:', err.message);
+            });
+    }
+
+    /**
+     * Show a thumbnail image in a quote view span element
+     */
+    _showQuoteViewThumb(spanId, imageUrl) {
+        const span = document.getElementById(spanId);
+        if (!span) return;
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Design preview';
+        img.className = 'quote-view-design-thumb';
+        img.style.width = '60px';
+        img.style.height = '60px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '6px';
+        img.style.border = '1px solid #e5e7eb';
+        img.style.cursor = 'pointer';
+        img.onerror = () => { span.style.display = 'none'; };
+        img.onclick = () => {
+            // Open full-size in overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'thumb-modal-overlay';
+            overlay.innerHTML = `<img src="${this.escapeHtml(imageUrl)}" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">`;
+            overlay.onclick = () => overlay.remove();
+            document.body.appendChild(overlay);
+        };
+        span.innerHTML = '';
+        span.appendChild(img);
+        span.style.display = 'inline-block';
     }
 
     getTrackingLink(carrier, trackingNumber) {

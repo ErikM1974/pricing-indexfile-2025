@@ -1705,4 +1705,53 @@ body {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
+
+    /* Hide design thumbnails in print */
+    .quote-view-design-thumb,
+    #qv-garment-thumb,
+    #qv-cap-thumb {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   DESIGN THUMBNAILS (2026-02-23)
+   ============================================================ */
+.quote-view-design-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    background: #fff;
+}
+
+.quote-view-design-thumb:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transform: scale(1.05);
+}
+
+/* Full-size thumbnail overlay */
+.thumb-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    cursor: pointer;
+}
+
+.thumb-modal-overlay img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    background: #fff;
 }
