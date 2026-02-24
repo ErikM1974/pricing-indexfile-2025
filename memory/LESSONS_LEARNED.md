@@ -41,13 +41,51 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Fix: Notes On Order Crammed Into Single Entry — Split Into Separate Notes (2026-02-24)
+
+**Problem:** Notes On Order in ShopWorks showed one combined note with all info (Quote ID, Tax Account, Expected Tax) on separate lines within the same entry. Staff had to click the note to read all lines.
+
+**Root Cause:** `buildNotes()` joined all `orderNoteParts[]` with `\n` into a single `{ Note, Type }` object. ShopWorks displays only the first line of multi-line notes in the list view.
+
+**Solution:** Each piece of info is now its own separate `{ Note: "...", Type: "Notes On Order" }` entry — Quote ID, Tax Account, Expected Tax, PO, Carrier, Tracking, etc. are all individual note entries. Matches Python InkSoft (3-Day Tees) pattern (lines 1358-1381 of `json_transform_gui.py`). Other note types (Art, Production, Purchasing, Shipping) remain single grouped entries since their content is logically related.
+
+**Prevention:** For ManageOrders notes, use separate note entries for distinct pieces of info that staff need to see at a glance. Only combine into one entry when content is logically grouped (like a list of line items in Notes To Purchasing). `[caspio-proxy]`
+
+---
+
+## Fix: ManageOrders TaxTotal > 0 Creates Unwanted Tax Line Item (2026-02-24)
+
+**Problem:** Pushed embroidery orders had a phantom tax line item in ShopWorks (e.g., `Tax_10.1`, "City of Milton Sales Tax 10.1%", $57.60 as a separate line item alongside products). This inflated the order total and confused the invoice.
+
+**Root Cause:** The transformer sent `TaxTotal: 57.6` at the order level. ManageOrders integration type auto-generates a tax line item from `TaxTotal` when it's > 0. The `TaxPartNumber` and `TaxPartDescription` are auto-created by ShopWorks (not sent by our code).
+
+**Solution:** Match Python InkSoft (3-Day Tees) pattern: `TaxTotal: 0`, `TaxPartNumber: ''`, `TaxPartDescription: ''`. Keep `coa_AccountSalesTax01` for GL account auto-fill in OnSite dropdown. Removed `Tax[]` array and `_effective_tax_rate` (not in ManageOrders schema). OnSite calculates tax from `sts_EnableTax01-04` flags on each line item. Notes On Order still has "Tax Account: XXXX (Description)" and "Expected Tax: $XX.XX" for manual review.
+
+**Prevention:** For ManageOrders integration type, ALWAYS send `TaxTotal: 0`. Let OnSite calculate tax from per-line-item `sts_EnableTax` flags. Use Notes On Order for tax context. Only InkSoft integration type supports `TaxTotal > 0` without creating unwanted line items. `[caspio-proxy]`
+
+---
+
+## Fix: Size Part Numbers — OnSite Needs Pre-Suffixed PNs for Extended Sizes (2026-02-24)
+
+**Problem (round 1):** Products pushed to ShopWorks had doubled size suffixes: `PC61_3XL` → `PC61_3XL_3XL`. Initial fix: send base StyleNumber only.
+
+**Problem (round 2):** Extended sizes (2XL, OSFA) lost their suffix: `J790` should be `J790_2X` for 2XL jacket. OnSite puts qty in XXL column but leaves PN unchanged.
+
+**Root Cause:** OnSite's Size Translation Table **only assigns size columns** (S/M/LG/XL/XXL/XXXL). It **never modifies the part number**. Extended sizes (2XL→`_2X`, 3XL→`_3XL`, OSFA→`_OSFA`) must be pre-suffixed. `quote_items.StyleNumber` is always the base style (never pre-suffixed), so `getPartNumber()` is safe — no doubling.
+
+**Solution:** Use `getPartNumber(item.StyleNumber, size)` for all LinesOE entries. Returns base PN for standard sizes (S/M/L/XL), suffixed PN for extended sizes. Verified: J790+L→`J790`, J790+2XL→`J790_2X`, 112+OSFA→`112_OSFA`.
+
+**Prevention:** OnSite's Size Translation Table only controls column assignment — never modifies PNs. Always use `getPartNumber()` from `size-suffix-config.js` for LinesOE part numbers. `[caspio-proxy]`
+
+---
+
 ## Discovery: ManageOrders Push API Does NOT Support Tax Fields (2026-02-22)
 
 **Problem:** EMB push sent `Tax[]` array, `TaxTotal`, `coa_AccountSalesTax01`, `_effective_tax_rate`, `sts_EnableTax01-04`, and `sts_TaxOverride` — all were stripped by OnSite. `TaxTotal` reset to 0 in OnSite response. Live InkSoft orders (Skyline Properties #52521, WA Hospitality #52520) had these fields preserved.
 
 **Root Cause:** OnSite has two integration types: **ManageOrders** and **InkSoft**. The ManageOrders Push API Swagger schema does NOT include `Tax[]`, `coa_AccountSalesTax01`, `_effective_tax_rate`, `sts_EnableTax01-04`, or `sts_TaxOverride`. These are InkSoft-specific extensions. Only `TaxTotal` is in the official schema but OnSite resets it for ManageOrders-type integrations. InkSoft-type integrations preserve all tax fields because they use a different field mapping.
 
-**Solution:** Code still sends all tax data (future-proofed). **Notes On Order** has `Tax Account: 2200 (WA Sales Tax 10.1%)` and `Expected Tax: $50.50` as manual fallback for staff to set tax on the ShopWorks order.
+**Solution:** ~~Code still sends all tax data (future-proofed).~~ **Updated 2026-02-24:** Removed `Tax[]` and `_effective_tax_rate`. Set `TaxTotal: 0` to prevent unwanted tax line items. `coa_AccountSalesTax01` kept for GL auto-fill. **Notes On Order** has `Tax Account: 2200 (WA Sales Tax 10.1%)` and `Expected Tax: $50.50` as manual fallback for staff to set tax on the ShopWorks order.
 
 **Prevention:** When building ManageOrders integrations, only rely on fields in the official Swagger spec. Non-Swagger fields will be silently stripped. For tax specifically, use Notes On Order as the reliable mechanism until ShopWorks adds tax field support to ManageOrders integrations. `[caspio-proxy]`
 

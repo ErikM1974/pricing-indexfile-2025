@@ -50,28 +50,31 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Update relevant memory file if it's about: ManageOrders, Caspio API, Stripe, ShopWorks
 - Tag with project: `[Pricing Index]`, `[caspio-proxy]`, `[Python Inksoft]`, `[All]`
 
-## Documentation Triggers (Auto-Ask)
+## Documentation Triggers (Auto-Update)
 
-Claude should **proactively ask** about documentation when these occur:
+**CRITICAL: Claude MUST auto-update memory files as part of the fix/feature workflow — no asking, just do it and notify.**
 
-### Pricing Changes
-After modifying pricing logic, ask:
-> "This pricing change may need documentation. Update PRICING_TIERS_MASTER_REFERENCE.md or [METHOD]_PRICING_RULES.md?"
+The workflow for any bug fix, feature, or integration change is:
+1. Write code → 2. Commit → 3. Deploy → **4. Update memory files** → 5. Notify Erik what was updated
 
-### Bug Fixes > 15 minutes
-After fixing any non-trivial bug, ask:
-> "Log this fix to LESSONS_LEARNED.md? (Problem/Root Cause/Solution)"
-
-### New Feature Complete
-After implementing a new feature, ask:
-> "Document this feature? Options: Add to existing doc, Create new memory file, Skip"
+### Bug Fixes (any non-trivial fix)
+**Auto-update** LESSONS_LEARNED.md (Problem/Root Cause/Solution/Prevention) + update MEMORY.md if the fix changes documented behavior. Notify:
+> "Updated LESSONS_LEARNED.md and MEMORY.md with the fix details."
 
 ### API/Integration Changes
-After modifying API endpoints or integrations, ask:
-> "Update API documentation in /memory/api/?"
+**Auto-update** MEMORY.md section for the affected integration (ManageOrders, Caspio, Stripe, ShopWorks). Notify:
+> "Updated MEMORY.md with the integration changes."
 
-### Rule: Don't Ask Twice
-If user says "skip" or "no" for a documentation prompt, don't ask again for the same change.
+### Pricing Changes
+**Auto-update** relevant pricing docs. Notify:
+> "Updated pricing documentation with the changes."
+
+### New Feature Complete
+**Auto-update** MEMORY.md with feature details. Notify:
+> "Documented new feature in MEMORY.md."
+
+### Rule: Don't Ask, Just Do
+Memory updates are part of completing the task — not a separate step that needs permission. If Erik says "skip" for a specific update, don't update that one.
 
 ## File Organization
 
