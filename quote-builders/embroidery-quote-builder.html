@@ -3873,7 +3873,9 @@ Company:Absher Construction Company
             const stitchStr = design.maxStitchCount ? design.maxStitchCount.toLocaleString() + ' stitches' : '';
             const tierBadge = design.maxStitchTier || 'Standard';
             const company = design.company || '';
-            const parts = [company, stitchStr, tierBadge].filter(Boolean);
+            const designName = design.designName || '';
+            const placement = design.placement || '';
+            const parts = [company, designName, stitchStr, tierBadge, placement].filter(Boolean);
 
             infoBadge.className = 'design-info-badge design-info-found';
             infoBadge.innerHTML = '<i class="fas fa-check-circle"></i> ' + escapeHtml(parts.join(' · '));
@@ -3909,11 +3911,19 @@ Company:Absher Construction Company
 
             showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
 
-            // Fetch and display design thumbnail (non-blocking)
-            if (typeof DesignThumbnailService !== 'undefined') {
+            // Use thumbnail from enriched /lookup response (faster, no extra API call)
+            const thumbUrl = design.thumbnailUrl || design.artworkUrl || '';
+            if (thumbUrl) {
+                showDesignThumbnail(type, thumbUrl);
+                if (type === 'garment') {
+                    primaryLogo.thumbnailUrl = thumbUrl;
+                } else if (typeof capPrimaryLogo !== 'undefined') {
+                    capPrimaryLogo.thumbnailUrl = thumbUrl;
+                }
+            } else if (typeof DesignThumbnailService !== 'undefined') {
+                // Fallback: legacy thumbnail service if unified table has no image
                 DesignThumbnailService.fetchThumbnail(designNum).then(imageUrl => {
                     showDesignThumbnail(type, imageUrl);
-                    // Store on logo object for draft save
                     if (type === 'garment') {
                         primaryLogo.thumbnailUrl = imageUrl || null;
                     } else if (typeof capPrimaryLogo !== 'undefined') {
@@ -4307,13 +4317,27 @@ Company:Absher Construction Company
                 // Truncate name
                 const name = d.designName ? (d.designName.length > 30 ? d.designName.substring(0, 28) + '...' : d.designName) : '';
 
+                // Stitch count text
+                const stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
+
+                // Placement badge
+                const placementBadge = d.placement ? '<span class="design-placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
+
+                // Thread colors (truncate if long)
+                const threadText = d.threadColors ? (d.threadColors.length > 35 ? d.threadColors.substring(0, 33) + '...' : d.threadColors) : '';
+
+                // Order count
+                const orderText = (d.orderCount && d.orderCount > 0) ? 'Ordered ' + d.orderCount + '×' : '';
+
                 return `<div class="design-gallery-card" onclick="selectDesignFromSearch('${dn}')"
                             data-design-number="${dn}" data-name="${escapeHtml(name)}" data-company="${escapeHtml(d.company || '')}">
                     <div class="design-gallery-thumb" id="gallery-thumb-${dn}">${thumbHtml}</div>
                     <div class="design-gallery-info">
                         <div class="design-gallery-number">#${dn}</div>
                         ${name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName) + '">' + escapeHtml(name) + '</div>' : ''}
-                        <div class="design-gallery-meta">${tierBadge}</div>
+                        <div class="design-gallery-meta">${tierBadge}${stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : ''}</div>
+                        ${(placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : ''}
+                        ${orderText ? '<div class="design-order-count">' + orderText + '</div>' : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -4452,6 +4476,12 @@ Company:Absher Construction Company
                                 <div class="design-result-company">${escapeHtml(d.company || 'Unknown')}</div>
                                 ${d.designName ? '<div class="design-result-name">' + escapeHtml(d.designName) + '</div>' : ''}
                                 <div class="design-result-meta">${metaHtml || '<span style="color:#94a3b8; font-size:11px;">No stitch data</span>'}</div>
+                                ${(d.threadColors || d.lastOrderDate || d.orderCount > 0 || d.artNotes) ? '<div class="design-result-extra">'
+                                    + (d.threadColors ? '<span class="design-thread-info" title="Thread Colors: ' + escapeHtml(d.threadColors) + '"><i class="fas fa-palette"></i> ' + escapeHtml(d.threadColors.length > 40 ? d.threadColors.substring(0, 38) + '...' : d.threadColors) + '</span>' : '')
+                                    + (d.orderCount > 0 ? '<span class="design-order-info"><i class="fas fa-redo-alt"></i> ' + d.orderCount + ' orders</span>' : '')
+                                    + (d.lastOrderDate ? '<span class="design-date-info"><i class="fas fa-calendar-alt"></i> Last: ' + escapeHtml(new Date(d.lastOrderDate).toLocaleDateString('en-US', {month:'short', year:'numeric'})) + '</span>' : '')
+                                + '</div>' : ''}
+                                ${d.artNotes ? '<div class="design-art-notes" title="' + escapeHtml(d.artNotes) + '"><i class="fas fa-sticky-note"></i> ' + escapeHtml(d.artNotes.length > 60 ? d.artNotes.substring(0, 58) + '...' : d.artNotes) + '</div>' : ''}
                             </div>
                         </div>`;
                 }).join('');
@@ -9793,9 +9823,19 @@ Company:Absher Construction Company
                         for (const entry of designEntries) {
                             const { num, label, dbInfo, inDb, fallbackInfo } = entry;
 
-                            bannerHtml += `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;flex-wrap:wrap;">`;
+                            // Design entry row with optional thumbnail
+                            const thumbUrl = inDb ? (dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
+                            const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
+
+                            bannerHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
+                            if (thumbUrl) {
+                                bannerHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" onerror="this.style.display='none'">`;
+                            }
                             bannerHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
                             bannerHtml += `<strong>#${escapeHtml(num)}</strong>`;
+                            if (designNameText) {
+                                bannerHtml += `<span style="color:#64748b;font-size:11px;font-style:italic;">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;
+                            }
 
                             if (inDb) {
                                 const sc = dbInfo.maxStitchCount;

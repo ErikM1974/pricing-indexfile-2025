@@ -29,6 +29,22 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Optimization: Design Lookup Normalization — 4 Tables → 1 Unified Table (2026-02-24)
+
+**Problem:** `digitized-designs.js` route was 1,317 lines with 4 parallel Caspio API calls per search (Master, ShopWorks_Designs, Thumbnail_Report, ArtRequests). Each endpoint had complex merge logic (`mergeDesignResults()` ~100 lines), timeout wrappers, and field name mapping across different table schemas. Slow searches (~2-3s) and fragile code.
+
+**Root Cause:** Design data was spread across 4 Caspio tables with different schemas. Every API request required fetching from all 4 tables, merging results, deduplicating, and picking "best" field values (e.g., company name priority: Master → ArtRequests → ShopWorks).
+
+**Solution:** Created `Design_Lookup_2026` unified table in Caspio (26 fields). Sync script (`scripts/sync-design-lookup.js`) reads all 4 source tables, merges with priority logic, and inserts ~38K records. Route refactored to query single table: 1,317 → 652 lines. Key findings:
+- **Caspio REST v3 does NOT support batch/array POST** — each record must be sent individually. Array POST returns 400 "IncorrectBodyParameter".
+- **Concurrency 10** (parallel individual POSTs with `Promise.allSettled`) achieves ~21 records/sec. Serial inserts only ~3/sec.
+- **`Is_Active` is Text(255) in Caspio** (not Boolean) — must use `'true'`/`'false'` strings in WHERE clauses.
+- Frontend only uses 4 of 11 endpoints: `/lookup`, `/fallback`, `/search-all`, `/by-customer`. 7 endpoints removed (CRUD, `/search`, single design lookup).
+
+**Prevention:** For large Caspio data consolidations, always test single-record POST first, then determine if batch is supported. Use materialized view pattern (periodic sync script) rather than real-time multi-table joins. `[caspio-proxy]`
+
+---
+
 ## Bug: ManageOrders OnSite Integrations All Share `/onsite` URL (2026-02-22)
 
 **Problem:** Embroidery PUSH health check returned 403 Forbidden from `manageordersapi.com/embroidery/signin`. The credentials were correct (same as working 3-Day Tees integration).

@@ -3135,6 +3135,113 @@ td.size-disabled input {
 }
 
 /* ============================================================
+   DESIGN GALLERY CARD ENHANCEMENTS
+   ============================================================ */
+
+.design-gallery-detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 3px;
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.3;
+}
+
+.design-placement-tag {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border: 1px solid #e2e8f0;
+}
+
+.design-thread-info {
+    font-size: 11px;
+    color: #64748b;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+}
+
+.design-order-count {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   DESIGN SEARCH RESULT ENHANCEMENTS
+   ============================================================ */
+
+.design-result-extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #64748b;
+}
+
+.design-result-extra i {
+    font-size: 10px;
+    margin-right: 2px;
+    opacity: 0.7;
+}
+
+.design-order-info {
+    color: #6366f1;
+    font-weight: 500;
+}
+
+.design-date-info {
+    color: #64748b;
+}
+
+.design-art-notes {
+    font-size: 11px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.design-art-notes i {
+    font-size: 10px;
+    margin-right: 3px;
+    opacity: 0.7;
+}
+
+/* ============================================================
+   IMPORT REVIEW DESIGN THUMBNAIL
+   ============================================================ */
+
+.spr-design-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+.spr-thread-info {
+    font-size: 11px;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* ============================================================
    DESIGN SEARCH MODAL
    ============================================================ */
 
