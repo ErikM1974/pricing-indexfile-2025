@@ -50,6 +50,9 @@
 | `/pages/data-entry-guide.html` | **NEW** ShopWorks data entry guide with API-driven service prices | data-entry-guide.js, data-entry-guide.css, app-config.js | ✅ Active |
 | `/pages/data-entry-guide.js` | **NEW** API price fetching for data entry guide | /api/service-codes | ✅ Active |
 | `/pages/data-entry-guide.css` | **NEW** Data entry guide styles (print-friendly) | — | ✅ Active |
+| `/pages/design-gallery.html` | **NEW** Standalone design gallery — search 39K+ digitized designs | design-gallery.js, design-gallery.css, design-thumbnail-service.js, app-config.js | ✅ Active |
+| `/pages/js/design-gallery.js` | **NEW** Design gallery controller — search, cards, detail panel, clipboard copy | /api/digitized-designs/search-all, /by-customer | ✅ Active |
+| `/pages/css/design-gallery.css` | **NEW** Design gallery page styles (responsive grid, cards, detail panel) | — | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 

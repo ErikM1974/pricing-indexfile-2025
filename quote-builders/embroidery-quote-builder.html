@@ -4326,8 +4326,11 @@ Company:Absher Construction Company
                 // Thread colors (truncate if long)
                 const threadText = d.threadColors ? (d.threadColors.length > 35 ? d.threadColors.substring(0, 33) + '...' : d.threadColors) : '';
 
-                // Order count
-                const orderText = (d.orderCount && d.orderCount > 0) ? 'Ordered ' + d.orderCount + '×' : '';
+                // DST filenames (for finding files on internal server)
+                const dstText = (d.dstFilenames && d.dstFilenames.length > 0) ? d.dstFilenames.join(', ') : '';
+                const dstDisplay = dstText.length > 50
+                    ? d.dstFilenames.slice(0, 2).join(', ') + ' +' + (d.dstFilenames.length - 2) + ' more'
+                    : dstText;
 
                 return `<div class="design-gallery-card" onclick="selectDesignFromSearch('${dn}')"
                             data-design-number="${dn}" data-name="${escapeHtml(name)}" data-company="${escapeHtml(d.company || '')}">
@@ -4337,7 +4340,7 @@ Company:Absher Construction Company
                         ${name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName) + '">' + escapeHtml(name) + '</div>' : ''}
                         <div class="design-gallery-meta">${tierBadge}${stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : ''}</div>
                         ${(placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : ''}
-                        ${orderText ? '<div class="design-order-count">' + orderText + '</div>' : ''}
+                        ${dstDisplay ? '<div class="design-dst-files" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -4482,6 +4485,7 @@ Company:Absher Construction Company
                                     + (d.lastOrderDate ? '<span class="design-date-info"><i class="fas fa-calendar-alt"></i> Last: ' + escapeHtml(new Date(d.lastOrderDate).toLocaleDateString('en-US', {month:'short', year:'numeric'})) + '</span>' : '')
                                 + '</div>' : ''}
                                 ${d.artNotes ? '<div class="design-art-notes" title="' + escapeHtml(d.artNotes) + '"><i class="fas fa-sticky-note"></i> ' + escapeHtml(d.artNotes.length > 60 ? d.artNotes.substring(0, 58) + '...' : d.artNotes) + '</div>' : ''}
+                                ${(d.dstFilenames && d.dstFilenames.length > 0) ? '<div class="design-dst-files" title="' + escapeHtml(d.dstFilenames.join(', ')) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(d.dstFilenames.length <= 2 ? d.dstFilenames.join(', ') : d.dstFilenames[0] + ' +' + (d.dstFilenames.length - 1) + ' more') + '</div>' : ''}
                             </div>
                         </div>`;
                 }).join('');

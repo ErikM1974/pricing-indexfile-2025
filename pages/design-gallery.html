@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Design Gallery - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/css/design-gallery.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="gallery-header">
+        <a href="/staff-dashboard.html" class="header-logo">
+            <img src="/images/nwca-logo.png" alt="NWCA" class="logo" onerror="this.style.display='none'">
+        </a>
+        <div class="header-title">
+            <h1>Design Gallery</h1>
+            <span class="header-subtitle" id="record-count">39,000+ digitized designs</span>
+        </div>
+        <a href="/staff-dashboard.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="search-field"
+                    placeholder="Search by company, design name, or design #..."
+                    autocomplete="off">
+                <button class="search-clear" id="search-clear" style="display:none;" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-options">
+                <div class="customer-filter">
+                    <label for="customer-id-input" class="customer-label">
+                        <i class="fas fa-user"></i> Customer #
+                    </label>
+                    <input type="text" id="customer-id-input" class="customer-field"
+                        placeholder="Optional" maxlength="10">
+                    <button class="btn-customer-load" id="btn-customer-load" onclick="loadCustomerGallery()" title="Load customer designs">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tier Filter Chips -->
+        <div class="filter-chips" id="filter-chips">
+            <button class="chip active" data-tier="all" onclick="filterByTier('all')">All</button>
+            <button class="chip" data-tier="Standard" onclick="filterByTier('Standard')">Standard</button>
+            <button class="chip" data-tier="Mid" onclick="filterByTier('Mid')">Mid</button>
+            <button class="chip" data-tier="Large" onclick="filterByTier('Large')">Large</button>
+            <button class="chip" data-tier="Full Back" onclick="filterByTier('Full Back')">Full Back</button>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <main class="gallery-main">
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+            <i class="fas fa-pencil-ruler empty-icon"></i>
+            <h2>Search Our Design Library</h2>
+            <p>Type a company name, design name, or design number above to get started.</p>
+            <p class="empty-hint">Or enter a Customer # to browse their designs.</p>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-state" id="loading-state" style="display:none;">
+            <div class="skeleton-grid">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="results-header" id="results-header" style="display:none;">
+            <span id="results-count"></span>
+            <span id="results-query"></span>
+        </div>
+        <div class="design-grid" id="design-grid"></div>
+
+        <!-- No Results -->
+        <div class="no-results" id="no-results" style="display:none;">
+            <i class="fas fa-search no-results-icon"></i>
+            <h3>No designs found</h3>
+            <p>Try a different search term or check the spelling.</p>
+        </div>
+    </main>
+
+    <!-- Detail Panel (slide-in) -->
+    <div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+    <div class="detail-panel" id="detail-panel">
+        <div class="detail-header">
+            <h2 id="detail-title"></h2>
+            <button class="detail-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="detail-body" id="detail-body"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/design-thumbnail-service.js"></script>
+    <script src="/pages/js/design-gallery.js"></script>
+</body>
+</html>
