@@ -1578,6 +1578,18 @@ Company:Absher Construction Company
                     <i class="fas fa-info-circle"></i>
                     Type a company name (e.g. "Aaberg") or design number to find existing designs
                 </div>
+                <!-- Tier filter chips -->
+                <div class="design-search-filters" id="design-search-filters" style="display:none;">
+                    <button class="design-search-chip active" data-tier="all" onclick="filterDesignSearchByTier('all')">All</button>
+                    <button class="design-search-chip" data-tier="Standard" onclick="filterDesignSearchByTier('Standard')">Standard</button>
+                    <button class="design-search-chip" data-tier="Mid" onclick="filterDesignSearchByTier('Mid')">Mid</button>
+                    <button class="design-search-chip" data-tier="Large" onclick="filterDesignSearchByTier('Large')">Large</button>
+                    <button class="design-search-chip" data-tier="Full Back" onclick="filterDesignSearchByTier('Full Back')">Full Back</button>
+                </div>
+                <!-- Dynamic company filter chips -->
+                <div class="design-search-company-chips" id="design-search-company-chips" style="display:none;"></div>
+                <!-- Results count header -->
+                <div class="design-search-results-header" id="design-search-results-header" style="display:none;"></div>
                 <div id="design-search-results" class="design-search-results">
                     <!-- Results populated by JS -->
                 </div>
@@ -2831,6 +2843,9 @@ Company:Absher Construction Company
                 reqShipDate: document.getElementById('req-ship-date')?.value || '',
                 dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
                 paymentTerms: document.getElementById('payment-terms')?.value || '',
+                // Cached design data for instant restore (no API call needed)
+                garmentDesignData: primaryLogo._designData || null,
+                capDesignData: (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo._designData) ? capPrimaryLogo._designData : null,
                 timestamp: Date.now()
             };
         }
@@ -2900,12 +2915,15 @@ Company:Absher Construction Company
                     if (gDesignInput) gDesignInput.value = draft.primaryLogo.designNumber;
                     const gClearBtn = document.getElementById('garment-design-clear');
                     if (gClearBtn) gClearBtn.style.display = 'inline-flex';
-                    // Show cached thumbnail immediately (before lookup refreshes it)
-                    if (draft.primaryLogo.thumbnailUrl) {
-                        showDesignThumbnail('garment', draft.primaryLogo.thumbnailUrl);
+                    // Use cached design data if available (no API call), fallback to lookup
+                    if (draft.garmentDesignData) {
+                        applyDesignFromCache('garment', draft.garmentDesignData);
+                    } else {
+                        if (draft.primaryLogo.thumbnailUrl) {
+                            showDesignThumbnail('garment', draft.primaryLogo.thumbnailUrl);
+                        }
+                        lookupDesignNumber('garment');
                     }
-                    // Trigger lookup to show design info badge
-                    lookupDesignNumber('garment');
                 }
             }
 
@@ -2926,11 +2944,15 @@ Company:Absher Construction Company
                     if (cDesignInput) cDesignInput.value = draft.capPrimaryLogo.designNumber;
                     const cClearBtn = document.getElementById('cap-design-clear');
                     if (cClearBtn) cClearBtn.style.display = 'inline-flex';
-                    // Show cached thumbnail immediately (before lookup refreshes it)
-                    if (draft.capPrimaryLogo.thumbnailUrl) {
-                        showDesignThumbnail('cap', draft.capPrimaryLogo.thumbnailUrl);
+                    // Use cached design data if available (no API call), fallback to lookup
+                    if (draft.capDesignData) {
+                        applyDesignFromCache('cap', draft.capDesignData);
+                    } else {
+                        if (draft.capPrimaryLogo.thumbnailUrl) {
+                            showDesignThumbnail('cap', draft.capPrimaryLogo.thumbnailUrl);
+                        }
+                        lookupDesignNumber('cap');
                     }
-                    lookupDesignNumber('cap');
                 }
             }
 
@@ -3794,6 +3816,189 @@ Company:Absher Construction Company
         let _customerDesignGallery = null;   // Cached gallery data: { customerId, results[] }
         let _galleryFilterTimeout = null;    // Debounce timer for gallery filter input
         let _designSearchDebounce = null;
+        const DESIGN_SEARCH_INITIAL_RENDER = 50; // Batch rendering threshold
+        let _designSearchState = {
+            allResults: [],
+            filteredResults: [],
+            activeTier: 'all',
+            activeCompany: 'all',
+            displayedCount: 0
+        };
+
+        /**
+         * Apply a design to a logo card from cached data (NO API call)
+         * @param {string} type - 'garment' or 'cap'
+         * @param {Object} designData - Full design data object from cache
+         */
+        async function applyDesignFromCache(type, designData) {
+            if (!designData || !designData.designNumber) return;
+            const designNum = String(designData.designNumber);
+            const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
+            const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+            const input = document.getElementById(inputId);
+            const clearBtn = document.getElementById(clearId);
+            if (input) input.value = designNum;
+            if (clearBtn) clearBtn.style.display = 'inline-flex';
+
+            // Build a design object compatible with applyDesignToCard
+            const design = {
+                company: designData.company || '',
+                designName: designData.designName || '',
+                maxStitchCount: designData.maxStitchCount || 0,
+                maxStitchTier: designData.maxStitchTier || 'Standard',
+                placement: designData.placement || '',
+                thumbnailUrl: designData.thumbnailUrl || '',
+                artworkUrl: designData.artworkUrl || '',
+                customerId: designData.customerId || '',
+                threadColors: designData.threadColors || '',
+                dstFilenames: designData.dstFilenames || [],
+                colorChanges: designData.colorChanges || 0,
+                extraColors: designData.extraColors || 0,
+                extraColorSurcharge: designData.extraColorSurcharge || 0,
+                orderCount: designData.orderCount || 0,
+                lastOrderDate: designData.lastOrderDate || '',
+                artNotes: designData.artNotes || '',
+                variants: designData.variants || []
+            };
+
+            // Store on logo object for draft persistence
+            if (type === 'garment') {
+                primaryLogo._designData = design;
+            } else if (typeof capPrimaryLogo !== 'undefined') {
+                capPrimaryLogo._designData = design;
+            }
+
+            await applyDesignToCard(type, designNum, design);
+        }
+
+        /**
+         * Filter design search results by stitch tier (chip click handler)
+         */
+        function filterDesignSearchByTier(tier) {
+            _designSearchState.activeTier = tier;
+            document.querySelectorAll('#design-search-filters .design-search-chip').forEach(c => {
+                c.classList.toggle('active', c.dataset.tier === tier);
+            });
+            applyDesignSearchFilters();
+        }
+
+        /**
+         * Filter design search results by company name (chip click handler)
+         */
+        function filterDesignSearchByCompany(company) {
+            _designSearchState.activeCompany = company;
+            document.querySelectorAll('#design-search-company-chips .design-search-company-chip').forEach(c => {
+                c.classList.toggle('active', c.dataset.company === company);
+            });
+            applyDesignSearchFilters();
+        }
+
+        /**
+         * Apply combined tier + company filters and re-render grid
+         */
+        function applyDesignSearchFilters() {
+            let results = _designSearchState.allResults;
+
+            // Apply tier filter
+            if (_designSearchState.activeTier !== 'all') {
+                results = results.filter(d => (d.maxStitchTier || 'Standard') === _designSearchState.activeTier);
+            }
+
+            // Apply company filter
+            if (_designSearchState.activeCompany !== 'all') {
+                results = results.filter(d => (d.company || 'Unknown') === _designSearchState.activeCompany);
+            }
+
+            // Apply text filter if in gallery mode with active text input
+            const searchInput = document.getElementById('design-search-input');
+            if (searchInput && searchInput._galleryMode) {
+                const q = searchInput.value.trim().toLowerCase();
+                if (q) {
+                    results = results.filter(d =>
+                        (d.designNumber && String(d.designNumber).toLowerCase().includes(q)) ||
+                        (d.designName && d.designName.toLowerCase().includes(q)) ||
+                        (d.company && d.company.toLowerCase().includes(q))
+                    );
+                }
+            }
+
+            _designSearchState.filteredResults = results;
+            renderDesignSearchGrid(results);
+            updateDesignSearchResultsHeader();
+        }
+
+        /**
+         * Build company filter chips from search/gallery results
+         */
+        function buildDesignSearchCompanyChips(designs) {
+            const container = document.getElementById('design-search-company-chips');
+            if (!container) return;
+
+            const companyCounts = {};
+            designs.forEach(d => {
+                const name = d.company || 'Unknown';
+                companyCounts[name] = (companyCounts[name] || 0) + 1;
+            });
+
+            const companies = Object.keys(companyCounts).sort();
+            if (companies.length < 2) {
+                container.style.display = 'none';
+                return;
+            }
+
+            let html = '<button class="design-search-company-chip active" data-company="all" onclick="filterDesignSearchByCompany(\'all\')">All <span class="chip-count">(' + designs.length + ')</span></button>';
+            companies.forEach(name => {
+                const escapedName = name.replace(/'/g, "\\'");
+                html += '<button class="design-search-company-chip" data-company="' + escapeHtml(name) + '" '
+                    + 'onclick="filterDesignSearchByCompany(\'' + escapedName + '\')" title="' + escapeHtml(name) + '">'
+                    + escapeHtml(name.length > 28 ? name.substring(0, 26) + '...' : name)
+                    + ' <span class="chip-count">(' + companyCounts[name] + ')</span></button>';
+            });
+
+            container.innerHTML = html;
+            container.style.display = 'flex';
+        }
+
+        /**
+         * Update the results count header in the search modal
+         */
+        function updateDesignSearchResultsHeader() {
+            const header = document.getElementById('design-search-results-header');
+            if (!header) return;
+
+            const filtered = _designSearchState.filteredResults.length;
+            const total = _designSearchState.allResults.length;
+
+            if (total === 0) {
+                header.style.display = 'none';
+                return;
+            }
+
+            const countText = filtered === total
+                ? '<span class="results-count">' + total + ' designs</span>'
+                : '<span class="results-count">' + filtered + ' of ' + total + ' designs</span>';
+
+            header.innerHTML = countText;
+            header.style.display = 'flex';
+        }
+
+        /**
+         * Reset design search modal filter state
+         */
+        function resetDesignSearchFilters() {
+            _designSearchState.activeTier = 'all';
+            _designSearchState.activeCompany = 'all';
+            _designSearchState.displayedCount = 0;
+            document.querySelectorAll('#design-search-filters .design-search-chip').forEach(c => {
+                c.classList.toggle('active', c.dataset.tier === 'all');
+            });
+            const companyChips = document.getElementById('design-search-company-chips');
+            if (companyChips) { companyChips.style.display = 'none'; companyChips.innerHTML = ''; }
+            const header = document.getElementById('design-search-results-header');
+            if (header) header.style.display = 'none';
+            const filters = document.getElementById('design-search-filters');
+            if (filters) filters.style.display = 'none';
+        }
 
         /**
          * Look up a design number from the input field
@@ -3877,8 +4082,32 @@ Company:Absher Construction Company
             const placement = design.placement || '';
             const parts = [company, designName, stitchStr, tierBadge, placement].filter(Boolean);
 
+            // Build enhanced info badge with DST, order history, extra color warning
+            let badgeHtml = '<i class="fas fa-check-circle"></i> ' + escapeHtml(parts.join(' · '));
+
+            // DST filenames (show first 2)
+            const dstArr = design.dstFilenames || [];
+            if (dstArr.length > 0) {
+                const dstDisplay = dstArr.length <= 2 ? dstArr.join(', ') : dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more';
+                badgeHtml += '<br><span style="font-size:11px;color:#6366f1;"><i class="fas fa-file-code" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
+            }
+
+            // Order history
+            if (design.orderCount > 0) {
+                let orderText = design.orderCount + ' orders';
+                if (design.lastOrderDate) {
+                    orderText += ' (last: ' + new Date(design.lastOrderDate).toLocaleDateString('en-US', {month:'short', year:'numeric'}) + ')';
+                }
+                badgeHtml += '<br><span style="font-size:11px;color:#6366f1;">📦 ' + escapeHtml(orderText) + '</span>';
+            }
+
+            // Extra color surcharge warning
+            if (design.extraColors > 0 && design.extraColorSurcharge > 0) {
+                badgeHtml += '<br><span style="font-size:11px;color:#d97706;font-weight:600;">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>';
+            }
+
             infoBadge.className = 'design-info-badge design-info-found';
-            infoBadge.innerHTML = '<i class="fas fa-check-circle"></i> ' + escapeHtml(parts.join(' · '));
+            infoBadge.innerHTML = badgeHtml;
             infoBadge.style.display = 'block';
             clearBtn.style.display = 'inline-flex';
 
@@ -4200,10 +4429,13 @@ Company:Absher Construction Company
                 modal.classList.remove('gallery-mode');
                 modal.style.display = 'none';
             }
+            // Reset filter state so reopening starts fresh
+            resetDesignSearchFilters();
         }
 
         /**
          * Load all designs for a customer into the gallery
+         * Uses unified state + card grid renderer with tier/company chips
          * @param {string} customerId
          */
         async function loadCustomerDesignGallery(customerId) {
@@ -4214,14 +4446,21 @@ Company:Absher Construction Company
 
             // Use cached data if same customer
             if (_customerDesignGallery && _customerDesignGallery.customerId === customerId) {
-                renderDesignGallery(_customerDesignGallery.results);
+                _designSearchState.allResults = _customerDesignGallery.results;
+                _designSearchState.filteredResults = _customerDesignGallery.results;
+                renderDesignSearchGrid(_customerDesignGallery.results);
                 if (countEl) countEl.textContent = _customerDesignGallery.results.length + ' designs';
+                const filters = document.getElementById('design-search-filters');
+                if (filters) filters.style.display = 'flex';
+                buildDesignSearchCompanyChips(_customerDesignGallery.results);
+                updateDesignSearchResultsHeader();
                 return;
             }
 
             if (loading) loading.style.display = 'flex';
             if (results) results.innerHTML = '';
             if (empty) empty.style.display = 'none';
+            resetDesignSearchFilters();
 
             try {
                 const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
@@ -4252,34 +4491,20 @@ Company:Absher Construction Company
                 _customerDesignGallery = { customerId, results: data.results };
                 if (countEl) countEl.textContent = data.results.length + ' designs';
 
-                // Populate _designSearchCache for thumbnail pass-through on selection
-                window._designSearchCache = window._designSearchCache || {};
-                for (const d of data.results) {
-                    window._designSearchCache[d.designNumber] = {
-                        artworkUrl: d.artworkUrl || null,
-                        thumbnailUrl: d.thumbnailUrl || null
-                    };
-                }
+                // Cache FULL design objects for zero-API-call selection
+                window._designSearchCache = {};
+                data.results.forEach(d => {
+                    window._designSearchCache[String(d.designNumber)] = d;
+                });
 
-                renderDesignGallery(data.results);
-
-                // Fetch thumbnails for designs missing images
-                if (typeof DesignThumbnailService !== 'undefined') {
-                    const noImage = data.results.filter(d => !d.artworkUrl && !d.thumbnailUrl).map(d => d.designNumber);
-                    if (noImage.length > 0) {
-                        DesignThumbnailService.fetchThumbnailsBatch(noImage).then(thumbMap => {
-                            for (const [dn, url] of Object.entries(thumbMap)) {
-                                // Update cache
-                                if (window._designSearchCache[dn]) window._designSearchCache[dn].thumbnailUrl = url;
-                                // Update DOM
-                                const slot = document.getElementById('gallery-thumb-' + dn);
-                                if (slot && url && !slot.querySelector('img')) {
-                                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">';
-                                }
-                            }
-                        });
-                    }
-                }
+                // Store in unified state + render with chips
+                _designSearchState.allResults = data.results;
+                _designSearchState.filteredResults = data.results;
+                const filters = document.getElementById('design-search-filters');
+                if (filters) filters.style.display = 'flex';
+                buildDesignSearchCompanyChips(data.results);
+                renderDesignSearchGrid(data.results);
+                updateDesignSearchResultsHeader();
 
             } catch (err) {
                 if (loading) loading.style.display = 'none';
@@ -4288,63 +4513,129 @@ Company:Absher Construction Company
         }
 
         /**
-         * Render design gallery cards in a CSS grid
+         * Render design search/gallery cards in a CSS grid (unified renderer)
+         * Supports batch rendering: shows first 50 cards + "Show more" button
          * @param {Array} designs
          */
-        function renderDesignGallery(designs) {
+        function renderDesignSearchGrid(designs) {
             const results = document.getElementById('design-search-results');
             if (!results) return;
 
+            // Remove any old show-more element
+            const oldMore = results.querySelector('.design-search-show-more');
+            if (oldMore) oldMore.remove();
+
             if (!designs || designs.length === 0) {
-                results.innerHTML = '<div class="design-gallery-no-match"><i class="fas fa-filter"></i> No designs match your filter</div>';
+                results.innerHTML = '<div class="design-gallery-no-match"><i class="fas fa-filter"></i> No designs match this filter</div>';
+                _designSearchState.displayedCount = 0;
                 return;
             }
 
-            results.innerHTML = designs.map(d => {
-                const dn = escapeHtml(d.designNumber);
-                const previewUrl = d.artworkUrl || d.thumbnailUrl || null;
-                const thumbHtml = previewUrl
-                    ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
-                    : '<i class="fas fa-image"></i>';
+            // Batch render first N cards
+            const initialBatch = designs.slice(0, DESIGN_SEARCH_INITIAL_RENDER);
+            results.innerHTML = initialBatch.map(buildDesignSearchCardHtml).join('');
+            _designSearchState.displayedCount = initialBatch.length;
 
-                // Stitch tier badge
-                let tierBadge = '';
-                if (d.maxStitchCount > 0) {
-                    const tierClass = (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
-                    tierBadge = '<span class="design-tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(d.maxStitchTier || 'Standard') + '</span>';
-                }
+            // Add "Show more" button if there are more results
+            if (designs.length > DESIGN_SEARCH_INITIAL_RENDER) {
+                const remaining = designs.length - DESIGN_SEARCH_INITIAL_RENDER;
+                results.innerHTML += '<div class="design-search-show-more"><button onclick="showMoreDesignSearchResults()"><i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
+            }
 
-                // Truncate name
-                const name = d.designName ? (d.designName.length > 30 ? d.designName.substring(0, 28) + '...' : d.designName) : '';
-
-                // Stitch count text
-                const stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
-
-                // Placement badge
-                const placementBadge = d.placement ? '<span class="design-placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
-
-                // Thread colors (truncate if long)
-                const threadText = d.threadColors ? (d.threadColors.length > 35 ? d.threadColors.substring(0, 33) + '...' : d.threadColors) : '';
-
-                // DST filenames (for finding files on internal server)
-                const dstText = (d.dstFilenames && d.dstFilenames.length > 0) ? d.dstFilenames.join(', ') : '';
-                const dstDisplay = dstText.length > 50
-                    ? d.dstFilenames.slice(0, 2).join(', ') + ' +' + (d.dstFilenames.length - 2) + ' more'
-                    : dstText;
-
-                return `<div class="design-gallery-card" onclick="selectDesignFromSearch('${dn}')"
-                            data-design-number="${dn}" data-name="${escapeHtml(name)}" data-company="${escapeHtml(d.company || '')}">
-                    <div class="design-gallery-thumb" id="gallery-thumb-${dn}">${thumbHtml}</div>
-                    <div class="design-gallery-info">
-                        <div class="design-gallery-number">#${dn}</div>
-                        ${name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName) + '">' + escapeHtml(name) + '</div>' : ''}
-                        <div class="design-gallery-meta">${tierBadge}${stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : ''}</div>
-                        ${(placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : ''}
-                        ${dstDisplay ? '<div class="design-dst-files" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : ''}
-                    </div>
-                </div>`;
-            }).join('');
+            // Lazy-load thumbnails for designs without images
+            lazyLoadDesignSearchThumbnails(initialBatch, results);
         }
+
+        /**
+         * Build a single design card HTML (matches standalone gallery layout)
+         */
+        function buildDesignSearchCardHtml(d) {
+            const dn = escapeHtml(String(d.designNumber));
+            const previewUrl = d.artworkUrl || d.thumbnailUrl || null;
+            const thumbHtml = previewUrl
+                ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
+                : '<i class="fas fa-image"></i>';
+
+            let tierBadge = '';
+            if (d.maxStitchCount > 0) {
+                const tierClass = (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
+                tierBadge = '<span class="design-tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(d.maxStitchTier || 'Standard') + '</span>';
+            }
+
+            const name = d.designName ? (d.designName.length > 30 ? d.designName.substring(0, 28) + '...' : d.designName) : '';
+            const stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
+            const placementBadge = d.placement ? '<span class="design-placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
+            const threadText = d.threadColors ? (d.threadColors.length > 35 ? d.threadColors.substring(0, 33) + '...' : d.threadColors) : '';
+            const dstArr = d.dstFilenames || [];
+            const dstText = dstArr.join(', ');
+            const dstDisplay = dstText.length > 50 ? dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more' : dstText;
+            const company = d.company || '';
+
+            return '<div class="design-gallery-card" onclick="selectDesignFromSearch(\'' + dn + '\')"'
+                + ' data-design-number="' + dn + '" data-company="' + escapeHtml(company) + '">'
+                + '<div class="design-gallery-thumb" id="gallery-thumb-' + dn + '">' + thumbHtml + '</div>'
+                + '<div class="design-gallery-info">'
+                    + '<div class="design-gallery-number">#' + dn + '</div>'
+                    + (company ? '<div class="design-gallery-name" title="' + escapeHtml(company) + '" style="font-style:normal;color:#374151;font-weight:500;">' + escapeHtml(company.length > 28 ? company.substring(0, 26) + '...' : company) + '</div>' : '')
+                    + (name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName || '') + '">' + escapeHtml(name) + '</div>' : '')
+                    + '<div class="design-gallery-meta">' + tierBadge + (stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : '') + '</div>'
+                    + ((placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
+                    + (dstDisplay ? '<div class="design-dst-files" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
+                + '</div>'
+            + '</div>';
+        }
+
+        /**
+         * Show remaining design search results (batch rendering)
+         */
+        function showMoreDesignSearchResults() {
+            const results = document.getElementById('design-search-results');
+            if (!results) return;
+
+            // Remove the show-more button
+            const showMore = results.querySelector('.design-search-show-more');
+            if (showMore) showMore.remove();
+
+            // Append remaining cards
+            const remaining = _designSearchState.filteredResults.slice(DESIGN_SEARCH_INITIAL_RENDER);
+            const temp = document.createElement('div');
+            temp.innerHTML = remaining.map(buildDesignSearchCardHtml).join('');
+            while (temp.firstChild) {
+                results.appendChild(temp.firstChild);
+            }
+            _designSearchState.displayedCount = _designSearchState.filteredResults.length;
+
+            // Lazy-load thumbnails for remaining
+            lazyLoadDesignSearchThumbnails(remaining, results);
+        }
+
+        /**
+         * Lazy-load thumbnails for designs missing images in the search modal
+         */
+        function lazyLoadDesignSearchThumbnails(designs, container) {
+            if (typeof DesignThumbnailService === 'undefined') return;
+            const noImage = designs.filter(d => !d.artworkUrl && !d.thumbnailUrl).map(d => String(d.designNumber)).slice(0, 20);
+            if (noImage.length === 0) return;
+
+            DesignThumbnailService.fetchThumbnailsBatch(noImage).then(thumbMap => {
+                for (const [dn, url] of Object.entries(thumbMap)) {
+                    if (url) {
+                        // Update cache
+                        if (window._designSearchCache && window._designSearchCache[dn]) {
+                            window._designSearchCache[dn].thumbnailUrl = url;
+                        }
+                        // Update DOM
+                        const slot = container.querySelector('#gallery-thumb-' + dn);
+                        if (slot && !slot.querySelector('img')) {
+                            slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Keep old name as alias for backward compat (used by gallery filter)
+        function renderDesignGallery(designs) { renderDesignSearchGrid(designs); }
 
         /**
          * Debounced search input handler
@@ -4353,26 +4644,16 @@ Company:Absher Construction Company
             const input = document.getElementById('design-search-input');
             if (!input) return;
 
-            // Gallery mode: client-side filter on cached results
+            // Gallery mode: client-side filter on cached results (uses unified filter pipeline)
             if (input._galleryMode && _customerDesignGallery) {
                 clearTimeout(_galleryFilterTimeout);
                 _galleryFilterTimeout = setTimeout(() => {
-                    const q = input.value.trim().toLowerCase();
-                    if (!q) {
-                        renderDesignGallery(_customerDesignGallery.results);
-                        return;
-                    }
-                    const filtered = _customerDesignGallery.results.filter(d =>
-                        (d.designNumber && d.designNumber.toLowerCase().includes(q)) ||
-                        (d.designName && d.designName.toLowerCase().includes(q)) ||
-                        (d.company && d.company.toLowerCase().includes(q))
-                    );
-                    renderDesignGallery(filtered);
+                    applyDesignSearchFilters();
                 }, 200);
                 return;
             }
 
-            // Search mode: original debounced API search
+            // Search mode: debounced API search
             clearTimeout(_designSearchDebounce);
             _designSearchDebounce = setTimeout(() => {
                 if (input && input.value.trim().length >= 2) {
@@ -4382,7 +4663,7 @@ Company:Absher Construction Company
         }
 
         /**
-         * Execute design search
+         * Execute design search — uses gallery card grid layout with tier + company chips
          */
         async function runDesignSearch() {
             const input = document.getElementById('design-search-input');
@@ -4397,13 +4678,14 @@ Company:Absher Construction Company
             results.innerHTML = '';
             empty.style.display = 'none';
             loading.style.display = 'flex';
+            resetDesignSearchFilters();
 
             try {
                 const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
                     || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-                const searchCustomerId = document.getElementById('customer-number').value.trim();
+                const searchCustomerId = document.getElementById('customer-number')?.value?.trim() || '';
                 const customerParam = searchCustomerId ? `&customerId=${encodeURIComponent(searchCustomerId)}` : '';
-                const resp = await fetch(`${apiBase}/api/digitized-designs/search-all?q=${encodeURIComponent(q)}${customerParam}&limit=20`);
+                const resp = await fetch(`${apiBase}/api/digitized-designs/search-all?q=${encodeURIComponent(q)}${customerParam}&limit=100`);
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json();
 
@@ -4414,102 +4696,26 @@ Company:Absher Construction Company
                     return;
                 }
 
-                // Show search scope indicators
-                if (data.customerScoped) {
-                    results.innerHTML = '<div class="design-search-fuzzy-note"><i class="fas fa-user-check"></i> Customer designs shown first</div>';
-                } else if (data.fuzzyEnabled) {
-                    results.innerHTML = '<div class="design-search-fuzzy-note"><i class="fas fa-magic"></i> Showing fuzzy matches — results ranked by relevance</div>';
-                }
-
-                // Cache search result data for thumbnail pass-through on selection
+                // Cache FULL design objects for zero-API-call selection
                 window._designSearchCache = {};
+                data.results.forEach(d => {
+                    window._designSearchCache[String(d.designNumber)] = d;
+                });
 
-                results.innerHTML += data.results.map(d => {
-                    const dn = escapeHtml(d.designNumber);
-                    // Cache artwork/thumbnail URLs for pass-through when user selects this design
-                    window._designSearchCache[dn] = { artworkUrl: d.artworkUrl || null, thumbnailUrl: d.thumbnailUrl || null };
+                // Store in unified state
+                _designSearchState.allResults = data.results;
+                _designSearchState.filteredResults = data.results;
 
-                    const hasStitch = d.maxStitchCount > 0;
-                    const stitchStr = hasStitch ? d.maxStitchCount.toLocaleString() : '';
-                    const tierClass = hasStitch ? (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-') : '';
+                // Show tier filter chips
+                const filters = document.getElementById('design-search-filters');
+                if (filters) filters.style.display = 'flex';
 
-                    // Build stitch/tier display or "No stitch data" fallback
-                    let metaHtml = '';
-                    if (hasStitch) {
-                        metaHtml += '<span class="design-result-stitch">' + stitchStr + ' stitches</span>';
-                        metaHtml += '<span class="design-tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(d.maxStitchTier || 'Standard') + '</span>';
-                    }
-                    if (d.variantCount > 1) {
-                        metaHtml += '<span class="design-result-variants">' + d.variantCount + ' variants</span>';
-                    }
-                    if (d.placement) {
-                        metaHtml += '<span class="design-result-placement" title="Placement">' + escapeHtml(d.placement) + '</span>';
-                    }
+                // Build company filter chips
+                buildDesignSearchCompanyChips(data.results);
 
-                    // Source badges
-                    const sources = d.sources || [];
-                    let sourceBadges = '';
-                    if (d.customerMatch) sourceBadges += '<span class="design-source-badge source-customer" title="Design belongs to selected customer">Your Customer</span>';
-                    if (sources.includes('master')) sourceBadges += '<span class="design-source-badge source-master" title="Digitized design with stitch data">Digitized</span>';
-                    if (sources.includes('artrequests')) sourceBadges += '<span class="design-source-badge source-art" title="Has art request with mockup">Art Request</span>';
-                    if (d.hasImage || d.artworkUrl) sourceBadges += '<span class="design-source-badge source-image" title="Has design image">Has Image</span>';
-
-                    // Relevance score indicator for fuzzy matches
-                    const scoreHtml = (data.fuzzyEnabled && typeof d.relevanceScore === 'number')
-                        ? '<span class="design-relevance-score" title="Match relevance">' + d.relevanceScore + '%</span>'
-                        : '';
-
-                    // Determine the initial thumbnail: artworkUrl or thumbnail, or placeholder
-                    const previewUrl = d.artworkUrl || d.thumbnailUrl || null;
-                    const thumbHtml = previewUrl
-                        ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
-                        : '<i class="fas fa-image"></i>';
-
-                    return `
-                        <div class="design-search-result-item" onclick="selectDesignFromSearch('${dn}')" style="display:flex; align-items:center; gap:10px;">
-                            <div class="design-search-thumb" id="search-thumb-${dn}">
-                                ${thumbHtml}
-                            </div>
-                            <div style="flex:1; min-width:0;">
-                                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                    <div class="design-result-number">#${dn}</div>
-                                    ${sourceBadges}
-                                    ${scoreHtml}
-                                </div>
-                                <div class="design-result-company">${escapeHtml(d.company || 'Unknown')}</div>
-                                ${d.designName ? '<div class="design-result-name">' + escapeHtml(d.designName) + '</div>' : ''}
-                                <div class="design-result-meta">${metaHtml || '<span style="color:#94a3b8; font-size:11px;">No stitch data</span>'}</div>
-                                ${(d.threadColors || d.lastOrderDate || d.orderCount > 0 || d.artNotes) ? '<div class="design-result-extra">'
-                                    + (d.threadColors ? '<span class="design-thread-info" title="Thread Colors: ' + escapeHtml(d.threadColors) + '"><i class="fas fa-palette"></i> ' + escapeHtml(d.threadColors.length > 40 ? d.threadColors.substring(0, 38) + '...' : d.threadColors) + '</span>' : '')
-                                    + (d.orderCount > 0 ? '<span class="design-order-info"><i class="fas fa-redo-alt"></i> ' + d.orderCount + ' orders</span>' : '')
-                                    + (d.lastOrderDate ? '<span class="design-date-info"><i class="fas fa-calendar-alt"></i> Last: ' + escapeHtml(new Date(d.lastOrderDate).toLocaleDateString('en-US', {month:'short', year:'numeric'})) + '</span>' : '')
-                                + '</div>' : ''}
-                                ${d.artNotes ? '<div class="design-art-notes" title="' + escapeHtml(d.artNotes) + '"><i class="fas fa-sticky-note"></i> ' + escapeHtml(d.artNotes.length > 60 ? d.artNotes.substring(0, 58) + '...' : d.artNotes) + '</div>' : ''}
-                                ${(d.dstFilenames && d.dstFilenames.length > 0) ? '<div class="design-dst-files" title="' + escapeHtml(d.dstFilenames.join(', ')) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(d.dstFilenames.length <= 2 ? d.dstFilenames.join(', ') : d.dstFilenames[0] + ' +' + (d.dstFilenames.length - 1) + ' more') + '</div>' : ''}
-                            </div>
-                        </div>`;
-                }).join('');
-
-                if (data.totalMatches > data.count) {
-                    results.innerHTML += `<div class="design-search-more">${data.totalMatches - data.count} more results — refine your search</div>`;
-                }
-
-                // Also fetch thumbnails from thumbnail service for designs that didn't come with images
-                if (typeof DesignThumbnailService !== 'undefined') {
-                    const designNums = data.results
-                        .filter(d => !d.artworkUrl && !d.thumbnailUrl)
-                        .map(d => d.designNumber);
-                    if (designNums.length > 0) {
-                        DesignThumbnailService.fetchThumbnailsBatch(designNums).then(thumbMap => {
-                            for (const [thumbDn, url] of Object.entries(thumbMap)) {
-                                const slot = document.getElementById('search-thumb-' + thumbDn);
-                                if (slot && url && !slot.querySelector('img')) {
-                                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(thumbDn) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">';
-                                }
-                            }
-                        });
-                    }
-                }
+                // Render card grid
+                renderDesignSearchGrid(data.results);
+                updateDesignSearchResultsHeader();
 
             } catch (err) {
                 loading.style.display = 'none';
@@ -4520,27 +4726,33 @@ Company:Absher Construction Company
 
         /**
          * Select a design from the search modal results
+         * Uses cached data to avoid redundant API call
          * @param {string} designNum
          */
         async function selectDesignFromSearch(designNum) {
             closeDesignSearchModal();
-            const inputId = _designSearchTarget === 'garment' ? 'garment-design-number' : 'cap-design-number';
-            const input = document.getElementById(inputId);
-            if (input) input.value = designNum;
 
-            // Pass through cached thumbnail from search results for instant display
-            const cached = window._designSearchCache?.[designNum];
-            const previewUrl = cached?.artworkUrl || cached?.thumbnailUrl || null;
-            if (previewUrl) {
-                showDesignThumbnail(_designSearchTarget, previewUrl);
-                // Store on logo object so it persists
-                if (_designSearchTarget === 'garment') primaryLogo.thumbnailUrl = previewUrl;
-                else if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo.thumbnailUrl = previewUrl;
+            // Try to use cached full design data (no API call needed)
+            const cached = window._designSearchCache?.[String(designNum)];
+            if (cached && cached.designNumber) {
+                // Full design object cached — apply directly
+                await applyDesignFromCache(_designSearchTarget, cached);
+            } else {
+                // Fallback: old behavior (API call) for designs without full cache
+                const inputId = _designSearchTarget === 'garment' ? 'garment-design-number' : 'cap-design-number';
+                const input = document.getElementById(inputId);
+                if (input) input.value = designNum;
+
+                // Show thumbnail instantly from partial cache
+                const previewUrl = cached?.artworkUrl || cached?.thumbnailUrl || null;
+                if (previewUrl) {
+                    showDesignThumbnail(_designSearchTarget, previewUrl);
+                    if (_designSearchTarget === 'garment') primaryLogo.thumbnailUrl = previewUrl;
+                    else if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo.thumbnailUrl = previewUrl;
+                }
+
+                await lookupDesignNumber(_designSearchTarget);
             }
-
-            await lookupDesignNumber(_designSearchTarget);
-            // lookupDesignNumber → applyDesignToCard still runs DesignThumbnailService,
-            // but it will just overwrite with the same URL (or a better one if available)
         }
 
         function setupPrimaryLogoHandlers() {
@@ -9073,6 +9285,15 @@ Company:Absher Construction Company
             if (typeof DesignThumbnailService !== 'undefined') DesignThumbnailService.clearCache();
             _customerDesignGallery = null;
             window._designSearchCache = {};
+            // Clear cached design data from logo objects
+            primaryLogo._designData = null;
+            if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo._designData = null;
+            // Reset design search state
+            _designSearchState.allResults = [];
+            _designSearchState.filteredResults = [];
+            _designSearchState.activeTier = 'all';
+            _designSearchState.activeCompany = 'all';
+            _designSearchState.displayedCount = 0;
             document.getElementById('primary-position').value = 'Left Chest';
             document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
             document.getElementById('primary-digitizing').checked = false;
@@ -11884,6 +12105,8 @@ Company:Absher Construction Company
                     }
 
                     // Store design number assignments on logo objects + update card headers + input fields
+                    // Use cached design lookup data to avoid redundant API calls
+                    const _importDesignLookup = _sprEmbConfigOptions?.designLookup;
                     if (embConfig.garmentDesignNumber) {
                         primaryLogo.designNumber = embConfig.garmentDesignNumber;
                         primaryLogo.designName = embConfig.garmentDesignName || '';
@@ -11892,8 +12115,13 @@ Company:Absher Construction Company
                         if (gdi) gdi.value = embConfig.garmentDesignNumber;
                         const gcb = document.getElementById('garment-design-clear');
                         if (gcb) gcb.style.display = 'inline-flex';
-                        // Show info badge via lookup
-                        lookupDesignNumber('garment');
+                        // Use cached data if available (no API call), fallback to lookup
+                        const gDesignData = _importDesignLookup?.designs?.[embConfig.garmentDesignNumber];
+                        if (gDesignData) {
+                            applyDesignFromCache('garment', gDesignData);
+                        } else {
+                            lookupDesignNumber('garment');
+                        }
                     }
                     if (embConfig.capDesignNumber) {
                         capPrimaryLogo.designNumber = embConfig.capDesignNumber;
@@ -11903,7 +12131,12 @@ Company:Absher Construction Company
                         if (cdi) cdi.value = embConfig.capDesignNumber;
                         const ccb = document.getElementById('cap-design-clear');
                         if (ccb) ccb.style.display = 'inline-flex';
-                        lookupDesignNumber('cap');
+                        const cDesignData = _importDesignLookup?.designs?.[embConfig.capDesignNumber];
+                        if (cDesignData) {
+                            applyDesignFromCache('cap', cDesignData);
+                        } else {
+                            lookupDesignNumber('cap');
+                        }
                     }
                 }
 
