@@ -1,26 +1,30 @@
 /**
- * Design Gallery — Standalone search & browse for 39K+ digitized designs
+ * Design Gallery v2 — Standalone search & browse for 39K+ digitized designs
+ * Features: batch rendering, centered modal, company chips, "show all" pagination
  * Uses /api/digitized-designs/search-all and /by-customer endpoints
  */
 (function () {
     'use strict';
 
     // --- Config ---
-    const API_BASE = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+    var API_BASE = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    const SEARCH_DELAY = 350; // debounce ms
-    const MAX_RESULTS = 50;
+    var SEARCH_DELAY = 350;
+    var MAX_RESULTS = 200;
+    var INITIAL_RENDER_COUNT = 50;
 
     // --- State ---
-    let currentResults = [];   // Full result set from last search
-    let filteredResults = [];  // After tier filter
-    let activeTier = 'all';
-    let searchTimer = null;
-    let isCustomerMode = false;
+    var currentResults = [];
+    var filteredResults = [];
+    var activeTier = 'all';
+    var activeCompany = 'all';
+    var searchTimer = null;
+    var isCustomerMode = false;
+    var displayedCount = 0;
 
     // --- Init ---
     document.addEventListener('DOMContentLoaded', function () {
-        const input = document.getElementById('search-input');
+        var input = document.getElementById('search-input');
         if (input) {
             input.addEventListener('input', onSearchInput);
             input.addEventListener('keydown', function (e) {
@@ -31,7 +35,7 @@
                 }
             });
         }
-        const custInput = document.getElementById('customer-id-input');
+        var custInput = document.getElementById('customer-id-input');
         if (custInput) {
             custInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
@@ -40,13 +44,21 @@
                 }
             });
         }
+
+        // Escape key closes modal/panel
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeDesignModal();
+                closeDetail();
+            }
+        });
     });
 
     // --- Search ---
     function onSearchInput() {
-        const input = document.getElementById('search-input');
-        const val = input.value.trim();
-        const clearBtn = document.getElementById('search-clear');
+        var input = document.getElementById('search-input');
+        var val = input.value.trim();
+        var clearBtn = document.getElementById('search-clear');
         clearBtn.style.display = val.length > 0 ? 'flex' : 'none';
 
         clearTimeout(searchTimer);
@@ -63,26 +75,35 @@
         showLoading();
 
         try {
-            const custId = document.getElementById('customer-id-input').value.trim();
-            let url = API_BASE + '/api/digitized-designs/search-all?q=' + encodeURIComponent(query)
+            var custId = document.getElementById('customer-id-input').value.trim();
+            var url = API_BASE + '/api/digitized-designs/search-all?q=' + encodeURIComponent(query)
                 + '&limit=' + MAX_RESULTS;
             if (custId) url += '&customerId=' + encodeURIComponent(custId);
 
-            const resp = await fetch(url);
+            var resp = await fetch(url);
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
-            const data = await resp.json();
+            var data = await resp.json();
 
             if (!data.success || !data.results || data.results.length === 0) {
                 currentResults = [];
                 showNoResults();
+                hideCompanyChips();
                 return;
             }
 
             currentResults = data.results;
             activeTier = 'all';
+            activeCompany = 'all';
             resetTierChips();
             applyFilter();
-            showResultsHeader(data.count, data.totalMatches, query);
+            showResultsHeader(filteredResults.length, data.totalMatches, query);
+            buildCompanyChips(currentResults);
+
+            // Update header subtitle with dynamic count
+            var subtitleEl = document.getElementById('record-count');
+            if (subtitleEl && data.totalMatches) {
+                subtitleEl.textContent = data.totalMatches.toLocaleString() + '+ digitized designs';
+            }
         } catch (err) {
             showToast('Search failed: ' + err.message, 'error');
             showNoResults();
@@ -91,7 +112,7 @@
 
     // --- Customer Gallery ---
     window.loadCustomerGallery = async function () {
-        const custId = document.getElementById('customer-id-input').value.trim();
+        var custId = document.getElementById('customer-id-input').value.trim();
         if (!custId) {
             showToast('Enter a Customer # first', 'warning');
             return;
@@ -100,22 +121,25 @@
         showLoading();
 
         try {
-            const url = API_BASE + '/api/digitized-designs/by-customer?customerId=' + encodeURIComponent(custId);
-            const resp = await fetch(url);
+            var url = API_BASE + '/api/digitized-designs/by-customer?customerId=' + encodeURIComponent(custId);
+            var resp = await fetch(url);
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
-            const data = await resp.json();
+            var data = await resp.json();
 
             if (!data.success || !data.results || data.results.length === 0) {
                 currentResults = [];
                 showNoResults();
+                hideCompanyChips();
                 return;
             }
 
             currentResults = data.results;
             activeTier = 'all';
+            activeCompany = 'all';
             resetTierChips();
             applyFilter();
-            showResultsHeader(data.count, data.count, 'Customer #' + custId);
+            showResultsHeader(filteredResults.length, data.count, 'Customer #' + custId);
+            buildCompanyChips(currentResults);
         } catch (err) {
             showToast('Customer lookup failed: ' + err.message, 'error');
             showNoResults();
@@ -129,6 +153,9 @@
             c.classList.toggle('active', c.dataset.tier === tier);
         });
         applyFilter();
+        // Update results header
+        var queryEl = document.getElementById('results-query');
+        showResultsHeader(filteredResults.length, currentResults.length, queryEl ? queryEl.dataset.query || '' : '');
     };
 
     function resetTierChips() {
@@ -137,103 +164,318 @@
         });
     }
 
+    // --- Company Filter ---
+    window.filterByCompany = function (company) {
+        activeCompany = company;
+        document.querySelectorAll('.company-chips .company-chip').forEach(function (c) {
+            c.classList.toggle('active', c.dataset.company === company);
+        });
+        applyFilter();
+        var queryEl = document.getElementById('results-query');
+        showResultsHeader(filteredResults.length, currentResults.length, queryEl ? queryEl.dataset.query || '' : '');
+    };
+
+    function buildCompanyChips(designs) {
+        var container = document.getElementById('company-chips');
+        if (!container) return;
+
+        // Count designs per company
+        var companyCounts = {};
+        designs.forEach(function (d) {
+            var name = d.company || 'Unknown';
+            companyCounts[name] = (companyCounts[name] || 0) + 1;
+        });
+
+        var companies = Object.keys(companyCounts).sort();
+
+        // Only show chips if there are 2+ companies
+        if (companies.length < 2) {
+            container.style.display = 'none';
+            return;
+        }
+
+        var html = '<button class="company-chip active" data-company="all" onclick="filterByCompany(\'all\')">'
+            + 'All <span class="chip-count">(' + designs.length + ')</span></button>';
+
+        companies.forEach(function (name) {
+            var escapedName = name.replace(/'/g, "\\'");
+            html += '<button class="company-chip" data-company="' + escapeHtml(name) + '" '
+                + 'onclick="filterByCompany(\'' + escapedName + '\')" title="' + escapeHtml(name) + '">'
+                + escapeHtml(name.length > 30 ? name.substring(0, 28) + '...' : name)
+                + ' <span class="chip-count">(' + companyCounts[name] + ')</span></button>';
+        });
+
+        container.innerHTML = html;
+        container.style.display = 'flex';
+    }
+
+    function hideCompanyChips() {
+        var container = document.getElementById('company-chips');
+        if (container) {
+            container.style.display = 'none';
+            container.innerHTML = '';
+        }
+        activeCompany = 'all';
+    }
+
+    // --- Combined Filter ---
     function applyFilter() {
-        if (activeTier === 'all') {
-            filteredResults = currentResults;
-        } else {
-            filteredResults = currentResults.filter(function (d) {
+        // Remove old show-all bar if present
+        var old = document.getElementById('show-all-bar');
+        if (old) old.remove();
+
+        var results = currentResults;
+
+        // Apply tier filter
+        if (activeTier !== 'all') {
+            results = results.filter(function (d) {
                 return (d.maxStitchTier || 'Standard') === activeTier;
             });
         }
+
+        // Apply company filter
+        if (activeCompany !== 'all') {
+            results = results.filter(function (d) {
+                return (d.company || 'Unknown') === activeCompany;
+            });
+        }
+
+        filteredResults = results;
         renderGrid(filteredResults);
     }
 
-    // --- Render ---
+    // --- Render Grid (batch rendering) ---
     function renderGrid(designs) {
-        const grid = document.getElementById('design-grid');
+        var grid = document.getElementById('design-grid');
         hideAll();
         grid.style.display = 'grid';
         document.getElementById('results-header').style.display = 'flex';
 
         if (designs.length === 0) {
-            grid.innerHTML = '<div class="no-filter-results">No designs match this tier filter.</div>';
+            grid.innerHTML = '<div class="no-filter-results">No designs match this filter.</div>';
             return;
         }
 
-        grid.innerHTML = designs.map(function (d) {
-            const dn = escapeHtml(String(d.designNumber));
-            const name = d.designName ? (d.designName.length > 28 ? d.designName.substring(0, 26) + '...' : d.designName) : '';
-            const company = d.company || '';
-            const companyDisplay = company.length > 25 ? company.substring(0, 23) + '...' : company;
+        // Render first batch
+        var initialBatch = designs.slice(0, INITIAL_RENDER_COUNT);
+        grid.innerHTML = initialBatch.map(buildCardHtml).join('');
+        displayedCount = initialBatch.length;
 
-            // Tier badge
-            const tierClass = (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
-            const tierBadge = d.maxStitchCount > 0
-                ? '<span class="tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(d.maxStitchTier || 'Standard') + '</span>'
-                : '';
-            const stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
+        // If more exist, append "Show all" button
+        if (designs.length > INITIAL_RENDER_COUNT) {
+            var showAllBar = document.createElement('div');
+            showAllBar.className = 'show-all-bar';
+            showAllBar.id = 'show-all-bar';
+            showAllBar.innerHTML = '<button class="btn-show-all" onclick="showAllResults()">'
+                + '<i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs'
+                + '</button>';
+            grid.parentNode.insertBefore(showAllBar, grid.nextSibling);
+        }
 
-            // Thumbnail
-            const thumbUrl = d.thumbnailUrl || d.artworkUrl || '';
-            const thumbHtml = thumbUrl
-                ? '<img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + dn + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler thumb-placeholder\\\'></i>\'">'
-                : '<i class="fas fa-pencil-ruler thumb-placeholder"></i>';
+        // Lazy-load thumbnails
+        lazyLoadThumbnails(initialBatch, grid);
+    }
 
-            // Placement
-            const placementBadge = d.placement ? '<span class="placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
+    // --- Build Card HTML (extracted helper) ---
+    function buildCardHtml(d) {
+        var dn = escapeHtml(String(d.designNumber));
+        var name = d.designName || '';
+        var company = d.company || '';
+        var tierValue = d.maxStitchTier || 'Standard';
 
-            // Thread colors
-            const threadText = d.threadColors ? (d.threadColors.length > 30 ? d.threadColors.substring(0, 28) + '...' : d.threadColors) : '';
+        // Tier badge
+        var tierClass = tierValue.toLowerCase().replace(/\s+/g, '-');
+        var tierBadge = d.maxStitchCount > 0
+            ? '<span class="tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(tierValue) + '</span>'
+            : '';
+        var stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
 
-            // DST filenames
-            const dstArr = d.dstFilenames || [];
-            const dstText = dstArr.join(', ');
-            const dstDisplay = dstText.length > 45
-                ? dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more'
-                : dstText;
+        // Thumbnail
+        var thumbUrl = d.thumbnailUrl || d.artworkUrl || '';
+        var thumbHtml = thumbUrl
+            ? '<img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + dn + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler thumb-placeholder\\\'></i>\'">'
+            : '<i class="fas fa-pencil-ruler thumb-placeholder"></i>';
 
-            return '<div class="design-card" onclick="copyDesignNumber(\'' + dn + '\')" title="Click to copy design #' + dn + '">'
-                + '<div class="card-thumb">' + thumbHtml + '</div>'
-                + '<div class="card-info">'
-                    + '<div class="card-number">#' + dn + '</div>'
-                    + (company ? '<div class="card-company" title="' + escapeHtml(company) + '">' + escapeHtml(companyDisplay) + '</div>' : '')
-                    + (name ? '<div class="card-name" title="' + escapeHtml(d.designName || '') + '">' + escapeHtml(name) + '</div>' : '')
-                    + '<div class="card-meta">' + tierBadge + (stitchText ? ' <span class="card-stitch">' + stitchText + '</span>' : '') + '</div>'
-                    + ((placementBadge || threadText) ? '<div class="card-detail">' + placementBadge + (threadText ? '<span class="card-threads" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
-                    + (dstDisplay ? '<div class="card-dst" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
-                + '</div>'
-                + '<button class="card-expand" onclick="event.stopPropagation(); openDetail(\'' + dn + '\')" title="View details">'
-                    + '<i class="fas fa-expand-alt"></i>'
-                + '</button>'
-            + '</div>';
-        }).join('');
+        // Placement
+        var placementBadge = d.placement ? '<span class="placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
 
-        // Lazy-load thumbnails for designs without images via DesignThumbnailService
-        if (typeof DesignThumbnailService !== 'undefined') {
-            var noImageDesigns = designs.filter(function (d) { return !d.thumbnailUrl && !d.artworkUrl; })
-                .map(function (d) { return String(d.designNumber); }).slice(0, 20);
-            if (noImageDesigns.length > 0) {
-                DesignThumbnailService.fetchThumbnailsBatch(noImageDesigns).then(function (thumbMap) {
-                    for (var dn in thumbMap) {
-                        if (thumbMap[dn]) {
-                            var cards = grid.querySelectorAll('.design-card');
-                            cards.forEach(function (card) {
-                                var numEl = card.querySelector('.card-number');
-                                if (numEl && numEl.textContent === '#' + dn) {
-                                    var thumbDiv = card.querySelector('.card-thumb');
-                                    if (thumbDiv && thumbDiv.querySelector('.thumb-placeholder')) {
-                                        thumbDiv.innerHTML = '<img src="' + escapeHtml(thumbMap[dn]) + '" alt="Design" loading="lazy">';
-                                    }
+        // Thread colors
+        var threadText = d.threadColors ? (d.threadColors.length > 30 ? d.threadColors.substring(0, 28) + '...' : d.threadColors) : '';
+
+        // DST filenames
+        var dstArr = d.dstFilenames || [];
+        var dstText = dstArr.join(', ');
+        var dstDisplay = dstText.length > 45
+            ? dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more'
+            : dstText;
+
+        return '<div class="design-card" data-tier="' + escapeHtml(tierValue) + '" onclick="openDesignModal(\'' + dn + '\')" title="Click to view design #' + dn + '">'
+            + '<div class="card-thumb">' + thumbHtml + '</div>'
+            + '<div class="card-info">'
+                + '<div class="card-number">#' + dn + '</div>'
+                + (company ? '<div class="card-company" title="' + escapeHtml(company) + '">' + escapeHtml(company) + '</div>' : '')
+                + (name ? '<div class="card-name" title="' + escapeHtml(name) + '">' + escapeHtml(name) + '</div>' : '')
+                + '<div class="card-meta">' + tierBadge + (stitchText ? ' <span class="card-stitch">' + stitchText + '</span>' : '') + '</div>'
+                + ((placementBadge || threadText) ? '<div class="card-detail">' + placementBadge + (threadText ? '<span class="card-threads" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
+                + (dstDisplay ? '<div class="card-dst" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
+            + '</div>'
+            + '<button class="card-copy-btn" onclick="event.stopPropagation(); copyDesignNumber(\'' + dn + '\')" title="Copy design #' + dn + '">'
+                + '<i class="fas fa-copy"></i>'
+            + '</button>'
+        + '</div>';
+    }
+
+    // --- Show All Results ---
+    window.showAllResults = function () {
+        var grid = document.getElementById('design-grid');
+        var showAllBar = document.getElementById('show-all-bar');
+
+        // Render remaining cards
+        var remaining = filteredResults.slice(INITIAL_RENDER_COUNT);
+        var temp = document.createElement('div');
+        temp.innerHTML = remaining.map(buildCardHtml).join('');
+        while (temp.firstChild) {
+            grid.appendChild(temp.firstChild);
+        }
+        displayedCount = filteredResults.length;
+
+        // Remove the show-all bar
+        if (showAllBar) showAllBar.remove();
+
+        // Update results header
+        var countEl = document.getElementById('results-count');
+        if (countEl) countEl.textContent = filteredResults.length + ' designs';
+
+        // Lazy-load thumbnails for remaining
+        lazyLoadThumbnails(remaining, grid);
+    };
+
+    // --- Lazy Load Thumbnails (extracted helper) ---
+    function lazyLoadThumbnails(designs, grid) {
+        if (typeof DesignThumbnailService === 'undefined') return;
+
+        var noImageDesigns = designs.filter(function (d) { return !d.thumbnailUrl && !d.artworkUrl; })
+            .map(function (d) { return String(d.designNumber); }).slice(0, 20);
+
+        if (noImageDesigns.length > 0) {
+            DesignThumbnailService.fetchThumbnailsBatch(noImageDesigns).then(function (thumbMap) {
+                for (var dn in thumbMap) {
+                    if (thumbMap[dn]) {
+                        var cards = grid.querySelectorAll('.design-card');
+                        cards.forEach(function (card) {
+                            var numEl = card.querySelector('.card-number');
+                            if (numEl && numEl.textContent === '#' + dn) {
+                                var thumbDiv = card.querySelector('.card-thumb');
+                                if (thumbDiv && thumbDiv.querySelector('.thumb-placeholder')) {
+                                    thumbDiv.innerHTML = '<img src="' + escapeHtml(thumbMap[dn]) + '" alt="Design" loading="lazy">';
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
         }
     }
 
-    // --- Detail Panel ---
+    // --- Design Modal (centered) ---
+    window.openDesignModal = function (designNumber) {
+        var design = currentResults.find(function (d) { return String(d.designNumber) === designNumber; });
+        if (!design) return;
+
+        var modal = document.getElementById('design-modal');
+        var overlay = document.getElementById('design-modal-overlay');
+        var body = document.getElementById('design-modal-body');
+
+        var thumbUrl = design.thumbnailUrl || design.artworkUrl || '';
+        var dstArr = design.dstFilenames || [];
+        var tierValue = design.maxStitchTier || 'Standard';
+        var tierClass = tierValue.toLowerCase().replace(/\s+/g, '-');
+
+        body.innerHTML = ''
+            + '<div class="modal-design-header">'
+                + '<h2 class="modal-design-number">Design #' + escapeHtml(designNumber) + '</h2>'
+                + (design.company ? '<div class="modal-design-company">' + escapeHtml(design.company) + '</div>' : '')
+                + (design.designName ? '<div class="modal-design-name">' + escapeHtml(design.designName) + '</div>' : '')
+            + '</div>'
+            + (thumbUrl
+                ? '<div class="modal-design-image"><img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler modal-no-image\\\' style=\\\'font-size:64px;color:#d1d5db\\\'></i>\'"></div>'
+                : '<div class="modal-design-image"><i class="fas fa-pencil-ruler" style="font-size:64px;color:#d1d5db"></i></div>')
+            + '<button class="btn-copy-modal" onclick="copyDesignNumber(\'' + escapeHtml(designNumber) + '\')">'
+                + '<i class="fas fa-copy"></i> Copy Design #' + escapeHtml(designNumber)
+            + '</button>'
+            + buildDetailSections(design, tierClass, dstArr);
+
+        overlay.classList.add('active');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeDesignModal = function () {
+        var modal = document.getElementById('design-modal');
+        var overlay = document.getElementById('design-modal-overlay');
+        if (modal) modal.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    // --- Build Detail Sections (shared by modal and side panel) ---
+    function buildDetailSections(design, tierClass, dstArr) {
+        var tierValue = design.maxStitchTier || 'Standard';
+        var html = '';
+
+        // Basic info
+        html += '<div class="modal-section">';
+        if (design.customerId) {
+            html += '<div class="modal-row"><span class="modal-label">Customer #</span><span class="modal-value">' + escapeHtml(design.customerId) + '</span></div>';
+        }
+        html += '<div class="modal-row"><span class="modal-label">Stitch Tier</span><span class="modal-value"><span class="tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(tierValue) + '</span></span></div>';
+        if (design.maxStitchCount) {
+            html += '<div class="modal-row"><span class="modal-label">Max Stitch Count</span><span class="modal-value">' + design.maxStitchCount.toLocaleString() + '</span></div>';
+        }
+        if (design.placement) {
+            html += '<div class="modal-row"><span class="modal-label">Placement</span><span class="modal-value">' + escapeHtml(design.placement) + '</span></div>';
+        }
+        if (design.threadColors) {
+            html += '<div class="modal-row"><span class="modal-label">Thread Colors</span><span class="modal-value modal-threads">' + escapeHtml(design.threadColors) + '</span></div>';
+        }
+        html += '</div>';
+
+        // DST files (full list, not truncated — key for Ruthie)
+        if (dstArr.length > 0) {
+            html += '<div class="modal-section">'
+                + '<div class="modal-section-title"><i class="fas fa-file-code"></i> DST Files (' + dstArr.length + ')</div>';
+            dstArr.forEach(function (f) {
+                html += '<div class="modal-dst-file"><i class="fas fa-file"></i> ' + escapeHtml(f) + '</div>';
+            });
+            html += '</div>';
+        }
+
+        // Order history
+        if (design.orderCount > 0 || design.lastOrderDate) {
+            html += '<div class="modal-section">';
+            if (design.orderCount > 0) {
+                html += '<div class="modal-row"><span class="modal-label">Order Count</span><span class="modal-value">' + design.orderCount + ' orders</span></div>';
+            }
+            if (design.lastOrderDate) {
+                html += '<div class="modal-row"><span class="modal-label">Last Order</span><span class="modal-value">'
+                    + new Date(design.lastOrderDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    + '</span></div>';
+            }
+            html += '</div>';
+        }
+
+        // Art notes
+        if (design.artNotes) {
+            html += '<div class="modal-section">'
+                + '<div class="modal-section-title"><i class="fas fa-sticky-note"></i> Art Notes</div>'
+                + '<p class="modal-notes">' + escapeHtml(design.artNotes) + '</p>'
+                + '</div>';
+        }
+
+        return html;
+    }
+
+    // --- Side Panel (kept for backward compatibility) ---
     window.openDetail = function (designNumber) {
         var design = currentResults.find(function (d) { return String(d.designNumber) === designNumber; });
         if (!design) return;
@@ -252,25 +494,7 @@
         body.innerHTML = ''
             + (thumbUrl ? '<div class="detail-image"><img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.style.display=\'none\'"></div>' : '')
             + '<button class="btn-copy-detail" onclick="copyDesignNumber(\'' + escapeHtml(designNumber) + '\')"><i class="fas fa-copy"></i> Copy Design #' + escapeHtml(designNumber) + '</button>'
-            + '<div class="detail-section">'
-                + '<div class="detail-row"><span class="detail-label">Company</span><span class="detail-value">' + escapeHtml(design.company || 'Unknown') + '</span></div>'
-                + (design.designName ? '<div class="detail-row"><span class="detail-label">Design Name</span><span class="detail-value">' + escapeHtml(design.designName) + '</span></div>' : '')
-                + (design.customerId ? '<div class="detail-row"><span class="detail-label">Customer #</span><span class="detail-value">' + escapeHtml(design.customerId) + '</span></div>' : '')
-            + '</div>'
-            + '<div class="detail-section">'
-                + '<div class="detail-row"><span class="detail-label">Stitch Tier</span><span class="detail-value"><span class="tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(design.maxStitchTier || 'Standard') + '</span></span></div>'
-                + (design.maxStitchCount ? '<div class="detail-row"><span class="detail-label">Max Stitch Count</span><span class="detail-value">' + design.maxStitchCount.toLocaleString() + '</span></div>' : '')
-                + (design.placement ? '<div class="detail-row"><span class="detail-label">Placement</span><span class="detail-value">' + escapeHtml(design.placement) + '</span></div>' : '')
-                + (design.threadColors ? '<div class="detail-row"><span class="detail-label">Thread Colors</span><span class="detail-value detail-threads">' + escapeHtml(design.threadColors) + '</span></div>' : '')
-            + '</div>'
-            + (dstArr.length > 0 ? '<div class="detail-section"><div class="detail-section-title"><i class="fas fa-file-code"></i> DST Files (' + dstArr.length + ')</div>'
-                + dstArr.map(function (f) { return '<div class="dst-file-row"><i class="fas fa-file"></i> ' + escapeHtml(f) + '</div>'; }).join('')
-            + '</div>' : '')
-            + ((design.orderCount > 0 || design.lastOrderDate) ? '<div class="detail-section">'
-                + (design.orderCount > 0 ? '<div class="detail-row"><span class="detail-label">Order Count</span><span class="detail-value">' + design.orderCount + ' orders</span></div>' : '')
-                + (design.lastOrderDate ? '<div class="detail-row"><span class="detail-label">Last Order</span><span class="detail-value">' + new Date(design.lastOrderDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + '</span></div>' : '')
-            + '</div>' : '')
-            + (design.artNotes ? '<div class="detail-section"><div class="detail-section-title"><i class="fas fa-sticky-note"></i> Art Notes</div><p class="detail-notes">' + escapeHtml(design.artNotes) + '</p></div>' : '');
+            + buildDetailSections(design, tierClass, dstArr);
 
         overlay.classList.add('active');
         panel.classList.add('active');
@@ -278,8 +502,10 @@
     };
 
     window.closeDetail = function () {
-        document.getElementById('detail-panel').classList.remove('active');
-        document.getElementById('detail-overlay').classList.remove('active');
+        var panel = document.getElementById('detail-panel');
+        var overlay = document.getElementById('detail-overlay');
+        if (panel) panel.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
         document.body.style.overflow = '';
     };
 
@@ -290,7 +516,6 @@
                 showToast('Design #' + designNumber + ' copied!', 'success');
             });
         } else {
-            // Fallback
             var ta = document.createElement('textarea');
             ta.value = designNumber;
             document.body.appendChild(ta);
@@ -308,6 +533,10 @@
         document.getElementById('search-clear').style.display = 'none';
         currentResults = [];
         filteredResults = [];
+        activeTier = 'all';
+        activeCompany = 'all';
+        resetTierChips();
+        hideCompanyChips();
         showEmpty();
         input.focus();
     };
@@ -319,6 +548,8 @@
         document.getElementById('no-results').style.display = 'none';
         document.getElementById('results-header').style.display = 'none';
         document.getElementById('design-grid').style.display = 'none';
+        var old = document.getElementById('show-all-bar');
+        if (old) old.remove();
     }
 
     function showEmpty() {
@@ -339,8 +570,18 @@
     function showResultsHeader(shown, total, query) {
         var header = document.getElementById('results-header');
         header.style.display = 'flex';
-        document.getElementById('results-count').textContent = shown + (total > shown ? ' of ' + total : '') + ' designs';
-        document.getElementById('results-query').textContent = query ? 'for "' + query + '"' : '';
+
+        var countText = shown + (total > shown ? ' of ' + total : '') + ' designs';
+
+        // Add "Show all" link if there are hidden results already loaded client-side
+        if (filteredResults.length > INITIAL_RENDER_COUNT && displayedCount < filteredResults.length) {
+            countText += ' <a href="#" class="show-all-link" onclick="event.preventDefault(); showAllResults();">Show all</a>';
+        }
+
+        document.getElementById('results-count').innerHTML = countText;
+        var queryEl = document.getElementById('results-query');
+        queryEl.textContent = query ? 'for \u201c' + query + '\u201d' : '';
+        queryEl.dataset.query = query || '';
     }
 
     // --- Toast ---
@@ -355,7 +596,7 @@
         setTimeout(function () {
             toast.classList.remove('show');
             setTimeout(function () { toast.remove(); }, 300);
-        }, 2500);
+        }, type === 'success' ? 3000 : 2500);
     }
     window.showToast = showToast;
 

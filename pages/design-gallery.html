@@ -58,6 +58,9 @@
             <button class="chip" data-tier="Large" onclick="filterByTier('Large')">Large</button>
             <button class="chip" data-tier="Full Back" onclick="filterByTier('Full Back')">Full Back</button>
         </div>
+
+        <!-- Dynamic Company Filter Chips (populated by JS after search) -->
+        <div class="company-chips" id="company-chips" style="display:none;"></div>
     </div>
 
     <!-- Results -->
@@ -105,6 +108,13 @@
             <button class="detail-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
         </div>
         <div class="detail-body" id="detail-body"></div>
+    </div>
+
+    <!-- Design Detail Modal (centered) -->
+    <div class="design-modal-overlay" id="design-modal-overlay" onclick="closeDesignModal()"></div>
+    <div class="design-modal" id="design-modal">
+        <button class="design-modal-close" onclick="closeDesignModal()"><i class="fas fa-times"></i></button>
+        <div class="design-modal-body" id="design-modal-body"></div>
     </div>
 
     <!-- Toast -->
