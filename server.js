@@ -2785,6 +2785,15 @@ app.get('/api/quote_items/quote/:quoteId', async (req, res) => {
   }
 });
 
+// Public design view page - shareable customer-facing design images
+app.get('/design/:designNumber', (req, res) => {
+  const designNumber = req.params.designNumber;
+  if (!designNumber || !/^\d+$/.test(designNumber)) {
+    return res.status(400).send('Invalid design number');
+  }
+  res.sendFile(path.join(__dirname, 'pages', 'design-view.html'));
+});
+
 // Public quote page route - serves the HTML
 app.get('/quote/:quoteId', (req, res) => {
   // Validate quote ID format - accept multiple formats:

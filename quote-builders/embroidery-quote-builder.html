@@ -3848,6 +3848,7 @@ Company:Absher Construction Company
                 maxStitchTier: designData.maxStitchTier || 'Standard',
                 placement: designData.placement || '',
                 thumbnailUrl: designData.thumbnailUrl || '',
+                dstPreviewUrl: designData.dstPreviewUrl || '',
                 artworkUrl: designData.artworkUrl || '',
                 customerId: designData.customerId || '',
                 threadColors: designData.threadColors || '',
@@ -4141,7 +4142,7 @@ Company:Absher Construction Company
             showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
 
             // Use thumbnail from enriched /lookup response (faster, no extra API call)
-            const thumbUrl = design.mockupUrl || design.thumbnailUrl || design.artworkUrl || '';
+            const thumbUrl = design.mockupUrl || design.dstPreviewUrl || design.thumbnailUrl || design.artworkUrl || '';
             if (thumbUrl) {
                 showDesignThumbnail(type, thumbUrl);
                 if (type === 'garment') {
@@ -10049,7 +10050,7 @@ Company:Absher Construction Company
                             const { num, label, dbInfo, inDb, fallbackInfo } = entry;
 
                             // Design entry row with optional thumbnail
-                            const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
+                            const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.dstPreviewUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
                             const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
 
                             bannerHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;

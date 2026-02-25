@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Design Preview - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/css/design-view.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="dv-header">
+        <div class="dv-header-inner">
+            <img src="/images/nwca-logo.png" alt="Northwest Custom Apparel" class="dv-logo" onerror="this.style.display='none'">
+            <div class="dv-header-text">
+                <h1>Northwest Custom Apparel</h1>
+                <span>Design Preview</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="dv-loading" id="dv-loading">
+        <div class="dv-spinner"></div>
+        <p>Loading design...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="dv-error" id="dv-error" style="display:none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <h2 id="dv-error-title">Design Not Found</h2>
+        <p id="dv-error-msg">The design you're looking for doesn't exist or may have been removed.</p>
+        <p class="dv-contact">Questions? Call us at <a href="tel:2539225793">253-922-5793</a></p>
+    </div>
+
+    <!-- Design Content -->
+    <main class="dv-content" id="dv-content" style="display:none;">
+        <!-- Design Info -->
+        <div class="dv-info">
+            <h2 class="dv-design-number" id="dv-design-number"></h2>
+            <div class="dv-company" id="dv-company"></div>
+            <div class="dv-name" id="dv-name"></div>
+        </div>
+
+        <!-- Hero Image -->
+        <div class="dv-hero" id="dv-hero">
+            <img id="dv-hero-img" src="" alt="Design preview" onclick="openLightbox(this.src)">
+        </div>
+
+        <!-- Image Grid -->
+        <div class="dv-image-grid" id="dv-image-grid"></div>
+
+        <!-- No Images Fallback -->
+        <div class="dv-no-images" id="dv-no-images" style="display:none;">
+            <i class="fas fa-image"></i>
+            <p>No preview images available for this design.</p>
+            <p class="dv-contact">Contact us for more information: <a href="tel:2539225793">253-922-5793</a></p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dv-footer">
+        <div class="dv-footer-inner">
+            <p><strong>Northwest Custom Apparel</strong></p>
+            <p>253-922-5793 &bull; <a href="https://www.nwcustomapparel.com">nwcustomapparel.com</a></p>
+        </div>
+    </footer>
+
+    <!-- Lightbox Overlay -->
+    <div class="dv-lightbox" id="dv-lightbox" onclick="closeLightbox(event)">
+        <button class="dv-lightbox-close" onclick="closeLightbox(event)"><i class="fas fa-times"></i></button>
+        <img id="dv-lightbox-img" src="" alt="Full size preview">
+    </div>
+
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/pages/js/design-view.js"></script>
+</body>
+</html>

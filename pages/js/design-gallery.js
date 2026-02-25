@@ -45,9 +45,14 @@
             });
         }
 
-        // Escape key closes modal/panel
+        // Escape key closes lightbox first, then modal/panel
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
+                var lightbox = document.getElementById('gallery-lightbox');
+                if (lightbox && lightbox.classList.contains('active')) {
+                    closeGalleryLightbox();
+                    return;
+                }
                 closeDesignModal();
                 closeDetail();
             }
@@ -290,8 +295,8 @@
             : '';
         var stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
 
-        // Thumbnail — prefer mockup over DST preview
-        var thumbUrl = d.mockupUrl || d.thumbnailUrl || d.artworkUrl || '';
+        // Thumbnail — prefer mockup > DST preview > thumbnail > artwork
+        var thumbUrl = d.mockupUrl || d.dstPreviewUrl || d.thumbnailUrl || d.artworkUrl || '';
         var thumbHtml = thumbUrl
             ? '<img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + dn + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler thumb-placeholder\\\'></i>\'">'
             : '<i class="fas fa-pencil-ruler thumb-placeholder"></i>';
@@ -313,7 +318,7 @@
             + '<div class="card-thumb">' + thumbHtml + '</div>'
             + '<div class="card-info">'
                 + '<div class="card-number">#' + dn + '</div>'
-                + (company ? '<div class="card-company" title="' + escapeHtml(company) + '">' + escapeHtml(company) + '</div>' : '')
+                + (company ? '<div class="card-company" title="' + escapeHtml(company) + '">' + escapeHtml(company) + (d.customerId ? ' <span class="card-cust-id">#' + escapeHtml(String(d.customerId)) + '</span>' : '') + '</div>' : '')
                 + (name ? '<div class="card-name" title="' + escapeHtml(name) + '">' + escapeHtml(name) + '</div>' : '')
                 + '<div class="card-meta">' + tierBadge + (stitchText ? ' <span class="card-stitch">' + stitchText + '</span>' : '') + '</div>'
                 + ((placementBadge || threadText) ? '<div class="card-detail">' + placementBadge + (threadText ? '<span class="card-threads" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
@@ -354,7 +359,7 @@
     function lazyLoadThumbnails(designs, grid) {
         if (typeof DesignThumbnailService === 'undefined') return;
 
-        var noImageDesigns = designs.filter(function (d) { return !d.mockupUrl && !d.thumbnailUrl && !d.artworkUrl; })
+        var noImageDesigns = designs.filter(function (d) { return !d.mockupUrl && !d.dstPreviewUrl && !d.thumbnailUrl && !d.artworkUrl; })
             .map(function (d) { return String(d.designNumber); }).slice(0, 20);
 
         if (noImageDesigns.length > 0) {
@@ -386,10 +391,21 @@
         var overlay = document.getElementById('design-modal-overlay');
         var body = document.getElementById('design-modal-body');
 
-        var displayUrl = design.mockupUrl || design.thumbnailUrl || design.artworkUrl || '';
+        var displayUrl = design.mockupUrl || design.dstPreviewUrl || design.thumbnailUrl || design.artworkUrl || '';
         var dstArr = design.dstFilenames || [];
         var tierValue = design.maxStitchTier || 'Standard';
         var tierClass = tierValue.toLowerCase().replace(/\s+/g, '-');
+
+        // Build image gallery — collect all unique images with labels
+        var allImages = [];
+        if (design.mockupUrl) allImages.push({ url: design.mockupUrl, label: 'Mockup', icon: 'fa-tshirt' });
+        if (design.dstPreviewUrl) allImages.push({ url: design.dstPreviewUrl, label: 'DST Preview', icon: 'fa-microchip' });
+        if (design.thumbnailUrl && design.thumbnailUrl !== design.dstPreviewUrl && design.thumbnailUrl !== design.mockupUrl) {
+            allImages.push({ url: design.thumbnailUrl, label: 'Thumbnail', icon: 'fa-image' });
+        }
+        if (design.artworkUrl && design.artworkUrl !== design.thumbnailUrl && design.artworkUrl !== design.mockupUrl) {
+            allImages.push({ url: design.artworkUrl, label: 'Artwork', icon: 'fa-palette' });
+        }
 
         body.innerHTML = ''
             + '<div class="modal-design-header">'
@@ -398,10 +414,11 @@
                 + (design.designName ? '<div class="modal-design-name">' + escapeHtml(design.designName) + '</div>' : '')
             + '</div>'
             + (displayUrl
-                ? '<div class="modal-design-image"><img src="' + escapeHtml(displayUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler modal-no-image\\\' style=\\\'font-size:64px;color:#d1d5db\\\'></i>\'"></div>'
-                : '<div class="modal-design-image"><i class="fas fa-pencil-ruler" style="font-size:64px;color:#d1d5db"></i></div>')
-            + '<button class="btn-copy-modal" onclick="copyDesignNumber(\'' + escapeHtml(designNumber) + '\')">'
-                + '<i class="fas fa-copy"></i> Copy Design #' + escapeHtml(designNumber)
+                ? '<div class="modal-design-image" id="modal-main-image"><img src="' + escapeHtml(displayUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onclick="openGalleryLightbox(this.src)" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler modal-no-image\\\' style=\\\'font-size:64px;color:#d1d5db\\\'></i>\'"></div>'
+                : '<div class="modal-design-image" id="modal-main-image"><i class="fas fa-pencil-ruler" style="font-size:64px;color:#d1d5db"></i></div>')
+            + buildImageGalleryHtml(allImages, displayUrl)
+            + '<button class="btn-share-modal" onclick="shareDesignWithCustomer(\'' + escapeHtml(designNumber) + '\')">'
+                + '<i class="fas fa-share-alt"></i> Share with Customer'
             + '</button>'
             + buildDetailSections(design, tierClass, dstArr);
 
@@ -416,6 +433,35 @@
         if (modal) modal.classList.remove('active');
         if (overlay) overlay.classList.remove('active');
         document.body.style.overflow = '';
+    };
+
+    // --- Build Image Gallery Thumbnails (labeled) ---
+    function buildImageGalleryHtml(allImages, activeUrl) {
+        if (allImages.length <= 1) return '';
+
+        var html = '<div class="modal-image-gallery">';
+        for (var i = 0; i < allImages.length; i++) {
+            var img = allImages[i];
+            var isActive = img.url === activeUrl ? ' active' : '';
+            html += '<div class="gallery-thumb' + isActive + '" onclick="swapMainImage(\'' + escapeHtml(img.url) + '\', this)" title="' + escapeHtml(img.label) + '">'
+                + '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(img.label) + '" onerror="this.parentElement.style.display=\'none\'">'
+                + '<span class="gallery-label"><i class="fas ' + img.icon + '"></i> ' + escapeHtml(img.label) + '</span>'
+                + '</div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    // --- Swap main image on gallery thumb click ---
+    window.swapMainImage = function (url, thumbEl) {
+        var mainImage = document.getElementById('modal-main-image');
+        if (mainImage) {
+            mainImage.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design preview">';
+        }
+        // Update active state on gallery thumbs
+        var gallery = thumbEl.parentElement;
+        gallery.querySelectorAll('.gallery-thumb').forEach(function (t) { t.classList.remove('active'); });
+        thumbEl.classList.add('active');
     };
 
     // --- Build Detail Sections (shared by modal and side panel) ---
@@ -472,14 +518,6 @@
                 + '</div>';
         }
 
-        // DST Preview — show small stitch preview when mockup is the main image
-        if (design.mockupUrl && design.thumbnailUrl && design.thumbnailUrl !== design.mockupUrl) {
-            html += '<div class="modal-section">'
-                + '<div class="modal-section-title"><i class="fas fa-microchip"></i> DST Stitch Preview</div>'
-                + '<div class="modal-dst-preview"><img src="' + escapeHtml(design.thumbnailUrl) + '" alt="DST stitch preview" onerror="this.parentElement.parentElement.style.display=\'none\'"></div>'
-                + '</div>';
-        }
-
         return html;
     }
 
@@ -495,13 +533,13 @@
 
         title.textContent = 'Design #' + designNumber;
 
-        var displayUrl = design.mockupUrl || design.thumbnailUrl || design.artworkUrl || '';
+        var displayUrl = design.mockupUrl || design.dstPreviewUrl || design.thumbnailUrl || design.artworkUrl || '';
         var dstArr = design.dstFilenames || [];
         var tierClass = (design.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
 
         body.innerHTML = ''
-            + (displayUrl ? '<div class="detail-image"><img src="' + escapeHtml(displayUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.style.display=\'none\'"></div>' : '')
-            + '<button class="btn-copy-detail" onclick="copyDesignNumber(\'' + escapeHtml(designNumber) + '\')"><i class="fas fa-copy"></i> Copy Design #' + escapeHtml(designNumber) + '</button>'
+            + (displayUrl ? '<div class="detail-image"><img src="' + escapeHtml(displayUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onclick="openGalleryLightbox(this.src)" onerror="this.parentElement.style.display=\'none\'"></div>' : '')
+            + '<button class="btn-share-detail" onclick="shareDesignWithCustomer(\'' + escapeHtml(designNumber) + '\')"><i class="fas fa-share-alt"></i> Share with Customer</button>'
             + buildDetailSections(design, tierClass, dstArr);
 
         overlay.classList.add('active');
@@ -607,6 +645,42 @@
         }, type === 'success' ? 3000 : 2500);
     }
     window.showToast = showToast;
+
+    // --- Share Design with Customer ---
+    window.shareDesignWithCustomer = function (designNumber) {
+        var url = window.location.origin + '/design/' + designNumber;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function () {
+                showToast('Customer link copied! ' + url, 'success');
+            });
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Customer link copied! ' + url, 'success');
+        }
+    };
+
+    // --- Gallery Lightbox (full-screen zoom for staff modal images) ---
+    window.openGalleryLightbox = function (src) {
+        if (!src) return;
+        var overlay = document.getElementById('gallery-lightbox');
+        var img = document.getElementById('gallery-lightbox-img');
+        if (!overlay || !img) return;
+        img.src = src;
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeGalleryLightbox = function (e) {
+        if (e && e.target && e.target.id === 'gallery-lightbox-img') return;
+        var overlay = document.getElementById('gallery-lightbox');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    };
 
     // --- Escape HTML ---
     function escapeHtml(str) {

@@ -442,6 +442,13 @@ body {
     line-height: 1.3;
 }
 
+.card-cust-id {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
 .card-name {
     font-size: 11px;
     color: #64748b;
@@ -591,7 +598,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.95);
-    width: 560px;
+    width: 680px;
     max-width: 92vw;
     max-height: 88vh;
     background: white;
@@ -658,7 +665,7 @@ body {
 
 .modal-design-image {
     width: 100%;
-    height: 280px;
+    height: 420px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -671,8 +678,9 @@ body {
 
 .modal-design-image img {
     max-width: 100%;
-    max-height: 280px;
+    max-height: 420px;
     object-fit: contain;
+    cursor: zoom-in;
 }
 
 .modal-no-image i {
@@ -680,10 +688,10 @@ body {
     color: #d1d5db;
 }
 
-.btn-copy-modal {
+.btn-share-modal {
     width: 100%;
     padding: 12px;
-    background: #6366f1;
+    background: #2e5827;
     color: white;
     border: none;
     border-radius: 8px;
@@ -694,8 +702,8 @@ body {
     transition: background 0.2s;
 }
 
-.btn-copy-modal:hover { background: #4f46e5; }
-.btn-copy-modal i { margin-right: 6px; }
+.btn-share-modal:hover { background: #1e3d1a; }
+.btn-share-modal i { margin-right: 6px; }
 
 /* Reuse detail-section styles for modal content */
 .modal-section {
@@ -779,6 +787,59 @@ body {
     border-radius: 6px;
     border: 1px solid #e5e7eb;
     background: #fafafa;
+}
+
+/* === Image Gallery (labeled thumbnails below main image) === */
+.modal-image-gallery {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 8px 0 4px;
+    flex-wrap: wrap;
+}
+
+.gallery-thumb {
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 4px;
+    background: #fafafa;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    max-width: 120px;
+}
+
+.gallery-thumb:hover {
+    border-color: #2e5827;
+    box-shadow: 0 2px 8px rgba(46, 88, 39, 0.15);
+}
+
+.gallery-thumb.active {
+    border-color: #2e5827;
+    box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.2);
+}
+
+.gallery-thumb img {
+    width: 100px;
+    height: 75px;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+}
+
+.gallery-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.gallery-thumb.active .gallery-label {
+    color: #2e5827;
     object-fit: contain;
 }
 
@@ -861,12 +922,13 @@ body {
     max-width: 100%;
     max-height: 220px;
     object-fit: contain;
+    cursor: zoom-in;
 }
 
-.btn-copy-detail {
+.btn-share-detail {
     width: 100%;
     padding: 10px;
-    background: #6366f1;
+    background: #2e5827;
     color: white;
     border: none;
     border-radius: 8px;
@@ -877,8 +939,8 @@ body {
     transition: background 0.2s;
 }
 
-.btn-copy-detail:hover { background: #4f46e5; }
-.btn-copy-detail i { margin-right: 6px; }
+.btn-share-detail:hover { background: #1e3d1a; }
+.btn-share-detail i { margin-right: 6px; }
 
 .detail-section {
     margin-bottom: 16px;
@@ -948,6 +1010,56 @@ body {
     color: #374151;
     line-height: 1.5;
     white-space: pre-wrap;
+}
+
+/* === Gallery Lightbox (full-screen zoom) === */
+.gallery-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.gallery-lightbox.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.gallery-lightbox img {
+    max-width: 92vw;
+    max-height: 92vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    z-index: 501;
+}
+
+.gallery-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* === Toast === */

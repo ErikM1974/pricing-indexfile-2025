@@ -51,8 +51,11 @@
 | `/pages/data-entry-guide.js` | **NEW** API price fetching for data entry guide | /api/service-codes | ✅ Active |
 | `/pages/data-entry-guide.css` | **NEW** Data entry guide styles (print-friendly) | — | ✅ Active |
 | `/pages/design-gallery.html` | **NEW** Standalone design gallery — search 39K+ digitized designs | design-gallery.js, design-gallery.css, design-thumbnail-service.js, app-config.js | ✅ Active |
-| `/pages/js/design-gallery.js` | **NEW** Design gallery controller — search, cards, detail panel, clipboard copy | /api/digitized-designs/search-all, /by-customer | ✅ Active |
-| `/pages/css/design-gallery.css` | **NEW** Design gallery page styles (responsive grid, cards, detail panel) | — | ✅ Active |
+| `/pages/js/design-gallery.js` | **NEW** Design gallery controller — search, cards, share with customer, lightbox zoom | /api/digitized-designs/search-all, /by-customer | ✅ Active |
+| `/pages/css/design-gallery.css` | **NEW** Design gallery page styles (responsive grid, cards, enlarged modal, lightbox) | — | ✅ Active |
+| `/pages/design-view.html` | **NEW** Public customer-facing design preview page — shareable via /design/:designNumber | design-view.js, design-view.css, app-config.js | ✅ Active |
+| `/pages/js/design-view.js` | **NEW** Customer design view — fetches design images, renders gallery + lightbox | /api/digitized-designs/lookup | ✅ Active |
+| `/pages/css/design-view.css` | **NEW** Customer design view styles (branded, responsive, lightbox overlay) | — | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 
