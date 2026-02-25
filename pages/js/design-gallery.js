@@ -290,8 +290,8 @@
             : '';
         var stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
 
-        // Thumbnail
-        var thumbUrl = d.thumbnailUrl || d.artworkUrl || '';
+        // Thumbnail — prefer mockup over DST preview
+        var thumbUrl = d.mockupUrl || d.thumbnailUrl || d.artworkUrl || '';
         var thumbHtml = thumbUrl
             ? '<img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + dn + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler thumb-placeholder\\\'></i>\'">'
             : '<i class="fas fa-pencil-ruler thumb-placeholder"></i>';
@@ -354,7 +354,7 @@
     function lazyLoadThumbnails(designs, grid) {
         if (typeof DesignThumbnailService === 'undefined') return;
 
-        var noImageDesigns = designs.filter(function (d) { return !d.thumbnailUrl && !d.artworkUrl; })
+        var noImageDesigns = designs.filter(function (d) { return !d.mockupUrl && !d.thumbnailUrl && !d.artworkUrl; })
             .map(function (d) { return String(d.designNumber); }).slice(0, 20);
 
         if (noImageDesigns.length > 0) {
@@ -386,7 +386,7 @@
         var overlay = document.getElementById('design-modal-overlay');
         var body = document.getElementById('design-modal-body');
 
-        var thumbUrl = design.thumbnailUrl || design.artworkUrl || '';
+        var displayUrl = design.mockupUrl || design.thumbnailUrl || design.artworkUrl || '';
         var dstArr = design.dstFilenames || [];
         var tierValue = design.maxStitchTier || 'Standard';
         var tierClass = tierValue.toLowerCase().replace(/\s+/g, '-');
@@ -397,8 +397,8 @@
                 + (design.company ? '<div class="modal-design-company">' + escapeHtml(design.company) + '</div>' : '')
                 + (design.designName ? '<div class="modal-design-name">' + escapeHtml(design.designName) + '</div>' : '')
             + '</div>'
-            + (thumbUrl
-                ? '<div class="modal-design-image"><img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler modal-no-image\\\' style=\\\'font-size:64px;color:#d1d5db\\\'></i>\'"></div>'
+            + (displayUrl
+                ? '<div class="modal-design-image"><img src="' + escapeHtml(displayUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler modal-no-image\\\' style=\\\'font-size:64px;color:#d1d5db\\\'></i>\'"></div>'
                 : '<div class="modal-design-image"><i class="fas fa-pencil-ruler" style="font-size:64px;color:#d1d5db"></i></div>')
             + '<button class="btn-copy-modal" onclick="copyDesignNumber(\'' + escapeHtml(designNumber) + '\')">'
                 + '<i class="fas fa-copy"></i> Copy Design #' + escapeHtml(designNumber)
@@ -472,6 +472,14 @@
                 + '</div>';
         }
 
+        // DST Preview — show small stitch preview when mockup is the main image
+        if (design.mockupUrl && design.thumbnailUrl && design.thumbnailUrl !== design.mockupUrl) {
+            html += '<div class="modal-section">'
+                + '<div class="modal-section-title"><i class="fas fa-microchip"></i> DST Stitch Preview</div>'
+                + '<div class="modal-dst-preview"><img src="' + escapeHtml(design.thumbnailUrl) + '" alt="DST stitch preview" onerror="this.parentElement.parentElement.style.display=\'none\'"></div>'
+                + '</div>';
+        }
+
         return html;
     }
 
@@ -487,12 +495,12 @@
 
         title.textContent = 'Design #' + designNumber;
 
-        var thumbUrl = design.thumbnailUrl || design.artworkUrl || '';
+        var displayUrl = design.mockupUrl || design.thumbnailUrl || design.artworkUrl || '';
         var dstArr = design.dstFilenames || [];
         var tierClass = (design.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
 
         body.innerHTML = ''
-            + (thumbUrl ? '<div class="detail-image"><img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.style.display=\'none\'"></div>' : '')
+            + (displayUrl ? '<div class="detail-image"><img src="' + escapeHtml(displayUrl) + '" alt="Design #' + escapeHtml(designNumber) + '" onerror="this.parentElement.style.display=\'none\'"></div>' : '')
             + '<button class="btn-copy-detail" onclick="copyDesignNumber(\'' + escapeHtml(designNumber) + '\')"><i class="fas fa-copy"></i> Copy Design #' + escapeHtml(designNumber) + '</button>'
             + buildDetailSections(design, tierClass, dstArr);
 

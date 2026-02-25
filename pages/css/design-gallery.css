@@ -768,6 +768,20 @@ body {
     white-space: pre-wrap;
 }
 
+.modal-dst-preview {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.modal-dst-preview img {
+    max-width: 180px;
+    max-height: 140px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #fafafa;
+    object-fit: contain;
+}
+
 /* === Detail Panel (slide-in, kept as backup) === */
 .detail-overlay {
     position: fixed;

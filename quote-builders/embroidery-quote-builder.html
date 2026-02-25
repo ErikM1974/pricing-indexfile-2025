@@ -4141,7 +4141,7 @@ Company:Absher Construction Company
             showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
 
             // Use thumbnail from enriched /lookup response (faster, no extra API call)
-            const thumbUrl = design.thumbnailUrl || design.artworkUrl || '';
+            const thumbUrl = design.mockupUrl || design.thumbnailUrl || design.artworkUrl || '';
             if (thumbUrl) {
                 showDesignThumbnail(type, thumbUrl);
                 if (type === 'garment') {
@@ -4551,7 +4551,7 @@ Company:Absher Construction Company
          */
         function buildDesignSearchCardHtml(d) {
             const dn = escapeHtml(String(d.designNumber));
-            const previewUrl = d.artworkUrl || d.thumbnailUrl || null;
+            const previewUrl = d.mockupUrl || d.artworkUrl || d.thumbnailUrl || null;
             const thumbHtml = previewUrl
                 ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
                 : '<i class="fas fa-image"></i>';
@@ -4614,7 +4614,7 @@ Company:Absher Construction Company
          */
         function lazyLoadDesignSearchThumbnails(designs, container) {
             if (typeof DesignThumbnailService === 'undefined') return;
-            const noImage = designs.filter(d => !d.artworkUrl && !d.thumbnailUrl).map(d => String(d.designNumber)).slice(0, 20);
+            const noImage = designs.filter(d => !d.mockupUrl && !d.artworkUrl && !d.thumbnailUrl).map(d => String(d.designNumber)).slice(0, 20);
             if (noImage.length === 0) return;
 
             DesignThumbnailService.fetchThumbnailsBatch(noImage).then(thumbMap => {
@@ -4744,7 +4744,7 @@ Company:Absher Construction Company
                 if (input) input.value = designNum;
 
                 // Show thumbnail instantly from partial cache
-                const previewUrl = cached?.artworkUrl || cached?.thumbnailUrl || null;
+                const previewUrl = cached?.mockupUrl || cached?.artworkUrl || cached?.thumbnailUrl || null;
                 if (previewUrl) {
                     showDesignThumbnail(_designSearchTarget, previewUrl);
                     if (_designSearchTarget === 'garment') primaryLogo.thumbnailUrl = previewUrl;
@@ -10049,7 +10049,7 @@ Company:Absher Construction Company
                             const { num, label, dbInfo, inDb, fallbackInfo } = entry;
 
                             // Design entry row with optional thumbnail
-                            const thumbUrl = inDb ? (dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
+                            const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
                             const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
 
                             bannerHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
