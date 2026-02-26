@@ -127,7 +127,8 @@
       "Bash(shopworks \")",
       "Bash(manageorders \")",
       "Bash(where:*)",
-      "Bash(pdftotext:*)"
+      "Bash(pdftotext:*)",
+      "WebFetch(domain:northwestcustomapparel.box.com)"
     ],
     "deny": [],
     "ask": [],

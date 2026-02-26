@@ -29,6 +29,56 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Data Quality: Design_Lookup_2026 — ID_Unique is Empty, Use Design_Number for WHERE (2026-02-26)
+
+**Problem:** Phase 4 of the 7-phase audit script (`audit-fix-design-lookup.js`) attempted to clean newlines from Art_Notes using `WHERE ID_Unique=${rec.ID_Unique}`. All 1,451 records failed — 104 with 400 errors, 1,347 with 0 records affected.
+
+**Root Cause:** `ID_Unique` field is empty/null for ALL records in `Design_Lookup_2026`. The field exists in the schema but was never populated (likely an AutoNumber that doesn't export or a leftover from table creation). WHERE clause `ID_Unique=` → malformed SQL → 400. WHERE clause `ID_Unique=<empty>` → 0 matches.
+
+**Solution:** Changed WHERE key to `Design_Number` (which IS populated for all records). Grouped records by Design_Number to avoid redundant updates (same design = same Art_Notes). Result: 1,351 records cleaned across 363 designs (26 residual errors from Art_Notes with special characters Caspio rejects).
+
+**Prevention:** For `Design_Lookup_2026`, NEVER use `ID_Unique` in WHERE clauses — it's always empty. Use `Design_Number` (numeric, always populated) as the primary key for updates. When updating shared fields (Art_Notes, Company, etc.), group by Design_Number first since multiple DST variants share the same design. `[caspio-proxy]`
+
+---
+
+## Data Quality: Design_Lookup_2026 Full Audit Results (2026-02-26)
+
+**Context:** After sync, backfill (94.8% Customer_ID fill), and fuzzy match (26 auto-fixes), ran comprehensive 7-phase audit on 159,009 rows.
+
+**Script:** `caspio-pricing-proxy/scripts/audit-fix-design-lookup.js` (CLI: `--live`, `--phase=N`, `--verbose`)
+
+**Results (109.7 min live run):**
+- Phase 1: **7,941** DEAD records deactivated (Customer_Type='DEAD' → Is_Active='false')
+- Phase 2: **321** empty ArtRequests shells deactivated (Design_Number >= 50000, zero metadata)
+- Phase 3: **11** test entries deactivated, 22 flagged for review
+- Phase 4: **1,351** Art_Notes cleaned (newlines → "; " separator), 26 errors (re-run after fix)
+- Phase 5: **108,725** records enriched with Customer_Type (from CSV + Caspio tables)
+- Phase 6: **27,672** records enriched with Sales_Rep (Taneisha/Nika account lists)
+- Phase 7: **480** records matched Company + Customer_ID from Design_Name parsing (118 groups: 106 exact + 12 fuzzy)
+
+**Total: ~146K records updated.** CSV report: `Downloads/design-lookup-audit-2026-02-26.csv` (2,144 entries).
+
+**Key gotchas:**
+- Phase 3 "DEMO" test detection caught real companies (Rhine Demolition, DeMolay) — fixed with `FALSE_POSITIVE_RE` and `\btest\b` standalone word match
+- Phase 7 parser false positives with generic words ("Blank Golf Ball" → customer "blank") — fixed with `PARSED_BLACKLIST` and strict prefix matching (key ≥ 8 chars, key length ≥ 40% of candidate)
+- Phase 7 found fewer orphans than expected (2,722 vs 16,600) because prior backfill/fuzzy scripts already fixed most
+- Caspio API timeouts after ~6,500 sequential PUT calls — 40 timeouts in Phase 5, but non-fatal (errors caught, script continues)
+`[caspio-proxy]`
+
+---
+
+## Algorithm: Fuzzy Match Scoring — Use MAX-of-Methods, Not Weighted Average (2026-02-26)
+
+**Problem:** Fuzzy match script to fix misspelled company names in Design_Lookup_2026 only found 5 auto-fixes at ≥0.95 threshold. Known good matches like "Pro End Painting" → "ProEnd Painting" (Levenshtein 0.94) scored only 0.625 composite. "L&W Supply" → "L & W Supply" similarly under-scored.
+
+**Root Cause:** Weighted-average composite scoring (`levNorm*0.45 + levRaw*0.15 + tokenScore*0.25 + bonuses`) penalized cases where one method was very strong but another was weak. "ProEnd" tokenizes differently than "Pro End" (token Jaccard = 0.25), diluting the strong Levenshtein signal. Punctuation differences ("L&W" vs "L & W") similarly hurt token scores.
+
+**Solution:** Changed to MAX-of-methods approach: `Math.max(levNorm, levRaw, levStripped, tokenScore) + bonuses`. Added 4th method `levStripped` — removes ALL non-alphanumeric characters before Levenshtein comparison (catches "L&W" = "LW" = "L & W"). Lowered thresholds from 0.95/0.80 to 0.90/0.75 (scores are now more accurate). Results: 5 → 26 auto-fixes, all verified correct.
+
+**Prevention:** When building composite similarity scores from multiple methods, prefer MAX (best individual signal) over weighted average (dilutes strong signals). Weighted average is appropriate when methods are complementary and you want agreement; MAX is better when any single strong match is sufficient evidence. `[caspio-proxy]`
+
+---
+
 ## Optimization: Design Lookup Normalization — 4 Tables → 1 Unified Table (2026-02-24)
 
 **Problem:** `digitized-designs.js` route was 1,317 lines with 4 parallel Caspio API calls per search (Master, ShopWorks_Designs, Thumbnail_Report, ArtRequests). Each endpoint had complex merge logic (`mergeDesignResults()` ~100 lines), timeout wrappers, and field name mapping across different table schemas. Slow searches (~2-3s) and fragile code.
