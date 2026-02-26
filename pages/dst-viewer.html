@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>DST Stitch Viewer — NW Custom Apparel</title>
+<link rel="icon" href="https://images.squarespace-cdn.com/content/v1/60f1a60d5f21c03fe5549985/4e1acba2-7884-430e-ba05-42daac3dbc2a/favicon.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/pages/css/dst-viewer.css">
+</head>
+<body>
+
+<div class="header">
+  <a href="/staff-dashboard.html" title="Back to Dashboard">
+    <img src="/images/nwca-logo.png" alt="NWCA" class="header-logo" onerror="this.style.display='none'">
+  </a>
+  <div class="header-divider"></div>
+  <h1>DST Stitch Viewer</h1>
+</div>
+
+<div class="app">
+  <div class="canvas-area" id="canvasArea">
+    <div class="upload-zone" id="uploadZone">
+      <div class="upload-box">
+        <div class="upload-icon"><i class="fas fa-folder-open"></i></div>
+        <h2>Drop a .DST file here</h2>
+        <p>or click to browse</p>
+        <span class="ext">.dst</span>
+      </div>
+      <input type="file" id="fileInput" accept=".dst" style="display:none">
+    </div>
+    <canvas id="stitchCanvas" width="800" height="600" style="display:none;"></canvas>
+    <div class="canvas-toolbar" id="toolbar">
+      <button id="btnMono" onclick="setRenderMode('mono')">Mono</button>
+      <button id="btnColors" class="active" onclick="setRenderMode('colors')">Color</button>
+      <button id="btnTrace" onclick="setRenderMode('trace')">Trace</button>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Design Info</h2>
+      <button class="reload-btn" id="reloadBtn" onclick="resetViewer()">New File</button>
+    </div>
+
+    <div class="file-info" id="fileInfo">
+      <div class="name" id="fileName"></div>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label">Stitches</div><div class="stat-value" id="statStitches" style="color:var(--stitch)">—</div></div>
+        <div class="stat"><div class="stat-label">Colors</div><div class="stat-value" id="statColors" style="color:var(--thread-change)">—</div></div>
+        <div class="stat"><div class="stat-label">Jumps</div><div class="stat-value" id="statJumps" style="color:var(--jump)">—</div></div>
+        <div class="stat"><div class="stat-label">Size</div><div class="stat-value" id="statSize" style="color:var(--accent);font-size:11px;">—</div></div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="switchTab('sequence')">Color Sequence</div>
+      <div class="tab" onclick="switchTab('breaks')">Thread Breaks</div>
+    </div>
+
+    <div class="panel active" id="panelSequence">
+      <div class="scroll-list" id="colorRunsList"></div>
+    </div>
+
+    <div class="panel" id="panelBreaks">
+      <div class="scroll-list" id="breaksList"></div>
+    </div>
+
+    <div class="sidebar-empty" id="sidebarEmpty">
+      Upload a .dst file to see<br>thread breaks and color sequence
+    </div>
+
+    <div class="trace-controls" id="traceControls">
+      <div class="trace-row">
+        <button class="trace-btn" onclick="traceStep(-1)">&#9664; Prev</button>
+        <button class="trace-btn primary" id="btnPlayPause" onclick="traceTogglePlay()">&#9654; Play</button>
+        <button class="trace-btn" onclick="traceStep(1)">Next &#9654;</button>
+        <button class="trace-btn" onclick="traceShowAll()">All</button>
+        <div class="speed-control">
+          <span>Speed</span>
+          <input type="range" min="1" max="10" value="5" id="speedSlider" oninput="updateSpeed()">
+          <span id="speedLabel">5x</span>
+        </div>
+      </div>
+      <div class="trace-progress">
+        <div class="trace-bar-wrap" id="traceBarWrap" onclick="traceSeek(event)">
+          <div class="trace-bar" id="traceBar"></div>
+        </div>
+        <div class="trace-label">
+          <span id="traceRunLabel">Color 0 / 0</span>
+          <span id="traceStitchLabel">0 stitches</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="size-bar" id="sizeBar"></div>
+  </div>
+</div>
+
+<script src="/pages/js/dst-viewer.js"></script>
+</body>
+</html>
