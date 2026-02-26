@@ -555,6 +555,34 @@ body {
     border: 1px solid #e2e8f0;
 }
 
+/* Sales Rep badges */
+.rep-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.rep-taneisha { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+.rep-nika { background: #e0f2fe; color: #075985; border: 1px solid #7dd3fc; }
+
+/* Customer Type badges */
+.cust-type-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.cust-type-active { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+.cust-type-dead { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.cust-type-inactive { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+.cust-type-prospect { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+
 /* === Show All Bar === */
 .show-all-bar {
     text-align: center;

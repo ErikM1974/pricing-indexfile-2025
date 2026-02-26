@@ -301,6 +301,16 @@
             ? '<img src="' + escapeHtml(thumbUrl) + '" alt="Design #' + dn + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-pencil-ruler thumb-placeholder\\\'></i>\'">'
             : '<i class="fas fa-pencil-ruler thumb-placeholder"></i>';
 
+        // Sales Rep badge
+        var repBadge = d.salesRep ? '<span class="rep-badge rep-' + escapeHtml(d.salesRep.toLowerCase()) + '">' + escapeHtml(d.salesRep) + '</span>' : '';
+
+        // Customer Type badge (only show non-standard types)
+        var custTypeBadge = '';
+        if (d.customerType && d.customerType !== 'ACTIVE') {
+            var ctClass = d.customerType.toLowerCase().replace(/\s+/g, '-');
+            custTypeBadge = '<span class="cust-type-badge cust-type-' + escapeHtml(ctClass) + '">' + escapeHtml(d.customerType) + '</span>';
+        }
+
         // Placement
         var placementBadge = d.placement ? '<span class="placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
 
@@ -320,7 +330,7 @@
                 + '<div class="card-number">#' + dn + '</div>'
                 + (company ? '<div class="card-company" title="' + escapeHtml(company) + '">' + escapeHtml(company) + (d.customerId ? ' <span class="card-cust-id">#' + escapeHtml(String(d.customerId)) + '</span>' : '') + '</div>' : '')
                 + (name ? '<div class="card-name" title="' + escapeHtml(name) + '">' + escapeHtml(name) + '</div>' : '')
-                + '<div class="card-meta">' + tierBadge + (stitchText ? ' <span class="card-stitch">' + stitchText + '</span>' : '') + '</div>'
+                + '<div class="card-meta">' + tierBadge + (stitchText ? ' <span class="card-stitch">' + stitchText + '</span>' : '') + repBadge + custTypeBadge + '</div>'
                 + ((placementBadge || threadText) ? '<div class="card-detail">' + placementBadge + (threadText ? '<span class="card-threads" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
                 + (dstDisplay ? '<div class="card-dst" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
             + '</div>'
@@ -473,6 +483,14 @@
         html += '<div class="modal-section">';
         if (design.customerId) {
             html += '<div class="modal-row"><span class="modal-label">Customer #</span><span class="modal-value">' + escapeHtml(design.customerId) + '</span></div>';
+        }
+        if (design.salesRep) {
+            html += '<div class="modal-row"><span class="modal-label">Sales Rep</span><span class="modal-value"><span class="rep-badge rep-' + escapeHtml(design.salesRep.toLowerCase()) + '">' + escapeHtml(design.salesRep) + '</span></span></div>';
+        }
+        if (design.customerType) {
+            var ctClass = design.customerType.toLowerCase().replace(/\s+/g, '-');
+            var ctBadgeClass = (design.customerType === 'ACTIVE') ? 'cust-type-active' : 'cust-type-' + escapeHtml(ctClass);
+            html += '<div class="modal-row"><span class="modal-label">Customer Type</span><span class="modal-value"><span class="cust-type-badge ' + ctBadgeClass + '">' + escapeHtml(design.customerType) + '</span></span></div>';
         }
         html += '<div class="modal-row"><span class="modal-label">Stitch Tier</span><span class="modal-value"><span class="tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(tierValue) + '</span></span></div>';
         if (design.maxStitchCount) {
