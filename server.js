@@ -11,6 +11,98 @@ const session = require('express-session');
 // Load environment variables
 dotenv.config();
 
+// =============================================================================
+// ROUTE TABLE OF CONTENTS (~2,900 lines)
+// =============================================================================
+//
+// INFRASTRUCTURE
+//   L17   Security: Input sanitization (sanitizeFilterInput, isValidIdentifier)
+//   L67   Security: CORS configuration
+//   L146  Session management (express-session)
+//   L166  Rate limiting (apiLimiter, strictLimiter)
+//   L414  Body parsing (JSON, urlencoded)
+//
+// STRIPE & PAYMENTS
+//   L272  POST /api/stripe/webhook
+//   L1004 GET  /api/stripe-config
+//   L1025 POST /api/create-payment-intent
+//   L1095 POST /api/create-checkout-session
+//   L1210 POST /api/verify-checkout-session
+//
+// 3-DAY TEES
+//   L1271 POST /api/submit-3day-order
+//
+// CRM & AUTH
+//   L508  POST /api/crm-session
+//   L543  GET  /crm-logout
+//   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
+//
+// STATIC FILE SERVING
+//   L567  Static directories (calculators, dashboards, quote-builders, etc.)
+//   L624  Directory-to-static mappings (20+ directories)
+//
+// LEGACY REDIRECTS
+//   L657  /calculators/embroidery-contract* → embroidery-pricing-all
+//   L662  /staff-dashboard.html → /dashboards/
+//   L666  /bundle-orders-dashboard.html → /dashboards/
+//   L783  /ae-dashboard.html → /dashboards/
+//   L791  /digitizingform.html → /calculators/
+//   L806  /christmas-bundles.html → /calculators/
+//   L858  /{page}.html → /pages/ (inventory, policies, resources, etc.)
+//
+// PRODUCT & CATALOG APIs
+//   L489  GET  /product (→ product/index.html)
+//   L980  GET  / (→ index.html)
+//   L992  GET  /api/status
+//   L2035 GET  /api/stylesearch
+//   L2051 GET  /api/product-colors
+//   L2067 GET  /api/sizes-by-style-color
+//   L2083 GET  /api/base-item-costs
+//   L2099 GET  /api/inventory
+//   L2254 GET  /api/christmas-products
+//   L2328 GET  /api/embroidery-pricing
+//   L2346 GET  /api/size-pricing
+//   L2397 GET  /api/image-proxy
+//
+// PRICING MATRIX CRUD
+//   L2119 GET  /api/pricing-matrix
+//   L2139 POST /api/pricing-matrix
+//   L2148 PUT  /api/pricing-matrix/:id
+//   L2158 GET  /api/pricing-matrix/lookup
+//   L2244 GET  /api/pricing-matrix/:id
+//
+// CART SYSTEM
+//   L1616 GET  /cart
+//   L1657 CRUD /api/cart-sessions
+//   L1703 CRUD /api/cart-items
+//   L1911 CRUD /api/cart-item-sizes
+//
+// CUSTOMER & ORDER APIS
+//   L1959 CRUD /api/customers
+//   L1998 CRUD /api/orders
+//
+// QUOTE SYSTEM
+//   L2446 CRUD /api/quote_sessions
+//   L2589 CRUD /api/quote_items
+//   L2710 CRUD /api/quote_analytics
+//
+// PUBLIC QUOTE & DESIGN ROUTES
+//   L2772 GET  /api/quote_items/quote/:quoteId
+//   L2789 GET  /design/:designNumber (→ design-view.html)
+//   L2798 GET  /quote/:quoteId (→ quote-view.html)
+//   L2810 GET  /api/public/quote/:quoteId
+//   L2852 POST /api/public/quote/:quoteId/accept
+//
+// FRIENDLY URL ROUTES
+//   L1623 /calculators/embroidery-pricing-all → index.html
+//   L1628 /pricing/embroidery → embroidery-pricing-all
+//   L1634 /pricing/cap-embroidery → cap-embroidery-pricing-integrated
+//   L1640 /pricing/dtg → dtg-pricing.html
+//   L1644 /pricing/screen-print → screen-print-pricing.html
+//   L1648 /pricing/dtf → /pricing/dtf/index.html
+//   L1652 /pricing/stickers → sticker-manual-pricing.html
+// =============================================================================
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
