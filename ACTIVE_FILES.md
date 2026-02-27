@@ -56,6 +56,9 @@
 | `/pages/design-view.html` | **NEW** Public customer-facing design preview page — shareable via /design/:designNumber | design-view.js, design-view.css, app-config.js | ✅ Active |
 | `/pages/js/design-view.js` | **NEW** Customer design view — fetches design images, renders gallery + lightbox | /api/digitized-designs/lookup | ✅ Active |
 | `/pages/css/design-view.css` | **NEW** Customer design view styles (branded, responsive, lightbox overlay) | — | ✅ Active |
+| `/pages/dst-viewer.html` | **NEW** DST embroidery stitch file viewer — drag-drop .DST, color/mono/trace modes | dst-viewer.js, dst-viewer.css, Font Awesome, DM Mono/Outfit fonts | ✅ Active |
+| `/pages/js/dst-viewer.js` | **NEW** DST binary parser, canvas renderer (3 modes), trace animation, thread color sequence | Vanilla JS, no dependencies | ✅ Active |
+| `/pages/css/dst-viewer.css` | **NEW** DST viewer dark theme styles (2-col grid, canvas, sidebar, trace controls, responsive) | CSS variables | ✅ Active |
 
 ## 📊 Calculators & Quote Builders
 

@@ -128,7 +128,9 @@
       "Bash(manageorders \")",
       "Bash(where:*)",
       "Bash(pdftotext:*)",
-      "WebFetch(domain:northwestcustomapparel.box.com)"
+      "WebFetch(domain:northwestcustomapparel.box.com)",
+      "mcp__Claude_Preview__preview_start",
+      "WebFetch(domain:c3eku948.caspio.com)"
     ],
     "deny": [],
     "ask": [],
