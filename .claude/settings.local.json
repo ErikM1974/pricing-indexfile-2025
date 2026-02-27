@@ -130,13 +130,30 @@
       "Bash(pdftotext:*)",
       "WebFetch(domain:northwestcustomapparel.box.com)",
       "mcp__Claude_Preview__preview_start",
-      "WebFetch(domain:c3eku948.caspio.com)"
+      "WebFetch(domain:c3eku948.caspio.com)",
+      "Bash(while read hash msg)",
+      "Bash(do if echo \"$msg\")",
+      "Bash(then echo \"=== $msg ===\")",
+      "Bash(fi)",
+      "Bash(bash -c 'MEMFILE=\"\"/c/Users/erik/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md\"\"; if [ -f \"\"$MEMFILE\"\" ]; then LINES=$\\(wc -l < \"\"$MEMFILE\"\"\\); echo \"\"MEMORY.md is $LINES lines\"\"; if [ \"\"$LINES\"\" -gt 180 ]; then echo \"\"[Memory Warning] MEMORY.md is $LINES lines \\(limit: 200\\). Condense or move details to topic files before it overflows.\"\"; else echo \"\"\\(No warning — under 180 threshold\\)\"\"; fi; else echo \"\"File not found\"\"; fi')"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
       "/home/erik/.claude"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'MEMFILE=\"/c/Users/erik/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md\"; if [ -f \"$MEMFILE\" ]; then LINES=$(wc -l < \"$MEMFILE\"); if [ \"$LINES\" -gt 180 ]; then echo \"[Memory Warning] MEMORY.md is $LINES lines (limit: 200). Condense or move details to topic files before it overflows.\"; fi; fi'"
+          }
+        ]
+      }
     ]
   }
 }

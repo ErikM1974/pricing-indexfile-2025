@@ -76,6 +76,30 @@ The workflow for any bug fix, feature, or integration change is:
 ### Rule: Don't Ask, Just Do
 Memory updates are part of completing the task — not a separate step that needs permission. If Erik says "skip" for a specific update, don't update that one.
 
+## Memory Maintenance Protocol
+
+**Auto-memory dir**: `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/`
+
+### What Goes Where (Decision Tree)
+| Content type | Destination |
+|---|---|
+| Sync rules, gotchas, key architectural decisions | MEMORY.md |
+| Detailed implementation notes (>10 lines on a topic) | Topic file (e.g., `emb-builder-details.md`) |
+| Bug fixes with root cause | `/memory/LESSONS_LEARNED.md` (git-tracked) |
+| One-time script results, batch stats, historical counts | **Nowhere** — ephemeral |
+
+### Size Discipline
+- **Target**: 100–150 lines. **Hard limit**: 200 lines (only first 200 load into context).
+- **Warning threshold**: 180 lines — a Stop hook fires automatically if exceeded.
+- When adding content: if a section grows past 10 lines, move details to a topic file and link from MEMORY.md.
+- When approaching 180 lines: condense existing content before adding more.
+
+### Topic File Rules
+- Located in the auto-memory directory (see path above).
+- Always linked from MEMORY.md header (e.g., `> Topic files: [emb-builder-details.md] | [design-lookup-details.md]`).
+- Each file should be self-contained with a `> Linked from MEMORY.md` header.
+- Create new topic files as needed — they have no line limit.
+
 ## File Organization
 
 ```

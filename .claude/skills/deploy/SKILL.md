@@ -185,25 +185,32 @@ Main branch is now live at:
 https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/
 ```
 
-### Step 13: Ask About Lessons Learned (REQUIRED)
+### Step 13: Memory Audit (REQUIRED)
 
-After successful deploy, ask:
+Before asking about session documentation, check MEMORY.md health:
+
+```bash
+MEMFILE="$HOME/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md"
+wc -l < "$MEMFILE"
 ```
-Any bugs fixed this session to log to LESSONS_LEARNED.md?
-```
+
+- If **over 180 lines**: STOP and condense MEMORY.md before continuing. Move detailed content to topic files.
+- If **under 180 lines**: Report the count (e.g., "MEMORY.md: 94/200 lines") and continue.
+
+### Step 14: Session Documentation (REQUIRED)
+
+Ask the user what type of work was done this session:
 
 Use AskUserQuestion with options:
-- "Yes, log a bug fix" → Ask for details, then add entry to `/memory/LESSONS_LEARNED.md`
-- "No, nothing to log" → Done
+- "Bug fix" → Collect Problem/Root Cause/Solution/Prevention, add to `/memory/LESSONS_LEARNED.md`. If the fix changes documented behavior, also update MEMORY.md.
+- "New feature or integration" → Add a concise entry to MEMORY.md (key facts, sync rules, gotchas only). If details exceed 10 lines, create/update a topic file instead.
+- "Nothing notable" → Skip documentation, deploy is complete.
 
-If user wants to log, collect:
-- Problem description
-- Symptoms
-- Root cause
-- Solution
-- Prevention (optional)
-
-Then add the entry at the top of LESSONS_LEARNED.md (below the header, above existing entries).
+**Rules for MEMORY.md updates:**
+- Only add sync rules, gotchas, key architectural decisions, and essential API facts
+- Detailed implementation notes go in topic files (emb-builder-details.md, design-lookup-details.md, etc.)
+- One-time script results, batch stats, historical counts → do NOT add anywhere
+- After any update, re-check line count. If over 180, condense immediately.
 
 ## Error Handling
 
