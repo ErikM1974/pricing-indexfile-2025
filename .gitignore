@@ -1,109 +1,91 @@
+# Dependencies & environment
 node_modules/
-npm-debug.log
-.DS_Store
 .env
+.DS_Store
+.vscode/
+npm-debug.log
+
+# Backup/version files (CLAUDE.md Rule #1)
+*.bak
+*.backup
+*-backup.*
+*-FINAL.*
+*-FIXED.*
+*-old.*
+
+# Test files in root (CLAUDE.md Rule #2)
+/test-*.html
+/test-*.js
+/test-*.css
+!tests/**
+
+# Temporary files
+*-temp.*
+*-debug.*
+*.tmp
+*.log
+tmpclaude-*
+_ul
+nul
+temp/
+logs/
+
+# CSS experiments
+*-unified-*.css
+!shared_components/css/quote-builder-unified-step1*.css
+*-temp.css
+*-backup.css
+
+# Generated test output
+tests/reports/
+tests/coverage/
+tests/validation/*.json
+tests/validation/*.csv
+tests/orders/
+*test-results*
+*test-failures*
+
+# Data files (may contain PII)
+*.csv
+
+# Local configuration
+.claude/settings.local.json
+.claude/agents/brand-guidelines-creator.md
+
+# Specific legacy/deleted files
 shared_components/js/dtg-page-setup-diagnostic.js
+shared_components/js/three-day-tees-order-service.js
 test-dtg-diagnostic.html
 dtg-pricing-old.html
-.gitignore
 staff-dashboard-backup-*.html
 staff-dashboard-integrated.html
 staff-dashboard-old.html
+scripts/parse-production-schedule.js
+HOMEPAGE_CURRENT_STATE_ANALYSIS.md
+richardson-caps/archive-working-files/
 
-# Development and test files
+# Training dev files
 training/server.js
 training/simple-server.js
 training/test-*.js
 training/test-*.md
 training/api-test-runner.html
-
-# Backup/version files
 training/*-v2.html
-.claude/agents/brand-guidelines-creator.md
-.claude/settings.local.json
-# CRITICAL ENFORCEMENT: Test files MUST be in /tests/ directory
-# Any test-* files in root are development mistakes
-/test-*.html
-/test-*.js
-/test-*.css
-# But allow test files in tests directory
-!tests/**
 
-# Temporary CSS experiments
-*-unified-*.css
-# Exception: Allow the unified step CSS files (production use)
-!shared_components/css/quote-builder-unified-step1*.css
-*-temp.css
-*-backup.css
-
-# Local configuration
-.claude/settings.local.json
-
-# Test results and data files
-*.csv
-*test-results*
-*test-failures*
-
-# Log files
-logs/
-*.log
-server.log
-
-# Backup files
-*.bak
-*-backup.*
-*-FINAL.*
-*-FIXED.*
-*-old.*
-*.backup
-
-# Temporary and debug files
-*-temp.*
-*-debug.*
-*.tmp
-tmpclaude-*
-.claude/settings.local.json
-temp/verify-dtg-pricing.js
-temp/DTG-Pricing-Formula-Verification.md
-temp/readonly/Claude's Plan.md
-temp/
-calculators/small-batch-panel-css.txt
-calculators/small-batch-panel-html.txt
-calculators/small-batch-panel-javascript.txt
+# Calculator scratch files
+calculators/small-batch-panel-*.txt
 calculators/INTEGRATION-INSTRUCTIONS.md
-.claude/settings.local.json
+
+# Specific doc files (moved to /memory/)
 docs/Additional-Logo-Implementation-Complete.md
 docs/Additional-Logo-Modal-Implementation-Plan.md
-HOMEPAGE_CURRENT_STATE_ANALYSIS.md
-richardson-caps/archive-working-files/
-.claude/settings.local.json
-.claude/settings.local.json
-shared_components/js/three-day-tees-order-service.js
-.vscode/
-.claude/settings.local.json
-.claude/settings.local.json
-.claude/settings.local.json
-scripts/parse-production-schedule.js
-.claude/settings.local.json
-.claude/settings.local.json
-nul
-.claude/settings.local.json
-_ul
-.claude/settings.local.json
-.claude/settings.local.json
-.claude/settings.local.json
+
+# Memory files managed outside git
 memory/CSV_ORDER_VALIDATION.md
 memory/EMBROIDERY_PRICING_RULES.md
-# Ad-hoc order test files (may contain PII)
-tests/orders/
 
-# Test reports and coverage (generated output - don't commit)
-tests/reports/
-tests/coverage/
-
-# Large validation data files (generated)
-tests/validation/*.json
-tests/validation/*.csv
+# ACTIVE_FILES.md (managed outside git)
 ACTIVE_FILES.md
-.claude/settings.local.json
+
+# Test utility scripts
 tests/scripts/show-service-codes.js

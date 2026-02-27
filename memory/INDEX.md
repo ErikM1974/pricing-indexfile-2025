@@ -44,7 +44,6 @@
 ├── SECURITY_AUDIT_2026-01.md         # Security audit findings & fixes
 ├── API_AUDIT_2026-01.md              # API call audit report
 ├── 2026_PRICING_MARGINS.md           # 2026 pricing margins reference
-├── REP_ACCOUNT_MANAGEMENT.md         # Rep account sync, reconcile, audit APIs
 ├── NIKA_DASHBOARD_BUILD_GUIDE.md     # Build guide for Nika's CRM dashboard
 ├── CUSTOMER_LOOKUP_SYSTEM.md         # Customer autocomplete for quote builders
 ├── SHOPWORKS_IMPORT_PLAN.md          # ShopWorks order text import for quote builders (IMPLEMENTED 2026-01-31)
@@ -212,7 +211,7 @@
 | Guide | Description |
 |-------|-------------|
 | **Nika Dashboard Build** | [NIKA_DASHBOARD_BUILD_GUIDE.md](./NIKA_DASHBOARD_BUILD_GUIDE.md) - Copy from Taneisha's CRM |
-| Rep Account Management | [REP_ACCOUNT_MANAGEMENT.md](./REP_ACCOUNT_MANAGEMENT.md) - Backend API docs |
+| Rep Account Management | See [MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md) - Backend CRM API docs |
 
 ### Common Tasks
 | Task | File |
