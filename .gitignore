@@ -25,7 +25,7 @@ npm-debug.log
 *.tmp
 *.log
 tmpclaude-*
-_ul
+_ul*
 nul
 temp/
 logs/
@@ -89,3 +89,4 @@ ACTIVE_FILES.md
 
 # Test utility scripts
 tests/scripts/show-service-codes.js
+tests/ui/test-step1-final.html
