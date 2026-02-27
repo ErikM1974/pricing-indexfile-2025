@@ -1,6 +1,6 @@
 # NWCA Cross-Project Knowledge Hub
 
-**Last Updated:** 2026-01-11
+**Last Updated:** 2026-02-27
 **Purpose:** Single entry point for documentation across all 3 NWCA projects
 
 ---
@@ -11,7 +11,7 @@
 |---------|----------|---------|------|
 | **Pricing Index File 2025** | This repo | Frontend - calculators, quote builders, pages | 3000 |
 | **caspio-pricing-proxy** | `../caspio-pricing-proxy` | Backend API server, caching, proxying | 3002 |
-| **Python Inksoft** | `../Python Inksoft` | Order transformation - InkSoft → ShopWorks | 5000 |
+| **Python Inksoft** | `../Python Inksoft` | Order transformation - InkSoft → ShopWorks (Flask/Python 3.11) | 5000 |
 
 ---
 
@@ -19,11 +19,11 @@
 
 | Project | CLAUDE.md | Memory Index | Memory Files |
 |---------|-----------|--------------|--------------|
-| Pricing Index | [CLAUDE.md](../CLAUDE.md) | [INDEX.md](./INDEX.md) | 111 files |
-| caspio-proxy | [CLAUDE.md](../../caspio-pricing-proxy/CLAUDE.md) | (see memory/) | 26 files |
+| Pricing Index | [CLAUDE.md](../CLAUDE.md) | [INDEX.md](./INDEX.md) | 76 files |
+| caspio-proxy | [CLAUDE.md](../../caspio-pricing-proxy/CLAUDE.md) | (see memory/) | 40 files |
 | Python Inksoft | [CLAUDE.md](../../Python%20Inksoft/CLAUDE.md) | (see memories/) | 19 files |
 
-**Total documentation:** 156 markdown files across all projects
+**Total documentation:** ~135 markdown files across all projects
 
 ---
 
@@ -39,6 +39,7 @@ These are the MASTER documents - update HERE, not copies elsewhere:
 | **Lessons Learned** | [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) | Pricing Index |
 | **3-Day Tees Flow** | [3-day-tees/ORDER_PUSH_FLOW.md](./3-day-tees/ORDER_PUSH_FLOW.md) | Pricing Index |
 | **Size Modifiers** | `Python Inksoft/transform.py` (lines 19-74) | Python Inksoft |
+| **OnSite Push Format** | `Python Inksoft/memories/OnSite_API_Schema.md` + `caspio-proxy/config/manageorders-emb-config.js` | Both |
 | **API Specification** | `caspio-proxy/memory/API_SPECIFICATION.yaml` | caspio-proxy |
 
 ---
@@ -63,6 +64,16 @@ These are the MASTER documents - update HERE, not copies elsewhere:
 5. ShopWorks imports with payment record
 ```
 
+### Order Flow: Embroidery Quote → ShopWorks
+```
+1. Staff builds quote (Pricing Index embroidery builder)
+2. Save → Caspio (quote_sessions + quote_items)
+3. Push button → caspio-proxy /api/embroidery-push/push-quote
+4. Transformer builds OnSite JSON (same format as InkSoft push)
+5. POST to ManageOrders OnSite API (same /onsite URL as InkSoft)
+6. ExtOrderID: EMB-{seq} (vs NWCA-{number} for InkSoft)
+```
+
 ### Inventory Check: Frontend → SanMar
 ```
 1. Quote builder checks availability (Pricing Index)
@@ -83,7 +94,7 @@ Key terms used across all projects:
 | `CATALOG_COLOR` | SanMar internal color code (e.g., "BrillOrng") | All - API queries |
 | `COLOR_NAME` | Display color name (e.g., "Brilliant Orange") | All - UI display |
 | `QuoteID` | Quote identifier format: `[PREFIX][MMDD]-[seq]` | Pricing Index |
-| `ExtOrderID` | External order ID format: `NWCA-[number]` | All - ShopWorks |
+| `ExtOrderID` | External order ID: `NWCA-{number}` (InkSoft), `EMB-{seq}` (Embroidery), `EMB-TEST-{seq}` (test) | All - ShopWorks |
 | `id_Integration` | ShopWorks integration ID for size translation | Python Inksoft |
 | `sts_*` | ShopWorks status flags (0=No, 1=Yes, .5=Partial) | All |
 | `cur_*` | ShopWorks currency/amount fields | All |
@@ -123,6 +134,8 @@ npm run doc-freshness      # Check staleness (coming soon)
 | **3-Day Tees order submission** | `server.js:749-1050` (NOT ThreeDayTeesOrderService - deleted!) |
 | **ManageOrders PUSH transform** | `caspio-proxy/lib/manageorders-push-client.js` |
 | **Size translation** | `Python Inksoft/transform.py:19-74` |
+| **InkSoft order transform** | `Python Inksoft/web/transform.py` + `web/stores.py` |
+| **Embroidery order push** | `caspio-proxy/src/routes/embroidery-push.js` + `lib/embroidery-push-transformer.js` |
 | **Pricing calculator logic** | `shared_components/js/*-pricing-*.js` |
 | **Quote builder logic** | `quote-builders/*-quote-builder.html` |
 | **API caching** | `caspio-proxy/server.js` (search "cache") |

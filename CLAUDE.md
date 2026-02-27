@@ -189,8 +189,12 @@ try {
 
 **Python Inksoft** - Order Transformation
 - Location: `../Python Inksoft` (sibling directory)
-- Transforms InkSoft orders to ShopWorks format
-- No direct dependency with this project
+- URL: `https://inksoft-transform-8a3dc4e38097.herokuapp.com`
+- Transforms InkSoft e-commerce orders → ShopWorks OnSite format
+- Flask app (Python 3.11), deployed via `git subtree push --prefix web heroku main`
+- Uses caspio-pricing-proxy for ShopWorks API + design lookups + gift certificates
+- **Shared patterns**: Size suffix logic (`_2X`, `_3XL`), OnSite push format, tax handling
+- When modifying ManageOrders push logic, check if same change applies here
 
 ### Key System Components
 
