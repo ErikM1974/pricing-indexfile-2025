@@ -50,6 +50,38 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 - Update relevant memory file if it's about: ManageOrders, Caspio API, Stripe, ShopWorks
 - Tag with project: `[Pricing Index]`, `[caspio-proxy]`, `[Python Inksoft]`, `[All]`
 
+## Codebase Health (Auto-Enforced)
+
+**Claude enforces these rules automatically on EVERY task — no manual cleanup sessions needed.**
+
+### On every file create:
+- Add entry to ACTIVE_FILES.md immediately (Rule #5)
+- Add entry to `shared_components/js/GUIDE.md` if it's a new JS file in that directory
+- Verify the file follows directory structure rules (tests→`/tests/`, shared JS→`/shared_components/js/`, etc.)
+
+### On every file delete:
+- Remove from ACTIVE_FILES.md immediately
+- Remove from GUIDE.md if applicable
+- Check for orphaned references (`grep` for filename in HTML/JS files)
+
+### On every file move/rename:
+- Update ACTIVE_FILES.md with new path
+- Update GUIDE.md if applicable
+- Update all `<script src>` and `import` references
+
+### On every server.js route change:
+- Update the Route TOC comment block at the top of server.js (line numbers)
+
+### Dead code detection (check during related work):
+- If you notice a JS file with zero HTML `<script>` references, flag it to Erik
+- If you find version-suffixed files (-v2, -v3, -backup), flag for removal
+- If a file hasn't been modified in 6+ months and has no references, flag it
+
+### Monthly health check (on first /deploy of each month):
+- Quick scan for `*.bak`, `*.backup`, `*-FINAL` files
+- Verify ACTIVE_FILES.md file count matches reality (±5 tolerance)
+- Check GUIDE.md covers all files in `shared_components/js/`
+
 ## Documentation Triggers (Auto-Update)
 
 **CRITICAL: Claude MUST auto-update memory files as part of the fix/feature workflow — no asking, just do it and notify.**

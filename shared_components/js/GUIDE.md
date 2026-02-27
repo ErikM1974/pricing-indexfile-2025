@@ -1,6 +1,6 @@
 # shared_components/js/ — File Guide
 
-**127 JavaScript files** organized by function. Updated 2026-02-27.
+**124 JavaScript files** organized by function. Updated 2026-02-27.
 
 ## Quote Builder System (shared across all builders)
 
@@ -124,9 +124,7 @@
 | `pricing-calculator.js` | Generic pricing calculator |
 | `pricing-matrix-api.js` | Pricing matrix API calls |
 | `pricing-matrix-capture.js` | Pricing matrix data capture |
-| `pricing-matrix-capture-fix.js` | Pricing matrix capture fixes |
 | `pricing-pages.js` | Shared pricing page utilities |
-| `hero-quantity-calculator.js` | Homepage quantity-based pricing preview |
 | `manual-mode-indicator.js` | Manual pricing mode UI indicator |
 | `laser-tumbler-simple.js` | Laser tumbler pricing logic |
 | `design-thumbnail-service.js` | Design thumbnail resolution service |
@@ -177,7 +175,6 @@
 | `cart-drawer.js` | Slide-out cart drawer |
 | `toast-notifications.js` | Toast notification system |
 | `enhanced-loading-animations.js` | Loading animation components |
-| `features-bundle.js` | Feature flag bundle |
 | `header-button-functions.js` | Header button event handlers |
 | `dp5-helper.js` | DataPage 5 (Caspio) helper |
 
@@ -193,3 +190,6 @@
 - `dtg-pricing-v4.js` — replaced by `dtg-pricing-service.js` + `dtg-adapter.js`
 - `dtg-pricing-v4-cleaned.js` — duplicate of above
 - `embroidery-pricing-v3.js` — replaced by `embroidery-pricing-service.js`
+- `features-bundle.js` — unreferenced Phase 2 feature experiment (never loaded)
+- `hero-quantity-calculator.js` — unreferenced cap embroidery quantity UX (never loaded)
+- `pricing-matrix-capture-fix.js` — unreferenced DTG matrix capture workaround (superseded)
