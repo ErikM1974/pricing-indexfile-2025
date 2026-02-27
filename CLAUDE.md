@@ -310,6 +310,6 @@ When discovering new ManageOrders patterns or issues:
 ---
 
 **When in doubt:**
-1. Check the Top 5 Never-Break Rules
+1. Check the Top 8 Never-Break Rules
 2. Check ACTIVE_FILES.md for existing functionality
 3. Use Task tool with Explore agent to look up detailed docs

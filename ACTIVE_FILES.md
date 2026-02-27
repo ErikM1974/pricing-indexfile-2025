@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-02-05
-**Total Active Files:** ~291 (includes Screen Print Quote Builder 2026 + Automated Testing Suite + Modern Step 2 Refactor + Staff Dashboard V2 + Public Quote View System + Commission Structure Dashboard + Rep CRM Dashboards for Taneisha & Nika + House Accounts Dashboard + Embroidery Pricing Documentation + Contract Embroidery Pricing Page)
+**Last Updated:** 2026-02-27
+**Total Active Files:** ~320 (includes all calculators, quote builders, dashboards, CRM, design gallery, DST viewer, 3-Day Tees, and testing suite)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
@@ -60,6 +60,30 @@
 | `/pages/js/dst-viewer.js` | **NEW** DST binary parser, canvas renderer (3 modes), trace animation, thread color sequence | Vanilla JS, no dependencies | ✅ Active |
 | `/pages/css/dst-viewer.css` | **NEW** DST viewer dark theme styles (2-col grid, canvas, sidebar, trace controls, responsive) | CSS variables | ✅ Active |
 
+### 3-Day Tees System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/3-day-tees.html` | 3-Day Tees ordering page (Stripe checkout) | 3-day-tees.js, 3-day-tees-redesign.css | ✅ Active |
+| `/pages/3-day-tees-success.html` | Post-purchase success/confirmation page | — | ✅ Active |
+| `/pages/js/3-day-tees.js` | 3-Day Tees order logic, Stripe integration, cart | ApiService.js, InventoryService.js | ✅ Active |
+| `/pages/css/3-day-tees-redesign.css` | 3-Day Tees page styles | — | ✅ Active |
+| `/pages/js/services/ApiService.js` | API service for 3-Day Tees (product, inventory, orders) | — | ✅ Active |
+| `/pages/js/services/InventoryService.js` | Inventory service for 3-Day Tees real-time stock | — | ✅ Active |
+| `/pages/js/utils/debounce.js` | Debounce utility for 3-Day Tees search | — | ✅ Active |
+
+### Other Pages (Undocumented Until 2026-02-27)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/richardson-112-product.html` | Richardson 112 product display page | richardson-112-product.css | ✅ Active |
+| `/pages/richardson-112-product.css` | Richardson 112 page styles | — | ✅ Active |
+| `/pages/dtg-compatible-products.html` | DTG-compatible products listing | — | ✅ Active |
+| `/pages/sample-cart.html` | Sample ordering cart page | — | ✅ Active |
+| `/pages/order-confirmation.html` | Order confirmation page | — | ✅ Active |
+| `/pages/top-sellers-product.css` | Top sellers product page styles | — | ✅ Active |
+| `/pages/css/policies-hub.css` | Policies hub page styles | — | ✅ Active |
+| `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |
+| `/pages/policies/dtg-artwork-checklist.html` | DTG artwork preparation checklist | — | ✅ Active |
+
 ## 📊 Calculators & Quote Builders
 
 ### Unified Manual Pricing Calculator
@@ -89,6 +113,11 @@
 | `/calculators/dtg-pricing.html` | DTG pricing calculator | dtg-adapter.js, dtg-pricing-service.js | ✅ Active |
 | `/calculators/dtg-manual-pricing.html` | Manual DTG pricing | dtg-config.js | ✅ Active |
 | `/quote-builders/dtg-quote-builder.html` | DTG Quote Builder 2026 (Excel-style) | dtg-quote-pricing.js | ✅ Active |
+| `/shared_components/js/dtg-quote-builder.js` | DTG quote builder controller | DTGQuotePricing class | ✅ Active |
+| `/shared_components/js/dtg-quote-pricing.js` | DTG quote pricing engine | Caspio API | ✅ Active |
+| `/shared_components/js/dtg-quote-products.js` | DTG quote product manager | SanMar API | ✅ Active |
+| `/shared_components/js/dtg-quote-service.js` | DTG quote save/email service | Caspio API, EmailJS | ✅ Active |
+| `/shared_components/js/dtg-quote-system.js` | DTG quote system orchestrator | — | ✅ Active |
 
 ### DTF System
 
@@ -122,12 +151,21 @@
 | `/calculators/embroidery-pricing-all/embroidery-pricing-all.js` | Combined Contract/DECG pricing logic (linear $/1K model) | /api/contract-pricing, /api/decg-pricing | ✅ Active |
 | `/calculators/embroidery-pricing-all/embroidery-pricing-all.css` | Tabbed interface styles | - | ✅ Active |
 | `/quote-builders/embroidery-quote-builder.html` | Embroidery/Cap Combo Quote Builder 2026 (Excel-style) | embroidery-quote-pricing.js | ✅ Active |
+| `/shared_components/js/embroidery-quote-pricing.js` | Embroidery pricing engine (tiers, LTM, stitch surcharges, FB) | Caspio API | ✅ Active |
+| `/shared_components/js/embroidery-quote-service.js` | Embroidery quote save/update/email service | Caspio API, EmailJS | ✅ Active |
+| `/shared_components/js/embroidery-quote-invoice.js` | Embroidery invoice generation (ShopWorks format) | — | ✅ Active |
+| `/shared_components/js/embroidery-quote-products.js` | Embroidery product row management | SanMar API | ✅ Active |
+| `/shared_components/js/embroidery-quote-logos.js` | Logo card management (positions, stitch tiers, AL) | — | ✅ Active |
+| `/shared_components/js/embroidery-quote-adapter.js` | Embroidery data adapter (Caspio → pricing engine) | Caspio API | ✅ Active |
 
 ### Screen Print System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/screen-print-pricing.html` | Screen print calculator | screenprint-pricing-v2.js, screenprint-pricing-service.js | ✅ Active |
 | `/quote-builders/screenprint-quote-builder.html` | Screen Print Quote Builder 2026 (Excel-style) | screenprint-pricing-service.js | ✅ Active |
+| `/shared_components/js/screenprint-quote-pricing.js` | Screen print quote pricing engine | Caspio API | ✅ Active |
+| `/shared_components/js/screenprint-quote-products.js` | Screen print quote product manager | SanMar API | ✅ Active |
+| `/shared_components/js/screenprint-quote-service.js` | Screen print quote save/email service | Caspio API, EmailJS | ✅ Active |
 | `/quote-builders/screenprint-fast-quote.html` | Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-service.js` | Pricing data adapter | Caspio API | ✅ Active |
@@ -168,6 +206,49 @@
 | `/calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html` | BCA bundle (Oct 2025 promo - archived) | breast-cancer-bundle-service.js | 📦 Archived |
 | `/calculators/safety-stripe-creator.html` | Safety stripes | safety-stripe-calculator.js | ✅ Active |
 | `/calculators/art-invoice-creator.html` | Art invoices | art-invoice-service-v2.js | ✅ Active |
+
+### DTG Contract Pricing (Customer-facing)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/dtg-contract/index.html` | DTG contract pricing calculator | dtg-contract-calculator.js | ✅ Active |
+| `/calculators/dtg-contract/dtg-contract-calculator.js` | DTG contract calculator logic | dtg-pricing-service.js | ✅ Active |
+| `/calculators/dtg-contract/dtg-quote-service.js` | DTG contract quote save service | base-quote-service.js | ✅ Active |
+| `/calculators/dtg-contract/dtg-contract-styles.css` | DTG contract page styles | — | ✅ Active |
+| `/calculators/dtg-contract/dtg-contract-fix.css` | DTG contract style fixes | — | ✅ Active |
+
+### Screen Print Customer Pricing (Customer-facing)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/screenprint-customer/index.html` | Screen print customer pricing calculator | screenprint-customer-calculator.js | ✅ Active |
+| `/calculators/screenprint-customer/screenprint-customer-calculator.js` | Customer-facing screen print calculator logic | screenprint-pricing-service.js | ✅ Active |
+| `/calculators/screenprint-customer/screenprint-customer-quote-service.js` | Screen print customer quote save service | base-quote-service.js | ✅ Active |
+| `/calculators/screenprint-customer/screenprint-customer-styles.css` | Screen print customer page styles | — | ✅ Active |
+| `/calculators/screenprint-customer/screenprint-customer-fix.css` | Screen print customer style fixes | — | ✅ Active |
+
+### Embroidered Emblem Calculator
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/embroidered-emblem/index.html` | Embroidered emblem/patch pricing calculator | emblem-calculator.js | ✅ Active |
+| `/calculators/embroidered-emblem/emblem-calculator.js` | Emblem calculator logic | — | ✅ Active |
+| `/calculators/embroidered-emblem/emblem-quote-service.js` | Emblem quote save service | base-quote-service.js | ✅ Active |
+| `/calculators/embroidered-emblem/embroidered-emblem-styles.css` | Emblem page styles | — | ✅ Active |
+
+### Laser Tumbler & Sticker Calculators
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/laser-tumbler-polarcamel.html` | Laser tumbler (Polar Camel) pricing calculator | laser-tumbler-calculator.js | ✅ Active |
+| `/calculators/laser-tumbler-calculator.js` | Laser tumbler calculator logic | — | ✅ Active |
+| `/calculators/laser-tumbler-styles.css` | Laser tumbler page styles | — | ✅ Active |
+| `/calculators/laser-tumbler-quote-service.js` | Laser tumbler quote save service | base-quote-service.js | ✅ Active |
+| `/calculators/sticker-manual-pricing.html` | Sticker pricing table page | — | ✅ Active |
+| `/calculators/laser-manual-pricing.html` | Laser pricing calculator (manual) | manual-calculator-styles.css | ✅ Active |
+
+### Caspio-Embedded Forms
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/digitizingform.html` | Digitizing request form (Caspio-embedded) | Caspio datapage | ✅ Active |
+| `/calculators/monogramform.html` | Monogram request form (Caspio-embedded) | Caspio datapage | ✅ Active |
+| `/calculators/purchasingform.html` | Purchasing form (Caspio-embedded) | Caspio datapage | ✅ Active |
 
 ### Embroidery Pricing (Unified - Feb 2026)
 
@@ -404,13 +485,6 @@ cap-embroidery-fix.css
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |
 | `/memory/CRM_DASHBOARD_AUTH.md` | CRM dashboard role-based auth (sessions + API proxy) | ✅ Active |
 
-### Implementation Documentation
-| File | Purpose | Status |
-|------|---------|--------|
-| `/docs/STEP2_REFACTOR_IMPLEMENTATION_SUMMARY.md` | Step 2 modernization complete details | ✅ Active |
-| `/docs/STEP2_TESTING_GUIDE.md` | Quick testing guide for Nika & Taneisha | ✅ Active |
-| `/docs/SWATCHES_FIX_20251015.md` | **NEW** Color swatches visibility fix | ✅ Active |
-
 ## 📂 Dashboard & Admin
 
 ### Staff Dashboards
@@ -424,9 +498,7 @@ cap-embroidery-fix.css
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
 | `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
 | `/dashboards/taneisha-crm.html` | Taneisha's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
-| `/dashboards/taneisha-calendar.html` | Follow-up calendar for Taneisha | rep-calendar.js, rep-crm.css | ✅ Active |
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
-| `/dashboards/nika-calendar.html` | **NEW** Follow-up calendar for Nika | rep-calendar.js, rep-crm.css | ✅ Active |
 | `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |
 | `/dashboards/js/rep-crm.js` | **SHARED** CRM service/controller (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
 | `/dashboards/js/rep-calendar.js` | **SHARED** Calendar logic (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
@@ -434,10 +506,21 @@ cap-embroidery-fix.css
 | `/dashboards/css/house-accounts.css` | **NEW** House Accounts dashboard styles | - | ✅ Active |
 | `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
 | `/dashboards/monogram-dashboard.html` | Monogram orders dashboard | monogram-dashboard.css, monogram-dashboard.js | ✅ Active |
-| `/dashboards/css/monogram-dashboard.css` | **NEW** Monogram dashboard styles (extracted from inline, NWCA green theme) | CSS variables | ✅ Active |
+| `/dashboards/css/monogram-dashboard.css` | Monogram dashboard styles (NWCA green theme) | CSS variables | ✅ Active |
+| `/dashboards/staff-login.html` | Staff authentication login page | — | ✅ Active |
+| `/dashboards/staff-portal-simple.html` | Simplified staff portal | — | ✅ Active |
+| `/dashboards/staff-portal-final.html` | Final staff portal layout | — | ✅ Active |
+| `/dashboards/quote-management.html` | Quote management dashboard (search, edit, manage quotes) | quote-management.css | ✅ Active |
+| `/dashboards/css/quote-management.css` | Quote management dashboard styles | — | ✅ Active |
+| `/dashboards/digitized-designs.html` | Digitized designs management dashboard | — | ✅ Active |
+| `/dashboards/art-invoice-view.html` | Art invoice detail view page | — | ✅ Active |
+| `/dashboards/bundle-orders-dashboard.html` | Bundle orders management dashboard | bundle-orders.js | ✅ Active |
+| `/dashboards/bundle-orders.js` | Bundle orders dashboard logic | — | ✅ Active |
+| `/dashboards/art-hub-coordinator.html` | Art hub — coordinator view | — | ✅ Active |
+| `/dashboards/art-hub-ruth.html` | Art hub — Ruth's personalized view | — | ✅ Active |
+| `/dashboards/art-hub-steve.html` | Art hub — Steve's personalized view | — | ✅ Active |
 | `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
-| `/dashboards/js/taneisha-calendar.js` | ⚠️ DEPRECATED - use rep-calendar.js | - | ⚠️ Legacy |
 
 ### Staff Dashboard V2 Files (2025-12-31 Redesign)
 | File | Purpose | Status |
@@ -519,12 +602,12 @@ cap-embroidery-fix.css
 ## 📊 Statistics
 
 ### File Count by Type
-- **HTML Files:** ~126 (down from 353)
-- **JavaScript Files:** ~112 (down from 297)
-- **CSS Files:** ~62
-- **Active Calculators:** 15
-- **Active Quote Builders:** 5
-- **Active Dashboards:** 12 (includes staff-dashboard-v2, commission-structure, taneisha-crm, nika-crm, house-accounts)
+- **HTML Files:** ~120
+- **JavaScript Files:** ~130
+- **CSS Files:** ~65
+- **Active Calculators:** 20 (includes contract, customer-facing, forms)
+- **Active Quote Builders:** 5 (DTG, DTF, Embroidery, Screen Print, Monogram)
+- **Active Dashboards:** 20 (includes staff portals, CRM, art hub variants, bundle orders, quote management)
 
 ### Organization Health
 - **Files in correct folders:** 100%
@@ -548,11 +631,6 @@ cap-embroidery-fix.css
 | `/admin/` | Administrative tools and utilities | ✅ Active | Backend administration |
 | `/art-tools/` | Art department tools | ✅ Active | Design utilities |
 | `/caspio-tables/` | Caspio database configurations | ✅ Active | Database schemas |
-| `/docs/` | Documentation | ✅ Active | Organized subdirectories |
-| `/docs/archive/` | Archived/old documentation | 📦 Archive | Historical reference |
-| `/docs/data-exports/` | Data export files | 📊 Data | CSV, JSON, XML exports |
-| `/docs/guides/` | Implementation guides | 📚 Guides | Technical documentation |
-| `/docs/templates/` | Template files | 📝 Templates | EmailJS and other templates |
 | `/email-templates/` | EmailJS templates | ✅ Active | Quote email templates |
 | `/logs/` | Log and generated files | 🚫 Ignored | Not in version control |
 | `/memory/` | Claude AI memory files | ✅ Active | API specs only |

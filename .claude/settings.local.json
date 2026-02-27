@@ -135,7 +135,10 @@
       "Bash(do if echo \"$msg\")",
       "Bash(then echo \"=== $msg ===\")",
       "Bash(fi)",
-      "Bash(bash -c 'MEMFILE=\"\"/c/Users/erik/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md\"\"; if [ -f \"\"$MEMFILE\"\" ]; then LINES=$\\(wc -l < \"\"$MEMFILE\"\"\\); echo \"\"MEMORY.md is $LINES lines\"\"; if [ \"\"$LINES\"\" -gt 180 ]; then echo \"\"[Memory Warning] MEMORY.md is $LINES lines \\(limit: 200\\). Condense or move details to topic files before it overflows.\"\"; else echo \"\"\\(No warning — under 180 threshold\\)\"\"; fi; else echo \"\"File not found\"\"; fi')"
+      "Bash(bash -c 'MEMFILE=\"\"/c/Users/erik/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md\"\"; if [ -f \"\"$MEMFILE\"\" ]; then LINES=$\\(wc -l < \"\"$MEMFILE\"\"\\); echo \"\"MEMORY.md is $LINES lines\"\"; if [ \"\"$LINES\"\" -gt 180 ]; then echo \"\"[Memory Warning] MEMORY.md is $LINES lines \\(limit: 200\\). Condense or move details to topic files before it overflows.\"\"; else echo \"\"\\(No warning — under 180 threshold\\)\"\"; fi; else echo \"\"File not found\"\"; fi')",
+      "Bash(while read f)",
+      "Bash(do ls -lh \"$f\")",
+      "Bash(for f in \"QUOTE_BUILDER_FEATURE_AUDIT.md\" \"QUOTE_BUILDER_WORKFLOWS.md\" \"SERVICE_CODES_TABLE.md\" \"MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md\" \"MANAGEORDERS_API_GUIDE_OFFICIAL.md\" \"EMBROIDERY_PRICING_PHILOSOPHY.md\" \"LASER_PATCH_IMPLEMENTATION.md\" \"UPS_SHIPPING_INTEGRATION_PLAN.md\" \"REP_ACCOUNT_MANAGEMENT.md\" \"REP_TRAINING_PRICING_GAP_ANALYSIS.md\" \"SHOPWORKS_DATA_ENTRY_GUIDE.md\")"
     ],
     "deny": [],
     "ask": [],

@@ -6,6 +6,13 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["server.js"],
       "port": 3000
+    },
+    {
+      "name": "caspio-proxy",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["src/index.js"],
+      "port": 3002,
+      "cwd": "../caspio-pricing-proxy"
     }
   ]
 }
