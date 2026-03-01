@@ -332,6 +332,8 @@
 |------|---------|--------------|--------|
 | `/shared_components/js/shopworks-import-parser.js` | Parse ShopWorks order text into structured data | - | ✅ Active |
 | `/shared_components/css/shopworks-import.css` | Import modal and preview styling | - | ✅ Active |
+| `/shared_components/css/old-designs.css` | Old designs archive page styling (amber theme) | - | ✅ Active |
+| `/shared_components/js/old-designs.js` | Old designs image modal and Caspio enhancements | - | ✅ Active |
 
 **Features:**
 - "Paste from ShopWorks" button in quote builders
@@ -513,6 +515,7 @@ cap-embroidery-fix.css
 | `/dashboards/quote-management.html` | Quote management dashboard (search, edit, manage quotes) | quote-management.css | ✅ Active |
 | `/dashboards/css/quote-management.css` | Quote management dashboard styles | — | ✅ Active |
 | `/dashboards/digitized-designs.html` | Digitized designs management dashboard | — | ✅ Active |
+| `/dashboards/old-designs.html` | Old designs archive search (Caspio embed) | old-designs.css, old-designs.js | ✅ Active |
 | `/dashboards/art-invoice-view.html` | Art invoice detail view page | — | ✅ Active |
 | `/dashboards/bundle-orders-dashboard.html` | Bundle orders management dashboard | bundle-orders.js | ✅ Active |
 | `/dashboards/bundle-orders.js` | Bundle orders dashboard logic | — | ✅ Active |
