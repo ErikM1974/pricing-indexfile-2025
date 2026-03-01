@@ -45,16 +45,6 @@
         </button>
     </div>
 
-    <!-- New Feature Announcement — auto-expires March 1 2026 -->
-    <div class="feature-announce-banner" id="featureAnnounceBanner">
-        <span><i class="fas fa-sparkles"></i> <strong>New Tool:</strong> Search our 39,000+ digitized designs by company, stitch count, or design number.
-            <a href="/dashboards/digitized-designs.html">Try it now &rarr;</a>
-        </span>
-        <button class="feature-announce-close" onclick="dismissFeatureAnnounce()" aria-label="Dismiss">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-
     <div class="dashboard-container">
         <!-- =====================================================
              SIDEBAR NAVIGATION (Preserved from original)
@@ -369,36 +359,34 @@
                             </div>
                         </div>
 
-                        <!-- Artwork -->
+                        <!-- Design Library -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-swatchbook"></i>
+                                </div>
+                                <span class="tool-category-title">Design Library</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/pages/design-gallery.html" class="tool-btn"><i class="fas fa-images"></i> Design Gallery</a>
+                                <a href="/dashboards/digitized-designs.html" class="tool-btn" id="digitizedDesignBtn"><i class="fas fa-th-list"></i> Digitized Designs</a>
+                                <a href="/dashboards/old-designs.html" class="tool-btn"><i class="fas fa-box-archive"></i> Old Designs Archive</a>
+                            </div>
+                        </div>
+
+                        <!-- Art Department -->
                         <div class="tool-category">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-palette"></i>
                                 </div>
-                                <span class="tool-category-title">Artwork & Designs</span>
+                                <span class="tool-category-title">Art Department</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/art-tools/ae-art-dashboard.html" class="tool-btn">AE Portal</a>
-                                <a href="/dashboards/art-hub-steve.html" class="tool-btn">Steve Portal</a>
-                                <a href="/dashboards/art-hub-ruth.html" class="tool-btn">Ruth Portal</a>
-                                <a href="/art-invoices-dashboard.html" class="tool-btn">Art Dashboard</a>
-                                <a href="/dashboards/digitized-designs.html" class="tool-btn feature-spotlight" id="digitizedDesignBtn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-color: #7c3aed;">
-                                    <i class="fas fa-th-list"></i> Digitized Design Master List 2026
-                                    <span class="new-badge">NEW</span>
-                                </a>
-                                <a href="/pages/design-gallery.html" class="tool-btn feature-spotlight" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border-color: #4f46e5;">
-                                    <i class="fas fa-images"></i> Design Gallery
-                                    <span class="new-badge">NEW</span>
-                                </a>
-                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn">Monogram Dashboard</a>
-                                <a href="/pages/dst-viewer.html" class="tool-btn feature-spotlight" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; border-color: #0284c7;">
-                                    <i class="fas fa-drafting-compass"></i> DST Stitch Viewer
-                                    <span class="new-badge">NEW</span>
-                                </a>
-                                <a href="/dashboards/old-designs.html" class="tool-btn feature-spotlight" style="background: linear-gradient(135deg, #d97706, #b45309); color: white; border-color: #b45309;">
-                                    <i class="fas fa-archive"></i> Old Designs Archive
-                                    <span class="new-badge">NEW</span>
-                                </a>
+                                <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-upload"></i> Submit Artwork</a>
+                                <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-user"></i> Steve's Queue</a>
+                                <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-user"></i> Ruth's Queue</a>
+                                <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-drafting-compass"></i> DST Stitch Viewer</a>
                             </div>
                         </div>
 
@@ -413,6 +401,7 @@
                             <div class="tool-buttons">
                                 <a href="/calculators/digitizingform.html" class="tool-btn">Digitizing</a>
                                 <a href="/calculators/purchasingform.html" class="tool-btn">Purchasing</a>
+                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font"></i> Monogram Dashboard</a>
                             </div>
                         </div>
 
@@ -936,36 +925,6 @@
                 sessionStorage.setItem('priceAlertDismissed_2026', 'true');
             }
         }
-
-        // Feature Announcement — Digitized Design Master List (expires March 1 2026)
-        function dismissFeatureAnnounce() {
-            const banner = document.getElementById('featureAnnounceBanner');
-            if (banner) {
-                banner.classList.add('hidden');
-                sessionStorage.setItem('featureAnnounceDismissed', 'true');
-            }
-        }
-
-        (function checkFeatureSpotlightExpiry() {
-            const expired = new Date() > new Date('2026-03-01');
-            const dismissed = sessionStorage.getItem('featureAnnounceDismissed') === 'true';
-
-            // Hide announcement if expired or dismissed
-            if (expired || dismissed) {
-                const banner = document.getElementById('featureAnnounceBanner');
-                if (banner) banner.classList.add('hidden');
-            }
-
-            // Remove spotlight glow + badge if expired
-            if (expired) {
-                const btn = document.getElementById('digitizedDesignBtn');
-                if (btn) {
-                    btn.classList.remove('feature-spotlight');
-                    const badge = btn.querySelector('.new-badge');
-                    if (badge) badge.remove();
-                }
-            }
-        })();
 
         // =====================================================
         // CELEBRATION DROPDOWN FUNCTIONS
