@@ -302,17 +302,11 @@ class RepCRMService {
             } else if (tier.includes('WIN BACK')) {
                 stats.winBack++;
                 stats.winBackRevenue += ytdSales;
-
-                if (account.Won_Back_Date) {
-                    stats.winBackBonus += ytdSales * 0.05;
-                }
+                stats.winBackBonus += ytdSales * 0.05;
 
                 const avgProfit = parseFloat(account.Avg_Annual_Profit) || 0;
                 stats.bountyPotential += avgProfit * 0.05;
-
-                if (account.Won_Back_Date) {
-                    stats.bountyEarned += ytdSales * 0.05;
-                }
+                stats.bountyEarned += ytdSales * 0.05;
             } else {
                 stats.unclassified++;
                 stats.unclassifiedRevenue += ytdSales;
@@ -332,6 +326,30 @@ class RepCRMService {
         });
 
         return stats;
+    }
+
+    /**
+     * Get current quarter info and payout date
+     */
+    getQuarterInfo() {
+        const now = new Date();
+        const month = now.getMonth();
+        const year = now.getFullYear();
+        const quarter = Math.floor(month / 3) + 1;
+
+        const payoutDates = {
+            1: `April 1, ${year}`,
+            2: `July 1, ${year}`,
+            3: `October 1, ${year}`,
+            4: `January 1, ${year + 1}`
+        };
+
+        return {
+            quarter,
+            label: `Q${quarter}`,
+            year,
+            payoutDate: payoutDates[quarter]
+        };
     }
 
     /**
@@ -521,6 +539,8 @@ class RepCRMController {
             winbackRevenue: document.getElementById('winback-revenue'),
             winbackCount: document.getElementById('winback-count'),
             winbackBonus: document.getElementById('winback-bonus'),
+            quarterLabel: document.getElementById('quarter-label'),
+            quarterPayoutDate: document.getElementById('quarter-payout-date'),
             unclassifiedRevenue: document.getElementById('unclassified-revenue'),
             unclassifiedCount: document.getElementById('unclassified-count'),
 
@@ -832,6 +852,13 @@ class RepCRMController {
         }
         if (this.elements.winbackBonus) {
             this.elements.winbackBonus.textContent = this.formatCurrency(stats.winBackBonus);
+        }
+        const quarterInfo = this.service.getQuarterInfo();
+        if (this.elements.quarterLabel) {
+            this.elements.quarterLabel.textContent = `${quarterInfo.label} Payout:`;
+        }
+        if (this.elements.quarterPayoutDate) {
+            this.elements.quarterPayoutDate.textContent = quarterInfo.payoutDate;
         }
         if (this.elements.unclassifiedRevenue) {
             this.elements.unclassifiedRevenue.textContent = this.formatCurrency(stats.unclassifiedRevenue);

@@ -455,6 +455,18 @@ body {
     font-weight: 700;
 }
 
+.bonus-line.quarter-payout {
+    border-top: none;
+    margin-top: 0.25rem;
+    padding-top: 0;
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+
+.payout-date {
+    font-weight: 600;
+}
+
 /* =====================================================
    MAIN LAYOUT (ACCOUNTS + SIDEBAR)
    ===================================================== */
