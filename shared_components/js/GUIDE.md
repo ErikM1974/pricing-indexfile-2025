@@ -141,6 +141,12 @@
 | `production-schedule-predictor.js` | Turnaround prediction engine |
 | `monogram-dashboard.js` | Monogram dashboard controller |
 
+## Art Hub Dashboard
+
+| File | Purpose |
+|------|---------|
+| `art-hub-steve.js` | Steve's quick-action buttons + status summary bar (MutationObserver) |
+
 ## Art Invoice System
 
 | File | Purpose |

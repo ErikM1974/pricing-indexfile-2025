@@ -89,6 +89,7 @@ dotenv.config();
 // PUBLIC QUOTE & DESIGN ROUTES
 //   L2772 GET  /api/quote_items/quote/:quoteId
 //   L2789 GET  /design/:designNumber (→ design-view.html)
+//   L2896 GET  /art-request/:designId (→ art-request-detail.html)
 //   L2798 GET  /quote/:quoteId (→ quote-view.html)
 //   L2810 GET  /api/public/quote/:quoteId
 //   L2852 POST /api/public/quote/:quoteId/accept
@@ -2884,6 +2885,15 @@ app.get('/design/:designNumber', (req, res) => {
     return res.status(400).send('Invalid design number');
   }
   res.sendFile(path.join(__dirname, 'pages', 'design-view.html'));
+});
+
+// Art request detail page - staff-facing shareable link
+app.get('/art-request/:designId', (req, res) => {
+  const designId = req.params.designId;
+  if (!designId || !/^\d+$/.test(designId)) {
+    return res.status(400).send('Invalid design ID');
+  }
+  res.sendFile(path.join(__dirname, 'pages', 'art-request-detail.html'));
 });
 
 // Public quote page route - serves the HTML

@@ -56,6 +56,9 @@
 | `/pages/design-view.html` | **NEW** Public customer-facing design preview page — shareable via /design/:designNumber | design-view.js, design-view.css, app-config.js | ✅ Active |
 | `/pages/js/design-view.js` | **NEW** Customer design view — fetches design images, renders gallery + lightbox | /api/digitized-designs/lookup | ✅ Active |
 | `/pages/css/design-view.css` | **NEW** Customer design view styles (branded, responsive, lightbox overlay) | — | ✅ Active |
+| `/pages/art-request-detail.html` | **NEW** Staff-facing art request detail page — shareable via /art-request/:designId | art-request-detail.js, art-request-detail.css, app-config.js | ✅ Active |
+| `/pages/js/art-request-detail.js` | **NEW** Art request detail — fetches art request + notes, renders info cards + timeline | /api/artrequests, /api/design-notes | ✅ Active |
+| `/pages/css/art-request-detail.css` | **NEW** Art request detail styles (two-column, status badges, billing grid, notes timeline) | — | ✅ Active |
 | `/pages/dst-viewer.html` | **NEW** DST embroidery stitch file viewer — drag-drop .DST, color/mono/trace modes | dst-viewer.js, dst-viewer.css, Font Awesome, DM Mono/Outfit fonts | ✅ Active |
 | `/pages/js/dst-viewer.js` | **NEW** DST binary parser, canvas renderer (3 modes), trace animation, thread color sequence | Vanilla JS, no dependencies | ✅ Active |
 | `/pages/css/dst-viewer.css` | **NEW** DST viewer dark theme styles (2-col grid, canvas, sidebar, trace controls, responsive) | CSS variables | ✅ Active |
@@ -521,7 +524,9 @@ cap-embroidery-fix.css
 | `/dashboards/bundle-orders.js` | Bundle orders dashboard logic | — | ✅ Active |
 | `/dashboards/art-hub-coordinator.html` | Art hub — coordinator view | — | ✅ Active |
 | `/dashboards/art-hub-ruth.html` | Art hub — Ruth's personalized view | — | ✅ Active |
-| `/dashboards/art-hub-steve.html` | Art hub — Steve's personalized view | — | ✅ Active |
+| `/dashboards/art-hub-steve.html` | Art hub — Steve's personalized view | art-hub.css, art-hub-steve.js | ✅ Active |
+| `/shared_components/css/art-hub.css` | **NEW** Shared art hub dashboard styles (CSS custom props for theming) | — | ✅ Active |
+| `/shared_components/js/art-hub-steve.js` | **NEW** Steve's quick-action buttons + status summary bar | art-hub.css, caspio-proxy API | ✅ Active |
 | `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
 

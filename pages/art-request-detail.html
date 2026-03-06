@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Art Request Detail - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="ard-header">
+        <div class="ard-header-inner">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="ard-logo">
+            <div class="ard-header-text">
+                <h1>Art Request Detail</h1>
+                <a href="/staff-dashboard.html" class="ard-back-link">Back to Staff Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="ard-loading" id="ard-loading">
+        <div class="ard-spinner"></div>
+        <p>Loading art request...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="ard-error" id="ard-error" style="display:none;">
+        <div class="ard-error-icon">!</div>
+        <h2 id="ard-error-title">Art Request Not Found</h2>
+        <p id="ard-error-msg">The art request you're looking for doesn't exist or may have been removed.</p>
+    </div>
+
+    <!-- Content -->
+    <main class="ard-content" id="ard-content" style="display:none;">
+
+        <!-- Status + Design ID Header -->
+        <div class="ard-title-row">
+            <h2 class="ard-design-id" id="ard-design-id"></h2>
+            <div class="ard-badges">
+                <span class="ard-status-badge" id="ard-status-badge"></span>
+                <span class="ard-revision-badge" id="ard-revision-badge" style="display:none;"></span>
+            </div>
+        </div>
+
+        <!-- Two-column layout -->
+        <div class="ard-grid">
+
+            <!-- Left Column: Info + Billing -->
+            <div class="ard-col-left">
+
+                <!-- Key Info Card -->
+                <div class="ard-card">
+                    <div class="ard-card-header">Request Info</div>
+                    <div class="ard-card-body">
+                        <div class="ard-field">
+                            <span class="ard-label">Company</span>
+                            <span class="ard-value" id="ard-company">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Sales Rep</span>
+                            <span class="ard-value" id="ard-sales-rep">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Order Type</span>
+                            <span class="ard-value" id="ard-order-type">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Priority</span>
+                            <span class="ard-value" id="ard-priority">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Due Date</span>
+                            <span class="ard-value" id="ard-due-date">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Date Created</span>
+                            <span class="ard-value" id="ard-date-created">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Art Time & Billing Card -->
+                <div class="ard-card">
+                    <div class="ard-card-header ard-card-header--green">Art Time & Billing</div>
+                    <div class="ard-card-body">
+                        <div class="ard-billing-grid">
+                            <div class="ard-billing-item">
+                                <div class="ard-billing-value" id="ard-art-minutes">0</div>
+                                <div class="ard-billing-label">Minutes</div>
+                            </div>
+                            <div class="ard-billing-item">
+                                <div class="ard-billing-value" id="ard-art-hours">0.00</div>
+                                <div class="ard-billing-label">Hours</div>
+                            </div>
+                            <div class="ard-billing-item">
+                                <div class="ard-billing-value" id="ard-art-billed">$0.00</div>
+                                <div class="ard-billing-label">Billed</div>
+                            </div>
+                        </div>
+                        <div class="ard-billing-rate">Rate: $75/hr in 15-min increments</div>
+                    </div>
+                </div>
+
+                <!-- Notes from Submitter -->
+                <div class="ard-card" id="ard-submitter-notes-card" style="display:none;">
+                    <div class="ard-card-header">Notes from Submitter</div>
+                    <div class="ard-card-body">
+                        <p class="ard-notes-text" id="ard-submitter-notes"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Preview + Notes Timeline -->
+            <div class="ard-col-right">
+
+                <!-- Design Preview -->
+                <div class="ard-card" id="ard-preview-card" style="display:none;">
+                    <div class="ard-card-header">Design Preview</div>
+                    <div class="ard-card-body ard-preview-body">
+                        <img id="ard-preview-img" src="" alt="Design preview" class="ard-preview-img">
+                    </div>
+                </div>
+
+                <!-- Notes Timeline -->
+                <div class="ard-card">
+                    <div class="ard-card-header">Notes & Activity</div>
+                    <div class="ard-card-body" id="ard-notes-container">
+                        <p class="ard-empty-notes" id="ard-empty-notes">No notes recorded for this request.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="ard-footer">
+        <p>Northwest Custom Apparel &bull; Internal Staff Page</p>
+    </footer>
+
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/pages/js/art-request-detail.js"></script>
+</body>
+</html>

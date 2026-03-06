@@ -1,0 +1,1118 @@
+/* ==========================================================================
+   Art Hub Dashboard - Shared Styles
+   Used by: art-hub-steve.html, ae-dashboard.html
+
+   Theme colors set per-page via :root custom properties:
+     --art-theme        Primary color (green #009900 or crimson #981e32)
+     --art-theme-light  Light tint for backgrounds
+     --art-theme-hover  Hover state for back-link
+   ========================================================================== */
+
+/* ---------- Base ---------- */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* ---------- Header ---------- */
+.minimal-header {
+    background: var(--art-theme);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo {
+    height: 40px;
+    filter: brightness(0) invert(1);
+}
+
+.back-link {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: 1px solid white;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.back-link:hover {
+    background: white;
+    color: var(--art-theme);
+}
+
+/* ---------- Tab Navigation ---------- */
+.tab-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    flex-wrap: wrap;
+}
+
+.tab-button {
+    background: #f0f0f0;
+    border: none;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s;
+    color: #333;
+    white-space: nowrap;
+}
+
+.tab-button:hover {
+    background: #e0e0e0;
+}
+
+.tab-button.active {
+    background: var(--art-theme);
+    color: white;
+}
+
+/* ---------- Tab Content ---------- */
+.tab-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tab-pane {
+    display: none;
+    max-width: 100%;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tab-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--art-theme);
+}
+
+/* ---------- Caspio Form Fixes ---------- */
+.tab-pane #caspioform {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+}
+
+#caspioform {
+    position: relative;
+    z-index: 1;
+}
+
+.cbFormModal,
+.cbModalBackground,
+[id*="cbModal"],
+[class*="cbModal"] {
+    z-index: 9999 !important;
+}
+
+/* ---------- Modal Styles (Notes) ---------- */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    background-color: var(--art-theme);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.close {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.close:hover,
+.close:focus {
+    opacity: 0.8;
+}
+
+/* View notes modal - wider */
+.view-notes-modal .modal-content {
+    max-width: 800px;
+}
+
+.view-notes-modal .modal-body {
+    padding: 0;
+}
+
+/* ---------- Info Message (AE) ---------- */
+.info-message {
+    background: #f0f4f8;
+    border-left: 4px solid var(--art-theme);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.info-message p {
+    margin: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ---------- NEW Badge ---------- */
+.new-badge {
+    display: inline-block;
+    background: #dc3545;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* ---------- More Dropdown (AE) ---------- */
+.more-dropdown {
+    position: relative;
+}
+
+.more-button {
+    background: #f0f0f0;
+    border: none;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.more-button:hover {
+    background: #e0e0e0;
+}
+
+.more-button.active {
+    background: var(--art-theme);
+    color: white;
+}
+
+.more-button svg {
+    transition: transform 0.3s;
+}
+
+.more-button.open svg {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 220px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-category {
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666;
+    background: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dropdown-item {
+    display: flex;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-item:hover {
+    background: #f5f5f5;
+    color: var(--art-theme);
+}
+
+.dropdown-item.active {
+    background: #fff5f5;
+    color: var(--art-theme);
+    font-weight: 500;
+}
+
+.dropdown-item svg {
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+/* ---------- Steve-specific: Table tab overflow ---------- */
+#table-tab {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Steve-specific: Mockup tab fixes ---------- */
+#mockup-tab.tab-pane.active,
+#sendmockup-tab.tab-pane.active {
+    display: block !important;
+}
+
+#mockup-tab .tab-title,
+#sendmockup-tab .tab-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--art-theme);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+#mockup-tab .cbResultSetTable,
+#mockup-tab table,
+#mockup-tab form {
+    position: relative;
+    z-index: 1;
+}
+
+#mockup-iframe {
+    width: 100%;
+    min-height: 600px;
+    height: auto;
+    border: none;
+}
+
+/* ==========================================================================
+   Requirements Tab — Billing Codes, File Requirements, Fee Structure
+   Used by: art-hub-steve.html (Requirements & Fees tab)
+   ========================================================================== */
+
+/* ---------- Section Headers ---------- */
+.req-section {
+    margin-bottom: 40px;
+}
+
+.req-section-title {
+    color: var(--art-theme);
+    border-bottom: 2px solid var(--art-theme);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* ---------- Billing Codes Section ---------- */
+.billing-codes-section {
+    background: linear-gradient(135deg, var(--art-theme-light) 0%, #e0f2e0 100%);
+    border: 2px solid var(--art-theme);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0,153,0,0.1);
+}
+
+.billing-codes-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.billing-codes-icon {
+    background: var(--art-theme);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.billing-codes-title {
+    margin: 0;
+    color: var(--art-theme);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.billing-codes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* ---------- Billing Code Cards (GRT-50, GRT-75) ---------- */
+.billing-code-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.billing-code-header {
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.billing-code-header--green  { background: #4caf50; }
+.billing-code-header--blue   { background: #2196f3; }
+
+.billing-code-pn {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.billing-code-subtitle {
+    font-size: 14px;
+    opacity: 0.95;
+    margin-top: 2px;
+}
+
+.billing-code-price {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.billing-code-body {
+    padding: 20px;
+}
+
+.billing-code-body-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.billing-code-body-desc {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* ---------- Callout Boxes ---------- */
+.callout {
+    padding: 10px 15px;
+    border-radius: 4px;
+    border-left: 3px solid;
+}
+
+.callout--blue {
+    background: #f0f9ff;
+    border-left-color: #2196f3;
+}
+
+.callout--amber {
+    background: #fff8e1;
+    border-left-color: #ffc107;
+}
+
+.callout--orange {
+    background: #fff3e0;
+    border-left-color: #ff9800;
+}
+
+.callout-label {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.callout-label--blue   { color: #1976d2; }
+.callout-label--amber  { color: #f57c00; }
+.callout-label--orange { color: #e65100; }
+
+.callout ul {
+    margin: 5px 0 0 0;
+    padding-left: 20px;
+    font-size: 13px;
+    color: #555;
+}
+
+.callout--spaced {
+    margin-top: 20px;
+}
+
+.callout-text {
+    font-size: 13px;
+    color: #666;
+}
+
+/* ---------- Billing Increments Grid ---------- */
+.increments-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5px 15px;
+    font-size: 13px;
+    color: #555;
+}
+
+.increments-grid .amount {
+    font-weight: 600;
+}
+
+/* ---------- Pro Tip / Important Note Boxes ---------- */
+.pro-tip-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.pro-tip-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pro-tip-text {
+    font-size: 14px;
+    color: #333;
+}
+
+.important-note {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--art-theme-light);
+    border: 2px solid var(--art-theme);
+    border-radius: 8px;
+}
+
+.important-note-inner {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.important-note-icon {
+    background: var(--art-theme);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.important-note-title {
+    font-weight: 600;
+    color: var(--art-theme);
+    margin-bottom: 5px;
+}
+
+.important-note-text {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* ---------- Quick Navigation Buttons ---------- */
+.quick-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.quick-nav-btn {
+    padding: 8px 16px;
+    background: var(--art-theme);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.quick-nav-btn:hover {
+    opacity: 0.9;
+}
+
+/* ---------- File Requirements Cards ---------- */
+.file-req-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.file-req-card {
+    background: white;
+    border: 2px solid var(--art-theme);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.file-req-card-header {
+    background: var(--art-theme);
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.file-req-card-body {
+    padding: 15px;
+}
+
+.file-req-card-body h4 {
+    color: #333;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.file-req-card-body ul {
+    margin: 0 0 15px 0;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.file-req-highlight {
+    margin: 10px 0;
+    padding: 10px;
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    border-radius: 4px;
+}
+
+.file-req-highlight strong {
+    color: #1976d2;
+}
+
+.file-req-item {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+/* ---------- File Definitions Section ---------- */
+.file-def-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.file-def-column-header {
+    background: #53565a;
+    color: white;
+    padding: 10px;
+    margin: 0 0 15px 0;
+    border-radius: 4px;
+}
+
+.file-def-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.file-def-card:last-child {
+    margin-bottom: 0;
+}
+
+.file-def-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.file-def-badge {
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.file-def-badge--png  { background: #4caf50; }
+.file-def-badge--jpg  { background: #ff9800; }
+.file-def-badge--psd  { background: #9c27b0; }
+.file-def-badge--ai   { background: #ff5722; }
+.file-def-badge--cdr  { background: #3f51b5; }
+.file-def-badge--pdf  { background: #e91e63; }
+.file-def-badge--eps  { background: #607d8b; }
+
+.file-def-type-label {
+    color: #666;
+    font-size: 13px;
+}
+
+.vector-tag {
+    background: #4caf50;
+    color: white;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.file-def-desc {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.highlight-blue {
+    color: #2196f3;
+    font-weight: bold;
+}
+
+.highlight-pink {
+    color: #e91e63;
+    font-weight: bold;
+}
+
+/* ---------- Fee Structure Section ---------- */
+.fee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.fee-card-primary {
+    background: linear-gradient(135deg, var(--art-theme) 0%, #00b300 100%);
+    border-radius: 12px;
+    padding: 25px;
+    color: white;
+    box-shadow: 0 8px 16px rgba(0,153,0,0.2);
+}
+
+.fee-card-secondary {
+    background: white;
+    border: 2px solid var(--art-theme);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.fee-amount {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.fee-card-secondary .fee-amount {
+    color: var(--art-theme);
+}
+
+.fee-label {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.fee-card-primary .fee-label {
+    opacity: 0.95;
+}
+
+.fee-card-secondary .fee-label {
+    color: #333;
+}
+
+.fee-card-secondary .fee-desc {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.fee-includes {
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.fee-includes-title {
+    margin-bottom: 12px;
+}
+
+.fee-includes-item {
+    display: flex;
+    align-items: start;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.fee-includes-item:last-child {
+    margin-bottom: 0;
+}
+
+.numbered-circle {
+    background: white;
+    color: var(--art-theme);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.fee-increments-box {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.fee-increments-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.fee-increments-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 15px;
+    font-size: 15px;
+}
+
+.fee-increments-grid .time-label {
+    color: #666;
+}
+
+.fee-increments-grid .time-price {
+    color: var(--art-theme);
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   Gallery Tab — JS-Injected Elements (Status Bar, Quick Actions, Modals)
+   Used by: art-hub-steve.js (dynamically created DOM elements)
+   ========================================================================== */
+
+/* ---------- Status Summary Bar ---------- */
+.art-status-summary {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 16px;
+}
+
+.status-pill--submitted     { background: #f3e8ff; color: #6f42c1; }
+.status-pill--inprogress    { background: #e6f3ff; color: #0066cc; }
+.status-pill--awaiting      { background: #fff4e6; color: #cc6d00; }
+.status-pill--completed     { background: #e6ffed; color: #00802b; }
+.status-pill--overdue       { background: #ffe6e6; color: #cc0000; }
+
+/* ---------- Quick-Action Buttons ---------- */
+.quick-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 20px 12px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.quick-action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    transition: background 0.2s;
+}
+
+.quick-action-btn--blue   { background: #0066cc; }
+.quick-action-btn--blue:hover  { background: #0052a3; }
+
+.quick-action-btn--green  { background: #28a745; }
+.quick-action-btn--green:hover { background: #218838; }
+
+.quick-action-btn--orange { background: #e67e22; }
+.quick-action-btn--orange:hover { background: #cf6d17; }
+
+/* ---------- Modal Overlay ---------- */
+.art-modal-overlay {
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+}
+
+/* ---------- Modal Base ---------- */
+.art-modal {
+    position: fixed;
+    z-index: 10001;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    max-width: 90vw;
+    overflow: hidden;
+}
+
+.art-modal--sm { width: 360px; }
+.art-modal--md { width: 400px; }
+
+/* ---------- Modal Header ---------- */
+.art-modal-header {
+    color: white;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.art-modal-header--green  { background: #28a745; }
+.art-modal-header--orange { background: #e67e22; }
+
+/* ---------- Modal Body ---------- */
+.art-modal-body {
+    padding: 20px;
+}
+
+.art-modal-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* ---------- Stepper (Art Time Modal) ---------- */
+.stepper-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.stepper-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.stepper-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.art-cost-display {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+/* ---------- Modal Actions ---------- */
+.art-modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.art-modal-actions--spaced {
+    margin-top: 12px;
+}
+
+.art-modal-btn-cancel {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.art-modal-btn-submit {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.art-modal-btn-submit--green  { background: #28a745; }
+.art-modal-btn-submit--orange { background: #e67e22; }
+
+/* ---------- Send Back Textarea ---------- */
+.send-back-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+/* ---------- Modal Checkbox + Header Badge ---------- */
+.art-modal-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #555;
+    margin: 12px 0;
+    cursor: pointer;
+}
+
+.art-modal-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.art-modal-header-badge {
+    font-size: 12px;
+    background: rgba(255,255,255,0.25);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.art-modal-label--spaced {
+    margin-top: 14px;
+}
+
+/* ==========================================================================
+   Caspio Theme Overrides — Gallery Cards
+   Override hardcoded colors in Caspio DataPage CSS to use theme variables
+   ========================================================================== */
+.card-header {
+    background: linear-gradient(135deg, var(--art-theme), var(--art-theme-dark, #006600)) !important;
+}
+
+.cbResultSetSearchContainer button[type="submit"] {
+    background-color: var(--art-theme) !important;
+    border-color: var(--art-theme) !important;
+}
