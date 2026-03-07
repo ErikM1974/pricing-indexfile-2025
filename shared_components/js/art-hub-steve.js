@@ -98,61 +98,35 @@
         }
     }
 
-    // ── Status Summary Bar ──────────────────────────────────────────────
+    // ── Status Summary Bar (removed — clutter for Steve) ─────────────
     function buildSummaryBar() {
         const existing = document.getElementById('art-status-summary');
         if (existing) existing.remove();
-
-        const galleryTab = document.getElementById('gallery-tab');
-        if (!galleryTab) return;
-
-        const cards = galleryTab.querySelectorAll('.card');
-        if (!cards.length) return;
-
-        const counts = { submitted: 0, inprogress: 0, awaitingapproval: 0, completed: 0, overdue: 0, cancel: 0 };
-
-        cards.forEach(card => {
-            const statusPill = card.querySelector('.status-pill');
-            if (statusPill) {
-                const raw = statusPill.textContent.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase().replace(/\s+/g, '');
-                if (counts.hasOwnProperty(raw)) counts[raw]++;
-            }
-            const duePill = card.querySelector('.due-status-pill');
-            if (duePill && duePill.textContent.trim().toLowerCase() === 'overdue') {
-                counts.overdue++;
-            }
-        });
-
-        const bar = document.createElement('div');
-        bar.id = 'art-status-summary';
-        bar.className = 'art-status-summary';
-
-        const pills = [
-            { label: 'Submitted',   count: counts.submitted,        cls: 'submitted' },
-            { label: 'In Progress', count: counts.inprogress,       cls: 'inprogress' },
-            { label: 'Awaiting',    count: counts.awaitingapproval, cls: 'awaiting' },
-            { label: 'Completed',   count: counts.completed,        cls: 'completed' },
-            { label: 'Overdue',     count: counts.overdue,          cls: 'overdue' },
-        ];
-
-        pills.forEach(p => {
-            const span = document.createElement('span');
-            span.className = `status-pill status-pill--${p.cls}`;
-            span.textContent = `${p.count} ${p.label}`;
-            bar.appendChild(span);
-        });
-
-        const title = galleryTab.querySelector('.tab-title');
-        if (title) {
-            title.insertAdjacentElement('afterend', bar);
-        } else {
-            galleryTab.prepend(bar);
-        }
     }
 
-    // ── Quick-Action Buttons ────────────────────────────────────────────
+    // ── Card Footer Buttons (unified row) ────────────────────────────────
     function injectQuickActions(card) {
-        if (card.querySelector('.quick-actions')) return;
+        if (card.querySelector('.card-footer-buttons')) return;
+
+        const statusPill = card.querySelector('.status-pill');
+        let status = '';
+        if (statusPill) {
+            status = statusPill.textContent.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase().replace(/\s+/g, '');
+        }
+
+        const isCompleted = status === 'completed';
+        const isCancelled = status === 'cancel';
+        const isInactive = isCompleted || isCancelled;
+
+        // Hide Overdue badge on completed cards
+        if (isCompleted) {
+            const duePill = card.querySelector('.due-status-pill');
+            if (duePill) duePill.style.display = 'none';
+            card.classList.add('card--completed');
+        }
+        if (isCancelled) {
+            card.classList.add('card--cancel');
+        }
 
         const idDiv = card.querySelector('.id-design');
         if (!idDiv) return;
@@ -162,13 +136,14 @@
         const footer = card.querySelector('.card-footer');
         if (!footer) return;
 
-        const group = document.createElement('div');
-        group.className = 'quick-actions';
+        // Build unified button container
+        const container = document.createElement('div');
+        container.className = 'card-footer-buttons';
 
         function btn(label, colorClass, onClick) {
             const b = document.createElement('button');
             b.textContent = label;
-            b.className = `quick-action-btn quick-action-btn--${colorClass}`;
+            b.className = `footer-btn footer-btn--${colorClass}`;
             b.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -177,36 +152,57 @@
             return b;
         }
 
-        group.appendChild(btn('Working', 'blue', async (b) => {
-            b.disabled = true;
-            b.textContent = 'Updating...';
-            try {
-                const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'In Progress\u{1F535}' })
-                });
-                if (!resp.ok) throw new Error(`Status ${resp.status}`);
-                b.textContent = 'Updated!';
-                b.style.background = '#28a745';
-                setTimeout(() => window.location.reload(), 800);
-            } catch (err) {
-                b.textContent = 'Error';
-                b.style.background = '#dc3545';
-                console.error('Quick action failed:', err);
-                setTimeout(() => { b.textContent = 'Working'; b.style.background = '#0066cc'; b.disabled = false; }, 2000);
+        // Left group: notes buttons
+        const notesGroup = document.createElement('div');
+        notesGroup.className = 'footer-notes-group';
+
+        if (!isInactive) {
+            notesGroup.appendChild(btn('Add Note', 'notes', () => openNoteModal(designId)));
+        }
+        notesGroup.appendChild(btn('View Notes', 'notes', () => viewNotesModal(designId)));
+
+        // Right group: action buttons + View Details
+        const actionsGroup = document.createElement('div');
+        actionsGroup.className = 'footer-actions-group';
+
+        if (!isInactive) {
+            actionsGroup.appendChild(btn('Working', 'working', async (b) => {
+                b.disabled = true;
+                b.textContent = 'Updating...';
+                try {
+                    const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'In Progress\u{1F535}' })
+                    });
+                    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+                    b.textContent = 'Updated!';
+                    b.style.background = '#28a745';
+                    setTimeout(() => window.location.reload(), 800);
+                } catch (err) {
+                    b.textContent = 'Error';
+                    b.style.background = '#dc3545';
+                    console.error('Quick action failed:', err);
+                    setTimeout(() => { b.textContent = 'Working'; b.style.background = ''; b.disabled = false; }, 2000);
+                }
+            }));
+
+            actionsGroup.appendChild(btn('Done', 'done', () => showArtTimeModal(designId)));
+            actionsGroup.appendChild(btn('Send Back', 'sendback', () => showSendBackModal(designId)));
+        }
+
+        // View Details — always shown, clicks Caspio's hidden DetailsLink
+        actionsGroup.appendChild(btn('View Details', 'details', () => {
+            const dataRow = card.closest('div[data-cb-name="data-row"]');
+            const caspioLink = dataRow && dataRow.querySelector('a[data-cb-name="DetailsLink"]');
+            if (caspioLink) {
+                caspioLink.click();
             }
         }));
 
-        group.appendChild(btn('Done', 'green', (b) => {
-            showArtTimeModal(designId);
-        }));
-
-        group.appendChild(btn('Send Back', 'orange', (b) => {
-            showSendBackModal(designId);
-        }));
-
-        footer.insertAdjacentElement('afterend', group);
+        container.appendChild(notesGroup);
+        container.appendChild(actionsGroup);
+        footer.appendChild(container);
     }
 
     // ── Art Time Modal (Done action) ────────────────────────────────────

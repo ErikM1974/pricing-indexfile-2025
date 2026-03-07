@@ -886,60 +886,44 @@ body {
    Used by: art-hub-steve.js (dynamically created DOM elements)
    ========================================================================== */
 
-/* ---------- Status Summary Bar ---------- */
-.art-status-summary {
+
+/* ---------- Unified Card Footer Buttons ---------- */
+.card-footer-buttons {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-    padding: 12px 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.status-pill {
-    padding: 4px 12px;
-    border-radius: 16px;
-}
-
-.status-pill--submitted     { background: #f3e8ff; color: #6f42c1; }
-.status-pill--inprogress    { background: #e6f3ff; color: #0066cc; }
-.status-pill--awaiting      { background: #fff4e6; color: #cc6d00; }
-.status-pill--completed     { background: #e6ffed; color: #00802b; }
-.status-pill--overdue       { background: #ffe6e6; color: #cc0000; }
-
-/* ---------- Quick-Action Buttons ---------- */
-.quick-actions {
-    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 6px;
-    margin-top: 8px;
-    padding: 8px 20px 12px;
-    background: #f8f9fa;
-    border-top: 1px solid #eee;
+    width: 100%;
 }
 
-.quick-action-btn {
-    padding: 6px 12px;
+.footer-notes-group,
+.footer-actions-group {
+    display: flex;
+    gap: 4px;
+}
+
+.footer-btn {
+    padding: 5px 10px;
     border: none;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     color: white;
-    transition: background 0.2s;
+    transition: opacity 0.2s;
+    white-space: nowrap;
 }
+.footer-btn:hover { opacity: 0.85; }
 
-.quick-action-btn--blue   { background: #0066cc; }
-.quick-action-btn--blue:hover  { background: #0052a3; }
+.footer-btn--notes    { background: #007bff; }
+.footer-btn--working  { background: #0066cc; }
+.footer-btn--done     { background: #28a745; }
+.footer-btn--sendback { background: #e67e22; }
+.footer-btn--details  { background: #6c757d; }
 
-.quick-action-btn--green  { background: #28a745; }
-.quick-action-btn--green:hover { background: #218838; }
-
-.quick-action-btn--orange { background: #e67e22; }
-.quick-action-btn--orange:hover { background: #cf6d17; }
+/* ---------- Completed / Cancelled Card States ---------- */
+.card--completed { border-left: 4px solid #28a745; opacity: 0.85; }
+.card--cancel    { border-left: 4px solid #999; opacity: 0.7; }
 
 /* ---------- Modal Overlay ---------- */
 .art-modal-overlay {
@@ -1112,7 +1096,72 @@ body {
     background: linear-gradient(135deg, var(--art-theme), var(--art-theme-dark, #006600)) !important;
 }
 
-.cbResultSetSearchContainer button[type="submit"] {
+/* Search bar: force inline layout and green button */
+/* Caspio injects display:inline-grid + grid placement on children.
+   Override to flex so label, input, and button sit in one centered row. */
+.cbSearchSpa {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    overflow: visible !important;
+    padding: 15px 20px !important;
+}
+
+/* Caspio wraps search form in div[style="display: table;"] — scope override
+   to only the form wrapper, not all divs on the page */
+#caspioform > div[style="display: table;"] {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Prevent Caspio block classes from expanding flex children */
+.cbSearchSpa .cbFormNestedTableContainer,
+.cbSearchSpa .cbSearchButtonContainer {
+    flex: 0 0 auto !important;
+    width: auto !important;
+}
+
+/* Keep label + input side-by-side inside the nested container */
+.cbSearchSpa .cbFormNestedTableContainer {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.cbSearchSpa .cbFormLabelCell {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+
+.cbSearchSpa .cbFormFieldCell {
+    flex-shrink: 0 !important;
+}
+
+.cbSearchSpa input.cbFormTextField {
+    width: 200px !important;
+    min-width: 200px !important;
+    box-sizing: border-box !important;
+}
+
+.cbSearchSpa .cbSearchButtonContainer {
+    padding: 0 !important;
+}
+
+.cbSearchSpa input.cbSearchButton {
+    margin: 0 !important;
+}
+
+input.cbSearchButton {
     background-color: var(--art-theme) !important;
-    border-color: var(--art-theme) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: white !important;
+    padding: 0 25px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    height: 42px !important;
+    line-height: 42px !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important;
 }
