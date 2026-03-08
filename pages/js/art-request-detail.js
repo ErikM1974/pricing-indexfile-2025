@@ -284,7 +284,7 @@
             const statusResp = await fetch(`${API_BASE}/api/art-requests/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Completed \u2705' })
+                body: JSON.stringify({ status: 'Completed' })
             });
             if (!statusResp.ok) throw new Error(`Status update failed: ${statusResp.status}`);
 
@@ -365,7 +365,7 @@
             const statusResp = await fetch(`${API_BASE}/api/art-requests/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Revision Requested \uD83D\uDD04' })
+                body: JSON.stringify({ status: 'Revision Requested' })
             });
             if (!statusResp.ok) throw new Error(`Status update failed: ${statusResp.status}`);
 

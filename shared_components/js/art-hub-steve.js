@@ -587,7 +587,7 @@
                     const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'In Progress\u{1F535}' })
+                        body: JSON.stringify({ status: 'In Progress' })
                     });
                     if (!resp.ok) throw new Error(`Status ${resp.status}`);
                     b.textContent = 'Updated!';
@@ -747,7 +747,7 @@
                 const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'Completed \u2705', artMinutes: mins })
+                    body: JSON.stringify({ status: 'Completed', artMinutes: mins })
                 });
                 if (!resp.ok) throw new Error(`Status ${resp.status}`);
 
@@ -1128,7 +1128,7 @@
 
         try {
             // 1. Update status to Awaiting Approval (backend handles additive art time)
-            const statusBody = { status: 'Awaiting Approval \uD83D\uDFE1' };
+            const statusBody = { status: 'Awaiting Approval' };
             if (mins > 0) statusBody.artMinutes = mins;
 
             const statusResp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
