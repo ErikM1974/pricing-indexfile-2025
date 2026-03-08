@@ -895,11 +895,22 @@ div[data-cb-name="RACtnr"] {
     display: none !important;
 }
 
+/* Extra-specificity hide for Caspio record action menus (three-dot icons).
+   Caspio may re-inject styles after ours — this outranks via class + attribute. */
+#gallery-tab .cbResultSetPanelColumnarRAContainer,
+#gallery-tab div.cbResultSetPanelColumnarRAContainer[data-cb-name="RACtnr"] {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
 .cbResultSetListViewTableOddCell,
 .cbResultSetListViewTableEvenCell {
     background: none !important;
     border: none !important;
     padding: 0 !important;
+    margin: 0 !important; /* Caspio adds margin-bottom:10px — remove for grid gap control */
 }
 
 /* --- Caspio Form Overflow Fix (prevent horizontal scrollbar) --- */
@@ -909,10 +920,12 @@ div[data-cb-name="RACtnr"] {
 }
 
 /* --- Gallery Grid (scoped to Steve's gallery tab) --- */
+/* minmax(0, 1fr) prevents grid blowout — plain 1fr respects min-content,
+   which lets wide card content push columns past the container edge. */
 #gallery-tab .cbColumnarReport {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -925,25 +938,26 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 
 /* --- Card Structure --- */
 .card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border: 1px solid #dde1e6;
+    border-radius: 10px;
     overflow: hidden;
     background-color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    /* No height:100% — let cards size naturally so short cards
+       don't get 100+px of dead whitespace in a mixed-content row */
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .card-header {
     color: white;
-    padding: 12px 15px;
+    padding: 10px 14px;
 }
 
 .card-header-top {
@@ -954,33 +968,35 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 }
 
 .card-header .company-name {
-    font-size: 1.2em;
-    font-weight: bold;
+    font-size: 1.15em;
+    font-weight: 700;
     margin: 0;
     color: white !important;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    letter-spacing: 0.01em;
 }
 
 .card-header .design-num {
-    font-size: 0.8em;
-    opacity: 0.9;
+    font-size: 0.75em;
+    opacity: 0.95;
     font-family: 'Courier New', monospace;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.18);
     padding: 2px 8px;
     border-radius: 4px;
     white-space: nowrap;
+    letter-spacing: 0.03em;
 }
 
 .card-header-sub {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 4px;
-    font-size: 0.85em;
-    opacity: 0.9;
+    margin-top: 3px;
+    font-size: 0.8em;
+    opacity: 0.85;
 }
 
 .card-header .id-design {
@@ -996,62 +1012,67 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 }
 
 .card-body {
-    padding: 12px 15px;
+    padding: 10px 14px 12px;
     flex-grow: 1;
 }
 
 /* --- Status & Due Date Pills --- */
 .status-container {
     display: flex;
-    gap: 10px;
-    margin-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
     align-items: center;
 }
 
 .due-date-actual {
-    font-size: 0.8em;
-    color: #666;
+    font-size: 0.78em;
+    color: #888;
     margin-left: auto;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .pill {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-weight: bold;
-    font-size: 0.85em;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.78em;
     text-align: center;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
 }
 
 .status-submitted        { background-color: #f3e8ff; color: #6f42c1; }
-.status-inprogress       { background-color: #e6f3ff; color: #0066cc; }
-.status-awaitingapproval { background-color: #fff4e6; color: #cc6d00; }
-.status-completed        { background-color: #e6ffed; color: #00802b; }
-.status-cancel           { background-color: #ffe6e6; color: #cc0000; }
-.status-revisionrequested { background-color: #fff4e6; color: #cc6d00; }
+.status-inprogress       { background-color: #dbeafe; color: #1d4ed8; }
+.status-awaitingapproval { background-color: #fef3c7; color: #b45309; }
+.status-completed        { background-color: #dcfce7; color: #15803d; }
+.status-cancel           { background-color: #fee2e2; color: #b91c1c; }
+.status-revisionrequested { background-color: #ffedd5; color: #c2410c; }
 
-.due-overdue   { background-color: #c0392b; color: white; }
-.due-today     { background-color: #e74c3c; color: white; }
-.due-tomorrow  { background-color: #f39c12; color: white; }
-.due-in-2-days { background-color: #f1c40f; color: #333; }
-.due-soon      { background-color: #3498db; color: white; }
-.due-upcoming  { background-color: #2ecc71; color: white; }
+.due-overdue   { background-color: #dc2626; color: white; }
+.due-today     { background-color: #ef4444; color: white; }
+.due-tomorrow  { background-color: #f59e0b; color: white; }
+.due-in-2-days { background-color: #fbbf24; color: #292524; }
+.due-soon      { background-color: #3b82f6; color: white; }
+.due-upcoming  { background-color: #22c55e; color: white; }
 
 /* --- Info Grid --- */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-bottom: 10px;
-    font-size: 0.85em;
+    gap: 5px;
+    margin-bottom: 8px;
+    font-size: 0.82em;
 }
 
 .info-item {
-    background-color: #f8f9fa;
-    padding: 6px 8px;
-    border-radius: 6px;
+    background-color: #f7f8fa;
+    padding: 5px 8px;
+    border-radius: 5px;
+    min-width: 0; /* prevent grid blowout from long text */
 }
 
 .info-item.art-charge {
@@ -1065,40 +1086,46 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 }
 
 .charge-separator {
-    color: #999;
+    color: #bbb;
 }
 
 .info-item .label {
-    font-weight: bold;
-    color: #555;
+    font-weight: 600;
+    font-size: 0.85em;
+    color: #888;
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .info-item .value {
-    color: #333;
+    color: #1a1a1a;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .info-item .value a {
     color: #007bff;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 /* --- Image Gallery --- */
 .image-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .image-wrapper {
     position: relative;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 6px;
     aspect-ratio: 1 / 1;
-    background-color: #e9ecef;
+    background-color: #f0f1f3;
 }
 
 .image-wrapper img {
@@ -1106,7 +1133,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     height: 100%;
     object-fit: cover;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .image-wrapper img:hover {
@@ -1115,9 +1142,9 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 
 /* --- Card Footer (base container for JS-injected buttons) --- */
 .card-footer {
-    padding: 15px 20px;
+    padding: 0;
     background-color: #f8f9fa;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #eee;
 }
 
 /* --- Image Modal --- */
@@ -1166,7 +1193,16 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 /* --- Gallery Responsive --- */
 @media (max-width: 768px) {
     #gallery-tab .cbColumnarReport {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .card-header .company-name {
+        font-size: 1.05em;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -1182,59 +1218,62 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     flex-direction: column;
     gap: 4px;
     width: 100%;
-    padding: 8px 12px 6px;
+    padding: 8px 12px;
+    box-sizing: border-box;
 }
 
 .footer-button-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    flex-wrap: wrap;
 }
 
 .footer-notes-group,
 .footer-actions-group {
     display: flex;
-    gap: 4px;
+    gap: 3px;
 }
 
 .footer-btn {
-    padding: 5px 12px;
+    padding: 5px 9px;
     border: none;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     color: white;
-    transition: opacity 0.2s;
+    transition: opacity 0.15s, transform 0.15s;
     white-space: nowrap;
 }
-.footer-btn:hover { opacity: 0.85; }
+.footer-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.footer-btn:active { transform: translateY(0); }
 
-.footer-btn--notes    { background: #007bff; }
-.footer-btn--working  { background: #0066cc; }
-.footer-btn--done     { background: #28a745; }
-.footer-btn--sendback { background: #e67e22; }
+.footer-btn--notes    { background: #3b82f6; }
+.footer-btn--working  { background: #2563eb; }
+.footer-btn--done     { background: #16a34a; }
+.footer-btn--sendback { background: #ea580c; }
 
 /* View Details — subtle text link below button row */
 .card-details-link {
     display: block;
     text-align: center;
-    font-size: 12px;
-    color: #6c757d;
+    font-size: 11px;
+    color: #9ca3af;
     text-decoration: none;
-    padding: 4px 0 0;
-    margin-top: 2px;
-    border-top: 1px solid #eee;
+    padding: 5px 0;
+    border-top: 1px solid #f0f0f0;
     cursor: pointer;
+    transition: color 0.15s;
 }
 .card-details-link:hover {
     color: var(--art-theme);
 }
 
 /* ---------- Completed / Cancelled Card States ---------- */
-.card--completed { border-left: 4px solid #28a745; opacity: 0.85; }
-.card--cancel    { border-left: 4px solid #999; opacity: 0.7; }
+.card--completed { border-left: 3px solid #22c55e; opacity: 0.8; }
+.card--cancel    { border-left: 3px solid #9ca3af; opacity: 0.65; }
 
 /* ---------- Modal Overlay ---------- */
 .art-modal-overlay {
@@ -1404,7 +1443,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
    Override hardcoded colors in Caspio DataPage CSS to use theme variables
    ========================================================================== */
 .card-header {
-    background: linear-gradient(135deg, var(--art-theme), var(--art-theme-dark, #006600)) !important;
+    background: linear-gradient(145deg, var(--art-theme), var(--art-theme-dark, #006600)) !important;
 }
 
 /* Search bar: force inline layout and green button */
