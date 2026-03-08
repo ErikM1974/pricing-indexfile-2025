@@ -98,6 +98,105 @@
         }
     }
 
+    // ── Image Modal (migrated from Caspio Footer) ─────────────────────
+    window.showModal = function (src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        if (modal && modalImg) {
+            modalImg.src = src;
+            modal.classList.add('show');
+        }
+    };
+
+    // ── Card Data Processing (migrated from Caspio Footer) ──────────
+    function styleCardPills(card) {
+        const block = card.closest('div[data-cb-name="data-row"]');
+        if (!block) return;
+
+        // Due date pill — read from Caspio calculated field
+        const duePill = card.querySelector('.due-status-pill');
+        const calcField = block.querySelector('.cbResultSetCalculatedField');
+        if (duePill && calcField) {
+            const text = calcField.textContent.trim();
+            duePill.textContent = text;
+            duePill.className = 'pill due-status-pill due-' + text.toLowerCase().replace(/ /g, '-');
+        }
+
+        // Status pill — add CSS class from text
+        const statusPill = card.querySelector('.status-pill');
+        if (statusPill) {
+            const text = statusPill.textContent.trim();
+            const clean = text.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase().replace(/\s+/g, '');
+            statusPill.className = 'pill status-pill status-' + clean;
+        }
+    }
+
+    function calculateArtHours(card) {
+        const chargeSpan = card.querySelector('.charge-amount');
+        const hoursSpan = card.querySelector('.charge-hours');
+        if (!chargeSpan || !hoursSpan) return;
+
+        const charge = parseFloat(chargeSpan.textContent.replace('$', '')) || 0;
+        if (charge > 0) {
+            const quarterHours = Math.ceil(charge / 18.75);
+            hoursSpan.textContent = (quarterHours * 0.25).toFixed(2) + ' hrs';
+        } else {
+            hoursSpan.textContent = '0.00 hrs';
+        }
+    }
+
+    // ── Rep Name Formatting (email → display name) ────────────────────
+    function formatRepName(card) {
+        const repEl = card.querySelector('.rep-name');
+        if (!repEl || repEl.dataset.formatted) return;
+        repEl.dataset.formatted = '1';
+
+        const email = (repEl.dataset.email || repEl.textContent || '').trim();
+        if (!email) return;
+
+        // Reverse lookup from REP_EMAIL_MAP
+        let displayName = '';
+        for (const [name, addr] of Object.entries(REP_EMAIL_MAP)) {
+            if (email.toLowerCase() === addr.toLowerCase()) {
+                displayName = name;
+                break;
+            }
+        }
+
+        // Fallback: extract name from email (before @)
+        if (!displayName) {
+            const atIndex = email.indexOf('@');
+            if (atIndex > 0) {
+                const local = email.substring(0, atIndex);
+                displayName = local.charAt(0).toUpperCase() + local.slice(1);
+            } else {
+                displayName = email;
+            }
+        }
+
+        repEl.textContent = displayName;
+        repEl.title = email;
+        repEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = 'mailto:' + email;
+        });
+    }
+
+    // ── Clean Empty Fields (hide SW#, Contact if blank) ─────────────
+    function cleanEmptyFields(card) {
+        // Hide SW design # if empty
+        const swNum = card.querySelector('.design-num');
+        if (swNum && !swNum.textContent.trim()) swNum.style.display = 'none';
+
+        // Hide contact info-item if both names empty
+        const contactItem = card.querySelector('.info-item-contact');
+        if (contactItem) {
+            const val = contactItem.querySelector('.value');
+            if (val && !val.textContent.trim()) contactItem.style.display = 'none';
+        }
+    }
+
     // ── Status Summary Bar (removed — clutter for Steve) ─────────────
     function buildSummaryBar() {
         const existing = document.getElementById('art-status-summary');
@@ -152,6 +251,10 @@
             return b;
         }
 
+        // Button row: notes on left, actions on right
+        const buttonRow = document.createElement('div');
+        buttonRow.className = 'footer-button-row';
+
         // Left group: notes buttons
         const notesGroup = document.createElement('div');
         notesGroup.className = 'footer-notes-group';
@@ -161,7 +264,7 @@
         }
         notesGroup.appendChild(btn('View Notes', 'notes', () => viewNotesModal(designId)));
 
-        // Right group: action buttons + View Details
+        // Right group: action buttons (no View Details here)
         const actionsGroup = document.createElement('div');
         actionsGroup.className = 'footer-actions-group';
 
@@ -191,18 +294,38 @@
             actionsGroup.appendChild(btn('Send Back', 'sendback', () => showSendBackModal(designId)));
         }
 
-        // View Details — always shown, clicks Caspio's hidden DetailsLink
-        actionsGroup.appendChild(btn('View Details', 'details', () => {
+        buttonRow.appendChild(notesGroup);
+        buttonRow.appendChild(actionsGroup);
+        container.appendChild(buttonRow);
+
+        // View Details — subtle text link below button row
+        const detailsLink = document.createElement('a');
+        detailsLink.className = 'card-details-link';
+        detailsLink.textContent = 'View Details \u2192';
+        detailsLink.href = '#';
+        detailsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const dataRow = card.closest('div[data-cb-name="data-row"]');
             const caspioLink = dataRow && dataRow.querySelector('a[data-cb-name="DetailsLink"]');
             if (caspioLink) {
                 caspioLink.click();
             }
-        }));
+        });
+        container.appendChild(detailsLink);
 
-        container.appendChild(notesGroup);
-        container.appendChild(actionsGroup);
         footer.appendChild(container);
+
+        // Make card body clickable to open details
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.footer-button-row, .card-details-link')) return;
+            const dataRow = card.closest('div[data-cb-name="data-row"]');
+            const caspioLink = dataRow && dataRow.querySelector('a[data-cb-name="DetailsLink"]');
+            if (caspioLink) {
+                caspioLink.click();
+            }
+        });
     }
 
     // ── Art Time Modal (Done action) ────────────────────────────────────
@@ -563,7 +686,13 @@
         if (!galleryTab) return;
 
         const cards = galleryTab.querySelectorAll('.card');
-        cards.forEach(injectQuickActions);
+        cards.forEach(card => {
+            styleCardPills(card);
+            calculateArtHours(card);
+            formatRepName(card);
+            cleanEmptyFields(card);
+            injectQuickActions(card);
+        });
         buildSummaryBar();
     }
 
@@ -594,12 +723,19 @@
             setTimeout(processCards, 500);
         });
 
+        // Image modal close button
+        document.getElementById('imageModalClose')?.addEventListener('click', () => {
+            document.getElementById('imageModal').classList.remove('show');
+        });
+
         // Close modals when clicking outside
         window.addEventListener('click', function (event) {
             if (event.target === document.getElementById('noteModal')) {
                 closeNoteModal();
             } else if (event.target === document.getElementById('viewNotesModal')) {
                 closeViewNotesModal();
+            } else if (event.target === document.getElementById('imageModal')) {
+                document.getElementById('imageModal').classList.remove('show');
             }
         });
 

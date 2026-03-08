@@ -882,6 +882,289 @@ body {
 }
 
 /* ==========================================================================
+   Gallery Tab — Caspio Card Layout
+   Migrated from DataPage inline styles → external for maintainability
+   Used by: art-hub-steve.html (Caspio "Artist Gallery- STEVE-2025")
+   ========================================================================== */
+
+/* --- Caspio Layout Fixes (hide default field labels/data) --- */
+.cbResultSetPanelDataContainer > .cbResultSetListViewDataLabel,
+.cbResultSetPanelDataContainer > .cbResultSetData[data-cb-kwn="true"],
+.cbResultSetPanelDataContainer > .cbResultSetData.cbResultSetCalculatedField,
+div[data-cb-name="RACtnr"] {
+    display: none !important;
+}
+
+.cbResultSetListViewTableOddCell,
+.cbResultSetListViewTableEvenCell {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* --- Gallery Grid (scoped to Steve's gallery tab) --- */
+#gallery-tab .cbColumnarReport {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Navigation Centering --- */
+nav[data-cb-name="cbNavigationTableBottom"] {
+    max-width: 1200px;
+    margin: 20px auto 0 auto;
+}
+
+/* --- Card Structure --- */
+.card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.card-header {
+    color: white;
+    padding: 12px 15px;
+}
+
+.card-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.card-header .company-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 0;
+    color: white !important;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-header .design-num {
+    font-size: 0.8em;
+    opacity: 0.9;
+    font-family: 'Courier New', monospace;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.card-header-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    font-size: 0.85em;
+    opacity: 0.9;
+}
+
+.card-header .id-design {
+    font-size: 1em;
+}
+
+.card-header .rep-name {
+    cursor: pointer;
+}
+
+.card-header .rep-name:hover {
+    text-decoration: underline;
+}
+
+.card-body {
+    padding: 12px 15px;
+    flex-grow: 1;
+}
+
+/* --- Status & Due Date Pills --- */
+.status-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.due-date-actual {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.pill {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.status-submitted        { background-color: #f3e8ff; color: #6f42c1; }
+.status-inprogress       { background-color: #e6f3ff; color: #0066cc; }
+.status-awaitingapproval { background-color: #fff4e6; color: #cc6d00; }
+.status-completed        { background-color: #e6ffed; color: #00802b; }
+.status-cancel           { background-color: #ffe6e6; color: #cc0000; }
+.status-revisionrequested { background-color: #fff4e6; color: #cc6d00; }
+
+.due-overdue   { background-color: #c0392b; color: white; }
+.due-today     { background-color: #e74c3c; color: white; }
+.due-tomorrow  { background-color: #f39c12; color: white; }
+.due-in-2-days { background-color: #f1c40f; color: #333; }
+.due-soon      { background-color: #3498db; color: white; }
+.due-upcoming  { background-color: #2ecc71; color: white; }
+
+/* --- Info Grid --- */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 0.85em;
+}
+
+.info-item {
+    background-color: #f8f9fa;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+.info-item.art-charge {
+    grid-column: 1 / -1;
+}
+
+.info-item.art-charge .value {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.charge-separator {
+    color: #999;
+}
+
+.info-item .label {
+    font-weight: bold;
+    color: #555;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.info-item .value {
+    color: #333;
+    font-weight: 500;
+}
+
+.info-item .value a {
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* --- Image Gallery --- */
+.image-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 1 / 1;
+    background-color: #e9ecef;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.image-wrapper img:hover {
+    transform: scale(1.05);
+}
+
+/* --- Card Footer (base container for JS-injected buttons) --- */
+.card-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* --- Image Modal --- */
+#imageModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    align-items: center;
+    justify-content: center;
+}
+
+#imageModal.show {
+    display: flex;
+}
+
+#imageModal .modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    width: auto;
+}
+
+#imageModal .close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* --- Gallery Responsive --- */
+@media (max-width: 768px) {
+    #gallery-tab .cbColumnarReport {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
    Gallery Tab — JS-Injected Elements (Status Bar, Quick Actions, Modals)
    Used by: art-hub-steve.js (dynamically created DOM elements)
    ========================================================================== */
@@ -890,10 +1173,17 @@ body {
 /* ---------- Unified Card Footer Buttons ---------- */
 .card-footer-buttons {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
+    flex-direction: column;
+    gap: 4px;
     width: 100%;
+    padding: 8px 12px 6px;
+}
+
+.footer-button-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
 }
 
 .footer-notes-group,
@@ -903,10 +1193,10 @@ body {
 }
 
 .footer-btn {
-    padding: 5px 10px;
+    padding: 5px 12px;
     border: none;
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     color: white;
@@ -919,7 +1209,22 @@ body {
 .footer-btn--working  { background: #0066cc; }
 .footer-btn--done     { background: #28a745; }
 .footer-btn--sendback { background: #e67e22; }
-.footer-btn--details  { background: #6c757d; }
+
+/* View Details — subtle text link below button row */
+.card-details-link {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #6c757d;
+    text-decoration: none;
+    padding: 4px 0 0;
+    margin-top: 2px;
+    border-top: 1px solid #eee;
+    cursor: pointer;
+}
+.card-details-link:hover {
+    color: var(--art-theme);
+}
 
 /* ---------- Completed / Cancelled Card States ---------- */
 .card--completed { border-left: 4px solid #28a745; opacity: 0.85; }
