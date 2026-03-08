@@ -98,7 +98,11 @@
         // Info fields
         setText('ard-company', req.CompanyName);
         setText('ard-sales-rep', req.Sales_Rep);
-        setText('ard-order-type', req.Order_Type);
+        // Order_Type can be an object like {'6':'Transfer'} from Caspio
+        const orderType = req.Order_Type && typeof req.Order_Type === 'object'
+            ? Object.values(req.Order_Type).join(', ')
+            : req.Order_Type;
+        setText('ard-order-type', orderType);
         setText('ard-priority', req.Priority);
         setText('ard-due-date', formatDate(req.Due_Date));
         setText('ard-date-created', formatDate(req.Date_Created));
@@ -164,6 +168,8 @@
         FILE_FIELDS.forEach(field => {
             const url = req[field.key];
             if (!url || !url.trim()) return;
+            // Filter out bare CDN base URLs that aren't actual files
+            if (/^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(url.trim())) return;
             fileCount++;
 
             const thumb = document.createElement('div');
