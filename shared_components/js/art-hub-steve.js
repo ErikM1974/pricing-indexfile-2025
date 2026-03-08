@@ -3,7 +3,7 @@
  *
  * Handles all interactive behavior for Steve's Art Hub dashboard:
  *   - Tab switching with Caspio conflict protection
- *   - View/Add Notes modals (iframe-based Caspio DataPages)
+ *   - Notes slide-out panel (API-powered, replaces Caspio iframes)
  *   - Quick-action buttons on gallery cards (Working/Done/Send Back)
  *   - Status summary bar above gallery
  *   - EmailJS notifications to sales reps on revision/completion
@@ -29,8 +29,6 @@
     };
 
     // ── Tab Navigation ────────────────────────────────────────────────
-    let noteWasSubmitted = false;
-
     function showTab(tabName, event) {
         if (event) {
             event.stopPropagation();
@@ -69,33 +67,295 @@
         localStorage.setItem('artistDashboardTab', tabName);
     }
 
-    // ── Notes Modals ──────────────────────────────────────────────────
-    function viewNotesModal(designId) {
-        document.getElementById('viewNotesRequestId').textContent = designId;
-        document.getElementById('viewNotesFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000d8d96d34814b43498414?ID_Design=' + designId;
-        document.getElementById('viewNotesModal').style.display = 'block';
+    // ── Notes Slide-Out Panel ───────────────────────────────────────────
+    let currentNotesDesignId = null;
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 
-    function closeViewNotesModal() {
-        document.getElementById('viewNotesModal').style.display = 'none';
-        document.getElementById('viewNotesFrame').src = '';
+    function getNoteTypeClass(noteType) {
+        const lower = (noteType || '').toLowerCase();
+        if (lower.includes('status update'))      return 'note-type-pill--status-update';
+        if (lower.includes('design update'))      return 'note-type-pill--design-update';
+        if (lower.includes('art time'))           return 'note-type-pill--art-time';
+        if (lower.includes('customer feedback'))  return 'note-type-pill--customer-feedback';
+        if (lower.includes('internal note'))      return 'note-type-pill--internal-note';
+        if (lower.includes('revision'))           return 'note-type-pill--design-update';
+        return 'note-type-pill--default';
     }
 
-    function openNoteModal(designId) {
-        noteWasSubmitted = false;
-        document.getElementById('requestId').textContent = designId;
-        document.getElementById('noteFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5?ID_Design=' + designId;
-        document.getElementById('noteModal').style.display = 'block';
-    }
-
-    function closeNoteModal() {
-        document.getElementById('noteModal').style.display = 'none';
-        document.getElementById('noteFrame').src = '';
-
-        if (noteWasSubmitted) {
-            window.location.reload();
-            noteWasSubmitted = false;
+    function getRepDisplayName(email) {
+        if (!email) return 'Unknown';
+        for (const [name, addr] of Object.entries(REP_EMAIL_MAP)) {
+            if (addr === email) return name;
         }
+        // Fallback: extract name before @
+        const atIdx = email.indexOf('@');
+        if (atIdx > 0) {
+            const raw = email.substring(0, atIdx);
+            return raw.charAt(0).toUpperCase() + raw.slice(1);
+        }
+        return email;
+    }
+
+    function formatNoteDate(dateStr) {
+        if (!dateStr) return '--';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    function openNotesPanel(designId, card) {
+        // If already open for a different card, just refresh
+        currentNotesDesignId = designId;
+
+        // Populate header
+        const company = card.querySelector('.company-name');
+        document.getElementById('notes-panel-company').textContent = company ? company.textContent.trim() : '';
+        document.getElementById('notes-panel-id').textContent = 'ID: ' + designId;
+
+        // Reset form
+        document.getElementById('note-type-select').value = '';
+        document.getElementById('note-text').value = '';
+        document.getElementById('note-text').style.borderColor = '';
+        document.getElementById('note-type-select').style.borderColor = '';
+        document.getElementById('note-notify-checkbox').checked = false;
+        document.getElementById('note-submit-btn').disabled = false;
+        document.getElementById('note-submit-btn').textContent = 'Add Note';
+
+        // Show panel
+        document.getElementById('notes-overlay').classList.add('active');
+        document.getElementById('notes-panel').classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        // Fetch notes
+        fetchNotes(designId);
+    }
+
+    function closeNotesPanel() {
+        document.getElementById('notes-panel').classList.remove('open');
+        document.getElementById('notes-overlay').classList.remove('active');
+        document.body.style.overflow = '';
+        currentNotesDesignId = null;
+    }
+
+    async function fetchNotes(designId) {
+        const timeline = document.getElementById('notes-timeline');
+        const loading = document.getElementById('notes-loading');
+        const empty = document.getElementById('notes-empty');
+        const badge = document.getElementById('notes-count-badge');
+
+        timeline.innerHTML = '';
+        loading.style.display = 'block';
+        empty.style.display = 'none';
+        badge.textContent = '...';
+
+        try {
+            const resp = await fetch(`${API_BASE}/api/design-notes?id_design=${designId}`);
+            if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+            const data = await resp.json();
+            const notes = data.Result || data || [];
+
+            loading.style.display = 'none';
+
+            if (!Array.isArray(notes) || notes.length === 0) {
+                empty.style.display = 'block';
+                badge.textContent = '0';
+                return;
+            }
+
+            badge.textContent = notes.length;
+            renderNotesTimeline(notes);
+        } catch (err) {
+            console.error('Failed to fetch notes:', err);
+            loading.style.display = 'none';
+            timeline.innerHTML = `
+                <div class="notes-error">
+                    Unable to load notes. Please try again.
+                    <br><button onclick="document.querySelector('#notes-timeline').innerHTML=''; fetchNotesRetry()">Retry</button>
+                </div>`;
+            badge.textContent = '!';
+        }
+    }
+
+    // Global retry function for the error button
+    window.fetchNotesRetry = function () {
+        if (currentNotesDesignId) fetchNotes(currentNotesDesignId);
+    };
+
+    function renderNotesTimeline(notes) {
+        const timeline = document.getElementById('notes-timeline');
+        timeline.innerHTML = '';
+
+        notes.forEach(note => {
+            const card = document.createElement('div');
+            card.className = 'note-card';
+            card.dataset.noteId = note.Note_ID;
+
+            const noteType = note.Note_Type || 'Note';
+            const typeClass = getNoteTypeClass(noteType);
+            const authorName = getRepDisplayName(note.Note_By);
+            const dateStr = formatNoteDate(note.Note_Date);
+            const noteText = escapeHtml(note.Note_Text || '');
+
+            card.innerHTML = `
+                <div class="note-card-header">
+                    <span class="note-type-pill ${typeClass}">${escapeHtml(noteType)}</span>
+                    <button class="note-delete-btn" title="Delete note" data-note-id="${note.Note_ID}">&times;</button>
+                </div>
+                <div class="note-card-text">${noteText}</div>
+                <div class="note-card-meta">
+                    <span class="note-card-author">${escapeHtml(authorName)}</span>
+                    <span>${dateStr}</span>
+                </div>
+            `;
+
+            // Delete handler
+            card.querySelector('.note-delete-btn').addEventListener('click', () => deleteNote(note.Note_ID));
+
+            timeline.appendChild(card);
+        });
+    }
+
+    async function submitNote() {
+        const noteType = document.getElementById('note-type-select').value;
+        const noteText = document.getElementById('note-text').value.trim();
+        const notify = document.getElementById('note-notify-checkbox').checked;
+        const submitBtn = document.getElementById('note-submit-btn');
+
+        // Validate
+        let valid = true;
+        if (!noteType) {
+            document.getElementById('note-type-select').style.borderColor = '#dc3545';
+            valid = false;
+        } else {
+            document.getElementById('note-type-select').style.borderColor = '';
+        }
+        if (!noteText) {
+            document.getElementById('note-text').style.borderColor = '#dc3545';
+            valid = false;
+        } else {
+            document.getElementById('note-text').style.borderColor = '';
+        }
+        if (!valid) return;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+
+        try {
+            const resp = await fetch(`${API_BASE}/api/design-notes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ID_Design: parseInt(currentNotesDesignId, 10),
+                    Note_Type: noteType,
+                    Note_Text: noteText,
+                    Note_By: 'art@nwcustomapparel.com'
+                })
+            });
+
+            if (!resp.ok) throw new Error(`Create note failed: ${resp.status}`);
+
+            // Clear form
+            document.getElementById('note-type-select').value = '';
+            document.getElementById('note-text').value = '';
+            document.getElementById('note-notify-checkbox').checked = false;
+            submitBtn.textContent = 'Saved!';
+            setTimeout(() => { submitBtn.textContent = 'Add Note'; submitBtn.disabled = false; }, 1200);
+
+            // Refresh timeline
+            fetchNotes(currentNotesDesignId);
+
+            // Send email notification if checkbox checked
+            if (notify) {
+                sendNoteEmail(currentNotesDesignId, noteType, noteText);
+            }
+        } catch (err) {
+            console.error('Failed to create note:', err);
+            submitBtn.textContent = 'Error — try again';
+            submitBtn.style.background = '#dc3545';
+            setTimeout(() => {
+                submitBtn.textContent = 'Add Note';
+                submitBtn.style.background = '';
+                submitBtn.disabled = false;
+            }, 2000);
+        }
+    }
+
+    async function deleteNote(noteId) {
+        if (!confirm('Delete this note? This cannot be undone.')) return;
+
+        try {
+            const resp = await fetch(`${API_BASE}/api/design-notes/${noteId}`, {
+                method: 'DELETE'
+            });
+            if (!resp.ok) throw new Error(`Delete failed: ${resp.status}`);
+
+            // Remove from DOM
+            const card = document.querySelector(`.note-card[data-note-id="${noteId}"]`);
+            if (card) card.remove();
+
+            // Update count
+            const remaining = document.querySelectorAll('.note-card').length;
+            document.getElementById('notes-count-badge').textContent = remaining;
+            if (remaining === 0) {
+                document.getElementById('notes-empty').style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Failed to delete note:', err);
+            alert('Unable to delete note. Please try again.');
+        }
+    }
+
+    function sendNoteEmail(designId, noteType, noteText) {
+        if (typeof emailjs === 'undefined') {
+            console.warn('EmailJS not loaded — skipping note notification');
+            return;
+        }
+
+        // Look up company name from panel header
+        const companyName = document.getElementById('notes-panel-company').textContent || 'Unknown';
+
+        // Look up the sales rep email from the card that opened this panel
+        // We need to find the card with this designId to get the rep email
+        const cards = document.querySelectorAll('.card');
+        let repEmail = 'sales@nwcustomapparel.com';
+        let repName = 'Sales Team';
+        cards.forEach(card => {
+            const idEl = card.querySelector('.id-design');
+            if (idEl && idEl.textContent.replace(/[^0-9]/g, '') === String(designId)) {
+                const repEl = card.querySelector('.rep-name');
+                if (repEl) {
+                    const email = repEl.dataset.email || repEl.textContent;
+                    if (email && email.includes('@')) {
+                        repEmail = email;
+                        repName = getRepDisplayName(email);
+                    }
+                }
+            }
+        });
+
+        const templateParams = {
+            to_email: repEmail,
+            to_name: repName,
+            design_id: designId,
+            company_name: companyName,
+            note_type: noteType,
+            note_text: noteText,
+            from_name: 'Art Department',
+            detail_link: `https://www.teamnwca.com/art-hub-detail.html?ID_Design=${designId}`
+        };
+
+        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', templateParams, EMAILJS_PUBLIC_KEY)
+            .then(() => console.log('Note notification email sent'))
+            .catch(err => console.warn('Note notification email failed (non-blocking):', err));
     }
 
     // ── Image Modal (migrated from Caspio Footer) ─────────────────────
@@ -255,14 +515,10 @@
         const buttonRow = document.createElement('div');
         buttonRow.className = 'footer-button-row';
 
-        // Left group: notes buttons
+        // Left group: single Notes button
         const notesGroup = document.createElement('div');
         notesGroup.className = 'footer-notes-group';
-
-        if (!isInactive) {
-            notesGroup.appendChild(btn('Add Note', 'notes', () => openNoteModal(designId)));
-        }
-        notesGroup.appendChild(btn('View Notes', 'notes', () => viewNotesModal(designId)));
+        notesGroup.appendChild(btn('Notes', 'notes', () => openNotesPanel(designId, card)));
 
         // Right group: action buttons (no View Details here)
         const actionsGroup = document.createElement('div');
@@ -728,30 +984,30 @@
             document.getElementById('imageModal').classList.remove('show');
         });
 
-        // Close modals when clicking outside
+        // Close image modal when clicking outside
         window.addEventListener('click', function (event) {
-            if (event.target === document.getElementById('noteModal')) {
-                closeNoteModal();
-            } else if (event.target === document.getElementById('viewNotesModal')) {
-                closeViewNotesModal();
-            } else if (event.target === document.getElementById('imageModal')) {
+            if (event.target === document.getElementById('imageModal')) {
                 document.getElementById('imageModal').classList.remove('show');
             }
         });
 
-        // Listen for messages from Caspio iframe
-        window.addEventListener('message', function (event) {
-            if (event.data === 'closeModal' || event.data === 'formSubmitted') {
-                noteWasSubmitted = true;
-                closeNoteModal();
+        // Notes panel: overlay click to close
+        document.getElementById('notes-overlay').addEventListener('click', closeNotesPanel);
+
+        // Notes panel: close button
+        document.getElementById('notes-panel-close').addEventListener('click', closeNotesPanel);
+
+        // Notes panel: submit button
+        document.getElementById('note-submit-btn').addEventListener('click', submitNote);
+
+        // Notes panel: Escape key to close
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && currentNotesDesignId) {
+                closeNotesPanel();
             }
         });
     });
 
     // ── Expose globals for HTML onclick attributes ────────────────────
     window.showTab = showTab;
-    window.viewNotesModal = viewNotesModal;
-    window.closeViewNotesModal = closeViewNotesModal;
-    window.openNoteModal = openNoteModal;
-    window.closeNoteModal = closeNoteModal;
 })();
