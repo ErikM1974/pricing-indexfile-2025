@@ -902,6 +902,12 @@ div[data-cb-name="RACtnr"] {
     padding: 0 !important;
 }
 
+/* --- Caspio Form Overflow Fix (prevent horizontal scrollbar) --- */
+/* Caspio sets overflow-x:auto !important on #caspioform — must override */
+#gallery-tab form#caspioform {
+    overflow-x: hidden !important;
+}
+
 /* --- Gallery Grid (scoped to Steve's gallery tab) --- */
 #gallery-tab .cbColumnarReport {
     display: grid;
