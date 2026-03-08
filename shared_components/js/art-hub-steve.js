@@ -29,6 +29,59 @@
         'Erik':     'erik@nwcustomapparel.com'
     };
 
+    /**
+     * Resolve a Sales_Rep value (display name OR email) to both name and email.
+     * Handles: 'Nika' (direct key), 'nika@nwcustomapparel.com' (reverse lookup),
+     *          unknown emails (prefix extraction), empty/null (fallback).
+     */
+    function resolveRep(repValue) {
+        if (!repValue || !repValue.trim()) {
+            return { displayName: 'Sales Team', email: 'sales@nwcustomapparel.com' };
+        }
+        const val = repValue.trim();
+        // Direct key match (display name like 'Nika')
+        if (REP_EMAIL_MAP[val]) return { displayName: val, email: REP_EMAIL_MAP[val] };
+        // Reverse lookup (email like 'nika@nwcustomapparel.com' → 'Nika')
+        for (const [name, addr] of Object.entries(REP_EMAIL_MAP)) {
+            if (val.toLowerCase() === addr.toLowerCase()) return { displayName: name, email: addr };
+        }
+        // Unknown email — extract name from prefix
+        if (val.includes('@')) {
+            const local = val.substring(0, val.indexOf('@'));
+            return { displayName: local.charAt(0).toUpperCase() + local.slice(1), email: val };
+        }
+        // Unknown non-email string
+        return { displayName: val, email: 'sales@nwcustomapparel.com' };
+    }
+
+    /**
+     * Post a structured art charge record (fire-and-forget, non-blocking).
+     * Called after each successful art time submission.
+     * Skips 0-minute entries — no charge to log.
+     */
+    function logArtCharge(designId, mins, description, chargeType, currentTotalMins) {
+        if (mins <= 0) return;
+
+        const newTotalMins = currentTotalMins + mins;
+        const cost = parseFloat((Math.ceil(mins / 15) * 0.25 * 75).toFixed(2));
+        const totalCost = parseFloat((Math.ceil(newTotalMins / 15) * 0.25 * 75).toFixed(2));
+
+        fetch(`${API_BASE}/api/art-charges`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ID_Design: parseInt(designId),
+                Minutes: mins,
+                Cost: cost,
+                Description: (description || '').substring(0, 255),
+                Charge_Type: chargeType,
+                Logged_By: 'art@nwcustomapparel.com',
+                Running_Total_Minutes: newTotalMins,
+                Running_Total_Cost: totalCost
+            })
+        }).catch(err => console.warn('Art charge log failed (non-blocking):', err));
+    }
+
     // ── Tab Navigation ────────────────────────────────────────────────
     function showTab(tabName, event) {
         if (event) {
@@ -548,7 +601,13 @@
                 }
             }));
 
-            actionsGroup.appendChild(btn('Mark Complete', 'done', () => showArtTimeModal(designId)));
+            // Log Time — show when actively working (In Progress or Revision Requested)
+            const canLogTime = status.includes('inprogress') || status.includes('revisionrequested');
+            if (canLogTime) {
+                actionsGroup.appendChild(btn('Log Time', 'logtime', () => showLogTimeModal(designId, card)));
+            }
+
+            actionsGroup.appendChild(btn('Mark Complete', 'done', () => showArtTimeModal(designId, card)));
 
             // Send Mockup — show when In Progress, Revision Requested, or Awaiting Approval
             const canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
@@ -591,27 +650,47 @@
         });
     }
 
-    // ── Art Time Modal (Done action) ────────────────────────────────────
-    function showArtTimeModal(designId) {
+    // ── Art Time Modal (Mark Complete action) ────────────────────────────
+    async function showArtTimeModal(designId, card) {
         removeModals();
+
+        // Fetch current art time from API
+        let currentMins = 0;
+        try {
+            const resp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&limit=1`);
+            if (resp.ok) {
+                const reqs = await resp.json();
+                if (reqs && reqs.length > 0) currentMins = reqs[0].Art_Minutes || 0;
+            }
+        } catch (err) {
+            console.warn('Could not fetch current art time:', err);
+        }
+
+        const prevHours = (Math.ceil(currentMins / 15) * 0.25).toFixed(2);
+        const prevCost = (parseFloat(prevHours) * 75).toFixed(2);
 
         const overlay = createOverlay();
         const modal = document.createElement('div');
         modal.id = 'art-time-modal';
         modal.className = 'art-modal art-modal--sm';
+        modal.dataset.currentMins = currentMins;
 
         modal.innerHTML = `
             <div class="art-modal-header art-modal-header--green">
                 Mark Complete — #${designId}
             </div>
             <div class="art-modal-body">
-                <label class="art-modal-label">Art Minutes</label>
+                <div class="art-prev-time">${currentMins > 0
+                    ? `Previously logged: ${currentMins} min ($${prevCost})`
+                    : 'No art time logged yet'}</div>
+                <label class="art-modal-label">Additional time:</label>
                 <div class="stepper-row">
                     <button id="at-minus" class="stepper-btn">-</button>
-                    <input id="at-minutes" type="number" value="15" min="0" step="15" class="stepper-input" />
+                    <input id="at-minutes" type="number" value="0" min="0" step="15" class="stepper-input" />
                     <button id="at-plus" class="stepper-btn">+</button>
                 </div>
-                <div id="at-cost" class="art-cost-display">= $18.75 (0.25 hrs)</div>
+                <div id="at-cost" class="art-cost-display">= $0.00</div>
+                <div id="at-new-total" class="art-new-total"></div>
                 <label class="art-modal-checkbox-label">
                     <input type="checkbox" id="at-notify" checked />
                     Notify sales rep design is complete
@@ -627,13 +706,19 @@
 
         const minutesInput = modal.querySelector('#at-minutes');
         const costDiv = modal.querySelector('#at-cost');
+        const newTotalDiv = modal.querySelector('#at-new-total');
 
         function updateCost() {
             const mins = parseInt(minutesInput.value) || 0;
             const quarterHours = Math.ceil(mins / 15) * 0.25;
             const cost = (quarterHours * 75).toFixed(2);
-            costDiv.textContent = `= $${cost} (${quarterHours.toFixed(2)} hrs)`;
+            costDiv.textContent = `= $${cost}`;
+            const totalMins = currentMins + mins;
+            const totalQh = Math.ceil(totalMins / 15) * 0.25;
+            const totalCost = (totalQh * 75).toFixed(2);
+            newTotalDiv.textContent = `Final total: ${totalMins} min (${totalQh.toFixed(2)} hrs, $${totalCost})`;
         }
+        updateCost();
 
         minutesInput.addEventListener('input', updateCost);
         modal.querySelector('#at-plus').addEventListener('click', () => {
@@ -651,7 +736,6 @@
 
         modal.querySelector('#at-submit').addEventListener('click', async function () {
             const mins = parseInt(minutesInput.value) || 0;
-            if (mins === 0 && !confirm('Art time is 0 minutes. Continue anyway?')) return;
 
             const shouldNotify = modal.querySelector('#at-notify').checked;
 
@@ -659,6 +743,7 @@
             this.textContent = 'Saving...';
 
             try {
+                // Additive art time — backend adds mins to existing total
                 const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -675,16 +760,20 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             noteType: 'Art Time',
-                            noteText: `Completed: ${mins} minutes ($${cost})`,
+                            noteText: `Completed: ${mins} additional minutes ($${cost})`,
                             noteBy: 'art@nwcustomapparel.com'
                         })
                     }).catch(err => console.warn('Art time note failed (non-blocking):', err));
+                    logArtCharge(designId, mins, 'Completed', 'Completion', currentMins);
                 }
 
                 // Send completion notification email
                 if (shouldNotify) {
+                    // Get rep email from card for correct routing
+                    const cardRepEl = card ? card.querySelector('.rep-name[data-email]') : null;
                     sendNotificationEmail(designId, 'completed', {
-                        artMinutes: mins
+                        artMinutes: currentMins + mins,
+                        salesRep: cardRepEl ? cardRepEl.dataset.email : ''
                     });
                 }
 
@@ -700,6 +789,141 @@
         });
     }
 
+    // ── Log Time Modal (standalone art time logging) ────────────────────
+    async function showLogTimeModal(designId, card) {
+        removeModals();
+
+        // Fetch current art time from API
+        let currentMins = 0;
+        try {
+            const resp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&limit=1`);
+            if (resp.ok) {
+                const reqs = await resp.json();
+                if (reqs && reqs.length > 0) currentMins = reqs[0].Art_Minutes || 0;
+            }
+        } catch (err) {
+            console.warn('Could not fetch current art time:', err);
+        }
+
+        // Get current status from card for the PUT (status stays unchanged)
+        const statusPill = card.querySelector('.status-pill');
+        const currentStatus = statusPill ? statusPill.textContent.trim() : 'In Progress 🔵';
+
+        const prevHours = (Math.ceil(currentMins / 15) * 0.25).toFixed(2);
+        const prevCost = (parseFloat(prevHours) * 75).toFixed(2);
+
+        const overlay = createOverlay();
+        const modal = document.createElement('div');
+        modal.id = 'log-time-modal';
+        modal.className = 'art-modal art-modal--sm';
+        modal.dataset.currentMins = currentMins;
+        modal.dataset.currentStatus = currentStatus;
+
+        modal.innerHTML = `
+            <div class="art-modal-header art-modal-header--teal">
+                Log Art Time — #${designId}
+            </div>
+            <div class="art-modal-body">
+                <div class="art-prev-time">${currentMins > 0
+                    ? `Previously logged: ${currentMins} min ($${prevCost})`
+                    : 'No art time logged yet'}</div>
+                <div class="stepper-row">
+                    <button id="lt-minus" class="stepper-btn">-</button>
+                    <input id="lt-minutes" type="number" value="0" min="0" step="15" class="stepper-input" />
+                    <button id="lt-plus" class="stepper-btn">+</button>
+                </div>
+                <div id="lt-cost" class="art-cost-display">= $0.00</div>
+                <div id="lt-new-total" class="art-new-total"></div>
+                <label class="art-modal-label" style="margin-top:12px;">Note (optional)</label>
+                <input type="text" id="lt-note" class="art-modal-note-input" placeholder="What did you work on?" />
+                <div class="art-modal-actions">
+                    <button id="lt-cancel" class="art-modal-btn-cancel">Cancel</button>
+                    <button id="lt-submit" class="art-modal-btn-submit art-modal-btn-submit--teal">Log Time</button>
+                </div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(modal);
+
+        const minutesInput = modal.querySelector('#lt-minutes');
+        const costDiv = modal.querySelector('#lt-cost');
+        const newTotalDiv = modal.querySelector('#lt-new-total');
+
+        function updateLogTimeCost() {
+            const mins = parseInt(minutesInput.value) || 0;
+            const qh = Math.ceil(mins / 15) * 0.25;
+            costDiv.textContent = `= $${(qh * 75).toFixed(2)}`;
+            const totalMins = currentMins + mins;
+            const totalQh = Math.ceil(totalMins / 15) * 0.25;
+            const totalCost = (totalQh * 75).toFixed(2);
+            newTotalDiv.textContent = `New total: ${totalMins} min (${totalQh.toFixed(2)} hrs, $${totalCost})`;
+        }
+        updateLogTimeCost();
+
+        minutesInput.addEventListener('input', updateLogTimeCost);
+        modal.querySelector('#lt-plus').addEventListener('click', () => {
+            minutesInput.value = (parseInt(minutesInput.value) || 0) + 15;
+            updateLogTimeCost();
+        });
+        modal.querySelector('#lt-minus').addEventListener('click', () => {
+            const v = (parseInt(minutesInput.value) || 0) - 15;
+            minutesInput.value = v < 0 ? 0 : v;
+            updateLogTimeCost();
+        });
+
+        modal.querySelector('#lt-cancel').addEventListener('click', removeModals);
+        overlay.addEventListener('click', removeModals);
+
+        modal.querySelector('#lt-submit').addEventListener('click', async function () {
+            const mins = parseInt(minutesInput.value) || 0;
+            if (mins === 0 && !confirm('Art time is 0 minutes. Continue anyway?')) return;
+
+            const noteText = modal.querySelector('#lt-note').value.trim();
+
+            this.disabled = true;
+            this.textContent = 'Saving...';
+
+            try {
+                // PUT status (unchanged) with additive art minutes
+                const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: currentStatus, artMinutes: mins })
+                });
+                if (!resp.ok) throw new Error(`Status ${resp.status}`);
+
+                // Log art time note
+                if (mins > 0) {
+                    const qh = Math.ceil(mins / 15) * 0.25;
+                    const cost = (qh * 75).toFixed(2);
+                    const noteBody = noteText
+                        ? `Logged ${mins} minutes ($${cost}) — ${noteText}`
+                        : `Logged ${mins} minutes ($${cost})`;
+                    await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            noteType: 'Art Time',
+                            noteText: noteBody,
+                            noteBy: 'art@nwcustomapparel.com'
+                        })
+                    }).catch(err => console.warn('Art time note failed (non-blocking):', err));
+                    const currentMinsForCharge = parseInt(modal.dataset.currentMins) || 0;
+                    logArtCharge(designId, mins, noteText || 'Art time logged', 'Log Time', currentMinsForCharge);
+                }
+
+                this.textContent = 'Saved!';
+                this.style.background = '#0891b2';
+                setTimeout(() => { removeModals(); window.location.reload(); }, 600);
+            } catch (err) {
+                this.textContent = 'Error — retry';
+                this.style.background = '#dc3545';
+                this.disabled = false;
+                console.error('Log time failed:', err);
+            }
+        });
+    }
+
     // ── Send Mockup Modal (merged Send Back + Send for Approval) ────────
     async function showSendForApprovalModal(designId, card) {
         const overlay = document.getElementById('approval-overlay');
@@ -708,10 +932,16 @@
 
         // Reset modal state
         document.getElementById('approval-message').value = '';
-        document.getElementById('approval-minutes').value = '15';
-        document.getElementById('approval-cost').textContent = '= $18.75';
+        document.getElementById('approval-minutes').value = '0';
+        document.getElementById('approval-cost').textContent = '= $0.00';
         document.getElementById('approval-files').innerHTML = '';
         document.getElementById('approval-no-files').style.display = 'none';
+        document.getElementById('approval-recipient').textContent = '';
+        document.getElementById('approval-cc-row').style.display = 'none';
+        document.getElementById('approval-cc-toggle').checked = false;
+        document.getElementById('approval-cc-options').innerHTML = '';
+        document.getElementById('approval-prev-time').textContent = '';
+        document.getElementById('approval-new-total').textContent = '';
         const submitBtn = document.getElementById('approval-submit');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Mockup';
@@ -750,6 +980,50 @@
             revBadge.style.display = 'none';
         }
 
+        // Populate recipient display and CC options
+        // Use User_Email (sales rep email in Caspio), fall back to Sales_Rep, then card data-email
+        let salesRep = artReqData ? (artReqData.User_Email || artReqData.Sales_Rep) : '';
+        if (!salesRep) {
+            const repEl = card.querySelector('.rep-name[data-email]');
+            if (repEl) salesRep = repEl.dataset.email;
+        }
+        const rep = resolveRep(salesRep);
+        const recipientEl = document.getElementById('approval-recipient');
+        recipientEl.textContent = `Sending to: ${rep.displayName} (${rep.email})`;
+
+        // Build CC checkboxes (all reps except primary)
+        const ccRow = document.getElementById('approval-cc-row');
+        const ccOptions = document.getElementById('approval-cc-options');
+        const ccToggle = document.getElementById('approval-cc-toggle');
+        const otherReps = Object.keys(REP_EMAIL_MAP).filter(r => r !== rep.displayName);
+        if (otherReps.length > 0) {
+            ccRow.style.display = 'flex';
+            ccOptions.innerHTML = otherReps.map(rep =>
+                `<label class="approval-cc-rep-label">
+                    <input type="checkbox" class="approval-cc-rep" value="${escapeHtml(rep)}" disabled> ${escapeHtml(rep)}
+                </label>`
+            ).join('');
+            ccToggle.addEventListener('change', function () {
+                ccOptions.querySelectorAll('.approval-cc-rep').forEach(cb => {
+                    cb.disabled = !this.checked;
+                    if (!this.checked) cb.checked = false;
+                });
+            });
+        }
+
+        // Populate running art time total
+        const currentArtMins = artReqData ? (artReqData.Art_Minutes || 0) : 0;
+        modal.dataset.currentArtMins = currentArtMins;
+        const prevTimeEl = document.getElementById('approval-prev-time');
+        if (currentArtMins > 0) {
+            const prevQh = Math.ceil(currentArtMins / 15) * 0.25;
+            const prevCost = (prevQh * 75).toFixed(2);
+            prevTimeEl.textContent = `Previously logged: ${currentArtMins} min ($${prevCost})`;
+        } else {
+            prevTimeEl.textContent = 'No art time logged yet';
+        }
+        updateApprovalTotal();
+
         // Build file thumbnails from all available file/CDN fields
         const fileFields = [
             { key: 'File_Upload', label: 'Original Upload' },
@@ -774,23 +1048,27 @@
                 fileCount++;
 
                 const fileCard = document.createElement('div');
-                fileCard.className = 'approval-file-card' + (fileCount === 1 ? ' primary-selected' : '');
+                fileCard.className = 'approval-file-card selected';
                 fileCard.dataset.url = url;
                 fileCard.innerHTML = `
-                    <input type="radio" name="primary-mockup" class="primary-radio"
-                           value="${escapeHtml(url)}" ${fileCount === 1 ? 'checked' : ''}>
+                    <input type="checkbox" class="mockup-checkbox"
+                           value="${escapeHtml(url)}" checked>
                     <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="approval-file-placeholder" style="display:none;">File</div>
                     <div class="approval-file-label">${escapeHtml(field.label)}</div>
-                    <div class="approval-primary-badge">Primary</div>
+                    <div class="approval-selected-badge">✓</div>
                 `;
 
-                // Radio-style primary selection on click
-                fileCard.addEventListener('click', () => {
-                    filesGrid.querySelectorAll('.approval-file-card').forEach(c => c.classList.remove('primary-selected'));
-                    fileCard.classList.add('primary-selected');
-                    fileCard.querySelector('input[type="radio"]').checked = true;
+                // Checkbox toggle on card click
+                fileCard.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('mockup-checkbox')) return;
+                    const cb = fileCard.querySelector('.mockup-checkbox');
+                    cb.checked = !cb.checked;
+                    fileCard.classList.toggle('selected', cb.checked);
+                });
+                fileCard.querySelector('.mockup-checkbox').addEventListener('change', function () {
+                    fileCard.classList.toggle('selected', this.checked);
                 });
 
                 filesGrid.appendChild(fileCard);
@@ -808,12 +1086,13 @@
         }
 
         // Store data on modal for submit handler
+        // Use resolved salesRep (includes card fallback) so email sends to correct rep
         modal.dataset.designId = designId;
-        modal.dataset.artReqJson = artReqData ? JSON.stringify({
-            Sales_Rep: artReqData.Sales_Rep,
-            CompanyName: artReqData.CompanyName,
-            Revision_Count: artReqData.Revision_Count || 0
-        }) : '';
+        modal.dataset.artReqJson = JSON.stringify({
+            Sales_Rep: salesRep || '',
+            CompanyName: artReqData ? artReqData.CompanyName : (companyEl ? companyEl.textContent.trim() : ''),
+            Revision_Count: artReqData ? (artReqData.Revision_Count || 0) : 0
+        });
     }
 
     function closeApprovalModal() {
@@ -829,9 +1108,15 @@
         const mins = parseInt(document.getElementById('approval-minutes').value) || 0;
         const message = document.getElementById('approval-message').value.trim();
 
-        // Get primary mockup URL from radio selection
-        const primaryRadio = document.querySelector('input[name="primary-mockup"]:checked');
-        const mockupUrl = primaryRadio ? primaryRadio.value : '';
+        // Get selected mockup URLs from checkboxes
+        const selectedBoxes = document.querySelectorAll('.mockup-checkbox:checked');
+        const mockupUrls = Array.from(selectedBoxes).map(cb => cb.value);
+        if (mockupUrls.length === 0) {
+            alert('Please select at least one mockup image to send.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Mockup';
+            return;
+        }
 
         // Parse stored art request data
         let artReqMeta = {};
@@ -883,16 +1168,30 @@
                         noteBy: 'art@nwcustomapparel.com'
                     })
                 }).catch(err => console.warn('Art time note failed (non-blocking):', err));
+                const currentArtMinsForCharge = parseInt(modal.dataset.currentArtMins) || 0;
+                logArtCharge(designId, mins, message || 'Mockup sent for approval', 'Mockup Sent', currentArtMinsForCharge);
             }
 
-            // 4. Send approval email to sales rep (fire-and-forget)
+            // 4. Collect CC recipients (if toggle is checked)
+            const ccEmails = [];
+            const ccToggle = document.getElementById('approval-cc-toggle');
+            if (ccToggle && ccToggle.checked) {
+                document.querySelectorAll('.approval-cc-rep:checked').forEach(cb => {
+                    const repName = cb.value;
+                    const repAddr = REP_EMAIL_MAP[repName];
+                    if (repAddr) ccEmails.push({ name: repName, email: repAddr });
+                });
+            }
+
+            // 5. Send approval email to sales rep (fire-and-forget)
             sendNotificationEmail(designId, 'approval', {
                 message: message,
                 revisionCount: revCount,
                 artMinutes: mins,
                 salesRep: artReqMeta.Sales_Rep,
                 companyName: artReqMeta.CompanyName,
-                mockupUrl: mockupUrl
+                mockupUrls: mockupUrls,
+                ccEmails: ccEmails
             });
 
             submitBtn.textContent = 'Sent!';
@@ -919,17 +1218,18 @@
             let companyName = data.companyName;
 
             if (!salesRep) {
-                const resp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&select=Sales_Rep,CompanyName&limit=1`);
+                const resp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&select=User_Email,Sales_Rep,CompanyName&limit=1`);
                 if (resp.ok) {
                     const reqs = await resp.json();
                     if (reqs && reqs.length > 0) {
-                        salesRep = reqs[0].Sales_Rep;
+                        salesRep = reqs[0].User_Email || reqs[0].Sales_Rep;
                         companyName = reqs[0].CompanyName;
                     }
                 }
             }
 
-            const repEmail = REP_EMAIL_MAP[salesRep] || 'sales@nwcustomapparel.com';
+            const rep = resolveRep(salesRep);
+            const repEmail = rep.email;
             const detailLink = `${window.location.origin}/art-request/${designId}`;
 
             let templateId, templateParams;
@@ -938,7 +1238,7 @@
                 templateId = 'template_art_revision';
                 templateParams = {
                     to_email: repEmail,
-                    to_name: salesRep || 'Sales Team',
+                    to_name: rep.displayName,
                     design_id: designId,
                     company_name: companyName || 'Unknown',
                     revision_notes: data.revisionNotes || '',
@@ -953,7 +1253,7 @@
                 templateId = 'template_art_completed';
                 templateParams = {
                     to_email: repEmail,
-                    to_name: salesRep || 'Sales Team',
+                    to_name: rep.displayName,
                     design_id: designId,
                     company_name: companyName || 'Unknown',
                     art_minutes: mins,
@@ -967,10 +1267,15 @@
                 const mins = data.artMinutes || 0;
                 const quarterHours = Math.ceil(mins / 15) * 0.25;
                 const cost = (quarterHours * 75).toFixed(2);
+                const urls = data.mockupUrls || [];
+                // Build HTML string of selected mockup images for the email
+                const imagesHtml = urls.map((url, i) =>
+                    `<div style="display:inline-block;margin:8px;"><img src="${url}" alt="Mockup ${i + 1}" style="max-width:260px;border-radius:8px;border:1px solid #e5e7eb;"></div>`
+                ).join('');
                 templateId = 'art_approval_request';
                 templateParams = {
                     to_email: repEmail,
-                    to_name: salesRep || 'Sales Team',
+                    to_name: rep.displayName,
                     design_id: designId,
                     company_name: companyName || 'Unknown',
                     revision_count: data.revisionCount || 0,
@@ -978,13 +1283,31 @@
                     art_time_display: `${mins} min (${quarterHours.toFixed(2)} hrs, $${cost})`,
                     detail_link: detailLink,
                     from_name: 'Art Department',
-                    mockup_url: data.mockupUrl || ''
+                    mockup_url: urls[0] || '',
+                    mockup_images_html: imagesHtml,
+                    mockup_count: urls.length
                 };
             }
 
             if (templateId) {
                 await emailjs.send(EMAILJS_SERVICE_ID, templateId, templateParams, EMAILJS_PUBLIC_KEY);
                 console.log(`Notification email sent (${type}) for design ${designId}`);
+
+                // Send CC emails for approval type (separate sends — EmailJS free tier has no native CC)
+                if (type === 'approval' && data.ccEmails && data.ccEmails.length > 0) {
+                    for (const cc of data.ccEmails) {
+                        try {
+                            const ccParams = Object.assign({}, templateParams, {
+                                to_email: cc.email,
+                                to_name: cc.name
+                            });
+                            await emailjs.send(EMAILJS_SERVICE_ID, templateId, ccParams, EMAILJS_PUBLIC_KEY);
+                            console.log(`CC email sent to ${cc.name} (${cc.email}) for design ${designId}`);
+                        } catch (ccErr) {
+                            console.warn(`CC email to ${cc.name} failed (non-blocking):`, ccErr);
+                        }
+                    }
+                }
             }
         } catch (err) {
             console.warn(`Notification email failed (${type}, non-blocking):`, err);
@@ -1000,10 +1323,23 @@
     }
 
     function removeModals() {
-        ['art-time-modal', 'quick-action-overlay'].forEach(id => {
+        ['art-time-modal', 'log-time-modal', 'quick-action-overlay'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.remove();
         });
+    }
+
+    // Helper: update approval modal's new total line
+    function updateApprovalTotal() {
+        const modal = document.getElementById('approval-modal');
+        if (!modal) return;
+        const currentArtMins = parseInt(modal.dataset.currentArtMins) || 0;
+        const sessionMins = parseInt(document.getElementById('approval-minutes').value) || 0;
+        const totalMins = currentArtMins + sessionMins;
+        const totalQh = Math.ceil(totalMins / 15) * 0.25;
+        const totalCost = (totalQh * 75).toFixed(2);
+        const el = document.getElementById('approval-new-total');
+        if (el) el.textContent = `New total: ${totalMins} min (${totalQh.toFixed(2)} hrs, $${totalCost})`;
     }
 
     // ── MutationObserver: Watch for Caspio gallery cards ────────────────
@@ -1088,13 +1424,24 @@
         document.getElementById('approval-cancel').addEventListener('click', closeApprovalModal);
         document.getElementById('approval-submit').addEventListener('click', submitSendForApproval);
 
-        // Live cost calculation for approval modal minutes
+        // Live cost calculation for approval modal minutes + stepper buttons
         const approvalMinsInput = document.getElementById('approval-minutes');
-        approvalMinsInput.addEventListener('input', function () {
-            const mins = parseInt(this.value) || 0;
+        function updateApprovalCost() {
+            const mins = parseInt(approvalMinsInput.value) || 0;
             const quarterHours = Math.ceil(mins / 15) * 0.25;
             const cost = (quarterHours * 75).toFixed(2);
             document.getElementById('approval-cost').textContent = `= $${cost}`;
+            updateApprovalTotal();
+        }
+        approvalMinsInput.addEventListener('input', updateApprovalCost);
+        document.getElementById('approval-plus').addEventListener('click', () => {
+            approvalMinsInput.value = (parseInt(approvalMinsInput.value) || 0) + 15;
+            updateApprovalCost();
+        });
+        document.getElementById('approval-minus').addEventListener('click', () => {
+            const v = (parseInt(approvalMinsInput.value) || 0) - 15;
+            approvalMinsInput.value = v < 0 ? 0 : v;
+            updateApprovalCost();
         });
     });
 

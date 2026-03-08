@@ -25,6 +25,20 @@
         'Erik':     'erik@nwcustomapparel.com'
     };
 
+    /** Resolve email or display name → display name using REP_MAP reverse lookup */
+    function resolveRepName(emailOrName) {
+        if (!emailOrName) return '';
+        if (REP_MAP[emailOrName]) return emailOrName;
+        for (const [name, addr] of Object.entries(REP_MAP)) {
+            if (emailOrName.toLowerCase() === addr.toLowerCase()) return name;
+        }
+        if (emailOrName.includes('@')) {
+            const local = emailOrName.substring(0, emailOrName.indexOf('@'));
+            return local.charAt(0).toUpperCase() + local.slice(1);
+        }
+        return emailOrName;
+    }
+
     // File fields to check for mockups/artwork
     const FILE_FIELDS = [
         { key: 'File_Upload', label: 'Original Upload' },
@@ -56,15 +70,19 @@
         fetch(`${API_BASE}/api/design-notes?id_design=${designId}&orderBy=Note_Date DESC`).then(r => {
             if (!r.ok) throw new Error(`Notes fetch failed: ${r.status}`);
             return r.json();
-        })
+        }),
+        fetch(`${API_BASE}/api/art-charges?id_design=${designId}`).then(r => {
+            if (!r.ok) return [];
+            return r.json();
+        }).catch(() => [])
     ])
-    .then(([artRequests, notes]) => {
+    .then(([artRequests, notes, charges]) => {
         if (!artRequests || artRequests.length === 0) {
             showError('Art Request Not Found', `No art request found with Design ID #${designId}.`);
             return;
         }
         currentRequest = artRequests[0];
-        render(currentRequest, notes || []);
+        render(currentRequest, notes || [], charges || []);
     })
     .catch(err => {
         console.error('Failed to load art request:', err);
@@ -72,7 +90,7 @@
     });
 
     // ── Render ──────────────────────────────────────────────────────────
-    function render(req, notes) {
+    function render(req, notes, charges) {
         document.getElementById('ard-loading').style.display = 'none';
         document.getElementById('ard-content').style.display = 'block';
 
@@ -97,7 +115,9 @@
 
         // Info fields
         setText('ard-company', req.CompanyName);
-        setText('ard-sales-rep', req.Sales_Rep);
+        const repEmail = req.User_Email || req.Sales_Rep || '';
+        const repResolved = resolveRepName(repEmail);
+        setText('ard-sales-rep', repResolved);
         // Order_Type can be an object like {'6':'Transfer'} from Caspio
         const orderType = req.Order_Type && typeof req.Order_Type === 'object'
             ? Object.values(req.Order_Type).join(', ')
@@ -156,6 +176,12 @@
 
         // Notes timeline
         renderNotes(notes);
+
+        // Art charge history
+        renderCharges(charges);
+
+        // Status timeline
+        renderStatusTimeline(notes);
     }
 
     // ── Mockup Gallery ────────────────────────────────────────────────────
@@ -523,5 +549,154 @@
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // ── Art Charge History ────────────────────────────────────────────────
+    function renderCharges(charges) {
+        const card = document.getElementById('ard-charges-card');
+        const list = document.getElementById('ard-charges-list');
+        const empty = document.getElementById('ard-charges-empty');
+
+        if (!charges || charges.length === 0) return;
+
+        card.style.display = '';
+        empty.style.display = 'none';
+        list.innerHTML = '';
+
+        charges.forEach(function (charge) {
+            const div = document.createElement('div');
+            div.className = 'ard-charge-row';
+
+            const typeBadgeClass = getChargeTypeClass(charge.Charge_Type);
+            const minsDisplay = charge.Minutes || 0;
+            const costDisplay = charge.Cost ? '$' + parseFloat(charge.Cost).toFixed(2) : '$0.00';
+            const dateDisplay = formatDate(charge.Charge_Date);
+            const desc = charge.Description || '';
+            const runMins = charge.Running_Total_Minutes || 0;
+            const runCost = charge.Running_Total_Cost ? parseFloat(charge.Running_Total_Cost).toFixed(2) : '0.00';
+
+            div.innerHTML =
+                '<div class="ard-charge-header">' +
+                    '<span class="ard-charge-type ' + typeBadgeClass + '">' + escapeHtml(charge.Charge_Type || 'Unknown') + '</span>' +
+                    '<span class="ard-charge-date">' + dateDisplay + '</span>' +
+                '</div>' +
+                '<div class="ard-charge-detail">' +
+                    '<span class="ard-charge-time">' + minsDisplay + ' min &middot; ' + costDisplay + '</span>' +
+                    (desc ? '<span class="ard-charge-desc">' + escapeHtml(desc) + '</span>' : '') +
+                '</div>' +
+                '<div class="ard-charge-running">Running total: ' + runMins + ' min ($' + runCost + ')</div>';
+
+            list.appendChild(div);
+        });
+    }
+
+    function getChargeTypeClass(type) {
+        if (!type) return 'ard-charge-type--default';
+        var lower = type.toLowerCase();
+        if (lower.includes('mockup')) return 'ard-charge-type--mockup';
+        if (lower.includes('completion')) return 'ard-charge-type--completion';
+        if (lower.includes('log')) return 'ard-charge-type--logtime';
+        return 'ard-charge-type--default';
+    }
+
+    // ── Status Timeline ──────────────────────────────────────────────────
+    function renderStatusTimeline(notes) {
+        var container = document.getElementById('ard-timeline');
+        var stepsEl = document.getElementById('ard-timeline-steps');
+        if (!container || !stepsEl || !currentRequest) return;
+
+        var STEPS = [
+            { key: 'submitted', label: 'Submitted', match: ['submitted'] },
+            { key: 'inprogress', label: 'In Progress', match: ['in progress', 'working'] },
+            { key: 'awaiting', label: 'Awaiting Approval', match: ['awaiting approval', 'mockup sent'] },
+            { key: 'completed', label: 'Completed', match: ['completed', 'approved'] }
+        ];
+
+        var revisionStep = { key: 'revision', label: 'Revision Requested', match: ['revision'] };
+
+        var currentStatus = (currentRequest.Status || '').replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase();
+        var stepDates = {};
+        var hasRevision = false;
+
+        // Submitted = creation date
+        stepDates.submitted = currentRequest.Date_Created;
+
+        // Scan notes chronologically to find status transitions
+        var sortedNotes = (notes || []).slice().sort(function (a, b) {
+            return new Date(a.Note_Date) - new Date(b.Note_Date);
+        });
+
+        sortedNotes.forEach(function (note) {
+            var text = (note.Note_Text || '').toLowerCase();
+            var type = (note.Note_Type || '').toLowerCase();
+            var date = note.Note_Date;
+
+            if (type.includes('mockup sent') || text.includes('mockup sent')) {
+                if (!stepDates.awaiting) stepDates.awaiting = date;
+            }
+            if (text.includes('revision requested') || type.includes('revision')) {
+                stepDates.revision = date;
+                hasRevision = true;
+            }
+            if (text.includes('working') || text.includes('in progress')) {
+                if (!stepDates.inprogress) stepDates.inprogress = date;
+            }
+            if ((text.includes('approved') || text.includes('completed')) && type.includes('status')) {
+                if (!stepDates.completed) stepDates.completed = date;
+            }
+        });
+
+        // Infer "In Progress" if later steps exist
+        if (!stepDates.inprogress && (stepDates.awaiting || stepDates.completed)) {
+            stepDates.inprogress = stepDates.submitted;
+        }
+
+        // Build step list (include revision only if it happened)
+        var activeSteps = STEPS.slice();
+        if (hasRevision) {
+            activeSteps.splice(3, 0, revisionStep);
+        }
+
+        // Determine current step — live status is definitive
+        var currentStepIdx = 0;
+        var statusMatchFound = false;
+
+        // First try: match against the actual current status (definitive)
+        activeSteps.forEach(function (step, i) {
+            if (step.match.some(function (s) { return currentStatus.includes(s); })) {
+                currentStepIdx = i;
+                statusMatchFound = true;
+            }
+        });
+
+        // Fallback: use dates if no live status match
+        if (!statusMatchFound) {
+            activeSteps.forEach(function (step, i) {
+                if (stepDates[step.key]) currentStepIdx = i;
+            });
+        }
+
+        // Render
+        stepsEl.innerHTML = '';
+        activeSteps.forEach(function (step, i) {
+            var stateClass = 'ard-step--future';
+            if (i < currentStepIdx) stateClass = 'ard-step--done';
+            if (i === currentStepIdx) stateClass = 'ard-step--current';
+
+            var div = document.createElement('div');
+            div.className = 'ard-step ' + stateClass;
+            if (step.key === 'revision') div.className += ' ard-step--revision';
+
+            var dateStr = stepDates[step.key] ? formatDate(stepDates[step.key]) : '';
+
+            div.innerHTML =
+                '<div class="ard-step-dot"></div>' +
+                '<div class="ard-step-label">' + escapeHtml(step.label) + '</div>' +
+                (dateStr ? '<div class="ard-step-date">' + dateStr + '</div>' : '');
+
+            stepsEl.appendChild(div);
+        });
+
+        container.style.display = '';
     }
 })();

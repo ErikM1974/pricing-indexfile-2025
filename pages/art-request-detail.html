@@ -46,6 +46,11 @@
             </div>
         </div>
 
+        <!-- Status Timeline -->
+        <div class="ard-timeline-container" id="ard-timeline" style="display:none;">
+            <div class="ard-timeline-steps" id="ard-timeline-steps"></div>
+        </div>
+
         <!-- Two-column layout -->
         <div class="ard-grid">
 
@@ -106,6 +111,15 @@
                             </div>
                         </div>
                         <div class="ard-billing-rate">Rate: $75/hr in 15-min increments</div>
+                    </div>
+                </div>
+
+                <!-- Art Charge History -->
+                <div class="ard-card" id="ard-charges-card" style="display:none;">
+                    <div class="ard-card-header ard-card-header--green">Art Charge History</div>
+                    <div class="ard-card-body" id="ard-charges-body">
+                        <p class="ard-empty-notes" id="ard-charges-empty">No charges recorded yet.</p>
+                        <div id="ard-charges-list"></div>
                     </div>
                 </div>
 
