@@ -4,9 +4,10 @@
  * Handles all interactive behavior for Steve's Art Hub dashboard:
  *   - Tab switching with Caspio conflict protection
  *   - Notes slide-out panel (API-powered, replaces Caspio iframes)
- *   - Quick-action buttons on gallery cards (Working/Done/Send Back)
+ *   - Quick-action buttons on gallery cards (Working/Done/Send Back/Send for Approval)
+ *   - Send for Approval modal (file thumbnails, art time, message to AE)
  *   - Status summary bar above gallery
- *   - EmailJS notifications to sales reps on revision/completion
+ *   - EmailJS notifications to sales reps on revision/completion/approval
  *
  * Uses MutationObserver to wait for Caspio DOM, then enhances each card.
  *
@@ -78,6 +79,7 @@
 
     function getNoteTypeClass(noteType) {
         const lower = (noteType || '').toLowerCase();
+        if (lower.includes('mockup sent'))        return 'note-type-pill--mockup-sent';
         if (lower.includes('status update'))      return 'note-type-pill--status-update';
         if (lower.includes('design update'))      return 'note-type-pill--design-update';
         if (lower.includes('art time'))           return 'note-type-pill--art-time';
@@ -548,6 +550,12 @@
 
             actionsGroup.appendChild(btn('Done', 'done', () => showArtTimeModal(designId)));
             actionsGroup.appendChild(btn('Send Back', 'sendback', () => showSendBackModal(designId)));
+
+            // Send for Approval — show when In Progress or Revision Requested
+            const canSendForApproval = status.includes('inprogress') || status.includes('revisionrequested');
+            if (canSendForApproval) {
+                actionsGroup.appendChild(btn('Send for Approval', 'approve', () => showSendForApprovalModal(designId, card)));
+            }
         }
 
         buttonRow.appendChild(notesGroup);
@@ -855,6 +863,201 @@
         });
     }
 
+    // ── Send for Approval Modal ──────────────────────────────────────────
+    async function showSendForApprovalModal(designId, card) {
+        const overlay = document.getElementById('approval-overlay');
+        const modal = document.getElementById('approval-modal');
+        if (!overlay || !modal) return;
+
+        // Reset modal state
+        document.getElementById('approval-message').value = '';
+        document.getElementById('approval-minutes').value = '15';
+        document.getElementById('approval-cost').textContent = '= $18.75';
+        document.getElementById('approval-files').innerHTML = '';
+        document.getElementById('approval-no-files').style.display = 'none';
+        const submitBtn = document.getElementById('approval-submit');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send for Approval';
+        submitBtn.style.background = '';
+
+        // Get company name from card
+        const companyEl = card.querySelector('.company-name');
+        document.getElementById('approval-company').textContent = companyEl ? companyEl.textContent.trim() : '';
+
+        // Show modal while data loads
+        overlay.style.display = 'block';
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Fetch art request data for files and revision count
+        let artReqData = null;
+        try {
+            const resp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&limit=1`);
+            if (resp.ok) {
+                const reqs = await resp.json();
+                if (reqs && reqs.length > 0) {
+                    artReqData = reqs[0];
+                }
+            }
+        } catch (e) {
+            console.warn('Could not fetch art request data:', e);
+        }
+
+        // Revision badge
+        const revBadge = document.getElementById('approval-modal-rev');
+        const revCount = artReqData ? (artReqData.Revision_Count || 0) : 0;
+        if (revCount > 0) {
+            revBadge.textContent = `Rev #${revCount}`;
+            revBadge.style.display = 'inline-block';
+        } else {
+            revBadge.style.display = 'none';
+        }
+
+        // Build file thumbnails from all available file/CDN fields
+        const fileFields = [
+            { key: 'File_Upload', label: 'Original Upload' },
+            { key: 'Mockup_Link', label: 'Mockup' },
+            { key: 'CDN_Link', label: 'Artwork 1' },
+            { key: 'CDN_Link_Two', label: 'Artwork 2' },
+            { key: 'CDN_Link_Three', label: 'Artwork 3' },
+            { key: 'CDN_Link_Four', label: 'Artwork 4' }
+        ];
+
+        const filesGrid = document.getElementById('approval-files');
+        const noFilesMsg = document.getElementById('approval-no-files');
+        filesGrid.innerHTML = '';
+        let fileCount = 0;
+
+        if (artReqData) {
+            fileFields.forEach(field => {
+                const url = artReqData[field.key];
+                if (!url || !url.trim()) return;
+                fileCount++;
+
+                const fileCard = document.createElement('div');
+                fileCard.className = 'approval-file-card selected';
+                fileCard.dataset.url = url;
+                fileCard.innerHTML = `
+                    <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="approval-file-placeholder" style="display:none;">File</div>
+                    <div class="approval-file-label">${escapeHtml(field.label)}</div>
+                    <div class="approval-file-check">&#10003;</div>
+                `;
+
+                // Toggle selection on click
+                fileCard.addEventListener('click', () => {
+                    fileCard.classList.toggle('selected');
+                });
+
+                filesGrid.appendChild(fileCard);
+            });
+        }
+
+        if (fileCount === 0) {
+            noFilesMsg.style.display = 'block';
+            filesGrid.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'No Files Available';
+        } else {
+            noFilesMsg.style.display = 'none';
+            filesGrid.style.display = 'grid';
+        }
+
+        // Store data on modal for submit handler
+        modal.dataset.designId = designId;
+        modal.dataset.artReqJson = artReqData ? JSON.stringify({
+            Sales_Rep: artReqData.Sales_Rep,
+            CompanyName: artReqData.CompanyName,
+            Revision_Count: artReqData.Revision_Count || 0
+        }) : '';
+    }
+
+    function closeApprovalModal() {
+        document.getElementById('approval-overlay').style.display = 'none';
+        document.getElementById('approval-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    async function submitSendForApproval() {
+        const modal = document.getElementById('approval-modal');
+        const designId = modal.dataset.designId;
+        const submitBtn = document.getElementById('approval-submit');
+        const mins = parseInt(document.getElementById('approval-minutes').value) || 0;
+        const message = document.getElementById('approval-message').value.trim();
+
+        // Parse stored art request data
+        let artReqMeta = {};
+        try { artReqMeta = JSON.parse(modal.dataset.artReqJson || '{}'); } catch (e) { /* ignore */ }
+        const revCount = artReqMeta.Revision_Count || 0;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+
+        try {
+            // 1. Update status to Awaiting Approval (backend handles additive art time)
+            const statusBody = { status: 'Awaiting Approval \uD83D\uDFE1' };
+            if (mins > 0) statusBody.artMinutes = mins;
+
+            const statusResp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(statusBody)
+            });
+            if (!statusResp.ok) throw new Error(`Status update ${statusResp.status}`);
+
+            // 2. Create "Mockup Sent" note
+            const revLabel = revCount > 0 ? ` (Rev #${revCount})` : '';
+            const noteText = message
+                ? `Mockup sent for approval${revLabel}: ${message}`
+                : `Mockup sent for approval${revLabel}`;
+
+            const noteResp = await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    noteType: 'Mockup Sent',
+                    noteText: noteText,
+                    noteBy: 'art@nwcustomapparel.com'
+                })
+            });
+            if (!noteResp.ok) throw new Error(`Note creation ${noteResp.status}`);
+
+            // 3. Log art time as separate note if > 0
+            if (mins > 0) {
+                const quarterHours = Math.ceil(mins / 15) * 0.25;
+                const cost = (quarterHours * 75).toFixed(2);
+                await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        noteType: 'Art Time',
+                        noteText: `Logged ${mins} minutes ($${cost})${revLabel}`,
+                        noteBy: 'art@nwcustomapparel.com'
+                    })
+                }).catch(err => console.warn('Art time note failed (non-blocking):', err));
+            }
+
+            // 4. Send approval email to sales rep (fire-and-forget)
+            sendNotificationEmail(designId, 'approval', {
+                message: message,
+                revisionCount: revCount,
+                artMinutes: mins,
+                salesRep: artReqMeta.Sales_Rep,
+                companyName: artReqMeta.CompanyName
+            });
+
+            submitBtn.textContent = 'Sent!';
+            submitBtn.style.background = '#28a745';
+            setTimeout(() => { closeApprovalModal(); window.location.reload(); }, 600);
+        } catch (err) {
+            submitBtn.textContent = 'Error — retry';
+            submitBtn.style.background = '#dc3545';
+            submitBtn.disabled = false;
+            console.error('Send for approval failed:', err);
+        }
+    }
+
     // ── Email Notification ────────────────────────────────────────────────
     async function sendNotificationEmail(designId, type, data) {
         if (typeof emailjs === 'undefined') {
@@ -909,6 +1112,24 @@
                     art_cost: `$${cost}`,
                     detail_link: detailLink,
                     from_name: 'Steve — Art Department'
+                };
+            }
+
+            if (type === 'approval') {
+                const mins = data.artMinutes || 0;
+                const quarterHours = Math.ceil(mins / 15) * 0.25;
+                const cost = (quarterHours * 75).toFixed(2);
+                templateId = 'art_approval_request';
+                templateParams = {
+                    to_email: repEmail,
+                    to_name: salesRep || 'Sales Team',
+                    design_id: designId,
+                    company_name: companyName || 'Unknown',
+                    revision_count: data.revisionCount || 0,
+                    message: data.message || 'Mockup is ready for your review.',
+                    art_time_display: `${mins} min (${quarterHours.toFixed(2)} hrs, $${cost})`,
+                    detail_link: detailLink,
+                    from_name: 'Art Department'
                 };
             }
 
@@ -1002,9 +1223,29 @@
 
         // Notes panel: Escape key to close
         document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape' && currentNotesDesignId) {
-                closeNotesPanel();
+            if (event.key === 'Escape') {
+                if (currentNotesDesignId) closeNotesPanel();
+                // Close approval modal on Escape
+                const approvalModal = document.getElementById('approval-modal');
+                if (approvalModal && approvalModal.style.display !== 'none') {
+                    closeApprovalModal();
+                }
             }
+        });
+
+        // ── Approval Modal Event Listeners ──────────────────────────────
+        document.getElementById('approval-overlay').addEventListener('click', closeApprovalModal);
+        document.getElementById('approval-modal-close').addEventListener('click', closeApprovalModal);
+        document.getElementById('approval-cancel').addEventListener('click', closeApprovalModal);
+        document.getElementById('approval-submit').addEventListener('click', submitSendForApproval);
+
+        // Live cost calculation for approval modal minutes
+        const approvalMinsInput = document.getElementById('approval-minutes');
+        approvalMinsInput.addEventListener('input', function () {
+            const mins = parseInt(this.value) || 0;
+            const quarterHours = Math.ceil(mins / 15) * 0.25;
+            const cost = (quarterHours * 75).toFixed(2);
+            document.getElementById('approval-cost').textContent = `= $${cost}`;
         });
     });
 

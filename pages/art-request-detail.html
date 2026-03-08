@@ -80,6 +80,10 @@
                             <span class="ard-label">Date Created</span>
                             <span class="ard-value" id="ard-date-created">--</span>
                         </div>
+                        <div class="ard-field" id="ard-placement-field" style="display:none;">
+                            <span class="ard-label">Garment Placement</span>
+                            <span class="ard-value" id="ard-placement">--</span>
+                        </div>
                     </div>
                 </div>
 
@@ -105,6 +109,21 @@
                     </div>
                 </div>
 
+                <!-- Contact Info Card -->
+                <div class="ard-card" id="ard-contact-card" style="display:none;">
+                    <div class="ard-card-header">Contact Info</div>
+                    <div class="ard-card-body">
+                        <div class="ard-field">
+                            <span class="ard-label">Contact Name</span>
+                            <span class="ard-value" id="ard-contact-name">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Email</span>
+                            <span class="ard-value" id="ard-contact-email">--</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Notes from Submitter -->
                 <div class="ard-card" id="ard-submitter-notes-card" style="display:none;">
                     <div class="ard-card-header">Notes from Submitter</div>
@@ -114,14 +133,35 @@
                 </div>
             </div>
 
-            <!-- Right Column: Preview + Notes Timeline -->
+            <!-- Right Column: Mockup Gallery + Notes Timeline -->
             <div class="ard-col-right">
 
-                <!-- Design Preview -->
-                <div class="ard-card" id="ard-preview-card" style="display:none;">
-                    <div class="ard-card-header">Design Preview</div>
-                    <div class="ard-card-body ard-preview-body">
-                        <img id="ard-preview-img" src="" alt="Design preview" class="ard-preview-img">
+                <!-- Mockup Gallery -->
+                <div class="ard-card" id="ard-gallery-card" style="display:none;">
+                    <div class="ard-card-header">Mockups & Artwork</div>
+                    <div class="ard-card-body">
+                        <div class="ard-gallery-grid" id="ard-gallery-grid"></div>
+                    </div>
+                </div>
+
+                <!-- AE Action Bar (visible only when Awaiting Approval) -->
+                <div class="ard-action-bar" id="ard-action-bar" style="display:none;">
+                    <div class="ard-action-bar-inner">
+                        <div class="ard-action-header">Review & Respond</div>
+                        <div class="ard-action-rep-row">
+                            <label for="ard-ae-select">Your Name:</label>
+                            <select id="ard-ae-select" class="ard-ae-select">
+                                <option value="">-- Select --</option>
+                                <option value="Taneisha">Taneisha</option>
+                                <option value="Nika">Nika</option>
+                                <option value="Ruthie">Ruthie</option>
+                                <option value="Erik">Erik</option>
+                            </select>
+                        </div>
+                        <div class="ard-action-buttons">
+                            <button class="ard-btn-approve" id="ard-btn-approve" disabled>Approve Design</button>
+                            <button class="ard-btn-changes" id="ard-btn-changes" disabled>Request Changes</button>
+                        </div>
                     </div>
                 </div>
 
@@ -136,11 +176,39 @@
         </div>
     </main>
 
+    <!-- Image Lightbox Modal -->
+    <div class="ard-lightbox" id="ard-lightbox" style="display:none;">
+        <div class="ard-lightbox-backdrop" id="ard-lightbox-backdrop"></div>
+        <div class="ard-lightbox-content">
+            <button class="ard-lightbox-close" id="ard-lightbox-close">&times;</button>
+            <img class="ard-lightbox-img" id="ard-lightbox-img" src="" alt="Full-size preview">
+            <div class="ard-lightbox-label" id="ard-lightbox-label"></div>
+        </div>
+    </div>
+
+    <!-- Request Changes Modal -->
+    <div class="ard-changes-overlay" id="ard-changes-overlay" style="display:none;"></div>
+    <div class="ard-changes-modal" id="ard-changes-modal" style="display:none;">
+        <div class="ard-changes-header">Request Changes</div>
+        <div class="ard-changes-body">
+            <label class="ard-changes-label">What changes are needed?</label>
+            <textarea id="ard-changes-notes" rows="4" placeholder="Describe the changes needed..." class="ard-changes-textarea"></textarea>
+            <div class="ard-changes-actions">
+                <button class="ard-changes-btn-cancel" id="ard-changes-cancel">Cancel</button>
+                <button class="ard-changes-btn-submit" id="ard-changes-submit">Submit Revision Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Status Message -->
+    <div class="ard-success-msg" id="ard-success-msg" style="display:none;"></div>
+
     <!-- Footer -->
     <footer class="ard-footer">
         <p>Northwest Custom Apparel &bull; Internal Staff Page</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/art-request-detail.js"></script>
 </body>
