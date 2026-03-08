@@ -1519,7 +1519,6 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 .footer-btn--notes    { background: #3b82f6; }
 .footer-btn--working  { background: #2563eb; }
 .footer-btn--done     { background: #16a34a; }
-.footer-btn--sendback { background: #ea580c; }
 .footer-btn--approve  { background: #d97706; }
 
 /* View Details — subtle text link below button row */
@@ -1877,12 +1876,16 @@ input.cbSearchButton {
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.approval-file-card.selected {
+.approval-file-card:hover {
+    border-color: #fcd34d;
+}
+
+.approval-file-card.primary-selected {
     border-color: #f59e0b;
-    box-shadow: 0 0 0 2px rgba(245,158,11,0.3);
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.3);
 }
 
 .approval-file-card img {
@@ -1892,7 +1895,7 @@ input.cbSearchButton {
     display: block;
 }
 
-.approval-file-card-label {
+.approval-file-label {
     font-size: 10px;
     text-align: center;
     padding: 4px;
@@ -1903,22 +1906,40 @@ input.cbSearchButton {
     text-overflow: ellipsis;
 }
 
-.approval-file-check {
+/* Hide radio input visually but keep accessible */
+.primary-radio {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* "Primary" badge — only visible on selected card */
+.approval-primary-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
     background: #f59e0b;
     color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
     display: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.approval-file-card.primary-selected .approval-primary-badge { display: block; }
+
+.approval-file-placeholder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #f3f4f6;
+    display: flex;
     align-items: center;
     justify-content: center;
+    color: #9ca3af;
     font-size: 12px;
-    font-weight: bold;
 }
-.approval-file-card.selected .approval-file-check { display: flex; }
 
 .approval-no-files {
     background: #fef3c7;

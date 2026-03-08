@@ -548,13 +548,12 @@
                 }
             }));
 
-            actionsGroup.appendChild(btn('Done', 'done', () => showArtTimeModal(designId)));
-            actionsGroup.appendChild(btn('Send Back', 'sendback', () => showSendBackModal(designId)));
+            actionsGroup.appendChild(btn('Mark Complete', 'done', () => showArtTimeModal(designId)));
 
-            // Send for Approval — show when In Progress or Revision Requested
-            const canSendForApproval = status.includes('inprogress') || status.includes('revisionrequested');
-            if (canSendForApproval) {
-                actionsGroup.appendChild(btn('Send for Approval', 'approve', () => showSendForApprovalModal(designId, card)));
+            // Send Mockup — show when In Progress, Revision Requested, or Awaiting Approval
+            const canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
+            if (canSendMockup) {
+                actionsGroup.appendChild(btn('Send Mockup', 'approve', () => showSendForApprovalModal(designId, card)));
             }
         }
 
@@ -701,169 +700,7 @@
         });
     }
 
-    // ── Send Back Modal (Revision action) ───────────────────────────────
-    async function showSendBackModal(designId) {
-        removeModals();
-
-        const overlay = createOverlay();
-        const modal = document.createElement('div');
-        modal.id = 'send-back-modal';
-        modal.className = 'art-modal art-modal--md';
-
-        // Default revision display — will be updated after fetch
-        let revisionNum = '?';
-
-        modal.innerHTML = `
-            <div class="art-modal-header art-modal-header--orange">
-                <span>Send Back — #${designId}</span>
-                <span class="art-modal-header-badge" id="sb-rev-badge"></span>
-            </div>
-            <div class="art-modal-body">
-                <label class="art-modal-label">Revision Notes *</label>
-                <textarea id="sb-notes" rows="4" placeholder="Describe what needs to change..."
-                    class="send-back-textarea"></textarea>
-
-                <label class="art-modal-label art-modal-label--spaced">Art Minutes (this session)</label>
-                <div class="stepper-row">
-                    <button id="sb-minus" class="stepper-btn">-</button>
-                    <input id="sb-minutes" type="number" value="0" min="0" step="15" class="stepper-input" />
-                    <button id="sb-plus" class="stepper-btn">+</button>
-                </div>
-                <div id="sb-cost" class="art-cost-display">= $0.00 (0.00 hrs)</div>
-
-                <label class="art-modal-checkbox-label">
-                    <input type="checkbox" id="sb-notify" checked />
-                    Notify sales rep via email
-                </label>
-
-                <div class="art-modal-actions art-modal-actions--spaced">
-                    <button id="sb-cancel" class="art-modal-btn-cancel">Cancel</button>
-                    <button id="sb-submit" class="art-modal-btn-submit art-modal-btn-submit--orange">Send Back</button>
-                </div>
-            </div>`;
-
-        document.body.appendChild(overlay);
-        document.body.appendChild(modal);
-
-        // Stepper logic
-        const minutesInput = modal.querySelector('#sb-minutes');
-        const costDiv = modal.querySelector('#sb-cost');
-
-        function updateCost() {
-            const mins = parseInt(minutesInput.value) || 0;
-            const quarterHours = Math.ceil(mins / 15) * 0.25;
-            const cost = (quarterHours * 75).toFixed(2);
-            costDiv.textContent = `= $${cost} (${quarterHours.toFixed(2)} hrs)`;
-        }
-
-        minutesInput.addEventListener('input', updateCost);
-        modal.querySelector('#sb-plus').addEventListener('click', () => {
-            minutesInput.value = (parseInt(minutesInput.value) || 0) + 15;
-            updateCost();
-        });
-        modal.querySelector('#sb-minus').addEventListener('click', () => {
-            const v = (parseInt(minutesInput.value) || 0) - 15;
-            minutesInput.value = v < 0 ? 0 : v;
-            updateCost();
-        });
-
-        modal.querySelector('#sb-cancel').addEventListener('click', removeModals);
-        overlay.addEventListener('click', removeModals);
-
-        // Fetch current revision count to display
-        let artReqData = null;
-        try {
-            const artReqResp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&select=Revision_Count,Sales_Rep,CompanyName&limit=1`);
-            if (artReqResp.ok) {
-                const artReqs = await artReqResp.json();
-                if (artReqs && artReqs.length > 0) {
-                    artReqData = artReqs[0];
-                    revisionNum = (artReqData.Revision_Count || 0) + 1;
-                    modal.querySelector('#sb-rev-badge').textContent = `Rev #${revisionNum}`;
-                    modal.querySelector('#sb-submit').textContent = `Send Back — Rev #${revisionNum}`;
-                }
-            }
-        } catch (e) {
-            console.warn('Could not fetch revision count (non-blocking):', e);
-        }
-
-        // Submit handler
-        modal.querySelector('#sb-submit').addEventListener('click', async function () {
-            const notes = modal.querySelector('#sb-notes').value.trim();
-            if (!notes) {
-                modal.querySelector('#sb-notes').style.borderColor = '#dc3545';
-                return;
-            }
-
-            const mins = parseInt(minutesInput.value) || 0;
-            const shouldNotify = modal.querySelector('#sb-notify').checked;
-
-            this.disabled = true;
-            this.textContent = 'Sending...';
-
-            try {
-                // Update status (backend increments Revision_Count and adds art time)
-                const statusBody = { status: 'Revision Requested \u{1F504}' };
-                if (mins > 0) statusBody.artMinutes = mins;
-
-                const statusResp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(statusBody)
-                });
-                if (!statusResp.ok) throw new Error(`Status update ${statusResp.status}`);
-
-                // Create revision note
-                const noteResp = await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        noteType: 'Design Update',
-                        noteText: `Revision Requested (Rev #${revisionNum}): ${notes}`,
-                        noteBy: 'art@nwcustomapparel.com'
-                    })
-                });
-                if (!noteResp.ok) throw new Error(`Note creation ${noteResp.status}`);
-
-                // Log art time as a separate note if > 0
-                if (mins > 0) {
-                    const quarterHours = Math.ceil(mins / 15) * 0.25;
-                    const cost = (quarterHours * 75).toFixed(2);
-                    await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            noteType: 'Art Time',
-                            noteText: `Logged ${mins} minutes ($${cost}) — Rev #${revisionNum}`,
-                            noteBy: 'art@nwcustomapparel.com'
-                        })
-                    }).catch(err => console.warn('Art time note failed (non-blocking):', err));
-                }
-
-                // Send notification email
-                if (shouldNotify) {
-                    sendNotificationEmail(designId, 'revision', {
-                        revisionNotes: notes,
-                        revisionCount: revisionNum,
-                        artMinutes: mins,
-                        salesRep: artReqData?.Sales_Rep,
-                        companyName: artReqData?.CompanyName
-                    });
-                }
-
-                this.textContent = 'Sent!';
-                this.style.background = '#28a745';
-                setTimeout(() => { removeModals(); window.location.reload(); }, 600);
-            } catch (err) {
-                this.textContent = 'Error — retry';
-                this.style.background = '#dc3545';
-                this.disabled = false;
-                console.error('Send back failed:', err);
-            }
-        });
-    }
-
-    // ── Send for Approval Modal ──────────────────────────────────────────
+    // ── Send Mockup Modal (merged Send Back + Send for Approval) ────────
     async function showSendForApprovalModal(designId, card) {
         const overlay = document.getElementById('approval-overlay');
         const modal = document.getElementById('approval-modal');
@@ -877,7 +714,7 @@
         document.getElementById('approval-no-files').style.display = 'none';
         const submitBtn = document.getElementById('approval-submit');
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Send for Approval';
+        submitBtn.textContent = 'Send Mockup';
         submitBtn.style.background = '';
 
         // Get company name from card
@@ -932,22 +769,28 @@
             fileFields.forEach(field => {
                 const url = artReqData[field.key];
                 if (!url || !url.trim()) return;
+                // Filter bare CDN base URLs (no actual file)
+                if (/^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(url.trim())) return;
                 fileCount++;
 
                 const fileCard = document.createElement('div');
-                fileCard.className = 'approval-file-card selected';
+                fileCard.className = 'approval-file-card' + (fileCount === 1 ? ' primary-selected' : '');
                 fileCard.dataset.url = url;
                 fileCard.innerHTML = `
+                    <input type="radio" name="primary-mockup" class="primary-radio"
+                           value="${escapeHtml(url)}" ${fileCount === 1 ? 'checked' : ''}>
                     <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="approval-file-placeholder" style="display:none;">File</div>
                     <div class="approval-file-label">${escapeHtml(field.label)}</div>
-                    <div class="approval-file-check">&#10003;</div>
+                    <div class="approval-primary-badge">Primary</div>
                 `;
 
-                // Toggle selection on click
+                // Radio-style primary selection on click
                 fileCard.addEventListener('click', () => {
-                    fileCard.classList.toggle('selected');
+                    filesGrid.querySelectorAll('.approval-file-card').forEach(c => c.classList.remove('primary-selected'));
+                    fileCard.classList.add('primary-selected');
+                    fileCard.querySelector('input[type="radio"]').checked = true;
                 });
 
                 filesGrid.appendChild(fileCard);
@@ -985,6 +828,10 @@
         const submitBtn = document.getElementById('approval-submit');
         const mins = parseInt(document.getElementById('approval-minutes').value) || 0;
         const message = document.getElementById('approval-message').value.trim();
+
+        // Get primary mockup URL from radio selection
+        const primaryRadio = document.querySelector('input[name="primary-mockup"]:checked');
+        const mockupUrl = primaryRadio ? primaryRadio.value : '';
 
         // Parse stored art request data
         let artReqMeta = {};
@@ -1044,7 +891,8 @@
                 revisionCount: revCount,
                 artMinutes: mins,
                 salesRep: artReqMeta.Sales_Rep,
-                companyName: artReqMeta.CompanyName
+                companyName: artReqMeta.CompanyName,
+                mockupUrl: mockupUrl
             });
 
             submitBtn.textContent = 'Sent!';
@@ -1129,7 +977,8 @@
                     message: data.message || 'Mockup is ready for your review.',
                     art_time_display: `${mins} min (${quarterHours.toFixed(2)} hrs, $${cost})`,
                     detail_link: detailLink,
-                    from_name: 'Art Department'
+                    from_name: 'Art Department',
+                    mockup_url: data.mockupUrl || ''
                 };
             }
 
@@ -1151,7 +1000,7 @@
     }
 
     function removeModals() {
-        ['art-time-modal', 'send-back-modal', 'quick-action-overlay'].forEach(id => {
+        ['art-time-modal', 'quick-action-overlay'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.remove();
         });

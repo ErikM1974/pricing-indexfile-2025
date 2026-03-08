@@ -29,6 +29,22 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: Caspio Dropdown Fields Return Objects, Not Strings (2026-03-08)
+
+**Problem:** Art Request Detail page showed `[object Object]` for Order Type instead of "Transfer". The field rendered fine in Caspio DataPages but broke in custom API-driven pages.
+
+**Root Cause:** Caspio dropdown/listbox fields return objects like `{'6': 'Transfer'}` (key-value pairs) through the REST API, not plain strings. Using `setText('ard-order-type', req.Order_Type)` directly passed the object to `textContent`, triggering JS default `[object Object]` stringification.
+
+**Solution:** Check `typeof === 'object'` and extract values: `Object.values(req.Order_Type).join(', ')`.
+
+**Related Bug:** Caspio CDN_Link fields store the base CDN URL (`https://cdn.caspio.com/A0E15000`) when no file is uploaded, rather than being empty/null. Filtered with regex `/^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i` to avoid showing empty image placeholders.
+
+**Prevention:** When rendering Caspio fields in custom pages, always check field type. Dropdowns → object, text → string, files → may be base URL when empty.
+
+**Tags:** `[Pricing Index]`
+
+---
+
 ## Pattern: Caspio DataPage Button Consolidation — JS-Only Card Buttons (2026-03-07)
 
 **Problem:** Art Hub cards had a cluttered two-row button layout: Caspio HTML Block 1 rendered `[Add Note] [View Notes] [View Details]` in `.card-footer`, then JS injected `[Working] [Done] [Send Back]` in a separate `.quick-actions` div below. Inconsistent styling, hard to maintain, and visually cramped.
