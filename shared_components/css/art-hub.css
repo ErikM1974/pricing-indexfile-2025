@@ -1883,9 +1883,15 @@ input.cbSearchButton {
     border-color: #fcd34d;
 }
 
-.approval-file-card.primary-selected {
+.approval-file-card.selected {
     border-color: #f59e0b;
     box-shadow: 0 0 0 3px rgba(245,158,11,0.3);
+}
+.approval-file-card:not(.selected) {
+    opacity: 0.55;
+}
+.approval-file-card:not(.selected):hover {
+    opacity: 0.8;
 }
 
 .approval-file-card img {
@@ -1906,29 +1912,30 @@ input.cbSearchButton {
     text-overflow: ellipsis;
 }
 
-/* Hide radio input visually but keep accessible */
-.primary-radio {
+/* Hide checkbox input visually but keep accessible */
+.mockup-checkbox {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-/* "Primary" badge — only visible on selected card */
-.approval-primary-badge {
+/* Checkmark badge — visible on selected cards */
+.approval-selected-badge {
     position: absolute;
     top: 6px;
     right: 6px;
     background: #f59e0b;
     color: white;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     display: none;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
 }
-.approval-file-card.primary-selected .approval-primary-badge { display: block; }
+.approval-file-card.selected .approval-selected-badge { display: flex; }
 
 .approval-file-placeholder {
     width: 100%;
@@ -2044,7 +2051,167 @@ input.cbSearchButton {
 .approval-btn-submit:hover { opacity: 0.9; }
 .approval-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ---------- Recipient + CC Row ---------- */
+.approval-recipient {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #065f46;
+    margin-bottom: 12px;
+}
+
+.approval-cc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+
+.approval-cc-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.approval-cc-label input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.approval-cc-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.approval-cc-rep-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+}
+
+.approval-cc-rep-label input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.approval-cc-rep-label input[type="checkbox"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ---------- Hint Text ---------- */
+.approval-hint {
+    font-size: 12px;
+    color: #9ca3af;
+    font-style: italic;
+    margin-bottom: 8px;
+    margin-top: -4px;
+}
+
+/* ---------- Art Time Section (Send Mockup modal) ---------- */
+.approval-time-section {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.approval-time-section .approval-section-label {
+    margin-bottom: 10px;
+}
+
+.approval-prev-time {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.approval-session-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.approval-session-row label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap;
+}
+
+.stepper-row--inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stepper-input--sm {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    text-align: center;
+}
+
+.approval-new-total {
+    font-size: 14px;
+    font-weight: 600;
+    color: #059669;
+    padding-top: 10px;
+    border-top: 1px dashed #d1d5db;
+}
+
+/* ---------- Log Time Button ---------- */
+.footer-btn--logtime { background: #0891b2; }
+
+/* ---------- Log Time Modal Overrides ---------- */
+.art-modal-header--teal { background: #0891b2; }
+.art-modal-btn-submit--teal { background: #0891b2; }
+
+.art-prev-time {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.art-new-total {
+    font-size: 14px;
+    font-weight: 600;
+    color: #059669;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #d1d5db;
+}
+
+.art-modal-note-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
 @media (max-width: 768px) {
     .approval-modal { width: 95vw; }
     .approval-time-row { flex-direction: column; align-items: flex-start; }
+    .approval-session-row { flex-wrap: wrap; }
+    .approval-cc-row { flex-direction: column; align-items: flex-start; }
 }

@@ -449,19 +449,34 @@
         </div>
         <div class="approval-modal-body">
             <div id="approval-company" class="approval-company"></div>
-            <div class="approval-section-label">Select primary mockup to send:</div>
+            <div id="approval-recipient" class="approval-recipient"></div>
+            <div id="approval-cc-row" class="approval-cc-row" style="display:none;">
+                <label class="approval-cc-label">
+                    <input type="checkbox" id="approval-cc-toggle"> Also notify:
+                </label>
+                <div id="approval-cc-options" class="approval-cc-checkbox-group"></div>
+            </div>
+            <div class="approval-section-label">Select mockups to send:</div>
+            <div class="approval-hint">Selected images appear in the email. All files are also viewable on the detail page.</div>
             <div id="approval-files" class="approval-files-grid"></div>
             <div id="approval-no-files" class="approval-no-files" style="display:none;">
                 No mockup files found. Upload files via the Caspio detail page first.
             </div>
             <div class="approval-section-label">Message to Sales Rep:</div>
             <textarea id="approval-message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>
-            <div class="approval-time-row">
-                <div class="approval-time-input">
-                    <label for="approval-minutes">Art Minutes (this session):</label>
-                    <input type="number" id="approval-minutes" value="15" min="0" step="15">
+            <div class="approval-time-section">
+                <div class="approval-section-label">Art Time</div>
+                <div id="approval-prev-time" class="approval-prev-time"></div>
+                <div class="approval-session-row">
+                    <label>This session:</label>
+                    <div class="stepper-row stepper-row--inline">
+                        <button type="button" id="approval-minus" class="stepper-btn">-</button>
+                        <input type="number" id="approval-minutes" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
+                        <button type="button" id="approval-plus" class="stepper-btn">+</button>
+                    </div>
+                    <span id="approval-cost" class="approval-cost">= $18.75</span>
                 </div>
-                <span id="approval-cost" class="approval-cost">= $18.75</span>
+                <div id="approval-new-total" class="approval-new-total"></div>
             </div>
         </div>
         <div class="approval-modal-footer">
