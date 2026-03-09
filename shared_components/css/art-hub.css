@@ -1347,13 +1347,37 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 
 .info-item.art-charge .value {
     display: flex;
-    align-items: center;
-    gap: 4px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
 }
 
 .charge-separator {
     color: #bbb;
 }
+
+/* ── Dual Charge Display (Quoted vs Actual) ── */
+.charge-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9em;
+}
+.charge-label {
+    font-size: 0.78em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    min-width: 48px;
+}
+.charge-line--quoted .charge-label { color: #9ca3af; }
+.charge-line--quoted .charge-val,
+.charge-line--quoted .charge-hrs { color: #6b7280; }
+.charge-line--actual .charge-label { color: #0891b2; }
+.charge-line--actual .charge-val { color: #0891b2; font-weight: 600; }
+.charge-line--actual .charge-hrs { color: #0891b2; }
+.charge-val--none { color: #9ca3af !important; font-style: italic; font-weight: 400 !important; }
+.charge-sep { color: #d1d5db; }
 
 .info-item .label {
     font-weight: 600;
@@ -1482,24 +1506,47 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 .card-footer-buttons {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     width: 100%;
     padding: 8px 12px;
     box-sizing: border-box;
 }
 
-.footer-button-row {
+/* Section row (STATUS, TIME) — label + buttons */
+.footer-section {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 6px;
+}
+
+.footer-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    min-width: 42px;
+    flex-shrink: 0;
+}
+
+.footer-section-btns {
+    display: flex;
     gap: 4px;
     flex-wrap: wrap;
 }
 
-.footer-notes-group,
-.footer-actions-group {
+/* Bottom info row (Notes + View Details) */
+.footer-info-row {
     display: flex;
-    gap: 3px;
+    align-items: center;
+    gap: 6px;
+    padding-top: 4px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.footer-info-separator {
+    color: #d1d5db;
+    font-size: 10px;
 }
 
 .footer-btn {
@@ -1521,15 +1568,11 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 .footer-btn--done     { background: #16a34a; }
 .footer-btn--approve  { background: #d97706; }
 
-/* View Details — subtle text link below button row */
+/* View Details — inline text link in info row */
 .card-details-link {
-    display: block;
-    text-align: center;
     font-size: 11px;
     color: #9ca3af;
     text-decoration: none;
-    padding: 5px 0;
-    border-top: 1px solid #f0f0f0;
     cursor: pointer;
     transition: color 0.15s;
 }
@@ -2177,6 +2220,46 @@ input.cbSearchButton {
     border-top: 1px dashed #d1d5db;
 }
 
+/* ---------- Time Log Button ---------- */
+.footer-btn--timelog { background: #64748b; }
+.footer-btn--timelog:hover { background: #475569; }
+
+/* ---------- Time Log Modal ---------- */
+.art-modal--timelog { width: 420px; max-height: 80vh; display: flex; flex-direction: column; }
+.art-modal--timelog .art-modal-body { overflow-y: auto; flex: 1; }
+.art-modal-header--slate { background: #64748b; }
+.time-log-company { font-size: 0.85em; opacity: 0.85; margin-top: 2px; }
+.time-log-summary {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 14px; text-align: center;
+    font-weight: 600; color: #166534; font-size: 0.95em;
+}
+.time-log-entry {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 8px;
+}
+.time-log-entry-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+}
+.time-log-badge {
+    font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 8px; border-radius: 4px; color: white;
+}
+.time-log-badge--logtime { background: #0891b2; }
+.time-log-badge--completion { background: #28a745; }
+.time-log-badge--mockup { background: #f59e0b; }
+.time-log-badge--default { background: #9ca3af; }
+.time-log-date { font-size: 0.8em; color: #6b7280; }
+.time-log-detail { font-size: 0.9em; color: #1e293b; font-weight: 500; }
+.time-log-desc { font-size: 0.82em; color: #6b7280; margin-top: 3px; }
+.time-log-running { font-size: 0.78em; color: #9ca3af; margin-top: 4px; }
+.time-log-negative .time-log-detail { color: #dc2626; }
+.time-log-empty { text-align: center; color: #9ca3af; font-style: italic; padding: 24px 0; }
+
+/* ---------- Reopen Button (completed cards) ---------- */
+.footer-btn--reopen { background: #f59e0b; }
+.footer-btn--reopen:hover { background: #d97706; }
+
 /* ---------- Log Time Button ---------- */
 .footer-btn--logtime { background: #0891b2; }
 
@@ -2294,197 +2377,507 @@ input.cbSearchButton {
     }
 }
 
-/* ── Detail Form Styling ─────────────────────────────────────────────── */
+/* ── Detail Form Styling (Semantic Markup) ─────────────────────────── */
 
 .art-detail-form {
-    max-width: 800px;
+    max-width: 820px;
     margin: 0 auto;
+    padding: 12px 0 20px;
 }
 
-.art-detail-form table {
+/* Override Caspio's inline-grid — switch to block flow so section headers work naturally */
+.art-detail-form section[data-cb-name="cbTable"] {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* 3-column rows: nested containers that share a grid row display inline */
+.art-detail-form .cbFormNestedTableContainer {
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+/* Default: each nested container takes ~1/3 width for 3-col rows */
+.art-detail-form .cbFormNestedTableContainer:not(.detail-full-row) {
+    width: 33.33%;
+}
+/* Full-width single-column items */
+.art-detail-form .detail-full-row {
+    display: block !important;
+    width: 100% !important;
+}
+.art-detail-form .detail-file-grid.detail-full-row {
+    display: flex !important;
+}
+
+/* Left-label kv pairs: flex row containers */
+.art-detail-form .detail-kv-row {
+    display: flex;
+    align-items: baseline;
     width: 100%;
-    border-collapse: collapse;
+    border-bottom: 1px solid #f1f5f9;
+    min-height: 32px;
+}
+.art-detail-form .detail-kv-label {
+    width: 160px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+.art-detail-form .detail-kv-value {
+    flex: 1;
+    box-sizing: border-box;
 }
 
-/* Section header rows */
-.detail-section-row td.detail-section-header {
-    background: #f0f4f8;
-    padding: 0.625rem 1rem;
-    font-weight: 600;
-    font-size: 0.8125rem;
+/* Section headers injected by JS — must span full grid in Caspio's inline-grid section */
+.detail-section-header {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #f0f4f8, #e8ecf1);
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 12px;
     color: #334155;
-    border-left: 3px solid #981e32;
-    letter-spacing: 0.03em;
+    border-left: 3px solid var(--art-theme, #009900);
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    border-bottom: 1px solid #e2e8f0;
-    margin-top: 0.5rem;
+    margin: 20px 0 6px;
+    border-radius: 0 6px 6px 0;
 }
 
-.detail-section-row:first-child td.detail-section-header {
-    margin-top: 0;
+.detail-section-header:first-child,
+.art-detail-form section > .detail-section-header:first-child {
+    margin-top: 4px;
 }
 
 .detail-section-header i {
-    margin-right: 0.5rem;
-    color: #981e32;
-    font-size: 0.8125rem;
+    margin-right: 8px;
+    color: var(--art-theme, #009900);
+    font-size: 13px;
+    width: 16px;
+    text-align: center;
 }
 
-/* Form field rows */
-.art-detail-form tr:not(.detail-section-row) td.cbFormLabelCell {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
+/* ── Nested field containers (3-column rows: Company/Due/Rep etc.) ── */
+.art-detail-form .cbFormNestedTableContainer {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.art-detail-form .cbFormNestedTableContainer .cbFormLabelCell {
+    font-size: 11px;
+    font-weight: 700;
     color: #64748b;
-    font-weight: 500;
-    white-space: nowrap;
-    width: 140px;
-    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-bottom: 3px;
 }
 
-.art-detail-form tr:not(.detail-section-row) td.cbFormLabelCell i {
-    color: #94a3b8;
-    margin-right: 0.375rem;
-    font-size: 0.75rem;
+.art-detail-form .cbFormNestedTableContainer .cbFormLabelCell i {
+    color: var(--art-theme, #009900);
+    margin-right: 5px;
+    font-size: 12px;
     width: 14px;
     text-align: center;
 }
 
-.art-detail-form tr:not(.detail-section-row) td.cbFormFieldCell {
-    padding: 0.375rem 0.75rem;
-    vertical-align: middle;
+.art-detail-form .cbFormNestedTableContainer .cbFormFieldCell {
+    padding: 2px 0 4px;
 }
 
-.art-detail-form td.cbFormFieldCell input[type="text"],
-.art-detail-form td.cbFormFieldCell select {
+/* Inputs inside nested containers */
+.art-detail-form .cbFormFieldCell input[type="text"],
+.art-detail-form .cbFormFieldCell input[type="number"],
+.art-detail-form .cbFormFieldCell select {
     width: 100%;
-    max-width: 400px;
-    padding: 0.375rem 0.5rem;
+    padding: 7px 10px;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 0.875rem;
+    border-radius: 6px;
+    font-size: 14px;
     color: #1e293b;
     background: #fff;
-    transition: border-color 0.15s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
 }
 
-.art-detail-form td.cbFormFieldCell input[type="text"]:focus,
-.art-detail-form td.cbFormFieldCell select:focus {
-    border-color: #981e32;
+.art-detail-form .cbFormFieldCell input[type="text"]:focus,
+.art-detail-form .cbFormFieldCell input[type="number"]:focus,
+.art-detail-form .cbFormFieldCell select:focus {
+    border-color: var(--art-theme, #009900);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(152, 30, 50, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 153, 0, 0.12);
 }
 
-.art-detail-form td.cbFormFieldCell textarea {
+.art-detail-form .cbFormFieldCell textarea {
     width: 100%;
-    max-width: 500px;
-    padding: 0.5rem;
+    padding: 8px 10px;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 0.875rem;
+    border-radius: 6px;
+    font-size: 14px;
     color: #1e293b;
-    min-height: 80px;
+    min-height: 70px;
     resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Row hover */
-.art-detail-form tr:not(.detail-section-row):hover {
+.art-detail-form .cbFormFieldCell textarea:focus {
+    border-color: var(--art-theme, #009900);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 153, 0, 0.12);
+}
+
+/* Static data display */
+.art-detail-form .cbFormDataCell .cbFormData,
+.art-detail-form .cbFormDataCellNumberDate .cbFormData {
+    font-size: 14px;
+    color: #1e293b;
+    padding: 5px 0;
+    display: inline-block;
+}
+
+/* Standalone data cells (not inside nested containers) should be block-level */
+.art-detail-form > section > .cbFormDataCell:not(.detail-kv-value),
+.art-detail-form > section > .cbFormDataCellNumberDate:not(.detail-kv-value) {
+    display: block;
+    width: 100%;
+}
+
+/* ── Left-label key-value rows (Order Type, Garment info, etc.) ── */
+.art-detail-form .detail-kv-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    padding: 7px 12px;
+}
+
+.art-detail-form .detail-kv-label i {
+    color: #94a3b8;
+    margin-right: 6px;
+    font-size: 12px;
+    width: 14px;
+    text-align: center;
+}
+
+.art-detail-form .detail-kv-value {
+    font-size: 14px;
+    color: #1e293b;
+    padding: 7px 12px;
+}
+
+/* Hover effect on kv pairs */
+.art-detail-form .detail-kv-row:hover {
     background: #f8fafc;
 }
 
-/* Row bottom border */
-.art-detail-form tr:not(.detail-section-row) {
-    border-bottom: 1px solid #f1f5f9;
+/* ── Status badge ── */
+.art-detail-form .detail-status-badge.detail-status-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 }
 
-/* Hidden rows (empty garment groups) */
-.detail-hidden-row {
+.status-submitted {
+    background: #ede9fe;
+    color: #6b21a8;
+}
+
+.status-in-progress {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-awaiting-approval {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-revision-requested {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ── Hidden rows (empty garment groups, empty file slots) ── */
+.detail-hidden-row,
+.art-detail-form .detail-hidden-row.detail-full-row {
     display: none !important;
 }
 
-/* Swatch thumbnails */
+/* ── Swatch thumbnails ── */
 .detail-swatch-img {
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
     border: 1px solid #d1d5db;
     object-fit: cover;
     vertical-align: middle;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
-/* Garment model images */
+/* ── Garment model images ── */
 .detail-garment-img {
     width: 100px;
     height: auto;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid #d1d5db;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;
     vertical-align: middle;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin: 4px 0;
 }
 
 .detail-garment-img:hover {
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: scale(1.06);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
 }
 
-/* UPDATE/BACK buttons */
-.art-detail-form input[type="submit"],
-.art-detail-form input[type="button"] {
-    padding: 0.5rem 1.25rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 500;
+/* ── Garment group cards (swatch + image + style/color inline) ── */
+.art-detail-form .garment-card {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.garment-card:hover {
+    background: #f8fafc;
+}
+
+.garment-card-images {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.garment-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.garment-card-info .garment-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 6px;
+}
+
+/* ── File upload containers (original Caspio) ── */
+.art-detail-form [class*="cbFormBlock"] img[width="200"],
+.art-detail-form .cbFormNestedTableContainer img {
+    max-width: 180px;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    margin: 4px 0;
+}
+
+/* ── File upload grid (2x2 layout) ── */
+.detail-file-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+}
+.detail-file-card {
+    flex: 0 0 calc(50% - 6px);
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    background: #fafbfc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.detail-file-card.detail-file-empty {
+    border-style: dashed;
+    background: #f8fafc;
+    color: #94a3b8;
+}
+.detail-file-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.detail-file-thumb {
+    max-width: 100% !important;
+    max-height: 150px !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+    object-fit: contain;
     cursor: pointer;
-    border: 1px solid #d1d5db;
-    margin: 0.5rem 0.25rem;
-    transition: background 0.15s, border-color 0.15s;
+}
+.detail-file-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--art-theme, #009900);
+    text-decoration: none;
+    border: 1px solid var(--art-theme, #009900);
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.detail-file-download:hover {
+    background: rgba(0, 153, 0, 0.06);
+    text-decoration: none;
+}
+.detail-file-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: #94a3b8;
+    cursor: pointer;
+    margin-top: 2px;
+}
+.detail-file-remove:hover {
+    color: #ef4444;
+}
+.detail-file-upload {
+    margin-top: 4px;
+}
+.detail-file-upload input[type="file"] {
+    font-size: 11px;
+    max-width: 100%;
 }
 
-.art-detail-form input[type="submit"] {
-    background: #981e32;
+/* File remove checkbox */
+.art-detail-form input[type="checkbox"] {
+    accent-color: var(--art-theme, #009900);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* ── UPDATE/BACK buttons ── */
+.art-detail-form .cbBackButtonContainer {
+    padding: 16px 8px;
+    margin-top: 12px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.art-detail-form .cbUpdateButton,
+.art-detail-form .cbBackButton {
+    padding: 9px 28px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.art-detail-form .cbUpdateButton {
+    background: var(--art-theme, #009900);
     color: #fff;
-    border-color: #981e32;
+    border-color: var(--art-theme, #009900);
 }
 
-.art-detail-form input[type="submit"]:hover {
-    background: #7a1828;
+.art-detail-form .cbUpdateButton:hover {
+    background: #007a00;
+    box-shadow: 0 2px 8px rgba(0, 153, 0, 0.25);
 }
 
-.art-detail-form input[type="button"] {
+.art-detail-form .cbBackButton {
     background: #f1f5f9;
     color: #334155;
+    border-color: #d1d5db;
 }
 
-.art-detail-form input[type="button"]:hover {
+.art-detail-form .cbBackButton:hover {
     background: #e2e8f0;
 }
 
-/* Responsive detail form */
+/* Download PDF / Report links at top */
+.art-detail-form .cbFormDownloadDetailsLink,
+.art-detail-form .cbFormBackToReportActionLink {
+    font-size: 13px;
+    color: var(--art-theme, #009900);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.art-detail-form .cbFormDownloadDetailsLink:hover,
+.art-detail-form .cbFormBackToReportActionLink:hover {
+    text-decoration: underline;
+}
+
+/* Record navigation at bottom */
+.art-detail-form .cbResultSetPaging,
+.art-detail-form [class*="cbResultSet"] {
+    font-size: 13px;
+    color: #64748b;
+    padding: 8px;
+}
+
+/* ── Responsive detail form ── */
 @media (max-width: 768px) {
     .art-detail-form {
         max-width: 100%;
+        padding: 8px 4px;
     }
 
-    .art-detail-form tr:not(.detail-section-row) td.cbFormLabelCell {
-        width: auto;
+    .art-detail-form .detail-kv-label {
         display: block;
-        padding-bottom: 0.125rem;
+        min-width: 0;
+        padding-bottom: 2px;
+        border-bottom: none;
     }
 
-    .art-detail-form tr:not(.detail-section-row) td.cbFormFieldCell {
+    .art-detail-form .detail-kv-value {
         display: block;
         padding-top: 0;
     }
 
-    .art-detail-form td.cbFormFieldCell input[type="text"],
-    .art-detail-form td.cbFormFieldCell select,
-    .art-detail-form td.cbFormFieldCell textarea {
+    .art-detail-form .cbFormFieldCell input[type="text"],
+    .art-detail-form .cbFormFieldCell input[type="number"],
+    .art-detail-form .cbFormFieldCell select,
+    .art-detail-form .cbFormFieldCell textarea {
         max-width: 100%;
     }
 
     .detail-garment-img {
         width: 80px;
+    }
+
+    .detail-section-header {
+        margin: 14px 0 4px;
+        padding: 8px 12px;
+        font-size: 11px;
     }
 }

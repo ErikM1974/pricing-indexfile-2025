@@ -451,13 +451,43 @@
         const hoursSpan = card.querySelector('.charge-hours');
         if (!chargeSpan || !hoursSpan) return;
 
-        const charge = parseFloat(chargeSpan.textContent.replace('$', '')) || 0;
-        if (charge > 0) {
-            const quarterHours = Math.ceil(charge / 18.75);
-            hoursSpan.textContent = (quarterHours * 0.25).toFixed(2) + ' hrs';
-        } else {
-            hoursSpan.textContent = '0.00 hrs';
+        // Quoted charge (AE's estimate from Prelim_Charges)
+        const quotedCharge = parseFloat(chargeSpan.textContent.replace('$', '')) || 0;
+        const quotedHours = quotedCharge > 0 ? (Math.ceil(quotedCharge / 18.75) * 0.25) : 0;
+
+        // Actual art time (Steve's logged time from Art_Minutes hidden span)
+        const actualMinsSpan = card.querySelector('.actual-minutes');
+        const actualMins = actualMinsSpan ? (parseInt(actualMinsSpan.textContent) || 0) : 0;
+        const actualHours = actualMins > 0 ? (Math.ceil(actualMins / 15) * 0.25) : 0;
+        const actualCost = actualHours * 75;
+
+        // Build dual-line display in the .value container
+        const valueDiv = chargeSpan.closest('.value');
+        if (!valueDiv) {
+            // Fallback: just set hours span like before
+            hoursSpan.textContent = quotedHours.toFixed(2) + ' hrs';
+            return;
         }
+
+        let html = '<div class="charge-line charge-line--quoted">';
+        html += '<span class="charge-label">Quoted</span>';
+        html += '<span class="charge-val">$' + quotedCharge.toFixed(2) + '</span>';
+        html += '<span class="charge-sep">&middot;</span>';
+        html += '<span class="charge-hrs">' + quotedHours.toFixed(2) + ' hrs</span>';
+        html += '</div>';
+
+        html += '<div class="charge-line charge-line--actual">';
+        html += '<span class="charge-label">Actual</span>';
+        if (actualMins > 0) {
+            html += '<span class="charge-val">$' + actualCost.toFixed(2) + '</span>';
+            html += '<span class="charge-sep">&middot;</span>';
+            html += '<span class="charge-hrs">' + actualHours.toFixed(2) + ' hrs</span>';
+        } else {
+            html += '<span class="charge-val charge-val--none">No time logged</span>';
+        }
+        html += '</div>';
+
+        valueDiv.innerHTML = html;
     }
 
     // ── Rep Name Formatting (email → display name) ────────────────────
@@ -556,6 +586,7 @@
 
         function btn(label, colorClass, onClick) {
             const b = document.createElement('button');
+            b.type = 'button'; // Prevent submit inside Caspio forms
             b.textContent = label;
             b.className = `footer-btn footer-btn--${colorClass}`;
             b.addEventListener('click', (e) => {
@@ -566,21 +597,26 @@
             return b;
         }
 
-        // Button row: notes on left, actions on right
-        const buttonRow = document.createElement('div');
-        buttonRow.className = 'footer-button-row';
+        // Helper: build a labeled section row (STATUS, TIME)
+        function section(labelText) {
+            const row = document.createElement('div');
+            row.className = 'footer-section';
+            const label = document.createElement('span');
+            label.className = 'footer-section-label';
+            label.textContent = labelText;
+            const btns = document.createElement('div');
+            btns.className = 'footer-section-btns';
+            row.appendChild(label);
+            row.appendChild(btns);
+            return { row: row, btns: btns };
+        }
 
-        // Left group: single Notes button
-        const notesGroup = document.createElement('div');
-        notesGroup.className = 'footer-notes-group';
-        notesGroup.appendChild(btn('Notes', 'notes', () => openNotesPanel(designId, card)));
-
-        // Right group: action buttons (no View Details here)
-        const actionsGroup = document.createElement('div');
-        actionsGroup.className = 'footer-actions-group';
+        // ── Row 1: STATUS — workflow actions ──
+        const statusSection = section('STATUS');
 
         if (!isInactive) {
-            actionsGroup.appendChild(btn('Working', 'working', async (b) => {
+            // Active: Working + Send Mockup
+            statusSection.btns.appendChild(btn('Working', 'working', async (b) => {
                 b.disabled = true;
                 b.textContent = 'Updating...';
                 try {
@@ -601,26 +637,61 @@
                 }
             }));
 
-            // Log Time — show when actively working (In Progress or Revision Requested)
-            const canLogTime = status.includes('inprogress') || status.includes('revisionrequested');
-            if (canLogTime) {
-                actionsGroup.appendChild(btn('Log Time', 'logtime', () => showLogTimeModal(designId, card)));
-            }
-
-            actionsGroup.appendChild(btn('Mark Complete', 'done', () => showArtTimeModal(designId, card)));
-
-            // Send Mockup — show when In Progress, Revision Requested, or Awaiting Approval
             const canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
             if (canSendMockup) {
-                actionsGroup.appendChild(btn('Send Mockup', 'approve', () => showSendForApprovalModal(designId, card)));
+                statusSection.btns.appendChild(btn('Send Mockup', 'approve', () => showSendForApprovalModal(designId, card)));
             }
+        } else if (isCompleted) {
+            // Completed: Reopen
+            statusSection.btns.appendChild(btn('Reopen', 'reopen', async (b) => {
+                b.disabled = true;
+                b.textContent = 'Reopening...';
+                try {
+                    const resp = await fetch(`${API_BASE}/api/art-requests/${designId}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'In Progress' })
+                    });
+                    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+                    fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            noteType: 'Status Change',
+                            noteText: 'Reopened from Completed',
+                            noteBy: 'art@nwcustomapparel.com'
+                        })
+                    }).catch(err => console.warn('Reopen note failed (non-blocking):', err));
+                    b.textContent = 'Reopened!';
+                    b.style.background = '#28a745';
+                    setTimeout(() => window.location.reload(), 800);
+                } catch (err) {
+                    b.textContent = 'Error';
+                    b.style.background = '#dc3545';
+                    console.error('Reopen failed:', err);
+                    setTimeout(() => { b.textContent = 'Reopen'; b.style.background = ''; b.disabled = false; }, 2000);
+                }
+            }));
         }
 
-        buttonRow.appendChild(notesGroup);
-        buttonRow.appendChild(actionsGroup);
-        container.appendChild(buttonRow);
+        // ── Row 2: TIME — art time management ──
+        const timeSection = section('TIME');
+        timeSection.btns.appendChild(btn('Log Time', 'logtime', () => showLogTimeModal(designId, card)));
+        if (!isInactive) {
+            timeSection.btns.appendChild(btn('Mark Complete', 'done', () => showArtTimeModal(designId, card)));
+        }
+        timeSection.btns.appendChild(btn('Time Log', 'timelog', () => showTimeLogModal(designId, card)));
 
-        // View Details — subtle text link below button row
+        // ── Row 3: Info — Notes + View Details ──
+        const infoRow = document.createElement('div');
+        infoRow.className = 'footer-info-row';
+        infoRow.appendChild(btn('Notes', 'notes', () => openNotesPanel(designId, card)));
+
+        const sep = document.createElement('span');
+        sep.className = 'footer-info-separator';
+        sep.textContent = '\u00B7';
+        infoRow.appendChild(sep);
+
         const detailsLink = document.createElement('a');
         detailsLink.className = 'card-details-link';
         detailsLink.textContent = 'View Details \u2192';
@@ -634,14 +705,21 @@
                 caspioLink.click();
             }
         });
-        container.appendChild(detailsLink);
+        infoRow.appendChild(detailsLink);
+
+        // Assemble: STATUS → TIME → Info
+        if (!isCancelled) {
+            container.appendChild(statusSection.row);
+            container.appendChild(timeSection.row);
+            container.appendChild(infoRow);
+        }
 
         footer.appendChild(container);
 
         // Make card body clickable to open details
         card.style.cursor = 'pointer';
         card.addEventListener('click', (e) => {
-            if (e.target.closest('.footer-button-row, .card-details-link')) return;
+            if (e.target.closest('.footer-section, .footer-info-row, .card-details-link')) return;
             const dataRow = card.closest('div[data-cb-name="data-row"]');
             const caspioLink = dataRow && dataRow.querySelector('a[data-cb-name="DetailsLink"]');
             if (caspioLink) {
@@ -691,10 +769,6 @@
                 </div>
                 <div id="at-cost" class="art-cost-display">= $0.00</div>
                 <div id="at-new-total" class="art-new-total"></div>
-                <label class="art-modal-checkbox-label">
-                    <input type="checkbox" id="at-notify" checked />
-                    Notify sales rep design is complete
-                </label>
                 <div class="art-modal-actions">
                     <button id="at-cancel" class="art-modal-btn-cancel">Cancel</button>
                     <button id="at-submit" class="art-modal-btn-submit art-modal-btn-submit--green">Complete</button>
@@ -737,8 +811,6 @@
         modal.querySelector('#at-submit').addEventListener('click', async function () {
             const mins = parseInt(minutesInput.value) || 0;
 
-            const shouldNotify = modal.querySelector('#at-notify').checked;
-
             this.disabled = true;
             this.textContent = 'Saving...';
 
@@ -767,15 +839,12 @@
                     logArtCharge(designId, mins, 'Completed', 'Completion', currentMins);
                 }
 
-                // Send completion notification email
-                if (shouldNotify) {
-                    // Get rep email from card for correct routing
-                    const cardRepEl = card ? card.querySelector('.rep-name[data-email]') : null;
-                    sendNotificationEmail(designId, 'completed', {
-                        artMinutes: currentMins + mins,
-                        salesRep: cardRepEl ? cardRepEl.dataset.email : ''
-                    });
-                }
+                // Always send completion notification email to sales rep
+                const cardRepEl = card ? card.querySelector('.rep-name[data-email]') : null;
+                sendNotificationEmail(designId, 'completed', {
+                    artMinutes: currentMins + mins,
+                    salesRep: cardRepEl ? cardRepEl.dataset.email : ''
+                });
 
                 this.textContent = 'Done!';
                 this.style.background = '#009900';
@@ -829,7 +898,7 @@
                     : 'No art time logged yet'}</div>
                 <div class="stepper-row">
                     <button id="lt-minus" class="stepper-btn">-</button>
-                    <input id="lt-minutes" type="number" value="0" min="0" step="15" class="stepper-input" />
+                    <input id="lt-minutes" type="number" value="0" step="15" class="stepper-input" />
                     <button id="lt-plus" class="stepper-btn">+</button>
                 </div>
                 <div id="lt-cost" class="art-cost-display">= $0.00</div>
@@ -851,10 +920,22 @@
 
         function updateLogTimeCost() {
             const mins = parseInt(minutesInput.value) || 0;
-            const qh = Math.ceil(mins / 15) * 0.25;
-            costDiv.textContent = `= $${(qh * 75).toFixed(2)}`;
-            const totalMins = currentMins + mins;
-            const totalQh = Math.ceil(totalMins / 15) * 0.25;
+            // Clamp so total never goes below 0
+            const clampedMins = Math.max(mins, -currentMins);
+            if (clampedMins !== mins) minutesInput.value = clampedMins;
+
+            if (clampedMins < 0) {
+                const removeMins = Math.abs(clampedMins);
+                const removeQh = Math.ceil(removeMins / 15) * 0.25;
+                costDiv.textContent = `Removing $${(removeQh * 75).toFixed(2)}`;
+                costDiv.style.color = '#dc3545';
+            } else {
+                const qh = Math.ceil(clampedMins / 15) * 0.25;
+                costDiv.textContent = `= $${(qh * 75).toFixed(2)}`;
+                costDiv.style.color = '';
+            }
+            const totalMins = currentMins + clampedMins;
+            const totalQh = totalMins > 0 ? (Math.ceil(totalMins / 15) * 0.25) : 0;
             const totalCost = (totalQh * 75).toFixed(2);
             newTotalDiv.textContent = `New total: ${totalMins} min (${totalQh.toFixed(2)} hrs, $${totalCost})`;
         }
@@ -867,7 +948,8 @@
         });
         modal.querySelector('#lt-minus').addEventListener('click', () => {
             const v = (parseInt(minutesInput.value) || 0) - 15;
-            minutesInput.value = v < 0 ? 0 : v;
+            // Allow negative down to -currentMins (total can't go below 0)
+            minutesInput.value = v < -currentMins ? -currentMins : v;
             updateLogTimeCost();
         });
 
@@ -875,8 +957,9 @@
         overlay.addEventListener('click', removeModals);
 
         modal.querySelector('#lt-submit').addEventListener('click', async function () {
-            const mins = parseInt(minutesInput.value) || 0;
+            const mins = Math.max(parseInt(minutesInput.value) || 0, -currentMins);
             if (mins === 0 && !confirm('Art time is 0 minutes. Continue anyway?')) return;
+            if (mins < 0 && !confirm(`Remove ${Math.abs(mins)} minutes from this design?`)) return;
 
             const noteText = modal.querySelector('#lt-note').value.trim();
 
@@ -892,13 +975,15 @@
                 });
                 if (!resp.ok) throw new Error(`Status ${resp.status}`);
 
-                // Log art time note
-                if (mins > 0) {
-                    const qh = Math.ceil(mins / 15) * 0.25;
+                // Log art time note (for adds and removals)
+                if (mins !== 0) {
+                    const absMins = Math.abs(mins);
+                    const qh = Math.ceil(absMins / 15) * 0.25;
                     const cost = (qh * 75).toFixed(2);
+                    const action = mins < 0 ? 'Removed' : 'Logged';
                     const noteBody = noteText
-                        ? `Logged ${mins} minutes ($${cost}) — ${noteText}`
-                        : `Logged ${mins} minutes ($${cost})`;
+                        ? `${action} ${absMins} minutes ($${cost}) — ${noteText}`
+                        : `${action} ${absMins} minutes ($${cost})`;
                     await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -909,7 +994,7 @@
                         })
                     }).catch(err => console.warn('Art time note failed (non-blocking):', err));
                     const currentMinsForCharge = parseInt(modal.dataset.currentMins) || 0;
-                    logArtCharge(designId, mins, noteText || 'Art time logged', 'Log Time', currentMinsForCharge);
+                    logArtCharge(designId, mins, noteText || (mins < 0 ? 'Time removed' : 'Art time logged'), 'Log Time', currentMinsForCharge);
                 }
 
                 this.textContent = 'Saved!';
@@ -922,6 +1007,98 @@
                 console.error('Log time failed:', err);
             }
         });
+    }
+
+    // ── Time Log History Modal (read-only charge history) ────────────────
+    async function showTimeLogModal(designId, card) {
+        removeModals();
+
+        // Get company name from card header
+        const companyEl = card.querySelector('.company-name, h3');
+        const company = companyEl ? companyEl.textContent.trim() : '';
+
+        const overlay = createOverlay();
+        const modal = document.createElement('div');
+        modal.id = 'time-log-modal';
+        modal.className = 'art-modal art-modal--timelog';
+
+        modal.innerHTML = `
+            <div class="art-modal-header art-modal-header--slate">
+                Time Log — #${designId}
+                ${company ? '<div class="time-log-company">' + escapeHtml(company) + '</div>' : ''}
+            </div>
+            <div class="art-modal-body">
+                <div style="text-align:center;color:#9ca3af;padding:20px 0;">Loading...</div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(modal);
+
+        overlay.addEventListener('click', removeModals);
+
+        // Fetch charge history
+        try {
+            const resp = await fetch(`${API_BASE}/api/art-charges?id_design=${designId}`);
+            if (!resp.ok) throw new Error(`Status ${resp.status}`);
+            const charges = await resp.json();
+
+            const body = modal.querySelector('.art-modal-body');
+
+            if (!charges || charges.length === 0) {
+                body.innerHTML = '<div class="time-log-empty">No time entries logged yet</div>' +
+                    '<div class="art-modal-actions"><button class="art-modal-btn-cancel" id="tl-close">Close</button></div>';
+                modal.querySelector('#tl-close').addEventListener('click', removeModals);
+                return;
+            }
+
+            // Summary from the most recent entry's running total
+            const latest = charges[0];
+            const totalMins = latest.Running_Total_Minutes || 0;
+            const totalHrs = totalMins > 0 ? (Math.ceil(totalMins / 15) * 0.25).toFixed(2) : '0.00';
+            const totalCost = totalMins > 0 ? (parseFloat(totalHrs) * 75).toFixed(2) : '0.00';
+
+            let html = '<div class="time-log-summary">Total: ' + totalMins + ' min &middot; ' + totalHrs + ' hrs &middot; $' + totalCost + '</div>';
+
+            charges.forEach(function (charge) {
+                const mins = charge.Minutes || 0;
+                const cost = charge.Cost ? parseFloat(charge.Cost).toFixed(2) : '0.00';
+                const isNeg = mins < 0;
+                const prefix = isNeg ? '' : '+';
+                const dateStr = formatNoteDate(charge.Charge_Date);
+                const desc = charge.Description || '';
+                const runMins = charge.Running_Total_Minutes || 0;
+                const runCost = charge.Running_Total_Cost ? parseFloat(charge.Running_Total_Cost).toFixed(2) : '0.00';
+
+                // Badge class
+                const type = (charge.Charge_Type || '').toLowerCase();
+                let badgeClass = 'time-log-badge--default';
+                if (type.includes('log')) badgeClass = 'time-log-badge--logtime';
+                else if (type.includes('completion')) badgeClass = 'time-log-badge--completion';
+                else if (type.includes('mockup')) badgeClass = 'time-log-badge--mockup';
+
+                html += '<div class="time-log-entry' + (isNeg ? ' time-log-negative' : '') + '">';
+                html += '<div class="time-log-entry-header">';
+                html += '<span class="time-log-badge ' + badgeClass + '">' + escapeHtml(charge.Charge_Type || 'Unknown') + '</span>';
+                html += '<span class="time-log-date">' + dateStr + '</span>';
+                html += '</div>';
+                html += '<div class="time-log-detail">' + prefix + mins + ' min &middot; $' + cost + '</div>';
+                if (desc) html += '<div class="time-log-desc">' + escapeHtml(desc) + '</div>';
+                html += '<div class="time-log-running">Running total: ' + runMins + ' min ($' + runCost + ')</div>';
+                html += '</div>';
+            });
+
+            html += '<div class="art-modal-actions"><button class="art-modal-btn-cancel" id="tl-close">Close</button></div>';
+
+            body.innerHTML = html;
+            modal.querySelector('#tl-close').addEventListener('click', removeModals);
+
+        } catch (err) {
+            console.error('Failed to load time log:', err);
+            const body = modal.querySelector('.art-modal-body');
+            body.innerHTML = '<div class="time-log-empty">Failed to load time log</div>' +
+                '<div class="art-modal-actions"><button class="art-modal-btn-cancel" id="tl-close">Close</button></div>';
+            modal.querySelector('#tl-close').addEventListener('click', removeModals);
+        }
     }
 
     // ── Send Mockup Modal (merged Send Back + Send for Approval) ────────
@@ -1323,7 +1500,7 @@
     }
 
     function removeModals() {
-        ['art-time-modal', 'log-time-modal', 'quick-action-overlay'].forEach(id => {
+        ['art-time-modal', 'log-time-modal', 'time-log-modal', 'quick-action-overlay'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.remove();
         });
@@ -1359,12 +1536,13 @@
     }
 
     // ── Detail Form Styling: Sections, image thumbnails, field cleanup ──
+    // Section headers match the physical form layout order (top to bottom)
     const DETAIL_SECTIONS = [
-        { title: 'Order Info', icon: 'fas fa-shopping-cart', fields: ['CompanyName', 'Order_Type', 'Order_Num_SW', 'Design_Num_SW', 'Shopwork_customer_number', 'User_Email'] },
-        { title: 'Contact', icon: 'fas fa-address-card', fields: ['Full_Name_Contact', 'First_name', 'Last_name', 'Email_Contact'] },
-        { title: 'Art Details', icon: 'fas fa-palette', fields: ['Status', 'Garment_Placement', 'Due_Date', 'Date_Created', 'Date_Updated', 'NOTES'] },
-        { title: 'Financials', icon: 'fas fa-dollar-sign', fields: ['Prelim_Charges', 'Additional_Services', 'Art_Minutes', 'Amount_Art_Billed'] },
-        { title: 'Garments', icon: 'fas fa-tshirt', fields: ['GarmentStyle', 'GarmentColor', 'Swatch_1', 'MAIN_IMAGE_URL_1', 'Garm_Style_2', 'Garm_Color_2', 'Swatch_2', 'MAIN_IMAGE_URL_2', 'Garm_Style_3', 'Garm_Color_3', 'Swatch_3', 'MAIN_IMAGE_URL_3', 'Garm_Style_4', 'Garm_Color_4', 'Swatch_4', 'MAIN_IMAGE_URL_4'] },
+        { title: 'Order Info', icon: 'fas fa-shopping-cart', fields: ['CompanyName', 'Due_Date', 'User_Email'] },
+        { title: 'Status & Dates', icon: 'fas fa-palette', fields: ['Status', 'Date_Created', 'Date_Updated'] },
+        { title: 'Contact', icon: 'fas fa-address-card', fields: ['First_name', 'Last_name', 'Email_Contact'] },
+        { title: 'Art Details', icon: 'fas fa-paint-brush', fields: ['Garment_Placement', 'Prelim_Charges', 'Additional_Services'] },
+        { title: 'Garments & Colors', icon: 'fas fa-tshirt', fields: ['GarmentStyle', 'GarmentColor', 'Swatch_1', 'MAIN_IMAGE_URL_1', 'Garm_Style_2', 'Garm_Color_2'] },
         { title: 'Uploaded Files', icon: 'fas fa-file-upload', fields: ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'] }
     ];
 
@@ -1376,135 +1554,321 @@
         if (!galleryTab) return;
 
         // Detect detail form — Caspio renders it inside #gallery-tab with an UPDATE button
-        const form = galleryTab.querySelector('form');
-        if (!form || form.dataset.detailStyled) return;
+        // Multiple forms may exist (search form + detail form) — find the one with the update button
+        // When Caspio navigates records, it reuses the form element but updates field values.
+        // Detect record change via RecordID hidden input and re-process from scratch.
+        let form = null;
+        const allForms = galleryTab.querySelectorAll('form');
+        for (const f of allForms) {
+            if (f.dataset.detailStyled) {
+                // Check if Caspio navigated to a different record (RecordID changed)
+                const recIdInput = f.querySelector('input[name="RecordID"]');
+                const currentRecId = recIdInput ? recIdInput.value : '';
+                if (currentRecId && currentRecId !== f.dataset.detailRecordId) {
+                    // Record changed — clean up all injected elements and re-process
+                    f.querySelectorAll('.detail-section-header, .garment-card, .detail-file-grid').forEach(el => el.remove());
+                    f.querySelectorAll('.detail-kv-row').forEach(row => {
+                        while (row.firstChild) row.parentNode.insertBefore(row.firstChild, row);
+                        row.remove();
+                    });
+                    f.querySelectorAll('.detail-hidden-row').forEach(el => el.classList.remove('detail-hidden-row'));
+                    f.querySelectorAll('.detail-swatch-img, .detail-garment-img').forEach(img => {
+                        // Restore the hidden span
+                        const span = img.previousElementSibling || img.nextElementSibling;
+                        if (span && span.classList.contains('cbFormData')) span.style.display = '';
+                        img.remove();
+                    });
+                    delete f.dataset.detailStyled;
+                    delete f.dataset.detailRecordId;
+                    f.classList.remove('art-detail-form');
+                } else {
+                    continue;
+                }
+            }
+            const btn = f.querySelector('.cbUpdateButton, input[type="submit"][value="Update"], input[type="submit"][value="UPDATE"]');
+            if (btn) { form = f; break; }
+        }
+        if (!form) return;
 
-        // Must have an update/submit button to be a detail form (not the search form)
-        const submitBtn = form.querySelector('input[type="submit"][value="Update"], input[type="submit"][value="UPDATE"]');
-        if (!submitBtn) return;
-
+        // Store current record ID for change detection
+        const recIdInput = form.querySelector('input[name="RecordID"]');
+        form.dataset.detailRecordId = recIdInput ? recIdInput.value : '';
         form.dataset.detailStyled = 'true';
         form.classList.add('art-detail-form');
 
-        // Build a map of field name → table row
-        const fieldRowMap = {};
-        const allInputs = form.querySelectorAll('input, select, textarea');
-        allInputs.forEach(input => {
+        // Find the main section (first section with many children = the form fields)
+        const allSections = form.querySelectorAll('section[data-cb-name="cbTable"]');
+        let mainSection = null;
+        allSections.forEach(sec => {
+            if (sec.children.length > 10) mainSection = sec;
+        });
+        if (!mainSection) return;
+
+        // ── Build field map: field name → { block (parent div), input/span, labelBlock } ──
+        // Semantic markup: each field is a direct child div of the section
+        // Inputs have IDs like EditRecord{FieldName}_{suffix}
+        // Static data is in <span class="cbFormData">
+        const fieldBlockMap = {};
+
+        // Map editable fields via inputs
+        form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(input => {
             const id = input.id || '';
-            // Caspio uses EditRecord{FieldName} as input IDs
-            const match = id.match(/^EditRecord(.+)$/);
-            if (match) {
-                const fieldName = match[1];
-                // Walk up to find the containing table row
-                let row = input.closest('tr');
-                if (row) {
-                    fieldRowMap[fieldName] = { row: row, input: input };
+            const match = id.match(/^EditRecord([A-Za-z_]+\d*)/);
+            if (!match) return;
+            const fieldName = match[1];
+            // Walk up to the block div (direct child of section)
+            let block = input.closest('[class*="cbFormBlock"]');
+            if (!block) block = input.closest('[data-cb-row-expanded]');
+            if (!block) return;
+            fieldBlockMap[fieldName] = { block: block, input: input, dataSpan: null };
+        });
+
+        // Helper: find sibling data cell for a label div (same row, data cell class)
+        function findDataSibling(labelDiv) {
+            const rowExp = labelDiv.getAttribute('data-cb-row-expanded') || labelDiv.getAttribute('data-cb-row-collapsed');
+            if (!rowExp) return { dataBlock: null, dataSpan: null };
+            let sibling = labelDiv.nextElementSibling;
+            while (sibling) {
+                const sibRow = sibling.getAttribute('data-cb-row-expanded') || sibling.getAttribute('data-cb-row-collapsed');
+                if (sibRow === rowExp && (sibling.classList.contains('cbFormDataCell') || sibling.classList.contains('cbFormDataCellNumberDate'))) {
+                    return { dataBlock: sibling, dataSpan: sibling.querySelector('.cbFormData') };
+                }
+                sibling = sibling.nextElementSibling;
+            }
+            return { dataBlock: null, dataSpan: null };
+        }
+
+        // Map static/label fields (left-label pairs like Order_Type, GarmentStyle)
+        // These are pairs: cbFormLabelCell div + cbFormDataCell div at the same row level
+        mainSection.querySelectorAll('.cbFormLabelCell').forEach(labelDiv => {
+            // Check for label with for= attribute
+            const labelEl = labelDiv.querySelector('label[for]');
+            const forAttr = labelEl ? labelEl.getAttribute('for') : '';
+            const match = forAttr ? forAttr.match(/^EditRecord([A-Za-z_]+\d*)/) : null;
+            if (match && !fieldBlockMap[match[1]]) {
+                let block = labelDiv.closest('[class*="cbFormBlock"]') || labelDiv;
+                const { dataBlock, dataSpan } = findDataSibling(labelDiv);
+                fieldBlockMap[match[1]] = { block: block, input: null, dataSpan: dataSpan, dataBlock: dataBlock, labelBlock: labelDiv };
+            }
+
+            // Also check data-cb-cell-name on the label div itself
+            // Strip LabelCell/DataCell suffix and hex deployment suffix (e.g., _773016335370a6)
+            const cellName = labelDiv.getAttribute('data-cb-cell-name') || '';
+            const cleanCell = cellName.replace(/(Label|Data)Cell$/, '');
+            const cellMatch = cleanCell.match(/^EditRecord([A-Za-z_\d]+?)(?:_[0-9a-f]{8,})?$/i);
+            if (cellMatch && !fieldBlockMap[cellMatch[1]]) {
+                let block = labelDiv.closest('[class*="cbFormBlock"]') || labelDiv;
+                const { dataBlock, dataSpan } = findDataSibling(labelDiv);
+                fieldBlockMap[cellMatch[1]] = { block: block, input: null, dataSpan: dataSpan, dataBlock: dataBlock, labelBlock: labelDiv };
+            }
+
+            // For left-oriented labels (no for=), get field name from label text
+            // This also serves as a fallback if the above paths didn't capture the field
+            if (!labelEl || !forAttr) {
+                const text = labelDiv.textContent.trim();
+                // Map both human-readable AND raw Caspio label texts (varies by deployment)
+                const TEXT_TO_FIELD = {
+                    'Order Type': 'Order_Type',
+                    'Order #': 'Order_Num_SW', 'Order Num SW': 'Order_Num_SW',
+                    'Placement': 'Garment_Placement', 'Garment Placement': 'Garment_Placement',
+                    'Style': 'GarmentStyle', 'GarmentStyle': 'GarmentStyle',
+                    'Color': 'GarmentColor', 'GarmentColor': 'GarmentColor',
+                    'Art Charge': 'Prelim_Charges', 'Art Estimate from AE': 'Prelim_Charges',
+                    'Add\'l Services': 'Additional_Services', 'Additional Services': 'Additional_Services',
+                    'Color 2': 'Garm_Color_2', 'Color 3': 'Garm_Color_3',
+                    'Color 4': 'Garm_Color_4', 'Style 2': 'Garm_Style_2',
+                    'Style 3': 'Garm_Style_3', 'Style 4': 'Garm_Style_4',
+                    'Garm Color 2': 'Garm_Color_2', 'Garm Color 3': 'Garm_Color_3',
+                    'Garm Color 4': 'Garm_Color_4', 'Garm Style 2': 'Garm_Style_2',
+                    'Garm Style 3': 'Garm_Style_3', 'Garm Style 4': 'Garm_Style_4',
+                    'Swatch': 'Swatch_1', 'Swatch 1': 'Swatch_1', 'Swatch 2': 'Swatch_2',
+                    'Swatch 3': 'Swatch_3', 'Swatch 4': 'Swatch_4',
+                    'Garment Image': 'MAIN_IMAGE_URL_1', 'Garment Image 2': 'MAIN_IMAGE_URL_2',
+                    'Garment Image 3': 'MAIN_IMAGE_URL_3', 'Garment Image 4': 'MAIN_IMAGE_URL_4',
+                    'MAIN IMAGE URL 1': 'MAIN_IMAGE_URL_1', 'MAIN IMAGE URL 2': 'MAIN_IMAGE_URL_2',
+                    'MAIN IMAGE URL 3': 'MAIN_IMAGE_URL_3', 'MAIN IMAGE URL 4': 'MAIN_IMAGE_URL_4',
+                    'Contact Name': 'Full_Name_Contact', 'Full Name Contact': 'Full_Name_Contact',
+                    'Customer #': 'Shopwork_customer_number',
+                    'Shopworks Customer Number from New Custom Table': 'Shopwork_customer_number'
+                };
+                const fieldName = TEXT_TO_FIELD[text];
+                if (fieldName && !fieldBlockMap[fieldName]) {
+                    const { dataBlock, dataSpan } = findDataSibling(labelDiv);
+                    fieldBlockMap[fieldName] = {
+                        block: labelDiv,
+                        input: null,
+                        dataSpan: dataSpan,
+                        dataBlock: dataBlock,
+                        labelBlock: labelDiv
+                    };
                 }
             }
         });
 
-        // Also find file fields — they use a different pattern
-        form.querySelectorAll('td.cbFormLabelCell').forEach(labelCell => {
-            const labelFor = labelCell.querySelector('label[for]');
-            if (labelFor) {
-                const forAttr = labelFor.getAttribute('for');
-                const match = forAttr.match(/^EditRecord(.+)$/);
-                if (match && !fieldRowMap[match[1]]) {
-                    const row = labelCell.closest('tr');
-                    if (row) {
-                        fieldRowMap[match[1]] = { row: row, input: null };
-                    }
-                }
+        // Also map static display fields that have data-cb-cell-name on data cells
+        mainSection.querySelectorAll('.cbFormDataCell, .cbFormDataCellNumberDate').forEach(dataDiv => {
+            const cellName = dataDiv.getAttribute('data-cb-cell-name') || '';
+            const cleanName = cellName.replace(/(Label|Data)Cell$/, '');
+            const match = cleanName.match(/^EditRecord([A-Za-z_\d]+?)(?:_[0-9a-f]{8,})?$/i);
+            if (match && !fieldBlockMap[match[1]]) {
+                fieldBlockMap[match[1]] = {
+                    block: dataDiv,
+                    input: null,
+                    dataSpan: dataDiv.querySelector('.cbFormData'),
+                    dataBlock: dataDiv
+                };
             }
         });
 
-        // Find the tbody (Caspio renders fields in a table > tbody)
-        const tbody = form.querySelector('table.cbFormTable tbody') || form.querySelector('table tbody') || form.querySelector('table');
-        if (!tbody) return;
+        // Map display-only nested containers (Company, Status, Charge, dates)
+        // These are .cbFormNestedTableContainer blocks with a label but no EditRecord input
+        const NESTED_LABEL_TO_FIELD = {
+            'Company': 'CompanyName', 'Charge': 'Amount_Art_Billed',
+            'Status': 'Status', 'Created Date': 'Date_Created', 'Updated Date': 'Date_Updated',
+            'Shopworks': 'Shopwork_customer_number_nested', 'ID': 'Record_ID'
+        };
+        mainSection.querySelectorAll('.cbFormNestedTableContainer').forEach(nc => {
+            if (nc.querySelector('input[id^="EditRecord"], select[id^="EditRecord"], textarea[id^="EditRecord"]')) return;
+            const labelCell = nc.querySelector('.cbFormLabelCell');
+            const labelText = labelCell ? labelCell.textContent.trim() : '';
+            const fieldName = NESTED_LABEL_TO_FIELD[labelText];
+            if (fieldName && !fieldBlockMap[fieldName]) {
+                const dataSpan = nc.querySelector('.cbFormData');
+                fieldBlockMap[fieldName] = { block: nc, input: null, dataSpan: dataSpan, dataBlock: nc };
+            }
+        });
+        // Also map standalone data cell block 1 (record ID)
+        const block1 = mainSection.children[0];
+        if (block1 && block1.classList.contains('cbFormDataCellNumberDate') && !fieldBlockMap['Record_ID']) {
+            const dataSpan = block1.querySelector('.cbFormData');
+            fieldBlockMap['Record_ID'] = { block: block1, input: null, dataSpan: dataSpan, dataBlock: block1 };
+        }
+
+        // ── Fix grid layout: mark full-width blocks ──
+        // Caspio uses a 6-column inline-grid. 3-col rows (Company|Due|Rep) each take 2 cols.
+        // Single-field rows (Notes, Files) and standalone cells need to span all 6 cols.
+        // Detect single-field rows: nested containers with data-cb-row-expanded that appear only once
+        const rowCounts = {};
+        Array.from(mainSection.children).forEach(child => {
+            const row = child.getAttribute('data-cb-row-expanded');
+            if (row) rowCounts[row] = (rowCounts[row] || 0) + 1;
+        });
+        Array.from(mainSection.children).forEach(child => {
+            const row = child.getAttribute('data-cb-row-expanded');
+            // Standalone data cell (block 1 = record ID)
+            if (child.classList.contains('cbFormDataCellNumberDate') && !child.classList.contains('cbFormLabelCell')) {
+                child.classList.add('detail-full-row');
+            }
+            // Nested containers in single-field rows (only 1 block in that grid row)
+            if (child.classList.contains('cbFormNestedTableContainer') && row && rowCounts[row] === 1) {
+                child.classList.add('detail-full-row');
+            }
+            // Left-label kv pairs (cbFormLabelCell or cbFormDataCell at section level)
+            // These should span 3 cols each (handled by .detail-kv-label / .detail-kv-value classes)
+        });
+        // Button container (last child with button)
+        const btnContainer = mainSection.querySelector('.cbBackButtonContainer, .cbFormActionButtonsContainer');
+        if (btnContainer) btnContainer.classList.add('detail-full-row');
+
+        // ── Hide Art_Minutes from detail form (single source of truth = Log Time modal on cards) ──
+        ['Art_Minutes', 'Amount_Art_Billed'].forEach(fieldName => {
+            const entry = fieldBlockMap[fieldName];
+            if (entry) {
+                const target = entry.block || entry.dataBlock;
+                if (target) target.classList.add('detail-hidden-row');
+                if (entry.labelBlock) entry.labelBlock.classList.add('detail-hidden-row');
+            }
+            // Also hide any EditRecord inputs for Art_Minutes (Caspio editable fields)
+            form.querySelectorAll('input[id*="Art_Minutes"], input[id*="Amount_Art_Billed"]').forEach(input => {
+                const block = input.closest('[class*="cbFormBlock"]') || input.closest('[data-cb-row-expanded]');
+                if (block) block.classList.add('detail-hidden-row');
+            });
+        });
 
         // ── Inject section headers ──
-        const placedFields = new Set();
         DETAIL_SECTIONS.forEach(section => {
-            // Find the first field in this section that exists in the form
-            let firstRow = null;
+            let firstBlock = null;
             for (const fieldName of section.fields) {
-                if (fieldRowMap[fieldName]) {
-                    firstRow = fieldRowMap[fieldName].row;
+                if (fieldBlockMap[fieldName]) {
+                    firstBlock = fieldBlockMap[fieldName].block;
                     break;
                 }
             }
-            if (!firstRow) return;
+            if (!firstBlock) return;
 
-            // Create section header row
-            const headerRow = document.createElement('tr');
-            headerRow.className = 'detail-section-row';
-            const headerCell = document.createElement('td');
-            headerCell.colSpan = 10; // span all columns
-            headerCell.className = 'detail-section-header';
-            headerCell.innerHTML = '<i class="' + escapeHtml(section.icon) + '"></i> ' + escapeHtml(section.title);
-            headerRow.appendChild(headerCell);
+            const header = document.createElement('div');
+            header.className = 'detail-section-header detail-full-row';
+            header.innerHTML = '<i class="' + escapeHtml(section.icon) + '"></i> ' + escapeHtml(section.title);
 
-            // Insert header before the first field row
-            firstRow.parentNode.insertBefore(headerRow, firstRow);
-
-            // Tag section fields for grouping
-            section.fields.forEach(f => placedFields.add(f));
+            // Insert before the first block in this section
+            firstBlock.parentNode.insertBefore(header, firstBlock);
         });
 
         // ── Handle Order_Type object display ──
-        if (fieldRowMap['Order_Type']) {
-            const otInput = fieldRowMap['Order_Type'].input;
-            if (otInput) {
-                const val = otInput.value || '';
-                // Caspio dropdown fields may return as object string like {'6':'Transfer'}
+        const otEntry = fieldBlockMap['Order_Type'];
+        if (otEntry) {
+            const span = otEntry.dataSpan;
+            if (span) {
+                const val = span.textContent.trim();
                 if (val.startsWith('{') && val.includes(':')) {
                     try {
                         const parsed = JSON.parse(val.replace(/'/g, '"'));
-                        otInput.value = Object.values(parsed).join(', ');
+                        span.textContent = Object.values(parsed).join(', ');
                     } catch (e) {
-                        // If parse fails, try regex extraction
                         const extracted = val.match(/'([^']+)'\s*$/);
-                        if (extracted) otInput.value = extracted[1];
+                        if (extracted) span.textContent = extracted[1];
                     }
                 }
             }
         }
 
+        // ── Status badge coloring ──
+        const statusEntry = fieldBlockMap['Status'];
+        if (statusEntry) {
+            const span = statusEntry.dataSpan || (statusEntry.block && statusEntry.block.querySelector('.cbFormData'));
+            if (span) {
+                const raw = span.textContent.trim().replace(/\s*[\u{1F534}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u{2705}\u{1F504}\u{1F535}]/gu, '').trim();
+                span.textContent = raw; // Strip emoji from display
+                const slug = raw.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
+                span.classList.add('detail-status-badge');
+                if (slug) span.classList.add('status-' + slug);
+            }
+        }
+
         // ── Convert Swatch URLs to thumbnail images ──
         ['Swatch_1', 'Swatch_2', 'Swatch_3', 'Swatch_4'].forEach(fieldName => {
-            if (!fieldRowMap[fieldName]) return;
-            const entry = fieldRowMap[fieldName];
-            const input = entry.input;
-            if (!input || !input.value) return;
-            const url = input.value.trim();
+            const entry = fieldBlockMap[fieldName];
+            if (!entry) return;
+            const span = entry.dataSpan;
+            if (!span) return;
+            const url = span.textContent.trim();
             if (!url || BARE_CDN_RE.test(url) || !url.startsWith('http')) return;
 
-            // Hide text input, show image
-            input.style.display = 'none';
+            span.style.display = 'none';
             const img = document.createElement('img');
             img.src = url;
             img.alt = 'Color swatch';
             img.className = 'detail-swatch-img';
-            img.onerror = function () { this.style.display = 'none'; input.style.display = ''; };
-            input.parentNode.insertBefore(img, input.nextSibling);
+            img.onerror = function () { this.style.display = 'none'; span.style.display = ''; };
+            span.parentNode.insertBefore(img, span.nextSibling);
         });
 
         // ── Convert MAIN_IMAGE_URL to garment thumbnails ──
         ['MAIN_IMAGE_URL_1', 'MAIN_IMAGE_URL_2', 'MAIN_IMAGE_URL_3', 'MAIN_IMAGE_URL_4'].forEach(fieldName => {
-            if (!fieldRowMap[fieldName]) return;
-            const entry = fieldRowMap[fieldName];
-            const input = entry.input;
-            if (!input || !input.value) return;
-            const url = input.value.trim();
+            const entry = fieldBlockMap[fieldName];
+            if (!entry) return;
+            const span = entry.dataSpan;
+            if (!span) return;
+            const url = span.textContent.trim();
             if (!url || BARE_CDN_RE.test(url) || !url.startsWith('http')) return;
 
-            input.style.display = 'none';
+            span.style.display = 'none';
             const img = document.createElement('img');
             img.src = url;
             img.alt = 'Garment image';
             img.className = 'detail-garment-img';
-            img.onerror = function () { this.style.display = 'none'; input.style.display = ''; };
-            input.parentNode.insertBefore(img, input.nextSibling);
+            img.onerror = function () { this.style.display = 'none'; span.style.display = ''; };
+            span.parentNode.insertBefore(img, span.nextSibling);
         });
 
         // ── Hide empty garment groups (2, 3, 4) ──
@@ -1513,21 +1877,97 @@
             { style: 'Garm_Style_3', related: ['Garm_Color_3', 'Swatch_3', 'MAIN_IMAGE_URL_3'] },
             { style: 'Garm_Style_4', related: ['Garm_Color_4', 'Swatch_4', 'MAIN_IMAGE_URL_4'] }
         ].forEach(group => {
-            const styleEntry = fieldRowMap[group.style];
+            const styleEntry = fieldBlockMap[group.style];
             if (!styleEntry) return;
-            const styleVal = styleEntry.input ? styleEntry.input.value.trim() : '';
+            const styleVal = styleEntry.dataSpan ? styleEntry.dataSpan.textContent.trim() : '';
             if (!styleVal) {
-                // Hide the style row and all related rows
-                styleEntry.row.classList.add('detail-hidden-row');
+                // Hide label + data blocks
+                if (styleEntry.block) styleEntry.block.classList.add('detail-hidden-row');
+                if (styleEntry.dataBlock) styleEntry.dataBlock.classList.add('detail-hidden-row');
                 group.related.forEach(relField => {
-                    if (fieldRowMap[relField]) {
-                        fieldRowMap[relField].row.classList.add('detail-hidden-row');
-                    }
+                    const rel = fieldBlockMap[relField];
+                    if (!rel) return;
+                    if (rel.block) rel.block.classList.add('detail-hidden-row');
+                    if (rel.dataBlock) rel.dataBlock.classList.add('detail-hidden-row');
                 });
             }
         });
 
-        // ── Clean up labels for new fields (add icons if missing) ──
+        // ── Build garment group cards (swatch + image + style/color on one line) ──
+        const garmentGroups = [
+            { style: 'GarmentStyle', color: 'GarmentColor', swatch: 'Swatch_1', image: 'MAIN_IMAGE_URL_1' },
+            { style: 'Garm_Style_2', color: 'Garm_Color_2', swatch: 'Swatch_2', image: 'MAIN_IMAGE_URL_2' },
+            { style: 'Garm_Style_3', color: 'Garm_Color_3', swatch: 'Swatch_3', image: 'MAIN_IMAGE_URL_3' },
+            { style: 'Garm_Style_4', color: 'Garm_Color_4', swatch: 'Swatch_4', image: 'MAIN_IMAGE_URL_4' }
+        ];
+
+        // Find the section header for Garments & Colors to insert cards after it
+        const sectionHeaders = mainSection.querySelectorAll('.detail-section-header');
+        let garmentHeader = null;
+        sectionHeaders.forEach(h => { if (h.textContent.trim() === 'Garments & Colors') garmentHeader = h; });
+
+        garmentGroups.forEach(g => {
+            const styleEntry = fieldBlockMap[g.style];
+            const colorEntry = fieldBlockMap[g.color];
+            const swatchEntry = fieldBlockMap[g.swatch];
+            const imageEntry = fieldBlockMap[g.image];
+
+            // Skip if style is empty (group already hidden)
+            const styleVal = styleEntry && styleEntry.dataSpan ? styleEntry.dataSpan.textContent.trim() : '';
+            if (!styleVal) return;
+
+            const colorVal = colorEntry && colorEntry.dataSpan ? colorEntry.dataSpan.textContent.trim() : '';
+
+            // Build the card
+            const card = document.createElement('div');
+            card.className = 'garment-card';
+
+            // Images container (swatch + garment image side by side)
+            const imagesDiv = document.createElement('div');
+            imagesDiv.className = 'garment-card-images';
+
+            // Grab swatch image if it exists
+            if (swatchEntry && swatchEntry.dataBlock) {
+                const swatchImg = swatchEntry.dataBlock.querySelector('.detail-swatch-img');
+                if (swatchImg) imagesDiv.appendChild(swatchImg.cloneNode(true));
+            }
+
+            // Grab garment image if it exists
+            if (imageEntry && imageEntry.dataBlock) {
+                const garmentImg = imageEntry.dataBlock.querySelector('.detail-garment-img');
+                if (garmentImg) imagesDiv.appendChild(garmentImg.cloneNode(true));
+            }
+
+            if (imagesDiv.children.length > 0) card.appendChild(imagesDiv);
+
+            // Info container (style + color text)
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'garment-card-info';
+            infoDiv.innerHTML = '<div><span class="garment-card-label">Style</span> ' + escapeHtml(styleVal) + '</div>'
+                + '<div><span class="garment-card-label">Color</span> ' + escapeHtml(colorVal) + '</div>';
+            card.appendChild(infoDiv);
+
+            // Insert card after the section header
+            if (garmentHeader) {
+                // Find the right insertion point — after last card or after header
+                let insertAfter = garmentHeader;
+                let nextEl = insertAfter.nextElementSibling;
+                while (nextEl && nextEl.classList.contains('garment-card')) {
+                    insertAfter = nextEl;
+                    nextEl = insertAfter.nextElementSibling;
+                }
+                insertAfter.parentNode.insertBefore(card, insertAfter.nextSibling);
+            }
+
+            // Hide the original KV-row source blocks for style/color/swatch/image
+            [styleEntry, colorEntry, swatchEntry, imageEntry].forEach(entry => {
+                if (!entry) return;
+                if (entry.block) entry.block.classList.add('detail-hidden-row');
+                if (entry.dataBlock) entry.dataBlock.classList.add('detail-hidden-row');
+            });
+        });
+
+        // ── Clean up labels: add icons if missing ──
         const LABEL_MAP = {
             'Order_Type': { icon: 'fas fa-tag', text: 'Order Type' },
             'Order_Num_SW': { icon: 'fas fa-hashtag', text: 'Order #' },
@@ -1536,7 +1976,7 @@
             'Garment_Placement': { icon: 'fas fa-crosshairs', text: 'Placement' },
             'GarmentStyle': { icon: 'fas fa-tshirt', text: 'Style' },
             'GarmentColor': { icon: 'fas fa-fill-drip', text: 'Color' },
-            'Prelim_Charges': { icon: 'fas fa-dollar-sign', text: 'Art Charge' },
+            'Prelim_Charges': { icon: 'fas fa-dollar-sign', text: 'Quoted Art Charge' },
             'Additional_Services': { icon: 'fas fa-plus-circle', text: 'Add\'l Services' },
             'Garm_Style_2': { icon: 'fas fa-tshirt', text: 'Style 2' },
             'Garm_Color_2': { icon: 'fas fa-fill-drip', text: 'Color 2' },
@@ -1551,25 +1991,213 @@
             'MAIN_IMAGE_URL_1': { icon: 'fas fa-image', text: 'Garment Image' },
             'MAIN_IMAGE_URL_2': { icon: 'fas fa-image', text: 'Garment Image 2' },
             'MAIN_IMAGE_URL_3': { icon: 'fas fa-image', text: 'Garment Image 3' },
-            'MAIN_IMAGE_URL_4': { icon: 'fas fa-image', text: 'Garment Image 4' },
-            'CompanyName': { icon: 'fas fa-building', text: 'Company' },
-            'Status': { icon: 'fas fa-info-circle', text: 'Status' },
-            'Date_Created': { icon: 'fas fa-calendar-plus', text: 'Created' },
-            'Date_Updated': { icon: 'fas fa-calendar-check', text: 'Updated' },
-            'Amount_Art_Billed': { icon: 'fas fa-receipt', text: 'Amount Billed' },
-            'ID_Design': { icon: 'fas fa-fingerprint', text: 'Design ID' }
+            'MAIN_IMAGE_URL_4': { icon: 'fas fa-image', text: 'Garment Image 4' }
         };
 
         Object.keys(LABEL_MAP).forEach(fieldName => {
-            if (!fieldRowMap[fieldName]) return;
-            const row = fieldRowMap[fieldName].row;
-            const labelCell = row.querySelector('td.cbFormLabelCell');
-            if (!labelCell) return;
+            const entry = fieldBlockMap[fieldName];
+            if (!entry || !entry.labelBlock) return;
+            const labelBlock = entry.labelBlock;
             // Only overwrite if it doesn't already have a custom icon
-            if (labelCell.querySelector('i.fas, i.far')) return;
+            if (labelBlock.querySelector('i.fas, i.far')) return;
             const info = LABEL_MAP[fieldName];
-            labelCell.innerHTML = '<label><i class="' + info.icon + '"></i> ' + escapeHtml(info.text) + '</label>';
+            labelBlock.innerHTML = '<label><i class="' + info.icon + '"></i> ' + escapeHtml(info.text) + '</label>';
         });
+
+        // ── Wrap left-label rows in flex containers for proper layout ──
+        // Each label+data pair becomes a .detail-kv-row flex container
+        const leftLabelFields = [
+            'Shopwork_customer_number', 'Order_Type', 'Order_Num_SW',
+            'Garment_Placement', 'Prelim_Charges', 'Additional_Services'
+        ];
+        leftLabelFields.forEach(fieldName => {
+            const entry = fieldBlockMap[fieldName];
+            if (!entry || !entry.labelBlock || !entry.dataBlock) return;
+            entry.labelBlock.classList.add('detail-kv-label');
+            entry.dataBlock.classList.add('detail-kv-value');
+            // Wrap pair in a flex row so each pair gets its own line
+            const row = document.createElement('div');
+            row.className = 'detail-kv-row';
+            entry.labelBlock.parentNode.insertBefore(row, entry.labelBlock);
+            row.appendChild(entry.labelBlock);
+            row.appendChild(entry.dataBlock);
+
+            // Hide KV rows with no value (no text, no images)
+            const valText = entry.dataBlock.textContent.trim();
+            const hasImg = entry.dataBlock.querySelector('img');
+            if (!valText && !hasImg) {
+                row.classList.add('detail-hidden-row');
+            }
+        });
+
+        // ── Hide redundant Contact Name (duplicates Contact section) ──
+        const contactNameEntry = fieldBlockMap['Full_Name_Contact'];
+        if (contactNameEntry) {
+            if (contactNameEntry.block) contactNameEntry.block.classList.add('detail-hidden-row');
+            if (contactNameEntry.dataBlock) contactNameEntry.dataBlock.classList.add('detail-hidden-row');
+        }
+
+        // ── Move Customer #, Order Type, Order # into Order Info (before Status & Dates header) ──
+        const allHeaders = mainSection.querySelectorAll('.detail-section-header');
+        let statusHeader = null;
+        let artDetailsHeader = null;
+        let garmentsHeader = null;
+        let filesHeader = null;
+        allHeaders.forEach(h => {
+            const t = h.textContent.trim();
+            if (t === 'Status & Dates') statusHeader = h;
+            if (t === 'Art Details') artDetailsHeader = h;
+            if (t === 'Garments & Colors') garmentsHeader = h;
+            if (t === 'Uploaded Files') filesHeader = h;
+        });
+
+        ['Shopwork_customer_number', 'Order_Type', 'Order_Num_SW'].forEach(fieldName => {
+            const entry = fieldBlockMap[fieldName];
+            if (!entry || !entry.labelBlock) return;
+            const kvRow = entry.labelBlock.closest('.detail-kv-row');
+            if (kvRow && statusHeader) {
+                statusHeader.parentNode.insertBefore(kvRow, statusHeader);
+            }
+        });
+
+        // ── Reorder sections: Contact → Art Details → Garments → Files ──
+        // Art Details header + content goes before Garments header
+        if (artDetailsHeader && garmentsHeader) {
+            garmentsHeader.parentNode.insertBefore(artDetailsHeader, garmentsHeader);
+        }
+
+        // Move Placement, Quoted Art Charge, Add'l Services before Garments header
+        ['Garment_Placement', 'Prelim_Charges', 'Additional_Services'].forEach(fieldName => {
+            const entry = fieldBlockMap[fieldName];
+            if (!entry || !entry.labelBlock) return;
+            const kvRow = entry.labelBlock.closest('.detail-kv-row');
+            if (kvRow && garmentsHeader) {
+                garmentsHeader.parentNode.insertBefore(kvRow, garmentsHeader);
+            }
+        });
+
+        // Move Notes textarea from Contact into Art Details (AFTER KV rows, before Garments)
+        mainSection.querySelectorAll('.cbFormNestedTableContainer').forEach(container => {
+            const label = container.querySelector('label');
+            if (!label) return;
+            if (label.textContent.trim() === 'Notes') {
+                if (garmentsHeader) {
+                    garmentsHeader.parentNode.insertBefore(container, garmentsHeader);
+                }
+            }
+        });
+
+        // Move Uploaded Files section to the end (after Garments & Colors)
+        if (filesHeader) {
+            const btnContainer = mainSection.querySelector('.cbBackButtonContainer, .cbFormActionButtonsContainer');
+            if (btnContainer) mainSection.insertBefore(filesHeader, btnContainer);
+            else mainSection.appendChild(filesHeader);
+            // Also move file containers after filesHeader so file grid builder finds them
+            mainSection.querySelectorAll('.cbFormNestedTableContainer').forEach(container => {
+                const label = container.querySelector('label');
+                if (!label) return;
+                if (/^File\s+\d$/i.test(label.textContent.trim())) {
+                    if (btnContainer) mainSection.insertBefore(container, btnContainer);
+                    else mainSection.appendChild(container);
+                }
+            });
+        }
+
+        // ── Build file upload grid (2x2 with download links) ──
+        const detailForm = document.querySelector('.art-detail-form');
+        if (detailForm && filesHeader) {
+            const fileContainers = [];
+            detailForm.querySelectorAll('.cbFormNestedTableContainer').forEach(container => {
+                const label = container.querySelector('label');
+                if (!label) return;
+                if (/^File\s+\d$/i.test(label.textContent.trim())) {
+                    fileContainers.push(container);
+                }
+            });
+
+            const fileGrid = document.createElement('div');
+            fileGrid.className = 'detail-file-grid detail-full-row';
+            let hasAnyFile = false;
+
+            fileContainers.forEach(container => {
+                const img = container.querySelector('img');
+                const fileInput = container.querySelector('input[type="file"]');
+                const removeCheck = container.querySelector('input[type="checkbox"]');
+                const removeLabel = removeCheck ? removeCheck.nextElementSibling || removeCheck.parentElement : null;
+                const label = container.querySelector('label[for^="label_"], label[id^="label_"], .cbFormLabelCell label');
+                const slotLabel = container.querySelector('.cbFormLabelCell label');
+                const slotName = slotLabel ? slotLabel.textContent.trim() : '';
+                const hasContent = !!img;
+
+                const card = document.createElement('div');
+                card.className = 'detail-file-card' + (hasContent ? '' : ' detail-file-empty');
+
+                // Slot label
+                const nameEl = document.createElement('div');
+                nameEl.className = 'detail-file-name';
+                nameEl.textContent = slotName;
+                card.appendChild(nameEl);
+
+                if (hasContent) {
+                    hasAnyFile = true;
+                    // Clone thumbnail
+                    const imgClone = img.cloneNode(true);
+                    imgClone.removeAttribute('width');
+                    imgClone.removeAttribute('vspace');
+                    imgClone.className = 'detail-file-thumb';
+                    card.appendChild(imgClone);
+
+                    // Download link
+                    const dl = document.createElement('a');
+                    dl.href = img.src;
+                    dl.target = '_blank';
+                    dl.className = 'detail-file-download';
+                    dl.innerHTML = '<i class="fas fa-download"></i> Download';
+                    card.appendChild(dl);
+
+                    // Remove checkbox (keep functional, restyle)
+                    if (removeCheck) {
+                        const removeWrap = document.createElement('label');
+                        removeWrap.className = 'detail-file-remove';
+                        const checkClone = removeCheck.cloneNode(true);
+                        // Sync checkbox state back to original
+                        checkClone.addEventListener('change', function () { removeCheck.checked = this.checked; });
+                        removeWrap.appendChild(checkClone);
+                        removeWrap.appendChild(document.createTextNode(' Remove'));
+                        card.appendChild(removeWrap);
+                    }
+                }
+
+                // Upload input (replace file)
+                if (fileInput) {
+                    const uploadWrap = document.createElement('div');
+                    uploadWrap.className = 'detail-file-upload';
+                    const inputClone = fileInput.cloneNode(true);
+                    // Sync file selection back to original
+                    inputClone.addEventListener('change', function () {
+                        // Copy the FileList by creating a DataTransfer
+                        if (this.files.length > 0) {
+                            const dt = new DataTransfer();
+                            for (const f of this.files) dt.items.add(f);
+                            fileInput.files = dt.files;
+                        }
+                    });
+                    uploadWrap.appendChild(inputClone);
+                    card.appendChild(uploadWrap);
+                }
+
+                fileGrid.appendChild(card);
+                container.classList.add('detail-hidden-row');
+            });
+
+            // Insert grid after Uploaded Files header (only if files exist)
+            if (hasAnyFile) {
+                filesHeader.parentNode.insertBefore(fileGrid, filesHeader.nextSibling);
+            } else {
+                // Hide entire Uploaded Files section when no files have content
+                filesHeader.classList.add('detail-hidden-row');
+            }
+        }
     }
 
     function initObserver() {

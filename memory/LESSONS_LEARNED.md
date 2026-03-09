@@ -29,6 +29,36 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: Caspio Form Buttons Default to type="submit" — Modal Shows Wrong Card Data (2026-03-09)
+
+**Problem**: Clicking "Time Log" button on card #2 always opened the modal showing card #1's design ID. All dynamically created buttons inside Caspio gallery cards showed incorrect data.
+
+**Root Cause**: `document.createElement('button')` defaults to `type="submit"`. Caspio wraps gallery cards in `<form>` elements. Clicking the button triggered Caspio's form submission handlers despite `e.preventDefault()` and `e.stopPropagation()` — Caspio's own listeners fired first, causing a DataPage re-render that interfered with the modal.
+
+**Solution**: Add `b.type = 'button'` to the `btn()` factory function in `injectQuickActions()`. Prevents the button from ever being treated as a submit trigger inside Caspio forms.
+
+**Prevention**: Always set `type="button"` on dynamically created `<button>` elements inside Caspio DataPages. Never rely on `preventDefault()` alone — Caspio's own event system can intercept before your handler.
+
+**Project**: [Pricing Index] — `shared_components/js/art-hub-steve.js`
+
+---
+
+## Bug: Caspio Semantic Markup — Deployment Suffixes Corrupt Field Name Extraction (2026-03-08)
+
+**Problem:** `processDetailForm()` in `art-hub-steve.js` couldn't map Caspio fields correctly. Swatch/garment image thumbnails wouldn't render (0 images), KV pairs had 15 labels but only 1 value. The detail form looked unstyled.
+
+**Root Cause 1 — Semantic markup vs table markup:** Caspio's `EnableSemanticMarkup="True"` renders `<div>` + `<section>` instead of `<table>`/`<tr>`/`<td>`. All existing JS/CSS selectors (`tr`, `td.cbFormLabelCell`, `table.cbFormTable tbody`) were dead code.
+
+**Root Cause 2 — Deployment hex suffixes in `data-cb-cell-name`:** Attributes like `EditRecordSwatch_1_773016335370a6LabelCell` contain 14-char hex deployment suffixes. Input IDs (`EditRecordDue_Date`) are clean — no suffix. The old regex `/^EditRecord([A-Za-z_]+\d*)/` captured `Order_Num_SW_773016335370` instead of `Order_Num_SW`.
+
+**Root Cause 3 — Missing sibling data cell lookup:** `data-cb-cell-name` path mapped label cells but set `dataSpan: null` because it never looked for the sibling data cell. The TEXT_TO_FIELD fallback path was then skipped since the field was already in `fieldBlockMap`.
+
+**Solution:** (1) Rewrote all selectors: `tr` → `[data-cb-row-expanded]`, `.cbFormLabelCell`/`.cbFormDataCell` (no tag qualifier). (2) New regex strips suffix: `cleanCell.match(/^EditRecord([A-Za-z_\d]+?)(?:_[0-9a-f]{8,})?$/i)` — non-greedy match + ≥8 hex chars avoids matching `_1`, `_2` field suffixes. (3) Added `findDataSibling()` helper that walks siblings matching `data-cb-row-expanded` to find the paired data cell. (4) Added raw Caspio labels to TEXT_TO_FIELD map (e.g., `'GarmentStyle': 'GarmentStyle'` alongside `'Style': 'GarmentStyle'`).
+
+**Prevention:** When working with Caspio semantic markup, always test regex patterns against real `data-cb-cell-name` values — they contain deployment-specific hex suffixes that change per DataPage build. Input IDs are clean. Always pair label cells with their data siblings via `data-cb-row-expanded` matching. [Pricing Index]
+
+---
+
 ## Bug: Caspio REST API AlterReadOnlyData — Two Root Causes (2026-03-08)
 
 **Problem:** `PUT /api/art-requests/:id/status` returned 500 `AlterReadOnlyData` error. Persisted even after removing emojis from status strings.
