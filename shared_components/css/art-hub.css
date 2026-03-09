@@ -2293,3 +2293,198 @@ input.cbSearchButton {
         max-width: none;
     }
 }
+
+/* ── Detail Form Styling ─────────────────────────────────────────────── */
+
+.art-detail-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.art-detail-form table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Section header rows */
+.detail-section-row td.detail-section-header {
+    background: #f0f4f8;
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: #334155;
+    border-left: 3px solid #981e32;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e2e8f0;
+    margin-top: 0.5rem;
+}
+
+.detail-section-row:first-child td.detail-section-header {
+    margin-top: 0;
+}
+
+.detail-section-header i {
+    margin-right: 0.5rem;
+    color: #981e32;
+    font-size: 0.8125rem;
+}
+
+/* Form field rows */
+.art-detail-form tr:not(.detail-section-row) td.cbFormLabelCell {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    color: #64748b;
+    font-weight: 500;
+    white-space: nowrap;
+    width: 140px;
+    vertical-align: middle;
+}
+
+.art-detail-form tr:not(.detail-section-row) td.cbFormLabelCell i {
+    color: #94a3b8;
+    margin-right: 0.375rem;
+    font-size: 0.75rem;
+    width: 14px;
+    text-align: center;
+}
+
+.art-detail-form tr:not(.detail-section-row) td.cbFormFieldCell {
+    padding: 0.375rem 0.75rem;
+    vertical-align: middle;
+}
+
+.art-detail-form td.cbFormFieldCell input[type="text"],
+.art-detail-form td.cbFormFieldCell select {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #1e293b;
+    background: #fff;
+    transition: border-color 0.15s;
+}
+
+.art-detail-form td.cbFormFieldCell input[type="text"]:focus,
+.art-detail-form td.cbFormFieldCell select:focus {
+    border-color: #981e32;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(152, 30, 50, 0.1);
+}
+
+.art-detail-form td.cbFormFieldCell textarea {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #1e293b;
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Row hover */
+.art-detail-form tr:not(.detail-section-row):hover {
+    background: #f8fafc;
+}
+
+/* Row bottom border */
+.art-detail-form tr:not(.detail-section-row) {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Hidden rows (empty garment groups) */
+.detail-hidden-row {
+    display: none !important;
+}
+
+/* Swatch thumbnails */
+.detail-swatch-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    object-fit: cover;
+    vertical-align: middle;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Garment model images */
+.detail-garment-img {
+    width: 100px;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    vertical-align: middle;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.detail-garment-img:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* UPDATE/BACK buttons */
+.art-detail-form input[type="submit"],
+.art-detail-form input[type="button"] {
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #d1d5db;
+    margin: 0.5rem 0.25rem;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.art-detail-form input[type="submit"] {
+    background: #981e32;
+    color: #fff;
+    border-color: #981e32;
+}
+
+.art-detail-form input[type="submit"]:hover {
+    background: #7a1828;
+}
+
+.art-detail-form input[type="button"] {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.art-detail-form input[type="button"]:hover {
+    background: #e2e8f0;
+}
+
+/* Responsive detail form */
+@media (max-width: 768px) {
+    .art-detail-form {
+        max-width: 100%;
+    }
+
+    .art-detail-form tr:not(.detail-section-row) td.cbFormLabelCell {
+        width: auto;
+        display: block;
+        padding-bottom: 0.125rem;
+    }
+
+    .art-detail-form tr:not(.detail-section-row) td.cbFormFieldCell {
+        display: block;
+        padding-top: 0;
+    }
+
+    .art-detail-form td.cbFormFieldCell input[type="text"],
+    .art-detail-form td.cbFormFieldCell select,
+    .art-detail-form td.cbFormFieldCell textarea {
+        max-width: 100%;
+    }
+
+    .detail-garment-img {
+        width: 80px;
+    }
+}

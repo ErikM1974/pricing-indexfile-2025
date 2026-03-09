@@ -29,6 +29,20 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: Caspio REST API AlterReadOnlyData — Two Root Causes (2026-03-08)
+
+**Problem:** `PUT /api/art-requests/:id/status` returned 500 `AlterReadOnlyData` error. Persisted even after removing emojis from status strings.
+
+**Root Cause 1 — Emojis:** Caspio REST API v2 rejects 4-byte UTF-8 (emojis like 🟡). Misleading error message says "read-only" when it's really an encoding issue.
+
+**Root Cause 2 — Formula Fields:** `Amount_Art_Billed` is a **Caspio Formula field** (`Ceiling(Art_Minutes/15)*0.25*75`). Writing to it via REST API causes `AlterReadOnlyData`. Caspio auto-calculates it when `Art_Minutes` changes — backend must NEVER write to formula fields.
+
+**Solution:** (1) Backend strips non-ASCII from status as defense-in-depth: `status.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim()`. (2) Removed all `Amount_Art_Billed` writes — only write `Art_Minutes`, let Caspio calculate billing. (3) Better error logging: log exact `updateData` payload on failures.
+
+**Prevention:** Never write to Caspio formula/calculated fields via REST API. Never include emojis in API payloads. Backend should sanitize inputs, not rely on frontend alone. [caspio-proxy]
+
+---
+
 ## Bug: Caspio Dropdown Fields Return Objects, Not Strings (2026-03-08)
 
 **Problem:** Art Request Detail page showed `[object Object]` for Order Type instead of "Transfer". The field rendered fine in Caspio DataPages but broke in custom API-driven pages.

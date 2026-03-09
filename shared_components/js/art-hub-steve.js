@@ -1358,6 +1358,220 @@
         buildSummaryBar();
     }
 
+    // ── Detail Form Styling: Sections, image thumbnails, field cleanup ──
+    const DETAIL_SECTIONS = [
+        { title: 'Order Info', icon: 'fas fa-shopping-cart', fields: ['CompanyName', 'Order_Type', 'Order_Num_SW', 'Design_Num_SW', 'Shopwork_customer_number', 'User_Email'] },
+        { title: 'Contact', icon: 'fas fa-address-card', fields: ['Full_Name_Contact', 'First_name', 'Last_name', 'Email_Contact'] },
+        { title: 'Art Details', icon: 'fas fa-palette', fields: ['Status', 'Garment_Placement', 'Due_Date', 'Date_Created', 'Date_Updated', 'NOTES'] },
+        { title: 'Financials', icon: 'fas fa-dollar-sign', fields: ['Prelim_Charges', 'Additional_Services', 'Art_Minutes', 'Amount_Art_Billed'] },
+        { title: 'Garments', icon: 'fas fa-tshirt', fields: ['GarmentStyle', 'GarmentColor', 'Swatch_1', 'MAIN_IMAGE_URL_1', 'Garm_Style_2', 'Garm_Color_2', 'Swatch_2', 'MAIN_IMAGE_URL_2', 'Garm_Style_3', 'Garm_Color_3', 'Swatch_3', 'MAIN_IMAGE_URL_3', 'Garm_Style_4', 'Garm_Color_4', 'Swatch_4', 'MAIN_IMAGE_URL_4'] },
+        { title: 'Uploaded Files', icon: 'fas fa-file-upload', fields: ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'] }
+    ];
+
+    // Bare CDN URL regex — filter these out (empty Caspio file fields)
+    const BARE_CDN_RE = /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i;
+
+    function processDetailForm() {
+        const galleryTab = document.getElementById('gallery-tab');
+        if (!galleryTab) return;
+
+        // Detect detail form — Caspio renders it inside #gallery-tab with an UPDATE button
+        const form = galleryTab.querySelector('form');
+        if (!form || form.dataset.detailStyled) return;
+
+        // Must have an update/submit button to be a detail form (not the search form)
+        const submitBtn = form.querySelector('input[type="submit"][value="Update"], input[type="submit"][value="UPDATE"]');
+        if (!submitBtn) return;
+
+        form.dataset.detailStyled = 'true';
+        form.classList.add('art-detail-form');
+
+        // Build a map of field name → table row
+        const fieldRowMap = {};
+        const allInputs = form.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            const id = input.id || '';
+            // Caspio uses EditRecord{FieldName} as input IDs
+            const match = id.match(/^EditRecord(.+)$/);
+            if (match) {
+                const fieldName = match[1];
+                // Walk up to find the containing table row
+                let row = input.closest('tr');
+                if (row) {
+                    fieldRowMap[fieldName] = { row: row, input: input };
+                }
+            }
+        });
+
+        // Also find file fields — they use a different pattern
+        form.querySelectorAll('td.cbFormLabelCell').forEach(labelCell => {
+            const labelFor = labelCell.querySelector('label[for]');
+            if (labelFor) {
+                const forAttr = labelFor.getAttribute('for');
+                const match = forAttr.match(/^EditRecord(.+)$/);
+                if (match && !fieldRowMap[match[1]]) {
+                    const row = labelCell.closest('tr');
+                    if (row) {
+                        fieldRowMap[match[1]] = { row: row, input: null };
+                    }
+                }
+            }
+        });
+
+        // Find the tbody (Caspio renders fields in a table > tbody)
+        const tbody = form.querySelector('table.cbFormTable tbody') || form.querySelector('table tbody') || form.querySelector('table');
+        if (!tbody) return;
+
+        // ── Inject section headers ──
+        const placedFields = new Set();
+        DETAIL_SECTIONS.forEach(section => {
+            // Find the first field in this section that exists in the form
+            let firstRow = null;
+            for (const fieldName of section.fields) {
+                if (fieldRowMap[fieldName]) {
+                    firstRow = fieldRowMap[fieldName].row;
+                    break;
+                }
+            }
+            if (!firstRow) return;
+
+            // Create section header row
+            const headerRow = document.createElement('tr');
+            headerRow.className = 'detail-section-row';
+            const headerCell = document.createElement('td');
+            headerCell.colSpan = 10; // span all columns
+            headerCell.className = 'detail-section-header';
+            headerCell.innerHTML = '<i class="' + escapeHtml(section.icon) + '"></i> ' + escapeHtml(section.title);
+            headerRow.appendChild(headerCell);
+
+            // Insert header before the first field row
+            firstRow.parentNode.insertBefore(headerRow, firstRow);
+
+            // Tag section fields for grouping
+            section.fields.forEach(f => placedFields.add(f));
+        });
+
+        // ── Handle Order_Type object display ──
+        if (fieldRowMap['Order_Type']) {
+            const otInput = fieldRowMap['Order_Type'].input;
+            if (otInput) {
+                const val = otInput.value || '';
+                // Caspio dropdown fields may return as object string like {'6':'Transfer'}
+                if (val.startsWith('{') && val.includes(':')) {
+                    try {
+                        const parsed = JSON.parse(val.replace(/'/g, '"'));
+                        otInput.value = Object.values(parsed).join(', ');
+                    } catch (e) {
+                        // If parse fails, try regex extraction
+                        const extracted = val.match(/'([^']+)'\s*$/);
+                        if (extracted) otInput.value = extracted[1];
+                    }
+                }
+            }
+        }
+
+        // ── Convert Swatch URLs to thumbnail images ──
+        ['Swatch_1', 'Swatch_2', 'Swatch_3', 'Swatch_4'].forEach(fieldName => {
+            if (!fieldRowMap[fieldName]) return;
+            const entry = fieldRowMap[fieldName];
+            const input = entry.input;
+            if (!input || !input.value) return;
+            const url = input.value.trim();
+            if (!url || BARE_CDN_RE.test(url) || !url.startsWith('http')) return;
+
+            // Hide text input, show image
+            input.style.display = 'none';
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Color swatch';
+            img.className = 'detail-swatch-img';
+            img.onerror = function () { this.style.display = 'none'; input.style.display = ''; };
+            input.parentNode.insertBefore(img, input.nextSibling);
+        });
+
+        // ── Convert MAIN_IMAGE_URL to garment thumbnails ──
+        ['MAIN_IMAGE_URL_1', 'MAIN_IMAGE_URL_2', 'MAIN_IMAGE_URL_3', 'MAIN_IMAGE_URL_4'].forEach(fieldName => {
+            if (!fieldRowMap[fieldName]) return;
+            const entry = fieldRowMap[fieldName];
+            const input = entry.input;
+            if (!input || !input.value) return;
+            const url = input.value.trim();
+            if (!url || BARE_CDN_RE.test(url) || !url.startsWith('http')) return;
+
+            input.style.display = 'none';
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Garment image';
+            img.className = 'detail-garment-img';
+            img.onerror = function () { this.style.display = 'none'; input.style.display = ''; };
+            input.parentNode.insertBefore(img, input.nextSibling);
+        });
+
+        // ── Hide empty garment groups (2, 3, 4) ──
+        [
+            { style: 'Garm_Style_2', related: ['Garm_Color_2', 'Swatch_2', 'MAIN_IMAGE_URL_2'] },
+            { style: 'Garm_Style_3', related: ['Garm_Color_3', 'Swatch_3', 'MAIN_IMAGE_URL_3'] },
+            { style: 'Garm_Style_4', related: ['Garm_Color_4', 'Swatch_4', 'MAIN_IMAGE_URL_4'] }
+        ].forEach(group => {
+            const styleEntry = fieldRowMap[group.style];
+            if (!styleEntry) return;
+            const styleVal = styleEntry.input ? styleEntry.input.value.trim() : '';
+            if (!styleVal) {
+                // Hide the style row and all related rows
+                styleEntry.row.classList.add('detail-hidden-row');
+                group.related.forEach(relField => {
+                    if (fieldRowMap[relField]) {
+                        fieldRowMap[relField].row.classList.add('detail-hidden-row');
+                    }
+                });
+            }
+        });
+
+        // ── Clean up labels for new fields (add icons if missing) ──
+        const LABEL_MAP = {
+            'Order_Type': { icon: 'fas fa-tag', text: 'Order Type' },
+            'Order_Num_SW': { icon: 'fas fa-hashtag', text: 'Order #' },
+            'Full_Name_Contact': { icon: 'fas fa-user-circle', text: 'Contact Name' },
+            'Shopwork_customer_number': { icon: 'fas fa-id-badge', text: 'Customer #' },
+            'Garment_Placement': { icon: 'fas fa-crosshairs', text: 'Placement' },
+            'GarmentStyle': { icon: 'fas fa-tshirt', text: 'Style' },
+            'GarmentColor': { icon: 'fas fa-fill-drip', text: 'Color' },
+            'Prelim_Charges': { icon: 'fas fa-dollar-sign', text: 'Art Charge' },
+            'Additional_Services': { icon: 'fas fa-plus-circle', text: 'Add\'l Services' },
+            'Garm_Style_2': { icon: 'fas fa-tshirt', text: 'Style 2' },
+            'Garm_Color_2': { icon: 'fas fa-fill-drip', text: 'Color 2' },
+            'Garm_Style_3': { icon: 'fas fa-tshirt', text: 'Style 3' },
+            'Garm_Color_3': { icon: 'fas fa-fill-drip', text: 'Color 3' },
+            'Garm_Style_4': { icon: 'fas fa-tshirt', text: 'Style 4' },
+            'Garm_Color_4': { icon: 'fas fa-fill-drip', text: 'Color 4' },
+            'Swatch_1': { icon: 'fas fa-square-full', text: 'Swatch' },
+            'Swatch_2': { icon: 'fas fa-square-full', text: 'Swatch 2' },
+            'Swatch_3': { icon: 'fas fa-square-full', text: 'Swatch 3' },
+            'Swatch_4': { icon: 'fas fa-square-full', text: 'Swatch 4' },
+            'MAIN_IMAGE_URL_1': { icon: 'fas fa-image', text: 'Garment Image' },
+            'MAIN_IMAGE_URL_2': { icon: 'fas fa-image', text: 'Garment Image 2' },
+            'MAIN_IMAGE_URL_3': { icon: 'fas fa-image', text: 'Garment Image 3' },
+            'MAIN_IMAGE_URL_4': { icon: 'fas fa-image', text: 'Garment Image 4' },
+            'CompanyName': { icon: 'fas fa-building', text: 'Company' },
+            'Status': { icon: 'fas fa-info-circle', text: 'Status' },
+            'Date_Created': { icon: 'fas fa-calendar-plus', text: 'Created' },
+            'Date_Updated': { icon: 'fas fa-calendar-check', text: 'Updated' },
+            'Amount_Art_Billed': { icon: 'fas fa-receipt', text: 'Amount Billed' },
+            'ID_Design': { icon: 'fas fa-fingerprint', text: 'Design ID' }
+        };
+
+        Object.keys(LABEL_MAP).forEach(fieldName => {
+            if (!fieldRowMap[fieldName]) return;
+            const row = fieldRowMap[fieldName].row;
+            const labelCell = row.querySelector('td.cbFormLabelCell');
+            if (!labelCell) return;
+            // Only overwrite if it doesn't already have a custom icon
+            if (labelCell.querySelector('i.fas, i.far')) return;
+            const info = LABEL_MAP[fieldName];
+            labelCell.innerHTML = '<label><i class="' + info.icon + '"></i> ' + escapeHtml(info.text) + '</label>';
+        });
+    }
+
     function initObserver() {
         const galleryTab = document.getElementById('gallery-tab');
         if (!galleryTab) return;
@@ -1365,7 +1579,10 @@
         let debounce;
         const observer = new MutationObserver(() => {
             clearTimeout(debounce);
-            debounce = setTimeout(processCards, 300);
+            debounce = setTimeout(() => {
+                processCards();
+                processDetailForm();
+            }, 300);
         });
 
         observer.observe(galleryTab, { childList: true, subtree: true });
