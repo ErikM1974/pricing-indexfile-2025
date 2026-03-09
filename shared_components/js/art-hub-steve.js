@@ -1371,6 +1371,105 @@
         observer.observe(galleryTab, { childList: true, subtree: true });
     }
 
+    // ── Real-Time Notification Polling (toast for sales rep actions) ────
+    const POLL_INTERVAL_MS = 45000; // 45 seconds
+    let pollTimerId = null;
+    let lastNotificationTime = parseInt(sessionStorage.getItem('artNotifLastSeen')) || Date.now();
+
+    function startNotificationPolling() {
+        // Initial poll shortly after page load (5s delay for Caspio to settle)
+        setTimeout(() => pollNotifications(), 5000);
+        pollTimerId = setInterval(pollNotifications, POLL_INTERVAL_MS);
+
+        // Pause polling when tab is hidden, resume when visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(pollTimerId);
+                pollTimerId = null;
+            } else {
+                pollNotifications();
+                pollTimerId = setInterval(pollNotifications, POLL_INTERVAL_MS);
+            }
+        });
+    }
+
+    async function pollNotifications() {
+        try {
+            const resp = await fetch(`${API_BASE}/api/art-notifications?since=${lastNotificationTime}`);
+            if (!resp.ok) return;
+            const data = await resp.json();
+
+            if (data.notifications && data.notifications.length > 0) {
+                data.notifications.forEach(n => showArtNotificationToast(n));
+                lastNotificationTime = data.serverTime || Date.now();
+                sessionStorage.setItem('artNotifLastSeen', String(lastNotificationTime));
+            }
+        } catch (err) {
+            // Silent failure — polling is best-effort
+        }
+    }
+
+    function showArtNotificationToast(notification) {
+        const container = getOrCreateToastContainer();
+        const toast = document.createElement('div');
+        toast.className = 'art-notif-toast';
+
+        const isApproval = notification.type === 'approved';
+        const icon = isApproval ? '✅' : '🔄';
+        const verb = isApproval ? 'approved' : 'requested changes on';
+        const accentColor = isApproval ? '#28a745' : '#fd7e14';
+
+        toast.style.borderLeftColor = accentColor;
+        toast.innerHTML =
+            '<div class="art-notif-toast-content">' +
+                '<span class="art-notif-toast-icon">' + icon + '</span>' +
+                '<div class="art-notif-toast-text">' +
+                    '<strong>' + escapeHtml(notification.actorName) + '</strong> ' +
+                    verb + ' design <strong>#' + escapeHtml(notification.designId) + '</strong>' +
+                    (notification.companyName ? ' (' + escapeHtml(notification.companyName) + ')' : '') +
+                '</div>' +
+                '<button class="art-notif-toast-close" aria-label="Dismiss">&times;</button>' +
+            '</div>';
+
+        // Click toast body to open detail page
+        toast.querySelector('.art-notif-toast-content').addEventListener('click', (e) => {
+            if (e.target.classList.contains('art-notif-toast-close')) return;
+            window.open('/art-request/' + notification.designId, '_blank');
+        });
+
+        // Dismiss button
+        toast.querySelector('.art-notif-toast-close').addEventListener('click', () => {
+            dismissToast(toast);
+        });
+
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+
+        // Auto-dismiss after 8 seconds
+        setTimeout(() => dismissToast(toast), 8000);
+    }
+
+    function dismissToast(toast) {
+        if (!toast || toast.classList.contains('removing')) return;
+        toast.classList.add('removing');
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+            const container = document.getElementById('art-notif-container');
+            if (container && container.children.length === 0) container.remove();
+        }, 300);
+    }
+
+    function getOrCreateToastContainer() {
+        let container = document.getElementById('art-notif-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'art-notif-container';
+            document.body.appendChild(container);
+        }
+        return container;
+    }
+
     // ── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
         // Restore saved tab preference
@@ -1380,6 +1479,7 @@
         }
 
         initObserver();
+        startNotificationPolling();
 
         document.addEventListener('DataPageReady', () => {
             setTimeout(processCards, 500);

@@ -304,6 +304,9 @@
             // 3. Send completion email to Steve (fire-and-forget)
             sendAENotificationEmail('approved', aeName);
 
+            // 4. Push real-time notification for Steve's dashboard
+            pushArtNotification('approved', aeName);
+
             showSuccessMessage('Design approved! Steve has been notified.');
             disableActionBar();
             updateStatusBadge('Completed', 'ard-status-badge--completed');
@@ -385,6 +388,9 @@
             // 3. Send revision email to Steve (fire-and-forget)
             sendAENotificationEmail('revision', aeName, notes);
 
+            // 4. Push real-time notification for Steve's dashboard
+            pushArtNotification('revision', aeName);
+
             closeChangesModal();
             showSuccessMessage('Revision request sent! Steve has been notified.');
             disableActionBar();
@@ -443,6 +449,16 @@
                 .then(() => console.log(`AE notification email sent (${type})`))
                 .catch(err => console.warn(`AE notification email failed (${type}, non-blocking):`, err));
         }
+    }
+
+    // ── Push Real-Time Notification (for Steve's dashboard toast) ────────
+    function pushArtNotification(type, aeName) {
+        const companyName = currentRequest ? currentRequest.CompanyName : 'Unknown';
+        fetch(`${API_BASE}/api/art-notifications`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, designId, companyName, actorName: aeName })
+        }).catch(err => console.warn('Art notification push failed (non-blocking):', err));
     }
 
     // ── UI Helpers ────────────────────────────────────────────────────────

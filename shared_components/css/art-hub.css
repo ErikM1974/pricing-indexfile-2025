@@ -2215,3 +2215,81 @@ input.cbSearchButton {
     .approval-session-row { flex-wrap: wrap; }
     .approval-cc-row { flex-direction: column; align-items: flex-start; }
 }
+
+/* ========== Art Notification Toasts ========== */
+#art-notif-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10010;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+.art-notif-toast {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-left: 4px solid #28a745;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.art-notif-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.art-notif-toast.removing {
+    transform: translateX(120%);
+    opacity: 0;
+}
+
+.art-notif-toast-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+}
+
+.art-notif-toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.art-notif-toast-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.art-notif-toast-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.art-notif-toast-close:hover {
+    color: #333;
+}
+
+@media (max-width: 600px) {
+    #art-notif-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
