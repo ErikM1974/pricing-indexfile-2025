@@ -146,6 +146,8 @@
 | File | Purpose |
 |------|---------|
 | `art-hub-steve.js` | Steve's quick-action buttons + status summary bar (MutationObserver) |
+| `ae-dashboard.js` | AE dashboard: tab switching, modals, dropdown, notification polling + toasts |
+| `ae-submit-form.js` | AE submit form enhancements: swatches, model images, row numbers, submission notification |
 
 ## Art Invoice System
 

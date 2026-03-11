@@ -841,10 +841,25 @@
 
                 // Always send completion notification email to sales rep
                 const cardRepEl = card ? card.querySelector('.rep-name[data-email]') : null;
+                const repEmail = cardRepEl ? cardRepEl.dataset.email : '';
                 sendNotificationEmail(designId, 'completed', {
                     artMinutes: currentMins + mins,
-                    salesRep: cardRepEl ? cardRepEl.dataset.email : ''
+                    salesRep: repEmail
                 });
+
+                // Push real-time notification for AE dashboard toast
+                const companyEl = card ? card.querySelector('.company-name') : null;
+                fetch(`${API_BASE}/api/art-notifications`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'completed',
+                        designId: designId,
+                        companyName: companyEl ? companyEl.textContent.trim() : '',
+                        actorName: 'Steve',
+                        targetRep: repEmail || null
+                    })
+                }).catch(() => { /* fire-and-forget */ });
 
                 this.textContent = 'Done!';
                 this.style.background = '#009900';
@@ -1370,6 +1385,20 @@
                 mockupUrls: mockupUrls,
                 ccEmails: ccEmails
             });
+
+            // 6. Push real-time notification for AE dashboard toast
+            const repResolved = resolveRep(artReqMeta.Sales_Rep);
+            fetch(`${API_BASE}/api/art-notifications`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'mockup_sent',
+                    designId: designId,
+                    companyName: artReqMeta.CompanyName || '',
+                    actorName: 'Steve',
+                    targetRep: repResolved.email
+                })
+            }).catch(() => { /* fire-and-forget */ });
 
             submitBtn.textContent = 'Sent!';
             submitBtn.style.background = '#28a745';
@@ -2259,10 +2288,19 @@
         const toast = document.createElement('div');
         toast.className = 'art-notif-toast';
 
-        const isApproval = notification.type === 'approved';
-        const icon = isApproval ? '✅' : '🔄';
-        const verb = isApproval ? 'approved' : 'requested changes on';
-        const accentColor = isApproval ? '#28a745' : '#fd7e14';
+        let icon, verb, accentColor;
+        switch (notification.type) {
+            case 'approved':
+                icon = '✅'; verb = 'approved'; accentColor = '#28a745'; break;
+            case 'revision':
+                icon = '🔄'; verb = 'requested changes on'; accentColor = '#fd7e14'; break;
+            case 'new_submission':
+                icon = '📋'; verb = 'submitted a new art request for'; accentColor = '#6f42c1'; break;
+            case 'completed':
+                icon = '✅'; verb = 'completed'; accentColor = '#28a745'; break;
+            default:
+                icon = '🔔'; verb = 'updated'; accentColor = '#0d6efd'; break;
+        }
 
         toast.style.borderLeftColor = accentColor;
         toast.innerHTML =

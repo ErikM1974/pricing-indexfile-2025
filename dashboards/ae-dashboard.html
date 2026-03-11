@@ -8,6 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <style>:root { --art-theme: #981e32; --art-theme-light: #fff5f5; --art-theme-hover: #981e32; }</style>
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/ae-submit-form.css">
 </head>
 <body>
     <div class="minimal-header">
@@ -63,10 +64,6 @@
             <!-- Submit Art Steve Tab -->
             <div id="submit-tab" class="tab-pane active">
                 <h2 class="tab-title">Submit Art Steve</h2>
-                <div class="info-message">
-                    <p>Fill out this form to submit a new art request to the Art Coordinator and Artist. 
-                    Please provide as much detail as possible to ensure your request is processed quickly.</p>
-                </div>
                 <!-- Caspio Submit Form DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150009f0e9f9d4ff3457dae47/emb"></script>
             </div>
@@ -601,147 +598,7 @@
         </div>
     </div>
     
-    <script>
-    // Track if a note was successfully submitted
-    let noteWasSubmitted = false;
-    
-    // Dropdown functionality
-    function toggleMoreDropdown() {
-        const dropdown = document.getElementById('moreDropdown');
-        const button = document.getElementById('moreButton');
-        
-        if (dropdown.classList.contains('show')) {
-            dropdown.classList.remove('show');
-            button.classList.remove('open');
-        } else {
-            dropdown.classList.add('show');
-            button.classList.add('open');
-        }
-    }
-    
-    function closeMoreDropdown() {
-        const dropdown = document.getElementById('moreDropdown');
-        const button = document.getElementById('moreButton');
-        dropdown.classList.remove('show');
-        button.classList.remove('open');
-    }
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        const dropdown = document.getElementById('moreDropdown');
-        const button = document.getElementById('moreButton');
-        
-        if (!event.target.closest('.more-dropdown')) {
-            dropdown.classList.remove('show');
-            button.classList.remove('open');
-        }
-    });
-    
-    // Tab switching functionality
-    function showTab(tabName) {
-        // Remove active class from all buttons and panes
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-        
-        // Update visible tabs - now we have 6 visible tabs
-        const visibleTabs = ['submit', 'mockup', 'mockup-ruth', 'gallery', 'view', 'requirements'];
-        const visibleIndex = visibleTabs.indexOf(tabName);
-        
-        if (visibleIndex !== -1) {
-            // It's a visible tab
-            document.querySelectorAll('.tab-button')[visibleIndex].classList.add('active');
-            // Remove active from More button
-            document.getElementById('moreButton').classList.remove('active');
-        } else {
-            // It's in the dropdown (only Design Name Generator now)
-            const dropdownItems = document.querySelectorAll('.dropdown-item');
-            const dropdownTabNames = ['generator'];
-            const dropdownIndex = dropdownTabNames.indexOf(tabName);
-            
-            if (dropdownIndex !== -1) {
-                dropdownItems[dropdownIndex].classList.add('active');
-                // Add active to More button to indicate selection is in dropdown
-                document.getElementById('moreButton').classList.add('active');
-            }
-        }
-        
-        // Show the corresponding tab pane
-        const tabPaneMap = {
-            'submit': 'submit-tab',
-            'mockup': 'mockup-tab',
-            'mockup-ruth': 'mockup-ruth-tab',
-            'requirements': 'requirements-tab',
-            'gallery': 'gallery-tab',
-            'generator': 'generator-tab',
-            'view': 'view-tab'
-        };
-        
-        if (tabPaneMap.hasOwnProperty(tabName)) {
-            document.getElementById(tabPaneMap[tabName]).classList.add('active');
-        }
-        
-        // Save preference
-        localStorage.setItem('aeDashboardTab', tabName);
-    }
-    
-    // Restore saved tab preference on load
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedTab = localStorage.getItem('aeDashboardTab');
-        if (savedTab && savedTab === 'view') {
-            showTab(savedTab);
-        }
-    });
-
-    // Modal functions for View Notes functionality
-    function viewNotesModal(designId) {
-        document.getElementById('viewNotesRequestId').textContent = designId;
-        document.getElementById('viewNotesFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000d8d96d34814b43498414?ID_Design=' + designId;
-        document.getElementById('viewNotesModal').style.display = 'block';
-    }
-
-    function closeViewNotesModal() {
-        document.getElementById('viewNotesModal').style.display = 'none';
-        document.getElementById('viewNotesFrame').src = '';
-    }
-
-    // Modal functions for Add Note functionality
-    function openNoteModal(designId) {
-        // Reset the submission flag when opening a new modal
-        noteWasSubmitted = false;
-        document.getElementById('requestId').textContent = designId;
-        document.getElementById('noteFrame').src = 'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5?ID_Design=' + designId;
-        document.getElementById('noteModal').style.display = 'block';
-    }
-
-    function closeNoteModal() {
-        document.getElementById('noteModal').style.display = 'none';
-        document.getElementById('noteFrame').src = '';
-        
-        // Only refresh if a note was actually submitted
-        if (noteWasSubmitted) {
-            window.location.reload();
-            noteWasSubmitted = false; // Reset flag
-        }
-    }
-
-    // Close modals when clicking outside of them
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('noteModal')) {
-            closeNoteModal();
-        } else if (event.target == document.getElementById('viewNotesModal')) {
-            closeViewNotesModal();
-        }
-    }
-
-    // Listen for messages from the iframe (in case Caspio sends a close message)
-    window.addEventListener('message', function(event) {
-        if (event.data === 'closeModal' || event.data === 'formSubmitted') {
-            // Set flag to indicate successful submission
-            noteWasSubmitted = true;
-            closeNoteModal();
-        }
-    });
-    </script>
+    <script src="/shared_components/js/ae-dashboard.js"></script>
+    <script src="/shared_components/js/ae-submit-form.js"></script>
 </body>
 </html>
