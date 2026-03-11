@@ -29,6 +29,38 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Fix: `<input type="submit">` Cannot Contain Child Elements (SVG Icons) (2026-03-11)
+
+**Problem**: `enhanceSubmitButton()` tried to insert an SVG icon into an `<input type="submit">` element. The icon never rendered.
+**Root Cause**: `<input>` is a void element in HTML — it cannot have child nodes. `innerHTML` on an `<input>` silently does nothing.
+**Solution**: Replace the `<input type="submit">` with a `<button type="submit">` element. Copy over `className` and `name` attributes. Use `parentNode.replaceChild(button, input)`. The `<button>` can then contain the SVG + text via `innerHTML`.
+**Prevention**: When adding icons/content inside form controls, check if the element is a void element (`<input>`, `<img>`, `<br>`, `<hr>`). Use `<button>` instead of `<input>` when the control needs to contain markup.
+
+## Fix: `box-sizing: content-box` Causes Horizontal Overflow with Padding (2026-03-11)
+
+**Problem**: Form labels were clipped on the left side — "Company" showed as "mpany". The entire form overflowed horizontally.
+**Root Cause**: `.ae-form-section` had `width: 100%` + `padding: 28px` but default `box-sizing: content-box`. Total rendered width = container + 56px padding, overflowing the viewport.
+**Solution**: Add `box-sizing: border-box !important` to the section. Also add a wildcard `*` rule for all children inside the Caspio form to prevent any child elements from having the same issue.
+**Prevention**: Always set `box-sizing: border-box` on any element that has both `width: 100%` and `padding`. Consider adding it as a global reset for Caspio form containers.
+
+## Pattern: Caspio Cascade Empty Detection — Custom Product Fallback (2026-03-11)
+
+**Problem**: AE Submit Art form uses Caspio cascading lookups tied to `Sanmar_Bulk_251816_Feb2024`. Non-SanMar styles (stickers, mugs, promo items) return empty color `<select>` — AE is stuck with no way to enter a color.
+**Solution**: `monitorGarmentCascade()` watches each garment row's style input. On blur, waits 1.5s for Caspio cascade, then checks if color `<select>` has real options. If empty: adds amber "Custom" badge, replaces `<select>` with `<input type="text">` (preserving `name` attr for form submission), hides swatch/image cells. Reversible — if AE re-enters a SanMar style and cascade populates, reverts to dropdown.
+**Key details**: Save reference to original `<select>` in `_originalColorSelects[rowNum]` for restoration. Use `card.replaceChild()` for clean DOM swap. Each row tracks state independently. Field names: row 1 = `GarmentColor`, rows 2-4 = `Garm_Color_N`.
+
+## Pattern: Caspio DataPage DOM Restructuring — External JS Enhancement Layer (2026-03-11)
+
+**Problem**: Caspio DataPage forms render as flat `<table>` markup with no semantic grouping. Needed modern card-based layout with sections, field pairs, and garment row cards.
+**Solution**: `restructureFormLayout()` runs on `DataPageReady`, wraps Caspio table rows into semantic sections (`ae-form-section`) with headers, pairs label+input rows into `field-pair` divs, and wraps garment rows into `garment-row-card` containers with row number badges. Guard flag `_aeRestructured` prevents re-wrapping on tab switches.
+**Key patterns**:
+- Use `MutationObserver` or `DataPageReady` event, NOT DOMContentLoaded (Caspio loads async via embed script)
+- Field name conventions: row 1 = `GarmentStyle`/`GarmentColor`, rows 2-4 = `Garm_Style_N`/`Garm_Color_N`
+- Swatch images: `Swatch_N` fields. Product images: `MAIN_IMAGE_URL_N` fields
+- Caspio `InsertRecord` prefix on all input names in submission forms
+- `cbFormFieldCell` class on cells containing Caspio-managed widgets (swatches, images) — hide these for custom products
+- Tab switch fires `DataPageReady` again — guard with `_aeRestructured` flag to prevent double-wrapping
+
 ## Bug: Caspio Form Buttons Default to type="submit" — Modal Shows Wrong Card Data (2026-03-09)
 
 **Problem**: Clicking "Time Log" button on card #2 always opened the modal showing card #1's design ID. All dynamically created buttons inside Caspio gallery cards showed incorrect data.
