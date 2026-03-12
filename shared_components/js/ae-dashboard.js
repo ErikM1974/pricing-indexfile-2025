@@ -46,8 +46,8 @@
 
     // ── Tab Switching ───────────────────────────────────────────────
 
-    var VISIBLE_TABS = ['submit', 'mockup-ruth', 'gallery', 'view', 'requirements'];
-    var DROPDOWN_TABS = ['generator'];
+    var VISIBLE_TABS = ['submit', 'mockup-ruth', 'view', 'requirements'];
+    var DROPDOWN_TABS = ['gallery', 'generator'];
 
     var TAB_PANE_MAP = {
         'submit': 'submit-tab',
@@ -281,79 +281,201 @@
     // ── Start Notification Polling ─────────────────────────────────
     startNotificationPolling();
 
-    // ── Enhance "View My Requests" Table ─────────────────────────
-    // Adds clickable "View Details" links to the Caspio report table
-    // in the View tab so AEs can open /art-request/:designId.
+    // ── "My Art Requests" Card View ──────────────────────────────
+    // Reads the Caspio report table, hides it, and renders visual
+    // cards with mockup images, status badges, and detail links.
 
-    function enhanceRequestsTable() {
+    var BARE_CDN_RE = /^https?:\/\/cdn\.caspio\.com\/[A-Za-z0-9]+\/?$/;
+
+    // Status badge config
+    var STATUS_MAP = {
+        'completed': { cls: 'ae-status--completed', label: 'Completed', icon: '&#x2714;' },
+        'in progress': { cls: 'ae-status--progress', label: 'In Progress', icon: '&#x25D0;' },
+        'awaiting approval': { cls: 'ae-status--awaiting', label: 'Awaiting Approval', icon: '&#x23F8;' },
+        'revision requested': { cls: 'ae-status--revision', label: 'Revision Requested', icon: '&#x1F504;' },
+        'submitted': { cls: 'ae-status--submitted', label: 'Submitted', icon: '&#x25CB;' },
+        'cancelled': { cls: 'ae-status--cancelled', label: 'Cancelled', icon: '&#x2715;' }
+    };
+
+    function getStatusInfo(rawStatus) {
+        var s = (rawStatus || '').replace(/[^\w\s]/gi, '').trim().toLowerCase();
+        if (!s || s === 'happy' || s === 'status') return STATUS_MAP['submitted'];
+        for (var key in STATUS_MAP) {
+            if (s.indexOf(key) !== -1) return STATUS_MAP[key];
+        }
+        return STATUS_MAP['submitted'];
+    }
+
+    function buildColumnMap(headers) {
+        var map = {};
+        for (var i = 0; i < headers.length; i++) {
+            var text = (headers[i].textContent || '').trim().toLowerCase();
+            if (text === 'status') map.status = i;
+            else if (text === 'id_design') map.idDesign = i;
+            else if (text.indexOf('company') !== -1) map.company = i;
+            else if (text.indexOf('due') !== -1) map.dueDate = i;
+            else if (text.indexOf('order') !== -1 && text.indexOf('#') !== -1) map.orderNum = i;
+            else if (text.indexOf('design') !== -1 && text.indexOf('#') !== -1) map.designNum = i;
+            else if (text.indexOf('view notes') !== -1) map.viewNotes = i;
+            else if (text.indexOf('add note') !== -1) map.addNote = i;
+            else if (text.indexOf('box file') !== -1 || text.indexOf('mockup') !== -1) map.boxMockup = i;
+            else if (text.indexOf('file upload') !== -1) map.fileUpload = i;
+            else if (text.indexOf('request type') !== -1) map.requestType = i;
+        }
+        return map;
+    }
+
+    function getCellText(row, idx) {
+        if (idx === undefined || idx === null) return '';
+        var cells = row.querySelectorAll('td');
+        if (!cells[idx]) return '';
+        // Caspio wraps labels in <span class="cbResultSetLabel">. Clone cell, remove label, get text.
+        var clone = cells[idx].cloneNode(true);
+        var label = clone.querySelector('.cbResultSetLabel');
+        if (label) label.remove();
+        return (clone.textContent || '').trim();
+    }
+
+    function getCellImgSrc(row, idx) {
+        if (idx === undefined || idx === null) return '';
+        var cells = row.querySelectorAll('td');
+        if (!cells[idx]) return '';
+        var img = cells[idx].querySelector('img');
+        if (img && img.src && !BARE_CDN_RE.test(img.src)) return img.src;
+        return '';
+    }
+
+    function getCellLink(row, idx) {
+        if (idx === undefined || idx === null) return null;
+        var cells = row.querySelectorAll('td');
+        if (!cells[idx]) return null;
+        var a = cells[idx].querySelector('a');
+        return a ? a.cloneNode(true) : null;
+    }
+
+    function renderArtRequestCards() {
         var viewTab = document.getElementById('view-tab');
         if (!viewTab) return;
 
-        var table = viewTab.querySelector('table');
+        var table = viewTab.querySelector('table.cbResultSetTable');
         if (!table) return;
 
-        // Already enhanced?
-        if (table.dataset.enhanced) return;
+        // Already rendered cards for this table instance?
+        if (table.dataset.cardsRendered) return;
 
         var headers = table.querySelectorAll('thead th');
         if (!headers.length) return;
 
-        // Find the design ID column — look for header containing "Design"
-        var designColIndex = -1;
-        for (var i = 0; i < headers.length; i++) {
-            var text = (headers[i].textContent || '').trim().toLowerCase();
-            if (text.indexOf('design') !== -1 && text.indexOf('#') !== -1) {
-                designColIndex = i;
-                break;
-            }
-        }
-        // Fallback: look for just "design" if no "#" match
-        if (designColIndex === -1) {
-            for (var j = 0; j < headers.length; j++) {
-                var text2 = (headers[j].textContent || '').trim().toLowerCase();
-                if (text2.indexOf('design') !== -1) {
-                    designColIndex = j;
-                    break;
-                }
-            }
-        }
+        var colMap = buildColumnMap(headers);
+        // Must have at least design number to be useful
+        if (colMap.designNum === undefined && colMap.idDesign === undefined) return;
 
-        if (designColIndex === -1) return; // Can't find design column
-
-        // Process each data row
         var rows = table.querySelectorAll('tbody tr');
+        if (!rows.length) return;
+
+        // Remove any previous card grid
+        var oldGrid = viewTab.querySelector('.ae-art-grid');
+        if (oldGrid) oldGrid.remove();
+
+        // Build card grid
+        var grid = document.createElement('div');
+        grid.className = 'ae-art-grid';
+
         rows.forEach(function (row) {
-            var cells = row.querySelectorAll('td');
-            if (cells.length <= designColIndex) return;
+            var designNum = getCellText(row, colMap.designNum);
+            var idDesign = getCellText(row, colMap.idDesign);
+            var company = getCellText(row, colMap.company);
+            var status = getCellText(row, colMap.status);
+            var dueDate = getCellText(row, colMap.dueDate);
+            var orderNum = getCellText(row, colMap.orderNum);
+            var requestType = getCellText(row, colMap.requestType);
 
-            var cell = cells[designColIndex];
-            var designId = (cell.textContent || '').trim().replace(/[^0-9]/g, '');
-            if (!designId) return;
+            // Image: Box_File_Mockup (text URL) > File_Upload_One (img src) > placeholder
+            var mockupUrl = getCellText(row, colMap.boxMockup);
+            if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
+                mockupUrl = getCellImgSrc(row, colMap.fileUpload);
+            }
 
-            // Wrap cell content in a link
-            var link = document.createElement('a');
-            link.href = '/art-request/' + designId;
-            link.target = '_blank';
-            link.textContent = designId;
-            link.style.color = '#2563eb';
-            link.style.fontWeight = '600';
-            link.style.textDecoration = 'none';
-            link.addEventListener('mouseenter', function () { link.style.textDecoration = 'underline'; });
-            link.addEventListener('mouseleave', function () { link.style.textDecoration = 'none'; });
-            cell.textContent = '';
-            cell.appendChild(link);
+            var statusInfo = getStatusInfo(status);
+            var detailId = idDesign.replace(/[^0-9]/g, '');
+
+            var card = document.createElement('div');
+            card.className = 'ae-art-card';
+
+            // Image section
+            var imageHtml;
+            if (mockupUrl) {
+                imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+            } else {
+                imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
+            }
+
+            // Request type badge
+            var typeBadge = '';
+            if (requestType && requestType.toLowerCase().indexOf('mockup') !== -1) {
+                typeBadge = '<span class="ae-art-card__type ae-art-card__type--mockup">Mockup</span>';
+            } else if (requestType && requestType.toLowerCase().indexOf('new') !== -1) {
+                typeBadge = '<span class="ae-art-card__type ae-art-card__type--new">New Artwork</span>';
+            }
+
+            card.innerHTML = imageHtml +
+                '<div class="ae-art-card__body">' +
+                    '<div class="ae-art-card__header">' +
+                        '<span class="ae-art-card__company">' + escapeHtml(company) + '</span>' +
+                        (designNum ? '<span class="ae-art-card__design-num">#' + escapeHtml(designNum) + '</span>' :
+                         detailId ? '<span class="ae-art-card__design-num">#' + escapeHtml(detailId) + '</span>' : '') +
+                    '</div>' +
+                    '<div class="ae-art-card__meta">' +
+                        '<span class="ae-art-card__status ' + statusInfo.cls + '">' + statusInfo.icon + ' ' + statusInfo.label + '</span>' +
+                        typeBadge +
+                    '</div>' +
+                    '<div class="ae-art-card__details">' +
+                        (dueDate ? '<span class="ae-art-card__detail">Due: ' + escapeHtml(dueDate) + '</span>' : '') +
+                        (orderNum ? '<span class="ae-art-card__detail">Order: ' + escapeHtml(orderNum) + '</span>' : '') +
+                    '</div>' +
+                '</div>' +
+                '<div class="ae-art-card__footer">' +
+                    (detailId ? '<a href="/art-request/' + escapeHtml(detailId) + '" target="_blank" class="ae-art-card__link ae-art-card__link--primary">View Details &rarr;</a>' : '') +
+                    '<span class="ae-art-card__actions" data-id-design="' + escapeHtml(idDesign) + '"></span>' +
+                '</div>';
+
+            // Inject View Notes / Add Note links into the actions span
+            var actionsSpan = card.querySelector('.ae-art-card__actions');
+            var notesLink = getCellLink(row, colMap.viewNotes);
+            var addNoteLink = getCellLink(row, colMap.addNote);
+            if (notesLink) {
+                notesLink.className = 'ae-art-card__link';
+                notesLink.textContent = 'Notes';
+                actionsSpan.appendChild(notesLink);
+            }
+            if (addNoteLink) {
+                addNoteLink.className = 'ae-art-card__link';
+                addNoteLink.textContent = '+ Note';
+                actionsSpan.appendChild(addNoteLink);
+            }
+
+            grid.appendChild(card);
         });
 
-        table.dataset.enhanced = 'true';
+        // Insert card grid before the table, then hide the table
+        table.parentNode.insertBefore(grid, table);
+        table.style.display = 'none';
+        table.dataset.cardsRendered = 'true';
     }
 
     // MutationObserver to catch Caspio report table rendering
     var viewTab = document.getElementById('view-tab');
     if (viewTab) {
-        var enhanceTimer = null;
-        var viewObserver = new MutationObserver(function () {
-            clearTimeout(enhanceTimer);
-            enhanceTimer = setTimeout(enhanceRequestsTable, 300);
+        var cardTimer = null;
+        var viewObserver = new MutationObserver(function (mutations) {
+            // Reset if Caspio re-renders the table (search/pagination)
+            var table = viewTab.querySelector('table.cbResultSetTable');
+            if (table && !table.dataset.cardsRendered) {
+                var oldGrid = viewTab.querySelector('.ae-art-grid');
+                if (oldGrid) oldGrid.remove();
+            }
+            clearTimeout(cardTimer);
+            cardTimer = setTimeout(renderArtRequestCards, 400);
         });
         viewObserver.observe(viewTab, { childList: true, subtree: true });
     }
