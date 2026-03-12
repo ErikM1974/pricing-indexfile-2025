@@ -230,13 +230,12 @@
     }
 
     // ── Mockup Upload ─────────────────────────────────────────────────
-    // Writable file fields for Steve's mockup/artwork output (priority order)
+    // Writable text URL fields for Steve's mockup uploads (priority order)
+    // CDN_Link* fields are Caspio FILE fields (read-only via API) — cannot write to them.
     const UPLOAD_FIELDS = [
         { key: 'Box_File_Mockup', label: 'Mockup' },
-        { key: 'CDN_Link', label: 'Artwork 1' },
-        { key: 'CDN_Link_Two', label: 'Artwork 2' },
-        { key: 'CDN_Link_Three', label: 'Artwork 3' },
-        { key: 'CDN_Link_Four', label: 'Artwork 4' }
+        { key: 'BoxFileLink', label: 'Mockup 2' },
+        { key: 'Company_Mockup', label: 'Mockup 3' }
     ];
 
     function initMockupUpload(req) {
