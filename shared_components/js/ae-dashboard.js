@@ -457,9 +457,14 @@
             grid.appendChild(card);
         });
 
-        // Insert card grid before the table, then hide the table
+        // Insert card grid before the table, then hide the table + Caspio nav/scrollbar
         table.parentNode.insertBefore(grid, table);
         table.style.display = 'none';
+        var caspioNav = viewTab.querySelector('.cbReportNavBarPanel');
+        if (caspioNav) caspioNav.style.display = 'none';
+        // Prevent horizontal overflow from any remaining Caspio elements
+        var caspioForm = table.closest('form');
+        if (caspioForm) caspioForm.style.overflow = 'hidden';
         table.dataset.cardsRendered = 'true';
     }
 
