@@ -440,11 +440,28 @@
                 </label>
                 <div id="approval-cc-options" class="approval-cc-checkbox-group"></div>
             </div>
-            <div class="approval-section-label">Select mockups to send:</div>
-            <div class="approval-hint">Selected images appear in the email. All files are also viewable on the detail page.</div>
-            <div id="approval-files" class="approval-files-grid"></div>
-            <div id="approval-no-files" class="approval-no-files" style="display:none;">
-                No mockup files found. Upload files via the Caspio detail page first.
+            <!-- Box File Picker -->
+            <div id="box-picker-section">
+                <div class="approval-section-label">Select mockup from Box:</div>
+                <div id="box-picker-loading" class="box-picker-loading" style="display:none;">
+                    <div class="box-picker-spinner"></div>
+                    <span>Searching Box...</span>
+                </div>
+                <div id="box-picker-folder" class="box-picker-folder-label" style="display:none;"></div>
+                <div id="box-picker-grid" class="box-picker-grid" style="display:none;"></div>
+                <div id="box-picker-empty" class="box-picker-empty" style="display:none;">
+                    No Box folder found for this design. Use paste URL below instead.
+                </div>
+                <div id="box-picker-error" class="box-picker-error" style="display:none;"></div>
+                <!-- Paste URL fallback -->
+                <div id="box-paste-fallback" class="box-paste-fallback" style="display:none;">
+                    <input type="url" id="box-paste-url" class="box-paste-input" placeholder="Paste mockup URL...">
+                </div>
+            </div>
+            <!-- Previously Sent Files (from Caspio) -->
+            <div id="approval-prev-section" style="display:none;">
+                <div class="approval-section-label approval-section-label--muted">Previously Sent:</div>
+                <div id="approval-files" class="approval-files-grid approval-files-grid--small"></div>
             </div>
             <div class="approval-section-label">Message to Sales Rep:</div>
             <textarea id="approval-message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>

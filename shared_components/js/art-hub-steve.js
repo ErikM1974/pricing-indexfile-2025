@@ -1227,67 +1227,128 @@
         }
         updateApprovalTotal();
 
-        // Build file thumbnails from all available file/CDN fields
-        const fileFields = [
-            { key: 'File_Upload', label: 'Original Upload' },
+        // ── Box File Picker: fetch folder by design number ──
+        const boxLoading = document.getElementById('box-picker-loading');
+        const boxFolderLabel = document.getElementById('box-picker-folder');
+        const boxGrid = document.getElementById('box-picker-grid');
+        const boxEmpty = document.getElementById('box-picker-empty');
+        const boxError = document.getElementById('box-picker-error');
+        const boxPasteFallback = document.getElementById('box-paste-fallback');
+        const boxPasteInput = document.getElementById('box-paste-url');
+
+        // Reset Box picker state
+        boxLoading.style.display = 'flex';
+        boxFolderLabel.style.display = 'none';
+        boxGrid.style.display = 'none';
+        boxGrid.innerHTML = '';
+        boxEmpty.style.display = 'none';
+        boxError.style.display = 'none';
+        boxPasteFallback.style.display = 'none';
+        if (boxPasteInput) boxPasteInput.value = '';
+        modal.dataset.selectedBoxFileId = '';
+        modal.dataset.selectedBoxFileUrl = '';
+
+        // Fetch Box folder files (don't block modal rendering)
+        (async function loadBoxFiles() {
+            try {
+                const boxResp = await fetch(`${API_BASE}/api/box/folder-files?designNumber=${designId}`);
+                boxLoading.style.display = 'none';
+                if (!boxResp.ok) throw new Error(`Box API ${boxResp.status}`);
+                const boxData = await boxResp.json();
+
+                if (!boxData.found || boxData.files.length === 0) {
+                    boxEmpty.style.display = 'block';
+                    boxPasteFallback.style.display = 'block';
+                    return;
+                }
+
+                boxFolderLabel.textContent = '\uD83D\uDCC1 ' + boxData.folderName + ' (' + boxData.files.length + ' files)';
+                boxFolderLabel.style.display = 'block';
+                boxGrid.style.display = 'grid';
+
+                boxData.files.forEach(file => {
+                    const card = document.createElement('div');
+                    card.className = 'box-file-card';
+                    card.dataset.fileId = file.id;
+                    card.dataset.fileName = file.name;
+
+                    const ext = (file.extension || '').toLowerCase();
+                    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'psd'].includes(ext);
+                    const sizeKB = file.size ? Math.round(file.size / 1024) : 0;
+                    const sizeLabel = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + ' MB' : sizeKB + ' KB';
+
+                    card.innerHTML =
+                        (file.thumbnailUrl
+                            ? '<img src="' + escapeHtml(file.thumbnailUrl) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                              + '<div class="box-file-placeholder" style="display:none;">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
+                            : '<div class="box-file-placeholder">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
+                        )
+                        + '<div class="box-file-name">' + escapeHtml(file.name) + '</div>'
+                        + '<div class="box-file-meta">' + escapeHtml(sizeLabel) + '</div>'
+                        + '<div class="box-file-check">\u2713</div>';
+
+                    card.addEventListener('click', () => {
+                        // Single-select: deselect others
+                        boxGrid.querySelectorAll('.box-file-card.selected').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        modal.dataset.selectedBoxFileId = file.id;
+                        modal.dataset.selectedBoxFileName = file.name;
+                        // Clear paste URL if user picks a Box file
+                        if (boxPasteInput) boxPasteInput.value = '';
+                        // Enable submit
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Send Mockup';
+                    });
+
+                    boxGrid.appendChild(card);
+                });
+
+                // Also show paste URL as alternative
+                boxPasteFallback.style.display = 'block';
+
+            } catch (err) {
+                boxLoading.style.display = 'none';
+                console.error('Box picker error:', err);
+                boxError.textContent = 'Could not load Box files. Use paste URL instead.';
+                boxError.style.display = 'block';
+                boxPasteFallback.style.display = 'block';
+            }
+        })();
+
+        // ── Previously Sent files (from Caspio) ──
+        const prevSection = document.getElementById('approval-prev-section');
+        const filesGrid = document.getElementById('approval-files');
+        filesGrid.innerHTML = '';
+        let prevFileCount = 0;
+
+        const prevFileFields = [
             { key: 'Box_File_Mockup', label: 'Mockup' },
             { key: 'BoxFileLink', label: 'Mockup 2' },
-            { key: 'Company_Mockup', label: 'Mockup 3' },
-            { key: 'CDN_Link', label: 'Artwork 1' },
-            { key: 'CDN_Link_Two', label: 'Artwork 2' },
-            { key: 'CDN_Link_Three', label: 'Artwork 3' },
-            { key: 'CDN_Link_Four', label: 'Artwork 4' }
+            { key: 'Company_Mockup', label: 'Mockup 3' }
         ];
 
-        const filesGrid = document.getElementById('approval-files');
-        const noFilesMsg = document.getElementById('approval-no-files');
-        filesGrid.innerHTML = '';
-        let fileCount = 0;
-
         if (artReqData) {
-            fileFields.forEach(field => {
+            prevFileFields.forEach(field => {
                 const url = artReqData[field.key];
                 if (!url || !url.trim()) return;
-                // Filter bare CDN base URLs (no actual file)
                 if (/^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(url.trim())) return;
-                fileCount++;
+                prevFileCount++;
 
                 const fileCard = document.createElement('div');
-                fileCard.className = 'approval-file-card selected';
-                fileCard.dataset.url = url;
-                fileCard.innerHTML = `
-                    <input type="checkbox" class="mockup-checkbox"
-                           value="${escapeHtml(url)}" checked>
-                    <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="approval-file-placeholder" style="display:none;">File</div>
-                    <div class="approval-file-label">${escapeHtml(field.label)}</div>
-                    <div class="approval-selected-badge">✓</div>
-                `;
-
-                // Checkbox toggle on card click
-                fileCard.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('mockup-checkbox')) return;
-                    const cb = fileCard.querySelector('.mockup-checkbox');
-                    cb.checked = !cb.checked;
-                    fileCard.classList.toggle('selected', cb.checked);
-                });
-                fileCard.querySelector('.mockup-checkbox').addEventListener('change', function () {
-                    fileCard.classList.toggle('selected', this.checked);
-                });
-
+                fileCard.className = 'approval-file-card';
+                fileCard.innerHTML =
+                    '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
+                    + ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                    + '<div class="approval-file-placeholder" style="display:none;">File</div>'
+                    + '<div class="approval-file-label">' + escapeHtml(field.label) + '</div>';
                 filesGrid.appendChild(fileCard);
             });
         }
 
-        if (fileCount === 0) {
-            noFilesMsg.style.display = 'block';
-            filesGrid.style.display = 'none';
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'No Files Available';
+        if (prevFileCount > 0) {
+            prevSection.style.display = 'block';
         } else {
-            noFilesMsg.style.display = 'none';
-            filesGrid.style.display = 'grid';
+            prevSection.style.display = 'none';
         }
 
         // Store data on modal for submit handler
@@ -1296,7 +1357,8 @@
         modal.dataset.artReqJson = JSON.stringify({
             Sales_Rep: salesRep || '',
             CompanyName: artReqData ? artReqData.CompanyName : (companyEl ? companyEl.textContent.trim() : ''),
-            Revision_Count: artReqData ? (artReqData.Revision_Count || 0) : 0
+            Revision_Count: artReqData ? (artReqData.Revision_Count || 0) : 0,
+            PK_ID: artReqData ? artReqData.PK_ID : null
         });
     }
 
@@ -1313,20 +1375,53 @@
         const mins = parseInt(document.getElementById('approval-minutes').value) || 0;
         const message = document.getElementById('approval-message').value.trim();
 
-        // Get selected mockup URLs from checkboxes
-        const selectedBoxes = document.querySelectorAll('.mockup-checkbox:checked');
-        const mockupUrls = Array.from(selectedBoxes).map(cb => cb.value);
-        if (mockupUrls.length === 0) {
-            alert('Please select at least one mockup image to send.');
+        // Parse stored art request data (needed for PK_ID in shared link save)
+        let artReqMeta = {};
+        try { artReqMeta = JSON.parse(modal.dataset.artReqJson || '{}'); } catch (e) { /* ignore */ }
+        const revCount = artReqMeta.Revision_Count || 0;
+
+        // Get mockup URL — either from Box file picker or paste URL
+        const selectedBoxFileId = modal.dataset.selectedBoxFileId;
+        const pasteUrl = (document.getElementById('box-paste-url') || {}).value || '';
+        let mockupUrls = [];
+
+        if (selectedBoxFileId) {
+            // Create shared link for selected Box file
+            submitBtn.textContent = 'Creating link...';
+            try {
+                const linkResp = await fetch(`${API_BASE}/api/box/shared-link`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fileId: selectedBoxFileId })
+                });
+                if (!linkResp.ok) throw new Error(`Shared link ${linkResp.status}`);
+                const linkData = await linkResp.json();
+                mockupUrls = [linkData.downloadUrl || linkData.sharedLink];
+
+                // Save to first empty Caspio mockup slot
+                const artReqPkId = artReqMeta.PK_ID;
+                if (artReqPkId && mockupUrls[0]) {
+                    fetch(`${API_BASE}/api/art-requests/${designId}/upload-mockup-url`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pkId: artReqPkId, url: mockupUrls[0] })
+                    }).catch(() => { /* fire-and-forget — URL is in the email either way */ });
+                }
+            } catch (linkErr) {
+                console.error('Failed to create Box shared link:', linkErr);
+                alert('Could not create shared link for the selected file. Please try paste URL instead.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Mockup';
+                return;
+            }
+        } else if (pasteUrl.trim()) {
+            mockupUrls = [pasteUrl.trim()];
+        } else {
+            alert('Please select a mockup file from Box or paste a URL.');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Send Mockup';
             return;
         }
-
-        // Parse stored art request data
-        let artReqMeta = {};
-        try { artReqMeta = JSON.parse(modal.dataset.artReqJson || '{}'); } catch (e) { /* ignore */ }
-        const revCount = artReqMeta.Revision_Count || 0;
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
