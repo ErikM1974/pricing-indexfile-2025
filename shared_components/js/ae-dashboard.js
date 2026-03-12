@@ -46,12 +46,11 @@
 
     // ── Tab Switching ───────────────────────────────────────────────
 
-    var VISIBLE_TABS = ['submit', 'mockup', 'mockup-ruth', 'gallery', 'view', 'requirements'];
+    var VISIBLE_TABS = ['submit', 'mockup-ruth', 'gallery', 'view', 'requirements'];
     var DROPDOWN_TABS = ['generator'];
 
     var TAB_PANE_MAP = {
         'submit': 'submit-tab',
-        'mockup': 'mockup-tab',
         'mockup-ruth': 'mockup-ruth-tab',
         'requirements': 'requirements-tab',
         'gallery': 'gallery-tab',
@@ -93,8 +92,15 @@
     // Restore saved tab on load
     document.addEventListener('DOMContentLoaded', function () {
         var savedTab = localStorage.getItem('aeDashboardTab');
-        if (savedTab && savedTab === 'view') {
-            showTab(savedTab);
+        if (savedTab) {
+            // Fallback to submit if saved tab no longer exists (e.g., removed mockup-tab)
+            if (!TAB_PANE_MAP.hasOwnProperty(savedTab)) {
+                savedTab = 'submit';
+                localStorage.setItem('aeDashboardTab', savedTab);
+            }
+            if (savedTab !== 'submit') {
+                showTab(savedTab);
+            }
         }
     });
 

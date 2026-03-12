@@ -113,6 +113,15 @@
             revBadge.style.display = 'inline-block';
         }
 
+        // Request type badge (Mockup)
+        if (req.Request_Type && req.Request_Type.toLowerCase() === 'mockup') {
+            const typeBadge = document.createElement('span');
+            typeBadge.className = 'ard-type-badge ard-type-badge--mockup';
+            typeBadge.textContent = '\uD83D\uDCF8 MOCKUP';
+            const headerEl = document.getElementById('ard-design-id');
+            if (headerEl) headerEl.parentNode.insertBefore(typeBadge, headerEl.nextSibling);
+        }
+
         // Info fields
         setText('ard-company', req.CompanyName);
         const repEmail = req.User_Email || req.Sales_Rep || '';

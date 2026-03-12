@@ -424,6 +424,24 @@
     };
 
     // ── Card Data Processing (migrated from Caspio Footer) ──────────
+    function addRequestTypeBadge(card) {
+        if (card.querySelector('.badge--mockup')) return; // already added
+        const typeSpan = card.querySelector('.cb-request-type');
+        if (!typeSpan) return;
+        const type = typeSpan.textContent.trim();
+        if (type.toLowerCase() !== 'mockup') return;
+
+        const badge = document.createElement('span');
+        badge.className = 'badge badge--mockup';
+        badge.textContent = '\uD83D\uDCF8 MOCKUP'; // 📸
+        const companyEl = card.querySelector('.company-name');
+        if (companyEl) {
+            companyEl.parentNode.insertBefore(badge, companyEl.nextSibling);
+        } else {
+            card.prepend(badge);
+        }
+    }
+
     function styleCardPills(card) {
         const block = card.closest('div[data-cb-name="data-row"]');
         if (!block) return;
@@ -1555,6 +1573,7 @@
 
         const cards = galleryTab.querySelectorAll('.card');
         cards.forEach(card => {
+            addRequestTypeBadge(card);
             styleCardPills(card);
             calculateArtHours(card);
             formatRepName(card);

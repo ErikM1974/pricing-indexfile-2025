@@ -1325,6 +1325,24 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 .due-soon      { background-color: #3b82f6; color: white; }
 .due-upcoming  { background-color: #22c55e; color: white; }
 
+/* --- Request Type Badges --- */
+.badge--mockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fbbf24;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
 /* --- Info Grid --- */
 .info-grid {
     display: grid;
