@@ -1238,6 +1238,8 @@
         const fileFields = [
             { key: 'File_Upload', label: 'Original Upload' },
             { key: 'Box_File_Mockup', label: 'Mockup' },
+            { key: 'BoxFileLink', label: 'Mockup 2' },
+            { key: 'Company_Mockup', label: 'Mockup 3' },
             { key: 'CDN_Link', label: 'Artwork 1' },
             { key: 'CDN_Link_Two', label: 'Artwork 2' },
             { key: 'CDN_Link_Three', label: 'Artwork 3' },
