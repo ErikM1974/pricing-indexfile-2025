@@ -647,11 +647,11 @@
     function collectMockupTargets() {
         var targets = [];
 
-        // 1. Contact Details section header (find by 📇 emoji)
-        var sectionHeaders = document.querySelectorAll('#submit-tab .section-header');
-        sectionHeaders.forEach(function (header) {
-            if (header.textContent.indexOf('📇') !== -1 || header.textContent.toLowerCase().indexOf('contact') !== -1) {
-                targets.push(header);
+        // 1. Contact Details section header (find by 📇 emoji in Caspio HTML blocks)
+        var htmlBlocks = document.querySelectorAll('#submit-tab .cbHTMLBlockContainer, #submit-tab .section-header');
+        htmlBlocks.forEach(function (block) {
+            if (block.textContent.indexOf('📇') !== -1 || block.textContent.toLowerCase().indexOf('contact') !== -1) {
+                targets.push(block);
             }
         });
 
@@ -699,6 +699,15 @@
 
         var buttons = toggleContainer.querySelectorAll('.toggle-btn');
         if (buttons.length === 0) return;
+
+        // Wrap buttons in .toggle-row if not already wrapped (Caspio HTML Block is flat)
+        if (!toggleContainer.querySelector('.toggle-row')) {
+            var row = document.createElement('div');
+            row.className = 'toggle-row';
+            buttons.forEach(function (btn) { row.appendChild(btn); });
+            var helper = toggleContainer.querySelector('.toggle-helper');
+            toggleContainer.insertBefore(row, helper || null);
+        }
 
         // Collect targets (must be done after restructuring)
         _mockupToggleTargets = collectMockupTargets();
