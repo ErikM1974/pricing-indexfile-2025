@@ -318,7 +318,9 @@
             else if (text.indexOf('design') !== -1 && text.indexOf('#') !== -1) map.designNum = i;
             else if (text.indexOf('view notes') !== -1) map.viewNotes = i;
             else if (text.indexOf('add note') !== -1) map.addNote = i;
-            else if (text.indexOf('box file') !== -1 || text.indexOf('mockup') !== -1) map.boxMockup = i;
+            else if (text.indexOf('box_file_mockup') !== -1 || text.indexOf('box file mockup') !== -1) map.boxMockup = i;
+            else if (text.indexOf('boxfilelink') !== -1 || text === 'box file link') map.boxFileLink = i;
+            else if (text.indexOf('company_mockup') !== -1 || text.indexOf('company mockup') !== -1) map.companyMockup = i;
             else if (text.indexOf('file upload') !== -1) map.fileUpload = i;
             else if (text.indexOf('request type') !== -1) map.requestType = i;
         }
@@ -390,8 +392,14 @@
             var orderNum = getCellText(row, colMap.orderNum);
             var requestType = getCellText(row, colMap.requestType);
 
-            // Image: Box_File_Mockup (text URL) > File_Upload_One (img src) > placeholder
+            // Image: Box_File_Mockup > BoxFileLink > Company_Mockup > File_Upload_One > placeholder
             var mockupUrl = getCellText(row, colMap.boxMockup);
+            if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
+                mockupUrl = getCellText(row, colMap.boxFileLink);
+            }
+            if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
+                mockupUrl = getCellText(row, colMap.companyMockup);
+            }
             if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
                 mockupUrl = getCellImgSrc(row, colMap.fileUpload);
             }

@@ -105,11 +105,9 @@
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
 
         const tabMap = {
-            'gallery':       { index: 0, pane: 'gallery-tab' },
-            'mockupgallery': { index: 1, pane: 'mockupgallery-tab' },
-            'table':         { index: 2, pane: 'table-tab' },
-            'express':       { index: 3, pane: 'express-tab' },
-            'requirements':  { index: 4, pane: 'requirements-tab' }
+            'gallery':      { index: 0, pane: 'gallery-tab' },
+            'express':      { index: 1, pane: 'express-tab' },
+            'requirements': { index: 2, pane: 'requirements-tab' }
         };
 
         const tab = tabMap[tabName];
@@ -2373,7 +2371,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Restore saved tab preference
         const savedTab = localStorage.getItem('artistDashboardTab');
-        if (savedTab && ['mockupgallery', 'table', 'express', 'requirements'].includes(savedTab)) {
+        if (savedTab && ['express', 'requirements'].includes(savedTab)) {
             showTab(savedTab);
         }
 
