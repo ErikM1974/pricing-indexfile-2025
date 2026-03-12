@@ -167,6 +167,9 @@
         // Mockup Gallery
         renderMockupGallery(req);
 
+        // Mockup Upload
+        initMockupUpload(req);
+
         // AE Action Bar — show only when status contains "Awaiting Approval"
         const statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
         if (statusLower.includes('awaitingapproval')) {
@@ -214,6 +217,152 @@
 
         if (fileCount > 0) {
             galleryCard.style.display = '';
+        }
+    }
+
+    // ── Mockup Upload ─────────────────────────────────────────────────
+    // Writable file fields for Steve's mockup/artwork output (priority order)
+    const UPLOAD_FIELDS = [
+        { key: 'Mockup_Link', label: 'Mockup' },
+        { key: 'CDN_Link', label: 'Artwork 1' },
+        { key: 'CDN_Link_Two', label: 'Artwork 2' },
+        { key: 'CDN_Link_Three', label: 'Artwork 3' },
+        { key: 'CDN_Link_Four', label: 'Artwork 4' }
+    ];
+
+    function initMockupUpload(req) {
+        const uploadCard = document.getElementById('ard-upload-card');
+        const urlInput = document.getElementById('ard-mockup-url');
+        const preview = document.getElementById('ard-upload-preview');
+        const previewImg = document.getElementById('ard-upload-preview-img');
+        const saveBtn = document.getElementById('ard-btn-upload');
+        const slotLabel = document.getElementById('ard-upload-slot');
+        const statusEl = document.getElementById('ard-upload-status');
+
+        if (!uploadCard || !urlInput || !saveBtn) return;
+
+        // Find first empty upload slot
+        let targetField = null;
+        for (let i = 0; i < UPLOAD_FIELDS.length; i++) {
+            const val = req[UPLOAD_FIELDS[i].key];
+            if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
+                targetField = UPLOAD_FIELDS[i];
+                break;
+            }
+        }
+
+        if (!targetField) {
+            // All slots full — show card with message
+            slotLabel.textContent = 'All mockup slots are full';
+            saveBtn.style.display = 'none';
+            urlInput.disabled = true;
+            urlInput.placeholder = 'No available slots';
+        } else {
+            slotLabel.textContent = 'Will save to: ' + targetField.label;
+        }
+
+        // Show the upload card
+        uploadCard.style.display = '';
+
+        // URL input preview logic
+        let debounceTimer = null;
+        urlInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                const url = urlInput.value.trim();
+                if (url && isValidUrl(url)) {
+                    previewImg.src = url;
+                    previewImg.onerror = function () {
+                        preview.style.display = 'none';
+                        // Still allow save — URL might be a non-image file (PDF, AI, etc.)
+                        saveBtn.disabled = !url;
+                    };
+                    previewImg.onload = function () {
+                        preview.style.display = '';
+                    };
+                    saveBtn.disabled = false;
+                } else {
+                    preview.style.display = 'none';
+                    saveBtn.disabled = true;
+                }
+            }, 400);
+        });
+
+        // Save button
+        saveBtn.addEventListener('click', async function () {
+            if (!targetField) return;
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            statusEl.style.display = 'none';
+
+            try {
+                const pkId = req.PK_ID;
+                if (!pkId) throw new Error('No PK_ID found on art request');
+
+                const resp = await fetch(`${API_BASE}/api/artrequests/${pkId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [targetField.key]: url })
+                });
+
+                if (!resp.ok) {
+                    const errData = await resp.json().catch(() => ({}));
+                    throw new Error(errData.error || `Server returned ${resp.status}`);
+                }
+
+                // Update local data and re-render gallery
+                currentRequest[targetField.key] = url;
+                renderMockupGallery(currentRequest);
+
+                // Show success
+                statusEl.textContent = 'Mockup saved to ' + targetField.label;
+                statusEl.className = 'ard-upload-status ard-upload-status--success';
+                statusEl.style.display = '';
+
+                // Clear input and preview
+                urlInput.value = '';
+                preview.style.display = 'none';
+
+                // Find next available slot
+                targetField = null;
+                for (let i = 0; i < UPLOAD_FIELDS.length; i++) {
+                    const val = currentRequest[UPLOAD_FIELDS[i].key];
+                    if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
+                        targetField = UPLOAD_FIELDS[i];
+                        break;
+                    }
+                }
+                if (targetField) {
+                    slotLabel.textContent = 'Will save to: ' + targetField.label;
+                    saveBtn.textContent = 'Save Mockup';
+                    saveBtn.disabled = true; // re-disabled until new URL entered
+                } else {
+                    slotLabel.textContent = 'All mockup slots are full';
+                    saveBtn.style.display = 'none';
+                    urlInput.disabled = true;
+                    urlInput.placeholder = 'No available slots';
+                }
+
+            } catch (err) {
+                console.error('Failed to save mockup:', err);
+                statusEl.textContent = 'Error: ' + (err.message || 'Failed to save mockup');
+                statusEl.className = 'ard-upload-status ard-upload-status--error';
+                statusEl.style.display = '';
+                saveBtn.textContent = 'Save Mockup';
+                saveBtn.disabled = false;
+            }
+        });
+    }
+
+    function isValidUrl(str) {
+        try {
+            const url = new URL(str);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch (e) {
+            return false;
         }
     }
 

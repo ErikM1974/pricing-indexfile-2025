@@ -631,11 +631,162 @@
         enhanceSubmitButton();
     }
 
+    // ── Request Type Toggle (New Artwork / Mockup) ─────────────────
+
+    /**
+     * Elements to hide/show when toggling between New Artwork and Mockup modes.
+     * Collected once after DOM restructuring, cached for fast toggling.
+     */
+    var _mockupToggleTargets = null;
+    var _designLabelOriginalText = '';
+
+    /**
+     * Collect the DOM elements that need to be hidden in mockup mode.
+     * Must be called AFTER restructureFormLayout() so .field-pair wrappers exist.
+     */
+    function collectMockupTargets() {
+        var targets = [];
+
+        // 1. Contact Details section header (find by 📇 emoji)
+        var sectionHeaders = document.querySelectorAll('#submit-tab .section-header');
+        sectionHeaders.forEach(function (header) {
+            if (header.textContent.indexOf('📇') !== -1 || header.textContent.toLowerCase().indexOf('contact') !== -1) {
+                targets.push(header);
+            }
+        });
+
+        // 2. First_name + Last_name entire .field-pair
+        var firstNameInput = document.querySelector('[name="InsertRecordFirst_name"]');
+        if (firstNameInput) {
+            var pair = firstNameInput.closest('.field-pair');
+            if (pair) targets.push(pair);
+        }
+
+        // 3. Order_Num_SW .field-group (within Design # / Order # pair)
+        var orderNumInput = document.querySelector('[name="InsertRecordOrder_Num_SW"]');
+        if (orderNumInput) {
+            var group = orderNumInput.closest('.field-group');
+            if (group) targets.push(group);
+        }
+
+        // 4. Order Type .field-group (within Order Type / Due Date pair)
+        //    This was paired by label text, so find via label content
+        var allFieldGroups = document.querySelectorAll('#submit-tab .field-group');
+        allFieldGroups.forEach(function (fg) {
+            var label = fg.querySelector('.cbFormLabelCell label');
+            if (label && label.textContent.trim().replace(/\*/g, '').trim() === 'Order Type') {
+                targets.push(fg);
+            }
+        });
+
+        // 5. Prelim_Charges + Additional_Services entire .field-pair
+        var prelimInput = document.querySelector('[name="InsertRecordPrelim_Charges"]');
+        if (prelimInput) {
+            var pair2 = prelimInput.closest('.field-pair');
+            if (pair2) targets.push(pair2);
+        }
+
+        return targets;
+    }
+
+    /**
+     * Initialize the request type toggle (New Artwork / Mockup).
+     * Attaches click listeners to toggle buttons, manages show/hide + relabeling.
+     */
+    function initRequestTypeToggle() {
+        var toggleContainer = document.getElementById('request-type-toggle');
+        if (!toggleContainer) return;
+
+        var buttons = toggleContainer.querySelectorAll('.toggle-btn');
+        if (buttons.length === 0) return;
+
+        // Collect targets (must be done after restructuring)
+        _mockupToggleTargets = collectMockupTargets();
+
+        // Cache original Design # label text
+        var designLabel = findLabelForInput('Design_Num_SW');
+        if (designLabel) {
+            _designLabelOriginalText = designLabel.textContent.trim();
+        }
+
+        // Attach listeners
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var requestType = btn.getAttribute('data-type');
+
+                // Update active state
+                buttons.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                // Set hidden field value
+                var hiddenField = document.querySelector('[name="InsertRecordRequest_Type"]');
+                if (hiddenField) {
+                    hiddenField.value = requestType === 'mockup' ? 'Mockup' : 'New Artwork';
+                }
+
+                // Update helper text
+                var helper = document.getElementById('toggle-helper');
+                if (helper) {
+                    helper.textContent = requestType === 'mockup'
+                        ? 'Place an existing design on a garment'
+                        : 'Create new artwork from scratch';
+                }
+
+                // Toggle visibility
+                applyMockupMode(requestType === 'mockup');
+            });
+        });
+    }
+
+    /**
+     * Find the <label> element for a given input field name.
+     */
+    function findLabelForInput(inputName) {
+        var input = document.querySelector('[name="InsertRecord' + inputName + '"]');
+        if (!input) return null;
+        var fieldGroup = input.closest('.field-group');
+        if (fieldGroup) {
+            var labelCell = fieldGroup.querySelector('.cbFormLabelCell label');
+            if (labelCell) return labelCell;
+        }
+        var labelCell2 = findLabelCellForInput(inputName);
+        if (labelCell2) {
+            return labelCell2.querySelector('label');
+        }
+        return null;
+    }
+
+    /**
+     * Show or hide sections based on mockup mode.
+     */
+    function applyMockupMode(isMockup) {
+        if (!_mockupToggleTargets) return;
+
+        _mockupToggleTargets.forEach(function (el) {
+            if (isMockup) {
+                el.classList.add('mockup-hidden');
+            } else {
+                el.classList.remove('mockup-hidden');
+            }
+        });
+
+        // Relabel Design # field
+        var designLabel = findLabelForInput('Design_Num_SW');
+        if (designLabel) {
+            if (isMockup) {
+                designLabel.textContent = 'Existing Design #';
+            } else {
+                designLabel.textContent = _designLabelOriginalText || 'Design #';
+            }
+        }
+    }
+
     // ── Init ───────────────────────────────────────────────────────
 
     document.addEventListener('DataPageReady', function () {
         setTimeout(function () {
             restructureFormLayout();
+            initRequestTypeToggle();
             monitorGarmentCascade();
             monitorAllSwatchesAndImages();
             addRowNumbers();

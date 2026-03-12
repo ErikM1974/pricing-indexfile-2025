@@ -158,6 +158,26 @@
                     </div>
                 </div>
 
+                <!-- Upload Mockup -->
+                <div class="ard-card" id="ard-upload-card" style="display:none;">
+                    <div class="ard-card-header ard-card-header--amber">Upload Mockup</div>
+                    <div class="ard-card-body">
+                        <div class="ard-upload-zone" id="ard-upload-zone">
+                            <label class="ard-upload-label" for="ard-mockup-url">Paste image URL (Box, CDN, etc.)</label>
+                            <input type="url" id="ard-mockup-url" class="ard-upload-input"
+                                   placeholder="https://app.box.com/shared/..." autocomplete="off">
+                            <div class="ard-upload-preview" id="ard-upload-preview" style="display:none;">
+                                <img id="ard-upload-preview-img" src="" alt="Preview">
+                            </div>
+                            <div class="ard-upload-actions">
+                                <span class="ard-upload-slot" id="ard-upload-slot"></span>
+                                <button class="ard-btn-upload" id="ard-btn-upload" type="button" disabled>Save Mockup</button>
+                            </div>
+                            <div class="ard-upload-status" id="ard-upload-status" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- AE Action Bar (visible only when Awaiting Approval) -->
                 <div class="ard-action-bar" id="ard-action-bar" style="display:none;">
                     <div class="ard-action-bar-inner">

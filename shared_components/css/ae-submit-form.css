@@ -512,6 +512,66 @@ input[name^="InsertRecordMAIN_IMAGE_URL_"] {
     border-left: 3px solid #f59e0b;
 }
 
+/* ---------- Request Type Toggle (New Artwork / Mockup) ---------- */
+.request-type-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--form-white);
+    border-radius: var(--form-radius-lg);
+    border: 1px solid var(--form-slate-200);
+    box-shadow: var(--form-shadow-sm);
+}
+
+.request-type-toggle .toggle-row {
+    display: flex;
+    gap: 4px;
+    background: var(--form-slate-100);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.toggle-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--form-font);
+    cursor: pointer;
+    transition: all var(--form-transition);
+    background: transparent;
+    color: var(--form-slate-500);
+    white-space: nowrap;
+}
+
+.toggle-btn:hover:not(.active) {
+    background: var(--form-slate-200);
+    color: var(--form-slate-700);
+}
+
+.toggle-btn.active {
+    background: var(--form-crimson);
+    color: white;
+    box-shadow: 0 2px 8px rgba(152, 30, 50, 0.3);
+}
+
+.toggle-helper {
+    font-size: 12px;
+    color: var(--form-slate-500);
+    margin: 0;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Hide sections in mockup mode */
+.mockup-hidden {
+    display: none !important;
+}
+
 /* ---------- Utility: Hide Virtual Parameters ---------- */
 input[name^="cbParamVirtual"] {
     display: none !important;
@@ -659,5 +719,10 @@ input[name^="cbParamVirtual"] {
 
     .file-upload-zone {
         padding: 14px;
+    }
+
+    .toggle-btn {
+        padding: 8px 16px;
+        font-size: 13px;
     }
 }
