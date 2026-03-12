@@ -2322,3 +2322,36 @@ For best practices/patterns:
 **Pattern:** How it works
 **Files:** Where to find implementation
 ```
+
+---
+
+## Bug: Caspio FILE fields are read-only via REST API
+**Date:** 2026-03-12
+**Project:** [caspio-proxy] Art Hub Phase 2b
+**Symptoms:** `PUT /api/artrequests/:PK_ID` returned 400 "AlterReadOnlyData" when writing to `CDN_Link_Two`
+**Root cause:** `CDN_Link`, `CDN_Link_Two`, `CDN_Link_Three`, `CDN_Link_Four` are Caspio **FILE** fields (file upload type). These are read-only via REST API — only writable through DataPage form submissions. Text URL fields like `Box_File_Mockup`, `BoxFileLink`, `Company_Mockup` are writable.
+**Solution:** Changed mockup upload targets from CDN_Link fields to text URL fields only.
+**Prevention:** When adding writable fields to Caspio tables, always verify the field type. FILE fields can be read via API (for display) but never written to. Use text fields for URL storage via REST API.
+
+## Bug: Box Search API eventual consistency causes duplicate folder creation
+**Date:** 2026-03-12
+**Project:** [caspio-proxy] Art Hub Phase 2b
+**Symptoms:** `findCustomerFolder()` returned null for a folder created minutes ago, causing `createCustomerFolder()` to attempt creation → Box 409 "item_name_in_use"
+**Root cause:** Box Search API is eventually consistent — newly created content may not appear in search results for several minutes.
+**Solution:** Added 409 conflict handler to `createCustomerFolder()` that extracts the existing folder from `err.response.data.context_info.conflicts[0]`. Also added in-memory `folderCache` Map to skip API calls entirely on repeat uploads.
+**Prevention:** Always handle 409 on Box folder/file creation. Use `context_info.conflicts` to extract existing items. Cache folder lookups in-memory.
+
+## Pattern: Box Client Credentials Grant for server-to-server uploads
+**Date:** 2026-03-12
+**Project:** [caspio-proxy] Art Hub Phase 2b
+**Description:** Server-to-server Box API access without user OAuth flow
+**Pattern:** Use Client Credentials Grant (`grant_type: client_credentials`, `box_subject_type: enterprise`, `box_subject_id: ENTERPRISE_ID`). Token cached with 60s pre-expiry buffer. Service Account (`AutomationUser_*@boxdevedition.com`) must be added as Editor on target folders. Shared links use `access: 'open'` for no-login-required URLs. `download_url` preferred over `url` for direct file access.
+**Files:** `caspio-pricing-proxy/src/routes/box-upload.js`
+
+## Bug: Heroku H12 timeout on Box folder listing
+**Date:** 2026-03-12
+**Project:** [caspio-proxy] Art Hub Phase 2b
+**Symptoms:** Upload timed out after 30s (Heroku H12) but actually succeeded on the backend
+**Root cause:** `findCustomerFolder()` paginated ALL items in Steve's Box folder (hundreds of subfolders) instead of using search. Each page request + processing exceeded Heroku's 30s request timeout.
+**Solution:** Replaced folder pagination with Box Search API (`GET /search` with `ancestor_folder_ids` filter) + in-memory `folderCache` Map. Search completes in <2s vs 30s+ for pagination. Fallback to single-page listing if search fails.
+**Prevention:** Never paginate large Box folders. Use Box Search API with `ancestor_folder_ids` for targeted lookups. Cache results in-memory for repeat access.

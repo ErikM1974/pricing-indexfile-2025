@@ -57,7 +57,7 @@
 | `/pages/js/design-view.js` | **NEW** Customer design view — fetches design images, renders gallery + lightbox | /api/digitized-designs/lookup | ✅ Active |
 | `/pages/css/design-view.css` | **NEW** Customer design view styles (branded, responsive, lightbox overlay) | — | ✅ Active |
 | `/pages/art-request-detail.html` | **NEW** Staff-facing art request detail page — shareable via /art-request/:designId | art-request-detail.js, art-request-detail.css, app-config.js | ✅ Active |
-| `/pages/js/art-request-detail.js` | **NEW** Art request detail — fetches art request + notes, renders info cards + timeline | /api/artrequests, /api/design-notes | ✅ Active |
+| `/pages/js/art-request-detail.js` | **NEW** Art request detail — fetches art request + notes, renders info cards + timeline, Box file upload | /api/artrequests, /api/design-notes, /api/art-requests/:id/upload-mockup (box-upload.js) | ✅ Active |
 | `/pages/css/art-request-detail.css` | **NEW** Art request detail styles (two-column, status badges, billing grid, notes timeline) | — | ✅ Active |
 | `/pages/dst-viewer.html` | **NEW** DST embroidery stitch file viewer — drag-drop .DST, color/mono/trace modes | dst-viewer.js, dst-viewer.css, Font Awesome, DM Mono/Outfit fonts | ✅ Active |
 | `/pages/js/dst-viewer.js` | **NEW** DST binary parser, canvas renderer (3 modes), trace animation, thread color sequence | Vanilla JS, no dependencies | ✅ Active |
