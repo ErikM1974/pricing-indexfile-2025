@@ -42,7 +42,7 @@
     // File fields to check for mockups/artwork
     const FILE_FIELDS = [
         { key: 'File_Upload', label: 'Original Upload' },
-        { key: 'Mockup_Link', label: 'Mockup' },
+        { key: 'Box_File_Mockup', label: 'Mockup' },
         { key: 'CDN_Link', label: 'Artwork 1' },
         { key: 'CDN_Link_Two', label: 'Artwork 2' },
         { key: 'CDN_Link_Three', label: 'Artwork 3' },
@@ -232,7 +232,7 @@
     // ── Mockup Upload ─────────────────────────────────────────────────
     // Writable file fields for Steve's mockup/artwork output (priority order)
     const UPLOAD_FIELDS = [
-        { key: 'Mockup_Link', label: 'Mockup' },
+        { key: 'Box_File_Mockup', label: 'Mockup' },
         { key: 'CDN_Link', label: 'Artwork 1' },
         { key: 'CDN_Link_Two', label: 'Artwork 2' },
         { key: 'CDN_Link_Three', label: 'Artwork 3' },

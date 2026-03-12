@@ -1237,7 +1237,7 @@
         // Build file thumbnails from all available file/CDN fields
         const fileFields = [
             { key: 'File_Upload', label: 'Original Upload' },
-            { key: 'Mockup_Link', label: 'Mockup' },
+            { key: 'Box_File_Mockup', label: 'Mockup' },
             { key: 'CDN_Link', label: 'Artwork 1' },
             { key: 'CDN_Link_Two', label: 'Artwork 2' },
             { key: 'CDN_Link_Three', label: 'Artwork 3' },
