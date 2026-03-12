@@ -240,130 +240,295 @@
     ];
 
     function initMockupUpload(req) {
-        const uploadCard = document.getElementById('ard-upload-card');
-        const urlInput = document.getElementById('ard-mockup-url');
-        const preview = document.getElementById('ard-upload-preview');
-        const previewImg = document.getElementById('ard-upload-preview-img');
-        const saveBtn = document.getElementById('ard-btn-upload');
-        const slotLabel = document.getElementById('ard-upload-slot');
-        const statusEl = document.getElementById('ard-upload-status');
+        var uploadCard = document.getElementById('ard-upload-card');
+        var saveBtn = document.getElementById('ard-btn-upload');
+        var slotLabel = document.getElementById('ard-upload-slot');
+        var statusEl = document.getElementById('ard-upload-status');
 
-        if (!uploadCard || !urlInput || !saveBtn) return;
+        if (!uploadCard || !saveBtn) return;
+
+        // Track active mode: 'file' or 'url'
+        var activeMode = 'file';
+        var selectedFile = null;
 
         // Find first empty upload slot
-        let targetField = null;
-        for (let i = 0; i < UPLOAD_FIELDS.length; i++) {
-            const val = req[UPLOAD_FIELDS[i].key];
-            if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
-                targetField = UPLOAD_FIELDS[i];
-                break;
-            }
-        }
+        var targetField = findNextSlot();
 
         if (!targetField) {
-            // All slots full — show card with message
-            slotLabel.textContent = 'All mockup slots are full';
+            slotLabel.textContent = 'All mockup slots are full (5/5)';
             saveBtn.style.display = 'none';
-            urlInput.disabled = true;
-            urlInput.placeholder = 'No available slots';
         } else {
             slotLabel.textContent = 'Will save to: ' + targetField.label;
         }
 
-        // Show the upload card
         uploadCard.style.display = '';
 
-        // URL input preview logic
-        let debounceTimer = null;
-        urlInput.addEventListener('input', function () {
+        // ── Tab Switching ─────────────────────────────────────────────
+        var tabFile = document.getElementById('ard-tab-file');
+        var tabUrl = document.getElementById('ard-tab-url');
+        var panelFile = document.getElementById('ard-panel-file');
+        var panelUrl = document.getElementById('ard-panel-url');
+
+        if (tabFile) tabFile.addEventListener('click', function () {
+            activeMode = 'file';
+            tabFile.classList.add('active');
+            tabUrl.classList.remove('active');
+            panelFile.style.display = '';
+            panelUrl.style.display = 'none';
+            updateSaveButton();
+        });
+        if (tabUrl) tabUrl.addEventListener('click', function () {
+            activeMode = 'url';
+            tabUrl.classList.add('active');
+            tabFile.classList.remove('active');
+            panelUrl.style.display = '';
+            panelFile.style.display = 'none';
+            updateSaveButton();
+        });
+
+        // ── File Upload (drag & drop + click) ─────────────────────────
+        var dropzone = document.getElementById('ard-dropzone');
+        var fileInput = document.getElementById('ard-file-input');
+        var filePreview = document.getElementById('ard-file-preview');
+        var filePreviewImg = document.getElementById('ard-file-preview-img');
+        var fileInfo = document.getElementById('ard-file-info');
+        var fileRemove = document.getElementById('ard-file-remove');
+
+        if (dropzone) {
+            dropzone.addEventListener('click', function () { fileInput.click(); });
+            dropzone.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                dropzone.classList.add('ard-dropzone--active');
+            });
+            dropzone.addEventListener('dragleave', function () {
+                dropzone.classList.remove('ard-dropzone--active');
+            });
+            dropzone.addEventListener('drop', function (e) {
+                e.preventDefault();
+                dropzone.classList.remove('ard-dropzone--active');
+                if (e.dataTransfer.files.length > 0) handleFileSelect(e.dataTransfer.files[0]);
+            });
+        }
+
+        if (fileInput) fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) handleFileSelect(fileInput.files[0]);
+        });
+
+        if (fileRemove) fileRemove.addEventListener('click', function () {
+            clearFileSelection();
+        });
+
+        function handleFileSelect(file) {
+            if (file.size > 20 * 1024 * 1024) {
+                showUploadStatus('File too large (max 20MB)', true);
+                return;
+            }
+            selectedFile = file;
+            var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            fileInfo.textContent = file.name + ' (' + sizeMB + ' MB)';
+
+            // Show preview for images
+            if (file.type.startsWith('image/')) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    filePreviewImg.src = e.target.result;
+                    filePreview.style.display = '';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                filePreviewImg.src = '';
+                filePreview.style.display = '';
+            }
+            dropzone.style.display = 'none';
+            updateSaveButton();
+        }
+
+        function clearFileSelection() {
+            selectedFile = null;
+            fileInput.value = '';
+            filePreview.style.display = 'none';
+            filePreviewImg.src = '';
+            dropzone.style.display = '';
+            updateSaveButton();
+        }
+
+        // ── URL Paste (fallback) ──────────────────────────────────────
+        var urlInput = document.getElementById('ard-mockup-url');
+        var urlPreview = document.getElementById('ard-upload-preview');
+        var urlPreviewImg = document.getElementById('ard-upload-preview-img');
+        var debounceTimer = null;
+
+        if (urlInput) urlInput.addEventListener('input', function () {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
-                const url = urlInput.value.trim();
+                var url = urlInput.value.trim();
                 if (url && isValidUrl(url)) {
-                    previewImg.src = url;
-                    previewImg.onerror = function () {
-                        preview.style.display = 'none';
-                        // Still allow save — URL might be a non-image file (PDF, AI, etc.)
-                        saveBtn.disabled = !url;
-                    };
-                    previewImg.onload = function () {
-                        preview.style.display = '';
-                    };
-                    saveBtn.disabled = false;
+                    urlPreviewImg.src = url;
+                    urlPreviewImg.onerror = function () { urlPreview.style.display = 'none'; };
+                    urlPreviewImg.onload = function () { urlPreview.style.display = ''; };
                 } else {
-                    preview.style.display = 'none';
-                    saveBtn.disabled = true;
+                    urlPreview.style.display = 'none';
                 }
+                updateSaveButton();
             }, 400);
         });
 
-        // Save button
+        // ── Save Button State ─────────────────────────────────────────
+        function updateSaveButton() {
+            if (!targetField) { saveBtn.disabled = true; return; }
+            if (activeMode === 'file') {
+                saveBtn.disabled = !selectedFile;
+                saveBtn.textContent = 'Upload Mockup';
+            } else {
+                var url = urlInput ? urlInput.value.trim() : '';
+                saveBtn.disabled = !url || !isValidUrl(url);
+                saveBtn.textContent = 'Save Mockup URL';
+            }
+        }
+
+        // ── Save Handler ──────────────────────────────────────────────
         saveBtn.addEventListener('click', async function () {
             if (!targetField) return;
-            const url = urlInput.value.trim();
-            if (!url) return;
-
             saveBtn.disabled = true;
-            saveBtn.textContent = 'Saving...';
             statusEl.style.display = 'none';
 
+            if (activeMode === 'file' && selectedFile) {
+                await uploadFileToBox(selectedFile);
+            } else if (activeMode === 'url') {
+                await saveUrlDirect();
+            }
+        });
+
+        // ── File Upload via Box API ───────────────────────────────────
+        async function uploadFileToBox(file) {
+            var progressBar = document.getElementById('ard-upload-progress');
+            var progressFill = document.getElementById('ard-progress-fill');
+            var progressText = document.getElementById('ard-progress-text');
+
+            saveBtn.textContent = 'Uploading...';
+            if (progressBar) { progressBar.style.display = ''; progressFill.style.width = '10%'; }
+
             try {
-                const pkId = req.PK_ID;
+                var pkId = req.PK_ID;
                 if (!pkId) throw new Error('No PK_ID found on art request');
 
-                const resp = await fetch(`${API_BASE}/api/artrequests/${pkId}`, {
+                var formData = new FormData();
+                formData.append('file', file);
+                formData.append('pkId', String(pkId));
+                formData.append('customerId', String(req.Shopwork_customer_number || req.id_customer || ''));
+                formData.append('companyName', req.CompanyName || '');
+
+                if (progressFill) progressFill.style.width = '30%';
+                if (progressText) progressText.textContent = 'Uploading to Box...';
+
+                var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (progressFill) progressFill.style.width = '80%';
+
+                if (!resp.ok) {
+                    var errData = await resp.json().catch(function () { return {}; });
+                    throw new Error(errData.error || 'Server returned ' + resp.status);
+                }
+
+                var result = await resp.json();
+                if (progressFill) progressFill.style.width = '100%';
+                if (progressText) progressText.textContent = 'Done!';
+
+                // Update local data and re-render
+                currentRequest[result.field] = result.url;
+                renderMockupGallery(currentRequest);
+
+                showUploadStatus('Mockup uploaded to Box and saved to ' + result.field, false);
+                clearFileSelection();
+                if (progressBar) setTimeout(function () { progressBar.style.display = 'none'; }, 1500);
+
+                advanceToNextSlot();
+
+            } catch (err) {
+                console.error('Box upload failed:', err);
+                showUploadStatus('Error: ' + (err.message || 'Upload failed'), true);
+                if (progressBar) progressBar.style.display = 'none';
+                saveBtn.textContent = 'Upload Mockup';
+                saveBtn.disabled = false;
+            }
+        }
+
+        // ── URL Paste Save (fallback) ─────────────────────────────────
+        async function saveUrlDirect() {
+            var url = urlInput.value.trim();
+            if (!url) return;
+
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                var pkId = req.PK_ID;
+                if (!pkId) throw new Error('No PK_ID found on art request');
+
+                var resp = await fetch(API_BASE + '/api/artrequests/' + pkId, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ [targetField.key]: url })
                 });
 
                 if (!resp.ok) {
-                    const errData = await resp.json().catch(() => ({}));
-                    throw new Error(errData.error || `Server returned ${resp.status}`);
+                    var errData = await resp.json().catch(function () { return {}; });
+                    throw new Error(errData.error || 'Server returned ' + resp.status);
                 }
 
-                // Update local data and re-render gallery
                 currentRequest[targetField.key] = url;
                 renderMockupGallery(currentRequest);
 
-                // Show success
-                statusEl.textContent = 'Mockup saved to ' + targetField.label;
-                statusEl.className = 'ard-upload-status ard-upload-status--success';
-                statusEl.style.display = '';
-
-                // Clear input and preview
+                showUploadStatus('Mockup URL saved to ' + targetField.label, false);
                 urlInput.value = '';
-                preview.style.display = 'none';
+                if (urlPreview) urlPreview.style.display = 'none';
 
-                // Find next available slot
-                targetField = null;
-                for (let i = 0; i < UPLOAD_FIELDS.length; i++) {
-                    const val = currentRequest[UPLOAD_FIELDS[i].key];
-                    if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
-                        targetField = UPLOAD_FIELDS[i];
-                        break;
-                    }
-                }
-                if (targetField) {
-                    slotLabel.textContent = 'Will save to: ' + targetField.label;
-                    saveBtn.textContent = 'Save Mockup';
-                    saveBtn.disabled = true; // re-disabled until new URL entered
-                } else {
-                    slotLabel.textContent = 'All mockup slots are full';
-                    saveBtn.style.display = 'none';
-                    urlInput.disabled = true;
-                    urlInput.placeholder = 'No available slots';
-                }
+                advanceToNextSlot();
 
             } catch (err) {
-                console.error('Failed to save mockup:', err);
-                statusEl.textContent = 'Error: ' + (err.message || 'Failed to save mockup');
-                statusEl.className = 'ard-upload-status ard-upload-status--error';
-                statusEl.style.display = '';
-                saveBtn.textContent = 'Save Mockup';
+                console.error('Failed to save mockup URL:', err);
+                showUploadStatus('Error: ' + (err.message || 'Failed to save'), true);
+                saveBtn.textContent = 'Save Mockup URL';
                 saveBtn.disabled = false;
             }
-        });
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────
+        function findNextSlot() {
+            for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
+                var val = req[UPLOAD_FIELDS[i].key];
+                if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
+                    return UPLOAD_FIELDS[i];
+                }
+            }
+            return null;
+        }
+
+        function advanceToNextSlot() {
+            targetField = null;
+            for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
+                var val = currentRequest[UPLOAD_FIELDS[i].key];
+                if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
+                    targetField = UPLOAD_FIELDS[i];
+                    break;
+                }
+            }
+            if (targetField) {
+                slotLabel.textContent = 'Will save to: ' + targetField.label;
+                updateSaveButton();
+            } else {
+                slotLabel.textContent = 'All mockup slots are full (5/5)';
+                saveBtn.style.display = 'none';
+            }
+        }
+
+        function showUploadStatus(msg, isError) {
+            statusEl.textContent = msg;
+            statusEl.className = 'ard-upload-status ' + (isError ? 'ard-upload-status--error' : 'ard-upload-status--success');
+            statusEl.style.display = '';
+        }
     }
 
     function isValidUrl(str) {

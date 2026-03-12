@@ -321,16 +321,159 @@ body {
 }
 
 /* ── Mockup Upload ──────────────────────────────────── */
-.ard-upload-zone {
+
+/* Tab toggle */
+.ard-upload-tabs {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    gap: 0;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e9ecef;
 }
 
+.ard-upload-tab {
+    padding: 8px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #888;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.ard-upload-tab:hover { color: #d97706; }
+
+.ard-upload-tab.active {
+    color: #d97706;
+    border-bottom-color: #d97706;
+}
+
+/* Panels */
+.ard-upload-panel {
+    margin-bottom: 12px;
+}
+
+/* Drag & drop zone */
+.ard-dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 200ms ease;
+    background: #fafafa;
+}
+
+.ard-dropzone:hover,
+.ard-dropzone--active {
+    border-color: #d97706;
+    background: #fffbeb;
+}
+
+.ard-dropzone-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.ard-dropzone-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.ard-dropzone-hint {
+    font-size: 12px;
+    color: #999;
+}
+
+.ard-file-hidden {
+    display: none;
+}
+
+/* File preview after selection */
+#ard-file-preview {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    background: #f8f9fa;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+#ard-file-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.ard-file-info {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.ard-file-remove {
+    background: none;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+
+.ard-file-remove:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* Progress bar */
+.ard-upload-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.ard-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ard-progress-fill {
+    height: 100%;
+    background: #d97706;
+    border-radius: 3px;
+    transition: width 300ms ease;
+    width: 0;
+}
+
+.ard-progress-text {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+}
+
+/* URL paste (fallback) */
 .ard-upload-label {
     font-size: 13px;
     font-weight: 600;
     color: #555;
+    display: block;
+    margin-bottom: 8px;
 }
 
 .ard-upload-input {
@@ -367,6 +510,7 @@ body {
     align-items: center;
     justify-content: center;
     background: #f8f9fa;
+    margin-top: 8px;
 }
 
 .ard-upload-preview img {
@@ -375,10 +519,12 @@ body {
     object-fit: contain;
 }
 
+/* Shared action bar & status */
 .ard-upload-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 12px;
 }
 
 .ard-upload-slot {
@@ -417,6 +563,7 @@ body {
     border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
+    margin-top: 8px;
 }
 
 .ard-upload-status--success {

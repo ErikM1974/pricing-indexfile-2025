@@ -162,19 +162,48 @@
                 <div class="ard-card" id="ard-upload-card" style="display:none;">
                     <div class="ard-card-header ard-card-header--amber">Upload Mockup</div>
                     <div class="ard-card-body">
-                        <div class="ard-upload-zone" id="ard-upload-zone">
+                        <!-- Tab toggle: File Upload vs Paste URL -->
+                        <div class="ard-upload-tabs">
+                            <button type="button" class="ard-upload-tab active" id="ard-tab-file" data-tab="file">Upload File</button>
+                            <button type="button" class="ard-upload-tab" id="ard-tab-url" data-tab="url">Paste URL</button>
+                        </div>
+
+                        <!-- File Upload Panel -->
+                        <div class="ard-upload-panel" id="ard-panel-file">
+                            <div class="ard-dropzone" id="ard-dropzone">
+                                <div class="ard-dropzone-content">
+                                    <div class="ard-dropzone-icon">&#128228;</div>
+                                    <p class="ard-dropzone-text">Drag & drop a file here, or click to browse</p>
+                                    <p class="ard-dropzone-hint">JPG, PNG, GIF, WebP, PDF &mdash; max 20MB</p>
+                                </div>
+                                <input type="file" id="ard-file-input" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" class="ard-file-hidden">
+                            </div>
+                            <div class="ard-upload-preview" id="ard-file-preview" style="display:none;">
+                                <img id="ard-file-preview-img" src="" alt="Preview">
+                                <div class="ard-file-info" id="ard-file-info"></div>
+                                <button type="button" class="ard-file-remove" id="ard-file-remove">&times; Remove</button>
+                            </div>
+                            <div class="ard-upload-progress" id="ard-upload-progress" style="display:none;">
+                                <div class="ard-progress-bar"><div class="ard-progress-fill" id="ard-progress-fill"></div></div>
+                                <span class="ard-progress-text" id="ard-progress-text">Uploading...</span>
+                            </div>
+                        </div>
+
+                        <!-- URL Paste Panel (secondary) -->
+                        <div class="ard-upload-panel" id="ard-panel-url" style="display:none;">
                             <label class="ard-upload-label" for="ard-mockup-url">Paste image URL (Box, CDN, etc.)</label>
                             <input type="url" id="ard-mockup-url" class="ard-upload-input"
                                    placeholder="https://app.box.com/shared/..." autocomplete="off">
                             <div class="ard-upload-preview" id="ard-upload-preview" style="display:none;">
                                 <img id="ard-upload-preview-img" src="" alt="Preview">
                             </div>
-                            <div class="ard-upload-actions">
-                                <span class="ard-upload-slot" id="ard-upload-slot"></span>
-                                <button class="ard-btn-upload" id="ard-btn-upload" type="button" disabled>Save Mockup</button>
-                            </div>
-                            <div class="ard-upload-status" id="ard-upload-status" style="display:none;"></div>
                         </div>
+
+                        <div class="ard-upload-actions">
+                            <span class="ard-upload-slot" id="ard-upload-slot"></span>
+                            <button class="ard-btn-upload" id="ard-btn-upload" type="button" disabled>Upload Mockup</button>
+                        </div>
+                        <div class="ard-upload-status" id="ard-upload-status" style="display:none;"></div>
                     </div>
                 </div>
 
