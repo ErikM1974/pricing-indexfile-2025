@@ -281,4 +281,81 @@
     // ── Start Notification Polling ─────────────────────────────────
     startNotificationPolling();
 
+    // ── Enhance "View My Requests" Table ─────────────────────────
+    // Adds clickable "View Details" links to the Caspio report table
+    // in the View tab so AEs can open /art-request/:designId.
+
+    function enhanceRequestsTable() {
+        var viewTab = document.getElementById('view-tab');
+        if (!viewTab) return;
+
+        var table = viewTab.querySelector('table');
+        if (!table) return;
+
+        // Already enhanced?
+        if (table.dataset.enhanced) return;
+
+        var headers = table.querySelectorAll('thead th');
+        if (!headers.length) return;
+
+        // Find the design ID column — look for header containing "Design"
+        var designColIndex = -1;
+        for (var i = 0; i < headers.length; i++) {
+            var text = (headers[i].textContent || '').trim().toLowerCase();
+            if (text.indexOf('design') !== -1 && text.indexOf('#') !== -1) {
+                designColIndex = i;
+                break;
+            }
+        }
+        // Fallback: look for just "design" if no "#" match
+        if (designColIndex === -1) {
+            for (var j = 0; j < headers.length; j++) {
+                var text2 = (headers[j].textContent || '').trim().toLowerCase();
+                if (text2.indexOf('design') !== -1) {
+                    designColIndex = j;
+                    break;
+                }
+            }
+        }
+
+        if (designColIndex === -1) return; // Can't find design column
+
+        // Process each data row
+        var rows = table.querySelectorAll('tbody tr');
+        rows.forEach(function (row) {
+            var cells = row.querySelectorAll('td');
+            if (cells.length <= designColIndex) return;
+
+            var cell = cells[designColIndex];
+            var designId = (cell.textContent || '').trim().replace(/[^0-9]/g, '');
+            if (!designId) return;
+
+            // Wrap cell content in a link
+            var link = document.createElement('a');
+            link.href = '/art-request/' + designId;
+            link.target = '_blank';
+            link.textContent = designId;
+            link.style.color = '#2563eb';
+            link.style.fontWeight = '600';
+            link.style.textDecoration = 'none';
+            link.addEventListener('mouseenter', function () { link.style.textDecoration = 'underline'; });
+            link.addEventListener('mouseleave', function () { link.style.textDecoration = 'none'; });
+            cell.textContent = '';
+            cell.appendChild(link);
+        });
+
+        table.dataset.enhanced = 'true';
+    }
+
+    // MutationObserver to catch Caspio report table rendering
+    var viewTab = document.getElementById('view-tab');
+    if (viewTab) {
+        var enhanceTimer = null;
+        var viewObserver = new MutationObserver(function () {
+            clearTimeout(enhanceTimer);
+            enhanceTimer = setTimeout(enhanceRequestsTable, 300);
+        });
+        viewObserver.observe(viewTab, { childList: true, subtree: true });
+    }
+
 })();

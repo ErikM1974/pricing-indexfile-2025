@@ -713,15 +713,10 @@
         const detailsLink = document.createElement('a');
         detailsLink.className = 'card-details-link';
         detailsLink.textContent = 'View Details \u2192';
-        detailsLink.href = '#';
+        detailsLink.href = '/art-request/' + designId;
+        detailsLink.target = '_blank';
         detailsLink.addEventListener('click', (e) => {
-            e.preventDefault();
             e.stopPropagation();
-            const dataRow = card.closest('div[data-cb-name="data-row"]');
-            const caspioLink = dataRow && dataRow.querySelector('a[data-cb-name="DetailsLink"]');
-            if (caspioLink) {
-                caspioLink.click();
-            }
         });
         infoRow.appendChild(detailsLink);
 
