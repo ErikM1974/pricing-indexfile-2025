@@ -739,12 +739,14 @@
                     var sizeKB = file.size ? Math.round(file.size / 1024) : 0;
                     var sizeLabel = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + ' MB' : sizeKB + ' KB';
 
+                    var extBadge = ext ? '<div class="box-file-ext-badge">' + escapeHtml(ext.toUpperCase()) + '</div>' : '';
                     card.innerHTML =
                         (file.thumbnailUrl
                             ? '<img src="' + escapeHtml(file.thumbnailUrl) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
                               + '<div class="box-file-placeholder" style="display:none;">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
                             : '<div class="box-file-placeholder">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
                         )
+                        + extBadge
                         + '<div class="box-file-name">' + escapeHtml(file.name) + '</div>'
                         + '<div class="box-file-meta">' + escapeHtml(sizeLabel) + '</div>'
                         + '<div class="box-file-check">\u2713</div>';

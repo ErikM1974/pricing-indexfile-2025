@@ -569,9 +569,14 @@
                         body: JSON.stringify({ status: 'In Progress' })
                     });
                     if (!resp.ok) throw new Error(`Status ${resp.status}`);
+                    await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: 'art@nwcustomapparel.com' })
+                    }).catch(() => {});
                     b.textContent = 'Updated!';
                     b.style.background = '#28a745';
-                    setTimeout(() => window.location.reload(), 800);
+                    setTimeout(() => window.location.reload(), 1200);
                 } catch (err) {
                     b.textContent = 'Error';
                     b.style.background = '#dc3545';

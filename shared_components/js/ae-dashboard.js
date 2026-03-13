@@ -46,7 +46,7 @@
 
     // ── Tab Switching ───────────────────────────────────────────────
 
-    var VISIBLE_TABS = ['submit', 'mockup-ruth', 'view', 'requirements'];
+    var VISIBLE_TABS = ['submit', 'mockup-ruth', 'view', 'review', 'requirements'];
     var DROPDOWN_TABS = ['gallery', 'generator'];
 
     var TAB_PANE_MAP = {
@@ -55,7 +55,8 @@
         'requirements': 'requirements-tab',
         'gallery': 'gallery-tab',
         'generator': 'generator-tab',
-        'view': 'view-tab'
+        'view': 'view-tab',
+        'review': 'review-tab'
     };
 
     window.showTab = function (tabName) {
@@ -85,6 +86,9 @@
             var pane = document.getElementById(TAB_PANE_MAP[tabName]);
             if (pane) pane.classList.add('active');
         }
+
+        // Load review tab data on switch
+        if (tabName === 'review') loadReviewTab();
 
         localStorage.setItem('aeDashboardTab', tabName);
     };
@@ -474,6 +478,104 @@
         var caspioForm = table.closest('form');
         if (caspioForm) caspioForm.style.overflow = 'hidden';
         table.dataset.cardsRendered = 'true';
+    }
+
+    // ── Review Mockups Tab ──────────────────────────────────────────
+    function loadReviewTab() {
+        var container = document.getElementById('review-cards-container');
+        var loading = document.getElementById('review-loading');
+        var emptyState = document.getElementById('review-empty-state');
+        if (!container) return;
+
+        container.innerHTML = '';
+        if (emptyState) emptyState.style.display = 'none';
+        if (loading) loading.style.display = '';
+
+        var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval' +
+            '&select=ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload,Due_Date,Status,Design_Number' +
+            '&orderBy=Date_Created%20DESC&limit=50';
+
+        fetch(url)
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Failed to fetch: ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                if (loading) loading.style.display = 'none';
+                var items = data.Result || data || [];
+                if (!items.length) {
+                    if (emptyState) emptyState.style.display = '';
+                    return;
+                }
+
+                var grid = document.createElement('div');
+                grid.className = 'ae-art-grid';
+
+                items.forEach(function (req) {
+                    var idDesign = String(req.ID_Design || '');
+                    var company = req.CompanyName || '';
+                    var designNum = req.Design_Number || '';
+                    var dueDate = req.Due_Date || '';
+                    var status = req.Status || 'Awaiting Approval';
+
+                    // Mockup image fallback chain
+                    var mockupUrl = req.Box_File_Mockup || '';
+                    if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.BoxFileLink || '';
+                    if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.Company_Mockup || '';
+                    if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.File_Upload || '';
+                    if (BARE_CDN_RE.test(mockupUrl)) mockupUrl = '';
+
+                    var statusInfo = getStatusInfo(status);
+                    var detailId = idDesign.replace(/[^0-9]/g, '');
+
+                    // Format due date
+                    var dueDateDisplay = '';
+                    if (dueDate) {
+                        try {
+                            var d = new Date(dueDate);
+                            dueDateDisplay = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                        } catch (e) { dueDateDisplay = dueDate; }
+                    }
+
+                    var card = document.createElement('div');
+                    card.className = 'ae-art-card';
+
+                    var imageHtml;
+                    if (mockupUrl) {
+                        imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                    } else {
+                        imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
+                    }
+
+                    card.innerHTML = imageHtml +
+                        '<div class="ae-art-card__body">' +
+                            '<div class="ae-art-card__header">' +
+                                '<span class="ae-art-card__company">' + escapeHtml(company) + '</span>' +
+                                (designNum ? '<span class="ae-art-card__design-num">#' + escapeHtml(designNum) + '</span>' :
+                                 detailId ? '<span class="ae-art-card__design-num">#' + escapeHtml(detailId) + '</span>' : '') +
+                            '</div>' +
+                            '<div class="ae-art-card__meta">' +
+                                '<span class="ae-art-card__status ' + statusInfo.cls + '">' + statusInfo.icon + ' ' + statusInfo.label + '</span>' +
+                            '</div>' +
+                            '<div class="ae-art-card__details">' +
+                                (dueDateDisplay ? '<span class="ae-art-card__detail">Due: ' + escapeHtml(dueDateDisplay) + '</span>' : '') +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="ae-art-card__footer">' +
+                            (detailId ? '<a href="/art-request/' + escapeHtml(detailId) + '" target="_blank" class="ae-art-card__link ae-art-card__link--primary">Review &amp; Respond &rarr;</a>' : '') +
+                        '</div>';
+
+                    grid.appendChild(card);
+                });
+
+                container.appendChild(grid);
+            })
+            .catch(function (err) {
+                if (loading) loading.style.display = 'none';
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc3545;">' +
+                    '<p>Unable to load mockups for review.</p>' +
+                    '<p style="font-size:13px;color:#999;">' + escapeHtml(err.message) + '</p></div>';
+            });
     }
 
     // MutationObserver to catch Caspio report table rendering

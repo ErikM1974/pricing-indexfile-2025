@@ -298,7 +298,26 @@
 
                 <!-- Notes Timeline -->
                 <div class="ard-card">
-                    <div class="ard-card-header">Notes & Activity</div>
+                    <div class="ard-card-header">
+                        Notes & Activity
+                        <button type="button" class="ard-add-note-toggle" id="ard-add-note-toggle">+ Add Note</button>
+                    </div>
+                    <div class="ard-add-note-form" id="ard-add-note-form">
+                        <select id="ard-note-type">
+                            <option value="">-- select type --</option>
+                            <option value="Status Update">Status Update</option>
+                            <option value="Design Update">Design Update</option>
+                            <option value="Customer Feedback">Customer Feedback</option>
+                            <option value="Internal Note">Internal Note</option>
+                        </select>
+                        <textarea id="ard-note-text" rows="3" placeholder="Write a note..."></textarea>
+                        <div class="ard-add-note-footer">
+                            <label class="ard-note-notify-label">
+                                <input type="checkbox" id="ard-note-notify"> Notify sales rep
+                            </label>
+                            <button type="button" class="ard-note-submit-btn" id="ard-note-submit">Add Note</button>
+                        </div>
+                    </div>
                     <div class="ard-card-body" id="ard-notes-container">
                         <p class="ard-empty-notes" id="ard-empty-notes">No notes recorded for this request.</p>
                     </div>

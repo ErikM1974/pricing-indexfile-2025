@@ -308,6 +308,41 @@ body {
     background: #f0f0f0;
 }
 
+.ard-gallery-ext-badge {
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    background: #e2e8f0;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.ard-gallery-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 0;
+    transition: background 0.15s;
+}
+.ard-gallery-remove:hover {
+    background: #dc3545;
+}
+
 .ard-gallery-label {
     font-size: 11px;
     color: #666;
@@ -1097,6 +1132,98 @@ body {
 .ard-note-type--status-update { background: #f3e8ff; color: #6f42c1; }
 .ard-note-type--mockup-sent { background: #fef3c7; color: #b45309; }
 .ard-note-type--default { background: #e9ecef; color: #495057; }
+
+/* ── Add Note Form ───────────────────────────── */
+.ard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ard-add-note-toggle {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.ard-add-note-toggle:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: #fff;
+}
+
+.ard-add-note-form {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 18px;
+    border-bottom: 1px solid #e9ecef;
+    background: #fafbfc;
+}
+
+.ard-add-note-form.open {
+    max-height: 300px;
+    padding: 14px 18px;
+}
+
+.ard-add-note-form select,
+.ard-add-note-form textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+}
+
+.ard-add-note-form select:focus,
+.ard-add-note-form textarea:focus {
+    outline: none;
+    border-color: #009900;
+    box-shadow: 0 0 0 2px rgba(0,153,0,0.15);
+}
+
+.ard-add-note-form select.error,
+.ard-add-note-form textarea.error {
+    border-color: #dc3545;
+}
+
+.ard-add-note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ard-note-notify-label {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.ard-note-submit-btn {
+    background: #d97706;
+    color: #fff;
+    border: none;
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.ard-note-submit-btn:hover { background: #b45309; }
+.ard-note-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Notes Timeline */
 .ard-empty-notes {

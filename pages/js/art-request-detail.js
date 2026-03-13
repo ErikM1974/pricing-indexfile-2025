@@ -39,6 +39,22 @@
         return emailOrName;
     }
 
+    // Image extensions that browsers can render natively
+    const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff', 'tif'];
+
+    /** Extract file extension from a URL (strips query params, returns lowercase) */
+    function getFileExtension(url) {
+        if (!url) return '';
+        try {
+            var path = url.split('?')[0].split('#')[0];
+            var lastDot = path.lastIndexOf('.');
+            if (lastDot === -1) return '';
+            return path.substring(lastDot + 1).toLowerCase();
+        } catch (e) {
+            return '';
+        }
+    }
+
     // File fields to check for mockups/artwork
     const FILE_FIELDS = [
         { key: 'Box_File_Mockup', label: 'Mockup' },
@@ -252,6 +268,7 @@
 
         // Notes timeline
         renderNotes(notes);
+        initAddNoteForm();
 
         // Art charge history
         renderCharges(charges);
@@ -303,9 +320,15 @@
                 body: JSON.stringify({ status: 'In Progress' })
             }).then(function (resp) {
                 if (!resp.ok) throw new Error('Status ' + resp.status);
+                return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: 'art@nwcustomapparel.com' })
+                });
+            }).then(function () {
                 btnWorking.textContent = 'Updated!';
                 btnWorking.style.background = '#28a745';
-                setTimeout(function () { location.reload(); }, 800);
+                setTimeout(function () { location.reload(); }, 1200);
             }).catch(function (err) {
                 btnWorking.textContent = 'Error';
                 btnWorking.style.background = '#dc3545';
@@ -336,14 +359,15 @@
                 body: JSON.stringify({ status: 'In Progress' })
             }).then(function (resp) {
                 if (!resp.ok) throw new Error('Status ' + resp.status);
-                fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: 'art@nwcustomapparel.com' })
-                }).catch(function () { /* fire-and-forget */ });
+                });
+            }).then(function () {
                 btnReopen.textContent = 'Reopened!';
                 btnReopen.style.background = '#28a745';
-                setTimeout(function () { location.reload(); }, 800);
+                setTimeout(function () { location.reload(); }, 1200);
             }).catch(function (err) {
                 btnReopen.textContent = 'Error';
                 btnReopen.style.background = '#dc3545';
@@ -406,6 +430,9 @@
     }
 
     // ── Mockup Gallery ────────────────────────────────────────────────────
+    // Writable mockup field keys (can be cleared via API)
+    const WRITABLE_KEYS = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup'];
+
     function renderMockupGallery(req) {
         const galleryCard = document.getElementById('ard-gallery-card');
         const grid = document.getElementById('ard-gallery-grid');
@@ -421,16 +448,96 @@
 
             const thumb = document.createElement('div');
             thumb.className = 'ard-gallery-thumb';
-            thumb.innerHTML = `
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="ard-gallery-placeholder" style="display:none;">
-                    <span>File</span>
-                </div>
-                <div class="ard-gallery-label">${escapeHtml(field.label)}</div>
-            `;
-            thumb.addEventListener('click', () => openLightbox(url, field.label));
+            var ext = getFileExtension(url);
+            var extLabel = ext ? ext.toUpperCase() : 'FILE';
+            var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+
+            // Remove button for writable fields only
+            var removeBtnHtml = '';
+            if (WRITABLE_KEYS.indexOf(field.key) !== -1) {
+                removeBtnHtml = '<button type="button" class="ard-gallery-remove" title="Remove mockup" data-field-key="' + escapeHtml(field.key) + '" data-field-label="' + escapeHtml(field.label) + '">&times;</button>';
+            }
+
+            if (isImage) {
+                thumb.innerHTML = removeBtnHtml + `
+                    <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="ard-gallery-placeholder" style="display:none;">
+                        <span class="ard-gallery-ext-badge">${escapeHtml(extLabel)}</span>
+                    </div>
+                    <div class="ard-gallery-label">${escapeHtml(field.label)}</div>
+                `;
+            } else {
+                thumb.innerHTML = removeBtnHtml + `
+                    <div class="ard-gallery-placeholder">
+                        <span class="ard-gallery-ext-badge">${escapeHtml(extLabel)}</span>
+                    </div>
+                    <div class="ard-gallery-label">${escapeHtml(field.label)}</div>
+                `;
+            }
+            thumb.addEventListener('click', function (e) {
+                // Don't open lightbox when clicking the remove button
+                if (e.target.closest('.ard-gallery-remove')) return;
+                openLightbox(url, field.label);
+            });
             grid.appendChild(thumb);
+        });
+
+        // Wire up remove buttons
+        grid.querySelectorAll('.ard-gallery-remove').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var fieldKey = btn.dataset.fieldKey;
+                var fieldLabel = btn.dataset.fieldLabel;
+                if (!confirm('Remove this mockup (' + fieldLabel + ')?')) return;
+
+                var pkId = req.PK_ID;
+                if (!pkId) { alert('Cannot remove: missing PK_ID'); return; }
+
+                btn.disabled = true;
+                btn.textContent = '...';
+
+                var body = {};
+                body[fieldKey] = '';
+                fetch(API_BASE + '/api/artrequests/' + pkId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                }).then(function (resp) {
+                    if (!resp.ok) throw new Error('Failed to clear mockup: ' + resp.status);
+                    // Update local state
+                    currentRequest[fieldKey] = '';
+                    // Log audit note
+                    return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: 'art@nwcustomapparel.com' })
+                    });
+                }).then(function () {
+                    // Re-render gallery and refresh upload slot label
+                    renderMockupGallery(currentRequest);
+                    var slotLabel = document.getElementById('ard-upload-slot');
+                    if (slotLabel) {
+                        var nextSlot = null;
+                        for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
+                            var val = currentRequest[UPLOAD_FIELDS[i].key];
+                            if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
+                                nextSlot = UPLOAD_FIELDS[i];
+                                break;
+                            }
+                        }
+                        if (nextSlot) {
+                            slotLabel.textContent = 'Will save to: ' + nextSlot.label;
+                        }
+                    }
+                    // Refresh notes timeline
+                    if (typeof refreshNotes === 'function') refreshNotes();
+                }).catch(function (err) {
+                    alert('Error removing mockup: ' + err.message);
+                    btn.disabled = false;
+                    btn.textContent = '\u00d7';
+                });
+            });
         });
 
         if (fileCount > 0) {
@@ -1335,6 +1442,91 @@
             `;
 
             container.appendChild(div);
+        });
+    }
+
+    // ── Refresh Notes (re-fetch and re-render) ────────────────────────
+    function refreshNotes() {
+        return fetch(API_BASE + '/api/design-notes?id_design=' + designId + '&orderBy=Note_Date DESC')
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (data) { renderNotes(Array.isArray(data) ? data : (data.Result || [])); })
+            .catch(function (err) { console.error('Notes refresh failed:', err); });
+    }
+
+    // ── Add Note Form ───────────────────────────────────────────────────
+    function initAddNoteForm() {
+        var toggle = document.getElementById('ard-add-note-toggle');
+        var form = document.getElementById('ard-add-note-form');
+        var submitBtn = document.getElementById('ard-note-submit');
+        if (!toggle || !form || !submitBtn) return;
+
+        toggle.addEventListener('click', function () {
+            form.classList.toggle('open');
+            toggle.textContent = form.classList.contains('open') ? '- Close' : '+ Add Note';
+        });
+
+        submitBtn.addEventListener('click', function () {
+            var typeEl = document.getElementById('ard-note-type');
+            var textEl = document.getElementById('ard-note-text');
+            var noteType = typeEl.value;
+            var noteText = textEl.value.trim();
+
+            typeEl.classList.remove('error');
+            textEl.classList.remove('error');
+            if (!noteType) { typeEl.classList.add('error'); return; }
+            if (!noteText) { textEl.classList.add('error'); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            fetch(API_BASE + '/api/design-notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ID_Design: parseInt(designId, 10),
+                    Note_Type: noteType,
+                    Note_Text: noteText,
+                    Note_By: 'art@nwcustomapparel.com'
+                })
+            }).then(function (resp) {
+                if (!resp.ok) throw new Error('Save failed: ' + resp.status);
+
+                // Notify sales rep if checked
+                var notifyEl = document.getElementById('ard-note-notify');
+                if (notifyEl && notifyEl.checked && currentRequest) {
+                    var repEmail = currentRequest.User_Email || currentRequest.Sales_Rep || '';
+                    var repName = resolveRepName(repEmail);
+                    if (repEmail && typeof emailjs !== 'undefined') {
+                        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                            to_email: repEmail,
+                            rep_name: repName,
+                            design_id: designId,
+                            company_name: currentRequest.CompanyName || '',
+                            note_type: noteType,
+                            note_text: noteText,
+                            from_name: 'Steve (Art Dept)'
+                        }, EMAILJS_PUBLIC_KEY).catch(function () { /* best effort */ });
+                    }
+                }
+
+                // Clear form and collapse
+                typeEl.value = '';
+                textEl.value = '';
+                if (notifyEl) notifyEl.checked = false;
+                form.classList.remove('open');
+                toggle.textContent = '+ Add Note';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Note';
+
+                // Refresh notes timeline
+                refreshNotes();
+            }).catch(function (err) {
+                console.error('Add note failed:', err);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Note';
+                submitBtn.style.background = '#dc3545';
+                setTimeout(function () { submitBtn.style.background = ''; }, 2000);
+            });
         });
     }
 

@@ -25,6 +25,7 @@
             <button class="tab-button active" onclick="showTab('submit')">Submit Art Steve</button>
             <button class="tab-button" onclick="showTab('mockup-ruth')">Request Mockup Ruth</button>
             <button class="tab-button" onclick="showTab('view')">My Art Requests</button>
+            <button class="tab-button" onclick="showTab('review')">Review Mockups</button>
             <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
             
             <!-- More Dropdown -->
@@ -490,7 +491,26 @@
                 <!-- Caspio Art Request Report DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500056c95cb6e408495e8c4d/emb"></script>
             </div>
-            
+
+            <!-- Review Mockups Tab -->
+            <div id="review-tab" class="tab-pane">
+                <h2 class="tab-title">Review Mockups</h2>
+                <p class="review-tab-subtitle" style="color:#666; margin:-8px 0 16px; font-size:14px;">Art requests awaiting your approval</p>
+                <div id="review-loading" style="text-align:center; padding:40px; display:none;">
+                    <div class="loading-spinner" style="width:32px;height:32px;border:3px solid #e9ecef;border-top-color:#981e32;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+                    <p style="color:#666;">Loading mockups...</p>
+                </div>
+                <div id="review-cards-container"></div>
+                <div id="review-empty-state" style="display:none; text-align:center; padding:60px 20px; color:#999;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:12px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <p style="font-size:16px; font-weight:500;">No mockups waiting for review</p>
+                    <p style="font-size:13px;">When Steve sends mockups for approval, they'll appear here.</p>
+                </div>
+            </div>
+
             <!-- Design Name Generator Tab -->
             <div id="generator-tab" class="tab-pane">
                 <h2 class="tab-title">Design Name Generator</h2>

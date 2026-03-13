@@ -2143,6 +2143,21 @@ input.cbSearchButton {
     display: flex;
 }
 
+.box-file-ext-badge {
+    position: absolute;
+    bottom: 46px;
+    right: 4px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    pointer-events: none;
+}
+
 .box-picker-empty {
     background: #fef3c7;
     border: 1px solid #fcd34d;
