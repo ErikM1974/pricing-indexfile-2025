@@ -134,7 +134,6 @@
             ? Object.values(req.Order_Type).join(', ')
             : req.Order_Type;
         setText('ard-order-type', orderType);
-        setText('ard-priority', req.Priority);
         setText('ard-due-date', formatDate(req.Due_Date));
         setText('ard-date-created', formatDate(req.Date_Created));
 
@@ -248,9 +247,11 @@
 
         if (!uploadCard || !saveBtn) return;
 
-        // Track active mode: 'file' or 'url'
+        // Track active mode: 'file', 'url', or 'box'
         var activeMode = 'file';
         var selectedFile = null;
+        var selectedBoxFiles = []; // multi-select: [{id, name}, ...]
+        var boxLoaded = false; // lazy-load Box folder on first tab click
 
         // Find first empty upload slot
         var targetField = findNextSlot();
@@ -266,26 +267,30 @@
 
         // ── Tab Switching ─────────────────────────────────────────────
         var tabFile = document.getElementById('ard-tab-file');
+        var tabBox = document.getElementById('ard-tab-box');
         var tabUrl = document.getElementById('ard-tab-url');
         var panelFile = document.getElementById('ard-panel-file');
+        var panelBox = document.getElementById('ard-panel-box');
         var panelUrl = document.getElementById('ard-panel-url');
 
-        if (tabFile) tabFile.addEventListener('click', function () {
-            activeMode = 'file';
-            tabFile.classList.add('active');
-            tabUrl.classList.remove('active');
-            panelFile.style.display = '';
-            panelUrl.style.display = 'none';
+        var allTabs = [tabFile, tabBox, tabUrl];
+        var allPanels = [panelFile, panelBox, panelUrl];
+
+        function switchTab(mode) {
+            activeMode = mode;
+            allTabs.forEach(function (t) { if (t) t.classList.remove('active'); });
+            allPanels.forEach(function (p) { if (p) p.style.display = 'none'; });
+
+            if (mode === 'file') { tabFile.classList.add('active'); panelFile.style.display = ''; }
+            else if (mode === 'box') { tabBox.classList.add('active'); panelBox.style.display = ''; if (!boxLoaded) loadBoxFiles(); }
+            else if (mode === 'url') { tabUrl.classList.add('active'); panelUrl.style.display = ''; }
+
             updateSaveButton();
-        });
-        if (tabUrl) tabUrl.addEventListener('click', function () {
-            activeMode = 'url';
-            tabUrl.classList.add('active');
-            tabFile.classList.remove('active');
-            panelUrl.style.display = '';
-            panelFile.style.display = 'none';
-            updateSaveButton();
-        });
+        }
+
+        if (tabFile) tabFile.addEventListener('click', function () { switchTab('file'); });
+        if (tabBox) tabBox.addEventListener('click', function () { switchTab('box'); });
+        if (tabUrl) tabUrl.addEventListener('click', function () { switchTab('url'); });
 
         // ── File Upload (drag & drop + click) ─────────────────────────
         var dropzone = document.getElementById('ard-dropzone');
@@ -353,6 +358,274 @@
             updateSaveButton();
         }
 
+        // ── Browse Box (two-level: folder list → file grid) ──────────
+        var boxLoadingEl = document.getElementById('ard-box-loading');
+        var boxFoldersView = document.getElementById('ard-box-folders-view');
+        var boxFilesView = document.getElementById('ard-box-files-view');
+        var boxFolderList = document.getElementById('ard-box-folder-list');
+        var boxSearchInput = document.getElementById('ard-box-search');
+        var boxBackBtn = document.getElementById('ard-box-back');
+        var boxFolderEl = document.getElementById('ard-box-folder');
+        var boxGridEl = document.getElementById('ard-box-grid');
+        var boxFilesEmpty = document.getElementById('ard-box-files-empty');
+        var boxErrorEl = document.getElementById('ard-box-error');
+        var cachedFolders = null; // cache folder list
+
+        function loadBoxFiles() {
+            boxLoaded = true;
+            if (cachedFolders) {
+                showFolderList(cachedFolders);
+                return;
+            }
+            boxLoadingEl.style.display = 'flex';
+            boxFoldersView.style.display = 'none';
+            boxFilesView.style.display = 'none';
+            boxErrorEl.style.display = 'none';
+
+            fetch(API_BASE + '/api/box/art-folders?limit=500')
+                .then(function (resp) {
+                    boxLoadingEl.style.display = 'none';
+                    if (!resp.ok) throw new Error('Box API ' + resp.status);
+                    return resp.json();
+                })
+                .then(function (data) {
+                    cachedFolders = data.folders || [];
+                    showFolderList(cachedFolders);
+                })
+                .catch(function (err) {
+                    boxLoadingEl.style.display = 'none';
+                    console.error('Box folders error:', err);
+                    boxErrorEl.textContent = 'Could not load Box folders. Use Upload File or Paste URL instead.';
+                    boxErrorEl.style.display = 'block';
+                });
+        }
+
+        function showFolderList(folders) {
+            boxFoldersView.style.display = '';
+            boxFilesView.style.display = 'none';
+            boxFolderList.innerHTML = '';
+            selectedBoxFiles = [];
+            updateSaveButton();
+
+            var query = (boxSearchInput.value || '').trim().toLowerCase();
+            var filtered = query
+                ? folders.filter(function (f) { return f.name.toLowerCase().indexOf(query) !== -1; })
+                : folders;
+
+            if (filtered.length === 0) {
+                boxFolderList.innerHTML = '<div class="ard-box-folder-empty">No folders match your search.</div>';
+                return;
+            }
+
+            filtered.forEach(function (folder) {
+                var row = document.createElement('div');
+                row.className = 'ard-box-folder-item';
+                row.innerHTML = '<span class="ard-box-folder-icon">\uD83D\uDCC1</span><span class="ard-box-folder-name">' + escapeHtml(folder.name) + '</span>';
+                row.addEventListener('click', function () {
+                    openFolder(folder.id, folder.name);
+                });
+                boxFolderList.appendChild(row);
+            });
+        }
+
+        // Filter folders on search input
+        if (boxSearchInput) {
+            var folderSearchTimer = null;
+            boxSearchInput.addEventListener('input', function () {
+                clearTimeout(folderSearchTimer);
+                folderSearchTimer = setTimeout(function () {
+                    if (cachedFolders) showFolderList(cachedFolders);
+                }, 200);
+            });
+        }
+
+        // Back button returns to folder list
+        if (boxBackBtn) {
+            boxBackBtn.addEventListener('click', function () {
+                boxFilesView.style.display = 'none';
+                boxFoldersView.style.display = '';
+                selectedBoxFiles = [];
+                updateSaveButton();
+            });
+        }
+
+        function openFolder(folderId, folderName) {
+            boxFoldersView.style.display = 'none';
+            boxFilesView.style.display = '';
+            boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName;
+            boxGridEl.style.display = 'none';
+            boxGridEl.innerHTML = '';
+            boxFilesEmpty.style.display = 'none';
+            selectedBoxFiles = [];
+            updateSaveButton();
+
+            // Show a small loading indicator in the folder label
+            boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName + ' — loading files...';
+
+            fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
+                .then(function (resp) {
+                    if (!resp.ok) throw new Error('Box API ' + resp.status);
+                    return resp.json();
+                })
+                .then(function (data) {
+                    var files = data.files || [];
+                    boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName + ' (' + files.length + ' files)';
+
+                    if (files.length === 0) {
+                        boxFilesEmpty.style.display = 'block';
+                        return;
+                    }
+
+                    boxGridEl.style.display = 'grid';
+
+                    // Sort: image files first (JPG/PNG), then others — preserves date order within groups
+                    var imageExts = ['jpg','jpeg','png','gif','bmp','tiff','tif','svg'];
+                    files.sort(function (a, b) {
+                        var aImg = imageExts.indexOf((a.extension || '').toLowerCase()) !== -1 ? 0 : 1;
+                        var bImg = imageExts.indexOf((b.extension || '').toLowerCase()) !== -1 ? 0 : 1;
+                        return aImg - bImg;
+                    });
+
+                    files.forEach(function (file) {
+                        var card = document.createElement('div');
+                        card.className = 'ard-box-file-card';
+
+                        var ext = (file.extension || '').toLowerCase();
+                        var sizeKB = file.size ? Math.round(file.size / 1024) : 0;
+                        var sizeLabel = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + ' MB' : sizeKB + ' KB';
+
+                        // Format modified date as short date
+                        var dateLabel = '';
+                        if (file.modified_at) {
+                            var d = new Date(file.modified_at);
+                            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            dateLabel = months[d.getMonth()] + ' ' + d.getDate();
+                            if (d.getFullYear() !== new Date().getFullYear()) {
+                                dateLabel += ', ' + d.getFullYear();
+                            }
+                        }
+                        var metaLabel = dateLabel ? dateLabel + ' · ' + sizeLabel : sizeLabel;
+
+                        // Color-code placeholders by file type
+                        var phClass = 'ard-box-file-placeholder';
+                        if (['jpg','jpeg','png','gif','bmp','tiff','tif','svg'].indexOf(ext) !== -1) phClass += ' ph-image';
+                        else if (['psd','ai','eps','cdr','indd','indt','idml'].indexOf(ext) !== -1) phClass += ' ph-design';
+                        else if (ext === 'pdf') phClass += ' ph-pdf';
+
+                        var thumbSrc = file.thumbnailUrl ? API_BASE + file.thumbnailUrl : '';
+                        card.innerHTML =
+                            (thumbSrc
+                                ? '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                                  + '<div class="' + phClass + '" style="display:none;">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
+                                : '<div class="' + phClass + '">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
+                            )
+                            + '<div class="ard-box-file-name">' + escapeHtml(file.name) + '</div>'
+                            + '<div class="ard-box-file-meta">' + escapeHtml(metaLabel) + '</div>'
+                            + '<div class="ard-box-file-check">\u2713</div>';
+
+                        card.addEventListener('click', function () {
+                            var idx = selectedBoxFiles.findIndex(function (f) { return f.id === file.id; });
+                            if (idx !== -1) {
+                                // Deselect — toggle off
+                                selectedBoxFiles.splice(idx, 1);
+                                card.classList.remove('selected');
+                            } else {
+                                // Count available slots
+                                var availSlots = countAvailableSlots();
+                                if (selectedBoxFiles.length >= availSlots) {
+                                    showUploadStatus('Only ' + availSlots + ' mockup slot' + (availSlots === 1 ? '' : 's') + ' available', true);
+                                    return;
+                                }
+                                selectedBoxFiles.push({ id: file.id, name: file.name });
+                                card.classList.add('selected');
+                            }
+                            updateSaveButton();
+                        });
+
+                        boxGridEl.appendChild(card);
+                    });
+                })
+                .catch(function (err) {
+                    console.error('Box folder files error:', err);
+                    boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName;
+                    boxFilesEmpty.textContent = 'Could not load files from this folder.';
+                    boxFilesEmpty.style.display = 'block';
+                });
+        }
+
+        async function sendBoxFiles() {
+            if (selectedBoxFiles.length === 0 || !targetField) return;
+
+            var total = selectedBoxFiles.length;
+            var filesToSend = selectedBoxFiles.slice(); // copy
+            var sentCount = 0;
+
+            try {
+                var pkId = req.PK_ID;
+                if (!pkId) throw new Error('No PK_ID found on art request');
+
+                for (var i = 0; i < filesToSend.length; i++) {
+                    var boxFile = filesToSend[i];
+                    saveBtn.textContent = total > 1
+                        ? 'Sending ' + (i + 1) + ' of ' + total + '...'
+                        : 'Creating link...';
+
+                    // 1. Create shared link
+                    var linkResp = await fetch(API_BASE + '/api/box/shared-link', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fileId: boxFile.id })
+                    });
+
+                    if (!linkResp.ok) {
+                        var errData = await linkResp.json().catch(function () { return {}; });
+                        throw new Error(errData.error || 'Failed to create shared link for ' + boxFile.name);
+                    }
+
+                    var linkData = await linkResp.json();
+                    var mockupUrl = linkData.downloadUrl || linkData.sharedLink;
+
+                    // 2. Save URL to next available Caspio slot
+                    var saveResp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup-url', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pkId: String(pkId), url: mockupUrl })
+                    });
+
+                    if (!saveResp.ok) {
+                        var saveErr = await saveResp.json().catch(function () { return {}; });
+                        throw new Error(saveErr.error || 'Failed to save mockup URL for ' + boxFile.name);
+                    }
+
+                    var saveData = await saveResp.json();
+                    var savedField = saveData.field || targetField.key;
+                    currentRequest[savedField] = mockupUrl;
+                    sentCount++;
+
+                    // Advance slot for next file
+                    advanceToNextSlot();
+                }
+
+                renderMockupGallery(currentRequest);
+
+                var msg = sentCount === 1
+                    ? 'Mockup saved from Box file: ' + filesToSend[0].name
+                    : sentCount + ' mockups saved from Box';
+                showUploadStatus(msg, false);
+
+                selectedBoxFiles = [];
+                boxGridEl.querySelectorAll('.ard-box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
+                updateSaveButton();
+
+            } catch (err) {
+                console.error('Box send failed:', err);
+                var partialMsg = sentCount > 0 ? ' (' + sentCount + ' of ' + total + ' sent)' : '';
+                showUploadStatus('Error: ' + (err.message || 'Failed to send Box file') + partialMsg, true);
+                saveBtn.textContent = 'Send Mockup';
+                saveBtn.disabled = false;
+            }
+        }
+
         // ── URL Paste (fallback) ──────────────────────────────────────
         var urlInput = document.getElementById('ard-mockup-url');
         var urlPreview = document.getElementById('ard-upload-preview');
@@ -380,6 +653,10 @@
             if (activeMode === 'file') {
                 saveBtn.disabled = !selectedFile;
                 saveBtn.textContent = 'Upload Mockup';
+            } else if (activeMode === 'box') {
+                var n = selectedBoxFiles.length;
+                saveBtn.disabled = n === 0;
+                saveBtn.textContent = n > 1 ? 'Send ' + n + ' Mockups' : 'Send Mockup';
             } else {
                 var url = urlInput ? urlInput.value.trim() : '';
                 saveBtn.disabled = !url || !isValidUrl(url);
@@ -395,6 +672,8 @@
 
             if (activeMode === 'file' && selectedFile) {
                 await uploadFileToBox(selectedFile);
+            } else if (activeMode === 'box' && selectedBoxFiles.length > 0) {
+                await sendBoxFiles();
             } else if (activeMode === 'url') {
                 await saveUrlDirect();
             }
@@ -497,6 +776,17 @@
         }
 
         // ── Helpers ───────────────────────────────────────────────────
+        function countAvailableSlots() {
+            var count = 0;
+            for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
+                var val = currentRequest[UPLOAD_FIELDS[i].key];
+                if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
         function findNextSlot() {
             for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
                 var val = req[UPLOAD_FIELDS[i].key];

@@ -74,10 +74,6 @@
                             <span class="ard-value" id="ard-order-type">--</span>
                         </div>
                         <div class="ard-field">
-                            <span class="ard-label">Priority</span>
-                            <span class="ard-value" id="ard-priority">--</span>
-                        </div>
-                        <div class="ard-field">
                             <span class="ard-label">Due Date</span>
                             <span class="ard-value" id="ard-due-date">--</span>
                         </div>
@@ -165,6 +161,7 @@
                         <!-- Tab toggle: File Upload vs Paste URL -->
                         <div class="ard-upload-tabs">
                             <button type="button" class="ard-upload-tab active" id="ard-tab-file" data-tab="file">Upload File</button>
+                            <button type="button" class="ard-upload-tab" id="ard-tab-box" data-tab="box">Browse Box</button>
                             <button type="button" class="ard-upload-tab" id="ard-tab-url" data-tab="url">Paste URL</button>
                         </div>
 
@@ -187,6 +184,27 @@
                                 <div class="ard-progress-bar"><div class="ard-progress-fill" id="ard-progress-fill"></div></div>
                                 <span class="ard-progress-text" id="ard-progress-text">Uploading...</span>
                             </div>
+                        </div>
+
+                        <!-- Browse Box Panel -->
+                        <div class="ard-upload-panel" id="ard-panel-box" style="display:none;">
+                            <div class="ard-box-loading" id="ard-box-loading" style="display:none;">
+                                <div class="ard-spinner-sm"></div>
+                                <span>Loading Box folders...</span>
+                            </div>
+                            <!-- Phase 1: Folder List -->
+                            <div id="ard-box-folders-view" style="display:none;">
+                                <input type="text" id="ard-box-search" class="ard-box-search" placeholder="Search folders..." autocomplete="off">
+                                <div class="ard-box-folder-list" id="ard-box-folder-list"></div>
+                            </div>
+                            <!-- Phase 2: File Grid (inside a folder) -->
+                            <div id="ard-box-files-view" style="display:none;">
+                                <button type="button" class="ard-box-back" id="ard-box-back">&larr; Back to folders</button>
+                                <div class="ard-box-folder" id="ard-box-folder"></div>
+                                <div class="ard-box-grid" id="ard-box-grid"></div>
+                                <div class="ard-box-files-empty" id="ard-box-files-empty" style="display:none;">This folder is empty.</div>
+                            </div>
+                            <div class="ard-box-error" id="ard-box-error" style="display:none;"></div>
                         </div>
 
                         <!-- URL Paste Panel (secondary) -->
