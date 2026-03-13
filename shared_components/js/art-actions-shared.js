@@ -876,6 +876,17 @@
 
         prevSection.style.display = prevFileCount > 0 ? 'block' : 'none';
 
+        // Auto-select the first previously sent mockup so Send works immediately
+        if (prevFileCount > 0) {
+            var firstCard = filesGrid.querySelector('.approval-file-card');
+            if (firstCard) {
+                firstCard.classList.add('selected');
+                if (boxPasteInput) boxPasteInput.value = firstCard.dataset.mockupUrl;
+                // Also store on modal for direct access
+                modal.dataset.existingMockupUrl = firstCard.dataset.mockupUrl;
+            }
+        }
+
         // Store data on modal for submit handler
         modal.dataset.designId = designId;
         modal.dataset.artReqJson = JSON.stringify({
@@ -907,6 +918,7 @@
 
         var selectedBoxFileId = modal.dataset.selectedBoxFileId;
         var pasteUrl = (document.getElementById('box-paste-url') || {}).value || '';
+        var existingMockupUrl = modal.dataset.existingMockupUrl || '';
         var mockupUrls = [];
 
         if (selectedBoxFileId) {
@@ -938,6 +950,8 @@
             }
         } else if (pasteUrl.trim()) {
             mockupUrls = [pasteUrl.trim()];
+        } else if (existingMockupUrl.trim()) {
+            mockupUrls = [existingMockupUrl.trim()];
         } else {
             alert('Please select a mockup file from Box or paste a URL.');
             submitBtn.disabled = false;
