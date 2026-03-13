@@ -358,8 +358,18 @@
             ArtActions.showArtTimeModal(designId, repEmail, company);
         });
 
+        var isAwaitingApproval = status.includes('awaitingapproval');
+        if (isAwaitingApproval) {
+            btnMockup.textContent = 'Send Reminder';
+            btnMockup.title = 'Re-send mockup notification to sales rep';
+        }
+
         btnMockup.addEventListener('click', function () {
-            ArtActions.showSendForApprovalModal(designId, company);
+            if (isAwaitingApproval) {
+                sendMockupReminder(designId, req, repEmail, company);
+            } else {
+                ArtActions.showSendForApprovalModal(designId, company);
+            }
         });
 
         btnReopen.addEventListener('click', function () {
@@ -392,6 +402,84 @@
 
         // Initialize approval modal listeners for Send Mockup
         ArtActions.initApprovalModalListeners();
+    }
+
+    // ── Send Reminder (re-send mockup notification without new revision) ──
+    function sendMockupReminder(designId, req, repEmail, company) {
+        var repName = resolveRepName(repEmail);
+        var repAddr = REP_MAP[repName] || repEmail;
+        var displayTo = repName || repAddr || 'sales rep';
+
+        if (!confirm('Send a mockup reminder to ' + displayTo + '?')) return;
+
+        var btn = document.getElementById('ard-btn-send-mockup');
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+
+        // Find the first available mockup URL for the email
+        var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+
+        // 1. Log a "Reminder" note
+        fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                noteType: 'Reminder',
+                noteText: 'Mockup reminder sent to ' + displayTo,
+                noteBy: 'art@nwcustomapparel.com'
+            })
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Note failed ' + resp.status);
+
+            // 2. Send EmailJS approval reminder (same template as original)
+            if (typeof emailjs !== 'undefined' && repAddr) {
+                var revCount = req.Revision_Count || 0;
+                emailjs.send(EMAILJS_SERVICE_ID, 'art_approval_request', {
+                    to_email: repAddr,
+                    to_name: repName || 'Sales Team',
+                    design_id: designId,
+                    company_name: company,
+                    detail_link: window.location.origin + '/art-request/' + designId,
+                    mockup_url: mockupUrl,
+                    message: 'Reminder: A mockup is awaiting your review.',
+                    from_name: 'Steve — Art Department',
+                    revision_count: revCount
+                }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                    console.warn('Reminder email failed:', err);
+                });
+            }
+
+            // 3. Post toast notification to AE dashboard
+            fetch(API_BASE + '/api/art-notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'mockup_reminder',
+                    designId: designId,
+                    companyName: company,
+                    actorName: 'Steve',
+                    targetRep: repAddr
+                })
+            }).catch(function () { /* fire-and-forget */ });
+
+            btn.textContent = 'Reminder Sent!';
+            btn.style.background = '#28a745';
+            setTimeout(function () {
+                btn.textContent = 'Send Reminder';
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 3000);
+
+        }).catch(function (err) {
+            console.error('Reminder failed:', err);
+            btn.textContent = 'Error';
+            btn.style.background = '#dc3545';
+            setTimeout(function () {
+                btn.textContent = 'Send Reminder';
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2000);
+        });
     }
 
     // ── Garments & Colors ─────────────────────────────────────────────────
@@ -1485,15 +1573,15 @@
     // ── Notes Timeline ──────────────────────────────────────────────────
     function renderNotes(notes) {
         const container = document.getElementById('ard-notes-container');
-        const emptyMsg = document.getElementById('ard-empty-notes');
+        if (!container) return;
+
+        // Clear previous content
+        container.innerHTML = '';
 
         if (!notes || notes.length === 0) {
-            emptyMsg.style.display = 'block';
+            container.innerHTML = '<p class="ard-empty-notes">No notes recorded for this request.</p>';
             return;
         }
-
-        emptyMsg.style.display = 'none';
-        container.innerHTML = '';
 
         notes.forEach(note => {
             const div = document.createElement('div');
