@@ -365,6 +365,7 @@
                     body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: 'art@nwcustomapparel.com' })
                 });
             }).then(function () {
+                ArtActions.notifyReopen(designId);
                 btnReopen.textContent = 'Reopened!';
                 btnReopen.style.background = '#28a745';
                 setTimeout(function () { location.reload(); }, 1200);

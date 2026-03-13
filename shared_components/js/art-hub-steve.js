@@ -613,6 +613,7 @@
                             noteBy: 'art@nwcustomapparel.com'
                         })
                     }).catch(err => console.warn('Reopen note failed (non-blocking):', err));
+                    ArtActions.notifyReopen(designId);
                     b.textContent = 'Reopened!';
                     b.style.background = '#28a745';
                     setTimeout(() => window.location.reload(), 800);

@@ -100,6 +100,48 @@
         }).catch(function (err) { console.warn('Art charge log failed (non-blocking):', err); });
     }
 
+    // ── Reopen Notification ─────────────────────────────────────────────
+
+    function notifyReopen(designId) {
+        fetch(API_BASE + '/api/artrequests?id_design=' + designId + '&select=User_Email,Sales_Rep,CompanyName&limit=1')
+            .then(function (resp) { return resp.ok ? resp.json() : []; })
+            .then(function (reqs) {
+                if (!reqs || !reqs.length) return;
+                var salesRep = reqs[0].User_Email || reqs[0].Sales_Rep;
+                var companyName = reqs[0].CompanyName || '';
+                var rep = resolveRep(salesRep);
+
+                // Toast notification to AE dashboard
+                fetch(API_BASE + '/api/art-notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'status_changed',
+                        designId: designId,
+                        companyName: companyName,
+                        actorName: 'Steve',
+                        targetRep: rep.email
+                    })
+                }).catch(function () { /* fire-and-forget */ });
+
+                // EmailJS email to AE
+                if (typeof emailjs !== 'undefined') {
+                    emailjs.init(EMAILJS_PUBLIC_KEY);
+                    emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                        to_email: rep.email,
+                        to_name: rep.displayName,
+                        design_id: designId,
+                        company_name: companyName,
+                        note_text: 'Design #' + designId + ' has been reopened — Steve is making additional changes.',
+                        note_type: 'Status Update',
+                        detail_link: window.location.origin + '/art-request/' + designId,
+                        from_name: 'Steve — Art Department'
+                    }).catch(function (err) { console.warn('Reopen email failed:', err); });
+                }
+            })
+            .catch(function (err) { console.warn('Reopen notification failed:', err); });
+    }
+
     // ── Email Notification ────────────────────────────────────────────
 
     async function sendNotificationEmail(designId, type, data) {
@@ -234,15 +276,21 @@
         removeModals();
 
         var currentMins = 0;
+        var currentStatus = '';
         try {
             var resp = await fetch(API_BASE + '/api/artrequests?id_design=' + designId + '&limit=1');
             if (resp.ok) {
                 var reqs = await resp.json();
-                if (reqs && reqs.length > 0) currentMins = reqs[0].Art_Minutes || 0;
+                if (reqs && reqs.length > 0) {
+                    currentMins = reqs[0].Art_Minutes || 0;
+                    currentStatus = (reqs[0].Status || '').toLowerCase().replace(/\s+/g, '');
+                }
             }
         } catch (err) {
             console.warn('Could not fetch current art time:', err);
         }
+
+        var isAwaitingApproval = currentStatus.indexOf('awaitingapproval') !== -1;
 
         var prevHours = (Math.ceil(currentMins / 15) * 0.25).toFixed(2);
         var prevCost = (parseFloat(prevHours) * 75).toFixed(2);
@@ -258,6 +306,11 @@
                 'Mark Complete — #' + designId +
             '</div>' +
             '<div class="art-modal-body">' +
+                (isAwaitingApproval
+                    ? '<div class="art-modal-warning">' +
+                          '\u26A0 This request is <strong>Awaiting Approval</strong> &mdash; the AE hasn\'t reviewed the mockup yet.' +
+                      '</div>'
+                    : '') +
                 '<div class="art-prev-time">' + (currentMins > 0
                     ? 'Previously logged: ' + currentMins + ' min ($' + prevCost + ')'
                     : 'No art time logged yet') + '</div>' +
@@ -1021,6 +1074,8 @@
         submitSendForApproval: submitSendForApproval,
         closeApprovalModal: closeApprovalModal,
         initApprovalModalListeners: initApprovalModalListeners,
+        // Notifications
+        notifyReopen: notifyReopen,
         // Helpers
         logArtCharge: logArtCharge,
         sendNotificationEmail: sendNotificationEmail,

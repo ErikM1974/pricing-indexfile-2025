@@ -210,8 +210,13 @@
         submitObserver.observe(submitTab, { childList: true, subtree: true });
     }
 
+    var EMAILJS_SERVICE_ID = 'service_1c4k67j';
+    var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+
     function notifyNewSubmission(designId, companyName) {
         if (!designId) return;
+
+        // Toast notification (existing)
         fetch(API_BASE + '/api/art-notifications', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -222,6 +227,21 @@
                 actorName: 'Sales Rep'
             })
         }).catch(function () { /* fire-and-forget */ });
+
+        // Email notification to Steve
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+            emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                to_email: 'art@nwcustomapparel.com',
+                to_name: 'Steve',
+                design_id: designId,
+                company_name: companyName || 'Unknown',
+                note_text: 'New art request submitted for ' + (companyName || 'Unknown') + ' (Design #' + designId + ')',
+                note_type: 'New Submission',
+                detail_link: window.location.origin + '/art-request/' + designId,
+                from_name: 'AE Dashboard'
+            }).catch(function () { /* fire-and-forget */ });
+        }
     }
 
     // ── Periodic Image Checks ──────────────────────────────────────

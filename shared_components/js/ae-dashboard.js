@@ -190,6 +190,7 @@
                 data.notifications.forEach(function (n) { showAeNotificationToast(n); });
                 lastNotificationTime = data.serverTime || Date.now();
                 sessionStorage.setItem('aeNotifLastSeen', String(lastNotificationTime));
+                updateTabBadges(); // Refresh counts when notifications arrive
             }
         } catch (err) {
             // Silent failure — polling is best-effort
@@ -514,6 +515,58 @@
         if (e.key === 'Escape') closeAELightbox();
     });
 
+    // ── Tab Count Badges ───────────────────────────────────────────
+    function updateTabBadges() {
+        fetch(API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=ID_Design&limit=100')
+            .then(function (resp) { return resp.ok ? resp.json() : []; })
+            .then(function (data) {
+                var items = data.Result || data || [];
+                var count = items.length;
+                // Find the Review Mockups tab button
+                var tabs = document.querySelectorAll('.ae-tab-btn');
+                tabs.forEach(function (tab) {
+                    if (tab.textContent.indexOf('Review') !== -1) {
+                        var badge = tab.querySelector('.ae-tab-badge');
+                        if (count > 0) {
+                            if (!badge) {
+                                badge = document.createElement('span');
+                                badge.className = 'ae-tab-badge';
+                                tab.appendChild(badge);
+                            }
+                            badge.textContent = count;
+                        } else if (badge) {
+                            badge.remove();
+                        }
+                    }
+                });
+            })
+            .catch(function () { /* silent */ });
+    }
+
+    // Run badge update after page load + after each notification poll
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(updateTabBadges, 3000);
+    });
+
+    // ── Helpers ────────────────────────────────────────────────────
+    function timeAgo(dateStr) {
+        if (!dateStr) return '';
+        try {
+            var d = new Date(dateStr);
+            var now = new Date();
+            var diffMs = now - d;
+            var diffMins = Math.floor(diffMs / 60000);
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return diffMins + 'm ago';
+            var diffHrs = Math.floor(diffMins / 60);
+            if (diffHrs < 24) return diffHrs + 'h ago';
+            var diffDays = Math.floor(diffHrs / 24);
+            if (diffDays === 1) return 'yesterday';
+            if (diffDays < 7) return diffDays + ' days ago';
+            return (d.getMonth() + 1) + '/' + d.getDate();
+        } catch (e) { return ''; }
+    }
+
     // ── Review Mockups Tab ──────────────────────────────────────────
     function loadReviewTab() {
         var container = document.getElementById('review-cards-container');
@@ -526,7 +579,7 @@
         if (loading) loading.style.display = '';
 
         var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval' +
-            '&select=ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload,Due_Date,Status,Design_Number' +
+            '&select=ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload,Due_Date,Status,Design_Number,Revision_Count,Date_Modified,NOTES' +
             '&orderBy=Date_Created%20DESC&limit=50';
 
         fetch(url)
@@ -551,6 +604,9 @@
                     var designNum = req.Design_Number || '';
                     var dueDate = req.Due_Date || '';
                     var status = req.Status || 'Awaiting Approval';
+                    var revCount = parseInt(req.Revision_Count) || 0;
+                    var dateModified = req.Date_Modified || '';
+                    var notes = req.NOTES || '';
 
                     // Mockup image fallback chain
                     var mockupUrl = req.Box_File_Mockup || '';
@@ -590,10 +646,13 @@
                             '</div>' +
                             '<div class="ae-art-card__meta">' +
                                 '<span class="ae-art-card__status ' + statusInfo.cls + '">' + statusInfo.icon + ' ' + statusInfo.label + '</span>' +
+                                (revCount > 0 ? '<span class="ae-art-card__rev-badge">Rev #' + revCount + '</span>' : '') +
                             '</div>' +
                             '<div class="ae-art-card__details">' +
                                 (dueDateDisplay ? '<span class="ae-art-card__detail">Due: ' + escapeHtml(dueDateDisplay) + '</span>' : '') +
+                                (dateModified ? '<span class="ae-art-card__sent">Sent ' + timeAgo(dateModified) + '</span>' : '') +
                             '</div>' +
+                            (notes ? '<div class="ae-art-card__notes-preview">' + escapeHtml(notes.substring(0, 80)) + (notes.length > 80 ? '...' : '') + '</div>' : '') +
                         '</div>' +
                         '<div class="ae-art-card__footer">' +
                             (detailId ? '<a href="/art-request/' + escapeHtml(detailId) + '" target="_blank" class="ae-art-card__link ae-art-card__link--primary">Review &amp; Respond &rarr;</a>' : '') +
