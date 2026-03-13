@@ -330,7 +330,7 @@
             note_type: noteType,
             note_text: noteText,
             from_name: 'Art Department',
-            detail_link: `https://www.teamnwca.com/art-hub-detail.html?ID_Design=${designId}`
+            detail_link: window.location.origin + '/art-request/' + designId
         };
 
         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', templateParams, EMAILJS_PUBLIC_KEY)
