@@ -298,14 +298,12 @@
         bar.style.display = 'flex';
 
         var btnWorking = document.getElementById('ard-btn-working');
-        var btnLogTime = document.getElementById('ard-btn-log-time');
         var btnComplete = document.getElementById('ard-btn-complete');
         var btnMockup = document.getElementById('ard-btn-send-mockup');
         var btnReopen = document.getElementById('ard-btn-reopen');
 
         if (isCompleted) {
             btnWorking.style.display = 'none';
-            btnLogTime.style.display = 'none';
             btnComplete.style.display = 'none';
             btnMockup.style.display = 'none';
             btnReopen.style.display = '';
@@ -340,13 +338,18 @@
                 btnWorking.textContent = 'Error';
                 btnWorking.style.background = '#dc3545';
                 console.error('Working action failed:', err);
-                setTimeout(function () { btnWorking.textContent = 'Working'; btnWorking.style.background = ''; btnWorking.disabled = false; }, 2000);
+                setTimeout(function () { btnWorking.textContent = 'In Progress'; btnWorking.style.background = ''; btnWorking.disabled = false; }, 2000);
             });
         });
 
-        btnLogTime.addEventListener('click', function () {
-            ArtActions.showLogTimeModal(designId, req.Status || 'In Progress 🔵');
-        });
+        // Log Time button in billing card header
+        var btnLogTimeBilling = document.getElementById('ard-btn-log-time-billing');
+        if (btnLogTimeBilling && !isCompleted) {
+            btnLogTimeBilling.style.display = '';
+            btnLogTimeBilling.addEventListener('click', function () {
+                ArtActions.showLogTimeModal(designId, req.Status || 'In Progress 🔵');
+            });
+        }
 
         btnComplete.addEventListener('click', function () {
             ArtActions.showArtTimeModal(designId, repEmail, company);

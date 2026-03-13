@@ -1151,6 +1151,18 @@ body {
     align-items: center;
 }
 
+.ard-card-header-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.ard-card-header-btn:hover { background: rgba(255,255,255,0.25); }
+
 .ard-add-note-toggle {
     background: none;
     border: 1px solid rgba(255,255,255,0.5);

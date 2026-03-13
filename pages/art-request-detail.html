@@ -54,10 +54,9 @@
 
         <!-- Steve's Action Bar (hidden by default, shown via JS for artist) -->
         <div id="ard-steve-actions" class="ard-steve-actions" style="display:none;">
-            <button type="button" class="ard-action-btn ard-action-working" id="ard-btn-working">Working</button>
-            <button type="button" class="ard-action-btn ard-action-log-time" id="ard-btn-log-time">Log Time</button>
-            <button type="button" class="ard-action-btn ard-action-complete" id="ard-btn-complete">Mark Complete</button>
+            <button type="button" class="ard-action-btn ard-action-working" id="ard-btn-working">In Progress</button>
             <button type="button" class="ard-action-btn ard-action-mockup" id="ard-btn-send-mockup">Send Mockup</button>
+            <button type="button" class="ard-action-btn ard-action-complete" id="ard-btn-complete">Mark Complete</button>
             <button type="button" class="ard-action-btn ard-action-reopen" id="ard-btn-reopen" style="display:none;">Reopen</button>
         </div>
 
@@ -125,7 +124,7 @@
 
                 <!-- Art Time & Billing Card -->
                 <div class="ard-card">
-                    <div class="ard-card-header ard-card-header--green">Art Time & Billing</div>
+                    <div class="ard-card-header ard-card-header--green">Art Time & Billing <button type="button" class="ard-card-header-btn" id="ard-btn-log-time-billing" style="display:none;">Log Time</button></div>
                     <div class="ard-card-body">
                         <div class="ard-billing-grid">
                             <div class="ard-billing-item">

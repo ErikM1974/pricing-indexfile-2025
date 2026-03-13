@@ -2355,3 +2355,19 @@ For best practices/patterns:
 **Root cause:** `findCustomerFolder()` paginated ALL items in Steve's Box folder (hundreds of subfolders) instead of using search. Each page request + processing exceeded Heroku's 30s request timeout.
 **Solution:** Replaced folder pagination with Box Search API (`GET /search` with `ancestor_folder_ids` filter) + in-memory `folderCache` Map. Search completes in <2s vs 30s+ for pagination. Fallback to single-page listing if search fails.
 **Prevention:** Never paginate large Box folders. Use Box Search API with `ancestor_folder_ids` for targeted lookups. Cache results in-memory for repeat access.
+
+## Bug: `const` + `var` redeclaration SyntaxError crashes detail page
+**Date:** 2026-03-13
+**Project:** [Pricing Index] Art Request Detail
+**Symptoms:** Art request detail page stuck on "Loading art request..." spinner. Console: `Uncaught SyntaxError: Identifier 'contactEmail' has already been declared`.
+**Root cause:** Line 224 declared `const contactEmail` for contact info section. Line 266 (Share with Customer feature, added same session) redeclared `var contactEmail` in the same function scope. `const`/`let` + `var` redeclaration is a SyntaxError.
+**Solution:** Removed the `var contactEmail` redeclaration at line 266 — the existing `const contactEmail` from line 224 was already in scope with the identical value.
+**Prevention:** When adding new code that references existing variables, search for prior declarations in the same scope first. Never redeclare with `var` when a `const`/`let` already exists.
+
+## Bug: Non-image files (EPS, PDF) opened in image lightbox instead of downloading
+**Date:** 2026-03-13
+**Project:** [Pricing Index] Art Request Detail
+**Symptoms:** Clicking EPS/PDF artwork cards opened a broken lightbox (blank `<img>` tag). Steve couldn't download artwork files to work on them.
+**Root cause:** `renderMockupGallery()` click handler called `openLightbox(url)` for ALL file types, but the lightbox only renders `<img>` tags — non-image formats (EPS, PDF, AI) can't display in `<img>`.
+**Solution:** Branch click handler by `isImage` flag: images → lightbox, non-images → `window.open(url, '_blank')`. Added "Click to download" hint text + `flex-direction: column` on placeholder for stacked layout.
+**Prevention:** When building click handlers for mixed file types, always check if the viewer supports the format. Use `window.open()` for non-renderable formats.
