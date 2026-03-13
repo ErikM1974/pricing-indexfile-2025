@@ -309,6 +309,10 @@ body {
     background: #f0f0f0;
 }
 
+.ard-gallery-placeholder svg {
+    margin-bottom: 6px;
+}
+
 .ard-gallery-ext-badge {
     font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
     font-size: 13px;
@@ -366,265 +370,221 @@ body {
     text-overflow: ellipsis;
 }
 
-/* ── Mockup Upload ──────────────────────────────────── */
-
-/* Tab toggle */
-.ard-upload-tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 16px;
-    border-bottom: 2px solid #e9ecef;
-}
-
-.ard-upload-tab {
-    padding: 8px 20px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: inherit;
-    color: #888;
-    cursor: pointer;
-    transition: all 200ms ease;
-}
-
-.ard-upload-tab:hover { color: #d97706; }
-
-.ard-upload-tab.active {
-    color: #d97706;
-    border-bottom-color: #d97706;
-}
-
-/* Panels */
-.ard-upload-panel {
-    margin-bottom: 12px;
-}
-
-/* Drag & drop zone */
-.ard-dropzone {
-    border: 2px dashed #d1d5db;
-    border-radius: 10px;
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 200ms ease;
-    background: #fafafa;
-}
-
-.ard-dropzone:hover,
-.ard-dropzone--active {
-    border-color: #d97706;
-    background: #fffbeb;
-}
-
-.ard-dropzone-icon {
-    font-size: 36px;
+/* ── Gallery Sections ───────────────────────────────── */
+.ard-gallery-section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #94a3b8;
     margin-bottom: 8px;
-}
-
-.ard-dropzone-text {
-    font-size: 14px;
     font-weight: 600;
-    color: #555;
-    margin-bottom: 4px;
+}
+.ard-gallery-section + .ard-gallery-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e9ecef;
 }
 
-.ard-dropzone-hint {
-    font-size: 12px;
-    color: #999;
+/* Fixed 3-column grid for mockup slots */
+.ard-mockups-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
 }
 
-.ard-file-hidden {
-    display: none;
-}
-
-/* File preview after selection */
-#ard-file-preview {
+/* Empty slot placeholder */
+.ard-slot-empty {
+    aspect-ratio: 1;
+    border: 2px dashed #cbd5e1;
     border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e9ecef;
-    background: #f8f9fa;
-    padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-}
-
-#ard-file-preview img {
-    max-width: 100%;
-    max-height: 200px;
-    object-fit: contain;
-    border-radius: 6px;
-}
-
-.ard-file-info {
-    font-size: 12px;
-    color: #666;
-    font-weight: 500;
-}
-
-.ard-file-remove {
-    background: none;
-    border: 1px solid #dc3545;
-    color: #dc3545;
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-family: inherit;
+    justify-content: center;
     cursor: pointer;
-    transition: all 200ms ease;
+    transition: border-color 0.2s, background 0.2s;
+    background: #f8fafc;
+    position: relative;
+}
+.ard-slot-empty:hover {
+    border-color: #d97706;
+    background: #fffbeb;
+}
+.ard-slot-empty-icon {
+    font-size: 28px;
+    color: #94a3b8;
+    line-height: 1;
+}
+.ard-slot-empty:hover .ard-slot-empty-icon { color: #d97706; }
+.ard-slot-empty-text {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+.ard-slot-empty:hover .ard-slot-empty-text { color: #b45309; }
+.ard-slot-empty-label {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    padding: 6px 4px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 6px 6px;
 }
 
-.ard-file-remove:hover {
-    background: #dc3545;
-    color: white;
+/* Popover for empty slot options */
+.ard-slot-popover {
+    position: absolute;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 4px;
+    min-width: 160px;
 }
-
-/* Progress bar */
-.ard-upload-progress {
+.ard-slot-popover-opt {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 8px;
-}
-
-.ard-progress-bar {
-    flex: 1;
-    height: 6px;
-    background: #e9ecef;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.ard-progress-fill {
-    height: 100%;
-    background: #d97706;
-    border-radius: 3px;
-    transition: width 300ms ease;
-    width: 0;
-}
-
-.ard-progress-text {
-    font-size: 12px;
-    color: #888;
-    white-space: nowrap;
-}
-
-/* URL paste (fallback) */
-.ard-upload-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #555;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.ard-upload-input {
+    gap: 8px;
     width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid #dee2e6;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
     font-family: inherit;
-    color: #333;
-    background: #fff;
-    transition: border-color 200ms ease, box-shadow 200ms ease;
-    box-sizing: border-box;
+    border-radius: 6px;
+    color: #334155;
 }
+.ard-slot-popover-opt:hover {
+    background: #f1f5f9;
+}
+.ard-pop-icon { font-size: 16px; }
 
-.ard-upload-input:focus {
-    outline: none;
+/* Drag feedback */
+.ard-gallery-thumb.dragging {
+    opacity: 0.4;
     border-color: #d97706;
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+.ard-gallery-thumb.drag-over,
+.ard-slot-empty.drag-over {
+    border-color: #d97706;
+    box-shadow: 0 0 0 3px rgba(217,119,6,0.2);
+    transform: scale(1.03);
 }
 
-.ard-upload-input:disabled {
-    background: #f8f9fa;
-    color: #999;
-    cursor: not-allowed;
+/* Upload spinner overlay on slot */
+.ard-slot-uploading {
+    pointer-events: none;
+    position: relative;
 }
-
-.ard-upload-preview {
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e9ecef;
-    max-height: 200px;
+.ard-slot-upload-spinner {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.8);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8f9fa;
-    margin-top: 8px;
+    border-radius: 8px;
+    z-index: 3;
+}
+.ard-slot-upload-spinner::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #d97706;
+    border-radius: 50%;
+    animation: ard-spin 0.8s linear infinite;
 }
 
-.ard-upload-preview img {
-    max-width: 100%;
-    max-height: 200px;
-    object-fit: contain;
+/* Box File Picker Modal */
+.ard-box-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
 }
-
-/* Shared action bar & status */
-.ard-upload-actions {
+.ard-box-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    z-index: 1001;
+    width: 90%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+.ard-box-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
 }
-
-.ard-upload-slot {
-    font-size: 12px;
-    color: #888;
-    font-weight: 500;
-}
-
-.ard-btn-upload {
-    padding: 10px 24px;
-    background: #d97706;
-    color: white;
+.ard-box-modal-header button {
+    background: none;
     border: none;
-    border-radius: 8px;
-    font-size: 14px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0 4px;
+}
+.ard-box-modal-header button:hover { color: #334155; }
+.ard-box-modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+.ard-box-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 20px;
+    border-top: 1px solid #e9ecef;
+}
+.ard-box-modal-cancel {
+    padding: 8px 20px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: all 200ms ease;
+    color: #64748b;
 }
-
-.ard-btn-upload:hover:not(:disabled) {
-    background: #b45309;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
-}
-
-.ard-btn-upload:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.ard-upload-status {
-    padding: 10px 14px;
-    border-radius: 8px;
+.ard-box-modal-cancel:hover { background: #e2e8f0; }
+.ard-box-modal-confirm {
+    padding: 8px 20px;
+    background: #d97706;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
     font-size: 13px;
-    font-weight: 500;
-    margin-top: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
 }
+.ard-box-modal-confirm:hover:not(:disabled) { background: #b45309; }
+.ard-box-modal-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.ard-upload-status--success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.ard-upload-status--error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-/* ── Browse Box Panel ────────────────────────────────── */
+/* ── Browse Box Panel (used by gallery Box modal) ──── */
 .ard-box-loading {
     display: flex;
     align-items: center;

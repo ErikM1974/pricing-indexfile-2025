@@ -576,6 +576,25 @@
                     }).catch(() => {});
                     b.textContent = 'Updated!';
                     b.style.background = '#28a745';
+
+                    // Notify sales rep (best-effort, non-blocking)
+                    const repEl = card.querySelector('.rep-name[data-email]');
+                    const cardRepEmail = repEl ? repEl.dataset.email : '';
+                    if (cardRepEmail && typeof emailjs !== 'undefined') {
+                        const companyEl = card.querySelector('.company-name');
+                        const repDispName = getRepDisplayName(cardRepEmail);
+                        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_in_progress', {
+                            to_email: cardRepEmail,
+                            to_name: repDispName || 'Sales Team',
+                            design_id: designId,
+                            company_name: companyEl ? companyEl.textContent.trim() : '',
+                            detail_link: window.location.origin + '/art-request/' + designId,
+                            from_name: 'Steve — Art Department'
+                        }, EMAILJS_PUBLIC_KEY).catch(err => {
+                            console.warn('In Progress email failed (non-blocking):', err);
+                        });
+                    }
+
                     setTimeout(() => window.location.reload(), 1200);
                 } catch (err) {
                     b.textContent = 'Error';

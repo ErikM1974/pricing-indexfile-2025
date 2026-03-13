@@ -55,18 +55,6 @@
         }
     }
 
-    // File fields to check for mockups/artwork
-    const FILE_FIELDS = [
-        { key: 'Box_File_Mockup', label: 'Mockup' },
-        { key: 'BoxFileLink', label: 'Mockup 2' },
-        { key: 'Company_Mockup', label: 'Mockup 3' },
-        { key: 'File_Upload', label: 'Original Upload' },
-        { key: 'CDN_Link', label: 'Artwork 1' },
-        { key: 'CDN_Link_Two', label: 'Artwork 2' },
-        { key: 'CDN_Link_Three', label: 'Artwork 3' },
-        { key: 'CDN_Link_Four', label: 'Artwork 4' }
-    ];
-
     // ── Smart Back Navigation ──────────────────────────────────────────
     (function setupBackNavigation() {
         var backLink = document.querySelector('.ard-back-link');
@@ -250,11 +238,9 @@
             document.getElementById('ard-submitter-notes-card').style.display = 'block';
         }
 
-        // Mockup Gallery
+        // Mockup Gallery (unified two-section)
         renderMockupGallery(req);
-
-        // Mockup Upload
-        initMockupUpload(req);
+        initGalleryInteractions(req);
 
         // AE Action Bar — show only when status contains "Awaiting Approval"
         const statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
@@ -333,6 +319,23 @@
             }).then(function () {
                 btnWorking.textContent = 'Updated!';
                 btnWorking.style.background = '#28a745';
+
+                // Notify sales rep (best-effort, non-blocking)
+                if (repEmail && typeof emailjs !== 'undefined') {
+                    var repName = resolveRepName(repEmail);
+                    var repAddr = REP_MAP[repName] || repEmail;
+                    emailjs.send(EMAILJS_SERVICE_ID, 'template_art_in_progress', {
+                        to_email: repAddr,
+                        to_name: repName || 'Sales Team',
+                        design_id: designId,
+                        company_name: company,
+                        detail_link: window.location.origin + '/art-request/' + designId,
+                        from_name: 'Steve — Art Department'
+                    }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                        console.warn('In Progress email failed (non-blocking):', err);
+                    });
+                }
+
                 setTimeout(function () { location.reload(); }, 1200);
             }).catch(function (err) {
                 btnWorking.textContent = 'Error';
@@ -440,75 +443,216 @@
         }
     }
 
-    // ── Mockup Gallery ────────────────────────────────────────────────────
-    // Writable mockup field keys (can be cleared via API)
-    const WRITABLE_KEYS = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup'];
+    // ── Mockup Gallery (Unified Two-Section) ────────────────────────────
+    // Writable mockup slots Steve controls
+    const MOCKUP_SLOTS = [
+        { key: 'Box_File_Mockup', label: 'Mockup' },
+        { key: 'BoxFileLink', label: 'Mockup 2' },
+        { key: 'Company_Mockup', label: 'Mockup 3' }
+    ];
+    // Read-only artwork fields from AE uploads
+    const READ_ONLY_FIELDS = [
+        { key: 'File_Upload', label: 'Original Upload' },
+        { key: 'CDN_Link', label: 'Artwork 1' },
+        { key: 'CDN_Link_Two', label: 'Artwork 2' },
+        { key: 'CDN_Link_Three', label: 'Artwork 3' },
+        { key: 'CDN_Link_Four', label: 'Artwork 4' }
+    ];
+    const WRITABLE_KEYS = MOCKUP_SLOTS.map(function (s) { return s.key; });
+
+    /** Return an inline SVG icon for known file types, or empty string */
+    function getFileTypeIcon(ext) {
+        var e = (ext || '').toUpperCase();
+        if (e === 'PDF') {
+            return '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">'
+                + '<rect x="4" y="2" width="32" height="36" rx="3" fill="#E53E3E"/>'
+                + '<rect x="8" y="6" width="24" height="6" rx="1" fill="#FEB2B2"/>'
+                + '<text x="20" y="30" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Arial,sans-serif">PDF</text>'
+                + '</svg>';
+        }
+        if (e === 'EPS') {
+            return '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">'
+                + '<rect x="4" y="2" width="32" height="36" rx="3" fill="#DD6B20"/>'
+                + '<rect x="8" y="6" width="24" height="6" rx="1" fill="#FEEBC8"/>'
+                + '<text x="20" y="30" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Arial,sans-serif">EPS</text>'
+                + '</svg>';
+        }
+        if (e === 'AI') {
+            return '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">'
+                + '<rect x="4" y="2" width="32" height="36" rx="3" fill="#D69E2E"/>'
+                + '<rect x="8" y="6" width="24" height="6" rx="1" fill="#FEFCBF"/>'
+                + '<text x="20" y="30" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Arial,sans-serif">AI</text>'
+                + '</svg>';
+        }
+        if (e === 'SVG') {
+            return '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">'
+                + '<rect x="4" y="2" width="32" height="36" rx="3" fill="#38A169"/>'
+                + '<rect x="8" y="6" width="24" height="6" rx="1" fill="#C6F6D5"/>'
+                + '<text x="20" y="30" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Arial,sans-serif">SVG</text>'
+                + '</svg>';
+        }
+        return '';
+    }
+
+    /** Check if a Caspio field value is empty or a bare CDN base URL */
+    function isEmptySlot(val) {
+        if (!val || !val.trim()) return true;
+        return /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim());
+    }
 
     function renderMockupGallery(req) {
-        const galleryCard = document.getElementById('ard-gallery-card');
-        const grid = document.getElementById('ard-gallery-grid');
-        grid.innerHTML = '';
+        // Section 1: Writable mockup slots (always 3)
+        var mockupsGrid = document.getElementById('ard-mockups-grid');
+        mockupsGrid.innerHTML = '';
 
-        let fileCount = 0;
-        FILE_FIELDS.forEach(field => {
-            const url = req[field.key];
-            if (!url || !url.trim()) return;
-            // Filter out bare CDN base URLs that aren't actual files
-            if (/^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(url.trim())) return;
-            fileCount++;
+        MOCKUP_SLOTS.forEach(function (slot, index) {
+            var url = req[slot.key];
+            var isEmpty = isEmptySlot(url);
 
-            const thumb = document.createElement('div');
-            thumb.className = 'ard-gallery-thumb';
-            var ext = getFileExtension(url);
-            var extLabel = ext ? ext.toUpperCase() : 'FILE';
-            var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+            if (isEmpty) {
+                // Empty slot — clickable "+" placeholder
+                var emptyEl = document.createElement('div');
+                emptyEl.className = 'ard-slot-empty';
+                emptyEl.dataset.slotIndex = index;
+                emptyEl.dataset.fieldKey = slot.key;
+                emptyEl.innerHTML = '<span class="ard-slot-empty-icon">+</span>'
+                    + '<span class="ard-slot-empty-text">Add Mockup</span>'
+                    + '<span class="ard-slot-empty-label">' + escapeHtml(slot.label) + '</span>';
 
-            // Remove button for writable fields only
-            var removeBtnHtml = '';
-            if (WRITABLE_KEYS.indexOf(field.key) !== -1) {
-                removeBtnHtml = '<button type="button" class="ard-gallery-remove" title="Remove mockup" data-field-key="' + escapeHtml(field.key) + '" data-field-label="' + escapeHtml(field.label) + '">&times;</button>';
-            }
+                // Drag target: accept filled mockups being dropped here
+                emptyEl.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    emptyEl.classList.add('drag-over');
+                });
+                emptyEl.addEventListener('dragleave', function () {
+                    emptyEl.classList.remove('drag-over');
+                });
+                emptyEl.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    emptyEl.classList.remove('drag-over');
+                    var fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                    if (isNaN(fromIdx) || fromIdx === index) return;
+                    swapMockupSlots(fromIdx, index);
+                });
 
-            if (isImage) {
-                thumb.innerHTML = removeBtnHtml + `
-                    <img src="${escapeHtml(url)}" alt="${escapeHtml(field.label)}" loading="lazy"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="ard-gallery-placeholder" style="display:none;">
-                        <span class="ard-gallery-ext-badge">${escapeHtml(extLabel)}</span>
-                    </div>
-                    <div class="ard-gallery-label">${escapeHtml(field.label)}</div>
-                `;
+                // Click opens popover
+                emptyEl.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    showSlotPopover(emptyEl, slot.key);
+                });
+
+                mockupsGrid.appendChild(emptyEl);
             } else {
-                thumb.innerHTML = removeBtnHtml + `
-                    <div class="ard-gallery-placeholder">
-                        <span class="ard-gallery-ext-badge">${escapeHtml(extLabel)}</span>
-                        <span class="ard-gallery-download-hint">Click to download</span>
-                    </div>
-                    <div class="ard-gallery-label">${escapeHtml(field.label)}</div>
-                `;
+                // Filled slot — thumbnail with remove + drag
+                var thumb = renderFilledThumb(url, slot, true);
+                thumb.dataset.slotIndex = index;
+                thumb.dataset.fieldKey = slot.key;
+                thumb.setAttribute('draggable', 'true');
+
+                // Drag start
+                thumb.addEventListener('dragstart', function (e) {
+                    e.dataTransfer.setData('text/plain', index.toString());
+                    e.dataTransfer.effectAllowed = 'move';
+                    thumb.classList.add('dragging');
+                });
+                thumb.addEventListener('dragend', function () {
+                    thumb.classList.remove('dragging');
+                    document.querySelectorAll('.drag-over').forEach(function (el) { el.classList.remove('drag-over'); });
+                });
+                // Drag target
+                thumb.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    thumb.classList.add('drag-over');
+                });
+                thumb.addEventListener('dragleave', function () {
+                    thumb.classList.remove('drag-over');
+                });
+                thumb.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    thumb.classList.remove('drag-over');
+                    var fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                    if (isNaN(fromIdx) || fromIdx === index) return;
+                    swapMockupSlots(fromIdx, index);
+                });
+
+                mockupsGrid.appendChild(thumb);
             }
-            thumb.addEventListener('click', function (e) {
-                // Don't open lightbox when clicking the remove button
-                if (e.target.closest('.ard-gallery-remove')) return;
-                if (isImage) {
-                    openLightbox(url, field.label);
-                } else {
-                    // Non-image files (EPS, PDF, etc.) — open/download in new tab
-                    window.open(url, '_blank');
-                }
-            });
-            grid.appendChild(thumb);
         });
 
-        // Wire up remove buttons
-        grid.querySelectorAll('.ard-gallery-remove').forEach(function (btn) {
+        // Wire up remove buttons on mockup slots
+        wireRemoveButtons(mockupsGrid);
+
+        // Section 2: Read-only artwork (only shows populated fields)
+        var artworkGrid = document.getElementById('ard-artwork-grid');
+        var artworkSection = document.getElementById('ard-artwork-section');
+        artworkGrid.innerHTML = '';
+        var artCount = 0;
+
+        READ_ONLY_FIELDS.forEach(function (field) {
+            var url = req[field.key];
+            if (isEmptySlot(url)) return;
+            artCount++;
+            var thumb = renderFilledThumb(url, field, false);
+            artworkGrid.appendChild(thumb);
+        });
+
+        artworkSection.style.display = artCount > 0 ? '' : 'none';
+    }
+
+    /** Render a filled gallery thumbnail for a file */
+    function renderFilledThumb(url, field, showRemove) {
+        var thumb = document.createElement('div');
+        thumb.className = 'ard-gallery-thumb';
+        var ext = getFileExtension(url);
+        var extLabel = ext ? ext.toUpperCase() : 'FILE';
+        var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+
+        var removeBtnHtml = '';
+        if (showRemove) {
+            removeBtnHtml = '<button type="button" class="ard-gallery-remove" title="Remove mockup" data-field-key="'
+                + escapeHtml(field.key) + '" data-field-label="' + escapeHtml(field.label) + '">&times;</button>';
+        }
+
+        if (isImage) {
+            thumb.innerHTML = removeBtnHtml
+                + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
+                + ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                + '<div class="ard-gallery-placeholder" style="display:none;">'
+                + '<span class="ard-gallery-ext-badge">' + escapeHtml(extLabel) + '</span></div>'
+                + '<div class="ard-gallery-label">' + escapeHtml(field.label) + '</div>';
+        } else {
+            var fileIcon = getFileTypeIcon(extLabel);
+            thumb.innerHTML = removeBtnHtml
+                + '<div class="ard-gallery-placeholder">' + fileIcon
+                + '<span class="ard-gallery-ext-badge">' + escapeHtml(extLabel) + '</span>'
+                + '<span class="ard-gallery-download-hint">Click to download</span></div>'
+                + '<div class="ard-gallery-label">' + escapeHtml(field.label) + '</div>';
+        }
+
+        thumb.addEventListener('click', function (e) {
+            if (e.target.closest('.ard-gallery-remove')) return;
+            if (isImage) {
+                openLightbox(url, field.label);
+            } else {
+                window.open(url, '_blank');
+            }
+        });
+
+        return thumb;
+    }
+
+    /** Wire up remove (x) buttons inside a container */
+    function wireRemoveButtons(container) {
+        container.querySelectorAll('.ard-gallery-remove').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 var fieldKey = btn.dataset.fieldKey;
                 var fieldLabel = btn.dataset.fieldLabel;
                 if (!confirm('Remove this mockup (' + fieldLabel + ')?')) return;
 
-                var pkId = req.PK_ID;
+                var pkId = currentRequest.PK_ID;
                 if (!pkId) { alert('Cannot remove: missing PK_ID'); return; }
 
                 btn.disabled = true;
@@ -522,32 +666,14 @@
                     body: JSON.stringify(body)
                 }).then(function (resp) {
                     if (!resp.ok) throw new Error('Failed to clear mockup: ' + resp.status);
-                    // Update local state
                     currentRequest[fieldKey] = '';
-                    // Log audit note
                     return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: 'art@nwcustomapparel.com' })
                     });
                 }).then(function () {
-                    // Re-render gallery and refresh upload slot label
                     renderMockupGallery(currentRequest);
-                    var slotLabel = document.getElementById('ard-upload-slot');
-                    if (slotLabel) {
-                        var nextSlot = null;
-                        for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
-                            var val = currentRequest[UPLOAD_FIELDS[i].key];
-                            if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
-                                nextSlot = UPLOAD_FIELDS[i];
-                                break;
-                            }
-                        }
-                        if (nextSlot) {
-                            slotLabel.textContent = 'Will save to: ' + nextSlot.label;
-                        }
-                    }
-                    // Refresh notes timeline
                     if (typeof refreshNotes === 'function') refreshNotes();
                 }).catch(function (err) {
                     alert('Error removing mockup: ' + err.message);
@@ -556,611 +682,409 @@
                 });
             });
         });
+    }
 
-        if (fileCount > 0) {
-            galleryCard.style.display = '';
+    /** Swap two mockup slot values (optimistic UI + Caspio PUT) */
+    async function swapMockupSlots(fromIdx, toIdx) {
+        var fromField = MOCKUP_SLOTS[fromIdx].key;
+        var toField = MOCKUP_SLOTS[toIdx].key;
+        var fromUrl = currentRequest[fromField] || '';
+        var toUrl = currentRequest[toField] || '';
+
+        // Optimistic UI
+        currentRequest[fromField] = toUrl;
+        currentRequest[toField] = fromUrl;
+        renderMockupGallery(currentRequest);
+
+        try {
+            var body = {};
+            body[fromField] = toUrl;
+            body[toField] = fromUrl;
+            var resp = await fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!resp.ok) throw new Error('Swap failed: ' + resp.status);
+        } catch (err) {
+            // Revert on failure
+            currentRequest[fromField] = fromUrl;
+            currentRequest[toField] = toUrl;
+            renderMockupGallery(currentRequest);
+            alert('Could not reorder mockups: ' + err.message);
         }
     }
 
-    // ── Mockup Upload ─────────────────────────────────────────────────
-    // Writable text URL fields for Steve's mockup uploads (priority order)
-    // CDN_Link* fields are Caspio FILE fields (read-only via API) — cannot write to them.
-    const UPLOAD_FIELDS = [
-        { key: 'Box_File_Mockup', label: 'Mockup' },
-        { key: 'BoxFileLink', label: 'Mockup 2' },
-        { key: 'Company_Mockup', label: 'Mockup 3' }
-    ];
+    // ── Gallery Interactions (Popover + Upload + Box Picker) ──────────
+    var activeSlotKey = null; // which slot is being uploaded to
+    var boxFoldersCache = null; // cache loaded folders
+    var selectedBoxFile = null; // {id, name} for Box picker modal
 
-    function initMockupUpload(req) {
-        var uploadCard = document.getElementById('ard-upload-card');
-        var saveBtn = document.getElementById('ard-btn-upload');
-        var slotLabel = document.getElementById('ard-upload-slot');
-        var statusEl = document.getElementById('ard-upload-status');
-
-        if (!uploadCard || !saveBtn) return;
-
-        // Track active mode: 'file', 'url', or 'box'
-        var activeMode = 'file';
-        var selectedFile = null;
-        var selectedBoxFiles = []; // multi-select: [{id, name}, ...]
-        var boxLoaded = false; // lazy-load Box folder on first tab click
-
-        // Find first empty upload slot
-        var targetField = findNextSlot();
-
-        if (!targetField) {
-            slotLabel.textContent = 'All mockup slots are full (5/5)';
-            saveBtn.style.display = 'none';
-        } else {
-            slotLabel.textContent = 'Will save to: ' + targetField.label;
-        }
-
-        uploadCard.style.display = '';
-
-        // ── Tab Switching ─────────────────────────────────────────────
-        var tabFile = document.getElementById('ard-tab-file');
-        var tabBox = document.getElementById('ard-tab-box');
-        var tabUrl = document.getElementById('ard-tab-url');
-        var panelFile = document.getElementById('ard-panel-file');
-        var panelBox = document.getElementById('ard-panel-box');
-        var panelUrl = document.getElementById('ard-panel-url');
-
-        var allTabs = [tabFile, tabBox, tabUrl];
-        var allPanels = [panelFile, panelBox, panelUrl];
-
-        function switchTab(mode) {
-            activeMode = mode;
-            allTabs.forEach(function (t) { if (t) t.classList.remove('active'); });
-            allPanels.forEach(function (p) { if (p) p.style.display = 'none'; });
-
-            if (mode === 'file') { tabFile.classList.add('active'); panelFile.style.display = ''; }
-            else if (mode === 'box') { tabBox.classList.add('active'); panelBox.style.display = ''; if (!boxLoaded) loadBoxFiles(); }
-            else if (mode === 'url') { tabUrl.classList.add('active'); panelUrl.style.display = ''; }
-
-            updateSaveButton();
-        }
-
-        if (tabFile) tabFile.addEventListener('click', function () { switchTab('file'); });
-        if (tabBox) tabBox.addEventListener('click', function () { switchTab('box'); });
-        if (tabUrl) tabUrl.addEventListener('click', function () { switchTab('url'); });
-
-        // ── File Upload (drag & drop + click) ─────────────────────────
-        var dropzone = document.getElementById('ard-dropzone');
-        var fileInput = document.getElementById('ard-file-input');
-        var filePreview = document.getElementById('ard-file-preview');
-        var filePreviewImg = document.getElementById('ard-file-preview-img');
-        var fileInfo = document.getElementById('ard-file-info');
-        var fileRemove = document.getElementById('ard-file-remove');
-
-        if (dropzone) {
-            dropzone.addEventListener('click', function () { fileInput.click(); });
-            dropzone.addEventListener('dragover', function (e) {
-                e.preventDefault();
-                dropzone.classList.add('ard-dropzone--active');
+    function initGalleryInteractions(req) {
+        // Popover: Upload File
+        var popUpload = document.getElementById('ard-pop-upload');
+        var slotFileInput = document.getElementById('ard-slot-file-input');
+        if (popUpload) {
+            popUpload.addEventListener('click', function () {
+                hideSlotPopover();
+                if (slotFileInput) slotFileInput.click();
             });
-            dropzone.addEventListener('dragleave', function () {
-                dropzone.classList.remove('ard-dropzone--active');
-            });
-            dropzone.addEventListener('drop', function (e) {
-                e.preventDefault();
-                dropzone.classList.remove('ard-dropzone--active');
-                if (e.dataTransfer.files.length > 0) handleFileSelect(e.dataTransfer.files[0]);
+        }
+        if (slotFileInput) {
+            slotFileInput.addEventListener('change', function () {
+                if (slotFileInput.files.length > 0 && activeSlotKey) {
+                    uploadFileToSlot(slotFileInput.files[0], activeSlotKey);
+                    slotFileInput.value = '';
+                }
             });
         }
 
-        if (fileInput) fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) handleFileSelect(fileInput.files[0]);
-        });
-
-        if (fileRemove) fileRemove.addEventListener('click', function () {
-            clearFileSelection();
-        });
-
-        function handleFileSelect(file) {
-            if (file.size > 20 * 1024 * 1024) {
-                showUploadStatus('File too large (max 20MB)', true);
-                return;
-            }
-            selectedFile = file;
-            var sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-            fileInfo.textContent = file.name + ' (' + sizeMB + ' MB)';
-
-            // Show preview for images
-            if (file.type.startsWith('image/')) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    filePreviewImg.src = e.target.result;
-                    filePreview.style.display = '';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                filePreviewImg.src = '';
-                filePreview.style.display = '';
-            }
-            dropzone.style.display = 'none';
-            updateSaveButton();
-        }
-
-        function clearFileSelection() {
-            selectedFile = null;
-            fileInput.value = '';
-            filePreview.style.display = 'none';
-            filePreviewImg.src = '';
-            dropzone.style.display = '';
-            updateSaveButton();
-        }
-
-        // ── Browse Box (two-level: folder list → file grid) ──────────
-        var boxLoadingEl = document.getElementById('ard-box-loading');
-        var boxFoldersView = document.getElementById('ard-box-folders-view');
-        var boxFilesView = document.getElementById('ard-box-files-view');
-        var boxFolderList = document.getElementById('ard-box-folder-list');
-        var boxSearchInput = document.getElementById('ard-box-search');
-        var boxBackBtn = document.getElementById('ard-box-back');
-        var boxFolderEl = document.getElementById('ard-box-folder');
-        var boxGridEl = document.getElementById('ard-box-grid');
-        var boxFilesEmpty = document.getElementById('ard-box-files-empty');
-        var boxErrorEl = document.getElementById('ard-box-error');
-        var cachedFolders = null; // cache folder list
-
-        function loadBoxFiles() {
-            boxLoaded = true;
-            if (cachedFolders) {
-                showFolderList(cachedFolders);
-                return;
-            }
-            boxLoadingEl.style.display = 'flex';
-            boxFoldersView.style.display = 'none';
-            boxFilesView.style.display = 'none';
-            boxErrorEl.style.display = 'none';
-
-            fetch(API_BASE + '/api/box/art-folders?limit=500')
-                .then(function (resp) {
-                    boxLoadingEl.style.display = 'none';
-                    if (!resp.ok) throw new Error('Box API ' + resp.status);
-                    return resp.json();
-                })
-                .then(function (data) {
-                    cachedFolders = data.folders || [];
-                    showFolderList(cachedFolders);
-                })
-                .catch(function (err) {
-                    boxLoadingEl.style.display = 'none';
-                    console.error('Box folders error:', err);
-                    boxErrorEl.textContent = 'Could not load Box folders. Use Upload File or Paste URL instead.';
-                    boxErrorEl.style.display = 'block';
-                });
-        }
-
-        function showFolderList(folders) {
-            boxFoldersView.style.display = '';
-            boxFilesView.style.display = 'none';
-            boxFolderList.innerHTML = '';
-            selectedBoxFiles = [];
-            updateSaveButton();
-
-            var query = (boxSearchInput.value || '').trim().toLowerCase();
-            var filtered = query
-                ? folders.filter(function (f) { return f.name.toLowerCase().indexOf(query) !== -1; })
-                : folders;
-
-            if (filtered.length === 0) {
-                boxFolderList.innerHTML = '<div class="ard-box-folder-empty">No folders match your search.</div>';
-                return;
-            }
-
-            filtered.forEach(function (folder) {
-                var row = document.createElement('div');
-                row.className = 'ard-box-folder-item';
-                row.innerHTML = '<span class="ard-box-folder-icon">\uD83D\uDCC1</span><span class="ard-box-folder-name">' + escapeHtml(folder.name) + '</span>';
-                row.addEventListener('click', function () {
-                    openFolder(folder.id, folder.name);
-                });
-                boxFolderList.appendChild(row);
+        // Popover: Browse Box
+        var popBox = document.getElementById('ard-pop-box');
+        if (popBox) {
+            popBox.addEventListener('click', function () {
+                hideSlotPopover();
+                openBoxPickerModal(activeSlotKey);
             });
         }
 
-        // Filter folders on search input
-        if (boxSearchInput) {
-            var folderSearchTimer = null;
-            boxSearchInput.addEventListener('input', function () {
-                clearTimeout(folderSearchTimer);
-                folderSearchTimer = setTimeout(function () {
-                    if (cachedFolders) showFolderList(cachedFolders);
-                }, 200);
-            });
-        }
+        // Box modal close/cancel
+        var boxClose = document.getElementById('ard-box-modal-close');
+        var boxCancel = document.getElementById('ard-box-modal-cancel');
+        var boxConfirm = document.getElementById('ard-box-modal-confirm');
+        if (boxClose) boxClose.addEventListener('click', closeBoxModal);
+        if (boxCancel) boxCancel.addEventListener('click', closeBoxModal);
+        document.getElementById('ard-box-modal-overlay').addEventListener('click', closeBoxModal);
 
-        // Back button returns to folder list
-        if (boxBackBtn) {
-            boxBackBtn.addEventListener('click', function () {
-                boxFilesView.style.display = 'none';
-                boxFoldersView.style.display = '';
-                selectedBoxFiles = [];
-                updateSaveButton();
-            });
-        }
+        // Box modal confirm
+        if (boxConfirm) {
+            boxConfirm.addEventListener('click', async function () {
+                if (!selectedBoxFile || !activeSlotKey) return;
+                boxConfirm.disabled = true;
+                boxConfirm.textContent = 'Creating link...';
 
-        function openFolder(folderId, folderName) {
-            boxFoldersView.style.display = 'none';
-            boxFilesView.style.display = '';
-            boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName;
-            boxGridEl.style.display = 'none';
-            boxGridEl.innerHTML = '';
-            boxFilesEmpty.style.display = 'none';
-            selectedBoxFiles = [];
-            updateSaveButton();
-
-            // Show a small loading indicator in the folder label
-            boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName + ' — loading files...';
-
-            fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
-                .then(function (resp) {
-                    if (!resp.ok) throw new Error('Box API ' + resp.status);
-                    return resp.json();
-                })
-                .then(function (data) {
-                    var files = data.files || [];
-                    boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName + ' (' + files.length + ' files)';
-
-                    if (files.length === 0) {
-                        boxFilesEmpty.style.display = 'block';
-                        return;
-                    }
-
-                    boxGridEl.style.display = 'grid';
-
-                    // Sort: image files first (JPG/PNG), then others — preserves date order within groups
-                    var imageExts = ['jpg','jpeg','png','gif','bmp','tiff','tif','svg'];
-                    files.sort(function (a, b) {
-                        var aImg = imageExts.indexOf((a.extension || '').toLowerCase()) !== -1 ? 0 : 1;
-                        var bImg = imageExts.indexOf((b.extension || '').toLowerCase()) !== -1 ? 0 : 1;
-                        return aImg - bImg;
-                    });
-
-                    files.forEach(function (file) {
-                        var card = document.createElement('div');
-                        card.className = 'ard-box-file-card';
-
-                        var ext = (file.extension || '').toLowerCase();
-                        var sizeKB = file.size ? Math.round(file.size / 1024) : 0;
-                        var sizeLabel = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + ' MB' : sizeKB + ' KB';
-
-                        // Format modified date as short date
-                        var dateLabel = '';
-                        if (file.modified_at) {
-                            var d = new Date(file.modified_at);
-                            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                            dateLabel = months[d.getMonth()] + ' ' + d.getDate();
-                            if (d.getFullYear() !== new Date().getFullYear()) {
-                                dateLabel += ', ' + d.getFullYear();
-                            }
-                        }
-                        var metaLabel = dateLabel ? dateLabel + ' · ' + sizeLabel : sizeLabel;
-
-                        // Color-code placeholders by file type
-                        var phClass = 'ard-box-file-placeholder';
-                        if (['jpg','jpeg','png','gif','bmp','tiff','tif','svg'].indexOf(ext) !== -1) phClass += ' ph-image';
-                        else if (['psd','ai','eps','cdr','indd','indt','idml'].indexOf(ext) !== -1) phClass += ' ph-design';
-                        else if (ext === 'pdf') phClass += ' ph-pdf';
-
-                        var thumbSrc = file.thumbnailUrl ? API_BASE + file.thumbnailUrl : '';
-                        card.innerHTML =
-                            (thumbSrc
-                                ? '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
-                                  + '<div class="' + phClass + '" style="display:none;">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
-                                : '<div class="' + phClass + '">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
-                            )
-                            + '<div class="ard-box-file-name">' + escapeHtml(file.name) + '</div>'
-                            + '<div class="ard-box-file-meta">' + escapeHtml(metaLabel) + '</div>'
-                            + '<div class="ard-box-file-check">\u2713</div>';
-
-                        card.addEventListener('click', function () {
-                            var idx = selectedBoxFiles.findIndex(function (f) { return f.id === file.id; });
-                            if (idx !== -1) {
-                                // Deselect — toggle off
-                                selectedBoxFiles.splice(idx, 1);
-                                card.classList.remove('selected');
-                            } else {
-                                // Count available slots
-                                var availSlots = countAvailableSlots();
-                                if (selectedBoxFiles.length >= availSlots) {
-                                    showUploadStatus('Only ' + availSlots + ' mockup slot' + (availSlots === 1 ? '' : 's') + ' available', true);
-                                    return;
-                                }
-                                selectedBoxFiles.push({ id: file.id, name: file.name });
-                                card.classList.add('selected');
-                            }
-                            updateSaveButton();
-                        });
-
-                        boxGridEl.appendChild(card);
-                    });
-                })
-                .catch(function (err) {
-                    console.error('Box folder files error:', err);
-                    boxFolderEl.textContent = '\uD83D\uDCC1 ' + folderName;
-                    boxFilesEmpty.textContent = 'Could not load files from this folder.';
-                    boxFilesEmpty.style.display = 'block';
-                });
-        }
-
-        async function sendBoxFiles() {
-            if (selectedBoxFiles.length === 0 || !targetField) return;
-
-            var total = selectedBoxFiles.length;
-            var filesToSend = selectedBoxFiles.slice(); // copy
-            var sentCount = 0;
-
-            try {
-                var pkId = req.PK_ID;
-                if (!pkId) throw new Error('No PK_ID found on art request');
-
-                for (var i = 0; i < filesToSend.length; i++) {
-                    var boxFile = filesToSend[i];
-                    saveBtn.textContent = total > 1
-                        ? 'Sending ' + (i + 1) + ' of ' + total + '...'
-                        : 'Creating link...';
-
-                    // 1. Create shared link
+                try {
+                    // Create shared link
                     var linkResp = await fetch(API_BASE + '/api/box/shared-link', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fileId: boxFile.id })
+                        body: JSON.stringify({ fileId: selectedBoxFile.id })
                     });
-
-                    if (!linkResp.ok) {
-                        var errData = await linkResp.json().catch(function () { return {}; });
-                        throw new Error(errData.error || 'Failed to create shared link for ' + boxFile.name);
-                    }
-
+                    if (!linkResp.ok) throw new Error('Failed to create shared link');
                     var linkData = await linkResp.json();
                     var mockupUrl = linkData.downloadUrl || linkData.sharedLink;
 
-                    // 2. Save URL to next available Caspio slot
-                    var saveResp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup-url', {
+                    // Save to specific Caspio field
+                    var pkId = currentRequest.PK_ID;
+                    var saveBody = {};
+                    saveBody[activeSlotKey] = mockupUrl;
+                    var saveResp = await fetch(API_BASE + '/api/artrequests/' + pkId, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(saveBody)
+                    });
+                    if (!saveResp.ok) throw new Error('Failed to save mockup URL');
+
+                    currentRequest[activeSlotKey] = mockupUrl;
+
+                    // Log audit note
+                    fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ pkId: String(pkId), url: mockupUrl })
-                    });
+                        body: JSON.stringify({ noteType: 'Mockup Added', noteText: 'Added mockup from Box: ' + selectedBoxFile.name, noteBy: 'art@nwcustomapparel.com' })
+                    }).catch(function () {});
 
-                    if (!saveResp.ok) {
-                        var saveErr = await saveResp.json().catch(function () { return {}; });
-                        throw new Error(saveErr.error || 'Failed to save mockup URL for ' + boxFile.name);
-                    }
-
-                    var saveData = await saveResp.json();
-                    var savedField = saveData.field || targetField.key;
-                    currentRequest[savedField] = mockupUrl;
-                    sentCount++;
-
-                    // Advance slot for next file
-                    advanceToNextSlot();
+                    closeBoxModal();
+                    renderMockupGallery(currentRequest);
+                    if (typeof refreshNotes === 'function') refreshNotes();
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                    boxConfirm.disabled = false;
+                    boxConfirm.textContent = 'Select File';
                 }
-
-                renderMockupGallery(currentRequest);
-
-                var msg = sentCount === 1
-                    ? 'Mockup saved from Box file: ' + filesToSend[0].name
-                    : sentCount + ' mockups saved from Box';
-                showUploadStatus(msg, false);
-
-                selectedBoxFiles = [];
-                boxGridEl.querySelectorAll('.ard-box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
-                updateSaveButton();
-
-            } catch (err) {
-                console.error('Box send failed:', err);
-                var partialMsg = sentCount > 0 ? ' (' + sentCount + ' of ' + total + ' sent)' : '';
-                showUploadStatus('Error: ' + (err.message || 'Failed to send Box file') + partialMsg, true);
-                saveBtn.textContent = 'Send Mockup';
-                saveBtn.disabled = false;
-            }
+            });
         }
 
-        // ── URL Paste (fallback) ──────────────────────────────────────
-        var urlInput = document.getElementById('ard-mockup-url');
-        var urlPreview = document.getElementById('ard-upload-preview');
-        var urlPreviewImg = document.getElementById('ard-upload-preview-img');
-        var debounceTimer = null;
-
-        if (urlInput) urlInput.addEventListener('input', function () {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(function () {
-                var url = urlInput.value.trim();
-                if (url && isValidUrl(url)) {
-                    urlPreviewImg.src = url;
-                    urlPreviewImg.onerror = function () { urlPreview.style.display = 'none'; };
-                    urlPreviewImg.onload = function () { urlPreview.style.display = ''; };
-                } else {
-                    urlPreview.style.display = 'none';
+        // Close popover on outside click
+        document.addEventListener('click', function (e) {
+            var popover = document.getElementById('ard-slot-popover');
+            if (popover && popover.style.display !== 'none') {
+                if (!e.target.closest('#ard-slot-popover') && !e.target.closest('.ard-slot-empty')) {
+                    hideSlotPopover();
                 }
-                updateSaveButton();
-            }, 400);
-        });
-
-        // ── Save Button State ─────────────────────────────────────────
-        function updateSaveButton() {
-            if (!targetField) { saveBtn.disabled = true; return; }
-            if (activeMode === 'file') {
-                saveBtn.disabled = !selectedFile;
-                saveBtn.textContent = 'Upload Mockup';
-            } else if (activeMode === 'box') {
-                var n = selectedBoxFiles.length;
-                saveBtn.disabled = n === 0;
-                saveBtn.textContent = n > 1 ? 'Send ' + n + ' Mockups' : 'Send Mockup';
-            } else {
-                var url = urlInput ? urlInput.value.trim() : '';
-                saveBtn.disabled = !url || !isValidUrl(url);
-                saveBtn.textContent = 'Save Mockup URL';
-            }
-        }
-
-        // ── Save Handler ──────────────────────────────────────────────
-        saveBtn.addEventListener('click', async function () {
-            if (!targetField) return;
-            saveBtn.disabled = true;
-            statusEl.style.display = 'none';
-
-            if (activeMode === 'file' && selectedFile) {
-                await uploadFileToBox(selectedFile);
-            } else if (activeMode === 'box' && selectedBoxFiles.length > 0) {
-                await sendBoxFiles();
-            } else if (activeMode === 'url') {
-                await saveUrlDirect();
             }
         });
+    }
 
-        // ── File Upload via Box API ───────────────────────────────────
-        async function uploadFileToBox(file) {
-            var progressBar = document.getElementById('ard-upload-progress');
-            var progressFill = document.getElementById('ard-progress-fill');
-            var progressText = document.getElementById('ard-progress-text');
+    /** Show upload popover anchored below a slot element */
+    function showSlotPopover(slotEl, fieldKey) {
+        activeSlotKey = fieldKey;
+        var popover = document.getElementById('ard-slot-popover');
+        var rect = slotEl.getBoundingClientRect();
+        var scrollY = window.scrollY;
+        popover.style.top = (rect.bottom + scrollY + 4) + 'px';
+        popover.style.left = rect.left + 'px';
+        popover.style.display = '';
+    }
 
-            saveBtn.textContent = 'Uploading...';
-            if (progressBar) { progressBar.style.display = ''; progressFill.style.width = '10%'; }
+    function hideSlotPopover() {
+        document.getElementById('ard-slot-popover').style.display = 'none';
+    }
 
-            try {
-                var pkId = req.PK_ID;
-                if (!pkId) throw new Error('No PK_ID found on art request');
-
-                var formData = new FormData();
-                formData.append('file', file);
-                formData.append('pkId', String(pkId));
-                formData.append('customerId', String(req.Shopwork_customer_number || req.id_customer || ''));
-                formData.append('companyName', req.CompanyName || '');
-
-                if (progressFill) progressFill.style.width = '30%';
-                if (progressText) progressText.textContent = 'Uploading to Box...';
-
-                var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (progressFill) progressFill.style.width = '80%';
-
-                if (!resp.ok) {
-                    var errData = await resp.json().catch(function () { return {}; });
-                    throw new Error(errData.error || 'Server returned ' + resp.status);
-                }
-
-                var result = await resp.json();
-                if (progressFill) progressFill.style.width = '100%';
-                if (progressText) progressText.textContent = 'Done!';
-
-                // Update local data and re-render
-                currentRequest[result.field] = result.url;
-                renderMockupGallery(currentRequest);
-
-                showUploadStatus('Mockup uploaded to Box and saved to ' + result.field, false);
-                clearFileSelection();
-                if (progressBar) setTimeout(function () { progressBar.style.display = 'none'; }, 1500);
-
-                advanceToNextSlot();
-
-            } catch (err) {
-                console.error('Box upload failed:', err);
-                showUploadStatus('Error: ' + (err.message || 'Upload failed'), true);
-                if (progressBar) progressBar.style.display = 'none';
-                saveBtn.textContent = 'Upload Mockup';
-                saveBtn.disabled = false;
-            }
+    /** Upload a local file to Box, then save URL to a specific Caspio field */
+    async function uploadFileToSlot(file, fieldKey) {
+        if (file.size > 20 * 1024 * 1024) {
+            alert('File too large (max 20MB)');
+            return;
         }
 
-        // ── URL Paste Save (fallback) ─────────────────────────────────
-        async function saveUrlDirect() {
-            var url = urlInput.value.trim();
-            if (!url) return;
+        // Show spinner on the slot
+        var slotEl = document.querySelector('[data-field-key="' + fieldKey + '"]');
+        if (slotEl) {
+            var spinner = document.createElement('div');
+            spinner.className = 'ard-slot-upload-spinner';
+            slotEl.appendChild(spinner);
+            slotEl.classList.add('ard-slot-uploading');
+        }
 
-            saveBtn.textContent = 'Saving...';
+        try {
+            var pkId = currentRequest.PK_ID;
+            if (!pkId) throw new Error('No PK_ID found');
 
-            try {
-                var pkId = req.PK_ID;
-                if (!pkId) throw new Error('No PK_ID found on art request');
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('pkId', String(pkId));
+            formData.append('customerId', String(currentRequest.Shopwork_customer_number || currentRequest.id_customer || ''));
+            formData.append('companyName', currentRequest.CompanyName || '');
 
-                var resp = await fetch(API_BASE + '/api/artrequests/' + pkId, {
+            var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup', {
+                method: 'POST',
+                body: formData
+            });
+            if (!resp.ok) {
+                var errData = await resp.json().catch(function () { return {}; });
+                throw new Error(errData.error || 'Upload failed');
+            }
+
+            var result = await resp.json();
+            // Backend auto-finds next empty slot. If it went to wrong field, swap.
+            if (result.field !== fieldKey) {
+                // Need to swap: move uploaded URL to correct slot
+                var swapBody = {};
+                swapBody[fieldKey] = result.url;
+                swapBody[result.field] = currentRequest[fieldKey] || '';
+                await fetch(API_BASE + '/api/artrequests/' + pkId, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ [targetField.key]: url })
+                    body: JSON.stringify(swapBody)
                 });
-
-                if (!resp.ok) {
-                    var errData = await resp.json().catch(function () { return {}; });
-                    throw new Error(errData.error || 'Server returned ' + resp.status);
-                }
-
-                currentRequest[targetField.key] = url;
-                renderMockupGallery(currentRequest);
-
-                showUploadStatus('Mockup URL saved to ' + targetField.label, false);
-                urlInput.value = '';
-                if (urlPreview) urlPreview.style.display = 'none';
-
-                advanceToNextSlot();
-
-            } catch (err) {
-                console.error('Failed to save mockup URL:', err);
-                showUploadStatus('Error: ' + (err.message || 'Failed to save'), true);
-                saveBtn.textContent = 'Save Mockup URL';
-                saveBtn.disabled = false;
-            }
-        }
-
-        // ── Helpers ───────────────────────────────────────────────────
-        function countAvailableSlots() {
-            var count = 0;
-            for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
-                var val = currentRequest[UPLOAD_FIELDS[i].key];
-                if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        function findNextSlot() {
-            for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
-                var val = req[UPLOAD_FIELDS[i].key];
-                if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
-                    return UPLOAD_FIELDS[i];
-                }
-            }
-            return null;
-        }
-
-        function advanceToNextSlot() {
-            targetField = null;
-            for (var i = 0; i < UPLOAD_FIELDS.length; i++) {
-                var val = currentRequest[UPLOAD_FIELDS[i].key];
-                if (!val || !val.trim() || /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim())) {
-                    targetField = UPLOAD_FIELDS[i];
-                    break;
-                }
-            }
-            if (targetField) {
-                slotLabel.textContent = 'Will save to: ' + targetField.label;
-                updateSaveButton();
+                currentRequest[fieldKey] = result.url;
+                currentRequest[result.field] = currentRequest[fieldKey] || '';
             } else {
-                slotLabel.textContent = 'All mockup slots are full (5/5)';
-                saveBtn.style.display = 'none';
+                currentRequest[result.field] = result.url;
             }
-        }
 
-        function showUploadStatus(msg, isError) {
-            statusEl.textContent = msg;
-            statusEl.className = 'ard-upload-status ' + (isError ? 'ard-upload-status--error' : 'ard-upload-status--success');
-            statusEl.style.display = '';
+            renderMockupGallery(currentRequest);
+            if (typeof refreshNotes === 'function') refreshNotes();
+        } catch (err) {
+            alert('Upload failed: ' + err.message);
+            renderMockupGallery(currentRequest);
         }
     }
 
-    function isValidUrl(str) {
-        try {
-            const url = new URL(str);
-            return url.protocol === 'http:' || url.protocol === 'https:';
-        } catch (e) {
-            return false;
+    /** Open Box file picker modal for a specific slot */
+    function openBoxPickerModal(fieldKey) {
+        activeSlotKey = fieldKey;
+        selectedBoxFile = null;
+        var overlay = document.getElementById('ard-box-modal-overlay');
+        var modal = document.getElementById('ard-box-modal');
+        var confirmBtn = document.getElementById('ard-box-modal-confirm');
+        overlay.style.display = '';
+        modal.style.display = '';
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Select File';
+        document.body.style.overflow = 'hidden';
+
+        // Reset views
+        document.getElementById('ard-box-folders-view').style.display = 'none';
+        document.getElementById('ard-box-files-view').style.display = 'none';
+        document.getElementById('ard-box-error').style.display = 'none';
+
+        loadBoxFolders();
+    }
+
+    function closeBoxModal() {
+        document.getElementById('ard-box-modal-overlay').style.display = 'none';
+        document.getElementById('ard-box-modal').style.display = 'none';
+        document.body.style.overflow = '';
+        selectedBoxFile = null;
+    }
+
+    /** Load Box folders (cached after first load) */
+    function loadBoxFolders() {
+        var loadingEl = document.getElementById('ard-box-loading');
+        var errorEl = document.getElementById('ard-box-error');
+
+        if (boxFoldersCache) {
+            showFolderList(boxFoldersCache);
+            return;
         }
+
+        loadingEl.style.display = 'flex';
+        fetch(API_BASE + '/api/box/art-folders?limit=500')
+            .then(function (resp) {
+                loadingEl.style.display = 'none';
+                if (!resp.ok) throw new Error('Box API ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                boxFoldersCache = data.folders || [];
+                showFolderList(boxFoldersCache);
+            })
+            .catch(function (err) {
+                loadingEl.style.display = 'none';
+                errorEl.textContent = 'Could not load Box folders: ' + err.message;
+                errorEl.style.display = 'block';
+            });
+    }
+
+    function showFolderList(folders) {
+        var foldersView = document.getElementById('ard-box-folders-view');
+        var folderList = document.getElementById('ard-box-folder-list');
+        var searchInput = document.getElementById('ard-box-search');
+        foldersView.style.display = '';
+        document.getElementById('ard-box-files-view').style.display = 'none';
+        folderList.innerHTML = '';
+
+        var query = (searchInput.value || '').trim().toLowerCase();
+        var filtered = query
+            ? folders.filter(function (f) { return f.name.toLowerCase().indexOf(query) !== -1; })
+            : folders;
+
+        if (filtered.length === 0) {
+            folderList.innerHTML = '<div class="ard-box-folder-empty">No folders match your search.</div>';
+            return;
+        }
+
+        filtered.forEach(function (folder) {
+            var row = document.createElement('div');
+            row.className = 'ard-box-folder-item';
+            row.innerHTML = '<span class="ard-box-folder-icon">\uD83D\uDCC1</span><span class="ard-box-folder-name">' + escapeHtml(folder.name) + '</span>';
+            row.addEventListener('click', function () { openBoxFolder(folder.id, folder.name); });
+            folderList.appendChild(row);
+        });
+
+        // Wire search filtering
+        if (!searchInput._wired) {
+            searchInput._wired = true;
+            var timer = null;
+            searchInput.addEventListener('input', function () {
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    if (boxFoldersCache) showFolderList(boxFoldersCache);
+                }, 200);
+            });
+        }
+    }
+
+    function openBoxFolder(folderId, folderName) {
+        var foldersView = document.getElementById('ard-box-folders-view');
+        var filesView = document.getElementById('ard-box-files-view');
+        var folderEl = document.getElementById('ard-box-folder');
+        var gridEl = document.getElementById('ard-box-grid');
+        var emptyEl = document.getElementById('ard-box-files-empty');
+        var confirmBtn = document.getElementById('ard-box-modal-confirm');
+
+        foldersView.style.display = 'none';
+        filesView.style.display = '';
+        folderEl.textContent = '\uD83D\uDCC1 ' + folderName + ' \u2014 loading...';
+        gridEl.innerHTML = '';
+        gridEl.style.display = 'none';
+        emptyEl.style.display = 'none';
+        selectedBoxFile = null;
+        confirmBtn.disabled = true;
+
+        // Back button
+        var backBtn = document.getElementById('ard-box-back');
+        if (!backBtn._wired) {
+            backBtn._wired = true;
+            backBtn.addEventListener('click', function () {
+                filesView.style.display = 'none';
+                foldersView.style.display = '';
+                selectedBoxFile = null;
+                confirmBtn.disabled = true;
+            });
+        }
+
+        fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Box API ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var files = data.files || [];
+                folderEl.textContent = '\uD83D\uDCC1 ' + folderName + ' (' + files.length + ' files)';
+
+                if (files.length === 0) {
+                    emptyEl.style.display = 'block';
+                    return;
+                }
+
+                gridEl.style.display = 'grid';
+                var imageExts = ['jpg','jpeg','png','gif','bmp','tiff','tif','svg'];
+                files.sort(function (a, b) {
+                    var aImg = imageExts.indexOf((a.extension || '').toLowerCase()) !== -1 ? 0 : 1;
+                    var bImg = imageExts.indexOf((b.extension || '').toLowerCase()) !== -1 ? 0 : 1;
+                    return aImg - bImg;
+                });
+
+                files.forEach(function (file) {
+                    var card = document.createElement('div');
+                    card.className = 'ard-box-file-card';
+                    var ext = (file.extension || '').toLowerCase();
+                    var sizeKB = file.size ? Math.round(file.size / 1024) : 0;
+                    var sizeLabel = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + ' MB' : sizeKB + ' KB';
+                    var dateLabel = '';
+                    if (file.modified_at) {
+                        var d = new Date(file.modified_at);
+                        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        dateLabel = months[d.getMonth()] + ' ' + d.getDate();
+                        if (d.getFullYear() !== new Date().getFullYear()) dateLabel += ', ' + d.getFullYear();
+                    }
+                    var metaLabel = dateLabel ? dateLabel + ' \u00b7 ' + sizeLabel : sizeLabel;
+
+                    var phClass = 'ard-box-file-placeholder';
+                    if (imageExts.indexOf(ext) !== -1) phClass += ' ph-image';
+                    else if (['psd','ai','eps','cdr','indd','indt','idml'].indexOf(ext) !== -1) phClass += ' ph-design';
+                    else if (ext === 'pdf') phClass += ' ph-pdf';
+
+                    var thumbSrc = file.thumbnailUrl ? API_BASE + file.thumbnailUrl : '';
+                    card.innerHTML =
+                        (thumbSrc
+                            ? '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                              + '<div class="' + phClass + '" style="display:none;">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
+                            : '<div class="' + phClass + '">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
+                        )
+                        + '<div class="ard-box-file-name">' + escapeHtml(file.name) + '</div>'
+                        + '<div class="ard-box-file-meta">' + escapeHtml(metaLabel) + '</div>'
+                        + '<div class="ard-box-file-check">\u2713</div>';
+
+                    card.addEventListener('click', function () {
+                        // Single select — deselect others
+                        gridEl.querySelectorAll('.ard-box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
+                        card.classList.add('selected');
+                        selectedBoxFile = { id: file.id, name: file.name };
+                        confirmBtn.disabled = false;
+                    });
+
+                    gridEl.appendChild(card);
+                });
+            })
+            .catch(function (err) {
+                folderEl.textContent = '\uD83D\uDCC1 ' + folderName;
+                emptyEl.textContent = 'Could not load files: ' + err.message;
+                emptyEl.style.display = 'block';
+            });
     }
 
     // ── Lightbox ────────────────────────────────────────────────────────
