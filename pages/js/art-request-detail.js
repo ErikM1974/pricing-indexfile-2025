@@ -263,7 +263,6 @@
             initActionBar();
 
             // Share with Customer — show when mockup exists + customer email exists
-            var contactEmail = req.Email_Contact || req.Email || '';
             var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
             if (contactEmail && mockupUrl) {
                 document.getElementById('ard-btn-share-customer').style.display = '';
@@ -480,6 +479,7 @@
                 thumb.innerHTML = removeBtnHtml + `
                     <div class="ard-gallery-placeholder">
                         <span class="ard-gallery-ext-badge">${escapeHtml(extLabel)}</span>
+                        <span class="ard-gallery-download-hint">Click to download</span>
                     </div>
                     <div class="ard-gallery-label">${escapeHtml(field.label)}</div>
                 `;
@@ -487,7 +487,12 @@
             thumb.addEventListener('click', function (e) {
                 // Don't open lightbox when clicking the remove button
                 if (e.target.closest('.ard-gallery-remove')) return;
-                openLightbox(url, field.label);
+                if (isImage) {
+                    openLightbox(url, field.label);
+                } else {
+                    // Non-image files (EPS, PDF, etc.) — open/download in new tab
+                    window.open(url, '_blank');
+                }
             });
             grid.appendChild(thumb);
         });
