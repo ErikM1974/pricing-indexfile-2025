@@ -145,7 +145,8 @@
 
 | File | Purpose |
 |------|---------|
-| `art-hub-steve.js` | Steve's quick-action buttons + status summary bar (MutationObserver) |
+| `art-actions-shared.js` | Shared art action modals (Log Time, Mark Complete, Send Mockup, Time Log) — `window.ArtActions` namespace, used by art-hub-steve.js + art-request-detail.js |
+| `art-hub-steve.js` | Steve's gallery card processing + notes panel — delegates modals to art-actions-shared.js |
 | `ae-dashboard.js` | AE dashboard: tab switching, modals, dropdown, notification polling + toasts |
 | `ae-submit-form.js` | AE submit form enhancements: swatches, model images, row numbers, submission notification |
 

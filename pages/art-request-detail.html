@@ -7,6 +7,7 @@
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="stylesheet" href="/pages/css/art-request-detail.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
 </head>
 <body>
     <!-- Header -->
@@ -49,6 +50,15 @@
         <!-- Status Timeline -->
         <div class="ard-timeline-container" id="ard-timeline" style="display:none;">
             <div class="ard-timeline-steps" id="ard-timeline-steps"></div>
+        </div>
+
+        <!-- Steve's Action Bar (hidden by default, shown via JS for artist) -->
+        <div id="ard-steve-actions" class="ard-steve-actions" style="display:none;">
+            <button type="button" class="ard-action-btn ard-action-working" id="ard-btn-working">Working</button>
+            <button type="button" class="ard-action-btn ard-action-log-time" id="ard-btn-log-time">Log Time</button>
+            <button type="button" class="ard-action-btn ard-action-complete" id="ard-btn-complete">Mark Complete</button>
+            <button type="button" class="ard-action-btn ard-action-mockup" id="ard-btn-send-mockup">Send Mockup</button>
+            <button type="button" class="ard-action-btn ard-action-reopen" id="ard-btn-reopen" style="display:none;">Reopen</button>
         </div>
 
         <!-- Two-column layout -->
@@ -324,6 +334,68 @@
     <!-- Success/Status Message -->
     <div class="ard-success-msg" id="ard-success-msg" style="display:none;"></div>
 
+    <!-- Send Mockup Modal (shared with Art Hub — used by Steve's action bar) -->
+    <div id="approval-overlay" class="art-modal-overlay" style="display:none;"></div>
+    <div id="approval-modal" class="approval-modal" style="display:none;">
+        <div class="approval-modal-header">
+            <div class="approval-modal-header-info">
+                <span>Send Mockup</span>
+                <span id="approval-modal-rev" class="approval-rev-badge"></span>
+            </div>
+            <button class="approval-modal-close" id="approval-modal-close">&times;</button>
+        </div>
+        <div class="approval-modal-body">
+            <div id="approval-company" class="approval-company"></div>
+            <div id="approval-recipient" class="approval-recipient"></div>
+            <div id="approval-cc-row" class="approval-cc-row" style="display:none;">
+                <label class="approval-cc-label">
+                    <input type="checkbox" id="approval-cc-toggle"> Also notify:
+                </label>
+                <div id="approval-cc-options" class="approval-cc-checkbox-group"></div>
+            </div>
+            <div id="box-picker-section">
+                <div class="approval-section-label">Select mockup from Box:</div>
+                <div id="box-picker-loading" class="box-picker-loading" style="display:none;">
+                    <div class="box-picker-spinner"></div>
+                    <span>Searching Box...</span>
+                </div>
+                <div id="box-picker-folder" class="box-picker-folder-label" style="display:none;"></div>
+                <div id="box-picker-grid" class="box-picker-grid" style="display:none;"></div>
+                <div id="box-picker-empty" class="box-picker-empty" style="display:none;">
+                    No Box folder found for this design. Use paste URL below instead.
+                </div>
+                <div id="box-picker-error" class="box-picker-error" style="display:none;"></div>
+                <div id="box-paste-fallback" class="box-paste-fallback" style="display:none;">
+                    <input type="url" id="box-paste-url" class="box-paste-input" placeholder="Paste mockup URL...">
+                </div>
+            </div>
+            <div id="approval-prev-section" style="display:none;">
+                <div class="approval-section-label approval-section-label--muted">Previously Sent:</div>
+                <div id="approval-files" class="approval-files-grid approval-files-grid--small"></div>
+            </div>
+            <div class="approval-section-label">Message to Sales Rep:</div>
+            <textarea id="approval-message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>
+            <div class="approval-time-section">
+                <div class="approval-section-label">Art Time</div>
+                <div id="approval-prev-time" class="approval-prev-time"></div>
+                <div class="approval-session-row">
+                    <label>This session:</label>
+                    <div class="stepper-row stepper-row--inline">
+                        <button type="button" id="approval-minus" class="stepper-btn">-</button>
+                        <input type="number" id="approval-minutes" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
+                        <button type="button" id="approval-plus" class="stepper-btn">+</button>
+                    </div>
+                    <span id="approval-cost" class="approval-cost">= $18.75</span>
+                </div>
+                <div id="approval-new-total" class="approval-new-total"></div>
+            </div>
+        </div>
+        <div class="approval-modal-footer">
+            <button id="approval-cancel" class="approval-btn-cancel">Cancel</button>
+            <button id="approval-submit" class="approval-btn-submit">Send Mockup</button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="ard-footer">
         <p>Northwest Custom Apparel &bull; Internal Staff Page</p>
@@ -331,6 +403,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/art-actions-shared.js"></script>
     <script src="/pages/js/art-request-detail.js"></script>
 </body>
 </html>

@@ -247,6 +247,9 @@
             initActionBar();
         }
 
+        // Steve's Action Bar — always show for artist workflow
+        renderSteveActions(req, statusClean);
+
         // Notes timeline
         renderNotes(notes);
 
@@ -255,6 +258,102 @@
 
         // Status timeline
         renderStatusTimeline(notes);
+    }
+
+    // ── Steve's Action Bar ────────────────────────────────────────────────
+    function renderSteveActions(req, statusClean) {
+        var bar = document.getElementById('ard-steve-actions');
+        if (!bar || !window.ArtActions) return;
+
+        var status = statusClean.toLowerCase().replace(/\s+/g, '');
+        var isCompleted = status === 'completed';
+        var isCancelled = status === 'cancel' || status === 'cancelled';
+
+        if (isCancelled) return;
+
+        bar.style.display = 'flex';
+
+        var btnWorking = document.getElementById('ard-btn-working');
+        var btnLogTime = document.getElementById('ard-btn-log-time');
+        var btnComplete = document.getElementById('ard-btn-complete');
+        var btnMockup = document.getElementById('ard-btn-send-mockup');
+        var btnReopen = document.getElementById('ard-btn-reopen');
+
+        if (isCompleted) {
+            btnWorking.style.display = 'none';
+            btnLogTime.style.display = 'none';
+            btnComplete.style.display = 'none';
+            btnMockup.style.display = 'none';
+            btnReopen.style.display = '';
+        } else {
+            // Hide Send Mockup if status doesn't allow it
+            var canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
+            if (!canSendMockup) btnMockup.style.display = 'none';
+        }
+
+        var repEmail = req.User_Email || req.Sales_Rep || '';
+        var company = req.CompanyName || '';
+
+        btnWorking.addEventListener('click', function () {
+            btnWorking.disabled = true;
+            btnWorking.textContent = 'Updating...';
+            fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'In Progress' })
+            }).then(function (resp) {
+                if (!resp.ok) throw new Error('Status ' + resp.status);
+                btnWorking.textContent = 'Updated!';
+                btnWorking.style.background = '#28a745';
+                setTimeout(function () { location.reload(); }, 800);
+            }).catch(function (err) {
+                btnWorking.textContent = 'Error';
+                btnWorking.style.background = '#dc3545';
+                console.error('Working action failed:', err);
+                setTimeout(function () { btnWorking.textContent = 'Working'; btnWorking.style.background = ''; btnWorking.disabled = false; }, 2000);
+            });
+        });
+
+        btnLogTime.addEventListener('click', function () {
+            ArtActions.showLogTimeModal(designId, req.Status || 'In Progress 🔵');
+        });
+
+        btnComplete.addEventListener('click', function () {
+            ArtActions.showArtTimeModal(designId, repEmail, company);
+        });
+
+        btnMockup.addEventListener('click', function () {
+            ArtActions.showSendForApprovalModal(designId, company);
+        });
+
+        btnReopen.addEventListener('click', function () {
+            if (!confirm('Reopen this art request?')) return;
+            btnReopen.disabled = true;
+            btnReopen.textContent = 'Reopening...';
+            fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'In Progress' })
+            }).then(function (resp) {
+                if (!resp.ok) throw new Error('Status ' + resp.status);
+                fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: 'art@nwcustomapparel.com' })
+                }).catch(function () { /* fire-and-forget */ });
+                btnReopen.textContent = 'Reopened!';
+                btnReopen.style.background = '#28a745';
+                setTimeout(function () { location.reload(); }, 800);
+            }).catch(function (err) {
+                btnReopen.textContent = 'Error';
+                btnReopen.style.background = '#dc3545';
+                console.error('Reopen failed:', err);
+                setTimeout(function () { btnReopen.textContent = 'Reopen'; btnReopen.style.background = ''; btnReopen.disabled = false; }, 2000);
+            });
+        });
+
+        // Initialize approval modal listeners for Send Mockup
+        ArtActions.initApprovalModalListeners();
     }
 
     // ── Garments & Colors ─────────────────────────────────────────────────

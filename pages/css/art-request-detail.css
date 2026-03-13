@@ -1438,4 +1438,37 @@ body {
     .ard-gallery-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .ard-steve-actions {
+        flex-wrap: wrap;
+    }
 }
+
+/* ── Steve's Action Bar ──────────────────────────────────────────────── */
+.ard-steve-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ard-action-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    color: #fff;
+}
+
+.ard-action-btn:hover { opacity: 0.9; }
+.ard-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ard-action-working  { background: #16a34a; }
+.ard-action-log-time { background: #0891b2; }
+.ard-action-complete { background: #dc2626; }
+.ard-action-mockup   { background: #ea580c; }
+.ard-action-reopen   { background: #d97706; }
