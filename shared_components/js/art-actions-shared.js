@@ -134,7 +134,7 @@
                         company_name: companyName,
                         note_text: 'Design #' + designId + ' has been reopened — Steve is making additional changes.',
                         note_type: 'Status Update',
-                        detail_link: window.location.origin + '/art-request/' + designId,
+                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
                         from_name: 'Steve — Art Department'
                     }).catch(function (err) { console.warn('Reopen email failed:', err); });
                 }
@@ -167,7 +167,7 @@
 
             var rep = resolveRep(salesRep);
             var repEmail = rep.email;
-            var detailLink = window.location.origin + '/art-request/' + designId;
+            var detailLink = 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId;
 
             var templateId, templateParams;
 

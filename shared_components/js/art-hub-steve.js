@@ -330,7 +330,7 @@
             note_type: noteType,
             note_text: noteText,
             from_name: 'Art Department',
-            detail_link: window.location.origin + '/art-request/' + designId
+            detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId
         };
 
         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', templateParams, EMAILJS_PUBLIC_KEY)
@@ -588,7 +588,7 @@
                             to_name: repDispName || 'Sales Team',
                             design_id: designId,
                             company_name: companyEl ? companyEl.textContent.trim() : '',
-                            detail_link: window.location.origin + '/art-request/' + designId,
+                            detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
                             from_name: 'Steve — Art Department'
                         }, EMAILJS_PUBLIC_KEY).catch(err => {
                             console.warn('In Progress email failed (non-blocking):', err);

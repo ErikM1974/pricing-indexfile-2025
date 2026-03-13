@@ -329,7 +329,7 @@
                         to_name: repName || 'Sales Team',
                         design_id: designId,
                         company_name: company,
-                        detail_link: window.location.origin + '/art-request/' + designId,
+                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
                         from_name: 'Steve — Art Department'
                     }, EMAILJS_PUBLIC_KEY).catch(function (err) {
                         console.warn('In Progress email failed (non-blocking):', err);
@@ -439,7 +439,7 @@
                     to_name: repName || 'Sales Team',
                     design_id: designId,
                     company_name: company,
-                    detail_link: window.location.origin + '/art-request/' + designId,
+                    detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
                     mockup_url: mockupUrl,
                     message: 'Reminder: A mockup is awaiting your review.',
                     from_name: 'Steve — Art Department',
