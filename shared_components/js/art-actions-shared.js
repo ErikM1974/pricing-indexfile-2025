@@ -848,12 +848,28 @@
                 prevFileCount++;
 
                 var fileCard = document.createElement('div');
-                fileCard.className = 'approval-file-card';
+                fileCard.className = 'approval-file-card approval-file-selectable';
+                fileCard.dataset.mockupUrl = url.trim();
+                fileCard.title = 'Click to select this mockup';
                 fileCard.innerHTML =
                     '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
                     + ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
                     + '<div class="approval-file-placeholder" style="display:none;">File</div>'
-                    + '<div class="approval-file-label">' + escapeHtml(field.label) + '</div>';
+                    + '<div class="approval-file-label">' + escapeHtml(field.label) + '</div>'
+                    + '<div class="approval-file-check">\u2713</div>';
+
+                fileCard.addEventListener('click', function () {
+                    // Deselect any Box file card
+                    boxGrid.querySelectorAll('.box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
+                    modal.dataset.selectedBoxFileId = '';
+                    modal.dataset.selectedBoxFileName = '';
+                    // Deselect other prev cards, select this one
+                    filesGrid.querySelectorAll('.approval-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
+                    fileCard.classList.add('selected');
+                    // Fill paste URL with this mockup's URL
+                    if (boxPasteInput) boxPasteInput.value = fileCard.dataset.mockupUrl;
+                });
+
                 filesGrid.appendChild(fileCard);
             });
         }

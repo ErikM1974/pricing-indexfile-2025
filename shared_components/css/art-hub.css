@@ -2209,13 +2209,39 @@ input.cbSearchButton {
 }
 
 .approval-files-grid--small .approval-file-card {
-    opacity: 0.6;
-    pointer-events: none;
+    opacity: 0.7;
     padding: 4px;
+    cursor: pointer;
 }
-
+.approval-files-grid--small .approval-file-card:hover {
+    opacity: 1;
+    border-color: #fcd34d;
+}
+.approval-files-grid--small .approval-file-card.selected {
+    opacity: 1;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.3);
+}
 .approval-files-grid--small .approval-file-card img {
     height: 56px;
+}
+.approval-file-check {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 12px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+.approval-file-card.selected .approval-file-check {
+    display: flex;
 }
 
 .approval-section-label--muted {
