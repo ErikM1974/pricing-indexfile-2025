@@ -292,6 +292,7 @@
                         <div class="ard-action-buttons">
                             <button class="ard-btn-approve" id="ard-btn-approve" disabled>Approve Design</button>
                             <button class="ard-btn-changes" id="ard-btn-changes" disabled>Request Changes</button>
+                            <button class="ard-btn-share-customer" id="ard-btn-share-customer" style="display:none">Share with Customer</button>
                         </div>
                     </div>
                 </div>
@@ -415,6 +416,38 @@
         </div>
     </div>
 
+    <!-- Share with Customer Modal -->
+    <div id="share-customer-overlay" class="art-modal-overlay" style="display:none;"></div>
+    <div id="share-customer-modal" class="share-customer-modal" style="display:none;">
+        <div class="share-customer-modal__header">
+            <span>Share Mockup with Customer</span>
+            <button type="button" class="share-customer-modal__close" id="share-customer-close">&times;</button>
+        </div>
+        <div class="share-customer-modal__body">
+            <div class="share-customer-modal__field">
+                <label for="share-customer-email">Customer Email</label>
+                <input type="email" id="share-customer-email" class="share-customer-modal__input" placeholder="customer@example.com" autocomplete="off">
+            </div>
+            <div class="share-customer-modal__field">
+                <label for="share-customer-name">Customer Name</label>
+                <input type="text" id="share-customer-name" class="share-customer-modal__input" placeholder="First Last" autocomplete="off">
+            </div>
+            <div class="share-customer-modal__field">
+                <label for="share-customer-message">Message</label>
+                <textarea id="share-customer-message" rows="4" class="share-customer-modal__textarea" placeholder="Write a message to the customer..."></textarea>
+            </div>
+            <div class="share-customer-modal__preview" id="share-customer-preview" style="display:none;">
+                <div class="share-customer-modal__preview-label">Mockup Preview</div>
+                <img id="share-customer-preview-img" src="" alt="Mockup preview">
+            </div>
+            <div class="share-customer-modal__rep-info" id="share-customer-rep-info"></div>
+        </div>
+        <div class="share-customer-modal__footer">
+            <button type="button" class="share-customer-modal__btn-cancel" id="share-customer-cancel">Cancel</button>
+            <button type="button" class="share-customer-modal__btn-send" id="share-customer-send">Send to Customer</button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="ard-footer">
         <p>Northwest Custom Apparel &bull; Internal Staff Page</p>
@@ -423,6 +456,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=2"></script>
-    <script src="/pages/js/art-request-detail.js?v=2"></script>
+    <script src="/pages/js/art-request-detail.js?v=3"></script>
 </body>
 </html>

@@ -261,6 +261,14 @@
         if (statusLower.includes('awaitingapproval')) {
             document.getElementById('ard-action-bar').style.display = '';
             initActionBar();
+
+            // Share with Customer — show when mockup exists + customer email exists
+            var contactEmail = req.Email_Contact || req.Email || '';
+            var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+            if (contactEmail && mockupUrl) {
+                document.getElementById('ard-btn-share-customer').style.display = '';
+                initShareWithCustomer(req);
+            }
         }
 
         // Steve's Action Bar — always show for artist workflow
@@ -1198,6 +1206,134 @@
             const aeName = aeSelect.value;
             if (!aeName) return;
             openChangesModal();
+        });
+    }
+
+    // ── Share with Customer ────────────────────────────────────────────
+    function initShareWithCustomer(req) {
+        var overlay = document.getElementById('share-customer-overlay');
+        var modal = document.getElementById('share-customer-modal');
+        var btn = document.getElementById('ard-btn-share-customer');
+        var closeBtn = document.getElementById('share-customer-close');
+        var cancelBtn = document.getElementById('share-customer-cancel');
+        var sendBtn = document.getElementById('share-customer-send');
+        var emailInput = document.getElementById('share-customer-email');
+        var nameInput = document.getElementById('share-customer-name');
+        var messageInput = document.getElementById('share-customer-message');
+        var previewSection = document.getElementById('share-customer-preview');
+        var previewImg = document.getElementById('share-customer-preview-img');
+        var repInfo = document.getElementById('share-customer-rep-info');
+
+        var contactEmail = req.Email_Contact || req.Email || '';
+        var contactName = ((req.First_name || req.First_Name || '') + ' ' + (req.Last_name || req.Last_Name || '')).trim();
+        var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+        var repEmail = req.User_Email || req.Sales_Rep || '';
+        var repName = resolveRepName(repEmail);
+        var repAddr = REP_MAP[repName] || repEmail;
+
+        function openModal() {
+            emailInput.value = contactEmail;
+            nameInput.value = contactName;
+            messageInput.value = 'Your mockup is ready for review. Please take a look and let us know if you\'d like any changes.';
+            if (mockupUrl) {
+                previewImg.src = mockupUrl;
+                previewSection.style.display = '';
+            } else {
+                previewSection.style.display = 'none';
+            }
+            repInfo.textContent = 'Sending as ' + (repName || 'Sales Rep') + ' (' + repAddr + ')';
+            overlay.style.display = 'block';
+            modal.style.display = 'block';
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send to Customer';
+        }
+
+        function closeModal() {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+
+        btn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+
+        sendBtn.addEventListener('click', function () {
+            var toEmail = emailInput.value.trim();
+            var toName = nameInput.value.trim();
+            var message = messageInput.value.trim();
+            if (!toEmail) { emailInput.focus(); return; }
+            if (!message) { messageInput.focus(); return; }
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            var templateParams = {
+                to_email: toEmail,
+                to_name: toName || 'Valued Customer',
+                company_name: req.CompanyName || '',
+                design_number: designId,
+                message: message,
+                mockup_url: mockupUrl,
+                from_name: repName || 'Northwest Custom Apparel',
+                rep_email: repAddr || 'sales@nwcustomapparel.com',
+                rep_phone: '253-922-5793'
+            };
+
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+                emailjs.send(EMAILJS_SERVICE_ID, 'template_customer_mockup', templateParams)
+                    .then(function () {
+                        // Log audit note
+                        fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                noteType: 'Customer Share',
+                                noteText: 'Mockup shared with customer: ' + toEmail,
+                                noteBy: repAddr || 'sales@nwcustomapparel.com'
+                            })
+                        }).catch(function () { /* fire-and-forget */ });
+
+                        // Post notification
+                        fetch(API_BASE + '/api/art-notifications', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: 'customer_share',
+                                designId: designId,
+                                companyName: req.CompanyName || '',
+                                actorName: repName || 'AE'
+                            })
+                        }).catch(function () { /* fire-and-forget */ });
+
+                        // Success
+                        closeModal();
+                        showSuccessMessage('Mockup sent to ' + toEmail);
+
+                        // Re-enable as "Send Again" after 30s
+                        btn.disabled = true;
+                        btn.textContent = 'Sent!';
+                        btn.style.background = '#28a745';
+                        btn.style.color = '#fff';
+                        setTimeout(function () {
+                            btn.disabled = false;
+                            btn.textContent = 'Send Again';
+                            btn.style.background = '';
+                            btn.style.color = '';
+                        }, 30000);
+                    })
+                    .catch(function (err) {
+                        console.error('Share email failed:', err);
+                        sendBtn.textContent = 'Failed — try again';
+                        sendBtn.style.background = '#dc3545';
+                        setTimeout(function () {
+                            sendBtn.disabled = false;
+                            sendBtn.textContent = 'Send to Customer';
+                            sendBtn.style.background = '';
+                        }, 3000);
+                    });
+            }
         });
     }
 
