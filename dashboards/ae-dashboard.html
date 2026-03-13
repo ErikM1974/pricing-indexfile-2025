@@ -563,7 +563,17 @@
         </div>
     </div>
     
-    <script src="/shared_components/js/ae-dashboard.js?v=3"></script>
+    <!-- Lightbox Overlay for Mockup Preview -->
+    <div class="ae-lightbox" id="ae-lightbox" style="display:none;">
+        <div class="ae-lightbox-backdrop" id="ae-lightbox-backdrop"></div>
+        <div class="ae-lightbox-content">
+            <button class="ae-lightbox-close" id="ae-lightbox-close">&times;</button>
+            <img class="ae-lightbox-img" id="ae-lightbox-img" src="" alt="Full-size mockup">
+            <div class="ae-lightbox-label" id="ae-lightbox-label"></div>
+        </div>
+    </div>
+
+    <script src="/shared_components/js/ae-dashboard.js?v=4"></script>
     <script src="/shared_components/js/ae-submit-form.js"></script>
 </body>
 </html>

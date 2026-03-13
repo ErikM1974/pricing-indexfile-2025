@@ -417,7 +417,7 @@
             // Image section
             var imageHtml;
             if (mockupUrl) {
-                imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
             } else {
                 imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
             }
@@ -469,6 +469,14 @@
             grid.appendChild(card);
         });
 
+        // Lightbox on mockup image click
+        grid.addEventListener('click', function (e) {
+            var img = e.target.closest('.ae-art-card__image img');
+            if (img && img.dataset.mockupUrl) {
+                openAELightbox(img.dataset.mockupUrl, img.alt || 'Mockup');
+            }
+        });
+
         // Insert card grid before the table, then hide the table + Caspio nav/scrollbar
         table.parentNode.insertBefore(grid, table);
         table.style.display = 'none';
@@ -479,6 +487,32 @@
         if (caspioForm) caspioForm.style.overflow = 'hidden';
         table.dataset.cardsRendered = 'true';
     }
+
+    // ── Lightbox for Mockup Preview ──────────────────────────────────
+    function openAELightbox(url, label) {
+        var lb = document.getElementById('ae-lightbox');
+        if (!lb) return;
+        document.getElementById('ae-lightbox-img').src = url;
+        document.getElementById('ae-lightbox-label').textContent = label || '';
+        lb.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAELightbox() {
+        var lb = document.getElementById('ae-lightbox');
+        if (!lb) return;
+        lb.style.display = 'none';
+        document.getElementById('ae-lightbox-img').src = '';
+        document.body.style.overflow = '';
+    }
+
+    // Close on backdrop click, × button, or Escape
+    document.addEventListener('click', function (e) {
+        if (e.target.id === 'ae-lightbox-close' || e.target.id === 'ae-lightbox-backdrop') closeAELightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAELightbox();
+    });
 
     // ── Review Mockups Tab ──────────────────────────────────────────
     function loadReviewTab() {
@@ -542,7 +576,7 @@
 
                     var imageHtml;
                     if (mockupUrl) {
-                        imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                        imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
                     } else {
                         imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
                     }
@@ -566,6 +600,14 @@
                         '</div>';
 
                     grid.appendChild(card);
+                });
+
+                // Lightbox on mockup image click
+                grid.addEventListener('click', function (e) {
+                    var img = e.target.closest('.ae-art-card__image img');
+                    if (img && img.dataset.mockupUrl) {
+                        openAELightbox(img.dataset.mockupUrl, img.alt || 'Mockup');
+                    }
                 });
 
                 container.appendChild(grid);
