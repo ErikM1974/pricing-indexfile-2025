@@ -238,7 +238,7 @@
                 company_name: companyName || 'Unknown',
                 note_text: 'New art request submitted for ' + (companyName || 'Unknown') + ' (Design #' + designId + ')',
                 note_type: 'New Submission',
-                detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
+                detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
                 from_name: 'AE Dashboard'
             }).catch(function () { /* fire-and-forget */ });
         }

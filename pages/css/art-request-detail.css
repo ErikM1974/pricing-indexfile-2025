@@ -1582,3 +1582,20 @@ body {
 .ard-action-complete { background: #dc2626; }
 .ard-action-mockup   { background: #ea580c; }
 .ard-action-reopen   { background: #d97706; }
+
+/* ── AE View (?view=ae) — maroon theme matching AE Dashboard ── */
+body.ae-view .ard-header {
+    background: linear-gradient(135deg, #981e32, #7a1828);
+}
+body.ae-view .ard-card-header {
+    background: #981e32;
+}
+body.ae-view .ard-card-header--green {
+    background: #981e32;
+}
+body.ae-view .ard-status-step.active .ard-status-dot {
+    background: #981e32;
+}
+body.ae-view .ard-status-step.active .ard-status-label {
+    color: #981e32;
+}

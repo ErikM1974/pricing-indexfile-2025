@@ -256,8 +256,22 @@
             }
         }
 
-        // Steve's Action Bar — always show for artist workflow
-        renderSteveActions(req, statusClean);
+        // Steve's Action Bar — hide when accessed via email link (?view=ae)
+        var urlParams = new URLSearchParams(window.location.search);
+        var isAeView = urlParams.get('view') === 'ae';
+        if (isAeView) {
+            document.body.classList.add('ae-view');
+            // Update header text and back link for AE context
+            var headerTitle = document.querySelector('.ard-header-text h1');
+            if (headerTitle) headerTitle.textContent = 'Art Request Review';
+            var backLink = document.querySelector('.ard-back-link');
+            if (backLink) {
+                backLink.textContent = '\u2190 Back to AE Dashboard';
+                backLink.href = '/dashboards/ae-dashboard.html';
+            }
+        } else {
+            renderSteveActions(req, statusClean);
+        }
 
         // Notes timeline
         renderNotes(notes);
@@ -329,7 +343,7 @@
                         to_name: repName || 'Sales Team',
                         design_id: designId,
                         company_name: company,
-                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
+                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
                         from_name: 'Steve — Art Department'
                     }, EMAILJS_PUBLIC_KEY).catch(function (err) {
                         console.warn('In Progress email failed (non-blocking):', err);
@@ -439,7 +453,7 @@
                     to_name: repName || 'Sales Team',
                     design_id: designId,
                     company_name: company,
-                    detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId,
+                    detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
                     mockup_url: mockupUrl,
                     message: 'Reminder: A mockup is awaiting your review.',
                     from_name: 'Steve — Art Department',
