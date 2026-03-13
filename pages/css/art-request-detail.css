@@ -1320,6 +1320,61 @@ body {
     font-style: italic;
 }
 
+/* ── Garments & Colors ──────────────────────────────── */
+.ard-garment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.ard-garment-row:last-child { border-bottom: none; }
+.ard-garment-info { flex: 1; min-width: 0; }
+.ard-garment-num {
+    font-size: 11px;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 2px;
+}
+.ard-garment-style {
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+}
+.ard-garment-color {
+    font-size: 13px;
+    color: #555;
+    margin-top: 2px;
+}
+.ard-garment-images {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+.ard-garment-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    background: #f8f9fa;
+    transition: border-color 0.15s, transform 0.15s;
+}
+.ard-garment-thumb:hover {
+    border-color: #009900;
+    transform: scale(1.1);
+}
+
+/* ── Billing Divider ───────────────────────────────── */
+.ard-billing-divider {
+    border-top: 1px solid #e9ecef;
+    margin: 12px 0;
+}
+
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 768px) {
     .ard-grid {

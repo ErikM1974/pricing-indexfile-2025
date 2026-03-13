@@ -88,6 +88,31 @@
                     </div>
                 </div>
 
+                <!-- ShopWorks References -->
+                <div class="ard-card" id="ard-sw-refs-card" style="display:none;">
+                    <div class="ard-card-header">ShopWorks References</div>
+                    <div class="ard-card-body">
+                        <div class="ard-field">
+                            <span class="ard-label">Customer #</span>
+                            <span class="ard-value" id="ard-sw-customer">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Design #</span>
+                            <span class="ard-value" id="ard-sw-design">--</span>
+                        </div>
+                        <div class="ard-field">
+                            <span class="ard-label">Order #</span>
+                            <span class="ard-value" id="ard-sw-order">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Garments & Colors -->
+                <div class="ard-card" id="ard-garments-card" style="display:none;">
+                    <div class="ard-card-header">Garments & Colors</div>
+                    <div class="ard-card-body" id="ard-garments-body"></div>
+                </div>
+
                 <!-- Art Time & Billing Card -->
                 <div class="ard-card">
                     <div class="ard-card-header ard-card-header--green">Art Time & Billing</div>
@@ -107,6 +132,17 @@
                             </div>
                         </div>
                         <div class="ard-billing-rate">Rate: $75/hr in 15-min increments</div>
+                        <div id="ard-quoted-section" style="display:none;">
+                            <div class="ard-billing-divider"></div>
+                            <div class="ard-field">
+                                <span class="ard-label">Quoted Art Charge</span>
+                                <span class="ard-value" id="ard-prelim-charges">--</span>
+                            </div>
+                            <div class="ard-field" id="ard-addl-services-field" style="display:none;">
+                                <span class="ard-label">Additional Services</span>
+                                <span class="ard-value" id="ard-addl-services">--</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -130,6 +166,10 @@
                         <div class="ard-field">
                             <span class="ard-label">Email</span>
                             <span class="ard-value" id="ard-contact-email">--</span>
+                        </div>
+                        <div class="ard-field" id="ard-phone-field" style="display:none;">
+                            <span class="ard-label">Phone</span>
+                            <span class="ard-value" id="ard-contact-phone">--</span>
                         </div>
                     </div>
                 </div>

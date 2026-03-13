@@ -51,6 +51,28 @@
         { key: 'CDN_Link_Four', label: 'Artwork 4' }
     ];
 
+    // ── Smart Back Navigation ──────────────────────────────────────────
+    (function setupBackNavigation() {
+        var backLink = document.querySelector('.ard-back-link');
+        if (!backLink) return;
+        var ref = document.referrer || '';
+        if (ref.indexOf('/dashboards/art-hub-steve') !== -1) {
+            backLink.textContent = '\u2190 Back to Art Hub';
+            backLink.href = '/dashboards/art-hub-steve.html';
+        } else if (ref.indexOf('/ae-dashboard') !== -1 || ref.indexOf('/dashboards/ae-dashboard') !== -1) {
+            backLink.textContent = '\u2190 Back to AE Dashboard';
+            backLink.href = '/dashboards/ae-dashboard.html';
+        } else if (window.opener || (window.history.length <= 2 && !ref)) {
+            backLink.textContent = '\u2190 Close Tab';
+            backLink.href = '#';
+            backLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.close();
+                window.location.href = '/staff-dashboard.html';
+            });
+        }
+    })();
+
     // Extract design ID from URL path: /art-request/12345
     const pathParts = window.location.pathname.split('/');
     const designId = pathParts[pathParts.length - 1];
@@ -143,6 +165,20 @@
             document.getElementById('ard-placement-field').style.display = '';
         }
 
+        // ShopWorks References
+        var swCustomer = req.Shopwork_customer_number || req.Shopworks_Customer_Number || '';
+        var swDesign = req.Design_Num_SW || '';
+        var swOrder = req.Order_Num_SW || '';
+        if (swCustomer || swDesign || swOrder) {
+            document.getElementById('ard-sw-refs-card').style.display = '';
+            if (swCustomer) setText('ard-sw-customer', swCustomer);
+            if (swDesign) setText('ard-sw-design', swDesign);
+            if (swOrder) setText('ard-sw-order', swOrder);
+        }
+
+        // Garments & Colors
+        renderGarments(req);
+
         // Billing
         const artMins = req.Art_Minutes || 0;
         const artHours = (Math.ceil(artMins / 15) * 0.25).toFixed(2);
@@ -150,6 +186,21 @@
         document.getElementById('ard-art-minutes').textContent = artMins;
         document.getElementById('ard-art-hours').textContent = artHours;
         document.getElementById('ard-art-billed').textContent = `$${parseFloat(artBilled).toFixed(2)}`;
+
+        // Quoted charges from AE
+        var prelimCharges = req.Prelim_Charges || req.Charge_Quoted || '';
+        var addlServices = req.Additional_Services || '';
+        if (prelimCharges || addlServices) {
+            document.getElementById('ard-quoted-section').style.display = '';
+            if (prelimCharges) {
+                var chargeVal = typeof prelimCharges === 'number' ? '$' + prelimCharges.toFixed(2) : prelimCharges;
+                setText('ard-prelim-charges', chargeVal);
+            }
+            if (addlServices) {
+                setText('ard-addl-services', addlServices);
+                document.getElementById('ard-addl-services-field').style.display = '';
+            }
+        }
 
         // Contact Info
         const firstName = req.First_name || req.First_Name || '';
@@ -165,6 +216,15 @@
                 emailEl.style.cursor = 'pointer';
                 emailEl.title = 'Click to email';
                 emailEl.addEventListener('click', () => { window.location.href = 'mailto:' + contactEmail; });
+            }
+            var phone = req.Phone || '';
+            if (phone) {
+                var phoneEl = document.getElementById('ard-contact-phone');
+                phoneEl.textContent = phone;
+                phoneEl.style.cursor = 'pointer';
+                phoneEl.title = 'Click to call';
+                phoneEl.addEventListener('click', function () { window.location.href = 'tel:' + phone; });
+                document.getElementById('ard-phone-field').style.display = '';
             }
         }
 
@@ -195,6 +255,55 @@
 
         // Status timeline
         renderStatusTimeline(notes);
+    }
+
+    // ── Garments & Colors ─────────────────────────────────────────────────
+    function renderGarments(req) {
+        var container = document.getElementById('ard-garments-body');
+        var card = document.getElementById('ard-garments-card');
+        var ROWS = [
+            { style: 'GarmentStyle', color: 'GarmentColor', swatch: 'Swatch_1', image: 'MAIN_IMAGE_URL_1', num: 1 },
+            { style: 'Garm_Style_2', color: 'Garm_Color_2', swatch: 'Swatch_2', image: 'MAIN_IMAGE_URL_2', num: 2 },
+            { style: 'Garm_Style_3', color: 'Garm_Color_3', swatch: 'Swatch_3', image: 'MAIN_IMAGE_URL_3', num: 3 },
+            { style: 'Garm_Style_4', color: 'Garm_Color_4', swatch: 'Swatch_4', image: 'MAIN_IMAGE_URL_4', num: 4 }
+        ];
+        var hasAny = false;
+        var html = '';
+        ROWS.forEach(function (row) {
+            var style = req[row.style] || '';
+            var color = req[row.color] || '';
+            if (!style && !color) return;
+            hasAny = true;
+            var swatchUrl = req[row.swatch] || '';
+            var imageUrl = req[row.image] || '';
+            html += '<div class="ard-garment-row">';
+            html += '<div class="ard-garment-info">';
+            html += '<div class="ard-garment-num">Garment ' + row.num + '</div>';
+            html += '<div class="ard-garment-style">' + escapeHtml(style) + '</div>';
+            if (color) html += '<div class="ard-garment-color">' + escapeHtml(color) + '</div>';
+            html += '</div>';
+            html += '<div class="ard-garment-images">';
+            if (swatchUrl) {
+                html += '<img class="ard-garment-thumb" src="' + escapeHtml(swatchUrl) + '" alt="Swatch" title="Color Swatch" loading="lazy" onerror="this.style.display=\'none\'">';
+            }
+            if (imageUrl) {
+                html += '<img class="ard-garment-thumb" src="' + escapeHtml(imageUrl) + '" alt="Model" title="Model Image" loading="lazy" onerror="this.style.display=\'none\'">';
+            }
+            html += '</div></div>';
+        });
+        if (hasAny) {
+            card.style.display = '';
+            container.innerHTML = html;
+            // Lightbox click on garment thumbnails
+            container.querySelectorAll('.ard-garment-thumb').forEach(function (img) {
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', function () {
+                    document.getElementById('ard-lightbox-img').src = img.src;
+                    document.getElementById('ard-lightbox-label').textContent = img.alt + ' - ' + img.title;
+                    document.getElementById('ard-lightbox').style.display = 'flex';
+                });
+            });
+        }
     }
 
     // ── Mockup Gallery ────────────────────────────────────────────────────
