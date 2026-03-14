@@ -726,3 +726,53 @@ input[name^="cbParamVirtual"] {
         font-size: 13px;
     }
 }
+
+/* ---------- Order # Validation ---------- */
+.ae-required-asterisk {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.ae-field-error {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.ae-field-verified {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15) !important;
+}
+
+.ae-field-warning {
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+}
+
+.ae-order-feedback {
+    font-size: 12px;
+    margin-top: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.ae-order-feedback--loading {
+    color: #64748b;
+    font-style: italic;
+}
+
+.ae-order-feedback--success {
+    color: #059669;
+    background: #ecfdf5;
+    font-weight: 500;
+}
+
+.ae-order-feedback--warning {
+    color: #92400e;
+    background: #fffbeb;
+}
+
+.ae-order-feedback--error {
+    color: #dc2626;
+    background: #fef2f2;
+    font-weight: 500;
+}

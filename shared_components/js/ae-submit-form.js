@@ -747,10 +747,23 @@
                 buttons.forEach(function (b) { b.classList.remove('active'); });
                 btn.classList.add('active');
 
-                // Set hidden field value
+                // Set hidden field value + track mode for validation
+                _currentRequestType = requestType === 'mockup' ? 'Mockup' : 'New Artwork';
                 var hiddenField = document.querySelector('[name="InsertRecordRequest_Type"]');
                 if (hiddenField) {
-                    hiddenField.value = requestType === 'mockup' ? 'Mockup' : 'New Artwork';
+                    hiddenField.value = _currentRequestType;
+                }
+
+                // Toggle required asterisk visibility
+                var asterisk = document.querySelector('.ae-required-asterisk');
+                if (asterisk) asterisk.style.display = requestType === 'mockup' ? 'none' : '';
+
+                // Clear any validation state on Order # when switching modes
+                var orderInput = document.querySelector('[name="InsertRecordOrder_Num_SW"]');
+                if (orderInput) {
+                    orderInput.classList.remove('ae-field-error', 'ae-field-warning');
+                    var fb = orderInput.parentNode.querySelector('.ae-order-feedback');
+                    if (fb) fb.style.display = 'none';
                 }
 
                 // Update helper text
@@ -810,12 +823,106 @@
         }
     }
 
+    // ── Order # Validation & ShopWorks Verification ────────────────
+
+    /**
+     * Track current request type mode for validation.
+     * Updated by initRequestTypeToggle() click handler.
+     */
+    var _currentRequestType = 'New Artwork'; // default
+
+    /**
+     * Add required asterisk to Order # label and attach validation.
+     * - On blur: verify order exists in ShopWorks via ManageOrders API
+     * - On submit: block if empty in New Artwork mode
+     */
+    function initOrderValidation() {
+        var orderInput = document.querySelector('[name="InsertRecordOrder_Num_SW"]');
+        if (!orderInput || orderInput._aeOrderValidation) return;
+        orderInput._aeOrderValidation = true;
+
+        // Add required asterisk to label
+        var label = findLabelForInput('Order_Num_SW');
+        if (label && label.textContent.indexOf('*') === -1) {
+            var asterisk = document.createElement('span');
+            asterisk.className = 'ae-required-asterisk';
+            asterisk.textContent = ' *';
+            label.appendChild(asterisk);
+        }
+
+        // Create feedback container next to input
+        var feedback = document.createElement('div');
+        feedback.className = 'ae-order-feedback';
+        feedback.style.display = 'none';
+        orderInput.parentNode.insertBefore(feedback, orderInput.nextSibling);
+
+        // On blur — verify order in ShopWorks
+        orderInput.addEventListener('blur', function () {
+            var orderNum = orderInput.value.trim();
+            orderInput.classList.remove('ae-field-error', 'ae-field-verified', 'ae-field-warning');
+            feedback.style.display = 'none';
+
+            if (!orderNum) return;
+
+            feedback.className = 'ae-order-feedback ae-order-feedback--loading';
+            feedback.textContent = 'Checking ShopWorks...';
+            feedback.style.display = 'block';
+
+            fetch(API_BASE + '/api/manageorders/orders?filter=id_Order=' + encodeURIComponent(orderNum))
+                .then(function (resp) { return resp.ok ? resp.json() : { result: [] }; })
+                .then(function (data) {
+                    var orders = data.result || data || [];
+                    if (orders.length > 0) {
+                        var customerName = orders[0].CustomerName || '';
+                        orderInput.classList.add('ae-field-verified');
+                        feedback.className = 'ae-order-feedback ae-order-feedback--success';
+                        feedback.innerHTML = '&#x2714; Order ' + escapeHtml(orderNum) + (customerName ? ' &mdash; ' + escapeHtml(customerName) : '');
+                    } else {
+                        orderInput.classList.add('ae-field-warning');
+                        feedback.className = 'ae-order-feedback ae-order-feedback--warning';
+                        feedback.textContent = '\u26A0 Order not found in ShopWorks \u2014 it may not have synced yet';
+                    }
+                    feedback.style.display = 'block';
+                })
+                .catch(function () {
+                    feedback.style.display = 'none';
+                });
+        });
+
+        // On submit — block if empty in New Artwork mode
+        var form = orderInput.closest('form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                if (_currentRequestType === 'Mockup') return; // skip in mockup mode
+
+                if (!orderInput.value.trim()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    orderInput.classList.add('ae-field-error');
+                    feedback.className = 'ae-order-feedback ae-order-feedback--error';
+                    feedback.textContent = 'ShopWorks Order # is required for New Artwork requests';
+                    feedback.style.display = 'block';
+                    orderInput.focus();
+                    orderInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return false;
+                }
+            }, true); // capture phase to fire before Caspio
+        }
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     // ── Init ───────────────────────────────────────────────────────
 
     document.addEventListener('DataPageReady', function () {
         setTimeout(function () {
             restructureFormLayout();
             initRequestTypeToggle();
+            initOrderValidation();
             monitorGarmentCascade();
             monitorAllSwatchesAndImages();
             addRowNumbers();
