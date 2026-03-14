@@ -16,6 +16,7 @@
 
     var EMAILJS_SERVICE_ID = 'service_1c4k67j';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    var HEROKU_ORIGIN = 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com';
 
     var REP_EMAIL_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
@@ -1095,6 +1096,88 @@
 
     // ── Expose public API ─────────────────────────────────────────────
 
+    // ── Send Mockup Reminder (shared by gallery cards + detail page) ──
+
+    function sendMockupReminder(designId, mockupUrl, repEmail, company, buttonEl) {
+        if (!mockupUrl) {
+            alert('No mockup has been uploaded yet. Please upload a mockup first.');
+            return;
+        }
+
+        var rep = resolveRep(repEmail);
+        var displayTo = rep.displayName || rep.email || 'sales rep';
+
+        if (!confirm('Send a mockup reminder to ' + displayTo + '?')) return;
+
+        var originalLabel = buttonEl.textContent;
+        buttonEl.disabled = true;
+        buttonEl.textContent = 'Sending...';
+
+        // 1. Log a "Reminder" note
+        fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                noteType: 'Reminder',
+                noteText: 'Mockup reminder sent to ' + displayTo,
+                noteBy: 'art@nwcustomapparel.com'
+            })
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Note failed ' + resp.status);
+
+            // 2. Send EmailJS approval reminder
+            if (typeof emailjs !== 'undefined' && rep.email) {
+                emailjs.send(EMAILJS_SERVICE_ID, 'art_approval_request', {
+                    to_email: rep.email,
+                    to_name: rep.displayName || 'Sales Team',
+                    design_id: designId,
+                    company_name: company,
+                    detail_link: HEROKU_ORIGIN + '/art-request/' + designId + '?view=ae',
+                    mockup_url: mockupUrl,
+                    message: 'Reminder: A mockup is awaiting your review.',
+                    from_name: 'Steve — Art Department',
+                    revision_count: 0,
+                    mockup_images_html: '<div style="display:inline-block;margin:8px;"><img src="' + escapeHtml(mockupUrl) + '" alt="Mockup" style="max-width:260px;border-radius:8px;border:1px solid #e5e7eb;"></div>',
+                    mockup_count: 1,
+                    art_time_display: ''
+                }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                    console.warn('Reminder email failed:', err);
+                });
+            }
+
+            // 3. Post toast notification to AE dashboard
+            fetch(API_BASE + '/api/art-notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'mockup_reminder',
+                    designId: designId,
+                    companyName: company,
+                    actorName: 'Steve',
+                    targetRep: rep.email
+                })
+            }).catch(function () { /* fire-and-forget */ });
+
+            buttonEl.textContent = 'Reminder Sent!';
+            buttonEl.style.background = '#28a745';
+            setTimeout(function () {
+                buttonEl.textContent = originalLabel;
+                buttonEl.style.background = '';
+                buttonEl.disabled = false;
+            }, 3000);
+
+        }).catch(function (err) {
+            console.error('Reminder failed:', err);
+            buttonEl.textContent = 'Error';
+            buttonEl.style.background = '#dc3545';
+            setTimeout(function () {
+                buttonEl.textContent = originalLabel;
+                buttonEl.style.background = '';
+                buttonEl.disabled = false;
+            }, 2000);
+        });
+    }
+
     window.ArtActions = {
         // Modal functions
         showArtTimeModal: showArtTimeModal,
@@ -1106,6 +1189,7 @@
         initApprovalModalListeners: initApprovalModalListeners,
         // Notifications
         notifyReopen: notifyReopen,
+        sendMockupReminder: sendMockupReminder,
         // Helpers
         logArtCharge: logArtCharge,
         sendNotificationEmail: sendNotificationEmail,

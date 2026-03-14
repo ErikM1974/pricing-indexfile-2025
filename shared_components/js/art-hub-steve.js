@@ -577,10 +577,10 @@
                     b.textContent = 'Updated!';
                     b.style.background = '#28a745';
 
-                    // Notify sales rep (best-effort, non-blocking)
+                    // Notify sales rep (best-effort, non-blocking) — only if status is actually changing
                     const repEl = card.querySelector('.rep-name[data-email]');
                     const cardRepEmail = repEl ? repEl.dataset.email : '';
-                    if (cardRepEmail && typeof emailjs !== 'undefined') {
+                    if (!status.includes('inprogress') && cardRepEmail && typeof emailjs !== 'undefined') {
                         const companyEl = card.querySelector('.company-name');
                         const repDispName = getRepDisplayName(cardRepEmail);
                         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_in_progress', {
@@ -604,8 +604,31 @@
                 }
             }));
 
-            const canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
-            if (canSendMockup) {
+            if (status.includes('awaitingapproval')) {
+                // Already sent — show Send Reminder (simple confirm + re-send, no full modal)
+                statusSection.btns.appendChild(btn('Send Reminder', 'approve', async (b) => {
+                    b.disabled = true;
+                    b.textContent = 'Loading...';
+                    try {
+                        const resp = await fetch(`${API_BASE}/api/artrequests?id_design=${designId}&limit=1`);
+                        if (!resp.ok) throw new Error('Fetch failed');
+                        const data = await resp.json();
+                        const req = data.Result ? data.Result[0] : data[0];
+                        const mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+                        const repEl = card.querySelector('.rep-name[data-email]');
+                        const repEmail = repEl ? repEl.dataset.email : '';
+                        const companyEl = card.querySelector('.company-name');
+                        const company = companyEl ? companyEl.textContent.trim() : '';
+                        b.textContent = 'Send Reminder';
+                        ArtActions.sendMockupReminder(designId, mockupUrl, repEmail, company, b);
+                    } catch (err) {
+                        console.error('Send Reminder failed:', err);
+                        b.textContent = 'Error';
+                        b.style.background = '#dc3545';
+                        setTimeout(() => { b.textContent = 'Send Reminder'; b.style.background = ''; b.disabled = false; }, 2000);
+                    }
+                }));
+            } else if (status.includes('inprogress') || status.includes('revisionrequested')) {
                 statusSection.btns.appendChild(btn('Send Mockup', 'approve', () => {
                     const companyEl = card.querySelector('.company-name');
                     ArtActions.showSendForApprovalModal(designId, companyEl ? companyEl.textContent.trim() : '');
