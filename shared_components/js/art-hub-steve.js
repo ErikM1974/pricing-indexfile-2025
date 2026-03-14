@@ -1635,6 +1635,13 @@
         auditObserver.observe(card);
     }
 
+    function getSteveCostFromCard(card) {
+        var actualMinsSpan = card.querySelector('.actual-minutes');
+        var actualMins = actualMinsSpan ? (parseInt(actualMinsSpan.textContent) || 0) : 0;
+        var actualHours = actualMins > 0 ? (Math.ceil(actualMins / 15) * 0.25) : 0;
+        return actualHours * 75;
+    }
+
     function loadCardAudit(card) {
         var orderNum = card.dataset.auditOrder;
         if (!orderNum) return;
@@ -1648,8 +1655,11 @@
                     return item.PartNumber && ART_PNS.indexOf(item.PartNumber.trim()) !== -1;
                 });
 
+                var steveCost = getSteveCostFromCard(card);
+
                 if (artItems.length === 0) {
-                    insertAuditBadge(card, 'No Art Charge', 'amber');
+                    insertAuditBadge(card, 'No Art Charge', 'amber',
+                        'No art charge found on invoice' + (steveCost > 0 ? ' \u2014 Steve: $' + steveCost.toFixed(2) : ''));
                     return;
                 }
 
@@ -1668,9 +1678,17 @@
                 });
 
                 if (waived && billedTotal === 0) {
-                    insertAuditBadge(card, 'Art Waived', 'red');
+                    insertAuditBadge(card, 'Art Waived', 'red',
+                        'Art charge waived on invoice' + (steveCost > 0 ? ' \u2014 Steve: $' + steveCost.toFixed(2) : ''));
+                } else if (steveCost > billedTotal) {
+                    // Steve's work exceeds what was billed — red flag
+                    var overage = steveCost - billedTotal;
+                    insertAuditBadge(card, 'Art \u25B2 $' + billedTotal.toFixed(0), 'red',
+                        'Steve: $' + steveCost.toFixed(2) + ' \u00B7 Billed: $' + billedTotal.toFixed(2) + ' \u2014 over by $' + overage.toFixed(2));
                 } else {
-                    insertAuditBadge(card, 'Art $' + billedTotal.toFixed(0), 'green');
+                    // Steve's work ≤ billed — profitable or break-even
+                    insertAuditBadge(card, 'Art \u2713 $' + billedTotal.toFixed(0), 'green',
+                        'Steve: $' + steveCost.toFixed(2) + ' \u00B7 Billed: $' + billedTotal.toFixed(2));
                 }
             })
             .catch(function () {
@@ -1678,10 +1696,11 @@
             });
     }
 
-    function insertAuditBadge(card, text, color) {
+    function insertAuditBadge(card, text, color, tooltip) {
         var badge = document.createElement('span');
         badge.className = 'audit-badge audit-badge--' + color;
         badge.textContent = text;
+        if (tooltip) badge.title = tooltip;
         // Insert after the status pill or in the card header area
         var headerArea = card.querySelector('.card-header') || card.querySelector('.company-name');
         if (headerArea) {
