@@ -2388,6 +2388,14 @@ For best practices/patterns:
 **Solution:** Hardcoded all email `detail_link` values to `https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/` + designId. Fixed in 4 files (7 occurrences): art-actions-shared.js, art-hub-steve.js, ae-submit-form.js, art-request-detail.js.
 **Prevention:** Never use `window.location.origin` for links in emails — emails are opened outside the sender's browser context. Use the production Heroku URL constant.
 
+## Bug: buildColumnMap() else-if chain — generic match overwrites specific column (2026-03-14)
+**Date:** 2026-03-14
+**Project:** [Pricing Index] AE Dashboard
+**Symptoms:** Company name not showing on AE art request gallery cards despite data existing in Caspio table.
+**Root cause:** `buildColumnMap()` used an `else if` chain where `text.indexOf('company')` (line 326) matched BOTH column 2 "Company" AND column 12 "Company Mockup". Since the loop processes columns sequentially, column 12 overwrote `map.company` from 2 to 12. The more specific "Company Mockup" check at line 334 never fired because the generic check caught it first.
+**Solution:** Moved the specific `company mockup` / `company_mockup` match BEFORE the generic `company` match in the else-if chain. Specific patterns must always come before generic substring patterns.
+**Prevention:** In `else if` column detection chains, always order matches from MOST SPECIFIC to LEAST SPECIFIC. A generic `indexOf('company')` will match "Company", "Company Mockup", "CompanyName", etc. Test column detection with `console.log(JSON.stringify(colMap))` to verify all columns map correctly.
+
 ## Bug: Non-image files (EPS, PDF) opened in image lightbox instead of downloading
 **Date:** 2026-03-13
 **Project:** [Pricing Index] Art Request Detail

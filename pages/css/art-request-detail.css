@@ -1599,3 +1599,64 @@ body.ae-view .ard-status-step.active .ard-status-dot {
 body.ae-view .ard-status-step.active .ard-status-label {
     color: #981e32;
 }
+
+/* ── Invoice Audit ─────────────────────────────────── */
+.ard-audit-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+.ard-audit-loading {
+    font-size: 12px;
+    color: #94a3b8;
+    font-style: italic;
+}
+.ard-audit-status {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+.ard-audit-status:last-child { margin-bottom: 0; }
+.ard-audit-status--green {
+    background: #ecfdf5;
+    border-left: 3px solid #059669;
+    color: #065f46;
+}
+.ard-audit-status--red {
+    background: #fef2f2;
+    border-left: 3px solid #dc2626;
+    color: #991b1b;
+}
+.ard-audit-status--amber {
+    background: #fffbeb;
+    border-left: 3px solid #d97706;
+    color: #92400e;
+}
+.ard-audit-status--gray {
+    background: #f8fafc;
+    border-left: 3px solid #94a3b8;
+    color: #64748b;
+}
+.ard-audit-message {
+    font-weight: 600;
+}
+.ard-audit-detail {
+    font-size: 12px;
+    margin-top: 4px;
+    opacity: 0.85;
+}
+.ard-audit-pn {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-weight: 600;
+}
+.ard-audit-comparison {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+    font-size: 11px;
+}

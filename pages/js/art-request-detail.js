@@ -206,6 +206,11 @@
             }
         }
 
+        // Invoice Audit — check ShopWorks for art charge line items
+        if (swOrder) {
+            loadInvoiceAudit(swOrder, artBilled, prelimCharges);
+        }
+
         // Contact Info
         const firstName = req.First_name || req.First_Name || '';
         const lastName = req.Last_name || req.Last_Name || '';
@@ -1824,5 +1829,104 @@
         });
 
         container.style.display = '';
+    }
+
+    // ── Invoice Audit — ShopWorks Art Charge Verification ─────────────
+    var ART_CHARGE_PNS = ['DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'AS-Garm', 'AS-CAP'];
+
+    function isArtChargePn(pn) {
+        if (!pn) return false;
+        return ART_CHARGE_PNS.indexOf(pn.trim()) !== -1;
+    }
+
+    function loadInvoiceAudit(orderNum, artBilled, prelimCharges) {
+        var container = document.getElementById('ard-invoice-audit');
+        var body = document.getElementById('ard-audit-body');
+        if (!container || !body) return;
+
+        container.style.display = '';
+        body.innerHTML = '<div class="ard-audit-loading">Checking invoice...</div>';
+
+        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var items = data.result || [];
+                if (items.length === 0) {
+                    body.innerHTML = renderAuditStatus('gray', 'Order #' + escapeHtml(orderNum) + ' not found or has no line items');
+                    return;
+                }
+
+                var artChargeItems = items.filter(function (item) {
+                    return isArtChargePn(item.PartNumber);
+                });
+
+                if (artChargeItems.length === 0) {
+                    // No art charge line item on order at all
+                    var msg = 'No Art Charge Found on Order #' + escapeHtml(orderNum);
+                    var detail = artBilled > 0
+                        ? 'Steve\'s work: $' + parseFloat(artBilled).toFixed(2) + ' — but no art charge line item on invoice'
+                        : 'No art charge line item exists on this ShopWorks order';
+                    body.innerHTML = renderAuditStatus('amber', msg, detail);
+                    return;
+                }
+
+                // Art charge line items found — check each
+                var html = '';
+                artChargeItems.forEach(function (item) {
+                    var price = item.LineUnitPrice;
+                    var desc = (item.PartDescription || '').trim();
+                    var descLower = desc.toLowerCase();
+                    var pn = item.PartNumber || '';
+
+                    // Waiver detection: null price (Calc OFF), or description contains waiver keywords
+                    var isWaived = price === null || price === 0 ||
+                        descLower.indexOf('waiv') !== -1 ||
+                        descLower.indexOf('no charge') !== -1 ||
+                        descLower.indexOf('n/c') !== -1 ||
+                        descLower.indexOf('comp') !== -1;
+
+                    if (isWaived) {
+                        var waivedMsg = 'ART CHARGE WAIVED';
+                        var waivedDetail = '<span class="ard-audit-pn">' + escapeHtml(pn) + '</span>';
+                        if (desc) waivedDetail += ' — "' + escapeHtml(desc) + '"';
+                        if (price !== null && price > 0) {
+                            waivedDetail += '<br>Listed price: $' + parseFloat(price).toFixed(2) + ' (toggled OFF)';
+                        }
+                        // Show comparison
+                        var comparison = [];
+                        if (artBilled > 0) comparison.push('Steve\'s actual work: $' + parseFloat(artBilled).toFixed(2));
+                        if (prelimCharges) {
+                            var qVal = typeof prelimCharges === 'number' ? '$' + prelimCharges.toFixed(2) : prelimCharges;
+                            comparison.push('Quoted: ' + qVal);
+                        }
+                        comparison.push('Billed to customer: $0.00');
+                        if (comparison.length > 0) {
+                            waivedDetail += '<div class="ard-audit-comparison">' + comparison.join(' &middot; ') + '</div>';
+                        }
+                        html += renderAuditStatus('red', waivedMsg, waivedDetail);
+                    } else {
+                        var billedMsg = 'Art Charge Billed: $' + parseFloat(price).toFixed(2);
+                        var billedDetail = '<span class="ard-audit-pn">' + escapeHtml(pn) + '</span>';
+                        if (desc) billedDetail += ' — ' + escapeHtml(desc);
+                        html += renderAuditStatus('green', billedMsg, billedDetail);
+                    }
+                });
+
+                body.innerHTML = html;
+            })
+            .catch(function () {
+                body.innerHTML = renderAuditStatus('gray', 'Unable to verify invoice for Order #' + escapeHtml(orderNum));
+            });
+    }
+
+    function renderAuditStatus(color, message, detail) {
+        var html = '<div class="ard-audit-status ard-audit-status--' + color + '">';
+        html += '<div class="ard-audit-message">' + message + '</div>';
+        if (detail) html += '<div class="ard-audit-detail">' + detail + '</div>';
+        html += '</div>';
+        return html;
     }
 })();
