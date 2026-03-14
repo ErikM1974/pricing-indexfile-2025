@@ -46,8 +46,8 @@
 
     // ── Tab Switching ───────────────────────────────────────────────
 
-    var VISIBLE_TABS = ['submit', 'mockup-ruth', 'view', 'review', 'requirements'];
-    var DROPDOWN_TABS = ['gallery', 'generator'];
+    var VISIBLE_TABS = ['submit', 'view', 'mockup-ruth'];
+    var DROPDOWN_TABS = ['review', 'requirements', 'gallery', 'generator'];
 
     var TAB_PANE_MAP = {
         'submit': 'submit-tab',
@@ -323,7 +323,6 @@
             var text = (headers[i].textContent || '').trim().toLowerCase();
             if (text === 'status') map.status = i;
             else if (text === 'id_design') map.idDesign = i;
-            else if (text.indexOf('company') !== -1) map.company = i;
             else if (text.indexOf('due') !== -1) map.dueDate = i;
             else if (text.indexOf('order') !== -1 && text.indexOf('#') !== -1) map.orderNum = i;
             else if (text.indexOf('design') !== -1 && text.indexOf('#') !== -1) map.designNum = i;
@@ -332,6 +331,7 @@
             else if (text.indexOf('box_file_mockup') !== -1 || text.indexOf('box file mockup') !== -1) map.boxMockup = i;
             else if (text.indexOf('boxfilelink') !== -1 || text === 'box file link') map.boxFileLink = i;
             else if (text.indexOf('company_mockup') !== -1 || text.indexOf('company mockup') !== -1) map.companyMockup = i;
+            else if (text.indexOf('company') !== -1) map.company = i;
             else if (text.indexOf('file upload') !== -1) map.fileUpload = i;
             else if (text.indexOf('request type') !== -1) map.requestType = i;
             else if (text.indexOf('revision') !== -1 || (text.indexOf('num') !== -1 && text.indexOf('rev') !== -1)) map.revisionCount = i;
@@ -583,8 +583,8 @@
             .then(function (data) {
                 var items = data.Result || data || [];
                 var count = items.length;
-                // Find the Review Mockups tab button
-                var tabs = document.querySelectorAll('.ae-tab-btn');
+                // Find the Review Mockups button (visible tab or dropdown item)
+                var tabs = document.querySelectorAll('.tab-button, .dropdown-item');
                 tabs.forEach(function (tab) {
                     if (tab.textContent.indexOf('Review') !== -1) {
                         var badge = tab.querySelector('.ae-tab-badge');

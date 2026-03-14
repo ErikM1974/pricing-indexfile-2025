@@ -22,11 +22,9 @@
         <!-- Tab Buttons -->
         <div class="tab-buttons">
             <!-- Visible Tabs -->
-            <button class="tab-button active" onclick="showTab('submit')">Submit Art Steve</button>
+            <button class="tab-button active" onclick="showTab('submit')">Submit Artwork to Steve</button>
+            <button class="tab-button" onclick="showTab('view')">Mockups</button>
             <button class="tab-button" onclick="showTab('mockup-ruth')">Request Mockup Ruth</button>
-            <button class="tab-button" onclick="showTab('view')">My Art Requests</button>
-            <button class="tab-button" onclick="showTab('review')">Review Mockups</button>
-            <button class="tab-button" onclick="showTab('requirements')">Art Requirements & Fees</button>
             
             <!-- More Dropdown -->
             <div class="more-dropdown" style="margin-left: auto;">
@@ -45,6 +43,22 @@
                         </svg>
                         Tools
                     </div>
+                    <button class="dropdown-item" onclick="showTab('review'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Review Mockups
+                    </button>
+                    <button class="dropdown-item" onclick="showTab('requirements'); closeMoreDropdown();">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        Art Requirements & Fees
+                    </button>
                     <button class="dropdown-item" onclick="showTab('gallery'); closeMoreDropdown();">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -70,7 +84,7 @@
         <div class="tab-content">
             <!-- Submit Art Steve Tab -->
             <div id="submit-tab" class="tab-pane active">
-                <h2 class="tab-title">Submit Art Steve</h2>
+                <h2 class="tab-title">Submit Artwork to Steve</h2>
                 <!-- Caspio Submit Form DataPage Embed -->
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150009f0e9f9d4ff3457dae47/emb"></script>
             </div>
@@ -483,7 +497,7 @@
             
             <!-- View Requests Tab -->
             <div id="view-tab" class="tab-pane">
-                <h2 class="tab-title">My Art Requests</h2>
+                <h2 class="tab-title">Mockups</h2>
                 <div class="info-message">
                     <p>View all your submitted art requests below. You can check the status, view notes, and track progress. 
                     Click on any request to see more details.</p>
@@ -574,7 +588,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="/shared_components/js/ae-dashboard.js?v=8"></script>
+    <script src="/shared_components/js/ae-dashboard.js?v=9"></script>
     <script src="/shared_components/js/ae-submit-form.js?v=2"></script>
 </body>
 </html>
