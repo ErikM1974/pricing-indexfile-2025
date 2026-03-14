@@ -1844,7 +1844,7 @@
     }
 
     // ── Invoice Audit — ShopWorks Art Charge Verification ─────────────
-    var ART_CHARGE_PNS = ['DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'AS-Garm', 'AS-CAP'];
+    var ART_CHARGE_PNS = ['Art', 'GRT-50', 'GRT-75'];
 
     function isArtChargePn(pn) {
         if (!pn) return false;

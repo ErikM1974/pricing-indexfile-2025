@@ -1643,7 +1643,7 @@
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (data) {
                 var items = data.result || [];
-                var ART_PNS = ['DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'AS-Garm', 'AS-CAP'];
+                var ART_PNS = ['Art', 'GRT-50', 'GRT-75'];
                 var artItems = items.filter(function (item) {
                     return item.PartNumber && ART_PNS.indexOf(item.PartNumber.trim()) !== -1;
                 });
