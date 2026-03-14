@@ -753,6 +753,7 @@
             formatRepName(card);
             cleanEmptyFields(card);
             injectQuickActions(card);
+            addAuditIndicator(card);
         });
         buildSummaryBar();
     }
@@ -1592,6 +1593,101 @@
         // ── Approval Modal Event Listeners (delegated to shared module) ──
         ArtActions.initApprovalModalListeners();
     });
+
+    // ── Audit Indicator on Gallery Cards ────────────────────────────
+    var auditObserver = null;
+
+    function initAuditObserver() {
+        if (auditObserver) return;
+        auditObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                var card = entry.target;
+                auditObserver.unobserve(card);
+                loadCardAudit(card);
+            });
+        }, { rootMargin: '200px' });
+    }
+
+    function addAuditIndicator(card) {
+        if (card.dataset.auditQueued) return;
+        // Find Order # from hidden Caspio span (cb-order-num) or info-grid labels
+        var orderNum = '';
+        var cbOrderSpan = card.querySelector('.cb-order-num');
+        if (cbOrderSpan) {
+            orderNum = cbOrderSpan.textContent.replace(/[^0-9]/g, '').trim();
+        }
+        if (!orderNum) {
+            // Fallback: check info-grid labels
+            var labels = card.querySelectorAll('.label, .info-label');
+            labels.forEach(function (lbl) {
+                if (lbl.textContent.trim() === 'Order #') {
+                    var val = lbl.nextElementSibling;
+                    if (val) orderNum = val.textContent.replace(/[^0-9]/g, '').trim();
+                }
+            });
+        }
+        if (!orderNum) return;
+
+        card.dataset.auditQueued = '1';
+        card.dataset.auditOrder = orderNum;
+        initAuditObserver();
+        auditObserver.observe(card);
+    }
+
+    function loadCardAudit(card) {
+        var orderNum = card.dataset.auditOrder;
+        if (!orderNum) return;
+
+        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (data) {
+                var items = data.result || [];
+                var ART_PNS = ['DD', 'DDE', 'DDT', 'GRT-50', 'GRT-75', 'AS-Garm', 'AS-CAP'];
+                var artItems = items.filter(function (item) {
+                    return item.PartNumber && ART_PNS.indexOf(item.PartNumber.trim()) !== -1;
+                });
+
+                if (artItems.length === 0) {
+                    insertAuditBadge(card, 'No Art Charge', 'amber');
+                    return;
+                }
+
+                var waived = false;
+                var billedTotal = 0;
+                artItems.forEach(function (item) {
+                    var price = item.LineUnitPrice;
+                    var desc = (item.PartDescription || '').toLowerCase();
+                    if (price === null || price === 0 ||
+                        desc.indexOf('waiv') !== -1 || desc.indexOf('no charge') !== -1 ||
+                        desc.indexOf('n/c') !== -1 || desc.indexOf('comp') !== -1) {
+                        waived = true;
+                    } else {
+                        billedTotal += parseFloat(price) || 0;
+                    }
+                });
+
+                if (waived && billedTotal === 0) {
+                    insertAuditBadge(card, 'Art Waived', 'red');
+                } else {
+                    insertAuditBadge(card, 'Art $' + billedTotal.toFixed(0), 'green');
+                }
+            })
+            .catch(function () {
+                // Silent fail — don't clutter cards with errors
+            });
+    }
+
+    function insertAuditBadge(card, text, color) {
+        var badge = document.createElement('span');
+        badge.className = 'audit-badge audit-badge--' + color;
+        badge.textContent = text;
+        // Insert after the status pill or in the card header area
+        var headerArea = card.querySelector('.card-header') || card.querySelector('.company-name');
+        if (headerArea) {
+            headerArea.appendChild(badge);
+        }
+    }
 
     // ── Expose globals for HTML onclick attributes ────────────────────
     window.showTab = showTab;

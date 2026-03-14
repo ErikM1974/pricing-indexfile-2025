@@ -1661,6 +1661,153 @@ body.ae-view .ard-status-step.active .ard-status-label {
     font-size: 11px;
 }
 
+/* ── Audit Stat Boxes (4-column comparison) ── */
+.ard-audit-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.ard-stat-box {
+    text-align: center;
+    padding: 10px 6px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+.ard-stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+.ard-stat-label {
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 2px;
+}
+.ard-stat-box--green { background: #ecfdf5; border-color: #059669; }
+.ard-stat-box--green .ard-stat-value { color: #059669; }
+.ard-stat-box--red { background: #fef2f2; border-color: #dc2626; }
+.ard-stat-box--red .ard-stat-value { color: #dc2626; }
+.ard-stat-box--amber { background: #fffbeb; border-color: #d97706; }
+.ard-stat-box--amber .ard-stat-value { color: #d97706; }
+.ard-stat-box--slate { background: #f1f5f9; border-color: #94a3b8; }
+.ard-stat-mismatch {
+    background: #fef2f2;
+    color: #dc2626;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* ── Invoice Header ── */
+.ard-invoice-header {
+    margin-bottom: 10px;
+}
+.ard-invoice-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+.ard-invoice-meta {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* ── Invoice Line Items Table ── */
+.ard-invoice-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+.ard-invoice-table th {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 2px solid #e2e8f0;
+    color: #475569;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+.ard-invoice-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+}
+.ard-inv-right { text-align: right; }
+.ard-inv-pn {
+    font-family: 'SF Mono', Consolas, monospace;
+    font-weight: 600;
+    font-size: 11px;
+    white-space: nowrap;
+}
+.ard-inv-row--waived {
+    background: #fef2f2;
+}
+.ard-inv-row--waived .ard-inv-pn { color: #dc2626; }
+.ard-inv-row--art {
+    background: #ecfdf5;
+}
+.ard-inv-row--art .ard-inv-pn { color: #059669; }
+.ard-inv-waived-tag {
+    background: #dc2626;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+}
+.ard-inv-art-tag {
+    background: #059669;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+}
+
+/* ── Invoice Totals ── */
+.ard-invoice-totals {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 8px;
+    margin-top: 0;
+}
+.ard-invoice-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: #475569;
+}
+.ard-invoice-total-row--grand {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 6px;
+    margin-top: 4px;
+}
+.ard-invoice-total-row--balance {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* ── Responsive: stack stat boxes on mobile ── */
+@media (max-width: 480px) {
+    .ard-audit-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* ── Find Order Button & Modal ────────────────────────── */
 .ard-find-order-btn {
     background: #3b82f6;

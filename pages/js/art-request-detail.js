@@ -208,7 +208,7 @@
 
         // Invoice Audit — check ShopWorks for art charge line items
         if (swOrder) {
-            loadInvoiceAudit(swOrder, artBilled, prelimCharges);
+            loadFullInvoice(swOrder, artBilled, prelimCharges);
         }
 
         // Show "Find Order" button when order # is blank but we have search data
@@ -1851,87 +1851,55 @@
         return ART_CHARGE_PNS.indexOf(pn.trim()) !== -1;
     }
 
-    function loadInvoiceAudit(orderNum, artBilled, prelimCharges) {
+    function loadFullInvoice(orderNum, artBilled, prelimCharges) {
         var container = document.getElementById('ard-invoice-audit');
         var body = document.getElementById('ard-audit-body');
         if (!container || !body) return;
 
         container.style.display = '';
-        body.innerHTML = '<div class="ard-audit-loading">Checking invoice...</div>';
+        body.innerHTML = '<div class="ard-audit-loading">Loading invoice...</div>';
 
-        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
-            .then(function (resp) {
-                if (!resp.ok) throw new Error('HTTP ' + resp.status);
-                return resp.json();
-            })
-            .then(function (data) {
-                var items = data.result || [];
-                if (items.length === 0) {
-                    body.innerHTML = renderAuditStatus('gray', 'Order #' + escapeHtml(orderNum) + ' not found or has no line items');
-                    return;
-                }
+        // Fetch order header + line items in parallel
+        Promise.all([
+            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
+            fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        ])
+        .then(function (results) {
+            var orderData = (results[0].result || [])[0] || null;
+            var lineItems = results[1].result || [];
 
-                var artChargeItems = items.filter(function (item) {
-                    return isArtChargePn(item.PartNumber);
-                });
+            if (!orderData && lineItems.length === 0) {
+                body.innerHTML = renderAuditStatus('gray', 'Order #' + escapeHtml(orderNum) + ' not found (may be older than 60 days)');
+                return;
+            }
 
-                if (artChargeItems.length === 0) {
-                    // No art charge line item on order at all
-                    var msg = 'No Art Charge Found on Order #' + escapeHtml(orderNum);
-                    var detail = artBilled > 0
-                        ? 'Steve\'s work: $' + parseFloat(artBilled).toFixed(2) + ' — but no art charge line item on invoice'
-                        : 'No art charge line item exists on this ShopWorks order';
-                    body.innerHTML = renderAuditStatus('amber', msg, detail);
-                    return;
-                }
+            var html = '';
 
-                // Art charge line items found — check each
-                var html = '';
-                artChargeItems.forEach(function (item) {
-                    var price = item.LineUnitPrice;
-                    var desc = (item.PartDescription || '').trim();
-                    var descLower = desc.toLowerCase();
-                    var pn = item.PartNumber || '';
+            // Audit Comparison Stat Boxes
+            html += renderAuditStatBoxes(orderData, lineItems, artBilled, prelimCharges);
 
-                    // Waiver detection: null price (Calc OFF), or description contains waiver keywords
-                    var isWaived = price === null || price === 0 ||
-                        descLower.indexOf('waiv') !== -1 ||
-                        descLower.indexOf('no charge') !== -1 ||
-                        descLower.indexOf('n/c') !== -1 ||
-                        descLower.indexOf('comp') !== -1;
+            // Order Header
+            if (orderData) {
+                html += renderOrderHeader(orderData, orderNum);
+            }
 
-                    if (isWaived) {
-                        var waivedMsg = 'ART CHARGE WAIVED';
-                        var waivedDetail = '<span class="ard-audit-pn">' + escapeHtml(pn) + '</span>';
-                        if (desc) waivedDetail += ' — "' + escapeHtml(desc) + '"';
-                        if (price !== null && price > 0) {
-                            waivedDetail += '<br>Listed price: $' + parseFloat(price).toFixed(2) + ' (toggled OFF)';
-                        }
-                        // Show comparison
-                        var comparison = [];
-                        if (artBilled > 0) comparison.push('Steve\'s actual work: $' + parseFloat(artBilled).toFixed(2));
-                        if (prelimCharges) {
-                            var qVal = typeof prelimCharges === 'number' ? '$' + prelimCharges.toFixed(2) : prelimCharges;
-                            comparison.push('Quoted: ' + qVal);
-                        }
-                        comparison.push('Billed to customer: $0.00');
-                        if (comparison.length > 0) {
-                            waivedDetail += '<div class="ard-audit-comparison">' + comparison.join(' &middot; ') + '</div>';
-                        }
-                        html += renderAuditStatus('red', waivedMsg, waivedDetail);
-                    } else {
-                        var billedMsg = 'Art Charge Billed: $' + parseFloat(price).toFixed(2);
-                        var billedDetail = '<span class="ard-audit-pn">' + escapeHtml(pn) + '</span>';
-                        if (desc) billedDetail += ' — ' + escapeHtml(desc);
-                        html += renderAuditStatus('green', billedMsg, billedDetail);
-                    }
-                });
+            // Full Line Items Table
+            if (lineItems.length > 0) {
+                html += renderFullLineItems(lineItems);
+            }
 
-                body.innerHTML = html;
-            })
-            .catch(function () {
-                body.innerHTML = renderAuditStatus('gray', 'Unable to verify invoice for Order #' + escapeHtml(orderNum));
-            });
+            // Order Totals
+            if (orderData) {
+                html += renderOrderTotals(orderData);
+            }
+
+            body.innerHTML = html;
+        })
+        .catch(function (err) {
+            body.innerHTML = renderAuditStatus('gray', 'Unable to load invoice for Order #' + escapeHtml(orderNum) + ': ' + escapeHtml(err.message));
+        });
     }
 
     function renderAuditStatus(color, message, detail) {
@@ -2141,33 +2109,213 @@
             return;
         }
         if (!confirm('Link Order #' + orderNum + ' to this art request?')) return;
-
         var pkId = currentRequest.PK_ID;
+
+        // Step 1: Save Order_Num_SW
         fetch(API_BASE + '/api/artrequests/' + pkId, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ Order_Num_SW: String(orderNum) })
         })
-            .then(function (resp) {
-                if (!resp.ok) throw new Error('HTTP ' + resp.status);
-                return resp.json();
-            })
-            .then(function () {
-                // Close modal
-                document.getElementById('find-order-overlay').style.display = 'none';
-                document.getElementById('find-order-modal').style.display = 'none';
-                // Update UI
-                setText('ard-sw-order', orderNum);
-                var findBtn = document.getElementById('ard-find-order-btn');
-                if (findBtn) findBtn.style.display = 'none';
-                // Run invoice audit with the newly linked order
-                var artBilled = currentRequest.Amount_Art_Billed || 0;
-                var prelimCharges = currentRequest.Prelim_Charges || currentRequest.Charge_Quoted || null;
-                loadInvoiceAudit(String(orderNum), artBilled, prelimCharges);
-                showSuccessMessage('Order #' + orderNum + ' linked successfully');
-            })
-            .catch(function (err) {
-                alert('Failed to link order: ' + err.message);
-            });
+        .then(function (resp) { if (!resp.ok) throw new Error('HTTP ' + resp.status); return resp.json(); })
+        .then(function () {
+            // Close modal
+            document.getElementById('find-order-overlay').style.display = 'none';
+            document.getElementById('find-order-modal').style.display = 'none';
+            setText('ard-sw-order', orderNum);
+            var findBtn = document.getElementById('ard-find-order-btn');
+            if (findBtn) findBtn.style.display = 'none';
+
+            // Step 2: Fetch order data to get Customer # and other info
+            return fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum));
+        })
+        .then(function (resp) { if (!resp.ok) throw new Error('HTTP ' + resp.status); return resp.json(); })
+        .then(function (data) {
+            var orders = data.result || [];
+            var order = orders[0];
+            if (order && order.id_Customer) {
+                var swCustomerEl = document.getElementById('ard-sw-customer');
+                var currentCustomer = swCustomerEl ? swCustomerEl.textContent.trim() : '';
+                if (!currentCustomer || currentCustomer === '--') {
+                    // Auto-populate Customer # in Caspio
+                    fetch(API_BASE + '/api/artrequests/' + pkId, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ Shopwork_customer_number: String(order.id_Customer) })
+                    }).catch(function () {}); // fire-and-forget
+                    setText('ard-sw-customer', order.id_Customer);
+                    document.getElementById('ard-sw-refs-card').style.display = '';
+                }
+            }
+            // Step 3: Load full invoice view
+            var artBilled = currentRequest.Amount_Art_Billed || 0;
+            var prelimCharges = currentRequest.Prelim_Charges || currentRequest.Charge_Quoted || null;
+            loadFullInvoice(String(orderNum), artBilled, prelimCharges);
+            showSuccessMessage('Order #' + orderNum + ' linked successfully');
+        })
+        .catch(function (err) { alert('Failed to link order: ' + err.message); });
     }
+
+    // ── Audit Stat Boxes — 4-column comparison ────────────────────────
+    function renderAuditStatBoxes(orderData, lineItems, artBilled, prelimCharges) {
+        // Find art charge items
+        var artChargeItems = lineItems.filter(function (item) { return isArtChargePn(item.PartNumber); });
+        var invoiceArtTotal = 0;
+        var artWaived = false;
+        artChargeItems.forEach(function (item) {
+            var price = item.LineUnitPrice;
+            var desc = (item.PartDescription || '').toLowerCase();
+            if (price === null || price === 0 || desc.match(/waiv|no charge|n\/c|comp/)) {
+                artWaived = true;
+            } else {
+                invoiceArtTotal += parseFloat(price) || 0;
+            }
+        });
+
+        var orderTotal = orderData ? (parseFloat(orderData.cur_TotalInvoice) || 0) : 0;
+        var steveBilled = parseFloat(artBilled) || 0;
+        var aeQuoted = typeof prelimCharges === 'number' ? prelimCharges : (parseFloat(prelimCharges) || 0);
+
+        // Determine art charge status
+        var artChargeStatus, artChargeColor, artChargeLabel;
+        if (artChargeItems.length === 0) {
+            artChargeStatus = 'missing';
+            artChargeColor = 'amber';
+            artChargeLabel = 'No Art Charge';
+        } else if (artWaived && invoiceArtTotal === 0) {
+            artChargeStatus = 'waived';
+            artChargeColor = 'red';
+            artChargeLabel = 'WAIVED';
+        } else {
+            artChargeStatus = 'billed';
+            artChargeColor = 'green';
+            artChargeLabel = '$' + invoiceArtTotal.toFixed(2);
+        }
+
+        // Mismatch detection
+        var hasMismatch = steveBilled > 0 && artChargeStatus !== 'billed';
+        var mismatchNote = '';
+        if (hasMismatch) {
+            mismatchNote = '<div class="ard-stat-mismatch">Steve billed $' + steveBilled.toFixed(2) +
+                ' but art charge is ' + (artWaived ? 'waived' : 'missing') + ' on invoice</div>';
+        }
+
+        var html = '<div class="ard-audit-stats">';
+
+        // Box 1: Steve's Work
+        html += '<div class="ard-stat-box">';
+        html += '<div class="ard-stat-value">$' + steveBilled.toFixed(2) + '</div>';
+        html += '<div class="ard-stat-label">Steve\'s Work</div>';
+        html += '</div>';
+
+        // Box 2: AE Quoted
+        html += '<div class="ard-stat-box">';
+        html += '<div class="ard-stat-value">' + (aeQuoted > 0 ? '$' + aeQuoted.toFixed(2) : '--') + '</div>';
+        html += '<div class="ard-stat-label">AE Quoted</div>';
+        html += '</div>';
+
+        // Box 3: Invoice Art Charge (color-coded)
+        html += '<div class="ard-stat-box ard-stat-box--' + artChargeColor + '">';
+        html += '<div class="ard-stat-value">' + artChargeLabel + '</div>';
+        html += '<div class="ard-stat-label">Invoice Art</div>';
+        html += '</div>';
+
+        // Box 4: Order Total
+        html += '<div class="ard-stat-box ard-stat-box--slate">';
+        html += '<div class="ard-stat-value">$' + orderTotal.toFixed(2) + '</div>';
+        html += '<div class="ard-stat-label">Order Total</div>';
+        html += '</div>';
+
+        html += '</div>'; // .ard-audit-stats
+        html += mismatchNote;
+
+        return html;
+    }
+
+    // ── Order Header — meta info ──────────────────────────────────────
+    function renderOrderHeader(order, orderNum) {
+        var dateOrdered = order.date_Ordered ? new Date(order.date_Ordered).toLocaleDateString() : '--';
+        var dateInvoiced = order.date_Invoiced ? new Date(order.date_Invoiced).toLocaleDateString() : null;
+        var rep = order.CustomerServiceRep || '--';
+        var customer = order.CustomerName || '';
+
+        var html = '<div class="ard-invoice-header">';
+        html += '<div class="ard-invoice-title">Order #' + escapeHtml(String(orderNum));
+        if (customer) html += ' — ' + escapeHtml(customer);
+        html += '</div>';
+        html += '<div class="ard-invoice-meta">';
+        html += 'Ordered ' + escapeHtml(dateOrdered) + ' · Rep: ' + escapeHtml(rep);
+        if (dateInvoiced) html += ' · Invoiced ' + escapeHtml(dateInvoiced);
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+
+    // ── Full Line Items Table ─────────────────────────────────────────
+    function renderFullLineItems(items) {
+        // Sort by SortOrder if available
+        items.sort(function (a, b) { return (a.SortOrder || 0) - (b.SortOrder || 0); });
+
+        var html = '<table class="ard-invoice-table">';
+        html += '<thead><tr>';
+        html += '<th>Part #</th><th>Description</th><th class="ard-inv-right">Qty</th>';
+        html += '<th class="ard-inv-right">Unit Price</th><th class="ard-inv-right">Ext Price</th>';
+        html += '</tr></thead><tbody>';
+
+        items.forEach(function (item) {
+            var pn = item.PartNumber || '';
+            var desc = item.PartDescription || '';
+            var qty = item.LineQuantity || 0;
+            var unitPrice = item.LineUnitPrice;
+            var isArt = isArtChargePn(pn);
+
+            // Waiver detection for art charge items
+            var descLower = desc.toLowerCase();
+            var isWaived = isArt && (unitPrice === null || unitPrice === 0 ||
+                descLower.indexOf('waiv') !== -1 || descLower.indexOf('no charge') !== -1 ||
+                descLower.indexOf('n/c') !== -1 || descLower.indexOf('comp') !== -1);
+
+            var extPrice = (unitPrice !== null && unitPrice !== undefined) ? (qty * parseFloat(unitPrice)) : 0;
+            var rowClass = isWaived ? 'ard-inv-row--waived' : isArt ? 'ard-inv-row--art' : '';
+
+            html += '<tr class="' + rowClass + '">';
+            html += '<td class="ard-inv-pn">' + escapeHtml(pn) + '</td>';
+            html += '<td>' + escapeHtml(desc);
+            if (isWaived) html += ' <span class="ard-inv-waived-tag">WAIVED</span>';
+            if (isArt && !isWaived) html += ' <span class="ard-inv-art-tag">ART</span>';
+            html += '</td>';
+            html += '<td class="ard-inv-right">' + qty + '</td>';
+            html += '<td class="ard-inv-right">' + (unitPrice !== null && unitPrice !== undefined ? '$' + parseFloat(unitPrice).toFixed(2) : '$0.00') + '</td>';
+            html += '<td class="ard-inv-right">' + '$' + extPrice.toFixed(2) + '</td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        return html;
+    }
+
+    // ── Order Totals — subtotal/tax/shipping/total/balance ────────────
+    function renderOrderTotals(order) {
+        var subtotal = parseFloat(order.cur_SubTotal) || 0;
+        var tax = parseFloat(order.cur_SalesTaxTotal) || 0;
+        var shipping = parseFloat(order.cur_Shipping) || 0;
+        var total = parseFloat(order.cur_TotalInvoice) || 0;
+        var balance = parseFloat(order.cur_Balance) || 0;
+
+        var html = '<div class="ard-invoice-totals">';
+        html += '<div class="ard-invoice-total-row"><span>Subtotal</span><span>$' + subtotal.toFixed(2) + '</span></div>';
+        if (shipping > 0) {
+            html += '<div class="ard-invoice-total-row"><span>Shipping</span><span>$' + shipping.toFixed(2) + '</span></div>';
+        }
+        if (tax > 0) {
+            html += '<div class="ard-invoice-total-row"><span>Sales Tax</span><span>$' + tax.toFixed(2) + '</span></div>';
+        }
+        html += '<div class="ard-invoice-total-row ard-invoice-total-row--grand"><span>Total</span><span>$' + total.toFixed(2) + '</span></div>';
+        if (balance > 0) {
+            html += '<div class="ard-invoice-total-row ard-invoice-total-row--balance"><span>Balance Due</span><span>$' + balance.toFixed(2) + '</span></div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
 })();
