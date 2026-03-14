@@ -1660,3 +1660,176 @@ body.ae-view .ard-status-step.active .ard-status-label {
     border-top: 1px dashed rgba(0,0,0,0.1);
     font-size: 11px;
 }
+
+/* ── Find Order Button & Modal ────────────────────────── */
+.ard-find-order-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 8px;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.ard-find-order-btn:hover { background: #2563eb; }
+
+/* Find Order Modal */
+.ard-fo-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    z-index: 1001;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+.ard-fo-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+.ard-fo-modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0 4px;
+}
+.ard-fo-modal-close:hover { color: #334155; }
+.ard-fo-modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Find Order states */
+.ard-fo-loading { font-size: 13px; color: #64748b; font-style: italic; padding: 16px 0; }
+.ard-fo-empty { font-size: 13px; color: #94a3b8; padding: 16px 0; }
+.ard-fo-error { font-size: 13px; color: #dc2626; padding: 16px 0; }
+.ard-fo-header { font-size: 12px; color: #64748b; margin-bottom: 10px; font-weight: 600; }
+
+/* Manual search row */
+.ard-fo-manual {
+    padding: 12px 20px;
+    border-top: 1px solid #e2e8f0;
+}
+.ard-fo-manual-label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+.ard-fo-manual-row { display: flex; gap: 6px; }
+.ard-fo-manual-input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.ard-fo-manual-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+.ard-fo-manual-btn {
+    background: #475569;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+.ard-fo-manual-btn:hover { background: #334155; }
+.ard-fo-manual-note {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* Order cards */
+.ard-order-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s, background 0.15s;
+}
+.ard-order-card:hover { border-color: #94a3b8; background: #f8fafc; }
+.ard-order-num { font-size: 15px; font-weight: 700; color: #1e293b; }
+.ard-order-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+.ard-order-actions { margin-top: 8px; display: flex; gap: 8px; }
+.ard-view-items-btn {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.ard-view-items-btn:hover { background: #e2e8f0; }
+.ard-view-items-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ard-link-order-btn {
+    background: #059669;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.ard-link-order-btn:hover { background: #047857; }
+
+/* Line items table (inside order cards) */
+.ard-line-items-table {
+    width: 100%;
+    font-size: 12px;
+    margin-top: 8px;
+    border-collapse: collapse;
+}
+.ard-line-items-table th {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+.ard-line-items-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.ard-li-pn {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-weight: 600;
+    font-size: 11px;
+}
+.ard-line-item-waived { background: #fef2f2; }
+.ard-line-item-waived .ard-li-pn { color: #dc2626; }
+.ard-line-item-billed { background: #ecfdf5; }
+.ard-line-item-billed .ard-li-pn { color: #059669; }

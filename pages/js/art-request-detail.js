@@ -211,6 +211,18 @@
             loadInvoiceAudit(swOrder, artBilled, prelimCharges);
         }
 
+        // Show "Find Order" button when order # is blank but we have search data
+        if (!swOrder && (swCustomer || req.CompanyName)) {
+            document.getElementById('ard-sw-refs-card').style.display = '';
+            var findBtn = document.getElementById('ard-find-order-btn');
+            if (findBtn) {
+                findBtn.style.display = '';
+                findBtn.addEventListener('click', function () {
+                    showFindOrderModal(swCustomer, req.CompanyName, req.Date_Created);
+                });
+            }
+        }
+
         // Contact Info
         const firstName = req.First_name || req.First_Name || '';
         const lastName = req.Last_name || req.Last_Name || '';
@@ -1928,5 +1940,234 @@
         if (detail) html += '<div class="ard-audit-detail">' + detail + '</div>';
         html += '</div>';
         return html;
+    }
+
+    // ── Find & Link ShopWorks Order ───────────────────────────────────
+    // Expose functions for inline onclick handlers in dynamically generated HTML
+    window.expandLineItems = expandLineItems;
+    window.linkOrder = linkOrder;
+
+    function showFindOrderModal(customerId, companyName) {
+        var overlay = document.getElementById('find-order-overlay');
+        var modal = document.getElementById('find-order-modal');
+        var body = document.getElementById('find-order-body');
+        var closeBtn = document.getElementById('find-order-close');
+        var manualInput = document.getElementById('ard-fo-manual-input');
+        var manualBtn = document.getElementById('ard-fo-manual-btn');
+
+        overlay.style.display = 'block';
+        modal.style.display = 'flex';
+        body.innerHTML = '<div class="ard-fo-loading">Searching ShopWorks...</div>';
+        manualInput.value = '';
+
+        function closeModal() {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+        closeBtn.onclick = closeModal;
+        overlay.onclick = closeModal;
+
+        manualBtn.onclick = function () { searchOrderManual(manualInput.value.trim(), body); };
+        manualInput.onkeydown = function (e) { if (e.key === 'Enter') manualBtn.click(); };
+
+        if (customerId) {
+            searchOrdersByCustomerId(customerId, companyName, body);
+        } else if (companyName) {
+            searchOrdersByName(companyName, body);
+        } else {
+            body.innerHTML = '<div class="ard-fo-empty">No customer info available. Use manual search below.</div>';
+        }
+    }
+
+    function searchOrdersByCustomerId(customerId, companyName, container) {
+        fetch(API_BASE + '/api/manageorders/orders?id_Customer=' + encodeURIComponent(customerId))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var orders = data.result || [];
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="ard-fo-empty">No orders found for Customer #' +
+                        escapeHtml(String(customerId)) + ' in ShopWorks (60-day window).</div>';
+                    return;
+                }
+                orders.sort(function (a, b) {
+                    return new Date(b.date_Ordered || 0) - new Date(a.date_Ordered || 0);
+                });
+                renderOrderCards(orders, container, companyName);
+            })
+            .catch(function (err) {
+                container.innerHTML = '<div class="ard-fo-error">Search failed: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function searchOrdersByName(companyName, container) {
+        fetch(API_BASE + '/api/manageorders/customers')
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var customers = data.customers || [];
+                var nameLower = companyName.toLowerCase();
+                var matches = customers.filter(function (c) {
+                    var cn = (c.CustomerName || '').toLowerCase();
+                    return cn.indexOf(nameLower) !== -1 || nameLower.indexOf(cn) !== -1;
+                });
+                if (matches.length === 0) {
+                    container.innerHTML = '<div class="ard-fo-empty">No customers matching "' +
+                        escapeHtml(companyName) + '" found in recent ShopWorks orders.</div>';
+                    return;
+                }
+                var bestMatch = matches[0];
+                container.innerHTML = '<div class="ard-fo-loading">Found customer "' +
+                    escapeHtml(bestMatch.CustomerName) + '" (#' + bestMatch.id_Customer + '). Loading orders...</div>';
+                return searchOrdersByCustomerId(bestMatch.id_Customer, bestMatch.CustomerName, container);
+            })
+            .catch(function (err) {
+                container.innerHTML = '<div class="ard-fo-error">Customer search failed: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function searchOrderManual(orderNum, container) {
+        if (!orderNum) return;
+        container.innerHTML = '<div class="ard-fo-loading">Looking up Order #' + escapeHtml(orderNum) + '...</div>';
+        fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var orders = data.result || [];
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="ard-fo-empty">Order #' + escapeHtml(orderNum) + ' not found in ShopWorks.</div>';
+                    return;
+                }
+                renderOrderCards(orders, container, '');
+            })
+            .catch(function (err) {
+                container.innerHTML = '<div class="ard-fo-error">Lookup failed: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function renderOrderCards(orders, container, companyLabel) {
+        var header = '<div class="ard-fo-header">Found ' + orders.length + ' order' +
+            (orders.length !== 1 ? 's' : '') + (companyLabel ? ' for ' + escapeHtml(companyLabel) : '') + ':</div>';
+        var html = header;
+        orders.forEach(function (order) {
+            var orderNum = order.id_Order || '';
+            var dateStr = order.date_Ordered ? new Date(order.date_Ordered).toLocaleDateString() : '--';
+            var rep = order.CustomerServiceRep || '--';
+            var invoiced = order.date_Invoiced
+                ? 'Invoiced ' + new Date(order.date_Invoiced).toLocaleDateString()
+                : 'Not invoiced';
+            var custName = order.CustomerName || '';
+            html += '<div class="ard-order-card" data-order="' + escapeHtml(String(orderNum)) + '">';
+            html += '<div class="ard-order-num">Order #' + escapeHtml(String(orderNum)) + '</div>';
+            html += '<div class="ard-order-meta">' + escapeHtml(dateStr) + ' &middot; ' + escapeHtml(rep) +
+                ' &middot; ' + escapeHtml(invoiced);
+            if (custName && !companyLabel) html += ' &middot; ' + escapeHtml(custName);
+            html += '</div>';
+            html += '<div class="ard-order-items" id="ard-items-' + escapeHtml(String(orderNum)) + '"></div>';
+            html += '<div class="ard-order-actions">';
+            html += '<button type="button" class="ard-view-items-btn" onclick="expandLineItems(\'' +
+                escapeHtml(String(orderNum)) + '\', this)">View Line Items</button>';
+            html += '<button type="button" class="ard-link-order-btn" onclick="linkOrder(\'' +
+                escapeHtml(String(orderNum)) + '\')">Link This Order</button>';
+            html += '</div></div>';
+        });
+        container.innerHTML = html;
+    }
+
+    function expandLineItems(orderNum, btn) {
+        var itemsDiv = document.getElementById('ard-items-' + orderNum);
+        if (!itemsDiv) return;
+        if (itemsDiv.innerHTML) {
+            itemsDiv.innerHTML = '';
+            btn.textContent = 'View Line Items';
+            return;
+        }
+        btn.textContent = 'Loading...';
+        btn.disabled = true;
+        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var items = data.result || [];
+                if (items.length === 0) {
+                    itemsDiv.innerHTML = '<div class="ard-fo-empty" style="padding:8px 0;">No line items found.</div>';
+                    btn.textContent = 'Hide Line Items';
+                    btn.disabled = false;
+                    return;
+                }
+                var html = '<table class="ard-line-items-table"><thead><tr><th>PN</th><th>Description</th><th>Qty</th><th>Price</th></tr></thead><tbody>';
+                items.forEach(function (item) {
+                    var pn = item.PartNumber || '';
+                    var isArt = isArtChargePn(pn);
+                    var price = item.LineUnitPrice;
+                    var desc = (item.PartDescription || '').trim();
+                    var descLower = desc.toLowerCase();
+                    var isWaived = isArt && (price === null || price === 0 ||
+                        descLower.indexOf('waiv') !== -1 ||
+                        descLower.indexOf('no charge') !== -1 ||
+                        descLower.indexOf('n/c') !== -1 ||
+                        descLower.indexOf('comp') !== -1);
+                    var rowClass = isWaived ? 'ard-line-item-waived' : isArt ? 'ard-line-item-billed' : '';
+                    html += '<tr class="' + rowClass + '">';
+                    html += '<td class="ard-li-pn">' + escapeHtml(pn) + '</td>';
+                    html += '<td>' + escapeHtml(desc) + '</td>';
+                    html += '<td>' + (item.LineQuantity || '') + '</td>';
+                    html += '<td>' + (price !== null && price !== undefined ? '$' + parseFloat(price).toFixed(2) : '$0.00') + '</td>';
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                itemsDiv.innerHTML = html;
+                btn.textContent = 'Hide Line Items';
+                btn.disabled = false;
+            })
+            .catch(function (err) {
+                itemsDiv.innerHTML = '<div class="ard-fo-error" style="padding:8px 0;">Failed to load: ' + escapeHtml(err.message) + '</div>';
+                btn.textContent = 'View Line Items';
+                btn.disabled = false;
+            });
+    }
+
+    function linkOrder(orderNum) {
+        if (!currentRequest || !currentRequest.PK_ID) {
+            showSuccessMessage('Error: Cannot save — missing record ID');
+            return;
+        }
+        if (!confirm('Link Order #' + orderNum + ' to this art request?')) return;
+
+        var pkId = currentRequest.PK_ID;
+        fetch(API_BASE + '/api/artrequests/' + pkId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Order_Num_SW: String(orderNum) })
+        })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function () {
+                // Close modal
+                document.getElementById('find-order-overlay').style.display = 'none';
+                document.getElementById('find-order-modal').style.display = 'none';
+                // Update UI
+                setText('ard-sw-order', orderNum);
+                var findBtn = document.getElementById('ard-find-order-btn');
+                if (findBtn) findBtn.style.display = 'none';
+                // Run invoice audit with the newly linked order
+                var artBilled = currentRequest.Amount_Art_Billed || 0;
+                var prelimCharges = currentRequest.Prelim_Charges || currentRequest.Charge_Quoted || null;
+                loadInvoiceAudit(String(orderNum), artBilled, prelimCharges);
+                showSuccessMessage('Order #' + orderNum + ' linked successfully');
+            })
+            .catch(function (err) {
+                alert('Failed to link order: ' + err.message);
+            });
     }
 })();

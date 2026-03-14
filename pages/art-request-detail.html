@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=2">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=3">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
 </head>
 <body>
@@ -112,6 +112,7 @@
                         <div class="ard-field">
                             <span class="ard-label">Order #</span>
                             <span class="ard-value" id="ard-sw-order">--</span>
+                            <button type="button" class="ard-find-order-btn" id="ard-find-order-btn" style="display:none;">Find Order</button>
                         </div>
                     </div>
                 </div>
@@ -317,6 +318,26 @@
         </div>
     </main>
 
+    <!-- Find Order Modal -->
+    <div class="art-modal-overlay" id="find-order-overlay" style="display:none;"></div>
+    <div class="ard-fo-modal" id="find-order-modal" style="display:none;">
+        <div class="ard-fo-modal-header">
+            <span>Find ShopWorks Order</span>
+            <button type="button" class="ard-fo-modal-close" id="find-order-close">&times;</button>
+        </div>
+        <div class="ard-fo-modal-body" id="find-order-body">
+            <div class="ard-fo-loading">Searching ShopWorks...</div>
+        </div>
+        <div class="ard-fo-manual">
+            <div class="ard-fo-manual-label">Or enter order number manually:</div>
+            <div class="ard-fo-manual-row">
+                <input type="text" id="ard-fo-manual-input" placeholder="Order #" class="ard-fo-manual-input">
+                <button type="button" id="ard-fo-manual-btn" class="ard-fo-manual-btn">Search</button>
+            </div>
+            <div class="ard-fo-manual-note">Note: ShopWorks data is only available for the last 60 days.</div>
+        </div>
+    </div>
+
     <!-- Image Lightbox Modal -->
     <div class="ard-lightbox" id="ard-lightbox" style="display:none;">
         <div class="ard-lightbox-backdrop" id="ard-lightbox-backdrop"></div>
@@ -447,6 +468,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=3"></script>
-    <script src="/pages/js/art-request-detail.js?v=6"></script>
+    <script src="/pages/js/art-request-detail.js?v=7"></script>
 </body>
 </html>
