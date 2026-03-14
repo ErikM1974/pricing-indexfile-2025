@@ -1600,92 +1600,97 @@ body.ae-view .ard-status-step.active .ard-status-label {
     color: #981e32;
 }
 
-/* ── Invoice Audit ─────────────────────────────────── */
-.ard-audit-header {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #64748b;
-    margin-bottom: 8px;
+/* ── Full-Width Invoice Accordion ─────────────────────── */
+.ard-invoice-accordion {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    margin-top: 20px;
+    overflow: hidden;
 }
-.ard-audit-loading {
+.ard-accordion-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 14px 20px;
+    background: #f8fafc;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+}
+.ard-accordion-toggle:hover { background: #f1f5f9; }
+.ard-accordion-icon {
+    font-size: 10px;
+    color: #64748b;
+    margin-right: 10px;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+.ard-accordion-icon.expanded { transform: rotate(90deg); }
+.ard-accordion-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+.ard-accordion-summary {
+    margin-left: auto;
     font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+.ard-accordion-body {
+    padding: 20px;
+}
+
+/* ── Audit Status Messages ── */
+.ard-audit-loading {
+    font-size: 13px;
     color: #94a3b8;
     font-style: italic;
+    padding: 12px 0;
 }
 .ard-audit-status {
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 10px 14px;
+    border-radius: 8px;
     font-size: 13px;
     line-height: 1.4;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 .ard-audit-status:last-child { margin-bottom: 0; }
-.ard-audit-status--green {
-    background: #ecfdf5;
-    border-left: 3px solid #059669;
-    color: #065f46;
-}
-.ard-audit-status--red {
-    background: #fef2f2;
-    border-left: 3px solid #dc2626;
-    color: #991b1b;
-}
-.ard-audit-status--amber {
-    background: #fffbeb;
-    border-left: 3px solid #d97706;
-    color: #92400e;
-}
-.ard-audit-status--gray {
-    background: #f8fafc;
-    border-left: 3px solid #94a3b8;
-    color: #64748b;
-}
-.ard-audit-message {
-    font-weight: 600;
-}
-.ard-audit-detail {
-    font-size: 12px;
-    margin-top: 4px;
-    opacity: 0.85;
-}
-.ard-audit-pn {
-    font-family: 'SF Mono', 'Consolas', monospace;
-    font-weight: 600;
-}
-.ard-audit-comparison {
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px dashed rgba(0,0,0,0.1);
-    font-size: 11px;
-}
+.ard-audit-status--green { background: #ecfdf5; border-left: 3px solid #059669; color: #065f46; }
+.ard-audit-status--red { background: #fef2f2; border-left: 3px solid #dc2626; color: #991b1b; }
+.ard-audit-status--amber { background: #fffbeb; border-left: 3px solid #d97706; color: #92400e; }
+.ard-audit-status--gray { background: #f8fafc; border-left: 3px solid #94a3b8; color: #64748b; }
+.ard-audit-message { font-weight: 600; }
+.ard-audit-detail { font-size: 12px; margin-top: 4px; opacity: 0.85; }
 
 /* ── Audit Stat Boxes (4-column comparison) ── */
 .ard-audit-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 16px;
 }
 .ard-stat-box {
     text-align: center;
-    padding: 10px 6px;
+    padding: 14px 8px;
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
 }
 .ard-stat-value {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     color: #1e293b;
 }
 .ard-stat-label {
-    font-size: 10px;
+    font-size: 11px;
     color: #64748b;
     text-transform: uppercase;
     font-weight: 600;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 .ard-stat-box--green { background: #ecfdf5; border-color: #059669; }
 .ard-stat-box--green .ard-stat-value { color: #059669; }
@@ -1697,71 +1702,112 @@ body.ae-view .ard-status-step.active .ard-status-label {
 .ard-stat-mismatch {
     background: #fef2f2;
     color: #dc2626;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-bottom: 10px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
     text-align: center;
 }
 
-/* ── Invoice Header ── */
+/* ── Invoice Order Header (2-column metadata grid) ── */
 .ard-invoice-header {
-    margin-bottom: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
 }
 .ard-invoice-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     color: #1e293b;
+    margin-bottom: 10px;
 }
-.ard-invoice-meta {
-    font-size: 11px;
+.ard-invoice-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px 24px;
+}
+.ard-invoice-meta-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 13px;
+}
+.ard-invoice-meta-label {
     color: #64748b;
-    margin-top: 2px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.ard-invoice-meta-value {
+    color: #1e293b;
+    font-weight: 500;
 }
 
-/* ── Invoice Line Items Table ── */
+/* ── Invoice Line Items Table (full-width with sizes) ── */
+.ard-invoice-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 0;
+}
 .ard-invoice-table {
     width: 100%;
-    font-size: 12px;
+    font-size: 13px;
     border-collapse: collapse;
     margin-bottom: 0;
+    min-width: 650px;
 }
 .ard-invoice-table th {
     text-align: left;
-    padding: 6px 8px;
+    padding: 8px 10px;
     border-bottom: 2px solid #e2e8f0;
     color: #475569;
     font-weight: 600;
     font-size: 10px;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 .ard-invoice-table td {
-    padding: 5px 8px;
+    padding: 6px 10px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: top;
 }
 .ard-inv-right { text-align: right; }
+.ard-inv-center { text-align: center; }
 .ard-inv-pn {
     font-family: 'SF Mono', Consolas, monospace;
     font-weight: 600;
-    font-size: 11px;
+    font-size: 12px;
     white-space: nowrap;
 }
-.ard-inv-row--waived {
-    background: #fef2f2;
+.ard-inv-color {
+    font-size: 12px;
+    color: #475569;
+    white-space: nowrap;
 }
+.ard-inv-size-qty {
+    font-size: 12px;
+    text-align: center;
+    color: #1e293b;
+    font-weight: 500;
+    min-width: 30px;
+}
+.ard-inv-size-empty {
+    font-size: 12px;
+    text-align: center;
+    color: #cbd5e1;
+}
+.ard-inv-row--waived { background: #fef2f2; }
 .ard-inv-row--waived .ard-inv-pn { color: #dc2626; }
-.ard-inv-row--art {
-    background: #ecfdf5;
-}
+.ard-inv-row--art { background: #ecfdf5; }
 .ard-inv-row--art .ard-inv-pn { color: #059669; }
 .ard-inv-waived-tag {
     background: #dc2626;
     color: white;
     font-size: 9px;
     font-weight: 700;
-    padding: 1px 5px;
+    padding: 2px 6px;
     border-radius: 3px;
     margin-left: 4px;
 }
@@ -1770,7 +1816,7 @@ body.ae-view .ard-status-step.active .ard-status-label {
     color: white;
     font-size: 9px;
     font-weight: 700;
-    padding: 1px 5px;
+    padding: 2px 6px;
     border-radius: 3px;
     margin-left: 4px;
 }
@@ -1778,34 +1824,42 @@ body.ae-view .ard-status-step.active .ard-status-label {
 /* ── Invoice Totals ── */
 .ard-invoice-totals {
     border-top: 2px solid #e2e8f0;
-    padding-top: 8px;
+    padding-top: 10px;
     margin-top: 0;
+    max-width: 350px;
+    margin-left: auto;
 }
 .ard-invoice-total-row {
     display: flex;
     justify-content: space-between;
-    padding: 3px 8px;
-    font-size: 12px;
+    padding: 4px 10px;
+    font-size: 13px;
     color: #475569;
 }
 .ard-invoice-total-row--grand {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     color: #1e293b;
     border-top: 1px solid #cbd5e1;
-    padding-top: 6px;
-    margin-top: 4px;
+    padding-top: 8px;
+    margin-top: 6px;
 }
 .ard-invoice-total-row--balance {
     color: #dc2626;
     font-weight: 600;
 }
 
-/* ── Responsive: stack stat boxes on mobile ── */
+/* ── Responsive: invoice accordion ── */
+@media (max-width: 768px) {
+    .ard-accordion-body { padding: 12px; }
+    .ard-invoice-meta-grid { grid-template-columns: 1fr 1fr; }
+    .ard-invoice-totals { max-width: 100%; }
+}
 @media (max-width: 480px) {
-    .ard-audit-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .ard-audit-stats { grid-template-columns: repeat(2, 1fr); }
+    .ard-invoice-meta-grid { grid-template-columns: 1fr; }
+    .ard-accordion-toggle { padding: 12px 14px; }
+    .ard-accordion-body { padding: 10px; }
 }
 
 /* ── Find Order Button & Modal ────────────────────────── */

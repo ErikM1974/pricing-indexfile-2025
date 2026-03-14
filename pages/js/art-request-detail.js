@@ -1852,12 +1852,30 @@
     }
 
     function loadFullInvoice(orderNum, artBilled, prelimCharges) {
-        var container = document.getElementById('ard-invoice-audit');
+        var section = document.getElementById('ard-invoice-section');
         var body = document.getElementById('ard-audit-body');
-        if (!container || !body) return;
+        var toggle = document.getElementById('ard-invoice-toggle');
+        var accordionBody = document.getElementById('ard-invoice-body');
+        var icon = document.getElementById('ard-accordion-icon');
+        var summary = document.getElementById('ard-invoice-summary');
+        if (!section || !body) return;
 
-        container.style.display = '';
+        section.style.display = '';
         body.innerHTML = '<div class="ard-audit-loading">Loading invoice...</div>';
+
+        // Wire up accordion toggle
+        if (toggle && !toggle._wired) {
+            toggle._wired = true;
+            toggle.addEventListener('click', function () {
+                var isOpen = accordionBody.style.display !== 'none';
+                accordionBody.style.display = isOpen ? 'none' : '';
+                icon.classList.toggle('expanded', !isOpen);
+            });
+        }
+
+        // Auto-expand on load
+        if (accordionBody) accordionBody.style.display = '';
+        if (icon) icon.classList.add('expanded');
 
         // Fetch order header + line items in parallel
         Promise.all([
@@ -1872,20 +1890,30 @@
 
             if (!orderData && lineItems.length === 0) {
                 body.innerHTML = renderAuditStatus('gray', 'Order #' + escapeHtml(orderNum) + ' not found (may be older than 60 days)');
+                if (summary) summary.textContent = 'Not found';
                 return;
             }
+
+            // Build accordion summary text
+            var total = orderData ? (parseFloat(orderData.cur_TotalInvoice) || 0) : 0;
+            var custName = orderData ? (orderData.CustomerName || '') : '';
+            var summaryParts = ['Order #' + orderNum];
+            if (custName) summaryParts.push(custName);
+            if (total > 0) summaryParts.push('$' + total.toFixed(2));
+            summaryParts.push(lineItems.length + ' item' + (lineItems.length !== 1 ? 's' : ''));
+            if (summary) summary.textContent = summaryParts.join(' \u00B7 ');
 
             var html = '';
 
             // Audit Comparison Stat Boxes
             html += renderAuditStatBoxes(orderData, lineItems, artBilled, prelimCharges);
 
-            // Order Header
+            // Order Header (enhanced with contact info, dates)
             if (orderData) {
                 html += renderOrderHeader(orderData, orderNum);
             }
 
-            // Full Line Items Table
+            // Full Line Items Table (with sizes + color)
             if (lineItems.length > 0) {
                 html += renderFullLineItems(lineItems);
             }
@@ -1899,6 +1927,7 @@
         })
         .catch(function (err) {
             body.innerHTML = renderAuditStatus('gray', 'Unable to load invoice for Order #' + escapeHtml(orderNum) + ': ' + escapeHtml(err.message));
+            if (summary) summary.textContent = 'Error loading';
         });
     }
 
@@ -2232,42 +2261,121 @@
         return html;
     }
 
-    // ── Order Header — meta info ──────────────────────────────────────
+    // ── Order Header — enhanced meta info with 2-column grid ──────────
     function renderOrderHeader(order, orderNum) {
         var dateOrdered = order.date_Ordered ? new Date(order.date_Ordered).toLocaleDateString() : '--';
         var dateInvoiced = order.date_Invoiced ? new Date(order.date_Invoiced).toLocaleDateString() : null;
+        var dateDue = order.date_Due ? new Date(order.date_Due).toLocaleDateString() : null;
         var rep = order.CustomerServiceRep || '--';
         var customer = order.CustomerName || '';
+        var custId = order.id_Customer || '';
 
         var html = '<div class="ard-invoice-header">';
         html += '<div class="ard-invoice-title">Order #' + escapeHtml(String(orderNum));
-        if (customer) html += ' — ' + escapeHtml(customer);
+        if (customer) html += ' \u2014 ' + escapeHtml(customer);
         html += '</div>';
-        html += '<div class="ard-invoice-meta">';
-        html += 'Ordered ' + escapeHtml(dateOrdered) + ' · Rep: ' + escapeHtml(rep);
-        if (dateInvoiced) html += ' · Invoiced ' + escapeHtml(dateInvoiced);
-        html += '</div>';
-        html += '</div>';
+
+        html += '<div class="ard-invoice-meta-grid">';
+
+        function metaItem(label, value) {
+            return '<div class="ard-invoice-meta-item"><span class="ard-invoice-meta-label">' +
+                label + '</span><span class="ard-invoice-meta-value">' + escapeHtml(value) + '</span></div>';
+        }
+
+        html += metaItem('Ordered', dateOrdered);
+        html += metaItem('Rep', rep);
+        if (custId) html += metaItem('Customer #', String(custId));
+        if (dateDue) html += metaItem('Due Date', dateDue);
+        if (dateInvoiced) html += metaItem('Invoiced', dateInvoiced);
+
+        html += '</div>'; // .ard-invoice-meta-grid
+        html += '</div>'; // .ard-invoice-header
         return html;
     }
 
-    // ── Full Line Items Table ─────────────────────────────────────────
+    // ── Size slot mapping (reused from monogram-form-service.js) ───────
+    var SIZE_SLOT_MAP = { Size01: 'S', Size02: 'M', Size03: 'L', Size04: 'XL', Size05: '2XL' };
+    var SIZE_SUFFIXES = ['XS','S','M','L','XL','2XL','2X','XXL','3XL','3X','XXXL',
+        '4XL','4X','5XL','5X','6XL','6X','LT','XLT','2XLT','3XLT','4XLT','OSFA','OS','ADJ'];
+
+    function getSize06Label(partNumber) {
+        if (!partNumber) return '3XL';
+        var lastIdx = partNumber.lastIndexOf('_');
+        if (lastIdx > 0) {
+            var suffix = partNumber.substring(lastIdx + 1).toUpperCase();
+            if (SIZE_SUFFIXES.indexOf(suffix) !== -1) return suffix;
+        }
+        return '3XL';
+    }
+
+    function isGarmentItem(item) {
+        return ['Size01','Size02','Size03','Size04','Size05','Size06'].some(function (s) {
+            return (item[s] || 0) > 0;
+        });
+    }
+
+    // ── Full Line Items Table (with sizes + color) ──────────────────────
     function renderFullLineItems(items) {
         // Sort by SortOrder if available
         items.sort(function (a, b) { return (a.SortOrder || 0) - (b.SortOrder || 0); });
 
-        var html = '<table class="ard-invoice-table">';
-        html += '<thead><tr>';
-        html += '<th>Part #</th><th>Description</th><th class="ard-inv-right">Qty</th>';
-        html += '<th class="ard-inv-right">Unit Price</th><th class="ard-inv-right">Ext Price</th>';
-        html += '</tr></thead><tbody>';
+        // Determine which size columns are needed (only show columns with data)
+        var activeSizes = {}; // { 'S': true, 'M': true, ... }
+        var itemSizeData = []; // parallel array of parsed size info per item
 
         items.forEach(function (item) {
+            var sizes = {};
+            if (isGarmentItem(item)) {
+                Object.keys(SIZE_SLOT_MAP).forEach(function (slot) {
+                    var qty = item[slot] || 0;
+                    if (qty > 0) {
+                        var label = SIZE_SLOT_MAP[slot];
+                        sizes[label] = qty;
+                        activeSizes[label] = true;
+                    }
+                });
+                var s6 = item.Size06 || 0;
+                if (s6 > 0) {
+                    var label = getSize06Label(item.PartNumber);
+                    sizes[label] = s6;
+                    activeSizes[label] = true;
+                }
+            }
+            itemSizeData.push(sizes);
+        });
+
+        // Build ordered list of active size columns
+        var allSizeOrder = ['XS','S','M','L','XL','2XL','3XL','4XL','5XL','6XL','LT','XLT','2XLT','3XLT','4XLT','OSFA','OS','ADJ'];
+        var sizeColumns = allSizeOrder.filter(function (s) { return activeSizes[s]; });
+        var hasSizes = sizeColumns.length > 0;
+        var hasColor = items.some(function (item) { return item.PartColor && isGarmentItem(item); });
+
+        // Build table
+        var html = '<div class="ard-invoice-table-wrap">';
+        html += '<table class="ard-invoice-table">';
+        html += '<thead><tr>';
+        html += '<th>Part #</th>';
+        if (hasColor) html += '<th>Color</th>';
+        html += '<th>Description</th>';
+        if (hasSizes) {
+            sizeColumns.forEach(function (s) {
+                html += '<th class="ard-inv-center">' + s + '</th>';
+            });
+        }
+        html += '<th class="ard-inv-right">Qty</th>';
+        html += '<th class="ard-inv-right">Unit Price</th>';
+        html += '<th class="ard-inv-right">Ext Price</th>';
+        html += '</tr></thead><tbody>';
+
+        items.forEach(function (item, idx) {
             var pn = item.PartNumber || '';
             var desc = item.PartDescription || '';
             var qty = item.LineQuantity || 0;
             var unitPrice = item.LineUnitPrice;
+            var color = item.PartColor || '';
             var isArt = isArtChargePn(pn);
+            var isGarment = isGarmentItem(item);
+            var sizes = itemSizeData[idx];
 
             // Waiver detection for art charge items
             var descLower = desc.toLowerCase();
@@ -2280,17 +2388,40 @@
 
             html += '<tr class="' + rowClass + '">';
             html += '<td class="ard-inv-pn">' + escapeHtml(pn) + '</td>';
+
+            if (hasColor) {
+                html += '<td class="ard-inv-color">' + escapeHtml(color) + '</td>';
+            }
+
             html += '<td>' + escapeHtml(desc);
             if (isWaived) html += ' <span class="ard-inv-waived-tag">WAIVED</span>';
             if (isArt && !isWaived) html += ' <span class="ard-inv-art-tag">ART</span>';
             html += '</td>';
+
+            if (hasSizes) {
+                if (isGarment) {
+                    sizeColumns.forEach(function (s) {
+                        var sQty = sizes[s] || 0;
+                        if (sQty > 0) {
+                            html += '<td class="ard-inv-size-qty">' + sQty + '</td>';
+                        } else {
+                            html += '<td class="ard-inv-size-empty">&middot;</td>';
+                        }
+                    });
+                } else {
+                    // Non-garment items span across size columns
+                    html += '<td colspan="' + sizeColumns.length + '"></td>';
+                }
+            }
+
             html += '<td class="ard-inv-right">' + qty + '</td>';
             html += '<td class="ard-inv-right">' + (unitPrice !== null && unitPrice !== undefined ? '$' + parseFloat(unitPrice).toFixed(2) : '$0.00') + '</td>';
-            html += '<td class="ard-inv-right">' + '$' + extPrice.toFixed(2) + '</td>';
+            html += '<td class="ard-inv-right">$' + extPrice.toFixed(2) + '</td>';
             html += '</tr>';
         });
 
         html += '</tbody></table>';
+        html += '</div>'; // .ard-invoice-table-wrap
         return html;
     }
 
