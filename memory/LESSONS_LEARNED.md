@@ -2364,6 +2364,30 @@ For best practices/patterns:
 **Solution:** Removed the `var contactEmail` redeclaration at line 266 — the existing `const contactEmail` from line 224 was already in scope with the identical value.
 **Prevention:** When adding new code that references existing variables, search for prior declarations in the same scope first. Never redeclare with `var` when a `const`/`let` already exists.
 
+## Bug: Async function silently swallows null reference — Send Mockup modal doesn't open
+**Date:** 2026-03-13
+**Project:** [Pricing Index] Art Request Detail
+**Symptoms:** Clicking "Send Mockup" button did nothing. No error in console. No modal appeared.
+**Root cause:** `showSendForApprovalModal()` is `async`. Line 672 accessed `document.getElementById('approval-no-files').style.display` but the element didn't exist in the HTML. The TypeError was caught by the async function's implicit Promise and swallowed as an unhandled rejection — never logged to console.
+**Solution:** Added the missing `<div id="approval-no-files">` element to the approval modal HTML.
+**Prevention:** (1) Always null-guard DOM lookups in async functions — errors won't show in console. (2) When adding `getElementById` calls in shared JS, verify the element exists in ALL HTML pages that use it.
+
+## Bug: renderNotes crashes on second call — innerHTML destroys child elements
+**Date:** 2026-03-13
+**Project:** [Pricing Index] Art Request Detail
+**Symptoms:** `Notes refresh failed: Cannot read properties of null (reading 'style')` on every refreshNotes() call after the first render.
+**Root cause:** `renderNotes()` did `container.innerHTML = ''` which destroyed the `<p id="ard-empty-notes">` element that was a child of the container. On subsequent calls, `getElementById('ard-empty-notes')` returned null.
+**Solution:** Instead of relying on a persistent DOM element, generate the empty message HTML dynamically inside `renderNotes()` when notes array is empty.
+**Prevention:** Never use `getElementById` to reference elements that are children of a container you clear with `innerHTML = ''`. Either re-create them dynamically or preserve them before clearing.
+
+## Bug: Email detail_link uses window.location.origin — breaks on custom domains
+**Date:** 2026-03-13
+**Project:** [Pricing Index] Art Hub
+**Symptoms:** "View & Approve" button in mockup approval emails linked to `https://www.teamnwca.com/art-request/52787` which 404'd. Sales reps couldn't reach the detail page from email.
+**Root cause:** `window.location.origin` returns whatever domain the sender is browsing from. Steve accesses the app via teamnwca.com (custom domain), but Express routes like `/art-request/:id` only work on the Heroku app URL.
+**Solution:** Hardcoded all email `detail_link` values to `https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/` + designId. Fixed in 4 files (7 occurrences): art-actions-shared.js, art-hub-steve.js, ae-submit-form.js, art-request-detail.js.
+**Prevention:** Never use `window.location.origin` for links in emails — emails are opened outside the sender's browser context. Use the production Heroku URL constant.
+
 ## Bug: Non-image files (EPS, PDF) opened in image lightbox instead of downloading
 **Date:** 2026-03-13
 **Project:** [Pricing Index] Art Request Detail

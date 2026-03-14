@@ -291,6 +291,12 @@
     // cards with mockup images, status badges, and detail links.
 
     var BARE_CDN_RE = /^https?:\/\/cdn\.caspio\.com\/[A-Za-z0-9]+\/?$/;
+    var NON_IMAGE_EXT = /\.(pdf|eps|ai|cdr|psd|indd|indt|idml)(\?|$)/i;
+    var EXT_COLORS = { PDF: '#e53e3e', EPS: '#dd6b20', AI: '#f6ad55', PSD: '#3182ce', CDR: '#38a169', SVG: '#805ad5' };
+    function getFileExt(url) {
+        var m = url.match(/\.([a-z0-9]{2,4})(\?|$)/i);
+        return m ? m[1].toUpperCase() : '';
+    }
 
     // Status badge config
     var STATUS_MAP = {
@@ -328,6 +334,14 @@
             else if (text.indexOf('company_mockup') !== -1 || text.indexOf('company mockup') !== -1) map.companyMockup = i;
             else if (text.indexOf('file upload') !== -1) map.fileUpload = i;
             else if (text.indexOf('request type') !== -1) map.requestType = i;
+            else if (text.indexOf('revision') !== -1 || (text.indexOf('num') !== -1 && text.indexOf('rev') !== -1)) map.revisionCount = i;
+            else if (text.indexOf('art') !== -1 && text.indexOf('minute') !== -1) map.artMinutes = i;
+            else if (text.indexOf('amount') !== -1 && text.indexOf('billed') !== -1) map.artBilled = i;
+            else if (text.indexOf('prelim') !== -1 || (text.indexOf('art') !== -1 && text.indexOf('estimate') !== -1)) map.prelimCharges = i;
+            else if (text.indexOf('user') !== -1 && (text.indexOf('name') !== -1 || text.indexOf('email') !== -1)) map.userName = i;
+            else if (text.indexOf('companyname') !== -1 || text === 'company name') map.companyName = i;
+            else if (text.indexOf('order') !== -1 && text.indexOf('num') !== -1 && text.indexOf('sw') !== -1) map.orderNumSW = i;
+            else if (text.indexOf('design') !== -1 && text.indexOf('num') !== -1 && text.indexOf('sw') !== -1) map.designNumSW = i;
         }
         return map;
     }
@@ -391,23 +405,49 @@
         rows.forEach(function (row) {
             var designNum = getCellText(row, colMap.designNum);
             var idDesign = getCellText(row, colMap.idDesign);
-            var company = getCellText(row, colMap.company);
+            var company = getCellText(row, colMap.companyName) || getCellText(row, colMap.company);
             var status = getCellText(row, colMap.status);
             var dueDate = getCellText(row, colMap.dueDate);
             var orderNum = getCellText(row, colMap.orderNum);
+            var orderNumSW = getCellText(row, colMap.orderNumSW);
+            var designNumSW = getCellText(row, colMap.designNumSW);
             var requestType = getCellText(row, colMap.requestType);
+            var revCount = parseInt(getCellText(row, colMap.revisionCount)) || 0;
+            var artMinutes = parseInt(getCellText(row, colMap.artMinutes)) || 0;
+            var artBilled = getCellText(row, colMap.artBilled);
+            var prelimCharges = getCellText(row, colMap.prelimCharges);
 
             // Image: Box_File_Mockup > BoxFileLink > Company_Mockup > File_Upload_One > placeholder
-            var mockupUrl = getCellText(row, colMap.boxMockup);
-            if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
-                mockupUrl = getCellText(row, colMap.boxFileLink);
+            var mockupUrl = '';
+            var imageSource = ''; // 'mockup' | 'artwork' | ''
+
+            var boxMockupVal = getCellText(row, colMap.boxMockup);
+            if (boxMockupVal && !BARE_CDN_RE.test(boxMockupVal)) {
+                mockupUrl = boxMockupVal; imageSource = 'mockup';
             }
-            if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
-                mockupUrl = getCellText(row, colMap.companyMockup);
+            if (!mockupUrl) {
+                var boxLinkVal = getCellText(row, colMap.boxFileLink);
+                if (boxLinkVal && !BARE_CDN_RE.test(boxLinkVal)) {
+                    mockupUrl = boxLinkVal; imageSource = 'mockup';
+                }
             }
-            if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) {
-                mockupUrl = getCellImgSrc(row, colMap.fileUpload);
+            if (!mockupUrl) {
+                var compMockupVal = getCellText(row, colMap.companyMockup);
+                if (compMockupVal && !BARE_CDN_RE.test(compMockupVal)) {
+                    mockupUrl = compMockupVal; imageSource = 'mockup';
+                }
             }
+            if (!mockupUrl) {
+                var fileUploadVal = getCellImgSrc(row, colMap.fileUpload);
+                if (fileUploadVal) {
+                    mockupUrl = fileUploadVal; imageSource = 'artwork';
+                }
+            }
+
+            // Rep name from User_Name email (e.g. nika@nwcustomapparel.com → Nika)
+            var userEmail = getCellText(row, colMap.userName);
+            var repName = userEmail ? userEmail.split('@')[0] : '';
+            if (repName) repName = repName.charAt(0).toUpperCase() + repName.slice(1);
 
             var statusInfo = getStatusInfo(status);
             var detailId = idDesign.replace(/[^0-9]/g, '');
@@ -415,12 +455,27 @@
             var card = document.createElement('div');
             card.className = 'ae-art-card';
 
-            // Image section — shimmer loading effect while Box images load
+            // Image source label — only label mockups, not original artwork
+            var imageLabelHtml = '';
+            if (imageSource === 'mockup') {
+                imageLabelHtml = '<span class="ae-art-card__image-label ae-art-card__image-label--mockup">Mockup</span>';
+            }
+
+            // Image section — shimmer loading, file-type badges for non-renderable files
             var imageHtml;
-            if (mockupUrl) {
-                imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+            if (mockupUrl && NON_IMAGE_EXT.test(mockupUrl)) {
+                // Non-renderable file — show colorful file-type badge
+                var ext = getFileExt(mockupUrl);
+                var extColor = EXT_COLORS[ext] || '#6b7280';
+                imageHtml = '<div class="ae-art-card__image">' + imageLabelHtml +
+                    '<div class="ae-art-card__file-badge">' +
+                        '<svg width="48" height="56" viewBox="0 0 48 56" fill="none"><path d="M4 4a4 4 0 014-4h22l14 14v38a4 4 0 01-4 4H8a4 4 0 01-4-4V4z" fill="#f3f4f6" stroke="' + extColor + '" stroke-width="2"/><path d="M30 0v10a4 4 0 004 4h10" fill="#e5e7eb" stroke="' + extColor + '" stroke-width="2"/></svg>' +
+                        '<span class="ae-art-card__file-ext" style="background:' + extColor + '">' + ext + '</span>' +
+                    '</div></div>';
+            } else if (mockupUrl) {
+                imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading">' + imageLabelHtml + '<img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
             } else {
-                imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
+                imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="ae-art-card__placeholder-text">No Image</span></div></div>';
             }
 
             // Request type badge
@@ -438,34 +493,35 @@
                         (designNum ? '<span class="ae-art-card__design-num">#' + escapeHtml(designNum) + '</span>' :
                          detailId ? '<span class="ae-art-card__design-num">#' + escapeHtml(detailId) + '</span>' : '') +
                     '</div>' +
+                    (repName ? '<div class="ae-art-card__rep">Rep: ' + escapeHtml(repName) + '</div>' : '') +
                     '<div class="ae-art-card__meta">' +
                         '<span class="ae-art-card__status ' + statusInfo.cls + '">' + statusInfo.icon + ' ' + statusInfo.label + '</span>' +
                         typeBadge +
+                        (revCount > 0 ? '<span class="ae-art-card__rev-badge">Rev #' + revCount + '</span>' : '') +
                     '</div>' +
                     '<div class="ae-art-card__details">' +
                         (dueDate ? '<span class="ae-art-card__detail">Due: ' + escapeHtml(dueDate) + '</span>' : '') +
-                        (orderNum ? '<span class="ae-art-card__detail">Order: ' + escapeHtml(orderNum) + '</span>' : '') +
+                        (orderNumSW ? '<span class="ae-art-card__detail">Order: ' + escapeHtml(orderNumSW) + '</span>' :
+                         orderNum ? '<span class="ae-art-card__detail">Order: ' + escapeHtml(orderNum) + '</span>' : '') +
                     '</div>' +
+                    (function () {
+                        if (!prelimCharges && artMinutes <= 0) return '';
+                        var hours = (Math.ceil(artMinutes / 15) * 0.25).toFixed(2);
+                        var html = '<div class="ae-art-card__billing">';
+                        if (prelimCharges) html += '<span class="ae-art-card__billing-quoted">Quoted: ' + escapeHtml(prelimCharges) + '</span>';
+                        if (artBilled) {
+                            var billedNum = parseFloat(artBilled);
+                            var billedDisplay = isNaN(billedNum) ? escapeHtml(artBilled) : '$' + billedNum.toFixed(2);
+                            html += '<span class="ae-art-card__billing-actual">Billed: ' + billedDisplay + ' (' + hours + 'h)</span>';
+                        }
+                        html += '</div>';
+                        return html;
+                    })() +
                 '</div>' +
                 '<div class="ae-art-card__footer">' +
                     (detailId ? '<a href="/art-request/' + escapeHtml(detailId) + '" target="_blank" class="ae-art-card__link ae-art-card__link--primary">View Details &rarr;</a>' : '') +
                     '<span class="ae-art-card__actions" data-id-design="' + escapeHtml(idDesign) + '"></span>' +
                 '</div>';
-
-            // Inject View Notes / Add Note links into the actions span
-            var actionsSpan = card.querySelector('.ae-art-card__actions');
-            var notesLink = getCellLink(row, colMap.viewNotes);
-            var addNoteLink = getCellLink(row, colMap.addNote);
-            if (notesLink) {
-                notesLink.className = 'ae-art-card__link';
-                notesLink.textContent = 'Notes';
-                actionsSpan.appendChild(notesLink);
-            }
-            if (addNoteLink) {
-                addNoteLink.className = 'ae-art-card__link';
-                addNoteLink.textContent = '+ Note';
-                actionsSpan.appendChild(addNoteLink);
-            }
 
             grid.appendChild(card);
         });
@@ -483,9 +539,14 @@
         table.style.display = 'none';
         var caspioNav = viewTab.querySelector('.cbReportNavBarPanel');
         if (caspioNav) caspioNav.style.display = 'none';
-        // Prevent horizontal overflow from any remaining Caspio elements
-        var caspioForm = table.closest('form');
-        if (caspioForm) caspioForm.style.overflow = 'hidden';
+        var caspioActions = viewTab.querySelector('.cbResultSetActionsContainer');
+        if (caspioActions) caspioActions.style.display = 'none';
+        // Prevent horizontal overflow — must use !important to override CSS !important rule
+        var viewForms = viewTab.querySelectorAll('form');
+        viewForms.forEach(function(f) {
+            f.style.setProperty('overflow', 'hidden', 'important');
+            f.style.setProperty('overflow-x', 'hidden', 'important');
+        });
         table.dataset.cardsRendered = 'true';
     }
 

@@ -3156,6 +3156,7 @@ input.cbSearchButton {
 
 /* -- Card image -- */
 .ae-art-card__image {
+    position: relative;
     min-height: 120px;
     max-height: 320px;
     overflow: hidden;
@@ -3173,12 +3174,19 @@ input.cbSearchButton {
 
 .ae-art-card__placeholder {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100%;
     min-height: 120px;
-    color: #9ca3af;
+    gap: 8px;
+    color: #d1d5db;
+}
+.ae-art-card__placeholder-text {
+    font-size: 11px;
+    color: #d1d5db;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Shimmer loading effect while Box images load */
@@ -3190,6 +3198,55 @@ input.cbSearchButton {
 @keyframes ae-shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+}
+
+/* -- Image source label overlay -- */
+.ae-art-card__image-label {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    z-index: 1;
+}
+.ae-art-card__image-label--mockup {
+    background: rgba(5, 150, 105, 0.9);
+    color: white;
+}
+.ae-art-card__image-label--artwork {
+    background: rgba(107, 114, 128, 0.85);
+    color: white;
+}
+
+/* -- File type badge for non-renderable files -- */
+.ae-art-card__file-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 120px;
+}
+.ae-art-card__file-ext {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: white;
+}
+
+/* -- Rep name line -- */
+.ae-art-card__rep {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: -4px;
+    margin-bottom: 6px;
 }
 
 /* -- Card body -- */
@@ -3291,6 +3348,36 @@ input.cbSearchButton {
 .ae-art-card__type--new {
     background: #ede9fe;
     color: #5b21b6;
+}
+
+/* -- Revision badge -- */
+.ae-art-card__rev-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #f59e0b;
+}
+
+/* -- Billing row -- */
+.ae-art-card__billing {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0 0;
+    margin-top: 6px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 12px;
+}
+.ae-art-card__billing-quoted {
+    color: #6b7280;
+}
+.ae-art-card__billing-actual {
+    color: #059669;
+    font-weight: 600;
 }
 
 /* -- Details row (due date, order #) -- */
