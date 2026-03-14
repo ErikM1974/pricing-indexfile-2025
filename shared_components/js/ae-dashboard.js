@@ -415,10 +415,10 @@
             var card = document.createElement('div');
             card.className = 'ae-art-card';
 
-            // Image section
+            // Image section — shimmer loading effect while Box images load
             var imageHtml;
             if (mockupUrl) {
-                imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
             } else {
                 imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
             }
@@ -632,7 +632,7 @@
 
                     var imageHtml;
                     if (mockupUrl) {
-                        imageHtml = '<div class="ae-art-card__image"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onerror="this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                        imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
                     } else {
                         imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
                     }

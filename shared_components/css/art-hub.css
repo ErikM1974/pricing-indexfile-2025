@@ -3156,7 +3156,8 @@ input.cbSearchButton {
 
 /* -- Card image -- */
 .ae-art-card__image {
-    aspect-ratio: 16 / 10;
+    min-height: 120px;
+    max-height: 320px;
     overflow: hidden;
     background: #f3f4f6;
     display: flex;
@@ -3166,8 +3167,8 @@ input.cbSearchButton {
 
 .ae-art-card__image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-height: 320px;
+    object-fit: contain;
 }
 
 .ae-art-card__placeholder {
@@ -3176,7 +3177,19 @@ input.cbSearchButton {
     justify-content: center;
     width: 100%;
     height: 100%;
+    min-height: 120px;
     color: #9ca3af;
+}
+
+/* Shimmer loading effect while Box images load */
+.ae-art-card__image--loading {
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: ae-shimmer 1.5s infinite;
+}
+@keyframes ae-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* -- Card body -- */
