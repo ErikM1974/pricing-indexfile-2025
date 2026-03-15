@@ -228,7 +228,7 @@
 
             if (templateId) {
                 await emailjs.send(EMAILJS_SERVICE_ID, templateId, templateParams, EMAILJS_PUBLIC_KEY);
-                console.log('Notification email sent (' + type + ') for design ' + designId);
+                // Notification email sent successfully
 
                 if (type === 'approval' && data.ccEmails && data.ccEmails.length > 0) {
                     for (var i = 0; i < data.ccEmails.length; i++) {

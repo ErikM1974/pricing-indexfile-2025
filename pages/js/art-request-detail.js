@@ -259,9 +259,13 @@
         renderMockupGallery(req);
         initGalleryInteractions(req);
 
-        // AE Action Bar — show only when status contains "Awaiting Approval"
+        // Detect view mode (AE vs Steve)
+        var urlParams = new URLSearchParams(window.location.search);
+        var isAeView = urlParams.get('view') === 'ae';
+
+        // AE Action Bar — show only for AE view when status is "Awaiting Approval"
         const statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
-        if (statusLower.includes('awaitingapproval')) {
+        if (isAeView && statusLower.includes('awaitingapproval')) {
             document.getElementById('ard-action-bar').style.display = '';
             initActionBar();
 
@@ -274,8 +278,6 @@
         }
 
         // Steve's Action Bar — hide when accessed via email link (?view=ae)
-        var urlParams = new URLSearchParams(window.location.search);
-        var isAeView = urlParams.get('view') === 'ae';
         if (isAeView) {
             document.body.classList.add('ae-view');
             // Update header text and back link for AE context
@@ -1612,7 +1614,7 @@
                     if (repEmail && typeof emailjs !== 'undefined') {
                         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
                             to_email: repEmail,
-                            rep_name: repName,
+                            to_name: repName,
                             design_id: designId,
                             company_name: currentRequest.CompanyName || '',
                             note_type: noteType,
