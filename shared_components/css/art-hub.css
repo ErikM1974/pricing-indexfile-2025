@@ -3721,3 +3721,10 @@ input.cbSearchButton {
 .audit-badge--green { background: #ecfdf5; color: #059669; border: 1px solid #059669; }
 .audit-badge--red { background: #fef2f2; color: #dc2626; border: 1px solid #dc2626; }
 .audit-badge--amber { background: #fffbeb; color: #d97706; border: 1px solid #d97706; }
+
+/* ── AE Gallery View (maroon theme overrides for shared DataPage) ── */
+.ae-gallery-view .card--completed { border-left-color: #981e32; }
+.ae-gallery-view .card-details-link { color: #981e32; }
+.ae-gallery-view .card-details-link:hover { color: #7a1828; }
+.ae-gallery-view .footer-info-row { justify-content: center; padding: 8px 0; }
+.ae-gallery-view .card-header { border-bottom: 2px solid #981e32; }
