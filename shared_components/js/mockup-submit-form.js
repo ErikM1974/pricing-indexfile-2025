@@ -314,9 +314,9 @@ var MockupSubmitForm = (function () {
     // ── Load Locations ─────────────────────────────────────────────────────
     function loadLocations() {
         fetch(API_BASE + '/api/locations?type=EMB,CAP')
-            .then(function (r) { return r.ok ? r.json() : { locations: [] }; })
+            .then(function (r) { return r.ok ? r.json() : []; })
             .then(function (data) {
-                allLocations = data.locations || [];
+                allLocations = Array.isArray(data) ? data : (data.locations || []);
                 var select = document.getElementById('msf-placement');
                 select.innerHTML = '<option value="">Select placement...</option>';
                 allLocations.forEach(function (loc) {
