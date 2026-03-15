@@ -498,7 +498,7 @@ cap-embroidery-fix.css
 | `/dashboards/staff-dashboard.html` | Main staff dashboard (legacy) | Multiple inline | ⚠️ Legacy |
 | `/dashboards/staff-dashboard-v2.html` | **NEW** Redesigned dashboard with 4-zone layout | staff-dashboard-*.js/css | ✅ Active |
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
-| `/dashboards/art-hub-dashboard.html` | Art hub | Multiple | ✅ Active |
+| `/dashboards/art-hub-dashboard.html` | ~~DELETED~~ Coordinator redirect (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
 | `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
@@ -522,12 +522,13 @@ cap-embroidery-fix.css
 | `/dashboards/art-invoice-view.html` | Art invoice detail view page | — | ✅ Active |
 | `/dashboards/bundle-orders-dashboard.html` | Bundle orders management dashboard | bundle-orders.js | ✅ Active |
 | `/dashboards/bundle-orders.js` | Bundle orders dashboard logic | — | ✅ Active |
-| `/dashboards/art-hub-coordinator.html` | Art hub — coordinator view | — | ✅ Active |
+| `/dashboards/art-hub-coordinator.html` | ~~DELETED~~ Coordinator workflow (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-hub-ruth.html` | Art hub — Ruth's personalized view | — | ✅ Active |
 | `/dashboards/art-hub-steve.html` | Art hub — Steve's personalized view | art-hub.css, art-hub-steve.js | ✅ Active |
 | `/shared_components/css/art-hub.css` | **NEW** Shared art hub dashboard styles (CSS custom props for theming) | — | ✅ Active |
 | `/shared_components/js/art-actions-shared.js` | **NEW** Shared art action modals (Log Time, Mark Complete, Send Mockup) — used by art-hub-steve.js + art-request-detail.js | art-hub.css, caspio-proxy API, EmailJS | ✅ Active |
 | `/shared_components/js/art-hub-steve.js` | Steve's gallery card processing + notes panel — delegates modals to art-actions-shared.js | art-hub.css, art-actions-shared.js, caspio-proxy API | ✅ Active |
+| `/shared_components/js/art-hub-ae.js` | AE gallery card processing (maroon theme, View Details only) | art-hub.css, ae-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | **NEW** AE submit art form styles (extracted from Caspio PageHeader) | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-submit-form.js` | **NEW** AE submit form JS: swatches, model images, row numbers, submission notification | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-dashboard.js` | **NEW** AE dashboard: tab switching, modals, dropdown, notification polling + toasts | ae-dashboard.html | ✅ Active |

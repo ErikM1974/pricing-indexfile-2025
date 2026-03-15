@@ -791,14 +791,6 @@ app.get('/universal-records-admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'universal-records-admin.html'));
 });
 
-app.get('/art-hub-detail.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-tools', 'art-hub-detail.html'));
-});
-
-app.get('/art-hub-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-dashboard.html'));
-});
-
 app.get('/art-hub-steve.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-steve.html'));
 });
@@ -807,8 +799,9 @@ app.get('/art-hub-ruth.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-ruth.html'));
 });
 
-app.get('/edit-ruth-mockup.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'mockups', 'edit-ruth-mockup.html'));
+// Ruth mockup detail page (serves for /mockup/123, /mockup/456, etc.)
+app.get('/mockup/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'mockup-detail.html'));
 });
 
 app.get('/announcements-create.html', (req, res) => {
@@ -869,16 +862,8 @@ app.get('/ae-submit-art.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'art-tools', 'ae-submit-art.html'));
 });
 
-app.get('/ae-art-report.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-tools', 'ae-art-report.html'));
-});
-
 app.get('/ae-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'ae-dashboard.html'));
-});
-
-app.get('/art-hub-coordinator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-coordinator.html'));
 });
 
 app.get('/digitizingform.html', (req, res) => {

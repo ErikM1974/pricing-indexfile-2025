@@ -179,15 +179,6 @@ const CRITICAL_PATHS = {
       ]
     },
     {
-      name: 'Art Hub Dashboard',
-      path: '/dashboards/art-hub-dashboard.html',
-      dependencies: [],
-      tests: [
-        { type: 'element', selector: '#art-hub', name: 'Art hub' },
-        { type: 'console', maxErrors: 0, name: 'No console errors' }
-      ]
-    },
-    {
       name: 'Art Invoices Dashboard',
       path: '/dashboards/art-invoices-dashboard.html',
       dependencies: [],
