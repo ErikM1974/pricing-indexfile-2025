@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Mockup Detail - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=1">
+</head>
+<body>
+    <!-- Header -->
+    <header class="pmd-header">
+        <div class="pmd-header-inner">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="pmd-logo">
+            <div class="pmd-header-text">
+                <h1 id="pmd-header-title">Mockup Detail</h1>
+                <a href="/art-hub-ruth.html" class="pmd-back-link" id="pmd-back-link">Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="pmd-loading" id="pmd-loading">
+        <div class="pmd-spinner"></div>
+        <p>Loading mockup...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="pmd-error" id="pmd-error" style="display:none;">
+        <div class="pmd-error-icon">!</div>
+        <h2 id="pmd-error-title">Mockup Not Found</h2>
+        <p id="pmd-error-msg">The mockup you're looking for doesn't exist or may have been removed.</p>
+    </div>
+
+    <!-- Content -->
+    <main class="pmd-content" id="pmd-content" style="display:none;">
+
+        <!-- Title Row -->
+        <div class="pmd-title-row">
+            <h2 class="pmd-design-id" id="pmd-design-id"></h2>
+            <div class="pmd-badges">
+                <span class="pmd-status-badge" id="pmd-status-badge"></span>
+                <span class="pmd-revision-badge" id="pmd-revision-badge" style="display:none;"></span>
+            </div>
+        </div>
+
+        <!-- Ruth's Action Bar (hidden for AE view) -->
+        <div class="pmd-action-bar" id="pmd-ruth-action-bar" style="display:none;"></div>
+
+        <!-- AE Action Bar (hidden for Ruth view) -->
+        <div class="pmd-action-bar" id="pmd-ae-action-bar" style="display:none;"></div>
+
+        <!-- Two-Column Grid -->
+        <div class="pmd-grid">
+            <!-- Left Column: Mockup Gallery -->
+            <div class="pmd-left-col">
+                <div class="pmd-card">
+                    <div class="pmd-card-header">Mockup Images</div>
+                    <div class="pmd-card-body">
+                        <div class="pmd-gallery-grid" id="pmd-gallery-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Notes Card -->
+                <div class="pmd-card">
+                    <div class="pmd-card-header">Notes &amp; Communication</div>
+                    <div class="pmd-card-body">
+                        <div class="pmd-notes-list" id="pmd-notes-list"></div>
+                        <div class="pmd-add-note" id="pmd-add-note">
+                            <textarea id="pmd-note-input" placeholder="Add a note..."></textarea>
+                            <button class="pmd-add-note-btn" id="pmd-add-note-btn">Add Note</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Info -->
+            <div class="pmd-right-col">
+                <div class="pmd-card">
+                    <div class="pmd-card-header">Request Details</div>
+                    <div class="pmd-card-body" id="pmd-info-fields"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Upload Popover (positioned absolutely) -->
+    <div class="pmd-slot-popover" id="pmd-slot-popover" style="display:none;">
+        <div class="pmd-pop-option" id="pmd-pop-upload">
+            <span>&#128228;</span> Upload File
+        </div>
+        <div class="pmd-pop-option" id="pmd-pop-box">
+            <span>&#128193;</span> Browse Box
+        </div>
+    </div>
+
+    <!-- Hidden file input for uploads -->
+    <input type="file" id="pmd-slot-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg">
+
+    <!-- Lightbox -->
+    <div class="pmd-lightbox" id="pmd-lightbox">
+        <button class="pmd-lightbox-close" id="pmd-lightbox-close">&times;</button>
+        <img id="pmd-lightbox-img" src="" alt="">
+        <div class="pmd-lightbox-label" id="pmd-lightbox-label"></div>
+    </div>
+
+    <!-- Box Picker Modal -->
+    <div class="pmd-box-overlay" id="pmd-box-overlay"></div>
+    <div class="pmd-box-modal" id="pmd-box-modal" style="display:none;">
+        <div class="pmd-box-modal-header">
+            <h3>Browse Box Files</h3>
+            <button class="pmd-box-modal-close" id="pmd-box-modal-close">&times;</button>
+        </div>
+        <div class="pmd-box-modal-body">
+            <div class="pmd-box-breadcrumb" id="pmd-box-breadcrumb"></div>
+            <div class="pmd-box-loading" id="pmd-box-loading" style="display:none;">
+                <div class="pmd-spinner" style="width:24px;height:24px;border-width:2px;"></div>
+                Loading...
+            </div>
+            <div id="pmd-box-file-list"></div>
+        </div>
+        <div class="pmd-box-modal-footer">
+            <button class="pmd-box-cancel-btn" id="pmd-box-cancel">Cancel</button>
+            <button class="pmd-box-confirm-btn" id="pmd-box-confirm" disabled>Select File</button>
+        </div>
+    </div>
+
+    <!-- Request Changes Modal (AE view) -->
+    <div class="pmd-modal-overlay" id="pmd-revise-overlay">
+        <div class="pmd-modal">
+            <div class="pmd-modal-header">Request Changes</div>
+            <div class="pmd-modal-body">
+                <label for="pmd-revise-notes">What changes are needed?</label>
+                <textarea id="pmd-revise-notes" placeholder="Describe the changes needed..."></textarea>
+            </div>
+            <div class="pmd-modal-footer">
+                <button class="pmd-box-cancel-btn" id="pmd-revise-cancel">Cancel</button>
+                <button class="pmd-action-btn pmd-action-btn--revise" id="pmd-revise-submit">Request Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/pages/js/mockup-detail.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,927 @@
+/* ==========================================================================
+   Mockup Detail Page — Ruth's Digitizing Mockup Detail
+   Used by: pages/mockup-detail.html
+   Prefix: pmd- (Purple Mockup Detail)
+   Purple theme: #6B46C1 (primary), #553C9A (dark), #8B5CF6 (light)
+   ========================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f6fa;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.pmd-header {
+    background: linear-gradient(135deg, #6B46C1, #553C9A);
+    color: white;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.pmd-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.pmd-logo {
+    height: 40px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.pmd-header-text h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.pmd-back-link {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.pmd-back-link:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* ── Loading ────────────────────────────────────────── */
+.pmd-loading {
+    text-align: center;
+    padding: 80px 20px;
+    color: #666;
+}
+
+.pmd-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #6B46C1;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: pmd-spin 0.8s linear infinite;
+}
+
+@keyframes pmd-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Error ──────────────────────────────────────────── */
+.pmd-error {
+    text-align: center;
+    padding: 80px 20px;
+    color: #666;
+}
+
+.pmd-error-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #fee;
+    color: #dc3545;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 60px;
+    margin: 0 auto 16px;
+}
+
+.pmd-error h2 {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* ── Content ────────────────────────────────────────── */
+.pmd-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    width: 100%;
+    flex: 1;
+}
+
+/* ── Title Row ──────────────────────────────────────── */
+.pmd-title-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.pmd-design-id {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+.pmd-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.pmd-status-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pmd-status-badge--submitted {
+    background: rgba(139,92,246,0.2);
+    color: #7c3aed;
+}
+
+.pmd-status-badge--in-progress {
+    background: rgba(59,130,246,0.15);
+    color: #2563eb;
+}
+
+.pmd-status-badge--awaiting-approval {
+    background: rgba(245,158,11,0.15);
+    color: #d97706;
+}
+
+.pmd-status-badge--approved {
+    background: rgba(16,185,129,0.15);
+    color: #059669;
+}
+
+.pmd-status-badge--revision-requested {
+    background: rgba(239,68,68,0.15);
+    color: #dc2626;
+}
+
+.pmd-revision-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* ── Action Bars ────────────────────────────────────── */
+.pmd-action-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.pmd-action-bar-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-right: 8px;
+}
+
+.pmd-action-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.pmd-action-btn--primary {
+    background: #6B46C1;
+    color: white;
+}
+
+.pmd-action-btn--primary:hover {
+    background: #553C9A;
+}
+
+.pmd-action-btn--start {
+    background: #3b82f6;
+    color: white;
+}
+
+.pmd-action-btn--start:hover {
+    background: #2563eb;
+}
+
+.pmd-action-btn--send {
+    background: #f59e0b;
+    color: white;
+}
+
+.pmd-action-btn--send:hover {
+    background: #d97706;
+}
+
+.pmd-action-btn--approve {
+    background: #10b981;
+    color: white;
+}
+
+.pmd-action-btn--approve:hover {
+    background: #059669;
+}
+
+.pmd-action-btn--revise {
+    background: #ef4444;
+    color: white;
+}
+
+.pmd-action-btn--revise:hover {
+    background: #dc2626;
+}
+
+.pmd-action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Two-Column Grid ────────────────────────────────── */
+.pmd-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Cards ──────────────────────────────────────────── */
+.pmd-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.pmd-card-header {
+    background: linear-gradient(135deg, #6B46C1, #553C9A);
+    color: white;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pmd-card-body {
+    padding: 16px;
+}
+
+/* ── Gallery ────────────────────────────────────────── */
+.pmd-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.pmd-gallery-slot {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #e5e7eb;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pmd-gallery-slot:hover {
+    border-color: #6B46C1;
+    box-shadow: 0 2px 8px rgba(107,70,193,0.2);
+}
+
+.pmd-slot-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8f5ff;
+    color: #6B46C1;
+    font-size: 13px;
+    font-weight: 500;
+    gap: 6px;
+    height: 100%;
+}
+
+.pmd-slot-empty-icon {
+    font-size: 28px;
+    opacity: 0.6;
+}
+
+.pmd-slot-filled img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pmd-slot-filled {
+    position: relative;
+    height: 100%;
+}
+
+.pmd-slot-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 8px;
+    text-align: center;
+}
+
+.pmd-slot-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(239,68,68,0.9);
+    color: white;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+}
+
+.pmd-gallery-slot:hover .pmd-slot-remove {
+    opacity: 1;
+}
+
+.pmd-slot-uploading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.pmd-slot-upload-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(107,70,193,0.3);
+    border-top-color: #6B46C1;
+    border-radius: 50%;
+    animation: pmd-spin 0.8s linear infinite;
+    z-index: 3;
+}
+
+.pmd-file-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #f3f0ff;
+    gap: 6px;
+}
+
+.pmd-file-ext-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #6B46C1;
+    color: white;
+    text-transform: uppercase;
+}
+
+/* ── Upload Popover ─────────────────────────────────── */
+.pmd-slot-popover {
+    position: absolute;
+    z-index: 100;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    padding: 8px;
+    display: none;
+}
+
+.pmd-pop-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.pmd-pop-option:hover {
+    background: #f3f0ff;
+    color: #6B46C1;
+}
+
+/* ── Info Fields ────────────────────────────────────── */
+.pmd-field-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.pmd-field-row:last-child {
+    border-bottom: none;
+}
+
+.pmd-field-label {
+    width: 120px;
+    flex-shrink: 0;
+    color: #888;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.pmd-field-value {
+    flex: 1;
+    color: #333;
+    word-break: break-word;
+}
+
+/* ── Notes Timeline ─────────────────────────────────── */
+.pmd-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pmd-note {
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    border-left: 3px solid #e5e7eb;
+}
+
+.pmd-note--ae_instruction {
+    border-left-color: #6B46C1;
+    background: #f8f5ff;
+}
+
+.pmd-note--artist_note {
+    border-left-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.pmd-note--status_change {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.pmd-note--revision_request {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.pmd-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pmd-note-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.pmd-note-type--ae_instruction {
+    background: rgba(107,70,193,0.15);
+    color: #6B46C1;
+}
+
+.pmd-note-type--artist_note {
+    background: rgba(59,130,246,0.15);
+    color: #2563eb;
+}
+
+.pmd-note-type--status_change {
+    background: rgba(245,158,11,0.15);
+    color: #d97706;
+}
+
+.pmd-note-type--revision_request {
+    background: rgba(239,68,68,0.15);
+    color: #dc2626;
+}
+
+.pmd-note-meta {
+    font-size: 12px;
+    color: #999;
+}
+
+.pmd-note-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.pmd-empty-notes {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* ── Add Note Form ──────────────────────────────────── */
+.pmd-add-note {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pmd-add-note textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.pmd-add-note textarea:focus {
+    outline: none;
+    border-color: #6B46C1;
+    box-shadow: 0 0 0 3px rgba(107,70,193,0.1);
+}
+
+.pmd-add-note-btn {
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: #6B46C1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+}
+
+.pmd-add-note-btn:hover {
+    background: #553C9A;
+}
+
+.pmd-add-note-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Lightbox ───────────────────────────────────────── */
+.pmd-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+
+.pmd-lightbox.show {
+    display: flex;
+}
+
+.pmd-lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+
+.pmd-lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pmd-lightbox-label {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 14px;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+/* ── Box Picker Modal ───────────────────────────────── */
+.pmd-box-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9000;
+    display: none;
+}
+
+.pmd-box-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-width: 95vw;
+    max-height: 80vh;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    z-index: 9001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pmd-box-modal-header {
+    background: #6B46C1;
+    color: white;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pmd-box-modal-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pmd-box-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.pmd-box-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    min-height: 200px;
+}
+
+.pmd-box-breadcrumb {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.pmd-box-breadcrumb-link {
+    color: #6B46C1;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.pmd-box-breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.pmd-box-folder-item,
+.pmd-box-file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 14px;
+}
+
+.pmd-box-folder-item:hover {
+    background: #f3f0ff;
+}
+
+.pmd-box-file-item:hover {
+    background: #f0f0f0;
+}
+
+.pmd-box-file-item.selected {
+    background: #ede9fe;
+    border: 2px solid #6B46C1;
+    border-radius: 8px;
+}
+
+.pmd-box-file-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pmd-box-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #888;
+    gap: 10px;
+}
+
+.pmd-box-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.pmd-box-cancel-btn {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.pmd-box-confirm-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #6B46C1;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.pmd-box-confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Request Changes Modal ──────────────────────────── */
+.pmd-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.pmd-modal-overlay.show {
+    display: flex;
+}
+
+.pmd-modal {
+    background: white;
+    border-radius: 12px;
+    width: 500px;
+    max-width: 95vw;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+
+.pmd-modal-header {
+    background: #6B46C1;
+    color: white;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pmd-modal-body {
+    padding: 20px;
+}
+
+.pmd-modal-body textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.pmd-modal-body label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.pmd-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ── Toast ──────────────────────────────────────────── */
+.pmd-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10001;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pmd-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.pmd-toast--success { background: #059669; }
+.pmd-toast--error { background: #dc2626; }
+.pmd-toast--info { background: #6B46C1; }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 900px) {
+    .pmd-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .pmd-header { padding: 12px 16px; }
+    .pmd-content { padding: 16px 12px; }
+    .pmd-gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .pmd-action-bar { flex-direction: column; }
+    .pmd-title-row { flex-direction: column; align-items: flex-start; }
+}

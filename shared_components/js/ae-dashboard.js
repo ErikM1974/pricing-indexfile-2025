@@ -46,11 +46,12 @@
 
     // ── Tab Switching ───────────────────────────────────────────────
 
-    var VISIBLE_TABS = ['submit', 'view', 'mockup-ruth'];
+    var VISIBLE_TABS = ['submit', 'view', 'mockup-ruth', 'digitizing'];
     var DROPDOWN_TABS = ['review', 'requirements', 'gallery', 'generator'];
 
     var TAB_PANE_MAP = {
         'submit': 'submit-tab',
+        'digitizing': 'digitizing-tab',
         'mockup-ruth': 'mockup-ruth-tab',
         'requirements': 'requirements-tab',
         'gallery': 'gallery-tab',

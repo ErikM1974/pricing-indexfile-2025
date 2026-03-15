@@ -1,0 +1,487 @@
+/* ==========================================================================
+   Mockup Submit Form — AE Digitizing/Mockup Request Form
+   Used by: ae-dashboard.html (Request Mockup Ruth tab)
+   Prefix: msf- (Mockup Submit Form)
+   Purple theme: #6B46C1 (primary), #553C9A (dark), #8B5CF6 (light)
+   ========================================================================== */
+
+.msf-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* ── Ruth Info Banner ───────────────────────────────── */
+.msf-ruth-banner {
+    display: flex;
+    gap: 20px;
+    background: #f8f5ff;
+    border: 2px solid #6B46C1;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    align-items: center;
+}
+
+.msf-ruth-photo {
+    flex-shrink: 0;
+    text-align: center;
+    width: 140px;
+}
+
+.msf-ruth-photo img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #6B46C1;
+    box-shadow: 0 4px 12px rgba(107,70,193,0.15);
+}
+
+.msf-ruth-photo h4 {
+    margin: 8px 0 2px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.msf-ruth-photo p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.msf-ruth-info {
+    flex: 1;
+}
+
+.msf-ruth-info h3 {
+    margin: 0 0 8px 0;
+    color: #6B46C1;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.msf-ruth-info p {
+    margin: 0;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.msf-mandatory-bar {
+    margin-top: 12px;
+    background: #6B46C1;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* ── Form Card ──────────────────────────────────────── */
+.msf-form-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.msf-form-header {
+    background: linear-gradient(135deg, #6B46C1, #553C9A);
+    color: white;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.msf-form-body {
+    padding: 24px;
+}
+
+/* ── Form Fields ────────────────────────────────────── */
+.msf-field {
+    margin-bottom: 20px;
+}
+
+.msf-field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.msf-field-label .msf-required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+.msf-field-hint {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.msf-input,
+.msf-select,
+.msf-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+.msf-input:focus,
+.msf-select:focus,
+.msf-textarea:focus {
+    outline: none;
+    border-color: #6B46C1;
+    box-shadow: 0 0 0 3px rgba(107,70,193,0.1);
+}
+
+.msf-input.msf-error,
+.msf-select.msf-error,
+.msf-textarea.msf-error {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+
+.msf-error-msg {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.msf-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.msf-input[readonly] {
+    background: #f3f4f6;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* ── Two-Column Row ─────────────────────────────────── */
+.msf-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ── Design Autocomplete ────────────────────────────── */
+.msf-autocomplete-wrap {
+    position: relative;
+}
+
+.msf-autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.msf-autocomplete-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+}
+
+.msf-autocomplete-item:hover {
+    background: #f3f0ff;
+}
+
+.msf-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.msf-autocomplete-design-num {
+    font-weight: 600;
+    color: #6B46C1;
+}
+
+.msf-autocomplete-company {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.msf-autocomplete-loading {
+    padding: 16px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+}
+
+/* ── Thread Color Chips ─────────────────────────────── */
+.msf-thread-picker {
+    position: relative;
+}
+
+.msf-thread-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    min-height: 0;
+}
+
+.msf-thread-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #f3f0ff;
+    border: 1px solid #d4c8f0;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #6B46C1;
+    font-weight: 500;
+}
+
+.msf-thread-chip-remove {
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #999;
+    margin-left: 2px;
+    line-height: 1;
+}
+
+.msf-thread-chip-remove:hover {
+    color: #dc2626;
+}
+
+.msf-thread-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0 0 6px 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.msf-thread-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.msf-thread-option:hover {
+    background: #f3f0ff;
+}
+
+.msf-thread-option.selected {
+    background: #ede9fe;
+    font-weight: 600;
+}
+
+.msf-thread-number {
+    color: #888;
+    font-size: 12px;
+}
+
+/* ── File Upload ────────────────────────────────────── */
+.msf-file-drop {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: #888;
+    font-size: 14px;
+}
+
+.msf-file-drop:hover {
+    border-color: #6B46C1;
+    background: #f8f5ff;
+    color: #6B46C1;
+}
+
+.msf-file-drop-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.msf-file-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f3f0ff;
+    border-radius: 6px;
+    margin-top: 8px;
+}
+
+.msf-file-preview-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.msf-file-remove {
+    cursor: pointer;
+    color: #dc2626;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0 4px;
+}
+
+/* ── Submit Button ──────────────────────────────────── */
+.msf-submit-row {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.msf-submit-btn {
+    padding: 12px 32px;
+    background: #6B46C1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+}
+
+.msf-submit-btn:hover {
+    background: #553C9A;
+}
+
+.msf-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.msf-submit-status {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ── Success State ──────────────────────────────────── */
+.msf-success {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.msf-success-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.msf-success h3 {
+    font-size: 20px;
+    color: #059669;
+    margin-bottom: 8px;
+}
+
+.msf-success p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.msf-success-link {
+    display: inline-block;
+    padding: 10px 24px;
+    background: #6B46C1;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.msf-success-link:hover {
+    background: #553C9A;
+}
+
+.msf-success-another {
+    display: inline-block;
+    margin-left: 12px;
+    padding: 10px 24px;
+    background: white;
+    color: #6B46C1;
+    border: 1px solid #6B46C1;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.msf-success-another:hover {
+    background: #f3f0ff;
+}
+
+/* ── Toast ──────────────────────────────────────────── */
+.msf-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10001;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.msf-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.msf-toast--success { background: #059669; }
+.msf-toast--error { background: #dc2626; }
+.msf-toast--info { background: #6B46C1; }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 600px) {
+    .msf-ruth-banner { flex-direction: column; text-align: center; }
+    .msf-row { grid-template-columns: 1fr; }
+    .msf-submit-row { flex-direction: column; }
+}
