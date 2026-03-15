@@ -115,22 +115,43 @@ Memory updates are part of completing the task — not a separate step that need
 ### What Goes Where (Decision Tree)
 | Content type | Destination |
 |---|---|
-| Sync rules, gotchas, key architectural decisions | MEMORY.md |
-| Detailed implementation notes (>10 lines on a topic) | Topic file (e.g., `emb-builder-details.md`) |
+| Sync rules, "NOT X" corrections, cross-system deps | MEMORY.md (1-liners only) |
+| Detailed implementation notes (>2 lines on a topic) | Topic file |
+| Database table schemas, field lists | `caspio-schema.md` |
 | Bug fixes with root cause | `/memory/LESSONS_LEARNED.md` (git-tracked) |
-| One-time script results, batch stats, historical counts | **Nowhere** — ephemeral |
+| One-time script results, batch stats | **Nowhere** — ephemeral |
 
 ### Size Discipline
-- **Target**: 100–150 lines. **Hard limit**: 200 lines (only first 200 load into context).
-- **Warning threshold**: 180 lines — a Stop hook fires automatically if exceeded.
-- When adding content: if a section grows past 10 lines, move details to a topic file and link from MEMORY.md.
-- When approaching 180 lines: condense existing content before adding more.
+- **Target**: 80–130 lines. **Hard limit**: 200 lines (only first 200 load into context).
+- **Warning threshold**: 150 lines — stop and condense before adding more.
+- **Rule of thumb**: If you're writing more than 2 lines about something, it belongs in a topic file.
+- Before adding to MEMORY.md: run `wc -l` to check current count. If over 130, condense first.
+
+### Topic Files (no line limit, loaded on demand)
+| File | Content |
+|---|---|
+| `backend-overview.md` | Backend route inventory (44 files), architecture, patterns, env vars |
+| `caspio-schema.md` | All Caspio table schemas, fields, gotchas |
+| `emb-builder-details.md` | Embroidery builder architecture deep-dive |
+| `design-lookup-details.md` | Design_Lookup_2026 normalization, enrichment |
+| `art-hub-details.md` | Art Hub full architecture, UI, workflows |
+| `common-gotchas.md` | All gotchas organized by category with code examples |
+| `python-inksoft-details.md` | Python Inksoft transform pipeline, OnSite payload, store configs |
 
 ### Topic File Rules
 - Located in the auto-memory directory (see path above).
-- Always linked from MEMORY.md header (e.g., `> Topic files: [emb-builder-details.md] | [design-lookup-details.md]`).
+- Always linked from MEMORY.md header row.
 - Each file should be self-contained with a `> Linked from MEMORY.md` header.
-- Create new topic files as needed — they have no line limit.
+- Create new topic files freely — they have no line limit.
+- When a MEMORY.md section grows past 10 lines, extract to topic file immediately.
+
+### Memory Efficiency Enforcement
+**On every MEMORY.md edit, Claude MUST:**
+1. Check line count with `wc -l` before AND after editing
+2. If adding new content would push past 130 lines, condense an existing section first
+3. Never duplicate info that's already in a topic file — just link to it
+4. Prefer updating existing topic files over adding lines to MEMORY.md
+5. When completing a feature that added 5+ lines, review if any can be condensed
 
 ## File Organization
 
