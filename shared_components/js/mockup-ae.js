@@ -122,7 +122,9 @@ var MockupAeGallery = (function () {
 
         var badges = '';
         if (mockupType) {
-            badges += '<span class="card-badge">' + mockupType + '</span>';
+            mockupType.split(', ').forEach(function (t) {
+                badges += '<span class="card-badge">' + escapeHtml(t.trim()) + '</span>';
+            });
         }
         if (revCount > 0) {
             badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';

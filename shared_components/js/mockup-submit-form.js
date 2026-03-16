@@ -103,20 +103,19 @@ var MockupSubmitForm = (function () {
             + '      </div>'
             + '    </div>'
 
-            // Mockup Type + Placement
+            // Mockup Type (multi-select checkboxes) + Placement
             + '    <div class="msf-row">'
             + '      <div class="msf-field">'
-            + '        <label class="msf-field-label">Mockup Type <span class="msf-required">*</span></label>'
-            + '        <select class="msf-select" id="msf-mockup-type">'
-            + '          <option value="">Select type...</option>'
-            + '          <option value="Embroidery">Embroidery</option>'
-            + '          <option value="Cap">Cap</option>'
-            + '          <option value="Jacket">Jacket</option>'
-            + '          <option value="Shirt">Shirt</option>'
-            + '          <option value="Polo">Polo</option>'
-            + '          <option value="Other">Other</option>'
-            + '        </select>'
-            + '        <span class="msf-error-msg" id="msf-type-error">Mockup type is required</span>'
+            + '        <label class="msf-field-label">Application Type <span class="msf-required">*</span></label>'
+            + '        <div class="msf-checkbox-group" id="msf-mockup-type-group">'
+            + '          <label class="msf-checkbox-label"><input type="checkbox" class="msf-mockup-type-cb" value="Cap"> Cap</label>'
+            + '          <label class="msf-checkbox-label"><input type="checkbox" class="msf-mockup-type-cb" value="Jacket"> Jacket</label>'
+            + '          <label class="msf-checkbox-label"><input type="checkbox" class="msf-mockup-type-cb" value="Shirt"> Shirt</label>'
+            + '          <label class="msf-checkbox-label"><input type="checkbox" class="msf-mockup-type-cb" value="Polo"> Polo</label>'
+            + '          <label class="msf-checkbox-label"><input type="checkbox" class="msf-mockup-type-cb" value="Beanie"> Beanie</label>'
+            + '          <label class="msf-checkbox-label"><input type="checkbox" class="msf-mockup-type-cb" value="Other"> Other</label>'
+            + '        </div>'
+            + '        <span class="msf-error-msg" id="msf-type-error">Select at least one application type</span>'
             + '      </div>'
             + '      <div class="msf-field">'
             + '        <label class="msf-field-label">Placement <span class="msf-required">*</span></label>'
@@ -554,14 +553,15 @@ var MockupSubmitForm = (function () {
             document.getElementById('msf-design-error').style.display = 'none';
         }
 
-        // Mockup Type — always required
-        var mockupType = document.getElementById('msf-mockup-type').value;
-        if (!mockupType) {
-            document.getElementById('msf-mockup-type').classList.add('msf-error');
+        // Application Type — at least one checkbox required
+        var checkedTypes = document.querySelectorAll('.msf-mockup-type-cb:checked');
+        var typeGroup = document.getElementById('msf-mockup-type-group');
+        if (checkedTypes.length === 0) {
+            if (typeGroup) typeGroup.classList.add('msf-error');
             document.getElementById('msf-type-error').style.display = '';
             valid = false;
         } else {
-            document.getElementById('msf-mockup-type').classList.remove('msf-error');
+            if (typeGroup) typeGroup.classList.remove('msf-error');
             document.getElementById('msf-type-error').style.display = 'none';
         }
 
@@ -659,7 +659,7 @@ var MockupSubmitForm = (function () {
                     Design_Name: document.getElementById('msf-design-name').value.trim(),
                     Company_Name: companyName,
                     Id_Customer: parseInt(document.getElementById('msf-customer-id').value) || 0,
-                    Mockup_Type: document.getElementById('msf-mockup-type').value,
+                    Mockup_Type: Array.from(document.querySelectorAll('.msf-mockup-type-cb:checked')).map(function(cb) { return cb.value; }).join(', '),
                     Print_Location: document.getElementById('msf-placement').value,
                     Garment_Info: buildGarmentInfo(),
                     Size_Specs: buildSizeSpecs(),
@@ -709,7 +709,24 @@ var MockupSubmitForm = (function () {
                     }).catch(function () {});
                 }
 
-                // Step 5: Show success
+                // Step 5: Notify Ruth via EmailJS
+                if (typeof emailjs !== 'undefined') {
+                    try {
+                        emailjs.init('4qSbDO-SQs19TbP80');
+                        emailjs.send('service_1c4k67j', 'template_art_note_added', {
+                            to_email: 'ruth@nwcustomapparel.com',
+                            to_name: 'Ruth',
+                            design_id: designNumber || 'NEW',
+                            company_name: companyName,
+                            note_text: 'New ' + currentRequestType + ' submitted for ' + companyName,
+                            note_type: 'New Submission',
+                            detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/mockup/' + (newId || ''),
+                            from_name: getSubmitterName()
+                        }).catch(function () {});
+                    } catch (e) { /* silent */ }
+                }
+
+                // Step 6: Show success
                 showSuccess(newId);
             })
             .catch(function (err) {

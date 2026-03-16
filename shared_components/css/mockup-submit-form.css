@@ -203,6 +203,44 @@
     display: none;
 }
 
+/* ── Checkbox Group (multi-select application types) ──── */
+.msf-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.msf-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+.msf-checkbox-label:hover {
+    border-color: #6B46C1;
+    background: #f8f5ff;
+}
+.msf-checkbox-label:has(input:checked) {
+    border-color: #6B46C1;
+    background: #f3eaff;
+    color: #553C9A;
+    font-weight: 500;
+}
+.msf-checkbox-label input[type="checkbox"] {
+    accent-color: #6B46C1;
+}
+.msf-checkbox-group.msf-error {
+    border: 1px solid #dc2626;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+
 .msf-textarea {
     min-height: 100px;
     resize: vertical;

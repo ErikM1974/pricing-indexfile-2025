@@ -14,6 +14,12 @@
 
     var IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
 
+    // ── EmailJS Config ──────────────────────────────────────────────────
+    var EMAILJS_SERVICE_ID = 'service_1c4k67j';
+    var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    var HEROKU_ORIGIN = 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com';
+    var RUTH_EMAIL = 'ruth@nwcustomapparel.com';
+
     var MOCKUP_SLOTS = [
         { key: 'Box_Mockup_1', label: 'Mockup 1' },
         { key: 'Box_Mockup_2', label: 'Mockup 2' },
@@ -40,6 +46,7 @@
 
     var urlParams = new URLSearchParams(window.location.search);
     isAeView = urlParams.get('view') === 'ae';
+    var isCustomerView = urlParams.get('view') === 'customer';
 
     // Adjust header for AE view
     if (isAeView) {
@@ -50,6 +57,15 @@
             backLink.textContent = 'Back to AE Dashboard';
             backLink.href = '/ae-dashboard.html';
         }
+    }
+
+    // Adjust header for customer view
+    if (isCustomerView) {
+        var headerTitle = document.getElementById('pmd-header-title');
+        var backLink = document.getElementById('pmd-back-link');
+        if (headerTitle) headerTitle.textContent = 'Mockup Approval';
+        if (backLink) backLink.style.display = 'none';
+        document.body.classList.add('pmd-customer-view');
     }
 
     // ── Fetch & Render ─────────────────────────────────────────────────────
@@ -111,14 +127,21 @@
         // Info fields
         renderInfoFields(mockup);
 
-        // Notes
-        renderNotes(notes);
+        // Notes (hide for customer view)
+        if (isCustomerView) {
+            var notesList = document.getElementById('pmd-notes-list');
+            if (notesList) notesList.closest('.pmd-card').style.display = 'none';
+        } else {
+            renderNotes(notes);
+        }
 
         // Wire up interactions
-        initGalleryInteractions();
-        initNoteForm();
+        if (!isCustomerView) {
+            initGalleryInteractions();
+            initNoteForm();
+        }
         initLightbox();
-        initBoxModal();
+        if (!isCustomerView) initBoxModal();
     }
 
     // ── Action Bars ────────────────────────────────────────────────────────
@@ -127,7 +150,38 @@
         var ruthBar = document.getElementById('pmd-ruth-action-bar');
         var aeBar = document.getElementById('pmd-ae-action-bar');
 
-        if (isAeView) {
+        if (isCustomerView) {
+            // Customer view
+            ruthBar.style.display = 'none';
+            aeBar.style.display = '';
+
+            if (statusLower === 'awaitingapproval') {
+                aeBar.innerHTML = '<div class="pmd-customer-action-panel">'
+                    + '<p class="pmd-customer-prompt">Please review the mockup(s) below and select the one you approve, or request changes.</p>'
+                    + '<div class="pmd-customer-btns">'
+                    + '<button class="pmd-action-btn pmd-action-btn--approve pmd-action-btn--lg" id="pmd-btn-customer-approve" disabled>Approve Selected Mockup</button>'
+                    + '<button class="pmd-action-btn pmd-action-btn--revise pmd-action-btn--lg" id="pmd-btn-customer-revise">Request Changes</button>'
+                    + '</div>'
+                    + '</div>';
+
+                document.getElementById('pmd-btn-customer-approve').addEventListener('click', function () {
+                    handleCustomerApproval(this);
+                });
+                document.getElementById('pmd-btn-customer-revise').addEventListener('click', function () {
+                    openReviseModal();
+                });
+            } else if (statusLower === 'approved') {
+                aeBar.innerHTML = '<div class="pmd-customer-thankyou">'
+                    + '<div class="pmd-customer-thankyou-icon">&#9989;</div>'
+                    + '<h3>Thank You!</h3>'
+                    + '<p>This mockup has been approved. We will proceed with production.</p>'
+                    + '</div>';
+            } else {
+                aeBar.innerHTML = '<div class="pmd-customer-status-msg">'
+                    + '<p>This mockup is not ready for review yet. Please check back later.</p>'
+                    + '</div>';
+            }
+        } else if (isAeView) {
             // AE view
             ruthBar.style.display = 'none';
 
@@ -135,13 +189,22 @@
                 aeBar.style.display = '';
                 aeBar.innerHTML = '<span class="pmd-action-bar-label">Review this mockup:</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve">Approve Mockup</button>'
-                    + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>';
+                    + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
+                    + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
 
                 document.getElementById('pmd-btn-approve').addEventListener('click', function () {
                     handleStatusUpdate('Approved', null, this);
                 });
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
+                });
+                document.getElementById('pmd-btn-copy-link').addEventListener('click', function () {
+                    var customerUrl = window.location.origin + '/mockup/' + mockupId + '?view=customer';
+                    navigator.clipboard.writeText(customerUrl).then(function () {
+                        showToast('Customer link copied to clipboard!', 'success');
+                    }).catch(function () {
+                        prompt('Copy this link:', customerUrl);
+                    });
                 });
             } else {
                 aeBar.style.display = 'none';
@@ -170,6 +233,60 @@
         }
     }
 
+    // ── Customer Approval ───────────────────────────────────────────────
+    var selectedMockupSlot = null;
+
+    function handleCustomerApproval(btnEl) {
+        if (!selectedMockupSlot) {
+            showToast('Please click on a mockup to select it first', 'error');
+            return;
+        }
+        if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Submitting...'; }
+
+        var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === selectedMockupSlot; })[0];
+        var approvalNote = 'Customer approved ' + (slotLabel ? slotLabel.label : selectedMockupSlot);
+
+        var body = {
+            status: 'Approved',
+            author: 'Customer',
+            authorName: 'Customer',
+            notes: approvalNote
+        };
+
+        fetch(API_BASE + '/api/mockups/' + mockupId + '/status', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Approval failed');
+            return resp.json();
+        }).then(function () {
+            showCustomerConfirmation('approved');
+        }).catch(function (err) {
+            showToast('Error: ' + err.message, 'error');
+            if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Approve Selected Mockup'; }
+        });
+    }
+
+    function showCustomerConfirmation(type) {
+        var content = document.getElementById('pmd-content');
+        if (type === 'approved') {
+            content.innerHTML = '<div class="pmd-customer-confirmation">'
+                + '<div class="pmd-customer-confirmation-icon">&#9989;</div>'
+                + '<h2>Thank You!</h2>'
+                + '<p>Your mockup approval has been recorded. We will proceed with production.</p>'
+                + '<p class="pmd-customer-company">' + escapeHtml(currentMockup.Company_Name || '') + '</p>'
+                + '</div>';
+        } else {
+            content.innerHTML = '<div class="pmd-customer-confirmation">'
+                + '<div class="pmd-customer-confirmation-icon">&#128221;</div>'
+                + '<h2>Feedback Submitted</h2>'
+                + '<p>Your revision request has been submitted. Our team will make the changes and send an updated mockup.</p>'
+                + '<p class="pmd-customer-company">' + escapeHtml(currentMockup.Company_Name || '') + '</p>'
+                + '</div>';
+        }
+    }
+
     // ── Status Update ──────────────────────────────────────────────────────
     function handleStatusUpdate(newStatus, notes, btnEl) {
         if (btnEl) {
@@ -177,15 +294,20 @@
             btnEl.textContent = 'Updating...';
         }
 
-        var body = {
-            status: newStatus,
-            author: isAeView ? (currentMockup.Submitted_By || 'ae@nwcustomapparel.com') : 'ruth@nwcustomapparel.com',
-            authorName: isAeView ? getAeDisplayName(currentMockup.Submitted_By) : 'Ruth'
-        };
-
-        if (notes) {
-            body.notes = notes;
+        var author, authorName;
+        if (isCustomerView) {
+            author = 'Customer';
+            authorName = 'Customer';
+        } else if (isAeView) {
+            author = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+            authorName = getAeDisplayName(currentMockup.Submitted_By);
+        } else {
+            author = 'ruth@nwcustomapparel.com';
+            authorName = 'Ruth';
         }
+
+        var body = { status: newStatus, author: author, authorName: authorName };
+        if (notes) body.notes = notes;
 
         fetch(API_BASE + '/api/mockups/' + mockupId + '/status', {
             method: 'PUT',
@@ -195,8 +317,14 @@
             if (!resp.ok) throw new Error('Status update failed');
             return resp.json();
         }).then(function () {
+            // Fire-and-forget email notifications
+            sendStatusNotifications(newStatus);
+
+            if (isCustomerView) {
+                showCustomerConfirmation(newStatus === 'Approved' ? 'approved' : 'revision');
+                return;
+            }
             showToast('Status updated to "' + newStatus + '"', 'success');
-            // Reload the page to reflect changes
             setTimeout(function () { location.reload(); }, 800);
         }).catch(function (err) {
             console.error('Status update error:', err);
@@ -214,7 +342,12 @@
         if (!grid) return;
         grid.innerHTML = '';
 
-        MOCKUP_SLOTS.forEach(function (slot) {
+        // Customer view: only show filled mockup slots (not reference file)
+        var slotsToRender = isCustomerView
+            ? MOCKUP_SLOTS.filter(function (s) { return s.key !== 'Box_Reference_File' && mockup[s.key]; })
+            : MOCKUP_SLOTS;
+
+        slotsToRender.forEach(function (slot) {
             var url = mockup[slot.key];
             var isEmpty = !url || !url.trim();
             var slotEl = document.createElement('div');
@@ -245,26 +378,43 @@
                 var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
 
                 if (isImage) {
+                    var showRemove = !isAeView && !isCustomerView;
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" loading="lazy"'
                         + ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
                         + '<div class="pmd-file-placeholder" style="display:none;">'
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
-                        + (!isAeView ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
+                        + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
+                        + (isCustomerView ? '<div class="pmd-slot-select-badge">Click to select</div>' : '')
                         + '</div>';
-                    slotEl.addEventListener('click', function (e) {
-                        if (e.target.closest('.pmd-slot-remove')) return;
-                        openLightbox(url, slot.label);
-                    });
+
+                    if (isCustomerView) {
+                        // Customer view: click to select for approval
+                        (function (slotKey, el) {
+                            el.addEventListener('click', function () {
+                                grid.querySelectorAll('.pmd-gallery-slot').forEach(function (s) { s.classList.remove('pmd-slot-selected'); });
+                                el.classList.add('pmd-slot-selected');
+                                selectedMockupSlot = slotKey;
+                                var approveBtn = document.getElementById('pmd-btn-customer-approve');
+                                if (approveBtn) approveBtn.disabled = false;
+                            });
+                        })(slot.key, slotEl);
+                    } else {
+                        slotEl.addEventListener('click', function (e) {
+                            if (e.target.closest('.pmd-slot-remove')) return;
+                            openLightbox(url, slot.label);
+                        });
+                    }
                 } else {
+                    var showRemoveNonImg = !isAeView && !isCustomerView;
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<div class="pmd-file-placeholder">'
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span>'
                         + '<span style="font-size:12px;color:#666;">' + escapeHtml(slot.label) + '</span>'
                         + '</div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
-                        + (!isAeView ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
+                        + (showRemoveNonImg ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
                         + '</div>';
                     slotEl.addEventListener('click', function (e) {
                         if (e.target.closest('.pmd-slot-remove')) return;
@@ -598,32 +748,55 @@
         var container = document.getElementById('pmd-info-fields');
         if (!container) return;
 
-        var fields = [
-            { label: 'Design #', value: mockup.Design_Number },
-            { label: 'Design Name', value: mockup.Design_Name },
-            { label: 'Company', value: mockup.Company_Name },
-            { label: 'Mockup Type', value: mockup.Mockup_Type },
-            { label: 'Garment', value: mockup.Garment_Info },
-            { label: 'Placement', value: mockup.Print_Location },
-            { label: 'Size Specs', value: mockup.Size_Specs },
-            { label: 'Submitted By', value: getAeDisplayName(mockup.Submitted_By) },
-            { label: 'Submitted', value: formatDate(mockup.Submitted_Date) },
-            { label: 'Due Date', value: formatDate(mockup.Due_Date) },
-            { label: 'Work Order', value: mockup.Work_Order_Number },
-            { label: 'Completed', value: formatDate(mockup.Completion_Date) }
-        ];
+        var fields;
+        if (isCustomerView) {
+            // Customer sees only basic info
+            fields = [
+                { label: 'Design #', value: mockup.Design_Number },
+                { label: 'Design Name', value: mockup.Design_Name },
+                { label: 'Company', value: mockup.Company_Name },
+                { label: 'Application', value: mockup.Mockup_Type },
+                { label: 'Placement', value: mockup.Print_Location },
+                { label: 'Size Specs', value: mockup.Size_Specs }
+            ];
+        } else {
+            fields = [
+                { label: 'Design #', value: mockup.Design_Number },
+                { label: 'Design Name', value: mockup.Design_Name },
+                { label: 'Company', value: mockup.Company_Name },
+                { label: 'Application', value: mockup.Mockup_Type },
+                { label: 'Garment', value: mockup.Garment_Info },
+                { label: 'Placement', value: mockup.Print_Location },
+                { label: 'Size Specs', value: mockup.Size_Specs },
+                { label: 'Submitted By', value: getAeDisplayName(mockup.Submitted_By) },
+                { label: 'Submitted', value: formatDate(mockup.Submitted_Date) },
+                { label: 'Due Date', value: formatDate(mockup.Due_Date) },
+                { label: 'Work Order', value: mockup.Work_Order_Number },
+                { label: 'Completed', value: formatDate(mockup.Completion_Date) }
+            ];
+        }
 
         container.innerHTML = fields
             .filter(function (f) { return f.value; })
             .map(function (f) {
+                // Render Mockup Type as badge pills
+                if (f.label === 'Application' && f.value) {
+                    var badges = f.value.split(', ').map(function (t) {
+                        return '<span class="pmd-type-badge">' + escapeHtml(t.trim()) + '</span>';
+                    }).join(' ');
+                    return '<div class="pmd-field-row">'
+                        + '<span class="pmd-field-label">' + escapeHtml(f.label) + '</span>'
+                        + '<span class="pmd-field-value">' + badges + '</span>'
+                        + '</div>';
+                }
                 return '<div class="pmd-field-row">'
                     + '<span class="pmd-field-label">' + escapeHtml(f.label) + '</span>'
                     + '<span class="pmd-field-value">' + escapeHtml(f.value) + '</span>'
                     + '</div>';
             }).join('');
 
-        // Show AE Notes if present
-        if (mockup.AE_Notes) {
+        // Show AE Notes if present (not for customer view)
+        if (mockup.AE_Notes && !isCustomerView) {
             container.innerHTML += '<div class="pmd-field-row" style="flex-direction:column;gap:4px;">'
                 + '<span class="pmd-field-label">AE Instructions</span>'
                 + '<span class="pmd-field-value" style="white-space:pre-wrap;">' + escapeHtml(mockup.AE_Notes) + '</span>'
@@ -803,6 +976,89 @@
         errorEl.style.display = '';
         document.getElementById('pmd-error-title').textContent = title || 'Error';
         document.getElementById('pmd-error-msg').textContent = message || '';
+    }
+
+    // ── EmailJS Notifications ─────────────────────────────────────────────
+    function sendMockupNotification(params) {
+        if (typeof emailjs === 'undefined') return;
+        try {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+            emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                to_email: params.to_email,
+                to_name: params.to_name,
+                design_id: currentMockup.Design_Number || currentMockup.ID,
+                company_name: currentMockup.Company_Name || 'Unknown',
+                note_text: params.note_text,
+                note_type: params.note_type,
+                detail_link: params.detail_link,
+                from_name: params.from_name || 'Mockup System'
+            }).catch(function () { /* fire-and-forget */ });
+        } catch (e) { /* silent */ }
+    }
+
+    function sendStatusNotifications(newStatus) {
+        if (!currentMockup) return;
+        var company = currentMockup.Company_Name || '';
+        var design = currentMockup.Design_Number || currentMockup.ID;
+        var ruthLink = HEROKU_ORIGIN + '/mockup/' + mockupId;
+        var aeLink = HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=ae';
+
+        if (newStatus === 'Awaiting Approval' && !isAeView && !isCustomerView) {
+            // Ruth sends for approval → notify AE
+            var aeEmail = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+            sendMockupNotification({
+                to_email: aeEmail,
+                to_name: getAeDisplayName(aeEmail),
+                note_text: 'Mockup is ready for your review: ' + company + ' #' + design,
+                note_type: 'Awaiting Approval',
+                detail_link: aeLink,
+                from_name: 'Ruth'
+            });
+        } else if (newStatus === 'Approved') {
+            // Notify Ruth
+            sendMockupNotification({
+                to_email: RUTH_EMAIL,
+                to_name: 'Ruth',
+                note_text: 'Mockup approved for ' + company + ' #' + design,
+                note_type: 'Approved',
+                detail_link: ruthLink,
+                from_name: isCustomerView ? 'Customer' : getAeDisplayName(currentMockup.Submitted_By)
+            });
+            // If customer approved, also notify AE
+            if (isCustomerView) {
+                var aeEmail2 = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+                sendMockupNotification({
+                    to_email: aeEmail2,
+                    to_name: getAeDisplayName(aeEmail2),
+                    note_text: 'Customer approved mockup for ' + company + ' #' + design,
+                    note_type: 'Customer Approved',
+                    detail_link: aeLink,
+                    from_name: 'Customer'
+                });
+            }
+        } else if (newStatus === 'Revision Requested') {
+            // Notify Ruth
+            sendMockupNotification({
+                to_email: RUTH_EMAIL,
+                to_name: 'Ruth',
+                note_text: 'Changes requested for ' + company + ' #' + design,
+                note_type: 'Revision Requested',
+                detail_link: ruthLink,
+                from_name: isCustomerView ? 'Customer' : getAeDisplayName(currentMockup.Submitted_By)
+            });
+            // If customer requested changes, also notify AE
+            if (isCustomerView) {
+                var aeEmail3 = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+                sendMockupNotification({
+                    to_email: aeEmail3,
+                    to_name: getAeDisplayName(aeEmail3),
+                    note_text: 'Customer requested changes for ' + company + ' #' + design,
+                    note_type: 'Customer Revision Request',
+                    detail_link: aeLink,
+                    from_name: 'Customer'
+                });
+            }
+        }
     }
 
     // ── Toast ───────────────────────────────────────────────────────────────

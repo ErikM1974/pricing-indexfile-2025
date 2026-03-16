@@ -473,6 +473,17 @@ body {
     color: #333;
     word-break: break-word;
 }
+.pmd-type-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #f3eaff;
+    color: #553C9A;
+    border: 1px solid #d6bcfa;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 4px;
+}
 
 /* ── Notes Timeline ─────────────────────────────────── */
 .pmd-notes-list {
@@ -911,6 +922,104 @@ body {
 .pmd-toast--error { background: #dc2626; }
 .pmd-toast--info { background: #6B46C1; }
 
+/* ── Customer Approval View ─────────────────────────── */
+.pmd-customer-view .pmd-grid {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.pmd-customer-action-panel {
+    text-align: center;
+}
+.pmd-customer-prompt {
+    margin: 0 0 16px 0;
+    font-size: 15px;
+    color: #555;
+}
+.pmd-customer-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.pmd-action-btn--lg {
+    padding: 14px 28px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+}
+.pmd-action-btn--copy {
+    background: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+.pmd-action-btn--copy:hover {
+    background: #e0e0e0;
+}
+.pmd-slot-select-badge {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    pointer-events: none;
+    opacity: 0.8;
+}
+.pmd-gallery-slot.pmd-slot-selected {
+    outline: 3px solid #059669;
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+.pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge {
+    background: #059669;
+    opacity: 1;
+}
+.pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge::after {
+    content: ' \2713 Selected';
+}
+.pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge {
+    font-size: 0;
+}
+.pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge::after {
+    font-size: 11px;
+}
+.pmd-customer-thankyou,
+.pmd-customer-confirmation {
+    text-align: center;
+    padding: 60px 20px;
+}
+.pmd-customer-thankyou-icon,
+.pmd-customer-confirmation-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+.pmd-customer-thankyou h3,
+.pmd-customer-confirmation h2 {
+    margin: 0 0 12px 0;
+    color: #333;
+}
+.pmd-customer-thankyou p,
+.pmd-customer-confirmation p {
+    color: #666;
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto 8px;
+}
+.pmd-customer-company {
+    font-weight: 600;
+    color: #6B46C1 !important;
+    margin-top: 16px !important;
+}
+.pmd-customer-status-msg {
+    text-align: center;
+    padding: 30px;
+    color: #888;
+    font-size: 15px;
+}
+
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 900px) {
     .pmd-grid {
@@ -924,4 +1033,6 @@ body {
     .pmd-gallery-grid { grid-template-columns: repeat(2, 1fr); }
     .pmd-action-bar { flex-direction: column; }
     .pmd-title-row { flex-direction: column; align-items: flex-start; }
+    .pmd-customer-btns { flex-direction: column; }
+    .pmd-action-btn--lg { width: 100%; }
 }
