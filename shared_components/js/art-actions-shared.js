@@ -922,6 +922,12 @@
         var existingMockupUrl = modal.dataset.existingMockupUrl || '';
         var mockupUrls = [];
 
+        // Validation: require at least one mockup file
+        if (!selectedBoxFileId && !pasteUrl.trim() && !existingMockupUrl.trim()) {
+            alert('Please select or upload at least one mockup before sending for approval.');
+            return;
+        }
+
         if (selectedBoxFileId) {
             submitBtn.textContent = 'Creating link...';
             try {

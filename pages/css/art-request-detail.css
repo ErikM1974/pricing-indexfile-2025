@@ -2140,3 +2140,87 @@ body.ae-view .ard-status-step.active .ard-status-label {
 .ard-drafts-dimmed .ard-gallery-thumb .ard-set-final-btn {
     opacity: 1;
 }
+
+/* ── Production Checklist Modal ─────────────────────────────────────── */
+.ard-checklist-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.ard-checklist-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.ard-checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+}
+.ard-checklist-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #059669;
+    cursor: pointer;
+}
+.ard-checklist-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+.ard-checklist-cancel {
+    padding: 8px 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.ard-checklist-cancel:hover { background: #f3f4f6; }
+.ard-checklist-confirm {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #059669;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+.ard-checklist-confirm:hover { background: #047857; }
+
+/* ── Inline Toast ─────────────────────────────────────────────────── */
+.ard-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #059669;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 10000;
+    animation: ard-toast-in 0.3s ease;
+}
+@keyframes ard-toast-in {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

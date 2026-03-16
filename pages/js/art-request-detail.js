@@ -575,7 +575,7 @@
             renderFinalMockup(currentRequest);
             renderMockupGallery(currentRequest);
             if (url) {
-                showArdToast('Final approved mockup set ✅');
+                showArdToast('Final approved mockup set! Don\'t forget to invoice the art charge.');
                 // Log note
                 fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
@@ -583,6 +583,22 @@
                     body: JSON.stringify({ noteType: 'Final Approved', noteText: 'Set final approved mockup for production', noteBy: 'art@nwcustomapparel.com' })
                 }).catch(function () {});
                 if (typeof refreshNotes === 'function') refreshNotes();
+                // Notify AE that final mockup is production-ready
+                var aeEmail = currentRequest.User_Email || currentRequest.Sales_Rep || '';
+                var company = currentRequest.CompanyName || '';
+                if (aeEmail && typeof emailjs !== 'undefined') {
+                    emailjs.init(EMAILJS_PUBLIC_KEY);
+                    emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                        to_email: aeEmail,
+                        to_name: aeEmail.split('@')[0],
+                        design_id: designId,
+                        company_name: company,
+                        note_text: 'Final approved mockup has been set for ' + company + ' #' + designId + '. Ready for production.',
+                        note_type: 'Production Ready',
+                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
+                        from_name: 'Steve'
+                    }, EMAILJS_PUBLIC_KEY).catch(function () {});
+                }
             } else {
                 showArdToast('Final mockup cleared');
             }
@@ -738,8 +754,7 @@
                         (function (slotUrl) {
                             setFinalBtn.addEventListener('click', function (e) {
                                 e.stopPropagation();
-                                if (!confirm('Set this as the production-ready mockup?')) return;
-                                setFinalMockup(slotUrl);
+                                showFinalChecklistModal(slotUrl);
                             });
                         })(url);
                     }
@@ -1817,6 +1832,35 @@
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    function showFinalChecklistModal(slotUrl) {
+        // Remove existing modal if any
+        var existing = document.getElementById('ard-final-checklist');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'ard-final-checklist';
+        overlay.className = 'ard-checklist-overlay';
+        overlay.innerHTML = '<div class="ard-checklist-modal">'
+            + '<h3 style="margin:0 0 16px;color:#059669;">Ready to set as production-ready?</h3>'
+            + '<label class="ard-checklist-item"><input type="checkbox"> Correct file resolution for print method</label>'
+            + '<label class="ard-checklist-item"><input type="checkbox"> Placement matches order specs</label>'
+            + '<label class="ard-checklist-item"><input type="checkbox"> Colors match PMS / customer approval</label>'
+            + '<p style="font-size:12px;color:#9ca3af;margin:12px 0 0;font-style:italic;">Checklist is informational — not required to proceed.</p>'
+            + '<div class="ard-checklist-btns">'
+            + '<button type="button" class="ard-checklist-cancel">Cancel</button>'
+            + '<button type="button" class="ard-checklist-confirm">Confirm Final ✅</button>'
+            + '</div></div>';
+
+        overlay.querySelector('.ard-checklist-cancel').addEventListener('click', function () { overlay.remove(); });
+        overlay.querySelector('.ard-checklist-confirm').addEventListener('click', function () {
+            overlay.remove();
+            setFinalMockup(slotUrl);
+        });
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+
+        document.body.appendChild(overlay);
     }
 
     function showArdToast(message) {

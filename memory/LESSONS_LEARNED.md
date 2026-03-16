@@ -29,6 +29,15 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: MutationObserver Fires Multiple Times — Duplicate EmailJS Sends (2026-03-16)
+
+**Problem:** Art Hub new submissions sent 2-4 duplicate "New Submission" emails to Steve. EmailJS flagged service as unstable due to rapid-fire sends.
+**Root Cause:** `ae-submit-form.js` used a MutationObserver with `subtree: true` to detect Caspio form success. Caspio's DOM rebuild fires multiple mutations, each finding the same `.id-number` element and calling `notifyNewSubmission()` repeatedly.
+**Solution:** Added `notifiedDesignIds = {}` guard — first call for each design ID sets the flag, subsequent calls return early.
+**Prevention:** [Pricing Index] Any MutationObserver-based detection of Caspio form events needs a dedup guard. Caspio DOM updates are non-atomic and fire multiple mutation events.
+
+---
+
 ## Fix: `<input type="submit">` Cannot Contain Child Elements (SVG Icons) (2026-03-11)
 
 **Problem**: `enhanceSubmitButton()` tried to insert an SVG icon into an `<input type="submit">` element. The icon never rendered.
