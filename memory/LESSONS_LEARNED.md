@@ -29,6 +29,16 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: CSS `display: none` in Stylesheet Overrides JS `display = ''` — Popover Never Shows (2026-03-16)
+
+**Problem:** Ruth's mockup upload popover (Upload File / Browse Box) never appeared when clicking empty mockup slots.
+**Root Cause:** CSS rule `.pmd-slot-popover { display: none; }` in stylesheet. JS used `popover.style.display = ''` to show it, which only clears the inline style — falling back to the CSS rule which keeps it hidden. Steve's page didn't have this bug because his `.ard-slot-popover` CSS didn't include `display: none`.
+**Solution:** Changed `popover.style.display = ''` to `popover.style.display = 'block'` in `showSlotPopover()`.
+**Prevention:** When toggling visibility via JS, always use explicit values (`'block'`/`'none'`), never rely on clearing inline styles to reveal elements. The CSS may have its own `display: none` rule.
+**Tags:** `[Pricing Index]` `[Art Hub]` `[CSS Gotcha]`
+
+---
+
 ## Bug: MutationObserver Fires Multiple Times — Duplicate EmailJS Sends (2026-03-16)
 
 **Problem:** Art Hub new submissions sent 2-4 duplicate "New Submission" emails to Steve. EmailJS flagged service as unstable due to rapid-fire sends.

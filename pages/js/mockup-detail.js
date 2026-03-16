@@ -187,13 +187,19 @@
 
             if (statusLower === 'awaitingapproval') {
                 aeBar.style.display = '';
-                aeBar.innerHTML = '<span class="pmd-action-bar-label">Review this mockup:</span>'
-                    + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve">Approve Mockup</button>'
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:</span>'
+                    + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve" disabled>Approve Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
 
                 document.getElementById('pmd-btn-approve').addEventListener('click', function () {
-                    handleStatusUpdate('Approved', null, this);
+                    if (!selectedMockupSlot) {
+                        showToast('Please click a mockup image to select it first', 'error');
+                        return;
+                    }
+                    var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === selectedMockupSlot; })[0];
+                    var approvalNote = 'AE approved ' + (slotLabel ? slotLabel.label : selectedMockupSlot);
+                    handleStatusUpdate('Approved', approvalNote, this);
                 });
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
@@ -342,6 +348,10 @@
         if (!grid) return;
         grid.innerHTML = '';
 
+        var statusLower = (mockup.Status || '').toLowerCase().replace(/\s+/g, '');
+        var isRefFile = false;
+        var aeCanSelect = isAeView && statusLower === 'awaitingapproval';
+
         // Customer view: only show filled mockup slots (not reference file)
         var slotsToRender = isCustomerView
             ? MOCKUP_SLOTS.filter(function (s) { return s.key !== 'Box_Reference_File' && mockup[s.key]; })
@@ -350,9 +360,20 @@
         slotsToRender.forEach(function (slot) {
             var url = mockup[slot.key];
             var isEmpty = !url || !url.trim();
+            isRefFile = slot.key === 'Box_Reference_File';
             var slotEl = document.createElement('div');
             slotEl.className = 'pmd-gallery-slot';
             slotEl.dataset.fieldKey = slot.key;
+
+            // Reference File gets distinct styling
+            if (isRefFile) {
+                slotEl.classList.add('pmd-gallery-slot--reference');
+            }
+
+            // Revision emphasis on filled mockup slots (not reference)
+            if (statusLower === 'revisionrequested' && !isEmpty && !isRefFile) {
+                slotEl.classList.add('pmd-gallery-slot--needs-revision');
+            }
 
             if (isEmpty) {
                 // Show empty slot
@@ -379,6 +400,7 @@
 
                 if (isImage) {
                     var showRemove = !isAeView && !isCustomerView;
+                    var showSelectBadge = isCustomerView || (aeCanSelect && !isRefFile);
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" loading="lazy"'
                         + ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
@@ -386,8 +408,16 @@
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
-                        + (isCustomerView ? '<div class="pmd-slot-select-badge">Click to select</div>' : '')
+                        + (showSelectBadge ? '<div class="pmd-slot-select-badge">Click to select</div>' : '')
                         + '</div>';
+
+                    // Revision badge on filled mockup slots
+                    if (statusLower === 'revisionrequested' && !isRefFile) {
+                        var revBadge = document.createElement('div');
+                        revBadge.className = 'pmd-slot-revision-badge';
+                        revBadge.textContent = 'Needs Update';
+                        slotEl.appendChild(revBadge);
+                    }
 
                     if (isCustomerView) {
                         // Customer view: click to select for approval
@@ -397,6 +427,18 @@
                                 el.classList.add('pmd-slot-selected');
                                 selectedMockupSlot = slotKey;
                                 var approveBtn = document.getElementById('pmd-btn-customer-approve');
+                                if (approveBtn) approveBtn.disabled = false;
+                            });
+                        })(slot.key, slotEl);
+                    } else if (aeCanSelect && !isRefFile) {
+                        // AE view: click to select which mockup to approve
+                        (function (slotKey, el) {
+                            el.addEventListener('click', function (e) {
+                                if (e.target.closest('.pmd-slot-remove')) return;
+                                grid.querySelectorAll('.pmd-gallery-slot').forEach(function (s) { s.classList.remove('pmd-slot-selected'); });
+                                el.classList.add('pmd-slot-selected');
+                                selectedMockupSlot = slotKey;
+                                var approveBtn = document.getElementById('pmd-btn-approve');
                                 if (approveBtn) approveBtn.disabled = false;
                             });
                         })(slot.key, slotEl);
@@ -532,6 +574,7 @@
             currentMockup[fieldKey] = result.url || result.sharedLink || '';
             renderGallery(currentMockup);
             showToast('File uploaded successfully', 'success');
+            sendUploadNotification(fieldKey, file.name);
         }).catch(function (err) {
             showToast('Upload failed: ' + err.message, 'error');
             if (slotEl) {
@@ -718,6 +761,7 @@
                 closeBoxModal();
                 renderGallery(currentMockup);
                 showToast('File linked from Box', 'success');
+                sendUploadNotification(activeSlotKey, selectedBoxFile.name);
 
                 // Add note then refresh to show it
                 fetch(API_BASE + '/api/mockup-notes', {
@@ -1031,6 +1075,31 @@
                 detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=ae'
             }).catch(function () { /* fire-and-forget */ });
         } catch (e) { /* silent */ }
+    }
+
+    function sendUploadNotification(fieldKey, fileName) {
+        // Only Ruth (default view) sends upload notifications to the AE
+        if (isAeView || isCustomerView) return;
+        if (!currentMockup) return;
+
+        var aeEmail = currentMockup.Submitted_By || '';
+        if (!aeEmail) return;
+
+        var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === fieldKey; })[0];
+        var slotName = slotLabel ? slotLabel.label : fieldKey;
+        var company = currentMockup.Company_Name || 'Unknown';
+        var design = currentMockup.Design_Number || currentMockup.ID;
+
+        sendMockupNotification({
+            to_email: aeEmail,
+            to_name: getAeDisplayName(aeEmail),
+            note_text: 'Ruth uploaded "' + (fileName || 'file') + '" to ' + slotName
+                + ' for ' + company + ' #' + design
+                + '. Please review when ready.',
+            note_type: 'Mockup Uploaded',
+            detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=ae',
+            from_name: 'Ruth'
+        });
     }
 
     function sendStatusNotifications(newStatus) {

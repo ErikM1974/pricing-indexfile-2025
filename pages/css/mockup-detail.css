@@ -1020,6 +1020,47 @@ body {
     font-size: 15px;
 }
 
+/* ── Reference File Slot ───────────────────────────── */
+.pmd-gallery-slot--reference {
+    aspect-ratio: 2.5 / 1;
+    grid-column: 1 / -1;
+    border-style: dashed;
+    border-color: #d1d5db;
+}
+.pmd-gallery-slot--reference .pmd-slot-empty {
+    background: #f5f5f5;
+    color: #999;
+}
+.pmd-gallery-slot--reference .pmd-slot-empty-icon {
+    color: #bbb;
+}
+.pmd-gallery-slot--reference:hover {
+    border-color: #aaa;
+    box-shadow: none;
+}
+
+/* ── Revision Emphasis ─────────────────────────────── */
+.pmd-gallery-slot--needs-revision {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
+}
+.pmd-gallery-slot--needs-revision:hover {
+    border-color: #d97706;
+}
+.pmd-slot-revision-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: #f59e0b;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 900px) {
     .pmd-grid {
