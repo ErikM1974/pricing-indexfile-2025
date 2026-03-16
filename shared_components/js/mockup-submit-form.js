@@ -394,7 +394,7 @@ var MockupSubmitForm = (function () {
 
     function filterThreadColors(query) {
         var dropdown = document.getElementById('msf-thread-dropdown');
-        dropdown.style.display = '';
+        dropdown.style.display = 'block';
         dropdown.innerHTML = '';
 
         var filtered = allThreadColors;
@@ -635,7 +635,7 @@ var MockupSubmitForm = (function () {
                 // Step 3: Upload reference file (if any)
                 if (referenceFile && newId) {
                     statusEl.textContent = 'Uploading file...';
-                    return uploadReferenceFile(newId, folderName).then(function () { return newId; });
+                    return uploadReferenceFile(newId, folderName, designNumber).then(function () { return newId; });
                 }
                 return newId;
             })
@@ -683,17 +683,25 @@ var MockupSubmitForm = (function () {
         .catch(function () { return null; });
     }
 
-    function uploadReferenceFile(mockupId, folderName) {
+    function uploadReferenceFile(mockupId, folderName, designNumber) {
         var formData = new FormData();
         formData.append('file', referenceFile);
         formData.append('slot', 'Box_Reference_File');
         formData.append('companyName', folderName);
+        if (designNumber) {
+            formData.append('designNumber', designNumber);
+        }
 
         return fetch(API_BASE + '/api/mockups/' + mockupId + '/upload-file', {
             method: 'POST',
             body: formData
         }).then(function (resp) {
-            if (!resp.ok) console.error('File upload failed but record was created');
+            if (!resp.ok) {
+                return resp.text().then(function (body) {
+                    console.error('File upload failed:', resp.status, body);
+                    showToast('File upload failed — record was created but file was not attached', 'error');
+                });
+            }
         });
     }
 
