@@ -213,8 +213,12 @@
     var EMAILJS_SERVICE_ID = 'service_1c4k67j';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
 
+    var notifiedDesignIds = {};
+
     function notifyNewSubmission(designId, companyName) {
         if (!designId) return;
+        if (notifiedDesignIds[designId]) return; // prevent duplicate sends from MutationObserver
+        notifiedDesignIds[designId] = true;
 
         // Toast notification (existing)
         fetch(API_BASE + '/api/art-notifications', {
