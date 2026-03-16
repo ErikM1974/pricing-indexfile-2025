@@ -494,6 +494,14 @@
     box-shadow: var(--shadow-md);
 }
 
+.tool-btn--legacy {
+    opacity: 0.55;
+    font-style: italic;
+}
+.tool-btn--legacy:hover {
+    opacity: 1;
+}
+
 .tool-btn i {
     font-size: 0.75rem;
 }
