@@ -763,6 +763,22 @@
                 showToast('File linked from Box', 'success');
                 sendUploadNotification(activeSlotKey, selectedBoxFile.name);
 
+                // Insert version record (fire-and-forget)
+                fetch(API_BASE + '/api/mockup-versions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Mockup_ID: parseInt(mockupId),
+                        Slot_Key: activeSlotKey,
+                        File_URL: fileUrl,
+                        File_Name: selectedBoxFile.name || '',
+                        Box_File_ID: String(selectedBoxFile.id || ''),
+                        Uploaded_By: 'Ruth'
+                    })
+                }).catch(function (err) {
+                    console.error('Version tracking failed:', err);
+                });
+
                 // Add note then refresh to show it
                 fetch(API_BASE + '/api/mockup-notes', {
                     method: 'POST',
