@@ -255,7 +255,8 @@
             document.getElementById('ard-submitter-notes-card').style.display = 'block';
         }
 
-        // Mockup Gallery (unified two-section)
+        // Final Approved Mockup + Mockup Gallery
+        renderFinalMockup(req);
         renderMockupGallery(req);
         initGalleryInteractions(req);
 
@@ -489,6 +490,107 @@
         }
     }
 
+    // ── Final Approved Mockup ────────────────────────────────────────────
+
+    function renderFinalMockup(req) {
+        var section = document.getElementById('ard-final-mockup-section');
+        var container = document.getElementById('ard-final-mockup-container');
+        var finalUrl = req.Final_Approved_Mockup;
+
+        if (!finalUrl || isEmptySlot(finalUrl)) {
+            section.style.display = 'none';
+            // Remove draft overlay from mockup slots
+            var mockupsSection = document.getElementById('ard-mockups-section');
+            if (mockupsSection) mockupsSection.classList.remove('ard-drafts-dimmed');
+            return;
+        }
+
+        section.style.display = '';
+        container.innerHTML = '';
+
+        var ext = getFileExtension(finalUrl);
+        var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+
+        var card = document.createElement('div');
+        card.className = 'ard-final-mockup-card';
+
+        // Determine which slot label this came from
+        var sourceLabel = '';
+        MOCKUP_SLOTS.forEach(function (slot) {
+            if (req[slot.key] === finalUrl) sourceLabel = slot.label;
+        });
+
+        if (isImage) {
+            card.innerHTML = '<img src="' + escapeHtml(finalUrl) + '" alt="Final Approved Mockup" loading="lazy"'
+                + ' onerror="this.style.display=\'none\';">'
+                + '<div class="ard-final-mockup-badge">✅ Production Ready</div>'
+                + (sourceLabel ? '<div class="ard-final-mockup-source">From: ' + escapeHtml(sourceLabel) + '</div>' : '');
+        } else {
+            var fileIcon = getFileTypeIcon(ext ? ext.toUpperCase() : '');
+            card.innerHTML = '<div class="ard-gallery-placeholder">' + fileIcon
+                + '<span class="ard-gallery-ext-badge">' + escapeHtml(ext ? ext.toUpperCase() : 'FILE') + '</span></div>'
+                + '<div class="ard-final-mockup-badge">✅ Production Ready</div>';
+        }
+
+        card.addEventListener('click', function () {
+            if (isImage) {
+                openLightbox(finalUrl, 'Final Approved Mockup');
+            } else {
+                window.open(finalUrl, '_blank');
+            }
+        });
+
+        container.appendChild(card);
+
+        // Add "Change" button for Steve (not AE view)
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('view') !== 'ae') {
+            var changeBtn = document.createElement('button');
+            changeBtn.type = 'button';
+            changeBtn.className = 'ard-final-change-btn';
+            changeBtn.textContent = 'Change Final Mockup';
+            changeBtn.addEventListener('click', function () {
+                if (!confirm('Clear the final approved mockup? You can then set a different one.')) return;
+                setFinalMockup('');
+            });
+            container.appendChild(changeBtn);
+        }
+
+        // Dim draft mockup slots
+        var mockupsSection = document.getElementById('ard-mockups-section');
+        if (mockupsSection) mockupsSection.classList.add('ard-drafts-dimmed');
+    }
+
+    function setFinalMockup(url) {
+        var pkId = currentRequest.PK_ID;
+        if (!pkId) { alert('Cannot update: missing PK_ID'); return; }
+
+        fetch(API_BASE + '/api/artrequests/' + pkId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Final_Approved_Mockup: url })
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Failed to update: ' + resp.status);
+            currentRequest.Final_Approved_Mockup = url;
+            renderFinalMockup(currentRequest);
+            renderMockupGallery(currentRequest);
+            if (url) {
+                showArdToast('Final approved mockup set ✅');
+                // Log note
+                fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ noteType: 'Final Approved', noteText: 'Set final approved mockup for production', noteBy: 'art@nwcustomapparel.com' })
+                }).catch(function () {});
+                if (typeof refreshNotes === 'function') refreshNotes();
+            } else {
+                showArdToast('Final mockup cleared');
+            }
+        }).catch(function (err) {
+            alert('Error: ' + err.message);
+        });
+    }
+
     // ── Mockup Gallery (Unified Two-Section) ────────────────────────────
     // Writable mockup slots Steve controls
     const MOCKUP_SLOTS = [
@@ -622,6 +724,27 @@
                     if (isNaN(fromIdx) || fromIdx === index) return;
                     swapMockupSlots(fromIdx, index);
                 });
+
+                // "Set as Final" button (Steve view only, not AE)
+                var urlParamsGallery = new URLSearchParams(window.location.search);
+                if (urlParamsGallery.get('view') !== 'ae') {
+                    var isFinal = req.Final_Approved_Mockup === url;
+                    var setFinalBtn = document.createElement('button');
+                    setFinalBtn.type = 'button';
+                    setFinalBtn.className = 'ard-set-final-btn' + (isFinal ? ' ard-set-final-btn--active' : '');
+                    setFinalBtn.textContent = isFinal ? '✅ Final' : 'Set as Final';
+                    setFinalBtn.title = isFinal ? 'This is the production-ready mockup' : 'Set this as the final approved mockup';
+                    if (!isFinal) {
+                        (function (slotUrl) {
+                            setFinalBtn.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                if (!confirm('Set this as the production-ready mockup?')) return;
+                                setFinalMockup(slotUrl);
+                            });
+                        })(url);
+                    }
+                    thumb.appendChild(setFinalBtn);
+                }
 
                 mockupsGrid.appendChild(thumb);
             }
@@ -1694,6 +1817,14 @@
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    function showArdToast(message) {
+        var toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#059669;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        document.body.appendChild(toast);
+        setTimeout(function () { toast.remove(); }, 3000);
     }
 
     // ── Art Charge History ────────────────────────────────────────────────
