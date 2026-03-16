@@ -635,9 +635,7 @@ var MockupSubmitForm = (function () {
                 // Step 3: Upload reference file (if any)
                 if (referenceFile && newId) {
                     statusEl.textContent = 'Uploading file...';
-                    var companyName = document.getElementById('msf-company').value.trim();
-                    var designNumber = document.getElementById('msf-design-number').value.trim();
-                    return uploadReferenceFile(newId, companyName, designNumber).then(function () { return newId; });
+                    return uploadReferenceFile(newId, folderName).then(function () { return newId; });
                 }
                 return newId;
             })
@@ -685,14 +683,11 @@ var MockupSubmitForm = (function () {
         .catch(function () { return null; });
     }
 
-    function uploadReferenceFile(mockupId, companyName, designNumber) {
+    function uploadReferenceFile(mockupId, folderName) {
         var formData = new FormData();
         formData.append('file', referenceFile);
         formData.append('slot', 'Box_Reference_File');
-        formData.append('companyName', companyName);
-        if (designNumber) {
-            formData.append('designNumber', designNumber);
-        }
+        formData.append('companyName', folderName);
 
         return fetch(API_BASE + '/api/mockups/' + mockupId + '/upload-file', {
             method: 'POST',
