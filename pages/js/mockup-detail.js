@@ -34,6 +34,7 @@
     var boxFoldersCache = null;
     var isAeView = false;
     var mockupId = null;
+    var mockupVersions = [];
 
     // ── URL Parsing ────────────────────────────────────────────────────────
     var pathParts = window.location.pathname.split('/');
@@ -77,10 +78,15 @@
         fetch(API_BASE + '/api/mockup-notes/' + mockupId).then(function (r) {
             if (!r.ok) return { notes: [] };
             return r.json();
+        }),
+        fetch(API_BASE + '/api/mockup-versions/' + mockupId).then(function (r) {
+            if (!r.ok) return { versions: [] };
+            return r.json();
         })
     ]).then(function (results) {
         var mockupData = results[0];
         var notesData = results[1];
+        mockupVersions = (results[2] && results[2].versions) || [];
 
         if (!mockupData.success || !mockupData.record) {
             showError('Mockup Not Found', 'No mockup found with ID ' + mockupId);
@@ -419,6 +425,24 @@
                         slotEl.appendChild(revBadge);
                     }
 
+                    // Version badge (only if more than 1 version exists for this slot)
+                    var slotVersions = mockupVersions.filter(function (v) { return v.Slot_Key === slot.key; });
+                    if (slotVersions.length > 1) {
+                        var currentVer = slotVersions[0]; // sorted desc by API
+                        var vBadge = document.createElement('div');
+                        vBadge.className = 'pmd-slot-version-badge';
+                        vBadge.textContent = 'v' + currentVer.Version_Number;
+                        vBadge.title = slotVersions.length + ' versions';
+                        // Shift left if remove button exists to avoid overlap
+                        if (showRemove) vBadge.style.right = '28px';
+                        slotEl.appendChild(vBadge);
+
+                        vBadge.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            toggleVersionDropdown(slotEl, slotVersions);
+                        });
+                    }
+
                     if (isCustomerView) {
                         // Customer view: click to select for approval
                         (function (slotKey, el) {
@@ -444,7 +468,7 @@
                         })(slot.key, slotEl);
                     } else {
                         slotEl.addEventListener('click', function (e) {
-                            if (e.target.closest('.pmd-slot-remove')) return;
+                            if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown')) return;
                             openLightbox(url, slot.label);
                         });
                     }
@@ -458,8 +482,25 @@
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemoveNonImg ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
                         + '</div>';
+                    // Version badge for non-image slots
+                    var slotVersionsNI = mockupVersions.filter(function (v) { return v.Slot_Key === slot.key; });
+                    if (slotVersionsNI.length > 1) {
+                        var currentVerNI = slotVersionsNI[0];
+                        var vBadgeNI = document.createElement('div');
+                        vBadgeNI.className = 'pmd-slot-version-badge';
+                        vBadgeNI.textContent = 'v' + currentVerNI.Version_Number;
+                        vBadgeNI.title = slotVersionsNI.length + ' versions';
+                        if (showRemoveNonImg) vBadgeNI.style.right = '28px';
+                        slotEl.appendChild(vBadgeNI);
+
+                        vBadgeNI.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            toggleVersionDropdown(slotEl, slotVersionsNI);
+                        });
+                    }
+
                     slotEl.addEventListener('click', function (e) {
-                        if (e.target.closest('.pmd-slot-remove')) return;
+                        if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown')) return;
                         window.open(url, '_blank');
                     });
                 }
@@ -572,7 +613,7 @@
             return resp.json();
         }).then(function (result) {
             currentMockup[fieldKey] = result.url || result.sharedLink || '';
-            renderGallery(currentMockup);
+            refreshVersionsThenRender();
             showToast('File uploaded successfully', 'success');
             sendUploadNotification(fieldKey, file.name);
         }).catch(function (err) {
@@ -759,7 +800,7 @@
                 if (!resp.ok) throw new Error('Failed to save URL');
                 currentMockup[activeSlotKey] = fileUrl;
                 closeBoxModal();
-                renderGallery(currentMockup);
+                refreshVersionsThenRender();
                 showToast('File linked from Box', 'success');
                 sendUploadNotification(activeSlotKey, selectedBoxFile.name);
 
@@ -958,6 +999,58 @@
 
     function closeReviseModal() {
         document.getElementById('pmd-revise-overlay').classList.remove('show');
+    }
+
+    // ── Version Helpers ────────────────────────────────────────────────────
+    function refreshVersionsThenRender() {
+        fetch(API_BASE + '/api/mockup-versions/' + mockupId).then(function (r) {
+            if (!r.ok) return { versions: [] };
+            return r.json();
+        }).then(function (data) {
+            mockupVersions = (data && data.versions) || [];
+            renderGallery(currentMockup);
+        }).catch(function () {
+            renderGallery(currentMockup);
+        });
+    }
+
+    function toggleVersionDropdown(slotEl, versions) {
+        var existing = document.querySelector('.pmd-version-dropdown');
+        if (existing) { existing.remove(); return; }
+
+        var dropdown = document.createElement('div');
+        dropdown.className = 'pmd-version-dropdown';
+
+        versions.forEach(function (v) {
+            var item = document.createElement('div');
+            item.className = 'pmd-version-item' + (v.Is_Current === 'Yes' ? ' pmd-version-item--current' : '');
+            item.innerHTML = '<span class="pmd-version-num">v' + v.Version_Number + '</span>'
+                + '<span class="pmd-version-name">' + escapeHtml(v.File_Name || 'File') + '</span>'
+                + '<span class="pmd-version-date">' + formatDate(v.Uploaded_Date) + '</span>'
+                + (v.Is_Current === 'Yes' ? '<span class="pmd-version-current-tag">Current</span>' : '');
+
+            item.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.remove();
+                var vExt = getFileExtension(v.File_URL);
+                if (IMAGE_EXTENSIONS.indexOf(vExt) !== -1) {
+                    openLightbox(v.File_URL, 'v' + v.Version_Number + ' \u2014 ' + (v.File_Name || ''));
+                } else {
+                    window.open(v.File_URL, '_blank');
+                }
+            });
+            dropdown.appendChild(item);
+        });
+
+        slotEl.appendChild(dropdown);
+
+        // Close on outside click
+        setTimeout(function () {
+            document.addEventListener('click', function closeDropdown() {
+                dropdown.remove();
+                document.removeEventListener('click', closeDropdown);
+            }, { once: true });
+        }, 0);
     }
 
     // ── Lightbox ───────────────────────────────────────────────────────────
