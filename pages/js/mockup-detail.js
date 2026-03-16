@@ -495,7 +495,7 @@
         var scrollY = window.scrollY;
         popover.style.top = (rect.bottom + scrollY + 4) + 'px';
         popover.style.left = rect.left + 'px';
-        popover.style.display = '';
+        popover.style.display = 'block';
     }
 
     function hideSlotPopover() {
