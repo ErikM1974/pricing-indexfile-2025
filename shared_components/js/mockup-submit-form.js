@@ -22,6 +22,7 @@ var MockupSubmitForm = (function () {
     var selectedThreadColors = [];
     var referenceFiles = [];  // Array of File objects (max 4)
     var allThreadColors = [];
+    var threadColorsLoaded = false;
     var allLocations = [];
     var currentRequestType = 'New Digitizing'; // or 'Mockup Request'
     var customerLookup = null;
@@ -381,6 +382,7 @@ var MockupSubmitForm = (function () {
             .then(function (r) { return r.ok ? r.json() : { colors: [] }; })
             .then(function (data) {
                 allThreadColors = data.colors || [];
+                threadColorsLoaded = true;
                 // Update hint with actual count
                 var hint = document.querySelector('.msf-field-hint');
                 if (hint && allThreadColors.length > 0) {
@@ -389,12 +391,20 @@ var MockupSubmitForm = (function () {
             })
             .catch(function () {
                 allThreadColors = [];
+                threadColorsLoaded = true;
             });
     }
 
     function filterThreadColors(query) {
         var dropdown = document.getElementById('msf-thread-dropdown');
         dropdown.style.display = 'block';
+
+        // Show loading state if colors haven't loaded yet
+        if (!threadColorsLoaded) {
+            dropdown.innerHTML = '<div style="padding:12px;color:#888;text-align:center;font-size:13px;">Loading thread colors...</div>';
+            return;
+        }
+
         dropdown.innerHTML = '';
 
         var filtered = allThreadColors;
@@ -467,6 +477,11 @@ var MockupSubmitForm = (function () {
             var file = fileList[i];
             if (file.size > 20 * 1024 * 1024) {
                 showToast(escapeHtml(file.name) + ' is too large (max 20MB)', 'error');
+                continue;
+            }
+            var isDuplicate = referenceFiles.some(function (f) { return f.name === file.name; });
+            if (isDuplicate) {
+                showToast(escapeHtml(file.name) + ' already added', 'error');
                 continue;
             }
             referenceFiles.push(file);

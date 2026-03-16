@@ -569,7 +569,7 @@
                 renderGallery(currentMockup);
                 showToast('File linked from Box', 'success');
 
-                // Add note (fire-and-forget)
+                // Add note then refresh to show it
                 fetch(API_BASE + '/api/mockup-notes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -580,9 +580,11 @@
                         Note_Text: 'Added file from Box: ' + selectedBoxFile.name,
                         Note_Type: 'artist_note'
                     })
-                }).catch(function () {});
-
-                refreshNotes();
+                }).then(function () {
+                    refreshNotes();
+                }).catch(function () {
+                    refreshNotes();
+                });
             });
         }).catch(function (err) {
             showToast('Error: ' + err.message, 'error');
@@ -742,8 +744,18 @@
 
     function openLightbox(url, label) {
         var lightbox = document.getElementById('pmd-lightbox');
-        document.getElementById('pmd-lightbox-img').src = url;
-        document.getElementById('pmd-lightbox-label').textContent = label || '';
+        var img = document.getElementById('pmd-lightbox-img');
+        var labelEl = document.getElementById('pmd-lightbox-label');
+
+        img.style.display = '';
+        labelEl.textContent = label || '';
+
+        img.onerror = function () {
+            img.style.display = 'none';
+            labelEl.textContent = 'Image could not be loaded \u2014 link may have expired';
+        };
+
+        img.src = url;
         lightbox.classList.add('show');
         document.body.style.overflow = 'hidden';
     }
