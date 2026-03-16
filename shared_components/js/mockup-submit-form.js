@@ -20,7 +20,7 @@ var MockupSubmitForm = (function () {
     // ── State ──────────────────────────────────────────────────────────────
     var containerId = null;
     var selectedThreadColors = [];
-    var referenceFile = null;
+    var referenceFiles = [];  // Array of File objects (max 4)
     var allThreadColors = [];
     var allLocations = [];
     var currentRequestType = 'New Digitizing'; // or 'Mockup Request'
@@ -189,15 +189,15 @@ var MockupSubmitForm = (function () {
             + '      <textarea class="msf-textarea" id="msf-instructions" placeholder="Special instructions for Ruth..."></textarea>'
             + '    </div>'
 
-            // File Upload
+            // File Upload (multi-file)
             + '    <div class="msf-field">'
-            + '      <label class="msf-field-label">Reference File</label>'
+            + '      <label class="msf-field-label">Reference Files</label>'
             + '      <div class="msf-file-drop" id="msf-file-drop">'
             + '        <div class="msf-file-drop-icon">&#128206;</div>'
             + '        <div>Click to upload or drag &amp; drop</div>'
-            + '        <div style="font-size:12px;color:#aaa;margin-top:4px;">.DST, .EMB, .AI, .EPS, .PDF, images (max 20MB)</div>'
+            + '        <div style="font-size:12px;color:#aaa;margin-top:4px;">.DST, .EMB, .AI, .EPS, .PDF, images — max 4 files, 20MB each</div>'
             + '      </div>'
-            + '      <input type="file" id="msf-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg">'
+            + '      <input type="file" id="msf-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg" multiple>'
             + '      <div id="msf-file-preview-area"></div>'
             + '    </div>'
 
@@ -320,7 +320,7 @@ var MockupSubmitForm = (function () {
         fileDrop.addEventListener('click', function () { fileInput.click(); });
         fileInput.addEventListener('change', function () {
             if (fileInput.files.length > 0) {
-                setReferenceFile(fileInput.files[0]);
+                addReferenceFiles(fileInput.files);
             }
         });
 
@@ -338,7 +338,7 @@ var MockupSubmitForm = (function () {
             fileDrop.style.borderColor = '#d1d5db';
             fileDrop.style.background = '';
             if (e.dataTransfer.files.length > 0) {
-                setReferenceFile(e.dataTransfer.files[0]);
+                addReferenceFiles(e.dataTransfer.files);
             }
         });
 
@@ -454,24 +454,62 @@ var MockupSubmitForm = (function () {
         document.getElementById('msf-thread-dropdown').style.display = 'none';
     }
 
-    // ── File Upload ────────────────────────────────────────────────────────
-    function setReferenceFile(file) {
-        if (file.size > 20 * 1024 * 1024) {
-            showToast('File too large (max 20MB)', 'error');
+    // ── File Upload (Multi-File) ────────────────────────────────────────
+    var MAX_FILES = 4;
+    var FILE_SLOTS = ['Box_Reference_File', 'Box_Mockup_1', 'Box_Mockup_2', 'Box_Mockup_3'];
+
+    function addReferenceFiles(fileList) {
+        for (var i = 0; i < fileList.length; i++) {
+            if (referenceFiles.length >= MAX_FILES) {
+                showToast('Maximum ' + MAX_FILES + ' files allowed', 'error');
+                break;
+            }
+            var file = fileList[i];
+            if (file.size > 20 * 1024 * 1024) {
+                showToast(escapeHtml(file.name) + ' is too large (max 20MB)', 'error');
+                continue;
+            }
+            referenceFiles.push(file);
+        }
+        renderFileList();
+        // Reset file input so same file can be re-selected
+        document.getElementById('msf-file-input').value = '';
+    }
+
+    function removeFile(index) {
+        referenceFiles.splice(index, 1);
+        renderFileList();
+    }
+
+    function renderFileList() {
+        var previewArea = document.getElementById('msf-file-preview-area');
+        if (referenceFiles.length === 0) {
+            previewArea.innerHTML = '';
             return;
         }
-        referenceFile = file;
+        var html = '';
+        for (var i = 0; i < referenceFiles.length; i++) {
+            var f = referenceFiles[i];
+            html += '<div class="msf-file-preview">'
+                + '<span class="msf-file-preview-name">'
+                + '<strong>' + FILE_SLOTS[i].replace('Box_', '').replace('_', ' ') + ':</strong> '
+                + escapeHtml(f.name) + ' (' + formatFileSize(f.size) + ')'
+                + '</span>'
+                + '<span class="msf-file-remove" data-file-index="' + i + '">&times;</span>'
+                + '</div>';
+        }
+        if (referenceFiles.length < MAX_FILES) {
+            html += '<div style="font-size:12px;color:#888;margin-top:4px;">'
+                + (MAX_FILES - referenceFiles.length) + ' more file' + (MAX_FILES - referenceFiles.length > 1 ? 's' : '') + ' can be added'
+                + '</div>';
+        }
+        previewArea.innerHTML = html;
 
-        var previewArea = document.getElementById('msf-file-preview-area');
-        previewArea.innerHTML = '<div class="msf-file-preview">'
-            + '<span class="msf-file-preview-name">' + escapeHtml(file.name) + ' (' + formatFileSize(file.size) + ')</span>'
-            + '<span class="msf-file-remove" id="msf-file-remove">&times;</span>'
-            + '</div>';
-
-        document.getElementById('msf-file-remove').addEventListener('click', function () {
-            referenceFile = null;
-            previewArea.innerHTML = '';
-            document.getElementById('msf-file-input').value = '';
+        // Wire up remove buttons
+        previewArea.querySelectorAll('.msf-file-remove').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                removeFile(parseInt(btn.dataset.fileIndex));
+            });
         });
     }
 
@@ -632,10 +670,10 @@ var MockupSubmitForm = (function () {
             .then(function (result) {
                 var newId = result.record && result.record.ID;
 
-                // Step 3: Upload reference file (if any)
-                if (referenceFile && newId) {
-                    statusEl.textContent = 'Uploading file...';
-                    return uploadReferenceFile(newId, folderName, designNumber).then(function () { return newId; });
+                // Step 3: Upload reference files (if any)
+                if (referenceFiles.length > 0 && newId) {
+                    statusEl.textContent = 'Uploading files...';
+                    return uploadReferenceFiles(newId, folderName, designNumber).then(function () { return newId; });
                 }
                 return newId;
             })
@@ -683,26 +721,56 @@ var MockupSubmitForm = (function () {
         .catch(function () { return null; });
     }
 
-    function uploadReferenceFile(mockupId, folderName, designNumber) {
-        var formData = new FormData();
-        formData.append('file', referenceFile);
-        formData.append('slot', 'Box_Reference_File');
-        formData.append('companyName', folderName);
-        if (designNumber) {
-            formData.append('designNumber', designNumber);
+    function uploadReferenceFiles(mockupId, folderName, designNumber) {
+        var uploads = [];
+        var failedFiles = [];
+
+        for (var i = 0; i < referenceFiles.length; i++) {
+            uploads.push({ file: referenceFiles[i], slot: FILE_SLOTS[i], index: i });
         }
 
-        return fetch(API_BASE + '/api/mockups/' + mockupId + '/upload-file', {
-            method: 'POST',
-            body: formData
-        }).then(function (resp) {
-            if (!resp.ok) {
-                return resp.text().then(function (body) {
-                    console.error('File upload failed:', resp.status, body);
-                    showToast('File upload failed — record was created but file was not attached', 'error');
-                });
+        // Upload sequentially to avoid overwhelming the server
+        function uploadNext(idx) {
+            if (idx >= uploads.length) {
+                if (failedFiles.length > 0) {
+                    showToast(failedFiles.length + ' file(s) failed to upload', 'error');
+                }
+                return Promise.resolve();
             }
-        });
+
+            var u = uploads[idx];
+            var statusEl = document.getElementById('msf-submit-status');
+            if (statusEl) {
+                statusEl.textContent = 'Uploading file ' + (idx + 1) + ' of ' + uploads.length + '...';
+            }
+
+            var formData = new FormData();
+            formData.append('file', u.file);
+            formData.append('slot', u.slot);
+            formData.append('companyName', folderName);
+            if (designNumber) {
+                formData.append('designNumber', designNumber);
+            }
+
+            return fetch(API_BASE + '/api/mockups/' + mockupId + '/upload-file', {
+                method: 'POST',
+                body: formData
+            }).then(function (resp) {
+                if (!resp.ok) {
+                    return resp.text().then(function (body) {
+                        console.error('File upload failed:', u.file.name, resp.status, body);
+                        failedFiles.push(u.file.name);
+                    });
+                }
+            }).catch(function (err) {
+                console.error('File upload error:', u.file.name, err);
+                failedFiles.push(u.file.name);
+            }).then(function () {
+                return uploadNext(idx + 1);
+            });
+        }
+
+        return uploadNext(0);
     }
 
     // ── Success State ──────────────────────────────────────────────────────
@@ -725,7 +793,7 @@ var MockupSubmitForm = (function () {
     // ── Reset Form ─────────────────────────────────────────────────────────
     function resetForm() {
         selectedThreadColors = [];
-        referenceFile = null;
+        referenceFiles = [];
         selectedContact = null;
         currentRequestType = 'New Digitizing';
 
