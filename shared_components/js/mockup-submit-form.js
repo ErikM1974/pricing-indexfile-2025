@@ -3,11 +3,13 @@
  *
  * Renders a custom form for AEs to request digitizing/mockups from Ruth.
  * Replaces both the Caspio DataPage and JotForm with a single JS-driven form.
- * Includes design autocomplete, thread color picker, location dropdown, file upload.
+ * Includes company autocomplete (CustomerLookupService), thread color picker,
+ * location dropdown, file upload, and sales rep auto-fill (StaffAuthHelper).
  *
  * Usage: MockupSubmitForm.init('container-id')
  *
- * Depends on: mockup-submit-form.css, app-config.js
+ * Depends on: mockup-submit-form.css, app-config.js,
+ *             customer-lookup-service.js, staff-auth-helper.js
  */
 var MockupSubmitForm = (function () {
     'use strict';
@@ -17,12 +19,13 @@ var MockupSubmitForm = (function () {
 
     // ── State ──────────────────────────────────────────────────────────────
     var containerId = null;
-    var selectedDesign = null;
     var selectedThreadColors = [];
     var referenceFile = null;
     var allThreadColors = [];
     var allLocations = [];
-    var searchTimeout = null;
+    var currentRequestType = 'New Digitizing'; // or 'Mockup Request'
+    var customerLookup = null;
+    var selectedContact = null;
 
     // ── Init ───────────────────────────────────────────────────────────────
     function init(containerIdParam) {
@@ -32,6 +35,9 @@ var MockupSubmitForm = (function () {
 
         container.innerHTML = buildFormHtml();
         wireEvents();
+        initToggle();
+        initCompanyAutocomplete();
+        initSalesRep();
         loadLocations();
         loadThreadColors();
     }
@@ -58,28 +64,43 @@ var MockupSubmitForm = (function () {
             + '  <div class="msf-form-header">New Digitizing / Mockup Request</div>'
             + '  <div class="msf-form-body" id="msf-form-body">'
 
-            // Design Number (autocomplete)
-            + '    <div class="msf-field">'
-            + '      <label class="msf-field-label">Design Number <span class="msf-required">*</span></label>'
-            + '      <div class="msf-autocomplete-wrap">'
-            + '        <input type="text" class="msf-input" id="msf-design-number" placeholder="Type design number to search..." autocomplete="off">'
-            + '        <div class="msf-autocomplete-list" id="msf-autocomplete-list"></div>'
+            // Request Type Toggle
+            + '    <div class="msf-toggle-section">'
+            + '      <div class="msf-toggle-row" id="msf-toggle-row">'
+            + '        <button type="button" class="msf-toggle-btn active" data-type="new">New Digitizing</button>'
+            + '        <button type="button" class="msf-toggle-btn" data-type="mockup">Mockup Request</button>'
             + '      </div>'
-            + '      <span class="msf-error-msg" id="msf-design-error">Design number is required</span>'
+            + '      <div class="msf-toggle-helper" id="msf-toggle-helper">New design that needs to be digitized from scratch</div>'
             + '    </div>'
 
-            // Company + Design Name (auto-filled)
+            // Company Name (autocomplete) + Sales Rep (auto-filled)
             + '    <div class="msf-row">'
             + '      <div class="msf-field">'
-            + '        <label class="msf-field-label">Company Name</label>'
-            + '        <input type="text" class="msf-input" id="msf-company" readonly placeholder="Auto-filled from design">'
+            + '        <label class="msf-field-label">Company Name <span class="msf-required">*</span></label>'
+            + '        <div class="msf-autocomplete-wrap">'
+            + '          <input type="text" class="msf-input" id="msf-company" placeholder="Type company name to search..." autocomplete="off">'
+            + '        </div>'
+            + '        <span class="msf-error-msg" id="msf-company-error">Company name is required</span>'
             + '      </div>'
             + '      <div class="msf-field">'
-            + '        <label class="msf-field-label">Design Name</label>'
-            + '        <input type="text" class="msf-input" id="msf-design-name" readonly placeholder="Auto-filled from design">'
+            + '        <label class="msf-field-label">Sales Rep</label>'
+            + '        <input type="text" class="msf-input" id="msf-sales-rep" placeholder="Auto-filled from login">'
             + '      </div>'
             + '    </div>'
             + '    <input type="hidden" id="msf-customer-id">'
+
+            // Design Number + Design Name (both editable)
+            + '    <div class="msf-row">'
+            + '      <div class="msf-field">'
+            + '        <label class="msf-field-label">Design Number <span class="msf-required msf-design-required" id="msf-design-asterisk">*</span></label>'
+            + '        <input type="text" class="msf-input" id="msf-design-number" placeholder="Enter design number" autocomplete="off">'
+            + '        <span class="msf-error-msg" id="msf-design-error">Design number is required</span>'
+            + '      </div>'
+            + '      <div class="msf-field">'
+            + '        <label class="msf-field-label">Design Name</label>'
+            + '        <input type="text" class="msf-input" id="msf-design-name" placeholder="Enter design name">'
+            + '      </div>'
+            + '    </div>'
 
             // Mockup Type + Placement
             + '    <div class="msf-row">'
@@ -147,7 +168,7 @@ var MockupSubmitForm = (function () {
             + '        <input type="text" class="msf-input" id="msf-thread-search" placeholder="Search thread colors..." autocomplete="off">'
             + '        <div class="msf-thread-dropdown" id="msf-thread-dropdown"></div>'
             + '      </div>'
-            + '      <span class="msf-field-hint">Type to search from 233 Isacord thread colors</span>'
+            + '      <span class="msf-field-hint">Type to search from Robison Anton thread colors</span>'
             + '    </div>'
 
             // Due Date + Work Order
@@ -182,7 +203,7 @@ var MockupSubmitForm = (function () {
 
             // Submit
             + '    <div class="msf-submit-row">'
-            + '      <button class="msf-submit-btn" id="msf-submit-btn">Submit Request</button>'
+            + '      <button type="button" class="msf-submit-btn" id="msf-submit-btn">Submit Request</button>'
             + '      <span class="msf-submit-status" id="msf-submit-status"></span>'
             + '    </div>'
 
@@ -191,28 +212,95 @@ var MockupSubmitForm = (function () {
             + '</div>';
     }
 
-    // ── Wire Events ────────────────────────────────────────────────────────
-    function wireEvents() {
-        // Design autocomplete
-        var designInput = document.getElementById('msf-design-number');
-        designInput.addEventListener('input', function () {
-            var q = designInput.value.trim();
-            if (q.length < 2) {
-                hideAutocomplete();
+    // ── Request Type Toggle ─────────────────────────────────────────────────
+    function initToggle() {
+        var buttons = document.querySelectorAll('.msf-toggle-btn');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var type = btn.getAttribute('data-type');
+
+                // Update active state
+                buttons.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                // Set mode
+                currentRequestType = type === 'mockup' ? 'Mockup Request' : 'New Digitizing';
+
+                // Update helper text
+                var helper = document.getElementById('msf-toggle-helper');
+                if (helper) {
+                    helper.textContent = type === 'mockup'
+                        ? 'Place an existing design on a new garment for approval'
+                        : 'New design that needs to be digitized from scratch';
+                }
+
+                // Toggle design number required asterisk
+                var asterisk = document.getElementById('msf-design-asterisk');
+                if (asterisk) {
+                    // In New Digitizing mode, design number is optional
+                    asterisk.style.display = type === 'mockup' ? '' : 'none';
+                }
+
+                // Clear validation errors on design number when switching
+                var designInput = document.getElementById('msf-design-number');
+                if (designInput) {
+                    designInput.classList.remove('msf-error');
+                    document.getElementById('msf-design-error').style.display = 'none';
+                }
+            });
+        });
+
+        // Set initial state — New Digitizing is default, design number optional
+        var asterisk = document.getElementById('msf-design-asterisk');
+        if (asterisk) asterisk.style.display = 'none';
+    }
+
+    // ── Company Autocomplete ────────────────────────────────────────────────
+    function initCompanyAutocomplete() {
+        if (typeof CustomerLookupService === 'undefined') {
+            return;
+        }
+
+        customerLookup = new CustomerLookupService({ maxResults: 10 });
+        customerLookup.bindToInput('msf-company', {
+            onSelect: function (contact) {
+                selectedContact = contact;
+                document.getElementById('msf-customer-id').value = contact.ID_Contact || '';
+
+                // Clear error state
+                document.getElementById('msf-company').classList.remove('msf-error');
+                document.getElementById('msf-company-error').style.display = 'none';
+            },
+            onClear: function () {
+                selectedContact = null;
+                document.getElementById('msf-customer-id').value = '';
+            }
+        });
+    }
+
+    // ── Sales Rep Auto-fill ─────────────────────────────────────────────────
+    function initSalesRep() {
+        var repInput = document.getElementById('msf-sales-rep');
+        if (!repInput) return;
+
+        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn()) {
+            var staffName = StaffAuthHelper.getLoggedInStaffName();
+            if (staffName) {
+                repInput.value = staffName;
+                repInput.readOnly = true;
                 return;
             }
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function () { searchDesigns(q); }, 300);
-        });
+        }
 
-        designInput.addEventListener('focus', function () {
-            if (designInput.value.trim().length >= 2) {
-                searchDesigns(designInput.value.trim());
-            }
-        });
+        // Fallback: editable field
+        repInput.readOnly = false;
+        repInput.placeholder = 'Enter your name';
+    }
 
+    // ── Wire Events ────────────────────────────────────────────────────────
+    function wireEvents() {
+        // Close dropdowns on outside click
         document.addEventListener('click', function (e) {
-            if (!e.target.closest('.msf-autocomplete-wrap')) hideAutocomplete();
             if (!e.target.closest('.msf-thread-picker')) hideThreadDropdown();
         });
 
@@ -258,59 +346,6 @@ var MockupSubmitForm = (function () {
         document.getElementById('msf-submit-btn').addEventListener('click', handleSubmit);
     }
 
-    // ── Design Autocomplete ────────────────────────────────────────────────
-    function searchDesigns(query) {
-        var list = document.getElementById('msf-autocomplete-list');
-        list.style.display = '';
-        list.innerHTML = '<div class="msf-autocomplete-loading">Searching...</div>';
-
-        fetch(API_BASE + '/api/digitized-designs/search-all?q=' + encodeURIComponent(query) + '&limit=10')
-            .then(function (r) {
-                if (!r.ok) throw new Error('Search failed');
-                return r.json();
-            })
-            .then(function (data) {
-                var designs = data.designs || data.results || [];
-                if (designs.length === 0) {
-                    list.innerHTML = '<div class="msf-autocomplete-loading">No designs found</div>';
-                    return;
-                }
-
-                list.innerHTML = '';
-                designs.forEach(function (d) {
-                    var item = document.createElement('div');
-                    item.className = 'msf-autocomplete-item';
-                    item.innerHTML = '<div class="msf-autocomplete-design-num">#' + escapeHtml(d.designNumber || '') + '</div>'
-                        + '<div class="msf-autocomplete-company">' + escapeHtml(d.company || d.companyName || '') + ' — ' + escapeHtml(d.designName || '') + '</div>';
-
-                    item.addEventListener('click', function () {
-                        selectDesign(d);
-                    });
-                    list.appendChild(item);
-                });
-            })
-            .catch(function () {
-                list.innerHTML = '<div class="msf-autocomplete-loading">Search error — try again</div>';
-            });
-    }
-
-    function selectDesign(design) {
-        selectedDesign = design;
-        document.getElementById('msf-design-number').value = design.designNumber || '';
-        document.getElementById('msf-company').value = design.company || design.companyName || '';
-        document.getElementById('msf-design-name').value = design.designName || '';
-        document.getElementById('msf-customer-id').value = design.customerId || '';
-        hideAutocomplete();
-
-        // Clear error
-        document.getElementById('msf-design-number').classList.remove('msf-error');
-        document.getElementById('msf-design-error').style.display = 'none';
-    }
-
-    function hideAutocomplete() {
-        document.getElementById('msf-autocomplete-list').style.display = 'none';
-    }
-
     // ── Load Locations ─────────────────────────────────────────────────────
     function loadLocations() {
         fetch(API_BASE + '/api/locations?type=EMB,CAP')
@@ -346,6 +381,11 @@ var MockupSubmitForm = (function () {
             .then(function (r) { return r.ok ? r.json() : { colors: [] }; })
             .then(function (data) {
                 allThreadColors = data.colors || [];
+                // Update hint with actual count
+                var hint = document.querySelector('.msf-field-hint');
+                if (hint && allThreadColors.length > 0) {
+                    hint.textContent = 'Type to search from ' + allThreadColors.length + ' Robison Anton thread colors';
+                }
             })
             .catch(function () {
                 allThreadColors = [];
@@ -439,8 +479,20 @@ var MockupSubmitForm = (function () {
     function validate() {
         var valid = true;
 
+        // Company Name — always required
+        var companyName = document.getElementById('msf-company').value.trim();
+        if (!companyName) {
+            document.getElementById('msf-company').classList.add('msf-error');
+            document.getElementById('msf-company-error').style.display = '';
+            valid = false;
+        } else {
+            document.getElementById('msf-company').classList.remove('msf-error');
+            document.getElementById('msf-company-error').style.display = 'none';
+        }
+
+        // Design Number — required only in Mockup Request mode
         var designNum = document.getElementById('msf-design-number').value.trim();
-        if (!designNum) {
+        if (currentRequestType === 'Mockup Request' && !designNum) {
             document.getElementById('msf-design-number').classList.add('msf-error');
             document.getElementById('msf-design-error').style.display = '';
             valid = false;
@@ -449,6 +501,7 @@ var MockupSubmitForm = (function () {
             document.getElementById('msf-design-error').style.display = 'none';
         }
 
+        // Mockup Type — always required
         var mockupType = document.getElementById('msf-mockup-type').value;
         if (!mockupType) {
             document.getElementById('msf-mockup-type').classList.add('msf-error');
@@ -459,6 +512,7 @@ var MockupSubmitForm = (function () {
             document.getElementById('msf-type-error').style.display = 'none';
         }
 
+        // Placement — always required
         var placement = document.getElementById('msf-placement').value;
         if (!placement) {
             document.getElementById('msf-placement').classList.add('msf-error');
@@ -515,6 +569,14 @@ var MockupSubmitForm = (function () {
         return '';
     }
 
+    // ── Build Box Folder Name ──────────────────────────────────────────────
+    function buildBoxFolderName(designNumber, companyName) {
+        if (designNumber) {
+            return designNumber + ' ' + companyName;
+        }
+        return 'NEW ' + companyName;
+    }
+
     // ── Submit ─────────────────────────────────────────────────────────────
     function handleSubmit() {
         if (!validate()) {
@@ -528,12 +590,13 @@ var MockupSubmitForm = (function () {
         statusEl.textContent = 'Submitting...';
 
         var designNumber = document.getElementById('msf-design-number').value.trim();
-        var companyName = document.getElementById('msf-company').value.trim() || 'Unknown Company';
+        var companyName = document.getElementById('msf-company').value.trim();
+        var folderName = buildBoxFolderName(designNumber, companyName);
 
-        // Step 1: Create Box folder for customer
+        // Step 1: Create Box folder
         statusEl.textContent = 'Creating folder...';
 
-        createBoxFolder(companyName)
+        createBoxFolder(folderName)
             .then(function (folderId) {
                 // Step 2: Create mockup record
                 statusEl.textContent = 'Creating record...';
@@ -551,6 +614,8 @@ var MockupSubmitForm = (function () {
                     Work_Order_Number: document.getElementById('msf-work-order').value.trim(),
                     AE_Notes: buildAeNotes(),
                     Submitted_By: getSubmitterEmail(),
+                    Sales_Rep: document.getElementById('msf-sales-rep').value.trim(),
+                    Request_Type: currentRequestType,
                     Box_Folder_ID: folderId || ''
                 };
 
@@ -570,7 +635,9 @@ var MockupSubmitForm = (function () {
                 // Step 3: Upload reference file (if any)
                 if (referenceFile && newId) {
                     statusEl.textContent = 'Uploading file...';
-                    return uploadReferenceFile(newId).then(function () { return newId; });
+                    var companyName = document.getElementById('msf-company').value.trim();
+                    var designNumber = document.getElementById('msf-design-number').value.trim();
+                    return uploadReferenceFile(newId, companyName, designNumber).then(function () { return newId; });
                 }
                 return newId;
             })
@@ -602,11 +669,11 @@ var MockupSubmitForm = (function () {
             });
     }
 
-    function createBoxFolder(companyName) {
+    function createBoxFolder(folderName) {
         return fetch(API_BASE + '/api/box/create-mockup-folder', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ companyName: companyName })
+            body: JSON.stringify({ companyName: folderName })
         })
         .then(function (resp) {
             if (!resp.ok) return null;
@@ -618,11 +685,14 @@ var MockupSubmitForm = (function () {
         .catch(function () { return null; });
     }
 
-    function uploadReferenceFile(mockupId) {
+    function uploadReferenceFile(mockupId, companyName, designNumber) {
         var formData = new FormData();
         formData.append('file', referenceFile);
         formData.append('slot', 'Box_Reference_File');
-        formData.append('companyName', document.getElementById('msf-company').value.trim());
+        formData.append('companyName', companyName);
+        if (designNumber) {
+            formData.append('designNumber', designNumber);
+        }
 
         return fetch(API_BASE + '/api/mockups/' + mockupId + '/upload-file', {
             method: 'POST',
@@ -641,7 +711,7 @@ var MockupSubmitForm = (function () {
             + '<p>Your digitizing/mockup request has been sent to Ruth. '
             + 'She will be notified and begin working on it.</p>'
             + (mockupId ? '<a href="/mockup/' + mockupId + '?view=ae" class="msf-success-link">View Mockup Details &rarr;</a>' : '')
-            + '<button class="msf-success-another" id="msf-another-btn">Submit Another</button>'
+            + '<button type="button" class="msf-success-another" id="msf-another-btn">Submit Another</button>'
             + '</div>';
 
         document.getElementById('msf-another-btn').addEventListener('click', function () {
@@ -651,13 +721,17 @@ var MockupSubmitForm = (function () {
 
     // ── Reset Form ─────────────────────────────────────────────────────────
     function resetForm() {
-        selectedDesign = null;
         selectedThreadColors = [];
         referenceFile = null;
+        selectedContact = null;
+        currentRequestType = 'New Digitizing';
 
         var container = document.getElementById(containerId);
         container.innerHTML = buildFormHtml();
         wireEvents();
+        initToggle();
+        initCompanyAutocomplete();
+        initSalesRep();
         loadLocations();
         // Thread colors already cached in allThreadColors
     }
@@ -677,7 +751,10 @@ var MockupSubmitForm = (function () {
     }
 
     function getSubmitterEmail() {
-        // Try to get from auth context or localStorage
+        if (typeof StaffAuthHelper !== 'undefined') {
+            var email = StaffAuthHelper.getLoggedInStaffEmail();
+            if (email) return email;
+        }
         if (window.APP_CONFIG && window.APP_CONFIG.USER && window.APP_CONFIG.USER.email) {
             return window.APP_CONFIG.USER.email;
         }
@@ -685,6 +762,10 @@ var MockupSubmitForm = (function () {
     }
 
     function getSubmitterName() {
+        if (typeof StaffAuthHelper !== 'undefined') {
+            var name = StaffAuthHelper.getLoggedInStaffName();
+            if (name) return name;
+        }
         if (window.APP_CONFIG && window.APP_CONFIG.USER && window.APP_CONFIG.USER.name) {
             return window.APP_CONFIG.USER.name;
         }
