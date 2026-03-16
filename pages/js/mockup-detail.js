@@ -996,6 +996,43 @@
         } catch (e) { /* silent */ }
     }
 
+    function sendApprovalNotification(aeEmail, message) {
+        if (typeof emailjs === 'undefined') return;
+        try {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+
+            // Build mockup images HTML from filled slots
+            var mockupImagesHtml = '';
+            var mockupCount = 0;
+            MOCKUP_SLOTS.forEach(function (slot) {
+                if (slot.key === 'Box_Reference_File') return;
+                var url = currentMockup[slot.key];
+                if (!url) return;
+                var ext = getFileExtension(url);
+                if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
+                mockupCount++;
+                mockupImagesHtml += '<div style="margin-bottom:12px;text-align:center;">'
+                    + '<p style="font-size:13px;color:#666;margin:0 0 6px 0;font-weight:600;">' + slot.label + '</p>'
+                    + '<img src="' + url + '" alt="' + slot.label + '" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid #e5e7eb;">'
+                    + '</div>';
+            });
+
+            emailjs.send(EMAILJS_SERVICE_ID, 'art_approval_request', {
+                to_email: aeEmail,
+                to_name: getAeDisplayName(aeEmail),
+                from_name: 'Ruth',
+                design_id: currentMockup.Design_Number || currentMockup.ID,
+                company_name: currentMockup.Company_Name || 'Unknown',
+                revision_count: currentMockup.Revision_Count || 0,
+                message: message || 'Mockup is ready for your review.',
+                mockup_count: mockupCount,
+                mockup_images_html: mockupImagesHtml,
+                art_time_display: 'N/A',
+                detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=ae'
+            }).catch(function () { /* fire-and-forget */ });
+        } catch (e) { /* silent */ }
+    }
+
     function sendStatusNotifications(newStatus) {
         if (!currentMockup) return;
         var company = currentMockup.Company_Name || '';
@@ -1004,16 +1041,9 @@
         var aeLink = HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=ae';
 
         if (newStatus === 'Awaiting Approval' && !isAeView && !isCustomerView) {
-            // Ruth sends for approval → notify AE
+            // Ruth sends for approval → notify AE with rich approval email
             var aeEmail = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
-            sendMockupNotification({
-                to_email: aeEmail,
-                to_name: getAeDisplayName(aeEmail),
-                note_text: 'Mockup is ready for your review: ' + company + ' #' + design,
-                note_type: 'Awaiting Approval',
-                detail_link: aeLink,
-                from_name: 'Ruth'
-            });
+            sendApprovalNotification(aeEmail, 'Mockup is ready for your review: ' + company + ' #' + design);
         } else if (newStatus === 'Approved') {
             // Notify Ruth
             sendMockupNotification({
