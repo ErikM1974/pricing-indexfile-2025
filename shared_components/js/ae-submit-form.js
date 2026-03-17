@@ -218,12 +218,14 @@
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     var SITE_ORIGIN = 'https://www.teamnwca.com';
 
-    var notifiedDesignIds = {};
+    // Window-level guard survives IIFE re-initialization (prevents duplicate emails
+    // when Caspio reloads the script or cached + fresh versions both run)
+    if (!window.__artSubmitNotified) window.__artSubmitNotified = {};
 
     function notifyNewSubmission(designId, companyName) {
         if (!designId) return;
-        if (notifiedDesignIds[designId]) return; // prevent duplicate sends from MutationObserver
-        notifiedDesignIds[designId] = true;
+        if (window.__artSubmitNotified[designId]) return; // prevent duplicate sends
+        window.__artSubmitNotified[designId] = true;
 
         // Toast notification (existing)
         fetch(API_BASE + '/api/art-notifications', {
