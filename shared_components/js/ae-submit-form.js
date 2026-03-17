@@ -191,9 +191,11 @@
         if (!submitTab) return;
 
         var submitObserver = new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                mutation.addedNodes.forEach(function (node) {
-                    if (node.nodeType !== 1) return;
+            for (var m = 0; m < mutations.length; m++) {
+                var addedNodes = mutations[m].addedNodes;
+                for (var n = 0; n < addedNodes.length; n++) {
+                    var node = addedNodes[n];
+                    if (node.nodeType !== 1) continue;
                     // Caspio replaces the form with confirmation HTML on success
                     // Look for the confirmation container with the ID_Design
                     var idElement = node.querySelector && node.querySelector('.id-number');
@@ -201,10 +203,12 @@
                         var designId = idElement.textContent.trim();
                         var companyEl = node.querySelector('.detail-value');
                         var companyName = companyEl ? companyEl.textContent.trim() : 'Unknown';
+                        submitObserver.disconnect(); // Stop observing immediately to prevent duplicate fires
                         notifyNewSubmission(designId, companyName);
+                        return; // Exit — only one notification per submission
                     }
-                });
-            });
+                }
+            }
         });
 
         submitObserver.observe(submitTab, { childList: true, subtree: true });
