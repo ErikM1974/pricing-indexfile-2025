@@ -42,6 +42,19 @@ Add new entries at the top of the relevant category.
 - Use pricing-bundle or base-item-costs endpoints which aggregate correctly
 - Other quote builders (DTG, Screenprint, Embroidery) are safe — they use service classes that handle pricing internally
 
+## Bug: DTF Quote Builder Parent Row Qty Double-Counts Child Rows (2026-03-17)
+
+**Problem:** Parent row 29M showed Qty=70 but Total=$585. Since 70 × $13 ≠ $585, the display looked broken. Actual standard qty was 45 (S:20 + M:25), child row 29M_2X had 25 (2XL:25).
+
+**Root Cause:** `onSizeChange()` in `dtf-quote-builder.html:1172-1177` added child row quantities to the parent's Qty cell via `querySelectorAll(`tr[data-parent-row-id]`)`. But `updatePricing()` in `dtf-quote-builder.js` only calculates the parent Total from standard sizes — child rows get their own separate Total.
+
+**Solution:** Removed the 6-line child row aggregation block from `onSizeChange()`. Parent Qty now shows only its own standard sizes. Child rows display their own Qty and Total independently. Sidebar "Total Pieces" already uses `getTotalQuantity()` which correctly counts standard + child separately.
+
+**Prevention:**
+- Parent Qty cell = standard sizes only (S, M, L, XL). Never add child quantities to parent display.
+- `getTotalQuantity()` is the single source of truth for combined totals (sidebar).
+- `updatePricing()` processes parent and child rows independently — keep display Qty consistent with this.
+
 ---
 
 ## Bug: CSS `display: none` in Stylesheet Overrides JS `display = ''` — Popover Never Shows (2026-03-16)

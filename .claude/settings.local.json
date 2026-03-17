@@ -154,7 +154,11 @@
       "Bash(find '/c/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025' -type f \\\\\\(-name *box* -o -name *design*scan* \\\\\\))",
       "WebFetch(domain:developer.box.com)",
       "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(f[''''name''''], f[''''extension''''], ''''thumb:'''', bool\\(f.get\\(''''thumbnailUrl''''\\)\\)\\) for f in data.get\\(''''files'''',[]\\)]\")",
-      "Bash(cmd //c \"taskkill /PID 24984 /F\")"
+      "Bash(cmd //c \"taskkill /PID 24984 /F\")",
+      "Bash(find '/c/Users/erik/OneDrive - Northwest Custom Apparel/2025' -type f \\\\\\(-name ae-submit-form.js -o -name *mockup* \\\\\\))",
+      "Bash(find 'C:/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025' -type f \\\\\\(-name *ae* -o -name *art*hub* \\\\\\))",
+      "Bash(2)",
+      "Bash(find 'C:\\\\Users\\\\erik\\\\OneDrive - Northwest Custom Apparel\\\\2025\\\\Pricing Index File 2025' -type f \\\\\\(-name *gallery* -o -name *manager* \\\\\\))"
     ],
     "deny": [],
     "ask": [],

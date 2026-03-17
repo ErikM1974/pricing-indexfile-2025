@@ -308,7 +308,9 @@ class DTFQuoteBuilder {
         const fields = {
             'customer-name': session.CustomerName,
             'customer-email': session.CustomerEmail,
-            'company-name': session.CompanyName
+            'company-name': session.CompanyName,
+            'customer-phone': session.CustomerPhone,
+            'project-name': session.ProjectName
         };
 
         for (const [id, value] of Object.entries(fields)) {
@@ -325,6 +327,48 @@ class DTFQuoteBuilder {
                     break;
                 }
             }
+        }
+
+        // Populate order & shipping fields (2026.03 overhaul)
+        const orderFields = {
+            'order-number': session.OrderNumber,
+            'po-number': session.PONumber,
+            'req-ship-date': session.ReqShipDate,
+            'drop-dead-date': session.DropDeadDate,
+            'ship-to-name': session.ShipToName,
+            'ship-address': session.ShipAddress,
+            'ship-city': session.ShipCity,
+            'ship-zip': session.ShipZip,
+            'ship-method': session.ShipMethod
+        };
+
+        let hasOrderData = false;
+        for (const [id, value] of Object.entries(orderFields)) {
+            const el = document.getElementById(id);
+            if (el && value) {
+                el.value = value;
+                hasOrderData = true;
+            }
+        }
+
+        // Set state dropdown
+        const stateSelect = document.getElementById('ship-state');
+        if (stateSelect && session.ShipState) {
+            stateSelect.value = session.ShipState;
+        }
+
+        // Set tax rate from saved quote
+        const taxRateInput = document.getElementById('tax-rate-input');
+        if (taxRateInput && session.TaxRate) {
+            taxRateInput.value = session.TaxRate;
+        }
+
+        // Auto-expand order details panel if data exists
+        if (hasOrderData) {
+            const content = document.getElementById('order-details-content');
+            const chevron = document.getElementById('order-details-chevron');
+            if (content) content.classList.remove('hidden');
+            if (chevron) chevron.style.transform = 'rotate(0)';
         }
     }
 
@@ -1507,10 +1551,12 @@ class DTFQuoteBuilder {
         const ltmTableTotal = document.getElementById('ltm-row-total');
 
         if (totalLtmFee > 0 && totalQty > 0) {
-            // Show LTM in product table
+            // Show LTM in product table — per-unit in Unit column, batch total in Total column
             if (ltmTableRow) {
                 ltmTableRow.style.display = 'table-row';
-                if (ltmTableUnit) ltmTableUnit.textContent = `$${totalLtmFee.toFixed(2)}`;
+                const ltmQtyCell = ltmTableRow.querySelector('.cell-qty');
+                if (ltmQtyCell) ltmQtyCell.textContent = totalQty;
+                if (ltmTableUnit) ltmTableUnit.textContent = `$${ltmPerUnit.toFixed(2)}`;
                 if (ltmTableTotal) ltmTableTotal.textContent = `$${totalLtmFee.toFixed(2)}`;
             }
         } else {
@@ -1684,6 +1730,102 @@ class DTFQuoteBuilder {
         if (qty <= 47) return '24-47';
         if (qty <= 71) return '48-71';
         return '72+';
+    }
+
+    /**
+     * Calculate subtotal from internal state (not DOM).
+     * Mirrors updatePricing() math but returns numbers for save/print.
+     * @returns {{ subtotal: number, productTotals: Map<id, { standardTotal: number, standardUnitPrice: number }>, childTotals: Map<childRowId, { total: number, unitPrice: number }> }}
+     */
+    calculateFromState() {
+        if (!this.currentPricingData || !this.pricingCalculator) {
+            return { subtotal: 0, productTotals: new Map(), childTotals: new Map() };
+        }
+
+        const totalQty = this.getTotalQuantity();
+        const locationCount = this.selectedLocations.length;
+        const isUnderMinimum = totalQty > 0 && totalQty < 10;
+        const pricingQty = isUnderMinimum ? 10 : totalQty;
+
+        const { marginDenom, ltmPerUnit, transferBreakdown, laborCostPerLoc, freightPerTransfer } = this.currentPricingData;
+        const transferCost = transferBreakdown?.total ?? 0;
+        const laborCost = (laborCostPerLoc ?? 0) * locationCount;
+        const freightCost = (freightPerTransfer ?? 0) * locationCount;
+
+        let subtotal = 0;
+        const productTotals = new Map();
+        const childTotals = new Map();
+
+        // Standard sizes per product (same as updatePricing lines 1524-1595)
+        const standardSizes = ['S', 'M', 'L', 'XL'];
+        this.products.forEach(product => {
+            let productTotal = 0;
+            let baseDisplayPrice = 0;
+
+            Object.entries(product.quantities).forEach(([size, qty]) => {
+                if (qty > 0 && standardSizes.includes(size)) {
+                    const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
+                    const garmentCost = product.baseCost / marginDenom + upcharge;
+                    const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                    const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
+                    productTotal += roundedPrice * qty;
+
+                    if (baseDisplayPrice === 0 && ['S', 'M', 'L'].includes(size)) {
+                        if (ltmPerUnit === 0) {
+                            baseDisplayPrice = roundedPrice;
+                        } else {
+                            const priceNoLTM = garmentCost + transferCost + laborCost + freightCost;
+                            baseDisplayPrice = this.pricingCalculator.applyRounding(priceNoLTM);
+                        }
+                    }
+                }
+            });
+
+            if (baseDisplayPrice === 0 && totalQty > 0) {
+                const garmentCost = product.baseCost / marginDenom;
+                const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                if (ltmPerUnit === 0) {
+                    baseDisplayPrice = this.pricingCalculator.applyRounding(unitPrice);
+                } else {
+                    const priceNoLTM = garmentCost + transferCost + laborCost + freightCost;
+                    baseDisplayPrice = this.pricingCalculator.applyRounding(priceNoLTM);
+                }
+            }
+
+            productTotals.set(product.id, { standardTotal: productTotal, standardUnitPrice: baseDisplayPrice });
+            subtotal += productTotal;
+        });
+
+        // Child rows (extended sizes — same as updatePricing lines 1597-1638)
+        const childRows = document.querySelectorAll('#product-tbody .child-row');
+        childRows.forEach(childRow => {
+            const extendedSize = childRow.dataset.extendedSize;
+            const baseCost = parseFloat(childRow.dataset.baseCost) || 0;
+            const sizeUpcharges = childRow.dataset.sizeUpcharges ? JSON.parse(childRow.dataset.sizeUpcharges) : {};
+            const qtyDisplay = childRow.querySelector('.cell-qty');
+            const qty = parseInt(qtyDisplay?.textContent) || 0;
+
+            if (qty > 0) {
+                const upcharge = this.getSizeUpcharge(extendedSize, sizeUpcharges);
+                const garmentCost = baseCost / marginDenom + upcharge;
+                const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
+
+                let displayPrice;
+                if (ltmPerUnit === 0) {
+                    displayPrice = roundedPrice;
+                } else {
+                    const priceNoLTM = garmentCost + transferCost + laborCost + freightCost;
+                    displayPrice = this.pricingCalculator.applyRounding(priceNoLTM);
+                }
+
+                const childTotal = roundedPrice * qty;
+                childTotals.set(childRow.id || childRow.dataset.rowId, { total: childTotal, unitPrice: displayPrice });
+                subtotal += childTotal;
+            }
+        });
+
+        return { subtotal, productTotals, childTotals };
     }
 
     showError(message) {
@@ -2077,10 +2219,12 @@ class DTFQuoteBuilder {
 
         // Generate quote ID
         const quoteId = this.generateQuoteId();
-        // DTF uses grand-total-with-tax (not grand-total), and ltm-row-total (not ltm-fee)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '')) || 0;
-        const subtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace('$', '')) || grandTotal;
-        const ltmFee = parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace('$', '')) || 0;
+        // Calculate from internal state (not DOM text) to avoid stale/drift issues
+        const stateCalc = this.calculateFromState();
+        const subtotal = stateCalc.subtotal;
+        const ltmFee = this.currentPricingData?.totalLtmFee || 0;
+        // Grand total = subtotal + fees - discount + tax (read tax from DOM since it's user-toggled)
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '')) || subtotal;
 
         // Build quote data
         const quoteData = {
@@ -2141,9 +2285,9 @@ class DTFQuoteBuilder {
                 });
 
                 if (stdTotalQty > 0) {
-                    // Get unit price - try class selector first, then ID fallback (HTML uses ID)
-                    const unitPriceCell = parentRow?.querySelector('.row-price') || document.getElementById(`row-price-${rowId}`);
-                    const unitPrice = parseFloat(unitPriceCell?.textContent?.replace('$', '').replace(',', '')) || 0;
+                    // Get unit price from calculated state (not DOM text)
+                    const calcData = stateCalc.productTotals.get(p.id);
+                    const unitPrice = calcData?.standardUnitPrice || 0;
 
                     sizeGroups.push({
                         sizes: stdQtys,
@@ -2172,8 +2316,10 @@ class DTFQuoteBuilder {
                         const childCatalogColor = childRow?.dataset?.catalogColor || catalogColor;
                         const childImageUrl = childRow?.dataset?.swatchUrl || imageUrl;
 
-                        const unitPriceCell = childRow?.querySelector('.cell-price');  // HTML child rows use .cell-price
-                        const unitPrice = parseFloat(unitPriceCell?.textContent?.replace('$', '').replace(',', '')) || 0;
+                        // Get unit price from calculated state (not DOM text)
+                        const childCalcKey = childRow?.id || childRow?.dataset?.rowId;
+                        const childCalcData = childCalcKey ? stateCalc.childTotals.get(childCalcKey) : null;
+                        const unitPrice = childCalcData?.unitPrice || 0;
 
                         sizeGroups.push({
                             sizes: { [size]: qty },
@@ -2215,8 +2361,22 @@ class DTFQuoteBuilder {
                 totalLtmFee: this.currentPricingData.totalLtmFee,
                 transferBreakdown: this.currentPricingData.transferBreakdown
             } : null,
+            // Order & shipping fields (2026.03 overhaul)
+            customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
+            projectName: document.getElementById('project-name')?.value?.trim() || '',
+            orderNumber: document.getElementById('order-number')?.value?.trim() || '',
+            poNumber: document.getElementById('po-number')?.value?.trim() || '',
+            reqShipDate: document.getElementById('req-ship-date')?.value || '',
+            dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
+            shipToName: document.getElementById('ship-to-name')?.value?.trim() || '',
+            shipAddress: document.getElementById('ship-address')?.value?.trim() || '',
+            shipCity: document.getElementById('ship-city')?.value?.trim() || '',
+            shipState: document.getElementById('ship-state')?.value || 'WA',
+            shipZip: document.getElementById('ship-zip')?.value?.trim() || '',
+            shipMethod: document.getElementById('ship-method')?.value || '',
+            taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
             createdAt: new Date().toISOString(),
-            builderVersion: '2026.01',
+            builderVersion: '2026.03',
             // Additional charges (2026 fee refactor)
             artCharge: document.getElementById('art-charge-toggle')?.checked
                 ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0,
@@ -2329,12 +2489,17 @@ class DTFQuoteBuilder {
             // Build pricing data in format expected by EmbroideryInvoiceGenerator
             const pricingData = this.buildPricingDataForInvoice();
 
-            // Customer data from form
+            // Customer data from form (includes order fields for PDF header)
             const customerData = {
                 name: document.getElementById('customer-name')?.value || 'Customer',
                 company: document.getElementById('company-name')?.value || '',
                 email: document.getElementById('customer-email')?.value || '',
-                salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+                phone: document.getElementById('customer-phone')?.value || '',
+                salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+                projectName: document.getElementById('project-name')?.value || '',
+                orderNumber: document.getElementById('order-number')?.value || '',
+                poNumber: document.getElementById('po-number')?.value || '',
+                reqShipDate: document.getElementById('req-ship-date')?.value || ''
             };
 
             // Generate and open print window
@@ -2361,9 +2526,10 @@ class DTFQuoteBuilder {
      */
     buildPricingDataForInvoice() {
         const totalQty = this.getTotalQuantity();
-        // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
-        const quoteId = document.getElementById('quote-id')?.textContent || `DTF-${Date.now()}`;
+        // Use calculated state for reliable totals
+        const stateCalc = this.calculateFromState();
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0') || stateCalc.subtotal;
+        const quoteId = document.getElementById('quote-id')?.textContent || this.editingQuoteId || `DTF-${Date.now()}`;
 
         // Build products array with line items
         const products = [];
@@ -2502,11 +2668,18 @@ class DTFQuoteBuilder {
             additionalServicesTotal: 0,
             // Empty logos means embroidery specs section will be skipped
             logos: [],
-            // DTF-specific info (could be used for future DTF specs section)
+            // DTF-specific info
             isDTF: true,
             selectedLocations: this.selectedLocations,
+            locationDetails: this.selectedLocations.map(loc => ({
+                code: loc,
+                label: this.locationConfig[loc]?.label || loc,
+                size: this.locationConfig[loc]?.size || ''
+            })),
             ltmFee: this.currentPricingData?.totalLtmFee || 0,
             ltmDistributed: false,  // LTM always shown as separate line item
+            projectName: document.getElementById('project-name')?.value || '',
+            taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
             // Artwork services
             artCharge: artCharge,
             graphicDesignFee: graphicDesignFee,
@@ -2892,13 +3065,26 @@ class DTFQuoteBuilder {
         const tbody = document.getElementById('product-tbody');
         tbody.innerHTML = `
             <tr id="empty-state-row">
-                <td colspan="12" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
                     <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
-                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500)</div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
+                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
+                        <span class="step-badge step-1">1</span> Select transfer locations above
+                        &nbsp;&bull;&nbsp;
+                        <span class="step-badge step-2">2</span> Type a style # (e.g., PC54, G500)
+                        &nbsp;&bull;&nbsp;
+                        <span class="step-badge step-3">3</span> Enter sizes and quantities
+                    </div>
                 </td>
             </tr>
         `;
+        // Also clear fee rows
+        const feesTbody = document.getElementById('fees-tbody');
+        if (feesTbody) {
+            feesTbody.querySelectorAll('.fee-row').forEach(row => {
+                row.style.display = 'none';
+            });
+        }
 
         // Reset state
         this.products = [];
@@ -2907,28 +3093,61 @@ class DTFQuoteBuilder {
         this.editingQuoteId = null;
         this.editingRevision = null;
 
-        // Reset location checkboxes
-        document.querySelectorAll('.location-checkbox').forEach(cb => {
+        // Reset location radios to None
+        document.querySelectorAll('input[name="front-location"]').forEach(r => {
+            r.checked = (r.value === '');
+        });
+        document.querySelectorAll('input[name="back-location"]').forEach(r => {
+            r.checked = (r.value === '');
+        });
+        document.querySelectorAll('input[name="sleeve-location"]').forEach(cb => {
             cb.checked = false;
         });
+        this.updateLocationSummary();
 
         // Reset customer form fields
-        const customerName = document.getElementById('customer-name');
-        const customerEmail = document.getElementById('customer-email');
-        const companyName = document.getElementById('company-name');
-        const customerLookup = document.getElementById('customer-lookup');
-        if (customerName) customerName.value = '';
-        if (customerEmail) customerEmail.value = '';
-        if (companyName) companyName.value = '';
-        if (customerLookup) customerLookup.value = '';
+        ['customer-name', 'customer-email', 'company-name', 'customer-lookup',
+         'customer-phone', 'project-name'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        // Reset order & shipping fields
+        ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date',
+         'ship-to-name', 'ship-address', 'ship-city', 'ship-zip', 'ship-method'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const stateSelect = document.getElementById('ship-state');
+        if (stateSelect) stateSelect.value = 'WA';
+
+        // Reset tax rate to default
+        const taxRateInput = document.getElementById('tax-rate-input');
+        if (taxRateInput) taxRateInput.value = '10.1';
+
+        // Collapse order details panel
+        const orderContent = document.getElementById('order-details-content');
+        const orderChevron = document.getElementById('order-details-chevron');
+        if (orderContent) orderContent.classList.add('hidden');
+        if (orderChevron) orderChevron.style.transform = 'rotate(-90deg)';
 
         // Reset additional charges
-        const rushFee = document.getElementById('rush-fee');
-        const discountAmount = document.getElementById('discount-amount');
-        const discountReason = document.getElementById('discount-reason');
-        if (rushFee) rushFee.value = '';
-        if (discountAmount) discountAmount.value = '';
-        if (discountReason) discountReason.value = '';
+        ['rush-fee', 'discount-amount', 'discount-reason', 'graphic-design-hours'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        // Reset art charge toggle
+        const artToggle = document.getElementById('art-charge-toggle');
+        const artInput = document.getElementById('art-charge');
+        const artWrapper = document.getElementById('art-charge-wrapper');
+        if (artToggle) artToggle.checked = false;
+        if (artInput) { artInput.value = ''; artInput.disabled = true; }
+        if (artWrapper) artWrapper.style.opacity = '0.4';
+
+        // Reset graphic design total display
+        const designTotal = document.getElementById('graphic-design-total');
+        if (designTotal) designTotal.textContent = '0.00';
 
         // Clear draft storage
         if (this.persistence) {

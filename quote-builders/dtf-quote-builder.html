@@ -21,7 +21,7 @@
     <script src="/config/app.config.js"></script>
 
     <!-- DTF Quote Builder Styles -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260112">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=20260317">
 
     <!-- Quote Builder Shared Components -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20250911">
@@ -199,8 +199,14 @@
                             <tr id="empty-state-row">
                                 <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
                                     <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
-                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
+                                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
+                                        <span class="step-badge step-1">1</span> Select transfer locations above
+                                        &nbsp;&bull;&nbsp;
+                                        <span class="step-badge step-2">2</span> Type a style # (e.g., PC54, G500)
+                                        &nbsp;&bull;&nbsp;
+                                        <span class="step-badge step-3">3</span> Enter sizes and quantities
+                                    </div>
                                 </td>
                             </tr>
                             <!-- Product rows will be added here -->
@@ -209,11 +215,11 @@
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <tr id="ltm-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-info-circle"></i> Less Than Minimum Fee
+                                    <i class="fas fa-info-circle"></i> Less Than Minimum Fee <small class="text-muted">(per piece)</small>
                                 </td>
-                                <td class="cell-qty">1</td>
-                                <td class="cell-price" id="ltm-row-unit">$50.00</td>
-                                <td class="cell-total" id="ltm-row-total">$50.00</td>
+                                <td class="cell-qty">0</td>
+                                <td class="cell-price" id="ltm-row-unit">$0.00</td>
+                                <td class="cell-total" id="ltm-row-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
                             <tr id="art-charge-row" class="fee-row" style="display: none;">
@@ -319,11 +325,15 @@
                     <div class="pricing-row" id="tax-toggle-row">
                         <label class="d-flex align-items-center gap-2">
                             <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
-                            <span>Include WA Sales Tax (10.1%)</span>
+                            <span>Include Tax</span>
                         </label>
+                        <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                               style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
+                               onchange="updateTaxCalculation()" title="Tax rate %">
+                        <span style="font-size: 11px; color: #64748b;">%</span>
                     </div>
                     <div class="pricing-row" id="tax-row">
-                        <span class="label text-muted">WA Sales Tax:</span>
+                        <span class="label text-muted" id="tax-rate-label">Sales Tax (10.1%)</span>
                         <span class="value" id="tax-amount">$0.00</span>
                     </div>
                     <div class="pricing-row grand-total-row">
@@ -480,7 +490,109 @@
                                 <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
                             </select>
                         </div>
+                        <div class="customer-field">
+                            <label class="quote-label">Phone</label>
+                            <input type="tel" id="customer-phone" placeholder="(253) 555-1234" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">Project Name</label>
+                            <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
+                        </div>
                     </div>
+
+                    <!-- Shipping & Order Details (collapsible) -->
+                    <div class="dtf-order-details-panel">
+                        <div class="charges-header" onclick="toggleOrderDetails()">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-truck"></i>
+                                <span>Shipping & Order Details</span>
+                                <span id="order-details-badge" class="charges-badge hidden">!</span>
+                            </div>
+                            <i id="order-details-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
+                        </div>
+                        <div id="order-details-content" class="charges-content hidden">
+                            <div class="d-flex flex-column gap-2" style="padding: 8px 0;">
+                                <!-- Order Info Row -->
+                                <div class="d-flex gap-2">
+                                    <div class="customer-field" style="flex: 1;">
+                                        <label class="quote-label" style="font-size: 11px;">Order #</label>
+                                        <input type="text" id="order-number" placeholder="ShopWorks #" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    </div>
+                                    <div class="customer-field" style="flex: 1;">
+                                        <label class="quote-label" style="font-size: 11px;">PO #</label>
+                                        <input type="text" id="po-number" placeholder="Purchase Order" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    </div>
+                                </div>
+                                <!-- Dates Row -->
+                                <div class="d-flex gap-2">
+                                    <div class="customer-field" style="flex: 1;">
+                                        <label class="quote-label" style="font-size: 11px;">Ship Date</label>
+                                        <input type="date" id="req-ship-date" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    </div>
+                                    <div class="customer-field" style="flex: 1;">
+                                        <label class="quote-label" style="font-size: 11px;">Drop Dead Date</label>
+                                        <input type="date" id="drop-dead-date" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    </div>
+                                </div>
+                                <!-- Shipping Address -->
+                                <div class="customer-field">
+                                    <label class="quote-label" style="font-size: 11px;">Ship To</label>
+                                    <input type="text" id="ship-to-name" placeholder="Recipient name" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                </div>
+                                <div class="customer-field">
+                                    <input type="text" id="ship-address" placeholder="Street address" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <div class="customer-field" style="flex: 2;">
+                                        <input type="text" id="ship-city" placeholder="City" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    </div>
+                                    <div class="customer-field" style="flex: 0 0 60px;">
+                                        <select id="ship-state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange()">
+                                            <option value="WA" selected>WA</option>
+                                            <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                                            <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                                            <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
+                                            <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+                                            <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
+                                            <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
+                                            <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
+                                            <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+                                            <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
+                                            <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
+                                            <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
+                                            <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+                                            <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
+                                            <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
+                                            <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
+                                            <option value="VA">VA</option><option value="WV">WV</option><option value="WI">WI</option>
+                                            <option value="WY">WY</option>
+                                        </select>
+                                    </div>
+                                    <div class="customer-field" style="flex: 0 0 80px;">
+                                        <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10" class="quote-input"
+                                               onblur="onShipZipBlur()" style="font-size: 12px; padding: 6px 8px;">
+                                    </div>
+                                    <button type="button" class="btn-tax-lookup" onclick="lookupTaxRate()" title="Look up tax rate">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div id="tax-lookup-status" style="font-size: 11px; color: #64748b; min-height: 14px;"></div>
+                                <!-- Shipping Method -->
+                                <div class="customer-field">
+                                    <label class="quote-label" style="font-size: 11px;">Shipping Method</label>
+                                    <select id="ship-method" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                        <option value="">Select...</option>
+                                        <option value="Ground">Ground</option>
+                                        <option value="2-Day">2-Day</option>
+                                        <option value="Overnight">Overnight</option>
+                                        <option value="Customer Pickup">Customer Pickup</option>
+                                        <option value="Delivery">Local Delivery</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
@@ -557,7 +669,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260127"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=20260112c"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=20260317"></script>
 
     <script>
         // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
@@ -659,14 +771,19 @@
                 subtotalEl.textContent = '$' + subtotal.toFixed(2);
             }
 
-            const taxRate = 0.101; // 10.1% WA sales tax
+            // Use dynamic tax rate from input (default 10.1% WA)
+            const rateInput = document.getElementById('tax-rate-input');
+            const taxRate = rateInput ? parseFloat(rateInput.value) / 100 : 0.101;
+            const taxLabel = document.getElementById('tax-rate-label');
+            const pct = (taxRate * 100).toFixed(1);
 
             if (includeTax) {
-                const tax = subtotal * taxRate;
+                const tax = Math.round(subtotal * taxRate * 100) / 100;
                 const total = subtotal + tax;
                 taxRowEl.style.display = 'flex';
                 taxAmountEl.textContent = '$' + tax.toFixed(2);
                 grandTotalEl.textContent = '$' + total.toFixed(2);
+                if (taxLabel) taxLabel.textContent = `Sales Tax (${pct}%)`;
             } else {
                 taxRowEl.style.display = 'none';
                 grandTotalEl.textContent = '$' + subtotal.toFixed(2);
@@ -758,6 +875,107 @@
                 }
             }
             updateFeeTableRows();
+        }
+
+        // ============================================
+        // TAX LOOKUP & SHIPPING FUNCTIONS
+        // (Uses API_BASE defined below in ROW-BASED INPUT section)
+        // ============================================
+
+        async function lookupTaxRate() {
+            const state = document.getElementById('ship-state')?.value || 'WA';
+            const zip = document.getElementById('ship-zip')?.value?.trim() || '';
+            const city = document.getElementById('ship-city')?.value?.trim() || '';
+            const address = document.getElementById('ship-address')?.value?.trim() || '';
+
+            // Non-WA state → 0% tax
+            if (state !== 'WA') {
+                document.getElementById('tax-rate-input').value = '0';
+                updateTaxCalculation();
+                showTaxStatus('Out of State — No Tax', 'info');
+                return true;
+            }
+
+            if (!zip || zip.length < 5) {
+                showTaxStatus('Enter ZIP code to look up rate', 'info');
+                return false;
+            }
+
+            try {
+                showTaxStatus('Looking up tax rate...', 'loading');
+                const resp = await fetch(`${API_BASE}/api/tax-rates/lookup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, city, state, zip })
+                });
+                if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+                const data = await resp.json();
+
+                if (!data.success) {
+                    showTaxStatus(data.error || 'Lookup failed', 'error');
+                    return false;
+                }
+
+                document.getElementById('tax-rate-input').value = data.taxRate;
+                updateTaxCalculation();
+
+                if (data.outOfState) {
+                    showTaxStatus('Out of State — No Tax', 'info');
+                } else if (data.fallback) {
+                    showTaxStatus(`Default rate ${data.taxRate}% (DOR unavailable)`, 'warning');
+                } else {
+                    const locationLabel = city || data.locationCode || 'WA';
+                    showTaxStatus(`${locationLabel} — ${data.taxRate}%`, 'success');
+                }
+                return true;
+            } catch (err) {
+                console.error('[Tax Lookup] Error:', err);
+                showTaxStatus('Lookup failed — using current rate', 'error');
+                return false;
+            }
+        }
+
+        function showTaxStatus(message, type) {
+            const el = document.getElementById('tax-lookup-status');
+            if (!el) return;
+            const colors = { success: '#059669', error: '#dc2626', warning: '#d97706', info: '#64748b', loading: '#2563eb' };
+            el.textContent = message;
+            el.style.color = colors[type] || '#64748b';
+        }
+
+        function onShipStateChange() {
+            const state = document.getElementById('ship-state')?.value;
+            if (state !== 'WA') {
+                document.getElementById('tax-rate-input').value = '0';
+                updateTaxCalculation();
+                showTaxStatus('Out of State — No Tax', 'info');
+            } else {
+                const zip = document.getElementById('ship-zip')?.value?.trim() || '';
+                if (zip.length >= 5) {
+                    lookupTaxRate();
+                } else {
+                    document.getElementById('tax-rate-input').value = '10.1';
+                    updateTaxCalculation();
+                    showTaxStatus('', 'info');
+                }
+            }
+        }
+
+        function onShipZipBlur() {
+            const state = document.getElementById('ship-state')?.value || 'WA';
+            const zip = document.getElementById('ship-zip')?.value?.trim() || '';
+            if (state === 'WA' && zip.length >= 5) {
+                lookupTaxRate();
+            }
+        }
+
+        function toggleOrderDetails() {
+            const content = document.getElementById('order-details-content');
+            const chevron = document.getElementById('order-details-chevron');
+            if (content && chevron) {
+                content.classList.toggle('hidden');
+                chevron.style.transform = content.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0)';
+            }
         }
 
         // ============================================
