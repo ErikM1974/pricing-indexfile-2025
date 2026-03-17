@@ -247,7 +247,7 @@
                 company_name: companyName || 'Unknown',
                 note_text: 'New art request submitted for ' + (companyName || 'Unknown') + ' (Design #' + designId + ')',
                 note_type: 'New Submission',
-                detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
+                detail_link: SITE_ORIGIN + '/art-request/' + designId,
                 from_name: 'AE Dashboard'
             }).catch(function () { /* fire-and-forget */ });
         }
