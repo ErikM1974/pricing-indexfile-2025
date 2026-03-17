@@ -138,6 +138,9 @@
         // Action bars
         renderActionBars(mockup);
 
+        // Revision feedback banner (shows above gallery for Revision Requested)
+        renderRevisionBanner(mockup, notes);
+
         // Gallery
         renderGallery(mockup);
 
@@ -412,6 +415,73 @@
                 btnEl.textContent = 'Retry';
             }
         });
+    }
+
+    // ── Revision Feedback Banner ────────────────────────────────────────────
+    function renderRevisionBanner(mockup, notes) {
+        var banner = document.getElementById('pmd-revision-banner');
+        if (!banner) return;
+
+        var statusLower = (mockup.Status || '').toLowerCase().replace(/\s+/g, '');
+        if (statusLower !== 'revisionrequested' || isCustomerView) {
+            banner.style.display = 'none';
+            return;
+        }
+
+        // Find the latest revision_request note
+        var revisionNote = null;
+        if (notes && notes.length > 0) {
+            for (var i = notes.length - 1; i >= 0; i--) {
+                if (notes[i].Note_Type === 'revision_request') {
+                    revisionNote = notes[i];
+                    break;
+                }
+            }
+        }
+
+        if (!revisionNote) {
+            banner.style.display = 'none';
+            return;
+        }
+
+        var authorName = revisionNote.Author_Name || 'AE';
+        var noteText = revisionNote.Note_Text || '';
+
+        // Check if the note has per-mockup sections (format: **Mockup N:** text)
+        var perMockupPattern = /\*\*(Mockup \d+):\*\*\s*/g;
+        var hasPerMockup = perMockupPattern.test(noteText);
+
+        var feedbackHtml = '';
+        if (hasPerMockup) {
+            // Parse per-mockup sections and show with thumbnails
+            var sections = noteText.split(/\*\*Mockup \d+:\*\*\s*/);
+            var labels = noteText.match(/\*\*(Mockup \d+):\*\*/g) || [];
+            for (var j = 0; j < labels.length; j++) {
+                var label = labels[j].replace(/\*\*/g, '');
+                var text = (sections[j + 1] || '').trim();
+                if (!text) continue;
+                var slotIndex = parseInt(label.replace('Mockup ', '')) - 1;
+                var slotKey = MOCKUP_SLOTS[slotIndex] ? MOCKUP_SLOTS[slotIndex].key : null;
+                var thumbUrl = slotKey && mockup[slotKey] ? mockup[slotKey] : '';
+                feedbackHtml += '<div class="pmd-rev-section">';
+                if (thumbUrl) {
+                    feedbackHtml += '<img src="' + escapeHtml(thumbUrl) + '" class="pmd-rev-thumb" alt="' + escapeHtml(label) + '">';
+                }
+                feedbackHtml += '<div class="pmd-rev-section-content">'
+                    + '<strong>' + escapeHtml(label) + ':</strong> '
+                    + escapeHtml(text)
+                    + '</div></div>';
+            }
+        } else {
+            feedbackHtml = '<div class="pmd-rev-text">' + escapeHtml(noteText) + '</div>';
+        }
+
+        banner.style.display = '';
+        banner.innerHTML = '<div class="pmd-rev-icon">&#9888;&#65039;</div>'
+            + '<div class="pmd-rev-content">'
+            + '<div class="pmd-rev-title">Changes Requested by ' + escapeHtml(authorName) + '</div>'
+            + feedbackHtml
+            + '</div>';
     }
 
     // ── Gallery Rendering ──────────────────────────────────────────────────
@@ -1069,19 +1139,66 @@
 
     // ── Request Changes Modal (AE) ─────────────────────────────────────────
     function openReviseModal() {
-        document.getElementById('pmd-revise-overlay').classList.add('show');
-        document.getElementById('pmd-revise-notes').value = '';
-        document.getElementById('pmd-revise-notes').focus();
+        var overlay = document.getElementById('pmd-revise-overlay');
+        var slotsContainer = document.getElementById('pmd-revise-slots');
+        var generalNotes = document.getElementById('pmd-revise-notes');
+
+        // Build per-mockup feedback slots
+        slotsContainer.innerHTML = '';
+        var filledSlots = MOCKUP_SLOTS.filter(function (s) {
+            return s.key !== 'Box_Reference_File' && currentMockup && currentMockup[s.key];
+        });
+
+        if (filledSlots.length > 0) {
+            filledSlots.forEach(function (slot) {
+                var thumbUrl = currentMockup[slot.key] || '';
+                var slotDiv = document.createElement('div');
+                slotDiv.className = 'pmd-revise-slot';
+                slotDiv.innerHTML = '<img src="' + escapeHtml(thumbUrl) + '" class="pmd-revise-thumb" alt="' + escapeHtml(slot.label) + '">'
+                    + '<div class="pmd-revise-slot-right">'
+                    + '<label class="pmd-revise-slot-label">' + escapeHtml(slot.label) + '</label>'
+                    + '<textarea class="pmd-revise-slot-textarea" data-slot="' + escapeHtml(slot.label) + '" placeholder="Changes needed for ' + escapeHtml(slot.label) + '..."></textarea>'
+                    + '</div>';
+                slotsContainer.appendChild(slotDiv);
+            });
+        }
+
+        generalNotes.value = '';
+        overlay.classList.add('show');
+
+        // Focus first slot textarea or general notes
+        var firstSlotTextarea = slotsContainer.querySelector('.pmd-revise-slot-textarea');
+        if (firstSlotTextarea) {
+            firstSlotTextarea.focus();
+        } else {
+            generalNotes.focus();
+        }
 
         document.getElementById('pmd-revise-cancel').addEventListener('click', closeReviseModal);
         document.getElementById('pmd-revise-submit').addEventListener('click', function () {
-            var notes = document.getElementById('pmd-revise-notes').value.trim();
-            if (!notes) {
-                showToast('Please describe the changes needed', 'error');
+            // Collect per-slot feedback
+            var parts = [];
+            var slotTextareas = slotsContainer.querySelectorAll('.pmd-revise-slot-textarea');
+            for (var i = 0; i < slotTextareas.length; i++) {
+                var text = slotTextareas[i].value.trim();
+                if (text) {
+                    parts.push('**' + slotTextareas[i].getAttribute('data-slot') + ':** ' + text);
+                }
+            }
+
+            // Add general notes
+            var general = generalNotes.value.trim();
+            if (general) {
+                parts.push(general);
+            }
+
+            var combinedNotes = parts.join('\n');
+            if (!combinedNotes) {
+                showToast('Please describe the changes needed for at least one mockup', 'error');
                 return;
             }
             closeReviseModal();
-            handleStatusUpdate('Revision Requested', notes, this);
+            handleStatusUpdate('Revision Requested', combinedNotes, this);
         });
     }
 

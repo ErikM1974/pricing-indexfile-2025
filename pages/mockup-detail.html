@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=6">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=7">
 </head>
 <body>
     <!-- Header -->
@@ -51,6 +51,9 @@
 
         <!-- AE Action Bar (hidden for Ruth view) -->
         <div class="pmd-action-bar" id="pmd-ae-action-bar" style="display:none;"></div>
+
+        <!-- Revision Feedback Banner (shown only for Revision Requested status) -->
+        <div class="pmd-revision-banner" id="pmd-revision-banner" style="display:none;"></div>
 
         <!-- Two-Column Grid -->
         <div class="pmd-grid">
@@ -136,11 +139,12 @@
 
     <!-- Request Changes Modal (AE view) -->
     <div class="pmd-modal-overlay" id="pmd-revise-overlay">
-        <div class="pmd-modal">
+        <div class="pmd-modal pmd-modal--revise">
             <div class="pmd-modal-header">Request Changes</div>
             <div class="pmd-modal-body">
-                <label for="pmd-revise-notes">What changes are needed?</label>
-                <textarea id="pmd-revise-notes" placeholder="Describe the changes needed..."></textarea>
+                <div id="pmd-revise-slots"></div>
+                <label for="pmd-revise-notes">General notes (optional)</label>
+                <textarea id="pmd-revise-notes" placeholder="Any overall feedback..."></textarea>
             </div>
             <div class="pmd-modal-footer">
                 <button class="pmd-box-cancel-btn" id="pmd-revise-cancel">Cancel</button>
@@ -151,6 +155,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/mockup-detail.js?v=11"></script>
+    <script src="/pages/js/mockup-detail.js?v=12"></script>
 </body>
 </html>

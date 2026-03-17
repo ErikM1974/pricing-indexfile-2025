@@ -916,6 +916,73 @@ body {
     cursor: not-allowed;
 }
 
+/* ── Revision Feedback Banner ──────────────────────── */
+.pmd-revision-banner {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.pmd-rev-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.pmd-rev-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.pmd-rev-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #991b1b;
+    margin-bottom: 8px;
+}
+
+.pmd-rev-text {
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.pmd-rev-section {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.pmd-rev-section:last-child {
+    margin-bottom: 0;
+}
+
+.pmd-rev-thumb {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.pmd-rev-section-content {
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.pmd-rev-section-content strong {
+    color: #991b1b;
+}
+
 /* ── Request Changes Modal ──────────────────────────── */
 .pmd-modal-overlay {
     position: fixed;
@@ -938,6 +1005,10 @@ body {
     max-width: 95vw;
     box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     overflow: hidden;
+}
+
+.pmd-modal--revise {
+    width: 600px;
 }
 
 .pmd-modal-header {
@@ -977,6 +1048,58 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+/* ── Per-Mockup Revision Slots ───────────────────── */
+.pmd-revise-slot {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.pmd-revise-slot:last-child {
+    margin-bottom: 12px;
+}
+
+.pmd-revise-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    flex-shrink: 0;
+}
+
+.pmd-revise-slot-right {
+    flex: 1;
+    min-width: 0;
+}
+
+.pmd-revise-slot-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.pmd-revise-slot-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+}
+
+.pmd-revise-slot-textarea:focus {
+    outline: none;
+    border-color: var(--art-theme, #6b21a8);
+    box-shadow: 0 0 0 2px rgba(107,33,168,0.15);
 }
 
 /* ── Toast ──────────────────────────────────────────── */
