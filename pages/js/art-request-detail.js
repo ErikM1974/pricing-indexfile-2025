@@ -357,6 +357,9 @@
             renderSteveActions(req, statusClean);
         }
 
+        // Revision feedback banner (shows above gallery for Revision Requested)
+        renderRevisionBanner(req, notes);
+
         // Notes timeline
         renderNotes(notes);
         initAddNoteForm();
@@ -725,6 +728,81 @@
     function isEmptySlot(val) {
         if (!val || !val.trim()) return true;
         return /^https?:\/\/cdn\.caspio\.com\/[A-Z0-9]+\/?$/i.test(val.trim());
+    }
+
+    // ── Revision Feedback Banner ────────────────────────────────────────────
+    function renderRevisionBanner(req, notes) {
+        var banner = document.getElementById('ard-revision-banner');
+        if (!banner) return;
+
+        var statusLower = (req.Status || '').toLowerCase().replace(/\s+/g, '');
+        if (statusLower !== 'revisionrequested' || isCustomerView) {
+            banner.style.display = 'none';
+            return;
+        }
+
+        // Find the latest revision note (Note_Type contains 'revision' or text starts with 'Revision requested')
+        var revisionNote = null;
+        if (notes && notes.length > 0) {
+            for (var i = notes.length - 1; i >= 0; i--) {
+                var nt = (notes[i].Note_Type || '').toLowerCase();
+                var txt = notes[i].Note_Text || '';
+                if (nt.indexOf('revision') !== -1 || txt.indexOf('Revision requested by') === 0) {
+                    revisionNote = notes[i];
+                    break;
+                }
+            }
+        }
+
+        if (!revisionNote) {
+            banner.style.display = 'none';
+            return;
+        }
+
+        var authorName = revisionNote.Note_By || 'AE';
+        var noteText = revisionNote.Note_Text || '';
+        // Strip "Revision requested by Name: " prefix if present
+        noteText = noteText.replace(/^Revision requested by [^:]+:\s*/, '');
+
+        // Check if the note has per-mockup sections (format: **Mockup N:** text)
+        var perMockupPattern = /\*\*(Mockup[^:]*?):\*\*/g;
+        var hasPerMockup = perMockupPattern.test(noteText);
+
+        var feedbackHtml = '';
+        if (hasPerMockup) {
+            var sections = noteText.split(/\*\*Mockup[^:]*?:\*\*\s*/);
+            var labels = noteText.match(/\*\*(Mockup[^:]*?):\*\*/g) || [];
+            for (var j = 0; j < labels.length; j++) {
+                var label = labels[j].replace(/\*\*/g, '');
+                var text = (sections[j + 1] || '').trim();
+                if (!text) continue;
+                // Try to find matching mockup slot thumbnail
+                var thumbUrl = '';
+                for (var k = 0; k < MOCKUP_SLOTS.length; k++) {
+                    if (label === MOCKUP_SLOTS[k].label && req[MOCKUP_SLOTS[k].key] && !isEmptySlot(req[MOCKUP_SLOTS[k].key])) {
+                        thumbUrl = req[MOCKUP_SLOTS[k].key];
+                        break;
+                    }
+                }
+                feedbackHtml += '<div class="ard-rev-section">';
+                if (thumbUrl) {
+                    feedbackHtml += '<img src="' + escapeHtml(thumbUrl) + '" class="ard-rev-thumb" alt="' + escapeHtml(label) + '">';
+                }
+                feedbackHtml += '<div class="ard-rev-section-content">'
+                    + '<strong>' + escapeHtml(label) + ':</strong> '
+                    + escapeHtml(text)
+                    + '</div></div>';
+            }
+        } else {
+            feedbackHtml = '<div class="ard-rev-text">' + escapeHtml(noteText) + '</div>';
+        }
+
+        banner.style.display = '';
+        banner.innerHTML = '<div class="ard-rev-icon">&#9888;&#65039;</div>'
+            + '<div class="ard-rev-content">'
+            + '<div class="ard-rev-title">Changes Requested by ' + escapeHtml(authorName) + '</div>'
+            + feedbackHtml
+            + '</div>';
     }
 
     function renderMockupGallery(req) {
@@ -1930,10 +2008,40 @@
 
     // ── Request Changes ────────────────────────────────────────────────
     function openChangesModal() {
-        document.getElementById('ard-changes-notes').value = '';
+        var slotsContainer = document.getElementById('ard-changes-slots');
+        var generalNotes = document.getElementById('ard-changes-notes');
+
+        // Build per-mockup feedback slots
+        slotsContainer.innerHTML = '';
+        var filledSlots = MOCKUP_SLOTS.filter(function (s) {
+            return currentRequest && currentRequest[s.key] && !isEmptySlot(currentRequest[s.key]);
+        });
+
+        if (filledSlots.length > 0) {
+            filledSlots.forEach(function (slot) {
+                var thumbUrl = currentRequest[slot.key] || '';
+                var slotDiv = document.createElement('div');
+                slotDiv.className = 'ard-revise-slot';
+                slotDiv.innerHTML = '<img src="' + escapeHtml(thumbUrl) + '" class="ard-revise-thumb" alt="' + escapeHtml(slot.label) + '">'
+                    + '<div class="ard-revise-slot-right">'
+                    + '<label class="ard-revise-slot-label">' + escapeHtml(slot.label) + '</label>'
+                    + '<textarea class="ard-revise-slot-textarea" data-slot="' + escapeHtml(slot.label) + '" placeholder="Changes needed for ' + escapeHtml(slot.label) + '..."></textarea>'
+                    + '</div>';
+                slotsContainer.appendChild(slotDiv);
+            });
+        }
+
+        generalNotes.value = '';
         document.getElementById('ard-changes-overlay').style.display = 'block';
         document.getElementById('ard-changes-modal').style.display = 'block';
-        document.getElementById('ard-changes-notes').focus();
+
+        // Focus first slot textarea or general notes
+        var firstSlotTextarea = slotsContainer.querySelector('.ard-revise-slot-textarea');
+        if (firstSlotTextarea) {
+            firstSlotTextarea.focus();
+        } else {
+            generalNotes.focus();
+        }
 
         // Wire up event listeners (only once)
         const cancelBtn = document.getElementById('ard-changes-cancel');
@@ -1952,13 +2060,33 @@
         const newSubmit = submitBtn.cloneNode(true);
         submitBtn.parentNode.replaceChild(newSubmit, submitBtn);
         newSubmit.addEventListener('click', () => {
-            const notes = document.getElementById('ard-changes-notes').value.trim();
-            if (!notes) {
-                document.getElementById('ard-changes-notes').style.borderColor = '#dc3545';
+            // Collect per-slot feedback
+            var parts = [];
+            var slotTextareas = slotsContainer.querySelectorAll('.ard-revise-slot-textarea');
+            for (var i = 0; i < slotTextareas.length; i++) {
+                var text = slotTextareas[i].value.trim();
+                if (text) {
+                    parts.push('**' + slotTextareas[i].getAttribute('data-slot') + ':** ' + text);
+                }
+            }
+
+            // Add general notes
+            var general = generalNotes.value.trim();
+            if (general) {
+                parts.push(general);
+            }
+
+            var combinedNotes = parts.join('\n');
+            if (!combinedNotes) {
+                if (firstSlotTextarea) {
+                    firstSlotTextarea.style.borderColor = '#dc3545';
+                } else {
+                    generalNotes.style.borderColor = '#dc3545';
+                }
                 return;
             }
             const aeName = document.getElementById('ard-ae-select').value;
-            requestChanges(designId, aeName, notes);
+            requestChanges(designId, aeName, combinedNotes);
         });
     }
 
@@ -1987,8 +2115,8 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    noteType: 'Design Update',
-                    noteText: `Revision requested by ${aeName}: ${notes}`,
+                    noteType: 'Revision Request',
+                    noteText: notes,
                     noteBy: aeEmail
                 })
             });

@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=8">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=9">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2">
 </head>
 <body>
@@ -264,6 +264,9 @@
                     </div>
                 </div>
 
+                <!-- Revision Feedback Banner -->
+                <div class="ard-revision-banner" id="ard-revision-banner" style="display:none;"></div>
+
                 <!-- AE Action Bar (visible only when Awaiting Approval) -->
                 <div class="ard-action-bar" id="ard-action-bar" style="display:none;">
                     <div class="ard-action-bar-inner">
@@ -367,8 +370,9 @@
     <div class="ard-changes-modal" id="ard-changes-modal" style="display:none;">
         <div class="ard-changes-header">Request Changes</div>
         <div class="ard-changes-body">
-            <label class="ard-changes-label">What changes are needed?</label>
-            <textarea id="ard-changes-notes" rows="4" placeholder="Describe the changes needed..." class="ard-changes-textarea"></textarea>
+            <div id="ard-changes-slots"></div>
+            <label class="ard-changes-label">General notes (optional)</label>
+            <textarea id="ard-changes-notes" rows="3" placeholder="Any overall feedback..." class="ard-changes-textarea"></textarea>
             <div class="ard-changes-actions">
                 <button class="ard-changes-btn-cancel" id="ard-changes-cancel">Cancel</button>
                 <button class="ard-changes-btn-submit" id="ard-changes-submit">Submit Revision Request</button>
@@ -482,6 +486,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=3"></script>
-    <script src="/pages/js/art-request-detail.js?v=11"></script>
+    <script src="/pages/js/art-request-detail.js?v=12"></script>
 </body>
 </html>
