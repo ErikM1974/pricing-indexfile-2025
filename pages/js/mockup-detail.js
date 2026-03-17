@@ -1691,6 +1691,14 @@
                 clearAllDropHighlights();
             });
 
+            // Click to lightbox (if image thumbnail available)
+            if (file.thumbnailUrl) {
+                item.addEventListener('click', function (e) {
+                    if (e.target.closest('.pmd-box-panel-item-delete')) return;
+                    openLightbox(API_BASE + file.thumbnailUrl, file.name);
+                });
+            }
+
             // Delete button
             var deleteBtn = item.querySelector('.pmd-box-panel-item-delete');
             if (deleteBtn) {

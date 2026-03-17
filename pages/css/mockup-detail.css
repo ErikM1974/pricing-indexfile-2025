@@ -1129,8 +1129,8 @@ body {
 
 .pmd-box-panel-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     min-height: 40px;
     transition: background 0.2s, outline-color 0.2s;
     border-radius: 6px;
