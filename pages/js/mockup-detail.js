@@ -35,6 +35,8 @@
     var isAeView = false;
     var mockupId = null;
     var mockupVersions = [];
+    var boxPanelFiles = [];
+    var dragSource = null;
 
     // ── URL Parsing ────────────────────────────────────────────────────────
     var pathParts = window.location.pathname.split('/');
@@ -162,6 +164,7 @@
         }
         initLightbox();
         if (!isCustomerView) initBoxModal();
+        if (!isCustomerView && !isAeView) initBoxFilesPanel();
     }
 
     // ── Action Bars ────────────────────────────────────────────────────────
@@ -676,6 +679,48 @@
                 if (dlUrl) downloadImage(dlUrl, dlName);
             });
         });
+
+        // Wire drag-and-drop on gallery slots (Ruth view only)
+        if (!isAeView && !isCustomerView) {
+            grid.querySelectorAll('.pmd-gallery-slot').forEach(function (slotEl) {
+                var fieldKey = slotEl.dataset.fieldKey;
+                var slotUrl = mockup[fieldKey];
+                var slotIsEmpty = !slotUrl || !slotUrl.trim();
+
+                if (!slotIsEmpty) {
+                    // Filled slot: make draggable (drag to Box panel to unassign)
+                    slotEl.draggable = true;
+                    slotEl.addEventListener('dragstart', function (e) {
+                        dragSource = { type: 'slot', slotKey: fieldKey };
+                        slotEl.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', 'slot:' + fieldKey);
+                    });
+                    slotEl.addEventListener('dragend', function () {
+                        slotEl.classList.remove('dragging');
+                        dragSource = null;
+                        clearAllDropHighlights();
+                    });
+                }
+
+                // All slots accept drops from Box panel
+                slotEl.addEventListener('dragover', function (e) {
+                    if (!dragSource || dragSource.type !== 'box') return;
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    slotEl.classList.add('drag-over');
+                });
+                slotEl.addEventListener('dragleave', function () {
+                    slotEl.classList.remove('drag-over');
+                });
+                slotEl.addEventListener('drop', function (e) {
+                    e.preventDefault();
+                    slotEl.classList.remove('drag-over');
+                    if (!dragSource || dragSource.type !== 'box') return;
+                    handleBoxToSlotDrop(dragSource.fileId, dragSource.fileName, fieldKey);
+                });
+            });
+        }
     }
 
     // ── Remove Slot File ───────────────────────────────────────────────────
@@ -1555,6 +1600,219 @@
             toast.classList.remove('show');
             setTimeout(function () { toast.remove(); }, 300);
         }, 3000);
+    }
+
+    // ── Box Files Panel ────────────────────────────────────────────────────
+    function initBoxFilesPanel() {
+        var card = document.getElementById('pmd-box-files-card');
+        if (!card) return;
+
+        var folderId = currentMockup && currentMockup.Box_Folder_ID;
+        if (!folderId) {
+            card.style.display = '';
+            document.getElementById('pmd-box-panel-empty').style.display = '';
+            return;
+        }
+
+        card.style.display = '';
+        loadBoxPanelFiles(folderId);
+    }
+
+    function loadBoxPanelFiles(folderId) {
+        var loadingEl = document.getElementById('pmd-box-panel-loading');
+        var emptyEl = document.getElementById('pmd-box-panel-empty');
+        var grid = document.getElementById('pmd-box-panel-grid');
+        var countEl = document.getElementById('pmd-box-file-count');
+
+        loadingEl.style.display = 'flex';
+        emptyEl.style.display = 'none';
+        grid.innerHTML = '';
+
+        fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Failed to load Box files');
+                return resp.json();
+            })
+            .then(function (data) {
+                loadingEl.style.display = 'none';
+                boxPanelFiles = data.files || [];
+
+                if (boxPanelFiles.length === 0) {
+                    emptyEl.style.display = '';
+                    emptyEl.textContent = 'No files in this folder.';
+                    countEl.textContent = '';
+                    return;
+                }
+
+                countEl.textContent = '(' + boxPanelFiles.length + ')';
+                renderBoxPanelFiles(boxPanelFiles);
+            })
+            .catch(function (err) {
+                loadingEl.style.display = 'none';
+                grid.innerHTML = '<p style="color:#dc2626;padding:12px;font-size:13px;">Failed to load: ' + escapeHtml(err.message) + '</p>';
+            });
+    }
+
+    function renderBoxPanelFiles(files) {
+        var grid = document.getElementById('pmd-box-panel-grid');
+        grid.innerHTML = '';
+
+        files.forEach(function (file) {
+            var ext = (file.extension || '').toLowerCase();
+            var item = document.createElement('div');
+            item.className = 'pmd-box-panel-item';
+            item.draggable = true;
+            item.dataset.boxFileId = file.id;
+            item.dataset.boxFileName = file.name;
+            item.title = file.name;
+
+            if (file.thumbnailUrl) {
+                item.innerHTML = '<img src="' + escapeHtml(API_BASE + file.thumbnailUrl) + '" alt="' + escapeHtml(file.name) + '" loading="lazy">'
+                    + '<div class="pmd-box-panel-item-name">' + escapeHtml(file.name) + '</div>'
+                    + '<button type="button" class="pmd-box-panel-item-delete" data-box-file-id="' + file.id + '" title="Delete from Box">&times;</button>';
+            } else {
+                item.innerHTML = '<div class="pmd-box-panel-placeholder">'
+                    + '<span class="pmd-box-panel-ext">' + escapeHtml(ext.toUpperCase() || '?') + '</span>'
+                    + '</div>'
+                    + '<div class="pmd-box-panel-item-name">' + escapeHtml(file.name) + '</div>'
+                    + '<button type="button" class="pmd-box-panel-item-delete" data-box-file-id="' + file.id + '" title="Delete from Box">&times;</button>';
+            }
+
+            // Drag start
+            item.addEventListener('dragstart', function (e) {
+                dragSource = { type: 'box', fileId: file.id, fileName: file.name };
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', 'box:' + file.id);
+            });
+            item.addEventListener('dragend', function () {
+                item.classList.remove('dragging');
+                dragSource = null;
+                clearAllDropHighlights();
+            });
+
+            // Delete button
+            var deleteBtn = item.querySelector('.pmd-box-panel-item-delete');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (!confirm('Delete "' + file.name + '" from Box?\nThis cannot be undone.')) return;
+                    deleteBoxFile(file.id);
+                });
+            }
+
+            grid.appendChild(item);
+        });
+
+        // Make Box panel grid a drop target (for slot-to-panel drags)
+        initBoxPanelDropTarget(grid);
+    }
+
+    function initBoxPanelDropTarget(grid) {
+        grid.addEventListener('dragover', function (e) {
+            if (!dragSource || dragSource.type !== 'slot') return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            grid.classList.add('drag-over');
+        });
+        grid.addEventListener('dragleave', function (e) {
+            if (!grid.contains(e.relatedTarget)) {
+                grid.classList.remove('drag-over');
+            }
+        });
+        grid.addEventListener('drop', function (e) {
+            e.preventDefault();
+            grid.classList.remove('drag-over');
+            if (!dragSource || dragSource.type !== 'slot') return;
+            handleSlotToBoxDrop(dragSource.slotKey);
+        });
+    }
+
+    function handleBoxToSlotDrop(fileId, fileName, slotKey) {
+        showToast('Assigning file to slot...', 'info');
+
+        fetch(API_BASE + '/api/box/shared-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileId: fileId })
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Failed to create shared link');
+            return resp.json();
+        }).then(function (linkData) {
+            var fileUrl = linkData.downloadUrl || linkData.sharedLink;
+
+            var saveBody = {};
+            saveBody[slotKey] = fileUrl;
+
+            return fetch(API_BASE + '/api/mockups/' + mockupId, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(saveBody)
+            }).then(function (resp) {
+                if (!resp.ok) throw new Error('Failed to save to slot');
+                currentMockup[slotKey] = fileUrl;
+                refreshVersionsThenRender();
+                showToast('File assigned to ' + (MOCKUP_SLOTS.filter(function (s) { return s.key === slotKey; })[0] || { label: 'slot' }).label, 'success');
+
+                // Refresh Box panel
+                if (currentMockup.Box_Folder_ID) {
+                    loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+                }
+            });
+        }).catch(function (err) {
+            showToast('Error: ' + err.message, 'error');
+        });
+    }
+
+    function handleSlotToBoxDrop(slotKey) {
+        showToast('Unassigning file from slot...', 'info');
+
+        var updateBody = {};
+        updateBody[slotKey] = '';
+
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateBody)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Failed to unassign');
+            currentMockup[slotKey] = '';
+            renderGallery(currentMockup);
+            showToast('File unassigned (still in Box)', 'info');
+
+            if (currentMockup.Box_Folder_ID) {
+                loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+            }
+        }).catch(function (err) {
+            showToast('Failed: ' + err.message, 'error');
+        });
+    }
+
+    function deleteBoxFile(fileId) {
+        showToast('Deleting file...', 'info');
+
+        fetch(API_BASE + '/api/box/file/' + fileId, {
+            method: 'DELETE'
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Delete failed');
+            return resp.json();
+        }).then(function () {
+            showToast('File deleted from Box', 'success');
+            if (currentMockup.Box_Folder_ID) {
+                loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+            }
+        }).catch(function (err) {
+            showToast('Delete failed: ' + err.message, 'error');
+        });
+    }
+
+    function clearAllDropHighlights() {
+        document.querySelectorAll('.drag-over').forEach(function (el) {
+            el.classList.remove('drag-over');
+        });
+        document.querySelectorAll('.dragging').forEach(function (el) {
+            el.classList.remove('dragging');
+        });
     }
 
 })();

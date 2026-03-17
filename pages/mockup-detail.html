@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=7">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=8">
 </head>
 <body>
     <!-- Header -->
@@ -85,6 +85,24 @@
                     <div class="pmd-card-header">Request Details</div>
                     <div class="pmd-card-body" id="pmd-info-fields"></div>
                 </div>
+
+                <!-- Box Files Panel (Ruth view only) -->
+                <div class="pmd-card" id="pmd-box-files-card" style="display:none;">
+                    <div class="pmd-card-header" style="display:flex;align-items:center;">
+                        <span>Box Files</span>
+                        <span class="pmd-box-file-count" id="pmd-box-file-count"></span>
+                    </div>
+                    <div class="pmd-card-body">
+                        <div class="pmd-box-panel-loading" id="pmd-box-panel-loading" style="display:none;">
+                            <div class="pmd-spinner" style="width:20px;height:20px;border-width:2px;"></div>
+                            Loading files...
+                        </div>
+                        <div class="pmd-box-panel-empty" id="pmd-box-panel-empty" style="display:none;">
+                            No Box folder linked to this mockup.
+                        </div>
+                        <div class="pmd-box-panel-grid" id="pmd-box-panel-grid"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -155,6 +173,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/mockup-detail.js?v=12"></script>
+    <script src="/pages/js/mockup-detail.js?v=13"></script>
 </body>
 </html>

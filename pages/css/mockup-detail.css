@@ -1102,6 +1102,141 @@ body {
     box-shadow: 0 0 0 2px rgba(107,33,168,0.15);
 }
 
+/* ── Box Files Panel ────────────────────────────────── */
+.pmd-box-file-count {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.8;
+    margin-left: auto;
+}
+
+.pmd-box-panel-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    color: #888;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.pmd-box-panel-empty {
+    text-align: center;
+    padding: 30px 16px;
+    color: #999;
+    font-size: 13px;
+}
+
+.pmd-box-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    min-height: 40px;
+    transition: background 0.2s, outline-color 0.2s;
+    border-radius: 6px;
+}
+
+.pmd-box-panel-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    cursor: grab;
+    transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+    background: #f8f9fa;
+}
+
+.pmd-box-panel-item:hover {
+    border-color: var(--art-theme, #6b21a8);
+    box-shadow: 0 2px 8px rgba(107,33,168,0.15);
+}
+
+.pmd-box-panel-item.dragging {
+    opacity: 0.4;
+}
+
+.pmd-box-panel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pmd-box-panel-item-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    font-size: 10px;
+    padding: 3px 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pmd-box-panel-item-delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(239,68,68,0.85);
+    color: white;
+    border: none;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+}
+
+.pmd-box-panel-item:hover .pmd-box-panel-item-delete {
+    opacity: 1;
+}
+
+.pmd-box-panel-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 4px;
+}
+
+.pmd-box-panel-ext {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #e5e7eb;
+    color: #555;
+    text-transform: uppercase;
+}
+
+/* Drag-and-drop visual feedback */
+.pmd-box-panel-grid.drag-over {
+    outline: 2px dashed var(--art-theme, #6b21a8);
+    outline-offset: -2px;
+    background: rgba(107,33,168,0.05);
+}
+
+.pmd-gallery-slot.drag-over {
+    border-color: var(--art-theme, #6b21a8) !important;
+    box-shadow: 0 0 0 3px rgba(107,33,168,0.15) !important;
+}
+
+.pmd-gallery-slot.dragging {
+    opacity: 0.4;
+}
+
 /* ── Toast ──────────────────────────────────────────── */
 .pmd-toast {
     position: fixed;
