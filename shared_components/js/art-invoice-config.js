@@ -82,7 +82,7 @@ const ART_INVOICE_CONFIG = {
 
     // Email Configuration
     EMAIL: {
-        SERVICE_ID: 'service_1c4k67j',
+        SERVICE_ID: 'service_jgrave3',
         TEMPLATE_ID: 'ArtInvoice',
         PUBLIC_KEY: '4qSbDO-SQs19TbP80',
         FROM_NAME: 'Northwest Custom Apparel Art Department',

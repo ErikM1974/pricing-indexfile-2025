@@ -14,7 +14,7 @@
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
-    var EMAILJS_SERVICE_ID = 'service_1c4k67j';
+    var EMAILJS_SERVICE_ID = 'service_jgrave3';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     var SITE_ORIGIN = 'https://www.teamnwca.com';
 

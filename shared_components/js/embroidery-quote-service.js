@@ -958,7 +958,7 @@ class EmbroideryQuoteService {
             
             // Send email
             const result = await emailjs.send(
-                'service_1c4k67j',
+                'service_jgrave3',
                 'template_3wmw3no', // Embroidery Quote template
                 emailData
             );

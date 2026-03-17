@@ -6,7 +6,7 @@ class ScreenPrintFastQuoteService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.quotePrefix = 'SPC';  // Screen Print Contract
-        this.emailjsServiceId = 'service_1c4k67j';
+        this.emailjsServiceId = 'service_jgrave3';
         this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
 
         // Initialize EmailJS if not already done

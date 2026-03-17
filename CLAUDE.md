@@ -229,7 +229,7 @@ try {
 ```
 API Proxy: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
 EmailJS Public Key: 4qSbDO-SQs19TbP80
-EmailJS Service ID: service_1c4k67j
+EmailJS Service ID: service_jgrave3
 Company Phone: 253-922-5793
 
 Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB

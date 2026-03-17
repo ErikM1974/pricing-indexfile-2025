@@ -4,7 +4,7 @@
 class BreastCancerBundleService {
     constructor() {
         this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
-        this.emailjsServiceId = 'service_1c4k67j';
+        this.emailjsServiceId = 'service_jgrave3';
         this.emailjsTemplateId = 'template_2rlgjio'; // BCA Bundle Customer template
         this.emailjsSalesTemplateId = 'template_af6h6kh'; // BCA Bundle Sales Team template
         this.emailjsPublicKey = '4qSbDO-SQs19TbP80';

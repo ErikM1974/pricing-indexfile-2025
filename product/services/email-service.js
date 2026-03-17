@@ -6,7 +6,7 @@
 export class EmailService {
     constructor() {
         this.publicKey = '4qSbDO-SQs19TbP80';
-        this.serviceId = 'service_1c4k67j';
+        this.serviceId = 'service_jgrave3';
         this.templateId = 'template_2fnnd49';
         this.initialized = false;
         

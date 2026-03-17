@@ -398,7 +398,7 @@ class DTFQuoteService {
             console.log('[DTFQuoteService] Email data prepared:', emailData);
 
             // When EmailJS template is ready, uncomment:
-            // await emailjs.send('service_1c4k67j', 'template_dtf_quote', emailData);
+            // await emailjs.send('service_jgrave3', 'template_dtf_quote', emailData);
 
             return {
                 success: true,

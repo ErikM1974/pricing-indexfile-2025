@@ -25,7 +25,7 @@ class CustomerScreenPrintCalculator {
         // Initialize EmailJS
         emailjs.init('4qSbDO-SQs19TbP80');
         this.emailConfig = {
-            serviceId: 'service_1c4k67j',
+            serviceId: 'service_jgrave3',
             templateId: 'template_igd6jtm'
         };
         

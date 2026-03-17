@@ -409,7 +409,7 @@ class DTGContractCalculator {
             company_year: '1977'
         };
 
-        return emailjs.send('service_1c4k67j', 'template_dtg_contract', emailData);
+        return emailjs.send('service_jgrave3', 'template_dtg_contract', emailData);
     }
 
     showSuccess(message) {

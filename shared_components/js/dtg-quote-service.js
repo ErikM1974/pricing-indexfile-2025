@@ -303,7 +303,7 @@ class DTGQuoteService {
             console.log('[DTGQuoteService] Email data prepared:', emailData);
             
             // When EmailJS template is ready, uncomment:
-            // await emailjs.send('service_1c4k67j', 'template_xxxxx', emailData);
+            // await emailjs.send('service_jgrave3', 'template_xxxxx', emailData);
             
             return {
                 success: true,

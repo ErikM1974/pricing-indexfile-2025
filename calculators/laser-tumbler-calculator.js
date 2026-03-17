@@ -472,7 +472,7 @@ class LaserTumblerCalculator {
             
             // Send email
             await emailjs.send(
-                'service_1c4k67j',
+                'service_jgrave3',
                 'template_6bie1il',
                 emailData
             );

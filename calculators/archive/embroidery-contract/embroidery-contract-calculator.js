@@ -3,7 +3,7 @@ const CALCULATOR_CONFIG = {
     name: 'Contract Embroidery',
     quotePrefix: 'EMB',
     emailTemplateId: 'Embroidery_Template',
-    emailServiceId: 'service_1c4k67j',
+    emailServiceId: 'service_jgrave3',
     emailPublicKey: '4qSbDO-SQs19TbP80'
 };
 
@@ -873,7 +873,7 @@ function setupEmailFormEventListener() {
     try {
         // Send email via EmailJS
         await emailjs.send(
-            'service_1c4k67j',  // Standard NWCA service
+            'service_jgrave3',  // Standard NWCA service
             'template_wna04vr',  // Template ID
             emailData
         );
@@ -890,7 +890,7 @@ function setupEmailFormEventListener() {
     } catch (error) {
         console.error('Error sending guide:', error);
         console.error('Template ID used:', 'template_wna04vr');
-        console.error('Service ID used:', 'service_1c4k67j');
+        console.error('Service ID used:', 'service_jgrave3');
         
         let errorMessage = 'Failed to send guide. Please try again.';
         if (error.status === 400 && error.text.includes('template ID not found')) {

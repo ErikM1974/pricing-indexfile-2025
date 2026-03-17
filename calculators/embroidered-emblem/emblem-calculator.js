@@ -458,7 +458,7 @@ class EmblemCalculator {
             
             // Send email
             const emailResult = await emailjs.send(
-                'service_1c4k67j',
+                'service_jgrave3',
                 'template_vpou6va',
                 emailData
             );

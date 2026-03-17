@@ -4,7 +4,7 @@
 class ChristmasBundleQuoteService {
     constructor() {
         this.apiBase = '/api';
-        this.emailjsServiceId = 'service_1c4k67j';
+        this.emailjsServiceId = 'service_jgrave3';
         this.emailjsTemplateId = 'template_christmas_bundle';
         this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
         this.quotePrefix = 'XMAS';

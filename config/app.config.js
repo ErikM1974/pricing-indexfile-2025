@@ -18,7 +18,7 @@ window.APP_CONFIG = {
     // EmailJS Configuration
     EMAIL: {
         PUBLIC_KEY: '4qSbDO-SQs19TbP80',
-        SERVICE_ID: 'service_1c4k67j',
+        SERVICE_ID: 'service_jgrave3',
         TEMPLATES: {
             DTG: 'template_dtg_quote',
             RICH: 'template_rich_quote',

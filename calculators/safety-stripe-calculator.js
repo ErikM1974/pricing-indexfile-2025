@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Sending email with data:', emailData);
             
             await emailjs.send(
-                'service_1c4k67j',
+                'service_jgrave3',
                 'template_stripe',  // TODO: Replace with actual template ID
                 emailData
             );

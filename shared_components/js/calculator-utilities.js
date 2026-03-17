@@ -40,7 +40,7 @@ window.safeTextNode = safeTextNode;
 const NWCA_CONFIG = {
     emailjs: {
         publicKey: '4qSbDO-SQs19TbP80',
-        serviceId: 'service_1c4k67j'
+        serviceId: 'service_jgrave3'
     },
     company: {
         name: 'Northwest Custom Apparel',

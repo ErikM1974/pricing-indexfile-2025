@@ -714,7 +714,7 @@ var MockupSubmitForm = (function () {
                 if (typeof emailjs !== 'undefined') {
                     try {
                         emailjs.init('4qSbDO-SQs19TbP80');
-                        emailjs.send('service_1c4k67j', 'template_art_note_added', {
+                        emailjs.send('service_jgrave3', 'template_art_note_added', {
                             to_email: 'ruth@nwcustomapparel.com',
                             to_name: 'Ruth',
                             design_id: designNumber || 'NEW',

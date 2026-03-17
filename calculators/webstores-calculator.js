@@ -6,7 +6,7 @@
 // Configuration
 const CALCULATOR_CONFIG = {
     emailPublicKey: '4qSbDO-SQs19TbP80',
-    emailServiceId: 'service_1c4k67j',
+    emailServiceId: 'service_jgrave3',
     emailTemplateId: 'webstore'
 };
 

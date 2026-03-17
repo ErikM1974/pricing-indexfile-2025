@@ -11,7 +11,7 @@
 class SampleOrderService {
     constructor() {
         this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-        this.emailServiceId = 'service_1c4k67j';
+        this.emailServiceId = 'service_jgrave3';
         this.emailPublicKey = '4qSbDO-SQs19TbP80';
 
         // Initialize EmailJS if available

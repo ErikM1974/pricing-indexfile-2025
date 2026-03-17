@@ -737,7 +737,7 @@
     // updateApprovalTotal, resolveRep — all now in window.ArtActions
 
     // EmailJS constants still needed for sendNoteEmail (notes panel)
-    const EMAILJS_SERVICE_ID = 'service_1c4k67j';
+    const EMAILJS_SERVICE_ID = 'service_jgrave3';
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     const SITE_ORIGIN = 'https://www.teamnwca.com';
 
