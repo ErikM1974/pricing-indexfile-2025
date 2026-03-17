@@ -1035,7 +1035,13 @@
                     // Store data on row
                     row.dataset.style = styleNumber;
                     row.dataset.productName = cleanTitle || styleNumber;
-                    row.dataset.baseCost = firstDetail.CASE_PRICE || 0;
+                    // Use min size price from BLANK bundle (base S/M/L/XL cost, max across all colors)
+                    // Avoids bug where firstDetail.CASE_PRICE is from an arbitrary color/size record
+                    const blankSizes = blankBundle.sizes || [];
+                    const baseSizePrice = blankSizes.length > 0
+                        ? Math.min(...blankSizes.map(s => s.price))
+                        : 0;
+                    row.dataset.baseCost = baseSizePrice || firstDetail.CASE_PRICE || 0;
                     // Store sizeUpcharges from BLANK bundle (has actual upcharge data)
                     // sellingPriceDisplayAddOns format: { "2XL": 2.00, "3XL": 3.00, "4XL": 4.00, ... }
                     const upcharges = blankBundle.sellingPriceDisplayAddOns || {};
