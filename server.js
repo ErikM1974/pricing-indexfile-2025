@@ -801,6 +801,9 @@ app.get('/art-hub-ruth.html', (req, res) => {
 
 // Ruth mockup detail page (serves for /mockup/123, /mockup/456, etc.)
 app.get('/mockup/:id', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'pages', 'mockup-detail.html'));
 });
 
@@ -2878,6 +2881,9 @@ app.get('/art-request/:designId', (req, res) => {
   if (!designId || !/^\d+$/.test(designId)) {
     return res.status(400).send('Invalid design ID');
   }
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'pages', 'art-request-detail.html'));
 });
 
