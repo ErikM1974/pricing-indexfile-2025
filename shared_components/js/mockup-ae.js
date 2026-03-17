@@ -130,11 +130,25 @@ var MockupAeGallery = (function () {
             badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
         }
 
-        // Highlight awaiting approval with a subtle CTA
+        // Highlight awaiting approval with a subtle CTA + elapsed time
         var ctaHtml = '';
         if (status === 'Awaiting Approval') {
+            var elapsedInfo = '';
+            if (mockup.Approval_Sent_Date) {
+                var elapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
+                elapsedInfo = ' <span class="approval-elapsed ' + elapsed.cssClass + '" style="font-weight:400;margin-left:4px;">(sent ' + escapeHtml(elapsed.text) + ')</span>';
+            }
             ctaHtml = '<div class="card-actions">'
-                + '<span style="font-size:12px;color:#d97706;font-weight:600;padding:6px 0;">&#9888; Needs your review</span>'
+                + '<span style="font-size:12px;color:#d97706;font-weight:600;padding:6px 0;">&#9888; Needs your review' + elapsedInfo + '</span>'
+                + '</div>';
+        }
+
+        var thumbUrl = mockup.Box_Mockup_1 || '';
+        var thumbHtml = '';
+        if (thumbUrl) {
+            thumbHtml = '<div class="card-thumb">'
+                + '<img src="' + escapeHtml(thumbUrl) + '" alt="Mockup preview" loading="lazy"'
+                + ' onerror="this.parentElement.style.display=\'none\';">'
                 + '</div>';
         }
 
@@ -148,6 +162,7 @@ var MockupAeGallery = (function () {
             + '    <span class="status-pill ' + statusClass + '">' + escapeHtml(status) + '</span>'
             + '  </div>'
             + '</div>'
+            + thumbHtml
             + '<div class="card-body">'
             + (designName ? '<div class="card-design-name">' + designName + '</div>' : '')
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
@@ -199,6 +214,30 @@ var MockupAeGallery = (function () {
         var d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function getElapsedText(date) {
+        var now = new Date();
+        var diffMs = now - date;
+        var diffMins = Math.floor(diffMs / 60000);
+        var diffHours = Math.floor(diffMs / 3600000);
+        var diffDays = Math.floor(diffMs / 86400000);
+
+        var text, cssClass;
+        if (diffMins < 60) {
+            text = diffMins <= 1 ? 'just now' : diffMins + ' min ago';
+            cssClass = 'approval-elapsed--fresh';
+        } else if (diffHours < 24) {
+            text = diffHours === 1 ? '1 hr ago' : diffHours + ' hrs ago';
+            cssClass = 'approval-elapsed--fresh';
+        } else if (diffDays < 3) {
+            text = diffDays === 1 ? '1 day ago' : diffDays + ' days ago';
+            cssClass = 'approval-elapsed--waiting';
+        } else {
+            text = diffDays + ' days ago';
+            cssClass = 'approval-elapsed--overdue';
+        }
+        return { text: text, cssClass: cssClass };
     }
 
     return {

@@ -61,6 +61,30 @@
         return due < new Date();
     }
 
+    function getElapsedText(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        let text, cssClass;
+        if (diffMins < 60) {
+            text = diffMins <= 1 ? 'just now' : diffMins + ' min ago';
+            cssClass = 'approval-elapsed--fresh';
+        } else if (diffHours < 24) {
+            text = diffHours === 1 ? '1 hr ago' : diffHours + ' hrs ago';
+            cssClass = 'approval-elapsed--fresh';
+        } else if (diffDays < 3) {
+            text = diffDays === 1 ? '1 day ago' : diffDays + ' days ago';
+            cssClass = 'approval-elapsed--waiting';
+        } else {
+            text = diffDays + ' days ago';
+            cssClass = 'approval-elapsed--overdue';
+        }
+        return { text, cssClass };
+    }
+
     // ── Set Current Date ─────────────────────────────────────────────────
     function setCurrentDate() {
         const el = document.getElementById('currentDate');
@@ -243,9 +267,16 @@
                         <button class="card-action-btn card-action-btn--send" data-id="${id}" data-action="send-approval">Send for Approval</button>
                     </div>`;
             } else if (statusLower === 'awaiting approval') {
+                let elapsedLabel = 'Waiting for AE review...';
+                let elapsedClass = '';
+                if (mockup.Approval_Sent_Date) {
+                    const elapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
+                    elapsedLabel = 'Sent to AE ' + elapsed.text;
+                    elapsedClass = elapsed.cssClass;
+                }
                 actionsHtml = `
                     <div class="card-actions">
-                        <span style="font-size:12px;color:#888;padding:6px 0;">Waiting for AE review...</span>
+                        <span class="approval-elapsed ${elapsedClass}" style="font-size:12px;padding:6px 0;">${escapeHtml(elapsedLabel)}</span>
                     </div>`;
             }
         }
@@ -258,6 +289,11 @@
             aeDisplay = aeDisplay.charAt(0).toUpperCase() + aeDisplay.slice(1);
         }
 
+        const thumbUrl = mockup.Box_Mockup_1 || '';
+        const thumbHtml = thumbUrl
+            ? `<div class="card-thumb"><img src="${escapeHtml(thumbUrl)}" alt="Mockup preview" loading="lazy" onerror="this.parentElement.style.display='none';"></div>`
+            : '';
+
         return `
         <div class="mockup-card" data-mockup-id="${id}">
             <div class="card-header">
@@ -269,6 +305,7 @@
                     <span class="status-pill ${statusClass}">${escapeHtml(status)}</span>
                 </div>
             </div>
+            ${thumbHtml}
             <div class="card-body">
                 ${designName ? `<div class="card-design-name">${designName}</div>` : ''}
                 <div class="card-meta">

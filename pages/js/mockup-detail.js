@@ -58,6 +58,16 @@
             backLink.textContent = 'Back to AE Dashboard';
             backLink.href = '/ae-dashboard.html';
         }
+        // Set maroon theme CSS variables for AE view
+        var root = document.documentElement;
+        root.style.setProperty('--art-theme', '#981e32');
+        root.style.setProperty('--art-theme-dark', '#7a1828');
+        root.style.setProperty('--art-theme-light', '#b92c43');
+        root.style.setProperty('--art-theme-bg', '#fff5f5');
+        root.style.setProperty('--art-theme-bg-hover', '#fce8ec');
+        root.style.setProperty('--art-theme-bg-selected', '#fde2e8');
+        root.style.setProperty('--art-theme-rgba-15', 'rgba(152,30,50,0.15)');
+        root.style.setProperty('--art-theme-rgba-10', 'rgba(152,30,50,0.1)');
     }
 
     // Adjust header for customer view
@@ -94,7 +104,8 @@
         }
 
         currentMockup = mockupData.record;
-        render(currentMockup, notesData.notes || []);
+        currentMockup._notes = notesData.notes || [];
+        render(currentMockup, currentMockup._notes);
     }).catch(function (err) {
         console.error('Failed to load mockup:', err);
         showError('Error Loading Mockup', err.message);
@@ -193,7 +204,12 @@
 
             if (statusLower === 'awaitingapproval') {
                 aeBar.style.display = '';
-                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:</span>'
+                var aeElapsedHtml = '';
+                if (mockup.Approval_Sent_Date) {
+                    var aeElapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
+                    aeElapsedHtml = ' <span class="approval-elapsed ' + aeElapsed.cssClass + '" style="margin-left:8px;" title="' + escapeHtml(formatDate(mockup.Approval_Sent_Date)) + '">(sent ' + escapeHtml(aeElapsed.text) + ')</span>';
+                }
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:' + aeElapsedHtml + '</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve" disabled>Approve Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
@@ -238,6 +254,56 @@
                     + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send">Send for Approval</button>';
                 document.getElementById('pmd-btn-send').addEventListener('click', function () {
                     handleStatusUpdate('Awaiting Approval', null, this);
+                });
+            } else if (statusLower === 'awaitingapproval') {
+                ruthBar.style.display = '';
+                // Find when approval was sent
+                var approvalSentDate = mockup.Approval_Sent_Date;
+                var elapsedHtml = '';
+                if (approvalSentDate) {
+                    var elapsed = getElapsedText(new Date(approvalSentDate));
+                    elapsedHtml = '<span class="approval-elapsed ' + elapsed.cssClass + '" title="' + escapeHtml(formatDate(approvalSentDate)) + '">'
+                        + 'Sent to AE ' + escapeHtml(elapsed.text)
+                        + '</span>';
+                } else {
+                    elapsedHtml = '<span class="approval-elapsed">Waiting for AE review</span>';
+                }
+                ruthBar.innerHTML = elapsedHtml
+                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-nudge">Send Reminder to AE</button>';
+                document.getElementById('pmd-btn-nudge').addEventListener('click', function () {
+                    var btn = this;
+                    btn.disabled = true;
+                    btn.textContent = 'Sending...';
+
+                    var aeEmail = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+                    var company = currentMockup.Company_Name || '';
+                    var design = currentMockup.Design_Number || currentMockup.ID;
+
+                    // Resend approval email
+                    sendApprovalNotification(aeEmail, 'Reminder: Mockup is waiting for your review — ' + company + ' #' + design);
+
+                    // Record nudge in notes timeline
+                    fetch(API_BASE + '/api/mockup-notes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            Mockup_ID: parseInt(mockupId),
+                            Author: 'ruth@nwcustomapparel.com',
+                            Author_Name: 'Ruth',
+                            Note_Text: 'Approval reminder sent to ' + getAeDisplayName(aeEmail),
+                            Note_Type: 'artist_note'
+                        })
+                    }).then(function () {
+                        refreshNotes();
+                        showToast('Reminder sent to ' + getAeDisplayName(aeEmail), 'success');
+                    }).catch(function () {
+                        showToast('Reminder email sent', 'success');
+                    }).finally(function () {
+                        setTimeout(function () {
+                            btn.disabled = false;
+                            btn.textContent = 'Send Reminder to AE';
+                        }, 5000);
+                    });
                 });
             } else {
                 ruthBar.style.display = 'none';
@@ -415,6 +481,12 @@
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
                         + (showSelectBadge ? '<div class="pmd-slot-select-badge">Click to select</div>' : '')
+                        + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
+                        + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
+                        + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>'
+                        + '<polyline points="7 10 12 15 17 10"></polyline>'
+                        + '<line x1="12" y1="15" x2="12" y2="3"></line>'
+                        + '</svg></button>'
                         + '</div>';
 
                     // Revision badge on filled mockup slots
@@ -468,7 +540,7 @@
                         })(slot.key, slotEl);
                     } else {
                         slotEl.addEventListener('click', function (e) {
-                            if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown')) return;
+                            if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown') || e.target.closest('.pmd-slot-download')) return;
                             openLightbox(url, slot.label);
                         });
                     }
@@ -481,6 +553,12 @@
                         + '</div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemoveNonImg ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
+                        + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
+                        + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
+                        + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>'
+                        + '<polyline points="7 10 12 15 17 10"></polyline>'
+                        + '<line x1="12" y1="15" x2="12" y2="3"></line>'
+                        + '</svg></button>'
                         + '</div>';
                     // Version badge for non-image slots
                     var slotVersionsNI = mockupVersions.filter(function (v) { return v.Slot_Key === slot.key; });
@@ -500,7 +578,7 @@
                     }
 
                     slotEl.addEventListener('click', function (e) {
-                        if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown')) return;
+                        if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown') || e.target.closest('.pmd-slot-download')) return;
                         window.open(url, '_blank');
                     });
                 }
@@ -516,6 +594,16 @@
                 var fieldKey = btn.dataset.fieldKey;
                 if (!confirm('Remove this file?')) return;
                 removeSlotFile(fieldKey);
+            });
+        });
+
+        // Wire download buttons
+        grid.querySelectorAll('.pmd-slot-download').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var dlUrl = btn.dataset.downloadUrl;
+                var dlName = btn.dataset.downloadName;
+                if (dlUrl) downloadImage(dlUrl, dlName);
             });
         });
     }
@@ -1057,6 +1145,7 @@
     function initLightbox() {
         var lightbox = document.getElementById('pmd-lightbox');
         var closeBtn = document.getElementById('pmd-lightbox-close');
+        var downloadBtn = document.getElementById('pmd-lightbox-download');
 
         closeBtn.addEventListener('click', closeLightbox);
         lightbox.addEventListener('click', function (e) {
@@ -1066,6 +1155,17 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') closeLightbox();
         });
+
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var img = document.getElementById('pmd-lightbox-img');
+                var label = document.getElementById('pmd-lightbox-label');
+                if (img && img.src) {
+                    downloadImage(img.src, label ? label.textContent : 'mockup');
+                }
+            });
+        }
     }
 
     function openLightbox(url, label) {
@@ -1093,12 +1193,63 @@
         document.body.style.overflow = '';
     }
 
+    function downloadImage(url, filename) {
+        var safeName = (filename || 'mockup').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'mockup';
+        fetch(url)
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Download failed');
+                return resp.blob();
+            })
+            .then(function (blob) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                var ext = '.png';
+                var ct = blob.type;
+                if (ct.indexOf('jpeg') !== -1 || ct.indexOf('jpg') !== -1) ext = '.jpg';
+                else if (ct.indexOf('gif') !== -1) ext = '.gif';
+                else if (ct.indexOf('webp') !== -1) ext = '.webp';
+                else if (ct.indexOf('pdf') !== -1) ext = '.pdf';
+                a.download = safeName + ext;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            })
+            .catch(function () {
+                window.open(url, '_blank');
+            });
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────────
     function escapeHtml(str) {
         if (!str) return '';
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    function getElapsedText(date) {
+        var now = new Date();
+        var diffMs = now - date;
+        var diffMins = Math.floor(diffMs / 60000);
+        var diffHours = Math.floor(diffMs / 3600000);
+        var diffDays = Math.floor(diffMs / 86400000);
+
+        var text, cssClass;
+        if (diffMins < 60) {
+            text = diffMins <= 1 ? 'just now' : diffMins + ' minutes ago';
+            cssClass = 'approval-elapsed--fresh';
+        } else if (diffHours < 24) {
+            text = diffHours === 1 ? '1 hour ago' : diffHours + ' hours ago';
+            cssClass = 'approval-elapsed--fresh';
+        } else if (diffDays < 3) {
+            text = diffDays === 1 ? '1 day ago' : diffDays + ' days ago';
+            cssClass = 'approval-elapsed--waiting';
+        } else {
+            text = diffDays + ' days ago';
+            cssClass = 'approval-elapsed--overdue';
+        }
+        return { text: text, cssClass: cssClass };
     }
 
     function formatDate(dateStr) {
