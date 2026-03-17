@@ -29,6 +29,21 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: DTF Quote Builder Garment Base Cost From Arbitrary Record — Pricing Inversion (2026-03-17)
+
+**Problem:** DTF quote builder showed 29LS (Long Sleeve) at $17.50 and 29M (Short Sleeve) at $18.00. Long sleeves should always cost more.
+
+**Root Cause:** `onStyleChange()` in `dtf-quote-builder.html:1038` used `firstDetail.CASE_PRICE` from `/api/product-details`, which returns hundreds of unsorted records (one per color × size combo). The first record's price is arbitrary — 29LS got $6.27 (Navy), 29M got $6.36 (White), inverting the prices. Correct base costs: 29LS=$6.49, 29M=$3.46.
+
+**Solution:** Use `Math.min()` on `blankBundle.sizes` from the BLANK pricing-bundle (already fetched in the same function) which returns MAX CASE_PRICE per size across all colors. Falls back to `firstDetail.CASE_PRICE` only if bundle has no size data.
+
+**Prevention:**
+- Never use `firstDetail.CASE_PRICE` from product-details — it returns per-color×size records in arbitrary order
+- Use pricing-bundle or base-item-costs endpoints which aggregate correctly
+- Other quote builders (DTG, Screenprint, Embroidery) are safe — they use service classes that handle pricing internally
+
+---
+
 ## Bug: CSS `display: none` in Stylesheet Overrides JS `display = ''` — Popover Never Shows (2026-03-16)
 
 **Problem:** Ruth's mockup upload popover (Upload File / Browse Box) never appeared when clicking empty mockup slots.

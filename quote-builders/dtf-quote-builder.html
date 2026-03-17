@@ -1169,12 +1169,9 @@
                 }
             });
 
-            // Add quantities from child rows
-            const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
-            childRows.forEach(childRow => {
-                const qtyDisplay = childRow.querySelector('.cell-qty');
-                total += parseInt(qtyDisplay?.textContent) || 0;
-            });
+            // Parent Qty shows only its own standard sizes.
+            // Child rows display their own Qty and Total independently.
+            // Sidebar "Total Pieces" aggregates both via getTotalQuantity().
 
             // Update quantity display
             const qtyCell = document.getElementById(`row-qty-${rowId}`);
