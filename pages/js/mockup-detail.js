@@ -149,12 +149,21 @@
         // Info fields
         renderInfoFields(mockup);
 
-        // Notes (hide for customer view)
+        // Notes (hide for customer view, move to right column for AE view)
         if (isCustomerView) {
             var notesList = document.getElementById('pmd-notes-list');
             if (notesList) notesList.closest('.pmd-card').style.display = 'none';
         } else {
             renderNotes(notes);
+            // AE view: move notes card to right column (below Request Details)
+            if (isAeView) {
+                var notesCard = document.getElementById('pmd-notes-list');
+                if (notesCard) {
+                    var card = notesCard.closest('.pmd-card');
+                    var rightCol = document.querySelector('.pmd-right-col');
+                    if (card && rightCol) rightCol.appendChild(card);
+                }
+            }
         }
 
         // Wire up interactions
@@ -1127,7 +1136,7 @@
             div.className = 'pmd-note pmd-note--' + noteType;
             div.innerHTML = '<div class="pmd-note-header">'
                 + '<span class="pmd-note-type pmd-note-type--' + noteType + '">' + escapeHtml(typeLabel) + '</span>'
-                + '<span class="pmd-note-meta">' + escapeHtml(note.Author_Name || '') + ' &bull; ' + formatDate(note.Created_Date) + '</span>'
+                + '<span class="pmd-note-meta">' + escapeHtml(note.Author_Name || '') + ' &bull; ' + formatDateTime(note.Created_Date) + '</span>'
                 + '</div>'
                 + '<div class="pmd-note-text">' + escapeHtml(note.Note_Text || '') + '</div>';
 
@@ -1419,6 +1428,14 @@
         var d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatDateTime(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     }
 
     function getFileExtension(url) {
