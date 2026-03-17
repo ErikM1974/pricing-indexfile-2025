@@ -17,6 +17,7 @@
 
     const EMAILJS_SERVICE_ID = 'service_1c4k67j';
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    const SITE_ORIGIN = 'https://www.teamnwca.com';
 
     const REP_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
@@ -76,6 +77,21 @@
             });
         }
     })();
+
+    // Detect view mode at IIFE scope (must be before header setup)
+    var iifeUrlParams = new URLSearchParams(window.location.search);
+    var isCustomerView = iifeUrlParams.get('view') === 'customer';
+    var isAeView = iifeUrlParams.get('view') === 'ae';
+    var selectedMockupSlot = null;
+
+    // Customer view — set up header before data loads
+    if (isCustomerView) {
+        document.body.classList.add('ard-customer-view');
+        var headerTitle = document.querySelector('.ard-header-text h1');
+        if (headerTitle) headerTitle.textContent = 'Mockup Approval';
+        var backLink = document.querySelector('.ard-back-link');
+        if (backLink) backLink.style.display = 'none';
+    }
 
     // Extract design ID from URL path: /art-request/12345
     const pathParts = window.location.pathname.split('/');
@@ -258,20 +274,68 @@
         // Final Approved Mockup + Mockup Gallery
         renderFinalMockup(req);
         renderMockupGallery(req);
+
+        const statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
+
+        // ── Customer View ──────────────────────────────────────────────
+        if (isCustomerView) {
+            // Hide elements not relevant to customer
+            var hideIds = ['ard-steve-actions', 'ard-action-bar', 'ard-invoice-section',
+                           'ard-sw-refs-card', 'ard-contact-card', 'ard-charges-card',
+                           'ard-submitter-notes-card', 'ard-artwork-section'];
+            hideIds.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            // Hide notes timeline card (second card in right column)
+            var notesCard = document.getElementById('ard-add-note-toggle');
+            if (notesCard) {
+                var nc = notesCard.closest('.ard-card');
+                if (nc) nc.style.display = 'none';
+            }
+            // Render customer action panel (before gallery)
+            renderCustomerActionPanel(req, statusClean);
+            // Make mockup slots selectable (if awaiting approval)
+            if (statusLower.includes('awaitingapproval')) {
+                initCustomerMockupSelection(req);
+            }
+            return;
+        }
+
+        // ── AE / Steve Views ───────────────────────────────────────────
         initGalleryInteractions(req);
 
-        // Detect view mode (AE vs Steve)
-        var urlParams = new URLSearchParams(window.location.search);
-        var isAeView = urlParams.get('view') === 'ae';
-
         // AE Action Bar — show only for AE view when status is "Awaiting Approval"
-        const statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
         if (isAeView && statusLower.includes('awaitingapproval')) {
             document.getElementById('ard-action-bar').style.display = '';
             initActionBar();
 
-            // Share with Customer — show when mockup exists + customer email exists
+            // Copy Customer Link — show when mockup exists
             var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+            if (mockupUrl) {
+                var copyLinkBtn = document.getElementById('ard-btn-copy-link');
+                if (copyLinkBtn) {
+                    copyLinkBtn.style.display = '';
+                    copyLinkBtn.addEventListener('click', function () {
+                        var customerUrl = SITE_ORIGIN + '/art-request/' + designId + '?view=customer';
+                        navigator.clipboard.writeText(customerUrl).then(function () {
+                            copyLinkBtn.textContent = 'Copied!';
+                            copyLinkBtn.style.background = '#059669';
+                            copyLinkBtn.style.color = '#fff';
+                            setTimeout(function () {
+                                copyLinkBtn.textContent = 'Copy Customer Link';
+                                copyLinkBtn.style.background = '';
+                                copyLinkBtn.style.color = '';
+                            }, 3000);
+                        }).catch(function () {
+                            // Fallback for older browsers
+                            prompt('Copy this link:', customerUrl);
+                        });
+                    });
+                }
+            }
+
+            // Email Customer — show when mockup exists + customer email exists
             if (contactEmail && mockupUrl) {
                 document.getElementById('ard-btn-share-customer').style.display = '';
                 initShareWithCustomer(req);
@@ -282,12 +346,12 @@
         if (isAeView) {
             document.body.classList.add('ae-view');
             // Update header text and back link for AE context
-            var headerTitle = document.querySelector('.ard-header-text h1');
-            if (headerTitle) headerTitle.textContent = 'Art Request Review';
-            var backLink = document.querySelector('.ard-back-link');
-            if (backLink) {
-                backLink.textContent = '\u2190 Back to AE Dashboard';
-                backLink.href = '/dashboards/ae-dashboard.html';
+            var headerTitleAe = document.querySelector('.ard-header-text h1');
+            if (headerTitleAe) headerTitleAe.textContent = 'Art Request Review';
+            var backLinkAe = document.querySelector('.ard-back-link');
+            if (backLinkAe) {
+                backLinkAe.textContent = '\u2190 Back to AE Dashboard';
+                backLinkAe.href = '/dashboards/ae-dashboard.html';
             }
         } else {
             renderSteveActions(req, statusClean);
@@ -363,7 +427,7 @@
                         to_name: repName || 'Sales Team',
                         design_id: designId,
                         company_name: company,
-                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
+                        detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                         from_name: 'Steve — Art Department'
                     }, EMAILJS_PUBLIC_KEY).catch(function (err) {
                         console.warn('In Progress email failed (non-blocking):', err);
@@ -542,9 +606,8 @@
 
         container.appendChild(card);
 
-        // Add "Change" button for Steve (not AE view)
-        var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('view') !== 'ae') {
+        // Add "Change" button for Steve (not AE or customer view)
+        if (!isAeView && !isCustomerView) {
             var changeBtn = document.createElement('button');
             changeBtn.type = 'button';
             changeBtn.className = 'ard-final-change-btn';
@@ -595,7 +658,7 @@
                         company_name: company,
                         note_text: 'Final approved mockup has been set for ' + company + ' #' + designId + '. Ready for production.',
                         note_type: 'Production Ready',
-                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
+                        detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                         from_name: 'Steve'
                     }, EMAILJS_PUBLIC_KEY).catch(function () {});
                 }
@@ -673,6 +736,9 @@
             var url = req[slot.key];
             var isEmpty = isEmptySlot(url);
 
+            // Customer view: skip empty slots entirely
+            if (isCustomerView && isEmpty) return;
+
             if (isEmpty) {
                 // Empty slot — clickable "+" placeholder
                 var emptyEl = document.createElement('div');
@@ -709,56 +775,57 @@
                 mockupsGrid.appendChild(emptyEl);
             } else {
                 // Filled slot — thumbnail with remove + drag
-                var thumb = renderFilledThumb(url, slot, true);
+                var thumb = renderFilledThumb(url, slot, !isCustomerView);
                 thumb.dataset.slotIndex = index;
                 thumb.dataset.fieldKey = slot.key;
-                thumb.setAttribute('draggable', 'true');
+                if (!isCustomerView) thumb.setAttribute('draggable', 'true');
 
-                // Drag start
-                thumb.addEventListener('dragstart', function (e) {
-                    e.dataTransfer.setData('text/plain', index.toString());
-                    e.dataTransfer.effectAllowed = 'move';
-                    thumb.classList.add('dragging');
-                });
-                thumb.addEventListener('dragend', function () {
-                    thumb.classList.remove('dragging');
-                    document.querySelectorAll('.drag-over').forEach(function (el) { el.classList.remove('drag-over'); });
-                });
-                // Drag target
-                thumb.addEventListener('dragover', function (e) {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                    thumb.classList.add('drag-over');
-                });
-                thumb.addEventListener('dragleave', function () {
-                    thumb.classList.remove('drag-over');
-                });
-                thumb.addEventListener('drop', function (e) {
-                    e.preventDefault();
-                    thumb.classList.remove('drag-over');
-                    var fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
-                    if (isNaN(fromIdx) || fromIdx === index) return;
-                    swapMockupSlots(fromIdx, index);
-                });
+                if (!isCustomerView) {
+                    // Drag start
+                    thumb.addEventListener('dragstart', function (e) {
+                        e.dataTransfer.setData('text/plain', index.toString());
+                        e.dataTransfer.effectAllowed = 'move';
+                        thumb.classList.add('dragging');
+                    });
+                    thumb.addEventListener('dragend', function () {
+                        thumb.classList.remove('dragging');
+                        document.querySelectorAll('.drag-over').forEach(function (el) { el.classList.remove('drag-over'); });
+                    });
+                    // Drag target
+                    thumb.addEventListener('dragover', function (e) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        thumb.classList.add('drag-over');
+                    });
+                    thumb.addEventListener('dragleave', function () {
+                        thumb.classList.remove('drag-over');
+                    });
+                    thumb.addEventListener('drop', function (e) {
+                        e.preventDefault();
+                        thumb.classList.remove('drag-over');
+                        var fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                        if (isNaN(fromIdx) || fromIdx === index) return;
+                        swapMockupSlots(fromIdx, index);
+                    });
 
-                // "Set as Final" button (Steve view only, not AE)
-                var urlParamsGallery = new URLSearchParams(window.location.search);
-                if (urlParamsGallery.get('view') !== 'ae') {
-                    var isFinal = req.Final_Approved_Mockup === url;
-                    var setFinalBtn = document.createElement('button');
-                    setFinalBtn.type = 'button';
-                    setFinalBtn.className = 'ard-set-final-btn' + (isFinal ? ' ard-set-final-btn--active' : '');
-                    setFinalBtn.textContent = isFinal ? '✅ Final' : 'Set as Final';
-                    setFinalBtn.title = isFinal ? 'This is the production-ready mockup' : 'Set this as the final approved mockup';
-                    if (!isFinal) {
-                        (function (slotUrl) {
-                            setFinalBtn.addEventListener('click', function (e) {
-                                e.stopPropagation();
-                                showFinalChecklistModal(slotUrl);
-                            });
-                        })(url);
+                    // "Set as Final" button (Steve view only, not AE)
+                    if (!isAeView) {
+                        var isFinal = req.Final_Approved_Mockup === url;
+                        var setFinalBtn = document.createElement('button');
+                        setFinalBtn.type = 'button';
+                        setFinalBtn.className = 'ard-set-final-btn' + (isFinal ? ' ard-set-final-btn--active' : '');
+                        setFinalBtn.textContent = isFinal ? '✅ Final' : 'Set as Final';
+                        setFinalBtn.title = isFinal ? 'This is the production-ready mockup' : 'Set this as the final approved mockup';
+                        if (!isFinal) {
+                            (function (slotUrl) {
+                                setFinalBtn.addEventListener('click', function (e) {
+                                    e.stopPropagation();
+                                    showFinalChecklistModal(slotUrl);
+                                });
+                            })(url);
+                        }
+                        thumb.appendChild(setFinalBtn);
                     }
-                    thumb.appendChild(setFinalBtn);
                 }
 
                 mockupsGrid.appendChild(thumb);
@@ -766,23 +833,36 @@
         });
 
         // Wire up remove buttons on mockup slots
-        wireRemoveButtons(mockupsGrid);
+        if (!isCustomerView) {
+            wireRemoveButtons(mockupsGrid);
+        }
 
-        // Section 2: Read-only artwork (only shows populated fields)
+        // Customer view: show "no mockups" if grid is empty
+        if (isCustomerView && mockupsGrid.children.length === 0) {
+            var noMockups = document.createElement('div');
+            noMockups.style.cssText = 'text-align:center; padding:24px; color:#999; font-size:14px;';
+            noMockups.textContent = 'No mockups available yet.';
+            mockupsGrid.appendChild(noMockups);
+        }
+
+        // Section 2: Read-only artwork (only shows populated fields) — hidden for customer view
         var artworkGrid = document.getElementById('ard-artwork-grid');
         var artworkSection = document.getElementById('ard-artwork-section');
         artworkGrid.innerHTML = '';
-        var artCount = 0;
 
-        READ_ONLY_FIELDS.forEach(function (field) {
-            var url = req[field.key];
-            if (isEmptySlot(url)) return;
-            artCount++;
-            var thumb = renderFilledThumb(url, field, false);
-            artworkGrid.appendChild(thumb);
-        });
-
-        artworkSection.style.display = artCount > 0 ? '' : 'none';
+        if (isCustomerView) {
+            artworkSection.style.display = 'none';
+        } else {
+            var artCount = 0;
+            READ_ONLY_FIELDS.forEach(function (field) {
+                var url = req[field.key];
+                if (isEmptySlot(url)) return;
+                artCount++;
+                var thumb = renderFilledThumb(url, field, false);
+                artworkGrid.appendChild(thumb);
+            });
+            artworkSection.style.display = artCount > 0 ? '' : 'none';
+        }
     }
 
     /** Render a filled gallery thumbnail for a file */
@@ -1451,6 +1531,353 @@
                     });
             }
         });
+    }
+
+    // ── Customer View Functions ──────────────────────────────────────────
+
+    /**
+     * Render the customer action panel (approve/revise buttons)
+     */
+    function renderCustomerActionPanel(req, statusClean) {
+        var statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
+        var galleryCard = document.getElementById('ard-gallery-card');
+        if (!galleryCard) return;
+
+        var panel = document.createElement('div');
+        panel.className = 'ard-customer-action-panel';
+        panel.id = 'ard-customer-action-panel';
+
+        if (statusLower.includes('completed') || statusLower.includes('approved')) {
+            // Already completed
+            panel.innerHTML = '<div class="ard-customer-confirmation-icon">✅</div>'
+                + '<h3 style="color:#059669; margin-bottom:8px;">Thank You!</h3>'
+                + '<p style="color:#666;">This mockup has been approved.</p>'
+                + '<p class="ard-confirmation-company" style="margin-top:16px; font-size:13px; color:#999;">'
+                + escapeHtml(req.CompanyName || '') + ' — Design #' + escapeHtml(designId) + '</p>';
+        } else if (statusLower.includes('awaitingapproval')) {
+            // Ready for review
+            panel.innerHTML = '<div class="ard-customer-action-prompt">'
+                + 'Please review the mockup' + (MOCKUP_SLOTS.some(function (s) { return req[s.key] && !isEmptySlot(req[s.key]); }) ? 's' : '')
+                + ' below. Click a mockup to select it, then approve or request changes.</div>'
+                + '<div class="ard-customer-action-buttons">'
+                + '<button class="ard-btn-customer-approve" id="ard-btn-customer-approve" disabled>Approve Selected Mockup</button>'
+                + '<button class="ard-btn-customer-revise" id="ard-btn-customer-revise">Request Changes</button>'
+                + '</div>';
+        } else {
+            // Not ready for review
+            panel.innerHTML = '<div class="ard-customer-not-ready">'
+                + '<div class="ard-customer-not-ready-icon">⏳</div>'
+                + '<p>This mockup is not ready for review yet.<br>You\'ll receive a notification when it\'s ready.</p></div>';
+        }
+
+        // Insert before gallery card
+        galleryCard.parentNode.insertBefore(panel, galleryCard);
+
+        // Wire up buttons
+        if (statusLower.includes('awaitingapproval')) {
+            var approveBtn = document.getElementById('ard-btn-customer-approve');
+            var reviseBtn = document.getElementById('ard-btn-customer-revise');
+
+            if (approveBtn) {
+                approveBtn.addEventListener('click', function () {
+                    handleCustomerApproval(req);
+                });
+            }
+            if (reviseBtn) {
+                reviseBtn.addEventListener('click', function () {
+                    openCustomerReviseModal(req);
+                });
+            }
+        }
+    }
+
+    /**
+     * Make mockup gallery slots selectable for customer view
+     */
+    function initCustomerMockupSelection(req) {
+        var grid = document.getElementById('ard-mockups-grid');
+        if (!grid) return;
+
+        var thumbs = grid.querySelectorAll('.ard-gallery-thumb');
+        if (thumbs.length === 0) return;
+
+        // If only one mockup, auto-select it
+        var filledThumbs = [];
+        thumbs.forEach(function (thumb) {
+            var key = thumb.dataset.fieldKey;
+            if (key && req[key] && !isEmptySlot(req[key])) {
+                filledThumbs.push(thumb);
+            }
+        });
+
+        filledThumbs.forEach(function (thumb) {
+            thumb.classList.add('ard-customer-selectable');
+
+            // Add "Click to select" hint
+            var hint = document.createElement('div');
+            hint.className = 'ard-slot-select-hint';
+            hint.textContent = 'Click to select';
+            thumb.style.position = 'relative';
+            thumb.appendChild(hint);
+
+            thumb.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Deselect all
+                grid.querySelectorAll('.ard-slot-selected').forEach(function (el) {
+                    el.classList.remove('ard-slot-selected');
+                    var badge = el.querySelector('.ard-slot-select-badge');
+                    if (badge) badge.remove();
+                    var hintEl = el.querySelector('.ard-slot-select-hint');
+                    if (hintEl) hintEl.textContent = 'Click to select';
+                });
+
+                // Select this one
+                thumb.classList.add('ard-slot-selected');
+                var badge = document.createElement('div');
+                badge.className = 'ard-slot-select-badge';
+                badge.textContent = '✓ Selected';
+                thumb.appendChild(badge);
+
+                var hintEl = thumb.querySelector('.ard-slot-select-hint');
+                if (hintEl) hintEl.textContent = '';
+
+                selectedMockupSlot = thumb.dataset.fieldKey;
+
+                // Enable approve button
+                var approveBtn = document.getElementById('ard-btn-customer-approve');
+                if (approveBtn) approveBtn.disabled = false;
+            });
+        });
+
+        // Auto-select if only one filled mockup
+        if (filledThumbs.length === 1) {
+            filledThumbs[0].click();
+        }
+    }
+
+    /**
+     * Handle customer approval — update status + log note + notify
+     */
+    function handleCustomerApproval(req) {
+        if (!selectedMockupSlot) {
+            alert('Please select a mockup first.');
+            return;
+        }
+        if (!confirm('Approve the selected mockup? This will notify the team.')) return;
+
+        var approveBtn = document.getElementById('ard-btn-customer-approve');
+        if (approveBtn) {
+            approveBtn.disabled = true;
+            approveBtn.textContent = 'Approving...';
+        }
+
+        // Find slot label
+        var slotLabel = 'Mockup';
+        MOCKUP_SLOTS.forEach(function (s) {
+            if (s.key === selectedMockupSlot) slotLabel = s.label;
+        });
+
+        // 1. Update status to Completed
+        fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'Completed' })
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Status update failed: ' + resp.status);
+
+            // 2. Add approval note
+            return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    noteType: 'Customer Approval',
+                    noteText: 'Customer approved ' + slotLabel,
+                    noteBy: 'customer'
+                })
+            });
+        }).then(function () {
+            // 3. Set Final_Approved_Mockup (fire-and-forget)
+            var mockupUrl = req[selectedMockupSlot] || '';
+            if (mockupUrl && currentRequest && currentRequest.PK_ID) {
+                fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Final_Approved_Mockup: mockupUrl })
+                }).catch(function () { /* fire-and-forget */ });
+            }
+
+            // 4. Notify Steve + AE
+            sendCustomerNotifications('approved', req);
+
+            // 5. Show confirmation
+            showCustomerConfirmation('approved', req);
+        }).catch(function (err) {
+            console.error('Customer approval failed:', err);
+            if (approveBtn) {
+                approveBtn.textContent = 'Error — try again';
+                approveBtn.style.background = '#dc3545';
+                setTimeout(function () {
+                    approveBtn.disabled = false;
+                    approveBtn.textContent = 'Approve Selected Mockup';
+                    approveBtn.style.background = '';
+                }, 3000);
+            }
+        });
+    }
+
+    /**
+     * Open the request changes modal for customer feedback
+     */
+    function openCustomerReviseModal(req) {
+        // Reuse existing changes modal
+        var overlay = document.getElementById('ard-changes-overlay');
+        var modal = document.getElementById('ard-changes-modal');
+        var textarea = document.getElementById('ard-changes-notes');
+        var submitBtn = document.getElementById('ard-changes-submit');
+        var cancelBtn = document.getElementById('ard-changes-cancel');
+
+        if (!overlay || !modal) return;
+
+        textarea.value = '';
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+        textarea.focus();
+
+        // Remove existing listeners by replacing button
+        var newSubmit = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newSubmit, submitBtn);
+        var newCancel = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+
+        function closeModal() {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+
+        newCancel.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+
+        newSubmit.addEventListener('click', function () {
+            var feedback = textarea.value.trim();
+            if (!feedback) { textarea.focus(); return; }
+
+            newSubmit.disabled = true;
+            newSubmit.textContent = 'Submitting...';
+
+            // 1. Update status to Revision Requested
+            fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Revision Requested' })
+            }).then(function (resp) {
+                if (!resp.ok) throw new Error('Status update failed: ' + resp.status);
+
+                // 2. Add revision note with feedback
+                return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        noteType: 'Customer Feedback',
+                        noteText: 'Customer requested changes: ' + feedback,
+                        noteBy: 'customer'
+                    })
+                });
+            }).then(function () {
+                closeModal();
+
+                // 3. Notify Steve + AE
+                sendCustomerNotifications('revision', req);
+
+                // 4. Show confirmation
+                showCustomerConfirmation('revision', req);
+            }).catch(function (err) {
+                console.error('Customer revision request failed:', err);
+                newSubmit.textContent = 'Error — try again';
+                newSubmit.style.background = '#dc3545';
+                setTimeout(function () {
+                    newSubmit.disabled = false;
+                    newSubmit.textContent = 'Submit Revision Request';
+                    newSubmit.style.background = '';
+                }, 3000);
+            });
+        });
+    }
+
+    /**
+     * Show full-page confirmation after customer action
+     */
+    function showCustomerConfirmation(type, req) {
+        var content = document.getElementById('ard-content');
+        if (!content) return;
+
+        var icon, title, message;
+        if (type === 'approved') {
+            icon = '✅';
+            title = 'Thank You!';
+            message = 'Your mockup has been approved and the team has been notified. Production will proceed with your approved design.';
+        } else {
+            icon = '📝';
+            title = 'Feedback Submitted';
+            message = 'Your feedback has been received. The art team will review your changes and send an updated mockup.';
+        }
+
+        content.innerHTML = '<div class="ard-customer-confirmation">'
+            + '<div class="ard-customer-confirmation-icon">' + icon + '</div>'
+            + '<h2>' + title + '</h2>'
+            + '<p>' + message + '</p>'
+            + '<p class="ard-confirmation-company">'
+            + escapeHtml(req.CompanyName || 'Northwest Custom Apparel') + ' — Design #' + escapeHtml(designId)
+            + '</p></div>';
+    }
+
+    /**
+     * Send email notifications to Steve + AE after customer action
+     */
+    function sendCustomerNotifications(type, req) {
+        if (typeof emailjs === 'undefined') return;
+
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+
+        var company = req.CompanyName || '';
+        var noteText = type === 'approved'
+            ? 'Customer approved mockup for ' + company + ' (Design #' + designId + ')'
+            : 'Customer requested changes for ' + company + ' (Design #' + designId + ')';
+        var noteType = type === 'approved' ? 'Customer Approval' : 'Customer Revision Request';
+
+        // Notify Steve
+        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+            to_email: 'art@nwcustomapparel.com',
+            to_name: 'Steve',
+            design_id: designId,
+            company_name: company,
+            note_text: noteText,
+            note_type: noteType,
+            detail_link: SITE_ORIGIN + '/art-request/' + designId,
+            from_name: 'Customer'
+        }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+            console.warn('Steve notification failed:', err);
+        });
+
+        // Notify AE
+        var repEmail = req.User_Email || req.Sales_Rep || '';
+        var repName = resolveRepName(repEmail);
+        var repAddr = REP_MAP[repName] || repEmail;
+        if (repAddr) {
+            emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                to_email: repAddr,
+                to_name: repName || 'Sales Rep',
+                design_id: designId,
+                company_name: company,
+                note_text: noteText,
+                note_type: noteType,
+                detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
+                from_name: 'Customer'
+            }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                console.warn('AE notification failed:', err);
+            });
+        }
     }
 
     // ── Approve Design ─────────────────────────────────────────────────

@@ -16,7 +16,7 @@
 
     var EMAILJS_SERVICE_ID = 'service_1c4k67j';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
-    var HEROKU_ORIGIN = 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com';
+    var SITE_ORIGIN = 'https://www.teamnwca.com';
 
     var REP_EMAIL_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
@@ -135,7 +135,7 @@
                         company_name: companyName,
                         note_text: 'Design #' + designId + ' has been reopened — Steve is making additional changes.',
                         note_type: 'Status Update',
-                        detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
+                        detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                         from_name: 'Steve — Art Department'
                     }).catch(function (err) { console.warn('Reopen email failed:', err); });
                 }
@@ -168,7 +168,7 @@
 
             var rep = resolveRep(salesRep);
             var repEmail = rep.email;
-            var detailLink = 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae';
+            var detailLink = SITE_ORIGIN + '/art-request/' + designId + '?view=ae';
 
             var templateId, templateParams;
 
@@ -1138,7 +1138,7 @@
                     to_name: rep.displayName || 'Sales Team',
                     design_id: designId,
                     company_name: company,
-                    detail_link: HEROKU_ORIGIN + '/art-request/' + designId + '?view=ae',
+                    detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                     mockup_url: mockupUrl,
                     message: 'Reminder: A mockup is awaiting your review.',
                     from_name: 'Steve — Art Department',

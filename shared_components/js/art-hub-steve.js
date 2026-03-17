@@ -330,7 +330,7 @@
             note_type: noteType,
             note_text: noteText,
             from_name: 'Art Department',
-            detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae'
+            detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae'
         };
 
         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', templateParams, EMAILJS_PUBLIC_KEY)
@@ -588,7 +588,7 @@
                             to_name: repDispName || 'Sales Team',
                             design_id: designId,
                             company_name: companyEl ? companyEl.textContent.trim() : '',
-                            detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
+                            detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                             from_name: 'Steve — Art Department'
                         }, EMAILJS_PUBLIC_KEY).catch(err => {
                             console.warn('In Progress email failed (non-blocking):', err);
@@ -739,6 +739,7 @@
     // EmailJS constants still needed for sendNoteEmail (notes panel)
     const EMAILJS_SERVICE_ID = 'service_1c4k67j';
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    const SITE_ORIGIN = 'https://www.teamnwca.com';
 
     // ── MutationObserver: Watch for Caspio gallery cards ────────────────
     function processCards() {

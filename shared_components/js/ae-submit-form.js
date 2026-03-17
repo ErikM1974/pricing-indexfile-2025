@@ -212,6 +212,7 @@
 
     var EMAILJS_SERVICE_ID = 'service_1c4k67j';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    var SITE_ORIGIN = 'https://www.teamnwca.com';
 
     var notifiedDesignIds = {};
 
@@ -242,7 +243,7 @@
                 company_name: companyName || 'Unknown',
                 note_text: 'New art request submitted for ' + (companyName || 'Unknown') + ' (Design #' + designId + ')',
                 note_type: 'New Submission',
-                detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/' + designId + '?view=ae',
+                detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                 from_name: 'AE Dashboard'
             }).catch(function () { /* fire-and-forget */ });
         }

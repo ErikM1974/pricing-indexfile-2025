@@ -16,6 +16,7 @@ var MockupSubmitForm = (function () {
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    var SITE_ORIGIN = 'https://www.teamnwca.com';
 
     // ── State ──────────────────────────────────────────────────────────────
     var containerId = null;
@@ -720,7 +721,7 @@ var MockupSubmitForm = (function () {
                             company_name: companyName,
                             note_text: 'New ' + currentRequestType + ' submitted for ' + companyName,
                             note_type: 'New Submission',
-                            detail_link: 'https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/mockup/' + (newId || ''),
+                            detail_link: SITE_ORIGIN + '/mockup/' + (newId || ''),
                             from_name: getSubmitterName()
                         }).catch(function () {});
                     } catch (e) { /* silent */ }
