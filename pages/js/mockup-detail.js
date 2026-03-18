@@ -188,7 +188,12 @@
             aeBar.style.display = '';
 
             if (statusLower === 'awaitingapproval') {
+                var greetingHtml = '';
+                if (currentMockup.Customer_Name) {
+                    greetingHtml = '<p class="pmd-customer-greeting">Hi ' + escapeHtml(currentMockup.Customer_Name) + ',</p>';
+                }
                 aeBar.innerHTML = '<div class="pmd-customer-action-panel">'
+                    + greetingHtml
                     + '<p class="pmd-customer-prompt">Please review the mockup(s) below and select the one you approve, or request changes.</p>'
                     + '<div class="pmd-customer-btns">'
                     + '<button class="pmd-action-btn pmd-action-btn--approve pmd-action-btn--lg" id="pmd-btn-customer-approve" disabled>Approve Selected Mockup</button>'
@@ -224,9 +229,17 @@
                     var aeElapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
                     aeElapsedHtml = ' <span class="approval-elapsed ' + aeElapsed.cssClass + '" style="margin-left:8px;" title="' + escapeHtml(formatDate(mockup.Approval_Sent_Date)) + '">(sent ' + escapeHtml(aeElapsed.text) + ')</span>';
                 }
-                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:' + aeElapsedHtml + '</span>'
+                // Customer approval elapsed time
+                var custElapsedHtml = '';
+                if (mockup.Customer_Approval_Sent_Date) {
+                    var custElapsed = getElapsedText(new Date(mockup.Customer_Approval_Sent_Date));
+                    custElapsedHtml = ' <span class="approval-elapsed pmd-customer-elapsed ' + custElapsed.cssClass + '" title="Sent to customer ' + escapeHtml(formatDate(mockup.Customer_Approval_Sent_Date)) + '">(customer sent ' + escapeHtml(custElapsed.text) + ')</span>';
+                }
+
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:' + aeElapsedHtml + custElapsedHtml + '</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve" disabled>Approve Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
+                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send-customer" title="Send approval email to customer">Send to Customer</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
 
                 document.getElementById('pmd-btn-approve').addEventListener('click', function () {
@@ -240,6 +253,9 @@
                 });
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
+                });
+                document.getElementById('pmd-btn-send-customer').addEventListener('click', function () {
+                    openSendToCustomerModal();
                 });
                 document.getElementById('pmd-btn-copy-link').addEventListener('click', function () {
                     var customerUrl = window.location.origin + '/mockup/' + mockupId + '?view=customer';
@@ -1063,14 +1079,17 @@
 
         var fields;
         if (isCustomerView) {
-            // Customer sees only basic info
+            // Customer sees expanded info
             fields = [
                 { label: 'Design #', value: mockup.Design_Number },
                 { label: 'Design Name', value: mockup.Design_Name },
                 { label: 'Company', value: mockup.Company_Name },
                 { label: 'Application', value: mockup.Mockup_Type },
                 { label: 'Placement', value: mockup.Print_Location },
-                { label: 'Size Specs', value: mockup.Size_Specs }
+                { label: 'Design Size', value: mockup.Design_Size },
+                { label: 'Work Order', value: mockup.Work_Order_Number },
+                { label: 'Size Specs', value: mockup.Size_Specs },
+                { label: 'Your Rep', value: getAeDisplayName(mockup.Submitted_By) }
             ];
         } else {
             fields = [
@@ -1080,6 +1099,7 @@
                 { label: 'Application', value: mockup.Mockup_Type },
                 { label: 'Garment', value: mockup.Garment_Info },
                 { label: 'Placement', value: mockup.Print_Location },
+                { label: 'Design Size', value: mockup.Design_Size },
                 { label: 'Size Specs', value: mockup.Size_Specs },
                 { label: 'Submitted By', value: getAeDisplayName(mockup.Submitted_By) },
                 { label: 'Submitted', value: formatDate(mockup.Submitted_Date) },
@@ -1486,6 +1506,237 @@
         errorEl.style.display = '';
         document.getElementById('pmd-error-title').textContent = title || 'Error';
         document.getElementById('pmd-error-msg').textContent = message || '';
+    }
+
+    // ── Send to Customer Modal ────────────────────────────────────────────
+    function openSendToCustomerModal() {
+        if (!currentMockup) return;
+
+        var overlay = document.getElementById('pmd-send-customer-overlay');
+        var infoGrid = document.getElementById('pmd-send-info-grid');
+        var previewGrid = document.getElementById('pmd-send-preview-grid');
+        var ccInfo = document.getElementById('pmd-send-cc-info');
+        var nameInput = document.getElementById('pmd-send-contact-name');
+        var emailInput = document.getElementById('pmd-send-contact-email');
+        var sizeInput = document.getElementById('pmd-send-design-size');
+
+        // Populate read-only info
+        var infoItems = [
+            { label: 'Company', value: currentMockup.Company_Name || '' },
+            { label: 'Design #', value: currentMockup.Design_Number || '' },
+            { label: 'Placement', value: currentMockup.Print_Location || '' },
+            { label: 'Work Order', value: currentMockup.Work_Order_Number || '' },
+            { label: 'Sales Rep', value: getAeDisplayName(currentMockup.Submitted_By) },
+            { label: 'Application', value: currentMockup.Mockup_Type || '' }
+        ];
+        infoGrid.innerHTML = infoItems.filter(function (i) { return i.value; }).map(function (i) {
+            return '<div class="pmd-send-info-item">'
+                + '<span class="pmd-send-info-label">' + escapeHtml(i.label) + '</span>'
+                + '<span class="pmd-send-info-value">' + escapeHtml(i.value) + '</span>'
+                + '</div>';
+        }).join('');
+
+        // Pre-fill design size from saved data
+        sizeInput.value = currentMockup.Design_Size || '';
+
+        // Pre-fill contact from previously saved data
+        if (currentMockup.Customer_Name || currentMockup.Customer_Email) {
+            nameInput.value = currentMockup.Customer_Name || '';
+            emailInput.value = currentMockup.Customer_Email || '';
+        } else {
+            nameInput.value = '';
+            emailInput.value = '';
+            // Auto-populate from contacts API
+            autoPopulateContact();
+        }
+
+        // Build mockup preview thumbnails
+        var previewHtml = '';
+        var mockupCount = 0;
+        MOCKUP_SLOTS.forEach(function (slot) {
+            if (slot.key === 'Box_Reference_File') return;
+            var url = currentMockup[slot.key];
+            if (!url) return;
+            var ext = getFileExtension(url);
+            if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
+            mockupCount++;
+            previewHtml += '<div class="pmd-send-preview-item">'
+                + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" class="pmd-send-preview-thumb">'
+                + '<span class="pmd-send-preview-label">' + escapeHtml(slot.label) + '</span>'
+                + '</div>';
+        });
+        if (mockupCount === 0) {
+            previewHtml = '<p class="pmd-send-preview-empty">No mockup images to send. Upload images first.</p>';
+        }
+        previewGrid.innerHTML = previewHtml;
+
+        // CC info
+        var repName = getAeDisplayName(currentMockup.Submitted_By);
+        ccInfo.innerHTML = '<strong>CC:</strong> Ruth (ruth@nwcustomapparel.com) + ' + escapeHtml(repName) + ' (' + escapeHtml(currentMockup.Submitted_By || '') + ')';
+
+        // Wire up buttons
+        document.getElementById('pmd-send-customer-cancel').onclick = function () {
+            overlay.classList.remove('show');
+        };
+        document.getElementById('pmd-send-customer-submit').onclick = function () {
+            submitSendToCustomer(this);
+        };
+
+        // Close on overlay click
+        overlay.onclick = function (e) {
+            if (e.target === overlay) overlay.classList.remove('show');
+        };
+
+        overlay.classList.add('show');
+    }
+
+    function autoPopulateContact() {
+        if (!currentMockup) return;
+
+        var companyName = currentMockup.Company_Name;
+        if (!companyName) return;
+
+        var nameInput = document.getElementById('pmd-send-contact-name');
+        var emailInput = document.getElementById('pmd-send-contact-email');
+
+        fetch(API_BASE + '/api/company-contacts/by-company?company=' + encodeURIComponent(companyName))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Contact lookup failed');
+                return resp.json();
+            })
+            .then(function (data) {
+                if (data.contacts && data.contacts.length > 0) {
+                    var contact = data.contacts[0];
+                    if (!nameInput.value) nameInput.value = contact.name || '';
+                    if (!emailInput.value) emailInput.value = contact.email || '';
+                }
+            })
+            .catch(function () {
+                // Silently fail — AE can type manually
+            });
+    }
+
+    function submitSendToCustomer(btnEl) {
+        var nameInput = document.getElementById('pmd-send-contact-name');
+        var emailInput = document.getElementById('pmd-send-contact-email');
+        var sizeInput = document.getElementById('pmd-send-design-size');
+        var overlay = document.getElementById('pmd-send-customer-overlay');
+
+        var customerName = (nameInput.value || '').trim();
+        var customerEmail = (emailInput.value || '').trim();
+        var designSize = (sizeInput.value || '').trim();
+
+        // Validate email
+        if (!customerEmail) {
+            showToast('Customer email is required', 'error');
+            emailInput.focus();
+            return;
+        }
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(customerEmail)) {
+            showToast('Please enter a valid email address', 'error');
+            emailInput.focus();
+            return;
+        }
+
+        // Check at least one mockup image exists
+        var hasMockup = false;
+        MOCKUP_SLOTS.forEach(function (slot) {
+            if (slot.key === 'Box_Reference_File') return;
+            var url = currentMockup[slot.key];
+            if (url && IMAGE_EXTENSIONS.indexOf(getFileExtension(url)) !== -1) hasMockup = true;
+        });
+        if (!hasMockup) {
+            showToast('No mockup images to send. Upload images first.', 'error');
+            return;
+        }
+
+        // Disable button
+        btnEl.disabled = true;
+        btnEl.textContent = 'Sending...';
+
+        // 1. Save customer info + design size to Caspio
+        var updateData = {
+            Customer_Email: customerEmail,
+            Customer_Name: customerName,
+            Customer_Approval_Sent_Date: new Date().toISOString()
+        };
+        if (designSize) updateData.Design_Size = designSize;
+
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Failed to save customer info');
+            return resp.json();
+        }).then(function () {
+            // 2. Build inline mockup images HTML for email
+            var mockupImagesHtml = '';
+            var mockupCount = 0;
+            MOCKUP_SLOTS.forEach(function (slot) {
+                if (slot.key === 'Box_Reference_File') return;
+                var url = currentMockup[slot.key];
+                if (!url) return;
+                var ext = getFileExtension(url);
+                if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
+                mockupCount++;
+                mockupImagesHtml += '<div style="margin-bottom:12px;text-align:center;">'
+                    + '<p style="font-size:13px;color:#666;margin:0 0 6px 0;font-weight:600;">' + slot.label + '</p>'
+                    + '<img src="' + url + '" alt="' + slot.label + '" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid #e5e7eb;">'
+                    + '</div>';
+            });
+
+            // 3. Send EmailJS
+            if (typeof emailjs === 'undefined') {
+                throw new Error('Email service not loaded');
+            }
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+
+            var repEmail = currentMockup.Submitted_By || '';
+            var ccEmails = RUTH_EMAIL;
+            if (repEmail && repEmail !== RUTH_EMAIL) {
+                ccEmails += ',' + repEmail;
+            }
+
+            return emailjs.send(EMAILJS_SERVICE_ID, 'mockup_customer_approval', {
+                to_email: customerEmail,
+                to_name: customerName || 'Customer',
+                cc_emails: ccEmails,
+                company_name: currentMockup.Company_Name || '',
+                design_number: currentMockup.Design_Number || '',
+                design_size: designSize || 'Not specified',
+                placement: currentMockup.Print_Location || 'Not specified',
+                work_order: currentMockup.Work_Order_Number || '',
+                sales_rep_name: getAeDisplayName(currentMockup.Submitted_By),
+                mockup_images_html: mockupImagesHtml,
+                mockup_count: mockupCount,
+                approval_link: HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=customer',
+                from_name: 'Northwest Custom Apparel'
+            });
+        }).then(function () {
+            // 4. Log a note
+            return fetch(API_BASE + '/api/mockup-notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Mockup_ID: parseInt(mockupId, 10),
+                    Author: currentMockup.Submitted_By || 'ae@nwcustomapparel.com',
+                    Author_Name: getAeDisplayName(currentMockup.Submitted_By),
+                    Note_Text: 'Customer approval email sent to ' + (customerName || 'customer') + ' (' + customerEmail + ')',
+                    Note_Type: 'customer_approval_sent'
+                })
+            });
+        }).then(function () {
+            // 5. Success
+            overlay.classList.remove('show');
+            showToast('Approval email sent to ' + customerEmail, 'success');
+            setTimeout(function () { location.reload(); }, 1200);
+        }).catch(function (err) {
+            showToast('Failed to send: ' + (err.message || err.text || 'Unknown error'), 'error');
+            btnEl.disabled = false;
+            btnEl.textContent = 'Send Approval Email';
+        });
     }
 
     // ── EmailJS Notifications ─────────────────────────────────────────────

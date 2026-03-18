@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=8">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=9">
 </head>
 <body>
     <!-- Header -->
@@ -171,8 +171,46 @@
         </div>
     </div>
 
+    <!-- Send to Customer Modal (AE view) -->
+    <div class="pmd-modal-overlay" id="pmd-send-customer-overlay">
+        <div class="pmd-modal pmd-modal--send-customer">
+            <div class="pmd-modal-header">Send to Customer for Approval</div>
+            <div class="pmd-modal-body">
+                <!-- Read-only info summary -->
+                <div class="pmd-send-info-grid" id="pmd-send-info-grid"></div>
+                <!-- Editable contact fields -->
+                <div class="pmd-send-contact-section">
+                    <h4 class="pmd-send-section-title">Customer Contact</h4>
+                    <div class="pmd-send-input-group">
+                        <label for="pmd-send-contact-name">Contact Name</label>
+                        <input type="text" id="pmd-send-contact-name" class="pmd-send-input" placeholder="Customer contact name">
+                    </div>
+                    <div class="pmd-send-input-group">
+                        <label for="pmd-send-contact-email">Contact Email <span class="pmd-send-required">*</span></label>
+                        <input type="email" id="pmd-send-contact-email" class="pmd-send-input" placeholder="customer@email.com" required>
+                    </div>
+                    <div class="pmd-send-input-group">
+                        <label for="pmd-send-design-size">Design Size (dimensions)</label>
+                        <input type="text" id="pmd-send-design-size" class="pmd-send-input" placeholder="e.g., 4x4 inches, 12x14 inches">
+                    </div>
+                </div>
+                <!-- Mockup preview -->
+                <div class="pmd-send-preview-section" id="pmd-send-preview-section">
+                    <h4 class="pmd-send-section-title">Mockups to Include</h4>
+                    <div class="pmd-send-preview-grid" id="pmd-send-preview-grid"></div>
+                </div>
+                <!-- CC info -->
+                <div class="pmd-send-cc-info" id="pmd-send-cc-info"></div>
+            </div>
+            <div class="pmd-modal-footer">
+                <button class="pmd-box-cancel-btn" id="pmd-send-customer-cancel">Cancel</button>
+                <button class="pmd-action-btn pmd-action-btn--approve" id="pmd-send-customer-submit">Send Approval Email</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/mockup-detail.js?v=13"></script>
+    <script src="/pages/js/mockup-detail.js?v=14"></script>
 </body>
 </html>

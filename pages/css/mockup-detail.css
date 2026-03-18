@@ -1472,6 +1472,146 @@ body {
     text-transform: uppercase;
 }
 
+/* ── Send to Customer Modal ──────────────────────────── */
+.pmd-modal--send-customer {
+    width: 640px;
+}
+
+.pmd-send-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.pmd-send-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pmd-send-info-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pmd-send-info-value {
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.pmd-send-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 12px 0;
+}
+
+.pmd-send-contact-section {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.pmd-send-input-group {
+    margin-bottom: 10px;
+}
+
+.pmd-send-input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.pmd-send-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #1f2937;
+    box-sizing: border-box;
+}
+
+.pmd-send-input:focus {
+    outline: none;
+    border-color: var(--art-theme, #981e32);
+    box-shadow: 0 0 0 2px rgba(152,30,50,0.15);
+}
+
+.pmd-send-required {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.pmd-send-preview-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pmd-send-preview-item {
+    text-align: center;
+}
+
+.pmd-send-preview-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #e5e7eb;
+}
+
+.pmd-send-preview-label {
+    display: block;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.pmd-send-preview-empty {
+    color: #9ca3af;
+    font-size: 13px;
+    font-style: italic;
+    padding: 12px 0;
+}
+
+.pmd-send-cc-info {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.pmd-send-cc-info strong {
+    color: #374151;
+}
+
+/* ── Customer Greeting ──────────────────────────────── */
+.pmd-customer-greeting {
+    font-size: 18px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 4px 0;
+}
+
+/* ── Customer Approval Elapsed (AE view) ────────────── */
+.pmd-customer-elapsed {
+    font-size: 12px;
+    margin-left: 8px;
+}
+
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 900px) {
     .pmd-grid {
