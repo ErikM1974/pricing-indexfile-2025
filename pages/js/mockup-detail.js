@@ -72,13 +72,23 @@
         root.style.setProperty('--art-theme-rgba-10', 'rgba(152,30,50,0.1)');
     }
 
-    // Adjust header for customer view
+    // Adjust header and theme for customer view — NWCA green
     if (isCustomerView) {
         var headerTitle = document.getElementById('pmd-header-title');
         var backLink = document.getElementById('pmd-back-link');
         if (headerTitle) headerTitle.textContent = 'Mockup Approval';
         if (backLink) backLink.style.display = 'none';
         document.body.classList.add('pmd-customer-view');
+        // Set green theme CSS variables for customer view
+        var root = document.documentElement;
+        root.style.setProperty('--art-theme', '#2e7d32');
+        root.style.setProperty('--art-theme-dark', '#1b5e20');
+        root.style.setProperty('--art-theme-light', '#4caf50');
+        root.style.setProperty('--art-theme-bg', '#f1f8e9');
+        root.style.setProperty('--art-theme-bg-hover', '#e8f5e9');
+        root.style.setProperty('--art-theme-bg-selected', '#c8e6c9');
+        root.style.setProperty('--art-theme-rgba-15', 'rgba(46,125,50,0.15)');
+        root.style.setProperty('--art-theme-rgba-10', 'rgba(46,125,50,0.1)');
     }
 
     // ── Fetch & Render ─────────────────────────────────────────────────────
@@ -187,7 +197,23 @@
             ruthBar.style.display = 'none';
             aeBar.style.display = '';
 
-            if (statusLower === 'awaitingapproval') {
+            // Check if any mockup slots are filled
+            var customerHasMockups = MOCKUP_SLOTS.some(function (s) { return mockup[s.key]; });
+
+            if (statusLower === 'approved') {
+                aeBar.innerHTML = '<div class="pmd-customer-thankyou">'
+                    + '<div class="pmd-customer-thankyou-icon">&#9989;</div>'
+                    + '<h3>Thank You!</h3>'
+                    + '<p>This mockup has been approved. We will proceed with production.</p>'
+                    + '</div>';
+            } else if (statusLower === 'completed') {
+                aeBar.innerHTML = '<div class="pmd-customer-thankyou">'
+                    + '<div class="pmd-customer-thankyou-icon">&#9989;</div>'
+                    + '<h3>This Request is Complete</h3>'
+                    + '<p>Thank you for your feedback. This design has been finalized.</p>'
+                    + '</div>';
+            } else if (customerHasMockups) {
+                // Customer can approve or request changes whenever mockups exist
                 var greetingHtml = '';
                 if (currentMockup.Customer_Name) {
                     greetingHtml = '<p class="pmd-customer-greeting">Hi ' + escapeHtml(currentMockup.Customer_Name) + ',</p>';
@@ -207,12 +233,6 @@
                 document.getElementById('pmd-btn-customer-revise').addEventListener('click', function () {
                     openReviseModal();
                 });
-            } else if (statusLower === 'approved') {
-                aeBar.innerHTML = '<div class="pmd-customer-thankyou">'
-                    + '<div class="pmd-customer-thankyou-icon">&#9989;</div>'
-                    + '<h3>Thank You!</h3>'
-                    + '<p>This mockup has been approved. We will proceed with production.</p>'
-                    + '</div>';
             } else {
                 aeBar.innerHTML = '<div class="pmd-customer-status-msg">'
                     + '<p>This mockup is not ready for review yet. Please check back later.</p>'
