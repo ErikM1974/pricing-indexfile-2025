@@ -3181,4 +3181,129 @@
         return html;
     }
 
+    // ── AI Vision Analysis ─────────────────────────────────────────────
+    function loadVisionAnalysis() {
+        var section = document.getElementById('ard-vision-section');
+        var container = document.getElementById('ard-vision-container');
+        if (!section || !container || !designId) return;
+
+        fetch(API_BASE + '/api/art-requests/' + designId + '/analysis')
+            .then(function (r) { return r.ok ? r.json() : { analyses: [] }; })
+            .then(function (data) {
+                var analyses = data.analyses || [];
+                if (analyses.length === 0) return;
+
+                section.style.display = '';
+                container.innerHTML = '';
+
+                // Group by Mockup_Slot, keep latest per slot
+                var slotMap = {};
+                analyses.forEach(function (a) {
+                    var slot = a.Mockup_Slot || 'Unknown';
+                    if (!slotMap[slot] || new Date(a.Analysis_Date) > new Date(slotMap[slot].Analysis_Date)) {
+                        slotMap[slot] = a;
+                    }
+                });
+
+                // Render cards
+                var slotOrder = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup'];
+                var slotLabels = { 'Box_File_Mockup': 'Mockup 1', 'BoxFileLink': 'Mockup 2', 'Company_Mockup': 'Mockup 3' };
+                var rendered = [];
+
+                slotOrder.forEach(function (slot) {
+                    if (slotMap[slot]) rendered.push({ slot: slot, label: slotLabels[slot] || slot, data: slotMap[slot] });
+                });
+                Object.keys(slotMap).forEach(function (slot) {
+                    if (slotOrder.indexOf(slot) === -1) {
+                        rendered.push({ slot: slot, label: slot, data: slotMap[slot] });
+                    }
+                });
+
+                var cardsHtml = '<div class="ard-vision-grid">';
+                rendered.forEach(function (item) {
+                    var a = item.data;
+                    var isPass = (a.Validation_Status || '').toLowerCase() === 'pass';
+                    var validationClass = isPass ? 'ard-vision-valid' : 'ard-vision-warn';
+
+                    cardsHtml += '<div class="ard-vision-card">'
+                        + '<div class="ard-vision-card-header">'
+                        + '<span class="ard-vision-slot-label">' + escapeHtml(item.label) + '</span>'
+                        + '<span class="ard-vision-badge ' + validationClass + '">' + escapeHtml(a.Validation_Status || 'N/A') + '</span>'
+                        + '</div>'
+                        + '<div class="ard-vision-card-body">'
+                        + '<div class="ard-vision-fields">';
+
+                    var fields = [
+                        { label: 'Design #', value: a.Extracted_Design_Number },
+                        { label: 'Method', value: a.Extracted_Method },
+                        { label: 'Customer', value: a.Extracted_Customer_Name },
+                        { label: 'Garment', value: a.Extracted_Garment_Info },
+                        { label: 'Placement', value: a.Extracted_Placement },
+                        { label: 'Size', value: a.Extracted_Size },
+                        { label: 'Sales Rep', value: a.Extracted_Sales_Rep },
+                        { label: 'Date', value: a.Extracted_Date },
+                        { label: 'Time', value: a.Extracted_Time }
+                    ];
+
+                    fields.forEach(function (f) {
+                        if (f.value) {
+                            cardsHtml += '<div class="ard-vision-field">'
+                                + '<span class="ard-vision-field-label">' + escapeHtml(f.label) + '</span>'
+                                + '<span class="ard-vision-field-value">' + escapeHtml(f.value) + '</span>'
+                                + '</div>';
+                        }
+                    });
+
+                    cardsHtml += '</div>';
+
+                    // Status pills
+                    var approvedYes = (a.Customer_Approved || '').toLowerCase() === 'yes';
+                    var filesYes = (a.Files_Prepared || '').toLowerCase() === 'yes';
+                    cardsHtml += '<div class="ard-vision-pills">'
+                        + '<span class="ard-vision-pill ' + (approvedYes ? 'ard-vision-pill--yes' : 'ard-vision-pill--no') + '">Approved: ' + escapeHtml(a.Customer_Approved || 'No') + '</span>'
+                        + '<span class="ard-vision-pill ' + (filesYes ? 'ard-vision-pill--yes' : 'ard-vision-pill--no') + '">Files Ready: ' + escapeHtml(a.Files_Prepared || 'No') + '</span>'
+                        + '</div>';
+
+                    // Design info
+                    if (a.Design_Description || a.Design_Text || a.Design_Colors) {
+                        cardsHtml += '<div class="ard-vision-design">';
+                        if (a.Design_Colors) {
+                            cardsHtml += '<div class="ard-vision-design-row">'
+                                + '<span class="ard-vision-field-label">Colors</span>'
+                                + '<span class="ard-vision-field-value">' + escapeHtml(a.Design_Colors) + '</span>'
+                                + '</div>';
+                        }
+                        if (a.Design_Text) {
+                            cardsHtml += '<div class="ard-vision-design-row">'
+                                + '<span class="ard-vision-field-label">Text on Design</span>'
+                                + '<span class="ard-vision-field-value">' + escapeHtml(a.Design_Text) + '</span>'
+                                + '</div>';
+                        }
+                        if (a.Design_Description) {
+                            cardsHtml += '<div class="ard-vision-desc">'
+                                + '<span class="ard-vision-field-label">Description</span>'
+                                + '<p class="ard-vision-desc-text">' + escapeHtml(a.Design_Description) + '</p>'
+                                + '</div>';
+                        }
+                        cardsHtml += '</div>';
+                    }
+
+                    if (a.Validation_Notes) {
+                        cardsHtml += '<div class="ard-vision-warning">' + escapeHtml(a.Validation_Notes) + '</div>';
+                    }
+
+                    cardsHtml += '</div></div>';
+                });
+
+                cardsHtml += '</div>';
+                container.innerHTML = cardsHtml;
+            })
+            .catch(function (err) {
+                console.warn('Vision analysis load failed:', err.message);
+            });
+    }
+
+    // Load vision data after page renders
+    setTimeout(loadVisionAnalysis, 1000);
+
 })();

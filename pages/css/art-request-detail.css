@@ -2540,3 +2540,144 @@ body.ard-customer-view .ard-footer {
     border-color: #2d6a2e;
     box-shadow: 0 0 0 2px rgba(45,106,46,0.15);
 }
+
+/* ── AI Vision Analysis Section ──────────────────────────── */
+.ard-vision-section {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+}
+.ard-card-header--vision {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #00d4ff;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.ard-vision-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 4px 0;
+}
+.ard-vision-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+.ard-vision-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.ard-vision-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+}
+.ard-vision-slot-label {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: #1e293b;
+}
+.ard-vision-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+.ard-vision-valid {
+    background: #dcfce7;
+    color: #166534;
+}
+.ard-vision-warn {
+    background: #fef3c7;
+    color: #92400e;
+}
+.ard-vision-card-body {
+    padding: 14px 16px;
+}
+.ard-vision-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    margin-bottom: 12px;
+}
+.ard-vision-field {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.ard-vision-field-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #9ca3af;
+}
+.ard-vision-field-value {
+    font-size: 0.88rem;
+    color: #1f2937;
+    font-weight: 500;
+}
+.ard-vision-pills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.ard-vision-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 14px;
+}
+.ard-vision-pill--yes {
+    background: #dcfce7;
+    color: #166534;
+}
+.ard-vision-pill--no {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.ard-vision-design {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+}
+.ard-vision-design-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 8px;
+}
+.ard-vision-design-row:last-child {
+    margin-bottom: 0;
+}
+.ard-vision-desc {
+    margin-top: 8px;
+}
+.ard-vision-desc-text {
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+.ard-vision-warning {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    color: #92400e;
+    margin-top: 8px;
+}
+
+/* AE view override — darker header */
+.ae-detail-view .ard-card-header--vision {
+    background: linear-gradient(135deg, #2d1b3d, #1a1a2e);
+    color: #c084fc;
+}
