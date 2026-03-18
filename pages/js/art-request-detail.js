@@ -1020,6 +1020,8 @@
                 }).then(function (resp) {
                     if (!resp.ok) throw new Error('Failed to clear mockup: ' + resp.status);
                     currentRequest[fieldKey] = '';
+                    // Delete AI analysis for this slot (fire-and-forget)
+                    fetch(API_BASE + '/api/art-requests/' + designId + '/analysis/' + encodeURIComponent(fieldKey), { method: 'DELETE' }).catch(function () {});
                     return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1027,6 +1029,7 @@
                     });
                 }).then(function () {
                     renderMockupGallery(currentRequest);
+                    loadVisionAnalysis(); // Refresh vision section
                     if (typeof refreshNotes === 'function') refreshNotes();
                 }).catch(function (err) {
                     alert('Error removing mockup: ' + err.message);
@@ -3199,10 +3202,18 @@
         if (!section || !container || !designId) return;
 
         fetch(API_BASE + '/api/art-requests/' + designId + '/analysis')
-            .then(function (r) { return r.ok ? r.json() : { analyses: [] }; })
+            .then(function (r) { return r.ok ? r.json() : { analyses: [], printLocations: [] }; })
             .then(function (data) {
                 var analyses = data.analyses || [];
                 if (analyses.length === 0) return;
+
+                // Group print locations by Analysis_ID (PK_ID)
+                var printMap = {};
+                (data.printLocations || []).forEach(function (pl) {
+                    var aid = pl.Analysis_ID;
+                    if (!printMap[aid]) printMap[aid] = [];
+                    printMap[aid].push(pl);
+                });
 
                 section.style.display = '';
                 container.innerHTML = '';
@@ -3216,7 +3227,6 @@
                     }
                 });
 
-                // Render cards
                 var slotOrder = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup'];
                 var slotLabels = { 'Box_File_Mockup': 'Mockup 1', 'BoxFileLink': 'Mockup 2', 'Company_Mockup': 'Mockup 3' };
                 var rendered = [];
@@ -3235,23 +3245,30 @@
                     var a = item.data;
                     var isPass = (a.Validation_Status || '').toLowerCase() === 'pass';
                     var validationClass = isPass ? 'ard-vision-valid' : 'ard-vision-warn';
+                    var method = (a.Extracted_Method || '').toLowerCase();
+                    var isScreenPrint = method.indexOf('screen') !== -1;
+                    var locations = printMap[a.PK_ID] || [];
 
                     cardsHtml += '<div class="ard-vision-card">'
                         + '<div class="ard-vision-card-header">'
                         + '<span class="ard-vision-slot-label">' + escapeHtml(item.label) + '</span>'
-                        + '<span class="ard-vision-badge ' + validationClass + '">' + escapeHtml(a.Validation_Status || 'N/A') + '</span>'
-                        + '</div>'
-                        + '<div class="ard-vision-card-body">'
-                        + '<div class="ard-vision-fields">';
+                        + '<div class="ard-vision-header-right">';
+                    if (a.Extracted_Method) {
+                        cardsHtml += '<span class="ard-vision-method-tag">' + escapeHtml(a.Extracted_Method) + '</span>';
+                    }
+                    cardsHtml += '<span class="ard-vision-badge ' + validationClass + '">' + escapeHtml(a.Validation_Status || 'N/A') + '</span>'
+                        + '</div></div>'
+                        + '<div class="ard-vision-card-body">';
 
+                    // Compact 3-column field grid
+                    cardsHtml += '<div class="ard-vision-fields">';
                     var fields = [
                         { label: 'Design #', value: a.Extracted_Design_Number },
-                        { label: 'Method', value: a.Extracted_Method },
                         { label: 'Customer', value: a.Extracted_Customer_Name },
+                        { label: 'Sales Rep', value: a.Extracted_Sales_Rep },
                         { label: 'Garment', value: a.Extracted_Garment_Info },
                         { label: 'Placement', value: a.Extracted_Placement },
                         { label: 'Size', value: a.Extracted_Size },
-                        { label: 'Sales Rep', value: a.Extracted_Sales_Rep },
                         { label: 'Date', value: a.Extracted_Date },
                         { label: 'Time', value: a.Extracted_Time }
                     ];
@@ -3264,19 +3281,72 @@
                                 + '</div>';
                         }
                     });
-
                     cardsHtml += '</div>';
 
-                    // Status pills
+                    // Status pills row
                     var approvedYes = (a.Customer_Approved || '').toLowerCase() === 'yes';
                     var filesYes = (a.Files_Prepared || '').toLowerCase() === 'yes';
                     cardsHtml += '<div class="ard-vision-pills">'
                         + '<span class="ard-vision-pill ' + (approvedYes ? 'ard-vision-pill--yes' : 'ard-vision-pill--no') + '">Approved: ' + escapeHtml(a.Customer_Approved || 'No') + '</span>'
-                        + '<span class="ard-vision-pill ' + (filesYes ? 'ard-vision-pill--yes' : 'ard-vision-pill--no') + '">Files Ready: ' + escapeHtml(a.Files_Prepared || 'No') + '</span>'
-                        + '</div>';
+                        + '<span class="ard-vision-pill ' + (filesYes ? 'ard-vision-pill--yes' : 'ard-vision-pill--no') + '">Files Ready: ' + escapeHtml(a.Files_Prepared || 'No') + '</span>';
+                    if (a.Has_Reflective && a.Has_Reflective.toLowerCase() === 'yes') {
+                        cardsHtml += '<span class="ard-vision-pill ard-vision-pill--special">Reflective</span>';
+                    }
+                    if (a.Has_Metallic && a.Has_Metallic.toLowerCase() === 'yes') {
+                        cardsHtml += '<span class="ard-vision-pill ard-vision-pill--special">Metallic</span>';
+                    }
+                    cardsHtml += '</div>';
 
-                    // Design info
-                    if (a.Design_Description || a.Design_Text || a.Design_Colors) {
+                    // Screen Print Details (from child table)
+                    if (isScreenPrint && (locations.length > 0 || a.Total_Screens)) {
+                        cardsHtml += '<div class="ard-vision-print-section">'
+                            + '<div class="ard-vision-print-header">Screen Print Details</div>';
+
+                        // Summary row
+                        if (a.Total_Screens || a.Total_Prints || a.Total_Flashes) {
+                            cardsHtml += '<div class="ard-vision-print-summary">';
+                            if (a.Total_Screens) cardsHtml += '<span class="ard-vision-print-stat"><strong>' + escapeHtml(a.Total_Screens) + '</strong> Screens</span>';
+                            if (a.Total_Prints) cardsHtml += '<span class="ard-vision-print-stat"><strong>' + escapeHtml(a.Total_Prints) + '</strong> Prints</span>';
+                            if (a.Total_Flashes) cardsHtml += '<span class="ard-vision-print-stat"><strong>' + escapeHtml(a.Total_Flashes) + '</strong> Flashes</span>';
+                            cardsHtml += '</div>';
+                        }
+
+                        // PMS Colors
+                        if (a.PMS_Colors) {
+                            cardsHtml += '<div class="ard-vision-pms">'
+                                + '<span class="ard-vision-field-label">PMS Colors</span>'
+                                + '<span class="ard-vision-field-value">' + escapeHtml(a.PMS_Colors) + '</span>'
+                                + '</div>';
+                        }
+
+                        // Per-location table
+                        if (locations.length > 0) {
+                            cardsHtml += '<table class="ard-vision-print-table">'
+                                + '<thead><tr>'
+                                + '<th>Location</th><th>Ink Colors</th><th>Screens</th><th>Prints</th><th>Flashes</th>'
+                                + '</tr></thead><tbody>';
+
+                            locations.forEach(function (loc) {
+                                cardsHtml += '<tr>'
+                                    + '<td class="ard-vision-print-placement">' + escapeHtml(loc.Placement || '--') + '</td>'
+                                    + '<td>' + escapeHtml(loc.Ink_Colors || '--') + '</td>'
+                                    + '<td class="ard-vision-print-num">' + escapeHtml(loc.Screens || '--') + '</td>'
+                                    + '<td class="ard-vision-print-num">' + escapeHtml(loc.Prints || '--') + '</td>'
+                                    + '<td class="ard-vision-print-num">' + escapeHtml(loc.Flashes || '--') + '</td>'
+                                    + '</tr>';
+                                if (loc.Print_Order) {
+                                    cardsHtml += '<tr class="ard-vision-print-order-row">'
+                                        + '<td colspan="5"><span class="ard-vision-field-label">Print Order:</span> '
+                                        + escapeHtml(loc.Print_Order) + '</td></tr>';
+                                }
+                            });
+                            cardsHtml += '</tbody></table>';
+                        }
+                        cardsHtml += '</div>';
+                    }
+
+                    // Design info (compact)
+                    if (a.Design_Colors || a.Design_Text || a.Design_Description) {
                         cardsHtml += '<div class="ard-vision-design">';
                         if (a.Design_Colors) {
                             cardsHtml += '<div class="ard-vision-design-row">'
@@ -3291,14 +3361,17 @@
                                 + '</div>';
                         }
                         if (a.Design_Description) {
+                            var descId = 'vision-desc-' + item.slot;
                             cardsHtml += '<div class="ard-vision-desc">'
                                 + '<span class="ard-vision-field-label">Description</span>'
-                                + '<p class="ard-vision-desc-text">' + escapeHtml(a.Design_Description) + '</p>'
+                                + '<p class="ard-vision-desc-text ard-vision-desc-collapsed" id="' + descId + '">' + escapeHtml(a.Design_Description) + '</p>'
+                                + '<button type="button" class="ard-vision-desc-toggle" onclick="var el=document.getElementById(\'' + descId + '\');el.classList.toggle(\'ard-vision-desc-collapsed\');this.textContent=el.classList.contains(\'ard-vision-desc-collapsed\')?\'Show more\':\'Show less\'">Show more</button>'
                                 + '</div>';
                         }
                         cardsHtml += '</div>';
                     }
 
+                    // Validation warning
                     if (a.Validation_Notes) {
                         cardsHtml += '<div class="ard-vision-warning">' + escapeHtml(a.Validation_Notes) + '</div>';
                     }
