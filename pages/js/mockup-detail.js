@@ -27,7 +27,8 @@
         return {
             name: name || 'Staff',
             email: email || 'staff@nwcustomapparel.com',
-            firstName: (name || 'Staff').split(' ')[0]
+            firstName: (name || 'Staff').split(' ')[0],
+            noteBy: name || email || 'staff@nwcustomapparel.com'
         };
     }
 

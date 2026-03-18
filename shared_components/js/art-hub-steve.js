@@ -26,7 +26,8 @@
         return {
             name: name || 'Staff',
             email: email || 'art@nwcustomapparel.com',
-            firstName: (name || 'Staff').split(' ')[0]
+            firstName: (name || 'Staff').split(' ')[0],
+            noteBy: name || email || 'art@nwcustomapparel.com'
         };
     }
 
@@ -585,7 +586,7 @@
                     await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: getLoggedInUser().email })
+                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: getLoggedInUser().noteBy })
                     }).catch(() => {});
                     b.textContent = 'Updated!';
                     b.style.background = '#28a745';
@@ -668,7 +669,7 @@
                         body: JSON.stringify({
                             noteType: 'Status Change',
                             noteText: 'Reopened from ' + reopenFromLabel,
-                            noteBy: getLoggedInUser().email
+                            noteBy: getLoggedInUser().noteBy
                         })
                     }).catch(err => console.warn('Reopen note failed (non-blocking):', err));
                     ArtActions.notifyReopen(designId);

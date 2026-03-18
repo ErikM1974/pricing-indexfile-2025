@@ -23,10 +23,13 @@
     function getLoggedInUser() {
         var name = sessionStorage.getItem('nwca_user_name') || '';
         var email = sessionStorage.getItem('nwca_user_email') || '';
+        // Use name for noteBy so notes show "Erik" not "art@nwcustomapparel.com"
+        var displayName = name || (email ? email.split('@')[0] : 'Staff');
         return {
             name: name || 'Staff',
             email: email || 'art@nwcustomapparel.com',
-            firstName: (name || 'Staff').split(' ')[0]
+            firstName: (name || 'Staff').split(' ')[0],
+            noteBy: name || email || 'art@nwcustomapparel.com'
         };
     }
 
@@ -155,7 +158,7 @@
 
         // Status badge
         const statusBadge = document.getElementById('ard-status-badge');
-        const rawStatus = req.Status || 'Unknown';
+        const rawStatus = req.Status || 'Submitted';
         const statusClean = rawStatus.replace(/[^\p{L}\p{N}\s-]/gu, '').trim();
         statusBadge.textContent = statusClean;
         statusBadge.className = 'ard-status-badge ' + getStatusClass(statusClean);
@@ -426,7 +429,7 @@
                 return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: getLoggedInUser().email })
+                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: getLoggedInUser().noteBy })
                 });
             }).then(function () {
                 btnWorking.textContent = 'Updated!';
@@ -498,7 +501,7 @@
                 return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: getLoggedInUser().email })
+                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: getLoggedInUser().noteBy })
                 });
             }).then(function () {
                 ArtActions.notifyReopen(designId);
@@ -657,7 +660,7 @@
                 fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteType: 'Final Approved', noteText: 'Set final approved mockup for production', noteBy: getLoggedInUser().email })
+                    body: JSON.stringify({ noteType: 'Final Approved', noteText: 'Set final approved mockup for production', noteBy: getLoggedInUser().noteBy })
                 }).catch(function () {});
                 if (typeof refreshNotes === 'function') refreshNotes();
                 // Notify AE that final mockup is production-ready
@@ -1025,7 +1028,7 @@
                     return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: getLoggedInUser().email })
+                        body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: getLoggedInUser().noteBy })
                     });
                 }).then(function () {
                     renderMockupGallery(currentRequest);
@@ -1147,7 +1150,7 @@
                     fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Mockup Added', noteText: 'Added mockup from Box: ' + selectedBoxFile.name, noteBy: getLoggedInUser().email })
+                        body: JSON.stringify({ noteType: 'Mockup Added', noteText: 'Added mockup from Box: ' + selectedBoxFile.name, noteBy: getLoggedInUser().noteBy })
                     }).catch(function () {});
 
                     closeBoxModal();

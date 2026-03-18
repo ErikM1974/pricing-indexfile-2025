@@ -21,7 +21,8 @@
         return {
             name: name || 'Staff',
             email: email || 'art@nwcustomapparel.com',
-            firstName: (name || 'Staff').split(' ')[0]
+            firstName: (name || 'Staff').split(' ')[0],
+            noteBy: name || email || 'art@nwcustomapparel.com'
         };
     }
 
@@ -396,7 +397,7 @@
                         body: JSON.stringify({
                             noteType: 'Art Time',
                             noteText: 'Completed: ' + mins + ' additional minutes ($' + cost + ')',
-                            noteBy: getLoggedInUser().email
+                            noteBy: getLoggedInUser().noteBy
                         })
                     }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
                     logArtCharge(designId, mins, 'Completed', 'Completion', currentMins);
@@ -569,7 +570,7 @@
                         body: JSON.stringify({
                             noteType: 'Art Time',
                             noteText: noteBody,
-                            noteBy: getLoggedInUser().email
+                            noteBy: getLoggedInUser().noteBy
                         })
                     }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
                     var currentMinsForCharge = parseInt(modal.dataset.currentMins) || 0;
@@ -1024,7 +1025,7 @@
                 body: JSON.stringify({
                     noteType: 'Mockup Sent',
                     noteText: noteText,
-                    noteBy: getLoggedInUser().email
+                    noteBy: getLoggedInUser().noteBy
                 })
             });
             if (!noteResp.ok) throw new Error('Note creation ' + noteResp.status);
@@ -1038,7 +1039,7 @@
                     body: JSON.stringify({
                         noteType: 'Art Time',
                         noteText: 'Logged ' + mins + ' minutes ($' + cost + ')' + revLabel,
-                        noteBy: getLoggedInUser().email
+                        noteBy: getLoggedInUser().noteBy
                     })
                 }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
                 var currentArtMinsForCharge = parseInt(modal.dataset.currentArtMins) || 0;
@@ -1168,7 +1169,7 @@
             body: JSON.stringify({
                 noteType: 'Reminder',
                 noteText: 'Mockup reminder sent to ' + displayTo,
-                noteBy: getLoggedInUser().email
+                noteBy: getLoggedInUser().noteBy
             })
         }).then(function (resp) {
             if (!resp.ok) throw new Error('Note failed ' + resp.status);
