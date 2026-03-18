@@ -2281,7 +2281,7 @@
             div.innerHTML = `
                 <div class="ard-note-header">
                     <span class="ard-note-type ${typeClass}">${escapeHtml(noteType)}</span>
-                    <span class="ard-note-meta">${escapeHtml(note.Note_By || '')} &bull; ${formatDate(note.Note_Date)}</span>
+                    <span class="ard-note-meta">${escapeHtml(note.Note_By || '')} &bull; ${formatDateTime(note.Note_Date)}</span>
                 </div>
                 <div class="ard-note-text">${escapeHtml(note.Note_Text || '')}</div>
             `;
@@ -2427,6 +2427,19 @@
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return dateStr;
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    function formatDateTime(dateStr) {
+        if (!dateStr) return '--';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            var date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            var time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            return date + ' ' + time;
         } catch (e) {
             return dateStr;
         }
