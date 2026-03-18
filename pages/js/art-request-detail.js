@@ -1153,6 +1153,8 @@
                     closeBoxModal();
                     renderMockupGallery(currentRequest);
                     if (typeof refreshNotes === 'function') refreshNotes();
+                    // Poll for AI vision analysis
+                    pollForVisionAnalysis(3);
                 } catch (err) {
                     alert('Error: ' + err.message);
                     boxConfirm.disabled = false;
@@ -1242,10 +1244,28 @@
 
             renderMockupGallery(currentRequest);
             if (typeof refreshNotes === 'function') refreshNotes();
+            // Poll for AI vision analysis (fire-and-forget takes ~3-8 seconds)
+            pollForVisionAnalysis(3);
         } catch (err) {
             alert('Upload failed: ' + err.message);
             renderMockupGallery(currentRequest);
         }
+    }
+
+    /** Poll for AI vision analysis after upload — retries every 3s up to maxAttempts */
+    function pollForVisionAnalysis(maxAttempts) {
+        var attempt = 0;
+        var prevCount = document.querySelectorAll('.ard-vision-card').length;
+        function check() {
+            attempt++;
+            loadVisionAnalysis();
+            setTimeout(function () {
+                var newCount = document.querySelectorAll('.ard-vision-card').length;
+                if (newCount > prevCount || attempt >= maxAttempts) return; // Done or give up
+                check();
+            }, 3000);
+        }
+        setTimeout(check, 3000); // First check after 3s
     }
 
     /** Open Box file picker modal for a specific slot */
