@@ -1295,6 +1295,14 @@ body {
 .pmd-action-btn--copy:hover {
     background: #e0e0e0;
 }
+.pmd-action-btn--reopen {
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+}
+.pmd-action-btn--reopen:hover {
+    background: #d97706;
+}
 .pmd-slot-select-badge {
     position: absolute;
     bottom: 28px;

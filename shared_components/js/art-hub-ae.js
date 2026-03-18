@@ -170,6 +170,7 @@
         }
 
         var isCompleted = status === 'completed';
+        var isApproved = status === 'approved';
         var isCancelled = status === 'cancel';
 
         if (isCompleted) {
@@ -205,6 +206,48 @@
             e.stopPropagation();
         });
         infoRow.appendChild(detailsLink);
+
+        // Add Reopen button for Approved/Completed
+        if (isApproved || isCompleted) {
+            var reopenBtn = document.createElement('button');
+            reopenBtn.className = 'card-reopen-btn';
+            reopenBtn.textContent = 'Reopen';
+            reopenBtn.title = 'Reopen for additional changes';
+            reopenBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var b = this;
+                if (!confirm('Reopen this request for changes?')) return;
+                b.disabled = true;
+                b.textContent = 'Reopening...';
+                var reopenFromLabel = isApproved ? 'Approved' : 'Completed';
+                fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'In Progress' })
+                }).then(function (resp) {
+                    if (!resp.ok) throw new Error('Status ' + resp.status);
+                    fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            noteType: 'Status Change',
+                            noteText: 'Reopened from ' + reopenFromLabel + ' by AE',
+                            noteBy: 'ae@nwcustomapparel.com'
+                        })
+                    }).catch(function () {});
+                    b.textContent = 'Reopened!';
+                    b.style.background = '#28a745';
+                    b.style.color = '#fff';
+                    setTimeout(function () { location.reload(); }, 800);
+                }).catch(function (err) {
+                    b.textContent = 'Error';
+                    b.style.background = '#dc3545';
+                    b.style.color = '#fff';
+                    setTimeout(function () { b.textContent = 'Reopen'; b.style.background = ''; b.style.color = ''; b.disabled = false; }, 2000);
+                });
+            });
+            infoRow.appendChild(reopenBtn);
+        }
 
         container.appendChild(infoRow);
         footer.appendChild(container);

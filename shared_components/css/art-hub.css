@@ -3755,10 +3755,25 @@ input.cbSearchButton {
 .ae-gallery-view .card-details-link { color: #981e32; }
 .ae-gallery-view .card-details-link:hover { color: #7a1828; }
 
-/* Footer layout — centered since AE only has View Details */
+/* Footer layout — space between when Reopen exists, centered otherwise */
 .ae-gallery-view .footer-info-row {
     justify-content: center;
     padding: 10px 0;
+    gap: 10px;
+}
+.card-reopen-btn {
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.card-reopen-btn:hover {
+    background: #d97706;
 }
 
 /* Hide Caspio search download link on AE (cleaner look) */

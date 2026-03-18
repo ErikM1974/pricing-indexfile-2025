@@ -281,8 +281,15 @@
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
                 });
+            } else if (statusLower === 'approved' || statusLower === 'completed') {
+                // Approved/Completed — show Reopen + Send + Copy
+                aeBar.style.display = '';
+                var statusLabel = statusLower === 'approved' ? 'Approved' : 'Completed';
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">' + statusLabel + custElapsedHtml + '</span>'
+                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>'
+                    + sendCopyButtons;
             } else if (hasMockups) {
-                // Non-approval status but mockups exist — show send + copy buttons
+                // Other status but mockups exist — show send + copy buttons
                 aeBar.style.display = '';
                 aeBar.innerHTML = '<span class="pmd-action-bar-label">Mockup actions:' + custElapsedHtml + '</span>'
                     + sendCopyButtons;
@@ -290,9 +297,10 @@
                 aeBar.style.display = 'none';
             }
 
-            // Attach send/copy listeners if buttons exist
+            // Attach send/copy/reopen listeners if buttons exist
             var sendBtn = document.getElementById('pmd-btn-send-customer');
             var copyBtn = document.getElementById('pmd-btn-copy-link');
+            var reopenBtn = document.getElementById('pmd-btn-reopen');
             if (sendBtn) {
                 sendBtn.addEventListener('click', function () {
                     openSendToCustomerModal();
@@ -306,6 +314,11 @@
                     }).catch(function () {
                         prompt('Copy this link:', customerUrl);
                     });
+                });
+            }
+            if (reopenBtn) {
+                reopenBtn.addEventListener('click', function () {
+                    handleReopen(this, getAeDisplayName(currentMockup.Submitted_By || ''));
                 });
             }
         } else {
@@ -376,6 +389,14 @@
                         }, 5000);
                     });
                 });
+            } else if (statusLower === 'approved' || statusLower === 'completed') {
+                ruthBar.style.display = '';
+                var statusLabel = statusLower === 'approved' ? 'approved' : 'completed';
+                ruthBar.innerHTML = '<span class="pmd-action-bar-label">This mockup is ' + statusLabel + '</span>'
+                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>';
+                document.getElementById('pmd-btn-reopen').addEventListener('click', function () {
+                    handleReopen(this, 'Ruth');
+                });
             } else {
                 ruthBar.style.display = 'none';
             }
@@ -434,6 +455,49 @@
                 + '<p class="pmd-customer-company">' + escapeHtml(currentMockup.Company_Name || '') + '</p>'
                 + '</div>';
         }
+    }
+
+    // ── Reopen from Approved/Completed ──────────────────────────────────────
+    function handleReopen(btnEl, reopenedBy) {
+        if (!confirm('Reopen this mockup for additional changes? Status will be set to Revision Requested.')) {
+            return;
+        }
+        if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Reopening...'; }
+
+        var previousStatus = (currentMockup.Status || '').replace(/\s+/g, '');
+        var noteText = 'Reopened from ' + previousStatus + ' — additional changes needed';
+        var authorName = reopenedBy || 'Unknown';
+
+        // Update status to Revision Requested
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Status: 'Revision Requested' })
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Status ' + resp.status);
+            // Log note
+            return fetch(API_BASE + '/api/mockup-notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Mockup_ID: parseInt(mockupId),
+                    Author: authorName,
+                    Author_Name: authorName,
+                    Note_Text: noteText,
+                    Note_Type: 'status_change'
+                })
+            });
+        }).then(function () {
+            // Send notifications to Ruth + AE
+            sendStatusNotifications('Revision Requested');
+            showToast('Mockup reopened for changes', 'success');
+            if (btnEl) { btnEl.textContent = 'Reopened!'; btnEl.style.background = '#28a745'; }
+            // Reload page after short delay
+            setTimeout(function () { location.reload(); }, 1000);
+        }).catch(function (err) {
+            showToast('Failed to reopen: ' + err.message, 'error');
+            if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Reopen for Changes'; }
+        });
     }
 
     // ── Status Update ──────────────────────────────────────────────────────

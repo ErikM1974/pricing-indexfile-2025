@@ -503,6 +503,7 @@
         }
 
         const isCompleted = status === 'completed';
+        const isApproved = status === 'approved';
         const isCancelled = status === 'cancel';
         const isInactive = isCompleted || isCancelled;
 
@@ -637,8 +638,9 @@
                     });
                 }));
             }
-        } else if (isCompleted) {
-            // Completed: Reopen
+        } else if (isCompleted || isApproved) {
+            // Completed/Approved: Reopen
+            var reopenFromLabel = isApproved ? 'Approved' : 'Completed';
             statusSection.btns.appendChild(btn('Reopen', 'reopen', async (b) => {
                 b.disabled = true;
                 b.textContent = 'Reopening...';
@@ -654,7 +656,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             noteType: 'Status Change',
-                            noteText: 'Reopened from Completed',
+                            noteText: 'Reopened from ' + reopenFromLabel,
                             noteBy: 'art@nwcustomapparel.com'
                         })
                     }).catch(err => console.warn('Reopen note failed (non-blocking):', err));
