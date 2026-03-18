@@ -444,14 +444,10 @@
                 <div id="mockup-submit-container"></div>
             </div>
             
-            <!-- Steve Mockups Tab — Steve's Art Request Gallery -->
-            <div id="view-tab" class="tab-pane ae-gallery-view">
+            <!-- Steve Mockups Tab — Custom API-driven gallery (replaces Caspio DataPage) -->
+            <div id="view-tab" class="tab-pane">
                 <h2 class="tab-title">Steve Mockups</h2>
-                <div class="info-message">
-                    <p>View all your submitted art requests below. Click on any request to see details.</p>
-                </div>
-                <!-- Steve's Art Request Gallery DataPage (processed by art-hub-ae.js) -->
-                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a28d5718e81646dd900b/emb"></script>
+                <div id="art-ae-gallery"></div>
             </div>
 
             <!-- Ruth Mockups Tab — Ruth's Digitizing Mockup Gallery (JS-driven) -->
@@ -549,9 +545,11 @@
     <script src="/shared_components/js/ae-submit-form.js?v=5"></script>
     <script src="/shared_components/js/art-hub-ae.js?v=2"></script>
     <script src="/shared_components/js/mockup-ae.js?v=3"></script>
+    <script src="/shared_components/js/art-ae.js?v=1"></script>
     <script src="/shared_components/js/mockup-submit-form.js?v=2"></script>
     <script>
-        // Initialize Ruth's mockup gallery and submit form
+        // Initialize galleries and submit form
+        if (typeof ArtAeGallery !== 'undefined') ArtAeGallery.init('art-ae-gallery');
         if (typeof MockupAeGallery !== 'undefined') MockupAeGallery.init('mockup-ae-gallery');
         if (typeof MockupSubmitForm !== 'undefined') MockupSubmitForm.init('mockup-submit-container');
     </script>

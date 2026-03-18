@@ -3780,3 +3780,78 @@ input.cbSearchButton {
 
 /* Hide Caspio search download link on AE (cleaner look) */
 .ae-gallery-view .cbResultSetDownloadLink { display: none !important; }
+
+/* --- Art AE Gallery Cards (Steve Mockups - API-driven) --- */
+.art-card .card-status-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.card-due {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: #4b5563;
+}
+.card-due--overdue {
+    background: #fef2f2;
+    color: #dc2626;
+    font-weight: 700;
+}
+.card-due--today {
+    background: #fff7ed;
+    color: #d97706;
+    font-weight: 700;
+}
+.card-due--soon {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.card-meta-row {
+    font-size: 13px;
+    color: #374151;
+    padding: 2px 0;
+}
+.card-meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+}
+
+.card-art-charge {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 12px;
+    color: #6b7280;
+}
+.card-art-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.card-art-row {
+    padding: 1px 0;
+}
+.card-art-quoted {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-right: 4px;
+}
+.card-art-actual {
+    font-size: 10px;
+    font-weight: 600;
+    color: #059669;
+    margin-right: 4px;
+}

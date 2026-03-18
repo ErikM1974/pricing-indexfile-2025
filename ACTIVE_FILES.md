@@ -529,6 +529,7 @@ cap-embroidery-fix.css
 | `/shared_components/js/art-actions-shared.js` | **NEW** Shared art action modals (Log Time, Mark Complete, Send Mockup) — used by art-hub-steve.js + art-request-detail.js | art-hub.css, caspio-proxy API, EmailJS | ✅ Active |
 | `/shared_components/js/art-hub-steve.js` | Steve's gallery card processing + notes panel — delegates modals to art-actions-shared.js | art-hub.css, art-actions-shared.js, caspio-proxy API | ✅ Active |
 | `/shared_components/js/art-hub-ae.js` | AE gallery card processing (maroon theme, View Details only) | art-hub.css, ae-dashboard.html | ✅ Active |
+| `/shared_components/js/art-ae.js` | AE Steve Mockups tab — API-driven art request gallery (replaces Caspio DataPage) | art-hub.css, ae-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | **NEW** AE submit art form styles (extracted from Caspio PageHeader) | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-submit-form.js` | **NEW** AE submit form JS: swatches, model images, row numbers, submission notification | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-dashboard.js` | **NEW** AE dashboard: tab switching, modals, dropdown, notification polling + toasts | ae-dashboard.html | ✅ Active |
