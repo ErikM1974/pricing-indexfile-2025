@@ -1182,6 +1182,33 @@
                 input.value = '';
                 refreshNotes();
                 showToast('Note added', 'success');
+
+                // Send email notification to the other party
+                if (typeof emailjs !== 'undefined') {
+                    var designId = currentMockup.Design_Number || mockupId;
+                    var company = currentMockup.Company_Name || 'Unknown';
+                    var toEmail, toName;
+                    if (isAeView) {
+                        // AE added note → notify Ruth
+                        toEmail = 'ruth@nwcustomapparel.com';
+                        toName = 'Ruth';
+                    } else {
+                        // Ruth added note → notify the AE who submitted
+                        toEmail = currentMockup.Submitted_By || 'sales@nwcustomapparel.com';
+                        toName = getAeDisplayName(toEmail);
+                    }
+                    emailjs.init('4qSbDO-SQs19TbP80');
+                    emailjs.send('service_jgrave3', 'template_art_note_added', {
+                        to_email: toEmail,
+                        to_name: toName,
+                        design_id: designId,
+                        company_name: company,
+                        note_text: text,
+                        note_type: noteType.replace(/_/g, ' '),
+                        detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId + (isAeView ? '' : '?view=ae'),
+                        from_name: authorName
+                    }).catch(function () { /* fire-and-forget */ });
+                }
             }).catch(function (err) {
                 showToast('Failed to save note: ' + err.message, 'error');
             }).finally(function () {
