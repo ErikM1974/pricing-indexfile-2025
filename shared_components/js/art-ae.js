@@ -15,10 +15,20 @@ var ArtAeGallery = (function () {
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    var DAYS_DEFAULT = 90;
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup';
+
     var containerId = null;
     var allRequests = [];
     var activeFilter = null;
     var searchTerm = '';
+    var showAll = false;
+
+    function getDateFrom(days) {
+        var cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - days);
+        return cutoff.toISOString().split('T')[0];
+    }
 
     function init(containerIdParam) {
         containerId = containerIdParam;
@@ -31,12 +41,17 @@ var ArtAeGallery = (function () {
 
         activeFilter = null;
         searchTerm = '';
+        showAll = false;
         fetchRequests();
     }
 
     function fetchRequests() {
         var url = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
-            + '&select=PK_ID,ID_Design,CompanyName,Design_Number,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Quoted_Art_Charge,Amount_Art_Billed,NOTES,Mockup';
+            + '&select=' + SELECT_FIELDS;
+
+        if (!showAll) {
+            url += '&dateCreatedFrom=' + getDateFrom(DAYS_DEFAULT);
+        }
 
         fetch(url)
             .then(function (r) {
@@ -102,6 +117,21 @@ var ArtAeGallery = (function () {
         });
 
         var html = '';
+
+        // Date range indicator
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+        if (showAll) {
+            html += '<span style="font-size:13px;color:#6b7280;">Showing 200 most recent requests</span>'
+                + '<button onclick="ArtAeGallery.toggleDateRange()" '
+                + 'style="padding:4px 12px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;color:#981e32;">'
+                + 'Last 90 Days</button>';
+        } else {
+            html += '<span style="font-size:13px;color:#6b7280;">Showing last 90 days (' + allRequests.length + ' requests)</span>'
+                + '<button onclick="ArtAeGallery.toggleDateRange()" '
+                + 'style="padding:4px 12px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;color:#981e32;">'
+                + 'Show All</button>';
+        }
+        html += '</div>';
 
         // Search bar
         html += '<div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">'
@@ -189,6 +219,19 @@ var ArtAeGallery = (function () {
         });
     }
 
+    function toggleDateRange() {
+        showAll = !showAll;
+        activeFilter = null;
+        searchTerm = '';
+        var container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">'
+                + '<div style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:#981e32;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
+                + 'Loading art requests...</div>';
+        }
+        fetchRequests();
+    }
+
     function statusPill(count, label, filterValue, bg, border, numColor, textColor) {
         var clickAttr = filterValue
             ? ' onclick="ArtAeGallery.filterByStatus(\'' + filterValue + '\')" style="cursor:pointer;'
@@ -211,7 +254,7 @@ var ArtAeGallery = (function () {
         var revCount = req.Revision_Count || 0;
         var salesRep = escapeHtml(req.Sales_Rep || extractRepFromEmail(req.User_Email));
         var artMinutes = req.Art_Minutes || 0;
-        var quotedArt = req.Quoted_Art_Charge;
+        var quotedArt = req.Prelim_Charges;
         var actualArt = req.Amount_Art_Billed;
         var notes = req.NOTES || '';
 
@@ -370,7 +413,8 @@ var ArtAeGallery = (function () {
     return {
         init: init,
         filterByStatus: filterByStatus,
-        clearFilter: clearFilter
+        clearFilter: clearFilter,
+        toggleDateRange: toggleDateRange
     };
 
 })();
