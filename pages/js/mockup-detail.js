@@ -1191,6 +1191,16 @@
         if (!container) return;
 
         var fields;
+        // Build logo dimensions display string
+        var logoDimensions = '';
+        if (mockup.Logo_Width && mockup.Logo_Height) {
+            logoDimensions = mockup.Logo_Width + ' x ' + mockup.Logo_Height;
+        } else if (mockup.Logo_Width) {
+            logoDimensions = mockup.Logo_Width + ' wide';
+        } else if (mockup.Logo_Height) {
+            logoDimensions = mockup.Logo_Height + ' tall';
+        }
+
         if (isCustomerView) {
             // Customer sees expanded info
             fields = [
@@ -1199,7 +1209,9 @@
                 { label: 'Company', value: mockup.Company_Name },
                 { label: 'Application', value: mockup.Mockup_Type },
                 { label: 'Placement', value: mockup.Print_Location },
+                { label: 'Logo Dimensions', value: logoDimensions },
                 { label: 'Design Size', value: mockup.Design_Size },
+                { label: 'Thread Colors', value: mockup.Thread_Colors },
                 { label: 'Work Order', value: mockup.Work_Order_Number },
                 { label: 'Size Specs', value: mockup.Size_Specs },
                 { label: 'Your Rep', value: getAeDisplayName(mockup.Submitted_By) }
@@ -1212,7 +1224,9 @@
                 { label: 'Application', value: mockup.Mockup_Type },
                 { label: 'Garment', value: mockup.Garment_Info },
                 { label: 'Placement', value: mockup.Print_Location },
+                { label: 'Logo Dimensions', value: logoDimensions },
                 { label: 'Design Size', value: mockup.Design_Size },
+                { label: 'Thread Colors', value: mockup.Thread_Colors },
                 { label: 'Size Specs', value: mockup.Size_Specs },
                 { label: 'Submitted By', value: getAeDisplayName(mockup.Submitted_By) },
                 { label: 'Submitted', value: formatDate(mockup.Submitted_Date) },
@@ -1248,6 +1262,144 @@
                 + '<span class="pmd-field-value" style="white-space:pre-wrap;">' + escapeHtml(mockup.AE_Notes) + '</span>'
                 + '</div>';
         }
+
+        // Ruth's view: editable Logo Width, Logo Height, Thread Colors
+        if (!isAeView && !isCustomerView) {
+            container.innerHTML += '<div class="pmd-editable-section">'
+                + '<div class="pmd-editable-header">Ruth\'s Fields</div>'
+                + '<div class="pmd-field-row pmd-field-row--editable">'
+                + '  <span class="pmd-field-label">Logo Width</span>'
+                + '  <input type="text" class="pmd-inline-input" id="pmd-logo-width" placeholder="e.g. 4" value="' + escapeHtml(mockup.Logo_Width || '') + '">'
+                + '</div>'
+                + '<div class="pmd-field-row pmd-field-row--editable">'
+                + '  <span class="pmd-field-label">Logo Height</span>'
+                + '  <input type="text" class="pmd-inline-input" id="pmd-logo-height" placeholder="e.g. 3.5" value="' + escapeHtml(mockup.Logo_Height || '') + '">'
+                + '</div>'
+                + '<div class="pmd-field-row pmd-field-row--editable" style="flex-direction:column;gap:4px;">'
+                + '  <span class="pmd-field-label">Thread Colors</span>'
+                + '  <div class="pmd-thread-input-wrapper">'
+                + '    <input type="text" class="pmd-inline-input pmd-thread-input" id="pmd-thread-colors" placeholder="Type to search colors..." value="' + escapeHtml(mockup.Thread_Colors || '') + '">'
+                + '    <div class="pmd-thread-suggestions" id="pmd-thread-suggestions"></div>'
+                + '  </div>'
+                + '</div>'
+                + '</div>';
+
+            // Auto-save on blur for width/height
+            var widthInput = document.getElementById('pmd-logo-width');
+            var heightInput = document.getElementById('pmd-logo-height');
+            var threadInput = document.getElementById('pmd-thread-colors');
+
+            if (widthInput) {
+                widthInput.addEventListener('blur', function () {
+                    saveInlineField('Logo_Width', this.value.trim(), this);
+                });
+            }
+            if (heightInput) {
+                heightInput.addEventListener('blur', function () {
+                    saveInlineField('Logo_Height', this.value.trim(), this);
+                });
+            }
+            if (threadInput) {
+                threadInput.addEventListener('blur', function () {
+                    // Delay to allow suggestion click
+                    var input = this;
+                    setTimeout(function () {
+                        saveInlineField('Thread_Colors', input.value.trim(), input);
+                    }, 200);
+                });
+                initThreadColorAutocomplete(threadInput);
+            }
+        }
+    }
+
+    // ── Inline Field Save ────────────────────────────────────────────────
+    function saveInlineField(fieldName, value, inputEl) {
+        var updateData = {};
+        updateData[fieldName] = value;
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Save failed');
+            if (inputEl) {
+                inputEl.classList.add('pmd-inline-saved');
+                setTimeout(function () { inputEl.classList.remove('pmd-inline-saved'); }, 1500);
+            }
+            // Update local state
+            if (currentMockup) currentMockup[fieldName] = value;
+        }).catch(function (err) {
+            showToast('Failed to save: ' + err.message, 'error');
+        });
+    }
+
+    // ── Thread Color Autocomplete ────────────────────────────────────────
+    var threadColorCache = null;
+    function initThreadColorAutocomplete(input) {
+        var suggestionsEl = document.getElementById('pmd-thread-suggestions');
+        if (!suggestionsEl) return;
+
+        // Fetch thread colors once
+        function getThreadColors() {
+            if (threadColorCache) return Promise.resolve(threadColorCache);
+            return fetch(API_BASE + '/api/thread-colors?instock=true')
+                .then(function (r) { return r.ok ? r.json() : { Result: [] }; })
+                .then(function (data) {
+                    threadColorCache = (data.Result || data.result || data || []).map(function (c) {
+                        return c.Thread_Color || c.thread_color || '';
+                    }).filter(Boolean);
+                    return threadColorCache;
+                }).catch(function () { return []; });
+        }
+
+        input.addEventListener('input', function () {
+            var val = this.value;
+            // Get the last color being typed (after last comma)
+            var parts = val.split(',');
+            var currentTyping = parts[parts.length - 1].trim().toLowerCase();
+
+            if (currentTyping.length < 1) {
+                suggestionsEl.style.display = 'none';
+                return;
+            }
+
+            getThreadColors().then(function (colors) {
+                // Filter already-entered colors
+                var entered = parts.slice(0, -1).map(function (p) { return p.trim().toLowerCase(); });
+                var matches = colors.filter(function (c) {
+                    return c.toLowerCase().indexOf(currentTyping) !== -1
+                        && entered.indexOf(c.toLowerCase()) === -1;
+                }).slice(0, 8);
+
+                if (matches.length === 0) {
+                    suggestionsEl.style.display = 'none';
+                    return;
+                }
+
+                suggestionsEl.innerHTML = matches.map(function (m) {
+                    return '<div class="pmd-thread-suggestion">' + escapeHtml(m) + '</div>';
+                }).join('');
+                suggestionsEl.style.display = 'block';
+
+                // Click handler for suggestions
+                suggestionsEl.querySelectorAll('.pmd-thread-suggestion').forEach(function (el) {
+                    el.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        var selected = this.textContent;
+                        // Replace current typing with selected color
+                        parts[parts.length - 1] = ' ' + selected;
+                        input.value = parts.join(',').replace(/^,\s*/, '').replace(/,\s*,/g, ',') + ', ';
+                        suggestionsEl.style.display = 'none';
+                        input.focus();
+                    });
+                });
+            });
+        });
+
+        // Hide suggestions on blur
+        input.addEventListener('blur', function () {
+            setTimeout(function () { suggestionsEl.style.display = 'none'; }, 300);
+        });
     }
 
     // ── Notes ──────────────────────────────────────────────────────────────
