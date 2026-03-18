@@ -222,6 +222,20 @@
             // AE view
             ruthBar.style.display = 'none';
 
+            // Check if any mockup slots are filled
+            var hasMockups = MOCKUP_SLOTS.some(function (s) { return mockup[s.key]; });
+
+            // Customer approval elapsed time (shown on any status)
+            var custElapsedHtml = '';
+            if (mockup.Customer_Approval_Sent_Date) {
+                var custElapsed = getElapsedText(new Date(mockup.Customer_Approval_Sent_Date));
+                custElapsedHtml = ' <span class="approval-elapsed pmd-customer-elapsed ' + custElapsed.cssClass + '" title="Sent to customer ' + escapeHtml(formatDate(mockup.Customer_Approval_Sent_Date)) + '">(customer sent ' + escapeHtml(custElapsed.text) + ')</span>';
+            }
+
+            // Send to Customer + Copy Link buttons (shared across statuses)
+            var sendCopyButtons = '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send-customer" title="Send approval email to customer">Send to Customer</button>'
+                + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
+
             if (statusLower === 'awaitingapproval') {
                 aeBar.style.display = '';
                 var aeElapsedHtml = '';
@@ -229,18 +243,11 @@
                     var aeElapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
                     aeElapsedHtml = ' <span class="approval-elapsed ' + aeElapsed.cssClass + '" style="margin-left:8px;" title="' + escapeHtml(formatDate(mockup.Approval_Sent_Date)) + '">(sent ' + escapeHtml(aeElapsed.text) + ')</span>';
                 }
-                // Customer approval elapsed time
-                var custElapsedHtml = '';
-                if (mockup.Customer_Approval_Sent_Date) {
-                    var custElapsed = getElapsedText(new Date(mockup.Customer_Approval_Sent_Date));
-                    custElapsedHtml = ' <span class="approval-elapsed pmd-customer-elapsed ' + custElapsed.cssClass + '" title="Sent to customer ' + escapeHtml(formatDate(mockup.Customer_Approval_Sent_Date)) + '">(customer sent ' + escapeHtml(custElapsed.text) + ')</span>';
-                }
 
                 aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:' + aeElapsedHtml + custElapsedHtml + '</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve" disabled>Approve Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
-                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send-customer" title="Send approval email to customer">Send to Customer</button>'
-                    + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
+                    + sendCopyButtons;
 
                 document.getElementById('pmd-btn-approve').addEventListener('click', function () {
                     if (!selectedMockupSlot) {
@@ -254,10 +261,25 @@
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
                 });
-                document.getElementById('pmd-btn-send-customer').addEventListener('click', function () {
+            } else if (hasMockups) {
+                // Non-approval status but mockups exist — show send + copy buttons
+                aeBar.style.display = '';
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">Mockup actions:' + custElapsedHtml + '</span>'
+                    + sendCopyButtons;
+            } else {
+                aeBar.style.display = 'none';
+            }
+
+            // Attach send/copy listeners if buttons exist
+            var sendBtn = document.getElementById('pmd-btn-send-customer');
+            var copyBtn = document.getElementById('pmd-btn-copy-link');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function () {
                     openSendToCustomerModal();
                 });
-                document.getElementById('pmd-btn-copy-link').addEventListener('click', function () {
+            }
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function () {
                     var customerUrl = window.location.origin + '/mockup/' + mockupId + '?view=customer';
                     navigator.clipboard.writeText(customerUrl).then(function () {
                         showToast('Customer link copied to clipboard!', 'success');
@@ -265,8 +287,6 @@
                         prompt('Copy this link:', customerUrl);
                     });
                 });
-            } else {
-                aeBar.style.display = 'none';
             }
         } else {
             // Ruth's view
