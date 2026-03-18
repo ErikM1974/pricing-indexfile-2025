@@ -18,6 +18,9 @@
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     var SITE_ORIGIN = 'https://www.teamnwca.com';
 
+    // Module-level callback for Send for Approval modal (functions can't go in dataset)
+    var _pendingApprovalOnSuccess = null;
+
     var REP_EMAIL_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
         'Nika':     'nika@nwcustomapparel.com',
@@ -273,7 +276,7 @@
      * @param {string} repEmail - Sales rep email (for completion notification)
      * @param {string} companyName - Company name (for notification)
      */
-    async function showArtTimeModal(designId, repEmail, companyName) {
+    async function showArtTimeModal(designId, repEmail, companyName, onSuccess) {
         removeModals();
 
         var currentMins = 0;
@@ -408,7 +411,15 @@
 
                 this.textContent = 'Done!';
                 this.style.background = '#009900';
-                setTimeout(function () { removeModals(); window.location.reload(); }, 600);
+                var totalMins = currentMins + mins;
+                setTimeout(function () {
+                    removeModals();
+                    if (typeof onSuccess === 'function') {
+                        onSuccess({ status: 'Completed', artMinutes: totalMins, action: 'markComplete' });
+                    } else {
+                        window.location.reload();
+                    }
+                }, 600);
             } catch (err) {
                 this.textContent = 'Error — retry';
                 this.style.background = '#dc3545';
@@ -423,7 +434,7 @@
      * @param {string} designId
      * @param {string} currentStatus - Current status text to preserve on PUT
      */
-    async function showLogTimeModal(designId, currentStatus) {
+    async function showLogTimeModal(designId, currentStatus, onSuccess) {
         removeModals();
 
         var currentMins = 0;
@@ -556,7 +567,16 @@
 
                 this.textContent = 'Saved!';
                 this.style.background = '#0891b2';
-                setTimeout(function () { removeModals(); window.location.reload(); }, 600);
+                var currentMinsForCallback = parseInt(modal.dataset.currentMins) || 0;
+                var totalMins = currentMinsForCallback + mins;
+                setTimeout(function () {
+                    removeModals();
+                    if (typeof onSuccess === 'function') {
+                        onSuccess({ status: currentStatus, artMinutes: totalMins, action: 'logTime' });
+                    } else {
+                        window.location.reload();
+                    }
+                }, 600);
             } catch (err) {
                 this.textContent = 'Error — retry';
                 this.style.background = '#dc3545';
@@ -660,7 +680,8 @@
      * @param {string} designId
      * @param {string} companyName
      */
-    async function showSendForApprovalModal(designId, companyName) {
+    async function showSendForApprovalModal(designId, companyName, onSuccess) {
+        _pendingApprovalOnSuccess = onSuccess || null;
         var overlay = document.getElementById('approval-overlay');
         var modal = document.getElementById('approval-modal');
         if (!overlay || !modal) return;
@@ -894,7 +915,8 @@
             Sales_Rep: salesRep || '',
             CompanyName: artReqData ? artReqData.CompanyName : (companyName || ''),
             Revision_Count: artReqData ? (artReqData.Revision_Count || 0) : 0,
-            PK_ID: artReqData ? artReqData.PK_ID : null
+            PK_ID: artReqData ? artReqData.PK_ID : null,
+            currentMins: artReqData ? (artReqData.Art_Minutes || 0) : 0
         });
     }
 
@@ -1047,7 +1069,16 @@
 
             submitBtn.textContent = 'Sent!';
             submitBtn.style.background = '#28a745';
-            setTimeout(function () { closeApprovalModal(); window.location.reload(); }, 600);
+            var cbk = _pendingApprovalOnSuccess;
+            _pendingApprovalOnSuccess = null;
+            setTimeout(function () {
+                closeApprovalModal();
+                if (typeof cbk === 'function') {
+                    cbk({ status: 'Awaiting Approval', artMinutes: artReqMeta.currentMins + mins, action: 'sendMockup' });
+                } else {
+                    window.location.reload();
+                }
+            }, 600);
         } catch (err) {
             submitBtn.textContent = 'Error — retry';
             submitBtn.style.background = '#dc3545';

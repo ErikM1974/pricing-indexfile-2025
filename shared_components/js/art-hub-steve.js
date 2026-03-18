@@ -396,6 +396,7 @@
 
         // Quoted charge (AE's estimate from Prelim_Charges)
         const quotedCharge = parseFloat(chargeSpan.textContent.replace('$', '')) || 0;
+        card.dataset.quotedCharge = quotedCharge;
         const quotedHours = quotedCharge > 0 ? (Math.ceil(quotedCharge / 18.75) * 0.25) : 0;
 
         // Actual art time (Steve's logged time from Art_Minutes hidden span)
@@ -595,7 +596,7 @@
                         });
                     }
 
-                    setTimeout(() => window.location.reload(), 1200);
+                    setTimeout(() => refreshCard(designId, { status: 'In Progress', action: 'markWorking' }), 600);
                 } catch (err) {
                     b.textContent = 'Error';
                     b.style.background = '#dc3545';
@@ -631,7 +632,9 @@
             } else if (status.includes('inprogress') || status.includes('revisionrequested')) {
                 statusSection.btns.appendChild(btn('Send Mockup', 'approve', () => {
                     const companyEl = card.querySelector('.company-name');
-                    ArtActions.showSendForApprovalModal(designId, companyEl ? companyEl.textContent.trim() : '');
+                    ArtActions.showSendForApprovalModal(designId, companyEl ? companyEl.textContent.trim() : '', function (data) {
+                        refreshCard(designId, data);
+                    });
                 }));
             }
         } else if (isCompleted) {
@@ -658,7 +661,7 @@
                     ArtActions.notifyReopen(designId);
                     b.textContent = 'Reopened!';
                     b.style.background = '#28a745';
-                    setTimeout(() => window.location.reload(), 800);
+                    setTimeout(() => refreshCard(designId, { status: 'In Progress', action: 'reopen' }), 600);
                 } catch (err) {
                     b.textContent = 'Error';
                     b.style.background = '#dc3545';
@@ -673,7 +676,9 @@
         timeSection.btns.appendChild(btn('Log Time', 'logtime', () => {
             const statusPillEl = card.querySelector('.status-pill');
             const curStatus = statusPillEl ? statusPillEl.textContent.trim() : 'In Progress 🔵';
-            ArtActions.showLogTimeModal(designId, curStatus);
+            ArtActions.showLogTimeModal(designId, curStatus, function (data) {
+                refreshCard(designId, data);
+            });
         }));
         if (!isInactive) {
             timeSection.btns.appendChild(btn('Mark Complete', 'done', () => {
@@ -681,7 +686,9 @@
                 const repEmail = repEl ? repEl.dataset.email : '';
                 const companyEl = card.querySelector('.company-name');
                 const company = companyEl ? companyEl.textContent.trim() : '';
-                ArtActions.showArtTimeModal(designId, repEmail, company);
+                ArtActions.showArtTimeModal(designId, repEmail, company, function (data) {
+                    refreshCard(designId, data);
+                });
             }));
         }
         timeSection.btns.appendChild(btn('Time Log', 'timelog', () => {
@@ -740,6 +747,83 @@
     const EMAILJS_SERVICE_ID = 'service_jgrave3';
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     const SITE_ORIGIN = 'https://www.teamnwca.com';
+
+    // ── In-Place Card Refresh (no page reload) ─────────────────────────
+    function findCardByDesignId(designId) {
+        var cards = document.querySelectorAll('#gallery-tab .card');
+        for (var i = 0; i < cards.length; i++) {
+            var idEl = cards[i].querySelector('.id-design');
+            if (idEl && idEl.textContent.replace(/[^0-9]/g, '') === String(designId)) return cards[i];
+        }
+        return null;
+    }
+
+    function refreshCard(designId, newData) {
+        var card = findCardByDesignId(designId);
+        if (!card) { window.location.reload(); return; }
+
+        // 1. Update status pill
+        if (newData.status) {
+            var pill = card.querySelector('.status-pill');
+            if (pill) {
+                var statusEmoji = { 'In Progress': '\uD83D\uDD35', 'Completed': '\u2705', 'Awaiting Approval': '\uD83D\uDFE0', 'Submitted': '\uD83C\uDD95', 'Revision Requested': '\uD83D\uDD04' };
+                pill.textContent = newData.status + ' ' + (statusEmoji[newData.status] || '');
+                pill.className = 'pill status-pill status-' + newData.status.toLowerCase().replace(/\s+/g, '');
+            }
+        }
+
+        // 2. Update art time display
+        if (newData.artMinutes !== undefined) {
+            var actualMinsSpan = card.querySelector('.actual-minutes');
+            if (actualMinsSpan) actualMinsSpan.textContent = newData.artMinutes;
+
+            var quotedCharge = parseFloat(card.dataset.quotedCharge) || 0;
+            var quotedHours = quotedCharge > 0 ? (Math.ceil(quotedCharge / 18.75) * 0.25) : 0;
+            var actualMins = newData.artMinutes;
+            var actualHours = actualMins > 0 ? (Math.ceil(actualMins / 15) * 0.25) : 0;
+            var actualCost = actualHours * 75;
+
+            var valueDiv = card.querySelector('.charge-line') ? card.querySelector('.charge-line').parentElement : null;
+            if (valueDiv) {
+                var html = '<div class="charge-line charge-line--quoted">';
+                html += '<span class="charge-label">Quoted</span>';
+                html += '<span class="charge-val">$' + quotedCharge.toFixed(2) + '</span>';
+                html += '<span class="charge-sep">&middot;</span>';
+                html += '<span class="charge-hrs">' + quotedHours.toFixed(2) + ' hrs</span>';
+                html += '</div>';
+                html += '<div class="charge-line charge-line--actual">';
+                html += '<span class="charge-label">Actual</span>';
+                if (actualMins > 0) {
+                    html += '<span class="charge-val">$' + actualCost.toFixed(2) + '</span>';
+                    html += '<span class="charge-sep">&middot;</span>';
+                    html += '<span class="charge-hrs">' + actualHours.toFixed(2) + ' hrs</span>';
+                } else {
+                    html += '<span class="charge-val charge-val--none">No time logged</span>';
+                }
+                html += '</div>';
+                valueDiv.innerHTML = html;
+            }
+        }
+
+        // 3. Update card classes
+        if (newData.status === 'Completed') {
+            card.classList.add('card--completed');
+            var duePill = card.querySelector('.due-status-pill');
+            if (duePill) duePill.style.display = 'none';
+        } else {
+            card.classList.remove('card--completed');
+        }
+
+        // 4. Rebuild footer buttons for new status
+        var existingFooter = card.querySelector('.card-footer-buttons');
+        if (existingFooter) existingFooter.remove();
+        injectQuickActions(card);
+
+        // 5. Flash success on the card
+        card.style.transition = 'box-shadow 0.3s ease';
+        card.style.boxShadow = '0 0 0 3px #28a745';
+        setTimeout(function () { card.style.boxShadow = ''; }, 2000);
+    }
 
     // ── MutationObserver: Watch for Caspio gallery cards ────────────────
     function processCards() {
