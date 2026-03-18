@@ -14,6 +14,17 @@
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // Logged-in user identity (from staff portal session)
+    function getLoggedInUser() {
+        var name = sessionStorage.getItem('nwca_user_name') || '';
+        var email = sessionStorage.getItem('nwca_user_email') || '';
+        return {
+            name: name || 'Staff',
+            email: email || 'art@nwcustomapparel.com',
+            firstName: (name || 'Staff').split(' ')[0]
+        };
+    }
+
     var EMAILJS_SERVICE_ID = 'service_jgrave3';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     var SITE_ORIGIN = 'https://www.teamnwca.com';
@@ -97,7 +108,7 @@
                 Cost: cost,
                 Description: (description || '').substring(0, 255),
                 Charge_Type: chargeType,
-                Logged_By: 'art@nwcustomapparel.com',
+                Logged_By: getLoggedInUser().email,
                 Running_Total_Minutes: newTotalMins,
                 Running_Total_Cost: totalCost
             })
@@ -385,7 +396,7 @@
                         body: JSON.stringify({
                             noteType: 'Art Time',
                             noteText: 'Completed: ' + mins + ' additional minutes ($' + cost + ')',
-                            noteBy: 'art@nwcustomapparel.com'
+                            noteBy: getLoggedInUser().email
                         })
                     }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
                     logArtCharge(designId, mins, 'Completed', 'Completion', currentMins);
@@ -558,7 +569,7 @@
                         body: JSON.stringify({
                             noteType: 'Art Time',
                             noteText: noteBody,
-                            noteBy: 'art@nwcustomapparel.com'
+                            noteBy: getLoggedInUser().email
                         })
                     }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
                     var currentMinsForCharge = parseInt(modal.dataset.currentMins) || 0;
@@ -1013,7 +1024,7 @@
                 body: JSON.stringify({
                     noteType: 'Mockup Sent',
                     noteText: noteText,
-                    noteBy: 'art@nwcustomapparel.com'
+                    noteBy: getLoggedInUser().email
                 })
             });
             if (!noteResp.ok) throw new Error('Note creation ' + noteResp.status);
@@ -1027,7 +1038,7 @@
                     body: JSON.stringify({
                         noteType: 'Art Time',
                         noteText: 'Logged ' + mins + ' minutes ($' + cost + ')' + revLabel,
-                        noteBy: 'art@nwcustomapparel.com'
+                        noteBy: getLoggedInUser().email
                     })
                 }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
                 var currentArtMinsForCharge = parseInt(modal.dataset.currentArtMins) || 0;
@@ -1157,7 +1168,7 @@
             body: JSON.stringify({
                 noteType: 'Reminder',
                 noteText: 'Mockup reminder sent to ' + displayTo,
-                noteBy: 'art@nwcustomapparel.com'
+                noteBy: getLoggedInUser().email
             })
         }).then(function (resp) {
             if (!resp.ok) throw new Error('Note failed ' + resp.status);

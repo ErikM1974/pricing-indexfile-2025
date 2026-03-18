@@ -19,6 +19,17 @@
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     const SITE_ORIGIN = 'https://www.teamnwca.com';
 
+    // Logged-in user identity (from staff portal session)
+    function getLoggedInUser() {
+        var name = sessionStorage.getItem('nwca_user_name') || '';
+        var email = sessionStorage.getItem('nwca_user_email') || '';
+        return {
+            name: name || 'Staff',
+            email: email || 'art@nwcustomapparel.com',
+            firstName: (name || 'Staff').split(' ')[0]
+        };
+    }
+
     const REP_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
         'Nika':     'nika@nwcustomapparel.com',
@@ -415,7 +426,7 @@
                 return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: 'art@nwcustomapparel.com' })
+                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: getLoggedInUser().email })
                 });
             }).then(function () {
                 btnWorking.textContent = 'Updated!';
@@ -487,7 +498,7 @@
                 return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: 'art@nwcustomapparel.com' })
+                    body: JSON.stringify({ noteType: 'Status Change', noteText: 'Reopened from Completed', noteBy: getLoggedInUser().email })
                 });
             }).then(function () {
                 ArtActions.notifyReopen(designId);
@@ -646,7 +657,7 @@
                 fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ noteType: 'Final Approved', noteText: 'Set final approved mockup for production', noteBy: 'art@nwcustomapparel.com' })
+                    body: JSON.stringify({ noteType: 'Final Approved', noteText: 'Set final approved mockup for production', noteBy: getLoggedInUser().email })
                 }).catch(function () {});
                 if (typeof refreshNotes === 'function') refreshNotes();
                 // Notify AE that final mockup is production-ready
@@ -1012,7 +1023,7 @@
                     return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: 'art@nwcustomapparel.com' })
+                        body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: getLoggedInUser().email })
                     });
                 }).then(function () {
                     renderMockupGallery(currentRequest);
@@ -1133,7 +1144,7 @@
                     fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Mockup Added', noteText: 'Added mockup from Box: ' + selectedBoxFile.name, noteBy: 'art@nwcustomapparel.com' })
+                        body: JSON.stringify({ noteType: 'Mockup Added', noteText: 'Added mockup from Box: ' + selectedBoxFile.name, noteBy: getLoggedInUser().email })
                     }).catch(function () {});
 
                     closeBoxModal();
@@ -2294,7 +2305,7 @@
                     ID_Design: parseInt(designId, 10),
                     Note_Type: noteType,
                     Note_Text: noteText,
-                    Note_By: 'art@nwcustomapparel.com'
+                    Note_By: getLoggedInUser().email
                 })
             }).then(function (resp) {
                 if (!resp.ok) throw new Error('Save failed: ' + resp.status);

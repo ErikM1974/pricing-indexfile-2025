@@ -19,6 +19,17 @@
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // ── Logged-in user identity (from staff portal session) ──────────
+    function getLoggedInUser() {
+        var name = sessionStorage.getItem('nwca_user_name') || '';
+        var email = sessionStorage.getItem('nwca_user_email') || '';
+        return {
+            name: name || 'Staff',
+            email: email || 'art@nwcustomapparel.com',
+            firstName: (name || 'Staff').split(' ')[0]
+        };
+    }
+
     // ── Shared references from art-actions-shared.js ─────────────────
     const REP_EMAIL_MAP = ArtActions.REP_EMAIL_MAP;
 
@@ -237,7 +248,7 @@
                     ID_Design: parseInt(currentNotesDesignId, 10),
                     Note_Type: noteType,
                     Note_Text: noteText,
-                    Note_By: 'art@nwcustomapparel.com'
+                    Note_By: getLoggedInUser().email
                 })
             });
 
@@ -574,7 +585,7 @@
                     await fetch(`${API_BASE}/api/art-requests/${designId}/note`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: 'art@nwcustomapparel.com' })
+                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'Status set to Working (In Progress)', noteBy: getLoggedInUser().email })
                     }).catch(() => {});
                     b.textContent = 'Updated!';
                     b.style.background = '#28a745';
@@ -657,7 +668,7 @@
                         body: JSON.stringify({
                             noteType: 'Status Change',
                             noteText: 'Reopened from ' + reopenFromLabel,
-                            noteBy: 'art@nwcustomapparel.com'
+                            noteBy: getLoggedInUser().email
                         })
                     }).catch(err => console.warn('Reopen note failed (non-blocking):', err));
                     ArtActions.notifyReopen(designId);

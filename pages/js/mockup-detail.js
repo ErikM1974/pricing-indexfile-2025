@@ -20,6 +20,17 @@
     var HEROKU_ORIGIN = 'https://www.teamnwca.com';
     var RUTH_EMAIL = 'ruth@nwcustomapparel.com';
 
+    // Logged-in user identity (from staff portal session)
+    function getLoggedInUser() {
+        var name = sessionStorage.getItem('nwca_user_name') || '';
+        var email = sessionStorage.getItem('nwca_user_email') || '';
+        return {
+            name: name || 'Staff',
+            email: email || 'staff@nwcustomapparel.com',
+            firstName: (name || 'Staff').split(' ')[0]
+        };
+    }
+
     var MOCKUP_SLOTS = [
         { key: 'Box_Mockup_1', label: 'Mockup 1' },
         { key: 'Box_Mockup_2', label: 'Mockup 2' },
@@ -372,8 +383,8 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             Mockup_ID: parseInt(mockupId),
-                            Author: 'ruth@nwcustomapparel.com',
-                            Author_Name: 'Ruth',
+                            Author: getLoggedInUser().email,
+                            Author_Name: getLoggedInUser().firstName,
                             Note_Text: 'Approval reminder sent to ' + getAeDisplayName(aeEmail),
                             Note_Type: 'artist_note'
                         })
@@ -519,12 +530,10 @@
         if (isCustomerView) {
             author = 'Customer';
             authorName = 'Customer';
-        } else if (isAeView) {
-            author = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
-            authorName = getAeDisplayName(currentMockup.Submitted_By);
         } else {
-            author = 'ruth@nwcustomapparel.com';
-            authorName = 'Ruth';
+            var loggedIn = getLoggedInUser();
+            author = loggedIn.email;
+            authorName = loggedIn.firstName;
         }
 
         var body = { status: newStatus, author: author, authorName: authorName };
@@ -1167,8 +1176,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         Mockup_ID: parseInt(mockupId),
-                        Author: 'ruth@nwcustomapparel.com',
-                        Author_Name: 'Ruth',
+                        Author: getLoggedInUser().email,
+                        Author_Name: getLoggedInUser().firstName,
                         Note_Text: 'Added file from Box: ' + selectedBoxFile.name,
                         Note_Type: 'artist_note'
                     })
@@ -1449,8 +1458,9 @@
             btn.textContent = 'Saving...';
 
             var noteType = isAeView ? 'ae_instruction' : 'artist_note';
-            var author = isAeView ? (currentMockup.Submitted_By || 'ae@nwcustomapparel.com') : 'ruth@nwcustomapparel.com';
-            var authorName = isAeView ? getAeDisplayName(currentMockup.Submitted_By) : 'Ruth';
+            var loggedIn = getLoggedInUser();
+            var author = loggedIn.email;
+            var authorName = loggedIn.firstName;
 
             fetch(API_BASE + '/api/mockup-notes', {
                 method: 'POST',
