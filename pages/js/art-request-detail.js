@@ -3207,12 +3207,19 @@
                 var analyses = data.analyses || [];
                 if (analyses.length === 0) return;
 
-                // Group print locations by Analysis_ID (PK_ID)
-                var printMap = {};
+                // Group print locations by Analysis_ID AND by Mockup_Slot (dual lookup)
+                var printMapById = {};
+                var printMapBySlot = {};
                 (data.printLocations || []).forEach(function (pl) {
                     var aid = pl.Analysis_ID;
-                    if (!printMap[aid]) printMap[aid] = [];
-                    printMap[aid].push(pl);
+                    if (!printMapById[aid]) printMapById[aid] = [];
+                    printMapById[aid].push(pl);
+                    // Also group by Mockup_Slot for fallback matching
+                    var slot = pl.Mockup_Slot;
+                    if (slot) {
+                        if (!printMapBySlot[slot]) printMapBySlot[slot] = [];
+                        printMapBySlot[slot].push(pl);
+                    }
                 });
 
                 section.style.display = '';
@@ -3247,7 +3254,8 @@
                     var validationClass = isPass ? 'ard-vision-valid' : 'ard-vision-warn';
                     var method = (a.Extracted_Method || '').toLowerCase();
                     var isScreenPrint = method.indexOf('screen') !== -1;
-                    var locations = printMap[a.PK_ID] || [];
+                    // Try matching by PK_ID first, then by Analysis_ID fallback format, then by Mockup_Slot
+                    var locations = printMapById[String(a.PK_ID)] || printMapById[a.Design_ID + '_' + a.PK_ID] || printMapBySlot[item.slot] || [];
 
                     cardsHtml += '<div class="ard-vision-card">'
                         + '<div class="ard-vision-card-header">'
