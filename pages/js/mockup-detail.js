@@ -405,12 +405,15 @@
 
     // ── Customer Approval ───────────────────────────────────────────────
     var selectedMockupSlot = null;
+    var customerApprovalInProgress = false;
 
     function handleCustomerApproval(btnEl) {
+        if (customerApprovalInProgress) return;
         if (!selectedMockupSlot) {
             showToast('Please click on a mockup to select it first', 'error');
             return;
         }
+        customerApprovalInProgress = true;
         if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Submitting...'; }
 
         var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === selectedMockupSlot; })[0];
@@ -431,8 +434,10 @@
             if (!resp.ok) throw new Error('Approval failed');
             return resp.json();
         }).then(function () {
+            sendStatusNotifications('Approved');
             showCustomerConfirmation('approved');
         }).catch(function (err) {
+            customerApprovalInProgress = false;
             showToast('Error: ' + err.message, 'error');
             if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Approve Selected Mockup'; }
         });
@@ -501,7 +506,10 @@
     }
 
     // ── Status Update ──────────────────────────────────────────────────────
+    var statusUpdateInProgress = false;
     function handleStatusUpdate(newStatus, notes, btnEl) {
+        if (statusUpdateInProgress) return;
+        statusUpdateInProgress = true;
         if (btnEl) {
             btnEl.disabled = true;
             btnEl.textContent = 'Updating...';
@@ -540,6 +548,7 @@
             showToast('Status updated to "' + newStatus + '"', 'success');
             setTimeout(function () { location.reload(); }, 800);
         }).catch(function (err) {
+            statusUpdateInProgress = false;
             console.error('Status update error:', err);
             showToast('Failed to update status: ' + err.message, 'error');
             if (btnEl) {
