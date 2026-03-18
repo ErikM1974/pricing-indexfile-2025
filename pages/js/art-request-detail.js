@@ -3207,19 +3207,12 @@
                 var analyses = data.analyses || [];
                 if (analyses.length === 0) return;
 
-                // Group print locations by Analysis_ID AND by Mockup_Slot (dual lookup)
+                // Group print locations by Analysis_ID
                 var printMapById = {};
-                var printMapBySlot = {};
                 (data.printLocations || []).forEach(function (pl) {
                     var aid = pl.Analysis_ID;
                     if (!printMapById[aid]) printMapById[aid] = [];
                     printMapById[aid].push(pl);
-                    // Also group by Mockup_Slot for fallback matching
-                    var slot = pl.Mockup_Slot;
-                    if (slot) {
-                        if (!printMapBySlot[slot]) printMapBySlot[slot] = [];
-                        printMapBySlot[slot].push(pl);
-                    }
                 });
 
                 section.style.display = '';
@@ -3254,8 +3247,20 @@
                     var validationClass = isPass ? 'ard-vision-valid' : 'ard-vision-warn';
                     var method = (a.Extracted_Method || '').toLowerCase();
                     var isScreenPrint = method.indexOf('screen') !== -1;
-                    // Try matching by PK_ID first, then by Analysis_ID fallback format, then by Mockup_Slot
-                    var locations = printMapById[String(a.PK_ID)] || printMapById[a.Design_ID + '_' + a.PK_ID] || printMapBySlot[item.slot] || [];
+                    // Match print locations by PK_ID, or find by Analysis_ID that starts with Design_ID + slot match
+                    var locations = printMapById[String(a.PK_ID)] || [];
+                    if (locations.length === 0) {
+                        // Fallback: find Analysis_ID keys that start with the Design_ID (format: designId_timestamp)
+                        Object.keys(printMapById).forEach(function (key) {
+                            if (locations.length === 0 && key.indexOf(a.Design_ID + '_') === 0) {
+                                // Filter to only locations matching this mockup slot
+                                var slotFiltered = printMapById[key].filter(function (pl) {
+                                    return pl.Mockup_Slot === item.slot;
+                                });
+                                if (slotFiltered.length > 0) locations = slotFiltered;
+                            }
+                        });
+                    }
 
                     cardsHtml += '<div class="ard-vision-card">'
                         + '<div class="ard-vision-card-header">'
