@@ -1178,6 +1178,36 @@ body {
     border-color: #dc3545;
 }
 
+/* Posting-as indicator */
+.ard-posting-as {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #6b7280;
+}
+.ard-posting-as-label { font-weight: 600; }
+.ard-posting-as-name {
+    font-weight: 700;
+    color: #1f2937;
+}
+.ard-posting-as-check {
+    color: #16a34a;
+    font-weight: 700;
+}
+.ard-posting-as select {
+    font-size: 12px;
+    padding: 2px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-family: inherit;
+    color: #1f2937;
+    background: #fff;
+    margin-bottom: 0;
+    width: auto;
+}
+
 .ard-add-note-footer {
     display: flex;
     justify-content: space-between;

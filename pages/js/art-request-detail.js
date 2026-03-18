@@ -2305,6 +2305,31 @@
         var submitBtn = document.getElementById('ard-note-submit');
         if (!toggle || !form || !submitBtn) return;
 
+        // Posting-as indicator
+        var STAFF_NAMES = ['Erik', 'Taneisha', 'Nika', 'Steve', 'Ruth', 'Jim', 'Mikalah'];
+        var postingAsEl = document.getElementById('ard-posting-as');
+        if (postingAsEl) {
+            var user = getLoggedInUser();
+            var detectedName = user.name && user.name !== 'Staff' ? user.firstName : '';
+            if (detectedName) {
+                postingAsEl.innerHTML = '<span class="ard-posting-as-label">Posting as:</span> '
+                    + '<span class="ard-posting-as-name">' + escapeHtml(detectedName) + '</span> '
+                    + '<span class="ard-posting-as-check">✓</span>';
+            } else {
+                var opts = '<option value="">-- select your name --</option>';
+                STAFF_NAMES.forEach(function (n) { opts += '<option value="' + n + '">' + n + '</option>'; });
+                opts += '<option value="Other">Other</option>';
+                postingAsEl.innerHTML = '<span class="ard-posting-as-label">Posting as:</span> '
+                    + '<select id="ard-posting-as-select">' + opts + '</select>';
+                var sel = document.getElementById('ard-posting-as-select');
+                if (sel) {
+                    sel.addEventListener('change', function () {
+                        if (sel.value) sessionStorage.setItem('nwca_user_name', sel.value);
+                    });
+                }
+            }
+        }
+
         toggle.addEventListener('click', function () {
             form.classList.toggle('open');
             toggle.textContent = form.classList.contains('open') ? '- Close' : '+ Add Note';
@@ -2324,6 +2349,14 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving...';
 
+            // Get posting-as name (from dropdown if no session, or from session)
+            var postingAsSelect = document.getElementById('ard-posting-as-select');
+            var postingAsName = postingAsSelect ? postingAsSelect.value : '';
+            if (!postingAsName) postingAsName = getLoggedInUser().noteBy;
+            if (!postingAsName || postingAsName === 'Staff') {
+                if (postingAsSelect) { postingAsSelect.style.borderColor = '#dc3545'; return; }
+            }
+
             fetch(API_BASE + '/api/design-notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2331,7 +2364,7 @@
                     ID_Design: parseInt(designId, 10),
                     Note_Type: noteType,
                     Note_Text: noteText,
-                    Note_By: getLoggedInUser().email
+                    Note_By: postingAsName
                 })
             }).then(function (resp) {
                 if (!resp.ok) throw new Error('Save failed: ' + resp.status);

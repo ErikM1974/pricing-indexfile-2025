@@ -678,6 +678,29 @@ body {
     cursor: not-allowed;
 }
 
+/* Posting-as indicator */
+.pmd-posting-as {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #6b7280;
+}
+.pmd-posting-as .posting-as-label { font-weight: 600; }
+.pmd-posting-as .posting-as-name { font-weight: 700; color: #1f2937; }
+.pmd-posting-as .posting-as-check { color: #16a34a; font-weight: 700; }
+.pmd-posting-as select {
+    font-size: 12px;
+    padding: 2px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-family: inherit;
+    color: #1f2937;
+    background: #fff;
+    width: auto;
+}
+
 /* ── Lightbox ───────────────────────────────────────── */
 .pmd-lightbox {
     position: fixed;

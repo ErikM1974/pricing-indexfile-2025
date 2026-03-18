@@ -1451,17 +1451,49 @@
         var input = document.getElementById('pmd-note-input');
         if (!btn || !input) return;
 
+        // Posting-as indicator
+        var STAFF_NAMES = ['Erik', 'Taneisha', 'Nika', 'Steve', 'Ruth', 'Jim', 'Mikalah'];
+        var postingAsEl = document.getElementById('pmd-posting-as');
+        if (postingAsEl) {
+            var user = getLoggedInUser();
+            var detectedName = user.name && user.name !== 'Staff' ? user.firstName : '';
+            if (detectedName) {
+                postingAsEl.innerHTML = '<span class="posting-as-label">Posting as:</span> '
+                    + '<span class="posting-as-name">' + escapeHtml(detectedName) + '</span> '
+                    + '<span class="posting-as-check">✓</span>';
+            } else {
+                var opts = '<option value="">-- select your name --</option>';
+                STAFF_NAMES.forEach(function (n) { opts += '<option value="' + n + '">' + n + '</option>'; });
+                opts += '<option value="Other">Other</option>';
+                postingAsEl.innerHTML = '<span class="posting-as-label">Posting as:</span> '
+                    + '<select id="pmd-posting-as-select">' + opts + '</select>';
+                var sel = document.getElementById('pmd-posting-as-select');
+                if (sel) {
+                    sel.addEventListener('change', function () {
+                        if (sel.value) sessionStorage.setItem('nwca_user_name', sel.value);
+                    });
+                }
+            }
+        }
+
         btn.addEventListener('click', function () {
             var text = input.value.trim();
             if (!text) return;
+
+            // Get posting-as name
+            var postingAsSelect = document.getElementById('pmd-posting-as-select');
+            var postingAsName = postingAsSelect ? postingAsSelect.value : '';
+            if (!postingAsName) postingAsName = getLoggedInUser().noteBy;
+            if (!postingAsName || postingAsName === 'Staff') {
+                if (postingAsSelect) { postingAsSelect.style.borderColor = '#dc3545'; return; }
+            }
 
             btn.disabled = true;
             btn.textContent = 'Saving...';
 
             var noteType = isAeView ? 'ae_instruction' : 'artist_note';
-            var loggedIn = getLoggedInUser();
-            var author = loggedIn.email;
-            var authorName = loggedIn.firstName;
+            var author = postingAsName;
+            var authorName = postingAsName.split(' ')[0];
 
             fetch(API_BASE + '/api/mockup-notes', {
                 method: 'POST',
