@@ -55,6 +55,34 @@ body {
   margin-left: auto;
 }
 
+/* Breadcrumb Nav */
+.breadcrumb-nav {
+  padding: 8px 24px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumb-nav a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.breadcrumb-nav a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--text-dim);
+}
+
+.breadcrumb-current {
+  color: var(--text-dim);
+}
+
 /* Upload Section */
 .upload-section {
   padding: 24px;
