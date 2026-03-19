@@ -169,8 +169,11 @@
         document.getElementById('statColors').textContent = (data.color_changes || 0) + 1;
         document.getElementById('statSize').textContent =
             (data.width_mm || 0) + 'mm x ' + (data.height_mm || 0) + 'mm';
-        document.getElementById('statSource').textContent =
-            (data.color_source || 'emb').toUpperCase() + ' file';
+        var sourceLabel = (data.color_source || 'emb').toUpperCase() + ' file';
+        if (data.pdf_confidence === 'vision') {
+            sourceLabel += ' (AI-extracted)';
+        }
+        document.getElementById('statSource').textContent = sourceLabel;
 
         document.getElementById('downloadPngBtn').disabled = false;
         document.getElementById('downloadSvgBtn').disabled = false;
@@ -222,7 +225,11 @@
         const isMatch = comparison.match;
 
         badge.className = 'match-badge ' + (isMatch ? 'match' : 'mismatch');
-        badge.textContent = matched + '/' + total + ' matched' + (isMatch ? '' : ' — mismatches found');
+        var badgeText = matched + '/' + total + ' matched' + (isMatch ? '' : ' — mismatches found');
+        if (comparison.pdf_confidence === 'vision') {
+            badgeText += ' (AI-extracted)';
+        }
+        badge.textContent = badgeText;
 
         // Build mismatch lookup
         const mismatchRuns = {};
