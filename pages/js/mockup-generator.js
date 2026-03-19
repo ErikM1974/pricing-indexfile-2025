@@ -6,6 +6,7 @@
     // File state
     const files = { dst: null, emb: null, pdf: null };
     let lastMockupData = null;
+    let lastComparisonHasMismatches = false;
 
     // DOM elements
     const dstZone = document.getElementById('dstZone');
@@ -16,6 +17,7 @@
     const pdfInput = document.getElementById('pdfInput');
     const generateBtn = document.getElementById('generateBtn');
     const compareBtn = document.getElementById('compareBtn');
+    const fixEmbBtn = document.getElementById('fixEmbBtn');
     const resetBtn = document.getElementById('resetBtn');
     const sourceToggle = document.getElementById('sourceToggle');
     const colorSource = document.getElementById('colorSource');
@@ -73,6 +75,15 @@
 
         // Show color source toggle when both EMB and PDF are loaded
         sourceToggle.style.display = (hasEmb && hasPdf) ? 'flex' : 'none';
+
+        // Show Fix EMB button when both EMB + PDF loaded AND mismatches exist
+        if (hasEmb && hasPdf && lastComparisonHasMismatches) {
+            fixEmbBtn.style.display = '';
+            fixEmbBtn.disabled = false;
+        } else {
+            fixEmbBtn.style.display = 'none';
+            fixEmbBtn.disabled = true;
+        }
     }
 
     // Generate Mockup
@@ -111,8 +122,10 @@
             displayDesignInfo(data);
 
             if (data.comparison) {
+                lastComparisonHasMismatches = !data.comparison.match;
                 displayComparison(data.comparison, data.thread_sequence,
                     data.comparison.emb_threads || data.thread_sequence);
+                updateButtons();
             }
 
         } catch (err) {
@@ -150,11 +163,72 @@
                 throw new Error(data.error || 'Unknown error');
             }
 
+            lastComparisonHasMismatches = !data.match;
             displayComparison(data, data.pdf_threads, data.emb_threads);
+            updateButtons();
 
         } catch (err) {
             showError('Failed to compare threads: ' + err.message);
             console.error('Compare error:', err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    // Fix EMB Colors — recolor EMB to match PDF
+    async function fixEmbColors() {
+        if (!files.emb || !files.pdf) return;
+
+        showSpinner('Recoloring EMB to match PDF...');
+        hideError();
+
+        const formData = new FormData();
+        formData.append('embFile', files.emb);
+        formData.append('pdfFile', files.pdf);
+
+        try {
+            const response = await fetch(API_BASE + '/api/embroidery/recolor-emb', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Server error');
+            }
+
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Unknown error');
+            }
+
+            // Download the corrected EMB file
+            var bytes = atob(data.emb_base64);
+            var arr = new Uint8Array(bytes.length);
+            for (var i = 0; i < bytes.length; i++) {
+                arr[i] = bytes.charCodeAt(i);
+            }
+            var blob = new Blob([arr], { type: 'application/octet-stream' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = data.filename || 'recolored.emb';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+
+            // Show success summary
+            var msg = 'EMB recolored: ' + data.modified + ' thread(s) updated, ' + data.unchanged + ' unchanged.';
+            if (data.changes && data.changes.length) {
+                msg += ' Changes: ' + data.changes.map(function(c) {
+                    return 'Run ' + c.run + ': ' + c.from + ' → ' + c.to;
+                }).join(', ');
+            }
+            showSuccess(msg);
+
+        } catch (err) {
+            showError('Failed to fix EMB colors: ' + err.message);
+            console.error('Fix EMB error:', err);
         } finally {
             hideSpinner();
         }
@@ -318,6 +392,7 @@
         files.emb = null;
         files.pdf = null;
         lastMockupData = null;
+        lastComparisonHasMismatches = false;
 
         [dstZone, embZone, pdfZone].forEach((z) => z.classList.remove('has-file'));
         ['dstFileName', 'embFileName', 'pdfFileName'].forEach((id) => {
@@ -338,11 +413,16 @@
     // Utilities
     function showError(msg) {
         errorBanner.textContent = msg;
-        errorBanner.classList.add('visible');
+        errorBanner.className = 'error-banner visible';
+    }
+
+    function showSuccess(msg) {
+        errorBanner.textContent = msg;
+        errorBanner.className = 'error-banner visible success';
     }
 
     function hideError() {
-        errorBanner.classList.remove('visible');
+        errorBanner.className = 'error-banner';
     }
 
     function showSpinner(text) {
@@ -372,6 +452,7 @@
 
     generateBtn.addEventListener('click', generateMockup);
     compareBtn.addEventListener('click', compareThreads);
+    fixEmbBtn.addEventListener('click', fixEmbColors);
     resetBtn.addEventListener('click', resetAll);
     document.getElementById('downloadPngBtn').addEventListener('click', downloadPng);
     document.getElementById('downloadSvgBtn').addEventListener('click', downloadSvg);

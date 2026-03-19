@@ -548,6 +548,12 @@ body {
   display: block;
 }
 
+.error-banner.success {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .results-grid {
