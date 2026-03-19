@@ -929,10 +929,35 @@
 
     // ── Init ───────────────────────────────────────────────────────
 
+    /**
+     * Add "Fill from Screenshot" button next to the request type toggle.
+     */
+    function addScreenshotFillButton() {
+        var toggleContainer = document.getElementById('request-type-toggle');
+        if (!toggleContainer) return;
+
+        var row = toggleContainer.querySelector('.toggle-row');
+        if (!row) return;
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ae-screenshot-btn';
+        btn.innerHTML = '📷 Fill from Screenshot';
+        btn.title = 'Paste a ShopWorks screenshot to auto-fill fields';
+        btn.addEventListener('click', function () {
+            if (window.ScreenshotFill) {
+                window.ScreenshotFill.open();
+            }
+        });
+
+        row.appendChild(btn);
+    }
+
     document.addEventListener('DataPageReady', function () {
         setTimeout(function () {
             restructureFormLayout();
             initRequestTypeToggle();
+            addScreenshotFillButton();
             initOrderValidation();
             monitorGarmentCascade();
             monitorAllSwatchesAndImages();

@@ -532,6 +532,7 @@ cap-embroidery-fix.css
 | `/shared_components/js/art-ae.js` | AE Steve Mockups tab — API-driven art request gallery (replaces Caspio DataPage) | art-hub.css, ae-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | **NEW** AE submit art form styles (extracted from Caspio PageHeader) | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-submit-form.js` | **NEW** AE submit form JS: swatches, model images, row numbers, submission notification | ae-dashboard.html | ✅ Active |
+| `/shared_components/js/screenshot-fill.js` | ShopWorks screenshot paste → AI vision → auto-fill art request form | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-dashboard.js` | **NEW** AE dashboard: tab switching, modals, dropdown, notification polling + toasts | ae-dashboard.html | ✅ Active |
 | `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
