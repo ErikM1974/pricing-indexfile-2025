@@ -695,8 +695,11 @@
      * Check for missing required fields and show notice.
      */
     function checkMissingFields() {
-        var missing = [];
-        var checks = [
+        var required = [];
+        var recommended = [];
+
+        // Required fields
+        var requiredChecks = [
             { name: 'InsertRecordCompanyName', label: 'Company' },
             { name: 'InsertRecordOrder_Type', label: 'Order Type', isMultiSelect: true },
             { name: 'InsertRecordDue_Date', label: 'Due Date' },
@@ -705,32 +708,48 @@
             { name: 'InsertRecordOrder_Num_SW', label: 'Order #' }
         ];
 
-        checks.forEach(function (f) {
+        requiredChecks.forEach(function (f) {
             var el = document.querySelector('[name="' + f.name + '"]');
             if (!el) return;
-            // Skip hidden fields (e.g. Order # in Mockup mode)
             if (el.closest && el.closest('.mockup-hidden')) return;
 
             if (f.isMultiSelect) {
-                // Check if any checkbox is checked in the Order Type container
                 var lbl = findLabelFor('Order Type');
                 if (lbl) {
                     var cell = lbl.closest('.cbFormLabelCell');
                     var fieldCell = cell ? cell.nextElementSibling : null;
-                    if (fieldCell) {
-                        var anyChecked = fieldCell.querySelector('input[type="checkbox"]:checked');
-                        if (!anyChecked) missing.push(f.label);
+                    if (fieldCell && !fieldCell.querySelector('input[type="checkbox"]:checked')) {
+                        required.push(f.label);
                     }
                 }
             } else if (f.isSelect) {
-                if (!el.value || el.value === '' || el.selectedIndex <= 0) missing.push(f.label);
+                if (!el.value || el.value === '' || el.selectedIndex <= 0) required.push(f.label);
             } else {
-                if (!el.value || el.value.trim() === '') missing.push(f.label);
+                if (!el.value || el.value.trim() === '') required.push(f.label);
             }
         });
 
-        if (missing.length > 0) {
-            showMissingFieldsNotice(missing);
+        // Recommended fields
+        var artEstimate = document.querySelector('[name="InsertRecordPrelim_Charges"]');
+        if (artEstimate && (!artEstimate.value || artEstimate.selectedIndex <= 0)) {
+            recommended.push('Art Estimate');
+        }
+
+        var artNotes = document.querySelector('[name="InsertRecordNOTES"]');
+        if (artNotes && !artNotes.value.trim()) {
+            recommended.push('Art Notes');
+        }
+
+        // Check if any file has been uploaded (file inputs have a "Choose File" button)
+        var fileInputs = document.querySelectorAll('#submit-tab input[type="file"]');
+        var hasFile = false;
+        fileInputs.forEach(function (fi) { if (fi.value) hasFile = true; });
+        if (!hasFile) {
+            recommended.push('File Upload');
+        }
+
+        if (required.length > 0 || recommended.length > 0) {
+            showMissingFieldsNotice(required, recommended);
         }
     }
 
@@ -744,17 +763,24 @@
         return null;
     }
 
-    function showMissingFieldsNotice(fields) {
-        // Remove existing notice
+    function showMissingFieldsNotice(requiredFields, recommendedFields) {
         var existing = document.querySelector('.ssf-missing-notice');
         if (existing) existing.remove();
+
+        var parts = [];
+        if (requiredFields && requiredFields.length > 0) {
+            parts.push('<strong>Required:</strong> ' + requiredFields.map(function (f) { return escapeHtml(f); }).join(', '));
+        }
+        if (recommendedFields && recommendedFields.length > 0) {
+            parts.push('<strong>Recommended:</strong> ' + recommendedFields.map(function (f) { return escapeHtml(f); }).join(', '));
+        }
 
         var notice = document.createElement('div');
         notice.className = 'ssf-missing-notice';
         notice.innerHTML = '<span class="ssf-missing-icon">'
             + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
             + '</span>'
-            + '<span><strong>Still needed:</strong> ' + fields.map(function (f) { return escapeHtml(f); }).join(', ') + '</span>'
+            + '<span>' + parts.join('<br>') + '</span>'
             + '<button type="button" class="ssf-missing-dismiss" title="Dismiss">&times;</button>';
 
         notice.querySelector('.ssf-missing-dismiss').addEventListener('click', function () {
