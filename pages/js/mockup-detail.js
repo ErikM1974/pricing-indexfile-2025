@@ -701,13 +701,13 @@
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
-                        + (showSelectBadge ? '<div class="pmd-slot-select-badge">Click to select</div>' : '')
+                        + (showSelectBadge ? '<div class="pmd-slot-select-badge">' + (isCustomerView ? 'Click to view & select' : 'Click to select') + '</div>' : '')
                         + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
                         + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
                         + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>'
                         + '<polyline points="7 10 12 15 17 10"></polyline>'
                         + '<line x1="12" y1="15" x2="12" y2="3"></line>'
-                        + '</svg></button>'
+                        + '</svg>' + (isCustomerView ? '<span>Download</span>' : '') + '</button>'
                         + '</div>';
 
                     // Revision badge on filled mockup slots
@@ -737,16 +737,18 @@
                     }
 
                     if (isCustomerView) {
-                        // Customer view: click to select for approval
-                        (function (slotKey, el) {
-                            el.addEventListener('click', function () {
+                        // Customer view: click to select AND open lightbox for full-size view
+                        (function (slotKey, el, imgUrl, imgLabel) {
+                            el.addEventListener('click', function (e) {
+                                if (e.target.closest('.pmd-slot-download')) return; // let download handle itself
                                 grid.querySelectorAll('.pmd-gallery-slot').forEach(function (s) { s.classList.remove('pmd-slot-selected'); });
                                 el.classList.add('pmd-slot-selected');
                                 selectedMockupSlot = slotKey;
                                 var approveBtn = document.getElementById('pmd-btn-customer-approve');
                                 if (approveBtn) approveBtn.disabled = false;
+                                openLightbox(imgUrl, imgLabel);
                             });
-                        })(slot.key, slotEl);
+                        })(slot.key, slotEl, url, slot.label);
                     } else if (aeCanSelect && !isRefFile) {
                         // AE view: click to select which mockup to approve
                         (function (slotKey, el) {
