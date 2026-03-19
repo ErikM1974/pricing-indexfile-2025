@@ -879,15 +879,19 @@
             feedback.textContent = 'Checking ShopWorks...';
             feedback.style.display = 'block';
 
-            fetch(API_BASE + '/api/manageorders/orders?filter=id_Order=' + encodeURIComponent(orderNum))
+            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
                 .then(function (resp) { return resp.ok ? resp.json() : { result: [] }; })
                 .then(function (data) {
                     var orders = data.result || data || [];
                     if (orders.length > 0) {
-                        var customerName = orders[0].CustomerName || '';
+                        var order = orders[0];
+                        var customerName = order.CustomerName || '';
                         orderInput.classList.add('ae-field-verified');
                         feedback.className = 'ae-order-feedback ae-order-feedback--success';
                         feedback.innerHTML = '&#x2714; Order ' + escapeHtml(orderNum) + (customerName ? ' &mdash; ' + escapeHtml(customerName) : '');
+
+                        // Auto-fill empty fields from ManageOrders data
+                        autoFillFromOrder(order);
                     } else {
                         orderInput.classList.add('ae-field-warning');
                         feedback.className = 'ae-order-feedback ae-order-feedback--warning';
@@ -925,6 +929,125 @@
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // ── ShopWorks Order Type ID → Caspio checkbox values ──
+    var ORDER_TYPE_ID_MAP = {
+        1:   ['Embroidery'],              // CAP Order
+        2:   ['Embroidery'],              // College Embroidery
+        3:   ['Other'],                   // Importing
+        4:   ['Other'],                   // Blank Goods
+        11:  ['Screen Print'],            // Custom Screen Print
+        12:  ['Screen Print'],            // Contract Screen Print
+        13:  ['Screen Print'],            // Screen Print Subcontract
+        14:  ['Screen Print'],            // Sample Screen Print
+        21:  ['Embroidery'],              // Custom Embroidery
+        22:  ['Embroidery'],              // Contract Embroidery
+        23:  ['Embroidery'],              // Subcontract Embroidery
+        24:  ['Other'],                   // Sample-Return to Vendor
+        31:  ['DTG'],                     // Inksoft
+        32:  ['Screen Print'],            // Preprint Customized, Screen
+        33:  ['Embroidery'],              // Preprint Customized, Embroidery
+        41:  ['Laser Engraving', 'ASI'],  // Laser/Ad Specialties
+        51:  ['Screen Print'],            // Screen Print Preprint Production
+        52:  ['Embroidery'],              // Embroidery Preprint Production
+        61:  ['Other'],                   // Inventory
+        91:  ['Embroidery'],              // Contract Receiving
+        95:  ['Other'],                   // Digitizing
+        999: ['Other']                    // External
+    };
+
+    /**
+     * Auto-fill empty form fields from ManageOrders order data.
+     * Only fills fields that are currently empty (won't overwrite screenshot/text paste data).
+     */
+    function autoFillFromOrder(order) {
+        if (!order || !window.ScreenshotFill) return;
+
+        var ssf = window.ScreenshotFill;
+        var filledCount = 0;
+
+        // Helper: set field only if empty
+        function setIfEmpty(fieldName, value) {
+            if (!value) return false;
+            var input = document.querySelector('[name="' + fieldName + '"]');
+            if (input && !input.value.trim()) {
+                input.value = String(value).trim();
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                ssf.highlightField(input);
+                filledCount++;
+                return true;
+            }
+            return false;
+        }
+
+        // Company name
+        setIfEmpty('InsertRecordCompanyName', order.CustomerName);
+
+        // Customer number
+        setIfEmpty('InsertRecordShopwork_customer_number', order.id_Customer);
+
+        // Design number
+        setIfEmpty('InsertRecordDesign_Num_SW', order.id_Design);
+
+        // Contact — try cascade dropdown first
+        if (order.ContactFirstName || order.ContactLastName) {
+            var fullName = ((order.ContactFirstName || '') + ' ' + (order.ContactLastName || '')).replace(/\s+/g, ' ').trim();
+            var contactSelect = document.querySelector('select[name="InsertRecordFull_Name_Contact"]');
+            // Only attempt if contact dropdown hasn't been selected yet
+            if (contactSelect && (!contactSelect.value || contactSelect.selectedIndex <= 0)) {
+                ssf.scheduleContactSelect(fullName, {
+                    contactFirstName: (order.ContactFirstName || '').trim(),
+                    contactLastName: (order.ContactLastName || '').trim(),
+                    contactEmail: order.ContactEmail || ''
+                });
+            }
+        }
+
+        // Order Type — map numeric ID to checkbox values
+        if (order.id_OrderType && ORDER_TYPE_ID_MAP[order.id_OrderType]) {
+            // Only fill if no order type checkboxes are already checked
+            var otLabel = null;
+            var allLabels = document.querySelectorAll('#submit-tab label');
+            for (var i = 0; i < allLabels.length; i++) {
+                if (allLabels[i].textContent.trim().replace(/\s*\*$/, '') === 'Order Type') {
+                    otLabel = allLabels[i]; break;
+                }
+            }
+            if (otLabel) {
+                var otCell = otLabel.closest('.cbFormLabelCell');
+                var otField = otCell ? otCell.nextElementSibling : null;
+                if (otField && !otField.querySelector('input[type="checkbox"]:checked')) {
+                    ssf.fillOrderTypeByValues(ORDER_TYPE_ID_MAP[order.id_OrderType]);
+                    filledCount++;
+                }
+            }
+        }
+
+        // Due Date — order date + 3 business days (only if empty)
+        if (order.date_Ordered) {
+            var dueDateInput = document.querySelector('[name="InsertRecordDue_Date"]');
+            if (dueDateInput && !dueDateInput.value.trim()) {
+                var orderDate = new Date(order.date_Ordered);
+                if (!isNaN(orderDate.getTime())) {
+                    var artDue = ssf.addBusinessDays(orderDate, 3);
+                    var mm = String(artDue.getMonth() + 1);
+                    var dd = String(artDue.getDate());
+                    var yyyy = artDue.getFullYear();
+                    dueDateInput.value = mm + '/' + dd + '/' + yyyy;
+                    dueDateInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    ssf.highlightField(dueDateInput);
+                    filledCount++;
+                }
+            }
+        }
+
+        if (filledCount > 0) {
+            ssf.showToast('Auto-filled ' + filledCount + ' fields from order data');
+        }
+
+        // Check for missing fields after cascades settle
+        setTimeout(function () { ssf.checkMissingFields(); }, 3000);
     }
 
     // ── Init ───────────────────────────────────────────────────────

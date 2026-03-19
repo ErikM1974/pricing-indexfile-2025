@@ -841,6 +841,11 @@
     // ── Order Type: check checkboxes in Caspio MSDropdown ──
     function fillOrderType(orderTypeText) {
         var values = ORDER_TYPE_MAP[orderTypeText] || ['Other'];
+        fillOrderTypeByValues(values);
+    }
+
+    function fillOrderTypeByValues(values) {
+        if (!values || !values.length) return;
 
         // Caspio MSDropdown renders as a container with checkbox inputs + labels
         // Find the Order_Type container
@@ -973,7 +978,14 @@
 
     window.ScreenshotFill = {
         open: openModal,
-        close: closeModal
+        close: closeModal,
+        // Exposed for reuse by ae-submit-form.js (order validation auto-fill)
+        scheduleContactSelect: scheduleContactSelect,
+        fillOrderTypeByValues: fillOrderTypeByValues,
+        highlightField: highlightField,
+        checkMissingFields: checkMissingFields,
+        addBusinessDays: addBusinessDays,
+        showToast: showToast
     };
 
 })();
