@@ -568,8 +568,20 @@
     function applyToForm(data) {
         var filledCount = 0;
 
-        // Simple text fields
+        // Step 1: Set CompanyName FIRST (triggers Contact cascade)
+        if (data.companyName) {
+            var companyInput = document.querySelector('[name="InsertRecordCompanyName"]');
+            if (companyInput) {
+                companyInput.value = data.companyName;
+                companyInput.dispatchEvent(new Event('change', { bubbles: true }));
+                highlightField(companyInput);
+                filledCount++;
+            }
+        }
+
+        // Step 2: Set other simple text fields (skip companyName, contactFirstName, contactLastName, contactEmail — those cascade from Contact)
         Object.keys(FIELD_MAP).forEach(function (key) {
+            if (key === 'companyName' || key === 'contactFirstName' || key === 'contactLastName' || key === 'contactEmail') return;
             if (data[key] != null && data[key] !== '') {
                 var input = document.querySelector('[name="' + FIELD_MAP[key] + '"]');
                 if (input) {
@@ -580,6 +592,14 @@
                 }
             }
         });
+
+        // Step 3: Wait for Contact cascade, then auto-select contact by name
+        if (data.contactFirstName || data.contactLastName) {
+            var fullName = ((data.contactFirstName || '') + ' ' + (data.contactLastName || '')).replace(/\s+/g, ' ').trim();
+            if (fullName) {
+                scheduleContactSelect(fullName, data);
+            }
+        }
 
         // Trigger Order # blur validation
         if (data.orderNumber) {
@@ -630,7 +650,6 @@
         if (data.locationCode && PLACEMENT_MAP[data.locationCode]) {
             var placementSelect = document.querySelector('[name="InsertRecordGarment_Placement"]');
             if (placementSelect) {
-                // Match by option text
                 var targetText = PLACEMENT_MAP[data.locationCode];
                 for (var p = 0; p < placementSelect.options.length; p++) {
                     if (placementSelect.options[p].text.trim() === targetText) {
@@ -663,6 +682,160 @@
         }
 
         showToast('Filled ' + filledCount + ' fields from ShopWorks');
+
+        // After cascades settle, check for missing required fields
+        setTimeout(function () { checkMissingFields(); }, 3000);
+    }
+
+    /**
+     * Auto-select contact from cascade dropdown after Company fills.
+     * Polls until dropdown populates, then matches by name.
+     * If contact found, Caspio cascades First/Last/Email automatically.
+     * If not found after timeout, falls back to setting fields directly.
+     */
+    function scheduleContactSelect(contactName, data) {
+        var attempts = 0;
+        var maxAttempts = 10; // 5 seconds
+
+        var interval = setInterval(function () {
+            attempts++;
+            var select = document.querySelector('select[name="InsertRecordFull_Name_Contact"]');
+
+            if (select && select.options.length > 1) {
+                // Try exact match first
+                var matched = false;
+                for (var i = 0; i < select.options.length; i++) {
+                    var optText = select.options[i].text.trim();
+                    if (optText.toLowerCase() === contactName.toLowerCase()) {
+                        select.value = select.options[i].value;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        highlightField(select);
+                        matched = true;
+                        clearInterval(interval);
+                        return;
+                    }
+                }
+                // Partial match — all name parts present
+                if (!matched) {
+                    var parts = contactName.split(' ').filter(function (p) { return p.length > 0; });
+                    for (var j = 0; j < select.options.length; j++) {
+                        var text = select.options[j].text.toLowerCase();
+                        var allMatch = parts.every(function (p) { return text.indexOf(p.toLowerCase()) !== -1; });
+                        if (allMatch) {
+                            select.value = select.options[j].value;
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                            highlightField(select);
+                            clearInterval(interval);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Timeout — fall back to setting First/Last/Email directly
+            if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                fallbackSetContactFields(data);
+            }
+        }, 500);
+    }
+
+    /**
+     * Fallback: set contact fields directly if cascade didn't populate or match.
+     */
+    function fallbackSetContactFields(data) {
+        var fields = {
+            contactFirstName: 'InsertRecordFirst_name',
+            contactLastName: 'InsertRecordLast_name',
+            contactEmail: 'InsertRecordEmail_Contact'
+        };
+        Object.keys(fields).forEach(function (key) {
+            if (data[key]) {
+                var input = document.querySelector('[name="' + fields[key] + '"]');
+                if (input && !input.value) {
+                    input.value = data[key];
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    highlightField(input);
+                }
+            }
+        });
+    }
+
+    /**
+     * Check for missing required fields and show notice.
+     */
+    function checkMissingFields() {
+        var missing = [];
+        var checks = [
+            { name: 'InsertRecordCompanyName', label: 'Company' },
+            { name: 'InsertRecordOrder_Type', label: 'Order Type', isMultiSelect: true },
+            { name: 'InsertRecordDue_Date', label: 'Due Date' },
+            { name: 'InsertRecordDesign_Num_SW', label: 'Design #' },
+            { name: 'InsertRecordGarment_Placement', label: 'Garment Placement', isSelect: true },
+            { name: 'InsertRecordOrder_Num_SW', label: 'Order #' }
+        ];
+
+        checks.forEach(function (f) {
+            var el = document.querySelector('[name="' + f.name + '"]');
+            if (!el) return;
+            // Skip hidden fields (e.g. Order # in Mockup mode)
+            if (el.closest && el.closest('.mockup-hidden')) return;
+
+            if (f.isMultiSelect) {
+                // Check if any checkbox is checked in the Order Type container
+                var lbl = findLabelFor('Order Type');
+                if (lbl) {
+                    var cell = lbl.closest('.cbFormLabelCell');
+                    var fieldCell = cell ? cell.nextElementSibling : null;
+                    if (fieldCell) {
+                        var anyChecked = fieldCell.querySelector('input[type="checkbox"]:checked');
+                        if (!anyChecked) missing.push(f.label);
+                    }
+                }
+            } else if (f.isSelect) {
+                if (!el.value || el.value === '' || el.selectedIndex <= 0) missing.push(f.label);
+            } else {
+                if (!el.value || el.value.trim() === '') missing.push(f.label);
+            }
+        });
+
+        if (missing.length > 0) {
+            showMissingFieldsNotice(missing);
+        }
+    }
+
+    function findLabelFor(labelText) {
+        var labels = document.querySelectorAll('#submit-tab label');
+        for (var i = 0; i < labels.length; i++) {
+            if (labels[i].textContent.trim().replace(/\s*\*$/, '') === labelText) {
+                return labels[i];
+            }
+        }
+        return null;
+    }
+
+    function showMissingFieldsNotice(fields) {
+        // Remove existing notice
+        var existing = document.querySelector('.ssf-missing-notice');
+        if (existing) existing.remove();
+
+        var notice = document.createElement('div');
+        notice.className = 'ssf-missing-notice';
+        notice.innerHTML = '<span class="ssf-missing-icon">'
+            + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+            + '</span>'
+            + '<span><strong>Still needed:</strong> ' + fields.map(function (f) { return escapeHtml(f); }).join(', ') + '</span>'
+            + '<button type="button" class="ssf-missing-dismiss" title="Dismiss">&times;</button>';
+
+        notice.querySelector('.ssf-missing-dismiss').addEventListener('click', function () {
+            notice.remove();
+        });
+
+        // Insert below the tools strip
+        var strip = document.querySelector('.ae-tools-strip');
+        if (strip) {
+            strip.parentElement.insertBefore(notice, strip.nextSibling);
+        }
     }
 
     // ── Order Type: check checkboxes in Caspio MSDropdown ──

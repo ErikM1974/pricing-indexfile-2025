@@ -891,7 +891,7 @@
                     } else {
                         orderInput.classList.add('ae-field-warning');
                         feedback.className = 'ae-order-feedback ae-order-feedback--warning';
-                        feedback.textContent = '\u26A0 Order not found in ShopWorks \u2014 it may not have synced yet';
+                        feedback.textContent = '\u2139 Order not verified yet \u2014 it may still be syncing from ShopWorks';
                     }
                     feedback.style.display = 'block';
                 })
