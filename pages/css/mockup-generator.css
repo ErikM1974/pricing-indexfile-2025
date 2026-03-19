@@ -370,7 +370,27 @@ body {
 }
 
 .thread-name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   font-weight: 500;
+}
+
+.thread-name-text {
+  font-weight: 500;
+}
+
+.thread-element {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 400;
+  font-style: italic;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .thread-catalog {

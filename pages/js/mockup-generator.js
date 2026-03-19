@@ -157,6 +157,11 @@
             }
             updateButtons();
 
+            // Fire-and-forget element identification (non-blocking)
+            if (data.image_base64 && data.thread_sequence) {
+                identifyElements(data.image_base64, data.thread_sequence);
+            }
+
         } catch (err) {
             showError('Failed to generate mockup: ' + err.message);
             console.error('Mockup generation error:', err);
@@ -421,9 +426,20 @@
             swatch.className = 'thread-swatch';
             swatch.style.background = t.hex || '#888';
 
+            var nameCell = document.createElement('div');
+            nameCell.className = 'thread-name';
+
             var nameSpan = document.createElement('span');
-            nameSpan.className = 'thread-name';
+            nameSpan.className = 'thread-name-text';
             nameSpan.textContent = t.name || '';
+            nameCell.appendChild(nameSpan);
+
+            if (t.element) {
+                var elemSpan = document.createElement('span');
+                elemSpan.className = 'thread-element';
+                elemSpan.textContent = t.element;
+                nameCell.appendChild(elemSpan);
+            }
 
             var catSpan = document.createElement('span');
             catSpan.className = 'thread-catalog';
@@ -431,7 +447,7 @@
 
             row.appendChild(runSpan);
             row.appendChild(swatch);
-            row.appendChild(nameSpan);
+            row.appendChild(nameCell);
             row.appendChild(catSpan);
 
             if (hasPicker) {
@@ -449,6 +465,52 @@
         });
 
         document.getElementById('threadCount').textContent = threads.length + ' runs';
+    }
+
+    // Element identification via vision (non-blocking)
+    async function identifyElements(mockupBase64, threads) {
+        if (!files.dst) return;
+        try {
+            var formData = new FormData();
+            formData.append('dstFile', files.dst);
+            formData.append('mockup_base64', mockupBase64);
+            formData.append('threads', JSON.stringify(threads));
+
+            var response = await fetch(API_BASE + '/api/embroidery/identify-elements', {
+                method: 'POST',
+                body: formData
+            });
+            var data = await response.json();
+            if (data.success && data.elements) {
+                applyElementLabels(data.elements);
+            }
+        } catch (err) {
+            console.warn('Element identification failed:', err);
+        }
+    }
+
+    function applyElementLabels(elements) {
+        var rows = document.querySelectorAll('#threadList .thread-row');
+        elements.forEach(function(label, idx) {
+            if (!label || !rows[idx]) return;
+
+            // Store in currentThreads for persistence across re-renders
+            if (currentThreads[idx]) {
+                currentThreads[idx].element = label;
+            }
+            if (originalThreads[idx]) {
+                originalThreads[idx].element = label;
+            }
+
+            // Add label to DOM
+            var nameCell = rows[idx].querySelector('.thread-name');
+            if (nameCell && !nameCell.querySelector('.thread-element')) {
+                var elemSpan = document.createElement('span');
+                elemSpan.className = 'thread-element';
+                elemSpan.textContent = label;
+                nameCell.appendChild(elemSpan);
+            }
+        });
     }
 
     function displayDesignInfo(data) {
