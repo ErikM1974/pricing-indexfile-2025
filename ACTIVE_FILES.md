@@ -62,6 +62,9 @@
 | `/pages/dst-viewer.html` | **NEW** DST embroidery stitch file viewer — drag-drop .DST, color/mono/trace modes | dst-viewer.js, dst-viewer.css, Font Awesome, DM Mono/Outfit fonts | ✅ Active |
 | `/pages/js/dst-viewer.js` | **NEW** DST binary parser, canvas renderer (3 modes), trace animation, thread color sequence | Vanilla JS, no dependencies | ✅ Active |
 | `/pages/css/dst-viewer.css` | **NEW** DST viewer dark theme styles (2-col grid, canvas, sidebar, trace controls, responsive) | CSS variables | ✅ Active |
+| `/pages/mockup-generator.html` | **NEW** Embroidery mockup generator — upload DST+EMB/PDF, generate colored mockups, compare threads | mockup-generator.js, mockup-generator.css, Font Awesome, Inter font | ✅ Active |
+| `/pages/js/mockup-generator.js` | **NEW** Mockup generator frontend — file upload, API calls to Python Inksoft, thread display, comparison table | Vanilla JS, calls inksoft-transform Heroku | ✅ Active |
+| `/pages/css/mockup-generator.css` | **NEW** Mockup generator dark theme styles (upload zones, results grid, comparison table, spinner) | CSS variables | ✅ Active |
 
 ### 3-Day Tees System
 | File | Purpose | Dependencies | Status |

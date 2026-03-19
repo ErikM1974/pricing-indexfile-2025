@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Mockup Generator | NWCA</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E1B000/Images/Favicon/nwca-favicon-32.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/css/mockup-generator.css?v=1">
+</head>
+<body>
+    <div class="header">
+        <a href="/staff-dashboard.html" title="Back to Dashboard">
+            <img src="https://cdn.caspio.com/A0E1B000/Images/1702507702032_nwca-logo-white-h_200.png" alt="NWCA" class="header-logo">
+        </a>
+        <div class="header-divider"></div>
+        <h1>Embroidery Mockup Generator</h1>
+        <span class="header-subtitle">Upload DST + EMB/PDF to generate colored mockups</span>
+    </div>
+
+    <div class="upload-section">
+        <div class="upload-grid">
+            <div class="upload-zone" id="dstZone">
+                <div class="icon"><i class="fas fa-vector-square"></i></div>
+                <h3>DST File</h3>
+                <p>Stitch data (required)</p>
+                <span class="ext-badge">.DST</span>
+                <div class="file-name" id="dstFileName"></div>
+                <input type="file" id="dstInput" accept=".dst" style="display:none">
+            </div>
+
+            <div class="upload-zone" id="embZone">
+                <div class="icon"><i class="fas fa-palette"></i></div>
+                <h3>EMB File</h3>
+                <p>Wilcom file with thread colors</p>
+                <span class="ext-badge">.EMB</span>
+                <div class="file-name" id="embFileName"></div>
+                <input type="file" id="embInput" accept=".emb,.EMB" style="display:none">
+            </div>
+
+            <div class="upload-zone" id="pdfZone">
+                <div class="icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Art Setup PDF</h3>
+                <p>ShopWorks thread color sheet</p>
+                <span class="ext-badge">.PDF</span>
+                <div class="file-name" id="pdfFileName"></div>
+                <input type="file" id="pdfInput" accept=".pdf" style="display:none">
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-primary" id="generateBtn" disabled>
+                <i class="fas fa-wand-magic-sparkles"></i> Generate Mockup
+            </button>
+            <button class="btn btn-secondary" id="compareBtn" disabled>
+                <i class="fas fa-code-compare"></i> Compare Threads
+            </button>
+            <button class="btn btn-secondary" id="resetBtn">
+                <i class="fas fa-rotate-left"></i> Reset
+            </button>
+            <div class="color-source-toggle" id="sourceToggle" style="display:none">
+                <label>Color source:</label>
+                <select id="colorSource">
+                    <option value="emb">EMB File</option>
+                    <option value="pdf">PDF File</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <div class="design-info" id="designInfo" style="display:none; max-width:1400px; margin:0 auto 20px; padding-left:40px; padding-right:40px;">
+        <div class="info-item">
+            <span class="info-label">Design #:</span>
+            <span class="info-value" id="infoDesignNum"></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Design:</span>
+            <span class="info-value" id="infoDesignName"></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Customer:</span>
+            <span class="info-value" id="infoCustomer"></span>
+        </div>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+        <div class="results-grid">
+            <div class="mockup-panel">
+                <div class="mockup-header">
+                    <h2>Mockup Preview</h2>
+                    <div class="mockup-actions">
+                        <button class="btn btn-secondary" id="downloadPngBtn" disabled>
+                            <i class="fas fa-download"></i> PNG
+                        </button>
+                        <button class="btn btn-secondary" id="downloadSvgBtn" disabled>
+                            <i class="fas fa-download"></i> SVG
+                        </button>
+                    </div>
+                </div>
+                <div class="mockup-image-container" id="mockupContainer">
+                    <img id="mockupImage" alt="Generated mockup">
+                </div>
+                <div class="mockup-stats" id="mockupStats">
+                    <div><span class="info-label">Stitches:</span> <span class="stat-value" id="statStitches"></span></div>
+                    <div><span class="info-label">Colors:</span> <span class="stat-value" id="statColors"></span></div>
+                    <div><span class="info-label">Size:</span> <span class="stat-value" id="statSize"></span></div>
+                    <div><span class="info-label">Source:</span> <span class="stat-value" id="statSource"></span></div>
+                </div>
+            </div>
+
+            <div class="thread-panel">
+                <div class="thread-header">
+                    <h2>Thread Sequence</h2>
+                    <span class="thread-count" id="threadCount"></span>
+                </div>
+                <div class="thread-list" id="threadList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="comparison-panel" id="comparisonPanel">
+        <div class="comparison-header">
+            <h2><i class="fas fa-code-compare"></i> EMB vs PDF Comparison</h2>
+            <span class="match-badge" id="matchBadge"></span>
+        </div>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Run</th>
+                    <th>EMB Color</th>
+                    <th>EMB #</th>
+                    <th>PDF Color</th>
+                    <th>PDF #</th>
+                    <th>Match</th>
+                </tr>
+            </thead>
+            <tbody id="comparisonBody"></tbody>
+        </table>
+    </div>
+
+    <div class="spinner-overlay" id="spinner">
+        <div class="spinner"></div>
+        <div class="spinner-text" id="spinnerText">Generating mockup...</div>
+    </div>
+
+    <script src="/pages/js/mockup-generator.js?v=1"></script>
+</body>
+</html>

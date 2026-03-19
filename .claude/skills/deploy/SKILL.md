@@ -46,6 +46,42 @@ If not on develop, inform the user and stop.
 git status --porcelain
 ```
 
+### Step 1.5: Auto-Bump Cache-Bust Versions
+
+**REQUIRED before committing.** For each modified `.js` or `.css` file detected in Step 1:
+
+1. Get the list of changed JS/CSS files:
+```bash
+git diff --name-only HEAD | grep -E '\.(js|css)$'
+```
+Also check unstaged/untracked:
+```bash
+git status --porcelain | grep -E '\.(js|css)$' | awk '{print $2}'
+```
+
+2. For each changed file, extract the filename and find all HTML files referencing it with `?v=`:
+```bash
+# Example for mockup-detail.js:
+grep -rn "mockup-detail\.js?v=" --include="*.html" .
+```
+
+3. Bump the version number in each matching HTML file:
+   - **Simple number** (e.g., `?v=12`): increment by 1 → `?v=13`
+   - **Date-based** (e.g., `?v=20260317`): replace with today's date in YYYYMMDD format
+   - Use `sed -i` for the replacement. Example:
+```bash
+sed -i "s/mockup-detail\.js?v=[0-9]*/mockup-detail.js?v=13/g" pages/mockup-detail.html
+```
+
+4. Stage the modified HTML files so they're included in the deploy commit.
+
+5. Report what was bumped:
+```
+Cache-bust: mockup-detail.js v12→v13 (1 file), mockup-detail.css v11→v12 (1 file)
+```
+
+**If no JS/CSS files were changed, skip this step.**
+
 ### Step 2: Commit Changes (if any)
 
 Only run if there are uncommitted changes from Step 1:

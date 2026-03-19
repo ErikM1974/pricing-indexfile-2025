@@ -1,0 +1,156 @@
+<!--
+  ============================================================
+  EmailJS Template: mockup_customer_approval
+  ============================================================
+
+  SETUP INSTRUCTIONS:
+  1. Go to https://dashboard.emailjs.com
+  2. Click "Email Templates" → "Create New Template"
+  3. Template Name: mockup_customer_approval
+  4. Subject line:  Mockup Ready for Your Review — {{company_name}} #{{design_number}}
+  5. From Name:     {{from_name}}
+  6. To Email:      {{to_email}}
+  7. CC:            {{cc_emails}}
+  8. Reply To:      (leave as your default, or set to sales rep email)
+  9. Paste everything below this comment block into the "Content" HTML editor
+  ============================================================
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;">
+
+  <!-- Outer wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7;padding:24px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Email card -->
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+          <!-- Header banner -->
+          <tr>
+            <td style="background-color:#2e7d32;padding:24px 32px;text-align:center;">
+              <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                   alt="Northwest Custom Apparel" width="180" style="display:block;margin:0 auto 12px auto;">
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:0.5px;">
+                Mockup Ready for Your Review
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:28px 32px 0 32px;">
+              <p style="margin:0 0 16px 0;font-size:16px;color:#1f2937;">
+                Hi {{to_name}},
+              </p>
+              <p style="margin:0 0 20px 0;font-size:15px;color:#4b5563;line-height:1.5;">
+                Your mockup is ready! Please review the design below and let us know if it looks good or if you'd like any changes.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Order details table -->
+          <tr>
+            <td style="padding:0 32px 20px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="50%" style="padding:4px 0;vertical-align:top;">
+                          <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Company</span><br>
+                          <span style="font-size:14px;color:#1f2937;font-weight:600;">{{company_name}}</span>
+                        </td>
+                        <td width="50%" style="padding:4px 0;vertical-align:top;">
+                          <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Design #</span><br>
+                          <span style="font-size:14px;color:#1f2937;font-weight:600;">{{design_number}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding:8px 0 4px 0;vertical-align:top;">
+                          <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Placement</span><br>
+                          <span style="font-size:14px;color:#1f2937;">{{placement}}</span>
+                        </td>
+                        <td width="50%" style="padding:8px 0 4px 0;vertical-align:top;">
+                          <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Design Size</span><br>
+                          <span style="font-size:14px;color:#1f2937;">{{design_size}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%" style="padding:8px 0 0 0;vertical-align:top;">
+                          <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Work Order</span><br>
+                          <span style="font-size:14px;color:#1f2937;">{{work_order}}</span>
+                        </td>
+                        <td width="50%" style="padding:8px 0 0 0;vertical-align:top;">
+                          <span style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Your Rep</span><br>
+                          <span style="font-size:14px;color:#1f2937;">{{sales_rep_name}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Mockup images section -->
+          <tr>
+            <td style="padding:0 32px 20px 32px;">
+              <h2 style="margin:0 0 12px 0;font-size:16px;color:#1f2937;font-weight:700;">
+                Your Mockup{{mockup_count}}
+              </h2>
+              <!-- Inline mockup images built by JS -->
+              {{{mockup_images_html}}}
+            </td>
+          </tr>
+
+          <!-- CTA Button -->
+          <tr>
+            <td style="padding:0 32px 28px 32px;text-align:center;">
+              <p style="margin:0 0 16px 0;font-size:14px;color:#6b7280;line-height:1.5;">
+                Click the button below to approve or request changes:
+              </p>
+              <a href="{{approval_link}}"
+                 style="display:inline-block;background-color:#2e7d32;color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:8px;font-size:16px;font-weight:700;letter-spacing:0.3px;">
+                Review &amp; Approve Mockup
+              </a>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 32px;">
+              <div style="border-top:1px solid #e5e7eb;"></div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 32px 24px 32px;text-align:center;">
+              <p style="margin:0 0 4px 0;font-size:13px;color:#9ca3af;">
+                Questions? Contact your rep <strong style="color:#4b5563;">{{sales_rep_name}}</strong> or call us at
+              </p>
+              <p style="margin:0 0 8px 0;font-size:14px;color:#2e7d32;font-weight:700;">
+                253-922-5793
+              </p>
+              <p style="margin:0;font-size:11px;color:#d1d5db;">
+                Northwest Custom Apparel &bull; Tacoma, WA
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- End email card -->
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

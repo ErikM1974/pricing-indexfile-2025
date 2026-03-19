@@ -158,7 +158,10 @@
       "Bash(find '/c/Users/erik/OneDrive - Northwest Custom Apparel/2025' -type f \\\\\\(-name ae-submit-form.js -o -name *mockup* \\\\\\))",
       "Bash(find 'C:/Users/erik/OneDrive - Northwest Custom Apparel/2025/Pricing Index File 2025' -type f \\\\\\(-name *ae* -o -name *art*hub* \\\\\\))",
       "Bash(2)",
-      "Bash(find 'C:\\\\Users\\\\erik\\\\OneDrive - Northwest Custom Apparel\\\\2025\\\\Pricing Index File 2025' -type f \\\\\\(-name *gallery* -o -name *manager* \\\\\\))"
+      "Bash(find 'C:\\\\Users\\\\erik\\\\OneDrive - Northwest Custom Apparel\\\\2025\\\\Pricing Index File 2025' -type f \\\\\\(-name *gallery* -o -name *manager* \\\\\\))",
+      "Bash(heroku apps:*)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\(x86\\)/**)"
     ],
     "deny": [],
     "ask": [],
