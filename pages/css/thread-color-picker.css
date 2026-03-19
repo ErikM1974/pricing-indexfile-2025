@@ -1,0 +1,211 @@
+/* Thread Color Picker Modal */
+.tcp-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1100;
+    align-items: center;
+    justify-content: center;
+}
+
+.tcp-overlay.visible {
+    display: flex;
+}
+
+.tcp-modal {
+    background: var(--surface, #1a1d22);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 720px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.tcp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tcp-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text, #e8eaed);
+}
+
+.tcp-close {
+    background: none;
+    border: none;
+    color: var(--text-dim, #8b919a);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.tcp-close:hover {
+    color: var(--text, #e8eaed);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tcp-current {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--text-dim, #8b919a);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tcp-current-value {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text, #e8eaed);
+}
+
+.tcp-current-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.tcp-search {
+    margin: 12px 20px 8px;
+    padding: 8px 12px;
+    background: var(--bg, #0f1114);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: var(--text, #e8eaed);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+}
+
+.tcp-search:focus {
+    border-color: var(--accent, #4fc3f7);
+}
+
+.tcp-search::placeholder {
+    color: var(--text-dim, #8b919a);
+}
+
+.tcp-family-bar {
+    display: flex;
+    gap: 4px;
+    padding: 4px 20px 8px;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.tcp-family-bar::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tcp-family-bar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+.tcp-tab {
+    padding: 4px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-dim, #8b919a);
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tcp-tab:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text, #e8eaed);
+}
+
+.tcp-tab.active {
+    background: var(--accent, #4fc3f7);
+    border-color: var(--accent, #4fc3f7);
+    color: #000;
+    font-weight: 600;
+}
+
+.tcp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 4px;
+    padding: 8px 20px 16px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.tcp-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tcp-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.tcp-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.tcp-cell:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.tcp-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tcp-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.tcp-name {
+    font-size: 12px;
+    color: var(--text, #e8eaed);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tcp-catalog {
+    font-size: 10px;
+    color: var(--text-dim, #8b919a);
+    font-family: monospace;
+}

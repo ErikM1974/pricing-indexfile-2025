@@ -8,6 +8,12 @@
     let lastMockupData = null;
     let lastComparisonHasMismatches = false;
 
+    // Interactive color swap state
+    let currentThreads = [];
+    let originalThreads = [];
+    let hasUnsavedChanges = false;
+    let rerenderTimer = null;
+
     // DOM elements
     const dstZone = document.getElementById('dstZone');
     const embZone = document.getElementById('embZone');
@@ -26,6 +32,13 @@
     const errorBanner = document.getElementById('errorBanner');
     const spinner = document.getElementById('spinner');
     const spinnerText = document.getElementById('spinnerText');
+    const downloadEmbBtn = document.getElementById('downloadEmbBtn');
+    const resetColorsBtn = document.getElementById('resetColorsBtn');
+
+    // Init color picker
+    if (typeof ThreadColorPicker !== 'undefined') {
+        ThreadColorPicker.init();
+    }
 
     // Upload zone setup
     function setupUploadZone(zone, input, type, extensions) {
@@ -84,6 +97,17 @@
             fixEmbBtn.style.display = 'none';
             fixEmbBtn.disabled = true;
         }
+
+        // Download EMB button — enabled when EMB loaded and threads modified
+        if (downloadEmbBtn) {
+            downloadEmbBtn.disabled = !hasEmb || !hasUnsavedChanges;
+            downloadEmbBtn.style.display = (hasEmb && currentThreads.length) ? '' : 'none';
+        }
+
+        // Reset colors button
+        if (resetColorsBtn) {
+            resetColorsBtn.style.display = hasUnsavedChanges ? '' : 'none';
+        }
     }
 
     // Generate Mockup
@@ -121,12 +145,17 @@
             displayThreads(data.thread_sequence);
             displayDesignInfo(data);
 
+            // Store threads for interactive editing
+            originalThreads = JSON.parse(JSON.stringify(data.thread_sequence));
+            currentThreads = JSON.parse(JSON.stringify(data.thread_sequence));
+            hasUnsavedChanges = false;
+
             if (data.comparison) {
                 lastComparisonHasMismatches = !data.comparison.match;
                 displayComparison(data.comparison, data.thread_sequence,
                     data.comparison.emb_threads || data.thread_sequence);
-                updateButtons();
             }
+            updateButtons();
 
         } catch (err) {
             showError('Failed to generate mockup: ' + err.message);
@@ -202,26 +231,12 @@
                 throw new Error(data.error || 'Unknown error');
             }
 
-            // Download the corrected EMB file
-            var bytes = atob(data.emb_base64);
-            var arr = new Uint8Array(bytes.length);
-            for (var i = 0; i < bytes.length; i++) {
-                arr[i] = bytes.charCodeAt(i);
-            }
-            var blob = new Blob([arr], { type: 'application/octet-stream' });
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = data.filename || 'recolored.emb';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
+            downloadBinaryBase64(data.filename || 'recolored.emb', data.emb_base64);
 
-            // Show success summary
             var msg = 'EMB recolored: ' + data.modified + ' thread(s) updated, ' + data.unchanged + ' unchanged.';
             if (data.changes && data.changes.length) {
                 msg += ' Changes: ' + data.changes.map(function(c) {
-                    return 'Run ' + c.run + ': ' + c.from + ' → ' + c.to;
+                    return 'Run ' + c.run + ': ' + c.from + ' \u2192 ' + c.to;
                 }).join(', ');
             }
             showSuccess(msg);
@@ -231,6 +246,135 @@
             console.error('Fix EMB error:', err);
         } finally {
             hideSpinner();
+        }
+    }
+
+    // Interactive color change callback
+    function onColorSelected(runIndex, newColor) {
+        if (runIndex < 0 || runIndex >= currentThreads.length) return;
+
+        currentThreads[runIndex].hex = newColor.hex;
+        currentThreads[runIndex].name = newColor.name;
+        currentThreads[runIndex].catalog = newColor.catalog;
+        hasUnsavedChanges = true;
+
+        // Update DOM immediately
+        var list = document.getElementById('threadList');
+        var rows = list.querySelectorAll('.thread-row');
+        if (rows[runIndex]) {
+            var swatch = rows[runIndex].querySelector('.thread-swatch');
+            var nameEl = rows[runIndex].querySelector('.thread-name');
+            var catEl = rows[runIndex].querySelector('.thread-catalog');
+            if (swatch) swatch.style.background = newColor.hex;
+            if (nameEl) nameEl.textContent = newColor.name;
+            if (catEl) catEl.textContent = newColor.catalog;
+
+            // Mark as modified
+            var orig = originalThreads[runIndex];
+            if (orig && orig.catalog !== newColor.catalog) {
+                rows[runIndex].classList.add('modified');
+            } else {
+                rows[runIndex].classList.remove('modified');
+            }
+        }
+
+        updateButtons();
+
+        // Debounced re-render
+        if (files.dst) {
+            clearTimeout(rerenderTimer);
+            document.getElementById('mockupContainer').classList.add('pending');
+            rerenderTimer = setTimeout(rerenderMockup, 600);
+        }
+    }
+
+    // Re-render mockup with current thread colors
+    async function rerenderMockup() {
+        if (!files.dst || !currentThreads.length) return;
+
+        var mockupContainer = document.getElementById('mockupContainer');
+
+        try {
+            var formData = new FormData();
+            formData.append('dstFile', files.dst);
+            formData.append('threads', JSON.stringify(currentThreads));
+            formData.append('format', 'png');
+
+            var response = await fetch(API_BASE + '/api/embroidery/rerender-mockup', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                var err = await response.json();
+                throw new Error(err.error || 'Server error');
+            }
+
+            var data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Unknown error');
+            }
+
+            document.getElementById('mockupImage').src = 'data:image/png;base64,' + data.image_base64;
+            lastMockupData = data;
+
+        } catch (err) {
+            showError('Re-render failed: ' + err.message);
+            console.error('Re-render error:', err);
+        } finally {
+            mockupContainer.classList.remove('pending');
+        }
+    }
+
+    // Download modified EMB with current thread selections
+    async function downloadModifiedEmb() {
+        if (!files.emb || !currentThreads.length) return;
+
+        showSpinner('Building modified EMB...');
+        hideError();
+
+        try {
+            var formData = new FormData();
+            formData.append('embFile', files.emb);
+            formData.append('threads', JSON.stringify(currentThreads));
+
+            var response = await fetch(API_BASE + '/api/embroidery/recolor-emb', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                var err = await response.json();
+                throw new Error(err.error || 'Server error');
+            }
+
+            var data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Unknown error');
+            }
+
+            downloadBinaryBase64(data.filename || 'modified.emb', data.emb_base64);
+            showSuccess('Modified EMB downloaded with ' + data.modified + ' color change(s).');
+
+        } catch (err) {
+            showError('EMB download failed: ' + err.message);
+            console.error('Download EMB error:', err);
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    // Reset colors to original
+    function resetColors() {
+        if (!originalThreads.length) return;
+        currentThreads = JSON.parse(JSON.stringify(originalThreads));
+        hasUnsavedChanges = false;
+        displayThreads(currentThreads);
+        updateButtons();
+
+        if (files.dst) {
+            document.getElementById('mockupContainer').classList.add('pending');
+            rerenderMockup();
         }
     }
 
@@ -258,15 +402,49 @@
     function displayThreads(threads) {
         const list = document.getElementById('threadList');
         list.innerHTML = '';
+        var hasPicker = (typeof ThreadColorPicker !== 'undefined');
 
-        threads.forEach((t) => {
-            const row = document.createElement('div');
-            row.className = 'thread-row';
-            row.innerHTML =
-                '<span class="thread-run">' + t.run + '</span>' +
-                '<div class="thread-swatch" style="background:' + escapeAttr(t.hex) + '"></div>' +
-                '<span class="thread-name">' + escapeHtml(t.name) + '</span>' +
-                '<span class="thread-catalog">' + escapeHtml(t.catalog || '') + '</span>';
+        threads.forEach(function(t, idx) {
+            var row = document.createElement('div');
+            row.className = 'thread-row' + (hasPicker ? ' clickable' : '');
+
+            // Check if modified from original
+            if (originalThreads[idx] && originalThreads[idx].catalog !== t.catalog) {
+                row.classList.add('modified');
+            }
+
+            var runSpan = document.createElement('span');
+            runSpan.className = 'thread-run';
+            runSpan.textContent = t.run || (idx + 1);
+
+            var swatch = document.createElement('div');
+            swatch.className = 'thread-swatch';
+            swatch.style.background = t.hex || '#888';
+
+            var nameSpan = document.createElement('span');
+            nameSpan.className = 'thread-name';
+            nameSpan.textContent = t.name || '';
+
+            var catSpan = document.createElement('span');
+            catSpan.className = 'thread-catalog';
+            catSpan.textContent = t.catalog || '';
+
+            row.appendChild(runSpan);
+            row.appendChild(swatch);
+            row.appendChild(nameSpan);
+            row.appendChild(catSpan);
+
+            if (hasPicker) {
+                var editIcon = document.createElement('span');
+                editIcon.className = 'thread-edit';
+                editIcon.innerHTML = '<i class="fas fa-pen"></i>';
+                row.appendChild(editIcon);
+
+                row.addEventListener('click', function() {
+                    ThreadColorPicker.open(idx, currentThreads[idx] || t, onColorSelected);
+                });
+            }
+
             list.appendChild(row);
         });
 
@@ -299,15 +477,14 @@
         const isMatch = comparison.match;
 
         badge.className = 'match-badge ' + (isMatch ? 'match' : 'mismatch');
-        var badgeText = matched + '/' + total + ' matched' + (isMatch ? '' : ' — mismatches found');
+        var badgeText = matched + '/' + total + ' matched' + (isMatch ? '' : ' \u2014 mismatches found');
         if (comparison.pdf_confidence === 'vision') {
             badgeText += ' (AI-extracted)';
         }
         badge.textContent = badgeText;
 
-        // Build mismatch lookup
         const mismatchRuns = {};
-        (comparison.mismatches || []).forEach((m) => {
+        (comparison.mismatches || []).forEach(function(m) {
             mismatchRuns[m.run] = m;
         });
 
@@ -316,17 +493,17 @@
             pdfThreads ? pdfThreads.length : 0
         );
 
-        for (let i = 0; i < maxRuns; i++) {
-            const emb = embThreads && embThreads[i] ? embThreads[i] : null;
-            const pdf = pdfThreads && pdfThreads[i] ? pdfThreads[i] : null;
-            const run = i + 1;
-            const isMismatch = !!mismatchRuns[run];
+        for (var i = 0; i < maxRuns; i++) {
+            var emb = embThreads && embThreads[i] ? embThreads[i] : null;
+            var pdf = pdfThreads && pdfThreads[i] ? pdfThreads[i] : null;
+            var run = i + 1;
+            var isMismatch = !!mismatchRuns[run];
 
-            const tr = document.createElement('tr');
+            var tr = document.createElement('tr');
             if (isMismatch) tr.className = 'mismatch-row';
 
-            const embSwatch = emb ? '<div class="thread-swatch" style="background:' + escapeAttr(emb.hex) + ';display:inline-block;vertical-align:middle;width:14px;height:14px;margin-right:6px"></div>' : '';
-            const pdfSwatch = pdf ? '<div class="thread-swatch" style="background:' + escapeAttr(pdf.hex) + ';display:inline-block;vertical-align:middle;width:14px;height:14px;margin-right:6px"></div>' : '';
+            var embSwatch = emb ? '<div class="thread-swatch" style="background:' + escapeAttr(emb.hex) + ';display:inline-block;vertical-align:middle;width:14px;height:14px;margin-right:6px"></div>' : '';
+            var pdfSwatch = pdf ? '<div class="thread-swatch" style="background:' + escapeAttr(pdf.hex) + ';display:inline-block;vertical-align:middle;width:14px;height:14px;margin-right:6px"></div>' : '';
 
             tr.innerHTML =
                 '<td>' + run + '</td>' +
@@ -354,36 +531,70 @@
         if (!files.dst) return;
 
         showSpinner('Generating SVG...');
-        const formData = new FormData();
+        var formData = new FormData();
         formData.append('dstFile', files.dst);
-        if (files.emb) formData.append('embFile', files.emb);
-        if (files.pdf) formData.append('pdfFile', files.pdf);
-        formData.append('source', colorSource.value);
-        formData.append('format', 'svg');
-
-        try {
-            const response = await fetch(API_BASE + '/api/embroidery/generate-mockup', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            if (data.success) {
-                downloadBase64('mockup.svg', data.image_base64, 'image/svg+xml');
+        if (currentThreads.length) {
+            formData.append('threads', JSON.stringify(currentThreads));
+            formData.append('format', 'svg');
+            try {
+                var response = await fetch(API_BASE + '/api/embroidery/rerender-mockup', {
+                    method: 'POST',
+                    body: formData
+                });
+                var data = await response.json();
+                if (data.success) {
+                    downloadBase64('mockup.svg', data.image_base64, 'image/svg+xml');
+                }
+            } catch (err) {
+                showError('SVG download failed: ' + err.message);
+            } finally {
+                hideSpinner();
             }
-        } catch (err) {
-            showError('SVG download failed: ' + err.message);
-        } finally {
-            hideSpinner();
+        } else {
+            if (files.emb) formData.append('embFile', files.emb);
+            if (files.pdf) formData.append('pdfFile', files.pdf);
+            formData.append('source', colorSource.value);
+            formData.append('format', 'svg');
+            try {
+                var response2 = await fetch(API_BASE + '/api/embroidery/generate-mockup', {
+                    method: 'POST',
+                    body: formData
+                });
+                var data2 = await response2.json();
+                if (data2.success) {
+                    downloadBase64('mockup.svg', data2.image_base64, 'image/svg+xml');
+                }
+            } catch (err2) {
+                showError('SVG download failed: ' + err2.message);
+            } finally {
+                hideSpinner();
+            }
         }
     }
 
     function downloadBase64(filename, base64Data, mimeType) {
-        const link = document.createElement('a');
+        var link = document.createElement('a');
         link.href = 'data:' + mimeType + ';base64,' + base64Data;
         link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    function downloadBinaryBase64(filename, base64Data) {
+        var bytes = atob(base64Data);
+        var arr = new Uint8Array(bytes.length);
+        for (var i = 0; i < bytes.length; i++) {
+            arr[i] = bytes.charCodeAt(i);
+        }
+        var blob = new Blob([arr], { type: 'application/octet-stream' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
     }
 
     // Reset
@@ -393,12 +604,15 @@
         files.pdf = null;
         lastMockupData = null;
         lastComparisonHasMismatches = false;
+        currentThreads = [];
+        originalThreads = [];
+        hasUnsavedChanges = false;
 
-        [dstZone, embZone, pdfZone].forEach((z) => z.classList.remove('has-file'));
-        ['dstFileName', 'embFileName', 'pdfFileName'].forEach((id) => {
+        [dstZone, embZone, pdfZone].forEach(function(z) { z.classList.remove('has-file'); });
+        ['dstFileName', 'embFileName', 'pdfFileName'].forEach(function(id) {
             document.getElementById(id).textContent = '';
         });
-        [dstInput, embInput, pdfInput].forEach((input) => { input.value = ''; });
+        [dstInput, embInput, pdfInput].forEach(function(input) { input.value = ''; });
 
         resultsSection.classList.remove('visible');
         comparisonPanel.classList.remove('visible');
@@ -456,5 +670,7 @@
     resetBtn.addEventListener('click', resetAll);
     document.getElementById('downloadPngBtn').addEventListener('click', downloadPng);
     document.getElementById('downloadSvgBtn').addEventListener('click', downloadSvg);
+    if (downloadEmbBtn) downloadEmbBtn.addEventListener('click', downloadModifiedEmb);
+    if (resetColorsBtn) resetColorsBtn.addEventListener('click', resetColors);
 
 })();

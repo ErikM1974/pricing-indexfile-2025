@@ -65,6 +65,8 @@
 | `/pages/mockup-generator.html` | **NEW** Embroidery mockup generator — upload DST+EMB/PDF, generate colored mockups, compare threads | mockup-generator.js, mockup-generator.css, Font Awesome, Inter font | ✅ Active |
 | `/pages/js/mockup-generator.js` | **NEW** Mockup generator frontend — file upload, API calls to Python Inksoft, thread display, comparison table | Vanilla JS, calls inksoft-transform Heroku | ✅ Active |
 | `/pages/css/mockup-generator.css` | **NEW** Mockup generator dark theme styles (upload zones, results grid, comparison table, spinner) | CSS variables | ✅ Active |
+| `/pages/js/thread-color-picker.js` | **NEW** Thread color picker modal — searchable RA catalog (~866 colors), family tabs, swatch grid | Vanilla JS, calls /api/embroidery/palette | ✅ Active |
+| `/pages/css/thread-color-picker.css` | **NEW** Thread color picker modal dark theme styles (overlay, search, family tabs, color grid) | CSS variables | ✅ Active |
 
 ### 3-Day Tees System
 | File | Purpose | Dependencies | Status |
