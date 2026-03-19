@@ -126,63 +126,22 @@
             '<div class="ssf-modal">',
             '  <div class="ssf-header">',
             '    <h3>',
-            '      <svg class="ssf-header-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
-            '      Fill from ShopWorks',
+            '      <svg class="ssf-header-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+            '      Paste Order Text',
             '    </h3>',
             '    <button class="ssf-close" title="Close">&times;</button>',
             '  </div>',
             '  <div class="ssf-body">',
-            '    <div class="ssf-mode-tabs">',
-            '      <button type="button" class="ssf-mode-tab ssf-mode-tab-active" data-mode="screenshot">',
-            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
-            '        Screenshot',
-            '      </button>',
-            '      <button type="button" class="ssf-mode-tab" data-mode="text">',
-            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
-            '        Paste Text',
-            '      </button>',
-            '    </div>',
-            '    <div class="ssf-tabs-hint">',
-            '      <div class="ssf-tab-pills">',
-            '        <span class="ssf-pill" data-tab="customer">Customer</span>',
-            '        <span class="ssf-pill" data-tab="design">Design</span>',
-            '        <span class="ssf-pill" data-tab="lineitems">Line Items</span>',
-            '      </div>',
-            '    </div>',
-            '    <div class="ssf-screenshot-area">',
-            '      <div class="ssf-drop-zone" id="ssf-drop-zone">',
-            '        <div class="ssf-drop-icon">',
-            '          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
-            '        </div>',
-            '        <div class="ssf-drop-text">Paste screenshot here<br><small>Ctrl+V or drag & drop from ShopWorks</small></div>',
-            '      </div>',
-            '      <div class="ssf-preview-img" id="ssf-preview-img" style="display:none;"></div>',
-            '      <div class="ssf-skeleton" id="ssf-skeleton" style="display:none;">',
-            '        <div class="ssf-skeleton-row" style="width:65%"></div>',
-            '        <div class="ssf-skeleton-row" style="width:80%"></div>',
-            '        <div class="ssf-skeleton-row" style="width:45%"></div>',
-            '        <div class="ssf-skeleton-row" style="width:72%"></div>',
-            '        <div class="ssf-skeleton-row" style="width:55%"></div>',
-            '        <div class="ssf-skeleton-row" style="width:60%"></div>',
-            '        <div class="ssf-skeleton-label">Reading ShopWorks data...</div>',
-            '      </div>',
-            '    </div>',
-            '    <div class="ssf-text-area" style="display:none;">',
-            '      <textarea id="ssf-text-input" class="ssf-textarea" rows="10" placeholder="Paste ShopWorks order text here...\n\nGo to ShopWorks → Print → copy the text output and paste it here. All fields will be extracted instantly."></textarea>',
+            '    <p class="ssf-hint">Paste the ShopWorks order text export below. All customer, order, and garment fields will be extracted instantly.</p>',
+            '    <div class="ssf-text-area">',
+            '      <textarea id="ssf-text-input" class="ssf-textarea" rows="10" placeholder="Paste ShopWorks order text here...\n\nShopWorks → Print tab → copy the text output"></textarea>',
             '      <button type="button" class="ssf-btn ssf-btn-parse" id="ssf-parse-btn">',
             '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
-            '        Parse & Extract',
+            '        Parse & Fill Form',
             '      </button>',
             '    </div>',
             '    <div class="ssf-status" id="ssf-status" style="display:none;"></div>',
             '    <div class="ssf-fields" id="ssf-fields" style="display:none;"></div>',
-            '    <div class="ssf-actions" id="ssf-actions" style="display:none;">',
-            '      <button type="button" class="ssf-btn ssf-btn-fill" id="ssf-fill-btn">',
-            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-            '        Fill Form',
-            '      </button>',
-            '      <button type="button" class="ssf-btn ssf-btn-another" id="ssf-another-btn">Paste Another</button>',
-            '    </div>',
             '  </div>',
             '</div>'
         ].join('\n');
@@ -193,51 +152,22 @@
             if (e.target === overlay) closeModal();
         });
 
-        // Fill button
-        overlay.querySelector('#ssf-fill-btn').addEventListener('click', function () {
-            applyToForm(accumulatedData);
-            closeModal();
-        });
-
-        // Paste Another button
-        overlay.querySelector('#ssf-another-btn').addEventListener('click', resetForNextPaste);
-
-        // Parse text button
+        // Parse & Fill button — parse text, fill form, close modal
         overlay.querySelector('#ssf-parse-btn').addEventListener('click', function () {
             var textInput = document.getElementById('ssf-text-input');
             if (textInput && textInput.value.trim()) {
                 var data = parseShopWorksText(textInput.value);
-                handleExtractionResult(data);
+                // Show brief status, fill form, close
+                var count = Object.keys(data).filter(function (k) { return k !== 'tab' && k !== 'garments' && data[k]; }).length;
+                if (data.garments) count += data.garments.length;
+                showStatus('Extracted ' + count + ' fields', 'success');
+                accumulatedData = data;
+                setTimeout(function () {
+                    applyToForm(data);
+                    closeModal();
+                }, 400);
             }
         });
-
-        // Mode tab switching
-        overlay.querySelectorAll('.ssf-mode-tab').forEach(function (tab) {
-            tab.addEventListener('click', function () {
-                switchMode(tab.getAttribute('data-mode'));
-            });
-        });
-
-        // Drop zone events
-        var dropZone = overlay.querySelector('#ssf-drop-zone');
-        dropZone.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            dropZone.classList.add('ssf-dragover');
-        });
-        dropZone.addEventListener('dragleave', function () {
-            dropZone.classList.remove('ssf-dragover');
-        });
-        dropZone.addEventListener('drop', function (e) {
-            e.preventDefault();
-            dropZone.classList.remove('ssf-dragover');
-            var files = e.dataTransfer.files;
-            if (files.length > 0 && files[0].type.startsWith('image/')) {
-                processImageFile(files[0]);
-            }
-        });
-
-        // Global paste handler (only when modal is open)
-        document.addEventListener('paste', handlePaste);
 
         document.body.appendChild(overlay);
         modal = overlay;
@@ -952,21 +882,22 @@
         var m = createModal();
         accumulatedData = {};
         pasteCount = 0;
-        activeTab = 'screenshot';
-        resetForNextPaste();
 
-        // Reset pills
-        m.querySelectorAll('.ssf-pill').forEach(function (pill) {
-            pill.classList.remove('ssf-pill-done');
-        });
-        // Reset mode tabs
-        switchMode('screenshot');
-
-        document.getElementById('ssf-fields').style.display = 'none';
-        document.getElementById('ssf-fields').innerHTML = '';
+        // Reset textarea and status
+        var textInput = document.getElementById('ssf-text-input');
+        if (textInput) textInput.value = '';
+        var statusEl = document.getElementById('ssf-status');
+        if (statusEl) statusEl.style.display = 'none';
+        var fieldsEl = document.getElementById('ssf-fields');
+        if (fieldsEl) { fieldsEl.style.display = 'none'; fieldsEl.innerHTML = ''; }
 
         m.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // Focus textarea
+        setTimeout(function () {
+            if (textInput) textInput.focus();
+        }, 100);
     }
 
     function closeModal() {
@@ -985,7 +916,8 @@
         highlightField: highlightField,
         checkMissingFields: checkMissingFields,
         addBusinessDays: addBusinessDays,
-        showToast: showToast
+        showToast: showToast,
+        scheduleColorFill: scheduleColorFill
     };
 
 })();

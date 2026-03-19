@@ -892,6 +892,9 @@
 
                         // Auto-fill empty fields from ManageOrders data
                         autoFillFromOrder(order);
+
+                        // Also fetch line items for garment styles + colors
+                        fetchAndFillLineItems(orderNum);
                     } else {
                         orderInput.classList.add('ae-field-warning');
                         feedback.className = 'ae-order-feedback ae-order-feedback--warning';
@@ -1050,10 +1053,124 @@
         setTimeout(function () { ssf.checkMissingFields(); }, 3000);
     }
 
+    // ── Garment style fields (rows 1-4) ──
+    var GARMENT_STYLE_FIELDS = [
+        'InsertRecordGarmentStyle',
+        'InsertRecordGarm_Style_2',
+        'InsertRecordGarm_Style_3',
+        'InsertRecordGarm_Style_4'
+    ];
+
+    // Non-garment part number prefixes to skip
+    var NON_GARMENT_PREFIXES = ['GRT-', 'STK-', 'LTM', 'Art', 'SHIP', 'TAX', 'DISC'];
+
+    // Art Estimate mapping from GRT part numbers
+    var ART_ESTIMATE_MAP = {
+        'GRT-25': '25',
+        'GRT-50': '50',
+        'GRT-75': '75',
+        'GRT-100': '100',
+        'GRT-150': '150'
+    };
+
+    /**
+     * Fetch line items for an order and fill garment style/color rows.
+     */
+    function fetchAndFillLineItems(orderNum) {
+        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            .then(function (resp) { return resp.ok ? resp.json() : { result: [] }; })
+            .then(function (data) {
+                var lineItems = data.result || [];
+                if (lineItems.length > 0) {
+                    fillGarmentsFromLineItems(lineItems);
+                }
+            })
+            .catch(function (err) {
+                console.warn('[AE] Line items fetch failed:', err.message);
+            });
+    }
+
+    /**
+     * Fill garment style/color rows from ManageOrders line items.
+     * Filters out non-garment items, deduplicates by base part number.
+     */
+    function fillGarmentsFromLineItems(lineItems) {
+        var ssf = window.ScreenshotFill;
+        if (!ssf) return;
+
+        var garments = [];
+        var artCharge = null;
+        var seenParts = {};
+
+        lineItems.forEach(function (item) {
+            if (!item.PartNumber) return;
+            var pn = item.PartNumber;
+
+            // Check for GRT art charge
+            if (pn.indexOf('GRT-') === 0) {
+                var base = pn.replace(/_\w+$/, '');
+                if (!artCharge && ART_ESTIMATE_MAP[base]) {
+                    artCharge = base;
+                }
+                return;
+            }
+
+            // Skip non-garment items
+            var skip = NON_GARMENT_PREFIXES.some(function (prefix) {
+                return pn.indexOf(prefix) === 0;
+            });
+            if (skip) return;
+
+            // Strip size suffix: C110_OSFA → C110, PC850H_2X → PC850H
+            var basePn = pn.replace(/_\w+$/, '');
+
+            // Deduplicate by base part number
+            if (seenParts[basePn]) return;
+            seenParts[basePn] = true;
+
+            garments.push({
+                partNumber: basePn,
+                color: item.PartColor || ''
+            });
+        });
+
+        // Fill garment rows (only if empty)
+        garments.slice(0, 4).forEach(function (g, i) {
+            var styleInput = document.querySelector('[name="' + GARMENT_STYLE_FIELDS[i] + '"]');
+            if (styleInput && !styleInput.value.trim()) {
+                styleInput.value = g.partNumber;
+                styleInput.dispatchEvent(new Event('change', { bubbles: true }));
+                styleInput.dispatchEvent(new Event('blur', { bubbles: true }));
+                ssf.highlightField(styleInput);
+
+                // Schedule color fill after Caspio cascade populates the dropdown
+                if (g.color && ssf.scheduleColorFill) {
+                    var colorFields = [
+                        'InsertRecordGarmentColor',
+                        'InsertRecordGarm_Color_2',
+                        'InsertRecordGarm_Color_3',
+                        'InsertRecordGarm_Color_4'
+                    ];
+                    ssf.scheduleColorFill(colorFields[i], g.color);
+                }
+            }
+        });
+
+        // Fill Art Estimate if GRT line item found
+        if (artCharge && ART_ESTIMATE_MAP[artCharge]) {
+            var artSelect = document.querySelector('[name="InsertRecordPrelim_Charges"]');
+            if (artSelect && (!artSelect.value || artSelect.selectedIndex <= 0)) {
+                artSelect.value = ART_ESTIMATE_MAP[artCharge];
+                artSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                ssf.highlightField(artSelect);
+            }
+        }
+    }
+
     // ── Init ───────────────────────────────────────────────────────
 
     /**
-     * Add "Fill from Screenshot" button below the request type toggle.
+     * Add "Paste Order Text" backup button below the request type toggle.
      */
     function addScreenshotFillButton() {
         // Remove any existing screenshot buttons (from Caspio HTML Block or prev DataPageReady calls)
@@ -1069,8 +1186,8 @@
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ae-screenshot-btn';
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Fill from ShopWorks';
-        btn.title = 'Paste a ShopWorks screenshot or text export to auto-fill fields';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Paste Order Text';
+        btn.title = 'Paste ShopWorks text export as backup when order # is not available';
         btn.addEventListener('click', function () {
             if (window.ScreenshotFill) {
                 window.ScreenshotFill.open();
