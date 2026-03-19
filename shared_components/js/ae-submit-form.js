@@ -933,8 +933,9 @@
      * Add "Fill from Screenshot" button below the request type toggle.
      */
     function addScreenshotFillButton() {
-        // Dedup guard — only one button
-        if (document.querySelector('.ae-screenshot-btn')) return;
+        // Remove any existing screenshot buttons (from Caspio HTML Block or prev DataPageReady calls)
+        document.querySelectorAll('.ae-screenshot-btn').forEach(function (el) { el.remove(); });
+        document.querySelectorAll('.ae-tools-strip').forEach(function (el) { el.remove(); });
 
         var toggleContainer = document.getElementById('request-type-toggle');
         if (!toggleContainer) return;
