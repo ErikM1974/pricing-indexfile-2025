@@ -930,27 +930,31 @@
     // ── Init ───────────────────────────────────────────────────────
 
     /**
-     * Add "Fill from Screenshot" button next to the request type toggle.
+     * Add "Fill from Screenshot" button below the request type toggle.
      */
     function addScreenshotFillButton() {
+        // Dedup guard — only one button
+        if (document.querySelector('.ae-screenshot-btn')) return;
+
         var toggleContainer = document.getElementById('request-type-toggle');
         if (!toggleContainer) return;
 
-        var row = toggleContainer.querySelector('.toggle-row');
-        if (!row) return;
+        var strip = document.createElement('div');
+        strip.className = 'ae-tools-strip';
 
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ae-screenshot-btn';
-        btn.innerHTML = '📷 Fill from Screenshot';
-        btn.title = 'Paste a ShopWorks screenshot to auto-fill fields';
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Fill from ShopWorks';
+        btn.title = 'Paste a ShopWorks screenshot or text export to auto-fill fields';
         btn.addEventListener('click', function () {
             if (window.ScreenshotFill) {
                 window.ScreenshotFill.open();
             }
         });
 
-        row.appendChild(btn);
+        strip.appendChild(btn);
+        toggleContainer.parentElement.insertBefore(strip, toggleContainer.nextSibling);
     }
 
     document.addEventListener('DataPageReady', function () {

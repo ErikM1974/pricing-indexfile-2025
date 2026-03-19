@@ -1,6 +1,7 @@
 /**
- * Screenshot Fill — Paste ShopWorks screenshots to auto-fill art request form
+ * Screenshot Fill — Paste ShopWorks screenshots OR text exports to auto-fill art request form
  * Supports Customer tab, Design tab, and Line Items tab screenshots (additive)
+ * Also supports ShopWorks text export (instant, no API call)
  *
  * Usage: window.ScreenshotFill.open() — opens the paste modal
  * Depends on: APP_CONFIG.API.BASE_URL (or fallback)
@@ -18,8 +19,60 @@
         orderNumber: 'InsertRecordOrder_Num_SW',
         contactFirstName: 'InsertRecordFirst_name',
         contactLastName: 'InsertRecordLast_name',
-        salesPerson: 'InsertRecordSales_Rep',
+        contactEmail: 'InsertRecordEmail_Contact',
         designNumber: 'InsertRecordDesign_Num_SW'
+    };
+
+    // ── Order Type mapping: ShopWorks name → Caspio multi-select checkbox values ──
+    var ORDER_TYPE_MAP = {
+        'Digital Printing':                ['DTG'],
+        'DTG':                             ['DTG'],
+        'Custom Screen Print':             ['Screen Print'],
+        'Contract Screen Print':           ['Screen Print'],
+        'Screen Print Subcontract':        ['Screen Print'],
+        'Sample Screen Print':             ['Screen Print'],
+        'Preprint Customized, Screen':     ['Screen Print'],
+        'Screen Print Preprint Production': ['Screen Print'],
+        'Transfers':                       ['Transfer'],
+        'Transfer':                        ['Transfer'],
+        'Custom Embroidery':               ['Embroidery'],
+        'Contract Embroidery':             ['Embroidery'],
+        'College Embroidery':              ['Embroidery'],
+        'Subcontract Embroidery':          ['Embroidery'],
+        'Preprint Customized, Embroidery': ['Embroidery'],
+        'Embroidery Preprint Production':  ['Embroidery'],
+        'EMB':                             ['Embroidery'],
+        'Laser/Ad Specialties':            ['Laser Engraving', 'ASI', 'Roland Stickers'],
+        'Laser/Ad Specialities':           ['Laser Engraving', 'ASI', 'Roland Stickers']
+    };
+
+    // ── Art Estimate mapping: GRT part number → dropdown value ──
+    var ART_ESTIMATE_MAP = {
+        'GRT-25': '25',
+        'GRT-50': '50',
+        'GRT-75': '75',
+        'GRT-100': '100',
+        'GRT-150': '150'
+    };
+
+    // ── Garment Placement mapping: ShopWorks location code → Caspio dropdown value ──
+    var PLACEMENT_MAP = {
+        'LC': 'Left Chest',
+        'FB': 'Full Back',
+        'FF': 'Full Front',
+        'CC': 'Full Front',
+        'LS': 'Left Sleeve',
+        'CB': 'Cap Back',
+        'CFC': 'Cap Front Panel',
+        'CLP': 'Cap Left Side Panel',
+        'CLS': 'Cap Left Side Panel',
+        'CRP': 'Cap Right Side Panel',
+        'CRS': 'Cap Right Side Panel',
+        'BON': 'Other (Specify)',
+        'ALC': 'Other (Specify)',
+        'ALP': 'Other (Specify)',
+        'ARC': 'Other (Specify)',
+        'ARP': 'Other (Specify)'
     };
 
     // Garment row field names (rows 1-4)
@@ -41,6 +94,7 @@
     var accumulatedData = {};
     var modal = null;
     var pasteCount = 0;
+    var activeTab = 'screenshot'; // 'screenshot' or 'text'
 
     // ── Escape HTML for XSS protection ──
     function escapeHtml(str) {
@@ -48,6 +102,18 @@
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // ── Business days calculation ──
+    function addBusinessDays(date, days) {
+        var result = new Date(date);
+        var added = 0;
+        while (added < days) {
+            result.setDate(result.getDate() + 1);
+            var dow = result.getDay();
+            if (dow !== 0 && dow !== 6) added++;
+        }
+        return result;
     }
 
     // ── Create Modal ──
@@ -59,28 +125,63 @@
         overlay.innerHTML = [
             '<div class="ssf-modal">',
             '  <div class="ssf-header">',
-            '    <h3>📷 Fill from ShopWorks Screenshot</h3>',
+            '    <h3>',
+            '      <svg class="ssf-header-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
+            '      Fill from ShopWorks',
+            '    </h3>',
             '    <button class="ssf-close" title="Close">&times;</button>',
             '  </div>',
             '  <div class="ssf-body">',
+            '    <div class="ssf-mode-tabs">',
+            '      <button type="button" class="ssf-mode-tab ssf-mode-tab-active" data-mode="screenshot">',
+            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+            '        Screenshot',
+            '      </button>',
+            '      <button type="button" class="ssf-mode-tab" data-mode="text">',
+            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+            '        Paste Text',
+            '      </button>',
+            '    </div>',
             '    <div class="ssf-tabs-hint">',
-            '      Paste screenshots from any ShopWorks tab — each one adds more fields:',
             '      <div class="ssf-tab-pills">',
-            '        <span class="ssf-pill" data-tab="customer">👤 Customer</span>',
-            '        <span class="ssf-pill" data-tab="design">🎨 Design</span>',
-            '        <span class="ssf-pill" data-tab="lineitems">📦 Line Items</span>',
+            '        <span class="ssf-pill" data-tab="customer">Customer</span>',
+            '        <span class="ssf-pill" data-tab="design">Design</span>',
+            '        <span class="ssf-pill" data-tab="lineitems">Line Items</span>',
             '      </div>',
             '    </div>',
-            '    <div class="ssf-drop-zone" id="ssf-drop-zone">',
-            '      <div class="ssf-drop-icon">📋</div>',
-            '      <div class="ssf-drop-text">Paste screenshot here<br><small>Ctrl+V or drag & drop</small></div>',
+            '    <div class="ssf-screenshot-area">',
+            '      <div class="ssf-drop-zone" id="ssf-drop-zone">',
+            '        <div class="ssf-drop-icon">',
+            '          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
+            '        </div>',
+            '        <div class="ssf-drop-text">Paste screenshot here<br><small>Ctrl+V or drag & drop from ShopWorks</small></div>',
+            '      </div>',
+            '      <div class="ssf-preview-img" id="ssf-preview-img" style="display:none;"></div>',
+            '      <div class="ssf-skeleton" id="ssf-skeleton" style="display:none;">',
+            '        <div class="ssf-skeleton-row" style="width:65%"></div>',
+            '        <div class="ssf-skeleton-row" style="width:80%"></div>',
+            '        <div class="ssf-skeleton-row" style="width:45%"></div>',
+            '        <div class="ssf-skeleton-row" style="width:72%"></div>',
+            '        <div class="ssf-skeleton-row" style="width:55%"></div>',
+            '        <div class="ssf-skeleton-row" style="width:60%"></div>',
+            '        <div class="ssf-skeleton-label">Reading ShopWorks data...</div>',
+            '      </div>',
             '    </div>',
-            '    <div class="ssf-preview-img" id="ssf-preview-img" style="display:none;"></div>',
+            '    <div class="ssf-text-area" style="display:none;">',
+            '      <textarea id="ssf-text-input" class="ssf-textarea" rows="10" placeholder="Paste ShopWorks order text here...\n\nGo to ShopWorks → Print → copy the text output and paste it here. All fields will be extracted instantly."></textarea>',
+            '      <button type="button" class="ssf-btn ssf-btn-parse" id="ssf-parse-btn">',
+            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+            '        Parse & Extract',
+            '      </button>',
+            '    </div>',
             '    <div class="ssf-status" id="ssf-status" style="display:none;"></div>',
             '    <div class="ssf-fields" id="ssf-fields" style="display:none;"></div>',
             '    <div class="ssf-actions" id="ssf-actions" style="display:none;">',
-            '      <button class="ssf-btn ssf-btn-fill" id="ssf-fill-btn">✅ Fill Form</button>',
-            '      <button class="ssf-btn ssf-btn-another" id="ssf-another-btn">📋 Paste Another Tab</button>',
+            '      <button type="button" class="ssf-btn ssf-btn-fill" id="ssf-fill-btn">',
+            '        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+            '        Fill Form',
+            '      </button>',
+            '      <button type="button" class="ssf-btn ssf-btn-another" id="ssf-another-btn">Paste Another</button>',
             '    </div>',
             '  </div>',
             '</div>'
@@ -100,6 +201,22 @@
 
         // Paste Another button
         overlay.querySelector('#ssf-another-btn').addEventListener('click', resetForNextPaste);
+
+        // Parse text button
+        overlay.querySelector('#ssf-parse-btn').addEventListener('click', function () {
+            var textInput = document.getElementById('ssf-text-input');
+            if (textInput && textInput.value.trim()) {
+                var data = parseShopWorksText(textInput.value);
+                handleExtractionResult(data);
+            }
+        });
+
+        // Mode tab switching
+        overlay.querySelectorAll('.ssf-mode-tab').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                switchMode(tab.getAttribute('data-mode'));
+            });
+        });
 
         // Drop zone events
         var dropZone = overlay.querySelector('#ssf-drop-zone');
@@ -127,20 +244,42 @@
         return overlay;
     }
 
+    function switchMode(mode) {
+        activeTab = mode;
+        if (!modal) return;
+        modal.querySelectorAll('.ssf-mode-tab').forEach(function (t) {
+            t.classList.toggle('ssf-mode-tab-active', t.getAttribute('data-mode') === mode);
+        });
+        var screenshotArea = modal.querySelector('.ssf-screenshot-area');
+        var textArea = modal.querySelector('.ssf-text-area');
+        if (mode === 'screenshot') {
+            screenshotArea.style.display = '';
+            textArea.style.display = 'none';
+        } else {
+            screenshotArea.style.display = 'none';
+            textArea.style.display = '';
+        }
+    }
+
     function handlePaste(e) {
         if (!modal || modal.style.display === 'none') return;
 
         var items = e.clipboardData && e.clipboardData.items;
         if (!items) return;
 
+        // Check for image first (screenshot mode)
         for (var i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
                 e.preventDefault();
+                // Auto-switch to screenshot mode if pasting an image
+                if (activeTab !== 'screenshot') switchMode('screenshot');
                 var blob = items[i].getAsFile();
                 processImageFile(blob);
                 return;
             }
         }
+
+        // If in text mode and pasting text, let it go to textarea naturally
     }
 
     function processImageFile(file) {
@@ -158,8 +297,16 @@
         previewEl.innerHTML = '<img src="' + dataUri + '" alt="Screenshot preview">';
         previewEl.style.display = 'block';
 
-        // Hide drop zone
+        // Hide drop zone, show skeleton
         document.getElementById('ssf-drop-zone').style.display = 'none';
+    }
+
+    function showSkeleton() {
+        document.getElementById('ssf-skeleton').style.display = 'block';
+    }
+
+    function hideSkeleton() {
+        document.getElementById('ssf-skeleton').style.display = 'none';
     }
 
     function showStatus(message, type) {
@@ -171,7 +318,8 @@
 
     // ── API Call ──
     function extractFromImage(dataUri) {
-        showStatus('Analyzing screenshot...', 'loading');
+        showSkeleton();
+        document.getElementById('ssf-status').style.display = 'none';
 
         fetch(API_BASE + '/api/vision/extract-shopworks', {
             method: 'POST',
@@ -183,15 +331,97 @@
                 return resp.json();
             })
             .then(function (result) {
+                hideSkeleton();
                 if (!result.success || !result.data) {
                     throw new Error(result.error || 'No data returned');
                 }
                 handleExtractionResult(result.data);
             })
             .catch(function (err) {
-                showStatus('❌ ' + err.message, 'error');
+                hideSkeleton();
+                showStatus(err.message, 'error');
                 console.error('[ScreenshotFill] Extraction failed:', err);
             });
+    }
+
+    // ── ShopWorks Text Export Parser (instant, no API) ──
+    function parseShopWorksText(text) {
+        var data = { tab: 'text' };
+        var lines = text.split('\n');
+        var section = '';
+
+        lines.forEach(function (line) {
+            // Track sections by *** delimiters
+            if (line.indexOf('***') !== -1) {
+                section = '';
+                return;
+            }
+            // Section headers (lines without colons that follow ***)
+            var trimmed = line.trim();
+            if (!trimmed) return;
+
+            if (trimmed === 'Your Company Information') { section = 'customer'; return; }
+            if (trimmed === 'Order Information') { section = 'order'; return; }
+            if (trimmed === 'Design Information') { section = 'design'; return; }
+            if (trimmed === 'Items Purchased') { section = 'items'; return; }
+            if (trimmed === 'Order Summary') { section = 'summary'; return; }
+            if (trimmed.indexOf('Item ') === 0 && trimmed.indexOf(' of ') !== -1) return; // "Item 1 of 3"
+
+            var match = trimmed.match(/^([^:]+):(.*)$/);
+            if (!match) return;
+            var key = match[1].trim();
+            var val = match[2].trim();
+            if (!val) return;
+
+            // Map by key + section context
+            if (key === 'Company' && section === 'customer') {
+                data.companyName = val;
+            } else if (key === 'Customer #') {
+                data.customerNumber = val;
+            } else if (key === 'Order #') {
+                data.orderNumber = val;
+            } else if (key === 'Ordered by') {
+                var parts = val.trim().split(/\s+/);
+                data.contactFirstName = parts[0] || '';
+                data.contactLastName = parts.slice(1).join(' ') || '';
+            } else if (key === 'Email' && section === 'order') {
+                data.contactEmail = val;
+            } else if (key === 'Phone' && section === 'order' && val) {
+                data.contactPhone = val;
+            } else if (key === 'Salesperson') {
+                data.salesPerson = val;
+            } else if (key === 'Date Order Placed') {
+                data.dateOrderPlaced = val;
+            } else if (key === 'Req. Ship Date') {
+                data.reqShipDate = val;
+            } else if (key === 'Design #') {
+                var dParts = val.split(' - ');
+                data.designNumber = dParts[0].trim();
+                if (dParts[1]) data.designName = dParts[1].trim();
+            } else if (key === 'Part Number' && section === 'items') {
+                if (!data.garments) data.garments = [];
+                // Strip size suffix: C110_OSFA → C110, PC54_2X → PC54
+                var base = val.replace(/_\w+$/, '');
+                // Check for GRT art charges
+                if (base.indexOf('GRT-') === 0) {
+                    data.artCharge = base;
+                } else {
+                    data.garments.push({ partNumber: base, color: '', description: '' });
+                }
+            } else if (key === 'Description' && section === 'items') {
+                if (data.garments && data.garments.length > 0) {
+                    var last = data.garments[data.garments.length - 1];
+                    last.description = val;
+                    // Extract color: "Size OSFA - Port Authority Flexfit 110 Mesh Cap, HtGrph/Blk"
+                    var commaIdx = val.lastIndexOf(',');
+                    if (commaIdx > -1) {
+                        last.color = val.substring(commaIdx + 1).trim();
+                    }
+                }
+            }
+        });
+
+        return data;
     }
 
     function handleExtractionResult(data) {
@@ -209,7 +439,6 @@
         // Merge garments additively
         if (data.garments && data.garments.length > 0) {
             if (!accumulatedData.garments) accumulatedData.garments = [];
-            // Add new garments that aren't already in the list (by part number)
             data.garments.forEach(function (g) {
                 var exists = accumulatedData.garments.some(function (existing) {
                     return existing.partNumber === g.partNumber && existing.color === g.color;
@@ -223,15 +452,21 @@
 
         pasteCount++;
 
-        // Update tab pill to show checkmark
+        // Update tab pill
         var tabName = data.tab || 'unknown';
         var pill = modal.querySelector('.ssf-pill[data-tab="' + tabName + '"]');
         if (pill && !pill.classList.contains('ssf-pill-done')) {
             pill.classList.add('ssf-pill-done');
-            pill.textContent = '✅ ' + pill.textContent.replace(/^[^\s]+\s/, '');
+        }
+        // For text mode, mark all pills as done since text contains everything
+        if (tabName === 'text') {
+            modal.querySelectorAll('.ssf-pill').forEach(function (p) {
+                p.classList.add('ssf-pill-done');
+            });
         }
 
-        showStatus('Found ' + newFieldCount + ' fields from ' + tabName + ' tab', 'success');
+        var source = tabName === 'text' ? 'text export' : tabName + ' tab';
+        showStatus('Found ' + newFieldCount + ' fields from ' + source, 'success');
         renderFieldPreview();
 
         // Show action buttons
@@ -242,7 +477,6 @@
         var fieldsEl = document.getElementById('ssf-fields');
         var html = '<div class="ssf-field-list">';
 
-        // Simple fields
         var labels = {
             companyName: 'Company',
             customerNumber: 'Customer #',
@@ -251,31 +485,65 @@
             contactLastName: 'Last Name',
             contactEmail: 'Email',
             contactPhone: 'Phone',
-            salesPerson: 'Sales Rep',
             designNumber: 'Design #',
             designName: 'Design Name',
             orderType: 'Order Type',
+            locationCode: 'Placement',
+            artCharge: 'Art Estimate',
             locations: 'Locations',
             dateOrderPlaced: 'Order Date',
             reqShipDate: 'Ship Date'
         };
 
+        // Calculate and show due date preview
+        var dueDatePreview = '';
+        if (accumulatedData.dateOrderPlaced) {
+            var orderDate = new Date(accumulatedData.dateOrderPlaced);
+            if (!isNaN(orderDate.getTime())) {
+                var artDue = addBusinessDays(orderDate, 3);
+                dueDatePreview = (artDue.getMonth() + 1) + '/' + artDue.getDate() + '/' + artDue.getFullYear();
+            }
+        }
+
+        var idx = 0;
         Object.keys(labels).forEach(function (key) {
             if (accumulatedData[key] != null && accumulatedData[key] !== '') {
-                html += '<div class="ssf-field-row">'
-                    + '<span class="ssf-field-label">' + labels[key] + ':</span>'
-                    + '<span class="ssf-field-value">' + escapeHtml(String(accumulatedData[key])) + '</span>'
+                var displayVal = escapeHtml(String(accumulatedData[key]));
+                // Show mapped values for special fields
+                if (key === 'orderType' && ORDER_TYPE_MAP[accumulatedData[key]]) {
+                    displayVal += ' <span class="ssf-field-mapped">&rarr; ' + ORDER_TYPE_MAP[accumulatedData[key]].join(', ') + '</span>';
+                }
+                if (key === 'locationCode' && PLACEMENT_MAP[accumulatedData[key]]) {
+                    displayVal += ' <span class="ssf-field-mapped">&rarr; ' + escapeHtml(PLACEMENT_MAP[accumulatedData[key]]) + '</span>';
+                }
+                if (key === 'artCharge' && ART_ESTIMATE_MAP[accumulatedData[key]]) {
+                    displayVal += ' <span class="ssf-field-mapped">&rarr; $' + ART_ESTIMATE_MAP[accumulatedData[key]] + '</span>';
+                }
+                html += '<div class="ssf-field-row" style="animation-delay:' + (idx * 80) + 'ms">'
+                    + '<span class="ssf-field-label">' + labels[key] + '</span>'
+                    + '<span class="ssf-field-value">' + displayVal + '</span>'
                     + '</div>';
+                idx++;
             }
         });
+
+        // Show calculated due date
+        if (dueDatePreview) {
+            html += '<div class="ssf-field-row ssf-field-row-calc" style="animation-delay:' + (idx * 80) + 'ms">'
+                + '<span class="ssf-field-label">Art Due Date</span>'
+                + '<span class="ssf-field-value">' + escapeHtml(dueDatePreview)
+                + ' <span class="ssf-field-mapped">(3 biz days after order placed)</span></span>'
+                + '</div>';
+            idx++;
+        }
 
         // Garments
         if (accumulatedData.garments && accumulatedData.garments.length > 0) {
             html += '<div class="ssf-field-section">Garments</div>';
             accumulatedData.garments.forEach(function (g, i) {
-                html += '<div class="ssf-field-row">'
-                    + '<span class="ssf-field-label">Row ' + (i + 1) + ':</span>'
-                    + '<span class="ssf-field-value">' + escapeHtml(g.partNumber) + ' — ' + escapeHtml(g.color) + '</span>'
+                html += '<div class="ssf-field-row" style="animation-delay:' + ((idx + i) * 80) + 'ms">'
+                    + '<span class="ssf-field-label">Row ' + (i + 1) + '</span>'
+                    + '<span class="ssf-field-value">' + escapeHtml(g.partNumber) + (g.color ? ' — ' + escapeHtml(g.color) : '') + '</span>'
                     + '</div>';
             });
         }
@@ -286,13 +554,14 @@
     }
 
     function resetForNextPaste() {
-        // Keep accumulated data, reset UI for next paste
         document.getElementById('ssf-drop-zone').style.display = '';
         document.getElementById('ssf-preview-img').style.display = 'none';
         document.getElementById('ssf-preview-img').innerHTML = '';
+        document.getElementById('ssf-skeleton').style.display = 'none';
         document.getElementById('ssf-status').style.display = 'none';
         document.getElementById('ssf-actions').style.display = 'none';
-        // Keep field preview visible so user sees accumulated fields
+        var textInput = document.getElementById('ssf-text-input');
+        if (textInput) textInput.value = '';
     }
 
     // ── Apply to Caspio Form ──
@@ -306,20 +575,11 @@
                 if (input) {
                     input.value = data[key];
                     input.dispatchEvent(new Event('change', { bubbles: true }));
+                    highlightField(input);
                     filledCount++;
                 }
             }
         });
-
-        // Contact email (find by label since Caspio field name may vary)
-        if (data.contactEmail) {
-            var emailInput = findInputByLabel("Contact's Email") || findInputByLabel("Contact Email");
-            if (emailInput) {
-                emailInput.value = data.contactEmail;
-                emailInput.dispatchEvent(new Event('change', { bubbles: true }));
-                filledCount++;
-            }
-        }
 
         // Trigger Order # blur validation
         if (data.orderNumber) {
@@ -331,6 +591,59 @@
             }
         }
 
+        // Order Type multi-select checkboxes
+        if (data.orderType) {
+            fillOrderType(data.orderType);
+            filledCount++;
+        }
+
+        // Due Date (order placed + 3 business days)
+        if (data.dateOrderPlaced) {
+            var orderDate = new Date(data.dateOrderPlaced);
+            if (!isNaN(orderDate.getTime())) {
+                var artDue = addBusinessDays(orderDate, 3);
+                var dueDateInput = document.querySelector('[name="InsertRecordDue_Date"]');
+                if (dueDateInput) {
+                    var mm = String(artDue.getMonth() + 1);
+                    var dd = String(artDue.getDate());
+                    var yyyy = artDue.getFullYear();
+                    dueDateInput.value = mm + '/' + dd + '/' + yyyy;
+                    dueDateInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    highlightField(dueDateInput);
+                    filledCount++;
+                }
+            }
+        }
+
+        // Art Estimate dropdown
+        if (data.artCharge && ART_ESTIMATE_MAP[data.artCharge]) {
+            var artSelect = document.querySelector('[name="InsertRecordPrelim_Charges"]');
+            if (artSelect) {
+                artSelect.value = ART_ESTIMATE_MAP[data.artCharge];
+                artSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                highlightField(artSelect);
+                filledCount++;
+            }
+        }
+
+        // Garment Placement dropdown
+        if (data.locationCode && PLACEMENT_MAP[data.locationCode]) {
+            var placementSelect = document.querySelector('[name="InsertRecordGarment_Placement"]');
+            if (placementSelect) {
+                // Match by option text
+                var targetText = PLACEMENT_MAP[data.locationCode];
+                for (var p = 0; p < placementSelect.options.length; p++) {
+                    if (placementSelect.options[p].text.trim() === targetText) {
+                        placementSelect.value = placementSelect.options[p].value;
+                        placementSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                        highlightField(placementSelect);
+                        filledCount++;
+                        break;
+                    }
+                }
+            }
+        }
+
         // Garment rows (up to 4)
         if (data.garments && data.garments.length > 0) {
             data.garments.slice(0, 4).forEach(function (g, i) {
@@ -339,9 +652,9 @@
                     styleInput.value = g.partNumber;
                     styleInput.dispatchEvent(new Event('change', { bubbles: true }));
                     styleInput.dispatchEvent(new Event('blur', { bubbles: true }));
+                    highlightField(styleInput);
                     filledCount++;
 
-                    // Wait for Caspio cascade to populate color dropdown, then set color
                     if (g.color) {
                         scheduleColorFill(GARMENT_COLOR_FIELDS[i], g.color);
                     }
@@ -349,13 +662,66 @@
             });
         }
 
-        // Show toast
-        showToast('Filled ' + filledCount + ' fields from screenshot');
+        showToast('Filled ' + filledCount + ' fields from ShopWorks');
+    }
+
+    // ── Order Type: check checkboxes in Caspio MSDropdown ──
+    function fillOrderType(orderTypeText) {
+        var values = ORDER_TYPE_MAP[orderTypeText] || ['Other'];
+
+        // Caspio MSDropdown renders as a container with checkbox inputs + labels
+        // Find the Order_Type container
+        var container = null;
+        var allLabels = document.querySelectorAll('#submit-tab label');
+        for (var i = 0; i < allLabels.length; i++) {
+            if (allLabels[i].textContent.trim().replace(/\s*\*$/, '') === 'Order Type') {
+                var cell = allLabels[i].closest('.cbFormLabelCell');
+                if (cell) {
+                    container = cell.nextElementSibling;
+                }
+                break;
+            }
+        }
+
+        if (!container) return;
+
+        // Find all checkbox inputs and their associated labels in the MSDropdown
+        var checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(function (cb) {
+            var label = cb.parentElement ? cb.parentElement.textContent.trim() : '';
+            if (!label && cb.nextElementSibling) label = cb.nextElementSibling.textContent.trim();
+            if (!label && cb.nextSibling) label = (cb.nextSibling.textContent || '').trim();
+
+            if (values.indexOf(label) !== -1) {
+                cb.checked = true;
+                cb.dispatchEvent(new Event('change', { bubbles: true }));
+                cb.dispatchEvent(new Event('click', { bubbles: true }));
+            }
+        });
+
+        // Also try the select element approach (in case Caspio renders differently)
+        var selectEl = container.querySelector('select[name="InsertRecordOrder_Type"]');
+        if (selectEl && selectEl.multiple) {
+            for (var j = 0; j < selectEl.options.length; j++) {
+                if (values.indexOf(selectEl.options[j].text.trim()) !== -1) {
+                    selectEl.options[j].selected = true;
+                }
+            }
+            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+
+    // ── Highlight filled field with blue glow ──
+    function highlightField(input) {
+        if (!input) return;
+        input.classList.add('ssf-field-glow');
+        setTimeout(function () {
+            input.classList.remove('ssf-field-glow');
+        }, 1800);
     }
 
     /**
      * Wait for Caspio cascade to populate the color dropdown, then set the value.
-     * Retries every 500ms for up to 5 seconds.
      */
     function scheduleColorFill(colorFieldName, colorValue) {
         var attempts = 0;
@@ -366,7 +732,6 @@
             var colorEl = document.querySelector('[name="' + colorFieldName + '"]');
 
             if (colorEl && colorEl.tagName === 'SELECT' && colorEl.options.length > 1) {
-                // Try exact match first, then partial match
                 var matched = false;
                 for (var j = 0; j < colorEl.options.length; j++) {
                     var optText = colorEl.options[j].text.toLowerCase();
@@ -374,6 +739,7 @@
                     if (optText === target || optText.indexOf(target) !== -1 || target.indexOf(optText) !== -1) {
                         colorEl.value = colorEl.options[j].value;
                         colorEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        highlightField(colorEl);
                         matched = true;
                         break;
                     }
@@ -383,7 +749,6 @@
 
             if (attempts >= maxAttempts) {
                 clearInterval(interval);
-                // If select never populated, try setting as text (custom product mode)
                 if (colorEl && colorEl.tagName === 'INPUT') {
                     colorEl.value = colorValue;
                     colorEl.dispatchEvent(new Event('change', { bubbles: true }));
@@ -392,29 +757,10 @@
         }, 500);
     }
 
-    /**
-     * Find an input by its label text (for fields where Caspio name is unpredictable)
-     */
-    function findInputByLabel(labelText) {
-        var labels = document.querySelectorAll('#submit-tab label');
-        for (var i = 0; i < labels.length; i++) {
-            if (labels[i].textContent.trim().replace(/\s*\*$/, '') === labelText) {
-                var cell = labels[i].closest('.cbFormLabelCell');
-                if (cell) {
-                    var fieldCell = cell.nextElementSibling;
-                    if (fieldCell) {
-                        return fieldCell.querySelector('input, select, textarea');
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     function showToast(message) {
         var toast = document.createElement('div');
         toast.className = 'ssf-toast';
-        toast.textContent = message;
+        toast.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ' + escapeHtml(message);
         document.body.appendChild(toast);
         setTimeout(function () { toast.classList.add('ssf-toast-show'); }, 10);
         setTimeout(function () {
@@ -426,18 +772,18 @@
     // ── Public API ──
     function openModal() {
         var m = createModal();
-        // Reset state
         accumulatedData = {};
         pasteCount = 0;
+        activeTab = 'screenshot';
         resetForNextPaste();
-        // Reset tab pills
+
+        // Reset pills
         m.querySelectorAll('.ssf-pill').forEach(function (pill) {
             pill.classList.remove('ssf-pill-done');
         });
-        var pills = m.querySelectorAll('.ssf-pill');
-        if (pills[0]) pills[0].textContent = '👤 Customer';
-        if (pills[1]) pills[1].textContent = '🎨 Design';
-        if (pills[2]) pills[2].textContent = '📦 Line Items';
+        // Reset mode tabs
+        switchMode('screenshot');
+
         document.getElementById('ssf-fields').style.display = 'none';
         document.getElementById('ssf-fields').innerHTML = '';
 
