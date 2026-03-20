@@ -344,7 +344,7 @@ body {
 
 .thread-row {
   display: grid;
-  grid-template-columns: 32px var(--thread-swatch) 1fr 60px;
+  grid-template-columns: 32px var(--thread-swatch) 1fr 1fr 60px;
   gap: 10px;
   align-items: center;
   padding: 8px 16px;
@@ -370,18 +370,11 @@ body {
 }
 
 .thread-name {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  font-weight: 500;
-}
-
-.thread-name-text {
   font-weight: 500;
 }
 
 .thread-element {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--accent);
   font-weight: 400;
   font-style: italic;

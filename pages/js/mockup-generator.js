@@ -428,18 +428,11 @@
 
             var nameCell = document.createElement('div');
             nameCell.className = 'thread-name';
+            nameCell.textContent = t.name || '';
 
-            var nameSpan = document.createElement('span');
-            nameSpan.className = 'thread-name-text';
-            nameSpan.textContent = t.name || '';
-            nameCell.appendChild(nameSpan);
-
-            if (t.element) {
-                var elemSpan = document.createElement('span');
-                elemSpan.className = 'thread-element';
-                elemSpan.textContent = t.element;
-                nameCell.appendChild(elemSpan);
-            }
+            var elemSpan = document.createElement('span');
+            elemSpan.className = 'thread-element';
+            elemSpan.textContent = t.element || '';
 
             var catSpan = document.createElement('span');
             catSpan.className = 'thread-catalog';
@@ -448,6 +441,7 @@
             row.appendChild(runSpan);
             row.appendChild(swatch);
             row.appendChild(nameCell);
+            row.appendChild(elemSpan);
             row.appendChild(catSpan);
 
             if (hasPicker) {
@@ -502,13 +496,10 @@
                 originalThreads[idx].element = label;
             }
 
-            // Add label to DOM
-            var nameCell = rows[idx].querySelector('.thread-name');
-            if (nameCell && !nameCell.querySelector('.thread-element')) {
-                var elemSpan = document.createElement('span');
-                elemSpan.className = 'thread-element';
+            // Update the element column
+            var elemSpan = rows[idx].querySelector('.thread-element');
+            if (elemSpan) {
                 elemSpan.textContent = label;
-                nameCell.appendChild(elemSpan);
             }
         });
     }
