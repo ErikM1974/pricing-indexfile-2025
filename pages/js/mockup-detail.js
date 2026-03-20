@@ -13,6 +13,7 @@
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
     var IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
+    var INKSOFT_API = 'https://inksoft-transform-8a3dc4e38097.herokuapp.com';
 
     // ── EmailJS Config ──────────────────────────────────────────────────
     var EMAILJS_SERVICE_ID = 'service_jgrave3';
@@ -1446,10 +1447,19 @@
                 + '</div>';
         }
 
-        // Ruth's view: editable Logo Width, Logo Height, Thread Colors
+        // Ruth's view: editable Logo Width, Logo Height, Thread Colors + EMB Upload
         if (!isAeView && !isCustomerView) {
             container.innerHTML += '<div class="pmd-editable-section">'
                 + '<div class="pmd-editable-header">Ruth\'s Fields</div>'
+                + '<div class="pmd-emb-upload-row">'
+                + '  <button type="button" class="pmd-emb-upload-btn" id="pmd-emb-upload-btn">'
+                + '    <span class="pmd-emb-btn-text">\u2B06 Upload EMB File</span>'
+                + '    <span class="pmd-emb-spinner"></span>'
+                + '  </button>'
+                + '  <input type="file" accept=".emb" id="pmd-emb-file-input" style="display:none;">'
+                + '  <span class="pmd-emb-filename" id="pmd-emb-filename"></span>'
+                + '</div>'
+                + '<div class="pmd-emb-results" id="pmd-emb-results"></div>'
                 + '<div class="pmd-field-row pmd-field-row--editable">'
                 + '  <span class="pmd-field-label">Logo Width</span>'
                 + '  <input type="text" class="pmd-inline-input" id="pmd-logo-width" placeholder="e.g. 4" value="' + escapeHtml(mockup.Logo_Width || '') + '">'
@@ -1465,6 +1475,7 @@
                 + '    <div class="pmd-thread-suggestions" id="pmd-thread-suggestions"></div>'
                 + '  </div>'
                 + '</div>'
+                + '<div class="pmd-thread-swatches" id="pmd-thread-swatches"></div>'
                 + '</div>';
 
             // Auto-save on blur for width/height
@@ -1491,6 +1502,17 @@
                     }, 200);
                 });
                 initThreadColorAutocomplete(threadInput);
+            }
+
+            // EMB Upload button
+            var embUploadBtn = document.getElementById('pmd-emb-upload-btn');
+            var embFileInput = document.getElementById('pmd-emb-file-input');
+            if (embUploadBtn && embFileInput) {
+                embUploadBtn.addEventListener('click', function () { embFileInput.click(); });
+                embFileInput.addEventListener('change', function () {
+                    if (this.files.length) handleEmbUpload(this.files[0]);
+                    this.value = ''; // reset for re-upload
+                });
             }
         }
     }
@@ -1583,6 +1605,161 @@
         input.addEventListener('blur', function () {
             setTimeout(function () { suggestionsEl.style.display = 'none'; }, 300);
         });
+    }
+
+    // ── EMB Upload Handler ────────────────────────────────────────────────
+    function handleEmbUpload(file) {
+        // Validate file
+        var ext = (file.name || '').split('.').pop().toLowerCase();
+        if (ext !== 'emb') {
+            showToast('Please select an .emb file', 'error');
+            return;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+            showToast('File too large (max 20 MB)', 'error');
+            return;
+        }
+
+        var btn = document.getElementById('pmd-emb-upload-btn');
+        var filenameEl = document.getElementById('pmd-emb-filename');
+        if (btn) btn.classList.add('loading');
+        if (btn) btn.disabled = true;
+        if (filenameEl) filenameEl.textContent = file.name;
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        fetch(INKSOFT_API + '/api/embroidery/parse-emb-full', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function (resp) {
+            if (!resp.ok) return resp.json().then(function (d) { throw new Error(d.error || 'Parse failed'); });
+            return resp.json();
+        })
+        .then(function (data) {
+            if (!data.success) throw new Error(data.error || 'Parse failed');
+
+            var threads = data.threads || [];
+            var resultsEl = document.getElementById('pmd-emb-results');
+
+            // Build results panel HTML
+            var html = '<div class="pmd-emb-results-header">';
+            if (data.image_base64) {
+                html += '<img class="pmd-emb-preview" src="data:image/jpeg;base64,' + data.image_base64 + '" alt="EMB Preview">';
+            }
+            html += '<div class="pmd-emb-stats">';
+            html += '<div><span class="pmd-emb-stat-label">Threads:</span> ' + threads.length + ' runs</div>';
+            if (data.dimensions_available) {
+                html += '<div><span class="pmd-emb-stat-label">Size:</span> '
+                    + data.width_inches + '&Prime; &times; ' + data.height_inches + '&Prime;</div>';
+            }
+            if (data.stitch_count) {
+                html += '<div><span class="pmd-emb-stat-label">Stitches:</span> '
+                    + Number(data.stitch_count).toLocaleString() + '</div>';
+            }
+            html += '</div></div>';
+
+            if (resultsEl) {
+                resultsEl.innerHTML = html;
+                resultsEl.classList.add('active');
+            }
+
+            // Auto-fill Logo Width & Height
+            if (data.dimensions_available) {
+                var widthInput = document.getElementById('pmd-logo-width');
+                var heightInput = document.getElementById('pmd-logo-height');
+                if (widthInput) {
+                    widthInput.value = data.width_inches;
+                    saveInlineField('Logo_Width', String(data.width_inches), widthInput);
+                }
+                if (heightInput) {
+                    heightInput.value = data.height_inches;
+                    saveInlineField('Logo_Height', String(data.height_inches), heightInput);
+                }
+            } else {
+                showToast('Dimensions not available from this EMB file — enter manually', 'info');
+            }
+
+            // Auto-fill Thread Colors (comma-separated names)
+            if (threads.length > 0) {
+                var colorNames = threads.map(function (t) { return t.name; }).join(', ');
+                var threadInput = document.getElementById('pmd-thread-colors');
+                if (threadInput) {
+                    threadInput.value = colorNames;
+                    saveInlineField('Thread_Colors', colorNames, threadInput);
+                }
+                renderThreadSwatches(threads);
+            }
+
+            showToast('EMB parsed — ' + threads.length + ' threads' +
+                (data.dimensions_available ? ', dimensions extracted' : '') , 'success');
+
+            // Upload EMB to Box (non-blocking)
+            uploadEmbToBox(file);
+        })
+        .catch(function (err) {
+            showToast('Failed to parse EMB: ' + err.message, 'error');
+        })
+        .finally(function () {
+            if (btn) btn.classList.remove('loading');
+            if (btn) btn.disabled = false;
+        });
+    }
+
+    function uploadEmbToBox(file) {
+        if (!currentMockup || !currentMockup.Box_Folder_ID) {
+            showToast('No Box folder for this mockup — EMB not uploaded to Box', 'info');
+            return;
+        }
+
+        var company = currentMockup.Company_Name || 'Unknown';
+        var designNum = currentMockup.Design_Number || currentMockup.PK_ID || '';
+        var shortCompany = company.substring(0, 30).trim();
+        var boxFileName = (shortCompany + ' EMB ' + designNum + '.emb').replace(/[<>:"/\\|?*]/g, '');
+
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('folderId', currentMockup.Box_Folder_ID);
+        formData.append('fileName', boxFileName);
+
+        fetch(API_BASE + '/api/box/upload-to-folder', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('Box upload failed');
+            return resp.json();
+        })
+        .then(function (data) {
+            if (data.success) {
+                showToast('EMB saved to Box: ' + data.fileName, 'success');
+                // Refresh Box panel
+                if (currentMockup.Box_Folder_ID) {
+                    loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+                }
+            }
+        })
+        .catch(function (err) {
+            showToast('Box upload failed: ' + err.message, 'error');
+        });
+    }
+
+    function renderThreadSwatches(threads) {
+        var container = document.getElementById('pmd-thread-swatches');
+        if (!container) return;
+
+        container.innerHTML = '';
+        threads.forEach(function (t) {
+            var swatch = document.createElement('span');
+            swatch.className = 'pmd-thread-swatch';
+            swatch.innerHTML = '<span class="pmd-thread-swatch-dot" style="background:' + escapeHtml(t.hex || '#888') + ';"></span>'
+                + '<span class="pmd-thread-swatch-run">' + t.run + '</span>'
+                + '<span>' + escapeHtml(t.name || '?') + '</span>'
+                + (t.catalog ? '<span class="pmd-thread-swatch-catalog">' + escapeHtml(t.catalog) + '</span>' : '');
+            container.appendChild(swatch);
+        });
+        container.classList.add('active');
     }
 
     // ── Notes ──────────────────────────────────────────────────────────────
