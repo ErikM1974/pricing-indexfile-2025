@@ -1789,8 +1789,11 @@
         }
 
         // Step 2: Save EMB record to Caspio (after Box upload completes)
+        // Smart sync: check for existing record first → UPDATE if exists, CREATE if new
         boxPromise.then(function (resolvedBoxFileId) {
             if (!currentMockup) return;
+
+            var mockupIdVal = currentMockup.PK_ID || currentMockup.ID;
 
             // Calculate total thread length
             var totalThreadLength = 0;
@@ -1802,7 +1805,7 @@
             }
 
             var record = {
-                Mockup_ID: currentMockup.PK_ID || currentMockup.ID,
+                Mockup_ID: mockupIdVal,
                 Box_File_ID: resolvedBoxFileId || '',
                 File_Name: file.name,
                 File_Size_KB: Math.round(file.size / 1024),
@@ -1828,22 +1831,58 @@
                 Uploaded_By: 'ruth@nwcustomapparel.com'
             };
 
-            fetch(API_BASE + '/api/emb-designs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(record)
-            })
+            // Check for existing primary EMB record for this mockup
+            fetch(API_BASE + '/api/emb-designs/by-mockup/' + mockupIdVal)
             .then(function (resp) {
-                if (!resp.ok) throw new Error('Caspio save failed');
+                if (!resp.ok) return { records: [] };
                 return resp.json();
             })
-            .then(function (result) {
-                if (result.success) {
-                    console.log('EMB record saved to Caspio, ID:', result.record.ID);
+            .then(function (existing) {
+                var existingPrimary = null;
+                if (existing.records && existing.records.length > 0) {
+                    // Find existing primary record to update
+                    for (var i = 0; i < existing.records.length; i++) {
+                        if (existing.records[i].Is_Primary === 'Yes') {
+                            existingPrimary = existing.records[i];
+                            break;
+                        }
+                    }
+                }
+
+                if (existingPrimary && existingPrimary.ID) {
+                    // UPDATE existing record — keeps Caspio in sync with new EMB file
+                    record.Upload_Date = new Date().toISOString();
+                    return fetch(API_BASE + '/api/emb-designs/' + existingPrimary.ID, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(record)
+                    }).then(function (resp) {
+                        if (!resp.ok) throw new Error('Caspio update failed');
+                        return resp.json();
+                    }).then(function (result) {
+                        console.log('EMB record updated in Caspio, ID:', existingPrimary.ID);
+                        showToast('EMB data updated in database', 'success');
+                    });
+                } else {
+                    // CREATE new record — first EMB for this mockup
+                    return fetch(API_BASE + '/api/emb-designs', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(record)
+                    }).then(function (resp) {
+                        if (!resp.ok) throw new Error('Caspio save failed');
+                        return resp.json();
+                    }).then(function (result) {
+                        if (result.success) {
+                            console.log('EMB record saved to Caspio, ID:', result.record.ID);
+                            showToast('EMB data saved to database', 'success');
+                        }
+                    });
                 }
             })
             .catch(function (err) {
                 console.error('Failed to save EMB record to Caspio:', err.message);
+                showToast('Warning: EMB file uploaded but database save failed', 'warning');
             });
         });
     }
