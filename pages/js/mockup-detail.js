@@ -364,8 +364,18 @@
                 } else {
                     elapsedHtml = '<span class="approval-elapsed">Waiting for AE review</span>';
                 }
+                // Count existing reminders
+                var ruthReminderCount = 0;
+                if (notes && notes.length > 0) {
+                    for (var ri = 0; ri < notes.length; ri++) {
+                        if ((notes[ri].Note_Text || '').indexOf('Approval reminder sent') === 0) {
+                            ruthReminderCount++;
+                        }
+                    }
+                }
+                var nudgeBtnLabel = ruthReminderCount > 0 ? 'Send Reminder to AE (' + ruthReminderCount + ' sent)' : 'Send Reminder to AE';
                 ruthBar.innerHTML = elapsedHtml
-                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-nudge">Send Reminder to AE</button>';
+                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-nudge" data-reminder-count="' + ruthReminderCount + '">' + nudgeBtnLabel + '</button>';
                 document.getElementById('pmd-btn-nudge').addEventListener('click', function () {
                     var btn = this;
                     btn.disabled = true;
@@ -375,8 +385,8 @@
                     var company = currentMockup.Company_Name || '';
                     var design = currentMockup.Design_Number || currentMockup.ID;
 
-                    // Resend approval email
-                    sendApprovalNotification(aeEmail, 'Reminder: Mockup is waiting for your review — ' + company + ' #' + design);
+                    // Resend approval email with REMINDER prefix
+                    sendApprovalNotification(aeEmail, 'Reminder: Mockup is waiting for your review — ' + company + ' #' + design, 'REMINDER: ');
 
                     // Record nudge in notes timeline
                     fetch(API_BASE + '/api/mockup-notes', {
@@ -395,9 +405,11 @@
                     }).catch(function () {
                         showToast('Reminder email sent', 'success');
                     }).finally(function () {
+                        var newCount = parseInt(btn.getAttribute('data-reminder-count') || '0') + 1;
+                        btn.setAttribute('data-reminder-count', newCount);
                         setTimeout(function () {
                             btn.disabled = false;
-                            btn.textContent = 'Send Reminder to AE';
+                            btn.textContent = 'Send Reminder to AE (' + newCount + ' sent)';
                         }, 5000);
                     });
                 });
@@ -2067,7 +2079,7 @@
         } catch (e) { /* silent */ }
     }
 
-    function sendApprovalNotification(aeEmail, message) {
+    function sendApprovalNotification(aeEmail, message, subjectPrefix) {
         if (typeof emailjs === 'undefined') return;
         try {
             emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -2095,6 +2107,7 @@
                 design_id: currentMockup.Design_Number || currentMockup.ID,
                 company_name: currentMockup.Company_Name || 'Unknown',
                 revision_count: currentMockup.Revision_Count || 0,
+                subject_prefix: subjectPrefix || '',
                 message: message || 'Mockup is ready for your review.',
                 mockup_count: mockupCount,
                 mockup_images_html: mockupImagesHtml,

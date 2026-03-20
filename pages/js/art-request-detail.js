@@ -474,9 +474,18 @@
         });
 
         var isAwaitingApproval = status.includes('awaitingapproval');
+        var reminderCount = 0;
+        if (isAwaitingApproval && notes && notes.length > 0) {
+            for (var r = 0; r < notes.length; r++) {
+                if ((notes[r].Note_Type || '').toLowerCase() === 'reminder') {
+                    reminderCount++;
+                }
+            }
+        }
         if (isAwaitingApproval) {
-            btnMockup.textContent = 'Send Reminder';
+            btnMockup.textContent = reminderCount > 0 ? 'Send Reminder (' + reminderCount + ' sent)' : 'Send Reminder';
             btnMockup.title = 'Re-send mockup notification to sales rep';
+            btnMockup.setAttribute('data-reminder-count', reminderCount);
         }
 
         btnMockup.addEventListener('click', function () {

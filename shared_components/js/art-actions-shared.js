@@ -1183,6 +1183,7 @@
                     company_name: company,
                     detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                     mockup_url: mockupUrl,
+                    subject_prefix: 'REMINDER: ',
                     message: 'Reminder: A mockup is awaiting your review.',
                     from_name: 'Steve — Art Department',
                     revision_count: 0,
@@ -1209,8 +1210,10 @@
 
             buttonEl.textContent = 'Reminder Sent!';
             buttonEl.style.background = '#28a745';
+            var newCount = (parseInt(buttonEl.getAttribute('data-reminder-count') || '0') + 1);
+            buttonEl.setAttribute('data-reminder-count', newCount);
             setTimeout(function () {
-                buttonEl.textContent = originalLabel;
+                buttonEl.textContent = 'Send Reminder (' + newCount + ' sent)';
                 buttonEl.style.background = '';
                 buttonEl.disabled = false;
             }, 3000);
