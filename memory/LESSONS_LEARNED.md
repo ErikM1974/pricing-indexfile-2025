@@ -2461,6 +2461,14 @@ For best practices/patterns:
 **Solution:** Changed to `colors_list = data.get('colors', data) if isinstance(data, dict) else data`. Also added guard: only set `CASPIO_LOADED = True` if `CASPIO_COLORS` is non-empty.
 **Prevention:** When consuming an API that wraps results in an envelope (`{success, count, data}`), always extract the inner array. Test with the envelope removed to catch this class of bug. Don't cache empty results as "loaded".
 
+## Bug: Variable scoping — referencing outer `notes` inside sub-render functions
+**Date:** 2026-03-20
+**Project:** [Pricing Index] Art Request Detail + Mockup Detail
+**Symptoms:** Both pages crashed with "notes is not defined" after adding reminder counter code that referenced `notes` inside `renderSteveActions()` and `renderActionBars()`.
+**Root cause:** `notes` was a parameter of `render()` but not passed to sub-functions. JS function scope doesn't inherit parent function parameters.
+**Solution:** Added `notes` as a third parameter to both functions and updated their call sites.
+**Prevention:** When adding code that references variables from a parent function, always verify the variable is in scope — either as a parameter, a closure variable, or a module-level variable. Don't assume inner functions can see outer function parameters.
+
 ## Bug: Non-image files (EPS, PDF) opened in image lightbox instead of downloading
 **Date:** 2026-03-13
 **Project:** [Pricing Index] Art Request Detail

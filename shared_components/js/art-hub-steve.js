@@ -739,15 +739,11 @@
 
         footer.appendChild(container);
 
-        // Make card body clickable to open details
+        // Make card body clickable to open custom detail page
         card.style.cursor = 'pointer';
         card.addEventListener('click', (e) => {
             if (e.target.closest('.footer-section, .footer-info-row, .card-details-link')) return;
-            const dataRow = card.closest('div[data-cb-name="data-row"]');
-            const caspioLink = dataRow && dataRow.querySelector('a[data-cb-name="DetailsLink"]');
-            if (caspioLink) {
-                caspioLink.click();
-            }
+            window.open('/art-request/' + designId, '_blank');
         });
     }
 
