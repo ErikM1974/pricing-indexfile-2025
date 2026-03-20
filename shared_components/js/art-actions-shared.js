@@ -404,23 +404,25 @@
                 });
                 if (!statusResp.ok) throw new Error('Status ' + statusResp.status);
 
+                // Always log a completion note
+                var completionNoteText = 'Marked as complete by Steve';
                 if (mins > 0) {
                     var qh = Math.ceil(mins / 15) * 0.25;
                     var cost = isWaived ? '0.00' : (qh * 75).toFixed(2);
-                    var noteText = isWaived
-                        ? 'Completed: ' + mins + ' additional minutes ($0.00 \u2014 fee waived)'
-                        : 'Completed: ' + mins + ' additional minutes ($' + cost + ')';
-                    await fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            noteType: 'Art Time',
-                            noteText: noteText,
-                            noteBy: getLoggedInUser().noteBy
-                        })
-                    }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
+                    completionNoteText = isWaived
+                        ? 'Marked as complete by Steve: ' + mins + ' additional minutes ($0.00 \u2014 fee waived)'
+                        : 'Marked as complete by Steve: ' + mins + ' additional minutes ($' + cost + ')';
                     logArtCharge(designId, mins, 'Completed', isWaived ? 'Completion (fee waived)' : 'Completion', currentMins, { waived: isWaived });
                 }
+                await fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        noteType: 'Status Change',
+                        noteText: completionNoteText,
+                        noteBy: getLoggedInUser().noteBy
+                    })
+                }).catch(function (err) { console.warn('Completion note failed (non-blocking):', err); });
 
                 sendNotificationEmail(designId, 'completed', {
                     artMinutes: currentMins + mins,

@@ -165,6 +165,9 @@
         // Revision feedback banner (shows above gallery for Revision Requested)
         renderRevisionBanner(mockup, notes);
 
+        // Status timeline (5-step progress stepper)
+        renderStatusTimeline(notes);
+
         // Gallery
         renderGallery(mockup);
 
@@ -1886,6 +1889,110 @@
             cssClass = 'approval-elapsed--overdue';
         }
         return { text: text, cssClass: cssClass };
+    }
+
+    // ── Status Timeline (5-step visual stepper) ────────────────────────
+    function renderStatusTimeline(notes) {
+        var container = document.getElementById('pmd-timeline');
+        var stepsEl = document.getElementById('pmd-timeline-steps');
+        if (!container || !stepsEl || !currentMockup) return;
+
+        var STEPS = [
+            { key: 'submitted', label: 'Submitted', match: ['submitted'] },
+            { key: 'inprogress', label: 'In Progress', match: ['in progress', 'working'] },
+            { key: 'awaiting', label: 'Awaiting Approval', match: ['awaiting approval', 'mockup sent'] },
+            { key: 'approved', label: 'Approved', match: ['approved'] },
+            { key: 'completed', label: 'Completed', match: ['completed'] }
+        ];
+
+        var revisionStep = { key: 'revision', label: 'Revision Requested', match: ['revision'] };
+
+        var currentStatus = (currentMockup.Status || '').replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase();
+        var stepDates = {};
+        var hasRevision = false;
+
+        // Submitted = creation date
+        stepDates.submitted = currentMockup.Submitted_Date;
+
+        // Scan notes chronologically to find status transitions
+        var sortedNotes = (notes || []).slice().sort(function (a, b) {
+            return new Date(a.Created_Date) - new Date(b.Created_Date);
+        });
+
+        sortedNotes.forEach(function (note) {
+            var text = (note.Note_Text || '').toLowerCase();
+            var type = (note.Note_Type || '').toLowerCase();
+            var date = note.Created_Date;
+
+            if (type.includes('mockup sent') || text.includes('mockup sent')) {
+                if (!stepDates.awaiting) stepDates.awaiting = date;
+            }
+            if (text.includes('revision requested') || type.includes('revision')) {
+                stepDates.revision = date;
+                hasRevision = true;
+            }
+            if (text.includes('working') || text.includes('in progress')) {
+                if (!stepDates.inprogress) stepDates.inprogress = date;
+            }
+            if (text.includes('approved') && !text.includes('completed') && (type.includes('status') || type.includes('approval'))) {
+                if (!stepDates.approved) stepDates.approved = date;
+            }
+            if (text.includes('completed') && type.includes('status')) {
+                if (!stepDates.completed) stepDates.completed = date;
+            }
+        });
+
+        // Infer "In Progress" if later steps exist
+        if (!stepDates.inprogress && (stepDates.awaiting || stepDates.completed)) {
+            stepDates.inprogress = stepDates.submitted;
+        }
+
+        // Build step list (include revision only if it happened)
+        var activeSteps = STEPS.slice();
+        if (hasRevision) {
+            activeSteps.splice(3, 0, revisionStep);
+        }
+
+        // Determine current step — live status is definitive
+        var currentStepIdx = 0;
+        var statusMatchFound = false;
+
+        activeSteps.forEach(function (step, i) {
+            if (step.match.some(function (s) { return currentStatus.includes(s); })) {
+                currentStepIdx = i;
+                statusMatchFound = true;
+            }
+        });
+
+        // Fallback: use dates if no live status match
+        if (!statusMatchFound) {
+            activeSteps.forEach(function (step, i) {
+                if (stepDates[step.key]) currentStepIdx = i;
+            });
+        }
+
+        // Render
+        stepsEl.innerHTML = '';
+        activeSteps.forEach(function (step, i) {
+            var stateClass = 'pmd-step--future';
+            if (i < currentStepIdx) stateClass = 'pmd-step--done';
+            if (i === currentStepIdx) stateClass = 'pmd-step--current';
+
+            var div = document.createElement('div');
+            div.className = 'pmd-step ' + stateClass;
+            if (step.key === 'revision') div.className += ' pmd-step--revision';
+
+            var dateStr = stepDates[step.key] ? formatDate(stepDates[step.key]) : '';
+
+            div.innerHTML =
+                '<div class="pmd-step-dot"></div>' +
+                '<div class="pmd-step-label">' + escapeHtml(step.label) + '</div>' +
+                (dateStr ? '<div class="pmd-step-date">' + dateStr + '</div>' : '');
+
+            stepsEl.appendChild(div);
+        });
+
+        container.style.display = '';
     }
 
     function formatDate(dateStr) {
