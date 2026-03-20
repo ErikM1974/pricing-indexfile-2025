@@ -252,6 +252,26 @@
                 detail_link: SITE_ORIGIN + '/art-request/' + designId,
                 from_name: 'AE Dashboard'
             }).catch(function () { /* fire-and-forget */ });
+
+            // Confirmation email to submitting sales rep
+            var submitterEmail = '';
+            var submitterName = 'Sales Rep';
+            if (typeof StaffAuthHelper !== 'undefined') {
+                submitterEmail = StaffAuthHelper.getLoggedInStaffEmail() || '';
+                submitterName = StaffAuthHelper.getLoggedInStaffName() || 'Sales Rep';
+            }
+            if (submitterEmail && submitterEmail !== 'art@nwcustomapparel.com') {
+                emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                    to_email: submitterEmail,
+                    to_name: submitterName,
+                    design_id: designId,
+                    company_name: companyName || 'Unknown',
+                    note_text: 'Your art request for ' + (companyName || 'Unknown') + ' (Design #' + designId + ') has been submitted to Steve.',
+                    note_type: 'Submission Confirmation',
+                    detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
+                    from_name: 'NWCA Art Department'
+                }).catch(function () { /* fire-and-forget */ });
+            }
         }
     }
 

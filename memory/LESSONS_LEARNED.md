@@ -29,6 +29,16 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: Claude API Multi-Image Request — 2000px Dimension Limit (2026-03-20)
+
+**Problem:** Element identification (35 images: 1 mockup + 34 per-run thumbnails) failed with `image dimensions exceed max allowed size for many-image requests: 2000 pixels`.
+**Root Cause:** `pyembroidery.write_png()` renders at native stitch resolution (can exceed 2000px). Claude API enforces stricter dimension limits when many images are sent in one request.
+**Solution:** Added `_resize_image_b64()` helper using Pillow — shrinks mockup to max 1000px, thumbnails to max 500px before sending to vision API.
+**Also discovered:** `pyembroidery.MOVE` doesn't exist (use `JUMP`). Claude model ID `claude-sonnet-4-5-20241022` doesn't exist — correct is `claude-sonnet-4-5-20250929`. Always verify model IDs via `GET /v1/models`.
+**Prevention:** [Python Inksoft] When sending multiple images to Claude vision, always resize to well under 2000px. Use Anthropic `/v1/models` endpoint to verify model IDs exist before hardcoding.
+
+---
+
 ## Bug: DTF Quote Builder Garment Base Cost From Arbitrary Record — Pricing Inversion (2026-03-17)
 
 **Problem:** DTF quote builder showed 29LS (Long Sleeve) at $17.50 and 29M (Short Sleeve) at $18.00. Long sleeves should always cost more.
@@ -2442,6 +2452,14 @@ For best practices/patterns:
 **Root cause:** `buildColumnMap()` used an `else if` chain where `text.indexOf('company')` (line 326) matched BOTH column 2 "Company" AND column 12 "Company Mockup". Since the loop processes columns sequentially, column 12 overwrote `map.company` from 2 to 12. The more specific "Company Mockup" check at line 334 never fired because the generic check caught it first.
 **Solution:** Moved the specific `company mockup` / `company_mockup` match BEFORE the generic `company` match in the else-if chain. Specific patterns must always come before generic substring patterns.
 **Prevention:** In `else if` column detection chains, always order matches from MOST SPECIFIC to LEAST SPECIFIC. A generic `indexOf('company')` will match "Company", "Company Mockup", "CompanyName", etc. Test column detection with `console.log(JSON.stringify(colMap))` to verify all columns map correctly.
+
+## Bug: Caspio thread-colors API response parsed incorrectly — palette returns 0 colors (2026-03-19)
+**Date:** 2026-03-19
+**Project:** [Python Inksoft] Embroidery Mockup Generator
+**Symptoms:** `GET /api/embroidery/palette` returned 0 colors. Color picker modal was empty. Bug was masked for months because `get_full_palette()` fell through to InkStitch rayon/poly palettes.
+**Root cause:** `_load_caspio_colors()` iterated `for row in data` where `data` is a dict `{"success": true, "count": 233, "colors": [...]}`. Iterating a dict yields keys ("success", "count", "colors"), not the color objects. `row.get('Thread_Number')` returned None for all, so CASPIO_COLORS stayed empty. Then `CASPIO_LOADED = True` cached the empty state for 1 hour.
+**Solution:** Changed to `colors_list = data.get('colors', data) if isinstance(data, dict) else data`. Also added guard: only set `CASPIO_LOADED = True` if `CASPIO_COLORS` is non-empty.
+**Prevention:** When consuming an API that wraps results in an envelope (`{success, count, data}`), always extract the inner array. Test with the envelope removed to catch this class of bug. Don't cache empty results as "loaded".
 
 ## Bug: Non-image files (EPS, PDF) opened in image lightbox instead of downloading
 **Date:** 2026-03-13

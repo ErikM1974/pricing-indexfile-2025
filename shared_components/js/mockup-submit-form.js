@@ -724,6 +724,22 @@ var MockupSubmitForm = (function () {
                             detail_link: SITE_ORIGIN + '/mockup/' + (newId || ''),
                             from_name: getSubmitterName()
                         }).catch(function () {});
+
+                        // Confirmation email to submitting sales rep
+                        var submitterEmail = getSubmitterEmail();
+                        var submitterName = getSubmitterName();
+                        if (submitterEmail && submitterEmail !== 'ruth@nwcustomapparel.com') {
+                            emailjs.send('service_jgrave3', 'template_art_note_added', {
+                                to_email: submitterEmail,
+                                to_name: submitterName,
+                                design_id: designNumber || 'NEW',
+                                company_name: companyName,
+                                note_text: 'Your ' + currentRequestType + ' request for ' + companyName + ' has been submitted to Ruth.',
+                                note_type: 'Submission Confirmation',
+                                detail_link: SITE_ORIGIN + '/mockup/' + (newId || '') + '?view=ae',
+                                from_name: 'NWCA Art Department'
+                            }).catch(function () {});
+                        }
                     } catch (e) { /* silent */ }
                 }
 

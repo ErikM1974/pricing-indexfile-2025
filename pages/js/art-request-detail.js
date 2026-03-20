@@ -2382,6 +2382,7 @@
                             company_name: currentRequest.CompanyName || '',
                             note_type: noteType,
                             note_text: noteText,
+                            detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                             from_name: 'Steve (Art Dept)'
                         }, EMAILJS_PUBLIC_KEY).catch(function () { /* best effort */ });
                     }
