@@ -376,6 +376,26 @@
 
             showToast(`Mockup updated to "${newStatus}"`, 'success');
 
+            // Notify AE when Ruth starts working
+            if (action === 'start' && typeof emailjs !== 'undefined') {
+                const mockup = allMockups.find(m => String(m.Mockup_ID) === String(mockupId));
+                if (mockup && mockup.Submitted_By) {
+                    try {
+                        emailjs.init('4qSbDO-SQs19TbP80');
+                        emailjs.send('service_jgrave3', 'template_art_note_added', {
+                            to_email: mockup.Submitted_By,
+                            to_name: mockup.Sales_Rep || 'Sales Rep',
+                            design_id: mockup.Design_Number || 'NEW',
+                            company_name: mockup.Company_Name || 'Unknown',
+                            note_text: 'Ruth has started working on your mockup request for ' + (mockup.Company_Name || 'Unknown'),
+                            note_type: 'In Progress',
+                            detail_link: 'https://www.teamnwca.com/mockup/' + mockupId + '?view=ae',
+                            from_name: 'Ruth (Digitizing)'
+                        }).catch(function () {});
+                    } catch (e) { /* silent */ }
+                }
+            }
+
             // Refresh data
             await fetchMockups();
 
