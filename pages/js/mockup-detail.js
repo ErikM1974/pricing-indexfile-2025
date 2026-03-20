@@ -50,6 +50,9 @@
     var mockupVersions = [];
     var boxPanelFiles = [];
     var dragSource = null;
+    var storedEmbRecords = {};       // keyed by Mockup_Slot: "1", "2", "3"
+    var activeThreadEditorSlot = null; // which slot's editor is open
+    var editorThreads = [];           // working copy of threads for active editor
 
     // ── URL Parsing ────────────────────────────────────────────────────────
     var pathParts = window.location.pathname.split('/');
@@ -972,8 +975,32 @@
                 }
             }
 
+            // Add per-slot thread swatch strip container (filled later by renderAllSlotSwatches)
+            if (!isRefFile) {
+                var slotIdx = slot.key.replace('Box_Mockup_', '');
+                slotEl.dataset.slotNumber = slotIdx;
+                // Container div for thread dots (populated after EMB records load)
+                var threadStripId = 'pmd-slot-threads-' + slotIdx;
+                var threadStrip = document.createElement('div');
+                threadStrip.className = 'pmd-slot-threads';
+                threadStrip.id = threadStripId;
+                threadStrip.dataset.slot = slotIdx;
+                threadStrip.style.display = 'none'; // hidden until data loads
+                slotEl.appendChild(threadStrip);
+            }
+
             grid.appendChild(slotEl);
         });
+
+        // Thread editor container (below grid, one shared panel)
+        var existingEditor = document.getElementById('pmd-thread-editor-container');
+        if (!existingEditor) {
+            var editorContainer = document.createElement('div');
+            editorContainer.className = 'pmd-thread-editor-container';
+            editorContainer.id = 'pmd-thread-editor-container';
+            editorContainer.style.display = 'none';
+            grid.parentNode.appendChild(editorContainer);
+        }
 
         // Wire remove buttons
         grid.querySelectorAll('.pmd-slot-remove').forEach(function (btn) {
@@ -1479,6 +1506,7 @@
                 + '  </div>'
                 + '</div>'
                 + '<div class="pmd-thread-swatches" id="pmd-thread-swatches"></div>'
+                + '<button type="button" class="pmd-print-thread-sheet-btn" id="pmd-print-thread-sheet-btn" style="display:none;">\uD83D\uDDA8\uFE0F Print Thread Sheet</button>'
                 + '</div>';
 
             // Auto-save on blur for width/height
@@ -1516,6 +1544,12 @@
                     if (this.files.length) handleEmbUpload(this.files[0]);
                     this.value = ''; // reset for re-upload
                 });
+            }
+
+            // Print Thread Sheet button
+            var printSheetBtn = document.getElementById('pmd-print-thread-sheet-btn');
+            if (printSheetBtn) {
+                printSheetBtn.addEventListener('click', generateThreadSheet);
             }
         }
     }
@@ -1806,6 +1840,7 @@
 
             var record = {
                 Mockup_ID: mockupIdVal,
+                Mockup_Slot: '1',
                 Box_File_ID: resolvedBoxFileId || '',
                 File_Name: file.name,
                 File_Size_KB: Math.round(file.size / 1024),
@@ -1862,6 +1897,7 @@
                     }).then(function (result) {
                         console.log('EMB record updated in Caspio, ID:', existingPrimary.ID);
                         showToast('EMB data updated in database', 'success');
+                        loadStoredEmbData(mockupIdVal);
                     });
                 } else {
                     // CREATE new record — first EMB for this mockup
@@ -1876,6 +1912,7 @@
                         if (result.success) {
                             console.log('EMB record saved to Caspio, ID:', result.record.ID);
                             showToast('EMB data saved to database', 'success');
+                            loadStoredEmbData(mockupIdVal);
                         }
                     });
                 }
@@ -1898,14 +1935,28 @@
         .then(function (data) {
             if (!data || !data.records || data.records.length === 0) return;
 
-            var primary = data.records[0]; // Is_Primary=Yes first (sorted by backend)
+            // Distribute records by Mockup_Slot
+            storedEmbRecords = {};
+            data.records.forEach(function (rec) {
+                var slot = rec.Mockup_Slot || '1';
+                storedEmbRecords[slot] = rec;
+            });
+
+            // Render mini swatch dots on gallery images
+            renderAllSlotSwatches();
+
+            // Show "Print Thread Sheet" button if any slot has data
+            var printBtn = document.getElementById('pmd-print-thread-sheet-btn');
+            if (printBtn) printBtn.style.display = Object.keys(storedEmbRecords).length > 0 ? 'inline-flex' : 'none';
+
+            // Also render sidebar EMB results from primary record (backward compat)
+            var primary = data.records[0];
             var resultsEl = document.getElementById('pmd-emb-results');
             var swatchesEl = document.getElementById('pmd-thread-swatches');
 
-            // Only render if swatches are not already showing (from a fresh upload)
+            // Only render sidebar if swatches are not already showing (from a fresh upload)
             if (swatchesEl && swatchesEl.classList.contains('active')) return;
 
-            // Build results panel from stored data
             if (resultsEl) {
                 var html = '<div class="pmd-emb-results-header">';
                 html += '<div class="pmd-emb-stats">';
@@ -1935,7 +1986,6 @@
                 resultsEl.classList.add('active');
             }
 
-            // Render thread swatches from stored JSON
             if (primary.Thread_Sequence_JSON) {
                 try {
                     var threads = JSON.parse(primary.Thread_Sequence_JSON);
@@ -1948,9 +1998,381 @@
             }
         })
         .catch(function (err) {
-            // Silent — stored EMB data is optional
             console.warn('Could not load stored EMB data:', err.message);
         });
+    }
+
+    // ── Per-Slot Thread Swatch Strips + Editor ───────────────────────────
+
+    function renderAllSlotSwatches() {
+        for (var s = 1; s <= 3; s++) {
+            var strip = document.getElementById('pmd-slot-threads-' + s);
+            if (!strip) continue;
+
+            var rec = storedEmbRecords[String(s)];
+            if (!rec || !rec.Thread_Sequence_JSON) {
+                strip.style.display = 'none';
+                // Show "+ Add Threads" button for Ruth view on filled slots
+                if (!isAeView && !isCustomerView) {
+                    var slotEl = strip.parentElement;
+                    var filledDiv = slotEl && slotEl.querySelector('.pmd-slot-filled');
+                    if (filledDiv && !slotEl.querySelector('.pmd-add-threads-btn')) {
+                        var addBtn = document.createElement('button');
+                        addBtn.className = 'pmd-add-threads-btn';
+                        addBtn.textContent = '+ Add Threads';
+                        addBtn.dataset.slot = String(s);
+                        addBtn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            var slotNum = parseInt(e.target.dataset.slot);
+                            toggleThreadEditor(slotNum);
+                        });
+                        slotEl.appendChild(addBtn);
+                    }
+                }
+                continue;
+            }
+
+            var threads = [];
+            try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { continue; }
+            if (!threads || threads.length === 0) { strip.style.display = 'none'; continue; }
+
+            strip.innerHTML = '';
+            threads.forEach(function (t) {
+                var dot = document.createElement('span');
+                dot.className = 'pmd-mini-dot';
+                dot.style.background = t.hex || '#888';
+                dot.title = 'Run ' + t.run + ': ' + (t.name || '?') + (t.catalog ? ' #' + t.catalog : '');
+                strip.appendChild(dot);
+            });
+
+            // Edit button (Ruth view only)
+            if (!isAeView && !isCustomerView) {
+                var editBtn = document.createElement('button');
+                editBtn.className = 'pmd-edit-threads-btn';
+                editBtn.innerHTML = '&#9998;';
+                editBtn.title = 'Edit thread colors';
+                editBtn.dataset.slot = String(s);
+                editBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    var slotNum = parseInt(e.target.closest('.pmd-edit-threads-btn').dataset.slot);
+                    toggleThreadEditor(slotNum);
+                });
+                strip.appendChild(editBtn);
+            }
+
+            strip.style.display = 'flex';
+
+            // Remove "+ Add Threads" button if it exists (we now have data)
+            var parent = strip.parentElement;
+            var addBtnExisting = parent && parent.querySelector('.pmd-add-threads-btn');
+            if (addBtnExisting) addBtnExisting.remove();
+        }
+    }
+
+    function toggleThreadEditor(slotNumber) {
+        var container = document.getElementById('pmd-thread-editor-container');
+        if (!container) return;
+
+        // If same slot is already open, close it
+        if (activeThreadEditorSlot === slotNumber) {
+            container.style.display = 'none';
+            activeThreadEditorSlot = null;
+            editorThreads = [];
+            return;
+        }
+
+        activeThreadEditorSlot = slotNumber;
+
+        // Load threads from stored record or start empty
+        var rec = storedEmbRecords[String(slotNumber)];
+        if (rec && rec.Thread_Sequence_JSON) {
+            try { editorThreads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { editorThreads = []; }
+        } else {
+            editorThreads = [];
+        }
+
+        // Initialize ThreadColorPicker if not already done
+        if (typeof ThreadColorPicker !== 'undefined' && !ThreadColorPicker._initialized) {
+            ThreadColorPicker.init().then(function () {
+                ThreadColorPicker._initialized = true;
+            }).catch(function (err) {
+                console.warn('ThreadColorPicker init failed:', err.message);
+            });
+        }
+
+        renderThreadEditorPanel(slotNumber);
+        container.style.display = 'block';
+        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function renderThreadEditorPanel(slotNumber) {
+        var container = document.getElementById('pmd-thread-editor-container');
+        if (!container) return;
+
+        var html = '<div class="pmd-thread-editor-header">'
+            + '<span>Thread Sequence &mdash; Mockup ' + slotNumber + '</span>'
+            + '<div>'
+            + '<button type="button" id="pmd-te-save">Save</button>'
+            + ' <button type="button" id="pmd-te-close">&times; Close</button>'
+            + '</div></div>';
+
+        // Column headers
+        html += '<div class="pmd-thread-editor-col-headers">'
+            + '<span>#</span><span></span><span>Color Name</span><span></span><span style="text-align:right">Cat#</span>'
+            + '</div>';
+
+        // Thread rows
+        html += '<div id="pmd-te-rows">';
+        if (editorThreads.length === 0) {
+            html += '<div style="padding:16px 12px;color:#9ca3af;font-size:0.8rem;text-align:center;">'
+                + 'No threads yet. Click "+ Add Run" to start.</div>';
+        } else {
+            editorThreads.forEach(function (t, idx) {
+                html += '<div class="pmd-thread-editor-row" data-run-index="' + idx + '">'
+                    + '<span class="pmd-te-run">' + (t.run || (idx + 1)) + '</span>'
+                    + '<span class="pmd-te-swatch" style="background:' + escapeHtml(t.hex || '#888') + ';"></span>'
+                    + '<span class="pmd-te-name">' + escapeHtml(t.name || 'Click to set') + '</span>'
+                    + '<span class="pmd-te-edit-icon">&#9998;</span>'
+                    + '<span class="pmd-te-catalog">' + escapeHtml(t.catalog || '') + '</span>'
+                    + '</div>';
+            });
+        }
+        html += '</div>';
+
+        // Action buttons
+        html += '<div class="pmd-thread-editor-actions">'
+            + '<button type="button" id="pmd-te-add-run">+ Add Run</button>'
+            + '<button type="button" id="pmd-te-remove-last">Remove Last</button>'
+            + '<button type="button" id="pmd-te-save-bottom" class="pmd-te-save-btn">Save Threads</button>'
+            + '</div>';
+
+        container.innerHTML = html;
+
+        // Wire events
+        container.querySelectorAll('.pmd-thread-editor-row').forEach(function (row) {
+            row.addEventListener('click', function () {
+                var idx = parseInt(row.dataset.runIndex);
+                var current = editorThreads[idx] || { hex: '#888', name: '', catalog: '' };
+                if (typeof ThreadColorPicker !== 'undefined') {
+                    ThreadColorPicker.open(idx, current, onEditorColorSelected);
+                }
+            });
+        });
+
+        document.getElementById('pmd-te-add-run').addEventListener('click', function () {
+            var newRun = { run: editorThreads.length + 1, name: 'Click to set', hex: '#888', catalog: '' };
+            editorThreads.push(newRun);
+            renderThreadEditorPanel(activeThreadEditorSlot);
+            // Open picker immediately for the new run
+            if (typeof ThreadColorPicker !== 'undefined') {
+                setTimeout(function () {
+                    ThreadColorPicker.open(editorThreads.length - 1, newRun, onEditorColorSelected);
+                }, 100);
+            }
+        });
+
+        document.getElementById('pmd-te-remove-last').addEventListener('click', function () {
+            if (editorThreads.length > 0) {
+                editorThreads.pop();
+                renderThreadEditorPanel(activeThreadEditorSlot);
+            }
+        });
+
+        var saveHandler = function () { saveSlotThreads(activeThreadEditorSlot); };
+        document.getElementById('pmd-te-save').addEventListener('click', saveHandler);
+        document.getElementById('pmd-te-save-bottom').addEventListener('click', saveHandler);
+
+        document.getElementById('pmd-te-close').addEventListener('click', function () {
+            container.style.display = 'none';
+            activeThreadEditorSlot = null;
+            editorThreads = [];
+        });
+    }
+
+    function onEditorColorSelected(runIndex, newColor) {
+        if (runIndex < 0 || runIndex >= editorThreads.length) return;
+        editorThreads[runIndex].hex = newColor.hex;
+        editorThreads[runIndex].name = newColor.name;
+        editorThreads[runIndex].catalog = newColor.catalog;
+
+        // Update DOM immediately
+        var rows = document.querySelectorAll('#pmd-te-rows .pmd-thread-editor-row');
+        if (rows[runIndex]) {
+            var swatch = rows[runIndex].querySelector('.pmd-te-swatch');
+            var nameEl = rows[runIndex].querySelector('.pmd-te-name');
+            var catEl = rows[runIndex].querySelector('.pmd-te-catalog');
+            if (swatch) swatch.style.background = newColor.hex;
+            if (nameEl) nameEl.textContent = newColor.name;
+            if (catEl) catEl.textContent = newColor.catalog;
+        }
+    }
+
+    function saveSlotThreads(slotNumber) {
+        if (!currentMockup || !slotNumber) return;
+
+        var mockupIdVal = currentMockup.PK_ID || currentMockup.ID;
+        var existing = storedEmbRecords[String(slotNumber)];
+
+        // Renumber runs
+        editorThreads.forEach(function (t, idx) { t.run = idx + 1; });
+
+        var record = {
+            Mockup_ID: mockupIdVal,
+            Mockup_Slot: String(slotNumber),
+            Thread_Count: editorThreads.length,
+            Color_Changes: Math.max(0, editorThreads.length - 1),
+            Thread_Colors: editorThreads.map(function (t) { return t.name; }).join(', '),
+            Thread_Sequence_JSON: JSON.stringify(editorThreads),
+            Colorway_Name: 'Mockup ' + slotNumber,
+            Is_Primary: slotNumber === 1 ? 'Yes' : 'No',
+            Upload_Date: new Date().toISOString(),
+            Uploaded_By: 'ruth@nwcustomapparel.com'
+        };
+
+        var url, method;
+        if (existing && existing.ID) {
+            url = API_BASE + '/api/emb-designs/' + existing.ID;
+            method = 'PUT';
+        } else {
+            url = API_BASE + '/api/emb-designs';
+            method = 'POST';
+        }
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(record)
+        })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('Save failed');
+            return resp.json();
+        })
+        .then(function (result) {
+            // Update local cache
+            if (method === 'POST' && result.record) {
+                storedEmbRecords[String(slotNumber)] = result.record;
+            } else if (existing) {
+                existing.Thread_Sequence_JSON = record.Thread_Sequence_JSON;
+                existing.Thread_Colors = record.Thread_Colors;
+                existing.Thread_Count = record.Thread_Count;
+                existing.Color_Changes = record.Color_Changes;
+            }
+            renderAllSlotSwatches();
+            showToast('Thread data saved for Mockup ' + slotNumber, 'success');
+
+            // Show print button
+            var printBtn = document.getElementById('pmd-print-thread-sheet-btn');
+            if (printBtn) printBtn.style.display = 'inline-flex';
+        })
+        .catch(function (err) {
+            console.error('Failed to save thread data:', err.message);
+            showToast('Failed to save thread data: ' + err.message, 'error');
+        });
+    }
+
+    // ── Print Thread Sheet PDF ───────────────────────────────────────────
+
+    function generateThreadSheet() {
+        if (!currentMockup) return;
+
+        var company = currentMockup.Company_Name || '';
+        var designNum = currentMockup.Design_Number || '';
+        var designName = currentMockup.Design_Name || '';
+        var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+            + '<title>Thread Sheet - ' + escapeHtml(company) + ' #' + escapeHtml(designNum) + '</title>'
+            + '<style>'
+            + '* { box-sizing: border-box; margin: 0; padding: 0; }'
+            + 'body { font-family: Arial, Helvetica, sans-serif; padding: 24px; color: #1a1a1a; }'
+            + '.header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #333; }'
+            + '.header h1 { font-size: 20px; margin-bottom: 4px; }'
+            + '.header .meta { font-size: 13px; color: #555; }'
+            + '.mockup-section { display: flex; gap: 20px; margin-bottom: 28px; page-break-inside: avoid; align-items: flex-start; }'
+            + '.mockup-img { width: 220px; height: 220px; object-fit: contain; border: 1px solid #ddd; border-radius: 6px; background: #f8f8f8; flex-shrink: 0; }'
+            + '.thread-table { flex: 1; }'
+            + '.thread-table h3 { font-size: 14px; margin-bottom: 6px; color: #333; }'
+            + 'table { width: 100%; border-collapse: collapse; font-size: 12px; }'
+            + 'th { background: #333; color: #fff; padding: 5px 8px; text-align: left; font-size: 11px; }'
+            + 'td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; }'
+            + 'tr:nth-child(even) { background: #f9f9f9; }'
+            + '.color-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ccc; vertical-align: middle; }'
+            + '.footer { text-align: center; font-size: 11px; color: #999; margin-top: 24px; padding-top: 12px; border-top: 1px solid #ddd; }'
+            + '@media print {'
+            + '  body { padding: 12px; }'
+            + '  @page { size: letter portrait; margin: 0.4in; }'
+            + '  .mockup-section { page-break-inside: avoid; }'
+            + '}'
+            + '</style></head><body>';
+
+        // Header
+        html += '<div class="header">'
+            + '<h1>THREAD COLOR SHEET</h1>'
+            + '<div class="meta">'
+            + escapeHtml(company) + ' &mdash; #' + escapeHtml(designNum)
+            + (designName ? ' &mdash; ' + escapeHtml(designName) : '')
+            + '<br>' + today
+            + '</div></div>';
+
+        // Each mockup slot with threads
+        var hasContent = false;
+        for (var s = 1; s <= 3; s++) {
+            var rec = storedEmbRecords[String(s)];
+            var imgUrl = currentMockup['Box_Mockup_' + s];
+            if (!rec && !imgUrl) continue;
+
+            var threads = [];
+            if (rec && rec.Thread_Sequence_JSON) {
+                try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { threads = []; }
+            }
+
+            if (threads.length === 0 && !imgUrl) continue;
+            hasContent = true;
+
+            html += '<div class="mockup-section">';
+
+            // Mockup image
+            if (imgUrl) {
+                html += '<img src="' + escapeHtml(imgUrl) + '" class="mockup-img" alt="Mockup ' + s + '">';
+            } else {
+                html += '<div class="mockup-img" style="display:flex;align-items:center;justify-content:center;color:#999;">No Image</div>';
+            }
+
+            // Thread table
+            html += '<div class="thread-table">';
+            html += '<h3>Mockup ' + s + (rec && rec.Colorway_Name ? ' &mdash; ' + escapeHtml(rec.Colorway_Name) : '') + '</h3>';
+
+            if (threads.length > 0) {
+                html += '<table><tr><th>#</th><th></th><th>Color</th><th>Cat#</th></tr>';
+                threads.forEach(function (t) {
+                    html += '<tr>'
+                        + '<td><strong>' + (t.run || '') + '</strong></td>'
+                        + '<td><span class="color-dot" style="background:' + escapeHtml(t.hex || '#888') + ';"></span></td>'
+                        + '<td>' + escapeHtml(t.name || '') + '</td>'
+                        + '<td style="font-family:monospace;">' + escapeHtml(t.catalog || '') + '</td>'
+                        + '</tr>';
+                });
+                html += '</table>';
+            } else {
+                html += '<p style="color:#999;font-size:12px;">No thread data</p>';
+            }
+
+            html += '</div></div>';
+        }
+
+        if (!hasContent) {
+            showToast('No thread data to print', 'info');
+            return;
+        }
+
+        // Footer
+        html += '<div class="footer">NW Custom Apparel &mdash; 253-922-5793 &mdash; Printed ' + today + '</div>';
+        html += '</body></html>';
+
+        var printWin = window.open('', '', 'width=900,height=700');
+        printWin.document.write(html);
+        printWin.document.close();
+        setTimeout(function () { printWin.print(); }, 500);
     }
 
     function renderThreadSwatches(threads) {

@@ -1735,6 +1735,196 @@ body {
     margin-left: 2px;
 }
 
+/* ── Per-Slot Thread Mini Dots (overlaid on mockup images) ──────────── */
+.pmd-slot-threads {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 6px;
+    background: rgba(0,0,0,0.55);
+    border-radius: 0 0 6px 6px;
+    z-index: 2;
+    flex-wrap: wrap;
+}
+.pmd-mini-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.5);
+    flex-shrink: 0;
+    cursor: default;
+}
+.pmd-mini-dot[title]:hover {
+    transform: scale(1.3);
+    transition: transform 0.15s;
+}
+.pmd-edit-threads-btn {
+    margin-left: auto;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    line-height: 1.4;
+}
+.pmd-edit-threads-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+.pmd-add-threads-btn {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(107,70,193,0.8);
+    color: #fff;
+    border: none;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 2;
+}
+.pmd-add-threads-btn:hover {
+    background: rgba(107,70,193,1);
+}
+
+/* ── Thread Editor Panel (below gallery grid) ──────────────────────── */
+.pmd-thread-editor-container {
+    margin-top: 12px;
+    border: 1px solid var(--art-theme-rgba-15, rgba(107,70,193,0.15));
+    border-radius: 8px;
+    background: var(--art-theme-bg, #f8f5ff);
+    overflow: hidden;
+}
+.pmd-thread-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--art-theme, #6B46C1);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+.pmd-thread-editor-header button {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.pmd-thread-editor-header button:hover {
+    background: rgba(255,255,255,0.35);
+}
+.pmd-thread-editor-col-headers {
+    display: grid;
+    grid-template-columns: 32px 28px 1fr auto 60px;
+    gap: 6px;
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid rgba(107,70,193,0.1);
+}
+.pmd-thread-editor-row {
+    display: grid;
+    grid-template-columns: 32px 28px 1fr auto 60px;
+    gap: 6px;
+    padding: 6px 12px;
+    align-items: center;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(107,70,193,0.06);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.pmd-thread-editor-row:hover {
+    background: rgba(107,70,193,0.06);
+}
+.pmd-thread-editor-row.modified {
+    background: #fef3c7;
+}
+.pmd-te-run {
+    font-weight: 700;
+    color: #374151;
+    text-align: center;
+}
+.pmd-te-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+.pmd-te-name {
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pmd-te-catalog {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-align: right;
+}
+.pmd-te-edit-icon {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    text-align: center;
+}
+.pmd-thread-editor-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid rgba(107,70,193,0.1);
+}
+.pmd-thread-editor-actions button {
+    font-size: 0.78rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #374151;
+}
+.pmd-thread-editor-actions button:hover {
+    background: #f3f4f6;
+}
+.pmd-thread-editor-actions .pmd-te-save-btn {
+    background: var(--art-theme, #6B46C1);
+    color: #fff;
+    border-color: var(--art-theme, #6B46C1);
+    margin-left: auto;
+}
+.pmd-thread-editor-actions .pmd-te-save-btn:hover {
+    opacity: 0.9;
+}
+
+/* Print Thread Sheet button */
+.pmd-print-thread-sheet-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #1e293b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 8px;
+}
+.pmd-print-thread-sheet-btn:hover {
+    background: #334155;
+}
+
 .pmd-slot-select-badge {
     position: absolute;
     bottom: 28px;
