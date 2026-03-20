@@ -1641,7 +1641,21 @@
             if (!data.success) throw new Error(data.error || 'Parse failed');
 
             var threads = data.threads || [];
+            var threadDetail = data.thread_detail || [];
             var resultsEl = document.getElementById('pmd-emb-results');
+
+            // Merge per-run stitch counts from thread_detail into threads
+            if (threadDetail.length > 0 && threads.length > 0) {
+                threads.forEach(function (t, i) {
+                    var detail = threadDetail[i];
+                    if (detail) {
+                        t.stitches = detail.stitches;
+                        t.thread_length = detail.thread_length;
+                        // Use OLE hex if available (more accurate)
+                        if (detail.hex) t.hex = detail.hex;
+                    }
+                });
+            }
 
             // Build results panel HTML
             var html = '<div class="pmd-emb-results-header">';
@@ -1657,6 +1671,16 @@
             if (data.stitch_count) {
                 html += '<div><span class="pmd-emb-stat-label">Stitches:</span> '
                     + Number(data.stitch_count).toLocaleString() + '</div>';
+            }
+            if (data.hoop_width_mm && data.hoop_height_mm) {
+                html += '<div><span class="pmd-emb-stat-label">Hoop:</span> '
+                    + data.hoop_width_mm + ' &times; ' + data.hoop_height_mm + ' mm</div>';
+            }
+            if (data.design_number) {
+                html += '<div><span class="pmd-emb-stat-label">Design #:</span> ' + escapeHtml(data.design_number) + '</div>';
+            }
+            if (data.colorway_name) {
+                html += '<div><span class="pmd-emb-stat-label">Colorway:</span> ' + escapeHtml(data.colorway_name) + '</div>';
             }
             html += '</div></div>';
 
@@ -1692,8 +1716,19 @@
                 renderThreadSwatches(threads);
             }
 
-            showToast('EMB parsed — ' + threads.length + ' threads' +
-                (data.dimensions_available ? ', dimensions extracted' : '') , 'success');
+            // Save additional EMB metadata to Caspio (Stitch_Count, Color_Changes if fields exist)
+            if (data.stitch_count) {
+                saveInlineField('Stitch_Count', String(data.stitch_count));
+            }
+            if (data.color_changes != null) {
+                saveInlineField('Color_Changes', String(data.color_changes));
+            }
+
+            var toastParts = [threads.length + ' threads'];
+            if (data.dimensions_available) toastParts.push(data.width_inches + '" × ' + data.height_inches + '"');
+            if (data.stitch_count) toastParts.push(Number(data.stitch_count).toLocaleString() + ' stitches');
+            if (data.application_type) toastParts.push(data.application_type);
+            showToast('EMB parsed: ' + toastParts.join(', '), 'success');
 
             // Upload EMB to Box (non-blocking)
             uploadEmbToBox(file);
@@ -1753,10 +1788,14 @@
         threads.forEach(function (t) {
             var swatch = document.createElement('span');
             swatch.className = 'pmd-thread-swatch';
-            swatch.innerHTML = '<span class="pmd-thread-swatch-dot" style="background:' + escapeHtml(t.hex || '#888') + ';"></span>'
+            var html = '<span class="pmd-thread-swatch-dot" style="background:' + escapeHtml(t.hex || '#888') + ';"></span>'
                 + '<span class="pmd-thread-swatch-run">' + t.run + '</span>'
                 + '<span>' + escapeHtml(t.name || '?') + '</span>'
                 + (t.catalog ? '<span class="pmd-thread-swatch-catalog">' + escapeHtml(t.catalog) + '</span>' : '');
+            if (t.stitches) {
+                html += '<span class="pmd-thread-swatch-stitches">' + Number(t.stitches).toLocaleString() + ' st</span>';
+            }
+            swatch.innerHTML = html;
             container.appendChild(swatch);
         });
         container.classList.add('active');

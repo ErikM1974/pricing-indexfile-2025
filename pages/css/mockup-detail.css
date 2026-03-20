@@ -1728,6 +1728,12 @@ body {
     color: #9ca3af;
     font-size: 0.68rem;
 }
+.pmd-thread-swatch-stitches {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin-left: 2px;
+}
 
 .pmd-slot-select-badge {
     position: absolute;
