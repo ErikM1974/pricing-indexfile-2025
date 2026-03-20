@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=14">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=16">
 </head>
 <body>
     <!-- Header -->
@@ -215,8 +215,28 @@
         </div>
     </div>
 
+    <!-- Find ShopWorks Order Modal -->
+    <div class="pmd-modal-overlay" id="pmd-fo-overlay"></div>
+    <div class="pmd-fo-modal" id="pmd-fo-modal" style="display:none;">
+        <div class="pmd-fo-modal-header">
+            <span>Find ShopWorks Order</span>
+            <button type="button" class="pmd-fo-modal-close" id="pmd-fo-close">&times;</button>
+        </div>
+        <div class="pmd-fo-modal-body" id="pmd-fo-body">
+            <div class="pmd-fo-loading">Searching ShopWorks...</div>
+        </div>
+        <div class="pmd-fo-manual">
+            <div class="pmd-fo-manual-label">Or enter order number manually:</div>
+            <div class="pmd-fo-manual-row">
+                <input type="text" id="pmd-fo-manual-input" placeholder="Order #" class="pmd-fo-manual-input">
+                <button type="button" id="pmd-fo-manual-btn" class="pmd-fo-manual-btn">Search</button>
+            </div>
+            <div class="pmd-fo-manual-note">Note: ShopWorks data is only available for the last 60 days.</div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/mockup-detail.js?v=27"></script>
+    <script src="/pages/js/mockup-detail.js?v=29"></script>
 </body>
 </html>

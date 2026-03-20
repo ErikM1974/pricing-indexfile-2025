@@ -168,6 +168,13 @@
         // Status timeline (5-step progress stepper)
         renderStatusTimeline(notes);
 
+        // ShopWorks Art Done check (for completed/approved mockups with a work order number)
+        var woNum = mockup.Work_Order_Number;
+        var statusLower = status.toLowerCase();
+        if (woNum && (statusLower === 'completed' || statusLower === 'approved')) {
+            checkShopWorksArtDone(woNum);
+        }
+
         // Gallery
         renderGallery(mockup);
 
@@ -199,6 +206,14 @@
         initLightbox();
         if (!isCustomerView) initBoxModal();
         if (!isCustomerView && !isAeView) initBoxFilesPanel();
+
+        // Wire up Find Order button
+        var findOrderBtn = document.getElementById('pmd-find-order-btn');
+        if (findOrderBtn) {
+            findOrderBtn.addEventListener('click', function () {
+                showFindOrderModal(mockup.Company_Name);
+            });
+        }
     }
 
     // ── Action Bars ────────────────────────────────────────────────────────
@@ -1389,7 +1404,7 @@
                 { label: 'Submitted By', value: getAeDisplayName(mockup.Submitted_By) },
                 { label: 'Submitted', value: formatDate(mockup.Submitted_Date) },
                 { label: 'Due Date', value: formatDate(mockup.Due_Date) },
-                { label: 'Work Order', value: mockup.Work_Order_Number },
+                { label: 'Work Order', value: mockup.Work_Order_Number, id: 'pmd-wo-value' },
                 { label: 'Completed', value: formatDate(mockup.Completion_Date) }
             ];
         }
@@ -1407,11 +1422,21 @@
                         + '<span class="pmd-field-value">' + badges + '</span>'
                         + '</div>';
                 }
+                var idAttr = f.id ? ' id="' + f.id + '"' : '';
                 return '<div class="pmd-field-row">'
                     + '<span class="pmd-field-label">' + escapeHtml(f.label) + '</span>'
-                    + '<span class="pmd-field-value">' + escapeHtml(f.value) + '</span>'
+                    + '<span class="pmd-field-value"' + idAttr + '>' + escapeHtml(f.value) + '</span>'
                     + '</div>';
             }).join('');
+
+        // Add "Find Order" button if no Work Order Number and not customer view
+        if (!mockup.Work_Order_Number && !isCustomerView) {
+            container.innerHTML += '<div class="pmd-field-row">'
+                + '<span class="pmd-field-label">Work Order</span>'
+                + '<span class="pmd-field-value" id="pmd-wo-value">'
+                + '<button type="button" class="pmd-find-order-btn" id="pmd-find-order-btn">Find Order</button>'
+                + '</span></div>';
+        }
 
         // Show AE Notes if present (not for customer view)
         if (mockup.AE_Notes && !isCustomerView) {
@@ -2689,6 +2714,263 @@
         document.querySelectorAll('.dragging').forEach(function (el) {
             el.classList.remove('dragging');
         });
+    }
+
+    // ── Find & Link ShopWorks Order ─────────────────────────────────────
+    window.pmdExpandLineItems = pmdExpandLineItems;
+    window.pmdLinkOrder = pmdLinkOrder;
+
+    function showFindOrderModal(companyName) {
+        var overlay = document.getElementById('pmd-fo-overlay');
+        var modal = document.getElementById('pmd-fo-modal');
+        var body = document.getElementById('pmd-fo-body');
+        var manualInput = document.getElementById('pmd-fo-manual-input');
+        var manualBtn = document.getElementById('pmd-fo-manual-btn');
+        var closeBtn = document.getElementById('pmd-fo-close');
+
+        overlay.style.display = 'block';
+        modal.style.display = 'flex';
+        body.innerHTML = '<div class="pmd-fo-loading">Searching ShopWorks...</div>';
+        manualInput.value = '';
+
+        function closeModal() {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+        closeBtn.onclick = closeModal;
+        overlay.onclick = closeModal;
+
+        manualBtn.onclick = function () { searchOrderManual(manualInput.value.trim(), body); };
+        manualInput.onkeydown = function (e) { if (e.key === 'Enter') manualBtn.click(); };
+
+        if (companyName) {
+            searchOrdersByName(companyName, body);
+        } else {
+            body.innerHTML = '<div class="pmd-fo-empty">No company info available. Use manual search below.</div>';
+        }
+    }
+
+    function searchOrdersByName(companyName, container) {
+        fetch(API_BASE + '/api/manageorders/customers')
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var customers = data.customers || [];
+                var nameLower = companyName.toLowerCase();
+                var matches = customers.filter(function (c) {
+                    var cn = (c.CustomerName || '').toLowerCase();
+                    return cn.indexOf(nameLower) !== -1 || nameLower.indexOf(cn) !== -1;
+                });
+                if (matches.length === 0) {
+                    container.innerHTML = '<div class="pmd-fo-empty">No customers matching "' +
+                        escapeHtml(companyName) + '" found in recent ShopWorks orders.</div>';
+                    return;
+                }
+                var bestMatch = matches[0];
+                container.innerHTML = '<div class="pmd-fo-loading">Found customer "' +
+                    escapeHtml(bestMatch.CustomerName) + '" (#' + bestMatch.id_Customer + '). Loading orders...</div>';
+                return searchOrdersByCustomerId(bestMatch.id_Customer, bestMatch.CustomerName, container);
+            })
+            .catch(function (err) {
+                container.innerHTML = '<div class="pmd-fo-error">Customer search failed: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function searchOrdersByCustomerId(customerId, companyName, container) {
+        fetch(API_BASE + '/api/manageorders/orders?id_Customer=' + encodeURIComponent(customerId))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var orders = data.result || [];
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="pmd-fo-empty">No orders found for Customer #' +
+                        escapeHtml(String(customerId)) + ' in ShopWorks (60-day window).</div>';
+                    return;
+                }
+                orders.sort(function (a, b) {
+                    return new Date(b.date_Ordered || 0) - new Date(a.date_Ordered || 0);
+                });
+                renderFoOrderCards(orders, container, companyName);
+            })
+            .catch(function (err) {
+                container.innerHTML = '<div class="pmd-fo-error">Search failed: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function searchOrderManual(orderNum, container) {
+        if (!orderNum) return;
+        container.innerHTML = '<div class="pmd-fo-loading">Looking up Order #' + escapeHtml(orderNum) + '...</div>';
+        fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var orders = data.result || [];
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="pmd-fo-empty">Order #' + escapeHtml(orderNum) + ' not found in ShopWorks.</div>';
+                    return;
+                }
+                renderFoOrderCards(orders, container, '');
+            })
+            .catch(function (err) {
+                container.innerHTML = '<div class="pmd-fo-error">Lookup failed: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function renderFoOrderCards(orders, container, companyLabel) {
+        var header = '<div class="pmd-fo-header">Found ' + orders.length + ' order' +
+            (orders.length !== 1 ? 's' : '') + (companyLabel ? ' for ' + escapeHtml(companyLabel) : '') + ':</div>';
+        var html = header;
+        orders.forEach(function (order) {
+            var orderNum = order.id_Order || '';
+            var dateStr = order.date_Ordered ? new Date(order.date_Ordered).toLocaleDateString() : '--';
+            var rep = order.CustomerServiceRep || '--';
+            var invoiced = order.date_Invoiced
+                ? 'Invoiced ' + new Date(order.date_Invoiced).toLocaleDateString()
+                : 'Not invoiced';
+            var custName = order.CustomerName || '';
+            var artDone = order.sts_ArtDone === 1;
+            html += '<div class="pmd-order-card">';
+            html += '<div class="pmd-order-num">Order #' + escapeHtml(String(orderNum));
+            html += ' <span class="pmd-fo-art-status pmd-fo-art-status--' + (artDone ? 'done' : 'pending') + '">';
+            html += artDone ? '\u2713 Art Done' : '\u2717 Art Pending';
+            html += '</span></div>';
+            html += '<div class="pmd-order-meta">' + escapeHtml(dateStr) + ' &middot; ' + escapeHtml(rep) +
+                ' &middot; ' + escapeHtml(invoiced);
+            if (custName && !companyLabel) html += ' &middot; ' + escapeHtml(custName);
+            html += '</div>';
+            html += '<div class="pmd-order-items" id="pmd-items-' + escapeHtml(String(orderNum)) + '"></div>';
+            html += '<div class="pmd-order-actions">';
+            html += '<button type="button" class="pmd-view-items-btn" onclick="pmdExpandLineItems(\'' +
+                escapeHtml(String(orderNum)) + '\', this)">View Line Items</button>';
+            html += '<button type="button" class="pmd-link-order-btn" onclick="pmdLinkOrder(\'' +
+                escapeHtml(String(orderNum)) + '\')">Link This Order</button>';
+            html += '</div></div>';
+        });
+        container.innerHTML = html;
+    }
+
+    function pmdExpandLineItems(orderNum, btn) {
+        var itemsDiv = document.getElementById('pmd-items-' + orderNum);
+        if (!itemsDiv) return;
+        if (itemsDiv.innerHTML) {
+            itemsDiv.innerHTML = '';
+            btn.textContent = 'View Line Items';
+            return;
+        }
+        btn.textContent = 'Loading...';
+        btn.disabled = true;
+        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var items = data.result || [];
+                if (items.length === 0) {
+                    itemsDiv.innerHTML = '<div class="pmd-fo-empty" style="padding:8px 0;">No line items found.</div>';
+                    btn.textContent = 'Hide Line Items';
+                    btn.disabled = false;
+                    return;
+                }
+                var html = '<table class="pmd-line-items-table"><thead><tr><th>PN</th><th>Description</th><th>Qty</th><th>Price</th></tr></thead><tbody>';
+                items.forEach(function (item) {
+                    var pn = item.PartNumber || '';
+                    var price = item.LineUnitPrice;
+                    html += '<tr>';
+                    html += '<td>' + escapeHtml(pn) + '</td>';
+                    html += '<td>' + escapeHtml((item.PartDescription || '').trim()) + '</td>';
+                    html += '<td>' + (item.LineQuantity || '') + '</td>';
+                    html += '<td>' + (price !== null && price !== undefined ? '$' + parseFloat(price).toFixed(2) : '$0.00') + '</td>';
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                itemsDiv.innerHTML = html;
+                btn.textContent = 'Hide Line Items';
+                btn.disabled = false;
+            })
+            .catch(function (err) {
+                itemsDiv.innerHTML = '<div class="pmd-fo-error" style="padding:8px 0;">Failed to load: ' + escapeHtml(err.message) + '</div>';
+                btn.textContent = 'View Line Items';
+                btn.disabled = false;
+            });
+    }
+
+    function pmdLinkOrder(orderNum) {
+        if (!currentMockup || !currentMockup.ID) {
+            alert('Error: Cannot save — missing record ID');
+            return;
+        }
+        if (!confirm('Link Order #' + orderNum + ' to this mockup?')) return;
+
+        fetch(API_BASE + '/api/mockups/' + currentMockup.ID, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Work_Order_Number: String(orderNum) })
+        })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            return resp.json();
+        })
+        .then(function () {
+            // Close modal
+            document.getElementById('pmd-fo-overlay').style.display = 'none';
+            document.getElementById('pmd-fo-modal').style.display = 'none';
+
+            // Update the Work Order field on the page
+            var woEl = document.getElementById('pmd-wo-value');
+            if (woEl) woEl.textContent = orderNum;
+
+            // Remove the Find Order button if it exists
+            var findBtn = document.getElementById('pmd-find-order-btn');
+            if (findBtn) findBtn.remove();
+
+            // Update local state
+            currentMockup.Work_Order_Number = String(orderNum);
+
+            // Now run the ShopWorks Art Done check
+            checkShopWorksArtDone(orderNum);
+
+            alert('Order #' + orderNum + ' linked successfully');
+        })
+        .catch(function (err) {
+            alert('Failed to link order: ' + err.message);
+        });
+    }
+
+    // ── ShopWorks Art Done Check ─────────────────────────────────────────
+    function checkShopWorksArtDone(workOrderNumber) {
+        fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(workOrderNumber))
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                var orders = data.result || [];
+                if (orders.length === 0) return;
+                var order = orders[0];
+                var artDone = order.sts_ArtDone === 1;
+
+                var badge = document.createElement('span');
+                badge.className = 'pmd-sw-badge ' + (artDone ? 'pmd-sw-badge--done' : 'pmd-sw-badge--pending');
+                badge.textContent = artDone ? '\u2713 Art Done in ShopWorks' : '\u2717 Art not yet done in ShopWorks';
+                badge.title = artDone
+                    ? 'Artwork marked done in ShopWorks (Order #' + workOrderNumber + ')'
+                    : 'Artwork not yet marked done in ShopWorks (Order #' + workOrderNumber + ')';
+
+                var badgesDiv = document.querySelector('.pmd-badges');
+                if (badgesDiv) {
+                    badgesDiv.appendChild(badge);
+                }
+            })
+            .catch(function () {
+                // Silent fail — non-critical indicator
+            });
     }
 
 })();

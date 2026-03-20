@@ -222,6 +222,9 @@
 
         // Attach event listeners to cards
         attachCardListeners();
+
+        // Audit badges for completed cards with work order numbers
+        addAuditIndicators();
     }
 
     function buildCard(mockup, showActions) {
@@ -294,8 +297,10 @@
             ? `<div class="card-thumb"><img src="${escapeHtml(thumbUrl)}" alt="Mockup preview" loading="lazy" onerror="this.parentElement.style.display='none';"></div>`
             : '';
 
+        const workOrder = escapeHtml(mockup.Work_Order_Number || '');
+
         return `
-        <div class="mockup-card" data-mockup-id="${id}">
+        <div class="mockup-card" data-mockup-id="${id}" data-work-order="${workOrder}">
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
@@ -461,6 +466,47 @@
             }
         } catch (err) {
             // Silent fail — polling is non-critical
+        }
+    }
+
+    // ── ShopWorks Art Done Audit Badges ──────────────────────────────────
+    function addAuditIndicators() {
+        const completedGrid = document.getElementById('completed-grid');
+        if (!completedGrid) return;
+
+        const cards = completedGrid.querySelectorAll('.mockup-card[data-work-order]');
+        cards.forEach(card => {
+            const wo = card.dataset.workOrder;
+            if (!wo) return;
+            if (card.dataset.auditQueued) return;
+            card.dataset.auditQueued = '1';
+
+            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(wo))
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(data => {
+                    const orders = data.result || [];
+                    if (orders.length === 0) return;
+                    const artDone = orders[0].sts_ArtDone === 1;
+                    insertAuditBadge(card,
+                        artDone ? '\u2713 SW Art Done' : '\u2717 SW Art Pending',
+                        artDone ? 'green' : 'amber',
+                        artDone ? 'Art marked done in ShopWorks' : 'Art not yet marked done in ShopWorks');
+                })
+                .catch(() => { /* silent */ });
+        });
+    }
+
+    function insertAuditBadge(card, text, color, tooltip) {
+        const badge = document.createElement('span');
+        badge.className = 'audit-badge audit-badge--' + color;
+        badge.textContent = text;
+        if (tooltip) badge.title = tooltip;
+        const headerArea = card.querySelector('.card-header') || card.querySelector('.card-company');
+        if (headerArea) {
+            headerArea.appendChild(badge);
         }
     }
 

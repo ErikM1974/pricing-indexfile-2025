@@ -186,6 +186,180 @@ body {
     color: #dc2626;
 }
 
+/* ── ShopWorks Art Done Badge ──────────────────────── */
+.pmd-sw-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.pmd-sw-badge--done { background: #dcfce7; color: #166534; }
+.pmd-sw-badge--pending { background: #fef3c7; color: #92400e; }
+
+/* ── Find Order Button & Modal ─────────────────────── */
+.pmd-find-order-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.pmd-find-order-btn:hover { background: #2563eb; }
+
+.pmd-fo-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    z-index: 1001;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+.pmd-fo-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+.pmd-fo-modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0 4px;
+}
+.pmd-fo-modal-close:hover { color: #334155; }
+.pmd-fo-modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+.pmd-fo-loading { font-size: 13px; color: #64748b; font-style: italic; padding: 16px 0; }
+.pmd-fo-empty { font-size: 13px; color: #94a3b8; padding: 16px 0; }
+.pmd-fo-error { font-size: 13px; color: #dc2626; padding: 16px 0; }
+.pmd-fo-header { font-size: 12px; color: #64748b; margin-bottom: 10px; font-weight: 600; }
+.pmd-fo-manual {
+    padding: 12px 20px;
+    border-top: 1px solid #e2e8f0;
+}
+.pmd-fo-manual-label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+.pmd-fo-manual-row { display: flex; gap: 6px; }
+.pmd-fo-manual-input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.pmd-fo-manual-input:focus {
+    outline: none;
+    border-color: #6B46C1;
+    box-shadow: 0 0 0 2px rgba(107,70,193,0.15);
+}
+.pmd-fo-manual-btn {
+    background: #475569;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+.pmd-fo-manual-btn:hover { background: #334155; }
+.pmd-fo-manual-note {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 6px;
+    font-style: italic;
+}
+.pmd-order-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s, background 0.15s;
+}
+.pmd-order-card:hover { border-color: #94a3b8; background: #f8fafc; }
+.pmd-order-num { font-size: 15px; font-weight: 700; color: #1e293b; }
+.pmd-order-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+.pmd-order-actions { margin-top: 8px; display: flex; gap: 8px; }
+.pmd-view-items-btn {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+.pmd-view-items-btn:hover { background: #e2e8f0; }
+.pmd-link-order-btn {
+    background: #6B46C1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+.pmd-link-order-btn:hover { background: #553C9A; }
+.pmd-fo-art-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+}
+.pmd-fo-art-status--done { background: #dcfce7; color: #166534; }
+.pmd-fo-art-status--pending { background: #fef3c7; color: #92400e; }
+.pmd-line-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-top: 8px;
+}
+.pmd-line-items-table th {
+    text-align: left;
+    padding: 4px 6px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 600;
+    color: #475569;
+}
+.pmd-line-items-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+
 /* ── Action Bars ────────────────────────────────────── */
 .pmd-action-bar {
     display: flex;

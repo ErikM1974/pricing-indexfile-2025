@@ -3100,6 +3100,14 @@
         html += '<div class="ard-stat-label">Order Total</div>';
         html += '</div>';
 
+        // Box 5: Art Done in ShopWorks
+        var artDone = orderData && orderData.sts_ArtDone === 1;
+        var artDoneColor = artDone ? 'green' : 'amber';
+        html += '<div class="ard-stat-box ard-stat-box--' + artDoneColor + '">';
+        html += '<div class="ard-stat-value">' + (artDone ? '\u2713 Done' : '\u2717 Not Done') + '</div>';
+        html += '<div class="ard-stat-label">SW Art Done</div>';
+        html += '</div>';
+
         html += '</div>'; // .ard-audit-stats
         html += mismatchNote;
 

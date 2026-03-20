@@ -1697,10 +1697,10 @@ body.ae-view .ard-status-step.active .ard-status-label {
 .ard-audit-message { font-weight: 600; }
 .ard-audit-detail { font-size: 12px; margin-top: 4px; opacity: 0.85; }
 
-/* ── Audit Stat Boxes (4-column comparison) ── */
+/* ── Audit Stat Boxes (5-column comparison) ── */
 .ard-audit-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     margin-bottom: 16px;
 }

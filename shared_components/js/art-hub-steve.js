@@ -1741,10 +1741,17 @@
         var orderNum = card.dataset.auditOrder;
         if (!orderNum) return;
 
-        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
-            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-            .then(function (data) {
-                var items = data.result || [];
+        // Fetch order header + line items in parallel
+        Promise.all([
+            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                .catch(function () { return { result: [] }; }),
+            fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        ])
+        .then(function (results) {
+                var orderData = (results[0].result || [])[0] || null;
+                var items = results[1].result || [];
                 var ART_PNS = ['Art', 'GRT-50', 'GRT-75'];
                 var artItems = items.filter(function (item) {
                     return item.PartNumber && ART_PNS.indexOf(item.PartNumber.trim()) !== -1;
@@ -1755,35 +1762,41 @@
                 if (artItems.length === 0) {
                     insertAuditBadge(card, 'No Art Charge', 'amber',
                         'No art charge found on invoice' + (steveCost > 0 ? ' \u2014 Steve: $' + steveCost.toFixed(2) : ''));
-                    return;
+                } else {
+                    var waived = false;
+                    var billedTotal = 0;
+                    artItems.forEach(function (item) {
+                        var price = item.LineUnitPrice;
+                        var desc = (item.PartDescription || '').toLowerCase();
+                        if (price === null || price === 0 ||
+                            desc.indexOf('waiv') !== -1 || desc.indexOf('no charge') !== -1 ||
+                            desc.indexOf('n/c') !== -1 || desc.indexOf('comp') !== -1) {
+                            waived = true;
+                        } else {
+                            billedTotal += parseFloat(price) || 0;
+                        }
+                    });
+
+                    if (waived && billedTotal === 0) {
+                        insertAuditBadge(card, 'Art Waived', 'red',
+                            'Art charge waived on invoice' + (steveCost > 0 ? ' \u2014 Steve: $' + steveCost.toFixed(2) : ''));
+                    } else if (steveCost > billedTotal) {
+                        var overage = steveCost - billedTotal;
+                        insertAuditBadge(card, 'Art \u25B2 $' + billedTotal.toFixed(0), 'red',
+                            'Steve: $' + steveCost.toFixed(2) + ' \u00B7 Billed: $' + billedTotal.toFixed(2) + ' \u2014 over by $' + overage.toFixed(2));
+                    } else {
+                        insertAuditBadge(card, 'Art \u2713 $' + billedTotal.toFixed(0), 'green',
+                            'Steve: $' + steveCost.toFixed(2) + ' \u00B7 Billed: $' + billedTotal.toFixed(2));
+                    }
                 }
 
-                var waived = false;
-                var billedTotal = 0;
-                artItems.forEach(function (item) {
-                    var price = item.LineUnitPrice;
-                    var desc = (item.PartDescription || '').toLowerCase();
-                    if (price === null || price === 0 ||
-                        desc.indexOf('waiv') !== -1 || desc.indexOf('no charge') !== -1 ||
-                        desc.indexOf('n/c') !== -1 || desc.indexOf('comp') !== -1) {
-                        waived = true;
-                    } else {
-                        billedTotal += parseFloat(price) || 0;
-                    }
-                });
-
-                if (waived && billedTotal === 0) {
-                    insertAuditBadge(card, 'Art Waived', 'red',
-                        'Art charge waived on invoice' + (steveCost > 0 ? ' \u2014 Steve: $' + steveCost.toFixed(2) : ''));
-                } else if (steveCost > billedTotal) {
-                    // Steve's work exceeds what was billed — red flag
-                    var overage = steveCost - billedTotal;
-                    insertAuditBadge(card, 'Art \u25B2 $' + billedTotal.toFixed(0), 'red',
-                        'Steve: $' + steveCost.toFixed(2) + ' \u00B7 Billed: $' + billedTotal.toFixed(2) + ' \u2014 over by $' + overage.toFixed(2));
-                } else {
-                    // Steve's work ≤ billed — profitable or break-even
-                    insertAuditBadge(card, 'Art \u2713 $' + billedTotal.toFixed(0), 'green',
-                        'Steve: $' + steveCost.toFixed(2) + ' \u00B7 Billed: $' + billedTotal.toFixed(2));
+                // ShopWorks Art Done badge
+                if (orderData) {
+                    var artDone = orderData.sts_ArtDone === 1;
+                    insertAuditBadge(card,
+                        artDone ? '\u2713 SW Art Done' : '\u2717 SW Art Pending',
+                        artDone ? 'green' : 'amber',
+                        artDone ? 'Art marked done in ShopWorks' : 'Art not yet marked done in ShopWorks');
                 }
             })
             .catch(function () {
