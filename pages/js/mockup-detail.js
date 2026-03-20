@@ -2178,6 +2178,81 @@
         showToast('DST elements applied to Mockup ' + slotNumber + ' — pick colors for each run', 'success');
     }
 
+    // Fetch DST from Box and run AI vision to generate thread elements
+    function generateElementsFromBoxDst(slotNumber, dstBoxFileId, mockupUrl, btnEl) {
+        if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Processing...'; }
+        showToast('Downloading DST from Box + identifying elements...', 'info');
+
+        // Step 1: Download DST from Box via proxy
+        fetch(API_BASE + '/api/box/download/' + dstBoxFileId)
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('Box download failed (HTTP ' + resp.status + ')');
+            return resp.blob();
+        })
+        .then(function (blob) {
+            // Step 2: Send DST blob to parse-dst-elements endpoint
+            var formData = new FormData();
+            formData.append('dstFile', blob, 'design.dst');
+            if (mockupUrl) formData.append('mockup_url', mockupUrl);
+
+            return fetch(INKSOFT_API + '/api/embroidery/parse-dst-elements', {
+                method: 'POST',
+                body: formData
+            });
+        })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('DST parse failed (HTTP ' + resp.status + ')');
+            return resp.json();
+        })
+        .then(function (data) {
+            if (!data.success) throw new Error(data.error || 'Parse failed');
+
+            var runCount = data.run_count || 0;
+            var stitchCount = data.stitch_count || 0;
+            var elements = data.elements || [];
+
+            showToast('Found ' + runCount + ' thread runs, ' + stitchCount.toLocaleString() + ' stitches', 'success');
+
+            // Pre-populate threads with elements (no colors)
+            var threads = [];
+            for (var i = 0; i < runCount; i++) {
+                threads.push({
+                    run: i + 1,
+                    name: '',
+                    hex: '',
+                    catalog: '',
+                    element: elements[i] || ''
+                });
+            }
+
+            // Update stored record
+            var rec = storedEmbRecords[String(slotNumber)];
+            if (rec) {
+                rec.Thread_Count = runCount;
+                rec.Color_Changes = runCount - 1;
+                rec.Stitch_Count = stitchCount;
+                rec.Thread_Sequence_JSON = JSON.stringify(threads);
+            }
+
+            // Open thread editor
+            editorThreads = threads;
+            activeThreadEditorSlot = slotNumber;
+            var editorContainer = document.getElementById('pmd-thread-editor-container');
+            if (editorContainer) {
+                editorContainer.style.display = 'block';
+                renderThreadEditorPanel(slotNumber);
+            }
+            renderAllSlotSwatches();
+
+            // Remove the generate button
+            if (btnEl && btnEl.parentNode) btnEl.remove();
+        })
+        .catch(function (err) {
+            showToast('Failed: ' + err.message, 'error');
+            if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = '&#9881; Generate Thread Elements'; }
+        });
+    }
+
     function loadStoredEmbData(mockupIdVal) {
         if (!mockupIdVal) return;
 
@@ -2287,8 +2362,32 @@
             }
 
             var threads = [];
-            try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { continue; }
-            if (!threads || threads.length === 0) { strip.style.display = 'none'; continue; }
+            try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { /* empty */ }
+            if (!threads || threads.length === 0) {
+                strip.style.display = 'none';
+                // If DST exists in Box but no threads, show "Generate Elements" button
+                if (!isAeView && !isCustomerView && rec.DST_Box_File_ID) {
+                    var slotEl2 = strip.parentElement;
+                    if (slotEl2 && !slotEl2.querySelector('.pmd-generate-elements-btn')) {
+                        // Remove "+ Add Threads" if it exists (we have a better option)
+                        var existingAdd = slotEl2.querySelector('.pmd-add-threads-btn');
+                        if (existingAdd) existingAdd.remove();
+
+                        (function (slotNum, dstBoxId, mockupUrl) {
+                            var genBtn = document.createElement('button');
+                            genBtn.className = 'pmd-generate-elements-btn';
+                            genBtn.innerHTML = '&#9881; Generate Thread Elements';
+                            genBtn.dataset.slot = String(slotNum);
+                            genBtn.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                generateElementsFromBoxDst(slotNum, dstBoxId, mockupUrl, genBtn);
+                            });
+                            slotEl2.appendChild(genBtn);
+                        })(s, rec.DST_Box_File_ID, currentMockup ? currentMockup['Box_Mockup_' + s] || currentMockup.Box_Mockup_1 : '');
+                    }
+                }
+                continue;
+            }
 
             strip.innerHTML = '';
             threads.forEach(function (t) {
