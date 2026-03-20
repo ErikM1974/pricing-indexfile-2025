@@ -2264,7 +2264,110 @@
             var parent = strip.parentElement;
             var addBtnExisting = parent && parent.querySelector('.pmd-add-threads-btn');
             if (addBtnExisting) addBtnExisting.remove();
+
+            // Add hover popover to the slot label
+            (function (slotNum, threadList) {
+                var slotEl = strip.parentElement;
+                if (!slotEl) return;
+                var label = slotEl.querySelector('.pmd-slot-label');
+                if (!label || label.dataset.popoverBound) return;
+                label.dataset.popoverBound = '1';
+                label.style.cursor = 'default';
+
+                label.addEventListener('mouseenter', function (e) {
+                    showThreadPopover(label, threadList, slotNum);
+                });
+                label.addEventListener('mouseleave', function () {
+                    hideThreadPopover();
+                });
+            })(s, threads);
         }
+    }
+
+    var _threadPopover = null;
+    function showThreadPopover(anchorEl, threads, slotNum) {
+        hideThreadPopover();
+        if (!threads || threads.length === 0) return;
+
+        var pop = document.createElement('div');
+        pop.className = 'pmd-thread-popover';
+        pop.id = 'pmd-thread-popover';
+
+        var title = document.createElement('div');
+        title.className = 'pmd-thread-popover-title';
+        title.textContent = 'Mockup ' + slotNum + ' — Thread Sequence';
+        pop.appendChild(title);
+
+        var hasElements = threads.some(function (t) { return t.element; });
+
+        threads.forEach(function (t) {
+            var row = document.createElement('div');
+            row.className = 'pmd-thread-popover-row';
+
+            var dot = document.createElement('span');
+            dot.className = 'pmd-thread-popover-dot';
+            dot.style.background = t.hex || '#888';
+            row.appendChild(dot);
+
+            var num = document.createElement('span');
+            num.className = 'pmd-thread-popover-num';
+            num.textContent = t.run || '';
+            row.appendChild(num);
+
+            var name = document.createElement('span');
+            name.className = 'pmd-thread-popover-name';
+            name.textContent = t.name || '(no color)';
+            row.appendChild(name);
+
+            if (hasElements) {
+                var el = document.createElement('span');
+                el.className = 'pmd-thread-popover-element';
+                el.textContent = t.element || '';
+                row.appendChild(el);
+            }
+
+            var cat = document.createElement('span');
+            cat.className = 'pmd-thread-popover-cat';
+            cat.textContent = t.catalog || '';
+            row.appendChild(cat);
+
+            pop.appendChild(row);
+        });
+
+        document.body.appendChild(pop);
+        _threadPopover = pop;
+
+        // Position below the label
+        var rect = anchorEl.getBoundingClientRect();
+        pop.style.left = rect.left + 'px';
+        pop.style.top = (rect.bottom + 6) + 'px';
+
+        // Keep within viewport
+        requestAnimationFrame(function () {
+            var popRect = pop.getBoundingClientRect();
+            if (popRect.right > window.innerWidth - 8) {
+                pop.style.left = (window.innerWidth - popRect.width - 8) + 'px';
+            }
+            if (popRect.bottom > window.innerHeight - 8) {
+                pop.style.top = (rect.top - popRect.height - 6) + 'px';
+            }
+        });
+
+        // Keep popover alive when hovering over it
+        pop.addEventListener('mouseenter', function () { pop.dataset.hovered = '1'; });
+        pop.addEventListener('mouseleave', function () {
+            pop.dataset.hovered = '';
+            hideThreadPopover();
+        });
+    }
+
+    function hideThreadPopover() {
+        setTimeout(function () {
+            if (_threadPopover && _threadPopover.dataset.hovered !== '1') {
+                _threadPopover.remove();
+                _threadPopover = null;
+            }
+        }, 100);
     }
 
     function toggleThreadEditor(slotNumber) {

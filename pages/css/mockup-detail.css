@@ -2406,6 +2406,79 @@ body {
     white-space: nowrap;
 }
 
+/* ── Thread Hover Popover ───────────────────────────── */
+.pmd-thread-popover {
+    position: fixed;
+    z-index: 9999;
+    background: #1e1e2e;
+    color: #e5e5e5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+    min-width: 200px;
+    max-width: 380px;
+    font-size: 0.78rem;
+    pointer-events: auto;
+    animation: pmd-pop-in 0.15s ease-out;
+}
+@keyframes pmd-pop-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.pmd-thread-popover-title {
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: #a78bfa;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.pmd-thread-popover-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.pmd-thread-popover-row:last-child {
+    border-bottom: none;
+}
+.pmd-thread-popover-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+}
+.pmd-thread-popover-num {
+    font-weight: 700;
+    width: 18px;
+    text-align: center;
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+.pmd-thread-popover-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pmd-thread-popover-element {
+    color: #a78bfa;
+    font-style: italic;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+.pmd-thread-popover-cat {
+    font-family: monospace;
+    font-size: 0.72rem;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
 /* ── Thread Editor: Element column variant ──────────── */
 .pmd-thread-editor-col-headers.pmd-te-has-elements,
 .pmd-thread-editor-row.pmd-te-has-elements {
