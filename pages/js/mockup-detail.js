@@ -182,6 +182,9 @@
         // Info fields
         renderInfoFields(mockup);
 
+        // Load stored EMB data from Caspio (shows swatches + results without re-parsing)
+        loadStoredEmbData(mockup.PK_ID || mockup.ID);
+
         // Notes (hide for customer view, move to right column for AE view)
         if (isCustomerView) {
             var notesList = document.getElementById('pmd-notes-list');
@@ -1730,8 +1733,8 @@
             if (data.application_type) toastParts.push(data.application_type);
             showToast('EMB parsed: ' + toastParts.join(', '), 'success');
 
-            // Upload EMB to Box (non-blocking)
-            uploadEmbToBox(file);
+            // Upload EMB to Box then save record to Caspio (non-blocking)
+            uploadEmbToBox(file, data, threads);
         })
         .catch(function (err) {
             showToast('Failed to parse EMB: ' + err.message, 'error');
@@ -1742,41 +1745,172 @@
         });
     }
 
-    function uploadEmbToBox(file) {
-        if (!currentMockup || !currentMockup.Box_Folder_ID) {
+    function uploadEmbToBox(file, parsedData, threads) {
+        var boxFileId = '';
+
+        // Step 1: Upload to Box (if folder exists)
+        var boxPromise;
+        if (currentMockup && currentMockup.Box_Folder_ID) {
+            var company = currentMockup.Company_Name || 'Unknown';
+            var designNum = currentMockup.Design_Number || currentMockup.PK_ID || '';
+            var shortCompany = company.substring(0, 30).trim();
+            var boxFileName = (shortCompany + ' EMB ' + designNum + '.emb').replace(/[<>:"/\\|?*]/g, '');
+
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('folderId', currentMockup.Box_Folder_ID);
+            formData.append('fileName', boxFileName);
+
+            boxPromise = fetch(API_BASE + '/api/box/upload-to-folder', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Box upload failed');
+                return resp.json();
+            })
+            .then(function (boxData) {
+                if (boxData.success) {
+                    boxFileId = boxData.fileId || '';
+                    showToast('EMB saved to Box: ' + boxData.fileName, 'success');
+                    if (currentMockup.Box_Folder_ID) {
+                        loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+                    }
+                }
+                return boxFileId;
+            })
+            .catch(function (err) {
+                showToast('Box upload failed: ' + err.message, 'error');
+                return '';
+            });
+        } else {
             showToast('No Box folder for this mockup — EMB not uploaded to Box', 'info');
-            return;
+            boxPromise = Promise.resolve('');
         }
 
-        var company = currentMockup.Company_Name || 'Unknown';
-        var designNum = currentMockup.Design_Number || currentMockup.PK_ID || '';
-        var shortCompany = company.substring(0, 30).trim();
-        var boxFileName = (shortCompany + ' EMB ' + designNum + '.emb').replace(/[<>:"/\\|?*]/g, '');
+        // Step 2: Save EMB record to Caspio (after Box upload completes)
+        boxPromise.then(function (resolvedBoxFileId) {
+            if (!currentMockup) return;
 
-        var formData = new FormData();
-        formData.append('file', file);
-        formData.append('folderId', currentMockup.Box_Folder_ID);
-        formData.append('fileName', boxFileName);
+            // Calculate total thread length
+            var totalThreadLength = 0;
+            if (threads && threads.length > 0) {
+                threads.forEach(function (t) {
+                    if (t.thread_length) totalThreadLength += t.thread_length;
+                });
+                totalThreadLength = Math.round(totalThreadLength / 100000 * 10) / 10; // 0.01mm to meters, 1 decimal
+            }
 
-        fetch(API_BASE + '/api/box/upload-to-folder', {
-            method: 'POST',
-            body: formData
-        })
+            var record = {
+                Mockup_ID: currentMockup.PK_ID || currentMockup.ID,
+                Box_File_ID: resolvedBoxFileId || '',
+                File_Name: file.name,
+                File_Size_KB: Math.round(file.size / 1024),
+                Design_Number: parsedData.design_number || currentMockup.Design_Number || '',
+                Colorway_Name: parsedData.colorway_name || 'Colorway 1',
+                Is_Primary: 'Yes',
+                Application_Type: parsedData.application_type || '',
+                Machine_Format: '',
+                Source_Format: '',
+                Width_MM: parsedData.width_mm || null,
+                Height_MM: parsedData.height_mm || null,
+                Width_Inches: parsedData.width_inches || null,
+                Height_Inches: parsedData.height_inches || null,
+                Stitch_Count: parsedData.stitch_count || null,
+                Color_Changes: parsedData.color_changes != null ? parsedData.color_changes : null,
+                Thread_Count: parsedData.count || (threads ? threads.length : null),
+                Hoop_Width_MM: parsedData.hoop_width_mm || null,
+                Hoop_Height_MM: parsedData.hoop_height_mm || null,
+                Thread_Colors: threads ? threads.map(function (t) { return t.name; }).join(', ') : '',
+                Thread_Sequence_JSON: threads ? JSON.stringify(threads) : '',
+                Thread_Length_Total_M: totalThreadLength || null,
+                Box_Folder_ID: currentMockup.Box_Folder_ID || '',
+                Uploaded_By: 'ruth@nwcustomapparel.com'
+            };
+
+            fetch(API_BASE + '/api/emb-designs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(record)
+            })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Caspio save failed');
+                return resp.json();
+            })
+            .then(function (result) {
+                if (result.success) {
+                    console.log('EMB record saved to Caspio, ID:', result.record.ID);
+                }
+            })
+            .catch(function (err) {
+                console.error('Failed to save EMB record to Caspio:', err.message);
+            });
+        });
+    }
+
+    function loadStoredEmbData(mockupIdVal) {
+        if (!mockupIdVal) return;
+
+        fetch(API_BASE + '/api/emb-designs/by-mockup/' + mockupIdVal)
         .then(function (resp) {
-            if (!resp.ok) throw new Error('Box upload failed');
+            if (!resp.ok) return null;
             return resp.json();
         })
         .then(function (data) {
-            if (data.success) {
-                showToast('EMB saved to Box: ' + data.fileName, 'success');
-                // Refresh Box panel
-                if (currentMockup.Box_Folder_ID) {
-                    loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+            if (!data || !data.records || data.records.length === 0) return;
+
+            var primary = data.records[0]; // Is_Primary=Yes first (sorted by backend)
+            var resultsEl = document.getElementById('pmd-emb-results');
+            var swatchesEl = document.getElementById('pmd-thread-swatches');
+
+            // Only render if swatches are not already showing (from a fresh upload)
+            if (swatchesEl && swatchesEl.classList.contains('active')) return;
+
+            // Build results panel from stored data
+            if (resultsEl) {
+                var html = '<div class="pmd-emb-results-header">';
+                html += '<div class="pmd-emb-stats">';
+                if (primary.Thread_Count) {
+                    html += '<div><span class="pmd-emb-stat-label">Threads:</span> ' + primary.Thread_Count + ' runs</div>';
+                }
+                if (primary.Width_Inches && primary.Height_Inches) {
+                    html += '<div><span class="pmd-emb-stat-label">Size:</span> '
+                        + primary.Width_Inches + '&Prime; &times; ' + primary.Height_Inches + '&Prime;</div>';
+                }
+                if (primary.Stitch_Count) {
+                    html += '<div><span class="pmd-emb-stat-label">Stitches:</span> '
+                        + Number(primary.Stitch_Count).toLocaleString() + '</div>';
+                }
+                if (primary.Hoop_Width_MM && primary.Hoop_Height_MM) {
+                    html += '<div><span class="pmd-emb-stat-label">Hoop:</span> '
+                        + primary.Hoop_Width_MM + ' &times; ' + primary.Hoop_Height_MM + ' mm</div>';
+                }
+                if (primary.Design_Number) {
+                    html += '<div><span class="pmd-emb-stat-label">Design #:</span> ' + escapeHtml(primary.Design_Number) + '</div>';
+                }
+                if (primary.Colorway_Name) {
+                    html += '<div><span class="pmd-emb-stat-label">Colorway:</span> ' + escapeHtml(primary.Colorway_Name) + '</div>';
+                }
+                html += '</div></div>';
+                resultsEl.innerHTML = html;
+                resultsEl.classList.add('active');
+            }
+
+            // Render thread swatches from stored JSON
+            if (primary.Thread_Sequence_JSON) {
+                try {
+                    var threads = JSON.parse(primary.Thread_Sequence_JSON);
+                    if (threads && threads.length > 0) {
+                        renderThreadSwatches(threads);
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse stored Thread_Sequence_JSON:', e.message);
                 }
             }
         })
         .catch(function (err) {
-            showToast('Box upload failed: ' + err.message, 'error');
+            // Silent — stored EMB data is optional
+            console.warn('Could not load stored EMB data:', err.message);
         });
     }
 
