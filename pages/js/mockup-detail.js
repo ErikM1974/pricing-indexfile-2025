@@ -293,11 +293,16 @@
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
                 });
-            } else if (statusLower === 'approved' || statusLower === 'completed') {
-                // Approved/Completed — show Reopen + Send + Copy
+            } else if (statusLower === 'approved') {
+                // Approved — waiting for Ruth to finalize
                 aeBar.style.display = '';
-                var statusLabel = statusLower === 'approved' ? 'Approved' : 'Completed';
-                aeBar.innerHTML = '<span class="pmd-action-bar-label">' + statusLabel + custElapsedHtml + '</span>'
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">\u2705 Approved \u2014 Waiting for Ruth to finalize and mark complete' + custElapsedHtml + '</span>'
+                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>'
+                    + sendCopyButtons;
+            } else if (statusLower === 'completed') {
+                // Completed — fully done
+                aeBar.style.display = '';
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">\u2705 Completed' + custElapsedHtml + '</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>'
                     + sendCopyButtons;
             } else if (hasMockups) {
@@ -413,10 +418,20 @@
                         }, 5000);
                     });
                 });
-            } else if (statusLower === 'approved' || statusLower === 'completed') {
+            } else if (statusLower === 'approved') {
                 ruthBar.style.display = '';
-                var statusLabel = statusLower === 'approved' ? 'approved' : 'completed';
-                ruthBar.innerHTML = '<span class="pmd-action-bar-label">This mockup is ' + statusLabel + '</span>'
+                ruthBar.innerHTML = '<span class="pmd-action-bar-label">\u2705 Approved \u2014 Ready for final review</span>'
+                    + '<button class="pmd-action-btn pmd-action-btn--complete" id="pmd-btn-mark-complete">Mark Complete</button>'
+                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>';
+                document.getElementById('pmd-btn-mark-complete').addEventListener('click', function () {
+                    openMarkCompleteModal(this);
+                });
+                document.getElementById('pmd-btn-reopen').addEventListener('click', function () {
+                    handleReopen(this, 'Ruth');
+                });
+            } else if (statusLower === 'completed') {
+                ruthBar.style.display = '';
+                ruthBar.innerHTML = '<span class="pmd-action-bar-label">This mockup is completed</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>';
                 document.getElementById('pmd-btn-reopen').addEventListener('click', function () {
                     handleReopen(this, 'Ruth');
@@ -484,6 +499,87 @@
                 + '<p class="pmd-customer-company">' + escapeHtml(currentMockup.Company_Name || '') + '</p>'
                 + '</div>';
         }
+    }
+
+    // ── Mark Complete Modal (Ruth) ─────────────────────────────────────────
+    function openMarkCompleteModal(btnEl) {
+        // Create modal overlay
+        var overlay = document.createElement('div');
+        overlay.className = 'pmd-modal-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9998;display:flex;align-items:center;justify-content:center;';
+
+        var modal = document.createElement('div');
+        modal.style.cssText = 'background:#fff;border-radius:12px;padding:0;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);z-index:9999;';
+        modal.innerHTML =
+            '<div style="background:#16a34a;color:#fff;padding:14px 20px;border-radius:12px 12px 0 0;font-weight:600;font-size:16px;">' +
+                'Mark Complete \u2014 #' + (currentMockup.Design_Number || mockupId) +
+            '</div>' +
+            '<div style="padding:20px;">' +
+                '<label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:6px;">Final notes (optional):</label>' +
+                '<textarea id="pmd-complete-notes" style="width:100%;height:80px;border:1px solid #d1d5db;border-radius:8px;padding:10px;font-size:14px;resize:vertical;box-sizing:border-box;" placeholder="Any final notes before completing..."></textarea>' +
+                '<div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">' +
+                    '<button id="pmd-complete-cancel" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;">Cancel</button>' +
+                    '<button id="pmd-complete-submit" style="padding:10px 20px;border:none;border-radius:8px;background:#16a34a;color:#fff;cursor:pointer;font-weight:600;font-size:14px;">Mark Complete</button>' +
+                '</div>' +
+            '</div>';
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) {
+                document.body.removeChild(overlay);
+            }
+        });
+
+        document.getElementById('pmd-complete-cancel').addEventListener('click', function () {
+            document.body.removeChild(overlay);
+        });
+
+        document.getElementById('pmd-complete-submit').addEventListener('click', function () {
+            var submitBtn = this;
+            var notesText = (document.getElementById('pmd-complete-notes').value || '').trim();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Completing...';
+
+            var noteText = 'Marked as complete by Ruth';
+            if (notesText) noteText += ': ' + notesText;
+
+            // 1. Update status to Completed
+            fetch(API_BASE + '/api/mockups/' + mockupId + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Completed' })
+            }).then(function (resp) {
+                if (!resp.ok) throw new Error('Status update failed: ' + resp.status);
+
+                // 2. Log completion note
+                return fetch(API_BASE + '/api/mockup-notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Mockup_ID: parseInt(mockupId),
+                        Author: getLoggedInUser().email,
+                        Author_Name: getLoggedInUser().firstName,
+                        Note_Text: noteText,
+                        Note_Type: 'status_change'
+                    })
+                });
+            }).then(function () {
+                // 3. Notify AE
+                sendStatusNotifications('Completed');
+
+                // 4. ShopWorks reminder
+                document.body.removeChild(overlay);
+                showToast('\u2705 Marked complete! Don\u2019t forget to upload the thumbnail to ShopWorks.', 'success');
+                setTimeout(function () { location.reload(); }, 2500);
+            }).catch(function (err) {
+                console.error('Mark complete failed:', err);
+                submitBtn.textContent = 'Error \u2014 retry';
+                submitBtn.style.background = '#dc3545';
+                submitBtn.disabled = false;
+            });
+        });
     }
 
     // ── Reopen from Approved/Completed ──────────────────────────────────────
@@ -2176,6 +2272,17 @@
                     from_name: 'Customer'
                 });
             }
+        } else if (newStatus === 'Completed') {
+            // Ruth marks complete → notify AE
+            var aeEmail4 = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+            sendMockupNotification({
+                to_email: aeEmail4,
+                to_name: getAeDisplayName(aeEmail4),
+                note_text: 'Mockup completed for ' + company + ' #' + design + ' \u2014 ready for production',
+                note_type: 'Completed',
+                detail_link: aeLink,
+                from_name: 'Ruth \u2014 Digitizing'
+            });
         } else if (newStatus === 'Revision Requested') {
             // Notify Ruth
             sendMockupNotification({

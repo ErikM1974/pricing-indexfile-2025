@@ -136,6 +136,7 @@ body {
 .ard-status-badge--submitted { background: #f3e8ff; color: #6f42c1; }
 .ard-status-badge--inprogress { background: #e6f3ff; color: #0066cc; }
 .ard-status-badge--revision { background: #fff4e6; color: #cc6d00; }
+.ard-status-badge--approved { background: #dbeafe; color: #1d4ed8; }
 .ard-status-badge--completed { background: #e6ffed; color: #00802b; }
 .ard-status-badge--awaiting { background: #fef3c7; color: #b45309; }
 .ard-status-badge--cancel { background: #f8d7da; color: #721c24; }

@@ -319,8 +319,16 @@
         // ── AE / Steve Views ───────────────────────────────────────────
         initGalleryInteractions(req);
 
-        // AE Action Bar — show only for AE view when status is "Awaiting Approval"
-        if (isAeView && statusLower.includes('awaitingapproval')) {
+        // AE Action Bar — show for AE view when "Awaiting Approval" or "Approved"
+        if (isAeView && statusLower === 'approved') {
+            var actionBar = document.getElementById('ard-action-bar');
+            actionBar.style.display = '';
+            var innerBar = actionBar.querySelector('.ard-action-bar-inner');
+            if (innerBar) {
+                innerBar.innerHTML = '<div class="ard-action-header" style="color:#2563eb;">' +
+                    '\u2705 Approved \u2014 Waiting for Steve to finalize and mark complete</div>';
+            }
+        } else if (isAeView && statusLower.includes('awaitingapproval')) {
             document.getElementById('ard-action-bar').style.display = '';
             initActionBar();
 
@@ -392,6 +400,7 @@
 
         var status = statusClean.toLowerCase().replace(/\s+/g, '');
         var isCompleted = status === 'completed';
+        var isApproved = status === 'approved';
         var isCancelled = status === 'cancel' || status === 'cancelled';
 
         if (isCancelled) return;
@@ -407,6 +416,12 @@
             btnWorking.style.display = 'none';
             btnComplete.style.display = 'none';
             btnMockup.style.display = 'none';
+            btnReopen.style.display = '';
+        } else if (isApproved) {
+            // Approved by AE/Customer — Steve gets final review + Mark Complete
+            btnWorking.style.display = 'none';
+            btnMockup.style.display = 'none';
+            btnComplete.style.display = '';
             btnReopen.style.display = '';
         } else {
             // Hide Send Mockup if status doesn't allow it
@@ -462,7 +477,7 @@
 
         // Log Time button in billing card header
         var btnLogTimeBilling = document.getElementById('ard-btn-log-time-billing');
-        if (btnLogTimeBilling && !isCompleted) {
+        if (btnLogTimeBilling && !isCompleted && !isApproved) {
             btnLogTimeBilling.style.display = '';
             btnLogTimeBilling.addEventListener('click', function () {
                 ArtActions.showLogTimeModal(designId, req.Status || 'In Progress 🔵');
@@ -1803,11 +1818,11 @@
             if (s.key === selectedMockupSlot) slotLabel = s.label;
         });
 
-        // 1. Update status to Completed
+        // 1. Update status to Approved (Steve will finalize and mark Complete)
         fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'Completed' })
+            body: JSON.stringify({ status: 'Approved' })
         }).then(function (resp) {
             if (!resp.ok) throw new Error('Status update failed: ' + resp.status);
 
@@ -1817,7 +1832,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     noteType: 'Customer Approval',
-                    noteText: 'Customer approved ' + slotLabel,
+                    noteText: 'Customer approved ' + slotLabel + ' — waiting for Steve to finalize',
                     noteBy: 'customer'
                 })
             });
@@ -2013,11 +2028,11 @@
         approveBtn.textContent = 'Approving...';
 
         try {
-            // 1. Update status to Completed
+            // 1. Update status to Approved (Steve will finalize and mark Complete)
             const statusResp = await fetch(`${API_BASE}/api/art-requests/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Completed' })
+                body: JSON.stringify({ status: 'Approved' })
             });
             if (!statusResp.ok) throw new Error(`Status update failed: ${statusResp.status}`);
 
@@ -2040,9 +2055,9 @@
             // 4. Push real-time notification for Steve's dashboard
             pushArtNotification('approved', aeName);
 
-            showSuccessMessage('Design approved! Steve has been notified.');
+            showSuccessMessage('Design approved! Steve will finalize and mark complete.');
             disableActionBar();
-            updateStatusBadge('Completed', 'ard-status-badge--completed');
+            updateStatusBadge('Approved', 'ard-status-badge--approved');
         } catch (err) {
             console.error('Approve design failed:', err);
             approveBtn.textContent = 'Error — retry';
@@ -2461,6 +2476,7 @@
         if (lower.includes('inprogress')) return 'ard-status-badge--inprogress';
         if (lower.includes('revisionrequested')) return 'ard-status-badge--revision';
         if (lower.includes('awaitingapproval')) return 'ard-status-badge--awaiting';
+        if (lower === 'approved') return 'ard-status-badge--approved';
         if (lower.includes('completed')) return 'ard-status-badge--completed';
         if (lower.includes('cancel')) return 'ard-status-badge--cancel';
         return 'ard-status-badge--default';
@@ -2577,7 +2593,8 @@
             { key: 'submitted', label: 'Submitted', match: ['submitted'] },
             { key: 'inprogress', label: 'In Progress', match: ['in progress', 'working'] },
             { key: 'awaiting', label: 'Awaiting Approval', match: ['awaiting approval', 'mockup sent'] },
-            { key: 'completed', label: 'Completed', match: ['completed', 'approved'] }
+            { key: 'approved', label: 'Approved', match: ['approved'] },
+            { key: 'completed', label: 'Completed', match: ['completed'] }
         ];
 
         var revisionStep = { key: 'revision', label: 'Revision Requested', match: ['revision'] };
@@ -2609,7 +2626,10 @@
             if (text.includes('working') || text.includes('in progress')) {
                 if (!stepDates.inprogress) stepDates.inprogress = date;
             }
-            if ((text.includes('approved') || text.includes('completed')) && type.includes('status')) {
+            if (text.includes('approved') && !text.includes('completed') && (type.includes('status') || type.includes('approval'))) {
+                if (!stepDates.approved) stepDates.approved = date;
+            }
+            if (text.includes('completed') && type.includes('status')) {
                 if (!stepDates.completed) stepDates.completed = date;
             }
         });

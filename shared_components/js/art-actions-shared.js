@@ -93,12 +93,13 @@
 
     // ── Art Charge Logging ────────────────────────────────────────────
 
-    function logArtCharge(designId, mins, description, chargeType, currentTotalMins) {
+    function logArtCharge(designId, mins, description, chargeType, currentTotalMins, options) {
         if (mins <= 0) return;
 
+        var isWaived = options && options.waived;
         var newTotalMins = currentTotalMins + mins;
-        var cost = parseFloat((Math.ceil(mins / 15) * 0.25 * 75).toFixed(2));
-        var totalCost = parseFloat((Math.ceil(newTotalMins / 15) * 0.25 * 75).toFixed(2));
+        var cost = isWaived ? 0 : parseFloat((Math.ceil(mins / 15) * 0.25 * 75).toFixed(2));
+        var totalCost = isWaived ? 0 : parseFloat((Math.ceil(newTotalMins / 15) * 0.25 * 75).toFixed(2));
 
         fetch(API_BASE + '/api/art-charges', {
             method: 'POST',
@@ -338,6 +339,10 @@
                 '</div>' +
                 '<div id="at-cost" class="art-cost-display">= $0.00</div>' +
                 '<div id="at-new-total" class="art-new-total"></div>' +
+                '<label class="art-waive-label" style="display:flex;align-items:center;gap:8px;margin:10px 0 4px;cursor:pointer;font-size:13px;color:#555;">' +
+                    '<input type="checkbox" id="at-waive" style="width:16px;height:16px;cursor:pointer;" />' +
+                    'Waive art fee <span style="color:#999;font-size:12px;">(no charge to customer)</span>' +
+                '</label>' +
                 '<div class="art-modal-actions">' +
                     '<button id="at-cancel" class="art-modal-btn-cancel">Cancel</button>' +
                     '<button id="at-submit" class="art-modal-btn-submit art-modal-btn-submit--green">Complete</button>' +
@@ -350,18 +355,28 @@
         var minutesInput = modal.querySelector('#at-minutes');
         var costDiv = modal.querySelector('#at-cost');
         var newTotalDiv = modal.querySelector('#at-new-total');
+        var waiveCheckbox = modal.querySelector('#at-waive');
 
         function updateCost() {
             var mins = parseInt(minutesInput.value) || 0;
+            var isWaived = waiveCheckbox && waiveCheckbox.checked;
             var qh = Math.ceil(mins / 15) * 0.25;
-            costDiv.textContent = '= $' + (qh * 75).toFixed(2);
             var totalMins = currentMins + mins;
             var totalQh = Math.ceil(totalMins / 15) * 0.25;
-            newTotalDiv.textContent = 'Final total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + (totalQh * 75).toFixed(2) + ')';
+            if (isWaived) {
+                costDiv.textContent = '= $0.00 (fee waived)';
+                costDiv.style.color = '#b45309';
+                newTotalDiv.textContent = 'Final total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $0.00 \u2014 fee waived)';
+            } else {
+                costDiv.textContent = '= $' + (qh * 75).toFixed(2);
+                costDiv.style.color = '';
+                newTotalDiv.textContent = 'Final total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + (totalQh * 75).toFixed(2) + ')';
+            }
         }
         updateCost();
 
         minutesInput.addEventListener('input', updateCost);
+        if (waiveCheckbox) waiveCheckbox.addEventListener('change', updateCost);
         modal.querySelector('#at-plus').addEventListener('click', function () {
             minutesInput.value = (parseInt(minutesInput.value) || 0) + 15;
             updateCost();
@@ -377,6 +392,7 @@
 
         modal.querySelector('#at-submit').addEventListener('click', async function () {
             var mins = parseInt(minutesInput.value) || 0;
+            var isWaived = waiveCheckbox && waiveCheckbox.checked;
             this.disabled = true;
             this.textContent = 'Saving...';
 
@@ -390,17 +406,20 @@
 
                 if (mins > 0) {
                     var qh = Math.ceil(mins / 15) * 0.25;
-                    var cost = (qh * 75).toFixed(2);
+                    var cost = isWaived ? '0.00' : (qh * 75).toFixed(2);
+                    var noteText = isWaived
+                        ? 'Completed: ' + mins + ' additional minutes ($0.00 \u2014 fee waived)'
+                        : 'Completed: ' + mins + ' additional minutes ($' + cost + ')';
                     await fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             noteType: 'Art Time',
-                            noteText: 'Completed: ' + mins + ' additional minutes ($' + cost + ')',
+                            noteText: noteText,
                             noteBy: getLoggedInUser().noteBy
                         })
                     }).catch(function (err) { console.warn('Art time note failed (non-blocking):', err); });
-                    logArtCharge(designId, mins, 'Completed', 'Completion', currentMins);
+                    logArtCharge(designId, mins, 'Completed', isWaived ? 'Completion (fee waived)' : 'Completion', currentMins, { waived: isWaived });
                 }
 
                 sendNotificationEmail(designId, 'completed', {
@@ -426,6 +445,8 @@
                 var totalMins = currentMins + mins;
                 setTimeout(function () {
                     removeModals();
+                    // ShopWorks reminder
+                    alert('\u2705 Marked complete!\n\nReminder: Upload the thumbnail to ShopWorks.');
                     if (typeof onSuccess === 'function') {
                         onSuccess({ status: 'Completed', artMinutes: totalMins, action: 'markComplete' });
                     } else {

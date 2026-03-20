@@ -1349,6 +1349,15 @@ body {
 .pmd-action-btn--copy:hover {
     background: #e0e0e0;
 }
+.pmd-action-btn--complete {
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    font-weight: 600;
+}
+.pmd-action-btn--complete:hover {
+    background: #15803d;
+}
 .pmd-action-btn--reopen {
     background: #f59e0b;
     color: #fff;
