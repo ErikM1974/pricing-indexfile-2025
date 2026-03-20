@@ -368,7 +368,7 @@
                 backLinkAe.href = '/dashboards/ae-dashboard.html';
             }
         } else {
-            renderSteveActions(req, statusClean);
+            renderSteveActions(req, statusClean, notes);
         }
 
         // Revision feedback banner (shows above gallery for Revision Requested)
@@ -386,7 +386,7 @@
     }
 
     // ── Steve's Action Bar ────────────────────────────────────────────────
-    function renderSteveActions(req, statusClean) {
+    function renderSteveActions(req, statusClean, notes) {
         var bar = document.getElementById('ard-steve-actions');
         if (!bar || !window.ArtActions) return;
 

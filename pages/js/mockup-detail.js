@@ -160,7 +160,7 @@
         }
 
         // Action bars
-        renderActionBars(mockup);
+        renderActionBars(mockup, notes);
 
         // Revision feedback banner (shows above gallery for Revision Requested)
         renderRevisionBanner(mockup, notes);
@@ -199,7 +199,7 @@
     }
 
     // ── Action Bars ────────────────────────────────────────────────────────
-    function renderActionBars(mockup) {
+    function renderActionBars(mockup, notes) {
         var statusLower = (mockup.Status || '').toLowerCase().replace(/\s+/g, '');
         var ruthBar = document.getElementById('pmd-ruth-action-bar');
         var aeBar = document.getElementById('pmd-ae-action-bar');
