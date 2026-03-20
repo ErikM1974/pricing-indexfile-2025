@@ -2122,6 +2122,62 @@
         });
     }
 
+    // Apply DST elements from slot 1 to another slot (reuse already-parsed data)
+    function applyDstElementsToSlot(slotNumber) {
+        var sourceRec = storedEmbRecords['1'];
+        if (!sourceRec || !sourceRec.Thread_Sequence_JSON) {
+            showToast('No DST data found — upload a DST first', 'error');
+            return;
+        }
+        var sourceThreads = [];
+        try { sourceThreads = JSON.parse(sourceRec.Thread_Sequence_JSON); } catch (e) { return; }
+        if (sourceThreads.length === 0) {
+            showToast('No thread data to apply', 'error');
+            return;
+        }
+
+        // Copy elements + run structure (keep colors empty so Ruth can pick for this slot)
+        var threads = sourceThreads.map(function (t) {
+            return {
+                run: t.run,
+                name: '',
+                hex: '',
+                catalog: '',
+                element: t.element || ''
+            };
+        });
+
+        editorThreads = threads;
+        activeThreadEditorSlot = slotNumber;
+
+        // Create/update the stored record for this slot
+        var mockupIdVal = currentMockup ? (currentMockup.PK_ID || currentMockup.ID) : mockupId;
+        if (!storedEmbRecords[String(slotNumber)]) {
+            storedEmbRecords[String(slotNumber)] = {
+                Mockup_ID: mockupIdVal,
+                Mockup_Slot: String(slotNumber),
+                Thread_Count: sourceRec.Thread_Count,
+                Color_Changes: sourceRec.Color_Changes,
+                Stitch_Count: sourceRec.Stitch_Count,
+                Thread_Sequence_JSON: JSON.stringify(threads)
+            };
+        } else {
+            storedEmbRecords[String(slotNumber)].Thread_Count = sourceRec.Thread_Count;
+            storedEmbRecords[String(slotNumber)].Color_Changes = sourceRec.Color_Changes;
+            storedEmbRecords[String(slotNumber)].Stitch_Count = sourceRec.Stitch_Count;
+            storedEmbRecords[String(slotNumber)].Thread_Sequence_JSON = JSON.stringify(threads);
+        }
+
+        // Open editor and render
+        var editorContainer = document.getElementById('pmd-thread-editor-container');
+        if (editorContainer) {
+            editorContainer.style.display = 'block';
+            renderThreadEditorPanel(slotNumber);
+        }
+        renderAllSlotSwatches();
+        showToast('DST elements applied to Mockup ' + slotNumber + ' — pick colors for each run', 'success');
+    }
+
     function loadStoredEmbData(mockupIdVal) {
         if (!mockupIdVal) return;
 
@@ -2243,6 +2299,20 @@
                 strip.appendChild(dot);
             });
 
+            // Info button — click to show thread sequence popover
+            (function (slotNum, threadList) {
+                var infoBtn = document.createElement('button');
+                infoBtn.className = 'pmd-thread-info-btn';
+                infoBtn.innerHTML = 'i';
+                infoBtn.title = 'View thread sequence';
+                infoBtn.dataset.slot = String(slotNum);
+                infoBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleThreadInfoPopover(infoBtn, threadList, slotNum);
+                });
+                strip.appendChild(infoBtn);
+            })(s, threads);
+
             // Edit button (Ruth view only)
             if (!isAeView && !isCustomerView) {
                 var editBtn = document.createElement('button');
@@ -2264,44 +2334,41 @@
             var parent = strip.parentElement;
             var addBtnExisting = parent && parent.querySelector('.pmd-add-threads-btn');
             if (addBtnExisting) addBtnExisting.remove();
-
-            // Add hover popover to the slot label AND thread strip
-            // (strip overlaps label with z-index:2, so bind both for coverage)
-            (function (slotNum, threadList, stripEl) {
-                var slotEl = stripEl.parentElement;
-                if (!slotEl) return;
-                var label = slotEl.querySelector('.pmd-slot-label');
-                if (stripEl.dataset.popoverBound) return;
-                stripEl.dataset.popoverBound = '1';
-                if (label) label.dataset.popoverBound = '1';
-
-                var anchor = label || stripEl;
-                var enterHandler = function () { showThreadPopover(anchor, threadList, slotNum); };
-                var leaveHandler = function () { hideThreadPopover(); };
-
-                stripEl.addEventListener('mouseenter', enterHandler);
-                stripEl.addEventListener('mouseleave', leaveHandler);
-                if (label) {
-                    label.addEventListener('mouseenter', enterHandler);
-                    label.addEventListener('mouseleave', leaveHandler);
-                }
-            })(s, threads, strip);
         }
     }
 
     var _threadPopover = null;
-    function showThreadPopover(anchorEl, threads, slotNum) {
-        hideThreadPopover();
+    var _threadPopoverSlot = null;
+
+    function toggleThreadInfoPopover(anchorEl, threads, slotNum) {
+        // If same slot is already showing, close it
+        if (_threadPopover && _threadPopoverSlot === slotNum) {
+            closeThreadInfoPopover();
+            return;
+        }
+        closeThreadInfoPopover();
         if (!threads || threads.length === 0) return;
 
         var pop = document.createElement('div');
         pop.className = 'pmd-thread-popover';
         pop.id = 'pmd-thread-popover';
 
-        var title = document.createElement('div');
+        // Header with title + close button
+        var header = document.createElement('div');
+        header.className = 'pmd-thread-popover-header';
+        var title = document.createElement('span');
         title.className = 'pmd-thread-popover-title';
         title.textContent = 'Mockup ' + slotNum + ' — Thread Sequence';
-        pop.appendChild(title);
+        header.appendChild(title);
+        var closeBtn = document.createElement('button');
+        closeBtn.className = 'pmd-thread-popover-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            closeThreadInfoPopover();
+        });
+        header.appendChild(closeBtn);
+        pop.appendChild(header);
 
         var hasElements = threads.some(function (t) { return t.element; });
 
@@ -2341,8 +2408,9 @@
 
         document.body.appendChild(pop);
         _threadPopover = pop;
+        _threadPopoverSlot = slotNum;
 
-        // Position below the label
+        // Position below the anchor button
         var rect = anchorEl.getBoundingClientRect();
         pop.style.left = rect.left + 'px';
         pop.style.top = (rect.bottom + 6) + 'px';
@@ -2358,21 +2426,25 @@
             }
         });
 
-        // Keep popover alive when hovering over it
-        pop.addEventListener('mouseenter', function () { pop.dataset.hovered = '1'; });
-        pop.addEventListener('mouseleave', function () {
-            pop.dataset.hovered = '';
-            hideThreadPopover();
-        });
+        // Click outside to close
+        setTimeout(function () {
+            document.addEventListener('click', _threadPopoverOutsideClick);
+        }, 10);
     }
 
-    function hideThreadPopover() {
-        setTimeout(function () {
-            if (_threadPopover && _threadPopover.dataset.hovered !== '1') {
-                _threadPopover.remove();
-                _threadPopover = null;
-            }
-        }, 100);
+    function _threadPopoverOutsideClick(e) {
+        if (_threadPopover && !_threadPopover.contains(e.target) && !e.target.closest('.pmd-thread-info-btn')) {
+            closeThreadInfoPopover();
+        }
+    }
+
+    function closeThreadInfoPopover() {
+        if (_threadPopover) {
+            _threadPopover.remove();
+            _threadPopover = null;
+            _threadPopoverSlot = null;
+        }
+        document.removeEventListener('click', _threadPopoverOutsideClick);
     }
 
     function toggleThreadEditor(slotNumber) {
@@ -2415,9 +2487,14 @@
         var container = document.getElementById('pmd-thread-editor-container');
         if (!container) return;
 
+        // Show "Apply DST" button if slot 1 has DST data and this is a different slot with no threads
+        var showApplyDst = slotNumber > 1 && editorThreads.length === 0
+            && storedEmbRecords['1'] && storedEmbRecords['1'].Thread_Sequence_JSON;
+
         var html = '<div class="pmd-thread-editor-header">'
             + '<span>Thread Sequence &mdash; Mockup ' + slotNumber + '</span>'
             + '<div>'
+            + (showApplyDst ? '<button type="button" id="pmd-te-apply-dst" class="pmd-te-apply-dst-btn">&#128295; Apply DST Elements</button> ' : '')
             + '<button type="button" id="pmd-te-save">Save</button>'
             + ' <button type="button" id="pmd-te-close">&times; Close</button>'
             + '</div></div>';
@@ -2497,6 +2574,14 @@
             activeThreadEditorSlot = null;
             editorThreads = [];
         });
+
+        // "Apply DST Elements" button (only rendered for slots 2/3 when slot 1 has DST data)
+        var applyDstBtn = document.getElementById('pmd-te-apply-dst');
+        if (applyDstBtn) {
+            applyDstBtn.addEventListener('click', function () {
+                applyDstElementsToSlot(activeThreadEditorSlot);
+            });
+        }
     }
 
     function onEditorColorSelected(runIndex, newColor) {
