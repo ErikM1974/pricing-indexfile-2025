@@ -2265,22 +2265,27 @@
             var addBtnExisting = parent && parent.querySelector('.pmd-add-threads-btn');
             if (addBtnExisting) addBtnExisting.remove();
 
-            // Add hover popover to the slot label
-            (function (slotNum, threadList) {
-                var slotEl = strip.parentElement;
+            // Add hover popover to the slot label AND thread strip
+            // (strip overlaps label with z-index:2, so bind both for coverage)
+            (function (slotNum, threadList, stripEl) {
+                var slotEl = stripEl.parentElement;
                 if (!slotEl) return;
                 var label = slotEl.querySelector('.pmd-slot-label');
-                if (!label || label.dataset.popoverBound) return;
-                label.dataset.popoverBound = '1';
-                label.style.cursor = 'default';
+                if (stripEl.dataset.popoverBound) return;
+                stripEl.dataset.popoverBound = '1';
+                if (label) label.dataset.popoverBound = '1';
 
-                label.addEventListener('mouseenter', function (e) {
-                    showThreadPopover(label, threadList, slotNum);
-                });
-                label.addEventListener('mouseleave', function () {
-                    hideThreadPopover();
-                });
-            })(s, threads);
+                var anchor = label || stripEl;
+                var enterHandler = function () { showThreadPopover(anchor, threadList, slotNum); };
+                var leaveHandler = function () { hideThreadPopover(); };
+
+                stripEl.addEventListener('mouseenter', enterHandler);
+                stripEl.addEventListener('mouseleave', leaveHandler);
+                if (label) {
+                    label.addEventListener('mouseenter', enterHandler);
+                    label.addEventListener('mouseleave', leaveHandler);
+                }
+            })(s, threads, strip);
         }
     }
 
