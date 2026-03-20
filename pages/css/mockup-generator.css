@@ -241,7 +241,7 @@ body {
 
 .results-grid {
   display: grid;
-  grid-template-columns: 1fr 420px;
+  grid-template-columns: 1fr 500px;
   gap: 20px;
 }
 
@@ -340,6 +340,20 @@ body {
 .thread-list {
   overflow-y: auto;
   flex: 1;
+}
+
+.thread-col-headers {
+  display: grid;
+  grid-template-columns: 32px var(--thread-swatch) 1fr 1fr 60px;
+  gap: 10px;
+  padding: 6px 16px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .thread-row {
