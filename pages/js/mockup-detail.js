@@ -1993,8 +1993,8 @@
             if (!resp.ok) throw new Error('Failed to save customer info');
             return resp.json();
         }).then(function () {
-            // 2. Build inline mockup images HTML for email
-            var mockupImagesHtml = '';
+            // 2. Build mockup link HTML for email (link instead of large inline images)
+            var approvalUrl = HEROKU_ORIGIN + '/mockup/' + mockupId + '?view=customer';
             var mockupCount = 0;
             MOCKUP_SLOTS.forEach(function (slot) {
                 if (slot.key === 'Box_Reference_File') return;
@@ -2003,11 +2003,12 @@
                 var ext = getFileExtension(url);
                 if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
                 mockupCount++;
-                mockupImagesHtml += '<div style="margin-bottom:12px;text-align:center;">'
-                    + '<p style="font-size:13px;color:#666;margin:0 0 6px 0;font-weight:600;">' + slot.label + '</p>'
-                    + '<img src="' + url + '" alt="' + slot.label + '" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid #e5e7eb;">'
-                    + '</div>';
             });
+            var mockupImagesHtml = '<div style="text-align:center;margin:20px 0;">'
+                + '<p style="font-size:14px;color:#555;margin:0 0 16px 0;">We have ' + mockupCount + ' mockup' + (mockupCount !== 1 ? 's' : '') + ' ready for your review.</p>'
+                + '<a href="' + approvalUrl + '" style="display:inline-block;padding:14px 32px;background-color:#16a34a;color:#ffffff;text-decoration:none;border-radius:8px;font-size:16px;font-weight:600;">View Mockup' + (mockupCount !== 1 ? 's' : '') + ' &amp; Approve</a>'
+                + '<p style="font-size:12px;color:#999;margin:16px 0 0 0;">Click the button above to view, select, and approve your mockup' + (mockupCount !== 1 ? 's' : '') + '.</p>'
+                + '</div>';
 
             // 3. Send EmailJS
             if (typeof emailjs === 'undefined') {
