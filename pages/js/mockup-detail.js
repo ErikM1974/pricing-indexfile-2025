@@ -476,6 +476,19 @@
             if (!resp.ok) throw new Error('Approval failed');
             return resp.json();
         }).then(function () {
+            // Log customer approval note for timeline
+            return fetch(API_BASE + '/api/mockup-notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Mockup_ID: parseInt(mockupId),
+                    Author: 'Customer',
+                    Author_Name: 'Customer',
+                    Note_Text: approvalNote,
+                    Note_Type: 'status_change'
+                })
+            }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
+        }).then(function () {
             sendStatusNotifications('Approved');
             showCustomerConfirmation('approved');
         }).catch(function (err) {
@@ -651,6 +664,15 @@
         var body = { status: newStatus, author: author, authorName: authorName };
         if (notes) body.notes = notes;
 
+        // Build note text for timeline tracking
+        // Always include the status name so timeline scanner can detect it
+        var noteText;
+        if (notes) {
+            noteText = 'Status changed to ' + newStatus + ': ' + notes;
+        } else {
+            noteText = 'Status changed to ' + newStatus;
+        }
+
         fetch(API_BASE + '/api/mockups/' + mockupId + '/status', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -658,6 +680,19 @@
         }).then(function (resp) {
             if (!resp.ok) throw new Error('Status update failed');
             return resp.json();
+        }).then(function () {
+            // Log status change note for timeline
+            return fetch(API_BASE + '/api/mockup-notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Mockup_ID: parseInt(mockupId),
+                    Author: author,
+                    Author_Name: authorName,
+                    Note_Text: noteText,
+                    Note_Type: 'status_change'
+                })
+            }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
         }).then(function () {
             // Fire-and-forget email notifications
             sendStatusNotifications(newStatus);
@@ -1924,7 +1959,7 @@
             var type = (note.Note_Type || '').toLowerCase();
             var date = note.Created_Date;
 
-            if (type.includes('mockup sent') || text.includes('mockup sent')) {
+            if (type.includes('mockup sent') || text.includes('mockup sent') || text.includes('awaiting approval')) {
                 if (!stepDates.awaiting) stepDates.awaiting = date;
             }
             if (text.includes('revision requested') || type.includes('revision')) {

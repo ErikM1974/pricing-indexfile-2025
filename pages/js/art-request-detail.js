@@ -2616,7 +2616,7 @@
             var type = (note.Note_Type || '').toLowerCase();
             var date = note.Note_Date;
 
-            if (type.includes('mockup sent') || text.includes('mockup sent')) {
+            if (type.includes('mockup sent') || text.includes('mockup sent') || text.includes('awaiting approval')) {
                 if (!stepDates.awaiting) stepDates.awaiting = date;
             }
             if (text.includes('revision requested') || type.includes('revision')) {
