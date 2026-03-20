@@ -2356,6 +2356,70 @@ body {
     text-align: center;
 }
 
+/* ── DST Upload Button ──────────────────────────────── */
+.pmd-dst-upload-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+.pmd-dst-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    position: relative;
+}
+.pmd-dst-upload-btn:hover {
+    background: #264a75;
+}
+.pmd-dst-upload-btn.loading .pmd-dst-btn-text {
+    opacity: 0.4;
+}
+.pmd-dst-upload-btn.loading .pmd-dst-spinner {
+    display: block;
+}
+.pmd-dst-upload-btn:disabled {
+    cursor: wait;
+}
+.pmd-dst-spinner {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: pmd-spin 0.6s linear infinite;
+}
+.pmd-dst-filename {
+    font-size: 0.75rem;
+    color: #6b7280;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Thread Editor: Element column variant ──────────── */
+.pmd-thread-editor-col-headers.pmd-te-has-elements,
+.pmd-thread-editor-row.pmd-te-has-elements {
+    grid-template-columns: 32px 28px 1fr 1fr auto 60px;
+}
+.pmd-te-element {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @media (max-width: 900px) {
     .pmd-grid {
         grid-template-columns: 1fr;

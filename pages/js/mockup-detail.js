@@ -1489,6 +1489,14 @@
                 + '  <input type="file" accept=".emb" id="pmd-emb-file-input" style="display:none;">'
                 + '  <span class="pmd-emb-filename" id="pmd-emb-filename"></span>'
                 + '</div>'
+                + '<div class="pmd-dst-upload-row">'
+                + '  <button type="button" class="pmd-dst-upload-btn" id="pmd-dst-upload-btn">'
+                + '    <span class="pmd-dst-btn-text">\u2B06 Upload DST File</span>'
+                + '    <span class="pmd-dst-spinner"></span>'
+                + '  </button>'
+                + '  <input type="file" accept=".dst" id="pmd-dst-file-input" style="display:none;">'
+                + '  <span class="pmd-dst-filename" id="pmd-dst-filename"></span>'
+                + '</div>'
                 + '<div class="pmd-emb-results" id="pmd-emb-results"></div>'
                 + '<div class="pmd-field-row pmd-field-row--editable">'
                 + '  <span class="pmd-field-label">Logo Width</span>'
@@ -1543,6 +1551,17 @@
                 embFileInput.addEventListener('change', function () {
                     if (this.files.length) handleEmbUpload(this.files[0]);
                     this.value = ''; // reset for re-upload
+                });
+            }
+
+            // DST Upload button
+            var dstUploadBtn = document.getElementById('pmd-dst-upload-btn');
+            var dstFileInput = document.getElementById('pmd-dst-file-input');
+            if (dstUploadBtn && dstFileInput) {
+                dstUploadBtn.addEventListener('click', function () { dstFileInput.click(); });
+                dstFileInput.addEventListener('change', function () {
+                    if (this.files.length) handleDstUpload(this.files[0]);
+                    this.value = '';
                 });
             }
 
@@ -1924,6 +1943,185 @@
         });
     }
 
+    // ── DST Upload + AI Vision Elements ──────────────────────────────────
+
+    function handleDstUpload(file) {
+        if (!file || !file.name.toLowerCase().endsWith('.dst')) {
+            showToast('Please select a .dst file', 'error');
+            return;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+            showToast('DST file too large (max 20 MB)', 'error');
+            return;
+        }
+
+        var btn = document.getElementById('pmd-dst-upload-btn');
+        var filenameEl = document.getElementById('pmd-dst-filename');
+        if (btn) { btn.classList.add('loading'); btn.disabled = true; }
+        if (filenameEl) filenameEl.textContent = file.name;
+
+        // Build FormData with DST file + mockup URL for vision context
+        var formData = new FormData();
+        formData.append('dstFile', file);
+        var mockupImgUrl = currentMockup ? currentMockup.Box_Mockup_1 : '';
+        if (mockupImgUrl) {
+            formData.append('mockup_url', mockupImgUrl);
+        }
+
+        showToast('Parsing DST + identifying elements...', 'info');
+
+        fetch(INKSOFT_API + '/api/embroidery/parse-dst-elements', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('DST parse failed (HTTP ' + resp.status + ')');
+            return resp.json();
+        })
+        .then(function (data) {
+            if (!data.success) {
+                showToast('DST parse failed', 'error');
+                return;
+            }
+
+            var runCount = data.run_count || 0;
+            var stitchCount = data.stitch_count || 0;
+            var elements = data.elements || [];
+
+            // Show results toast
+            var parts = [runCount + ' thread runs', stitchCount.toLocaleString() + ' stitches'];
+            if (elements.length > 0) parts.push('elements identified');
+            showToast('DST parsed: ' + parts.join(', '), 'success');
+
+            // Pre-populate thread editor for slot 1 with elements (no colors yet)
+            var threads = [];
+            for (var i = 0; i < runCount; i++) {
+                threads.push({
+                    run: i + 1,
+                    name: '',
+                    hex: '',
+                    catalog: '',
+                    element: elements[i] || ''
+                });
+            }
+
+            // Store in editorThreads and open the editor for slot 1
+            editorThreads = threads;
+            activeThreadEditorSlot = 1;
+
+            // If no existing record for slot 1, create a temporary one
+            if (!storedEmbRecords['1']) {
+                storedEmbRecords['1'] = {
+                    Mockup_ID: currentMockup ? (currentMockup.PK_ID || currentMockup.ID) : mockupId,
+                    Mockup_Slot: '1',
+                    Thread_Count: runCount,
+                    Color_Changes: runCount - 1,
+                    Stitch_Count: stitchCount,
+                    Thread_Sequence_JSON: JSON.stringify(threads)
+                };
+            } else {
+                // Update existing record with DST data
+                storedEmbRecords['1'].Thread_Count = runCount;
+                storedEmbRecords['1'].Color_Changes = runCount - 1;
+                storedEmbRecords['1'].Stitch_Count = stitchCount;
+                storedEmbRecords['1'].Thread_Sequence_JSON = JSON.stringify(threads);
+            }
+
+            // Render the editor panel
+            var editorContainer = document.getElementById('pmd-thread-editor-container');
+            if (editorContainer) {
+                editorContainer.style.display = 'block';
+                renderThreadEditorPanel(1);
+            }
+
+            renderAllSlotSwatches();
+
+            // Upload DST to Box + save reference to Caspio
+            uploadDstToBox(file, data);
+        })
+        .catch(function (err) {
+            showToast('DST parse failed: ' + err.message, 'error');
+        })
+        .finally(function () {
+            if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+        });
+    }
+
+    function uploadDstToBox(file, parsedData) {
+        if (!currentMockup || !currentMockup.Box_Folder_ID) {
+            showToast('No Box folder — DST not uploaded to Box', 'info');
+            return;
+        }
+
+        var company = currentMockup.Company_Name || 'Unknown';
+        var designNum = currentMockup.Design_Number || currentMockup.PK_ID || '';
+        var shortCompany = company.substring(0, 30).trim();
+        var boxFileName = (shortCompany + ' DST ' + designNum + '.dst').replace(/[<>:"/\\|?*]/g, '');
+
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('folderId', currentMockup.Box_Folder_ID);
+        formData.append('fileName', boxFileName);
+
+        fetch(API_BASE + '/api/box/upload-to-folder', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('Box upload failed');
+            return resp.json();
+        })
+        .then(function (boxData) {
+            if (boxData.success) {
+                showToast('DST saved to Box: ' + boxData.fileName, 'success');
+                // Save DST reference to Caspio EMB record
+                var mockupIdVal = currentMockup.PK_ID || currentMockup.ID;
+                var existing = storedEmbRecords['1'];
+                var dstFields = {
+                    DST_Box_File_ID: boxData.fileId || '',
+                    DST_File_Name: file.name,
+                    Stitch_Count: parsedData.stitch_count || null,
+                    Thread_Count: parsedData.run_count || null,
+                    Color_Changes: (parsedData.run_count || 1) - 1
+                };
+
+                if (existing && existing.ID) {
+                    fetch(API_BASE + '/api/emb-designs/' + existing.ID, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dstFields)
+                    }).then(function (r) {
+                        if (r.ok) showToast('DST reference saved to database', 'success');
+                    });
+                } else {
+                    dstFields.Mockup_ID = mockupIdVal;
+                    dstFields.Mockup_Slot = '1';
+                    dstFields.Is_Primary = 'Yes';
+                    dstFields.Uploaded_By = 'ruth@nwcustomapparel.com';
+                    fetch(API_BASE + '/api/emb-designs', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dstFields)
+                    }).then(function (r) {
+                        if (r.ok) return r.json();
+                    }).then(function (result) {
+                        if (result && result.success) {
+                            showToast('DST data saved to database', 'success');
+                            loadStoredEmbData(mockupIdVal);
+                        }
+                    });
+                }
+
+                if (currentMockup.Box_Folder_ID) {
+                    loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+                }
+            }
+        })
+        .catch(function (err) {
+            showToast('DST Box upload failed: ' + err.message, 'error');
+        });
+    }
+
     function loadStoredEmbData(mockupIdVal) {
         if (!mockupIdVal) return;
 
@@ -2041,7 +2239,7 @@
                 var dot = document.createElement('span');
                 dot.className = 'pmd-mini-dot';
                 dot.style.background = t.hex || '#888';
-                dot.title = 'Run ' + t.run + ': ' + (t.name || '?') + (t.catalog ? ' #' + t.catalog : '');
+                dot.title = 'Run ' + t.run + ': ' + (t.name || '?') + (t.element ? ' \u2014 ' + t.element : '') + (t.catalog ? ' #' + t.catalog : '');
                 strip.appendChild(dot);
             });
 
@@ -2117,8 +2315,11 @@
             + '</div></div>';
 
         // Column headers
-        html += '<div class="pmd-thread-editor-col-headers">'
-            + '<span>#</span><span></span><span>Color Name</span><span></span><span style="text-align:right">Cat#</span>'
+        var hasElements = editorThreads.some(function (t) { return t.element; });
+        html += '<div class="pmd-thread-editor-col-headers' + (hasElements ? ' pmd-te-has-elements' : '') + '">'
+            + '<span>#</span><span></span><span>Color Name</span>'
+            + (hasElements ? '<span>Element</span>' : '')
+            + '<span></span><span style="text-align:right">Cat#</span>'
             + '</div>';
 
         // Thread rows
@@ -2128,10 +2329,11 @@
                 + 'No threads yet. Click "+ Add Run" to start.</div>';
         } else {
             editorThreads.forEach(function (t, idx) {
-                html += '<div class="pmd-thread-editor-row" data-run-index="' + idx + '">'
+                html += '<div class="pmd-thread-editor-row' + (hasElements ? ' pmd-te-has-elements' : '') + '" data-run-index="' + idx + '">'
                     + '<span class="pmd-te-run">' + (t.run || (idx + 1)) + '</span>'
                     + '<span class="pmd-te-swatch" style="background:' + escapeHtml(t.hex || '#888') + ';"></span>'
                     + '<span class="pmd-te-name">' + escapeHtml(t.name || 'Click to set') + '</span>'
+                    + (hasElements ? '<span class="pmd-te-element">' + escapeHtml(t.element || '') + '</span>' : '')
                     + '<span class="pmd-te-edit-icon">&#9998;</span>'
                     + '<span class="pmd-te-catalog">' + escapeHtml(t.catalog || '') + '</span>'
                     + '</div>';
@@ -2280,14 +2482,39 @@
         var designName = currentMockup.Design_Name || '';
         var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
+        // Gather metadata for richer header
+        var primaryRec = storedEmbRecords['1'];
+        var stitchCount = primaryRec ? (primaryRec.Stitch_Count || '') : '';
+        var logoW = currentMockup.Logo_Width || '';
+        var logoH = currentMockup.Logo_Height || '';
+        var placement = currentMockup.Print_Location || '';
+        var garmentDesc = currentMockup.Garment_Description || '';
+        var hoopW = primaryRec ? (primaryRec.Hoop_Width || '') : '';
+        var hoopH = primaryRec ? (primaryRec.Hoop_Height || '') : '';
+
+        // Check if any slot has elements
+        var anyElements = false;
+        for (var chk = 1; chk <= 3; chk++) {
+            var chkRec = storedEmbRecords[String(chk)];
+            if (chkRec && chkRec.Thread_Sequence_JSON) {
+                try {
+                    var chkThreads = JSON.parse(chkRec.Thread_Sequence_JSON);
+                    if (chkThreads.some(function (t) { return t.element; })) anyElements = true;
+                } catch (e) {}
+            }
+        }
+
         var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
             + '<title>Thread Sheet - ' + escapeHtml(company) + ' #' + escapeHtml(designNum) + '</title>'
             + '<style>'
             + '* { box-sizing: border-box; margin: 0; padding: 0; }'
             + 'body { font-family: Arial, Helvetica, sans-serif; padding: 24px; color: #1a1a1a; }'
-            + '.header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #333; }'
+            + '.header { text-align: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #333; }'
             + '.header h1 { font-size: 20px; margin-bottom: 4px; }'
             + '.header .meta { font-size: 13px; color: #555; }'
+            + '.header .meta-details { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-top: 8px; font-size: 12px; color: #444; }'
+            + '.header .meta-details span { white-space: nowrap; }'
+            + '.header .meta-details .md-label { font-weight: 700; color: #222; }'
             + '.mockup-section { display: flex; gap: 20px; margin-bottom: 28px; page-break-inside: avoid; align-items: flex-start; }'
             + '.mockup-img { width: 220px; height: 220px; object-fit: contain; border: 1px solid #ddd; border-radius: 6px; background: #f8f8f8; flex-shrink: 0; }'
             + '.thread-table { flex: 1; }'
@@ -2297,6 +2524,7 @@
             + 'td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; }'
             + 'tr:nth-child(even) { background: #f9f9f9; }'
             + '.color-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ccc; vertical-align: middle; }'
+            + '.td-element { color: #555; font-style: italic; }'
             + '.footer { text-align: center; font-size: 11px; color: #999; margin-top: 24px; padding-top: 12px; border-top: 1px solid #ddd; }'
             + '@media print {'
             + '  body { padding: 12px; }'
@@ -2311,8 +2539,20 @@
             + '<div class="meta">'
             + escapeHtml(company) + ' &mdash; #' + escapeHtml(designNum)
             + (designName ? ' &mdash; ' + escapeHtml(designName) : '')
-            + '<br>' + today
-            + '</div></div>';
+            + '</div>';
+
+        // Metadata details row
+        var metaParts = [];
+        if (stitchCount) metaParts.push('<span><span class="md-label">Stitches:</span> ' + Number(stitchCount).toLocaleString() + '</span>');
+        if (logoW && logoH) metaParts.push('<span><span class="md-label">Size:</span> ' + escapeHtml(logoW) + '&Prime; &times; ' + escapeHtml(logoH) + '&Prime;</span>');
+        if (hoopW && hoopH) metaParts.push('<span><span class="md-label">Hoop:</span> ' + escapeHtml(hoopW) + ' &times; ' + escapeHtml(hoopH) + ' mm</span>');
+        if (placement) metaParts.push('<span><span class="md-label">Placement:</span> ' + escapeHtml(placement) + '</span>');
+        if (garmentDesc) metaParts.push('<span><span class="md-label">Garment:</span> ' + escapeHtml(garmentDesc) + '</span>');
+        if (metaParts.length > 0) {
+            html += '<div class="meta-details">' + metaParts.join('') + '</div>';
+        }
+        html += '<div class="meta" style="margin-top:4px;">' + today + '</div>';
+        html += '</div>';
 
         // Each mockup slot with threads
         var hasContent = false;
@@ -2343,12 +2583,16 @@
             html += '<h3>Mockup ' + s + (rec && rec.Colorway_Name ? ' &mdash; ' + escapeHtml(rec.Colorway_Name) : '') + '</h3>';
 
             if (threads.length > 0) {
-                html += '<table><tr><th>#</th><th></th><th>Color</th><th>Cat#</th></tr>';
+                var slotHasElements = threads.some(function (t) { return t.element; });
+                html += '<table><tr><th>#</th><th></th><th>Color</th>'
+                    + (slotHasElements ? '<th>Element</th>' : '')
+                    + '<th>Cat#</th></tr>';
                 threads.forEach(function (t) {
                     html += '<tr>'
                         + '<td><strong>' + (t.run || '') + '</strong></td>'
                         + '<td><span class="color-dot" style="background:' + escapeHtml(t.hex || '#888') + ';"></span></td>'
                         + '<td>' + escapeHtml(t.name || '') + '</td>'
+                        + (slotHasElements ? '<td class="td-element">' + escapeHtml(t.element || '') + '</td>' : '')
                         + '<td style="font-family:monospace;">' + escapeHtml(t.catalog || '') + '</td>'
                         + '</tr>';
                 });
