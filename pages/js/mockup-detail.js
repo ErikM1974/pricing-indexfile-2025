@@ -4498,9 +4498,24 @@
         });
 
         Promise.all(imagePromises).then(function (loadedSlots) {
+            var pageHeight = 279.4; // letter height in mm
+            var pageBottom = 260;   // leave 20mm for footer area
+            var imgWidth = contentWidth * 0.6;
+            var imgHeight = imgWidth * 0.75; // 4:3 aspect ratio (~81mm)
+
             loadedSlots.forEach(function (slot) {
-                // Check if we need a new page
-                if (yPos > 220) {
+                // Calculate total space needed for this mockup section
+                var mockupImgH = slot.imgData ? imgHeight : 12;
+                var rec = storedEmbRecords[String(slot.num)];
+                var threads = [];
+                if (rec && rec.Thread_Sequence_JSON) {
+                    try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { /* empty */ }
+                }
+                var threadH = threads.length > 0 ? (8 + threads.length * 4) : 0;
+                var neededH = 6 + mockupImgH + 4 + threadH + 8; // label+gap + image + gap + threads + spacing
+
+                // Smart page break: if this mockup won't fit, start a new page
+                if (yPos + neededH > pageBottom) {
                     pdf.addPage();
                     yPos = margin;
                 }
@@ -4515,8 +4530,6 @@
 
                 // Mockup image
                 if (slot.imgData) {
-                    var imgWidth = contentWidth * 0.6;
-                    var imgHeight = imgWidth * 0.75; // 4:3 aspect ratio
                     pdf.addImage(slot.imgData, 'JPEG', margin, yPos, imgWidth, imgHeight);
                     yPos += imgHeight + 4;
                 } else {
@@ -4527,52 +4540,47 @@
                 }
 
                 // Thread sequence for this slot
-                var rec = storedEmbRecords[String(slot.num)];
-                if (rec && rec.Thread_Sequence_JSON) {
-                    var threads = [];
-                    try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { /* empty */ }
-                    if (threads.length > 0) {
-                        pdf.setFontSize(7);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.setTextColor(100, 100, 100);
-                        pdf.text('THREAD SEQUENCE', margin, yPos);
+                if (threads.length > 0) {
+                    pdf.setFontSize(7);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('THREAD SEQUENCE', margin, yPos);
+                    yPos += 4;
+
+                    pdf.setFontSize(8);
+                    threads.forEach(function (t) {
+                        // Color dot
+                        var hex = t.hex || '#888888';
+                        var r = parseInt(hex.slice(1, 3), 16);
+                        var g = parseInt(hex.slice(3, 5), 16);
+                        var b = parseInt(hex.slice(5, 7), 16);
+                        pdf.setFillColor(r, g, b);
+                        pdf.circle(margin + 2, yPos - 1, 1.5, 'F');
+
+                        // Run number + name
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(80, 80, 80);
+                        pdf.text(String(t.run || ''), margin + 6, yPos);
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text(t.name || '(no color)', margin + 12, yPos);
+
+                        // Element name
+                        if (t.element) {
+                            pdf.setFont('helvetica', 'italic');
+                            pdf.setTextColor(74, 122, 74);
+                            pdf.text(t.element, margin + 50, yPos);
+                        }
+
+                        pdf.setTextColor(0, 0, 0);
                         yPos += 4;
-
-                        pdf.setFontSize(8);
-                        threads.forEach(function (t) {
-                            // Color dot
-                            var hex = t.hex || '#888888';
-                            var r = parseInt(hex.slice(1, 3), 16);
-                            var g = parseInt(hex.slice(3, 5), 16);
-                            var b = parseInt(hex.slice(5, 7), 16);
-                            pdf.setFillColor(r, g, b);
-                            pdf.circle(margin + 2, yPos - 1, 1.5, 'F');
-
-                            // Run number + name
-                            pdf.setFont('helvetica', 'normal');
-                            pdf.setTextColor(80, 80, 80);
-                            pdf.text(String(t.run || ''), margin + 6, yPos);
-                            pdf.setTextColor(0, 0, 0);
-                            pdf.text(t.name || '(no color)', margin + 12, yPos);
-
-                            // Element name
-                            if (t.element) {
-                                pdf.setFont('helvetica', 'italic');
-                                pdf.setTextColor(74, 122, 74);
-                                pdf.text(t.element, margin + 50, yPos);
-                            }
-
-                            pdf.setTextColor(0, 0, 0);
-                            yPos += 4;
-                        });
-                    }
+                    });
                 }
 
                 yPos += 8;
             });
 
-            // ── Footer ──
-            var footerY = 270;
+            // ── Footer — always at bottom of last page ──
+            var footerY = pageHeight - 10;
             pdf.setFontSize(7);
             pdf.setTextColor(150, 150, 150);
             pdf.setFont('helvetica', 'normal');
