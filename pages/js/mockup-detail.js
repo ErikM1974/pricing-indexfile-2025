@@ -4236,38 +4236,91 @@
             });
     }
 
+    function buildOrderCardHtml(order, companyLabel) {
+        var orderNum = order.id_Order || '';
+        var dateStr = order.date_Ordered ? new Date(order.date_Ordered).toLocaleDateString() : '--';
+        var rep = order.CustomerServiceRep || '--';
+        var invoiced = order.date_Invoiced
+            ? 'Invoiced ' + new Date(order.date_Invoiced).toLocaleDateString()
+            : 'Not invoiced';
+        var custName = order.CustomerName || '';
+        var artDone = order.sts_ArtDone === 1;
+        var html = '<div class="pmd-order-card">';
+        html += '<div class="pmd-order-num">Order #' + escapeHtml(String(orderNum));
+        html += ' <span class="pmd-fo-art-status pmd-fo-art-status--' + (artDone ? 'done' : 'pending') + '">';
+        html += artDone ? '\u2713 Art Done' : '\u2717 Art Pending';
+        html += '</span></div>';
+        html += '<div class="pmd-order-meta">' + escapeHtml(dateStr) + ' &middot; ' + escapeHtml(rep) +
+            ' &middot; ' + escapeHtml(invoiced);
+        if (custName && !companyLabel) html += ' &middot; ' + escapeHtml(custName);
+        html += '</div>';
+        html += '<div class="pmd-order-items" id="pmd-items-' + escapeHtml(String(orderNum)) + '"></div>';
+        html += '<div class="pmd-order-actions">';
+        html += '<button type="button" class="pmd-view-items-btn" onclick="pmdExpandLineItems(\'' +
+            escapeHtml(String(orderNum)) + '\', this)">View Line Items</button>';
+        html += '<button type="button" class="pmd-link-order-btn" onclick="pmdLinkOrder(\'' +
+            escapeHtml(String(orderNum)) + '\')">Link This Order</button>';
+        html += '</div></div>';
+        return html;
+    }
+
     function renderFoOrderCards(orders, container, companyLabel) {
-        var header = '<div class="pmd-fo-header">Found ' + orders.length + ' order' +
-            (orders.length !== 1 ? 's' : '') + (companyLabel ? ' for ' + escapeHtml(companyLabel) : '') + ':</div>';
-        var html = header;
-        orders.forEach(function (order) {
-            var orderNum = order.id_Order || '';
-            var dateStr = order.date_Ordered ? new Date(order.date_Ordered).toLocaleDateString() : '--';
-            var rep = order.CustomerServiceRep || '--';
-            var invoiced = order.date_Invoiced
-                ? 'Invoiced ' + new Date(order.date_Invoiced).toLocaleDateString()
-                : 'Not invoiced';
-            var custName = order.CustomerName || '';
-            var artDone = order.sts_ArtDone === 1;
-            html += '<div class="pmd-order-card">';
-            html += '<div class="pmd-order-num">Order #' + escapeHtml(String(orderNum));
-            html += ' <span class="pmd-fo-art-status pmd-fo-art-status--' + (artDone ? 'done' : 'pending') + '">';
-            html += artDone ? '\u2713 Art Done' : '\u2717 Art Pending';
-            html += '</span></div>';
-            html += '<div class="pmd-order-meta">' + escapeHtml(dateStr) + ' &middot; ' + escapeHtml(rep) +
-                ' &middot; ' + escapeHtml(invoiced);
-            if (custName && !companyLabel) html += ' &middot; ' + escapeHtml(custName);
+        // Date-window filtering: show orders within ±30 days of mockup submission
+        var mockupDate = currentMockup && currentMockup.Submitted_Date
+            ? new Date(currentMockup.Submitted_Date)
+            : null;
+        var nearbyOrders = [];
+        var otherOrders = [];
+
+        if (mockupDate && orders.length > 3) {
+            var windowMs = 30 * 24 * 60 * 60 * 1000; // 30 days
+            var windowStart = new Date(mockupDate.getTime() - windowMs);
+            var windowEnd = new Date(mockupDate.getTime() + windowMs);
+            orders.forEach(function (order) {
+                var oDate = order.date_Ordered ? new Date(order.date_Ordered) : null;
+                if (oDate && oDate >= windowStart && oDate <= windowEnd) {
+                    nearbyOrders.push(order);
+                } else {
+                    otherOrders.push(order);
+                }
+            });
+        }
+
+        var useFiltering = nearbyOrders.length > 0 && otherOrders.length > 0;
+        var html = '';
+
+        if (useFiltering) {
+            var mockupDateStr = mockupDate.toLocaleDateString();
+            html += '<div class="pmd-fo-header">Found ' + nearbyOrders.length + ' order' +
+                (nearbyOrders.length !== 1 ? 's' : '') + ' near mockup date (' + escapeHtml(mockupDateStr) + ')' +
+                (companyLabel ? ' for ' + escapeHtml(companyLabel) : '') + ':</div>';
+            nearbyOrders.forEach(function (order) {
+                html += buildOrderCardHtml(order, companyLabel);
+            });
+            html += '<div class="pmd-fo-show-all" id="pmd-fo-show-all-toggle" style="padding:10px 0;text-align:center;">';
+            html += '<button type="button" onclick="pmdShowAllOrders()" style="background:none;border:none;color:#6366f1;cursor:pointer;font-size:13px;text-decoration:underline;">';
+            html += 'Show all ' + orders.length + ' orders</button></div>';
+            html += '<div id="pmd-fo-other-orders" style="display:none;">';
+            otherOrders.forEach(function (order) {
+                html += buildOrderCardHtml(order, companyLabel);
+            });
             html += '</div>';
-            html += '<div class="pmd-order-items" id="pmd-items-' + escapeHtml(String(orderNum)) + '"></div>';
-            html += '<div class="pmd-order-actions">';
-            html += '<button type="button" class="pmd-view-items-btn" onclick="pmdExpandLineItems(\'' +
-                escapeHtml(String(orderNum)) + '\', this)">View Line Items</button>';
-            html += '<button type="button" class="pmd-link-order-btn" onclick="pmdLinkOrder(\'' +
-                escapeHtml(String(orderNum)) + '\')">Link This Order</button>';
-            html += '</div></div>';
-        });
+        } else {
+            html += '<div class="pmd-fo-header">Found ' + orders.length + ' order' +
+                (orders.length !== 1 ? 's' : '') + (companyLabel ? ' for ' + escapeHtml(companyLabel) : '') + ':</div>';
+            orders.forEach(function (order) {
+                html += buildOrderCardHtml(order, companyLabel);
+            });
+        }
         container.innerHTML = html;
     }
+
+    window.pmdShowAllOrders = function () {
+        var otherDiv = document.getElementById('pmd-fo-other-orders');
+        var toggleDiv = document.getElementById('pmd-fo-show-all-toggle');
+        if (otherDiv) otherDiv.style.display = 'block';
+        if (toggleDiv) toggleDiv.style.display = 'none';
+    };
 
     function pmdExpandLineItems(orderNum, btn) {
         var itemsDiv = document.getElementById('pmd-items-' + orderNum);
