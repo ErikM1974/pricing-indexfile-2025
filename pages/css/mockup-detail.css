@@ -1738,23 +1738,23 @@ body {
 /* ── Per-Slot Thread Mini Dots (overlaid on mockup images) ──────────── */
 .pmd-slot-threads {
     position: absolute;
-    bottom: 4px;
+    bottom: 0;
     left: 4px;
     right: 4px;
     display: flex;
     align-items: center;
-    gap: 3px;
-    padding: 3px 6px;
+    gap: 5px;
+    padding: 6px 10px;
     background: rgba(0,0,0,0.55);
     border-radius: 0 0 6px 6px;
     z-index: 2;
     flex-wrap: wrap;
 }
 .pmd-mini-dot {
-    width: 11px;
-    height: 11px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255,255,255,0.5);
     flex-shrink: 0;
     cursor: default;
 }
@@ -1767,8 +1767,8 @@ body {
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
-    font-size: 11px;
-    padding: 1px 6px;
+    font-size: 13px;
+    padding: 3px 10px;
     border-radius: 8px;
     cursor: pointer;
     line-height: 1.4;
@@ -2438,12 +2438,12 @@ body {
     background: rgba(167,139,250,0.25);
     border: 1px solid rgba(167,139,250,0.5);
     color: #d4bfff;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     font-style: italic;
     font-family: Georgia, serif;
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     cursor: pointer;
     line-height: 1;
