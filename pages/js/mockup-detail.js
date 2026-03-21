@@ -2397,18 +2397,24 @@
                 continue;
             }
 
-            // Customer view: render always-visible inline thread box instead of strip
+            // Customer view: render always-visible inline thread box AFTER the slot
+            // (not inside it — .pmd-gallery-slot has overflow:hidden + aspect-ratio:1 which clips children)
             if (isCustomerView) {
                 strip.style.display = 'none';
-                var slotEl = strip.parentElement;
-                // Remove any existing inline box
-                var existingBox = slotEl && slotEl.querySelector('.pmd-thread-inline-box');
-                if (existingBox) existingBox.remove();
+                var slotEl = strip.parentElement; // .pmd-gallery-slot
+                var gridEl = slotEl ? slotEl.parentElement : null; // .pmd-gallery-grid
 
-                if (slotEl) {
+                // Remove any existing inline box for this slot
+                if (gridEl) {
+                    var existingBox = gridEl.querySelector('.pmd-thread-inline-box[data-slot="' + s + '"]');
+                    if (existingBox) existingBox.remove();
+                }
+
+                if (slotEl && gridEl) {
                     var hasElements = threads.some(function (t) { return t.element; });
                     var box = document.createElement('div');
                     box.className = 'pmd-thread-inline-box';
+                    box.dataset.slot = String(s);
 
                     var boxTitle = document.createElement('div');
                     boxTitle.className = 'pmd-thread-inline-title';
@@ -2444,7 +2450,8 @@
                         box.appendChild(row);
                     });
 
-                    slotEl.appendChild(box);
+                    // Insert AFTER the slot element (as sibling in grid), not inside it
+                    gridEl.insertBefore(box, slotEl.nextSibling);
                 }
             } else {
                 // Ruth/AE view: render mini dots + info button + edit button strip
