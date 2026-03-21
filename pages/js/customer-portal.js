@@ -9,6 +9,9 @@
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // Only show records from 2026 onwards (before that, images weren't consistently uploaded)
+    var DATE_CUTOFF = '2026-01-01T00:00:00';
+
     // ── Parse customer ID from URL ──
     var pathParts = window.location.pathname.split('/');
     var customerId = pathParts[pathParts.length - 1];
@@ -83,16 +86,21 @@
             });
     }
 
-    // ── Fetch mockups by company name ──
+    // ── Fetch mockups by company name (2026+ with images only) ──
     function fetchMockups(companyName) {
-        var url = API_BASE + '/api/mockups?companyName=' + encodeURIComponent(companyName);
+        var url = API_BASE + '/api/mockups?companyName=' + encodeURIComponent(companyName)
+            + '&dateFrom=' + encodeURIComponent(DATE_CUTOFF);
         return fetch(url)
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Mockups fetch failed: ' + resp.status);
                 return resp.json();
             })
             .then(function (data) {
-                return data.records || data || [];
+                var records = data.records || data || [];
+                // Only show mockups that have at least one image
+                return records.filter(function (m) {
+                    return m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
+                });
             })
             .catch(function (err) {
                 console.error('Mockups fetch error:', err);
@@ -100,10 +108,11 @@
             });
     }
 
-    // ── Fetch art requests by company name + ShopWorks customer number ──
+    // ── Fetch art requests by company name + ShopWorks customer number (2026+ with images only) ──
     function fetchArtRequests(companyName, custId) {
         // Try by ShopWorks customer number first, fall back to company name
-        var url = API_BASE + '/api/artrequests?shopworksCustomerId=' + encodeURIComponent(custId);
+        var url = API_BASE + '/api/artrequests?shopworksCustomerId=' + encodeURIComponent(custId)
+            + '&dateCreatedFrom=' + encodeURIComponent(DATE_CUTOFF);
         return fetch(url)
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Art requests fetch failed: ' + resp.status);
@@ -111,18 +120,29 @@
             })
             .then(function (data) {
                 var records = Array.isArray(data) ? data : (data.records || []);
-                if (records.length > 0) return records;
+                if (records.length > 0) return filterArtWithImages(records);
 
                 // Fallback: try by company name
-                var nameUrl = API_BASE + '/api/artrequests?companyName=' + encodeURIComponent(companyName);
+                var nameUrl = API_BASE + '/api/artrequests?companyName=' + encodeURIComponent(companyName)
+                    + '&dateCreatedFrom=' + encodeURIComponent(DATE_CUTOFF);
                 return fetch(nameUrl)
                     .then(function (r) { return r.json(); })
-                    .then(function (d) { return Array.isArray(d) ? d : (d.records || []); });
+                    .then(function (d) {
+                        var recs = Array.isArray(d) ? d : (d.records || []);
+                        return filterArtWithImages(recs);
+                    });
             })
             .catch(function (err) {
                 console.error('Art requests fetch error:', err);
                 return [];
             });
+    }
+
+    // Filter art requests to only those with at least one image
+    function filterArtWithImages(records) {
+        return records.filter(function (ar) {
+            return ar.MAIN_IMAGE_URL_1 || ar.MAIN_IMAGE_URL_2 || ar.MAIN_IMAGE_URL_3 || ar.MAIN_IMAGE_URL_4;
+        });
     }
 
     // ── Render mockup cards ──
