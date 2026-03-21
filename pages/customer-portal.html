@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Your Design Portal - Northwest Custom Apparel</title>
+    <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=1">
+</head>
+<body>
+    <!-- Header -->
+    <header class="cp-header">
+        <img src="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png"
+             alt="NWCA" class="cp-header-logo"
+             onerror="this.style.display='none'">
+        <div class="cp-header-text">
+            <h1>Your Design Portal</h1>
+            <p>Northwest Custom Apparel</p>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="cp-loading" id="cp-loading">
+        <div class="cp-spinner"></div>
+        <div class="cp-loading-text">Loading your designs...</div>
+    </div>
+
+    <!-- Error State -->
+    <div class="cp-error" id="cp-error" style="display:none;">
+        <div class="cp-error-icon">&#9888;</div>
+        <div class="cp-error-title" id="cp-error-title">Something went wrong</div>
+        <div class="cp-error-message" id="cp-error-message">Please try refreshing the page or contact us at (253) 922-5793.</div>
+    </div>
+
+    <!-- Content -->
+    <main class="cp-main" id="cp-content" style="display:none;">
+        <!-- Company banner -->
+        <div class="cp-company-banner">
+            <div class="cp-company-name" id="cp-company-name"></div>
+            <div class="cp-company-subtitle" id="cp-company-subtitle">Your designs and mockups</div>
+        </div>
+
+        <!-- Mockups section -->
+        <section class="cp-section" id="cp-section-mockups">
+            <div class="cp-section-header">
+                <h2>Mockups</h2>
+                <span class="cp-section-count" id="cp-mockup-count">0</span>
+            </div>
+            <div class="cp-card-grid" id="cp-mockup-grid"></div>
+            <div class="cp-empty" id="cp-mockup-empty" style="display:none;">
+                <div class="cp-empty-icon">&#128221;</div>
+                No mockups on file yet.
+            </div>
+        </section>
+
+        <!-- Art Requests section -->
+        <section class="cp-section" id="cp-section-art">
+            <div class="cp-section-header">
+                <h2>Art &amp; Designs</h2>
+                <span class="cp-section-count" id="cp-art-count">0</span>
+            </div>
+            <div class="cp-card-grid" id="cp-art-grid"></div>
+            <div class="cp-empty" id="cp-art-empty" style="display:none;">
+                <div class="cp-empty-icon">&#127912;</div>
+                No art requests on file yet.
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div class="cp-footer">
+        Northwest Custom Apparel &middot; (253) 922-5793 &middot; sales@nwcustomapparel.com
+    </div>
+
+    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/pages/js/customer-portal.js?v=1"></script>
+</body>
+</html>
