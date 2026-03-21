@@ -266,7 +266,7 @@ var MockupSubmitForm = (function () {
         customerLookup.bindToInput('msf-company', {
             onSelect: function (contact) {
                 selectedContact = contact;
-                document.getElementById('msf-customer-id').value = contact.ID_Contact || '';
+                document.getElementById('msf-customer-id').value = contact.id_Customer || '';
 
                 // Clear error state
                 document.getElementById('msf-company').classList.remove('msf-error');

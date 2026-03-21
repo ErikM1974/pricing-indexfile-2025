@@ -807,6 +807,18 @@ app.get('/mockup/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'mockup-detail.html'));
 });
 
+// Customer Portal — /portal/:customerId
+app.get('/portal/:customerId', (req, res) => {
+  const customerId = req.params.customerId;
+  if (!customerId || !/^\d+$/.test(customerId)) {
+    return res.status(400).send('Invalid customer ID');
+  }
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-portal.html'));
+});
+
 app.get('/announcements-create.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'announcements-create.html'));
 });
