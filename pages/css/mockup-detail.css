@@ -222,7 +222,7 @@ body {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    z-index: 1001;
+    z-index: 9001;
     width: 90%;
     max-width: 600px;
     max-height: 80vh;
