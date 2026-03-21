@@ -1498,11 +1498,44 @@ body {
 }
 .pmd-customer-action-panel {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .pmd-customer-prompt {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     font-size: 15px;
     color: #555;
+}
+.pmd-customer-sent-date {
+    margin: 0 0 16px 0;
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+}
+.pmd-pdf-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1.5px solid #bbb;
+    border-radius: 6px;
+    color: #666;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    align-self: center;
+}
+.pmd-pdf-download-btn:hover {
+    border-color: #2e7d32;
+    color: #2e7d32;
+    background: #f0f7f0;
+}
+.pmd-pdf-download-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 .pmd-customer-btns {
     display: flex;
@@ -2564,6 +2597,53 @@ body {
     flex-shrink: 0;
 }
 
+/* ── Customer View: Inline Thread Sequence Box ──────── */
+.pmd-thread-inline-box {
+    background: #f8faf8;
+    border: 1px solid #d1d9d1;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 8px;
+}
+.pmd-thread-inline-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7b6b;
+    margin-bottom: 6px;
+}
+.pmd-thread-inline-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+}
+.pmd-thread-inline-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+}
+.pmd-thread-inline-num {
+    font-size: 0.75rem;
+    color: #888;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.pmd-thread-inline-name {
+    font-size: 0.85rem;
+    color: #333;
+}
+.pmd-thread-inline-element {
+    font-size: 0.75rem;
+    color: #4a7a4a;
+    font-style: italic;
+    margin-left: auto;
+}
+
 /* ── Thread Editor: Element column variant ──────────── */
 .pmd-thread-editor-col-headers.pmd-te-has-elements,
 .pmd-thread-editor-row.pmd-te-has-elements {
@@ -2592,6 +2672,10 @@ body {
     .pmd-title-row { flex-direction: column; align-items: flex-start; }
     .pmd-customer-btns { flex-direction: column; }
     .pmd-action-btn--lg { width: 100%; }
-    .pmd-timeline-container { padding: 16px; }
+    .pmd-timeline-container { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .pmd-timeline-steps { min-width: 400px; }
+}
+@media (max-width: 480px) {
+    .pmd-customer-view .pmd-gallery-grid { grid-template-columns: 1fr; }
+    .pmd-timeline-steps { min-width: 340px; font-size: 0.7rem; }
 }

@@ -255,13 +255,19 @@
                 if (currentMockup.Customer_Name) {
                     greetingHtml = '<p class="pmd-customer-greeting">Hi ' + escapeHtml(currentMockup.Customer_Name) + ',</p>';
                 }
+                var sentDateHtml = '';
+                if (currentMockup.Customer_Approval_Sent_Date) {
+                    sentDateHtml = '<p class="pmd-customer-sent-date">Sent on ' + escapeHtml(formatDate(currentMockup.Customer_Approval_Sent_Date)) + '</p>';
+                }
                 aeBar.innerHTML = '<div class="pmd-customer-action-panel">'
                     + greetingHtml
                     + '<p class="pmd-customer-prompt">Please review the mockup(s) below and select the one you approve, or request changes.</p>'
+                    + sentDateHtml
                     + '<div class="pmd-customer-btns">'
                     + '<button class="pmd-action-btn pmd-action-btn--approve pmd-action-btn--lg" id="pmd-btn-customer-approve" disabled>Approve Selected Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise pmd-action-btn--lg" id="pmd-btn-customer-revise">Request Changes</button>'
                     + '</div>'
+                    + '<button class="pmd-pdf-download-btn" id="pmd-btn-download-pdf" title="Download a PDF copy for your records">&#128196; Download PDF</button>'
                     + '</div>';
 
                 document.getElementById('pmd-btn-customer-approve').addEventListener('click', function () {
@@ -269,6 +275,9 @@
                 });
                 document.getElementById('pmd-btn-customer-revise').addEventListener('click', function () {
                     openReviseModal();
+                });
+                document.getElementById('pmd-btn-download-pdf').addEventListener('click', function () {
+                    generateCustomerPDF();
                 });
             } else {
                 aeBar.innerHTML = '<div class="pmd-customer-status-msg">'
@@ -1415,7 +1424,6 @@
                 { label: 'Placement', value: mockup.Print_Location },
                 { label: 'Logo Dimensions', value: logoDimensions },
                 { label: 'Design Size', value: mockup.Design_Size },
-                { label: 'Thread Colors', value: mockup.Thread_Colors },
                 { label: 'Work Order', value: mockup.Work_Order_Number },
                 { label: 'Size Specs', value: mockup.Size_Specs },
                 { label: 'Your Rep', value: getAeDisplayName(mockup.Submitted_By) }
@@ -2389,45 +2397,97 @@
                 continue;
             }
 
-            strip.innerHTML = '';
-            threads.forEach(function (t) {
-                var dot = document.createElement('span');
-                dot.className = 'pmd-mini-dot';
-                dot.style.background = t.hex || '#888';
-                dot.title = 'Run ' + t.run + ': ' + (t.name || '?') + (t.element ? ' \u2014 ' + t.element : '') + (t.catalog ? ' #' + t.catalog : '');
-                strip.appendChild(dot);
-            });
+            // Customer view: render always-visible inline thread box instead of strip
+            if (isCustomerView) {
+                strip.style.display = 'none';
+                var slotEl = strip.parentElement;
+                // Remove any existing inline box
+                var existingBox = slotEl && slotEl.querySelector('.pmd-thread-inline-box');
+                if (existingBox) existingBox.remove();
 
-            // Info button — click to show thread sequence popover
-            (function (slotNum, threadList) {
-                var infoBtn = document.createElement('button');
-                infoBtn.className = 'pmd-thread-info-btn';
-                infoBtn.innerHTML = 'i';
-                infoBtn.title = 'View thread sequence';
-                infoBtn.dataset.slot = String(slotNum);
-                infoBtn.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    toggleThreadInfoPopover(infoBtn, threadList, slotNum);
-                });
-                strip.appendChild(infoBtn);
-            })(s, threads);
+                if (slotEl) {
+                    var hasElements = threads.some(function (t) { return t.element; });
+                    var box = document.createElement('div');
+                    box.className = 'pmd-thread-inline-box';
 
-            // Edit button (Ruth view only)
-            if (!isAeView && !isCustomerView) {
-                var editBtn = document.createElement('button');
-                editBtn.className = 'pmd-edit-threads-btn';
-                editBtn.innerHTML = '&#9998;';
-                editBtn.title = 'Edit thread colors';
-                editBtn.dataset.slot = String(s);
-                editBtn.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    var slotNum = parseInt(e.target.closest('.pmd-edit-threads-btn').dataset.slot);
-                    toggleThreadEditor(slotNum);
+                    var boxTitle = document.createElement('div');
+                    boxTitle.className = 'pmd-thread-inline-title';
+                    boxTitle.textContent = 'Thread Sequence';
+                    box.appendChild(boxTitle);
+
+                    threads.forEach(function (t) {
+                        var row = document.createElement('div');
+                        row.className = 'pmd-thread-inline-row';
+
+                        var dot = document.createElement('span');
+                        dot.className = 'pmd-thread-inline-dot';
+                        dot.style.background = t.hex || '#888';
+                        row.appendChild(dot);
+
+                        var num = document.createElement('span');
+                        num.className = 'pmd-thread-inline-num';
+                        num.textContent = t.run || '';
+                        row.appendChild(num);
+
+                        var name = document.createElement('span');
+                        name.className = 'pmd-thread-inline-name';
+                        name.textContent = t.name || '(no color)';
+                        row.appendChild(name);
+
+                        if (hasElements && t.element) {
+                            var el = document.createElement('span');
+                            el.className = 'pmd-thread-inline-element';
+                            el.textContent = t.element;
+                            row.appendChild(el);
+                        }
+
+                        box.appendChild(row);
+                    });
+
+                    slotEl.appendChild(box);
+                }
+            } else {
+                // Ruth/AE view: render mini dots + info button + edit button strip
+                strip.innerHTML = '';
+                threads.forEach(function (t) {
+                    var dot = document.createElement('span');
+                    dot.className = 'pmd-mini-dot';
+                    dot.style.background = t.hex || '#888';
+                    dot.title = 'Run ' + t.run + ': ' + (t.name || '?') + (t.element ? ' \u2014 ' + t.element : '') + (t.catalog ? ' #' + t.catalog : '');
+                    strip.appendChild(dot);
                 });
-                strip.appendChild(editBtn);
+
+                // Info button — click to show thread sequence popover
+                (function (slotNum, threadList) {
+                    var infoBtn = document.createElement('button');
+                    infoBtn.className = 'pmd-thread-info-btn';
+                    infoBtn.innerHTML = 'i';
+                    infoBtn.title = 'View thread sequence';
+                    infoBtn.dataset.slot = String(slotNum);
+                    infoBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        toggleThreadInfoPopover(infoBtn, threadList, slotNum);
+                    });
+                    strip.appendChild(infoBtn);
+                })(s, threads);
+
+                // Edit button (Ruth view only)
+                if (!isAeView) {
+                    var editBtn = document.createElement('button');
+                    editBtn.className = 'pmd-edit-threads-btn';
+                    editBtn.innerHTML = '&#9998;';
+                    editBtn.title = 'Edit thread colors';
+                    editBtn.dataset.slot = String(s);
+                    editBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        var slotNum = parseInt(e.target.closest('.pmd-edit-threads-btn').dataset.slot);
+                        toggleThreadEditor(slotNum);
+                    });
+                    strip.appendChild(editBtn);
+                }
+
+                strip.style.display = 'flex';
             }
-
-            strip.style.display = 'flex';
 
             // Remove "+ Add Threads" button if it exists (we now have data)
             var parent = strip.parentElement;
@@ -4318,6 +4378,232 @@
             .catch(function () {
                 // Silent fail — non-critical indicator
             });
+    }
+
+    // ── Customer PDF Download ──────────────────────────────────────────
+    function generateCustomerPDF() {
+        if (!window.jspdf) {
+            alert('PDF library not loaded. Please refresh and try again.');
+            return;
+        }
+
+        var btn = document.getElementById('pmd-btn-download-pdf');
+        var originalText = btn.innerHTML;
+        btn.innerHTML = 'Generating...';
+        btn.disabled = true;
+
+        var mockup = currentMockup;
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF('p', 'mm', 'letter');
+        var pageWidth = 215.9;
+        var margin = 18;
+        var contentWidth = pageWidth - margin * 2;
+        var yPos = 0;
+
+        // ── Header banner ──
+        pdf.setFillColor(46, 125, 50); // green to match customer theme
+        pdf.rect(0, 0, pageWidth, 36, 'F');
+
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Northwest Custom Apparel', margin, 12);
+
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('2025 Freeman Road East, Milton, WA 98354', margin, 19);
+        pdf.text('(253) 922-5793 | sales@nwcustomapparel.com', margin, 25);
+
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Mockup Approval Sheet', pageWidth - margin, 14, { align: 'right' });
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        var statusText = mockup.Status || 'In Progress';
+        pdf.text(statusText, pageWidth - margin, 22, { align: 'right' });
+
+        if (mockup.Customer_Approval_Sent_Date) {
+            pdf.text('Sent: ' + formatDate(mockup.Customer_Approval_Sent_Date), pageWidth - margin, 29, { align: 'right' });
+        }
+
+        yPos = 44;
+
+        // ── Company + Design Info ──
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(mockup.Company_Name || '', margin, yPos);
+        yPos += 7;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Design #' + (mockup.Design_Number || '') + ' — ' + (mockup.Design_Name || ''), margin, yPos);
+        yPos += 10;
+
+        // ── Request Details table ──
+        var logoDim = '';
+        if (mockup.Logo_Width && mockup.Logo_Height) logoDim = mockup.Logo_Width + ' x ' + mockup.Logo_Height;
+        else if (mockup.Logo_Width) logoDim = mockup.Logo_Width + ' wide';
+
+        var details = [
+            ['Application', mockup.Mockup_Type || ''],
+            ['Placement', mockup.Print_Location || ''],
+            ['Logo Dimensions', logoDim],
+            ['Design Size', mockup.Design_Size || ''],
+            ['Your Rep', getAeDisplayName(mockup.Submitted_By) || '']
+        ].filter(function (d) { return d[1]; });
+
+        pdf.setFontSize(9);
+        details.forEach(function (d) {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(d[0] + ':', margin, yPos);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(d[1], margin + 35, yPos);
+            yPos += 5;
+        });
+
+        yPos += 6;
+
+        // ── Draw line separator ──
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 8;
+
+        // ── Load mockup images and render ──
+        var slots = [];
+        for (var s = 1; s <= 3; s++) {
+            var key = 'Box_Mockup_' + s;
+            if (mockup[key]) {
+                slots.push({ num: s, url: mockup[key] });
+            }
+        }
+
+        // Load all images in parallel
+        var imagePromises = slots.map(function (slot) {
+            return loadImageAsBase64(slot.url).then(function (imgData) {
+                slot.imgData = imgData;
+                return slot;
+            }).catch(function () {
+                slot.imgData = null;
+                return slot;
+            });
+        });
+
+        Promise.all(imagePromises).then(function (loadedSlots) {
+            loadedSlots.forEach(function (slot) {
+                // Check if we need a new page
+                if (yPos > 220) {
+                    pdf.addPage();
+                    yPos = margin;
+                }
+
+                // Mockup label
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(46, 125, 50);
+                pdf.text('Mockup ' + slot.num, margin, yPos);
+                pdf.setTextColor(0, 0, 0);
+                yPos += 4;
+
+                // Mockup image
+                if (slot.imgData) {
+                    var imgWidth = contentWidth * 0.6;
+                    var imgHeight = imgWidth * 0.75; // 4:3 aspect ratio
+                    pdf.addImage(slot.imgData, 'JPEG', margin, yPos, imgWidth, imgHeight);
+                    yPos += imgHeight + 4;
+                } else {
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.text('(Image could not be loaded)', margin, yPos + 5);
+                    yPos += 12;
+                }
+
+                // Thread sequence for this slot
+                var rec = storedEmbRecords[String(slot.num)];
+                if (rec && rec.Thread_Sequence_JSON) {
+                    var threads = [];
+                    try { threads = JSON.parse(rec.Thread_Sequence_JSON); } catch (e) { /* empty */ }
+                    if (threads.length > 0) {
+                        pdf.setFontSize(7);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.text('THREAD SEQUENCE', margin, yPos);
+                        yPos += 4;
+
+                        pdf.setFontSize(8);
+                        threads.forEach(function (t) {
+                            // Color dot
+                            var hex = t.hex || '#888888';
+                            var r = parseInt(hex.slice(1, 3), 16);
+                            var g = parseInt(hex.slice(3, 5), 16);
+                            var b = parseInt(hex.slice(5, 7), 16);
+                            pdf.setFillColor(r, g, b);
+                            pdf.circle(margin + 2, yPos - 1, 1.5, 'F');
+
+                            // Run number + name
+                            pdf.setFont('helvetica', 'normal');
+                            pdf.setTextColor(80, 80, 80);
+                            pdf.text(String(t.run || ''), margin + 6, yPos);
+                            pdf.setTextColor(0, 0, 0);
+                            pdf.text(t.name || '(no color)', margin + 12, yPos);
+
+                            // Element name
+                            if (t.element) {
+                                pdf.setFont('helvetica', 'italic');
+                                pdf.setTextColor(74, 122, 74);
+                                pdf.text(t.element, margin + 50, yPos);
+                            }
+
+                            pdf.setTextColor(0, 0, 0);
+                            yPos += 4;
+                        });
+                    }
+                }
+
+                yPos += 8;
+            });
+
+            // ── Footer ──
+            var footerY = 270;
+            pdf.setFontSize(7);
+            pdf.setTextColor(150, 150, 150);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('Generated ' + formatDate(new Date().toISOString()) + ' | Northwest Custom Apparel', pageWidth / 2, footerY, { align: 'center' });
+
+            // Save
+            var fileName = 'Mockup-' + (mockup.Design_Number || 'unknown') + '-' + (mockup.Company_Name || 'customer').replace(/[^a-zA-Z0-9]/g, '-') + '.pdf';
+            pdf.save(fileName);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(function (err) {
+            console.error('PDF generation error:', err);
+            alert('Error generating PDF. Please try again.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function loadImageAsBase64(url) {
+        return new Promise(function (resolve, reject) {
+            var img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function () {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                try {
+                    resolve(canvas.toDataURL('image/jpeg', 0.85));
+                } catch (e) {
+                    reject(e);
+                }
+            };
+            img.onerror = reject;
+            img.src = url;
+        });
     }
 
 })();
