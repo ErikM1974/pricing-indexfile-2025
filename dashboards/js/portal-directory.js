@@ -34,6 +34,30 @@
         Promise.all([fetchMockups(), fetchArtRequests()])
             .then(function (results) {
                 allCompanies = aggregateCompanies(results[0], results[1]);
+
+                // Auto-resolve missing customer IDs from Company_Contacts table
+                var needsId = allCompanies.filter(function (c) { return !c.customerId || c.customerId <= 0; });
+                if (needsId.length > 0) {
+                    return Promise.all(needsId.map(function (c) {
+                        return fetch(API_BASE + '/api/company-contacts/search?q=' + encodeURIComponent(c.displayName) + '&limit=3')
+                            .then(function (r) { return r.ok ? r.json() : { contacts: [] }; })
+                            .then(function (data) {
+                                var contacts = data.contacts || data || [];
+                                if (Array.isArray(contacts) && contacts.length > 0) {
+                                    var match = contacts.find(function (ct) {
+                                        return ct.CustomerCompanyName &&
+                                            ct.CustomerCompanyName.toLowerCase() === c.displayName.toLowerCase();
+                                    });
+                                    if (match && match.id_Customer) {
+                                        c.customerId = match.id_Customer;
+                                    }
+                                }
+                            })
+                            .catch(function () { /* skip — card stays as No ID */ });
+                    }));
+                }
+            })
+            .then(function () {
                 sortCompanies('lastUpdated');
 
                 document.getElementById('pd-loading').style.display = 'none';
