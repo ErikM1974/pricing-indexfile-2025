@@ -61,7 +61,7 @@
 
                 // Step 2: Fetch mockups and art requests in parallel
                 return Promise.all([
-                    fetchMockups(companyName),
+                    fetchMockups(companyName, customerId),
                     fetchArtRequests(companyName, customerId)
                 ]);
             })
@@ -87,8 +87,9 @@
     }
 
     // ── Fetch mockups by company name (2026+ with images only) ──
-    function fetchMockups(companyName) {
-        var url = API_BASE + '/api/mockups?companyName=' + encodeURIComponent(companyName)
+    function fetchMockups(companyName, custId) {
+        // Query by customer ID (reliable) with company name fallback
+        var url = API_BASE + '/api/mockups?idCustomer=' + encodeURIComponent(custId)
             + '&dateFrom=' + encodeURIComponent(DATE_CUTOFF);
         return fetch(url)
             .then(function (resp) {
