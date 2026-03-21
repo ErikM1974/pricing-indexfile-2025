@@ -4593,24 +4593,22 @@
     }
 
     function loadImageAsBase64(url) {
-        return new Promise(function (resolve, reject) {
-            var img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = function () {
-                var canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                try {
-                    resolve(canvas.toDataURL('image/jpeg', 0.85));
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            img.onerror = reject;
-            img.src = url;
-        });
+        // Proxy external images (Box, etc.) through our server to avoid CORS issues
+        var proxyUrl = '/api/image-proxy?url=' + encodeURIComponent(url);
+
+        return fetch(proxyUrl)
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Image proxy returned ' + resp.status);
+                return resp.blob();
+            })
+            .then(function (blob) {
+                return new Promise(function (resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onloadend = function () { resolve(reader.result); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            });
     }
 
 })();
