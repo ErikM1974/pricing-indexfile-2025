@@ -83,6 +83,8 @@ var MockupSubmitForm = (function () {
             + '          <input type="text" class="msf-input" id="msf-company" placeholder="Type company name to search..." autocomplete="off">'
             + '        </div>'
             + '        <span class="msf-error-msg" id="msf-company-error">Company name is required</span>'
+            + '        <span class="msf-warning-msg" id="msf-customer-id-warning" style="display:none;color:#b45309;font-size:0.82rem;margin-top:4px;">'
+            + '          <i class="fas fa-exclamation-triangle"></i> No customer ID found &mdash; portal link won\'t work for this company</span>'
             + '      </div>'
             + '      <div class="msf-field">'
             + '        <label class="msf-field-label">Sales Rep</label>'
@@ -271,10 +273,16 @@ var MockupSubmitForm = (function () {
                 // Clear error state
                 document.getElementById('msf-company').classList.remove('msf-error');
                 document.getElementById('msf-company-error').style.display = 'none';
+
+                // Show warning if no customer ID
+                var warn = document.getElementById('msf-customer-id-warning');
+                if (warn) warn.style.display = (contact.id_Customer && contact.id_Customer > 0) ? 'none' : 'block';
             },
             onClear: function () {
                 selectedContact = null;
                 document.getElementById('msf-customer-id').value = '';
+                var warn = document.getElementById('msf-customer-id-warning');
+                if (warn) warn.style.display = 'none';
             }
         });
     }

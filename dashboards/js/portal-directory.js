@@ -39,7 +39,7 @@
                 var needsId = allCompanies.filter(function (c) { return !c.customerId || c.customerId <= 0; });
                 if (needsId.length > 0) {
                     return Promise.all(needsId.map(function (c) {
-                        return fetch(API_BASE + '/api/company-contacts/search?q=' + encodeURIComponent(c.displayName) + '&limit=3')
+                        return fetch(API_BASE + '/api/company-contacts/search?q=' + encodeURIComponent(c.displayName) + '&limit=3&includeInactive=true')
                             .then(function (r) { return r.ok ? r.json() : { contacts: [] }; })
                             .then(function (data) {
                                 var contacts = data.contacts || data || [];
