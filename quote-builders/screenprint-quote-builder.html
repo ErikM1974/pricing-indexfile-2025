@@ -1993,24 +1993,8 @@
         }
 
         /**
-         * Extract clean product name from API title
-         * API returns: "NF0A3LH4 - The North Face DryVent Rain Jacket. NF0A3LH4"
-         * We want: "The North Face DryVent Rain Jacket"
+         * cleanProductTitle() — now provided by quote-builder-utils.js
          */
-        function cleanProductTitle(title, styleNumber) {
-            if (!title || !styleNumber) return title || '';
-
-            // Escape special regex characters in style number
-            const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-            // Remove style number prefix pattern: "STYLE - " or "STYLE. "
-            let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
-
-            // Remove trailing style number: ". STYLE" or " STYLE" at end
-            cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
-
-            return cleaned.trim() || title;
-        }
 
         // Position abbreviation mapping for compact breakdown display
         const POSITION_ABBREV = {
@@ -2041,91 +2025,7 @@
          * @param {Object} logoConfig - Logo configuration (position, stitchCount)
          * @returns {string} HTML string for breakdown
          */
-        function buildPricingBreakdown(product, lineItem, logoConfig) {
-            if (!lineItem) return '';
-
-            const isCap = product?.isCap || false;
-            const logoPos = logoConfig?.position || (isCap ? 'CF' : 'Left Chest');
-            const stitchCount = logoConfig?.stitchCount || 8000;
-            const stitchK = Math.round(stitchCount / 1000);
-
-            // Get abbreviated position name
-            const posAbbrev = POSITION_ABBREV[logoPos] || logoPos.substring(0, 2).toUpperCase();
-            const posFullName = POSITION_FULL_NAMES[posAbbrev] || logoPos;
-
-            const basePrice = lineItem.basePrice || 0;
-            const extraStitchCost = lineItem.extraStitchCost || 0;
-            const alCost = lineItem.alCost || 0;
-            const unitPrice = lineItem.unitPrice || 0;
-
-            // Calculate extra stitches for tooltip
-            const baseStitches = isCap ? 8000 : 8000;
-            const extraK = stitchCount > baseStitches ? Math.round((stitchCount - baseStitches) / 1000) : 0;
-            const rate = isCap ? 1.00 : 1.25;
-
-            // Build tooltip text with full formula (&#10; = newline in title attribute)
-            let tooltipParts = [`Position: ${posFullName}`, `Stitches: ${stitchCount.toLocaleString()}`];
-            tooltipParts.push(`Base: $${basePrice.toFixed(2)}`);
-            if (extraStitchCost > 0) {
-                tooltipParts.push(`Extra: ${extraK}K × $${rate.toFixed(2)} = $${extraStitchCost.toFixed(2)}`);
-            }
-            if (alCost > 0) {
-                tooltipParts.push(`AL: $${alCost.toFixed(2)}`);
-            }
-            tooltipParts.push(`Unit: $${unitPrice.toFixed(2)}`);
-            const tooltipText = tooltipParts.join('&#10;');
-
-            // Build visible breakdown with compact format
-            let html = `<span class="breakdown-wrapper" title="${tooltipText}">`;
-            html += `<span class="breakdown-icon">└─</span>`;
-            html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
-
-            // If there are extra costs, show detailed breakdown
-            if (extraStitchCost > 0 || alCost > 0) {
-                html += ` <span class="breakdown-sep">|</span> `;
-                html += `<span class="breakdown-base">Base $${formatPrice(basePrice)}</span>`;
-
-                if (extraStitchCost > 0) {
-                    html += ` <span class="breakdown-plus">+</span> `;
-                    html += `<span class="breakdown-extra">Extra $${formatPrice(extraStitchCost)}</span>`;
-                }
-
-                if (alCost > 0) {
-                    html += ` <span class="breakdown-plus">+</span> `;
-                    html += `<span class="breakdown-al">AL $${formatPrice(alCost)}</span>`;
-                }
-
-                html += ` <span class="breakdown-eq">=</span> `;
-                html += `<span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
-            } else {
-                // Simple format: just position, stitch count, and price
-                html += ` <span class="breakdown-sep">|</span> <span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
-            }
-
-            html += `</span>`;
-            return html;
-        }
-
-        /**
-         * Update the pricing breakdown display for a product row
-         * @param {number} rowId - Row ID
-         * @param {Object} product - Product data
-         * @param {Object} lineItem - Line item from pricing calculator
-         * @param {Object} logoConfig - Logo configuration
-         */
-        function updateRowBreakdown(rowId, product, lineItem, logoConfig) {
-            const breakdownEl = document.getElementById(`breakdown-${rowId}`);
-            if (!breakdownEl) return;
-
-            const breakdownHtml = buildPricingBreakdown(product, lineItem, logoConfig);
-            if (breakdownHtml) {
-                breakdownEl.innerHTML = breakdownHtml;
-                breakdownEl.classList.add('visible');
-            } else {
-                breakdownEl.innerHTML = '';
-                breakdownEl.classList.remove('visible');
-            }
-        }
+        // buildPricingBreakdown() and updateRowBreakdown() removed — dead code (embroidery-specific, never called in screenprint)
 
         /**
          * Check if a style number is a cap/hat product
@@ -2773,13 +2673,7 @@
             });
         }
 
-        // Generate inline style for color swatch (image or fallback hex)
-        function getSwatchStyle(color) {
-            if (color.COLOR_SQUARE_IMAGE) {
-                return `background-image: url('${color.COLOR_SQUARE_IMAGE}'); background-size: cover; background-position: center;`;
-            }
-            return `background-color: ${color.HEX_CODE || '#ccc'};`;
-        }
+        // getSwatchStyle() — now provided by quote-builder-utils.js
 
         // ============================================================
         // COLOR PICKER FUNCTIONS
@@ -3533,30 +3427,7 @@
             recalculatePricing();
         }
 
-        /**
-         * Reorder a product row based on type: garments first, caps below
-         * Called after cap detection to maintain visual organization
-         */
-        function reorderRowByProductType(row) {
-            if (!row) return;
-
-            const tbody = document.getElementById('product-tbody');
-            if (!tbody) return;
-
-            const isCap = row.dataset.isCap === 'true';
-
-            if (isCap) {
-                // Cap rows go at the end (after all other rows)
-                tbody.appendChild(row);
-            } else {
-                // Garment rows go before any cap rows
-                const firstCapRow = tbody.querySelector('tr[data-is-cap="true"]:not(.child-row)');
-                if (firstCapRow) {
-                    tbody.insertBefore(row, firstCapRow);
-                }
-                // If no cap rows yet, row stays where it is (already at end)
-            }
-        }
+        // reorderRowByProductType() removed — dead code (never called)
 
         function deleteRow(rowId) {
             const row = document.getElementById(`row-${rowId}`);
