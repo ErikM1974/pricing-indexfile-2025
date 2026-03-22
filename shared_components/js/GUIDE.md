@@ -20,6 +20,7 @@
 | `quote-indicator-manager.js` | Quote status indicators |
 | `color-picker-component.js` | Shared color picker module |
 | `extended-sizes-config.js` | Extended size definitions (2XL→6XL, OSFA, etc.) |
+| `quote-extended-sizes.js` | Extended size popup functions (open/close/apply/child rows) — shared by EMB, DTG, SP |
 | `pricing-sidebar-component.js` | Unified pricing sidebar |
 | `customer-lookup-service.js` | Customer autocomplete from Caspio |
 | `product-thumbnail-modal.js` | Product image thumbnail + click-to-enlarge |
