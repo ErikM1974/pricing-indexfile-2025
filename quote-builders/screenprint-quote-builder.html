@@ -882,6 +882,7 @@
 
                 if (!response.ok) {
                     console.warn('Failed to fetch extended sizes for this product');
+                    showToast('Unable to load extended sizes for this product.', 'warning');
                     return []; // Return empty to trigger "No extended sizes available" message
                 }
 
@@ -938,6 +939,7 @@
 
             } catch (error) {
                 console.error('Error fetching extended sizes:', error);
+                showToast('Error loading extended sizes. Please try again.', 'error');
                 return []; // Return empty to trigger "No extended sizes available" message
             }
         }
@@ -1472,7 +1474,7 @@
 
                     const colorCell = row.querySelector('.cell-color');
                     if (colorCell) {
-                        colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${product.color || ''}`;
+                        colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${escapeHtml(product.color || '')}`;
                     }
 
                     // Restore size quantities
@@ -1521,9 +1523,9 @@
          */
         function updateEditModeUI(quoteId, revision) {
             // Update header subtitle
-            const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child');
+            const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
             if (headerSubtitle) {
-                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
             }
 
             // Update save button text
@@ -2270,11 +2272,6 @@
                     recalculatePricing();
                 });
             }
-        }
-
-        // Legacy functions for backward compatibility
-        function setupDigitizingToggle() {
-            // Now handled by setupPrimaryLogoHandlers
         }
 
         // ============================================================

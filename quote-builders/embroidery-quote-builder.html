@@ -2307,6 +2307,7 @@ Company:Absher Construction Company
 
                 if (!response.ok) {
                     console.warn('Failed to fetch extended sizes for this product');
+                    showToast('Unable to load extended sizes for this product.', 'warning');
                     return []; // Return empty to trigger "No extended sizes available" message
                 }
 
@@ -2362,6 +2363,7 @@ Company:Absher Construction Company
 
             } catch (error) {
                 console.error('Error fetching extended sizes:', error);
+                showToast('Error loading extended sizes. Please try again.', 'error');
                 return []; // Return empty to trigger "No extended sizes available" message
             }
         }
@@ -3204,7 +3206,7 @@ Company:Absher Construction Company
          */
         function updateEditModeUI(quoteId, revision) {
             // Update header subtitle
-            const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child');
+            const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
             if (headerSubtitle) {
                 headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(quoteId)} • Rev ${escapeHtml(String(revision))}</span>`;
             }
@@ -4824,11 +4826,6 @@ Company:Absher Construction Company
                     recalculatePricing();
                 });
             }
-        }
-
-        // Legacy functions for backward compatibility
-        function setupDigitizingToggle() {
-            // Now handled by setupPrimaryLogoHandlers
         }
 
         // ============================================================
