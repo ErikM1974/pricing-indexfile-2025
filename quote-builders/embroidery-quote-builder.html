@@ -15,10 +15,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Embroidery Quote Builder Styles (External CSS - Extracted January 2026) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260223c">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=20260321">
 
     <!-- Quote Builder Shared Components -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260127">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260321">
 
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
@@ -38,11 +38,6 @@
     <!-- App Configuration (centralized API URLs, settings) -->
     <script src="/config/app.config.js"></script>
 
-    <!-- REMOVED: 1,799 lines of inline CSS moved to embroidery-quote-builder-extracted.css -->
-    <style>
-        /* Placeholder - inline styles removed, using external CSS */
-    </style>
-
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -57,14 +52,14 @@
                  alt="Northwest Custom Apparel"
                  class="logo">
         </a>
-        <div style="text-align: center;">
-            <div style="font-size: 18px; font-weight: 600;">
+        <div class="power-header-center">
+            <div class="power-header-title">
                 2026 Embroidery Quote Builder
                 <span id="unsaved-indicator" class="unsaved-badge" style="display: none;">
                     <i class="fas fa-circle"></i> Unsaved
                 </span>
             </div>
-            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">Garments + Caps | Embroidery, 3D Puff & Laser Patches</div>
+            <div class="power-header-subtitle">Garments + Caps | Embroidery, 3D Puff & Laser Patches</div>
         </div>
         <div class="header-actions">
             <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
@@ -282,9 +277,9 @@
                                 <th class="color-col">Color</th>
                                 <th class="size-col">S</th>
                                 <th class="size-col">M</th>
-                                <th class="size-col">LG</th>
+                                <th class="size-col">L</th>
                                 <th class="size-col">XL</th>
-                                <th class="size-col">XXL</th>
+                                <th class="size-col">2XL</th>
                                 <th class="size-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>

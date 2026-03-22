@@ -21,10 +21,10 @@
     <script src="/config/app.config.js"></script>
 
     <!-- DTG Quote Builder Styles (External CSS - Extracted January 2026) -->
-    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder-extracted.css?v=20260106">
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder-extracted.css?v=20260321">
 
     <!-- Quote Builder Shared Components -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260127">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260321">
 
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
@@ -34,11 +34,6 @@
 
     <!-- Customer Lookup Autocomplete -->
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
-
-    <!-- REMOVED: 1,950 lines of inline CSS moved to dtg-quote-builder-extracted.css -->
-    <style>
-        /* Placeholder - inline styles removed, using external CSS */
-    </style>
 
 </head>
 <body>
@@ -54,14 +49,14 @@
                  alt="Northwest Custom Apparel"
                  class="logo">
         </a>
-        <div style="text-align: center;">
-            <div style="font-size: 18px; font-weight: 600;">
+        <div class="power-header-center">
+            <div class="power-header-title">
                 2026 DTG Quote Builder
                 <span id="unsaved-indicator" class="unsaved-badge" style="display: none;">
                     <i class="fas fa-circle"></i> Unsaved
                 </span>
             </div>
-            <div style="font-size: 12px; color: #ffffff; margin-top: 2px;">Direct-to-Garment Printing</div>
+            <div class="power-header-subtitle">Direct-to-Garment Printing</div>
         </div>
         <div class="header-actions">
             <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">

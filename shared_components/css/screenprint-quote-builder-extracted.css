@@ -552,54 +552,11 @@ body {
     z-index: 10;
 }
 
-.product-table th {
-    background: #2c3e50;
-    color: white;
-    padding: 10px 8px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 12px;
-    border-right: 1px solid #34495e;
-    white-space: nowrap;
-}
+/* .product-table th — moved to quote-builder-common.css (2026-03-21 consolidation) */
 
-.product-table th:first-child {
-    text-align: left;
-    padding-left: 12px;
-}
+/* th:first-child + column widths — moved to quote-builder-common.css (2026-03-21) */
 
-.product-table th.size-col {
-    width: 55px;
-    min-width: 55px;
-}
-
-.product-table th.style-col {
-    width: 100px;
-}
-
-.product-table th.desc-col {
-    width: auto;
-    min-width: 180px;
-}
-
-.product-table th.color-col {
-    width: 200px;
-    min-width: 200px;
-}
-
-.product-table th.qty-col {
-    width: 60px;
-    background: #1a5276;
-}
-
-.product-table th.price-col {
-    width: 80px;
-    background: #1e8449;
-}
-
-.product-table th.actions-col {
-    width: 40px;
-    background: #7f8c8d;
+/* Column-specific th widths + backgrounds — moved to quote-builder-common.css (2026-03-21) */
 }
 
 .product-table td {

@@ -29,6 +29,18 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: Find Order Modal — Clicks Intercepted by Overlay z-index (2026-03-21)
+
+**Problem:** [Pricing Index] "Link This Order" button in the Find ShopWorks Order modal on mockup detail page did nothing — modal just closed instead of saving the order link.
+
+**Root Cause:** The modal overlay (`.pmd-modal-overlay`) had `z-index: 9000` while the modal itself (`.pmd-fo-modal`) had `z-index: 1001`. The overlay sat on top of the modal, intercepting all click events. Since the overlay had `onclick = closeModal`, clicking any button inside the modal actually triggered the overlay's close handler.
+
+**Solution:** Changed `.pmd-fo-modal` z-index from `1001` to `9001` (one above the overlay's 9000). Also added ±30 day date-window filtering to show only orders near the mockup's submission date, with a "Show all" toggle.
+
+**Prevention:** When creating modal overlays, always ensure the modal container has a higher z-index than the overlay. Pattern: overlay = N, modal = N+1. Check with DevTools by clicking — if the wrong element receives focus, inspect z-index stacking.
+
+---
+
 ## Bug: Claude API Multi-Image Request — 2000px Dimension Limit (2026-03-20)
 
 **Problem:** Element identification (35 images: 1 mockup + 34 per-run thumbnails) failed with `image dimensions exceed max allowed size for many-image requests: 2000 pixels`.
