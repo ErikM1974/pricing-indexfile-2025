@@ -79,11 +79,9 @@ class DTFQuoteBuilder {
                 const data = this.getCurrentQuoteData();
                 if (data && (data.products.length > 0 || data.selectedLocations.length > 0)) {
                     this.persistence.save(data);
-                    console.log('[DTFQuoteBuilder] Auto-saved draft');
                 }
             };
 
-            console.log('[DTFQuoteBuilder] Persistence initialized');
         } else {
             console.warn('[DTFQuoteBuilder] QuotePersistence not available');
         }
@@ -94,7 +92,6 @@ class DTFQuoteBuilder {
                 persistence: this.persistence,
                 debug: false
             });
-            console.log('[DTFQuoteBuilder] Session initialized');
         }
     }
 
@@ -125,7 +122,6 @@ class DTFQuoteBuilder {
      * Restore draft data to the form
      */
     restoreDraft(draft) {
-        console.log('[DTFQuoteBuilder] Restoring draft...', draft);
 
         // Restore customer info
         if (draft.customerName) {
@@ -174,7 +170,6 @@ class DTFQuoteBuilder {
             this.updatePricing();
         }
 
-        console.log('[DTFQuoteBuilder] Draft restored successfully');
     }
 
     /**
@@ -186,7 +181,6 @@ class DTFQuoteBuilder {
     }
 
     async init() {
-        console.log('[DTFQuoteBuilder] Initializing Excel-style layout...');
 
         try {
             // Load pricing data
@@ -204,7 +198,6 @@ class DTFQuoteBuilder {
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = this.checkForEditMode();
         if (editQuoteId) {
-            console.log('[DTFQuoteBuilder] Edit mode detected:', editQuoteId);
             // Skip draft recovery and load the existing quote instead
             await this.loadQuoteForEditing(editQuoteId);
         } else {
@@ -213,7 +206,6 @@ class DTFQuoteBuilder {
                 this.session.showRecoveryDialog(
                     (draft) => this.restoreDraft(draft),
                     () => {
-                        console.log('[DTFQuoteBuilder] User chose to start fresh');
                     }
                 );
             }
@@ -254,7 +246,6 @@ class DTFQuoteBuilder {
             searchInput.focus();
         }
 
-        console.log('[DTFQuoteBuilder] Ready');
     }
 
     async loadPricingData() {
@@ -264,7 +255,6 @@ class DTFQuoteBuilder {
                 throw new Error(`API returned ${response.status}`);
             }
             this.pricingData = await response.json();
-            console.log('[DTFQuoteBuilder] Pricing data loaded');
             this.hideError(); // Clear any previous errors
         } catch (error) {
             console.error('[DTFQuoteBuilder] Failed to load pricing:', error);
@@ -551,7 +541,6 @@ class DTFQuoteBuilder {
                         sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 } else {
-                    console.log(`[EditMode] Extended size ${normalizedSize}: ${qty} - user needs to re-enter in popup`);
                 }
             }
         }
@@ -562,7 +551,6 @@ class DTFQuoteBuilder {
      * Populates all form fields with quote data
      */
     async loadQuoteForEditing(quoteId) {
-        console.log('[EditMode] Loading quote for editing:', quoteId);
 
         // Show loading toast
         if (typeof showToast === 'function') {
@@ -600,7 +588,6 @@ class DTFQuoteBuilder {
             // Recalculate pricing to update totals
             this.updatePricing();
 
-            console.log('[EditMode] Quote loaded successfully');
             if (typeof showToast === 'function') {
                 showToast(`Editing ${quoteId} (Rev ${this.editingRevision})`, 'success');
             }
@@ -655,7 +642,6 @@ class DTFQuoteBuilder {
             this.selectedLocations.push(checkbox.value);
         });
 
-        console.log('[Location] Selected:', this.selectedLocations);
 
         // Update UI
         this.updateLocationSummary();
@@ -714,7 +700,6 @@ class DTFQuoteBuilder {
         this.productsManager.initializeExactMatchSearch(
             // Exact match callback - auto-load product immediately
             (product) => {
-                console.log('[DTFQuoteBuilder] Exact match found:', product.value);
                 searchInput.value = product.value;
                 this.selectProduct(product.value);
                 if (suggestionsContainer) suggestionsContainer.style.display = 'none';
@@ -731,7 +716,6 @@ class DTFQuoteBuilder {
                 },
                 // Called when Enter selects an item
                 onSelect: (product) => {
-                    console.log('[DTFQuoteBuilder] Keyboard selected:', product.value);
                     searchInput.value = '';
                     this.selectProduct(product.value);
                     if (suggestionsContainer) suggestionsContainer.style.display = 'none';
@@ -879,7 +863,6 @@ class DTFQuoteBuilder {
     }
 
     async selectProduct(styleNumber) {
-        console.log('[DTFQuoteBuilder] Product selected:', styleNumber);
 
         // Use the SAME row creation path as the Add button (matches DTG pattern)
         // This ensures proper event handlers for child row creation
@@ -1026,7 +1009,6 @@ class DTFQuoteBuilder {
         // Setup color picker handlers
         this.setupColorPicker(row, product.id);
 
-        console.log('[DTFQuoteBuilder] Product row added:', product.styleNumber);
     }
 
     /**
@@ -1110,7 +1092,6 @@ class DTFQuoteBuilder {
                 // Enable size inputs now that color is selected
                 this.enableSizeInputs(productId);
 
-                console.log(`[DTFQuoteBuilder] Color selected: ${colorName} (${catalogColor})`);
             });
         });
     }
@@ -1132,7 +1113,6 @@ class DTFQuoteBuilder {
             extButton.disabled = false;
         }
 
-        console.log(`[DTFQuoteBuilder] Size inputs enabled for product ${productId}`);
     }
 
     /**
@@ -1849,7 +1829,6 @@ class DTFQuoteBuilder {
 
     getSizeUpcharge(size, upcharges) {
         if (!upcharges || Object.keys(upcharges).length === 0) {
-            console.log(`[DTF] No upcharges provided for size ${size}, using defaults`);
             // Fallback defaults if no API data
             const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
             const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
@@ -1886,7 +1865,6 @@ class DTFQuoteBuilder {
         };
 
         const result = upchargeMap[normalizedSize] ?? 0;
-        console.log(`[DTF] getSizeUpcharge(${size}): API value=${getValue(normalizedSize)}, result=${result}`);
         return result;
     }
 
@@ -2410,7 +2388,6 @@ class DTFQuoteBuilder {
 
             if (this.editingQuoteId) {
                 // Update existing quote
-                console.log('[DTFQuoteBuilder] Updating existing quote:', this.editingQuoteId);
                 quoteData.quoteId = this.editingQuoteId;
                 finalQuoteId = this.editingQuoteId;
                 result = await this.quoteService.updateQuote(this.editingQuoteId, quoteData);
@@ -2425,12 +2402,10 @@ class DTFQuoteBuilder {
             }
 
             if (result.success) {
-                console.log('[DTFQuoteBuilder] Quote saved successfully:', finalQuoteId);
 
                 // Clear draft after successful save
                 if (this.persistence) {
                     this.persistence.clearDraft();
-                    console.log('[DTFQuoteBuilder] Draft cleared after successful save');
                 }
 
                 // Show success modal with shareable link

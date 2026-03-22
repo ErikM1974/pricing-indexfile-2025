@@ -29,6 +29,18 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: `sed` Line Deletion Breaks Multi-Line Statements — Orphaned Object Properties (2026-03-22)
+
+**Problem:** [Pricing Index] Using `sed -i '/console\.log/d'` to bulk-remove debug logs broke DTG and Screenprint builders with `SyntaxError: Unexpected token ':'`. Product search completely stopped working.
+
+**Root Cause:** A multi-line `console.log('[SKU Validation]...', {` call spanned 4 lines. `sed` only deleted the first line (containing `console.log`), leaving the object properties (`availableSizes,`, `catalogColor,`, `validatedAt: new Date()`) and closing `});` as orphaned JavaScript — invalid syntax outside any function call.
+
+**Solution:** Manually found and removed the orphaned property lines from DTG (line ~2424) and Screenprint (line ~2545). Verified DTF and Embroidery were unaffected.
+
+**Prevention:** Never use `sed -i '/pattern/d'` on JavaScript files — multi-line statements will break. Use targeted Edit tool replacements that read the full block first, or grep for lines ending with `{` or `,` to identify multi-line calls before deletion.
+
+---
+
 ## Bug: Shared JS Module Causes SyntaxError — Duplicate `const` Declarations (2026-03-22)
 
 **Problem:** [Pricing Index] Adding `extended-sizes-config.js` as a shared `<script>` tag to embroidery/DTG/screenprint builders caused `SyntaxError: Identifier 'STANDARD_SIZES' has already been declared`, completely breaking all 3 builders (couldn't type in search or do anything).
