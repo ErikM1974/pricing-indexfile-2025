@@ -5384,24 +5384,8 @@ Company:Absher Construction Company
         }
 
         /**
-         * Extract clean product name from API title
-         * API returns: "NF0A3LH4 - The North Face DryVent Rain Jacket. NF0A3LH4"
-         * We want: "The North Face DryVent Rain Jacket"
+         * cleanProductTitle() — now provided by quote-builder-utils.js
          */
-        function cleanProductTitle(title, styleNumber) {
-            if (!title || !styleNumber) return title || '';
-
-            // Escape special regex characters in style number
-            const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-            // Remove style number prefix pattern: "STYLE - " or "STYLE. "
-            let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
-
-            // Remove trailing style number: ". STYLE" or " STYLE" at end
-            cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
-
-            return cleaned.trim() || title;
-        }
 
         // Position abbreviation mapping for compact breakdown display
         const POSITION_ABBREV = {
@@ -6158,13 +6142,7 @@ Company:Absher Construction Company
             });
         }
 
-        // Generate inline style for color swatch (image or fallback hex)
-        function getSwatchStyle(color) {
-            if (color.COLOR_SQUARE_IMAGE) {
-                return `background-image: url('${color.COLOR_SQUARE_IMAGE}'); background-size: cover; background-position: center;`;
-            }
-            return `background-color: ${color.HEX_CODE || '#ccc'};`;
-        }
+        // getSwatchStyle() — now provided by quote-builder-utils.js
 
         // ============================================================
         // COLOR PICKER FUNCTIONS

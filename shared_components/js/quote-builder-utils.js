@@ -560,10 +560,37 @@ function initializeDiscountControls() {
     }
 }
 
+// ============================================
+// PRODUCT DISPLAY UTILITIES
+// ============================================
+
+/**
+ * Remove style number prefix/suffix from product title
+ * e.g., "PC54 - Port & Co Essential Tee" → "Port & Co Essential Tee"
+ */
+function cleanProductTitle(title, styleNumber) {
+    if (!title || !styleNumber) return title || '';
+    const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
+    cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
+    return cleaned.trim() || title;
+}
+
+/**
+ * Generate inline CSS style string for a color swatch
+ * Uses COLOR_SQUARE_IMAGE if available, falls back to HEX_CODE
+ */
+function getSwatchStyle(color) {
+    if (color.COLOR_SQUARE_IMAGE) {
+        return `background-image: url('${color.COLOR_SQUARE_IMAGE}'); background-size: cover; background-position: center;`;
+    }
+    return `background-color: ${color.HEX_CODE || '#ccc'};`;
+}
+
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { escapeHtml, formatPrice };
+    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle };
 }
 
 // Log that utilities are loaded
-console.log('[QuoteBuilderUtils] Shared utilities loaded v1.0.0');
+console.log('[QuoteBuilderUtils] Shared utilities loaded v2.0.0');

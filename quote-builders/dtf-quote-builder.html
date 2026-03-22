@@ -1948,14 +1948,7 @@
             });
         }
 
-        // Helper functions
-        function cleanProductTitle(title, styleNumber) {
-            if (!title || !styleNumber) return title || '';
-            const escapedStyle = styleNumber.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            let cleaned = title.replace(new RegExp(`^${escapedStyle}\\s*[-.]\\s*`, 'i'), '');
-            cleaned = cleaned.replace(new RegExp(`[.\\s]+${escapedStyle}\\s*$`, 'i'), '');
-            return cleaned.trim() || title;
-        }
+        // cleanProductTitle() — now provided by quote-builder-utils.js
 
         // escapeHtml() is now provided by quote-builder-utils.js
 
@@ -1982,12 +1975,7 @@
             }
         }
 
-        function getSwatchStyle(color) {
-            if (color.COLOR_SQUARE_IMAGE) {
-                return `background-image: url('${color.COLOR_SQUARE_IMAGE}'); background-size: cover; background-position: center;`;
-            }
-            return `background-color: ${color.HEX_CODE || '#ccc'};`;
-        }
+        // getSwatchStyle() — now provided by quote-builder-utils.js
 
         // showToast() is now provided by quote-builder-utils.js (fixed - no longer uses alert())
 
