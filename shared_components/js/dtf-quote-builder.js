@@ -289,9 +289,9 @@ class DTFQuoteBuilder {
      */
     updateEditModeUI(quoteId, revision) {
         // Update header subtitle
-        const headerSubtitle = document.querySelector('.power-header div[style*="text-align: center"] div:last-child, .dtf-header div[style*="text-align: center"] div:last-child');
+        const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
         if (headerSubtitle) {
-            headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${quoteId} • Rev ${revision}</span>`;
+            headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
         }
 
         // Update save button text
