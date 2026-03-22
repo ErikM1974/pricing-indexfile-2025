@@ -645,8 +645,7 @@
         // NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
         // SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
 
-        // Standard sizes that group together (same pricing) - Slots 1-4
-        const STANDARD_SIZES = ['S', 'M', 'L', 'XL'];
+        // STANDARD_SIZES — now provided by extended-sizes-config.js
 
         // Extended sizes that get their own line items
         // Note: 2XL goes to Size05 (dedicated), all others go to Size06 (Other)
@@ -838,35 +837,7 @@
             'OSFA', 'OSFM'
         ];
 
-        // Complete SIZE_TO_SUFFIX mapping for ShopWorks part numbers
-        // Standard sizes (S, M, L, XL) have no suffix
-        // All other sizes get a suffix appended to the base part number
-        const SIZE_TO_SUFFIX = {
-            // Standard sizes (no suffix) - Size01-04
-            'S': '', 'M': '', 'L': '', 'XL': '',
-            // 2XL/XXL - Size05
-            '2XL': '_2X', 'XXL': '_XXL',
-            // Extended large - Size06
-            '3XL': '_3XL', '4XL': '_4XL', '5XL': '_5XL', '6XL': '_6XL', 'XXXL': '_XXXL',
-            '7XL': '_7XL', '8XL': '_8XL', '9XL': '_9XL', '10XL': '_10XL',
-            // Extra small - Size06
-            'XS': '_XS', 'XXS': '_XXS', '2XS': '_2XS',
-            // One-size options - Size06
-            'OSFA': '_OSFA', 'OSFM': '_OSFM',
-            // Size combinations - Size06
-            'S/M': '_S/M', 'M/L': '_M/L', 'L/XL': '_L/XL',
-            'XS/S': '_XS/S', 'X/2X': '_X/2X', 'S/XL': '_S/XL',
-            // Tall sizes - Size06
-            'LT': '_LT', 'XLT': '_XLT', '2XLT': '_2XLT', '3XLT': '_3XLT',
-            '4XLT': '_4XLT', '5XLT': '_5XLT', '6XLT': '_6XLT',
-            'ST': '_ST', 'MT': '_MT', 'XST': '_XST',
-            // Youth sizes - Size06
-            'YXS': '_YXS', 'YS': '_YS', 'YM': '_YM', 'YL': '_YL', 'YXL': '_YXL',
-            // Toddler sizes - Size06
-            '2T': '_2T', '3T': '_3T', '4T': '_4T', '5T': '_5T', '5/6T': '_5/6T', '6T': '_6T',
-            // Big sizes - Size06
-            'LB': '_LB', 'XLB': '_XLB', '2XLB': '_2XLB'
-        };
+        // SIZE_TO_SUFFIX — now provided by extended-sizes-config.js
 
         // ============================================================
         // EXTENDED SIZE PICKER POPUP (for Size06/XXXL column)
