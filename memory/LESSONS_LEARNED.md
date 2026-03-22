@@ -29,6 +29,18 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: Shared JS Module Causes SyntaxError — Duplicate `const` Declarations (2026-03-22)
+
+**Problem:** [Pricing Index] Adding `extended-sizes-config.js` as a shared `<script>` tag to embroidery/DTG/screenprint builders caused `SyntaxError: Identifier 'STANDARD_SIZES' has already been declared`, completely breaking all 3 builders (couldn't type in search or do anything).
+
+**Root Cause:** `extended-sizes-config.js` declares top-level `const` variables (`STANDARD_SIZES`, `SIZE_TO_SUFFIX`, `EXTENDED_SIZE_ORDER`). Each builder's inline `<script>` also declared identical `const` variables. JavaScript prohibits redeclaring `const` at the same scope level — the second declaration throws a `SyntaxError` that halts all script execution.
+
+**Solution:** Removed the duplicate `const` declarations from all 3 builders' inline scripts (3 separate commits as issues were discovered one at a time). The shared module's versions are identical or superset — safe to use.
+
+**Prevention:** Before adding a shared JS module via `<script>` tag, grep for ALL its top-level `const`/`let`/`class` declarations and verify none conflict with the target page's inline scripts. Use `grep -n "^const \|^let \|^class " shared-module.js` then check each name against the target HTML. Unlike `var` and `function`, `const`/`let` throw fatal errors on redeclaration.
+
+---
+
 ## Bug: Find Order Modal — Clicks Intercepted by Overlay z-index (2026-03-21)
 
 **Problem:** [Pricing Index] "Link This Order" button in the Find ShopWorks Order modal on mockup detail page did nothing — modal just closed instead of saving the order link.

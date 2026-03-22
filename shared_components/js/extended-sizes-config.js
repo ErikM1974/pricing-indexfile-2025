@@ -341,13 +341,32 @@ function getSizeCategory(size) {
  * @param {string} color - The catalog color (e.g., 'Dark Heather Grey') - REQUIRED by API
  * @returns {Promise<string[]>} Array of available extended sizes
  */
+function extractExtendedSizesFromData(data) {
+    const allSizes = new Set();
+    if (Array.isArray(data)) {
+        data.forEach(item => {
+            ['Size01', 'Size02', 'Size03', 'Size04', 'Size05', 'Size06'].forEach(field => {
+                if (item[field] && item[field].trim()) {
+                    allSizes.add(item[field].trim());
+                }
+            });
+            if (item.SIZE && item.SIZE.trim()) {
+                allSizes.add(item.SIZE.trim());
+            }
+        });
+    }
+    const extendedSizes = [...allSizes].filter(size => isExtendedSize(size));
+    const supportedSizes = extendedSizes.filter(size => SIZE_TO_SUFFIX.hasOwnProperty(size));
+    return sortSizes(supportedSizes);
+}
+
 async function getAvailableExtendedSizes(styleNumber, color = '') {
     const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     const cacheKey = `${styleNumber}-${color || ''}`;
 
     // Return cached result if available (prevents rate limiting)
     if (extendedSizesCache.has(cacheKey)) {
-        console.log(`[ExtendedSizes] Using cached sizes for ${styleNumber}`);
+        // Cache hit — no API call needed
         return extendedSizesCache.get(cacheKey);
     }
 
@@ -357,58 +376,32 @@ async function getAvailableExtendedSizes(styleNumber, color = '') {
         );
 
         if (!response.ok) {
-            // Handle rate limiting specifically - throw error so caller can show retry message
-            if (response.status === 429) {
-                console.warn(`[ExtendedSizes] Rate limited for ${styleNumber} - please try again`);
-                const error = new Error('RATE_LIMITED');
-                error.status = 429;
-                throw error;
+            if (response.status === 429 && color) {
+                // Rate limited — retry without color filter
+                console.warn(`[ExtendedSizes] Rate limited for ${styleNumber}, retrying without color`);
+                const fallback = await fetch(
+                    `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`
+                );
+                if (fallback.ok) {
+                    const fbData = await fallback.json();
+                    const fbSizes = extractExtendedSizesFromData(fbData);
+                    extendedSizesCache.set(cacheKey, fbSizes);
+                    return fbSizes;
+                }
             }
             console.warn(`[ExtendedSizes] API error for ${styleNumber}:`, response.status);
             return [];
         }
 
         const data = await response.json();
-
-        // Extract unique sizes from the response
-        const allSizes = new Set();
-
-        if (Array.isArray(data)) {
-            data.forEach(item => {
-                // Check for size fields in ShopWorks format
-                ['Size01', 'Size02', 'Size03', 'Size04', 'Size05', 'Size06'].forEach(field => {
-                    if (item[field] && item[field].trim()) {
-                        allSizes.add(item[field].trim());
-                    }
-                });
-
-                // Also check for SIZE field (alternate format)
-                if (item.SIZE && item.SIZE.trim()) {
-                    allSizes.add(item.SIZE.trim());
-                }
-            });
-        }
-
-        // Filter to only extended sizes (not standard S, M, L, XL)
-        const extendedSizes = [...allSizes].filter(size => isExtendedSize(size));
-
-        // Filter to only sizes we have suffix mappings for
-        const supportedSizes = extendedSizes.filter(size => SIZE_TO_SUFFIX.hasOwnProperty(size));
-
-        // Sort by our defined order
-        const sortedSizes = sortSizes(supportedSizes);
+        const sortedSizes = extractExtendedSizesFromData(data);
 
         // Cache successful result
         extendedSizesCache.set(cacheKey, sortedSizes);
-        console.log(`[ExtendedSizes] ${styleNumber} available:`, sortedSizes);
         return sortedSizes;
 
     } catch (error) {
-        // Re-throw rate limit errors so caller can handle them
-        if (error.message === 'RATE_LIMITED') {
-            throw error;
-        }
-        console.error(`[ExtendedSizes] Failed to fetch sizes for ${styleNumber}:`, error);
+        console.warn(`[ExtendedSizes] Failed to fetch sizes for ${styleNumber}:`, error.message);
         return [];
     }
 }
@@ -461,4 +454,4 @@ window.ExtendedSizesConfig = {
     getAllExtendedSizes
 };
 
-console.log('[ExtendedSizesConfig] Module loaded with', EXTENDED_SIZE_ORDER.length, 'extended sizes');
+// Module loaded

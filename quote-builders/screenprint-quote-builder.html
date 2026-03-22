@@ -824,81 +824,7 @@
         // EXTENDED SIZE PICKER POPUP (for Size06/XXXL column)
         // ============================================================
 
-        /**
-         * Fetch available extended sizes for a product from the API
-         * @param {string} styleNumber - Product style number (e.g., 'J790')
-         * @param {string} color - Product color (CATALOG_COLOR)
-         * @returns {Promise<string[]>} Array of available extended sizes (e.g., ['XS', '3XL', '4XL'])
-         */
-        async function getAvailableExtendedSizes(styleNumber, color) {
-            try {
-                // Query the ShopWorks import format endpoint to get available SKUs
-                const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color || '')}`;
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    console.warn('Failed to fetch extended sizes for this product');
-                    showToast('Unable to load extended sizes for this product.', 'warning');
-                    return []; // Return empty to trigger "No extended sizes available" message
-                }
-
-                const skus = await response.json();
-
-                // Extract available extended sizes from Size06 field in response
-                const extendedSizes = new Set();
-
-                skus.forEach(sku => {
-                    // Check Size06 field for extended sizes (XS, 3XL, 4XL, etc.)
-                    if (sku.Size06 && typeof sku.Size06 === 'string') {
-                        extendedSizes.add(sku.Size06);
-                    }
-
-                    // Also check ID_Product for suffix pattern to identify available sizes
-                    // e.g., J790_3X indicates 3XL is available
-                    if (sku.ID_Product && sku.ID_Product.includes('_')) {
-                        const suffix = sku.ID_Product.split('_').pop();
-                        // Map suffix back to size name (reverse of SIZE_TO_SUFFIX)
-                        const suffixToSize = {
-                            // Extended large (short-form AND full-form suffixes)
-                            '2X': '2XL', '2XL': '2XL', '3X': '3XL', '3XL': '3XL',
-                            '4X': '4XL', '4XL': '4XL', '5X': '5XL', '5XL': '5XL',
-                            '6X': '6XL', '6XL': '6XL',
-                            '7XL': '7XL', '8XL': '8XL', '9XL': '9XL', '10XL': '10XL',
-                            // Extra small
-                            'XS': 'XS', 'XXS': 'XXS', '2XS': '2XS', 'XXL': 'XXL',
-                            // One-size
-                            'OSFA': 'OSFA', 'OSFM': 'OSFM',
-                            // Combos
-                            'S/M': 'S/M', 'M/L': 'M/L', 'L/XL': 'L/XL',
-                            'XS/S': 'XS/S', 'X/2X': 'X/2X', 'S/XL': 'S/XL',
-                            // Tall
-                            'LT': 'LT', 'XLT': 'XLT', '2XLT': '2XLT', '3XLT': '3XLT',
-                            '4XLT': '4XLT', '5XLT': '5XLT', '6XLT': '6XLT',
-                            'ST': 'ST', 'MT': 'MT', 'XST': 'XST',
-                            // Youth
-                            'YXS': 'YXS', 'YS': 'YS', 'YM': 'YM', 'YL': 'YL', 'YXL': 'YXL',
-                            // Toddler
-                            '2T': '2T', '3T': '3T', '4T': '4T', '5T': '5T', '5/6T': '5/6T', '6T': '6T',
-                            // Big
-                            'LB': 'LB', 'XLB': 'XLB', '2XLB': '2XLB'
-                        };
-                        if (suffixToSize[suffix]) {
-                            extendedSizes.add(suffixToSize[suffix]);
-                        }
-                    }
-                });
-
-                // Return as sorted array, maintaining standard order
-                const orderedSizes = SIZE06_EXTENDED_SIZES.filter(size => extendedSizes.has(size));
-                console.log(`📦 Available extended sizes for ${styleNumber}:`, orderedSizes);
-                return orderedSizes;
-
-            } catch (error) {
-                console.error('Error fetching extended sizes:', error);
-                showToast('Error loading extended sizes. Please try again.', 'error');
-                return []; // Return empty to trigger "No extended sizes available" message
-            }
-        }
+        // getAvailableExtendedSizes() — now provided by extended-sizes-config.js (with caching)
 
         // [Extended size functions removed — now in quote-extended-sizes.js]
         // openExtendedSizePopup, closeExtendedSizePopup, toggleWaistGroup,
@@ -950,7 +876,6 @@
         function restoreScreenPrintDraft(draft) {
             if (!draft) return;
 
-            console.log('[ScreenPrint] Restoring draft:', draft);
 
             // Restore customer info
             if (draft.customerName) {
@@ -1353,7 +1278,6 @@
                             sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
                         }
                     } else {
-                        console.log(`[EditMode] Extended size ${normalizedSize}: ${qty} - user needs to re-enter in popup`);
                     }
                 }
             }
@@ -1364,7 +1288,6 @@
          * Populates all form fields with quote data
          */
         async function loadQuoteForEditing(quoteId) {
-            console.log('[EditMode] Loading quote for editing:', quoteId);
             showToast('Loading quote...', 'info');
 
             try {
@@ -1398,7 +1321,6 @@
                 // Recalculate pricing to update totals
                 recalculatePricing();
 
-                console.log('[EditMode] Quote loaded successfully');
                 showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
             } catch (error) {
@@ -1547,7 +1469,6 @@
         // ============================================================
 
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Screen Print Quote Builder initializing...');
 
             showLoading(true);
 
@@ -1561,7 +1482,6 @@
                 // Check for edit mode (loading existing quote for revision)
                 const editQuoteId = checkForEditMode();
                 if (editQuoteId) {
-                    console.log('[Init] Edit mode detected:', editQuoteId);
                     // Skip draft recovery and load the existing quote instead
                     await loadQuoteForEditing(editQuoteId);
                 } else {
@@ -1619,7 +1539,6 @@
                     searchInput.focus();
                 }
 
-                console.log('✅ Screen Print Quote Builder ready');
                 showToast('Ready to build Screen Print quotes!', 'success');
 
             } catch (error) {
@@ -1653,7 +1572,6 @@
 
                 // Auto-load exact matches immediately
                 onExactMatch: (product) => {
-                    console.log('[ScreenPrint] Exact match found:', product.value);
                     searchInput.value = '';
                     selectProduct(product.value);
                 },
@@ -1670,7 +1588,6 @@
 
                 // Keyboard navigation: select item via Enter
                 onSelect: (product) => {
-                    console.log('[ScreenPrint] Keyboard selected:', product.value);
                     searchInput.value = '';
                     selectProduct(product.value);
                 },
@@ -1718,7 +1635,6 @@
                 }
             });
 
-            console.log('[ScreenPrint] Search autocomplete initialized with ExactMatchSearch');
         }
 
         /**
@@ -2045,7 +1961,6 @@
             // BEST METHOD: Check CATEGORY_NAME from SanMar API
             // SanMar categorizes all caps/hats under "Caps" category
             if (categoryName && categoryName.toLowerCase() === 'caps') {
-                console.log(`[isCapProduct] ${style} detected as cap via CATEGORY_NAME: "${categoryName}"`);
                 return true;
             }
 
@@ -2060,13 +1975,11 @@
             // C+digit (C112, C118)
             // Richardson styles (112, 110, 115, etc) - numeric only
             if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
-                console.log(`[isCapProduct] ${style} detected as cap via style pattern`);
                 return true;
             }
 
             // Richardson caps - 2-3 digit numeric styles (100-999)
             if (/^\d{2,3}$/.test(styleUpper)) {
-                console.log(`[isCapProduct] ${style} detected as cap via Richardson numeric pattern`);
                 return true;
             }
 
@@ -2074,7 +1987,6 @@
             if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
                 titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||
                 titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {
-                console.log(`[isCapProduct] ${style} detected as cap via title keyword`);
                 return true;
             }
 
@@ -2472,7 +2384,6 @@
             if (row.dataset.isCap === 'true') {
                 try {
                     const capUrl = `${API_BASE}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
-                    console.log(`[Cap Sizes] Fetching sizes for ${styleNumber}: ${capUrl}`);
                     const capResponse = await fetch(capUrl);
 
                     let capSizes = ['OSFA']; // Default fallback
@@ -2486,11 +2397,9 @@
                         console.warn(`[Cap Sizes] API failed for ${styleNumber}, using OSFA fallback`);
                     }
 
-                    console.log(`[Cap Sizes] ${styleNumber} sizes:`, capSizes);
 
                     // Analyze cap sizes and update UI
                     const sizeInfo = analyzeSizeCategory(capSizes);
-                    console.log(`📐 Cap size category for ${styleNumber}: ${sizeInfo.category}`, sizeInfo);
 
                     updateRowForSizeCategory(row, sizeInfo);
                     row.dataset.availableSizes = JSON.stringify(capSizes);
@@ -2524,16 +2433,13 @@
                     // Try fallback: fetch without color filter to at least get size info
                     try {
                         const altUrl = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`;
-                        console.log(`[Size Detection] Trying fallback without color: ${altUrl}`);
                         const altResponse = await fetch(altUrl);
 
                         if (altResponse.ok) {
                             const skus = await altResponse.json();
                             if (skus && skus.length > 0) {
-                                console.log(`[Size Detection] Fallback succeeded with ${skus.length} SKUs`);
                                 const allSizes = extractAllSizes(skus);
                                 const sizeInfo = analyzeSizeCategory(allSizes);
-                                console.log(`📐 Size category for ${styleNumber} (fallback): ${sizeInfo.category}`, sizeInfo);
                                 updateRowForSizeCategory(row, sizeInfo);
                                 row.dataset.availableSizes = JSON.stringify(allSizes);
                                 return;
@@ -2552,7 +2458,6 @@
 
                 // Analyze and update UI
                 const sizeInfo = analyzeSizeCategory(allSizes);
-                console.log(`📐 Size category for ${styleNumber}: ${sizeInfo.category}`, sizeInfo);
 
                 updateRowForSizeCategory(row, sizeInfo);
 
@@ -2637,11 +2542,6 @@
                 }
             }
 
-            console.log(`[SKU Validation] ${styleNumber} validated:`, {
-                availableSizes,
-                catalogColor,
-                validatedAt: new Date().toISOString()
-            });
         }
 
         /**
@@ -3033,7 +2933,6 @@
                             childColorSelect.value = color;
                         }
 
-                        console.log(`Cascaded color change to child row ${childRowId}: ${color}`);
                     }
                 });
                 updateChildRowColorIndicators(rowId);
@@ -3064,7 +2963,6 @@
             // Update visual indicator
             updateChildRowColorIndicators(parentRowId);
 
-            console.log(`Child row ${childRowId} color changed to ${color} (catalog: ${catalogColor})`);
 
             // Recalculate pricing
             recalculatePricing();
@@ -3345,7 +3243,6 @@
             }
             childRowMap[parentRowId][size] = childRowId;
 
-            console.log(`Created child row ${childRowId} for ${baseStyle} ${size}`);
         }
 
         /**
@@ -4538,7 +4435,6 @@
                 let result;
                 if (editingQuoteId) {
                     // Update existing quote
-                    console.log('[ScreenPrint] Updating existing quote:', editingQuoteId);
                     result = await quoteService.updateQuote(editingQuoteId, quoteData);
                     if (result && result.success) {
                         result.quoteID = editingQuoteId;
@@ -4552,7 +4448,6 @@
                 }
 
                 if (result.success) {
-                    console.log('[ScreenPrint] Quote saved:', result.quoteID);
 
                     // Clear auto-save draft on successful save (2026 consolidation)
                     if (spPersistence) {
