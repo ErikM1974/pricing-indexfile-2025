@@ -2249,80 +2249,7 @@ Company:Absher Construction Company
         // EXTENDED SIZE PICKER POPUP (for Size06/XXXL column)
         // ============================================================
 
-        /**
-         * Fetch available extended sizes for a product from the API
-         * @param {string} styleNumber - Product style number (e.g., 'J790')
-         * @param {string} color - Product color (CATALOG_COLOR)
-         * @returns {Promise<string[]>} Array of available extended sizes (e.g., ['XS', '3XL', '4XL'])
-         */
-        async function getAvailableExtendedSizes(styleNumber, color) {
-            try {
-                // Query the ShopWorks import format endpoint to get available SKUs
-                const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color || '')}`;
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    console.warn('Failed to fetch extended sizes for this product');
-                    showToast('Unable to load extended sizes for this product.', 'warning');
-                    return []; // Return empty to trigger "No extended sizes available" message
-                }
-
-                const skus = await response.json();
-
-                // Extract available extended sizes from Size06 field in response
-                const extendedSizes = new Set();
-
-                skus.forEach(sku => {
-                    // Check Size06 field for extended sizes (XS, 3XL, 4XL, etc.)
-                    if (sku.Size06 && typeof sku.Size06 === 'string') {
-                        extendedSizes.add(sku.Size06);
-                    }
-
-                    // Also check ID_Product for suffix pattern to identify available sizes
-                    // e.g., J790_3X indicates 3XL is available
-                    if (sku.ID_Product && sku.ID_Product.includes('_')) {
-                        const suffix = sku.ID_Product.split('_').pop();
-                        // Map suffix back to size name (reverse of SIZE_TO_SUFFIX)
-                        const suffixToSize = {
-                            // Extended large (short-form AND full-form suffixes)
-                            '2X': '2XL', '2XL': '2XL', '3X': '3XL', '3XL': '3XL',
-                            '4X': '4XL', '4XL': '4XL', '5X': '5XL', '5XL': '5XL',
-                            '6X': '6XL', '6XL': '6XL',
-                            '7XL': '7XL', '8XL': '8XL', '9XL': '9XL', '10XL': '10XL',
-                            // Extra small
-                            'XS': 'XS', 'XXS': 'XXS', '2XS': '2XS', 'XXL': 'XXL',
-                            // One-size
-                            'OSFA': 'OSFA', 'OSFM': 'OSFM',
-                            // Combos
-                            'S/M': 'S/M', 'M/L': 'M/L', 'L/XL': 'L/XL',
-                            'XS/S': 'XS/S', 'X/2X': 'X/2X', 'S/XL': 'S/XL',
-                            // Tall
-                            'LT': 'LT', 'XLT': 'XLT', '2XLT': '2XLT', '3XLT': '3XLT',
-                            '4XLT': '4XLT', '5XLT': '5XLT', '6XLT': '6XLT',
-                            'ST': 'ST', 'MT': 'MT', 'XST': 'XST',
-                            // Youth
-                            'YXS': 'YXS', 'YS': 'YS', 'YM': 'YM', 'YL': 'YL', 'YXL': 'YXL',
-                            // Toddler
-                            '2T': '2T', '3T': '3T', '4T': '4T', '5T': '5T', '5/6T': '5/6T', '6T': '6T',
-                            // Big
-                            'LB': 'LB', 'XLB': 'XLB', '2XLB': '2XLB'
-                        };
-                        if (suffixToSize[suffix]) {
-                            extendedSizes.add(suffixToSize[suffix]);
-                        }
-                    }
-                });
-
-                // Return as sorted array, maintaining standard order
-                const orderedSizes = SIZE06_EXTENDED_SIZES.filter(size => extendedSizes.has(size));
-                return orderedSizes;
-
-            } catch (error) {
-                console.error('Error fetching extended sizes:', error);
-                showToast('Error loading extended sizes. Please try again.', 'error');
-                return []; // Return empty to trigger "No extended sizes available" message
-            }
-        }
+        // getAvailableExtendedSizes() — now provided by extended-sizes-config.js (with caching)
 
         // ============================================================
         // EXTENDED SIZE FUNCTIONS — moved to /shared_components/js/quote-extended-sizes.js
@@ -11546,7 +11473,6 @@ Company:Absher Construction Company
                             const lookupData = await lookupResp.json();
                             if (lookupData.success) {
                                 designLookup = lookupData;
-                                console.log(`[ShopWorks Import] Design lookup: found ${lookupData.count} designs, ${lookupData.notFound?.length || 0} not found`);
                             }
                         }
                     } catch (err) {
@@ -11566,7 +11492,6 @@ Company:Absher Construction Company
                                 if (fbData.success && fbData.count > 0) {
                                     designLookup.fallbackDesigns = fbData.designs;
                                     designLookup.notFound = fbData.notFound; // update to truly-not-found
-                                    console.log(`[ShopWorks Import] Fallback lookup: found ${fbData.count} in ShopWorks table, ${fbData.notFound.length} truly not found`);
                                 }
                             }
                         } catch (err) {

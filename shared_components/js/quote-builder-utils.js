@@ -592,5 +592,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle };
 }
 
-// Log that utilities are loaded
-console.log('[QuoteBuilderUtils] Shared utilities loaded v2.0.0');
+// QuoteBuilderUtils v2.0.0 loaded

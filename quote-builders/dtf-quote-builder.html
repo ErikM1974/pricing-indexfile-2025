@@ -674,7 +674,6 @@
     <script>
         // Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DTF Quote Builder: Inline init complete');
 
             // Setup keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -1264,7 +1263,6 @@
                     // sellingPriceDisplayAddOns format: { "2XL": 2.00, "3XL": 3.00, "4XL": 4.00, ... }
                     const upcharges = blankBundle.sellingPriceDisplayAddOns || {};
                     row.dataset.sizeUpcharges = JSON.stringify(upcharges);
-                    console.log(`[DTF] Loaded upcharges for ${styleNumber}:`, upcharges);
 
                     // Populate color picker (now includes MAIN_IMAGE_URL from product-colors API)
                     if (colors && colors.length > 0) {
@@ -1334,32 +1332,26 @@
          * Handle size input changes
          */
         function onSizeChange(rowId) {
-            console.log(`[DEBUG onSizeChange] Called for row ${rowId}`);
             const row = document.getElementById(`row-${rowId}`);
             if (!row) {
-                console.log(`[DEBUG onSizeChange] Row not found: row-${rowId}`);
                 return;
             }
 
             // Skip if this is a child row (child rows use onChildSizeChange)
             if (row.classList.contains('child-row')) {
-                console.log(`[DEBUG onSizeChange] Skipping child row ${rowId}`);
                 if (dtfQuoteBuilder) dtfQuoteBuilder.recalculatePricing();
                 return;
             }
 
             // Handle 2XL - auto-create child row when quantity entered
             const xxlInput = row.querySelector('[data-size="2XL"]');
-            console.log(`[DEBUG onSizeChange] 2XL input:`, xxlInput ? `value=${xxlInput.value}, disabled=${xxlInput.disabled}` : 'not found');
             if (xxlInput && !xxlInput.disabled) {
                 const qty = parseInt(xxlInput.value) || 0;
                 // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
                 const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
-                console.log(`[DEBUG onSizeChange] 2XL qty=${qty}, existingChildId=${existingChildId}`);
 
                 if (qty > 0 && !existingChildId) {
                     // CREATE CHILD ROW for 2XL
-                    console.log(`[DEBUG onSizeChange] Creating child row for 2XL qty=${qty}`);
                     createChildRow(rowId, '2XL', qty);
                     // Disable parent's 2XL input and CLEAR the value
                     xxlInput.disabled = true;
@@ -1541,7 +1533,6 @@
             const parentHex = parentRow.dataset.hex || '#ccc';
             const parentColors = parentRow.dataset.colors ? JSON.parse(parentRow.dataset.colors) : [];
 
-            console.log(`[DEBUG createChildRow] Reading from parent: color="${parentColor}", swatchUrl="${parentSwatchUrl || '(none)'}", colors=${parentColors.length} available`);
 
             // Build color options HTML for child row picker
             const colorOptionsHtml = parentColors.map(c =>
@@ -1659,7 +1650,6 @@
             if (!childRowMap[parentRowId]) childRowMap[parentRowId] = {};
             childRowMap[parentRowId][size] = childRowId;
 
-            console.log(`[DTF] Created child row ${childRowId} for ${baseStyle} ${size} qty=${qty}`);
 
             // Trigger pricing recalculation
             if (dtfQuoteBuilder) {
@@ -1704,7 +1694,6 @@
                     dtfQuoteBuilder.recalculatePricing();
                 }
 
-                console.log(`[DTF] Removed child row ${childRowId} for size ${size}`);
             }
         }
 
@@ -1781,7 +1770,6 @@
             const normalizedSize = size === 'XXXL' ? '3XL' : size;
 
             // DEBUG: Log what we're looking for
-            console.log(`[DEBUG getExtendedSizeQty] parentRowId=${parentRowId}, size=${size}, normalized=${normalizedSize}`);
 
             // Check if there's a child row for this size
             if (childRowMap[parentRowId] && childRowMap[parentRowId][normalizedSize]) {
@@ -1791,7 +1779,6 @@
                     const qtyCell = childRow.querySelector('.cell-qty');
                     if (qtyCell) {
                         const qty = parseInt(qtyCell.textContent) || 0;
-                        console.log(`[DEBUG getExtendedSizeQty] Found child row ${childRowId}, qty=${qty}`);
                         return qty;
                     }
                 }
@@ -1807,17 +1794,14 @@
                 // 3XL+ only exist in popup/child rows, no parent input to check
 
                 const sizeInput = parentRow.querySelector(`[data-size="${inputSize}"]`);
-                console.log(`[DEBUG getExtendedSizeQty] Checking parent input [data-size="${inputSize}"], found=${!!sizeInput}, disabled=${sizeInput?.disabled}, value=${sizeInput?.value}`);
                 if (sizeInput && !sizeInput.disabled && !sizeInput.classList.contains('xxxl-picker-btn')) {
                     const val = parseInt(sizeInput.value) || 0;
                     if (val > 0) {
-                        console.log(`[DEBUG getExtendedSizeQty] Using parent input value=${val}`);
                         return val;
                     }
                 }
             }
 
-            console.log(`[DEBUG getExtendedSizeQty] Returning 0 (no value found)`);
             return 0;
         }
         // Expose to global scope for JS class to use
@@ -1874,7 +1858,6 @@
                 dtfQuoteBuilder.recalculatePricing();
             }
 
-            console.log(`[DTF] Child row ${childRowId} color changed to ${colorName} (catalog: ${catalogColor})`);
         }
 
         /**
