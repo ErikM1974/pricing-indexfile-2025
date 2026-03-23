@@ -1606,6 +1606,21 @@ Same fix applied to `calculateCapProductPrice()` (lines 646-667).
 
 # Code Organization
 
+## CSS Consolidation: Quote Builder Shared Styles (2026-03-23)
+**Date:** 2026-03-23
+**Project:** [Pricing Index]
+**Problem:** All 4 quote builders (DTG, DTF, Embroidery, Screenprint) had ~25 identical CSS sections duplicated across their individual CSS files (12,648 total lines). Changes to shared UI (table headers, pricing rows, modals) required editing 4 files. Embroidery also had 442 lines of inline `<style>` violating Rule #3.
+**Root cause:** CSS was extracted from inline styles into per-builder files (Jan 2026) without a consolidation step. Each builder got a full copy of all shared styles.
+**Solution:** Moved shared sections (reset, header, layout, product table, child rows, cell inputs, search, pricing sidebar, customer panel, action buttons, modals, toast, keyboard hints, size picker, OSFA, cap badge, desc cell, pricing breakdown, coming soon accordion, animations, LTM toggle, min-order warning) into `quote-builder-common.css`. Fixed CSS load order: common loads FIRST, builder-specific loads SECOND (overrides via cascade). Extracted embroidery inline styles to external CSS. Net: -3,354 lines, 9,294 total (from 12,648).
+**Prevention:**
+- `quote-builder-common.css` loads FIRST in all 4 HTML files — builder CSS overrides via cascade
+- DTG overrides: `td { padding: 0 }`, `.cell-input { height: 36px }` (vs 40px default)
+- EMB overrides: `.power-sidebar { min-width: 260px; max-width: 500px }`, price override UI
+- DTF overrides: `.power-sidebar { width: 320px; overflow-y: auto }`, location config, DTF-specific modals
+- When adding NEW shared styles, add to `quote-builder-common.css`, not individual builder files
+- When adding builder-specific overrides, add to the builder's CSS file (it loads second, wins cascade)
+**Files:** `shared_components/css/quote-builder-common.css` (3,318 lines), all 4 builder CSS + HTML files
+
 ## Fix: Variable Scoping in Review Modal — embConfigOptions vs _sprEmbConfigOptions (2026-02-19)
 **Date:** 2026-02-19
 **Project:** [Pricing Index]
@@ -2512,3 +2527,36 @@ For best practices/patterns:
 **Root cause:** `renderMockupGallery()` click handler called `openLightbox(url)` for ALL file types, but the lightbox only renders `<img>` tags — non-image formats (EPS, PDF, AI) can't display in `<img>`.
 **Solution:** Branch click handler by `isImage` flag: images → lightbox, non-images → `window.open(url, '_blank')`. Added "Click to download" hint text + `flex-direction: column` on placeholder for stacked layout.
 **Prevention:** When building click handlers for mixed file types, always check if the viewer supports the format. Use `window.open()` for non-renderable formats.
+
+---
+
+### 2026-03-23: LTM Display Mode — Builtin vs Separate Math Must Match
+
+**Date:** 2026-03-23
+**Project:** [Pricing Index] Quote Builder LTM Standardization
+**Symptoms:** In DTG/Screenprint "builtin" mode, row total didn't match unit price × qty. In DTF "separate" mode, LTM was double-counted (in subtotal AND as fee row).
+**Root cause:** DTG/SPC: `productSubtotal += sizePrice * qty` used base price, not display price (which included LTM). DTF: `productTotal += roundedPrice * qty` always included LTM via rounding, but separate mode also showed fee row.
+**Solution:** DTG/SPC: Branch subtotal calc by display mode — builtin uses displayPrice, separate uses sizePrice. Grand total doesn't add ltmFee separately in builtin mode. DTF: Always use roundedPrice for totals (LTM baked in by pricing engine rounding); separate mode fee row is informational only "(included)".
+**Prevention:** When adding a "display mode" toggle that changes how a fee appears, trace ALL paths: unit price display, row total, subtotal, grand total, tax calculation, discount calculation. Both modes must produce identical grand totals.
+
+---
+
+### 2026-03-23: Cache Buster Versions — Stale JS Causes Invisible Bugs
+
+**Date:** 2026-03-23
+**Project:** [Pricing Index] Quote Builder Refactoring
+**Symptoms:** DTF LTM control panel not appearing after code changes. New shared functions not available. Browser console showed no errors but old behavior persisted.
+**Root cause:** `<script src="file.js?v=20260321">` version stamp not updated after modifying the file. Browser served cached old version. Even Ctrl+Shift+R didn't always work when Express server also cached.
+**Solution:** Updated all `?v=` stamps to today's date (`20260323`) across all 4 builder HTML files. Restarted Express server to clear server-side cache.
+**Prevention:** After modifying ANY shared JS/CSS file, immediately update the `?v=` cache buster in ALL HTML files that reference it. The /deploy skill now auto-bumps versions.
+
+---
+
+### 2026-03-23: 429 Rate Limit — Cache API Responses for Size Detection
+
+**Date:** 2026-03-23
+**Project:** [Pricing Index] Embroidery Quote Builder
+**Symptoms:** Console showed 429 Too Many Requests when adding products with extended sizes. Size detection, product colors, and service codes APIs all hitting rate limits.
+**Root cause:** `detectAndAdjustSizeUI()` fetched `/api/sanmar-shopworks/import-format` on every color selection with ZERO caching. Same style+color triggered same API call repeatedly. Adding multiple products or re-selecting colors caused 10-20 requests/second.
+**Solution:** Added `sizeDetectionCache` (Map) and `productColorsCache` (Map) at top of embroidery-quote-builder.js. Both cap and garment paths check cache before API call. Same style+color never fetched twice in a session.
+**Prevention:** Any API call triggered by user interaction (click, change, input) should be cached if the data doesn't change within a session. Use Map with `${style}-${color}` keys.
