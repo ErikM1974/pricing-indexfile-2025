@@ -6776,14 +6776,6 @@ async function embEmailQuote() {
     });
 }
 
-// Toggle Coming Soon accordion
-function toggleComingSoon() {
-    const content = document.getElementById('coming-soon-content');
-    const chevron = document.getElementById('coming-soon-chevron');
-    content.classList.toggle('open');
-    chevron.classList.toggle('rotated');
-}
-
 // ============================================
 // Additional Charges Section Functions
 // ============================================

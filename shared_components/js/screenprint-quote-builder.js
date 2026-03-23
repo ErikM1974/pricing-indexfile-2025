@@ -3818,14 +3818,6 @@ async function spcEmailQuote() {
     });
 }
 
-// Toggle Coming Soon accordion
-function toggleComingSoon() {
-    const content = document.getElementById('coming-soon-content');
-    const chevron = document.getElementById('coming-soon-chevron');
-    content.classList.toggle('open');
-    chevron.classList.toggle('rotated');
-}
-
 async function copyToClipboard() {
     const products = collectProductsFromTable();
     if (products.length === 0) {
