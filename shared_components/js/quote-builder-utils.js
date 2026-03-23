@@ -1260,9 +1260,75 @@ async function emailQuote(options = {}) {
     }
 }
 
+// ============================================================
+// QUANTITY BREAK NUDGE
+// ============================================================
+
+/**
+ * Show a nudge message when the customer is close to the next pricing tier.
+ * Call this from each builder's pricing update function after calculating total quantity.
+ *
+ * @param {number} totalQty - Current total pieces
+ * @param {string} method - 'dtg' | 'dtf' | 'scp' | 'emb'
+ * @param {number|null} [savingsPerPiece=null] - Per-piece savings at next tier (optional)
+ * @param {string} [containerId='quantity-nudge'] - ID of the nudge container div
+ */
+function updateQuantityNudge(totalQty, method, savingsPerPiece = null, containerId = 'quantity-nudge') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Tier breakpoints per method (lower bound of each tier)
+    const tiers = {
+        dtg: [12, 24, 48, 72],
+        dtf: [10, 24, 48, 72],
+        scp: [24, 37, 73, 145],
+        emb: [8, 24, 48, 72]
+    };
+
+    const breaks = tiers[method];
+    if (!breaks || totalQty <= 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    // Find the next tier the customer hasn't reached yet
+    let nextBreak = null;
+    for (const b of breaks) {
+        if (totalQty < b) {
+            nextBreak = b;
+            break;
+        }
+    }
+
+    if (!nextBreak) {
+        // Already at highest tier
+        container.style.display = 'none';
+        return;
+    }
+
+    const needed = nextBreak - totalQty;
+    const threshold = Math.ceil(nextBreak * 0.30); // Show nudge when within 30% of next tier
+
+    if (needed <= threshold && needed > 0) {
+        // Find the tier label (e.g., "24-47")
+        const breakIndex = breaks.indexOf(nextBreak);
+        const tierEnd = breakIndex < breaks.length - 1 ? breaks[breakIndex + 1] - 1 : '+';
+        const tierLabel = tierEnd === '+' ? `${nextBreak}+` : `${nextBreak}-${tierEnd}`;
+
+        let html = `<i class="fas fa-arrow-up" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more piece${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
+        if (savingsPerPiece && savingsPerPiece > 0.01) {
+            html += ` — <strong style="color: #15803d;">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
+        }
+        container.innerHTML = html;
+        container.style.display = 'block';
+    } else {
+        container.style.display = 'none';
+    }
+}
+
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle };
 }
 
-// QuoteBuilderUtils v3.0.0 loaded
+// QuoteBuilderUtils v3.1.0 loaded

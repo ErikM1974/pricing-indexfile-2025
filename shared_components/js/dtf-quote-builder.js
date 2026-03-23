@@ -1695,6 +1695,40 @@ class DTFQuoteBuilder {
         document.getElementById('subtotal').textContent = `$${grandTotal.toFixed(2)}`;
         updatePerUnitPrice(grandTotal, totalQty);
 
+        // Compute per-piece savings for next tier nudge
+        let nextTierSavings = null;
+        try {
+            const nextBreaks = [10, 24, 48, 72];
+            const nextBreak = nextBreaks.find(b => totalQty < b);
+            if (nextBreak && totalQty > 0) {
+                const nextTierData = this.pricingCalculator.getTierData(nextBreak);
+                const curMargin = marginDenom;
+                const nextMargin = this.pricingCalculator.getMarginDenominator(nextBreak);
+                if (curMargin && nextMargin && curMargin !== nextMargin) {
+                    // Approximate: lower margin denom = higher price. Savings ≈ garment * (1/curMargin - 1/nextMargin)
+                    // Use a typical $5 garment cost as reference
+                    const typicalGarment = 5.0;
+                    const curMarkup = typicalGarment / curMargin;
+                    const nextMarkup = typicalGarment / nextMargin;
+                    if (curMarkup > nextMarkup) nextTierSavings = curMarkup - nextMarkup;
+                }
+                // Also factor in transfer cost changes
+                const nextTransfer = this.pricingCalculator.calculateTransferCosts(this.selectedLocations, nextBreak);
+                if (nextTransfer && transferBreakdown) {
+                    const transferSavings = (transferCost - nextTransfer.total);
+                    nextTierSavings = (nextTierSavings || 0) + transferSavings;
+                }
+                // Factor in freight savings
+                const nextFreight = this.pricingCalculator.getFreightPerTransfer(nextBreak) * locationCount;
+                const freightSavings = freightCost - nextFreight;
+                if (freightSavings > 0) nextTierSavings = (nextTierSavings || 0) + freightSavings;
+                // Ensure positive
+                if (nextTierSavings <= 0) nextTierSavings = null;
+            }
+        } catch (e) { /* graceful fallback */ }
+        window.currentPricingData.nextTierSavings = nextTierSavings;
+        updateQuantityNudge(totalQty, 'dtf', nextTierSavings);
+
         // Update pre-tax subtotal for tax calculation
         const preTaxSubtotal = document.getElementById('pre-tax-subtotal');
         if (preTaxSubtotal) {

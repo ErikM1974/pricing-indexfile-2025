@@ -109,8 +109,11 @@ class DTGQuoteService {
                     tier: quoteData.tier,
                     projectName: quoteData.projectName || '',
                     specialNotes: quoteData.specialNotes || '',
-                    salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com'
+                    salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                    userNotes: quoteData.notes || ''
                 }),
+                // Sales rep (2026-03-23)
+                SalesRepEmail: quoteData.salesRep || '',
                 // Additional charges (2026 fee refactor)
                 ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
                 GraphicDesignHours: parseFloat(quoteData.graphicDesignHours) || 0,
@@ -122,6 +125,8 @@ class DTGQuoteService {
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Tax rate (2026-03-23)
+                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',
@@ -133,8 +138,7 @@ class DTGQuoteService {
                 ShipMethod: quoteData.shipMethod || '',
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
                 ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : '',
-                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : '',
-                Notes: quoteData.notes || ''
+                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : ''
             };
 
             // Save session
@@ -534,7 +538,8 @@ class DTGQuoteService {
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
                 ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : '',
                 DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : '',
-                LTM_Waived: quoteData.ltmWaived ? true : false
+                LTM_Waived: quoteData.ltmWaived ? true : false,
+                TaxRate: parseFloat(quoteData.taxRate) || 10.1
             };
 
             // Update session via PUT

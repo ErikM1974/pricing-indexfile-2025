@@ -2950,10 +2950,25 @@ async function recalculatePricing() {
         const setupFees = printConfig.setupFee;
         const grandTotal = (ltmDisplayMode === 'builtin') ? subtotal + setupFees : subtotal + ltmFee + setupFees;
 
+        // Compute per-piece savings for next tier nudge
+        let nextTierSavings = null;
+        if (pricedProducts.length > 0 && primaryPricing?.tiers) {
+            try {
+                const currentTierIdx = primaryPricing.tiers.indexOf(tierData);
+                if (currentTierIdx >= 0 && currentTierIdx < primaryPricing.tiers.length - 1) {
+                    const nextTier = primaryPricing.tiers[currentTierIdx + 1];
+                    const curPrice = tierData.prices?.['M'] ?? tierData.prices?.['L'] ?? Object.values(tierData.prices || {})[0] ?? 0;
+                    const nextPrice = nextTier.prices?.['M'] ?? nextTier.prices?.['L'] ?? Object.values(nextTier.prices || {})[0] ?? 0;
+                    if (curPrice > nextPrice) nextTierSavings = curPrice - nextPrice;
+                }
+            } catch (e) { /* graceful fallback */ }
+        }
+
         // Store LTM state for tax/discount calculations
         window.currentPricingData = window.currentPricingData || {};
         window.currentPricingData.ltmFee = ltmFee;
         window.currentPricingData.ltmDisplayMode = ltmDisplayMode;
+        window.currentPricingData.nextTierSavings = nextTierSavings;
 
         // Update pricing display sidebar
         updatePricingDisplay({
@@ -3105,6 +3120,7 @@ function updatePricingDisplay(pricing) {
     document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
     updatePerUnitPrice(pricing.subtotal || 0, pricing.totalQuantity || 0);
+    updateQuantityNudge(pricing.totalQuantity || 0, 'scp', window.currentPricingData?.nextTierSavings);
 
     // Minimum order warning banner (show when qty > 0 but < 24)
     const minWarning = document.getElementById('min-order-warning');

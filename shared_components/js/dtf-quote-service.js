@@ -172,6 +172,9 @@ class DTFQuoteService {
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Sales rep + tax rate (2026-03-23)
+                SalesRepEmail: quoteData.salesRep || '',
+                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
                 // Shipping fee + notes (2026-03-22)
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0
             };
@@ -639,6 +642,8 @@ class DTFQuoteService {
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Tax rate (2026-03-23)
+                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
                 // Shipping fee (2026-03-22)
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0
             };
