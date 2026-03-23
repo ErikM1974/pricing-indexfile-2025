@@ -5,6 +5,10 @@
 // Use centralized config (fallback to hardcoded URL for backwards compatibility)
 const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+// API response caches (prevent 429 rate limit errors)
+const sizeDetectionCache = new Map();   // key: "style-color" → size detection result
+const productColorsCache = new Map();   // key: "style" → colors array
+
 // Embroidery defaults — synced with API values at runtime
 const EMB_DEFAULTS = {
     GARMENT_STITCH_COUNT: 8000,
@@ -2992,6 +2996,7 @@ async function onStyleChange(input, rowId) {
         let product = productCache[styleNumber];
         if (!product) {
             const response = await fetch(`${API_BASE}/api/stylesearch?term=${styleNumber}`);
+            if (!response.ok) throw new Error(`Style search API returned ${response.status}`);
             const data = await response.json();
             if (data && data.length > 0) {
                 // Find exact match or use first result
@@ -3039,9 +3044,16 @@ async function onStyleChange(input, rowId) {
             // Update description with clean title
             descInput.value = cleanTitle || styleNumber;
 
-            // Fetch colors using product-colors API (also returns CATEGORY_NAME)
-            const colorsResponse = await fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`);
-            const colorsData = await colorsResponse.json();
+            // Fetch colors using product-colors API (also returns CATEGORY_NAME) — cached per style
+            let colorsData;
+            if (productColorsCache.has(styleNumber)) {
+                colorsData = productColorsCache.get(styleNumber);
+            } else {
+                const colorsResponse = await fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`);
+                if (!colorsResponse.ok) throw new Error(`Colors API returned ${colorsResponse.status}`);
+                colorsData = await colorsResponse.json();
+                productColorsCache.set(styleNumber, colorsData);
+            }
             const colors = colorsData.colors || [];
 
             // Store product category from API
@@ -4026,6 +4038,16 @@ async function detectAndAdjustSizeUI(rowId) {
     // =========================================
     if (row.dataset.isCap === 'true') {
         try {
+            const capCacheKey = `cap-${styleNumber}-${catalogColor}`;
+            if (sizeDetectionCache.has(capCacheKey)) {
+                const cached = sizeDetectionCache.get(capCacheKey);
+                const sizeInfo = analyzeSizeCategory(cached);
+                updateRowForSizeCategory(row, sizeInfo);
+                row.dataset.availableSizes = JSON.stringify(cached);
+                row.dataset.capSizes = JSON.stringify(cached);
+                return;
+            }
+
             const capUrl = `${API_BASE}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
             const capResponse = await fetch(capUrl);
 
@@ -4042,7 +4064,8 @@ async function detectAndAdjustSizeUI(rowId) {
             }
 
 
-            // Analyze cap sizes and update UI
+            // Cache and update UI
+            sizeDetectionCache.set(capCacheKey, capSizes);
             const sizeInfo = analyzeSizeCategory(capSizes);
 
             updateRowForSizeCategory(row, sizeInfo);
@@ -4063,6 +4086,16 @@ async function detectAndAdjustSizeUI(rowId) {
     // =========================================
     // STANDARD GARMENT HANDLING
     // =========================================
+    const garmentCacheKey = `garment-${styleNumber}-${catalogColor}`;
+    if (sizeDetectionCache.has(garmentCacheKey)) {
+        const cached = sizeDetectionCache.get(garmentCacheKey);
+        const sizeInfo = analyzeSizeCategory(cached);
+        updateRowForSizeCategory(row, sizeInfo);
+        row.dataset.availableSizes = JSON.stringify(cached);
+        validateSizeAvailability(row, cached);
+        return;
+    }
+
     try {
         // Fetch all available sizes for this style+color
         const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
@@ -4099,6 +4132,9 @@ async function detectAndAdjustSizeUI(rowId) {
 
         // Extract ALL available sizes (not just Size06)
         const allSizes = extractAllSizes(skus);
+
+        // Cache for future use (same style+color won't re-fetch)
+        sizeDetectionCache.set(garmentCacheKey, allSizes);
 
         // Analyze and update UI
         const sizeInfo = analyzeSizeCategory(allSizes);
