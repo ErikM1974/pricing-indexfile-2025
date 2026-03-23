@@ -587,9 +587,156 @@ function getSwatchStyle(color) {
     return `background-color: ${color.HEX_CODE || '#ccc'};`;
 }
 
+// ============================================
+// LTM (LESS THAN MINIMUM) CONTROLS
+// ============================================
+
+/**
+ * Render an LTM control panel with waive checkbox + display mode radio buttons.
+ * @param {string} containerId - DOM id for the container div (must exist)
+ * @param {object} options
+ * @param {number} options.feeAmount - Current LTM fee dollar amount
+ * @param {string} [options.feeLabel='Small Order Fee'] - Panel heading
+ * @param {boolean} [options.defaultEnabled=true] - Whether LTM is applied by default
+ * @param {string} [options.defaultMode='builtin'] - 'builtin' or 'separate'
+ */
+function renderLtmControlPanel(containerId, options = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const feeAmount = options.feeAmount || 0;
+    const feeLabel = options.feeLabel || 'Small Order Fee';
+    const enabled = options.defaultEnabled !== false;
+    const mode = options.defaultMode || 'builtin';
+    const prefix = containerId; // unique prefix for radio name groups
+
+    container.innerHTML = `
+        <div class="ltm-control-panel">
+            <div class="ltm-control-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${escapeHtml(feeLabel)}</span>
+            </div>
+            <div class="ltm-control-body">
+                <label class="ltm-checkbox-label">
+                    <input type="checkbox" class="ltm-apply-checkbox" ${enabled ? 'checked' : ''}
+                           data-ltm-container="${escapeHtml(containerId)}">
+                    Apply LTM Fee (<span class="ltm-fee-display">$${feeAmount.toFixed(2)}</span>)
+                    <span class="ltm-status-badge">${enabled ? 'Applied' : 'Waived'}</span>
+                </label>
+                <div class="ltm-mode-radios" ${!enabled ? 'style="opacity:0.4;pointer-events:none;"' : ''}>
+                    <label class="ltm-radio-label">
+                        <input type="radio" name="${prefix}-ltm-mode" value="builtin"
+                               ${mode === 'builtin' ? 'checked' : ''} ${!enabled ? 'disabled' : ''}>
+                        Built into price
+                    </label>
+                    <label class="ltm-radio-label">
+                        <input type="radio" name="${prefix}-ltm-mode" value="separate"
+                               ${mode === 'separate' ? 'checked' : ''} ${!enabled ? 'disabled' : ''}>
+                        Show as separate line item
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Read current LTM control state from a panel.
+ * @param {string} containerId - The container id used in renderLtmControlPanel
+ * @returns {{ enabled: boolean, displayMode: 'builtin'|'separate' }}
+ */
+function getLtmControlState(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return { enabled: true, displayMode: 'builtin' };
+
+    const checkbox = container.querySelector('.ltm-apply-checkbox');
+    const checkedRadio = container.querySelector(`input[name="${containerId}-ltm-mode"]:checked`);
+
+    return {
+        enabled: checkbox ? checkbox.checked : true,
+        displayMode: checkedRadio ? checkedRadio.value : 'builtin'
+    };
+}
+
+/**
+ * Restore LTM control state (e.g., from a saved quote).
+ * @param {string} containerId
+ * @param {{ enabled?: boolean, displayMode?: string, feeAmount?: number }} state
+ */
+function setLtmControlState(containerId, state = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const checkbox = container.querySelector('.ltm-apply-checkbox');
+    const radios = container.querySelectorAll(`input[name="${containerId}-ltm-mode"]`);
+    const modeWrapper = container.querySelector('.ltm-mode-radios');
+    const badge = container.querySelector('.ltm-status-badge');
+
+    if (checkbox && state.enabled !== undefined) {
+        checkbox.checked = state.enabled;
+        if (badge) badge.textContent = state.enabled ? 'Applied' : 'Waived';
+        if (modeWrapper) {
+            modeWrapper.style.opacity = state.enabled ? '' : '0.4';
+            modeWrapper.style.pointerEvents = state.enabled ? '' : 'none';
+        }
+        radios.forEach(r => { r.disabled = !state.enabled; });
+    }
+
+    if (state.displayMode) {
+        radios.forEach(r => { r.checked = (r.value === state.displayMode); });
+    }
+
+    if (state.feeAmount !== undefined) {
+        const feeDisplay = container.querySelector('.ltm-fee-display');
+        if (feeDisplay) feeDisplay.textContent = `$${state.feeAmount.toFixed(2)}`;
+    }
+}
+
+/**
+ * Wire up event listeners on an LTM control panel.
+ * @param {string} containerId
+ * @param {function} onChange - Called with { enabled: boolean, displayMode: string }
+ */
+function initLtmControlListeners(containerId, onChange) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Prevent double-binding if called multiple times
+    if (container.dataset.ltmInitialized) return;
+    container.dataset.ltmInitialized = 'true';
+
+    const checkbox = container.querySelector('.ltm-apply-checkbox');
+    const radios = container.querySelectorAll(`input[name="${containerId}-ltm-mode"]`);
+    const modeWrapper = container.querySelector('.ltm-mode-radios');
+    const badge = container.querySelector('.ltm-status-badge');
+
+    function fireChange() {
+        if (typeof onChange === 'function') {
+            onChange(getLtmControlState(containerId));
+        }
+    }
+
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            const enabled = checkbox.checked;
+            if (badge) badge.textContent = enabled ? 'Applied' : 'Waived';
+            if (modeWrapper) {
+                modeWrapper.style.opacity = enabled ? '' : '0.4';
+                modeWrapper.style.pointerEvents = enabled ? '' : 'none';
+            }
+            radios.forEach(r => { r.disabled = !enabled; });
+            fireChange();
+        });
+    }
+
+    radios.forEach(r => {
+        r.addEventListener('change', fireChange);
+    });
+}
+
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle };
 }
 
-// QuoteBuilderUtils v2.0.0 loaded
+// QuoteBuilderUtils v2.1.0 loaded

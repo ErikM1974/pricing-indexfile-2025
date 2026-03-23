@@ -379,6 +379,11 @@
                 </div>
             </div>
 
+            <!-- LTM Control Panel (shown only when LTM applies) -->
+            <div id="dtf-ltm-wrapper" style="display: none; margin-bottom: 12px;">
+                <div id="dtf-ltm-panel"></div>
+            </div>
+
             <!-- Additional Charges Panel -->
             <div class="additional-charges-panel">
                 <div class="charges-header" onclick="toggleAdditionalCharges()">
@@ -738,6 +743,7 @@
             const grandTotalEl = document.getElementById('grand-total-with-tax');
 
             // Get base subtotal from pricing
+            // DTF subtotal always includes LTM (baked in by pricing engine rounding) — no mode branching needed
             let subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
 
             // Add art charge if enabled

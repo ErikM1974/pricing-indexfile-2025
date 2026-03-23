@@ -168,7 +168,10 @@ class DTFQuoteService {
                 RushFee: parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0,
                 Discount: parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0,
                 DiscountPercent: parseFloat(quoteData.discountPercent) || 0,
-                DiscountReason: quoteData.discountReason || ''
+                DiscountReason: quoteData.discountReason || '',
+                // LTM display preferences (2026-03-22)
+                LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
+                LTM_Waived: quoteData.ltmWaived ? true : false
             };
 
             // Save session
@@ -630,7 +633,10 @@ class DTFQuoteService {
                 }),
                 RevisionNumber: newRevision,
                 RevisedAt: this.formatDateForCaspio(new Date()),
-                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com'
+                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                // LTM display preferences (2026-03-22)
+                LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
+                LTM_Waived: quoteData.ltmWaived ? true : false
             };
 
             // Update session via PUT

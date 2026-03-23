@@ -438,6 +438,11 @@
                 </div>
             </div>
 
+            <!-- LTM Control Panel (shown only when qty <= 71) -->
+            <div id="spc-ltm-wrapper" style="display: none; margin-bottom: 12px;">
+                <div id="spc-ltm-panel"></div>
+            </div>
+
             <!-- Additional Charges Panel -->
             <div class="additional-charges-panel">
                 <div class="charges-header" onclick="toggleAdditionalCharges()">
@@ -1401,6 +1406,11 @@
                 totalScreens: 1,
                 setupFee: 30.00
             };
+
+            // Reset LTM control panel
+            setLtmControlState('spc-ltm-panel', { enabled: true, displayMode: 'builtin' });
+            const ltmWrapperReset = document.getElementById('spc-ltm-wrapper');
+            if (ltmWrapperReset) ltmWrapperReset.style.display = 'none';
 
             // Reset UI controls
             document.querySelector('input[name="front-location"][value="LC"]').checked = true;
@@ -3504,14 +3514,36 @@
             // Determine tier based on total quantity
             const tier = getScreenPrintTier(totalQty);
 
-            // Calculate Small Batch Fee based on quantity tier (min order is 24 pieces)
-            let ltmFee = 0;
-            if (totalQty <= 36) {
-                ltmFee = 75;  // 24-36 tier
-            } else if (totalQty <= 71) {
-                ltmFee = 50;  // 37-71 tier
+            // LTM control panel — show/hide based on quantity
+            let baseLtmFee = 0;
+            if (totalQty > 0 && totalQty <= 36) baseLtmFee = 75;
+            else if (totalQty <= 71) baseLtmFee = 50;
+            const wouldHaveLTM = baseLtmFee > 0;
+
+            const ltmWrapper = document.getElementById('spc-ltm-wrapper');
+            if (ltmWrapper) {
+                if (wouldHaveLTM) {
+                    ltmWrapper.style.display = '';
+                    if (!document.querySelector('#spc-ltm-panel .ltm-control-panel')) {
+                        renderLtmControlPanel('spc-ltm-panel', { feeAmount: baseLtmFee });
+                        initLtmControlListeners('spc-ltm-panel', () => {
+                            recalculatePricing();
+                            markScreenPrintDirty();
+                        });
+                    } else {
+                        setLtmControlState('spc-ltm-panel', { feeAmount: baseLtmFee });
+                    }
+                } else {
+                    ltmWrapper.style.display = 'none';
+                    setLtmControlState('spc-ltm-panel', { enabled: true, displayMode: 'builtin' });
+                }
             }
-            // 72+ pieces: no fee
+
+            // Read LTM control state
+            const ltmState = getLtmControlState('spc-ltm-panel');
+            const ltmEnabled = wouldHaveLTM ? ltmState.enabled : true;
+            const ltmDisplayMode = ltmState.displayMode || 'builtin';
+            const ltmFee = (wouldHaveLTM && ltmEnabled) ? baseLtmFee : 0;
             const perUnitLTM = ltmFee > 0 ? Math.floor(ltmFee / totalQty * 100) / 100 : 0;
 
             // Safety stripes: $2 per piece per location
@@ -3585,9 +3617,10 @@
                         // Add safety stripes
                         sizePrice += safetyStripesPerPiece;
 
-                        // Display base price (LTM shown as separate line item)
-                        const displayPrice = sizePrice;
-                        productSubtotal += sizePrice * qty;
+                        // Display price: builtin mode adds LTM per-unit, separate mode shows base price
+                        const displayPrice = (ltmDisplayMode === 'builtin' && perUnitLTM > 0) ? sizePrice + perUnitLTM : sizePrice;
+                        // Use displayPrice for subtotal so row totals match displayed unit prices
+                        productSubtotal += displayPrice * qty;
 
                         // Update row price cell (for standard sizes, update parent row)
                         // Note: 2XL/XXL are child rows but NOT in SIZE06_EXTENDED_SIZES (they go in Size05 column)
@@ -3618,7 +3651,7 @@
                     // Update parent row total (all sizes combined)
                     const parentTotalCell = document.getElementById(`row-total-${rowId}`);
                     if (parentTotalCell) {
-                        // productSubtotal includes all sizes for this product (LTM shown separately)
+                        // productSubtotal includes all sizes (with LTM baked in when builtin mode)
                         parentTotalCell.textContent = product.totalQty > 0 ? `$${productSubtotal.toFixed(2)}` : '-';
                     }
 
@@ -3633,9 +3666,14 @@
                     });
                 }
 
-                // Calculate grand total (subtotal + LTM + setup fees)
+                // Calculate grand total — in builtin mode LTM is already in subtotal via inflated unit prices
                 const setupFees = printConfig.setupFee;
-                const grandTotal = subtotal + ltmFee + setupFees;
+                const grandTotal = (ltmDisplayMode === 'builtin') ? subtotal + setupFees : subtotal + ltmFee + setupFees;
+
+                // Store LTM state for tax/discount calculations
+                window.currentPricingData = window.currentPricingData || {};
+                window.currentPricingData.ltmFee = ltmFee;
+                window.currentPricingData.ltmDisplayMode = ltmDisplayMode;
 
                 // Update pricing display sidebar
                 updatePricingDisplay({
@@ -3643,6 +3681,7 @@
                     tier: tier.label,
                     subtotal: subtotal,
                     ltmFee: ltmFee,
+                    ltmDisplayMode: ltmDisplayMode,
                     setupFees: setupFees,
                     grandTotal: grandTotal,
                     products: pricedProducts
@@ -3802,20 +3841,19 @@
             const pricingTierEl = document.getElementById('pricing-tier');
             pricingTierEl.textContent = pricing.tier || '24-36';
 
-            // LTM display (table only - sidebar removed)
+            // LTM display — show table row only in "separate" mode
             const ltmTableRow = document.getElementById('ltm-fee-row');
             const ltmTableUnit = document.getElementById('ltm-row-unit');
             const ltmTableTotal = document.getElementById('ltm-row-total');
+            const ltmMode = pricing.ltmDisplayMode || 'builtin';
 
-            if (pricing.ltmFee > 0) {
-                // Show LTM in product table
+            if (pricing.ltmFee > 0 && ltmMode === 'separate') {
                 if (ltmTableRow) {
                     ltmTableRow.style.display = 'table-row';
                     if (ltmTableUnit) ltmTableUnit.textContent = `$${pricing.ltmFee.toFixed(2)}`;
                     if (ltmTableTotal) ltmTableTotal.textContent = `$${pricing.ltmFee.toFixed(2)}`;
                 }
             } else {
-                // No LTM fee (qty >= 24) - hide LTM row
                 if (ltmTableRow) ltmTableRow.style.display = 'none';
             }
 
@@ -4083,8 +4121,7 @@
                         const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
                         const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
                         const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '') || 0);
-                        const ltmFee = document.getElementById('ltm-fee-row')?.style.display !== 'none'
-                            ? parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+                        const ltmFee = window.currentPricingData?.ltmFee || 0;
 
                         const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + setupFee + ltmFee;
                         actualDiscount = discountableSubtotal * (discountAmount / 100);
@@ -4147,8 +4184,9 @@
                     salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
                 };
 
-                // LTM always shown as separate line item
-                pricingData.ltmDistributed = false;
+                // LTM display mode: builtin = baked into prices, separate = shown as line item
+                const ltmState = getLtmControlState('spc-ltm-panel');
+                pricingData.ltmDistributed = (ltmState.displayMode === 'builtin');
 
                 const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
                 const printWindow = window.open('', '_blank');
@@ -4429,7 +4467,10 @@
                     rushFee: rushFee,
                     discount: discount,
                     discountPercent: discountPercent,
-                    discountReason: discountReason
+                    discountReason: discountReason,
+                    // LTM display preferences (2026-03-22)
+                    ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
+                    ltmWaived: !getLtmControlState('spc-ltm-panel').enabled
                 };
 
                 let result;

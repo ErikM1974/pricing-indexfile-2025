@@ -1514,33 +1514,69 @@ class DTFQuoteBuilder {
         const totalLtmFee = tierData.ltmFee || 0;
         const marginDenom = this.pricingCalculator.getMarginDenominator(pricingQty);
 
+        // LTM control panel — show/hide based on whether LTM applies
+        const wouldHaveLTM = totalLtmFee > 0 && totalQty > 0;
+        const ltmWrapper = document.getElementById('dtf-ltm-wrapper');
+        if (ltmWrapper) {
+            if (wouldHaveLTM) {
+                ltmWrapper.style.display = '';
+                if (!document.querySelector('#dtf-ltm-panel .ltm-control-panel')) {
+                    renderLtmControlPanel('dtf-ltm-panel', { feeAmount: totalLtmFee });
+                    initLtmControlListeners('dtf-ltm-panel', () => {
+                        this.updatePricing();
+                    });
+                } else {
+                    setLtmControlState('dtf-ltm-panel', { feeAmount: totalLtmFee });
+                }
+            } else {
+                ltmWrapper.style.display = 'none';
+                setLtmControlState('dtf-ltm-panel', { enabled: true, displayMode: 'builtin' });
+            }
+        }
+
+        // Read LTM control state
+        const ltmCtrlState = getLtmControlState('dtf-ltm-panel');
+        const ltmEnabled = wouldHaveLTM ? ltmCtrlState.enabled : true;
+        const ltmDisplayMode = ltmCtrlState.displayMode || 'builtin';
+        const effectiveLtmPerUnit = ltmEnabled ? ltmPerUnit : 0;
+        const effectiveLtmFee = ltmEnabled ? totalLtmFee : 0;
+
         // Store for quote save
         this.currentPricingData = {
             transferBreakdown,
             laborCostPerLoc,
             freightPerTransfer,
-            ltmPerUnit,
-            totalLtmFee,
+            ltmPerUnit: effectiveLtmPerUnit,
+            totalLtmFee: effectiveLtmFee,
             marginDenom,
-            tier
+            tier,
+            ltmDisplayMode
         };
+        // Mirror on window for inline HTML tax/discount functions
+        window.currentPricingData = window.currentPricingData || {};
+        window.currentPricingData.ltmFee = effectiveLtmFee;
+        window.currentPricingData.ltmDisplayMode = ltmDisplayMode;
 
-        // LTM display - DTF only uses table row (no sidebar ltm-row/ltm-fee elements)
+        // LTM display — show table row in "separate" mode as informational (included in price)
+        // DTF's pricing engine bakes LTM into the rounded unit price, so the fee row shows
+        // the LTM amount but it's already in the subtotal — not added separately
         const ltmTableRow = document.getElementById('ltm-fee-row');
         const ltmTableUnit = document.getElementById('ltm-row-unit');
         const ltmTableTotal = document.getElementById('ltm-row-total');
 
-        if (totalLtmFee > 0 && totalQty > 0) {
-            // Show LTM in product table — per-unit in Unit column, batch total in Total column
+        if (effectiveLtmFee > 0 && ltmDisplayMode === 'separate') {
             if (ltmTableRow) {
                 ltmTableRow.style.display = 'table-row';
                 const ltmQtyCell = ltmTableRow.querySelector('.cell-qty');
                 if (ltmQtyCell) ltmQtyCell.textContent = totalQty;
-                if (ltmTableUnit) ltmTableUnit.textContent = `$${ltmPerUnit.toFixed(2)}`;
-                if (ltmTableTotal) ltmTableTotal.textContent = `$${totalLtmFee.toFixed(2)}`;
+                if (ltmTableUnit) ltmTableUnit.textContent = `$${effectiveLtmPerUnit.toFixed(2)}`;
+                if (ltmTableTotal) ltmTableTotal.textContent = `(included)`;
+                // Update fee label to clarify it's informational
+                const feeLabel = ltmTableRow.querySelector('.fee-label');
+                if (feeLabel) feeLabel.innerHTML = '<i class="fas fa-info-circle"></i> LTM Fee ($' + effectiveLtmFee.toFixed(2) + ' included in unit prices)';
             }
         } else {
-            // Hide LTM row
+            // builtin mode or LTM waived — hide fee row
             if (ltmTableRow) ltmTableRow.style.display = 'none';
         }
 
@@ -1564,25 +1600,22 @@ class DTFQuoteBuilder {
             Object.entries(product.quantities).forEach(([size, qty]) => {
                 if (qty > 0 && standardSizes.includes(size)) {
                     const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges);
-                    // Use margin from API (not hardcoded 0.57)
-                    // Upcharge is a selling price add-on, add AFTER margin calculation
                     const garmentCost = product.baseCost / marginDenom + upcharge;
-                    // Full unit price always includes LTM for calculation
-                    const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
-                    // Use rounding from API
+                    // Full unit price includes LTM (unless waived) — rounding absorbs LTM
+                    const unitPrice = garmentCost + transferCost + laborCost + freightCost + effectiveLtmPerUnit;
                     const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
+                    // Price without LTM for separate mode display only
+                    const priceWithoutLTM = this.pricingCalculator.applyRounding(garmentCost + transferCost + laborCost + freightCost);
+                    // Always use roundedPrice for totals (LTM is baked in by pricing engine rounding)
+                    // Separate mode fee row is informational — it shows how much LTM is included
                     productTotal += roundedPrice * qty;
 
-                    // Track base unit price (S/M/LG size - no upcharge) for display
+                    // Track base unit price for display
                     if (baseUnitPrice === 0 && ['S', 'M', 'L'].includes(size)) {
                         baseUnitPrice = roundedPrice;
-                        // Display price without LTM (LTM shown as separate line item)
-                        if (ltmPerUnit === 0) {
-                            baseDisplayPrice = roundedPrice;
-                        } else {
-                            const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
-                            baseDisplayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
-                        }
+                        // Display price: builtin shows full price, separate shows base only
+                        const displayPrice = (effectiveLtmPerUnit === 0 || ltmDisplayMode === 'builtin') ? roundedPrice : priceWithoutLTM;
+                        baseDisplayPrice = displayPrice;
                     }
                 }
             });
@@ -1590,15 +1623,10 @@ class DTFQuoteBuilder {
             // If no base price yet, calculate it for display
             if (baseUnitPrice === 0 && totalQty > 0) {
                 const garmentCost = product.baseCost / marginDenom;
-                const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                const unitPrice = garmentCost + transferCost + laborCost + freightCost + effectiveLtmPerUnit;
                 baseUnitPrice = this.pricingCalculator.applyRounding(unitPrice);
-                // Display price without LTM (LTM shown as separate line item)
-                if (ltmPerUnit === 0) {
-                    baseDisplayPrice = baseUnitPrice;
-                } else {
-                    const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
-                    baseDisplayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
-                }
+                const priceNoLTM = this.pricingCalculator.applyRounding(garmentCost + transferCost + laborCost + freightCost);
+                baseDisplayPrice = (effectiveLtmPerUnit === 0 || ltmDisplayMode === 'builtin') ? baseUnitPrice : priceNoLTM;
             }
 
             // Update row price (per-unit, not line total)
@@ -1635,12 +1663,12 @@ class DTFQuoteBuilder {
 
                 // Calculate unit price with upcharge (add AFTER margin, not before)
                 const garmentCost = baseCost / marginDenom + upcharge;
-                const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
+                const unitPrice = garmentCost + transferCost + laborCost + freightCost + effectiveLtmPerUnit;
                 const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
 
-                // Calculate display price without LTM (LTM shown as separate line item)
+                // Display mode: builtin shows LTM in price, separate shows base only
                 let displayPrice;
-                if (ltmPerUnit === 0) {
+                if (effectiveLtmPerUnit === 0 || ltmDisplayMode === 'builtin') {
                     displayPrice = roundedPrice;
                 } else {
                     const priceWithoutLTM = garmentCost + transferCost + laborCost + freightCost;
@@ -1658,7 +1686,7 @@ class DTFQuoteBuilder {
                     childTotalCell.textContent = qty > 0 ? `$${childTotal.toFixed(2)}` : '-';
                 }
 
-                // Add to grand total
+                // Always use roundedPrice for grand total (LTM baked in by pricing engine rounding)
                 grandTotal += roundedPrice * qty;
             }
         });
@@ -2371,7 +2399,10 @@ class DTFQuoteBuilder {
             })(),
             discountPercent: document.getElementById('discount-type')?.value === 'percent'
                 ? parseFloat(document.getElementById('discount-amount')?.value || 0) : 0,
-            discountReason: document.getElementById('discount-reason')?.value || ''
+            discountReason: document.getElementById('discount-reason')?.value || '',
+            // LTM display preferences (2026-03-22)
+            ltmDisplayMode: getLtmControlState('dtf-ltm-panel').displayMode || 'builtin',
+            ltmWaived: !getLtmControlState('dtf-ltm-panel').enabled
         };
 
         // Show saving state on button
@@ -2652,7 +2683,7 @@ class DTFQuoteBuilder {
                 size: this.locationConfig[loc]?.size || ''
             })),
             ltmFee: this.currentPricingData?.totalLtmFee || 0,
-            ltmDistributed: false,  // LTM always shown as separate line item
+            ltmDistributed: (this.currentPricingData?.ltmDisplayMode || 'builtin') === 'builtin',
             projectName: document.getElementById('project-name')?.value || '',
             taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
             // Artwork services
@@ -3060,6 +3091,11 @@ class DTFQuoteBuilder {
                 row.style.display = 'none';
             });
         }
+
+        // Reset LTM control panel
+        setLtmControlState('dtf-ltm-panel', { enabled: true, displayMode: 'builtin' });
+        const ltmWrapperReset = document.getElementById('dtf-ltm-wrapper');
+        if (ltmWrapperReset) ltmWrapperReset.style.display = 'none';
 
         // Reset state
         this.products = [];
