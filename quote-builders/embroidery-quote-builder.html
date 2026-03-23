@@ -859,10 +859,6 @@
                         </div>
                     </div>
                     <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
-                    <!-- LTM Control Panel (shown only when qty <= 7) -->
-                    <div id="emb-ltm-wrapper" style="display: none;">
-                        <div id="emb-ltm-panel"></div>
-                    </div>
                     <!-- Discount -->
                     <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fca5a5; background: #fef2f2; margin: 12px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
                         <label style="font-size: 12px; color: #b91c1c; margin-bottom: 4px; display: block; font-weight: 600;">Discount</label>
@@ -907,6 +903,11 @@
                                style="width: 100%; padding: 8px 10px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-top: 8px; display: none;">
                     </div>
                 </div>
+            </div>
+
+            <!-- LTM Control Panel (shown only when garment qty <= 7 or cap qty <= 7) -->
+            <div id="emb-ltm-wrapper" style="display: none; margin-bottom: 12px;">
+                <div id="emb-ltm-panel"></div>
             </div>
 
             <!-- Totals Section with Tax -->
