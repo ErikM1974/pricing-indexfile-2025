@@ -3196,11 +3196,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Global function wrappers for HTML onclick handlers
-function copyQuoteToClipboard() {
+function copyToClipboard() {
     if (dtfQuoteBuilder) {
         dtfQuoteBuilder.copyQuoteToClipboard();
     }
 }
+// Legacy alias
+function copyQuoteToClipboard() { copyToClipboard(); }
 
 function printQuote() {
     if (dtfQuoteBuilder) {

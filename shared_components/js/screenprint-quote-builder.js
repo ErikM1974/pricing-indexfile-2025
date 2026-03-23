@@ -3244,11 +3244,15 @@ function updateTaxCalculation() {
 // toggleAdditionalCharges() moved to quote-builder-utils.js
 
 function updateAdditionalCharges() {
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designFee = designHours * 75;
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const badge = document.getElementById('charges-badge');
 
-    const netCharges = rushFee - discountAmount;
+    const netCharges = artCharge + designFee + rushFee - discountAmount;
     if (netCharges !== 0) {
         badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
         badge.classList.remove('hidden');

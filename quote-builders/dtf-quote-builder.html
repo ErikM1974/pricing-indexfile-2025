@@ -569,9 +569,7 @@
                     <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
-                    <button type="button" onclick="dtfEmailQuote()" style="margin-top: 8px; width: 100%; padding: 10px; background: #eff6ff; color: #2563eb; border: 1px solid #93c5fd; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
-                        <i class="fas fa-envelope"></i> Email Quote
-                    </button>
+                    <!-- Email button moved to action panel below -->
                 </div>
             </div>
 
@@ -579,11 +577,14 @@
 
             <!-- Action Buttons (DTG Style) -->
             <div class="action-panel">
-                <button class="btn-action btn-primary-action" onclick="copyQuoteToClipboard()">
+                <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
                 </button>
                 <button class="btn-action btn-secondary-action" onclick="printQuote()">
                     <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="dtfEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
+                    <i class="fas fa-envelope"></i> Email Quote
                 </button>
             </div>
         </div>
@@ -637,7 +638,7 @@
     <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>
 
     <!-- Invoice Generator (for professional PDF output) -->
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260111"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260323b"></script>
 
     <!-- DTF-specific Scripts -->
     <script src="/shared_components/js/product-category-filter.js?v=20260127"></script>
@@ -645,7 +646,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260127"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=20260323"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=20260323c"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
