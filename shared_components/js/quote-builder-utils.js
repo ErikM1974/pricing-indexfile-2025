@@ -247,6 +247,26 @@ function toggleAdditionalCharges() {
 }
 
 /**
+ * Toggle merged Fees & Charges panel (replaces separate artwork + charges panels)
+ * Element IDs: fees-charges-content, charges-chevron
+ */
+function toggleFeesCharges() {
+    const content = document.getElementById('fees-charges-content');
+    const chevron = document.getElementById('charges-chevron');
+    if (!content || !chevron) return;
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        content.style.display = '';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
  * Toggle Artwork Services panel expand/collapse
  * Element IDs: artwork-content, artwork-chevron (consistent across all builders)
  */

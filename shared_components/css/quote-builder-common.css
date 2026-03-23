@@ -1476,6 +1476,17 @@ textarea:disabled {
     color: #3b82f6;
 }
 
+.charge-subsection-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #166534;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed #86efac;
+}
+
 .btn-tax-lookup {
     flex: 0 0 32px;
     height: 32px;
