@@ -247,6 +247,26 @@ function toggleAdditionalCharges() {
 }
 
 /**
+ * Toggle merged Fees & Charges panel (replaces separate artwork + charges panels)
+ * Element IDs: fees-charges-content, charges-chevron
+ */
+function toggleFeesCharges() {
+    const content = document.getElementById('fees-charges-content');
+    const chevron = document.getElementById('charges-chevron');
+    if (!content || !chevron) return;
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        content.style.display = '';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
  * Toggle Artwork Services panel expand/collapse
  * Element IDs: artwork-content, artwork-chevron (consistent across all builders)
  */
@@ -587,9 +607,637 @@ function getSwatchStyle(color) {
     return `background-color: ${color.HEX_CODE || '#ccc'};`;
 }
 
+// ============================================
+// LTM (LESS THAN MINIMUM) CONTROLS
+// ============================================
+
+/**
+ * Render an LTM control panel with waive checkbox + display mode radio buttons.
+ * @param {string} containerId - DOM id for the container div (must exist)
+ * @param {object} options
+ * @param {number} options.feeAmount - Current LTM fee dollar amount
+ * @param {string} [options.feeLabel='Small Order Fee'] - Panel heading
+ * @param {boolean} [options.defaultEnabled=true] - Whether LTM is applied by default
+ * @param {string} [options.defaultMode='builtin'] - 'builtin' or 'separate'
+ */
+function renderLtmControlPanel(containerId, options = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const feeAmount = options.feeAmount || 0;
+    const feeLabel = options.feeLabel || 'Small Order Fee';
+    const enabled = options.defaultEnabled !== false;
+    const mode = options.defaultMode || 'builtin';
+    const prefix = containerId; // unique prefix for radio name groups
+
+    container.innerHTML = `
+        <div class="ltm-control-panel">
+            <div class="ltm-control-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${escapeHtml(feeLabel)}</span>
+            </div>
+            <div class="ltm-control-body">
+                <label class="ltm-checkbox-label">
+                    <input type="checkbox" class="ltm-apply-checkbox" ${enabled ? 'checked' : ''}
+                           data-ltm-container="${escapeHtml(containerId)}">
+                    Apply LTM Fee (<span class="ltm-fee-display">$${feeAmount.toFixed(2)}</span>)
+                    <span class="ltm-status-badge">${enabled ? 'Applied' : 'Waived'}</span>
+                </label>
+                <div class="ltm-mode-radios" ${!enabled ? 'style="opacity:0.4;pointer-events:none;"' : ''}>
+                    <label class="ltm-radio-label">
+                        <input type="radio" name="${prefix}-ltm-mode" value="builtin"
+                               ${mode === 'builtin' ? 'checked' : ''} ${!enabled ? 'disabled' : ''}>
+                        Built into price
+                    </label>
+                    <label class="ltm-radio-label">
+                        <input type="radio" name="${prefix}-ltm-mode" value="separate"
+                               ${mode === 'separate' ? 'checked' : ''} ${!enabled ? 'disabled' : ''}>
+                        Show as separate line item
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Read current LTM control state from a panel.
+ * @param {string} containerId - The container id used in renderLtmControlPanel
+ * @returns {{ enabled: boolean, displayMode: 'builtin'|'separate' }}
+ */
+function getLtmControlState(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return { enabled: true, displayMode: 'builtin' };
+
+    const checkbox = container.querySelector('.ltm-apply-checkbox');
+    const checkedRadio = container.querySelector(`input[name="${containerId}-ltm-mode"]:checked`);
+
+    return {
+        enabled: checkbox ? checkbox.checked : true,
+        displayMode: checkedRadio ? checkedRadio.value : 'builtin'
+    };
+}
+
+/**
+ * Restore LTM control state (e.g., from a saved quote).
+ * @param {string} containerId
+ * @param {{ enabled?: boolean, displayMode?: string, feeAmount?: number }} state
+ */
+function setLtmControlState(containerId, state = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const checkbox = container.querySelector('.ltm-apply-checkbox');
+    const radios = container.querySelectorAll(`input[name="${containerId}-ltm-mode"]`);
+    const modeWrapper = container.querySelector('.ltm-mode-radios');
+    const badge = container.querySelector('.ltm-status-badge');
+
+    if (checkbox && state.enabled !== undefined) {
+        checkbox.checked = state.enabled;
+        if (badge) badge.textContent = state.enabled ? 'Applied' : 'Waived';
+        if (modeWrapper) {
+            modeWrapper.style.opacity = state.enabled ? '' : '0.4';
+            modeWrapper.style.pointerEvents = state.enabled ? '' : 'none';
+        }
+        radios.forEach(r => { r.disabled = !state.enabled; });
+    }
+
+    if (state.displayMode) {
+        radios.forEach(r => { r.checked = (r.value === state.displayMode); });
+    }
+
+    if (state.feeAmount !== undefined) {
+        const feeDisplay = container.querySelector('.ltm-fee-display');
+        if (feeDisplay) feeDisplay.textContent = `$${state.feeAmount.toFixed(2)}`;
+    }
+}
+
+/**
+ * Wire up event listeners on an LTM control panel.
+ * @param {string} containerId
+ * @param {function} onChange - Called with { enabled: boolean, displayMode: string }
+ */
+function initLtmControlListeners(containerId, onChange) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Prevent double-binding if called multiple times
+    if (container.dataset.ltmInitialized) return;
+    container.dataset.ltmInitialized = 'true';
+
+    const checkbox = container.querySelector('.ltm-apply-checkbox');
+    const radios = container.querySelectorAll(`input[name="${containerId}-ltm-mode"]`);
+    const modeWrapper = container.querySelector('.ltm-mode-radios');
+    const badge = container.querySelector('.ltm-status-badge');
+
+    function fireChange() {
+        if (typeof onChange === 'function') {
+            onChange(getLtmControlState(containerId));
+        }
+    }
+
+    if (checkbox) {
+        checkbox.addEventListener('change', () => {
+            const enabled = checkbox.checked;
+            if (badge) badge.textContent = enabled ? 'Applied' : 'Waived';
+            if (modeWrapper) {
+                modeWrapper.style.opacity = enabled ? '' : '0.4';
+                modeWrapper.style.pointerEvents = enabled ? '' : 'none';
+            }
+            radios.forEach(r => { r.disabled = !enabled; });
+            fireChange();
+        });
+    }
+
+    radios.forEach(r => {
+        r.addEventListener('change', fireChange);
+    });
+}
+
+// ============================================
+// SHARED BUILDER FUNCTIONS
+// Extracted from DTG/Screenprint/Embroidery (identical across all)
+// ============================================
+
+/**
+ * Populate customer info fields from a saved quote session.
+ * @param {object} session - Caspio session object with CustomerName, CustomerEmail, etc.
+ */
+function populateCustomerInfo(session) {
+    const fields = {
+        'customer-name': session.CustomerName,
+        'customer-email': session.CustomerEmail,
+        'company-name': session.CompanyName
+    };
+    for (const [id, value] of Object.entries(fields)) {
+        const el = document.getElementById(id);
+        if (el && value) el.value = value;
+    }
+    const salesRepSelect = document.getElementById('sales-rep');
+    if (salesRepSelect && session.SalesRepEmail) {
+        for (let i = 0; i < salesRepSelect.options.length; i++) {
+            if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                salesRepSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * Check URL for ?edit=QUOTE_ID parameter.
+ * @returns {string|null} Quote ID to edit, or null
+ */
+function checkForEditMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('edit');
+}
+
+/**
+ * Update UI to show edit mode (header subtitle + save button text).
+ * @param {string} quoteId
+ * @param {number} revision
+ */
+function updateEditModeUI(quoteId, revision) {
+    const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
+    }
+    const saveBtn = document.querySelector('.btn-save-quote');
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+    }
+}
+
+/**
+ * Show/hide the loading overlay.
+ * @param {boolean} show
+ */
+function showLoading(show) {
+    const overlay = document.getElementById('loading-overlay');
+    if (!overlay) return;
+    if (show) {
+        overlay.classList.add('show');
+    } else {
+        overlay.classList.remove('show');
+    }
+}
+
+/**
+ * Toggle Save & Share panel expand/collapse.
+ */
+function toggleSaveShare() {
+    const content = document.getElementById('save-share-content');
+    const chevron = document.getElementById('save-share-chevron');
+    if (!content || !chevron) return;
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
+ * Confirm starting a new quote (checks for unsaved changes).
+ * Requires builder to define: hasUnsavedChanges(), resetQuote()
+ */
+function confirmNewQuote() {
+    if (typeof hasUnsavedChanges === 'function' && hasUnsavedChanges()) {
+        if (confirm('You have unsaved changes. Start a new quote?')) {
+            resetQuote();
+        }
+    } else {
+        resetQuote();
+    }
+}
+
+/**
+ * Mark quote as having unsaved changes. Shows badge.
+ * Requires `hasChanges` variable in builder scope.
+ */
+function markAsUnsaved() {
+    hasChanges = true;
+    const indicator = document.getElementById('unsaved-indicator');
+    if (indicator) indicator.style.display = 'inline';
+}
+
+/**
+ * Mark quote as saved. Hides badge.
+ */
+function markAsSaved() {
+    hasChanges = false;
+    const indicator = document.getElementById('unsaved-indicator');
+    if (indicator) indicator.style.display = 'none';
+}
+
+/**
+ * Check if there are unsaved changes.
+ * @returns {boolean}
+ */
+function hasUnsavedChanges() {
+    return hasChanges;
+}
+
+/**
+ * Setup global keyboard shortcuts (Ctrl+S save, Ctrl+P print, Escape close popups).
+ * Requires builder to define: saveQuote(), printQuote(), closeExtendedSizePopup()
+ */
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const sizePopup = document.getElementById('extended-size-popup');
+            if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                e.preventDefault();
+                if (typeof closeExtendedSizePopup === 'function') closeExtendedSizePopup();
+                return;
+            }
+        }
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            if (typeof saveQuote === 'function') saveQuote();
+        }
+        if (e.ctrlKey && e.key === 'p') {
+            e.preventDefault();
+            if (typeof printQuote === 'function') printQuote();
+        }
+    });
+}
+
+// ============================================
+// ORDER, SHIPPING & TAX FIELDS
+// ============================================
+
+const US_STATES = 'AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY';
+
+/**
+ * Render order, shipping, and notes fields into a container.
+ * @param {string} containerId - DOM id for the container div
+ */
+function renderOrderShippingFields(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const stateOptions = US_STATES.split(',').map(s =>
+        `<option value="${s}"${s === 'WA' ? ' selected' : ''}>${s}</option>`
+    ).join('');
+
+    container.innerHTML = `
+        <div class="order-shipping-panel">
+            <div class="charges-header" onclick="toggleOrderShippingPanel('${containerId}')">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-truck"></i>
+                    <span>Order & Shipping</span>
+                    <span class="order-shipping-badge charges-badge hidden">!</span>
+                </div>
+                <i class="order-shipping-chevron fas fa-chevron-down collapsible-chevron"></i>
+            </div>
+            <div class="order-shipping-content charges-content hidden">
+                <div class="d-flex flex-column gap-2" style="padding: 8px 0;">
+                    <!-- Phone + Order # -->
+                    <div class="d-flex gap-2">
+                        <div class="customer-field" style="flex: 1;">
+                            <label class="quote-label" style="font-size: 11px;">Phone</label>
+                            <input type="tel" class="os-phone quote-input" placeholder="(253) 555-1234" style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                        <div class="customer-field" style="flex: 1;">
+                            <label class="quote-label" style="font-size: 11px;">Order #</label>
+                            <input type="text" class="os-order-number quote-input" placeholder="ShopWorks #" style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                    </div>
+                    <!-- PO # + Shipping Fee -->
+                    <div class="d-flex gap-2">
+                        <div class="customer-field" style="flex: 1;">
+                            <label class="quote-label" style="font-size: 11px;">PO #</label>
+                            <input type="text" class="os-po-number quote-input" placeholder="Purchase Order" style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                        <div class="customer-field" style="flex: 1;">
+                            <label class="quote-label" style="font-size: 11px;">Shipping Fee</label>
+                            <div style="position: relative;">
+                                <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;">$</span>
+                                <input type="number" class="os-shipping-fee quote-input" min="0" step="0.01" placeholder="0.00" value="0"
+                                       style="font-size: 12px; padding: 6px 8px 6px 22px; width: 100%; box-sizing: border-box;">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dates -->
+                    <div class="d-flex gap-2">
+                        <div class="customer-field" style="flex: 1;">
+                            <label class="quote-label" style="font-size: 11px;">Ship Date</label>
+                            <input type="date" class="os-req-ship-date quote-input" style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                        <div class="customer-field" style="flex: 1;">
+                            <label class="quote-label" style="font-size: 11px;">Drop Dead Date</label>
+                            <input type="date" class="os-drop-dead-date quote-input" style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                    </div>
+                    <!-- Ship To Address -->
+                    <div class="customer-field">
+                        <label class="quote-label" style="font-size: 11px;">Ship To Address</label>
+                        <input type="text" class="os-ship-address quote-input" placeholder="Street address" style="font-size: 12px; padding: 6px 8px;">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <div class="customer-field" style="flex: 2;">
+                            <input type="text" class="os-ship-city quote-input" placeholder="City" style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                        <div class="customer-field" style="flex: 0 0 60px;">
+                            <select class="os-ship-state quote-input" style="font-size: 12px; padding: 6px 4px;">
+                                ${stateOptions}
+                            </select>
+                        </div>
+                        <div class="customer-field" style="flex: 0 0 80px;">
+                            <input type="text" class="os-ship-zip quote-input" placeholder="ZIP" maxlength="10"
+                                   style="font-size: 12px; padding: 6px 8px;">
+                        </div>
+                        <button type="button" class="btn-tax-lookup" title="Look up tax rate">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="os-tax-status" style="font-size: 11px; color: #64748b; min-height: 14px;"></div>
+                    <!-- Ship Method -->
+                    <div class="customer-field">
+                        <label class="quote-label" style="font-size: 11px;">Ship Method</label>
+                        <select class="os-ship-method quote-input" style="font-size: 12px; padding: 6px 8px;">
+                            <option value="">Select...</option>
+                            <option value="Ground">Ground</option>
+                            <option value="2-Day">2-Day</option>
+                            <option value="Overnight">Overnight</option>
+                            <option value="Customer Pickup">Customer Pickup</option>
+                            <option value="Delivery">Local Delivery</option>
+                        </select>
+                    </div>
+                    <!-- Notes -->
+                    <div class="customer-field" style="margin-top: 4px;">
+                        <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
+                        <textarea class="os-notes quote-input" placeholder="Special instructions, employee names, etc."
+                                  style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Toggle the order/shipping panel visibility.
+ */
+function toggleOrderShippingPanel(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const content = container.querySelector('.order-shipping-content');
+    const chevron = container.querySelector('.order-shipping-chevron');
+    if (content) content.classList.toggle('hidden');
+    if (chevron) chevron.style.transform = content.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+/**
+ * Wire up event listeners for order/shipping fields.
+ * @param {string} containerId
+ * @param {object} options - { onShippingFeeChange, onTaxRateChange, apiBaseUrl }
+ */
+function initOrderShippingListeners(containerId, options = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (container.dataset.osInitialized) return;
+    container.dataset.osInitialized = 'true';
+
+    const apiBase = options.apiBaseUrl || (typeof APP_CONFIG !== 'undefined' ? APP_CONFIG.API.BASE_URL : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com');
+
+    // State change → auto lookup or zero tax
+    const stateSelect = container.querySelector('.os-ship-state');
+    if (stateSelect) {
+        stateSelect.addEventListener('change', () => {
+            if (stateSelect.value !== 'WA') {
+                if (options.onTaxRateChange) options.onTaxRateChange(0);
+                _showTaxStatus(container, 'Out of State — No Tax', 'info');
+            } else {
+                const zip = container.querySelector('.os-ship-zip')?.value?.trim();
+                if (zip && zip.length >= 5) {
+                    _doTaxLookup(container, apiBase, options);
+                } else {
+                    if (options.onTaxRateChange) options.onTaxRateChange(10.1);
+                    _showTaxStatus(container, '', '');
+                }
+            }
+        });
+    }
+
+    // ZIP blur → auto lookup
+    const zipInput = container.querySelector('.os-ship-zip');
+    if (zipInput) {
+        zipInput.addEventListener('blur', () => {
+            const state = container.querySelector('.os-ship-state')?.value || 'WA';
+            if (state === 'WA' && zipInput.value.trim().length >= 5) {
+                _doTaxLookup(container, apiBase, options);
+            }
+        });
+    }
+
+    // Tax lookup button
+    const lookupBtn = container.querySelector('.btn-tax-lookup');
+    if (lookupBtn) {
+        lookupBtn.addEventListener('click', () => _doTaxLookup(container, apiBase, options));
+    }
+
+    // Shipping fee change
+    const shippingFee = container.querySelector('.os-shipping-fee');
+    if (shippingFee) {
+        shippingFee.addEventListener('change', () => {
+            if (options.onShippingFeeChange) options.onShippingFeeChange(parseFloat(shippingFee.value) || 0);
+        });
+        shippingFee.addEventListener('input', () => {
+            if (options.onShippingFeeChange) options.onShippingFeeChange(parseFloat(shippingFee.value) || 0);
+        });
+    }
+}
+
+/** Internal: perform ZIP-based tax lookup */
+async function _doTaxLookup(container, apiBase, options) {
+    const state = container.querySelector('.os-ship-state')?.value || 'WA';
+    const zip = container.querySelector('.os-ship-zip')?.value?.trim() || '';
+    const city = container.querySelector('.os-ship-city')?.value?.trim() || '';
+    const address = container.querySelector('.os-ship-address')?.value?.trim() || '';
+
+    if (state !== 'WA') {
+        if (options.onTaxRateChange) options.onTaxRateChange(0);
+        _showTaxStatus(container, 'Out of State — No Tax', 'info');
+        return;
+    }
+    if (!zip || zip.length < 5) {
+        _showTaxStatus(container, 'Enter ZIP code to look up rate', 'info');
+        return;
+    }
+
+    try {
+        _showTaxStatus(container, 'Looking up tax rate...', 'loading');
+        const resp = await fetch(`${apiBase}/api/tax-rates/lookup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address, city, state, zip })
+        });
+        if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+        const data = await resp.json();
+
+        if (!data.success) {
+            _showTaxStatus(container, data.error || 'Lookup failed', 'error');
+            return;
+        }
+
+        if (options.onTaxRateChange) options.onTaxRateChange(data.taxRate);
+
+        if (data.outOfState) {
+            _showTaxStatus(container, 'Out of State — No Tax', 'info');
+        } else if (data.fallback) {
+            _showTaxStatus(container, `Default rate ${data.taxRate}% (DOR unavailable)`, 'warning');
+        } else {
+            const loc = city || data.locationCode || 'WA';
+            _showTaxStatus(container, `${loc} — ${data.taxRate}%`, 'success');
+        }
+    } catch (err) {
+        _showTaxStatus(container, 'Lookup failed — using current rate', 'error');
+    }
+}
+
+/** Internal: show tax lookup status message */
+function _showTaxStatus(container, msg, type) {
+    const el = container.querySelector('.os-tax-status');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : type === 'warning' ? '#d97706' : '#64748b';
+}
+
+/**
+ * Read all order/shipping field values from the panel.
+ * @param {string} containerId
+ * @returns {object} Field values for saving
+ */
+function getOrderShippingData(containerId) {
+    const c = document.getElementById(containerId);
+    if (!c) return {};
+    return {
+        phone: c.querySelector('.os-phone')?.value?.trim() || '',
+        orderNumber: c.querySelector('.os-order-number')?.value?.trim() || '',
+        poNumber: c.querySelector('.os-po-number')?.value?.trim() || '',
+        shippingFee: parseFloat(c.querySelector('.os-shipping-fee')?.value) || 0,
+        reqShipDate: c.querySelector('.os-req-ship-date')?.value || '',
+        dropDeadDate: c.querySelector('.os-drop-dead-date')?.value || '',
+        shipAddress: c.querySelector('.os-ship-address')?.value?.trim() || '',
+        shipCity: c.querySelector('.os-ship-city')?.value?.trim() || '',
+        shipState: c.querySelector('.os-ship-state')?.value || 'WA',
+        shipZip: c.querySelector('.os-ship-zip')?.value?.trim() || '',
+        shipMethod: c.querySelector('.os-ship-method')?.value || '',
+        notes: c.querySelector('.os-notes')?.value?.trim() || ''
+    };
+}
+
+/**
+ * Restore order/shipping field values (e.g., from a saved quote).
+ * @param {string} containerId
+ * @param {object} data - Field values to restore
+ */
+function setOrderShippingData(containerId, data) {
+    const c = document.getElementById(containerId);
+    if (!c || !data) return;
+    const set = (sel, val) => { const el = c.querySelector(sel); if (el && val) el.value = val; };
+    set('.os-phone', data.phone || data.Phone);
+    set('.os-order-number', data.orderNumber || data.OrderNumber);
+    set('.os-po-number', data.poNumber || data.PurchaseOrderNumber);
+    set('.os-shipping-fee', data.shippingFee || data.ShippingFee);
+    set('.os-req-ship-date', data.reqShipDate || data.ReqShipDate);
+    set('.os-drop-dead-date', data.dropDeadDate || data.DropDeadDate);
+    set('.os-ship-address', data.shipAddress || data.ShipToAddress);
+    set('.os-ship-city', data.shipCity || data.ShipToCity);
+    set('.os-ship-state', data.shipState || data.ShipToState);
+    set('.os-ship-zip', data.shipZip || data.ShipToZip);
+    set('.os-ship-method', data.shipMethod || data.ShipMethod);
+    set('.os-notes', data.notes || data.Notes);
+}
+
+// ============================================
+// EMAIL QUOTE
+// ============================================
+
+/**
+ * Send a quote email to the customer via EmailJS.
+ * @param {object} options - { quoteId, customerEmail, customerName, salesRepEmail, quoteUrl }
+ */
+async function emailQuote(options = {}) {
+    if (!options.customerEmail) {
+        showToast('Please enter customer email before sending', 'error');
+        return false;
+    }
+    if (!options.quoteId) {
+        showToast('Please save the quote first', 'error');
+        return false;
+    }
+
+    const siteOrigin = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.SITE_ORIGIN) || 'https://www.teamnwca.com';
+    const quoteUrl = options.quoteUrl || `${siteOrigin}/quote/${options.quoteId}`;
+
+    try {
+        showToast('Sending email...', 'info');
+        await emailjs.send('service_jgrave3', 'template_quote_email', {
+            to_email: options.customerEmail,
+            customer_name: options.customerName || 'Customer',
+            quote_id: options.quoteId,
+            quote_link: quoteUrl,
+            reply_to: options.salesRepEmail || 'sales@nwcustomapparel.com',
+            company_name: 'Northwest Custom Apparel',
+            company_phone: '253-922-5793'
+        });
+        showToast('Quote emailed to ' + options.customerEmail, 'success');
+        return true;
+    } catch (err) {
+        console.error('[EmailQuote] Error:', err);
+        showToast('Failed to send email. Please try again.', 'error');
+        return false;
+    }
+}
+
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle };
 }
 
-// QuoteBuilderUtils v2.0.0 loaded
+// QuoteBuilderUtils v3.0.0 loaded

@@ -1,13 +1,9 @@
 // ============================================================
-// DTG POWER QUOTE - Excel-Style Quote Builder
+// SCREEN PRINT QUOTE BUILDER - Excel-Style Quote Builder
 // ============================================================
 
 // Use centralized config (fallback to hardcoded URL for backwards compatibility)
 const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-
-// Auto-save & Draft Recovery (2026 consolidation)
-let dtgPersistence = null;
-let dtgSession = null;
 
 // NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
 // SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
@@ -38,8 +34,12 @@ const SIZE_DISPLAY_LABELS = {
 };
 
 // State
-let dtgPricingService = null;
+let screenPrintPricingService = null;
 let quoteService = null;
+
+// Auto-save & Draft Recovery (2026 consolidation)
+let spPersistence = null;
+let spSession = null;
 
 let products = [];
 let rowCounter = 0;
@@ -53,12 +53,20 @@ let editingRevision = null;
 // Unsaved changes tracking
 let hasChanges = false;
 
-// DTG Print Location Configuration
-let printLocation = {
-    front: 'LC',  // LC, FF, JF
-    back: '',     // '', FB, JB (empty = none)
-    combined: 'LC' // Combined code: LC, FF, JF, FB, JB, LC_FB, FF_FB, JF_JB, etc.
+// Screen Print Location Configuration
+// Screen Print Configuration State
+let printConfig = {
+    frontLocation: 'LC',      // LC, FF, JF
+    frontColors: 1,           // 1-6
+    backLocation: '',         // '', FB, JB
+    backColors: 1,            // 1-6
+    isDarkGarment: false,     // Adds white underbase (+1 screen per location)
+    isSafetyStripes: false,   // Adds $2/piece/location
+    totalScreens: 1,          // Calculated
+    setupFee: 30.00           // Calculated: screens × $30
 };
+
+const SCREEN_FEE = 30.00; // $30 per screen
 
 // Print location display names
 const LOCATION_NAMES = {
@@ -66,40 +74,83 @@ const LOCATION_NAMES = {
     'FF': 'Full Front',
     'JF': 'Jumbo Front',
     'FB': 'Full Back',
-    'JB': 'Jumbo Back',
-    'LC_FB': 'Left Chest + Full Back',
-    'LC_JB': 'Left Chest + Jumbo Back',
-    'FF_FB': 'Full Front + Full Back',
-    'FF_JB': 'Full Front + Jumbo Back',
-    'JF_FB': 'Jumbo Front + Full Back',
-    'JF_JB': 'Jumbo Front + Jumbo Back'
+    'JB': 'Jumbo Back'
 };
 
-// Update print location from UI selections
-function updatePrintLocation() {
+// Update print configuration from UI selections
+function updatePrintConfig() {
+    // Get location selections
     const frontRadio = document.querySelector('input[name="front-location"]:checked');
     const backRadio = document.querySelector('input[name="back-location"]:checked');
+    const frontColorsRadio = document.querySelector('input[name="front-colors"]:checked');
+    const backColorsRadio = document.querySelector('input[name="back-colors"]:checked');
 
-    printLocation.front = frontRadio ? frontRadio.value : 'LC';
-    printLocation.back = backRadio ? backRadio.value : '';
+    printConfig.frontLocation = frontRadio ? frontRadio.value : 'LC';
+    printConfig.backLocation = backRadio ? backRadio.value : '';
+    printConfig.frontColors = frontColorsRadio ? parseInt(frontColorsRadio.value) : 1;
+    printConfig.backColors = backColorsRadio ? parseInt(backColorsRadio.value) : 1;
+    printConfig.isDarkGarment = document.getElementById('dark-garment-toggle').checked;
+    printConfig.isSafetyStripes = document.getElementById('safety-stripes-toggle').checked;
 
-    // Generate combined code
-    if (printLocation.back) {
-        printLocation.combined = `${printLocation.front}_${printLocation.back}`;
+    // Show/hide back colors section
+    const backColorsSection = document.getElementById('back-colors-section');
+    const backIcon = document.getElementById('back-icon');
+    if (printConfig.backLocation) {
+        backColorsSection.style.display = 'block';
+        backIcon.className = 'fas fa-check-circle';
+        backIcon.style.color = '#28a745';
     } else {
-        printLocation.combined = printLocation.front;
+        backColorsSection.style.display = 'none';
+        backIcon.className = 'fas fa-plus-circle';
+        backIcon.style.color = '#888';
     }
 
-    // Update display
-    const displayName = LOCATION_NAMES[printLocation.combined] || printLocation.combined;
-    document.getElementById('location-display').textContent = displayName;
-    document.getElementById('location-code').textContent = `Code: ${printLocation.combined}`;
+    // Calculate screens
+    let frontScreens = printConfig.frontColors;
+    let backScreens = printConfig.backLocation ? printConfig.backColors : 0;
 
-    // Update sidebar display
-    const sidebarLocation = document.getElementById('sidebar-location');
-    if (sidebarLocation) sidebarLocation.textContent = displayName;
+    // Add underbase for dark garments
+    if (printConfig.isDarkGarment) {
+        frontScreens += 1;
+        if (printConfig.backLocation) {
+            backScreens += 1;
+        }
+    }
 
-    // Recalculate all product prices with new location
+    printConfig.totalScreens = frontScreens + backScreens;
+    printConfig.setupFee = printConfig.totalScreens * SCREEN_FEE;
+
+    // Update front setup display
+    const frontSetupEl = document.getElementById('front-setup-display');
+    if (printConfig.isDarkGarment) {
+        frontSetupEl.textContent = `${printConfig.frontColors} + 1 underbase = ${frontScreens} screens × $30 = $${(frontScreens * SCREEN_FEE).toFixed(2)}`;
+    } else {
+        frontSetupEl.textContent = `${frontScreens} screen${frontScreens > 1 ? 's' : ''} × $30 = $${(frontScreens * SCREEN_FEE).toFixed(2)}`;
+    }
+
+    // Update back setup display (if visible)
+    if (printConfig.backLocation) {
+        const backSetupEl = document.getElementById('back-setup-display');
+        if (printConfig.isDarkGarment) {
+            backSetupEl.textContent = `${printConfig.backColors} + 1 underbase = ${backScreens} screens × $30 = $${(backScreens * SCREEN_FEE).toFixed(2)}`;
+        } else {
+            backSetupEl.textContent = `${backScreens} screen${backScreens > 1 ? 's' : ''} × $30 = $${(backScreens * SCREEN_FEE).toFixed(2)}`;
+        }
+    }
+
+    // Update total setup fee display
+    document.getElementById('total-screens-display').textContent = `${printConfig.totalScreens} screen${printConfig.totalScreens > 1 ? 's' : ''} total`;
+    document.getElementById('setup-fee-display').textContent = `$${printConfig.setupFee.toFixed(2)}`;
+
+    // Show/hide dark garment note
+    const darkNote = document.getElementById('dark-garment-note');
+    if (printConfig.isDarkGarment) {
+        darkNote.style.display = 'block';
+    } else {
+        darkNote.style.display = 'none';
+    }
+
+    // Recalculate all product prices with new configuration
     recalculateAllPrices();
 }
 
@@ -142,6 +193,161 @@ const SIZE06_EXTENDED_SIZES = [
 // openExtendedSizePopup, closeExtendedSizePopup, toggleWaistGroup,
 // getExtendedSizeQty, applyExtendedSizes, createOrUpdateExtendedChildRow,
 // updateXXXLCellDisplay, updateChildRowPrice
+
+// ============================================================
+// AUTO-SAVE & DRAFT RECOVERY (2026 consolidation)
+// ============================================================
+
+function initScreenPrintPersistence() {
+    if (typeof QuotePersistence !== 'undefined') {
+        spPersistence = new QuotePersistence({
+            prefix: 'SPC',
+            autoSaveInterval: 30000,
+            debug: false
+        });
+
+        // Setup auto-save callback
+        spPersistence.onAutoSave = () => {
+            const data = getScreenPrintQuoteData();
+            if (data && (data.products.length > 0 || data.customerName)) {
+                spPersistence.save(data);
+            }
+        };
+    }
+
+    if (typeof QuoteSession !== 'undefined' && spPersistence) {
+        spSession = new QuoteSession({
+            prefix: 'SPC',
+            persistence: spPersistence,
+            debug: false
+        });
+    }
+}
+
+function getScreenPrintQuoteData() {
+    return {
+        products: collectProductsFromTable(),
+        printConfig: { ...printConfig },
+        customerName: document.getElementById('customer-name')?.value || '',
+        customerEmail: document.getElementById('customer-email')?.value || '',
+        companyName: document.getElementById('company-name')?.value || '',
+        salesRep: document.getElementById('sales-rep')?.value || '',
+        timestamp: Date.now()
+    };
+}
+
+function restoreScreenPrintDraft(draft) {
+    if (!draft) return;
+
+
+    // Restore customer info
+    if (draft.customerName) {
+        const nameEl = document.getElementById('customer-name');
+        if (nameEl) nameEl.value = draft.customerName;
+    }
+    if (draft.customerEmail) {
+        const emailEl = document.getElementById('customer-email');
+        if (emailEl) emailEl.value = draft.customerEmail;
+    }
+    if (draft.companyName) {
+        const companyEl = document.getElementById('company-name');
+        if (companyEl) companyEl.value = draft.companyName;
+    }
+    if (draft.salesRep) {
+        const salesRepEl = document.getElementById('sales-rep');
+        if (salesRepEl) salesRepEl.value = draft.salesRep;
+    }
+
+    // Restore print configuration
+    if (draft.printConfig) {
+        // Restore front location
+        const frontRadio = document.querySelector(`input[name="front-location"][value="${draft.printConfig.frontLocation}"]`);
+        if (frontRadio) frontRadio.checked = true;
+
+        // Restore front colors
+        const frontColorsRadio = document.querySelector(`input[name="front-colors"][value="${draft.printConfig.frontColors}"]`);
+        if (frontColorsRadio) frontColorsRadio.checked = true;
+
+        // Restore back location
+        const backRadio = document.querySelector(`input[name="back-location"][value="${draft.printConfig.backLocation || ''}"]`);
+        if (backRadio) backRadio.checked = true;
+
+        // Restore back colors
+        if (draft.printConfig.backLocation) {
+            const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${draft.printConfig.backColors}"]`);
+            if (backColorsRadio) backColorsRadio.checked = true;
+        }
+
+        // Restore dark garment toggle
+        const darkGarmentToggle = document.getElementById('dark-garment-toggle');
+        if (darkGarmentToggle) darkGarmentToggle.checked = draft.printConfig.isDarkGarment || false;
+
+        // Restore safety stripes toggle
+        const safetyStripesToggle = document.getElementById('safety-stripes-toggle');
+        if (safetyStripesToggle) safetyStripesToggle.checked = draft.printConfig.isSafetyStripes || false;
+
+        // Update config state
+        updatePrintConfig();
+    }
+
+    // Restore products
+    if (draft.products && draft.products.length > 0) {
+        // Clear any existing rows first
+        const tbody = document.getElementById('product-tbody');
+        if (tbody) tbody.innerHTML = '';
+
+        draft.products.forEach(product => {
+            // Add product row with saved data
+            const rowId = addNewRow();
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            // Set product data
+            row.dataset.style = product.style || '';
+            row.dataset.catalogColor = product.catalogColor || '';
+            row.dataset.colorName = product.color || '';
+            row.dataset.description = product.description || '';
+            row.dataset.imageUrl = product.imageUrl || '';
+
+            // Update display cells
+            const styleCell = row.querySelector('.cell-style');
+            if (styleCell) styleCell.textContent = product.style || '';
+
+            const descCell = row.querySelector('.cell-desc');
+            if (descCell) descCell.textContent = product.description || '';
+
+            const colorCell = row.querySelector('.cell-color');
+            if (colorCell) {
+                colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${escapeHtml(product.color || '')}`;
+            }
+
+            // Restore size quantities
+            if (product.sizes || product.sizeBreakdown) {
+                const sizes = product.sizes || product.sizeBreakdown;
+                Object.entries(sizes).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        const sizeInput = row.querySelector(`input[data-size="${size}"]`);
+                        if (sizeInput) {
+                            sizeInput.value = qty;
+                            updateRowQuantityTotal(rowId);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Recalculate pricing after restoring products
+        recalculatePricing();
+    }
+
+    showToast('Draft restored successfully', 'success');
+}
+
+function markScreenPrintDirty() {
+    if (spPersistence) {
+        spPersistence.markDirty();
+    }
+}
 
 // ============================================================
 // EDIT MODE FUNCTIONS
@@ -251,30 +457,50 @@ function populateAdditionalCharges(session) {
 }
 
 /**
- * Populate print location from session Notes
+ * Populate print configuration from session Notes
  */
-function populatePrintLocation(session) {
+function populatePrintConfigFromSession(session) {
     try {
         const notes = JSON.parse(session.Notes || '{}');
-        if (notes.location) {
-            // Location format could be 'LC', 'FF_FB', etc.
-            const parts = notes.location.split('_');
-            const frontLoc = parts[0] || 'LC';
-            const backLoc = parts[1] || '';
 
-            // Set front location radio
-            const frontRadio = document.querySelector(`input[name="front-location"][value="${frontLoc}"]`);
+        // Set front location
+        if (notes.frontLocation) {
+            const frontRadio = document.querySelector(`input[name="front-location"][value="${notes.frontLocation}"]`);
             if (frontRadio) frontRadio.checked = true;
-
-            // Set back location radio
-            const backRadio = document.querySelector(`input[name="back-location"][value="${backLoc}"]`);
-            if (backRadio) backRadio.checked = true;
-
-            // Trigger update
-            updatePrintLocation();
         }
+
+        // Set front colors
+        if (notes.frontColors) {
+            const frontColorsRadio = document.querySelector(`input[name="front-colors"][value="${notes.frontColors}"]`);
+            if (frontColorsRadio) frontColorsRadio.checked = true;
+        }
+
+        // Set back location
+        if (notes.backLocation) {
+            const backRadio = document.querySelector(`input[name="back-location"][value="${notes.backLocation}"]`);
+            if (backRadio) backRadio.checked = true;
+        }
+
+        // Set back colors
+        if (notes.backColors) {
+            const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${notes.backColors}"]`);
+            if (backColorsRadio) backColorsRadio.checked = true;
+        }
+
+        // Set dark garment toggle
+        if (notes.isDarkGarment) {
+            document.getElementById('dark-garment-toggle').checked = true;
+        }
+
+        // Set safety stripes toggle
+        if (notes.hasSafetyStripes) {
+            document.getElementById('safety-stripes-toggle').checked = true;
+        }
+
+        // Trigger update to recalculate screens and fees
+        updatePrintConfig();
     } catch (e) {
-        console.warn('[EditMode] Could not parse location from notes:', e);
+        console.warn('[EditMode] Could not parse print config from notes:', e);
     }
 }
 
@@ -282,9 +508,9 @@ function populatePrintLocation(session) {
  * Populate products from line items
  */
 async function populateProducts(items) {
-    // Filter to only DTG product items
+    // Filter to only screen print product items
     const productItems = items.filter(item =>
-        item.EmbellishmentType === 'dtg' &&
+        item.EmbellishmentType === 'screenprint' &&
         item.StyleNumber
     );
 
@@ -341,7 +567,6 @@ async function addProductFromQuote(product) {
     // Select the color
     const pickerDropdown = row.querySelector('.color-picker-dropdown');
     if (pickerDropdown) {
-        // Try to find color option by name or catalog color
         const colorOption = pickerDropdown.querySelector(
             `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
         ) || Array.from(pickerDropdown.querySelectorAll('.color-option')).find(opt =>
@@ -361,7 +586,6 @@ async function addProductFromQuote(product) {
             // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
             const normalizedSize = size;
 
-            // Standard sizes go directly in the row
             if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
                 const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
                                  row.querySelector(`input[data-size="${size}"]`);
@@ -370,8 +594,6 @@ async function addProductFromQuote(product) {
                     sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             } else {
-                // Extended sizes - need to open popup and set them
-                // For now, store them and they'll be handled when extended size popup opens
             }
         }
     }
@@ -406,22 +628,17 @@ async function loadQuoteForEditing(quoteId) {
         // Populate additional charges (2026 fee refactor)
         populateAdditionalCharges(session);
 
-        // Populate print location
-        populatePrintLocation(session);
+        // Populate print configuration
+        populatePrintConfigFromSession(session);
 
         // Populate products from line items
         await populateProducts(items);
 
         // Restore order & shipping fields from saved session
-        setOrderShippingData('dtg-order-fields', session);
-        // Restore tax rate if saved
-        if (session.TaxRate) {
-            const rateInput = document.getElementById('tax-rate-input');
-            if (rateInput) rateInput.value = parseFloat(session.TaxRate) * 100 || 10.1;
-        }
+        setOrderShippingData('spc-order-fields', session);
 
         // Recalculate pricing to update totals
-        recalculateAllPrices();
+        recalculatePricing();
 
         showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
@@ -455,7 +672,7 @@ function resetQuote() {
             <td colspan="13" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
                 <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
                 <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500)</div>
+                <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
             </td>
         </tr>
     `;
@@ -466,10 +683,32 @@ function resetQuote() {
     productCache = {};
     childRowMap = {};
 
-    // Reset print location to defaults
-    printLocation = { front: 'LC', back: '', combined: 'LC' };
+    // Reset print config to defaults
+    printConfig = {
+        frontLocation: 'LC',
+        frontColors: 1,
+        backLocation: '',
+        backColors: 1,
+        isDarkGarment: false,
+        isSafetyStripes: false,
+        totalScreens: 1,
+        setupFee: 30.00
+    };
+
+    // Reset LTM control panel
+    setLtmControlState('spc-ltm-panel', { enabled: true, displayMode: 'builtin' });
+    const ltmWrapperReset = document.getElementById('spc-ltm-wrapper');
+    if (ltmWrapperReset) ltmWrapperReset.style.display = 'none';
+
+    // Reset UI controls
     document.querySelector('input[name="front-location"][value="LC"]').checked = true;
     document.querySelectorAll('input[name="back-location"]').forEach(r => r.checked = false);
+    document.getElementById('front-colors').value = '1';
+    document.getElementById('back-colors').value = '1';
+    const darkGarmentToggle = document.getElementById('dark-garment');
+    const safetyToggle = document.getElementById('safety-stripes');
+    if (darkGarmentToggle) darkGarmentToggle.checked = false;
+    if (safetyToggle) safetyToggle.checked = false;
 
     // Reset customer form fields
     document.getElementById('customer-name').value = '';
@@ -477,13 +716,8 @@ function resetQuote() {
     document.getElementById('company-name').value = '';
     document.getElementById('customer-lookup').value = '';
 
-    // Reset LTM control panel
-    setLtmControlState('dtg-ltm-panel', { enabled: true, displayMode: 'builtin' });
-    const ltmWrapperReset = document.getElementById('dtg-ltm-wrapper');
-    if (ltmWrapperReset) ltmWrapperReset.style.display = 'none';
-
     // Reset order & shipping fields
-    setOrderShippingData('dtg-order-fields', {});
+    setOrderShippingData('spc-order-fields', {});
     const taxRateReset = document.getElementById('tax-rate-input');
     if (taxRateReset) taxRateReset.value = '10.1';
 
@@ -495,13 +729,26 @@ function resetQuote() {
     if (discountAmount) discountAmount.value = '';
     if (discountReason) discountReason.value = '';
 
+    // Reset artwork services
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artCharge = document.getElementById('art-charge');
+    const artChargeWrapper = document.getElementById('art-charge-wrapper');
+    const graphicDesignHours = document.getElementById('graphic-design-hours');
+    if (artChargeToggle) artChargeToggle.checked = false;
+    if (artCharge) {
+        artCharge.value = '0';
+        artCharge.disabled = true;
+    }
+    if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
+    if (graphicDesignHours) graphicDesignHours.value = '';
+
     // Clear edit mode
     editingQuoteId = null;
     editingRevision = null;
 
     // Clear draft storage
-    if (dtgPersistence) {
-        dtgPersistence.clearDraft();
+    if (typeof screenPrintPersistence !== 'undefined' && screenPrintPersistence) {
+        screenPrintPersistence.clearDraft();
     }
 
     // Mark as saved (no unsaved changes)
@@ -509,6 +756,7 @@ function resetQuote() {
 
     // Update totals display
     updateGrandTotal();
+    updateScreenConfig();
 
     // Focus search bar for immediate typing
     const searchInput = document.getElementById('product-search');
@@ -528,11 +776,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     showLoading(true);
 
     try {
-        // Initialize DTG pricing service
-        dtgPricingService = new DTGPricingService();
+        // Initialize Screen Print pricing service
+        screenPrintPricingService = new ScreenPrintPricingService();
 
         // Initialize quote service for save/load
-        quoteService = new DTGQuoteService();
+        quoteService = new ScreenPrintQuoteService();
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = checkForEditMode();
@@ -540,18 +788,15 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Skip draft recovery and load the existing quote instead
             await loadQuoteForEditing(editQuoteId);
         } else {
-            // Initialize auto-save persistence (2026 consolidation)
-            initDTGPersistence();
-
-            // Setup event listeners
-            setupSearchAutocomplete();
-            setupKeyboardShortcuts();
+            // Initialize auto-save & draft recovery (2026 consolidation)
+            initScreenPrintPersistence();
 
             // Check for draft recovery
-            if (dtgSession && dtgSession.shouldShowRecovery()) {
-                dtgSession.showRecoveryDialog(
-                    (draft) => restoreDTGDraft(draft),
+            if (spSession && spSession.shouldShowRecovery()) {
+                spSession.showRecoveryDialog(
+                    (draft) => restoreScreenPrintDraft(draft),
                     () => {
+                        if (spPersistence) spPersistence.clearDraft();
                         // No auto-row - user starts with empty state
                     }
                 );
@@ -563,6 +808,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         setupSearchAutocomplete();
         setupKeyboardShortcuts();
 
+        // Initialize print configuration
+        updatePrintConfig();
+
         // Auto-select sales rep based on logged-in staff (2026 consolidation)
         if (typeof StaffAuthHelper !== 'undefined') {
             StaffAuthHelper.autoSelectSalesRep('sales-rep');
@@ -573,12 +821,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             const customerLookup = new CustomerLookupService();
             customerLookup.bindToInput('customer-lookup', {
                 onSelect: (contact) => {
+                    // Auto-fill customer fields
                     document.getElementById('customer-name').value = contact.ct_NameFull || '';
                     document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
                     document.getElementById('company-name').value = contact.CustomerCompanyName || '';
                     showToast('Customer info loaded', 'success');
                 },
                 onClear: () => {
+                    // Clear customer fields when lookup cleared
                     document.getElementById('customer-name').value = '';
                     document.getElementById('customer-email').value = '';
                     document.getElementById('company-name').value = '';
@@ -587,8 +837,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         // Initialize order & shipping fields (shared component)
-        renderOrderShippingFields('dtg-order-fields');
-        initOrderShippingListeners('dtg-order-fields', {
+        renderOrderShippingFields('spc-order-fields');
+        initOrderShippingListeners('spc-order-fields', {
             onShippingFeeChange: () => updateTaxCalculation(),
             onTaxRateChange: (rate) => {
                 const rateInput = document.getElementById('tax-rate-input');
@@ -603,7 +853,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             searchInput.focus();
         }
 
-        showToast('Ready to build DTG quotes!', 'success');
+        showToast('Ready to build Screen Print quotes!', 'success');
 
     } catch (error) {
         console.error('Failed to initialize:', error);
@@ -614,156 +864,80 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================================
-// AUTO-SAVE PERSISTENCE (2026 consolidation)
+// PRODUCT SEARCH & AUTOCOMPLETE (Using ExactMatchSearch module)
 // ============================================================
 
-function initDTGPersistence() {
-    if (typeof QuotePersistence !== 'undefined') {
-        dtgPersistence = new QuotePersistence({
-            prefix: 'DTG',
-            autoSaveInterval: 30000, // 30 seconds
-            debug: false
-        });
-
-        // Set up auto-save callback
-        dtgPersistence.onAutoSave = () => {
-            const data = getDTGQuoteData();
-            if (data && data.products.length > 0) {
-                dtgPersistence.save(data);
-            }
-        };
-
-    } else {
-        console.warn('[DTG] QuotePersistence not available');
-    }
-
-    if (typeof QuoteSession !== 'undefined' && dtgPersistence) {
-        dtgSession = new QuoteSession({
-            prefix: 'DTG',
-            persistence: dtgPersistence,
-            debug: false
-        });
-    }
-}
-
-function getDTGQuoteData() {
-    const products = collectProductsFromTable();
-    return {
-        products: products,
-        printLocation: document.querySelector('input[name="print-location"]:checked')?.value || 'front',
-        customerName: document.getElementById('customer-name')?.value || '',
-        customerEmail: document.getElementById('customer-email')?.value || '',
-        companyName: document.getElementById('company-name')?.value || '',
-        projectName: document.getElementById('project-name')?.value || '',
-        specialNotes: document.getElementById('special-notes')?.value || '',
-        salesRep: document.getElementById('sales-rep')?.value || ''
-    };
-}
-
-function restoreDTGDraft(draft) {
-
-    // Restore customer info
-    if (draft.customerName) {
-        const el = document.getElementById('customer-name');
-        if (el) el.value = draft.customerName;
-    }
-    if (draft.customerEmail) {
-        const el = document.getElementById('customer-email');
-        if (el) el.value = draft.customerEmail;
-    }
-    if (draft.companyName) {
-        const el = document.getElementById('company-name');
-        if (el) el.value = draft.companyName;
-    }
-    if (draft.projectName) {
-        const el = document.getElementById('project-name');
-        if (el) el.value = draft.projectName;
-    }
-    if (draft.specialNotes) {
-        const el = document.getElementById('special-notes');
-        if (el) el.value = draft.specialNotes;
-    }
-    if (draft.salesRep) {
-        const el = document.getElementById('sales-rep');
-        if (el) el.value = draft.salesRep;
-    }
-
-    // Restore print location
-    if (draft.printLocation) {
-        const radio = document.querySelector(`input[name="print-location"][value="${draft.printLocation}"]`);
-        if (radio) radio.checked = true;
-    }
-
-    // Restore products
-    if (draft.products && draft.products.length > 0) {
-        // Clear existing rows first
-        const tbody = document.getElementById('products-tbody');
-        if (tbody) tbody.innerHTML = '';
-
-        // Add each product back
-        draft.products.forEach(product => {
-            // Simplified restoration - would need to match your addProductRow logic
-            // For now, just add an empty row and user can re-enter
-            addNewRow();
-        });
-    } else {
-        addNewRow();
-    }
-
-    // Recalculate pricing
-    recalculatePricing();
-
-}
-
-function markDTGDirty() {
-    if (dtgPersistence) {
-        dtgPersistence.markDirty();
-    }
-}
-
-// ============================================================
-// PRODUCT SEARCH & AUTOCOMPLETE
-// ============================================================
+// Module instance - initialized in setupSearchAutocomplete
+let exactMatchSearcher = null;
 
 function setupSearchAutocomplete() {
     const searchInput = document.getElementById('product-search');
     const suggestions = document.getElementById('search-suggestions');
 
-    let debounceTimer;
-    let selectedIndex = -1;
+    if (!searchInput || !window.ExactMatchSearch) {
+        console.error('[ScreenPrint] Search input or ExactMatchSearch module not found');
+        return;
+    }
 
+    // Initialize ExactMatchSearch with full keyboard navigation
+    exactMatchSearcher = new window.ExactMatchSearch({
+        apiBase: API_BASE,
+        debounceMs: 300,  // Standardized debounce
+
+        // Auto-load exact matches immediately
+        onExactMatch: (product) => {
+            searchInput.value = '';
+            selectProduct(product.value);
+        },
+
+        // Show suggestions dropdown
+        onSuggestions: (products) => {
+            showSearchSuggestions(products);
+        },
+
+        // Keyboard navigation: update visual highlight
+        onNavigate: (selectedIndex, products) => {
+            updateSearchSelectionHighlight(selectedIndex);
+        },
+
+        // Keyboard navigation: select item via Enter
+        onSelect: (product) => {
+            searchInput.value = '';
+            selectProduct(product.value);
+        },
+
+        // Keyboard navigation: close dropdown via Escape
+        onClose: () => {
+            suggestions.classList.remove('show');
+        }
+    });
+
+    // Wire up search input
     searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
         const query = this.value.trim();
-        selectedIndex = -1; // Reset selection on new input
 
-        if (query.length < 3) {
+        if (query.length < 2) {
             suggestions.classList.remove('show');
             return;
         }
 
-        debounceTimer = setTimeout(() => searchProducts(query), 150);
+        exactMatchSearcher.search(query);
     });
 
+    // Handle keyboard navigation
     searchInput.addEventListener('keydown', function(e) {
-        const items = suggestions.querySelectorAll('.suggestion-item');
+        // Let ExactMatchSearch handle navigation keys
+        if (exactMatchSearcher && exactMatchSearcher.handleKeyDown(e)) {
+            return; // Event was handled
+        }
 
-        if (e.key === 'ArrowDown') {
+        // Handle Enter for immediate search when nothing is selected
+        if (e.key === 'Enter') {
             e.preventDefault();
-            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-            updateSelection(items, selectedIndex);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(selectedIndex - 1, -1);
-            updateSelection(items, selectedIndex);
-        } else if (e.key === 'Enter') {
-            if (selectedIndex >= 0 && items[selectedIndex]) {
-                e.preventDefault();
-                items[selectedIndex].click();
+            const query = searchInput.value.trim();
+            if (query.length >= 2) {
+                exactMatchSearcher.searchImmediate(query);
             }
-        } else if (e.key === 'Escape') {
-            suggestions.classList.remove('show');
-            selectedIndex = -1;
         }
     });
 
@@ -771,105 +945,60 @@ function setupSearchAutocomplete() {
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.search-input-wrapper')) {
             suggestions.classList.remove('show');
-            selectedIndex = -1;
+            if (exactMatchSearcher) exactMatchSearcher.resetNavigation();
         }
     });
+
 }
 
 /**
- * Update visual selection state for keyboard navigation
+ * Show search suggestions dropdown
  */
-function updateSelection(items, selectedIndex) {
-    items.forEach((item, i) => {
-        item.classList.toggle('selected', i === selectedIndex);
-    });
-    if (selectedIndex >= 0 && items[selectedIndex]) {
-        items[selectedIndex].scrollIntoView({ block: 'nearest' });
-    }
-}
-
-/**
- * Highlight matched text in search results
- */
-function highlightMatch(text, query) {
-    if (!query) return text;
-    // Escape regex special characters in query
-    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${escapedQuery})`, 'gi');
-    return text.replace(regex, '<strong>$1</strong>');
-}
-
-/**
- * Rank search results by relevance to query (best web practices)
- * Priority: exact match > starts with > contains > other
- */
-function rankSearchResults(results, query) {
-    const q = query.toUpperCase();
-
-    return results.sort((a, b) => {
-        const aStyle = (a.value || '').toUpperCase();
-        const bStyle = (b.value || '').toUpperCase();
-
-        // Calculate priority score (lower = higher priority)
-        const getScore = (style) => {
-            if (style === q) return 0;           // Exact match
-            if (style.startsWith(q)) return 1;   // Starts with
-            if (style.includes(q)) return 2;     // Contains
-            return 3;                             // Other
-        };
-
-        const aScore = getScore(aStyle);
-        const bScore = getScore(bStyle);
-
-        // Primary sort: by relevance score
-        if (aScore !== bScore) return aScore - bScore;
-
-        // Secondary sort: alphabetically
-        return aStyle.localeCompare(bStyle);
-    });
-}
-
-async function searchProducts(query) {
+function showSearchSuggestions(products) {
     const suggestions = document.getElementById('search-suggestions');
 
-    try {
-        // Use stylesearch API endpoint (returns {value, label} format)
-        const response = await fetch(`${API_BASE}/api/stylesearch?term=${encodeURIComponent(query)}`);
-        const data = await response.json();
-
-        if (data && data.length > 0) {
-            // Rank results: exact matches first, then starts-with, then contains
-            // Limit to 10 results for focused display
-            const rankedResults = rankSearchResults(data, query).slice(0, 10);
-
-            suggestions.innerHTML = rankedResults.map(product => {
-                // Extract product name (remove style prefix from label)
-                const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
-                return `
-                    <div class="suggestion-item" onclick="selectProduct('${product.value}')">
-                        <span class="style">${highlightMatch(product.value, query)}</span>
-                        <span class="name">${productName}</span>
-                    </div>
-                `;
-            }).join('');
-            suggestions.classList.add('show');
-
-            // Cache product data (convert to expected format)
-            rankedResults.forEach(p => {
-                productCache[p.value] = {
-                    STYLE: p.value,
-                    PRODUCT_TITLE: p.label
-                };
-            });
-        } else {
-            suggestions.innerHTML = '<div class="suggestion-item"><span>No products found</span></div>';
-            suggestions.classList.add('show');
-        }
-    } catch (error) {
-        console.error('Search error:', error);
-        suggestions.innerHTML = '<div class="suggestion-item"><span>Search error - try again</span></div>';
+    if (!products || products.length === 0) {
+        suggestions.innerHTML = '<div class="suggestion-item"><span>No products found</span></div>';
         suggestions.classList.add('show');
+        return;
     }
+
+    suggestions.innerHTML = products.map(product => {
+        // Extract product name (remove style prefix from label)
+        const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
+        return `
+            <div class="suggestion-item" onclick="selectProduct('${product.value}')">
+                <span class="style">${product.value}</span>
+                <span class="name">${productName}</span>
+            </div>
+        `;
+    }).join('');
+    suggestions.classList.add('show');
+
+    // Cache product data (convert to expected format)
+    products.forEach(p => {
+        productCache[p.value] = {
+            STYLE: p.value,
+            PRODUCT_TITLE: p.label
+        };
+    });
+}
+
+/**
+ * Update visual highlight on selected suggestion item
+ */
+function updateSearchSelectionHighlight(selectedIndex) {
+    const suggestions = document.getElementById('search-suggestions');
+    if (!suggestions) return;
+
+    suggestions.querySelectorAll('.suggestion-item').forEach((item, index) => {
+        if (index === selectedIndex) {
+            item.classList.add('selected');
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+            item.classList.remove('selected');
+        }
+    });
 }
 
 async function selectProduct(styleNumber) {
@@ -1023,17 +1152,9 @@ async function onStyleChange(input, rowId) {
             const categoryName = colorsData.CATEGORY_NAME || '';
             row.dataset.category = categoryName;
 
-            // Check for cap products - DTG CANNOT print caps, block them
+            // Screen Print can print both garments and caps
             const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);
-            if (isCap) {
-                // Remove the row - DTG can't print caps
-                row.remove();
-                showToast('DTG printing is not available for caps. Please use embroidery for cap orders.', 'error', 5000);
-                return;
-            }
-
-            // All products in DTG are garments (no caps allowed)
-            row.dataset.isCap = 'false';
+            row.dataset.isCap = isCap ? 'true' : 'false';
 
             if (colors && colors.length > 0) {
                 // Populate custom color picker dropdown with swatches
@@ -1134,91 +1255,7 @@ const POSITION_FULL_NAMES = {
  * @param {Object} logoConfig - Logo configuration (position, stitchCount)
  * @returns {string} HTML string for breakdown
  */
-function buildPricingBreakdown(product, lineItem, logoConfig) {
-    if (!lineItem) return '';
-
-    const isCap = product?.isCap || false;
-    const logoPos = logoConfig?.position || (isCap ? 'CF' : 'Left Chest');
-    const stitchCount = logoConfig?.stitchCount || 8000;
-    const stitchK = Math.round(stitchCount / 1000);
-
-    // Get abbreviated position name
-    const posAbbrev = POSITION_ABBREV[logoPos] || logoPos.substring(0, 2).toUpperCase();
-    const posFullName = POSITION_FULL_NAMES[posAbbrev] || logoPos;
-
-    const basePrice = lineItem.basePrice || 0;
-    const extraStitchCost = lineItem.extraStitchCost || 0;
-    const alCost = lineItem.alCost || 0;
-    const unitPrice = lineItem.unitPrice || 0;
-
-    // Calculate extra stitches for tooltip
-    const baseStitches = isCap ? 8000 : 8000;
-    const extraK = stitchCount > baseStitches ? Math.round((stitchCount - baseStitches) / 1000) : 0;
-    const rate = isCap ? 1.00 : 1.25;
-
-    // Build tooltip text with full formula (&#10; = newline in title attribute)
-    let tooltipParts = [`Position: ${posFullName}`, `Stitches: ${stitchCount.toLocaleString()}`];
-    tooltipParts.push(`Base: $${basePrice.toFixed(2)}`);
-    if (extraStitchCost > 0) {
-        tooltipParts.push(`Extra: ${extraK}K × $${rate.toFixed(2)} = $${extraStitchCost.toFixed(2)}`);
-    }
-    if (alCost > 0) {
-        tooltipParts.push(`AL: $${alCost.toFixed(2)}`);
-    }
-    tooltipParts.push(`Unit: $${unitPrice.toFixed(2)}`);
-    const tooltipText = tooltipParts.join('&#10;');
-
-    // Build visible breakdown with compact format
-    let html = `<span class="breakdown-wrapper" title="${tooltipText}">`;
-    html += `<span class="breakdown-icon">└─</span>`;
-    html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
-
-    // If there are extra costs, show detailed breakdown
-    if (extraStitchCost > 0 || alCost > 0) {
-        html += ` <span class="breakdown-sep">|</span> `;
-        html += `<span class="breakdown-base">Base $${formatPrice(basePrice)}</span>`;
-
-        if (extraStitchCost > 0) {
-            html += ` <span class="breakdown-plus">+</span> `;
-            html += `<span class="breakdown-extra">Extra $${formatPrice(extraStitchCost)}</span>`;
-        }
-
-        if (alCost > 0) {
-            html += ` <span class="breakdown-plus">+</span> `;
-            html += `<span class="breakdown-al">AL $${formatPrice(alCost)}</span>`;
-        }
-
-        html += ` <span class="breakdown-eq">=</span> `;
-        html += `<span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
-    } else {
-        // Simple format: just position, stitch count, and price
-        html += ` <span class="breakdown-sep">|</span> <span class="breakdown-total">$${formatPrice(unitPrice)}/ea</span>`;
-    }
-
-    html += `</span>`;
-    return html;
-}
-
-/**
- * Update the pricing breakdown display for a product row
- * @param {number} rowId - Row ID
- * @param {Object} product - Product data
- * @param {Object} lineItem - Line item from pricing calculator
- * @param {Object} logoConfig - Logo configuration
- */
-function updateRowBreakdown(rowId, product, lineItem, logoConfig) {
-    const breakdownEl = document.getElementById(`breakdown-${rowId}`);
-    if (!breakdownEl) return;
-
-    const breakdownHtml = buildPricingBreakdown(product, lineItem, logoConfig);
-    if (breakdownHtml) {
-        breakdownEl.innerHTML = breakdownHtml;
-        breakdownEl.classList.add('visible');
-    } else {
-        breakdownEl.innerHTML = '';
-        breakdownEl.classList.remove('visible');
-    }
-}
+// buildPricingBreakdown() and updateRowBreakdown() removed — dead code (embroidery-specific, never called in screenprint)
 
 /**
  * Check if a style number is a cap/hat product
@@ -2601,30 +2638,7 @@ function clearExtendedSize(parentRowId, size) {
     recalculatePricing();
 }
 
-/**
- * Reorder a product row based on type: garments first, caps below
- * Called after cap detection to maintain visual organization
- */
-function reorderRowByProductType(row) {
-    if (!row) return;
-
-    const tbody = document.getElementById('product-tbody');
-    if (!tbody) return;
-
-    const isCap = row.dataset.isCap === 'true';
-
-    if (isCap) {
-        // Cap rows go at the end (after all other rows)
-        tbody.appendChild(row);
-    } else {
-        // Garment rows go before any cap rows
-        const firstCapRow = tbody.querySelector('tr[data-is-cap="true"]:not(.child-row)');
-        if (firstCapRow) {
-            tbody.insertBefore(row, firstCapRow);
-        }
-        // If no cap rows yet, row stays where it is (already at end)
-    }
-}
+// reorderRowByProductType() removed — dead code (never called)
 
 function deleteRow(rowId) {
     const row = document.getElementById(`row-${rowId}`);
@@ -2723,12 +2737,29 @@ function handleCellKeydown(event, input) {
 }
 
 // ============================================================
-// PRICING CALCULATIONS (DTG)
+// PRICING CALCULATIONS (Screen Print)
 // ============================================================
 
 // Alias for backward compatibility
 function recalculateAllPrices() {
     recalculatePricing();
+}
+
+// Screen Print tier mapping (different from DTG)
+const SCREENPRINT_TIERS = [
+    { label: '24-36', min: 24, max: 36 },
+    { label: '37-72', min: 37, max: 72 },
+    { label: '73-144', min: 73, max: 144 },
+    { label: '145+', min: 145, max: Infinity }
+];
+
+function getScreenPrintTier(qty) {
+    // Under 24 uses 24-36 pricing (+ LTM fee applied separately)
+    if (qty < 24) return SCREENPRINT_TIERS[0];
+    for (const tier of SCREENPRINT_TIERS) {
+        if (qty >= tier.min && qty <= tier.max) return tier;
+    }
+    return SCREENPRINT_TIERS[SCREENPRINT_TIERS.length - 1];
 }
 
 async function recalculatePricing() {
@@ -2738,11 +2769,11 @@ async function recalculatePricing() {
     if (productList.length === 0) {
         updatePricingDisplay({
             totalQuantity: 0,
-            tier: '12-23',
+            tier: '24-36',
             subtotal: 0,
             ltmFee: 0,
-            setupFees: 0,
-            grandTotal: 0
+            setupFees: printConfig.setupFee,
+            grandTotal: printConfig.setupFee
         });
         // Clear all price and total cells
         document.querySelectorAll('.cell-price').forEach(cell => {
@@ -2761,37 +2792,43 @@ async function recalculatePricing() {
     });
 
     // Determine tier based on total quantity
-    let tier = '24-47';
-    if (totalQty >= 72) tier = '72+';
-    else if (totalQty >= 48) tier = '48-71';
-    else if (totalQty >= 24) tier = '24-47';
-    else tier = '12-23'; // DTG minimum tier (uses 24-47 pricing with LTM)
+    const tier = getScreenPrintTier(totalQty);
 
     // LTM control panel — show/hide based on quantity
-    const wouldHaveLTM = totalQty > 0 && totalQty < 24;
-    const ltmWrapper = document.getElementById('dtg-ltm-wrapper');
+    let baseLtmFee = 0;
+    if (totalQty > 0 && totalQty <= 36) baseLtmFee = 75;
+    else if (totalQty <= 71) baseLtmFee = 50;
+    const wouldHaveLTM = baseLtmFee > 0;
+
+    const ltmWrapper = document.getElementById('spc-ltm-wrapper');
     if (ltmWrapper) {
         if (wouldHaveLTM) {
             ltmWrapper.style.display = '';
-            if (!document.querySelector('#dtg-ltm-panel .ltm-control-panel')) {
-                renderLtmControlPanel('dtg-ltm-panel', { feeAmount: 50 });
-                initLtmControlListeners('dtg-ltm-panel', () => {
+            if (!document.querySelector('#spc-ltm-panel .ltm-control-panel')) {
+                renderLtmControlPanel('spc-ltm-panel', { feeAmount: baseLtmFee });
+                initLtmControlListeners('spc-ltm-panel', () => {
                     recalculatePricing();
-                    markDTGDirty();
+                    markScreenPrintDirty();
                 });
+            } else {
+                setLtmControlState('spc-ltm-panel', { feeAmount: baseLtmFee });
             }
         } else {
             ltmWrapper.style.display = 'none';
-            setLtmControlState('dtg-ltm-panel', { enabled: true, displayMode: 'builtin' });
+            setLtmControlState('spc-ltm-panel', { enabled: true, displayMode: 'builtin' });
         }
     }
 
     // Read LTM control state
-    const ltmState = getLtmControlState('dtg-ltm-panel');
+    const ltmState = getLtmControlState('spc-ltm-panel');
     const ltmEnabled = wouldHaveLTM ? ltmState.enabled : true;
     const ltmDisplayMode = ltmState.displayMode || 'builtin';
-    const ltmFee = (wouldHaveLTM && ltmEnabled) ? 50 : 0;
+    const ltmFee = (wouldHaveLTM && ltmEnabled) ? baseLtmFee : 0;
     const perUnitLTM = ltmFee > 0 ? Math.floor(ltmFee / totalQty * 100) / 100 : 0;
+
+    // Safety stripes: $2 per piece per location
+    const locationCount = printConfig.backLocation ? 2 : 1;
+    const safetyStripesPerPiece = printConfig.isSafetyStripes ? (2.00 * locationCount) : 0;
 
     let subtotal = 0;
     const pricedProducts = [];
@@ -2801,31 +2838,40 @@ async function recalculatePricing() {
         for (const product of productList) {
             const style = product.style;
 
-            // Fetch DTG pricing data for this style
-            const pricingData = await dtgPricingService.fetchPricingData(style, product.catalogColor);
+            // Fetch Screen Print pricing data for this style
+            const pricingData = await screenPrintPricingService.fetchPricingData(style);
 
             if (!pricingData) {
                 console.warn(`No pricing data for ${style}`);
                 continue;
             }
 
-            // Calculate prices for all locations
-            const locationCode = printLocation.combined;
-            const allPrices = dtgPricingService.calculateAllLocationPrices(
-                pricingData.pricing || pricingData,
-                totalQty
-            );
+            // Get primary location pricing (garment + print)
+            const frontColors = printConfig.frontColors.toString();
+            const primaryPricing = pricingData.primaryLocationPricing?.[frontColors];
 
-            if (!allPrices || !allPrices[locationCode]) {
-                console.warn(`No prices for location ${locationCode}`);
+            if (!primaryPricing || !primaryPricing.tiers) {
+                console.warn(`No primary pricing for ${frontColors} colors`);
                 continue;
             }
 
-            const locationPrices = allPrices[locationCode];
-            const actualTier = dtgPricingService.getTierForQuantity(
-                (pricingData.pricing || pricingData).tiers,
-                totalQty
-            );
+            // Find the tier data for this quantity
+            const tierData = primaryPricing.tiers.find(t =>
+                totalQty >= t.minQty && (t.maxQty === null || totalQty <= t.maxQty)
+            ) || primaryPricing.tiers[0];
+
+            // Get additional location pricing if back location enabled
+            let additionalPricePerPiece = 0;
+            if (printConfig.backLocation) {
+                const backColors = printConfig.backColors.toString();
+                const additionalPricing = pricingData.additionalLocationPricing?.[backColors];
+                if (additionalPricing && additionalPricing.tiers) {
+                    const additionalTier = additionalPricing.tiers.find(t =>
+                        totalQty >= t.minQty && (t.maxQty === null || totalQty <= t.maxQty)
+                    ) || additionalPricing.tiers[0];
+                    additionalPricePerPiece = additionalTier?.pricePerPiece || 0;
+                }
+            }
 
             // Find parent row for this product
             const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`);
@@ -2838,8 +2884,18 @@ async function recalculatePricing() {
             Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
                 if (qty <= 0) return;
 
-                const sizePrice = locationPrices[size]?.[actualTier?.TierLabel];
-                if (typeof sizePrice !== 'number') return;
+                // Get base price for this size from primary location
+                let sizePrice = tierData.prices?.[size];
+                if (typeof sizePrice !== 'number') {
+                    // Try common fallbacks
+                    sizePrice = tierData.prices?.['M'] || tierData.prices?.['L'] || 0;
+                }
+
+                // Add additional location price
+                sizePrice += additionalPricePerPiece;
+
+                // Add safety stripes
+                sizePrice += safetyStripesPerPiece;
 
                 // Display price: builtin mode adds LTM per-unit, separate mode shows base price
                 const displayPrice = (ltmDisplayMode === 'builtin' && perUnitLTM > 0) ? sizePrice + perUnitLTM : sizePrice;
@@ -2880,18 +2936,19 @@ async function recalculatePricing() {
             }
 
             // Update pricing breakdown for the row
-            updateRowBreakdownDTG(rowId, product, locationCode, locationPrices, actualTier);
+            updateRowBreakdownScreenPrint(rowId, product, tierData);
 
             subtotal += productSubtotal;
             pricedProducts.push({
                 product,
-                prices: locationPrices,
-                tier: actualTier
+                prices: tierData.prices,
+                tier: tier
             });
         }
 
         // Calculate grand total — in builtin mode LTM is already in subtotal via inflated unit prices
-        const grandTotal = (ltmDisplayMode === 'builtin') ? subtotal : subtotal + ltmFee;
+        const setupFees = printConfig.setupFee;
+        const grandTotal = (ltmDisplayMode === 'builtin') ? subtotal + setupFees : subtotal + ltmFee + setupFees;
 
         // Store LTM state for tax/discount calculations
         window.currentPricingData = window.currentPricingData || {};
@@ -2901,37 +2958,47 @@ async function recalculatePricing() {
         // Update pricing display sidebar
         updatePricingDisplay({
             totalQuantity: totalQty,
-            tier: tier,
+            tier: tier.label,
             subtotal: subtotal,
             ltmFee: ltmFee,
             ltmDisplayMode: ltmDisplayMode,
-            setupFees: 0, // No setup fees for DTG
+            setupFees: setupFees,
             grandTotal: grandTotal,
             products: pricedProducts
         });
 
     } catch (error) {
-        console.error('DTG Pricing calculation error:', error);
+        console.error('Screen Print Pricing calculation error:', error);
         showToast('Error calculating prices. Please try again.', 'error');
     }
 
-    // Mark dirty for auto-save (pricing changes imply data changes)
-    markDTGDirty();
+    // Mark as dirty for auto-save (2026 consolidation)
+    markScreenPrintDirty();
 }
 
-// Update row breakdown display for DTG (simpler than embroidery - no stitch counts)
-function updateRowBreakdownDTG(rowId, product, locationCode, prices, tier) {
+// Update row breakdown display for Screen Print
+function updateRowBreakdownScreenPrint(rowId, product, tierData) {
     const breakdownEl = document.getElementById(`breakdown-${rowId}`);
     if (!breakdownEl) return;
 
-    const locationName = LOCATION_NAMES[locationCode] || locationCode;
-    const basePrice = prices['M']?.[tier?.TierLabel] || prices['L']?.[tier?.TierLabel] || 0;
+    const frontName = LOCATION_NAMES[printConfig.frontLocation] || printConfig.frontLocation;
+    const basePrice = tierData.prices?.['M'] || tierData.prices?.['L'] || 0;
 
-    breakdownEl.innerHTML = `
-        <span class="breakdown-item">${locationName}</span>
+    let breakdownHtml = `
+        <span class="breakdown-item">${frontName} (${printConfig.frontColors}-color)</span>
         <span class="breakdown-separator">|</span>
-        <span class="breakdown-item">Base $${basePrice.toFixed(2)}</span>
+        <span class="breakdown-item">$${basePrice.toFixed(2)}/ea</span>
     `;
+
+    if (printConfig.backLocation) {
+        const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
+        breakdownHtml += `
+            <span class="breakdown-separator">+</span>
+            <span class="breakdown-item">${backName} (${printConfig.backColors}-color)</span>
+        `;
+    }
+
+    breakdownEl.innerHTML = breakdownHtml;
 }
 
 function collectProductsFromTable() {
@@ -3030,21 +3097,29 @@ function updatePricingDisplay(pricing) {
     // Store for toggle reference
     window.currentPricingData = pricing;
 
-    // Update sidebar print location display
-    const locationName = LOCATION_NAMES[printLocation.combined] || printLocation.combined;
-    const sidebarLocation = document.getElementById('sidebar-location');
-    if (sidebarLocation) {
-        sidebarLocation.textContent = locationName;
-    }
+    // Update sidebar print configuration display
+    updateSidebarPrintConfig();
 
     // Basic pricing info
-    document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
+    const totalQty = pricing.totalQuantity || 0;
+    document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
-    // Note: #grand-total was replaced by tax section - updateTaxCalculation() handles #grand-total-with-tax
+
+    // Minimum order warning banner (show when qty > 0 but < 24)
+    const minWarning = document.getElementById('min-order-warning');
+    if (minWarning) {
+        minWarning.style.display = (totalQty > 0 && totalQty < 24) ? 'flex' : 'none';
+    }
+
+    // Update pre-tax subtotal for tax calculation (grand total before tax)
+    document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+
+    // Update tax calculation
+    updateTaxCalculation();
 
     // Pricing tier
     const pricingTierEl = document.getElementById('pricing-tier');
-    pricingTierEl.textContent = pricing.tier || '12-23';
+    pricingTierEl.textContent = pricing.tier || '24-36';
 
     // LTM display — show table row only in "separate" mode
     const ltmTableRow = document.getElementById('ltm-fee-row');
@@ -3053,108 +3128,128 @@ function updatePricingDisplay(pricing) {
     const ltmMode = pricing.ltmDisplayMode || 'builtin';
 
     if (pricing.ltmFee > 0 && ltmMode === 'separate') {
-        // Show LTM as separate line item in product table
         if (ltmTableRow) {
             ltmTableRow.style.display = 'table-row';
             if (ltmTableUnit) ltmTableUnit.textContent = `$${pricing.ltmFee.toFixed(2)}`;
             if (ltmTableTotal) ltmTableTotal.textContent = `$${pricing.ltmFee.toFixed(2)}`;
         }
     } else {
-        // builtin mode or no LTM — hide fee row (LTM baked into unit prices)
         if (ltmTableRow) ltmTableRow.style.display = 'none';
     }
 
-    // Update all fee table rows
+    // Update all fee table rows (setup, art, design, rush, discount)
     updateFeeTableRows();
+}
 
-    // Update tax calculation with new subtotal
-    updateTaxCalculation();
+// Update sidebar to reflect current print configuration
+function updateSidebarPrintConfig() {
+    const frontName = LOCATION_NAMES[printConfig.frontLocation] || printConfig.frontLocation;
+    document.getElementById('sidebar-front').textContent = `${frontName} (${printConfig.frontColors}-color)`;
+
+    // Back location
+    const backRow = document.getElementById('sidebar-back-row');
+    if (printConfig.backLocation) {
+        const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
+        document.getElementById('sidebar-back').textContent = `${backName} (${printConfig.backColors}-color)`;
+        backRow.style.display = 'flex';
+    } else {
+        backRow.style.display = 'none';
+    }
+
+    // Total screens
+    document.getElementById('sidebar-screens').textContent = printConfig.totalScreens;
+
+    // Dark garment
+    document.getElementById('sidebar-dark-row').style.display = printConfig.isDarkGarment ? 'flex' : 'none';
+
+    // Safety stripes
+    const stripesRow = document.getElementById('sidebar-stripes-row');
+    if (printConfig.isSafetyStripes) {
+        const locationCount = printConfig.backLocation ? 2 : 1;
+        document.getElementById('sidebar-stripes-cost').textContent = `+$${(2.00 * locationCount).toFixed(2)}/pc`;
+        stripesRow.style.display = 'flex';
+    } else {
+        stripesRow.style.display = 'none';
+    }
+
+    // Update fee table rows (includes setup fee)
+    updateFeeTableRows();
 }
 
 // ============================================================
-// SIDEBAR: TAX CALCULATION
+// TAX CALCULATION & ADDITIONAL CHARGES
 // ============================================================
 
 function updateTaxCalculation() {
     const includeTax = document.getElementById('include-tax')?.checked;
-    const subtotalEl = document.getElementById('subtotal');
-    const preTaxSubtotalEl = document.getElementById('pre-tax-subtotal');
+    const subtotalEl = document.getElementById('pre-tax-subtotal');
     const taxRowEl = document.getElementById('tax-row');
     const taxAmountEl = document.getElementById('tax-amount');
     const grandTotalEl = document.getElementById('grand-total-with-tax');
 
-    // Get base subtotal (products only)
-    const productsSubtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
-
-    // In separate mode, LTM is not in productsSubtotal — add it for tax. In builtin mode, it's already included.
-    const ltmValue = (window.currentPricingData?.ltmDisplayMode === 'separate') ? (window.currentPricingData?.ltmFee || 0) : 0;
+    // Get base subtotal from pricing
+    let subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
 
     // Add art charge if enabled
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+    subtotal += artCharge;
 
     // Add graphic design fee
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
     const designFee = designHours * 75;
+    subtotal += designFee;
 
-    // Calculate adjustments from additional charges
+    // Add rush fee if present
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    subtotal += rushFee;
+
+    // Subtract discount if present
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const discountType = document.getElementById('discount-type')?.value || 'fixed';
-
-    // Get shipping fee from order fields
-    const shippingFee = parseFloat(document.querySelector('#dtg-order-fields .os-shipping-fee')?.value) || 0;
-
-    // Calculate adjusted subtotal
-    let adjustedSubtotal = productsSubtotal + ltmValue + artCharge + designFee + rushFee;
-
-    // Apply discount
-    if (discountAmount > 0) {
-        if (discountType === 'percent') {
-            adjustedSubtotal -= (adjustedSubtotal * discountAmount / 100);
-        } else {
-            adjustedSubtotal -= discountAmount;
-        }
+    let discount = 0;
+    if (discountType === 'percent') {
+        discount = subtotal * (discountAmount / 100);
+    } else {
+        discount = discountAmount;
     }
+    subtotal = Math.max(0, subtotal - discount);
 
-    // Add shipping (after discount — shipping is not discountable)
-    adjustedSubtotal += shippingFee;
+    // Add shipping fee (after discount — shipping not discountable)
+    const shippingFee = parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0;
+    subtotal += shippingFee;
 
-    // Update pre-tax subtotal display
-    if (preTaxSubtotalEl) {
-        preTaxSubtotalEl.textContent = `$${adjustedSubtotal.toFixed(2)}`;
+    // Update the pre-tax subtotal display to show adjusted amount
+    if (subtotalEl) {
+        subtotalEl.textContent = '$' + subtotal.toFixed(2);
     }
 
     // Dynamic tax rate from ZIP lookup or manual input
     const taxRateInput = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
     const taxRate = taxRateInput / 100;
 
-    if (includeTax && adjustedSubtotal > 0) {
-        const tax = Math.round(adjustedSubtotal * taxRate * 100) / 100;
-        const total = adjustedSubtotal + tax;
-        if (taxRowEl) taxRowEl.style.display = 'flex';
-        if (taxAmountEl) taxAmountEl.textContent = `$${tax.toFixed(2)}`;
-        if (grandTotalEl) grandTotalEl.textContent = `$${total.toFixed(2)}`;
+    if (includeTax) {
+        const tax = Math.round(subtotal * taxRate * 100) / 100;
+        const total = subtotal + tax;
+        taxRowEl.style.display = 'flex';
+        taxAmountEl.textContent = '$' + tax.toFixed(2);
+        grandTotalEl.textContent = '$' + total.toFixed(2);
     } else {
-        if (taxRowEl) taxRowEl.style.display = 'none';
-        if (grandTotalEl) grandTotalEl.textContent = `$${adjustedSubtotal.toFixed(2)}`;
+        taxRowEl.style.display = 'none';
+        grandTotalEl.textContent = '$' + subtotal.toFixed(2);
     }
 }
 
-// ============================================================
-// SIDEBAR: ADDITIONAL CHARGES PANEL
 // toggleAdditionalCharges() moved to quote-builder-utils.js
-// ============================================================
 
 function updateAdditionalCharges() {
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const badge = document.getElementById('charges-badge');
 
-    const total = rushFee - discountAmount;
-
-    if (total !== 0) {
-        badge.textContent = total >= 0 ? `+$${total.toFixed(2)}` : `-$${Math.abs(total).toFixed(2)}`;
+    const netCharges = rushFee - discountAmount;
+    if (netCharges !== 0) {
+        badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
         badge.classList.remove('hidden');
     } else {
         badge.classList.add('hidden');
@@ -3239,6 +3334,19 @@ function handleDiscountReasonPresetChange() {
 // ============================================================
 
 function updateFeeTableRows() {
+    // Setup fee row (always shown for screen print)
+    const setupFeeRow = document.getElementById('setup-fee-table-row');
+    const setupScreensLabel = document.getElementById('setup-screens-label');
+    const setupFeeUnit = document.getElementById('setup-fee-unit');
+    const setupFeeTotal = document.getElementById('setup-fee-total');
+    if (setupFeeRow && printConfig) {
+        const screens = printConfig.totalScreens || 1;
+        const fee = screens * SCREEN_FEE;
+        setupScreensLabel.textContent = screens + ' screen' + (screens > 1 ? 's' : '');
+        setupFeeUnit.textContent = '$' + fee.toFixed(2);
+        setupFeeTotal.textContent = '$' + fee.toFixed(2);
+    }
+
     // Art charge row
     const artChargeRow = document.getElementById('art-charge-row');
     const artChargeToggle = document.getElementById('art-charge-toggle');
@@ -3289,18 +3397,19 @@ function updateFeeTableRows() {
     if (discountRow) {
         if (discountAmount > 0) {
             discountRow.style.display = 'table-row';
+            // Calculate actual discount
             let actualDiscount = discountAmount;
             if (discountType === 'percent') {
-                // Calculate discountable subtotal (products + additional services)
+                // Calculate discountable subtotal (products + additional services + setup fees)
                 const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
                 const artCharge = document.getElementById('art-charge-toggle')?.checked
                     ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
                 const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
                 const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-                const ltmFee = document.getElementById('ltm-fee-row')?.style.display !== 'none'
-                    ? parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
+                const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '') || 0);
+                const ltmFee = window.currentPricingData?.ltmFee || 0;
 
-                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + ltmFee;
+                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + setupFee + ltmFee;
                 actualDiscount = discountableSubtotal * (discountAmount / 100);
             }
             const reasonLabel = document.getElementById('discount-reason-label');
@@ -3322,10 +3431,6 @@ function updateFeeTableRows() {
     }
 }
 
-// ============================================================
-// SIDEBAR: SAVE & SHARE TOGGLE
-// ============================================================
-
 // toggleSaveShare() → moved to quote-builder-utils.js
 
 // ============================================================
@@ -3343,8 +3448,7 @@ async function printQuote() {
 
     try {
         // Build pricing data structure for invoice generator
-        // DTG doesn't use logos - build from collected products and current pricing
-        const pricingData = buildDTGPricingData(products);
+        const pricingData = buildScreenprintPricingData(products);
 
         // Generate and open print window
         const invoiceGenerator = new EmbroideryInvoiceGenerator();
@@ -3356,7 +3460,7 @@ async function printQuote() {
         };
 
         // LTM display mode: builtin = baked into prices, separate = shown as line item
-        const ltmState = getLtmControlState('dtg-ltm-panel');
+        const ltmState = getLtmControlState('spc-ltm-panel');
         pricingData.ltmDistributed = (ltmState.displayMode === 'builtin');
 
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
@@ -3378,13 +3482,12 @@ async function printQuote() {
 }
 
 /**
- * Build pricing data structure for EmbroideryInvoiceGenerator from DTG products
- * DTG doesn't have logos - uses printLocation for print specifications
+ * Build pricing data structure for EmbroideryInvoiceGenerator from Screen Print products
  * FIXED: Read unit prices from DOM cells where they're already displayed
  */
-function buildDTGPricingData(products) {
+function buildScreenprintPricingData(products) {
     const currentPricing = window.currentPricingData || {};
-    const quoteId = document.getElementById('quote-id')?.textContent || `DTG-${Date.now()}`;
+    const quoteId = document.getElementById('quote-id')?.textContent || `SPC-${Date.now()}`;
 
     // Build products array with line items for invoice
     const invoiceProducts = [];
@@ -3404,8 +3507,9 @@ function buildDTGPricingData(products) {
         const basePriceText = basePriceCell?.textContent || '$0.00';
         const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
 
-        // Base sizes (S, M, LG, XL, XXL) - Note: L is internal, LG is display
-        const baseSizes = ['S', 'M', 'LG', 'L', 'XL', 'XXL'];
+        // Base sizes (S, M, L, XL, XXL) - Note: L is internal, LG is display
+        // 2XL is NOT a base size - it goes in extendedSizes with its own upcharge
+        const baseSizes = ['S', 'M', 'L', 'LG', 'XL', 'XXL'];
         const baseSizeQtys = {};
         let baseQty = 0;
 
@@ -3432,7 +3536,7 @@ function buildDTGPricingData(products) {
             });
         }
 
-        // Extended sizes - read from child row price cells
+        // Extended sizes - read from child row price cells (includes 2XL which has upcharge)
         const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
         extendedSizes.forEach(size => {
             const qty = product.sizeBreakdown[size] || 0;
@@ -3473,6 +3577,16 @@ function buildDTGPricingData(products) {
         });
     });
 
+    // Build print config description for invoice
+    const frontDesc = getLocationName(printConfig.frontLocation) + ` (${printConfig.frontColors}-color)`;
+    const backDesc = printConfig.backLocation ? getLocationName(printConfig.backLocation) + ` (${printConfig.backColors}-color)` : null;
+
+    // Calculate safety stripes total for display as separate line item
+    const locationCount = printConfig.backLocation ? 2 : 1;
+    const safetyStripesTotal = printConfig.isSafetyStripes
+        ? (currentPricing.totalQuantity * 2.00 * locationCount)
+        : 0;
+
     // Get art charge and graphic design from UI
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
@@ -3491,18 +3605,26 @@ function buildDTGPricingData(products) {
 
     return {
         quoteId: quoteId,
-        tier: currentPricing.tier || '12-23',
+        tier: currentPricing.tier || '24-36',
         products: invoiceProducts,
         subtotal: subtotal,
         grandTotal: currentPricing.grandTotal || subtotal,
-        setupFees: 0,
+        setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
         logos: [],
-        // DTG-specific: print location instead of logos
-        isDTG: true,
-        printLocation: printLocation,
+        // Screenprint-specific
+        isScreenprint: true,
+        printConfig: {
+            front: frontDesc,
+            back: backDesc,
+            isDarkGarment: printConfig.isDarkGarment,
+            hasSafetyStripes: printConfig.isSafetyStripes,
+            totalScreens: printConfig.totalScreens || 1
+        },
         ltmFee: currentPricing.ltmFee || 0,
+        safetyStripesTotal: safetyStripesTotal,
+        totalQuantity: currentPricing.totalQuantity || 0,
         // New fee fields
         artCharge: artCharge,
         graphicDesignHours: graphicDesignHours,
@@ -3513,9 +3635,20 @@ function buildDTGPricingData(products) {
     };
 }
 
+function getLocationName(code) {
+    const names = {
+        'LC': 'Left Chest',
+        'FF': 'Full Front',
+        'JF': 'Jumbo Front',
+        'FB': 'Full Back',
+        'JB': 'Jumbo Back'
+    };
+    return names[code] || code;
+}
+
 /**
  * Save quote and get shareable link
- * Uses DTGQuoteService and QuoteShareModal
+ * Uses ScreenPrintQuoteService and QuoteShareModal
  */
 async function saveAndGetLink() {
     const products = collectProductsFromTable();
@@ -3543,147 +3676,24 @@ async function saveAndGetLink() {
         saveBtn.disabled = true;
     }
 
-    showLoading(true);
-
     try {
-        // Force recalculate pricing before save to ensure data is fresh
-        await recalculatePricing();
+        // Get current pricing data
+        const pricing = window.currentPricingData || {};
 
-        // Calculate pricing for DTG products
-        const pricing = {
-            totalQuantity: products.reduce((sum, p) => sum + (p.totalQuantity || 0), 0),
-            subtotal: products.reduce((sum, p) => sum + (p.lineTotal || 0), 0),
-            ltmFee: window.currentPricingData?.ltmFee || 0,
-            grandTotal: window.currentPricingData?.grandTotal || 0,
-            tier: window.currentPricingData?.tier || ''
-        };
-
-        // Build quoteData in format expected by DTGQuoteService
-        // Transform collected products to match service expectations
-        const transformedProducts = products.map(p => {
-            // Find pricing data for this product from currentPricingData
-            const pricingInfo = window.currentPricingData?.products?.find(
-                pp => pp.product.style === p.style && pp.product.catalogColor === p.catalogColor
-            );
-
-            // Calculate LTM per unit
-            const ltmPerUnit = pricing.ltmFee > 0 && pricing.totalQuantity > 0
-                ? pricing.ltmFee / pricing.totalQuantity
-                : 0;
-            const tierLabel = pricingInfo?.tier?.TierLabel || pricing.tier || '24-47';
-
-            // Build sizeGroups - ALWAYS build, with fallback to UI prices
-            let sizeGroups = [];
-
-            // Group standard and extended sizes separately for pricing
-            const standardSizes = {};
-            const extendedSizes = {};
-
-            Object.entries(p.sizeBreakdown || {}).forEach(([size, qty]) => {
-                if (SIZE06_EXTENDED_SIZES.includes(size) || size === '2XL' || size === 'XXL') {
-                    extendedSizes[size] = qty;
-                } else {
-                    standardSizes[size] = qty;
-                }
-            });
-
-            // Find the parent row to read UI-displayed prices as fallback
-            const parentRow = document.querySelector(
-                `tr[data-style="${p.style}"][data-catalog-color="${p.catalogColor}"]:not(.child-row)`
-            );
-            const rowId = parentRow?.dataset?.rowId || p.rowId;
-
-            // Create sizeGroup for standard sizes
-            if (Object.keys(standardSizes).length > 0) {
-                const standardQty = Object.values(standardSizes).reduce((a, b) => a + b, 0);
-                const firstSize = Object.keys(standardSizes)[0];
-
-                // Try pricingInfo first, fall back to UI-displayed price
-                let basePrice = pricingInfo?.prices?.[firstSize]?.[tierLabel] || 0;
-
-                if (basePrice === 0 && rowId) {
-                    // Fallback: read from UI price cell
-                    const priceCell = document.getElementById(`row-price-${rowId}`);
-                    const priceText = priceCell?.textContent?.replace('$', '').trim();
-                    // Handle "-" placeholder (means no price calculated yet)
-                    if (priceText && priceText !== '-') {
-                        basePrice = parseFloat(priceText) || 0;
-                    }
-                }
-
-                sizeGroups.push({
-                    quantity: standardQty,
-                    basePrice: basePrice,
-                    ltmPerUnit: 0,
-                    unitPrice: basePrice,
-                    total: basePrice * standardQty,
-                    sizes: standardSizes
-                });
-            }
-
-            // Create sizeGroup for each extended size (different pricing)
-            Object.entries(extendedSizes).forEach(([size, qty]) => {
-                // Try pricingInfo first
-                let basePrice = pricingInfo?.prices?.[size]?.[tierLabel] || 0;
-
-                if (basePrice === 0 && rowId) {
-                    // Fallback: find child row price for this extended size
-                    const childRowId = childRowMap[rowId]?.[size];
-                    if (childRowId) {
-                        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                        const priceText = childPriceCell?.textContent?.replace('$', '').trim();
-                        // Handle "-" placeholder (means no price calculated yet)
-                        if (priceText && priceText !== '-') {
-                            basePrice = parseFloat(priceText) || 0;
-                        }
-                    }
-                }
-
-                sizeGroups.push({
-                    quantity: qty,
-                    basePrice: basePrice,
-                    ltmPerUnit: 0,
-                    unitPrice: basePrice,
-                    total: basePrice * qty,
-                    sizes: { [size]: qty }
-                });
-            });
-
-            // Debug logging for quote save issues
-            if (sizeGroups.length === 0) {
-                console.warn('[DTG Save] No sizeGroups created for product:', p.style, p.catalogColor);
-                console.warn('[DTG Save] sizeBreakdown:', p.sizeBreakdown);
-                console.warn('[DTG Save] pricingInfo found:', !!pricingInfo);
-            } else {
-            }
-
-            return {
-                styleNumber: p.style,
-                color: p.color,
-                colorCode: p.catalogColor,
-                productName: p.productName,
-                totalQuantity: p.totalQty,
-                sizeQuantities: p.sizeBreakdown,
-                sizeGroups: sizeGroups,
-                imageUrl: ''
-            };
-        });
-
-        // Validate pricing before save - warn if all prices are $0
-        const hasValidPricing = transformedProducts.some(p =>
-            p.sizeGroups?.some(sg => sg.basePrice > 0)
-        );
-        if (!hasValidPricing) {
-            console.error('[DTG Save] WARNING: All products have $0 pricing!');
-            console.error('[DTG Save] currentPricingData:', window.currentPricingData);
-            showToast('Pricing not loaded. Please wait for prices to load and try again.', 'error');
-            showLoading(false);
-            if (saveBtn) {
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
-            }
-            return;
-        }
+        // Format items for quote service
+        const items = products.map(product => ({
+            styleNumber: product.style,
+            productName: product.description || product.style,
+            color: product.color,
+            colorCode: product.catalogColor || product.color,
+            quantity: product.qty,
+            sizeBreakdown: product.sizes || {},
+            basePrice: product.basePrice || 0,
+            unitPrice: product.unitPrice || 0,
+            ltmPerUnit: product.ltmPerUnit || 0,
+            lineTotal: product.lineTotal || (product.qty * (product.unitPrice || 0)),
+            imageUrl: product.imageUrl || ''
+        }));
 
         // Get additional charges for saving (2026 fee refactor)
         const artChargeToggle = document.getElementById('art-charge-toggle');
@@ -3694,24 +3704,37 @@ async function saveAndGetLink() {
         const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
         const discountType = document.getElementById('discount-type')?.value || 'fixed';
         const discountReason = document.getElementById('discount-reason')?.value || '';
-        // Calculate discountable subtotal for percentage discount (products + additional services)
-        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (pricing.ltmFee || 0);
+        // Calculate discountable subtotal for percentage discount (products + additional services + setup fees)
+        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (printConfig.setupFee || 0) + (pricing.ltmFee || 0);
         const discount = discountType === 'percent' ? (discountableSubtotal * discountAmount / 100) : discountAmount;
         const discountPercent = discountType === 'percent' ? discountAmount : 0;
 
+        // Collect quote data
         const quoteData = {
             customerName: customerName,
             customerEmail: customerEmail,
             companyName: document.getElementById('company-name')?.value?.trim() || '',
             salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
-            products: transformedProducts,
-            totalQuantity: pricing.totalQuantity || products.reduce((sum, p) => sum + (p.totalQty || 0), 0),
+            items: items,
+            totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
             subtotal: pricing.subtotal || 0,
             ltmFee: pricing.ltmFee || 0,
-            total: pricing.grandTotal || pricing.total || 0,
-            tier: pricing.tier || '',
-            location: printLocation,
-            locationName: LOCATION_NAMES[printLocation.combined] || printLocation.combined,
+            setupFees: printConfig.setupFee || 0,
+            grandTotal: pricing.grandTotal || 0,
+            frontLocation: printConfig.frontLocation,
+            frontColors: printConfig.frontColors,
+            backLocation: printConfig.backLocation,
+            backColors: printConfig.backColors,
+            isDarkGarment: printConfig.isDarkGarment,
+            hasSafetyStripes: printConfig.isSafetyStripes,
+            printSetup: {
+                frontLocation: printConfig.frontLocation,
+                frontColors: printConfig.frontColors,
+                backLocation: printConfig.backLocation,
+                backColors: printConfig.backColors,
+                isDarkGarment: printConfig.isDarkGarment,
+                isSafetyStripes: printConfig.isSafetyStripes
+            },
             // Additional charges (2026 fee refactor)
             artCharge: artCharge,
             graphicDesignHours: graphicDesignHours,
@@ -3721,10 +3744,10 @@ async function saveAndGetLink() {
             discountPercent: discountPercent,
             discountReason: discountReason,
             // LTM display preferences (2026-03-22)
-            ltmDisplayMode: getLtmControlState('dtg-ltm-panel').displayMode || 'builtin',
-            ltmWaived: !getLtmControlState('dtg-ltm-panel').enabled,
+            ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
+            ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
             // Order & shipping fields (2026-03-22)
-            ...getOrderShippingData('dtg-order-fields')
+            ...getOrderShippingData('spc-order-fields')
         };
 
         let result;
@@ -3742,11 +3765,11 @@ async function saveAndGetLink() {
             result = await quoteService.saveQuote(quoteData);
         }
 
-        if (result && result.success && result.quoteID) {
+        if (result.success) {
 
-            // Clear draft after successful save
-            if (dtgPersistence) {
-                dtgPersistence.clearDraft();
+            // Clear auto-save draft on successful save (2026 consolidation)
+            if (spPersistence) {
+                spPersistence.clearDraft();
             }
 
             // Show success modal with shareable link
@@ -3761,13 +3784,13 @@ async function saveAndGetLink() {
                 alert(message);
             }
         } else {
-            throw new Error(result?.error || 'Failed to save quote');
+            throw new Error(result.error || 'Failed to save quote');
         }
+
     } catch (error) {
-        console.error('[DTG] Save error:', error);
+        console.error('[ScreenPrint] Save error:', error);
         showToast('Error saving quote: ' + error.message, 'error');
     } finally {
-        showLoading(false);
         // Restore button state
         if (saveBtn) {
             saveBtn.innerHTML = originalText;
@@ -3781,7 +3804,7 @@ async function saveQuote() {
     return saveAndGetLink();
 }
 
-async function dtgEmailQuote() {
+async function spcEmailQuote() {
     const quoteId = editingQuoteId;
     if (!quoteId) {
         showToast('Please save the quote first before emailing', 'error');
@@ -3795,6 +3818,14 @@ async function dtgEmailQuote() {
     });
 }
 
+// Toggle Coming Soon accordion
+function toggleComingSoon() {
+    const content = document.getElementById('coming-soon-content');
+    const chevron = document.getElementById('coming-soon-chevron');
+    content.classList.toggle('open');
+    chevron.classList.toggle('rotated');
+}
+
 async function copyToClipboard() {
     const products = collectProductsFromTable();
     if (products.length === 0) {
@@ -3803,13 +3834,14 @@ async function copyToClipboard() {
     }
 
     try {
-        // Get current pricing data
-        const pricing = {
-            totalQuantity: window.currentPricingData?.totalQuantity || products.reduce((sum, p) => sum + (p.totalQty || 0), 0),
-            subtotal: window.currentPricingData?.subtotal || 0,
-            ltmFee: window.currentPricingData?.ltmFee || 0,
-            grandTotal: window.currentPricingData?.grandTotal || 0,
-            tier: window.currentPricingData?.tier || ''
+        // Get current pricing from sidebar
+        const pricing = window.currentPricingData || {
+            totalQuantity: 0,
+            tier: '24-36',
+            subtotal: 0,
+            ltmFee: 0,
+            setupFees: printConfig.setupFee,
+            grandTotal: printConfig.setupFee
         };
 
         const text = generateQuoteText(products, pricing);
@@ -3823,36 +3855,55 @@ async function copyToClipboard() {
 }
 
 function generateQuoteText(products, pricing) {
-    const locationName = LOCATION_NAMES[printLocation.combined] || printLocation.combined;
-
     const lines = [
-        'NORTHWEST CUSTOM APPAREL - DTG PRINT QUOTE',
+        'NORTHWEST CUSTOM APPAREL - SCREEN PRINT QUOTE',
         '================================================',
         `Date: ${new Date().toLocaleDateString()}`,
-        `Customer: ${document.getElementById('customer-name').value || 'N/A'}`,
-        `Company: ${document.getElementById('company-name').value || 'N/A'}`,
-        '',
-        `Print Location: ${locationName}`,
-        '',
-        'PRODUCTS:',
-        '------------------------------------------------'
+        `Customer: ${document.getElementById('customer-name')?.value || 'N/A'}`,
+        `Company: ${document.getElementById('company-name')?.value || 'N/A'}`,
     ];
 
+    // Print Configuration
+    lines.push('');
+    lines.push('PRINT CONFIGURATION:');
+    const frontName = LOCATION_NAMES[printConfig.frontLocation] || printConfig.frontLocation;
+    lines.push(`  Front: ${frontName} (${printConfig.frontColors}-color)`);
+    if (printConfig.backLocation) {
+        const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
+        lines.push(`  Back: ${backName} (${printConfig.backColors}-color)`);
+    }
+    if (printConfig.isDarkGarment) {
+        lines.push(`  Dark Garment: Yes (includes white underbase)`);
+    }
+    if (printConfig.isSafetyStripes) {
+        const locationCount = printConfig.backLocation ? 2 : 1;
+        lines.push(`  Safety Stripes: +$${(2.00 * locationCount).toFixed(2)}/piece`);
+    }
+    lines.push(`  Total Screens: ${printConfig.totalScreens}`);
+    lines.push(`  Setup Fee: $${printConfig.setupFee.toFixed(2)}`);
+
+    // Products
+    lines.push('');
+    lines.push('PRODUCTS:');
+    lines.push('------------------------------------------------');
     products.forEach(p => {
-        const sizes = Object.entries(p.sizeBreakdown || {}).map(([s, q]) => `${s}:${q}`).join(' ');
-        lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQty}`);
+        const sizes = Object.entries(p.sizeBreakdown || {})
+            .filter(([s, q]) => q > 0)
+            .map(([s, q]) => `${s}:${q}`)
+            .join(' ');
+        lines.push(`${p.style} - ${p.color} | ${sizes} | Qty: ${p.totalQty || 0}`);
     });
 
+    // Summary
     lines.push('');
     lines.push('------------------------------------------------');
-    lines.push(`Total Pieces: ${pricing.totalQuantity}`);
-    lines.push(`Tier: ${pricing.tier}`);
-    lines.push(`Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
-
+    lines.push(`Total Pieces: ${pricing.totalQuantity || 0}`);
+    lines.push(`Pricing Tier: ${pricing.tier || '24-36'}`);
+    lines.push(`Products Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
+    lines.push(`Setup Fee (${printConfig.totalScreens} screens): $${(pricing.setupFees || 0).toFixed(2)}`);
     if (pricing.ltmFee > 0) {
         lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
     }
-
     lines.push(`TOTAL: $${(pricing.grandTotal || 0).toFixed(2)}`);
     lines.push('');
     lines.push('Northwest Custom Apparel | 253-922-5793');

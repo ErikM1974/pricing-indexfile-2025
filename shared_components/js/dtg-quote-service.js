@@ -118,7 +118,23 @@ class DTGQuoteService {
                 RushFee: parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0,
                 Discount: parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0,
                 DiscountPercent: parseFloat(quoteData.discountPercent) || 0,
-                DiscountReason: quoteData.discountReason || ''
+                DiscountReason: quoteData.discountReason || '',
+                // LTM display preferences (2026-03-22)
+                LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
+                LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Order & shipping fields (2026-03-22)
+                Phone: quoteData.phone || '',
+                OrderNumber: quoteData.orderNumber || '',
+                PurchaseOrderNumber: quoteData.poNumber || '',
+                ShipToAddress: quoteData.shipAddress || '',
+                ShipToCity: quoteData.shipCity || '',
+                ShipToState: quoteData.shipState || '',
+                ShipToZip: quoteData.shipZip || '',
+                ShipMethod: quoteData.shipMethod || '',
+                ShippingFee: parseFloat(quoteData.shippingFee) || 0,
+                ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : '',
+                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : '',
+                Notes: quoteData.notes || ''
             };
 
             // Save session
@@ -497,11 +513,28 @@ class DTGQuoteService {
                     tier: quoteData.tier,
                     projectName: quoteData.projectName || '',
                     specialNotes: quoteData.specialNotes || '',
+                    userNotes: quoteData.notes || '',
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com'
                 }),
                 RevisionNumber: newRevision,
                 RevisedAt: this.formatDateForCaspio(new Date()),
-                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com'
+                RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com',
+                // LTM display preferences (2026-03-22)
+                LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
+                LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Order & shipping fields (2026-03-22)
+                Phone: quoteData.phone || '',
+                OrderNumber: quoteData.orderNumber || '',
+                PurchaseOrderNumber: quoteData.poNumber || '',
+                ShipToAddress: quoteData.shipAddress || '',
+                ShipToCity: quoteData.shipCity || '',
+                ShipToState: quoteData.shipState || '',
+                ShipToZip: quoteData.shipZip || '',
+                ShipMethod: quoteData.shipMethod || '',
+                ShippingFee: parseFloat(quoteData.shippingFee) || 0,
+                ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : '',
+                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : '',
+                LTM_Waived: quoteData.ltmWaived ? true : false
             };
 
             // Update session via PUT

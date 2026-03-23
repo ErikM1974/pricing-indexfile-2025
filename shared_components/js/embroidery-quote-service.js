@@ -342,7 +342,10 @@ class EmbroideryQuoteService {
                 TrackingNumber: customerData.trackingNumber || '',
                 // Design assignments (2026-02-19)
                 GarmentDesignNumber: customerData.garmentDesignNumber || '',
-                CapDesignNumber: customerData.capDesignNumber || ''
+                CapDesignNumber: customerData.capDesignNumber || '',
+                // LTM display preferences (2026-03-22)
+                LTM_Display_Mode: customerData.ltmDisplayMode || 'builtin',
+                LTM_Waived: customerData.ltmWaived ? true : false
             };
 
             // Save session
@@ -1426,6 +1429,9 @@ class EmbroideryQuoteService {
                 // Design assignments (2026-02-19)
                 GarmentDesignNumber: customerData.garmentDesignNumber || '',
                 CapDesignNumber: customerData.capDesignNumber || '',
+                // LTM display preferences (2026-03-22)
+                LTM_Display_Mode: customerData.ltmDisplayMode || 'builtin',
+                LTM_Waived: customerData.ltmWaived ? true : false,
                 // Revision tracking (fields added to Caspio 2026-01-15)
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
