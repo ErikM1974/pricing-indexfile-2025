@@ -318,6 +318,49 @@
             <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
             <!-- Scrollable content container -->
             <div class="sidebar-scroll-container">
+            <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
+            <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
+                <div class="customer-panel-header" onclick="document.getElementById('spc-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;">
+                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #4cb354;"></i> Customer</h4>
+                    <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
+                </div>
+                <div id="spc-customer-fields">
+                    <div class="customer-field customer-lookup-container" style="margin-bottom: 8px;">
+                        <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
+                        <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
+                    </div>
+                    <div class="customer-lookup-divider" style="text-align: center; font-size: 11px; color: #999; margin: 8px 0;">OR ENTER MANUALLY</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div class="customer-field">
+                            <label class="quote-label">NAME *</label>
+                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">EMAIL *</label>
+                            <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">COMPANY</label>
+                            <input type="text" id="company-name" placeholder="Company name" class="quote-input">
+                        </div>
+                        <div class="customer-field">
+                            <label class="quote-label">SALES REP</label>
+                            <select id="sales-rep" class="quote-input" style="background: white;">
+                                <option value="sales@nwcustomapparel.com">General Sales</option>
+                                <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                                <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                                <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                <option value="art@nwcustomapparel.com">Steve Deland</option>
+                                <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Pricing Panel -->
             <div class="pricing-panel">
                 <div class="pricing-title">
@@ -470,41 +513,8 @@
                     <i id="save-share-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
                 </div>
                 <div id="save-share-content" class="save-share-content">
-                    <div class="customer-fields d-flex flex-column gap-3">
-                        <!-- Customer Lookup -->
-                        <div class="customer-field customer-lookup-container">
-                            <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> Find Customer</label>
-                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
-                        </div>
-                        <div class="customer-lookup-divider">or enter manually</div>
-                        <div class="customer-field">
-                            <label class="quote-label">Name *</label>
-                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
-                        </div>
-                        <div class="customer-field">
-                            <label class="quote-label">Email *</label>
-                            <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input">
-                        </div>
-                        <div class="customer-field">
-                            <label class="quote-label">Company</label>
-                            <input type="text" id="company-name" placeholder="Company name" class="quote-input">
-                        </div>
-                        <div class="customer-field">
-                            <label class="quote-label">Sales Rep</label>
-                            <select id="sales-rep" class="quote-input" style="background: white;">
-                                <option value="sales@nwcustomapparel.com">General Sales</option>
-                                <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                                <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                                <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                                <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                                <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                                <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                                <option value="art@nwcustomapparel.com">Steve Deland</option>
-                                <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    <!-- Customer fields moved to top of sidebar (2026-03-23) -->
+                    <button class="btn-save-quote" onclick="saveAndGetLink()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
                 </div>
