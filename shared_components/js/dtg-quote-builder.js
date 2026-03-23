@@ -2301,22 +2301,25 @@ function onSizeChange(rowId) {
         return;
     }
 
-    // Calculate total from ALL enabled size inputs (handles remapped columns)
-    // This works for standard, combo-only, youth-only, toddler-only, tall-only
-    let total = 0;
+    // Calculate total from ONLY parent row's enabled size inputs (excludes disabled 2XL, XXXL picker, OSFA)
+    // Child row quantities display separately — don't double-count in parent
+    let standardTotal = 0;
     row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-        total += parseInt(input.value) || 0;
+        standardTotal += parseInt(input.value) || 0;
     });
 
-    // Add quantities from child rows (extended sizes)
-    const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
-    childRows.forEach(childRow => {
-        const qtyDisplay = childRow.querySelector('.qty-display');
-        total += parseInt(qtyDisplay?.textContent) || 0;
-    });
-
-    // Update parent row quantity display
-    document.getElementById(`row-qty-${rowId}`).textContent = total;
+    if (standardTotal > 0) {
+        document.getElementById(`row-qty-${rowId}`).textContent = standardTotal;
+    } else {
+        // Variant-only: show child row total so parent doesn't display "0"
+        let childTotal = 0;
+        const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+        childRows.forEach(childRow => {
+            const qtyDisplay = childRow.querySelector('.qty-display');
+            childTotal += parseInt(qtyDisplay?.textContent) || 0;
+        });
+        document.getElementById(`row-qty-${rowId}`).textContent = childTotal;
+    }
 
     // Handle 2XL/XXL size (has direct input) - create/update/remove child rows
     // Note: Size06 sizes (XS, 3XL, 4XL, 5XL, 6XL) are handled by the Extended Size Picker popup
@@ -2832,7 +2835,8 @@ async function recalculatePricing() {
             if (!parentRow) continue;
 
             const rowId = parentRow.dataset.rowId;
-            let productSubtotal = 0;
+            let productSubtotal = 0;      // ALL sizes (for sidebar subtotal)
+            let parentOnlySubtotal = 0;   // Standard sizes only (for parent row Total cell)
 
             // Calculate and display price for each size
             Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
@@ -2849,6 +2853,9 @@ async function recalculatePricing() {
                 // Update row price cell (for standard sizes, update parent row)
                 // Note: 2XL/XXL are child rows but NOT in SIZE06_EXTENDED_SIZES (they go in Size05 column)
                 const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size) || size === '2XL' || size === 'XXL';
+                if (!isExtendedSize) {
+                    parentOnlySubtotal += displayPrice * qty;
+                }
                 if (!isExtendedSize) {
                     const priceCell = document.getElementById(`row-price-${rowId}`);
                     if (priceCell) {
@@ -2872,11 +2879,11 @@ async function recalculatePricing() {
                 }
             });
 
-            // Update parent row total (all sizes combined)
+            // Update parent row total (standard sizes only — child rows show their own totals)
             const parentTotalCell = document.getElementById(`row-total-${rowId}`);
             if (parentTotalCell) {
-                // productSubtotal includes all sizes (with LTM baked in when builtin mode)
-                parentTotalCell.textContent = product.totalQty > 0 ? `$${productSubtotal.toFixed(2)}` : '-';
+                const displayTotal = parentOnlySubtotal > 0 ? parentOnlySubtotal : productSubtotal;
+                parentTotalCell.textContent = product.totalQty > 0 ? `$${displayTotal.toFixed(2)}` : '-';
             }
 
             // Update pricing breakdown for the row
