@@ -10825,3 +10825,365 @@ async function diagnoseQuote() {
         showToast('Diagnosis error: ' + error.message, 'error');
     }
 }
+
+// ============================================================
+// ACTION BUTTONS: Copy, Print, Email
+// ============================================================
+
+/**
+ * Build pricing data structure for EmbroideryInvoiceGenerator
+ * Handles garment/cap splits, stitch count tiers, digitizing fees,
+ * AL fees, service codes (DECG/DECC), and LTM display mode.
+ */
+function buildEmbroideryPricingData(allItems) {
+    const productList = allItems.filter(p => !p.isService);
+    const serviceItems = allItems.filter(p => p.isService);
+    const quoteId = document.getElementById('quote-id')?.textContent || `EMB-${Date.now()}`;
+
+    // Build products array with line items for invoice
+    const invoiceProducts = [];
+
+    productList.forEach(product => {
+        const lineItems = [];
+
+        // Find the parent row for this product to read its displayed price
+        const parentRow = document.querySelector(
+            `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
+        );
+        const rowId = parentRow?.dataset?.rowId;
+
+        // Read base price from parent row's price cell
+        const basePriceCell = document.getElementById(`row-price-${rowId}`);
+        const basePriceText = basePriceCell?.textContent || '$0.00';
+        const baseUnitPrice = parseFloat(basePriceText.replace(/[^0-9.]/g, '')) || 0;
+
+        // Base sizes (S, M, L, XL)
+        const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
+        const baseSizeQtys = {};
+        let baseQty = 0;
+
+        Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+            if (size === 'SVC') return; // Skip service pseudo-size
+            const displaySize = size === 'L' ? 'LG' : size;
+            if (baseSizes.includes(size) && qty > 0) {
+                baseSizeQtys[displaySize] = qty;
+                baseQty += qty;
+            }
+        });
+
+        // Handle OSFA (beanies, caps without sized variants)
+        const osfaQty = product.sizeBreakdown['OSFA'] || 0;
+        if (osfaQty > 0 && baseQty === 0) {
+            // OSFA-only product — use parent price as base
+            lineItems.push({
+                description: `OSFA(${osfaQty})`,
+                quantity: osfaQty,
+                unitPrice: baseUnitPrice,
+                total: osfaQty * baseUnitPrice
+            });
+        } else {
+            if (baseQty > 0) {
+                const desc = Object.entries(baseSizeQtys)
+                    .map(([size, qty]) => `${size}(${qty})`)
+                    .join(' ');
+                lineItems.push({
+                    description: desc,
+                    quantity: baseQty,
+                    unitPrice: baseUnitPrice,
+                    total: baseQty * baseUnitPrice
+                });
+            }
+
+            // Extended sizes — read from child row price cells
+            const extendedSizes = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
+            extendedSizes.forEach(size => {
+                const qty = product.sizeBreakdown[size] || 0;
+                if (qty > 0) {
+                    const childRowId = childRowMap[rowId]?.[size];
+                    const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                    const childPriceText = childPriceCell?.textContent || '$0.00';
+                    const unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+
+                    lineItems.push({
+                        description: `${size}(${qty})`,
+                        quantity: qty,
+                        unitPrice: unitPrice,
+                        total: qty * unitPrice,
+                        hasUpcharge: true
+                    });
+                }
+            });
+        }
+
+        if (lineItems.length > 0) {
+            invoiceProducts.push({
+                product: {
+                    style: product.style,
+                    title: product.productName || product.style,
+                    color: product.color,
+                    isCap: product.isCap || false
+                },
+                lineItems: lineItems
+            });
+        }
+    });
+
+    // Add service items (DECG, DECC, AL, Monogram) as invoice products
+    serviceItems.forEach(si => {
+        invoiceProducts.push({
+            product: {
+                style: si.style,
+                title: si.productName || si.title || si.style,
+                color: '',
+                isService: true,
+                isCap: si.isCap || false,
+                position: si.position || '',
+                totalQuantity: si.totalQuantity
+            },
+            isService: true,
+            lineItems: [{
+                description: si.productName || si.title || si.style,
+                quantity: si.totalQuantity,
+                unitPrice: si.unitPrice,
+                total: si.unitPrice * si.totalQuantity
+            }]
+        });
+    });
+
+    // Calculate subtotal from line items
+    let subtotal = 0;
+    invoiceProducts.forEach(p => {
+        p.lineItems.forEach(item => { subtotal += item.total; });
+    });
+
+    // Read grand total from DOM (includes LTM, setup fees)
+    const grandTotalText = document.getElementById('grand-total')?.textContent || '$0.00';
+    const grandTotal = parseFloat(grandTotalText.replace(/[$,]/g, '')) || 0;
+
+    // Read total quantity from DOM
+    const totalQty = parseInt(document.getElementById('total-qty')?.textContent) || 0;
+
+    // Tier from DOM
+    const tierText = document.getElementById('pricing-tier')?.textContent || '1-7';
+
+    // Logo configurations for embroidery specs section
+    const { logoConfigs, allLogos } = buildLogoConfiguration();
+    const garmentLogos = [primaryLogo, ...additionalLogos];
+    const capLogos = [capPrimaryLogo, ...capAdditionalLogos];
+
+    // Determine what's in the quote
+    const hasGarments = productList.some(p => !p.isCap) || serviceItems.some(s => s.serviceType === 'decg');
+    const hasCaps = productList.some(p => p.isCap) || serviceItems.some(s => s.serviceType === 'decc');
+
+    // Setup fees (digitizing)
+    const digitizingCount = allLogos.filter(l => l.needsDigitizing).length;
+    const setupFees = digitizingCount * 100;
+
+    // Cap embellishment type
+    const capEmbType = getCapEmbellishmentType();
+
+    // Patch setup fee
+    const capHasStyle = hasCaps;
+    const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
+    const capPatchSetupFee = showPatchSetup ? EMB_DEFAULTS.PATCH_SETUP_FEE : 0;
+
+    // LTM state
+    const ltmState = getLtmControlState('emb-ltm-panel');
+    const ltmDistributed = (ltmState.displayMode === 'builtin');
+
+    // Additional charges
+    const charges = getAdditionalCharges();
+
+    // 3D puff upcharge
+    const puffUpchargePerCap = (capEmbType === '3d-puff' && pricingCalculator)
+        ? (pricingCalculator.getEmbellishmentUpcharges?.()?.['3d-puff'] || 0)
+        : 0;
+
+    return {
+        quoteId: quoteId,
+        tier: tierText,
+        products: invoiceProducts,
+        subtotal: subtotal,
+        grandTotal: grandTotal,
+        totalQuantity: totalQty,
+        setupFees: setupFees + capPatchSetupFee,
+        setupFeesCount: digitizingCount,
+        // Embroidery-specific
+        logos: allLogos,
+        logoConfigs: logoConfigs,
+        garmentLogos: garmentLogos,
+        capLogos: capLogos,
+        hasGarments: hasGarments,
+        hasCaps: hasCaps,
+        capEmbellishmentType: capEmbType,
+        capPatchSetupFee: capPatchSetupFee,
+        puffUpchargePerCap: puffUpchargePerCap,
+        // LTM
+        ltmFee: 0, // Already baked into grandTotal
+        ltmDistributed: ltmDistributed,
+        // Fees
+        artCharge: charges.artCharge || 0,
+        graphicDesignHours: charges.graphicDesignHours || 0,
+        graphicDesignCharge: charges.graphicDesignCharge || 0,
+        rushFee: charges.rushFee || 0,
+        discount: charges.discount || 0,
+        discountReason: charges.discountReason || '',
+        // DECG/DECC
+        decgQty: charges.decgQty || 0,
+        decgUnit: charges.decgUnit || 0,
+        decgTotal: charges.decgTotal || 0,
+        deccQty: charges.deccQty || 0,
+        deccUnit: charges.deccUnit || 0,
+        deccTotal: charges.deccTotal || 0
+    };
+}
+
+/**
+ * Copy embroidery quote to clipboard as formatted text
+ */
+async function copyToClipboard() {
+    const allItems = collectProductsFromTable();
+    const productList = allItems.filter(p => !p.isService);
+    const serviceItems = allItems.filter(p => p.isService);
+
+    if (allItems.length === 0) {
+        showToast('Add products first', 'error');
+        return;
+    }
+
+    try {
+        const text = generateEmbQuoteText(productList, serviceItems);
+        await navigator.clipboard.writeText(text);
+        showToast('Quote copied to clipboard!', 'success');
+    } catch (error) {
+        console.error('Copy error:', error);
+        showToast('Error copying to clipboard', 'error');
+    }
+}
+
+/**
+ * Generate formatted text for clipboard copy
+ */
+function generateEmbQuoteText(products, serviceItems) {
+    const capEmbType = getCapEmbellishmentType();
+    const capTypeLabel = { 'embroidery': 'Embroidery', '3d-puff': '3D Puff', 'laser-patch': 'Laser Patch' }[capEmbType] || 'Embroidery';
+
+    const lines = [
+        'NORTHWEST CUSTOM APPAREL - EMBROIDERY QUOTE',
+        '================================================',
+        `Date: ${new Date().toLocaleDateString()}`,
+        `Customer: ${document.getElementById('customer-name')?.value || 'N/A'}`,
+        `Company: ${document.getElementById('company-name')?.value || 'N/A'}`,
+        ''
+    ];
+
+    // Embroidery configuration
+    lines.push('EMBROIDERY CONFIGURATION:');
+    lines.push(`  Primary: ${primaryLogo.position} (${primaryLogo.stitchCount.toLocaleString()} stitches)`);
+    if (primaryLogo.needsDigitizing) lines.push('    Needs Digitizing: Yes');
+    if (globalAL.garment.enabled) {
+        lines.push(`  Additional Location: ${globalAL.garment.stitchCount.toLocaleString()} stitches`);
+    }
+
+    const hasCaps = products.some(p => p.isCap) || serviceItems.some(s => s.isCap);
+    if (hasCaps) {
+        lines.push(`  Cap: ${capTypeLabel} (${capPrimaryLogo.stitchCount.toLocaleString()} stitches)`);
+        if (globalAL.cap.enabled) {
+            lines.push(`  Cap AL: ${globalAL.cap.stitchCount.toLocaleString()} stitches`);
+        }
+    }
+
+    // Products
+    lines.push('');
+    lines.push('PRODUCTS:');
+    lines.push('------------------------------------------------');
+    products.forEach(p => {
+        const sizes = Object.entries(p.sizeBreakdown || {})
+            .filter(([, q]) => q > 0)
+            .map(([s, q]) => `${s}:${q}`)
+            .join(' ');
+        const capTag = p.isCap ? ' [CAP]' : '';
+        lines.push(`${p.style} - ${p.color}${capTag} | ${sizes} | Qty: ${p.totalQuantity || 0}`);
+    });
+
+    // Service items
+    if (serviceItems.length > 0) {
+        lines.push('');
+        serviceItems.forEach(si => {
+            lines.push(`${si.style} - ${si.productName || si.title} | Qty: ${si.totalQuantity} | $${si.unitPrice.toFixed(2)}/ea`);
+        });
+    }
+
+    // Summary
+    const grandTotalText = document.getElementById('grand-total')?.textContent || '$0.00';
+    const totalQty = document.getElementById('total-qty')?.textContent || '0';
+    const tier = document.getElementById('pricing-tier')?.textContent || '1-7';
+
+    lines.push('');
+    lines.push('------------------------------------------------');
+    lines.push(`Total Pieces: ${totalQty}`);
+    lines.push(`Pricing Tier: ${tier}`);
+    lines.push(`TOTAL: ${grandTotalText}`);
+    lines.push('');
+    lines.push('Northwest Custom Apparel | 253-922-5793');
+
+    return lines.join('\n');
+}
+
+/**
+ * Print embroidery quote using EmbroideryInvoiceGenerator
+ */
+async function printQuote() {
+    const allItems = collectProductsFromTable();
+    if (allItems.length === 0) {
+        showToast('Add products before printing', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const pricingData = buildEmbroideryPricingData(allItems);
+
+        const invoiceGenerator = new EmbroideryInvoiceGenerator();
+        const customerData = {
+            name: document.getElementById('customer-name')?.value || 'Customer',
+            company: document.getElementById('company-name')?.value || '',
+            email: document.getElementById('customer-email')?.value || '',
+            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+        };
+
+        const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(invoiceHTML);
+        printWindow.document.close();
+
+        setTimeout(() => {
+            printWindow.print();
+        }, 300);
+
+        showToast('Opening print dialog...', 'success');
+    } catch (error) {
+        console.error('Print error:', error);
+        showToast('Error generating PDF', 'error');
+    }
+
+    showLoading(false);
+}
+
+/**
+ * Email embroidery quote — requires save first, then calls shared emailQuote()
+ */
+async function embEmailQuote() {
+    const quoteId = editingQuoteId;
+    if (!quoteId) {
+        showToast('Please save the quote first before emailing', 'error');
+        return;
+    }
+    await emailQuote({
+        quoteId,
+        customerEmail: document.getElementById('customer-email')?.value?.trim(),
+        customerName: document.getElementById('customer-name')?.value?.trim(),
+        salesRepEmail: document.getElementById('sales-rep')?.value
+    });
+}

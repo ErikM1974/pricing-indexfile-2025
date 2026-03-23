@@ -938,6 +938,19 @@
 
             </div><!-- End sidebar-scroll-container -->
 
+            <!-- Action Buttons (Outside scroll container - always visible) -->
+            <div class="action-panel">
+                <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i> Copy Quote to Clipboard
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="embEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
+                    <i class="fas fa-envelope"></i> Email Quote
+                </button>
+            </div>
+
             <!-- Sticky TOTAL - Hidden (totals now shown in pricing summary above) -->
             <div class="pricing-total-sticky" style="display: none;">
                 <div class="pricing-row total">
@@ -1370,7 +1383,8 @@ Company:Absher Construction Company
     <script src="/shared_components/js/shopworks-import-parser.js?v=20260220-xxl-fix"></script>
 
     <!-- Power Quote Controller (extracted to external JS) -->
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=20260323"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260323b"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=20260323b"></script>
 
 </body>
 </html>
