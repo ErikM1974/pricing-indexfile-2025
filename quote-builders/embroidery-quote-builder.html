@@ -59,9 +59,6 @@
         <div class="power-header-center">
             <div class="power-header-title">
                 2026 Embroidery Quote Builder
-                <span id="unsaved-indicator" class="unsaved-badge" style="display: none;">
-                    <i class="fas fa-circle"></i> Unsaved
-                </span>
             </div>
             <div class="power-header-subtitle">Garments + Caps | Embroidery, 3D Puff & Laser Patches</div>
         </div>
@@ -859,49 +856,7 @@
                         </div>
                     </div>
                     <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
-                    <!-- Discount -->
-                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #fca5a5; background: #fef2f2; margin: 12px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
-                        <label style="font-size: 12px; color: #b91c1c; margin-bottom: 4px; display: block; font-weight: 600;">Discount</label>
-                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                            <div id="discount-input-wrapper" style="position: relative; flex: 1; display: none;">
-                                <span id="discount-symbol" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                                <input type="number" id="discount-amount" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
-                                       onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
-                                       style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            </div>
-                            <select id="discount-preset" onchange="handleDiscountPresetChange()"
-                                    style="flex: 1; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
-                                <option value="0" selected>None</option>
-                                <option value="5">5%</option>
-                                <option value="10">10%</option>
-                                <option value="15">15%</option>
-                                <option value="20">20%</option>
-                                <option value="25">25%</option>
-                                <option value="custom">Custom...</option>
-                            </select>
-                            <select id="discount-type" onchange="updateDiscountType(); updateTaxCalculation();"
-                                    style="width: 60px; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white;">
-                                <option value="percent">%</option>
-                                <option value="fixed">$</option>
-                            </select>
-                        </div>
-                        <select id="discount-reason-preset" onchange="handleDiscountReasonPresetChange()"
-                                style="width: 100%; padding: 8px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; background: white; margin-top: 8px;">
-                            <option value="" selected>No reason</option>
-                            <option value="Repeat customer">Repeat customer</option>
-                            <option value="Bulk order">Bulk order</option>
-                            <option value="Non-profit/Church/School">Non-profit/Church/School</option>
-                            <option value="Price match">Price match</option>
-                            <option value="Sample order">Sample order</option>
-                            <option value="Sales promotion">Sales promotion</option>
-                            <option value="Customer service">Customer service</option>
-                            <option value="Quote revision">Quote revision</option>
-                            <option value="custom">Custom...</option>
-                        </select>
-                        <input type="text" id="discount-reason" placeholder="Enter custom reason..."
-                               oninput="updateFeeTableRows()"
-                               style="width: 100%; padding: 8px 10px; border: 1px solid #fca5a5; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-top: 8px; display: none;">
-                    </div>
+                    <!-- Discount controls removed 2026-03-23 -->
                 </div>
             </div>
 
