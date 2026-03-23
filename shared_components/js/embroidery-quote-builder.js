@@ -5830,6 +5830,9 @@ function updatePricingDisplay(pricing) {
     }
 
     // LTM fee rows: show only in "separate" display mode
+    const ltmState = getLtmControlState('emb-ltm-panel');
+    const ltmDisplayMode = ltmState.displayMode || 'builtin';
+    const ltmEnabled = ltmState.enabled;
     const garmentLtmTableRow = document.getElementById('garment-ltm-table-row');
     const capLtmTableRow = document.getElementById('cap-ltm-table-row');
     if (ltmDisplayMode === 'separate' && ltmEnabled) {
