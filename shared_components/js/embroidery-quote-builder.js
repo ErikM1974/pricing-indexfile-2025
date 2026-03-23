@@ -5342,23 +5342,37 @@ async function recalculatePricing() {
     // Show/hide LTM control panel based on quantities
     const garmentQtyForLtm = productList.filter(p => !p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
     const capQtyForLtm = productList.filter(p => p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
-    const wouldHaveLTM = (garmentQtyForLtm > 0 && garmentQtyForLtm <= 7) || (capQtyForLtm > 0 && capQtyForLtm <= 7);
+    const garmentHasLTM = garmentQtyForLtm > 0 && garmentQtyForLtm <= 7;
+    const capHasLTM = capQtyForLtm > 0 && capQtyForLtm <= 7;
+    const wouldHaveLTM = garmentHasLTM || capHasLTM;
     const ltmWrapper = document.getElementById('emb-ltm-wrapper');
     if (ltmWrapper) {
         if (wouldHaveLTM) {
             ltmWrapper.style.display = '';
-            // Calculate total LTM fee for display
-            const totalLtmFee = ((garmentQtyForLtm > 0 && garmentQtyForLtm <= 7) ? 50 : 0) +
-                                ((capQtyForLtm > 0 && capQtyForLtm <= 7) ? 50 : 0);
+            const garmentLtmFee = garmentHasLTM ? 50 : 0;
+            const capLtmFee = capHasLTM ? 50 : 0;
+            const totalLtmFee = garmentLtmFee + capLtmFee;
+            // Build label showing which types have LTM
+            let feeLabel = 'Small Order Fee';
+            if (garmentHasLTM && capHasLTM) {
+                feeLabel = 'Small Order Fee — Garments ($50) + Caps ($50)';
+            } else if (garmentHasLTM) {
+                feeLabel = 'Small Order Fee — Garments';
+            } else if (capHasLTM) {
+                feeLabel = 'Small Order Fee — Caps';
+            }
             // Render panel if not yet rendered, or update fee amount
             if (!document.querySelector('#emb-ltm-panel .ltm-control-panel')) {
-                renderLtmControlPanel('emb-ltm-panel', { feeAmount: totalLtmFee });
+                renderLtmControlPanel('emb-ltm-panel', { feeAmount: totalLtmFee, feeLabel: feeLabel });
                 initLtmControlListeners('emb-ltm-panel', () => {
                     recalculatePricing();
                     markAsUnsaved();
                 });
             } else {
                 setLtmControlState('emb-ltm-panel', { feeAmount: totalLtmFee });
+                // Update header label for garment/cap changes
+                const headerSpan = document.querySelector('#emb-ltm-panel .ltm-control-header span');
+                if (headerSpan) headerSpan.textContent = feeLabel;
             }
         } else {
             ltmWrapper.style.display = 'none';
