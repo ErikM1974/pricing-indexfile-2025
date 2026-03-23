@@ -2628,10 +2628,7 @@ Company:Absher Construction Company
          * Check URL for edit parameter
          * Returns quote ID if editing, null otherwise
          */
-        function checkForEditMode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('edit');
-        }
+        // checkForEditMode() → moved to quote-builder-utils.js
 
         /**
          * Load existing quote for editing
@@ -2727,25 +2724,10 @@ Company:Absher Construction Company
             }
         }
 
-        /**
-         * Update UI to show edit mode
-         */
-        function updateEditModeUI(quoteId, revision) {
-            // Update header subtitle
-            const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
-            if (headerSubtitle) {
-                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(quoteId)} • Rev ${escapeHtml(String(revision))}</span>`;
-            }
-
-            // Update save button text
-            const saveBtn = document.querySelector('.btn-save-quote');
-            if (saveBtn) {
-                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
-            }
-        }
+        // updateEditModeUI() → moved to quote-builder-utils.js
 
         /**
-         * Populate customer information fields
+         * Populate customer information fields (embroidery-specific with extra fields)
          */
         function populateCustomerInfo(session) {
             const fields = {
@@ -8758,15 +8740,7 @@ Company:Absher Construction Company
          * Confirm and start a new quote
          * Prompts user if there are unsaved changes
          */
-        function confirmNewQuote() {
-            if (hasUnsavedChanges()) {
-                if (confirm('You have unsaved changes. Start a new quote?')) {
-                    resetQuote();
-                }
-            } else {
-                resetQuote();
-            }
-        }
+        // confirmNewQuote() → moved to quote-builder-utils.js
 
         /**
          * Reset all quote data and start fresh
@@ -9268,16 +9242,7 @@ Company:Absher Construction Company
         // UTILITIES
         // ============================================================
 
-        function showLoading(show) {
-            const overlay = document.getElementById('loading-overlay');
-            if (show) {
-                overlay.classList.add('show');
-            } else {
-                overlay.classList.remove('show');
-            }
-        }
-
-        // showToast() is now provided by quote-builder-utils.js
+        // showLoading(), showToast() → provided by quote-builder-utils.js
 
         // ============================================================
         // SHOPWORKS IMPORT FUNCTIONS

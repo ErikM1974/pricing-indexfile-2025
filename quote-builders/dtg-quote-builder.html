@@ -716,54 +716,7 @@
          * Check URL for edit parameter
          * Returns quote ID if editing, null otherwise
          */
-        function checkForEditMode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('edit');
-        }
-
-        /**
-         * Update UI to show edit mode
-         */
-        function updateEditModeUI(quoteId, revision) {
-            // Update header subtitle
-            const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
-            if (headerSubtitle) {
-                headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
-            }
-
-            // Update save button text
-            const saveBtn = document.querySelector('.btn-save-quote');
-            if (saveBtn) {
-                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
-            }
-        }
-
-        /**
-         * Populate customer information fields
-         */
-        function populateCustomerInfo(session) {
-            const fields = {
-                'customer-name': session.CustomerName,
-                'customer-email': session.CustomerEmail,
-                'company-name': session.CompanyName
-            };
-
-            for (const [id, value] of Object.entries(fields)) {
-                const el = document.getElementById(id);
-                if (el && value) el.value = value;
-            }
-
-            // Set sales rep dropdown
-            const salesRepSelect = document.getElementById('sales-rep');
-            if (salesRepSelect && session.SalesRepEmail) {
-                for (let i = 0; i < salesRepSelect.options.length; i++) {
-                    if (salesRepSelect.options[i].value === session.SalesRepEmail) {
-                        salesRepSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
+        // checkForEditMode(), updateEditModeUI(), populateCustomerInfo() → moved to quote-builder-utils.js
 
         /**
          * Populate additional charges from saved session (2026 fee refactor)
@@ -1075,15 +1028,7 @@
         // New Quote Functionality (UX Improvement)
         // ============================================
 
-        function confirmNewQuote() {
-            if (hasUnsavedChanges()) {
-                if (confirm('You have unsaved changes. Start a new quote?')) {
-                    resetQuote();
-                }
-            } else {
-                resetQuote();
-            }
-        }
+        // confirmNewQuote() → moved to quote-builder-utils.js
 
         function resetQuote() {
             // Clear all product rows and re-add empty state
@@ -3988,18 +3933,7 @@
         // SIDEBAR: SAVE & SHARE TOGGLE
         // ============================================================
 
-        function toggleSaveShare() {
-            const content = document.getElementById('save-share-content');
-            const chevron = document.getElementById('save-share-chevron');
-
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                content.classList.add('hidden');
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
+        // toggleSaveShare() → moved to quote-builder-utils.js
 
         // ============================================================
         // ACTIONS (Save, Print, Email, Copy)
@@ -4537,16 +4471,7 @@
         // UTILITIES
         // ============================================================
 
-        function showLoading(show) {
-            const overlay = document.getElementById('loading-overlay');
-            if (show) {
-                overlay.classList.add('show');
-            } else {
-                overlay.classList.remove('show');
-            }
-        }
-
-        // showToast() is now provided by quote-builder-utils.js
+        // showLoading(), showToast() → provided by quote-builder-utils.js
     </script>
 </body>
 </html>

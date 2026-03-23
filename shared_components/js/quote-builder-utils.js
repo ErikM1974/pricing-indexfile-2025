@@ -755,6 +755,105 @@ function initLtmControlListeners(containerId, onChange) {
 }
 
 // ============================================
+// SHARED BUILDER FUNCTIONS
+// Extracted from DTG/Screenprint/Embroidery (identical across all)
+// ============================================
+
+/**
+ * Populate customer info fields from a saved quote session.
+ * @param {object} session - Caspio session object with CustomerName, CustomerEmail, etc.
+ */
+function populateCustomerInfo(session) {
+    const fields = {
+        'customer-name': session.CustomerName,
+        'customer-email': session.CustomerEmail,
+        'company-name': session.CompanyName
+    };
+    for (const [id, value] of Object.entries(fields)) {
+        const el = document.getElementById(id);
+        if (el && value) el.value = value;
+    }
+    const salesRepSelect = document.getElementById('sales-rep');
+    if (salesRepSelect && session.SalesRepEmail) {
+        for (let i = 0; i < salesRepSelect.options.length; i++) {
+            if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                salesRepSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * Check URL for ?edit=QUOTE_ID parameter.
+ * @returns {string|null} Quote ID to edit, or null
+ */
+function checkForEditMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('edit');
+}
+
+/**
+ * Update UI to show edit mode (header subtitle + save button text).
+ * @param {string} quoteId
+ * @param {number} revision
+ */
+function updateEditModeUI(quoteId, revision) {
+    const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
+    }
+    const saveBtn = document.querySelector('.btn-save-quote');
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+    }
+}
+
+/**
+ * Show/hide the loading overlay.
+ * @param {boolean} show
+ */
+function showLoading(show) {
+    const overlay = document.getElementById('loading-overlay');
+    if (!overlay) return;
+    if (show) {
+        overlay.classList.add('show');
+    } else {
+        overlay.classList.remove('show');
+    }
+}
+
+/**
+ * Toggle Save & Share panel expand/collapse.
+ */
+function toggleSaveShare() {
+    const content = document.getElementById('save-share-content');
+    const chevron = document.getElementById('save-share-chevron');
+    if (!content || !chevron) return;
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
+ * Confirm starting a new quote (checks for unsaved changes).
+ * Requires builder to define: hasUnsavedChanges(), resetQuote()
+ */
+function confirmNewQuote() {
+    if (typeof hasUnsavedChanges === 'function' && hasUnsavedChanges()) {
+        if (confirm('You have unsaved changes. Start a new quote?')) {
+            resetQuote();
+        }
+    } else {
+        resetQuote();
+    }
+}
+
+// ============================================
 // ORDER, SHIPPING & TAX FIELDS
 // ============================================
 
