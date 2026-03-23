@@ -1,0 +1,10825 @@
+// ============================================================
+// EMBROIDERY POWER QUOTE - Excel-Style Quote Builder
+// ============================================================
+
+// Use centralized config (fallback to hardcoded URL for backwards compatibility)
+const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+// Embroidery defaults — synced with API values at runtime
+const EMB_DEFAULTS = {
+    GARMENT_STITCH_COUNT: 8000,
+    CAP_STITCH_COUNT: 5000,
+    AL_GARMENT_STITCH_COUNT: 8000,
+    STITCH_STEP: 1000,
+    MAX_STITCH_COUNT: 50000,
+    PATCH_SETUP_FEE: 50
+};
+
+// NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
+// SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
+
+// STANDARD_SIZES — now provided by extended-sizes-config.js
+
+// Extended sizes that get their own line items
+// Note: 2XL goes to Size05 (dedicated), all others go to Size06 (Other)
+const EXTENDED_SIZES = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL'];
+
+// ShopWorks size slot mapping
+// Size01-04: Standard sizes (S, M, L, XL) - combined into one line item
+// Size05: 2XL only - separate line item
+// Size06: ALL others (XS, 3XL, 4XL, 5XL, Youth, Tall, OSFA) - each gets separate line item
+const SIZE_TO_SLOT = {
+    'S': 'Size01', 'M': 'Size02', 'L': 'Size03', 'XL': 'Size04',
+    '2XL': 'Size05',  // 2XL has dedicated slot
+    'XS': 'Size06', '3XL': 'Size06', '4XL': 'Size06',
+    '5XL': 'Size06', '6XL': 'Size06', 'OSFA': 'Size06'
+};
+
+// Display labels matching ShopWorks column headers
+// Note: Internally we use L/2XL/3XL, but display as LG/XXL/XXXL
+const SIZE_DISPLAY_LABELS = {
+    'S': 'S', 'M': 'M', 'L': 'LG', 'XL': 'XL',
+    '2XL': 'XXL', '3XL': 'XXXL',
+    'XS': 'XXXL', '4XL': 'XXXL', '5XL': 'XXXL', '6XL': 'XXXL'
+};
+
+// State
+let pricingCalculator = null;
+let quoteService = null;
+
+// Edit mode state (for revising existing quotes)
+let editingQuoteId = null;
+let editingRevision = null;
+
+// Unsaved changes tracking (UX improvement)
+let hasChanges = false;
+
+// Auto-save & Draft Recovery (2026 consolidation)
+let embPersistence = null;
+let embSession = null;
+
+// Primary logo configuration
+let primaryLogo = {
+    position: 'Left Chest',
+    stitchCount: EMB_DEFAULTS.GARMENT_STITCH_COUNT,
+    needsDigitizing: false,
+    isPrimary: true
+};
+
+// Additional logos array (for garments)
+let additionalLogos = [];
+// Example entry: { id: 'global-al-garment', position: 'AL', stitchCount: 8000, needsDigitizing: false, isPrimary: false }
+
+// Cap Logo Configuration (separate from garment logos)
+// Supports multiple embellishment types: 'embroidery', '3d-puff', 'patch'
+let capPrimaryLogo = {
+    position: 'CF',  // Cap Front (always)
+    stitchCount: EMB_DEFAULTS.GARMENT_STITCH_COUNT,
+    needsDigitizing: false,
+    isPrimary: true,
+    embellishmentType: 'embroidery',  // Default: flat embroidery
+    needsSetup: true  // For patches: setup fee (GRT-50)
+};
+let capAdditionalLogos = [];
+// Example entry: { id: 'global-al-cap', position: 'AL-Cap', stitchCount: 5000, needsDigitizing: false, isPrimary: false }
+
+let products = [];
+let rowCounter = 0;
+let productCache = {}; // Cache product data for quick lookup
+let childRowMap = {}; // Track child rows: { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
+// Global AL config (applies to all products of type when enabled)
+let globalAL = {
+    garment: { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false },
+    cap: { enabled: false, position: 'AL-Cap', stitchCount: EMB_DEFAULTS.CAP_STITCH_COUNT, needsDigitizing: false }
+};
+
+// Sync module-level AL arrays from globalAL state
+// Called whenever globalAL changes so all existing references (save, invoice, etc.) get correct data
+function _syncALArrays() {
+    additionalLogos = globalAL.garment.enabled ? [{
+        id: 'global-al-garment',
+        position: 'AL',
+        stitchCount: globalAL.garment.stitchCount,
+        needsDigitizing: globalAL.garment.needsDigitizing,
+        isPrimary: false
+    }] : [];
+    capAdditionalLogos = globalAL.cap.enabled ? [{
+        id: 'global-al-cap',
+        position: 'AL-Cap',
+        stitchCount: globalAL.cap.stitchCount,
+        needsDigitizing: globalAL.cap.needsDigitizing,
+        isPrimary: false
+    }] : [];
+}
+
+// Handle primary logo position change (for Full Back 25K minimum)
+// Map arbitrary stitch count to nearest tier dropdown value
+function mapStitchCountToTierValue(stitchCount, position) {
+    if (position === 'Full Back' || stitchCount >= 25000) return '25000';
+    if (stitchCount > 15000) return '18000';
+    if (stitchCount > 10000) return '12000';
+    return '8000';
+}
+
+function onPrimaryPositionChange() {
+    const posSelect = document.getElementById('primary-position');
+    const tierSelect = document.getElementById('primary-stitches');
+    const fbField = document.getElementById('fb-stitch-count-field');
+    primaryLogo.position = posSelect.value;
+
+    if (posSelect.value === 'Full Back') {
+        tierSelect.value = '25000';
+        fbField.style.display = '';
+        const fbInput = document.getElementById('fb-stitch-count');
+        primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
+        showToast('Full Back requires minimum 25,000 stitches', 'info');
+    } else {
+        fbField.style.display = 'none';
+        if (parseInt(tierSelect.value) >= 25000) {
+            // Switching away from Full Back — reset tier
+            tierSelect.value = '8000';
+            primaryLogo.stitchCount = 8000;
+        }
+    }
+    recalculatePricing();
+}
+
+// Handle garment stitch tier dropdown change
+function onPrimaryStitchTierChange() {
+    const select = document.getElementById('primary-stitches');
+    const posSelect = document.getElementById('primary-position');
+    const fbField = document.getElementById('fb-stitch-count-field');
+    const sc = parseInt(select.value) || 8000;
+
+    if (sc >= 25000) {
+        // Full Back tier selected — sync position, show stitch input
+        posSelect.value = 'Full Back';
+        primaryLogo.position = 'Full Back';
+        posSelect.disabled = true;
+        fbField.style.display = '';
+        const fbInput = document.getElementById('fb-stitch-count');
+        primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
+    } else {
+        // Standard/Mid/Large — hide FB stitch input
+        fbField.style.display = 'none';
+        primaryLogo.stitchCount = sc;
+        if (posSelect.disabled) {
+            posSelect.disabled = false;
+            posSelect.value = 'Left Chest';
+            primaryLogo.position = 'Left Chest';
+        }
+    }
+    recalculatePricing();
+}
+
+// Handle Full Back stitch count input change
+function onFullBackStitchCountChange() {
+    const fbInput = document.getElementById('fb-stitch-count');
+    const val = parseInt(fbInput.value) || 25000;
+    primaryLogo.stitchCount = Math.max(val, 25000);
+    recalculatePricing();
+}
+
+// Handle cap stitch tier dropdown change
+function onCapStitchTierChange() {
+    const select = document.getElementById('cap-primary-stitches');
+    capPrimaryLogo.stitchCount = parseInt(select.value) || 8000;
+    recalculatePricing();
+}
+
+// Update dropdown labels from API-driven surcharge data
+function updateStitchTierDropdownLabels() {
+    const data = pricingCalculator && pricingCalculator.stitchSurchargeData;
+    if (!data) return; // API didn't load, keep hardcoded labels
+
+    const selects = [
+        document.getElementById('primary-stitches'),
+        document.getElementById('cap-primary-stitches')
+    ];
+    for (const select of selects) {
+        if (!select) continue;
+        for (const opt of select.options) {
+            const val = parseInt(opt.value);
+            if (val === 12000) {
+                opt.text = `Mid +$${data.midFee}/pc (10-15K)`;
+            } else if (val === 18000) {
+                opt.text = `Large +$${data.largeFee}/pc (15-25K)`;
+            }
+        }
+    }
+}
+
+// Update global AL config (stitch count or digitizing change)
+// Position is fixed: 'AL' for garments, 'AL-Cap' for caps
+function updateGlobalAL(type) {
+    // Stitch count is always base (no input field — simplified)
+    const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
+    if (digitizingCheckbox) globalAL[type].needsDigitizing = digitizingCheckbox.checked;
+
+    _syncALArrays();
+    recalculatePricing();
+}
+
+// NEW: Toggle function for modernized toggle switch UI
+function toggleGlobalALNew(type) {
+    const switchEl = document.getElementById(`${type}-al-switch`);
+    const labelEl = document.getElementById(`${type}-al-label`);
+    const configEl = document.getElementById(`${type}-al-config-new`);
+    const hiddenCheckbox = document.getElementById(`${type}-al-toggle`);
+
+    // Toggle the state
+    const isActive = switchEl.classList.toggle('active');
+    labelEl.classList.toggle('active', isActive);
+    configEl.classList.toggle('visible', isActive);
+
+    // Update hidden checkbox for backwards compatibility
+    hiddenCheckbox.checked = isActive;
+
+    // Update global state
+    globalAL[type].enabled = isActive;
+
+    // Sync module-level arrays and recalculate
+    _syncALArrays();
+    recalculatePricing();
+}
+
+// Toggle logo card collapse/expand
+function toggleLogoCard(cardId) {
+    const card = document.getElementById(cardId);
+    if (card) card.classList.toggle('collapsed');
+}
+
+// Toggle notes section collapse/expand
+function toggleNotesSection() {
+    const section = document.getElementById('notes-section');
+    if (!section) return;
+    const isCollapsed = section.classList.toggle('collapsed');
+    const body = section.querySelector('.notes-body');
+    const icon = section.querySelector('.notes-toggle-icon');
+    if (body) body.style.display = isCollapsed ? 'none' : 'block';
+    if (icon) icon.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+}
+
+// Update notes badge count
+function updateNotesBadge() {
+    const notesEl = document.getElementById('notes');
+    const badge = document.getElementById('notes-badge');
+    if (!notesEl || !badge) return;
+    const lines = notesEl.value.trim().split('\n').filter(l => l.trim()).length;
+    if (lines > 0) {
+        badge.textContent = lines;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+// NEW: Toggle function for modernized digitizing checkbox
+function toggleDigitizingCheckbox(element, checkboxId) {
+    const checkbox = document.getElementById(checkboxId);
+    checkbox.checked = !checkbox.checked;
+    element.classList.toggle('checked', checkbox.checked);
+
+    // Update the corresponding logo object based on checkbox ID
+    if (checkboxId === 'primary-digitizing') {
+        primaryLogo.needsDigitizing = checkbox.checked;
+    } else if (checkboxId === 'cap-primary-digitizing') {
+        capPrimaryLogo.needsDigitizing = checkbox.checked;
+    } else if (checkboxId === 'cap-patch-setup') {
+        capPrimaryLogo.needsSetup = checkbox.checked;
+    }
+
+    // Trigger pricing recalculation
+    recalculatePricing();
+}
+
+// toggleArtCharge(), toggleArtworkServices(), updateArtworkCharges()
+// moved to quote-builder-utils.js
+
+// Handle cap embellishment type change (Flat Embroidery, 3D Puff, or Patch)
+function handleCapEmbellishmentChange() {
+    const embellishmentType = document.getElementById('cap-embellishment-type').value;
+    const embroideryOptions = document.getElementById('cap-embroidery-options');
+    const patchOptions = document.getElementById('cap-patch-options');
+
+    // Update the capPrimaryLogo object with new embellishment type
+    capPrimaryLogo.embellishmentType = embellishmentType;
+
+    if (embellishmentType === 'laser-patch') {
+        // Show patch options, hide embroidery options (AL toggle is inside embroidery options)
+        embroideryOptions.style.display = 'none';
+        patchOptions.style.display = 'block';
+        // Disable AL if it was enabled (toggle is hidden with embroidery options)
+        if (globalAL.cap.enabled) {
+            toggleGlobalALNew('cap'); // Turn it off
+        }
+        // For patches: no stitches needed, use setup fee instead of digitizing
+        capPrimaryLogo.stitchCount = 0;
+        capPrimaryLogo.needsDigitizing = false;
+        capPrimaryLogo.needsSetup = document.getElementById('cap-patch-setup')?.checked ?? true;
+    } else {
+        // Show embroidery options (for both flat and 3D puff) — AL toggle is inline
+        embroideryOptions.style.display = 'block';
+        patchOptions.style.display = 'none';
+        // Restore stitch count from input
+        capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
+        capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
+        capPrimaryLogo.needsSetup = false; // Not applicable for embroidery
+    }
+
+
+    // Recalculate pricing with new embellishment type
+    recalculatePricing();
+}
+
+// Get current cap embellishment type
+function getCapEmbellishmentType() {
+    const dropdown = document.getElementById('cap-embellishment-type');
+    return dropdown ? dropdown.value : 'embroidery';
+}
+
+// Update embellishment dropdown labels with prices from API
+// Rule: ALWAYS pull pricing from Caspio API - never hardcode
+function updateEmbellishmentDropdownLabels() {
+    if (!pricingCalculator || !pricingCalculator.capInitialized) return;
+
+    const dropdown = document.getElementById('cap-embellishment-type');
+    if (!dropdown) return;
+
+    const upcharges = pricingCalculator.getEmbellishmentUpcharges();
+
+    // Update 3D Puff option
+    const puffOption = dropdown.querySelector('option[value="3d-puff"]');
+    if (puffOption) {
+        puffOption.textContent = `3D Puff Embroidery (+$${upcharges.puff}/cap)`;
+    }
+
+    // Update Patch option
+    const patchOption = dropdown.querySelector('option[value="laser-patch"]');
+    if (patchOption) {
+        patchOption.textContent = `Laser Leatherette Patch (+$${upcharges.patch}/cap)`;
+    }
+
+}
+
+// Extended sizes available for Size06 (Other) column
+// Note: Actual available sizes are fetched dynamically per product via API
+// Includes OSFA for beanies, bags, and other one-size-fits-all items
+// All sizes that go in Size06 column (the "Other/Catch-All" column)
+// Based on Python Inksoft/Inksoft_Size_Translation_Import.csv
+const SIZE06_EXTENDED_SIZES = [
+    // Extended large
+    'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
+    // One-size
+    'OSFA', 'OSFM',
+    // Combos (for fitted caps)
+    'S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X', 'S/XL',
+    // Tall
+    'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT', 'XST',
+    // Youth
+    'YXS', 'YS', 'YM', 'YL', 'YXL',
+    // Toddler
+    '2T', '3T', '4T', '5T', '5/6T', '6T',
+    // Big
+    'LB', 'XLB', '2XLB',
+    // Extra small
+    'XXS', '2XS', 'XXL'
+];
+
+// EXTENDED_SIZE_ORDER — now provided by extended-sizes-config.js
+
+// SIZE_TO_SUFFIX — now provided by extended-sizes-config.js
+
+// ============================================================
+// EXTENDED SIZE PICKER POPUP (for Size06/XXXL column)
+// ============================================================
+
+// getAvailableExtendedSizes() — now provided by extended-sizes-config.js (with caching)
+
+// ============================================================
+// EXTENDED SIZE FUNCTIONS — moved to /shared_components/js/quote-extended-sizes.js
+// Functions: openExtendedSizePopup, closeExtendedSizePopup, toggleWaistGroup,
+//   getExtendedSizeQty, applyExtendedSizes, createOrUpdateExtendedChildRow,
+//   updateXXXLCellDisplay, updateChildRowPrice
+// Dependencies that remain here: childRowMap, createChildRow, removeChildRow,
+//   recalculatePricing, getAvailableExtendedSizes
+// ============================================================
+
+// REMOVED: openExtendedSizePopup — now in quote-extended-sizes.js
+// REMOVED: closeExtendedSizePopup — now in quote-extended-sizes.js
+// REMOVED: toggleWaistGroup — now in quote-extended-sizes.js
+// REMOVED: getExtendedSizeQty — now in quote-extended-sizes.js
+// REMOVED: applyExtendedSizes — now in quote-extended-sizes.js
+// REMOVED: createOrUpdateExtendedChildRow — now in quote-extended-sizes.js
+// REMOVED: updateXXXLCellDisplay — now in quote-extended-sizes.js
+// REMOVED: updateChildRowPrice — now in quote-extended-sizes.js
+
+/* PLACEHOLDER — this block replaces ~400 lines of inline functions
+   that were byte-for-byte identical across embroidery, DTG, and screenprint.
+   The functions are now loaded from quote-extended-sizes.js via <script> tag.
+*/
+
+// [functions removed — now in quote-extended-sizes.js]
+// openExtendedSizePopup, closeExtendedSizePopup, toggleWaistGroup,
+// getExtendedSizeQty, applyExtendedSizes, createOrUpdateExtendedChildRow,
+// updateXXXLCellDisplay, updateChildRowPrice
+// ~390 lines moved to shared module — see quote-extended-sizes.js
+
+// ============================================================
+// AUTO-SAVE & DRAFT RECOVERY (2026 consolidation)
+// ============================================================
+
+function initEmbroideryPersistence() {
+    if (typeof QuotePersistence !== 'undefined') {
+        embPersistence = new QuotePersistence({
+            prefix: 'EMB',
+            autoSaveInterval: 30000,
+            debug: false
+        });
+
+        // Setup auto-save callback
+        embPersistence.onAutoSave = () => {
+            const data = getEmbroideryQuoteData();
+            if (data && (data.products.length > 0 || data.customerName)) {
+                embPersistence.save(data);
+            }
+        };
+    }
+
+    if (typeof QuoteSession !== 'undefined' && embPersistence) {
+        embSession = new QuoteSession({
+            prefix: 'EMB',
+            persistence: embPersistence,
+            debug: false
+        });
+    }
+}
+
+function getEmbroideryQuoteData() {
+    return {
+        products: collectProductsFromTable(),
+        primaryLogo: { ...primaryLogo },
+        capPrimaryLogo: typeof capPrimaryLogo !== 'undefined' ? { ...capPrimaryLogo } : null,
+        garmentAL: {
+            enabled: globalAL.garment.enabled,
+            position: 'AL',
+            stitches: globalAL.garment.stitchCount,
+            needsDigitizing: globalAL.garment.needsDigitizing
+        },
+        capAL: {
+            enabled: globalAL.cap.enabled,
+            position: 'AL-Cap',
+            stitches: globalAL.cap.stitchCount,
+            needsDigitizing: globalAL.cap.needsDigitizing
+        },
+        customerName: document.getElementById('customer-name')?.value || '',
+        customerEmail: document.getElementById('customer-email')?.value || '',
+        companyName: document.getElementById('company-name')?.value || '',
+        salesRep: document.getElementById('sales-rep')?.value || '',
+        notes: document.getElementById('notes')?.value || '',
+        ltmEnabled: getLtmControlState('emb-ltm-panel').enabled,
+        ltmDisplayMode: getLtmControlState('emb-ltm-panel').displayMode || 'builtin',
+        taxRate: document.getElementById('tax-rate-input')?.value || '10.1',
+        includeTax: document.getElementById('include-tax')?.checked ?? true,
+        shippingFee: document.getElementById('shipping-fee')?.value || '0',
+        shipAddress: document.getElementById('ship-address')?.value || '',
+        shipCity: document.getElementById('ship-city')?.value || '',
+        shipState: document.getElementById('ship-state')?.value || 'WA',
+        shipZip: document.getElementById('ship-zip')?.value || '',
+        // Order details
+        customerPhone: document.getElementById('customer-phone')?.value || '',
+        poNumber: document.getElementById('po-number')?.value || '',
+        orderNumber: document.getElementById('order-number')?.value || '',
+        customerNumber: document.getElementById('customer-number')?.value || '',
+        shipMethod: document.getElementById('ship-method')?.value || '',
+        shipMethodOther: document.getElementById('ship-method-other')?.value || '',
+        dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
+        reqShipDate: document.getElementById('req-ship-date')?.value || '',
+        dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
+        paymentTerms: document.getElementById('payment-terms')?.value || '',
+        // Cached design data for instant restore (no API call needed)
+        garmentDesignData: primaryLogo._designData || null,
+        capDesignData: (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo._designData) ? capPrimaryLogo._designData : null,
+        timestamp: Date.now()
+    };
+}
+
+function restoreEmbroideryDraft(draft) {
+    if (!draft) return;
+
+    // Restore customer info
+    if (draft.customerName) {
+        const nameEl = document.getElementById('customer-name');
+        if (nameEl) nameEl.value = draft.customerName;
+    }
+    if (draft.customerEmail) {
+        const emailEl = document.getElementById('customer-email');
+        if (emailEl) emailEl.value = draft.customerEmail;
+    }
+    if (draft.companyName) {
+        const companyEl = document.getElementById('company-name');
+        if (companyEl) companyEl.value = draft.companyName;
+    }
+    if (draft.salesRep) {
+        const salesRepEl = document.getElementById('sales-rep');
+        if (salesRepEl) salesRepEl.value = draft.salesRep;
+    }
+    if (draft.notes) {
+        const notesEl = document.getElementById('notes');
+        if (notesEl) {
+            notesEl.value = draft.notes;
+            // Show the notes section
+            const section = document.getElementById('notes-section');
+            if (section && section.classList.contains('collapsed')) {
+                section.classList.remove('collapsed');
+                const body = section.querySelector('.notes-body');
+                const icon = section.querySelector('.notes-toggle-icon');
+                if (body) body.style.display = 'block';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            }
+            updateNotesBadge();
+        }
+    }
+
+    // Restore primary logo configuration
+    if (draft.primaryLogo) {
+        primaryLogo = { ...primaryLogo, ...draft.primaryLogo };
+        const positionEl = document.getElementById('primary-position');
+        if (positionEl) positionEl.value = draft.primaryLogo.position || 'Left Chest';
+        const stitchesEl = document.getElementById('primary-stitches');
+        if (stitchesEl) stitchesEl.value = mapStitchCountToTierValue(
+            draft.primaryLogo.stitchCount || 8000,
+            draft.primaryLogo.position
+        );
+        const digitizingEl = document.getElementById('primary-digitizing');
+        if (digitizingEl) digitizingEl.checked = draft.primaryLogo.needsDigitizing || false;
+        // Sync position dropdown disabled state and FB stitch input for Full Back
+        if (draft.primaryLogo.position === 'Full Back') {
+            const posEl = document.getElementById('primary-position');
+            if (posEl) posEl.disabled = true;
+            const fbField = document.getElementById('fb-stitch-count-field');
+            const fbInput = document.getElementById('fb-stitch-count');
+            if (fbField) fbField.style.display = '';
+            if (fbInput) fbInput.value = draft.primaryLogo.stitchCount || 25000;
+        }
+        // Restore design number label on card header + input field
+        if (draft.primaryLogo.designNumber) {
+            updateLogoCardHeader('garment', draft.primaryLogo.designNumber);
+            const gDesignInput = document.getElementById('garment-design-number');
+            if (gDesignInput) gDesignInput.value = draft.primaryLogo.designNumber;
+            const gClearBtn = document.getElementById('garment-design-clear');
+            if (gClearBtn) gClearBtn.style.display = 'inline-flex';
+            // Use cached design data if available (no API call), fallback to lookup
+            if (draft.garmentDesignData) {
+                applyDesignFromCache('garment', draft.garmentDesignData);
+            } else {
+                if (draft.primaryLogo.thumbnailUrl) {
+                    showDesignThumbnail('garment', draft.primaryLogo.thumbnailUrl);
+                }
+                lookupDesignNumber('garment');
+            }
+        }
+    }
+
+    // Restore cap primary logo if present
+    if (draft.capPrimaryLogo && typeof capPrimaryLogo !== 'undefined') {
+        capPrimaryLogo = { ...capPrimaryLogo, ...draft.capPrimaryLogo };
+        const capStitchesEl = document.getElementById('cap-primary-stitches');
+        if (capStitchesEl) capStitchesEl.value = mapStitchCountToTierValue(
+            draft.capPrimaryLogo.stitchCount || 8000,
+            'CF'
+        );
+        const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+        if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
+        // Restore design number label on card header + input field
+        if (draft.capPrimaryLogo.designNumber) {
+            updateLogoCardHeader('cap', draft.capPrimaryLogo.designNumber);
+            const cDesignInput = document.getElementById('cap-design-number');
+            if (cDesignInput) cDesignInput.value = draft.capPrimaryLogo.designNumber;
+            const cClearBtn = document.getElementById('cap-design-clear');
+            if (cClearBtn) cClearBtn.style.display = 'inline-flex';
+            // Use cached design data if available (no API call), fallback to lookup
+            if (draft.capDesignData) {
+                applyDesignFromCache('cap', draft.capDesignData);
+            } else {
+                if (draft.capPrimaryLogo.thumbnailUrl) {
+                    showDesignThumbnail('cap', draft.capPrimaryLogo.thumbnailUrl);
+                }
+                lookupDesignNumber('cap');
+            }
+        }
+    }
+
+    // Restore LTM override state
+    if (draft.ltmEnabled === false || draft.ltmDisplayMode) {
+        setLtmControlState('emb-ltm-panel', {
+            enabled: draft.ltmEnabled !== false,
+            displayMode: draft.ltmDisplayMode || 'builtin'
+        });
+    }
+
+    // Restore tax rate and shipping
+    if (draft.taxRate) {
+        const rateInput = document.getElementById('tax-rate-input');
+        if (rateInput) rateInput.value = draft.taxRate;
+    }
+    if (draft.includeTax === false) {
+        document.getElementById('include-tax').checked = false;
+    }
+    if (draft.shippingFee && parseFloat(draft.shippingFee) > 0) {
+        document.getElementById('shipping-fee').value = draft.shippingFee;
+    }
+
+    // Restore Ship To address
+    if (draft.shipAddress) document.getElementById('ship-address').value = draft.shipAddress;
+    if (draft.shipCity) document.getElementById('ship-city').value = draft.shipCity;
+    if (draft.shipState) document.getElementById('ship-state').value = draft.shipState;
+    if (draft.shipZip) document.getElementById('ship-zip').value = draft.shipZip;
+
+    // Restore order details
+    if (draft.customerPhone) document.getElementById('customer-phone').value = draft.customerPhone;
+    if (draft.poNumber) document.getElementById('po-number').value = draft.poNumber;
+    if (draft.orderNumber) document.getElementById('order-number').value = draft.orderNumber;
+    if (draft.customerNumber) document.getElementById('customer-number').value = draft.customerNumber;
+    if (draft.shipMethod) {
+        document.getElementById('ship-method').value = draft.shipMethod;
+        if (draft.shipMethod === 'Other' && draft.shipMethodOther) {
+            document.getElementById('ship-method-other').value = draft.shipMethodOther;
+        }
+        onShipMethodChange();
+    }
+    if (draft.dateOrderPlaced) document.getElementById('date-order-placed').value = draft.dateOrderPlaced;
+    if (draft.reqShipDate) document.getElementById('req-ship-date').value = draft.reqShipDate;
+    if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = draft.dropDeadDate;
+    if (draft.paymentTerms) document.getElementById('payment-terms').value = draft.paymentTerms;
+    // Auto-expand Order Details panel if any field restored
+    if (draft.poNumber || draft.orderNumber || draft.shipMethod ||
+        draft.dateOrderPlaced || draft.reqShipDate || draft.dropDeadDate || draft.paymentTerms) {
+        const odContent = document.getElementById('order-details-content');
+        const odChevron = document.getElementById('order-details-chevron');
+        if (odContent) odContent.style.display = 'block';
+        if (odChevron) odChevron.style.transform = 'rotate(180deg)';
+    }
+
+    updateTaxCalculation();
+
+    // Restore garment AL configuration
+    if (draft.garmentAL && draft.garmentAL.enabled) {
+        globalAL.garment.enabled = true;
+        globalAL.garment.position = 'AL';
+        globalAL.garment.stitchCount = parseInt(draft.garmentAL.stitches) || 8000;
+        globalAL.garment.needsDigitizing = draft.garmentAL.needsDigitizing || false;
+
+        // Update UI toggle
+        const garmentALSwitch = document.getElementById('garment-al-switch');
+        const garmentALLabel = document.getElementById('garment-al-label');
+        const garmentALConfig = document.getElementById('garment-al-config-new');
+        const garmentALToggle = document.getElementById('garment-al-toggle');
+        if (garmentALSwitch) garmentALSwitch.classList.add('active');
+        if (garmentALLabel) garmentALLabel.classList.add('active');
+        if (garmentALConfig) garmentALConfig.classList.add('visible');
+        if (garmentALToggle) garmentALToggle.checked = true;
+
+        const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+        if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
+    }
+
+    // Restore cap AL configuration
+    if (draft.capAL && draft.capAL.enabled) {
+        globalAL.cap.enabled = true;
+        globalAL.cap.position = 'AL-Cap';
+        globalAL.cap.stitchCount = parseInt(draft.capAL.stitches) || 5000;
+        globalAL.cap.needsDigitizing = draft.capAL.needsDigitizing || false;
+
+        // Update UI toggle
+        const capALSwitch = document.getElementById('cap-al-switch');
+        const capALLabel = document.getElementById('cap-al-label');
+        const capALConfig = document.getElementById('cap-al-config-new');
+        const capALToggle = document.getElementById('cap-al-toggle');
+        if (capALSwitch) capALSwitch.classList.add('active');
+        if (capALLabel) capALLabel.classList.add('active');
+        if (capALConfig) capALConfig.classList.add('visible');
+        if (capALToggle) capALToggle.checked = true;
+
+        const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
+        if (digitizingEl) digitizingEl.checked = globalAL.cap.needsDigitizing;
+    }
+
+    _syncALArrays();
+
+    // Restore products
+    if (draft.products && draft.products.length > 0) {
+        // Clear any existing rows first
+        const tbody = document.getElementById('product-tbody');
+        if (tbody) tbody.innerHTML = '';
+
+        draft.products.forEach(product => {
+            // Add product row with saved data
+            const rowId = addNewRow();
+            const row = document.getElementById(`row-${rowId}`);
+            if (!row) return;
+
+            // Set product data
+            row.dataset.style = product.style || '';
+            row.dataset.catalogColor = product.catalogColor || '';
+            row.dataset.colorName = product.color || '';
+            row.dataset.description = product.description || '';
+            row.dataset.imageUrl = product.imageUrl || '';
+            row.dataset.productType = product.productType || 'garment';
+
+            // Update display cells
+            const styleCell = row.querySelector('.cell-style');
+            if (styleCell) styleCell.textContent = product.style || '';
+
+            const descCell = row.querySelector('.cell-desc');
+            if (descCell) descCell.textContent = product.description || '';
+
+            const colorCell = row.querySelector('.cell-color');
+            if (colorCell) {
+                colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${escapeHtml(product.color || '')}`;
+            }
+
+            // Restore size quantities
+            if (product.sizes || product.sizeBreakdown) {
+                const sizes = product.sizes || product.sizeBreakdown;
+                Object.entries(sizes).forEach(([size, qty]) => {
+                    if (qty > 0) {
+                        const sizeInput = row.querySelector(`input[data-size="${size}"]`);
+                        if (sizeInput) {
+                            sizeInput.value = qty;
+                            updateRowQuantityTotal(rowId);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Check for caps/garments to show appropriate logo sections
+        updateCapLogoSectionVisibility();
+        updateGarmentLogoSectionVisibility();
+
+        // Recalculate pricing after restoring products
+        recalculatePricing();
+    }
+
+    showToast('Draft restored successfully', 'success');
+}
+
+function markEmbroideryDirty() {
+    if (embPersistence) {
+        embPersistence.markDirty();
+    }
+}
+
+// ============================================================
+// EDIT MODE (Quote Revisions)
+// ============================================================
+
+/**
+ * Check URL for edit parameter
+ * Returns quote ID if editing, null otherwise
+ */
+// checkForEditMode() → moved to quote-builder-utils.js
+
+/**
+ * Load existing quote for editing
+ * Populates all form fields with quote data
+ */
+async function loadQuoteForEditing(quoteId) {
+    showToast('Loading quote...', 'info');
+
+    try {
+        const result = await quoteService.loadQuote(quoteId);
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to load quote');
+        }
+
+        const session = result.session;
+        const items = result.items;
+
+        // Store edit mode state
+        editingQuoteId = quoteId;
+        editingRevision = session.RevisionNumber || 1;
+
+        // Update page header to show edit mode
+        updateEditModeUI(quoteId, editingRevision);
+
+        // Populate customer information
+        populateCustomerInfo(session);
+
+        // Populate logo configuration
+        populateLogoConfig(session, items);
+
+        // Populate products from line items
+        await populateProducts(items);
+
+        // Populate additional charges
+        populateAdditionalCharges(session);
+
+        // Restore tax rate and shipping from fee items
+        const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
+        if (taxFeeItem) {
+            const rateInput = document.getElementById('tax-rate-input');
+            if (rateInput) rateInput.value = taxFeeItem.BaseUnitPrice || 10.1;
+        }
+        const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
+        if (shipFeeItem && shipFeeItem.LineTotal > 0) {
+            document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
+        }
+
+        // Restore LTM display preferences from saved quote
+        if (session.LTM_Display_Mode || session.LTM_Waived) {
+            // Ensure LTM panel is rendered before setting state
+            // (recalculatePricing will render it, but we need state set first)
+            window._pendingLtmState = {
+                enabled: !session.LTM_Waived,
+                displayMode: session.LTM_Display_Mode || 'builtin'
+            };
+        }
+
+        // Recalculate pricing to update totals
+        recalculatePricing();
+
+        // Apply pending LTM state after panel is rendered
+        if (window._pendingLtmState) {
+            setLtmControlState('emb-ltm-panel', window._pendingLtmState);
+            delete window._pendingLtmState;
+            // Re-run pricing with the restored state
+            recalculatePricing();
+        }
+
+        showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+
+        // Show push button for existing quotes
+        showPushButton(quoteId);
+
+        // Check if already pushed
+        if (session.PushedToShopWorks) {
+            const pushBtn = document.getElementById('emb-push-shopworks-btn');
+            const pushLabel = document.getElementById('emb-push-shopworks-label');
+            if (pushBtn && pushLabel) {
+                pushLabel.textContent = 'Already Pushed';
+                pushBtn.disabled = true;
+                pushBtn.style.opacity = '0.6';
+                pushBtn.style.background = '#28a745';
+            }
+        }
+
+    } catch (error) {
+        console.error('[EditMode] Error loading quote:', error);
+        showToast('Error loading quote: ' + error.message, 'error');
+        // Clear edit mode and start fresh
+        editingQuoteId = null;
+        editingRevision = null;
+        addNewRow();
+    }
+}
+
+// updateEditModeUI() → moved to quote-builder-utils.js
+
+/**
+ * Populate customer information fields (embroidery-specific with extra fields)
+ */
+function populateCustomerInfo(session) {
+    const fields = {
+        'customer-name': session.CustomerName,
+        'customer-email': session.CustomerEmail,
+        'company-name': session.CompanyName
+    };
+
+    for (const [id, value] of Object.entries(fields)) {
+        const el = document.getElementById(id);
+        if (el && value) el.value = value;
+    }
+
+    // Set sales rep dropdown
+    const salesRepSelect = document.getElementById('sales-rep');
+    if (salesRepSelect && session.SalesRepEmail) {
+        for (let i = 0; i < salesRepSelect.options.length; i++) {
+            if (salesRepSelect.options[i].value === session.SalesRepEmail) {
+                salesRepSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+
+    // Restore notes (plain text — not JSON)
+    if (session.Notes) {
+        let notesText = session.Notes;
+        // If Notes is JSON (DTG/DTF/SP), skip — those are structured config, not user notes
+        try { JSON.parse(notesText); notesText = ''; } catch (e) { /* plain text — use as-is */ }
+        if (notesText) {
+            const notesEl = document.getElementById('notes');
+            if (notesEl) {
+                notesEl.value = notesText;
+                const section = document.getElementById('notes-section');
+                if (section && section.classList.contains('collapsed')) {
+                    section.classList.remove('collapsed');
+                    const body = section.querySelector('.notes-body');
+                    const icon = section.querySelector('.notes-toggle-icon');
+                    if (body) body.style.display = 'block';
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                }
+                updateNotesBadge();
+            }
+        }
+    }
+}
+
+/**
+ * Populate logo configuration from session data
+ */
+function populateLogoConfig(session, items) {
+    // Primary logo (garment)
+    if (session.PrintLocation) {
+        const posSelect = document.getElementById('primary-position');
+        if (posSelect) posSelect.value = session.PrintLocation;
+        primaryLogo.position = session.PrintLocation;
+    }
+    if (session.StitchCount) {
+        const stitchInput = document.getElementById('primary-stitches');
+        if (stitchInput) stitchInput.value = mapStitchCountToTierValue(session.StitchCount, session.PrintLocation);
+        primaryLogo.stitchCount = session.StitchCount;
+        // Sync position dropdown disabled state and FB stitch input for Full Back
+        if (session.PrintLocation === 'Full Back') {
+            const posEl = document.getElementById('primary-position');
+            if (posEl) posEl.disabled = true;
+            const fbField = document.getElementById('fb-stitch-count-field');
+            const fbInput = document.getElementById('fb-stitch-count');
+            if (fbField) fbField.style.display = '';
+            if (fbInput) fbInput.value = session.StitchCount || 25000;
+        }
+    }
+    if (session.DigitizingFee > 0) {
+        const digitizingCb = document.getElementById('primary-digitizing');
+        if (digitizingCb) {
+            digitizingCb.checked = true;
+            // Update visual indicator
+            const container = digitizingCb.closest('.digitizing-checkbox');
+            if (container) container.classList.add('checked');
+        }
+        primaryLogo.needsDigitizing = true;
+    }
+
+    // Additional logo on garments
+    if (session.AdditionalLogoLocation) {
+        globalAL.garment.enabled = true;
+        globalAL.garment.position = 'AL';
+        globalAL.garment.stitchCount = session.AdditionalStitchCount || EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
+
+        // Update UI
+        const alSwitch = document.getElementById('garment-al-switch');
+        if (alSwitch) alSwitch.classList.add('active');
+        const alLabel = document.getElementById('garment-al-label');
+        if (alLabel) alLabel.classList.add('active');
+        const alConfig = document.getElementById('garment-al-config-new');
+        if (alConfig) alConfig.classList.add('visible');
+        const alToggle = document.getElementById('garment-al-toggle');
+        if (alToggle) alToggle.checked = true;
+
+        _syncALArrays();
+    }
+
+    // Cap primary logo
+    if (session.CapPrintLocation) {
+        const capPosSelect = document.getElementById('cap-primary-position');
+        if (capPosSelect) capPosSelect.value = session.CapPrintLocation;
+        capPrimaryLogo.position = session.CapPrintLocation;
+    }
+    if (session.CapStitchCount) {
+        const capStitchInput = document.getElementById('cap-primary-stitches');
+        if (capStitchInput) capStitchInput.value = mapStitchCountToTierValue(session.CapStitchCount, 'CF');
+        capPrimaryLogo.stitchCount = session.CapStitchCount;
+    }
+    if (session.CapDigitizingFee > 0) {
+        const capDigitizingCb = document.getElementById('cap-primary-digitizing');
+        if (capDigitizingCb) {
+            capDigitizingCb.checked = true;
+            const container = capDigitizingCb.closest('.digitizing-checkbox');
+            if (container) container.classList.add('checked');
+        }
+        capPrimaryLogo.needsDigitizing = true;
+    }
+
+    // Design number assignments (2026-02-19)
+    if (session.GarmentDesignNumber) {
+        primaryLogo.designNumber = session.GarmentDesignNumber;
+        updateLogoCardHeader('garment', session.GarmentDesignNumber);
+        const gDesignInput = document.getElementById('garment-design-number');
+        if (gDesignInput) gDesignInput.value = session.GarmentDesignNumber;
+        const gClearBtn = document.getElementById('garment-design-clear');
+        if (gClearBtn) gClearBtn.style.display = 'inline-flex';
+        lookupDesignNumber('garment');
+    }
+    if (session.CapDesignNumber) {
+        capPrimaryLogo.designNumber = session.CapDesignNumber;
+        updateLogoCardHeader('cap', session.CapDesignNumber);
+        const cDesignInput = document.getElementById('cap-design-number');
+        if (cDesignInput) cDesignInput.value = session.CapDesignNumber;
+        const cClearBtn = document.getElementById('cap-design-clear');
+        if (cClearBtn) cClearBtn.style.display = 'inline-flex';
+        lookupDesignNumber('cap');
+    }
+}
+
+/**
+ * Populate products from line items
+ * Handles regular products AND service items (DECG, DECC, MONOGRAM)
+ */
+async function populateProducts(items) {
+    // Service items to create as service product rows (2026-02 refactor)
+    const SERVICE_STYLE_NUMBERS = [
+        'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
+        '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
+        // Legacy backward-compat (old quotes):
+        'FB', 'MONOGRAM', 'AS-GARM', 'NAME'
+    ];
+
+    // Separate service items from regular products
+    const serviceItems = items.filter(item =>
+        SERVICE_STYLE_NUMBERS.includes(item.StyleNumber) ||
+        item.EmbellishmentType === 'customer-supplied' ||
+        item.EmbellishmentType === 'monogram' ||
+        item.EmbellishmentType === 'embroidery-additional'
+    );
+
+    // Filter to only regular product items
+    const productItems = items.filter(item =>
+        item.EmbellishmentType === 'embroidery' &&
+        item.StyleNumber &&
+        !item.StyleNumber.startsWith('AL-') &&
+        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber)
+    );
+
+    // Group items by StyleNumber + Color to consolidate size quantities
+    const productGroups = {};
+    for (const item of productItems) {
+        const key = `${item.StyleNumber}|${item.Color}`;
+        if (!productGroups[key]) {
+            productGroups[key] = {
+                styleNumber: item.StyleNumber,
+                color: item.Color,
+                productName: item.ProductName,
+                sizeBreakdown: {},
+                priceOverride: 0,
+                sizeOverrides: {}  // Per-size price overrides (child rows)
+            };
+        }
+        // Check for price override stored in LogoSpecs
+        if (item.LogoSpecs) {
+            try {
+                const specs = JSON.parse(item.LogoSpecs);
+                if (specs.priceOverride && specs.overridePrice > 0) {
+                    if (specs.sizeOverride) {
+                        // Per-size override — map to specific sizes in this line item
+                        const sizes = JSON.parse(item.SizeBreakdown || '{}');
+                        for (const sz of Object.keys(sizes)) {
+                            productGroups[key].sizeOverrides[sz] = specs.overridePrice;
+                        }
+                    } else {
+                        // Parent row override
+                        productGroups[key].priceOverride = specs.overridePrice;
+                    }
+                }
+            } catch (e) { /* ignore parse errors */ }
+        }
+        // Merge size breakdowns
+        try {
+            const sizes = JSON.parse(item.SizeBreakdown || '{}');
+            for (const [size, qty] of Object.entries(sizes)) {
+                productGroups[key].sizeBreakdown[size] =
+                    (productGroups[key].sizeBreakdown[size] || 0) + qty;
+            }
+        } catch (e) {
+            console.warn('[EditMode] Could not parse SizeBreakdown:', item.SizeBreakdown);
+        }
+    }
+
+    // Add each regular product to the table
+    for (const product of Object.values(productGroups)) {
+        await addProductFromQuote(product);
+    }
+
+    // Add service items as service product rows (2026-02 refactor)
+    for (const serviceItem of serviceItems) {
+        const serviceType = serviceItem.StyleNumber;
+        const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP' || serviceType === 'AL-CAP' || serviceType === '3D-EMB' || serviceType === 'Laser Patch';
+
+        // Parse metadata from SizeBreakdown if available
+        let stitchCount = 8000;
+        try {
+            const meta = JSON.parse(serviceItem.SizeBreakdown || '{}');
+            stitchCount = meta.stitchCount || 8000;
+        } catch (e) { /* ignore */ }
+
+        const serviceRow = createServiceProductRow(serviceType, {
+            quantity: serviceItem.Quantity,
+            unitPrice: serviceItem.BaseUnitPrice || serviceItem.FinalUnitPrice,
+            total: serviceItem.LineTotal,
+            stitchCount: stitchCount,
+            position: serviceItem.PrintLocationName || '',
+            isCap: isCap
+        });
+
+        // Restore price override for DECG/DECC if saved
+        if (serviceRow && serviceItem.LogoSpecs) {
+            try {
+                const specs = JSON.parse(serviceItem.LogoSpecs);
+                if (specs.priceOverride && specs.overridePrice > 0) {
+                    serviceRow.dataset.sellPrice = specs.overridePrice.toString();
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+    }
+}
+
+/**
+ * Add a product row from loaded quote data
+ */
+async function addProductFromQuote(product) {
+    // Add new row
+    addNewRow();
+    const row = document.querySelector('tr.new-row');
+    if (!row) return;
+
+    const rowId = row.dataset.rowId;
+    const styleInput = row.querySelector('.style-input');
+
+    // Set style number and trigger color loading
+    styleInput.value = product.styleNumber;
+    await onStyleChange(styleInput, parseInt(rowId));
+
+    // Small delay to let colors load
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Select the color
+    const pickerDropdown = row.querySelector('.color-picker-dropdown');
+    if (pickerDropdown) {
+        const colorOption = pickerDropdown.querySelector(
+            `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+        );
+        if (colorOption) {
+            selectColor(parseInt(rowId), colorOption);
+        }
+    }
+
+    // Small delay for color selection to process
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Set size quantities - handle both standard sizes and extended/tall sizes
+    // Extended sizes need child rows (same as ShopWorks import)
+    const rowIdNum = parseInt(rowId);
+
+    for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
+        if (qty <= 0) continue;
+
+        // Check if this is an extended/tall size that needs a child row
+        // SIZE06_EXTENDED_SIZES is defined at module level and includes tall sizes
+        const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size.toUpperCase()) ||
+                               SIZE06_EXTENDED_SIZES.includes(size);
+
+        if (isExtendedSize) {
+            // Create child row for extended size (same pattern as ShopWorks import)
+            createChildRow(rowIdNum, size, qty);
+        } else if (size === '2XL') {
+            // 2XL goes in Size05 column but still needs a child row
+            createChildRow(rowIdNum, '2XL', qty);
+        } else {
+            // Standard size - find existing input
+            const sizeInput = row.querySelector(`input[data-size="${size}"]`);
+            if (sizeInput && !sizeInput.disabled) {
+                sizeInput.value = qty;
+                // Trigger change event to update totals
+                sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+            } else {
+                console.warn(`[addProductFromQuote] No input found for size ${size}, creating child row`);
+                createChildRow(rowIdNum, size, qty);
+            }
+        }
+    }
+
+    // Restore price override if saved
+    if (product.priceOverride > 0) {
+        row.dataset.sellPrice = product.priceOverride.toString();
+    }
+
+    // Restore per-size price overrides on child rows
+    if (product.sizeOverrides && Object.keys(product.sizeOverrides).length > 0) {
+        for (const [size, price] of Object.entries(product.sizeOverrides)) {
+            const childRowId = childRowMap[rowIdNum]?.[size];
+            if (childRowId) {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) childRow.dataset.sellPrice = price.toString();
+            }
+        }
+    }
+
+    // Trigger pricing recalculation after all sizes are set
+    onSizeChange(rowIdNum);
+}
+
+/**
+ * Populate additional charges from session data
+ */
+function populateAdditionalCharges(session) {
+    const chargeFields = {
+        'art-charge': session.ArtCharge,
+        'graphic-design-hours': session.GraphicDesignHours,
+        'rush-fee': session.RushFee,
+        'sample-fee': session.SampleFee,
+        'sample-qty': session.SampleQty
+    };
+
+    for (const [id, value] of Object.entries(chargeFields)) {
+        const el = document.getElementById(id);
+        if (el && value !== undefined && value !== null) {
+            el.value = value;
+        }
+    }
+
+    // Restore art charge toggle state
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    if (artChargeToggle && session.ArtCharge > 0) {
+        artChargeToggle.checked = true;
+        const wrapper = document.getElementById('art-charge-wrapper');
+        const input = document.getElementById('art-charge');
+        if (wrapper) wrapper.style.opacity = '1';
+        if (input) input.disabled = false;
+    }
+
+    // Update artwork charges display (badge and graphic design total)
+    updateArtworkCharges();
+
+    // Handle discount
+    if (session.Discount > 0 || session.DiscountPercent > 0) {
+        const discountPreset = document.getElementById('discount-preset');
+        if (session.DiscountPercent > 0) {
+            document.getElementById('discount-type').value = 'percent';
+            document.getElementById('discount-amount').value = session.DiscountPercent;
+            // Set preset dropdown based on value
+            if (discountPreset) {
+                const presetValues = ['5', '10', '15', '20', '25'];
+                const percentStr = String(session.DiscountPercent);
+                if (presetValues.includes(percentStr)) {
+                    discountPreset.value = percentStr;
+                } else {
+                    discountPreset.value = 'custom';
+                }
+            }
+        } else {
+            document.getElementById('discount-type').value = 'fixed';
+            document.getElementById('discount-amount').value = session.Discount;
+            document.getElementById('discount-symbol').textContent = '$';
+        }
+        // Update UI to show correct input/preset based on type
+        if (typeof updateDiscountType === 'function') {
+            updateDiscountType();
+        }
+        // If custom percentage, ensure input wrapper is visible
+        if (session.DiscountPercent > 0 && discountPreset && discountPreset.value === 'custom') {
+            const inputWrapper = document.getElementById('discount-input-wrapper');
+            const symbol = document.getElementById('discount-symbol');
+            if (inputWrapper) inputWrapper.style.display = 'block';
+            if (symbol) symbol.textContent = '%';
+        }
+    }
+
+    // Restore discount reason with preset detection
+    if (session.DiscountReason) {
+        const reasonPreset = document.getElementById('discount-reason-preset');
+        const reasonEl = document.getElementById('discount-reason');
+        if (reasonPreset && reasonEl) {
+            const presetValues = Array.from(reasonPreset.options)
+                .map(opt => opt.value)
+                .filter(v => v !== 'custom');
+            if (presetValues.includes(session.DiscountReason)) {
+                // Exact match to preset
+                reasonPreset.value = session.DiscountReason;
+                reasonEl.style.display = 'none';
+                reasonEl.value = session.DiscountReason;
+            } else {
+                // Custom reason
+                reasonPreset.value = 'custom';
+                reasonEl.style.display = 'block';
+                reasonEl.value = session.DiscountReason;
+            }
+        }
+    }
+
+    // Update the additional charges display
+    updateAdditionalCharges();
+}
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', async function() {
+
+    showLoading(true);
+
+    // ALWAYS set up search first - independent of pricing calculator
+    // This ensures search works even if pricing API fails
+    setupSearchAutocomplete();
+    setupKeyboardShortcuts();
+    setupPrimaryLogoHandlers();
+    setupCapPrimaryLogoHandlers();  // Cap logo handlers
+
+    // Auto-select sales rep based on logged-in staff (2026 consolidation)
+    if (typeof StaffAuthHelper !== 'undefined') {
+        StaffAuthHelper.autoSelectSalesRep('sales-rep');
+    }
+
+    // Initialize customer lookup autocomplete
+    if (typeof CustomerLookupService !== 'undefined') {
+        const customerLookup = new CustomerLookupService();
+        window.customerLookupInstance = customerLookup;  // Store for ShopWorks import
+        customerLookup.bindToInput('customer-lookup', {
+            onSelect: (contact) => {
+                document.getElementById('customer-name').value = contact.ct_NameFull || '';
+                document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+                document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                // Fill customer number (ShopWorks ID)
+                document.getElementById('customer-number').value = contact.id_Customer || '';
+                // Phone — API may not return phone, clear if empty
+                const phoneInput = document.getElementById('customer-phone');
+                if (phoneInput) phoneInput.value = contact.Phone || '';
+                // Auto-fill Ship To from contact address
+                if (contact.State) {
+                    const stateInput = document.getElementById('ship-state');
+                    if (stateInput) stateInput.value = contact.State;
+                }
+                if (contact.City) {
+                    const cityInput = document.getElementById('ship-city');
+                    if (cityInput) cityInput.value = contact.City;
+                }
+                if (contact.Zip) {
+                    const zipInput = document.getElementById('ship-zip');
+                    if (zipInput) {
+                        zipInput.value = contact.Zip;
+                        lookupTaxRate(); // Auto-trigger tax lookup
+                    }
+                }
+                if (contact.Address) {
+                    const addrInput = document.getElementById('ship-address');
+                    if (addrInput) addrInput.value = contact.Address;
+                }
+                _customerDesignGallery = null; // Invalidate gallery cache on customer change
+                showToast('Customer info loaded', 'success');
+            },
+            onClear: () => {
+                document.getElementById('customer-name').value = '';
+                document.getElementById('customer-email').value = '';
+                document.getElementById('company-name').value = '';
+                document.getElementById('customer-number').value = '';
+                const phoneInput = document.getElementById('customer-phone');
+                if (phoneInput) phoneInput.value = '';
+                _customerDesignGallery = null; // Invalidate gallery cache on customer clear
+            }
+        });
+    }
+
+    // Notes textarea badge update on input
+    const notesTextarea = document.getElementById('notes');
+    if (notesTextarea) {
+        notesTextarea.addEventListener('input', updateNotesBadge);
+    }
+
+    // Setup unsaved changes tracking for form fields (UX improvement)
+    setupUnsavedChangesTracking();
+
+    try {
+        // Initialize pricing calculator
+        pricingCalculator = new EmbroideryPricingCalculator();
+        await pricingCalculator.initializeConfig();
+        updateStitchTierDropdownLabels();
+
+        // Initialize quote service
+        quoteService = new EmbroideryQuoteService();
+
+        // Check for edit mode (loading existing quote for revision)
+        const editQuoteId = checkForEditMode();
+        if (editQuoteId) {
+            // Skip draft recovery and load the existing quote instead
+            await loadQuoteForEditing(editQuoteId);
+        } else {
+            // Initialize auto-save & draft recovery (2026 consolidation)
+            initEmbroideryPersistence();
+
+            // Check for draft recovery
+            if (embSession && embSession.shouldShowRecovery()) {
+                embSession.showRecoveryDialog(
+                    (draft) => restoreEmbroideryDraft(draft),
+                    () => {
+                        if (embPersistence) embPersistence.clearDraft();
+                        // No auto-row - user starts with empty state
+                    }
+                );
+            }
+            // No auto-row - empty state message guides user to search
+        }
+
+        showToast('Ready to build quotes!', 'success');
+
+        // Initialize additional charges display (for default $50 art charge)
+        updateAdditionalCharges();
+
+    } catch (error) {
+        console.error('Failed to initialize pricing:', error);
+        showToast('Pricing unavailable. Search still works.', 'warning');
+    }
+
+    // Auto-focus search bar for immediate typing (UX improvement)
+    const searchInput = document.getElementById('product-search');
+    if (searchInput) {
+        searchInput.focus();
+    }
+
+    showLoading(false);
+});
+
+// ============================================================
+// LOGO PRESETS
+// ============================================================
+
+// ============================================================
+// STITCH TIER BADGE
+// ============================================================
+
+// ============================================================
+// PRIMARY LOGO HANDLERS
+// ============================================================
+
+function updateLogoCardHeader(type, designNumber) {
+    const cardId = type === 'garment' ? 'garment-logo-card' : 'cap-logo-card';
+    const baseTitle = type === 'garment' ? 'Primary Logo' : 'Cap Front Logo';
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    const titleEl = card.querySelector('.logo-card-title');
+    if (titleEl) {
+        titleEl.textContent = designNumber
+            ? `${baseTitle} — Design #${designNumber}`
+            : baseTitle;
+    }
+}
+
+// ============================================================
+// DESIGN NUMBER LOOKUP / SEARCH
+// ============================================================
+
+let _designSearchTarget = 'garment'; // Which logo card the search modal targets
+let _customerDesignGallery = null;   // Cached gallery data: { customerId, results[] }
+let _galleryFilterTimeout = null;    // Debounce timer for gallery filter input
+let _designSearchDebounce = null;
+const DESIGN_SEARCH_INITIAL_RENDER = 50; // Batch rendering threshold
+let _designSearchState = {
+    allResults: [],
+    filteredResults: [],
+    activeTier: 'all',
+    activeCompany: 'all',
+    displayedCount: 0
+};
+
+/**
+ * Apply a design to a logo card from cached data (NO API call)
+ * @param {string} type - 'garment' or 'cap'
+ * @param {Object} designData - Full design data object from cache
+ */
+async function applyDesignFromCache(type, designData) {
+    if (!designData || !designData.designNumber) return;
+    const designNum = String(designData.designNumber);
+    const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
+    const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+    const input = document.getElementById(inputId);
+    const clearBtn = document.getElementById(clearId);
+    if (input) input.value = designNum;
+    if (clearBtn) clearBtn.style.display = 'inline-flex';
+
+    // Build a design object compatible with applyDesignToCard
+    const design = {
+        company: designData.company || '',
+        designName: designData.designName || '',
+        maxStitchCount: designData.maxStitchCount || 0,
+        maxStitchTier: designData.maxStitchTier || 'Standard',
+        placement: designData.placement || '',
+        thumbnailUrl: designData.thumbnailUrl || '',
+        dstPreviewUrl: designData.dstPreviewUrl || '',
+        artworkUrl: designData.artworkUrl || '',
+        customerId: designData.customerId || '',
+        threadColors: designData.threadColors || '',
+        dstFilenames: designData.dstFilenames || [],
+        colorChanges: designData.colorChanges || 0,
+        extraColors: designData.extraColors || 0,
+        extraColorSurcharge: designData.extraColorSurcharge || 0,
+        orderCount: designData.orderCount || 0,
+        lastOrderDate: designData.lastOrderDate || '',
+        artNotes: designData.artNotes || '',
+        variants: designData.variants || []
+    };
+
+    // Store on logo object for draft persistence
+    if (type === 'garment') {
+        primaryLogo._designData = design;
+    } else if (typeof capPrimaryLogo !== 'undefined') {
+        capPrimaryLogo._designData = design;
+    }
+
+    await applyDesignToCard(type, designNum, design);
+}
+
+/**
+ * Filter design search results by stitch tier (chip click handler)
+ */
+function filterDesignSearchByTier(tier) {
+    _designSearchState.activeTier = tier;
+    document.querySelectorAll('#design-search-filters .design-search-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.tier === tier);
+    });
+    applyDesignSearchFilters();
+}
+
+/**
+ * Filter design search results by company name (chip click handler)
+ */
+function filterDesignSearchByCompany(company) {
+    _designSearchState.activeCompany = company;
+    document.querySelectorAll('#design-search-company-chips .design-search-company-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.company === company);
+    });
+    applyDesignSearchFilters();
+}
+
+/**
+ * Apply combined tier + company filters and re-render grid
+ */
+function applyDesignSearchFilters() {
+    let results = _designSearchState.allResults;
+
+    // Apply tier filter
+    if (_designSearchState.activeTier !== 'all') {
+        results = results.filter(d => (d.maxStitchTier || 'Standard') === _designSearchState.activeTier);
+    }
+
+    // Apply company filter
+    if (_designSearchState.activeCompany !== 'all') {
+        results = results.filter(d => (d.company || 'Unknown') === _designSearchState.activeCompany);
+    }
+
+    // Apply text filter if in gallery mode with active text input
+    const searchInput = document.getElementById('design-search-input');
+    if (searchInput && searchInput._galleryMode) {
+        const q = searchInput.value.trim().toLowerCase();
+        if (q) {
+            results = results.filter(d =>
+                (d.designNumber && String(d.designNumber).toLowerCase().includes(q)) ||
+                (d.designName && d.designName.toLowerCase().includes(q)) ||
+                (d.company && d.company.toLowerCase().includes(q))
+            );
+        }
+    }
+
+    _designSearchState.filteredResults = results;
+    renderDesignSearchGrid(results);
+    updateDesignSearchResultsHeader();
+}
+
+/**
+ * Build company filter chips from search/gallery results
+ */
+function buildDesignSearchCompanyChips(designs) {
+    const container = document.getElementById('design-search-company-chips');
+    if (!container) return;
+
+    const companyCounts = {};
+    designs.forEach(d => {
+        const name = d.company || 'Unknown';
+        companyCounts[name] = (companyCounts[name] || 0) + 1;
+    });
+
+    const companies = Object.keys(companyCounts).sort();
+    if (companies.length < 2) {
+        container.style.display = 'none';
+        return;
+    }
+
+    let html = '<button class="design-search-company-chip active" data-company="all" onclick="filterDesignSearchByCompany(\'all\')">All <span class="chip-count">(' + designs.length + ')</span></button>';
+    companies.forEach(name => {
+        const escapedName = name.replace(/'/g, "\\'");
+        html += '<button class="design-search-company-chip" data-company="' + escapeHtml(name) + '" '
+            + 'onclick="filterDesignSearchByCompany(\'' + escapedName + '\')" title="' + escapeHtml(name) + '">'
+            + escapeHtml(name.length > 28 ? name.substring(0, 26) + '...' : name)
+            + ' <span class="chip-count">(' + companyCounts[name] + ')</span></button>';
+    });
+
+    container.innerHTML = html;
+    container.style.display = 'flex';
+}
+
+/**
+ * Update the results count header in the search modal
+ */
+function updateDesignSearchResultsHeader() {
+    const header = document.getElementById('design-search-results-header');
+    if (!header) return;
+
+    const filtered = _designSearchState.filteredResults.length;
+    const total = _designSearchState.allResults.length;
+
+    if (total === 0) {
+        header.style.display = 'none';
+        return;
+    }
+
+    const countText = filtered === total
+        ? '<span class="results-count">' + total + ' designs</span>'
+        : '<span class="results-count">' + filtered + ' of ' + total + ' designs</span>';
+
+    header.innerHTML = countText;
+    header.style.display = 'flex';
+}
+
+/**
+ * Reset design search modal filter state
+ */
+function resetDesignSearchFilters() {
+    _designSearchState.activeTier = 'all';
+    _designSearchState.activeCompany = 'all';
+    _designSearchState.displayedCount = 0;
+    document.querySelectorAll('#design-search-filters .design-search-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.tier === 'all');
+    });
+    const companyChips = document.getElementById('design-search-company-chips');
+    if (companyChips) { companyChips.style.display = 'none'; companyChips.innerHTML = ''; }
+    const header = document.getElementById('design-search-results-header');
+    if (header) header.style.display = 'none';
+    const filters = document.getElementById('design-search-filters');
+    if (filters) filters.style.display = 'none';
+}
+
+/**
+ * Look up a design number from the input field
+ * @param {string} type - 'garment' or 'cap'
+ */
+async function lookupDesignNumber(type) {
+    const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
+    const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
+    const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+    const input = document.getElementById(inputId);
+    const infoBadge = document.getElementById(infoId);
+    const clearBtn = document.getElementById(clearId);
+    if (!input) return;
+
+    const designNum = input.value.trim().replace(/[^\d]/g, '');
+    if (!designNum || designNum.length < 1) {
+        showToast('Enter a design number to look up', 'warning');
+        input.focus();
+        return;
+    }
+
+    // Show loading state
+    infoBadge.style.display = 'block';
+    infoBadge.className = 'design-info-badge design-info-loading';
+    infoBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Looking up design #' + escapeHtml(designNum) + '...';
+
+    try {
+        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/digitized-designs/lookup?designs=${designNum}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        if (data.success && data.designs && data.designs[designNum]) {
+            const design = data.designs[designNum];
+            await applyDesignToCard(type, designNum, design);
+        } else {
+            // Not found in master — try fallback
+            const fbResp = await fetch(`${apiBase}/api/digitized-designs/fallback?designs=${designNum}`);
+            if (fbResp.ok) {
+                const fbData = await fbResp.json();
+                if (fbData.success && fbData.designs && fbData.designs[designNum]) {
+                    const fbDesign = fbData.designs[designNum];
+                    await applyDesignToCard(type, designNum, {
+                        company: fbDesign.companyName || '',
+                        maxStitchCount: fbDesign.stitchCount || 0,
+                        maxStitchTier: fbDesign.stitchTier || 'Standard',
+                        variants: [{ designDescription: fbDesign.designName || '' }]
+                    });
+                    return;
+                }
+            }
+            // Truly not found
+            infoBadge.className = 'design-info-badge design-info-warning';
+            infoBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Design #' + escapeHtml(designNum) +
+                ' not found in database. A new design will be created in ShopWorks.';
+            // Still set the number — user might know it exists in ShopWorks
+            setDesignNumberOnLogo(type, designNum);
+            clearBtn.style.display = 'inline-flex';
+        }
+    } catch (err) {
+        console.error('Design lookup failed:', err);
+        infoBadge.className = 'design-info-badge design-info-error';
+        infoBadge.innerHTML = '<i class="fas fa-times-circle"></i> Lookup failed: ' + escapeHtml(err.message);
+    }
+}
+
+/**
+ * Apply a found design to the logo card
+ */
+async function applyDesignToCard(type, designNum, design) {
+    const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
+    const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+    const infoBadge = document.getElementById(infoId);
+    const clearBtn = document.getElementById(clearId);
+
+    const stitchStr = design.maxStitchCount ? design.maxStitchCount.toLocaleString() + ' stitches' : '';
+    const tierBadge = design.maxStitchTier || 'Standard';
+    const company = design.company || '';
+    const designName = design.designName || '';
+    const placement = design.placement || '';
+    const parts = [company, designName, stitchStr, tierBadge, placement].filter(Boolean);
+
+    // Build enhanced info badge with DST, order history, extra color warning
+    let badgeHtml = '<i class="fas fa-check-circle"></i> ' + escapeHtml(parts.join(' · '));
+
+    // DST filenames (show first 2)
+    const dstArr = design.dstFilenames || [];
+    if (dstArr.length > 0) {
+        const dstDisplay = dstArr.length <= 2 ? dstArr.join(', ') : dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more';
+        badgeHtml += '<br><span style="font-size:11px;color:#6366f1;"><i class="fas fa-file-code" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
+    }
+
+    // Order history
+    if (design.orderCount > 0) {
+        let orderText = design.orderCount + ' orders';
+        if (design.lastOrderDate) {
+            orderText += ' (last: ' + new Date(design.lastOrderDate).toLocaleDateString('en-US', {month:'short', year:'numeric'}) + ')';
+        }
+        badgeHtml += '<br><span style="font-size:11px;color:#6366f1;">📦 ' + escapeHtml(orderText) + '</span>';
+    }
+
+    // Extra color surcharge warning
+    if (design.extraColors > 0 && design.extraColorSurcharge > 0) {
+        badgeHtml += '<br><span style="font-size:11px;color:#d97706;font-weight:600;">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>';
+    }
+
+    infoBadge.className = 'design-info-badge design-info-found';
+    infoBadge.innerHTML = badgeHtml;
+    infoBadge.style.display = 'block';
+    clearBtn.style.display = 'inline-flex';
+
+    // Set design number on the logo object
+    setDesignNumberOnLogo(type, designNum);
+    updateLogoCardHeader(type, designNum);
+
+    // Auto-set stitch tier dropdown if we have stitch info
+    if (design.maxStitchCount && design.maxStitchCount > 0) {
+        autoSetStitchTier(type, design.maxStitchCount, design.maxStitchTier);
+    }
+
+    // Auto-fill Customer # from design database or company contacts lookup
+    const customerInput = document.getElementById('customer-number');
+    if (customerInput && !customerInput.value.trim()) {
+        if (design.customerId) {
+            // Direct customer ID from design master table
+            customerInput.value = design.customerId;
+            // Also fill company name if empty
+            const companyInput = document.getElementById('company-name');
+            if (companyInput && !companyInput.value.trim() && company) {
+                companyInput.value = company;
+            }
+            showToast('Customer # ' + design.customerId + ' auto-set from design database', 'info');
+        } else if (company) {
+            // Fallback: search company contacts by company name (AWAITED to prevent race condition)
+            await autoFillCustomerFromCompany(company);
+        }
+    }
+
+    showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
+
+    // Use thumbnail from enriched /lookup response (faster, no extra API call)
+    const thumbUrl = design.mockupUrl || design.dstPreviewUrl || design.thumbnailUrl || design.artworkUrl || '';
+    if (thumbUrl) {
+        showDesignThumbnail(type, thumbUrl);
+        if (type === 'garment') {
+            primaryLogo.thumbnailUrl = thumbUrl;
+        } else if (typeof capPrimaryLogo !== 'undefined') {
+            capPrimaryLogo.thumbnailUrl = thumbUrl;
+        }
+    } else if (typeof DesignThumbnailService !== 'undefined') {
+        // Fallback: legacy thumbnail service if unified table has no image
+        DesignThumbnailService.fetchThumbnail(designNum).then(imageUrl => {
+            showDesignThumbnail(type, imageUrl);
+            if (type === 'garment') {
+                primaryLogo.thumbnailUrl = imageUrl || null;
+            } else if (typeof capPrimaryLogo !== 'undefined') {
+                capPrimaryLogo.thumbnailUrl = imageUrl || null;
+            }
+        });
+    }
+}
+
+/**
+ * Show or hide a design thumbnail in the logo card area
+ * @param {string} type - 'garment' or 'cap'
+ * @param {string|null} imageUrl - URL to the thumbnail image, or null
+ */
+function showDesignThumbnail(type, imageUrl) {
+    const thumbDiv = document.getElementById(type === 'garment' ? 'garment-design-thumbnail' : 'cap-design-thumbnail');
+    if (!thumbDiv) return;
+    if (imageUrl) {
+        const img = thumbDiv.querySelector('.design-thumb-img');
+        img.src = imageUrl;
+        thumbDiv.style.display = 'block';
+    } else {
+        thumbDiv.style.display = 'none';
+    }
+}
+
+/**
+ * Open full-size thumbnail in a modal overlay
+ * @param {HTMLElement} thumbnailDiv - The .design-thumbnail-preview div that was clicked
+ */
+function openThumbnailFullSize(thumbnailDiv) {
+    const img = thumbnailDiv.querySelector('img');
+    if (!img || !img.src) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'thumb-modal-overlay';
+    overlay.innerHTML = '<img src="' + escapeHtml(img.src) + '" alt="Design full size">';
+    overlay.addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
+}
+
+/**
+ * Auto-fill Customer # by searching company contacts API.
+ * Called when design lookup returns a company name but no Customer_ID.
+ * Searches Company_Contacts_Merge_ODBC for matching company → fills id_Customer.
+ */
+async function autoFillCustomerFromCompany(companyName) {
+    const customerInput = document.getElementById('customer-number');
+    if (!customerInput || customerInput.value.trim()) return; // Already has value
+
+    try {
+        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        // The contacts search API strips apostrophes from the query,
+        // so "Aaberg's Rentals" → "Aabergs Rentals" which won't match.
+        // Use the first word as search term for reliable matching.
+        const firstWord = companyName.trim().split(/[\s']/)[0];
+        const searchTerm = firstWord.length >= 2 ? firstWord : companyName.replace(/'/g, '');
+        if (searchTerm.length < 2) return;
+
+        const resp = await fetch(`${apiBase}/api/company-contacts/search?q=${encodeURIComponent(searchTerm)}&limit=5`);
+        if (!resp.ok) return; // Silent fail — user can fill manually
+
+        const data = await resp.json();
+        const contacts = data.contacts || [];
+        if (contacts.length === 0) return;
+
+        // Find best match — exact company name match (case-insensitive)
+        const fullNameLower = companyName.toLowerCase().trim();
+        const exactMatch = contacts.find(c =>
+            (c.CustomerCompanyName || '').toLowerCase().trim() === fullNameLower
+        );
+        // Also check if first result's company contains our search term
+        const bestMatch = exactMatch || contacts[0];
+
+        // Only auto-fill if company name is a close match
+        if (bestMatch && bestMatch.id_Customer) {
+            const matchName = (bestMatch.CustomerCompanyName || '').toLowerCase();
+            const isCloseMatch = exactMatch || matchName.includes(firstWord.toLowerCase());
+            if (isCloseMatch && !customerInput.value.trim()) {
+                customerInput.value = bestMatch.id_Customer;
+                // Also fill other customer fields if empty
+                const companyInput = document.getElementById('company-name');
+                if (companyInput && !companyInput.value.trim() && bestMatch.CustomerCompanyName) {
+                    companyInput.value = bestMatch.CustomerCompanyName;
+                }
+                const nameInput = document.getElementById('customer-name');
+                if (nameInput && !nameInput.value.trim() && bestMatch.ct_NameFull) {
+                    nameInput.value = bestMatch.ct_NameFull;
+                }
+                const emailInput = document.getElementById('customer-email');
+                if (emailInput && !emailInput.value.trim() && bestMatch.ContactNumbersEmail) {
+                    emailInput.value = bestMatch.ContactNumbersEmail;
+                }
+                // Auto-fill Ship To address if available
+                if (bestMatch.State) {
+                    const stateInput = document.getElementById('ship-state');
+                    if (stateInput && !stateInput.value) stateInput.value = bestMatch.State;
+                }
+                if (bestMatch.City) {
+                    const cityInput = document.getElementById('ship-city');
+                    if (cityInput && !cityInput.value.trim()) cityInput.value = bestMatch.City;
+                }
+                if (bestMatch.Zip) {
+                    const zipInput = document.getElementById('ship-zip');
+                    if (zipInput && !zipInput.value.trim()) {
+                        zipInput.value = bestMatch.Zip;
+                        lookupTaxRate(); // Auto-trigger tax lookup
+                    }
+                }
+                if (bestMatch.Address) {
+                    const addrInput = document.getElementById('ship-address');
+                    if (addrInput && !addrInput.value.trim()) addrInput.value = bestMatch.Address;
+                }
+                showToast('Customer # ' + bestMatch.id_Customer + ' auto-set from ' +
+                    escapeHtml(bestMatch.CustomerCompanyName || companyName), 'info');
+            }
+        }
+    } catch (err) {
+        // Silent fail — customer # can be filled manually
+        console.warn('Auto-fill customer from company failed:', err.message);
+    }
+}
+
+/**
+ * Set design number on the appropriate logo object
+ */
+function setDesignNumberOnLogo(type, designNum) {
+    if (type === 'garment') {
+        primaryLogo.designNumber = designNum;
+    } else if (type === 'cap') {
+        if (typeof capPrimaryLogo !== 'undefined') {
+            capPrimaryLogo.designNumber = designNum;
+        }
+    }
+}
+
+/**
+ * Auto-set stitch tier dropdown from design data
+ */
+function autoSetStitchTier(type, stitchCount, tierName) {
+    const dropdownId = type === 'garment' ? 'primary-stitches' : 'cap-primary-stitches';
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    // Map stitch count to tier value (reuse existing logic)
+    let tierValue;
+    if (stitchCount >= 25000) {
+        tierValue = '25000';
+    } else if (stitchCount > 15000) {
+        tierValue = '18000';
+    } else if (stitchCount > 10000) {
+        tierValue = '12000';
+    } else {
+        tierValue = '8000';
+    }
+
+    dropdown.value = tierValue;
+    // Trigger change events
+    if (type === 'garment') {
+        if (typeof onPrimaryStitchTierChange === 'function') onPrimaryStitchTierChange();
+        // Handle Full Back position auto-select
+        if (stitchCount >= 25000) {
+            const posDropdown = document.getElementById('primary-position');
+            if (posDropdown && posDropdown.value !== 'Full Back') {
+                posDropdown.value = 'Full Back';
+                if (typeof onPrimaryPositionChange === 'function') onPrimaryPositionChange();
+            }
+        }
+    } else {
+        if (typeof onCapStitchTierChange === 'function') onCapStitchTierChange();
+    }
+}
+
+/**
+ * Clear design number from a logo card
+ * @param {string} type - 'garment' or 'cap'
+ */
+function clearDesignNumber(type) {
+    const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
+    const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
+    const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
+
+    const input = document.getElementById(inputId);
+    const infoBadge = document.getElementById(infoId);
+    const clearBtn = document.getElementById(clearId);
+
+    if (input) input.value = '';
+    if (infoBadge) { infoBadge.style.display = 'none'; infoBadge.innerHTML = ''; }
+    if (clearBtn) clearBtn.style.display = 'none';
+
+    // Clear the design number on the logo object
+    setDesignNumberOnLogo(type, null);
+    updateLogoCardHeader(type, null);
+
+    // Hide design thumbnail and clear cached URL
+    showDesignThumbnail(type, null);
+    if (type === 'garment') {
+        primaryLogo.thumbnailUrl = null;
+    } else if (typeof capPrimaryLogo !== 'undefined') {
+        capPrimaryLogo.thumbnailUrl = null;
+    }
+
+    showToast('Design unlinked', 'info');
+}
+
+/**
+ * Open the design search modal
+ * @param {string} type - 'garment' or 'cap'
+ */
+function openDesignSearchModal(type) {
+    _designSearchTarget = type;
+    const modal = document.getElementById('design-search-modal');
+    const searchInput = document.getElementById('design-search-input');
+    const results = document.getElementById('design-search-results');
+    const empty = document.getElementById('design-search-empty');
+    const loading = document.getElementById('design-search-loading');
+    const galleryHeader = document.getElementById('design-gallery-header');
+    const searchHint = document.getElementById('design-search-hint');
+    const searchBtn = document.getElementById('design-search-go');
+
+    if (results) results.innerHTML = '';
+    if (empty) empty.style.display = 'none';
+    if (loading) loading.style.display = 'none';
+    if (searchInput) searchInput.value = '';
+
+    // Check if a customer is selected → gallery mode
+    const customerId = document.getElementById('customer-number')?.value?.trim();
+    const customerName = document.getElementById('customer-name')?.value?.trim()
+        || document.getElementById('company-name')?.value?.trim() || '';
+
+    if (customerId) {
+        // Gallery mode: auto-load customer designs
+        modal.classList.add('gallery-mode');
+        if (galleryHeader) {
+            galleryHeader.style.display = '';
+            const nameEl = galleryHeader.querySelector('.gallery-customer-name');
+            if (nameEl) nameEl.textContent = customerName || ('Customer #' + customerId);
+            const countEl = galleryHeader.querySelector('.gallery-design-count');
+            if (countEl) countEl.textContent = '';
+        }
+        if (searchHint) searchHint.style.display = 'none';
+        if (searchBtn) searchBtn.style.display = 'none';
+        if (searchInput) {
+            searchInput.placeholder = 'Filter designs...';
+            searchInput._galleryMode = true;
+        }
+        // Show modal then load gallery
+        if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; }
+        setTimeout(() => { if (searchInput) searchInput.focus(); }, 100);
+        loadCustomerDesignGallery(customerId);
+    } else {
+        // Search mode: original behavior
+        modal.classList.remove('gallery-mode');
+        if (galleryHeader) galleryHeader.style.display = 'none';
+        if (searchHint) searchHint.style.display = '';
+        if (searchBtn) searchBtn.style.display = '';
+        if (searchInput) {
+            searchInput.placeholder = 'Search by company name or design number...';
+            searchInput._galleryMode = false;
+        }
+        if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; }
+        setTimeout(() => { if (searchInput) searchInput.focus(); }, 100);
+    }
+}
+
+/**
+ * Close the design search modal
+ */
+function closeDesignSearchModal() {
+    const modal = document.getElementById('design-search-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.classList.remove('gallery-mode');
+        modal.style.display = 'none';
+    }
+    // Reset filter state so reopening starts fresh
+    resetDesignSearchFilters();
+}
+
+/**
+ * Load all designs for a customer into the gallery
+ * Uses unified state + card grid renderer with tier/company chips
+ * @param {string} customerId
+ */
+async function loadCustomerDesignGallery(customerId) {
+    const results = document.getElementById('design-search-results');
+    const empty = document.getElementById('design-search-empty');
+    const loading = document.getElementById('design-search-loading');
+    const countEl = document.querySelector('#design-gallery-header .gallery-design-count');
+
+    // Use cached data if same customer
+    if (_customerDesignGallery && _customerDesignGallery.customerId === customerId) {
+        _designSearchState.allResults = _customerDesignGallery.results;
+        _designSearchState.filteredResults = _customerDesignGallery.results;
+        renderDesignSearchGrid(_customerDesignGallery.results);
+        if (countEl) countEl.textContent = _customerDesignGallery.results.length + ' designs';
+        const filters = document.getElementById('design-search-filters');
+        if (filters) filters.style.display = 'flex';
+        buildDesignSearchCompanyChips(_customerDesignGallery.results);
+        updateDesignSearchResultsHeader();
+        return;
+    }
+
+    if (loading) loading.style.display = 'flex';
+    if (results) results.innerHTML = '';
+    if (empty) empty.style.display = 'none';
+    resetDesignSearchFilters();
+
+    try {
+        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/digitized-designs/by-customer?customerId=${encodeURIComponent(customerId)}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        if (loading) loading.style.display = 'none';
+
+        if (!data.success || !data.results || data.results.length === 0) {
+            // No designs: show message and fall back to search mode
+            if (countEl) countEl.textContent = '0 designs';
+            const searchInput = document.getElementById('design-search-input');
+            const searchHint = document.getElementById('design-search-hint');
+            const searchBtn = document.getElementById('design-search-go');
+            if (results) results.innerHTML = '<div class="design-search-empty" style="display:flex;"><i class="fas fa-folder-open"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';
+            if (searchInput) {
+                searchInput.placeholder = 'Search by company name or design number...';
+                searchInput._galleryMode = false;
+            }
+            if (searchHint) searchHint.style.display = '';
+            if (searchBtn) searchBtn.style.display = '';
+            return;
+        }
+
+        // Cache gallery data
+        _customerDesignGallery = { customerId, results: data.results };
+        if (countEl) countEl.textContent = data.results.length + ' designs';
+
+        // Cache FULL design objects for zero-API-call selection
+        window._designSearchCache = {};
+        data.results.forEach(d => {
+            window._designSearchCache[String(d.designNumber)] = d;
+        });
+
+        // Store in unified state + render with chips
+        _designSearchState.allResults = data.results;
+        _designSearchState.filteredResults = data.results;
+        const filters = document.getElementById('design-search-filters');
+        if (filters) filters.style.display = 'flex';
+        buildDesignSearchCompanyChips(data.results);
+        renderDesignSearchGrid(data.results);
+        updateDesignSearchResultsHeader();
+
+    } catch (err) {
+        if (loading) loading.style.display = 'none';
+        if (results) results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle"></i> Failed to load designs: ' + escapeHtml(err.message) + '</div>';
+    }
+}
+
+/**
+ * Render design search/gallery cards in a CSS grid (unified renderer)
+ * Supports batch rendering: shows first 50 cards + "Show more" button
+ * @param {Array} designs
+ */
+function renderDesignSearchGrid(designs) {
+    const results = document.getElementById('design-search-results');
+    if (!results) return;
+
+    // Remove any old show-more element
+    const oldMore = results.querySelector('.design-search-show-more');
+    if (oldMore) oldMore.remove();
+
+    if (!designs || designs.length === 0) {
+        results.innerHTML = '<div class="design-gallery-no-match"><i class="fas fa-filter"></i> No designs match this filter</div>';
+        _designSearchState.displayedCount = 0;
+        return;
+    }
+
+    // Batch render first N cards
+    const initialBatch = designs.slice(0, DESIGN_SEARCH_INITIAL_RENDER);
+    results.innerHTML = initialBatch.map(buildDesignSearchCardHtml).join('');
+    _designSearchState.displayedCount = initialBatch.length;
+
+    // Add "Show more" button if there are more results
+    if (designs.length > DESIGN_SEARCH_INITIAL_RENDER) {
+        const remaining = designs.length - DESIGN_SEARCH_INITIAL_RENDER;
+        results.innerHTML += '<div class="design-search-show-more"><button onclick="showMoreDesignSearchResults()"><i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
+    }
+
+    // Lazy-load thumbnails for designs without images
+    lazyLoadDesignSearchThumbnails(initialBatch, results);
+}
+
+/**
+ * Build a single design card HTML (matches standalone gallery layout)
+ */
+function buildDesignSearchCardHtml(d) {
+    const dn = escapeHtml(String(d.designNumber));
+    const previewUrl = d.mockupUrl || d.artworkUrl || d.thumbnailUrl || null;
+    const thumbHtml = previewUrl
+        ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
+        : '<i class="fas fa-image"></i>';
+
+    let tierBadge = '';
+    if (d.maxStitchCount > 0) {
+        const tierClass = (d.maxStitchTier || 'Standard').toLowerCase().replace(/\s+/g, '-');
+        tierBadge = '<span class="design-tier-badge tier-' + escapeHtml(tierClass) + '">' + escapeHtml(d.maxStitchTier || 'Standard') + '</span>';
+    }
+
+    const name = d.designName ? (d.designName.length > 30 ? d.designName.substring(0, 28) + '...' : d.designName) : '';
+    const stitchText = d.maxStitchCount > 0 ? d.maxStitchCount.toLocaleString() + ' st' : '';
+    const placementBadge = d.placement ? '<span class="design-placement-tag">' + escapeHtml(d.placement) + '</span>' : '';
+    const threadText = d.threadColors ? (d.threadColors.length > 35 ? d.threadColors.substring(0, 33) + '...' : d.threadColors) : '';
+    const dstArr = d.dstFilenames || [];
+    const dstText = dstArr.join(', ');
+    const dstDisplay = dstText.length > 50 ? dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more' : dstText;
+    const company = d.company || '';
+
+    return '<div class="design-gallery-card" onclick="selectDesignFromSearch(\'' + dn + '\')"'
+        + ' data-design-number="' + dn + '" data-company="' + escapeHtml(company) + '">'
+        + '<div class="design-gallery-thumb" id="gallery-thumb-' + dn + '">' + thumbHtml + '</div>'
+        + '<div class="design-gallery-info">'
+            + '<div class="design-gallery-number">#' + dn + '</div>'
+            + (company ? '<div class="design-gallery-name" title="' + escapeHtml(company) + '" style="font-style:normal;color:#374151;font-weight:500;">' + escapeHtml(company.length > 28 ? company.substring(0, 26) + '...' : company) + '</div>' : '')
+            + (name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName || '') + '">' + escapeHtml(name) + '</div>' : '')
+            + '<div class="design-gallery-meta">' + tierBadge + (stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : '') + '</div>'
+            + ((placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
+            + (dstDisplay ? '<div class="design-dst-files" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
+        + '</div>'
+    + '</div>';
+}
+
+/**
+ * Show remaining design search results (batch rendering)
+ */
+function showMoreDesignSearchResults() {
+    const results = document.getElementById('design-search-results');
+    if (!results) return;
+
+    // Remove the show-more button
+    const showMore = results.querySelector('.design-search-show-more');
+    if (showMore) showMore.remove();
+
+    // Append remaining cards
+    const remaining = _designSearchState.filteredResults.slice(DESIGN_SEARCH_INITIAL_RENDER);
+    const temp = document.createElement('div');
+    temp.innerHTML = remaining.map(buildDesignSearchCardHtml).join('');
+    while (temp.firstChild) {
+        results.appendChild(temp.firstChild);
+    }
+    _designSearchState.displayedCount = _designSearchState.filteredResults.length;
+
+    // Lazy-load thumbnails for remaining
+    lazyLoadDesignSearchThumbnails(remaining, results);
+}
+
+/**
+ * Lazy-load thumbnails for designs missing images in the search modal
+ */
+function lazyLoadDesignSearchThumbnails(designs, container) {
+    if (typeof DesignThumbnailService === 'undefined') return;
+    const noImage = designs.filter(d => !d.mockupUrl && !d.artworkUrl && !d.thumbnailUrl).map(d => String(d.designNumber)).slice(0, 20);
+    if (noImage.length === 0) return;
+
+    DesignThumbnailService.fetchThumbnailsBatch(noImage).then(thumbMap => {
+        for (const [dn, url] of Object.entries(thumbMap)) {
+            if (url) {
+                // Update cache
+                if (window._designSearchCache && window._designSearchCache[dn]) {
+                    window._designSearchCache[dn].thumbnailUrl = url;
+                }
+                // Update DOM
+                const slot = container.querySelector('#gallery-thumb-' + dn);
+                if (slot && !slot.querySelector('img')) {
+                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">';
+                }
+            }
+        }
+    });
+}
+
+// Keep old name as alias for backward compat (used by gallery filter)
+function renderDesignGallery(designs) { renderDesignSearchGrid(designs); }
+
+/**
+ * Debounced search input handler
+ */
+function onDesignSearchInput() {
+    const input = document.getElementById('design-search-input');
+    if (!input) return;
+
+    // Gallery mode: client-side filter on cached results (uses unified filter pipeline)
+    if (input._galleryMode && _customerDesignGallery) {
+        clearTimeout(_galleryFilterTimeout);
+        _galleryFilterTimeout = setTimeout(() => {
+            applyDesignSearchFilters();
+        }, 200);
+        return;
+    }
+
+    // Search mode: debounced API search
+    clearTimeout(_designSearchDebounce);
+    _designSearchDebounce = setTimeout(() => {
+        if (input && input.value.trim().length >= 2) {
+            runDesignSearch();
+        }
+    }, 400);
+}
+
+/**
+ * Execute design search — uses gallery card grid layout with tier + company chips
+ */
+async function runDesignSearch() {
+    const input = document.getElementById('design-search-input');
+    const results = document.getElementById('design-search-results');
+    const empty = document.getElementById('design-search-empty');
+    const loading = document.getElementById('design-search-loading');
+    if (!input) return;
+
+    const q = input.value.trim();
+    if (q.length < 2) return;
+
+    results.innerHTML = '';
+    empty.style.display = 'none';
+    loading.style.display = 'flex';
+    resetDesignSearchFilters();
+
+    try {
+        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const searchCustomerId = document.getElementById('customer-number')?.value?.trim() || '';
+        const customerParam = searchCustomerId ? `&customerId=${encodeURIComponent(searchCustomerId)}` : '';
+        const resp = await fetch(`${apiBase}/api/digitized-designs/search-all?q=${encodeURIComponent(q)}${customerParam}&limit=100`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        loading.style.display = 'none';
+
+        if (!data.success || !data.results || data.results.length === 0) {
+            empty.style.display = 'flex';
+            return;
+        }
+
+        // Cache FULL design objects for zero-API-call selection
+        window._designSearchCache = {};
+        data.results.forEach(d => {
+            window._designSearchCache[String(d.designNumber)] = d;
+        });
+
+        // Store in unified state
+        _designSearchState.allResults = data.results;
+        _designSearchState.filteredResults = data.results;
+
+        // Show tier filter chips
+        const filters = document.getElementById('design-search-filters');
+        if (filters) filters.style.display = 'flex';
+
+        // Build company filter chips
+        buildDesignSearchCompanyChips(data.results);
+
+        // Render card grid
+        renderDesignSearchGrid(data.results);
+        updateDesignSearchResultsHeader();
+
+    } catch (err) {
+        loading.style.display = 'none';
+        console.error('Design search failed:', err);
+        results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle"></i> Search failed: ' + escapeHtml(err.message) + '</div>';
+    }
+}
+
+/**
+ * Select a design from the search modal results
+ * Uses cached data to avoid redundant API call
+ * @param {string} designNum
+ */
+async function selectDesignFromSearch(designNum) {
+    closeDesignSearchModal();
+
+    // Try to use cached full design data (no API call needed)
+    const cached = window._designSearchCache?.[String(designNum)];
+    if (cached && cached.designNumber) {
+        // Full design object cached — apply directly
+        await applyDesignFromCache(_designSearchTarget, cached);
+    } else {
+        // Fallback: old behavior (API call) for designs without full cache
+        const inputId = _designSearchTarget === 'garment' ? 'garment-design-number' : 'cap-design-number';
+        const input = document.getElementById(inputId);
+        if (input) input.value = designNum;
+
+        // Show thumbnail instantly from partial cache
+        const previewUrl = cached?.mockupUrl || cached?.artworkUrl || cached?.thumbnailUrl || null;
+        if (previewUrl) {
+            showDesignThumbnail(_designSearchTarget, previewUrl);
+            if (_designSearchTarget === 'garment') primaryLogo.thumbnailUrl = previewUrl;
+            else if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo.thumbnailUrl = previewUrl;
+        }
+
+        await lookupDesignNumber(_designSearchTarget);
+    }
+}
+
+function setupPrimaryLogoHandlers() {
+    // Position and tier dropdown handled by inline onchange handlers
+    // (onPrimaryPositionChange, onPrimaryStitchTierChange)
+
+    // Digitizing checkbox
+    const digitizingCheckbox = document.getElementById('primary-digitizing');
+    if (digitizingCheckbox) {
+        digitizingCheckbox.addEventListener('change', function() {
+            primaryLogo.needsDigitizing = this.checked;
+            recalculatePricing();
+        });
+    }
+}
+
+// (Per-logo card functions removed — AL is now managed via global toggle only)
+
+// Update cap logo section visibility based on caps in quote
+function updateCapLogoSectionVisibility() {
+    const hasCaps = document.querySelectorAll('tr[data-is-cap="true"]').length > 0;
+    // Use new card element (2026 modernized UI)
+    const capCard = document.getElementById('cap-logo-card');
+    if (capCard) {
+        capCard.style.display = hasCaps ? 'block' : 'none';
+        // Update dropdown labels with API prices when showing cap section
+        if (hasCaps) {
+            updateEmbellishmentDropdownLabels();
+        }
+    }
+    // Legacy fallback
+    const capSection = document.getElementById('cap-logo-section');
+    if (capSection) {
+        capSection.style.display = hasCaps ? 'block' : 'none';
+    }
+    // Also update artwork services visibility
+    updateArtworkServicesVisibility();
+}
+
+// Update garment logo section visibility based on garments in quote
+function updateGarmentLogoSectionVisibility() {
+    const hasGarments = document.querySelectorAll('tr[data-is-cap="false"]').length > 0;
+    const garmentCard = document.getElementById('garment-logo-card');
+    if (garmentCard) {
+        garmentCard.style.display = hasGarments ? 'block' : 'none';
+    }
+    // Also update artwork services visibility
+    updateArtworkServicesVisibility();
+}
+
+// Update empty state row visibility based on products
+function updateArtworkServicesVisibility() {
+    // Check for rows with data-is-cap attribute (indicates a valid product was added)
+    const hasGarments = document.querySelectorAll('tr[data-is-cap="false"]').length > 0;
+    const hasCaps = document.querySelectorAll('tr[data-is-cap="true"]').length > 0;
+    const hasAnyProducts = hasGarments || hasCaps;
+    // Artwork Services panel is now in sidebar (always visible)
+    // Just update empty state row visibility
+    const emptyStateRow = document.getElementById('empty-state-row');
+    if (emptyStateRow) {
+        emptyStateRow.style.display = hasAnyProducts ? 'none' : '';
+    }
+}
+
+// Setup cap primary logo event handlers
+function setupCapPrimaryLogoHandlers() {
+    // Tier dropdown handled by inline onchange handler (onCapStitchTierChange)
+    const digitizingCheckbox = document.getElementById('cap-primary-digitizing');
+
+    if (digitizingCheckbox) {
+        digitizingCheckbox.addEventListener('change', function() {
+            capPrimaryLogo.needsDigitizing = this.checked;
+            recalculatePricing();
+        });
+    }
+}
+
+// ============================================================
+// PRODUCT SEARCH & AUTOCOMPLETE (Using ExactMatchSearch module)
+// ============================================================
+
+// Module instance - initialized in setupSearchAutocomplete
+let exactMatchSearcher = null;
+
+function setupSearchAutocomplete() {
+    const searchInput = document.getElementById('product-search');
+    const suggestions = document.getElementById('search-suggestions');
+
+    if (!searchInput || !window.ExactMatchSearch) {
+        console.error('[Embroidery] Search input or ExactMatchSearch module not found');
+        return;
+    }
+
+    // Initialize ExactMatchSearch with full keyboard navigation
+    exactMatchSearcher = new window.ExactMatchSearch({
+        apiBase: API_BASE,
+        debounceMs: 300,  // Standardized debounce
+
+        // Auto-load exact matches immediately
+        onExactMatch: (product) => {
+            // Exact match found
+            searchInput.value = '';
+            selectProduct(product.value);
+        },
+
+        // Show suggestions dropdown
+        onSuggestions: (products) => {
+            showSearchSuggestions(products);
+        },
+
+        // Keyboard navigation: update visual highlight
+        onNavigate: (selectedIndex, products) => {
+            updateSearchSelectionHighlight(selectedIndex);
+        },
+
+        // Keyboard navigation: select item via Enter
+        onSelect: (product) => {
+            // Keyboard selected product
+            searchInput.value = '';
+            selectProduct(product.value);
+        },
+
+        // Keyboard navigation: close dropdown via Escape
+        onClose: () => {
+            suggestions.classList.remove('show');
+        }
+    });
+
+    // Wire up search input
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            suggestions.classList.remove('show');
+            return;
+        }
+
+        exactMatchSearcher.search(query);
+    });
+
+    // Handle keyboard navigation
+    searchInput.addEventListener('keydown', function(e) {
+        // Let ExactMatchSearch handle navigation keys
+        if (exactMatchSearcher && exactMatchSearcher.handleKeyDown(e)) {
+            return; // Event was handled
+        }
+
+        // Handle Enter for immediate search when nothing is selected
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query.length >= 2) {
+                exactMatchSearcher.searchImmediate(query);
+            }
+        }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-input-wrapper')) {
+            suggestions.classList.remove('show');
+            if (exactMatchSearcher) exactMatchSearcher.resetNavigation();
+        }
+    });
+
+    // Search autocomplete initialized
+}
+
+/**
+ * Show search suggestions dropdown
+ */
+function showSearchSuggestions(products) {
+    const suggestions = document.getElementById('search-suggestions');
+
+    if (!products || products.length === 0) {
+        suggestions.innerHTML = '<div class="suggestion-item"><span>No products found</span></div>';
+        suggestions.classList.add('show');
+        return;
+    }
+
+    suggestions.innerHTML = products.map(product => {
+        // Extract product name (remove style prefix from label)
+        const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
+        return `
+            <div class="suggestion-item" onclick="selectProduct('${escapeHtml(product.value)}')">
+                <span class="style">${escapeHtml(product.value)}</span>
+                <span class="name">${escapeHtml(productName)}</span>
+            </div>
+        `;
+    }).join('');
+    suggestions.classList.add('show');
+
+    // Cache product data (convert to expected format)
+    products.forEach(p => {
+        productCache[p.value] = {
+            STYLE: p.value,
+            PRODUCT_TITLE: p.label
+        };
+    });
+}
+
+/**
+ * Update visual highlight on selected suggestion item
+ */
+function updateSearchSelectionHighlight(selectedIndex) {
+    const suggestions = document.getElementById('search-suggestions');
+    if (!suggestions) return;
+
+    suggestions.querySelectorAll('.suggestion-item').forEach((item, index) => {
+        if (index === selectedIndex) {
+            item.classList.add('selected');
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+async function selectProduct(styleNumber) {
+    const searchInput = document.getElementById('product-search');
+    const suggestions = document.getElementById('search-suggestions');
+
+    searchInput.value = '';
+    suggestions.classList.remove('show');
+
+    // Add product to table
+    await addProductRow(styleNumber);
+
+    // Mark as having unsaved changes
+    markAsUnsaved();
+}
+
+// ============================================================
+// PRODUCT TABLE MANAGEMENT
+// ============================================================
+
+function addNewRow() {
+    const tbody = document.getElementById('product-tbody');
+    const rowId = ++rowCounter;
+
+    // Hide empty state message when adding first row
+    const emptyStateRow = document.getElementById('empty-state-row');
+    if (emptyStateRow) emptyStateRow.style.display = 'none';
+
+    const row = document.createElement('tr');
+    row.id = `row-${rowId}`;
+    row.className = 'new-row';
+    row.dataset.rowId = rowId;
+
+    row.innerHTML = `
+        <td>
+            <input type="text" class="cell-input style-input"
+                   placeholder="Style #"
+                   data-field="style"
+                   onchange="onStyleChange(this, ${rowId})"
+                   onkeydown="handleCellKeydown(event, this)">
+        </td>
+        <td class="thumbnail-col">
+            <div class="product-thumbnail no-image" id="thumb-${rowId}"
+                 title="Select a color to see product image"
+                 style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;"></div>
+        </td>
+        <td class="desc-cell">
+            <div class="desc-row">
+                <input type="text" class="cell-input desc-input"
+                       placeholder="(auto)"
+                       data-field="description"
+                       readonly>
+                <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
+                    <i class="fas fa-hat-cowboy"></i> Cap
+                </span>
+            </div>
+            <div class="pricing-breakdown" id="breakdown-${rowId}"></div>
+        </td>
+        <td>
+            <div class="color-picker-wrapper" data-row-id="${rowId}">
+                <div class="color-picker-selected disabled" onclick="toggleColorPicker(${rowId})" tabindex="0" onkeydown="handleColorPickerKeydown(event, ${rowId})">
+                    <span class="color-swatch empty"></span>
+                    <span class="color-name placeholder">Select color...</span>
+                    <i class="fas fa-chevron-down picker-arrow"></i>
+                </div>
+                <div class="color-picker-dropdown hidden" id="color-dropdown-${rowId}"></div>
+            </div>
+        </td>
+        <td><input type="number" class="cell-input size-input" data-size="S" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="M" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="L" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
+        <td class="cell-qty" id="row-qty-${rowId}">0</td>
+        <td class="cell-price" id="row-price-${rowId}"
+            ondblclick="enablePriceOverride(${rowId})"
+            title="Double-click to override price">-</td>
+        <td class="cell-total" id="row-total-${rowId}">-</td>
+        <td class="cell-actions">
+            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #d1d5db; cursor: not-allowed; padding: 4px; font-size: 13px; opacity: 0.5;" disabled onmouseover="if(!this.disabled)this.style.color='#3b82f6'" onmouseout="if(!this.disabled)this.style.color='#94a3b8'"
+                <i class="fas fa-copy"></i>
+            </button>
+            <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    `;
+
+    tbody.appendChild(row);
+
+    // Focus on the style input
+    setTimeout(() => {
+        row.querySelector('.style-input').focus();
+    }, 50);
+
+    // Remove the "new-row" highlight after a moment
+    setTimeout(() => {
+        row.classList.remove('new-row');
+    }, 1000);
+}
+
+async function addProductRow(styleNumber) {
+    // Find or create empty row
+    let targetRow = document.querySelector('tr.new-row');
+    if (!targetRow) {
+        addNewRow();
+        targetRow = document.querySelector('tr.new-row');
+    }
+
+    const rowId = targetRow.dataset.rowId;
+    const styleInput = targetRow.querySelector('.style-input');
+    styleInput.value = styleNumber;
+
+    await onStyleChange(styleInput, parseInt(rowId));
+}
+
+/**
+ * Create a service product row (DECG, DECC, AL, FB, CB, MONOGRAM, etc.)
+ * These appear as line items in the product table, not as fee rows
+ * @param {string} serviceType - Service code: DECG, DECC, AL, FB, CB, CS, MONOGRAM, AS-GARM, AS-CAP
+ * @param {Object} data - Service data: { quantity, stitchCount, position, unitPrice, total, isCap }
+ * @returns {HTMLElement} The created row element
+ */
+function createServiceProductRow(serviceType, data) {
+    const tbody = document.getElementById('product-tbody');
+    const rowId = ++rowCounter;
+
+    // Hide empty state message
+    const emptyStateRow = document.getElementById('empty-state-row');
+    if (emptyStateRow) emptyStateRow.style.display = 'none';
+
+    // Service type metadata
+    const SERVICE_META = {
+        'DECG': { description: 'Customer-Supplied Garments', icon: 'fa-tshirt', isCap: false },
+        'DECC': { description: 'Customer-Supplied Caps', icon: 'fa-hard-hat', isCap: true },
+        'AL': { description: 'Additional Logo', icon: 'fa-plus-circle', isCap: false },
+        'AL-CAP': { description: 'Additional Logo Cap', icon: 'fa-plus-circle', isCap: true },
+        'FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
+        'DECG-FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
+        'CB': { description: 'Cap Back Embroidery', icon: 'fa-hat-cowboy', isCap: true },
+        'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
+        'Monogram': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+        'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+        'Name/Number': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false },
+        'NAME': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false }, // Legacy
+        'WEIGHT': { description: 'Weight', icon: 'fa-weight-hanging', isCap: false },
+        'SEG': { description: 'Sewing (Garment)', icon: 'fa-scissors', isCap: false },
+        'SECC': { description: 'Sewing (Cap)', icon: 'fa-scissors', isCap: true },
+        'DT': { description: 'Design Transfer', icon: 'fa-exchange-alt', isCap: false },
+        'CTR-GARMT': { description: 'Contract (Garment)', icon: 'fa-file-contract', isCap: false },
+        'CTR-CAP': { description: 'Contract (Cap)', icon: 'fa-file-contract', isCap: true },
+        'AS-Garm': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
+        'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
+        'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
+        '3D-EMB': { description: '3D Puff Embroidery', icon: 'fa-cube', isCap: true },
+        'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true }
+    };
+
+    const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
+    const isCap = data.isCap !== undefined ? data.isCap : meta.isCap;
+    const quantity = data.quantity || 0;
+    const unitPrice = data.unitPrice || 0;
+    const total = data.total || (quantity * unitPrice);
+    const stitchCount = data.stitchCount || 8000;
+    const position = data.position || '';
+
+    // Description with position info
+    let displayDescription = meta.description;
+    if (position) {
+        displayDescription += `: ${position}`;
+    }
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB') {
+        displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
+    }
+
+    const row = document.createElement('tr');
+    row.id = `row-${rowId}`;
+    row.className = 'service-product-row';
+    row.dataset.rowId = rowId;
+    row.dataset.productType = 'service';
+    row.dataset.serviceType = serviceType.toLowerCase();
+    row.dataset.style = serviceType;
+    row.dataset.isCap = isCap.toString();
+    row.dataset.stitchCount = stitchCount.toString();
+    row.dataset.position = position;
+    row.dataset.unitPrice = unitPrice.toString();
+
+    row.innerHTML = `
+        <td>
+            <span class="service-style-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;">
+                <i class="fas ${meta.icon}"></i>
+                ${serviceType}
+            </span>
+        </td>
+        <td class="thumbnail-col">
+            <div class="service-icon" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: ${isCap ? '#eff6ff' : '#fffbeb'}; border-radius: 6px;">
+                <i class="fas ${meta.icon}" style="font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};"></i>
+            </div>
+        </td>
+        <td class="desc-cell">
+            <div class="desc-row">
+                <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
+                ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy"></i> Cap</span>' : ''}
+            </div>
+        </td>
+        <td>
+            <span style="color: #64748b; font-size: 12px;">N/A</span>
+        </td>
+        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 11px; font-style: italic;">
+            Service item - no size breakdown
+        </td>
+        <td class="cell-qty">
+            <input type="number" class="cell-input service-qty" min="0" max="9999" value="${quantity}"
+                   onchange="onServiceQtyChange(${rowId})" onkeydown="handleCellKeydown(event, this)"
+                   style="width: 60px; text-align: center;">
+        </td>
+        <td class="cell-price" id="row-price-${rowId}"
+            ${['DECG', 'DECC'].includes(serviceType) ? `ondblclick="enablePriceOverride(${rowId})" title="Double-click to override price"` : ''}>$${unitPrice.toFixed(2)}</td>
+        <td class="cell-total" id="row-total-${rowId}">$${total.toFixed(2)}</td>
+        <td class="cell-actions">
+            <button class="btn-delete-row" onclick="deleteServiceRow(${rowId})" title="Delete service">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    `;
+
+    // Insert service rows after all regular product rows but before fee rows
+    // Find the fees-tbody or append to product-tbody
+    const feesTbody = document.getElementById('fees-tbody');
+    if (feesTbody && feesTbody.previousElementSibling) {
+        // Insert at end of product-tbody, just before fees-tbody
+        tbody.appendChild(row);
+    } else {
+        tbody.appendChild(row);
+    }
+
+    return row;
+}
+
+/**
+ * Toggle the "Add Service" dropdown menu
+ */
+function toggleServiceDropdown() {
+    const menu = document.getElementById('service-dropdown-menu');
+    if (!menu) return;
+    const isVisible = menu.style.display !== 'none';
+    menu.style.display = isVisible ? 'none' : 'block';
+    // Close on outside click
+    if (!isVisible) {
+        const closeHandler = (e) => {
+            if (!e.target.closest('.add-service-dropdown')) {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeHandler);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', closeHandler), 0);
+    }
+}
+
+/**
+ * Add a manual service row (Monogram, Name/Number, WEIGHT)
+ * Called from the "Add Service" dropdown
+ */
+function addManualServiceRow(serviceType) {
+    // Close dropdown
+    const menu = document.getElementById('service-dropdown-menu');
+    if (menu) menu.style.display = 'none';
+
+    // Default prices per service type
+    const SERVICE_DEFAULTS = {
+        'Monogram': { unitPrice: 12.50, quantity: 1 },
+        'Name/Number': { unitPrice: 15.00, quantity: 1 },
+        'WEIGHT': { unitPrice: 6.25, quantity: 1 },
+        'SEG': { unitPrice: 10.00, quantity: 1 },
+        'DT': { unitPrice: 50.00, quantity: 1 },
+        'CTR-GARMT': { unitPrice: 0, quantity: 1 },
+        'CTR-CAP': { unitPrice: 0, quantity: 1 }
+    };
+
+    const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };
+
+    const row = createServiceProductRow(serviceType, {
+        quantity: defaults.quantity,
+        unitPrice: defaults.unitPrice,
+        total: defaults.quantity * defaults.unitPrice,
+        isCap: false
+    });
+
+    if (row) {
+        // Focus the quantity input so user can immediately set count
+        const qtyInput = row.querySelector('.service-qty');
+        if (qtyInput) {
+            setTimeout(() => {
+                qtyInput.focus();
+                qtyInput.select();
+            }, 50);
+        }
+        markAsUnsaved();
+        recalculatePricing();
+        showToast(`${serviceType} service row added`, 'success');
+    }
+}
+
+/**
+ * Handle quantity change for service product rows
+ */
+function onServiceQtyChange(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row || row.dataset.productType !== 'service') return;
+
+    const qtyInput = row.querySelector('.service-qty');
+    const quantity = parseInt(qtyInput?.value) || 0;
+    // Use sell price override if set, otherwise use original unit price
+    const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
+    const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
+    const total = quantity * unitPrice;
+
+    // Update price cell with override indicator if applicable
+    const priceCell = document.getElementById(`row-price-${rowId}`);
+    if (priceCell) {
+        if (overridePrice > 0) {
+            priceCell.classList.add('price-overridden');
+            priceCell.innerHTML = `<span class="price-override-wrapper">$${unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
+        } else {
+            priceCell.classList.remove('price-overridden');
+            priceCell.textContent = `$${unitPrice.toFixed(2)}`;
+        }
+    }
+
+    // Update total display
+    const totalCell = document.getElementById(`row-total-${rowId}`);
+    if (totalCell) totalCell.textContent = `$${total.toFixed(2)}`;
+
+    // Trigger recalculation
+    recalculatePricing();
+    markAsUnsaved();
+}
+
+/**
+ * Delete a service product row
+ */
+function deleteServiceRow(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (row) {
+        row.remove();
+        recalculatePricing();
+        markAsUnsaved();
+    }
+}
+
+async function onStyleChange(input, rowId) {
+    let styleNumber = input.value.trim().toUpperCase();
+    if (!styleNumber) return;
+
+    const row = document.getElementById(`row-${rowId}`);
+    const descInput = row.querySelector('[data-field="description"]');
+    const pickerWrapper = row.querySelector('.color-picker-wrapper');
+    const pickerSelected = row.querySelector('.color-picker-selected');
+    const pickerDropdown = row.querySelector('.color-picker-dropdown');
+
+    try {
+        // Fetch product data using stylesearch API
+        let product = productCache[styleNumber];
+        if (!product) {
+            const response = await fetch(`${API_BASE}/api/stylesearch?term=${styleNumber}`);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                // Find exact match or use first result
+                const exactMatch = data.find(p => p.value.toUpperCase() === styleNumber);
+                const result = exactMatch || data[0];
+                product = {
+                    STYLE: result.value,
+                    PRODUCT_TITLE: result.label
+                };
+                productCache[styleNumber] = product;
+            }
+        }
+
+        // Generic fallback: if SanMar lookup failed and style has underscore,
+        // strip the suffix and retry (handles pants sizes, fit variants, etc.)
+        if (!product && styleNumber.includes('_')) {
+            const baseStyle = styleNumber.substring(0, styleNumber.lastIndexOf('_'));
+            if (baseStyle) {
+                const retryResponse = await fetch(`${API_BASE}/api/stylesearch?term=${baseStyle}`);
+                const retryData = await retryResponse.json();
+                if (retryData && retryData.length > 0) {
+                    const exactMatch = retryData.find(p => p.value.toUpperCase() === baseStyle);
+                    const result = exactMatch || retryData[0];
+                    product = {
+                        STYLE: result.value,
+                        PRODUCT_TITLE: result.label
+                    };
+                    productCache[baseStyle] = product;
+                    const strippedSuffix = styleNumber.substring(styleNumber.lastIndexOf('_'));
+                    row.dataset.originalPartNumber = styleNumber;
+                    input.value = baseStyle;
+                    styleNumber = baseStyle;
+                    showToast(`${row.dataset.originalPartNumber} → imported as ${baseStyle} (suffix ${strippedSuffix} stripped)`, 'info', 5000);
+                }
+            }
+        }
+
+        if (product) {
+            // Pants products (PT20, etc.) are now supported via size picker popup
+            // Size category detection will handle waist/inseam sizing
+
+            // Clean product title (remove duplicate style numbers from API response)
+            const cleanTitle = cleanProductTitle(product.PRODUCT_TITLE, styleNumber);
+
+            // Update description with clean title
+            descInput.value = cleanTitle || styleNumber;
+
+            // Fetch colors using product-colors API (also returns CATEGORY_NAME)
+            const colorsResponse = await fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`);
+            const colorsData = await colorsResponse.json();
+            const colors = colorsData.colors || [];
+
+            // Store product category from API
+            const categoryName = colorsData.CATEGORY_NAME || '';
+            row.dataset.category = categoryName;
+
+            // Check for cap products using CATEGORY_NAME (definitive) or pattern matching (fallback)
+            const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);
+            const capBadge = document.getElementById(`cap-badge-${rowId}`);
+            if (isCap) {
+                row.dataset.isCap = 'true';
+                if (capBadge) capBadge.style.display = 'inline-flex';
+                showToast('Cap detected - using cap embroidery pricing', 'info', 3000);
+            } else {
+                row.dataset.isCap = 'false';
+                if (capBadge) capBadge.style.display = 'none';
+                // Warn about mixed orders when adding garments to laser-patch quote
+                if (getCapEmbellishmentType() === 'laser-patch') {
+                    showToast('Warning: Laser patch embellishment is for caps only. Garments will use standard embroidery pricing.', 'warning', 5000);
+                }
+            }
+
+            // Reorder row: caps go below garments
+            reorderRowByProductType(row);
+
+            // Update logo section visibility based on product types
+            updateCapLogoSectionVisibility();
+            updateGarmentLogoSectionVisibility();
+
+            if (colors && colors.length > 0) {
+                // Populate custom color picker dropdown with swatches
+                pickerDropdown.innerHTML = colors.map(c => `
+                    <div class="color-picker-option"
+                         data-color-name="${escapeHtml(c.COLOR_NAME)}"
+                         data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
+                         data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
+                         data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
+                         data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
+                         onclick="selectColor(${rowId}, this)">
+                        <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                        <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
+                    </div>
+                `).join('');
+
+                // Enable the picker
+                pickerSelected.classList.remove('disabled');
+
+                // Store colors for later (child rows, etc.)
+                row.dataset.colors = JSON.stringify(colors);
+            }
+
+            // Store product info
+            row.dataset.style = styleNumber;
+            row.dataset.productName = cleanTitle || styleNumber;
+
+            // Enable "duplicate row" button now that style is loaded
+            const dupBtn = row.querySelector('.btn-duplicate-row');
+            if (dupBtn) {
+                dupBtn.disabled = false;
+                dupBtn.style.color = '#94a3b8';
+                dupBtn.style.cursor = 'pointer';
+                dupBtn.style.opacity = '1';
+            }
+
+        } else {
+            // SanMar product not found — check Non-SanMar Products database
+            try {
+                const nsResponse = await fetch(`${API_BASE}/api/non-sanmar-products/style/${encodeURIComponent(styleNumber)}`);
+                if (nsResponse.ok) {
+                    const nsData = await nsResponse.json();
+                    if (nsData.success && nsData.data) {
+                        populateNonSanmarRow(row, rowId, nsData.data);
+                        return;
+                    }
+                }
+            } catch (nsErr) {
+                console.warn('[onStyleChange] Non-SanMar lookup failed:', nsErr.message);
+            }
+
+            // Not in SanMar or Non-SanMar database — show "Not found" with Add button
+            descInput.value = 'Not found';
+            showToast(`Style ${styleNumber} not found — click "Add" to register it`, 'warning');
+
+            // Store import data on the row for the Add modal
+            row.dataset.style = styleNumber;
+            row.dataset.notFound = 'true';
+
+            // Add "Add Product" button below the description
+            const descCell = descInput.closest('td') || descInput.parentElement;
+            if (descCell && !descCell.querySelector('.btn-add-nonsanmar')) {
+                const btnWrap = document.createElement('div');
+                btnWrap.className = 'btn-add-nonsanmar-block';
+                const addBtn = document.createElement('button');
+                addBtn.className = 'btn-add-nonsanmar pulse';
+                addBtn.title = 'Add to Non-SanMar database';
+                addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Product';
+                addBtn.onclick = () => showAddNonSanmarModal(rowId);
+                btnWrap.appendChild(addBtn);
+                descCell.appendChild(btnWrap);
+                // Stop pulse animation after 5s
+                setTimeout(() => addBtn.classList.remove('pulse'), 5000);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading product:', error);
+        showToast('Error loading product', 'error');
+    }
+}
+
+// escapeHtml() is now provided by quote-builder-utils.js
+
+/**
+ * Populate a product row from Non_SanMar_Products data
+ */
+function populateNonSanmarRow(row, rowId, product) {
+    const descInput = row.querySelector('[data-field="description"]');
+    const pickerSelected = row.querySelector('.color-picker-selected');
+    const pickerDropdown = row.querySelector('.color-picker-dropdown');
+
+    // Set description and mark as non-SanMar
+    descInput.value = product.ProductName || product.StyleNumber;
+    row.dataset.nonSanmar = 'true';
+    row.dataset.sellPrice = product.DefaultSellPrice || 0;
+    row.dataset.style = product.StyleNumber;
+    row.dataset.productName = product.ProductName || product.StyleNumber;
+
+    // Remove any "Add" button if it existed
+    const addBtn = row.querySelector('.btn-add-nonsanmar');
+    if (addBtn) addBtn.remove();
+    delete row.dataset.notFound;
+
+    // Enable "duplicate row" button for non-SanMar products too
+    const dupBtn = row.querySelector('.btn-duplicate-row');
+    if (dupBtn) {
+        dupBtn.disabled = false;
+        dupBtn.style.color = '#94a3b8';
+        dupBtn.style.cursor = 'pointer';
+        dupBtn.style.opacity = '1';
+    }
+
+    // Detect cap vs garment
+    const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');
+    const capBadge = document.getElementById(`cap-badge-${rowId}`);
+    if (isCap) {
+        row.dataset.isCap = 'true';
+        if (capBadge) capBadge.style.display = 'inline-flex';
+        showToast('Non-SanMar cap detected — using sell price override', 'info', 3000);
+    } else {
+        row.dataset.isCap = 'false';
+        if (capBadge) capBadge.style.display = 'none';
+    }
+
+    // Reorder and update section visibility
+    reorderRowByProductType(row);
+    updateCapLogoSectionVisibility();
+    updateGarmentLogoSectionVisibility();
+
+    // Populate color dropdown from DefaultColors (comma-separated text)
+    const defaultColors = (product.DefaultColors || '').split(',').map(c => c.trim()).filter(Boolean);
+    if (defaultColors.length > 0 && pickerDropdown) {
+        pickerDropdown.innerHTML = defaultColors.map(color => `
+            <div class="color-picker-option"
+                 data-color-name="${escapeHtml(color)}"
+                 data-catalog-color="${escapeHtml(color)}"
+                 data-swatch-url=""
+                 data-hex="#ccc"
+                 data-image-url=""
+                 onclick="selectNonSanmarColor(${rowId}, this)">
+                <span class="color-swatch" style="background-color: #ccc;"></span>
+                <span class="color-name">${escapeHtml(color)}</span>
+            </div>
+        `).join('');
+
+        pickerSelected.classList.remove('disabled');
+        row.dataset.colors = JSON.stringify(defaultColors.map(c => ({ COLOR_NAME: c, CATALOG_COLOR: c })));
+    }
+
+    // Enable size inputs based on product type
+    if (isCap) {
+        setNonSanmarCapSizes(row, rowId, product.AvailableSizes);
+    } else {
+        setNonSanmarGarmentSizes(row, rowId, product.AvailableSizes);
+    }
+
+    // Add non-SanMar badge to style cell
+    const styleCell = row.querySelector('.style-input')?.closest('td');
+    if (styleCell && !styleCell.querySelector('.non-sanmar-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'non-sanmar-badge';
+        badge.textContent = 'Custom';
+        badge.title = 'Non-SanMar product — sell price override';
+        styleCell.appendChild(badge);
+    }
+
+    // Remove any btn-add-nonsanmar-block wrapper too
+    const addBtnBlock = row.querySelector('.btn-add-nonsanmar-block');
+    if (addBtnBlock) addBtnBlock.remove();
+
+    // Add pencil icon to price cell for inline editing
+    updateNonSanmarPriceCell(row, rowId);
+}
+
+/**
+ * Update the price cell display for non-SanMar rows with pencil edit affordance.
+ * Shows pencil icon for priced items, warning icon for $0 items.
+ */
+function updateNonSanmarPriceCell(row, rowId) {
+    const priceCell = document.getElementById(`row-price-${rowId}`);
+    if (!priceCell) return;
+
+    const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
+    if (sellPrice > 0) {
+        priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+        priceCell.classList.remove('ns-price-zero');
+    } else {
+        priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt"></i></span>`;
+        priceCell.classList.add('ns-price-zero');
+        row.classList.add('price-warning');
+    }
+}
+
+/**
+ * Select color for non-SanMar product (simpler than SanMar — no swatch images)
+ */
+function selectNonSanmarColor(rowId, optionEl) {
+    const row = document.getElementById(`row-${rowId}`);
+    const colorName = optionEl.dataset.colorName;
+
+    // Update selected display
+    const pickerSelected = row.querySelector('.color-picker-selected');
+    const swatch = pickerSelected.querySelector('.color-swatch');
+    const nameSpan = pickerSelected.querySelector('.color-name');
+    swatch.style.backgroundImage = '';
+    swatch.style.backgroundColor = '#ccc';
+    swatch.classList.remove('empty');
+    nameSpan.textContent = colorName;
+    nameSpan.classList.remove('placeholder');
+
+    // Mark selected
+    row.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
+    optionEl.classList.add('selected');
+
+    // Store on row
+    row.dataset.color = colorName;
+    row.dataset.catalogColor = colorName;
+
+    // Close dropdown
+    row.querySelector('.color-picker-dropdown').classList.add('hidden');
+
+    // Enable size inputs (non-SanMar skips detectAndAdjustSizeUI API call)
+    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+
+    // For caps, keep only OSFA enabled
+    if (row.dataset.isCap === 'true') {
+        setNonSanmarCapSizes(row, rowId, row.dataset.availableSizes || 'OSFA');
+    }
+
+    // Focus first size input
+    const firstSize = row.querySelector('.size-input:not([disabled])');
+    if (firstSize) firstSize.focus();
+
+    // Cascade to child rows
+    cascadeColorToChildRows(rowId, colorName, colorName, '', '#ccc');
+    recalculatePricing();
+}
+
+/**
+ * Set cap sizes for non-SanMar products (default: OSFA only)
+ */
+function setNonSanmarCapSizes(row, rowId, availableSizes) {
+    const sizes = (availableSizes || 'OSFA').split(',').map(s => s.trim().toUpperCase());
+    row.dataset.availableSizes = sizes.join(',');
+
+    // Disable all size inputs first
+    row.querySelectorAll('.size-input').forEach(input => input.disabled = true);
+
+    // Enable only the available sizes
+    sizes.forEach(size => {
+        const input = row.querySelector(`[data-size="${size}"]`);
+        if (input) input.disabled = false;
+    });
+}
+
+/**
+ * Set garment sizes for non-SanMar products (default: S-3XL)
+ */
+function setNonSanmarGarmentSizes(row, rowId, availableSizes) {
+    const defaultSizes = 'S,M,L,XL,2XL,3XL';
+    const sizes = (availableSizes || defaultSizes).split(',').map(s => s.trim().toUpperCase());
+    row.dataset.availableSizes = sizes.join(',');
+
+    // Enable standard sizes
+    row.querySelectorAll('.size-input').forEach(input => {
+        const size = input.dataset.size;
+        input.disabled = !sizes.includes(size);
+    });
+}
+
+/**
+ * Parse ShopWorks description to extract brand, product name, color, and category
+ * Patterns:
+ *   "Kitchen Skull Cap: Edwards, Black" → Brand: Edwards, Name: Kitchen Skull Cap, Color: Black
+ *   "Port Authority Soft Brushed Canvas Cap" → Brand: Port Authority, Name: rest
+ */
+function parseShopWorksDescription(description, partNumber) {
+    const result = { brand: '', name: '', color: '', category: '' };
+    if (!description) return result;
+
+    const desc = description.trim();
+
+    // Pattern 1: "ProductName: Brand, Color" (colon format)
+    const colonMatch = desc.match(/^(.+?):\s*(.+?)(?:,\s*(.+))?$/);
+    if (colonMatch) {
+        result.name = colonMatch[1].trim();
+        result.brand = colonMatch[2].trim();
+        result.color = (colonMatch[3] || '').trim();
+    } else {
+        // Pattern 2: Known brand prefix
+        const knownBrands = ['Port Authority', 'Port & Company', 'Sport-Tek', 'CornerStone',
+            'The North Face', 'Nike', 'Carhartt', 'Brooks Brothers', 'TravisMathew',
+            'Under Armour', 'New Era', 'OGIO', 'Red House', 'Mercer+Mettle',
+            'Edwards', 'Richardson', 'Outdoor Cap', 'Pacific Headwear'];
+
+        let matched = false;
+        for (const brand of knownBrands) {
+            if (desc.toLowerCase().startsWith(brand.toLowerCase())) {
+                result.brand = brand;
+                const rest = desc.substring(brand.length).replace(/^\s+/, '');
+                // Check for trailing color after comma
+                const commaIdx = rest.lastIndexOf(',');
+                if (commaIdx > 0) {
+                    result.name = rest.substring(0, commaIdx).trim();
+                    result.color = rest.substring(commaIdx + 1).trim();
+                } else {
+                    result.name = rest;
+                }
+                matched = true;
+                break;
+            }
+        }
+
+        if (!matched) {
+            // Fallback: check for trailing color after last comma
+            const commaIdx = desc.lastIndexOf(',');
+            if (commaIdx > 0) {
+                result.name = desc.substring(0, commaIdx).trim();
+                const possibleColor = desc.substring(commaIdx + 1).trim();
+                if (isCommonColor(possibleColor)) {
+                    result.color = possibleColor;
+                } else {
+                    result.name = desc; // Not a color, keep full desc
+                }
+            } else {
+                result.name = desc;
+            }
+        }
+    }
+
+    // Category detection from keywords
+    const combined = `${result.name} ${desc}`.toLowerCase();
+    if (/\b(cap|hat|beanie|visor|snapback|trucker|headwear|skull cap)\b/.test(combined)) {
+        result.category = 'Caps';
+    } else if (/\b(tee|t-shirt|tshirt)\b/.test(combined)) {
+        result.category = 'T-Shirts';
+    } else if (/\b(polo|pique)\b/.test(combined)) {
+        result.category = 'Polos/Knits';
+    } else if (/\b(jacket|coat|parka|outerwear)\b/.test(combined)) {
+        result.category = 'Outerwear';
+    } else if (/\b(fleece|hoodie|hooded|sweatshirt|pullover)\b/.test(combined)) {
+        result.category = 'Fleece';
+    } else if (/\b(button|dress shirt|oxford|woven)\b/.test(combined)) {
+        result.category = 'Woven Shirts';
+    }
+
+    return result;
+}
+
+/**
+ * Check if a string is a common garment color name
+ */
+function isCommonColor(str) {
+    const colors = ['black', 'white', 'navy', 'royal', 'red', 'grey', 'gray', 'charcoal',
+        'khaki', 'tan', 'brown', 'green', 'olive', 'blue', 'pink', 'purple', 'orange',
+        'yellow', 'teal', 'burgundy', 'maroon', 'cream', 'ivory', 'silver', 'gold',
+        'heather', 'camo', 'natural', 'stone', 'steel', 'slate', 'smoke', 'iron'];
+    return colors.some(c => str.toLowerCase().includes(c));
+}
+
+/**
+ * Update product thumbnail when color is selected
+ */
+function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, colorName) {
+    const thumbContainer = document.getElementById(`thumb-${rowId}`);
+    if (!thumbContainer) return;
+
+    if (imageUrl) {
+        // Replace placeholder with actual thumbnail
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = productName || styleNumber;
+        img.className = 'product-thumbnail';
+        img.onclick = () => {
+            if (window.productThumbnailModal) {
+                productThumbnailModal.open(imageUrl, productName, styleNumber, colorName);
+            }
+        };
+        img.onerror = () => {
+            img.classList.add('no-image');
+            img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        };
+
+        thumbContainer.replaceWith(img);
+        img.id = `thumb-${rowId}`;
+    }
+}
+
+/**
+ * cleanProductTitle() — now provided by quote-builder-utils.js
+ */
+
+// Position abbreviation mapping for compact breakdown display
+const POSITION_ABBREV = {
+    'Left Chest': 'LC', 'Right Chest': 'RC', 'Center Chest': 'CC',
+    'Full Front': 'FF', 'Full Back': 'FB', 'Upper Back': 'UB',
+    'Left Sleeve': 'LS', 'Right Sleeve': 'RS',
+    'CF': 'CF', 'CB': 'CB', 'CL': 'CL', 'CR': 'CR',
+    'Cap Front': 'CF', 'Cap Back': 'CB'
+};
+
+// Full names for tooltip display
+const POSITION_FULL_NAMES = {
+    'LC': 'Left Chest', 'RC': 'Right Chest', 'CC': 'Center Chest',
+    'FF': 'Full Front', 'FB': 'Full Back', 'UB': 'Upper Back',
+    'LS': 'Left Sleeve', 'RS': 'Right Sleeve',
+    'CF': 'Cap Front', 'CB': 'Cap Back', 'CL': 'Cap Left Side', 'CR': 'Cap Right Side'
+};
+
+// formatPrice() is now provided by quote-builder-utils.js
+
+/**
+ * Build pricing breakdown HTML for a product row
+ * Shows compact format: └─ LC 10K | Base $23 + Extra $2.50 = $25.50/ea
+ * Includes hover tooltip with full calculation details
+ *
+ * @param {Object} product - Product data with isCap flag
+ * @param {Object} lineItem - Line item from pricing calculator
+ * @param {Object} logoConfig - Logo configuration (position, stitchCount)
+ * @returns {string} HTML string for breakdown
+ */
+function buildPricingBreakdown(product, lineItem, logoConfig) {
+    if (!lineItem) return '';
+
+    const isCap = product?.isCap || false;
+    const logoPos = logoConfig?.position || (isCap ? 'CF' : 'Left Chest');
+    const stitchCount = logoConfig?.stitchCount || 8000;
+    const stitchK = Math.round(stitchCount / 1000);
+
+    // Check if this is a cap with laser-patch embellishment
+    const capEmbellishment = isCap ? getCapEmbellishmentType() : null;
+    const isLaserPatch = isCap && capEmbellishment === 'laser-patch';
+
+    // Get abbreviated position name
+    const posAbbrev = POSITION_ABBREV[logoPos] || logoPos.substring(0, 2).toUpperCase();
+    const posFullName = POSITION_FULL_NAMES[posAbbrev] || logoPos;
+
+    const basePrice = lineItem.basePrice || 0;
+    const extraStitchCost = lineItem.extraStitchCost || 0;
+    const alCost = lineItem.alCost || 0;
+    const unitPrice = lineItem.unitPrice || 0;
+
+    // Calculate extra stitches for tooltip
+    const baseStitches = isCap ? 8000 : 8000;
+    const extraK = stitchCount > baseStitches ? Math.round((stitchCount - baseStitches) / 1000) : 0;
+    const rate = isCap ? 1.00 : 1.25;
+
+    // Build tooltip text with full formula (&#10; = newline in title attribute)
+    let tooltipParts = [];
+    if (isLaserPatch) {
+        // Laser patch tooltip - no stitches
+        tooltipParts = [`Type: Laser Leatherette Patch`, `Position: Cap Front`];
+    } else {
+        tooltipParts = [`Position: ${posFullName}`, `Stitches: ${stitchCount.toLocaleString()}`];
+    }
+    tooltipParts.push(`Base: $${basePrice.toFixed(2)}`);
+    if (extraStitchCost > 0 && !isLaserPatch) {
+        tooltipParts.push(`Extra: ${extraK}K × $${rate.toFixed(2)} = $${extraStitchCost.toFixed(2)}`);
+    }
+    if (alCost > 0) {
+        tooltipParts.push(`AL: $${alCost.toFixed(2)}`);
+    }
+    tooltipParts.push(`Unit: $${unitPrice.toFixed(2)}`);
+    const tooltipText = tooltipParts.join('&#10;');
+
+    // Build visible breakdown with compact format
+    let html = `<span class="breakdown-wrapper" title="${tooltipText}">`;
+    html += `<span class="breakdown-icon">└─</span>`;
+    // For laser patches, show "Laser Patch" instead of stitch count
+    if (isLaserPatch) {
+        html += `<span class="breakdown-pos">Laser Patch</span>`;
+    } else {
+        html += `<span class="breakdown-pos">${posAbbrev} ${stitchK}K</span>`;
+    }
+
+    // CHANGED 2026-01-14: Show BASE price only (extra stitches and AL are separate sidebar line items)
+    // Show base price with optional upcharge note
+    if (lineItem.hasUpcharge && lineItem.upcharge > 0) {
+        // Extended size with upcharge - show breakdown
+        html += ` <span class="breakdown-sep">|</span> `;
+        html += `<span class="breakdown-base">Base $${formatPrice(basePrice - lineItem.upcharge)} + Upcharge $${formatPrice(lineItem.upcharge)}</span>`;
+        html += ` <span class="breakdown-eq">=</span> `;
+        html += `<span class="breakdown-total">$${formatPrice(basePrice)}/ea</span>`;
+    } else {
+        // Standard size - just show base price
+        html += ` <span class="breakdown-sep">|</span> <span class="breakdown-total">$${formatPrice(basePrice)}/ea</span>`;
+    }
+
+    html += `</span>`;
+    return html;
+}
+
+/**
+ * Update the pricing breakdown display for a product row
+ * @param {number} rowId - Row ID
+ * @param {Object} product - Product data
+ * @param {Object} lineItem - Line item from pricing calculator
+ * @param {Object} logoConfig - Logo configuration
+ */
+function updateRowBreakdown(rowId, product, lineItem, logoConfig) {
+    const breakdownEl = document.getElementById(`breakdown-${rowId}`);
+    if (!breakdownEl) return;
+
+    const breakdownHtml = buildPricingBreakdown(product, lineItem, logoConfig);
+    if (breakdownHtml) {
+        breakdownEl.innerHTML = breakdownHtml;
+        breakdownEl.classList.add('visible');
+    } else {
+        breakdownEl.innerHTML = '';
+        breakdownEl.classList.remove('visible');
+    }
+}
+
+/**
+ * Check if a style number is a cap/hat product
+ * @param {string} style - Style number
+ * @param {string} productTitle - Product title/description
+ * @param {string} categoryName - CATEGORY_NAME from SanMar API (most reliable)
+ * @returns {boolean} True if cap/hat
+ */
+function isCapProduct(style, productTitle = '', categoryName = '') {
+    // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing
+    // Matches ProductCategoryFilter used by calculator pages
+    if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {
+        if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {
+            return false;
+        }
+    }
+
+    // BEST METHOD: Check CATEGORY_NAME from SanMar API
+    // SanMar categorizes all caps/hats under "Caps" category
+    if (categoryName && categoryName.toLowerCase() === 'caps') {
+        return true;
+    }
+
+    // FALLBACK: Pattern matching for cases where category isn't available
+    if (!style) return false;
+    const styleUpper = style.toUpperCase();
+    const titleUpper = (productTitle || '').toUpperCase();
+
+    // Check style patterns:
+    // CP* caps (CP80, CP90, etc)
+    // NE* caps (NE1000, NE400)
+    // C+digit (C112, C118)
+    // Richardson styles (112, 110, 115, etc) - numeric only
+    if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
+        return true;
+    }
+
+    // Richardson caps - 2-3 digit numeric styles (100-999)
+    if (/^\d{2,3}$/.test(styleUpper)) {
+        return true;
+    }
+
+    // Check title keywords — but first strip DECG/service prefixes so
+    // "Di. Embroider Cap - T-shirt" doesn't match on "Cap" in the prefix
+    const strippedTitle = titleUpper.replace(/^DI\.\s*EMBROIDER\s+(CAP|GARMENT)\s*-\s*/i, '');
+    if (strippedTitle.includes('CAP') || strippedTitle.includes('HAT') ||
+        strippedTitle.includes('BEANIE') || strippedTitle.includes('SNAPBACK') ||
+        strippedTitle.includes('TRUCKER') || strippedTitle.includes('RICHARDSON')) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Check if product is pants (waist/inseam sizing not supported)
+ * @param {string} style - Style number
+ * @param {string} productTitle - Product title/description
+ * @returns {boolean} True if pants
+ */
+function isPantsProduct(style, productTitle = '') {
+    if (!style) return false;
+    const styleUpper = style.toUpperCase();
+    const titleUpper = (productTitle || '').toUpperCase();
+
+    // Red Kap work pants (PT prefix)
+    if (styleUpper.startsWith('PT') && /^PT\d/.test(styleUpper)) return true;
+
+    // Title keywords for pants
+    if (titleUpper.includes('PANT') || titleUpper.includes('WORK PANT') ||
+        titleUpper.includes('CARGO') || titleUpper.includes('TROUSER') ||
+        titleUpper.includes('INDUSTRIAL PANT')) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Analyze available sizes and determine the product's size category
+ * Handles OSFA, combo sizes, youth, toddler, tall, and standard products
+ * @param {string[]} availableSizes - Array of available sizes from API
+ * @returns {Object} Category info with display configuration
+ */
+function analyzeSizeCategory(availableSizes) {
+    if (!availableSizes || availableSizes.length === 0) {
+        return { category: 'unknown', columns: [], useQtyOnly: false };
+    }
+
+    const sizes = availableSizes.map(s => s.toUpperCase());
+    const STANDARD = ['S', 'M', 'L', 'XL'];
+    const COMBO = ['S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X'];
+    const YOUTH = ['YXS', 'YS', 'YM', 'YL', 'YXL'];
+    const TODDLER = ['2T', '3T', '4T', '5T', '5/6T', '6T'];
+    const TALL = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT'];
+    const ONE_SIZE = ['OSFA', 'OSFM'];
+    const PANTS_PATTERN = /^\d{4}$/;  // 4-digit waist/inseam codes like 2737, 2830
+    const WAIST_ONLY_PATTERN = /^W\d{2}$/;  // Waist-only codes like W30, W32 (PT66 shorts)
+
+    // Count sizes in each category for dominant detection
+    const youthCount = sizes.filter(s => YOUTH.includes(s)).length;
+    const toddlerCount = sizes.filter(s => TODDLER.includes(s)).length;
+    const tallCount = sizes.filter(s => TALL.includes(s)).length;
+    const comboCount = sizes.filter(s => COMBO.includes(s)).length;
+    const osfaCount = sizes.filter(s => ONE_SIZE.includes(s)).length;
+    const standardCount = sizes.filter(s => STANDARD.includes(s)).length;
+    const pantsCount = sizes.filter(s => PANTS_PATTERN.test(s)).length;
+    const waistOnlyCount = sizes.filter(s => WAIST_ONLY_PATTERN.test(s)).length;
+
+    // Priority 1a: Waist-only shorts (W30, W32, etc. - PT66, CT103542)
+    if (waistOnlyCount > 0 && waistOnlyCount >= sizes.length / 2) {
+        // Extract all valid waist-only sizes
+        const waistSizes = sizes.filter(s => WAIST_ONLY_PATTERN.test(s));
+        return {
+            category: 'shorts',
+            columns: [],
+            useQtyOnly: false,
+            shortsSizes: waistSizes,
+            baseSize: waistSizes[0],
+            message: 'Select waist sizes'
+        };
+    }
+
+    // Priority 1b: Pants (waist/inseam sizes like 3032 for 30x32)
+    if (pantsCount > 0 && pantsCount >= sizes.length / 2) {
+        // Extract all valid pants sizes (4-digit codes)
+        const pantsSizes = sizes.filter(s => PANTS_PATTERN.test(s));
+        return {
+            category: 'pants',
+            columns: [],
+            useQtyOnly: false,
+            pantsSizes: pantsSizes,
+            baseSize: pantsSizes[0],
+            message: 'Select waist/inseam sizes'
+        };
+    }
+
+    // Priority 2: OSFA-only (caps, bags, beanies)
+    if (osfaCount > 0 && osfaCount === sizes.length) {
+        return {
+            category: 'osfa-only',
+            columns: [],
+            useQtyOnly: true,
+            baseSize: sizes[0],
+            message: 'One Size Fits All'
+        };
+    }
+
+    // Priority 3: Combo-only (fitted caps like NE1000)
+    if (comboCount > 0 && comboCount === sizes.length) {
+        return {
+            category: 'combo-only',
+            columns: sizes,
+            useQtyOnly: false,
+            baseSize: sizes[0]
+        };
+    }
+
+    // Priority 4: Youth-dominant (has youth sizes AND more youth than standard)
+    // PC61Y returns both S,M,L,XL AND YS,YM,YL,YXL - youth should win
+    if (youthCount > 0 && youthCount >= standardCount) {
+        return {
+            category: 'youth-only',
+            columns: YOUTH.filter(y => sizes.includes(y)),
+            useQtyOnly: false,
+            baseSize: sizes.find(s => YOUTH.includes(s)) || sizes[0]
+        };
+    }
+
+    // Priority 5: Toddler-dominant
+    if (toddlerCount > 0 && toddlerCount >= standardCount) {
+        return {
+            category: 'toddler-only',
+            columns: TODDLER.filter(t => sizes.includes(t)),
+            useQtyOnly: false,
+            baseSize: sizes.find(s => TODDLER.includes(s)) || sizes[0]
+        };
+    }
+
+    // Priority 6: Tall-dominant (LT, XLT without S, M, L, XL)
+    if (tallCount > 0 && standardCount === 0) {
+        return {
+            category: 'tall-only',
+            columns: sizes.filter(s => TALL.includes(s) || s === '2XL'),
+            useQtyOnly: false,
+            baseSize: sizes.find(s => TALL.includes(s)) || sizes[0]
+        };
+    }
+
+    // Priority 7: Standard (has S, M, L, XL as dominant)
+    if (standardCount > 0) {
+        return {
+            category: 'standard',
+            columns: ['S', 'M', 'L', 'XL', '2XL'],
+            useQtyOnly: false,
+            baseSize: 'S',
+            extendedSizes: sizes.filter(s => !STANDARD.includes(s) && s !== '2XL')
+        };
+    }
+
+    // Fallback for unknown patterns
+    return {
+        category: 'other',
+        columns: sizes.slice(0, 5),
+        useQtyOnly: false,
+        baseSize: sizes[0]
+    };
+}
+
+/**
+ * Update row UI based on size category
+ * Handles OSFA (single qty input), combo sizes, and other non-standard layouts
+ * @param {HTMLElement} row - The product row element
+ * @param {Object} sizeInfo - Result from analyzeSizeCategory()
+ */
+function updateRowForSizeCategory(row, sizeInfo) {
+    const rowId = row.dataset.rowId;
+    const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
+    const xxxlCell = row.querySelector('.xxxl-picker-btn');
+
+    // Store category info for later use
+    row.dataset.sizeCategory = sizeInfo.category;
+    row.dataset.baseSize = sizeInfo.baseSize || '';
+
+    // Handle PANTS (waist/inseam sizes) - use size picker popup
+    if (sizeInfo.category === 'pants') {
+        // Disable all size columns (parent row doesn't take quantities)
+        sizeInputs.forEach(input => {
+            input.disabled = true;
+            input.value = '';
+            input.placeholder = '-';
+            input.closest('td').classList.add('size-disabled');
+        });
+
+        // Enable XXXL cell as "Select Sizes" picker button
+        if (xxxlCell && sizeInfo.pantsSizes && sizeInfo.pantsSizes.length > 0) {
+            row.dataset.pantsSizes = JSON.stringify(sizeInfo.pantsSizes);
+            row.dataset.extendedSizes = JSON.stringify(sizeInfo.pantsSizes); // For compatibility
+            xxxlCell.classList.add('pants-picker-btn');
+            xxxlCell.disabled = false;
+            xxxlCell.placeholder = '+';
+            xxxlCell.closest('td').classList.remove('size-disabled');
+        } else if (xxxlCell) {
+            xxxlCell.disabled = true;
+            xxxlCell.placeholder = '-';
+            xxxlCell.closest('td').classList.add('size-disabled');
+        }
+
+        row.classList.add('pants-row');
+        row.classList.add('non-standard-sizes');
+        showToast('Pants product - click + to select waist/inseam sizes', 'info', 4000);
+        return;
+    }
+
+    // Handle SHORTS (waist-only sizes like W30, W32) - use size picker popup
+    if (sizeInfo.category === 'shorts') {
+        // Disable all size columns (parent row doesn't take quantities)
+        sizeInputs.forEach(input => {
+            input.disabled = true;
+            input.value = '';
+            input.placeholder = '-';
+            input.closest('td').classList.add('size-disabled');
+        });
+
+        // Enable XXXL cell as "Select Sizes" picker button
+        if (xxxlCell && sizeInfo.shortsSizes && sizeInfo.shortsSizes.length > 0) {
+            row.dataset.shortsSizes = JSON.stringify(sizeInfo.shortsSizes);
+            row.dataset.extendedSizes = JSON.stringify(sizeInfo.shortsSizes); // For compatibility
+            row.dataset.sizeCategory = 'shorts'; // Ensure category is set
+            xxxlCell.classList.add('shorts-picker-btn');
+            xxxlCell.disabled = false;
+            xxxlCell.placeholder = '+';
+            xxxlCell.closest('td').classList.remove('size-disabled');
+        } else if (xxxlCell) {
+            xxxlCell.disabled = true;
+            xxxlCell.placeholder = '-';
+            xxxlCell.closest('td').classList.add('size-disabled');
+        }
+
+        row.classList.add('shorts-row');
+        row.classList.add('non-standard-sizes');
+        showToast('Shorts product - click + to select waist sizes', 'info', 4000);
+        return;
+    }
+
+    if (sizeInfo.useQtyOnly) {
+        // OSFA-only: Hide all size columns, convert to single qty input
+        sizeInputs.forEach(input => {
+            input.disabled = true;
+            input.value = '';
+            input.placeholder = '-';
+            input.closest('td').classList.add('size-disabled');
+        });
+
+        // Convert XXXL cell to qty input for OSFA
+        if (xxxlCell) {
+            xxxlCell.classList.remove('xxxl-picker-btn');
+            xxxlCell.classList.add('osfa-qty-input');
+            xxxlCell.removeAttribute('readonly');
+            xxxlCell.type = 'number';
+            xxxlCell.min = '0';
+            xxxlCell.placeholder = 'Qty';
+            xxxlCell.value = '';
+            xxxlCell.disabled = false;
+            xxxlCell.onclick = null;
+            xxxlCell.onkeydown = null;
+            xxxlCell.onchange = () => onOSFAQtyChange(rowId);
+            xxxlCell.closest('td').classList.remove('size-disabled');
+        }
+
+        // Update header for this row (visual indicator)
+        row.classList.add('osfa-only-row');
+
+    } else if (sizeInfo.category === 'tall-only') {
+        // TALL products: All sizes via extended size popup (like OSFA but with size picker)
+        // Parent row has disabled columns; child rows handle each tall size
+        const ALL_TALL = ['LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT'];
+        const availableTallSizes = ALL_TALL.filter(s => sizeInfo.columns.includes(s));
+
+        // Disable ALL size columns (parent row doesn't take quantities)
+        sizeInputs.forEach((input, index) => {
+            input.disabled = true;
+            input.value = '';
+            input.placeholder = '-';
+            input.closest('td').classList.add('size-disabled');
+        });
+
+        // Enable XXXL picker for ALL tall sizes
+        if (availableTallSizes.length > 0 && xxxlCell) {
+            row.dataset.extendedSizes = JSON.stringify(availableTallSizes);
+            xxxlCell.disabled = false;
+            xxxlCell.placeholder = '+';
+            xxxlCell.closest('td').classList.remove('size-disabled');
+        } else if (xxxlCell) {
+            xxxlCell.disabled = true;
+            xxxlCell.placeholder = '-';
+            xxxlCell.closest('td').classList.add('size-disabled');
+        }
+
+        row.classList.add('non-standard-sizes');
+        row.classList.add('tall-only-row');
+
+    } else if (sizeInfo.category !== 'standard' && sizeInfo.category !== 'unknown') {
+        // Non-standard columns (combo, youth, toddler)
+        const columns = sizeInfo.columns;
+
+        sizeInputs.forEach((input, index) => {
+            if (index < columns.length) {
+                // Remap this column to new size
+                const newSize = columns[index];
+                input.dataset.size = newSize;
+                input.disabled = false;
+                input.placeholder = '0';
+                input.closest('td').classList.remove('size-disabled');
+
+                // Update column header visually
+                updateColumnLabel(row, index, newSize);
+            } else {
+                // Hide extra columns
+                input.disabled = true;
+                input.value = '';
+                input.placeholder = '-';
+                input.closest('td').classList.add('size-disabled');
+            }
+        });
+
+        // Handle XXXL picker based on extended sizes
+        if (!sizeInfo.extendedSizes || sizeInfo.extendedSizes.length === 0) {
+            if (xxxlCell) {
+                xxxlCell.disabled = true;
+                xxxlCell.placeholder = '-';
+                xxxlCell.closest('td').classList.add('size-disabled');
+            }
+        }
+
+        // Add visual indicator class
+        row.classList.add('non-standard-sizes');
+    }
+    // Standard category keeps default UI
+}
+
+/**
+ * Update column label for a specific row's size input
+ * Creates inline label overlay showing the actual size name
+ */
+function updateColumnLabel(row, colIndex, newLabel) {
+    const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
+    const input = sizeInputs[colIndex];
+    if (!input) return;
+
+    const td = input.closest('td');
+
+    // Add a label overlay showing the size
+    let label = td.querySelector('.size-label-override');
+    if (!label) {
+        label = document.createElement('span');
+        label.className = 'size-label-override';
+        td.insertBefore(label, input);
+    }
+    label.textContent = newLabel;
+}
+
+/**
+ * Handle quantity change for OSFA-only products
+ * Updates dataset, qty display, and triggers pricing recalculation
+ */
+function onOSFAQtyChange(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    const osfaInput = row.querySelector('.osfa-qty-input');
+    const qty = parseInt(osfaInput?.value) || 0;
+
+    // Store OSFA qty in dataset
+    row.dataset.osfaQty = qty;
+    row.dataset.isOsfaOnly = 'true';
+
+    // Update qty display
+    const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
+    if (qtyDisplay) qtyDisplay.textContent = qty;
+
+    // Trigger pricing recalculation
+    recalculatePricing();
+}
+
+/**
+ * Fetch available sizes and adjust UI based on product type
+ * Called after color selection to determine proper size columns
+ */
+async function detectAndAdjustSizeUI(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    const styleNumber = row.dataset.style;
+    const catalogColor = row.dataset.catalogColor;
+
+    if (!styleNumber || !catalogColor) return;
+
+    // =========================================
+    // CAP SPECIAL HANDLING
+    // Caps use /api/sizes-by-style-color endpoint
+    // =========================================
+    if (row.dataset.isCap === 'true') {
+        try {
+            const capUrl = `${API_BASE}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
+            const capResponse = await fetch(capUrl);
+
+            let capSizes = ['OSFA']; // Default fallback
+            if (capResponse.ok) {
+                const capData = await capResponse.json();
+                const sizes = capData.data || capData.sizes || capData;
+                if (Array.isArray(sizes) && sizes.length > 0) {
+                    capSizes = sizes;
+                }
+            } else {
+                console.warn(`[Cap Sizes] API failed for ${styleNumber}, using OSFA fallback`);
+                showToast(`Cap sizes unavailable for ${styleNumber}, defaulting to OSFA`, 'warning');
+            }
+
+
+            // Analyze cap sizes and update UI
+            const sizeInfo = analyzeSizeCategory(capSizes);
+
+            updateRowForSizeCategory(row, sizeInfo);
+            row.dataset.availableSizes = JSON.stringify(capSizes);
+            row.dataset.capSizes = JSON.stringify(capSizes);
+            return; // Exit - cap handling complete
+        } catch (capError) {
+            console.error('[Cap Sizes] Error fetching cap sizes:', capError);
+            // Fall through to use OSFA
+            const osfaInfo = { category: 'osfa-only', columns: [], useQtyOnly: true, baseSize: 'OSFA', message: 'One Size Fits All' };
+            updateRowForSizeCategory(row, osfaInfo);
+            row.dataset.availableSizes = JSON.stringify(['OSFA']);
+            row.dataset.capSizes = JSON.stringify(['OSFA']);
+            return;
+        }
+    }
+
+    // =========================================
+    // STANDARD GARMENT HANDLING
+    // =========================================
+    try {
+        // Fetch all available sizes for this style+color
+        const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.error(`[Size Detection] API failed for ${styleNumber}:`);
+            console.error(`  Status: ${response.status} ${response.statusText}`);
+            console.error(`  URL: ${url}`);
+            console.error(`  CatalogColor: ${catalogColor}`);
+
+            // Try fallback: fetch without color filter to at least get size info
+            try {
+                const altUrl = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`;
+                const altResponse = await fetch(altUrl);
+
+                if (altResponse.ok) {
+                    const skus = await altResponse.json();
+                    if (skus && skus.length > 0) {
+                        const allSizes = extractAllSizes(skus);
+                        const sizeInfo = analyzeSizeCategory(allSizes);
+                        updateRowForSizeCategory(row, sizeInfo);
+                        row.dataset.availableSizes = JSON.stringify(allSizes);
+                        return;
+                    }
+                }
+            } catch (fallbackError) {
+                console.error('[Size Detection] Fallback also failed:', fallbackError);
+            }
+            return;
+        }
+
+        const skus = await response.json();
+
+        // Extract ALL available sizes (not just Size06)
+        const allSizes = extractAllSizes(skus);
+
+        // Analyze and update UI
+        const sizeInfo = analyzeSizeCategory(allSizes);
+
+        updateRowForSizeCategory(row, sizeInfo);
+
+        // Store for pricing calculations
+        row.dataset.availableSizes = JSON.stringify(allSizes);
+
+        // Validate size availability using SKU service
+        validateSizeAvailability(row, allSizes);
+
+    } catch (error) {
+        console.error('Error detecting size category:', error);
+    }
+}
+
+/**
+ * Validate size availability and update UI indicators
+ * Uses SKUValidationService to check which sizes exist in ShopWorks
+ *
+ * @param {HTMLElement} row - Product row element
+ * @param {string[]} availableSizes - Sizes available for this product/color
+ */
+function validateSizeAvailability(row, availableSizes) {
+    if (!row || !availableSizes) return;
+
+    const styleNumber = row.dataset.style;
+    const catalogColor = row.dataset.catalogColor;
+    const skuService = window.skuValidationService || new SKUValidationService();
+    window.skuValidationService = skuService; // Cache for reuse
+
+    // Get all size inputs in this row
+    const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
+    const xxxlCell = row.querySelector('.xxxl-picker-btn');
+
+    // Standard size columns (S, M, L, XL, XXL)
+    const columnSizes = ['S', 'M', 'L', 'XL', '2XL'];
+
+    sizeInputs.forEach((input, index) => {
+        const size = columnSizes[index];
+        if (!size) return;
+
+        const isAvailable = availableSizes.includes(size);
+        const sku = skuService.sanmarToShopWorksSKU(styleNumber, size);
+
+        // Update input state based on availability
+        if (isAvailable) {
+            input.classList.add('size-available');
+            input.classList.remove('size-unavailable');
+            input.disabled = false;
+            input.placeholder = '0';
+            input.title = `${size} (SKU: ${sku})`;
+        } else {
+            input.classList.add('size-unavailable');
+            input.classList.remove('size-available');
+            input.disabled = true;
+            input.value = '';
+            input.placeholder = 'N/A';
+            input.title = `${size} not available for this style/color`;
+            input.closest('td')?.classList.add('size-disabled');
+        }
+
+        // Store SKU on input for reference
+        input.dataset.sku = sku;
+    });
+
+    // Update extended size picker (XXXL column) if present
+    if (xxxlCell && !xxxlCell.classList.contains('osfa-qty-input')) {
+        const extendedSizes = availableSizes.filter(s =>
+            !columnSizes.includes(s) && s !== 'OSFA'
+        );
+        const hasExtended = extendedSizes.length > 0;
+
+        if (hasExtended) {
+            xxxlCell.classList.remove('size-unavailable');
+            xxxlCell.disabled = false;
+            xxxlCell.title = `Extended sizes: ${extendedSizes.join(', ')}`;
+            row.dataset.extendedSizes = JSON.stringify(extendedSizes);
+        } else {
+            xxxlCell.classList.add('size-unavailable');
+            xxxlCell.disabled = true;
+            xxxlCell.placeholder = '-';
+            xxxlCell.title = 'No extended sizes available';
+        }
+    }
+
+}
+
+/**
+ * Extract ALL sizes from SKU data (Size01-06 fields)
+ * Returns sizes in logical display order
+ */
+function extractAllSizes(skus) {
+    const sizes = new Set();
+
+    skus.forEach(sku => {
+        ['Size01', 'Size02', 'Size03', 'Size04', 'Size05', 'Size06'].forEach(field => {
+            if (sku[field] && typeof sku[field] === 'string' && sku[field].trim()) {
+                sizes.add(sku[field].trim());
+            }
+        });
+    });
+
+    // Return in logical order
+    const ORDER = ['S', 'M', 'L', 'XL', '2XL', 'XS', 'S/M', 'M/L', 'L/XL',
+                   'YXS', 'YS', 'YM', 'YL', 'YXL', '2T', '3T', '4T', '5T', '6T',
+                   'LT', 'XLT', '2XLT', '3XLT', 'OSFA', 'OSFM'];
+    return [...sizes].sort((a, b) => {
+        const ai = ORDER.indexOf(a);
+        const bi = ORDER.indexOf(b);
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+    });
+}
+
+// getSwatchStyle() — now provided by quote-builder-utils.js
+
+// ============================================================
+// COLOR PICKER FUNCTIONS
+// ============================================================
+
+/**
+ * Toggle color picker dropdown open/closed
+ */
+function toggleColorPicker(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    const pickerSelected = row.querySelector('.color-picker-selected');
+    const dropdown = row.querySelector('.color-picker-dropdown');
+
+    // Don't open if disabled
+    if (pickerSelected.classList.contains('disabled')) return;
+
+    // Close all other open dropdowns first
+    document.querySelectorAll('.color-picker-dropdown').forEach(d => {
+        if (d !== dropdown) d.classList.add('hidden');
+    });
+
+    // Toggle this dropdown
+    dropdown.classList.toggle('hidden');
+
+    // Scroll selected option into view if open
+    if (!dropdown.classList.contains('hidden')) {
+        const selectedOption = dropdown.querySelector('.color-picker-option.selected');
+        if (selectedOption) {
+            selectedOption.scrollIntoView({ block: 'nearest' });
+        }
+    }
+}
+
+/**
+ * Select a color from the dropdown
+ */
+function selectColor(rowId, optionEl, skipDuplicateCheck) {
+    const row = document.getElementById(`row-${rowId}`);
+    const colorName = optionEl.dataset.colorName;
+    const catalogColor = optionEl.dataset.catalogColor;
+    const swatchUrl = optionEl.dataset.swatchUrl;
+    const hex = optionEl.dataset.hex;
+    const imageUrl = optionEl.dataset.imageUrl;
+    const style = row.dataset.style;
+
+    // Check for duplicate row (same style + color) — skip during import where same style+color at different prices is legitimate
+    if (!skipDuplicateCheck) {
+        const existingRow = findExistingRow(style, catalogColor, rowId);
+        if (existingRow) {
+            showToast(`${style} in ${colorName} already exists. Adding to existing row.`, 'info');
+            row.querySelector('.color-picker-dropdown').classList.add('hidden');
+            const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
+            if (existingFirstSize) existingFirstSize.focus();
+            return;
+        }
+    }
+
+    // Update selected display with swatch and full color name
+    const pickerSelected = row.querySelector('.color-picker-selected');
+    const swatch = pickerSelected.querySelector('.color-swatch');
+    const nameSpan = pickerSelected.querySelector('.color-name');
+
+    // Set swatch style (image or hex fallback)
+    if (swatchUrl) {
+        swatch.style.backgroundImage = `url('${swatchUrl}')`;
+        swatch.style.backgroundColor = '';
+        swatch.style.backgroundSize = 'cover';
+        swatch.style.backgroundPosition = 'center';
+    } else {
+        swatch.style.backgroundImage = '';
+        swatch.style.backgroundColor = hex || '#ccc';
+    }
+    swatch.classList.remove('empty');
+
+    // Set full color name
+    nameSpan.textContent = colorName;
+    nameSpan.classList.remove('placeholder');
+
+    // Mark selected option in dropdown
+    row.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
+    optionEl.classList.add('selected');
+
+    // Clear manual price override when color changes (new color = different product cost)
+    if (row.dataset.nonSanmar !== 'true' && row.dataset.sellPrice) {
+        delete row.dataset.sellPrice;
+    }
+
+    // Store data on row
+    row.dataset.color = colorName;
+    row.dataset.catalogColor = catalogColor;
+    row.dataset.swatchUrl = swatchUrl || '';
+    row.dataset.hex = hex || '';
+    row.dataset.imageUrl = imageUrl || '';
+
+    // Update product thumbnail
+    updateProductThumbnail(rowId, imageUrl, row.dataset.productName, style, colorName);
+
+    // Close dropdown
+    row.querySelector('.color-picker-dropdown').classList.add('hidden');
+
+    // Enable size inputs initially (may be disabled by detectAndAdjustSizeUI for special products)
+    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+
+    // Detect size category and adjust UI (OSFA, combo, youth, toddler, tall, standard)
+    // This runs async but doesn't block - will update UI when API returns
+    detectAndAdjustSizeUI(rowId);
+
+    // Focus first size input (may be overridden by detectAndAdjustSizeUI for special products)
+    const firstSize = row.querySelector('.size-input');
+    if (firstSize) firstSize.focus();
+
+    // Cascade to child rows if any
+    cascadeColorToChildRows(rowId, colorName, catalogColor, swatchUrl, hex);
+
+    recalculatePricing();
+}
+
+/**
+ * Cascade color selection to child rows (for extended sizes)
+ */
+function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl, hex) {
+    if (!childRowMap[parentRowId]) return;
+
+    Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+        const childRow = document.getElementById(`row-${childRowId}`);
+        if (childRow && childRow.dataset.colorManuallySet !== 'true') {
+            childRow.dataset.color = colorName;
+            childRow.dataset.catalogColor = catalogColor;
+
+            // Update child row's color picker display if it has one
+            const childPicker = childRow.querySelector('.color-picker-selected');
+            if (childPicker) {
+                const childSwatch = childPicker.querySelector('.color-swatch');
+                const childName = childPicker.querySelector('.color-name');
+                if (childSwatch && childName) {
+                    if (swatchUrl) {
+                        childSwatch.style.backgroundImage = `url('${swatchUrl}')`;
+                        childSwatch.style.backgroundColor = '';
+                    } else {
+                        childSwatch.style.backgroundImage = '';
+                        childSwatch.style.backgroundColor = hex || '#ccc';
+                    }
+                    childSwatch.classList.remove('empty');
+                    childName.textContent = colorName;
+                    childName.classList.remove('placeholder');
+                }
+            }
+        }
+    });
+    updateChildRowColorIndicators(parentRowId);
+}
+
+/**
+ * Handle keyboard navigation in color picker
+ */
+function handleColorPickerKeydown(event, rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    const dropdown = row.querySelector('.color-picker-dropdown');
+    const isOpen = !dropdown.classList.contains('hidden');
+
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleColorPicker(rowId);
+    } else if (event.key === 'Escape' && isOpen) {
+        event.preventDefault();
+        dropdown.classList.add('hidden');
+    } else if (event.key === 'ArrowDown' && isOpen) {
+        event.preventDefault();
+        navigateOptions(dropdown, 1);
+    } else if (event.key === 'ArrowUp' && isOpen) {
+        event.preventDefault();
+        navigateOptions(dropdown, -1);
+    } else if (event.key === 'Tab') {
+        // Close dropdown on tab
+        dropdown.classList.add('hidden');
+    }
+}
+
+/**
+ * Navigate through dropdown options with arrow keys
+ */
+function navigateOptions(dropdown, direction) {
+    const options = dropdown.querySelectorAll('.color-picker-option');
+    if (options.length === 0) return;
+
+    let currentIndex = -1;
+    options.forEach((opt, i) => {
+        if (opt.classList.contains('focused')) currentIndex = i;
+    });
+
+    // Remove current focus
+    options.forEach(opt => opt.classList.remove('focused'));
+
+    // Calculate new index
+    let newIndex = currentIndex + direction;
+    if (newIndex < 0) newIndex = options.length - 1;
+    if (newIndex >= options.length) newIndex = 0;
+
+    // Add focus to new option
+    options[newIndex].classList.add('focused');
+    options[newIndex].scrollIntoView({ block: 'nearest' });
+}
+
+// Click outside handler to close all dropdowns
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.color-picker-wrapper')) {
+        document.querySelectorAll('.color-picker-dropdown').forEach(d => d.classList.add('hidden'));
+    }
+});
+
+/**
+ * Select a color for a child row (extended size)
+ * Similar to selectColor but marks color as manually set
+ */
+function selectChildColor(childRowId, parentRowId, optionEl) {
+    const childRow = document.getElementById(`row-${childRowId}`);
+    const colorName = optionEl.dataset.colorName;
+    const catalogColor = optionEl.dataset.catalogColor;
+    const swatchUrl = optionEl.dataset.swatchUrl;
+    const hex = optionEl.dataset.hex;
+
+    // Update selected display with swatch and full color name
+    const pickerSelected = childRow.querySelector('.color-picker-selected');
+    const swatch = pickerSelected.querySelector('.color-swatch');
+    const nameSpan = pickerSelected.querySelector('.color-name');
+
+    // Set swatch style (image or hex fallback)
+    if (swatchUrl) {
+        swatch.style.backgroundImage = `url('${swatchUrl}')`;
+        swatch.style.backgroundColor = '';
+        swatch.style.backgroundSize = 'cover';
+        swatch.style.backgroundPosition = 'center';
+    } else {
+        swatch.style.backgroundImage = '';
+        swatch.style.backgroundColor = hex || '#ccc';
+    }
+    swatch.classList.remove('empty');
+
+    // Set full color name
+    nameSpan.textContent = colorName;
+    nameSpan.classList.remove('placeholder');
+
+    // Mark selected option in dropdown
+    childRow.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
+    optionEl.classList.add('selected');
+
+    // Store data on row
+    childRow.dataset.color = colorName;
+    childRow.dataset.catalogColor = catalogColor;
+    childRow.dataset.swatchUrl = swatchUrl || '';
+    childRow.dataset.hex = hex || '';
+    childRow.dataset.colorManuallySet = 'true';  // Mark as manually changed
+
+    // Clear per-size price override on color change (new color = new product cost)
+    delete childRow.dataset.sellPrice;
+
+    // Close dropdown
+    childRow.querySelector('.color-picker-dropdown').classList.add('hidden');
+
+    // Update visual indicator for different color
+    updateChildRowColorIndicators(parentRowId);
+
+    recalculatePricing();
+}
+
+/**
+ * Update visual styling for child rows based on color match with parent
+ */
+function updateChildRowColorIndicators(parentRowId) {
+    const parentRow = document.getElementById(`row-${parentRowId}`);
+    if (!parentRow) return;
+
+    const parentCatalogColor = parentRow.dataset.catalogColor;
+
+    if (childRowMap[parentRowId]) {
+        Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+            const childRow = document.getElementById(`row-${childRowId}`);
+            if (childRow) {
+                if (childRow.dataset.catalogColor !== parentCatalogColor) {
+                    childRow.classList.add('different-color');
+                } else {
+                    childRow.classList.remove('different-color');
+                }
+            }
+        });
+    }
+}
+
+/**
+ * Find an existing row with the same style and catalogColor (excluding current row)
+ */
+function findExistingRow(style, catalogColor, excludeRowId) {
+    const rows = document.querySelectorAll('#product-tbody tr:not(.child-row)');
+    for (const row of rows) {
+        const rowNumericId = parseInt(row.id.replace('row-', ''));
+        if (rowNumericId === excludeRowId) continue;
+        if (row.dataset.style === style && row.dataset.catalogColor === catalogColor) {
+            return row;
+        }
+    }
+    return null;
+}
+
+function onSizeChange(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    // Mark as having unsaved changes
+    markAsUnsaved();
+
+    // Skip if this is a child row (child rows don't trigger size changes)
+    if (row.classList.contains('child-row')) {
+        recalculatePricing();
+        return;
+    }
+
+    const sizeCategory = row.dataset.sizeCategory;
+
+    // OSFA-only products are handled separately by onOSFAQtyChange()
+    if (sizeCategory === 'osfa-only') {
+        recalculatePricing();
+        return;
+    }
+
+    // IMPORTANT: Handle 2XL/XXL child row FIRST (before quantity calculation)
+    // This ensures the 2XL input is disabled before we sum enabled inputs,
+    // preventing the 2XL value from being counted twice (in parent AND child)
+    // Bug fix: 2026-01-14 - Parent row showed 16 instead of 14 for S/M/L/XL
+    const xxlInput = row.querySelector('[data-size="2XL"]');
+    if (xxlInput) {
+        const qty = parseInt(xxlInput.value) || 0;
+        // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
+        const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
+        const existingChildSize = childRowMap[rowId]?.['2XL'] ? '2XL' : (childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
+
+        if (qty > 0) {
+            // Need a child row for 2XL (or XXL if that's what exists)
+            if (existingChildId) {
+                updateChildRow(existingChildId, qty);
+            } else {
+                createChildRow(rowId, '2XL', qty);
+            }
+            // Disable the 2XL input in parent BEFORE quantity calculation
+            xxlInput.disabled = true;
+            xxlInput.value = '';  // Clear to prevent visual confusion
+            xxlInput.style.background = '#f5f5f5';
+            xxlInput.style.color = '#999';
+        } else {
+            // Remove child row if it exists (could be 2XL or XXL)
+            if (existingChildId) {
+                removeChildRow(rowId, existingChildSize);
+            }
+            // Re-enable 2XL input in parent
+            xxlInput.disabled = false;
+            xxlInput.style.background = '';
+            xxlInput.style.color = '';
+        }
+    }
+
+    // Update parent row quantity display
+    // Shows standard sizes total when > 0, or child row total for variant-only products
+    // Bug fix 2026-01-14: Standard total excludes disabled 2XL (counted in child row)
+    // Enhancement 2026-02-06: Variant-only products show child total instead of "0"
+    updateParentQtyDisplay(rowId);
+
+    // Recalculate pricing
+    recalculatePricing();
+}
+
+/**
+ * Update parent row Qty display.
+ * Shows standard size total when > 0, otherwise shows sum of child row quantities.
+ * DISPLAY-ONLY: collectProductsFromTable(), pricing engine, save/load, and
+ * ShopWorks Entry Guide all read size inputs and child .qty-display directly,
+ * never this cell. Safe to update without affecting data.
+ */
+function updateParentQtyDisplay(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+    if (row.classList.contains('child-row')) return;
+    if (row.dataset.isOsfaOnly === 'true') return; // OSFA-only already handled directly
+
+    let standardTotal = 0;
+    row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+        standardTotal += parseInt(input.value) || 0;
+    });
+
+    if (standardTotal > 0) {
+        // Normal case: parent has standard sizes, show their total
+        document.getElementById(`row-qty-${rowId}`).textContent = standardTotal;
+    } else {
+        // Variant-only: show child row total so parent doesn't display "0"
+        let childTotal = 0;
+        if (childRowMap[rowId]) {
+            Object.values(childRowMap[rowId]).forEach(childRowId => {
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) {
+                    const qtyDisplay = childRow.querySelector('.qty-display');
+                    childTotal += parseInt(qtyDisplay?.textContent) || 0;
+                }
+            });
+        }
+        document.getElementById(`row-qty-${rowId}`).textContent = childTotal;
+    }
+}
+
+/**
+ * Post-import: Hide parent rows that have zero standard sizes (variant-only).
+ * Promotes child rows to look like normal product rows (standalone-child class).
+ * Called once after all products are imported in confirmShopWorksImport().
+ */
+function hideVariantOnlyParents() {
+    const tbody = document.getElementById('product-tbody');
+    if (!tbody) return;
+
+    const parentRows = tbody.querySelectorAll('tr:not(.child-row):not(.service-product-row)');
+    parentRows.forEach(parentRow => {
+        const rowId = parseInt(parentRow.dataset.rowId);
+        if (!rowId || !childRowMap[rowId]) return;
+        if (parentRow.dataset.isOsfaOnly === 'true') return;
+
+        // Check if ALL standard size inputs are empty/zero
+        let standardTotal = 0;
+        parentRow.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+            standardTotal += parseInt(input.value) || 0;
+        });
+
+        if (standardTotal > 0) return; // Has standard sizes — keep parent visible
+
+        // This is a variant-only parent — hide it and promote children
+        parentRow.classList.add('variant-only-parent');
+        parentRow.dataset.variantOnlyHidden = 'true';
+
+        // Promote each child row to standalone
+        const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+        childRows.forEach(childRow => {
+            childRow.classList.add('standalone-child');
+
+            // Copy thumbnail from parent to child
+            const parentThumbCell = parentRow.querySelector('.thumbnail-col');
+            const childThumbCell = childRow.querySelector('.thumbnail-col');
+            if (parentThumbCell && childThumbCell && parentThumbCell.innerHTML.trim()) {
+                childThumbCell.innerHTML = parentThumbCell.innerHTML;
+            }
+        });
+
+    });
+}
+
+/**
+ * Unhide a variant-only parent row (called when its last child is deleted).
+ */
+function unhideVariantOnlyParent(parentRowId) {
+    const parentRow = document.getElementById(`row-${parentRowId}`);
+    if (!parentRow || parentRow.dataset.variantOnlyHidden !== 'true') return;
+
+    parentRow.classList.remove('variant-only-parent');
+    parentRow.dataset.variantOnlyHidden = 'false';
+}
+
+/**
+ * Generate ShopWorks-compatible part number
+ * Uses SIZE_TO_SUFFIX which contains ALL size suffixes (tall, youth, toddler, etc.)
+ */
+function getPartNumber(baseStyle, size) {
+    // For pants sizes (4-digit codes like 3032), append directly with underscore
+    if (/^\d{4}$/.test(size)) {
+        return `${baseStyle}_${size}`;
+    }
+    return baseStyle + (SIZE_TO_SUFFIX[size] || '');
+}
+
+/**
+ * Create a child row for an extended size
+ */
+function createChildRow(parentRowId, size, qty) {
+    const parentRow = document.getElementById(`row-${parentRowId}`);
+    if (!parentRow) return;
+
+    const childRowId = ++rowCounter;
+    const baseStyle = parentRow.dataset.style;
+    const partNumber = getPartNumber(baseStyle, size);
+
+    // Get parent's available colors for the dropdown
+    const parentColors = parentRow.dataset.colors ? JSON.parse(parentRow.dataset.colors) : [];
+    const parentColor = parentRow.dataset.color || '';
+    const parentCatalogColor = parentRow.dataset.catalogColor || '';
+    const parentSwatchUrl = parentRow.dataset.swatchUrl || '';
+    const parentHex = parentRow.dataset.hex || '#ccc';
+
+    // Build color picker options HTML with swatches
+    const colorOptionsHtml = parentColors.map(c =>
+        `<div class="color-picker-option ${c.COLOR_NAME === parentColor ? 'selected' : ''}"
+             data-color-name="${escapeHtml(c.COLOR_NAME)}"
+             data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
+             data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
+             data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
+             onclick="selectChildColor(${childRowId}, ${parentRowId}, this)">
+            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+            <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
+        </div>`
+    ).join('');
+
+    // Build current color display
+    const currentSwatchStyle = parentSwatchUrl
+        ? `background-image: url('${parentSwatchUrl}'); background-size: cover; background-position: center;`
+        : `background-color: ${parentHex};`;
+
+    const childRow = document.createElement('tr');
+    childRow.id = `row-${childRowId}`;
+    childRow.className = 'child-row';
+    childRow.dataset.rowId = childRowId;
+    childRow.dataset.parentRowId = parentRowId;
+    childRow.dataset.extendedSize = size;
+    childRow.dataset.style = partNumber;
+    childRow.dataset.baseStyle = baseStyle;
+    childRow.dataset.color = parentRow.dataset.color;
+    childRow.dataset.catalogColor = parentRow.dataset.catalogColor;
+    childRow.dataset.swatchUrl = parentSwatchUrl;
+    childRow.dataset.hex = parentHex;
+    childRow.dataset.productName = parentRow.dataset.productName;
+    childRow.dataset.colorManuallySet = 'false';  // Track if user manually changed color
+
+    // Determine which column this size goes to:
+    // - Size05 (XXL column): 2XL and XXL (both map to Size05 in ShopWorks)
+    // - Size06 (XXXL column): XS, 3XL, 4XL, 5XL, 6XL, pants sizes, shorts sizes
+    const isSize05 = size === '2XL' || size === 'XXL';
+    const isPantsSize = /^\d{4}$/.test(size);  // 4-digit pants sizes like 3032
+    const isShortsSize = /^W\d{2}$/.test(size);  // Waist-only shorts sizes like W30
+    const isSize06 = SIZE06_EXTENDED_SIZES.includes(size) || isPantsSize || isShortsSize;
+
+    // Format display size (pants: "3032" -> "30x32", shorts: "W30" -> "Waist 30", others: keep as-is)
+    let displaySize = size;
+    if (isPantsSize) {
+        const waist = size.substring(0, 2);
+        const inseam = size.substring(2, 4);
+        displaySize = `${waist}x${inseam}`;
+    } else if (isShortsSize) {
+        const waist = size.replace('W', '');
+        displaySize = `Waist ${waist}`;
+    }
+
+    // Create cell content - only the specific size column is editable
+    childRow.innerHTML = `
+        <td>
+            <span class="child-indicator">└</span>
+            <span class="style-display">${partNumber}</span>
+        </td>
+        <td class="thumbnail-col"></td>
+        <td>
+            <span class="desc-display" style="color: #666; font-size: 12px;">${escapeHtml(parentRow.dataset.productName)} - <strong>${displaySize}</strong></span>
+        </td>
+        <td>
+            <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
+                <div class="color-picker-selected" onclick="toggleColorPicker(${childRowId})" tabindex="0" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
+                    <span class="color-swatch" style="${currentSwatchStyle}"></span>
+                    <span class="color-name">${escapeHtml(parentColor)}</span>
+                    <i class="fas fa-chevron-down picker-arrow"></i>
+                </div>
+                <div class="color-picker-dropdown hidden" id="color-dropdown-${childRowId}">
+                    ${colorOptionsHtml}
+                </div>
+            </div>
+        </td>
+        <td><input type="number" class="cell-input size-input" data-size="S" disabled value="" style="background: #f5f5f5;"></td>
+        <td><input type="number" class="cell-input size-input" data-size="M" disabled value="" style="background: #f5f5f5;"></td>
+        <td><input type="number" class="cell-input size-input" data-size="L" disabled value="" style="background: #f5f5f5;"></td>
+        <td><input type="number" class="cell-input size-input" data-size="XL" disabled value="" style="background: #f5f5f5;"></td>
+        <td><input type="number" class="cell-input size-input" data-size="2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
+        <td><input type="number" class="cell-input size-input" data-size="${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
+        <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
+        <td class="cell-price unit-price-display" id="row-price-${childRowId}"
+            ondblclick="enablePriceOverride(${childRowId})"
+            title="Double-click to override price">-</td>
+        <td class="cell-total" id="row-total-${childRowId}">-</td>
+        <td class="cell-actions">
+            <button class="btn-delete-row" onclick="clearExtendedSize(${parentRowId}, '${size}')" title="Remove ${displaySize}">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    `;
+
+    // Insert in correct size order: XS, 2XL, 3XL, 4XL, 5XL, 6XL
+    const existingChildren = Array.from(document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`));
+
+    if (existingChildren.length === 0) {
+        // No children yet, insert after parent
+        parentRow.after(childRow);
+    } else {
+        // Find correct position based on size order (XS first, then 2XL, 3XL, etc.)
+        const newSizeIndex = EXTENDED_SIZE_ORDER.indexOf(size);
+        let insertAfter = parentRow;  // Default: after parent (for XS or first size)
+
+        for (const existingChild of existingChildren) {
+            const existingSize = existingChild.dataset.extendedSize;
+            const existingSizeIndex = EXTENDED_SIZE_ORDER.indexOf(existingSize);
+
+            // If existing size comes before new size in order, insert after this child
+            if (existingSizeIndex < newSizeIndex) {
+                insertAfter = existingChild;
+            } else {
+                // Found a size that should come after us, stop here
+                break;
+            }
+        }
+
+        insertAfter.after(childRow);
+    }
+
+    // Track child row
+    if (!childRowMap[parentRowId]) {
+        childRowMap[parentRowId] = {};
+    }
+    childRowMap[parentRowId][size] = childRowId;
+
+}
+
+/**
+ * Update an existing child row quantity
+ */
+function updateChildRow(childRowId, qty) {
+    const childRow = document.getElementById(`row-${childRowId}`);
+    if (!childRow) return;
+
+    const size = childRow.dataset.extendedSize;
+    const sizeInput = childRow.querySelector(`[data-size="${size}"]`);
+    if (sizeInput) {
+        sizeInput.value = qty;
+    }
+    document.getElementById(`row-qty-${childRowId}`).textContent = qty;
+}
+
+/**
+ * Remove a child row
+ */
+function removeChildRow(parentRowId, size) {
+    const childRowId = childRowMap[parentRowId]?.[size];
+    if (childRowId) {
+        const childRow = document.getElementById(`row-${childRowId}`);
+        if (childRow) {
+            childRow.remove();
+        }
+        delete childRowMap[parentRowId][size];
+    }
+}
+
+/**
+ * Handle size change in child row - sync back to parent
+ */
+function onChildSizeChange(childRowId, parentRowId, size) {
+    const childRow = document.getElementById(`row-${childRowId}`);
+    const parentRow = document.getElementById(`row-${parentRowId}`);
+    if (!childRow || !parentRow) return;
+
+    const sizeInput = childRow.querySelector(`[data-size="${size}"]`);
+    const qty = parseInt(sizeInput?.value) || 0;
+
+    // Update child row quantity display
+    document.getElementById(`row-qty-${childRowId}`).textContent = qty;
+
+    // Update parent Qty display (reflects child changes for variant-only rows)
+    updateParentQtyDisplay(parseInt(parentRowId));
+
+    // Sync back to parent row's hidden input
+    const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
+    if (parentInput) {
+        parentInput.value = qty;
+    }
+
+    // If qty is 0, remove the child row
+    if (qty === 0) {
+        clearExtendedSize(parentRowId, size);
+    }
+
+    recalculatePricing();
+}
+
+/**
+ * Clear an extended size (remove child row, enable parent input)
+ */
+function clearExtendedSize(parentRowId, size) {
+    const parentRow = document.getElementById(`row-${parentRowId}`);
+    if (!parentRow) return;
+
+    // Clear parent input
+    const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
+    if (parentInput) {
+        parentInput.value = '';
+        parentInput.disabled = false;
+        parentInput.style.background = '';
+        parentInput.style.color = '';
+    }
+
+    // Remove child row
+    removeChildRow(parentRowId, size);
+
+    // If parent was hidden (variant-only) and has no more children, unhide it
+    if (parentRow.dataset.variantOnlyHidden === 'true') {
+        const remainingChildren = document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`);
+        if (remainingChildren.length === 0) {
+            unhideVariantOnlyParent(parentRowId);
+        }
+    }
+
+    // Update parent Qty display (may revert to 0 if no children remain)
+    updateParentQtyDisplay(parentRowId);
+
+    recalculatePricing();
+}
+
+/**
+ * Reorder a product row based on type: garments first, caps below
+ * Called after cap detection to maintain visual organization
+ */
+function reorderRowByProductType(row) {
+    if (!row) return;
+
+    const tbody = document.getElementById('product-tbody');
+    if (!tbody) return;
+
+    const isCap = row.dataset.isCap === 'true';
+
+    if (isCap) {
+        // Cap rows go at the end (after all other rows)
+        tbody.appendChild(row);
+    } else {
+        // Garment rows go before any cap rows
+        const firstCapRow = tbody.querySelector('tr[data-is-cap="true"]:not(.child-row)');
+        if (firstCapRow) {
+            tbody.insertBefore(row, firstCapRow);
+        }
+        // If no cap rows yet, row stays where it is (already at end)
+    }
+}
+
+function deleteRow(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    // If this is a parent row, also remove all child rows
+    if (!row.classList.contains('child-row') && childRowMap[rowId]) {
+        Object.keys(childRowMap[rowId]).forEach(size => {
+            const childRowId = childRowMap[rowId][size];
+            const childRow = document.getElementById(`row-${childRowId}`);
+            if (childRow) {
+                childRow.remove();
+            }
+        });
+        delete childRowMap[rowId];
+    }
+
+
+    row.remove();
+    recalculatePricing();
+
+    // Update logo section visibility (hide if no products of that type remain)
+    updateCapLogoSectionVisibility();
+    updateGarmentLogoSectionVisibility();
+}
+
+/**
+ * Duplicate a product row for a different color of the same style.
+ * Pre-populates the style number and triggers onStyleChange() so
+ * the color picker loads — user just picks the new color.
+ */
+async function duplicateRowNewColor(sourceRowId) {
+    const sourceRow = document.getElementById(`row-${sourceRowId}`);
+    if (!sourceRow) return;
+
+    const style = sourceRow.dataset.style;
+    if (!style) {
+        showToast('No style loaded on this row', 'error');
+        return;
+    }
+
+    // Create a new row
+    addNewRow();
+    const newRow = document.querySelector('tr.new-row');
+    if (!newRow) return;
+
+    const newRowId = parseInt(newRow.dataset.rowId);
+    const styleInput = newRow.querySelector('.style-input');
+    if (styleInput) {
+        styleInput.value = style;
+        await onStyleChange(styleInput, newRowId);
+        showToast(`Select a new color for ${style}`, 'info', 3000);
+    }
+}
+
+// ============================================================
+// PRICE OVERRIDE (double-click to edit)
+// ============================================================
+
+/**
+ * Enable price override on a product row via double-click.
+ * Replaces price cell content with an editable input.
+ * Enter/blur commits the override; Escape cancels.
+ */
+function enablePriceOverride(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    // Only allow override on product rows and DECG/DECC service rows
+    if (row.dataset.productType === 'service') {
+        const sType = (row.dataset.serviceType || '').toUpperCase();
+        if (sType !== 'DECG' && sType !== 'DECC') return;
+    }
+
+    // Don't allow override on empty product rows (no style or no quantities yet)
+    // Child rows inherit style/color from parent, so allow them through
+    // Non-SanMar rows may not have color set yet, but should still allow price edit
+    const isChildRow = row.classList.contains('child-row');
+    const isNonSanmar = row.dataset.nonSanmar === 'true';
+    if (row.dataset.productType !== 'service' && !isChildRow && !isNonSanmar && (!row.dataset.style || !row.dataset.color)) return;
+
+    const priceCell = document.getElementById(`row-price-${rowId}`);
+    if (!priceCell) return;
+
+    // Already editing — don't re-enter
+    if (priceCell.querySelector('.price-override-input')) return;
+
+    // Read current displayed price (strip $ and any reset button text)
+    const currentText = priceCell.textContent.replace(/[^0-9.]/g, '');
+    const currentPrice = parseFloat(currentText) || 0;
+
+    // Replace cell content with input
+    priceCell.innerHTML = `<input type="number" class="price-override-input"
+        step="0.01" min="0" value="${currentPrice.toFixed(2)}">`;
+
+    const input = priceCell.querySelector('.price-override-input');
+    input.focus();
+    input.select();
+
+    // Commit on Enter or blur
+    function commitOverride() {
+        const newPrice = parseFloat(input.value);
+        if (isNaN(newPrice) || newPrice <= 0) {
+            cancelOverride();
+            return;
+        }
+
+        // Set the sell price override on the row
+        row.dataset.sellPrice = newPrice.toString();
+        markAsUnsaved();
+        recalculatePricing();
+    }
+
+    // Cancel on Escape — restore original display
+    function cancelOverride() {
+        // Remove input, let recalculatePricing restore the cell
+        // If there was an existing override, keep it; otherwise clear
+        recalculatePricing();
+    }
+
+    let committed = false;
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            committed = true;
+            commitOverride();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            committed = true;
+            cancelOverride();
+        }
+    });
+
+    input.addEventListener('blur', () => {
+        if (!committed) {
+            commitOverride();
+        }
+    });
+}
+
+/**
+ * Clear price override on a product row — revert to formula-calculated price.
+ */
+function clearPriceOverride(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    // Remove override
+    delete row.dataset.sellPrice;
+
+    markAsUnsaved();
+    recalculatePricing();
+}
+
+// ============================================================
+// KEYBOARD NAVIGATION (Excel-style)
+// ============================================================
+
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Escape = Close popups
+        if (e.key === 'Escape') {
+            const sizePopup = document.getElementById('extended-size-popup');
+            if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                e.preventDefault();
+                closeExtendedSizePopup();
+                return;
+            }
+        }
+
+        // Ctrl+S = Save
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            saveQuote();
+        }
+
+    });
+}
+
+function handleCellKeydown(event, input) {
+    const row = input.closest('tr');
+    const cells = Array.from(row.querySelectorAll('input:not([readonly]), select:not(:disabled)'));
+    const currentIndex = cells.indexOf(input);
+
+    if (event.key === 'Tab' && !event.shiftKey) {
+        // Tab to next cell
+        if (currentIndex === cells.length - 1) {
+            // Last cell in row - add new row
+            event.preventDefault();
+            addNewRow();
+        }
+    } else if (event.key === 'Enter') {
+        // Enter = next row
+        event.preventDefault();
+
+        const tbody = document.getElementById('product-tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const currentRowIndex = rows.indexOf(row);
+
+        if (currentRowIndex === rows.length - 1) {
+            // Last row - add new
+            addNewRow();
+        } else {
+            // Focus same column in next row
+            const nextRow = rows[currentRowIndex + 1];
+            const nextCells = Array.from(nextRow.querySelectorAll('input:not([readonly]), select:not(:disabled)'));
+            if (nextCells[currentIndex]) {
+                nextCells[currentIndex].focus();
+            } else if (nextCells[0]) {
+                nextCells[0].focus();
+            }
+        }
+    } else if (event.key === 'ArrowDown') {
+        // Arrow down
+        event.preventDefault();
+        const tbody = document.getElementById('product-tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const currentRowIndex = rows.indexOf(row);
+
+        if (currentRowIndex < rows.length - 1) {
+            const nextRow = rows[currentRowIndex + 1];
+            const field = input.dataset.field || input.dataset.size;
+            const nextInput = nextRow.querySelector(`[data-field="${field}"], [data-size="${field}"]`);
+            if (nextInput && !nextInput.disabled) {
+                nextInput.focus();
+            }
+        }
+    } else if (event.key === 'ArrowUp') {
+        // Arrow up
+        event.preventDefault();
+        const tbody = document.getElementById('product-tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const currentRowIndex = rows.indexOf(row);
+
+        if (currentRowIndex > 0) {
+            const prevRow = rows[currentRowIndex - 1];
+            const field = input.dataset.field || input.dataset.size;
+            const prevInput = prevRow.querySelector(`[data-field="${field}"], [data-size="${field}"]`);
+            if (prevInput && !prevInput.disabled) {
+                prevInput.focus();
+            }
+        }
+    }
+}
+
+// ============================================================
+// PRICING CALCULATIONS
+// ============================================================
+
+// Debounce utility for input handlers that fire on every keystroke
+function debounce(fn, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+/**
+ * Build logo configuration from current global state.
+ * Shared between recalculatePricing() and saveAndGetLink() to avoid duplication.
+ */
+function buildLogoConfiguration() {
+    const garmentAL = globalAL.garment.enabled ? [{
+        id: 'global-al-garment',
+        position: 'AL',
+        stitchCount: globalAL.garment.stitchCount,
+        needsDigitizing: globalAL.garment.needsDigitizing
+    }] : [];
+    const capAL = globalAL.cap.enabled ? [{
+        id: 'global-al-cap',
+        position: 'AL-Cap',
+        stitchCount: globalAL.cap.stitchCount,
+        needsDigitizing: globalAL.cap.needsDigitizing
+    }] : [];
+
+    const logoConfigs = {
+        garment: {
+            primary: { ...primaryLogo, id: 'primary' },
+            additional: garmentAL
+        },
+        cap: {
+            primary: { ...capPrimaryLogo, id: 'cap-primary' },
+            additional: capAL
+        }
+    };
+
+    const allLogos = [
+        { ...primaryLogo, id: 'primary' },
+        ...garmentAL,
+        { ...capPrimaryLogo, id: 'cap-primary' },
+        ...capAL
+    ];
+
+    return { logoConfigs, allLogos };
+}
+
+const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 250);
+
+async function recalculatePricing() {
+    // Collect products from table (parent rows only)
+    const allItems = collectProductsFromTable();
+    const productList = allItems.filter(p => !p.isService);
+    const serviceItems = allItems.filter(p => p.isService);
+
+    if (productList.length === 0) {
+        // Sum ALL service items (DECG, DECC, Monogram, AL, etc.)
+        let serviceOnlyTotal = 0;
+        let totalQty = 0;
+        let hasGarments = false;
+        let hasCaps = false;
+
+        serviceItems.forEach(si => {
+            serviceOnlyTotal += si.unitPrice * si.totalQuantity;
+            totalQty += si.totalQuantity;
+            if (si.serviceType === 'decg' || !si.isCap) hasGarments = true;
+            if (si.serviceType === 'decc' || si.isCap) hasCaps = true;
+
+            // Update service row price/total cells (reflects overrides)
+            const siRow = document.getElementById(`row-${si.rowId}`);
+            const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
+            const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
+            const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
+            if (siPriceCell) {
+                if (siHasOverride) {
+                    siPriceCell.classList.add('price-overridden');
+                    siPriceCell.innerHTML = `<span class="price-override-wrapper">$${si.unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${si.rowId})" title="Clear override">&times;</button></span>`;
+                } else {
+                    siPriceCell.classList.remove('price-overridden');
+                    siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
+                }
+            }
+            if (siTotalCell) {
+                siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
+            }
+        });
+
+        // Check for laser-patch cap setup fee
+        const capEmbType = getCapEmbellishmentType();
+        const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
+        const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
+        const patchSetupFee = showPatchSetup ? EMB_DEFAULTS.PATCH_SETUP_FEE : 0;
+
+        // Determine tier based on total quantity
+        const tier = totalQty <= 7 ? '1-7' : totalQty <= 23 ? '8-23' : totalQty <= 47 ? '24-47' : totalQty <= 71 ? '48-71' : '72+';
+
+        updatePricingDisplay({
+            totalQuantity: totalQty,
+            tier: tier,
+            subtotal: serviceOnlyTotal,
+            ltmFee: 0,
+            setupFees: patchSetupFee,
+            capSetupFees: patchSetupFee,
+            garmentSetupFees: 0,
+            hasCaps: hasCaps || capHasStyle,
+            hasGarments: hasGarments || serviceOnlyTotal > 0,
+            grandTotal: serviceOnlyTotal + patchSetupFee
+        });
+
+        // Clear product price cells (not service rows)
+        document.querySelectorAll('tr[data-style]:not(.service-product-row) .cell-price').forEach(cell => {
+            cell.textContent = '-';
+            cell.classList.remove('price-overridden');
+        });
+        return;
+    }
+
+    // Build logo configuration from global state (shared helper)
+    const { logoConfigs, allLogos } = buildLogoConfiguration();
+
+    // Show/hide LTM control panel based on quantities
+    const garmentQtyForLtm = productList.filter(p => !p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
+    const capQtyForLtm = productList.filter(p => p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
+    const wouldHaveLTM = (garmentQtyForLtm > 0 && garmentQtyForLtm <= 7) || (capQtyForLtm > 0 && capQtyForLtm <= 7);
+    const ltmWrapper = document.getElementById('emb-ltm-wrapper');
+    if (ltmWrapper) {
+        if (wouldHaveLTM) {
+            ltmWrapper.style.display = '';
+            // Calculate total LTM fee for display
+            const totalLtmFee = ((garmentQtyForLtm > 0 && garmentQtyForLtm <= 7) ? 50 : 0) +
+                                ((capQtyForLtm > 0 && capQtyForLtm <= 7) ? 50 : 0);
+            // Render panel if not yet rendered, or update fee amount
+            if (!document.querySelector('#emb-ltm-panel .ltm-control-panel')) {
+                renderLtmControlPanel('emb-ltm-panel', { feeAmount: totalLtmFee });
+                initLtmControlListeners('emb-ltm-panel', () => {
+                    recalculatePricing();
+                    markAsUnsaved();
+                });
+            } else {
+                setLtmControlState('emb-ltm-panel', { feeAmount: totalLtmFee });
+            }
+        } else {
+            ltmWrapper.style.display = 'none';
+            setLtmControlState('emb-ltm-panel', { enabled: true, displayMode: 'builtin' });
+        }
+    }
+
+    // Read LTM control state
+    const ltmState = getLtmControlState('emb-ltm-panel');
+    const ltmEnabled = wouldHaveLTM ? ltmState.enabled : true;
+    const ltmDisplayMode = ltmState.displayMode || 'builtin';
+
+    try {
+        const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
+
+        if (pricing) {
+            // Update row prices - match line items to rows by style AND color
+            // With different colors per extended size, we now get separate products for each color
+            pricing.products.forEach((pp) => {
+                const style = pp.product.style;
+                const productCatalogColor = pp.product.catalogColor;
+                // Match by BOTH style AND catalogColor to handle duplicate styles with different colors
+                const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${productCatalogColor}"]:not(.child-row)`);
+
+                if (!parentRow) return;
+
+                const rowId = parentRow.dataset.rowId;
+                const isParentColor = productCatalogColor === parentRow.dataset.catalogColor;
+
+                if (pp.lineItems.length > 0) {
+                    // For products matching the parent's color, update parent row price
+                    if (isParentColor) {
+                        // Find standard sizes line item (no upcharge)
+                        const standardLineItem = pp.lineItems.find(li => !li.hasUpcharge);
+                        if (standardLineItem) {
+                            const priceCell = document.getElementById(`row-price-${rowId}`);
+                            const totalCell = document.getElementById(`row-total-${rowId}`);
+                            if (priceCell) {
+                                // Display unit price — builtin mode shows LTM in price, separate mode shows base price
+                                const displayPrice = (ltmDisplayMode === 'builtin')
+                                    ? (standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0)
+                                    : (standardLineItem.unitPrice || 0);
+                                const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                                const isNsRow = parentRow.dataset.nonSanmar === 'true';
+
+                                if (isNsRow) {
+                                    // Non-SanMar: pencil icon, no clear button (price override IS the price)
+                                    priceCell.classList.remove('price-overridden');
+                                    priceCell.classList.remove('ns-price-zero');
+                                    priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${displayPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+                                } else if (hasOverride) {
+                                    priceCell.classList.add('price-overridden');
+                                    priceCell.innerHTML = `<span class="price-override-wrapper">$${displayPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
+                                } else {
+                                    priceCell.classList.remove('price-overridden');
+                                    priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                                }
+
+                                // Calculate and display line total
+                                if (totalCell) {
+                                    // Use parent row's displayed qty (excludes child rows)
+                                    // standardLineItem.quantity includes child sizes, which is wrong for parent display
+                                    const parentQtyCell = document.getElementById(`row-qty-${rowId}`);
+                                    const qty = parseInt(parentQtyCell?.textContent) || 0;
+                                    const lineTotal = displayPrice * qty;
+                                    totalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
+                                }
+                            }
+
+                            // Update pricing breakdown in description cell
+                            const logoConfig = pp.isCap ? logoConfigs.cap.primary : logoConfigs.garment.primary;
+
+                            // Find AL cost for this row from additionalServices
+                            const rowAL = pricing.additionalServices?.find(al => al.rowId == rowId);
+                            const lineItemWithAL = {
+                                ...standardLineItem,
+                                alCost: rowAL ? rowAL.unitPrice : 0
+                            };
+                            updateRowBreakdown(rowId, pp.product, lineItemWithAL, logoConfig);
+                        }
+                    }
+
+                    // Update child row prices - match by BOTH size AND color
+                    // A child row price only updates if its color matches this product's color
+                    pp.lineItems.forEach(li => {
+                        // First, try to get size from lineItem.size property (garments have this)
+                        // If not available, fall back to parsing description (caps use "3XL(2)" format)
+                        let sizesToCheck = [];
+                        if (li.size) {
+                            sizesToCheck = [li.size];
+                        } else {
+                            // Match ALL extended sizes in description (handles caps with "3XL(2)" format)
+                            const description = li.description || '';
+                            const extendedSizeRegex = new RegExp(
+                                '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
+                                'g'
+                            );
+                            sizesToCheck = description.match(extendedSizeRegex) || [];
+                        }
+
+                        sizesToCheck.forEach(size => {
+                            const childRowId = childRowMap[rowId]?.[size];
+                            if (childRowId) {
+                                const childRow = document.getElementById(`row-${childRowId}`);
+                                // Only update price if child row's color matches this product's color
+                                if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
+                                    const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                                    const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+                                    if (childPriceCell) {
+                                        // Display unit price — builtin mode shows LTM in price, separate mode shows base price
+                                        const displayPrice = (ltmDisplayMode === 'builtin')
+                                            ? (li.unitPriceWithLTM || li.unitPrice || 0)
+                                            : (li.unitPrice || 0);
+                                        // Check parent override (child-specific overrides handled in post-processing)
+                                        const childHasOwnOverride = parseFloat(childRow.dataset.sellPrice) > 0;
+                                        const hasParentOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                                        if (hasParentOverride && !childHasOwnOverride) {
+                                            childPriceCell.classList.add('price-overridden');
+                                        } else if (!childHasOwnOverride) {
+                                            childPriceCell.classList.remove('price-overridden');
+                                        }
+                                        childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                                        // Calculate and display line total for child row
+                                        if (childTotalCell) {
+                                            // Extract quantity for THIS size from description
+                                            // Format: "M(3) L(2) XL(1) XS(1)" - parse qty in parentheses after size
+                                            const sizeQtyMatch = (li.description || '').match(new RegExp(size + '\\((\\d+)\\)'));
+                                            const qty = sizeQtyMatch ? parseInt(sizeQtyMatch[1]) : (li.quantity || 0);
+                                            const lineTotal = displayPrice * qty;
+                                            childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Add service item totals (DECG/DECC) to pricing for mixed orders
+            if (serviceItems.length > 0) {
+                let serviceTotal = 0;
+                serviceItems.forEach(si => {
+                    serviceTotal += si.unitPrice * si.totalQuantity;
+
+                    // Update service row price/total cells (reflects overrides)
+                    const siRow = document.getElementById(`row-${si.rowId}`);
+                    const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
+                    const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
+                    const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
+                    if (siPriceCell) {
+                        if (siHasOverride) {
+                            siPriceCell.classList.add('price-overridden');
+                            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${si.unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${si.rowId})" title="Clear override">&times;</button></span>`;
+                        } else {
+                            siPriceCell.classList.remove('price-overridden');
+                            siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
+                        }
+                    }
+                    if (siTotalCell) {
+                        siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
+                    }
+                });
+                pricing.subtotal += serviceTotal;
+                pricing.grandTotal += serviceTotal;
+            }
+
+            // Post-process: per-size price overrides on child rows
+            let childOverrideDelta = 0;
+            document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
+                const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+                if (childOverride <= 0) return;
+
+                const childRowId = childRow.dataset.rowId;
+                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+                const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
+                if (!childPriceCell) return;
+
+                // Get the calculated price currently in the cell
+                const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
+                const calculatedPrice = parseFloat(currentText) || 0;
+                const qty = parseInt(childQtyCell?.textContent) || 0;
+
+                // Override display
+                childPriceCell.classList.add('price-overridden');
+                childPriceCell.innerHTML = `<span class="price-override-wrapper">$${childOverride.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${childRowId})" title="Clear override">&times;</button></span>`;
+
+                if (childTotalCell && qty > 0) {
+                    childTotalCell.textContent = `$${(childOverride * qty).toFixed(2)}`;
+                }
+
+                // Track delta for total adjustment
+                childOverrideDelta += (childOverride - calculatedPrice) * qty;
+            });
+
+            // Adjust totals if child overrides changed prices
+            if (childOverrideDelta !== 0) {
+                pricing.subtotal += childOverrideDelta;
+                pricing.grandTotal += childOverrideDelta;
+            }
+
+            updatePricingDisplay(pricing);
+        }
+    } catch (error) {
+        console.error('Pricing calculation error:', error);
+        showToast('Pricing calculation error. Please try again.', 'error');
+    }
+
+    // Mark as dirty for auto-save (2026 consolidation)
+    markEmbroideryDirty();
+}
+
+function collectProductsFromTable() {
+    const products = [];
+    // Only collect from parent rows (not child rows or AL config rows)
+    const rows = document.querySelectorAll('#product-tbody tr:not(.child-row):not(.al-config-row):not(.fee-row):not(#empty-state-row)');
+
+    rows.forEach(row => {
+        const rowId = parseInt(row.id.replace('row-', ''));
+        const style = row.dataset.style;
+
+        // Handle SERVICE product rows (DECG, DECC, AL, MONOGRAM, etc.)
+        if (row.dataset.productType === 'service') {
+            const qtyInput = row.querySelector('.service-qty');
+            const quantity = parseInt(qtyInput?.value) || 0;
+
+            if (quantity > 0) {
+                const serviceType = row.dataset.serviceType;
+                const isCap = row.dataset.isCap === 'true';
+                const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
+                const position = row.dataset.position || '';
+                // Use sell price override if set (DECG/DECC), otherwise original unit price
+                const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
+                const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
+
+                products.push({
+                    style: style,
+                    isService: true,
+                    serviceType: serviceType,
+                    position: position,
+                    stitchCount: stitchCount,
+                    totalQuantity: quantity,
+                    sizeBreakdown: { 'SVC': quantity }, // Use SVC as pseudo-size for services
+                    isCap: isCap,
+                    rowId: rowId,
+                    unitPrice: unitPrice,
+                    color: '',
+                    catalogColor: '',
+                    productName: row.querySelector('.service-description')?.textContent || style,
+                    title: row.querySelector('.service-description')?.textContent || style
+                });
+            }
+            return; // Skip normal product processing for service rows
+        }
+
+        const parentColor = row.dataset.color;
+        const parentCatalogColor = row.dataset.catalogColor || '';
+
+        if (!style || !parentColor) {
+            console.warn(`[collectProducts] Skipping row ${rowId}: style="${style || ''}", color="${parentColor || ''}"`, row.dataset.importData || '');
+            return;
+        }
+
+        // Group sizes by color - different colors become separate products
+        const colorGroups = {};
+
+        // Initialize parent color group
+        colorGroups[parentCatalogColor] = {
+            color: parentColor,
+            catalogColor: parentCatalogColor,
+            sizeBreakdown: {},
+            totalQty: 0
+        };
+
+        // Collect size inputs from parent row (standard or remapped sizes)
+        // IMPORTANT: Exclude .xxxl-picker-btn (shows TOTAL) and .osfa-qty-input (handled separately)
+        // Note: For non-standard products (combo, youth, toddler, tall), data-size is remapped
+        const sizeCategory = row.dataset.sizeCategory;
+        row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
+            const size = input.dataset.size;
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0 && size) {
+                colorGroups[parentCatalogColor].sizeBreakdown[size] = qty;
+                colorGroups[parentCatalogColor].totalQty += qty;
+            }
+        });
+
+        // Handle OSFA-only products (beanies, caps, bags)
+        // OSFA qty is stored in parent row, not child rows
+        if (row.dataset.isOsfaOnly === 'true') {
+            const osfaQty = parseInt(row.dataset.osfaQty) || 0;
+            if (osfaQty > 0) {
+                colorGroups[parentCatalogColor].sizeBreakdown['OSFA'] = osfaQty;
+                colorGroups[parentCatalogColor].totalQty += osfaQty;
+            }
+        }
+
+        // Collect extended sizes from CHILD ROWS - GROUP BY COLOR
+        // Child rows may have different colors than parent
+        // Also collect per-size price overrides from child rows
+        const sizeOverrides = {};
+        const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+        childRows.forEach(childRow => {
+            const size = childRow.dataset.extendedSize;
+            const childColor = childRow.dataset.color;
+            const childCatalogColor = childRow.dataset.catalogColor || '';
+            const qtyDisplay = childRow.querySelector('.qty-display');
+            const qty = parseInt(qtyDisplay?.textContent) || 0;
+
+            if (qty > 0 && size) {
+                // Initialize color group if different from parent
+                if (!colorGroups[childCatalogColor]) {
+                    colorGroups[childCatalogColor] = {
+                        color: childColor,
+                        catalogColor: childCatalogColor,
+                        sizeBreakdown: {},
+                        totalQty: 0
+                    };
+                }
+
+                colorGroups[childCatalogColor].sizeBreakdown[size] = qty;
+                colorGroups[childCatalogColor].totalQty += qty;
+
+                // Collect per-size price override if set
+                const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+                if (childOverride > 0) {
+                    sizeOverrides[size] = childOverride;
+                }
+            }
+        });
+
+        // Create product entry for each color group with quantities
+        Object.entries(colorGroups).forEach(([catalogColor, group]) => {
+            if (group.totalQty > 0) {
+                const isCap = row.dataset.isCap === 'true';
+
+                // Get global AL config for this product type
+                const alConfig = isCap ? globalAL.cap : globalAL.garment;
+                const additionalLogos = alConfig.enabled ? [{
+                    id: `global-al-${isCap ? 'cap' : 'garment'}`,
+                    position: alConfig.position,
+                    stitchCount: alConfig.stitchCount,
+                    quantity: group.totalQty
+                }] : [];
+
+                products.push({
+                    style: style,
+                    color: group.color,
+                    catalogColor: group.catalogColor,
+                    productName: row.dataset.productName || style,
+                    title: row.dataset.productName || style,  // For invoice PDF description column
+                    sizeBreakdown: group.sizeBreakdown,
+                    totalQuantity: group.totalQty,
+                    isCap: isCap,  // Cap detection for pricing routing
+                    rowId: rowId,  // Track row for AL price updates
+                    imageUrl: row.dataset.imageUrl || '',  // Image URL for quote view display
+                    sellPriceOverride: parseFloat(row.dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
+                    sizeOverrides: sizeOverrides,  // Per-size price overrides from child rows (e.g., { '2XL': 27, '3XL': 29 })
+                    _swUnitPrice: parseFloat(row.dataset.swUnitPrice) || 0,  // ShopWorks charged price for audit
+                    logoAssignments: {
+                        primary: { logoId: 'primary', quantity: group.totalQty },
+                        additional: additionalLogos
+                    }
+                });
+            }
+        });
+    });
+
+    // Sort products: garments first, caps last (for consistent pricing display)
+    products.sort((a, b) => {
+        if (a.isCap === b.isCap) return 0;
+        return a.isCap ? 1 : -1; // Garments first, caps last
+    });
+
+    return products;
+}
+
+function updatePricingDisplay(pricing) {
+    const totalQty = pricing.totalQuantity || 0;
+    document.getElementById('total-qty').textContent = totalQty;
+    document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
+    document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+
+    // Minimum order warning banner (show when qty > 0 but <= 7)
+    const minWarning = document.getElementById('min-order-warning');
+    if (minWarning) {
+        minWarning.style.display = (totalQty > 0 && totalQty <= 7) ? 'flex' : 'none';
+    }
+
+    // Update products label based on embellishment type
+    const productsLabel = document.getElementById('products-label');
+    if (productsLabel) {
+        const capEmbType = getCapEmbellishmentType();
+        if (capEmbType === 'laser-patch' && pricing.hasCaps && !pricing.hasGarments) {
+            // Caps-only laser patch order - show "Products (Laser Patch):"
+            productsLabel.textContent = 'Products (Laser Patch):';
+        } else {
+            // Default - embroidery with stitch count
+            productsLabel.textContent = 'Products (Base 8K):';
+        }
+    }
+    // Update the pre-tax subtotal (same as grand-total before tax)
+    document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+
+    // Quantity breakdown for mixed quotes
+    const garmentQtyRow = document.getElementById('garment-qty-row');
+    const capQtyRow = document.getElementById('cap-qty-row');
+    const isMixedQuote = pricing.hasCaps && pricing.hasGarments;
+
+    if (isMixedQuote) {
+        garmentQtyRow.style.display = 'flex';
+        capQtyRow.style.display = 'flex';
+        document.getElementById('garment-qty').textContent = pricing.garmentQuantity || 0;
+        document.getElementById('cap-qty').textContent = pricing.capQuantity || 0;
+    } else {
+        garmentQtyRow.style.display = 'none';
+        capQtyRow.style.display = 'none';
+    }
+
+    // Tier display - show separate tiers for mixed quotes
+    const pricingTierEl = document.getElementById('pricing-tier');
+    const garmentTierRow = document.getElementById('garment-tier-row');
+    const capTierRow = document.getElementById('cap-tier-row');
+
+    if (isMixedQuote) {
+        // Mixed quote - show "Mixed" and separate tier breakdown
+        pricingTierEl.textContent = 'Mixed';
+        garmentTierRow.style.display = 'flex';
+        capTierRow.style.display = 'flex';
+        document.getElementById('garment-tier').textContent = pricing.garmentTier || '1-7';
+        document.getElementById('cap-tier').textContent = pricing.capTier || '1-7';
+    } else if (pricing.hasCaps) {
+        // Caps only
+        pricingTierEl.textContent = pricing.capTier || '1-7';
+        garmentTierRow.style.display = 'none';
+        capTierRow.style.display = 'none';
+    } else {
+        // Garments only or no products
+        pricingTierEl.textContent = pricing.garmentTier || pricing.tier || '1-7';
+        garmentTierRow.style.display = 'none';
+        capTierRow.style.display = 'none';
+    }
+
+    // Mixed quote subtotal breakdown (caps + garments)
+    const garmentSubtotalRow = document.getElementById('garment-subtotal-row');
+    const capSubtotalRow = document.getElementById('cap-subtotal-row');
+
+    if (isMixedQuote) {
+        // Show breakdown rows (LTM baked into subtotals)
+        garmentSubtotalRow.style.display = 'flex';
+        capSubtotalRow.style.display = 'flex';
+        document.getElementById('garment-subtotal').textContent = `$${((pricing.garmentSubtotal || 0) + (pricing.garmentLtmFee || 0)).toFixed(2)}`;
+        document.getElementById('cap-subtotal').textContent = `$${((pricing.capSubtotal || 0) + (pricing.capLtmFee || 0)).toFixed(2)}`;
+    } else if (pricing.hasCaps && !pricing.hasGarments) {
+        // Caps only - show just cap breakdown (LTM baked in)
+        garmentSubtotalRow.style.display = 'none';
+        capSubtotalRow.style.display = 'flex';
+        document.getElementById('cap-subtotal').textContent = `$${((pricing.capSubtotal || 0) + (pricing.capLtmFee || 0)).toFixed(2)}`;
+    } else if (pricing.hasGarments && !pricing.hasCaps) {
+        // Garments only - hide breakdown rows (default view)
+        garmentSubtotalRow.style.display = 'none';
+        capSubtotalRow.style.display = 'none';
+    } else {
+        // No products
+        garmentSubtotalRow.style.display = 'none';
+        capSubtotalRow.style.display = 'none';
+    }
+
+    // LTM fee rows: show only in "separate" display mode
+    const garmentLtmTableRow = document.getElementById('garment-ltm-table-row');
+    const capLtmTableRow = document.getElementById('cap-ltm-table-row');
+    if (ltmDisplayMode === 'separate' && ltmEnabled) {
+        if (garmentLtmTableRow) {
+            const showGarment = (pricing.garmentLtmFee || 0) > 0;
+            garmentLtmTableRow.style.display = showGarment ? 'table-row' : 'none';
+            if (showGarment) {
+                document.getElementById('garment-ltm-unit').textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
+                document.getElementById('garment-ltm-table-total').textContent = `$${pricing.garmentLtmFee.toFixed(2)}`;
+            }
+        }
+        if (capLtmTableRow) {
+            const showCap = (pricing.capLtmFee || 0) > 0;
+            capLtmTableRow.style.display = showCap ? 'table-row' : 'none';
+            if (showCap) {
+                document.getElementById('cap-ltm-unit').textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+                document.getElementById('cap-ltm-table-total').textContent = `$${pricing.capLtmFee.toFixed(2)}`;
+            }
+        }
+    } else {
+        // builtin mode or LTM waived: hide fee rows
+        if (garmentLtmTableRow) garmentLtmTableRow.style.display = 'none';
+        if (capLtmTableRow) capLtmTableRow.style.display = 'none';
+    }
+
+    // Setup (Digitizing) row - table row only (sidebar removed in 2026 refactor)
+    const setupFeeTableRow = document.getElementById('setup-fee-table-row');
+    const setupFeeUnit = document.getElementById('setup-fee-unit');
+    const setupFeeTotal = document.getElementById('setup-fee-total');
+
+    // Check cap embellishment type for label
+    const capEmbType = getCapEmbellishmentType();
+    const isCapLaserPatch = capEmbType === 'laser-patch';
+
+    if (pricing.setupFees > 0) {
+        if (setupFeeTableRow) {
+            setupFeeTableRow.style.display = 'table-row';
+            // Update label based on what's in quote
+            const hasCapSetup = (pricing.capSetupFees || 0) > 0;
+            const hasGarmentSetup = (pricing.garmentSetupFees || 0) > 0;
+            const setupLabel = setupFeeTableRow.querySelector('.fee-label');
+            if (setupLabel) {
+                if (hasCapSetup && !hasGarmentSetup && isCapLaserPatch) {
+                    setupLabel.innerHTML = '<i class="fas fa-cog"></i> GRT-50 : Laser Patch Setup';
+                } else {
+                    setupLabel.innerHTML = '<i class="fas fa-cog"></i> Digitizing/Setup Fee';
+                }
+            }
+            if (setupFeeUnit) setupFeeUnit.textContent = `$${pricing.setupFees.toFixed(2)}`;
+            if (setupFeeTotal) setupFeeTotal.textContent = `$${pricing.setupFees.toFixed(2)}`;
+        }
+    } else {
+        if (setupFeeTableRow) setupFeeTableRow.style.display = 'none';
+    }
+
+    // Additional Stitches fee rows (AS-GARM / AS-CAP)
+    // Stitch fees are calculated by the pricing engine and included in grandTotal
+    // These rows provide visible feedback to the user
+    const garmentStitchFeeRow = document.getElementById('garment-stitch-fee-row');
+    const capStitchFeeRow = document.getElementById('cap-stitch-fee-row');
+
+    if (pricing.garmentStitchTotal > 0) {
+        if (garmentStitchFeeRow) {
+            garmentStitchFeeRow.style.display = 'table-row';
+            const garmentQty = pricing.garmentQuantity || 0;
+            const unitPrice = garmentQty > 0 ? pricing.garmentStitchTotal / garmentQty : 0;
+            document.getElementById('garment-stitch-fee-qty').textContent = garmentQty;
+            document.getElementById('garment-stitch-fee-unit').textContent = `$${unitPrice.toFixed(2)}`;
+            document.getElementById('garment-stitch-fee-total').textContent = `$${pricing.garmentStitchTotal.toFixed(2)}`;
+        }
+    } else {
+        if (garmentStitchFeeRow) garmentStitchFeeRow.style.display = 'none';
+    }
+
+    if (pricing.capStitchTotal > 0) {
+        if (capStitchFeeRow) {
+            capStitchFeeRow.style.display = 'table-row';
+            const capQty = pricing.capQuantity || 0;
+            const unitPrice = capQty > 0 ? pricing.capStitchTotal / capQty : 0;
+            document.getElementById('cap-stitch-fee-qty').textContent = capQty;
+            document.getElementById('cap-stitch-fee-unit').textContent = `$${unitPrice.toFixed(2)}`;
+            document.getElementById('cap-stitch-fee-total').textContent = `$${pricing.capStitchTotal.toFixed(2)}`;
+        }
+    } else {
+        if (capStitchFeeRow) capStitchFeeRow.style.display = 'none';
+    }
+
+    // ============================================
+    // Additional Logo (AL) fee rows + sidebar display
+    // Uses pricing engine's additionalServices — no duplicate calculation
+    // ============================================
+    const garmentAlFeeRow = document.getElementById('garment-al-fee-row');
+    const capAlFeeRow = document.getElementById('cap-al-fee-row');
+
+    // Find garment AL and cap AL from pricing engine results
+    const garmentALServices = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
+    const capALServices = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
+
+    // Garment AL fee row
+    const garmentALTotal = garmentALServices.reduce((sum, s) => sum + s.total, 0);
+    if (garmentALTotal > 0 && garmentALServices.length > 0) {
+        if (garmentAlFeeRow) {
+            garmentAlFeeRow.style.display = 'table-row';
+            const garmentALQty = garmentALServices.reduce((sum, s) => sum + s.quantity, 0);
+            const garmentALUnitPrice = garmentALQty > 0 ? garmentALTotal / garmentALQty : 0;
+            document.getElementById('garment-al-fee-qty').textContent = garmentALQty;
+            document.getElementById('garment-al-fee-unit').textContent = `$${garmentALUnitPrice.toFixed(2)}`;
+            document.getElementById('garment-al-fee-total').textContent = `$${garmentALTotal.toFixed(2)}`;
+        }
+    } else {
+        if (garmentAlFeeRow) garmentAlFeeRow.style.display = 'none';
+    }
+
+    // Cap AL fee row
+    const capALTotal = capALServices.reduce((sum, s) => sum + s.total, 0);
+    if (capALTotal > 0 && capALServices.length > 0) {
+        if (capAlFeeRow) {
+            capAlFeeRow.style.display = 'table-row';
+            const capALQty = capALServices.reduce((sum, s) => sum + s.quantity, 0);
+            const capALUnitPrice = capALQty > 0 ? capALTotal / capALQty : 0;
+            document.getElementById('cap-al-fee-qty').textContent = capALQty;
+            document.getElementById('cap-al-fee-unit').textContent = `$${capALUnitPrice.toFixed(2)}`;
+            document.getElementById('cap-al-fee-total').textContent = `$${capALTotal.toFixed(2)}`;
+        }
+    } else {
+        if (capAlFeeRow) capAlFeeRow.style.display = 'none';
+    }
+
+    // Sidebar summary display
+    const alContainer = document.getElementById('additional-logos-pricing');
+    if (garmentALTotal > 0) {
+        const garmentALSideQty = garmentALServices.reduce((sum, s) => sum + s.quantity, 0);
+        const garmentALSideUnit = garmentALSideQty > 0 ? garmentALTotal / garmentALSideQty : 0;
+        alContainer.innerHTML = `
+            <div class="pricing-row al-pricing-row">
+                <span class="label"><i class="fas fa-tshirt" style="font-size: 10px; margin-right: 3px;"></i> AL:</span>
+                <span class="value">$${garmentALTotal.toFixed(2)}</span>
+            </div>
+            <div class="pricing-row sub-breakdown">
+                <span class="label">$${garmentALSideUnit.toFixed(2)} × ${garmentALSideQty}</span>
+                <span class="value sub-value"></span>
+            </div>
+        `;
+    } else {
+        alContainer.innerHTML = '';
+    }
+
+    const capAlContainer = document.getElementById('cap-additional-logos-pricing');
+    if (capALTotal > 0) {
+        const capALSideQty = capALServices.reduce((sum, s) => sum + s.quantity, 0);
+        const capALSideUnit = capALSideQty > 0 ? capALTotal / capALSideQty : 0;
+        capAlContainer.innerHTML = `
+            <div class="pricing-row al-pricing-row cap-al">
+                <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 10px; margin-right: 3px;"></i> AL-Cap:</span>
+                <span class="value">$${capALTotal.toFixed(2)}</span>
+            </div>
+            <div class="pricing-row sub-breakdown">
+                <span class="label">$${capALSideUnit.toFixed(2)} × ${capALSideQty}</span>
+                <span class="value sub-value"></span>
+            </div>
+        `;
+    } else {
+        capAlContainer.innerHTML = '';
+    }
+
+    // ============================================
+    // Cap Embellishment Upcharge Fee Row (3D-EMB / Laser Patch)
+    // Extracted from per-piece price as separate fee item for ShopWorks
+    // ============================================
+    const capEmbFeeRow = document.getElementById('cap-embellishment-fee-row');
+    const capEmbFeeLabel = document.getElementById('cap-embellishment-fee-label');
+    const puffTotal = pricing.puffUpchargePerCap > 0 ? pricing.puffUpchargePerCap * (pricing.capQuantity || 0) : 0;
+    const patchTotal = pricing.patchUpchargePerCap > 0 ? pricing.patchUpchargePerCap * (pricing.capQuantity || 0) : 0;
+    const capEmbTotal = puffTotal + patchTotal;
+
+    if (capEmbTotal > 0 && capEmbFeeRow) {
+        capEmbFeeRow.style.display = 'table-row';
+        const capQty = pricing.capQuantity || 0;
+        const unitPrice = pricing.puffUpchargePerCap || pricing.patchUpchargePerCap || 0;
+        if (capEmbFeeLabel) {
+            if (puffTotal > 0) {
+                capEmbFeeLabel.textContent = '3D-EMB : 3D Puff Upcharge';
+            } else {
+                capEmbFeeLabel.textContent = 'Laser Patch : Patch Upcharge';
+            }
+        }
+        document.getElementById('cap-embellishment-fee-qty').textContent = capQty;
+        document.getElementById('cap-embellishment-fee-unit').textContent = `$${unitPrice.toFixed(2)}`;
+        document.getElementById('cap-embellishment-fee-total').textContent = `$${capEmbTotal.toFixed(2)}`;
+    } else {
+        if (capEmbFeeRow) capEmbFeeRow.style.display = 'none';
+    }
+
+    // ============================================
+    // Additional Logo Digitizing Fee Rows
+    // Digitizing fees are now counted in pricing engine via logoConfigs.additional
+    // These display rows show/hide based on globalAL state
+    // ============================================
+    const garmentAlDigitizingRow = document.getElementById('garment-al-digitizing-row');
+    const garmentAlDigitizingPosition = document.getElementById('garment-al-digitizing-position');
+
+    if (globalAL.garment.enabled && globalAL.garment.needsDigitizing && pricing.garmentQuantity > 0) {
+        if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'table-row';
+        if (garmentAlDigitizingPosition) garmentAlDigitizingPosition.textContent = 'AL';
+    } else {
+        if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'none';
+    }
+
+    const capAlDigitizingRow = document.getElementById('cap-al-digitizing-row');
+    const capAlDigitizingPosition = document.getElementById('cap-al-digitizing-position');
+
+    if (globalAL.cap.enabled && globalAL.cap.needsDigitizing && pricing.capQuantity > 0) {
+        if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'table-row';
+        if (capAlDigitizingPosition) capAlDigitizingPosition.textContent = 'AL-Cap';
+    } else {
+        if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
+    }
+
+    // Update tax calculation at the end of pricing display
+    updateTaxCalculation();
+}
+
+/**
+ * Calculate the discountable subtotal consistently across all functions.
+ * Includes: products grandTotal + art charge + graphic design + rush fee + sample fees
+ * LTM is already baked into grandTotal so no separate LTM addition needed.
+ * @returns {{ baseSubtotal: number, additionalCharges: number, discountableSubtotal: number, discount: number, adjustedSubtotal: number }}
+ */
+function calculateDiscountableSubtotal() {
+    const baseSubtotalText = document.getElementById('grand-total')?.textContent || '$0.00';
+    const baseSubtotal = parseFloat(baseSubtotalText.replace(/[$,]/g, '')) || 0;
+
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artCharge = artChargeToggle?.checked
+        ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
+    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * 75;
+    const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
+    const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
+    const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
+    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+
+    const additionalCharges = artCharge + designFee + rushFee + (sampleFee * sampleQty) + shippingFee;
+    const discountableSubtotal = baseSubtotal + additionalCharges;
+
+    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
+    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+
+    let discount = 0;
+    if (discountType === 'percent') {
+        discount = discountableSubtotal * (discountAmount / 100);
+    } else {
+        discount = discountAmount;
+    }
+
+    // Cap discount at subtotal to prevent negative totals
+    if (discount > discountableSubtotal && discountableSubtotal > 0) {
+        discount = discountableSubtotal;
+        showToast('Discount capped at subtotal amount', 'warning');
+    }
+
+    return {
+        baseSubtotal,
+        additionalCharges,
+        discountableSubtotal,
+        discount,
+        adjustedSubtotal: discountableSubtotal - discount
+    };
+}
+
+// ============================================================
+// TAX RATE LOOKUP (WA DOR API)
+// ============================================================
+
+/**
+ * Show status message in the tax lookup status area
+ * @param {string} message - Status text
+ * @param {string} type - 'success'|'warning'|'error'|'loading'|'info'
+ */
+function showTaxStatus(message, type) {
+    const el = document.getElementById('tax-lookup-status');
+    if (!el) return;
+
+    const colors = {
+        success: '#16a34a',
+        warning: '#d97706',
+        error: '#dc2626',
+        loading: '#6366f1',
+        info: '#0284c7'
+    };
+
+    const icons = {
+        success: '<i class="fas fa-check-circle"></i> ',
+        warning: '<i class="fas fa-exclamation-triangle"></i> ',
+        error: '<i class="fas fa-times-circle"></i> ',
+        loading: '<i class="fas fa-spinner fa-spin"></i> ',
+        info: '<i class="fas fa-info-circle"></i> '
+    };
+
+    el.style.color = colors[type] || '#64748b';
+    el.innerHTML = (icons[type] || '') + message;
+}
+
+/**
+ * Look up WA tax rate via DOR API
+ * Called on ZIP blur, state change, and manual button click
+ */
+async function lookupTaxRate() {
+    const state = document.getElementById('ship-state').value;
+    const zip = document.getElementById('ship-zip').value.trim();
+    const city = document.getElementById('ship-city').value.trim();
+    const address = document.getElementById('ship-address').value.trim();
+
+    // Non-WA state → 0% tax
+    if (state !== 'WA') {
+        document.getElementById('tax-rate-input').value = '0';
+        updateTaxCalculation();
+        showTaxStatus('Out of State — No Tax', 'info');
+        return true;
+    }
+
+    // Need at least a ZIP code
+    if (!zip || zip.length < 5) {
+        showTaxStatus('Enter ZIP code to look up rate', 'info');
+        return false;
+    }
+
+    try {
+        showTaxStatus('Looking up tax rate...', 'loading');
+        const resp = await fetch(`${API_BASE}/api/tax-rates/lookup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address, city, state, zip })
+        });
+        if (!resp.ok) {
+            throw new Error(`API returned ${resp.status}`);
+        }
+        const data = await resp.json();
+
+        if (!data.success) {
+            showTaxStatus(data.error || 'Lookup failed', 'error');
+            return false;
+        }
+
+        document.getElementById('tax-rate-input').value = data.taxRate;
+        updateTaxCalculation();
+
+        if (data.outOfState) {
+            showTaxStatus('Out of State — No Tax', 'info');
+        } else if (data.fallback) {
+            showTaxStatus(`Default rate ${data.taxRate}% (DOR unavailable)`, 'warning');
+        } else {
+            const locationLabel = city || data.locationCode || 'WA';
+            showTaxStatus(`${locationLabel} — ${data.taxRate}% (Account ${data.account})`, 'success');
+        }
+        return true;
+    } catch (err) {
+        console.error('[Tax Lookup] Error:', err);
+        showTaxStatus('Lookup failed — using current rate', 'error');
+        return false;
+    }
+}
+
+/**
+ * Handle state dropdown change
+ * If non-WA, set tax to 0%. If WA with ZIP, trigger lookup.
+ */
+function onShipStateChange() {
+    const state = document.getElementById('ship-state').value;
+    if (state !== 'WA') {
+        document.getElementById('tax-rate-input').value = '0';
+        updateTaxCalculation();
+        showTaxStatus('Out of State — No Tax', 'info');
+    } else {
+        const zip = document.getElementById('ship-zip').value.trim();
+        if (zip && zip.length >= 5) {
+            lookupTaxRate();
+        } else {
+            // Reset to WA default
+            document.getElementById('tax-rate-input').value = '10.1';
+            updateTaxCalculation();
+            showTaxStatus('', 'info');
+        }
+    }
+}
+
+/**
+ * Handle ZIP code blur — trigger lookup if WA + valid ZIP
+ */
+function onShipZipBlur() {
+    const state = document.getElementById('ship-state').value;
+    const zip = document.getElementById('ship-zip').value.trim();
+    if (state === 'WA' && zip.length >= 5) {
+        lookupTaxRate();
+    }
+}
+
+/**
+ * Handle ship method dropdown change.
+ * When "Customer Pickup" selected, hide address fields and auto-set Milton, WA for tax.
+ * When "Other" selected, show custom text input.
+ */
+function onShipMethodChange() {
+    const method = document.getElementById('ship-method').value;
+    const addressFields = document.getElementById('ship-address-fields');
+    const pickupNotice = document.getElementById('pickup-notice');
+    const otherInput = document.getElementById('ship-method-other');
+
+    if (method === 'Customer Pickup') {
+        // Hide address fields, show pickup notice
+        if (addressFields) addressFields.style.display = 'none';
+        if (pickupNotice) pickupNotice.style.display = 'block';
+        if (otherInput) otherInput.style.display = 'none';
+        // Auto-set Milton, WA 98354 for tax lookup (NW Custom Apparel shop location)
+        document.getElementById('ship-address').value = '';
+        document.getElementById('ship-city').value = 'Milton';
+        document.getElementById('ship-state').value = 'WA';
+        document.getElementById('ship-zip').value = '98354';
+        lookupTaxRate();
+    } else {
+        // Show address fields, hide pickup notice
+        if (addressFields) addressFields.style.display = '';
+        if (pickupNotice) pickupNotice.style.display = 'none';
+        // Show/hide Other text input
+        if (otherInput) {
+            otherInput.style.display = (method === 'Other') ? 'block' : 'none';
+        }
+    }
+}
+
+/**
+ * Update tax calculation based on toggle state
+ * Uses shared calculateDiscountableSubtotal() for consistent discount math
+ * Called after pricing updates and when any charge input changes
+ */
+function updateTaxCalculation() {
+    const includeTax = document.getElementById('include-tax')?.checked ?? true;
+    const { adjustedSubtotal } = calculateDiscountableSubtotal();
+
+    const rateInput = document.getElementById('tax-rate-input');
+    const taxRate = rateInput ? parseFloat(rateInput.value) / 100 : 0.101;
+
+    const taxRow = document.getElementById('tax-row');
+    const taxAmountEl = document.getElementById('tax-amount');
+    const grandTotalWithTax = document.getElementById('grand-total-with-tax');
+    const preTaxSubtotal = document.getElementById('pre-tax-subtotal');
+
+    if (!taxRow || !taxAmountEl || !grandTotalWithTax) return;
+
+    // Update pre-tax subtotal display to show adjusted amount
+    if (preTaxSubtotal) {
+        preTaxSubtotal.textContent = '$' + adjustedSubtotal.toFixed(2);
+    }
+
+    // Update tax label dynamically
+    const taxLabel = document.getElementById('tax-label');
+    if (taxLabel) {
+        const pct = (taxRate * 100).toFixed(1);
+        taxLabel.textContent = pct === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pct}%):`;
+    }
+
+    if (includeTax) {
+        const tax = adjustedSubtotal * taxRate;
+        taxRow.style.display = 'flex';
+        taxAmountEl.textContent = '$' + tax.toFixed(2);
+        grandTotalWithTax.textContent = '$' + (adjustedSubtotal + tax).toFixed(2);
+    } else {
+        taxRow.style.display = 'none';
+        grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
+    }
+}
+
+// ============================================================
+// ACTIONS (Save, Print, Email, Copy)
+// ============================================================
+
+/**
+ * Save quote and get shareable link
+ * Uses EmbroideryQuoteService and QuoteShareModal
+ */
+async function saveAndGetLink() {
+    const allItems = collectProductsFromTable();
+    const products = allItems.filter(p => !p.isService);
+    const manualServiceItems = allItems.filter(p => p.isService);
+    const decgItems = collectDECGItems();
+    if (products.length === 0 && decgItems.length === 0 && manualServiceItems.length === 0) {
+        showToast('Add products before saving', 'error');
+        return;
+    }
+
+    // Validate required fields
+    const customerName = document.getElementById('customer-name')?.value?.trim();
+    const customerEmail = document.getElementById('customer-email')?.value?.trim();
+
+    if (!customerName || !customerEmail) {
+        showToast('Please enter customer name and email', 'error');
+        if (!customerName) document.getElementById('customer-name')?.focus();
+        else if (!customerEmail) document.getElementById('customer-email')?.focus();
+        return;
+    }
+
+    // Validate non-SanMar products have pricing set
+    const zeroPriceRows = products.filter(p => {
+        const row = document.getElementById(`row-${p.rowId}`);
+        return row && row.dataset.nonSanmar === 'true' && p.sellPriceOverride <= 0;
+    });
+    if (zeroPriceRows.length > 0) {
+        const styleList = zeroPriceRows.map(p => p.style).join(', ');
+        showToast(`Non-SanMar product(s) have $0 pricing: ${styleList}. Double-click the price cell to set a price.`, 'error', 6000);
+        return;
+    }
+
+    // Get save button for loading state
+    const saveBtn = document.querySelector('.btn-save-quote');
+    const originalText = saveBtn?.innerHTML;
+    if (saveBtn) {
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.disabled = true;
+    }
+
+    showLoading(true);
+
+    try {
+        // Build logo configuration from global state (shared helper)
+        const { logoConfigs, allLogos } = buildLogoConfiguration();
+
+        // Read LTM control state
+        const ltmState = getLtmControlState('emb-ltm-panel');
+        const ltmEnabled = ltmState.enabled;
+        const ltmDisplayMode = ltmState.displayMode || 'builtin';
+
+        let pricing;
+        if (products.length === 0) {
+            // DECG-only: build minimal pricing (no pricing engine needed)
+            const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+            const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+            pricing = {
+                products: [],
+                totalQuantity: decgQty,
+                subtotal: decgTotal,
+                grandTotal: decgTotal,
+                tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+                ltmFee: 0,
+                additionalServices: [],
+                additionalStitchTotal: 0,
+                garmentStitchTotal: 0,
+                capStitchTotal: 0,
+                garmentSetupFees: 0,
+                capSetupFees: 0,
+                garmentQuantity: 0,
+                capQuantity: 0
+            };
+        } else {
+            pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
+        }
+
+        // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
+        // Only for mixed orders (products + DECG). DECG-only path above already initialized correctly.
+        if (decgItems.length > 0 && products.length > 0) {
+            const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+            pricing.subtotal += decgServiceTotal;
+            pricing.grandTotal += decgServiceTotal;
+        }
+
+        // Include manual service items (Monogram/Name-Number/WEIGHT) in grandTotal
+        if (manualServiceItems.length > 0) {
+            const manualServiceTotal = manualServiceItems.reduce((sum, si) => sum + (si.unitPrice * si.totalQuantity), 0);
+            pricing.subtotal += manualServiceTotal;
+            pricing.grandTotal += manualServiceTotal;
+        }
+
+        // Get sales rep NAME from dropdown selected option text
+        const salesRepSelect = document.getElementById('sales-rep');
+        const salesRepEmail = salesRepSelect?.value || 'sales@nwcustomapparel.com';
+        const salesRepName = salesRepSelect?.options[salesRepSelect.selectedIndex]?.text || '';
+
+        // Get additional charges (artwork, rush, sample, discount)
+        const additionalCharges = getAdditionalCharges();
+
+        // Build customer data with additional charges
+        const customerData = {
+            email: customerEmail,
+            name: customerName,
+            company: document.getElementById('company-name')?.value?.trim() || '',
+            salesRepEmail: salesRepEmail,
+            salesRepName: salesRepName,
+            notes: document.getElementById('notes')?.value?.trim() || '',
+            // Additional charges (2026-01-14)
+            artCharge: additionalCharges.artCharge,
+            graphicDesignHours: additionalCharges.graphicDesignHours,
+            graphicDesignCharge: additionalCharges.graphicDesignCharge,
+            rushFee: additionalCharges.rushFee,
+            sampleFee: additionalCharges.sampleFee,
+            sampleQty: additionalCharges.sampleQty,
+            discount: additionalCharges.discount,
+            discountPercent: additionalCharges.discountPercent,
+            discountReason: additionalCharges.discountReason,
+            // Order details (2026-02-11)
+            phone: document.getElementById('customer-phone')?.value?.trim() || '',
+            orderNumber: document.getElementById('order-number')?.value?.trim() || '',
+            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
+            purchaseOrderNumber: document.getElementById('po-number')?.value?.trim() || '',
+            shipToAddress: document.getElementById('ship-address')?.value?.trim() || '',
+            shipToCity: document.getElementById('ship-city')?.value?.trim() || '',
+            shipToState: document.getElementById('ship-state')?.value || '',
+            shipToZip: document.getElementById('ship-zip')?.value?.trim() || '',
+            shipMethod: (() => {
+                const sel = document.getElementById('ship-method')?.value || '';
+                if (sel === 'Other') return document.getElementById('ship-method-other')?.value?.trim() || 'Other';
+                return sel;
+            })(),
+            dateOrderPlaced: document.getElementById('date-order-placed')?.value?.trim() || '',
+            reqShipDate: document.getElementById('req-ship-date')?.value?.trim() || '',
+            dropDeadDate: document.getElementById('drop-dead-date')?.value?.trim() || '',
+            paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
+            // Frozen tax & design data for Caspio (2026-02-12)
+            designNumbers: lastImportMetadata?.designNumbers || [],
+            digitizingCodes: lastImportMetadata?.digitizingCodes || [],
+            digitizingFees: lastImportMetadata?.parsedServices?.digitizingFees || [],
+            taxRate: (() => {
+                const includeTax = document.getElementById('include-tax')?.checked;
+                if (!includeTax) return 0;
+                const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+                return rateVal / 100;
+            })(),
+            taxAmount: (() => {
+                const includeTax = document.getElementById('include-tax')?.checked;
+                if (!includeTax) return 0;
+                const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+                const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
+                const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
+                const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+                return Math.round((preTaxSubtotal + shippingFee) * (rateVal / 100) * 100) / 100;
+            })(),
+            importNotes: lastImportMetadata
+                ? [...(lastImportMetadata.warnings || []), ...(lastImportMetadata.unmatchedLines || []), ...(lastImportMetadata.reviewItems || [])]
+                : [],
+            paidToDate: lastImportMetadata?.paidToDate ?? 0,
+            balanceAmount: lastImportMetadata?.balanceAmount ?? 0,
+            orderNotes: lastImportMetadata?.orderNotes ?? '',
+            // Package tracking (2026-02-14)
+            carrier: lastImportMetadata?.carrier || '',
+            trackingNumber: lastImportMetadata?.trackingNumber || '',
+            // Design assignments (2026-02-19)
+            garmentDesignNumber: primaryLogo.designNumber || '',
+            capDesignNumber: (typeof capPrimaryLogo !== 'undefined' ? capPrimaryLogo.designNumber : '') || '',
+            // ShopWorks pricing audit (2026-02-13)
+            swTotal: lastImportMetadata?.swTotal ?? 0,
+            swSubtotal: lastImportMetadata?.swSubtotal ?? 0,
+            priceAuditJSON: (() => {
+                if (!lastImportMetadata || !lastImportMetadata.swSubtotal) return '';
+                const swSub = lastImportMetadata.swSubtotal;
+                const ourSub = pricing.grandTotal || 0;
+                const delta = ourSub - swSub;
+                const pct = swSub > 0 ? Math.abs(delta / swSub) * 100 : 0;
+                const flag = pct <= 5 ? 'OK' : pct <= 15 ? 'REVIEW' : 'MISMATCH';
+                const prods = (pricing.products || []).map(pp => {
+                    const li = (pp.lineItems || [pp])[0];
+                    const ourUnit = li?.unitPriceWithLTM || li?.unitPrice || 0;
+                    const swUnit = pp.product?._swUnitPrice || 0;
+                    const pDelta = ourUnit - swUnit;
+                    const pPct = swUnit > 0 ? Math.abs(pDelta / swUnit) * 100 : 0;
+                    return {
+                        style: pp.product?.style || '?',
+                        color: pp.product?.color || '?',
+                        qty: pp.product?.totalQuantity || 0,
+                        swUnit: parseFloat(swUnit.toFixed(2)),
+                        ourUnit: parseFloat(ourUnit.toFixed(2)),
+                        delta: parseFloat(pDelta.toFixed(2)),
+                        flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
+                    };
+                });
+                // Append service items (AL, Monogram, Weight, Digitizing) to audit
+                const svc = lastImportMetadata.parsedServices || {};
+                const alFeePerUnit = pricing.additionalServices?.length > 0
+                    ? (pricing.additionalServices[0]?.unitPrice || 6.50)
+                    : 6.50;
+                (svc.additionalLogos || []).forEach(al => {
+                    const swU = parseFloat(al.unitPrice || al.price || 0);
+                    const ourU = parseFloat(alFeePerUnit.toFixed(2));
+                    const d = ourU - swU;
+                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                    prods.push({ style: 'AL', color: 'Service', qty: parseInt(al.quantity || al.qty || 0),
+                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                });
+                (svc.monograms || []).forEach(m => {
+                    const swU = parseFloat(m.unitPrice || m.price || 0);
+                    const ourU = 12.50;
+                    const d = ourU - swU;
+                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                    prods.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
+                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                });
+                (svc.weights || []).forEach(w => {
+                    const swU = parseFloat(w.unitPrice || w.price || 0);
+                    const ourU = 6.25;
+                    const d = ourU - swU;
+                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                    prods.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
+                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                });
+                (svc.digitizingFees || []).forEach(df => {
+                    const swU = parseFloat(df.amount || df.unitPrice || 0);
+                    const ourU = swU; // Digitizing is pass-through, same price expected
+                    prods.push({ style: df.code || 'DD', color: 'Service', qty: 1,
+                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+                        delta: 0, flag: 'OK', isService: true });
+                });
+                // DECG/DECC items
+                const parsedDecg = svc.decgItems || [];
+                parsedDecg.forEach(pd => {
+                    const swU = parseFloat(pd.unitPrice || 0);
+                    const ourU = parseFloat(pd.calculatedUnitPrice || 0);
+                    const qty = parseInt(pd.quantity || 0);
+                    const d = ourU - swU;
+                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+                    const label = pd.serviceType === 'decc' ? 'DECC' : 'DECG';
+                    prods.push({ style: label, color: 'Service', qty: qty,
+                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+                });
+                return JSON.stringify({ swTotal: lastImportMetadata.swTotal, swSubtotal: swSub,
+                    ourSubtotal: parseFloat(ourSub.toFixed(2)), deltaSubtotal: parseFloat(delta.toFixed(2)),
+                    deltaPct: parseFloat(pct.toFixed(1)), flag, products: prods });
+            })()
+        };
+
+        // DECG/DECC items already collected at function start
+
+        // Build quote data
+        const quoteData = {
+            products: products,
+            logos: allLogos,
+            // Cap embellishment type for laser-patch orders
+            capEmbellishmentType: getCapEmbellishmentType(),
+            // DECG/DECC items for shareable URLs
+            decgItems: decgItems
+        };
+
+        // Override ltmDistributed based on display mode selection
+        pricing.ltmDistributed = (ltmDisplayMode === 'builtin');
+
+        // Add LTM state to customerData for Caspio persistence
+        customerData.ltmDisplayMode = ltmDisplayMode;
+        customerData.ltmWaived = !ltmEnabled;
+
+        // Attach logos and embellishment type to pricing for service to access
+        pricing.logos = allLogos;
+        pricing.capEmbellishmentType = getCapEmbellishmentType();
+        // Attach DECG items to pricing for service to access
+        pricing.decgItems = decgItems;
+        // Attach manual service items (Monogram/Name-Number/WEIGHT) for saving
+        pricing.manualServiceItems = manualServiceItems;
+
+        let result;
+        if (editingQuoteId) {
+            // Edit mode: Update existing quote (save revision)
+            result = await quoteService.updateQuote(editingQuoteId, quoteData, customerData, pricing);
+        } else {
+            // New quote mode: Create new quote
+            result = await quoteService.saveQuote(quoteData, customerData, pricing);
+        }
+
+        if (result && result.quoteID) {
+            // Warn if partial save (some items failed to persist)
+            if (result.partialSave && result.warning) {
+                showToast(result.warning, 'error');
+            }
+
+            const isUpdate = !!editingQuoteId;
+            // Clear auto-save draft on successful save (2026 consolidation)
+            if (embPersistence) {
+                embPersistence.clearDraft();
+            }
+
+            // Mark as saved (no unsaved changes)
+            markAsSaved();
+
+            if (isUpdate) {
+                // Update mode: Show revision success message
+                const newRevision = result.revision || (editingRevision + 1);
+                editingRevision = newRevision;
+                updateEditModeUI(result.quoteID, newRevision);
+                showToast(`Revision ${newRevision} saved successfully!`, 'success');
+
+                // Show modal with link (don't pass message as baseUrl!)
+                if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                    QuoteShareModal.show(result.quoteID);
+                } else {
+                    const url = `${window.location.origin}/quote/${result.quoteID}`;
+                    navigator.clipboard.writeText(url).catch(() => {});
+                    showToast(`Quote ${result.quoteID} updated (Rev ${newRevision}). Link copied!`, 'success');
+                }
+            } else {
+                // New quote: Show success modal with shareable link
+                if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                    QuoteShareModal.show(result.quoteID);
+                } else {
+                    const url = `${window.location.origin}/quote/${result.quoteID}`;
+                    navigator.clipboard.writeText(url).catch(() => {});
+                    showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
+                }
+            }
+
+            // Show Push to ShopWorks button after successful save
+            showPushButton(result.quoteID);
+        } else {
+            throw new Error(result?.error || 'Failed to save quote');
+        }
+    } catch (error) {
+        console.error('[Embroidery] Save error:', error);
+        showToast('Error saving quote: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+        // Restore button state
+        if (saveBtn) {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+    }
+}
+
+// Legacy function - redirects to saveAndGetLink
+async function saveQuote() {
+    return saveAndGetLink();
+}
+
+// =====================================================
+// Push to ShopWorks
+// =====================================================
+
+let _pushQuoteId = null;
+
+function showPushButton(quoteId) {
+    _pushQuoteId = quoteId;
+    const btn = document.getElementById('emb-push-shopworks-btn');
+    if (btn) {
+        btn.style.display = '';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.background = '#1a5276';
+        const label = document.getElementById('emb-push-shopworks-label');
+        if (label) label.textContent = 'Push to ShopWorks';
+    }
+}
+
+async function pushToShopWorks() {
+    const btn = document.getElementById('emb-push-shopworks-btn');
+    const label = document.getElementById('emb-push-shopworks-label');
+    if (!btn || btn.disabled || !_pushQuoteId) return;
+
+    const customerName = document.getElementById('customer-name')?.value?.trim() || '';
+    const companyName = document.getElementById('company-name')?.value?.trim() || '';
+    const displayName = companyName || customerName || 'N/A';
+
+    const confirmed = confirm(
+        `Push to ShopWorks?\n\n` +
+        `Quote: ${_pushQuoteId}\n` +
+        `Customer: ${displayName}\n` +
+        `ExtOrderID: NWCA-EMB-${_pushQuoteId}\n\n` +
+        `This will create a new order in ShopWorks OnSite.`
+    );
+
+    if (!confirmed) return;
+
+    // Loading state
+    const originalText = label.textContent;
+    label.textContent = 'Pushing...';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    try {
+        const apiBase = typeof APP_CONFIG !== 'undefined'
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        const response = await fetch(`${apiBase}/api/embroidery-push/push-quote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                quoteId: _pushQuoteId,
+                isTest: false,
+                force: false,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 409) {
+                // Already pushed
+                label.textContent = 'Already Pushed';
+                btn.style.background = '#28a745';
+                showToast('Already pushed to ShopWorks', 'info');
+                return;
+            }
+            throw new Error(data.error || data.details || `HTTP ${response.status}`);
+        }
+
+        // Success
+        label.textContent = 'Pushed ✓';
+        btn.style.background = '#28a745';
+        showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
+
+    } catch (error) {
+        console.error('[Embroidery] Push error:', error);
+        label.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        showToast(`Push failed: ${error.message}`, 'error');
+    }
+}
+
+async function embEmailQuote() {
+    const quoteId = editingQuoteId;
+    if (!quoteId) {
+        showToast('Please save the quote first before emailing', 'error');
+        return;
+    }
+    await emailQuote({
+        quoteId,
+        customerEmail: document.getElementById('customer-email')?.value?.trim(),
+        customerName: document.getElementById('customer-name')?.value?.trim(),
+        salesRepEmail: document.getElementById('sales-rep')?.value
+    });
+}
+
+// Toggle Coming Soon accordion
+function toggleComingSoon() {
+    const content = document.getElementById('coming-soon-content');
+    const chevron = document.getElementById('coming-soon-chevron');
+    content.classList.toggle('open');
+    chevron.classList.toggle('rotated');
+}
+
+// ============================================
+// Additional Charges Section Functions
+// ============================================
+
+/**
+ * Toggle Additional Charges panel visibility
+ * Panel is COLLAPSED by default to reduce visual clutter
+ */
+function toggleAdditionalCharges() {
+    const content = document.getElementById('charges-content');
+    const chevron = document.getElementById('charges-chevron');
+    if (content.style.display === 'none') {
+        // Expanding - show content, chevron points UP
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(0deg)';
+    } else {
+        // Collapsing - hide content, chevron points DOWN
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(180deg)';
+    }
+}
+
+/**
+ * Toggle Save & Share panel visibility
+ * Panel is COLLAPSED by default - user expands when ready to save
+ */
+function toggleSaveShare() {
+    const content = document.getElementById('save-share-content');
+    const chevron = document.getElementById('save-share-chevron');
+    if (content.style.display === 'none') {
+        // Expanding - show content, chevron points UP
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(0deg)';
+    } else {
+        // Collapsing - hide content, chevron points DOWN
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(180deg)';
+    }
+}
+
+function toggleOrderDetails() {
+    const content = document.getElementById('order-details-content');
+    const chevron = document.getElementById('order-details-chevron');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        chevron.style.transform = '';
+    }
+}
+
+// ============================================
+// Unsaved Changes Tracking (UX Improvement)
+// ============================================
+
+/**
+ * Mark quote as having unsaved changes
+ * Shows pulsing "Unsaved" badge in header
+ */
+function markAsUnsaved() {
+    hasChanges = true;
+    const indicator = document.getElementById('unsaved-indicator');
+    if (indicator) {
+        indicator.style.display = 'inline';
+    }
+}
+
+/**
+ * Mark quote as saved (no unsaved changes)
+ * Hides the "Unsaved" badge
+ */
+function markAsSaved() {
+    hasChanges = false;
+    const indicator = document.getElementById('unsaved-indicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+}
+
+/**
+ * Check if there are unsaved changes
+ */
+function hasUnsavedChanges() {
+    return hasChanges;
+}
+
+/**
+ * Setup event listeners for tracking unsaved changes
+ * Adds listeners to customer fields and additional charges
+ */
+function setupUnsavedChangesTracking() {
+    // Customer fields
+    const customerFields = [
+        'customer-name', 'customer-email', 'company-name', 'customer-lookup', 'sales-rep'
+    ];
+    customerFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', markAsUnsaved);
+            el.addEventListener('change', markAsUnsaved);
+        }
+    });
+
+    // Additional charges fields
+    const chargeFields = [
+        'rush-fee', 'discount-amount', 'discount-reason', 'art-charge', 'graphic-design-hours'
+    ];
+    chargeFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', markAsUnsaved);
+            el.addEventListener('change', markAsUnsaved);
+        }
+    });
+
+    // Logo configuration fields
+    const logoFields = [
+        'primary-position', 'primary-stitches', 'primary-digitizing',
+        'fb-stitch-count',
+        'garment-al-digitizing-checkbox',
+        'cap-primary-stitches', 'cap-al-digitizing-checkbox',
+        'cap-embellishment-type'
+    ];
+    logoFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', markAsUnsaved);
+            el.addEventListener('change', markAsUnsaved);
+        }
+    });
+}
+
+// ============================================
+// New Quote Functionality (UX Improvement)
+// ============================================
+
+/**
+ * Confirm and start a new quote
+ * Prompts user if there are unsaved changes
+ */
+// confirmNewQuote() → moved to quote-builder-utils.js
+
+/**
+ * Reset all quote data and start fresh
+ */
+function resetQuote() {
+    // Clear all product rows and re-add empty state
+    const tbody = document.getElementById('product-tbody');
+    tbody.innerHTML = `
+        <tr id="empty-state-row">
+            <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+            </td>
+        </tr>
+    `;
+
+    // Reset row counter
+    rowCounter = 0;
+
+    // Reset logo cards visibility
+    const garmentCard = document.getElementById('garment-logo-card');
+    const capCard = document.getElementById('cap-logo-card');
+    if (garmentCard) garmentCard.style.display = 'none';
+    if (capCard) capCard.style.display = 'none';
+    // Note: Artwork services panel is now in sidebar (always visible, no reset needed)
+
+    // Reset logo configurations to defaults
+    primaryLogo.position = 'Left Chest';
+    primaryLogo.stitchCount = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
+    primaryLogo.needsDigitizing = false;
+    primaryLogo.designNumber = null;
+    primaryLogo.designName = null;
+    primaryLogo.thumbnailUrl = null;
+    updateLogoCardHeader('garment', null);
+    // Clear design number inputs
+    const gDesignInput = document.getElementById('garment-design-number');
+    if (gDesignInput) gDesignInput.value = '';
+    const gDesignInfo = document.getElementById('garment-design-info');
+    if (gDesignInfo) { gDesignInfo.style.display = 'none'; gDesignInfo.innerHTML = ''; }
+    const gDesignClear = document.getElementById('garment-design-clear');
+    if (gDesignClear) gDesignClear.style.display = 'none';
+    showDesignThumbnail('garment', null);
+    if (typeof capPrimaryLogo !== 'undefined') {
+        capPrimaryLogo.designNumber = null;
+        capPrimaryLogo.designName = null;
+        capPrimaryLogo.thumbnailUrl = null;
+        updateLogoCardHeader('cap', null);
+        const cDesignInput = document.getElementById('cap-design-number');
+        if (cDesignInput) cDesignInput.value = '';
+        const cDesignInfo = document.getElementById('cap-design-info');
+        if (cDesignInfo) { cDesignInfo.style.display = 'none'; cDesignInfo.innerHTML = ''; }
+        const cDesignClear = document.getElementById('cap-design-clear');
+        if (cDesignClear) cDesignClear.style.display = 'none';
+        showDesignThumbnail('cap', null);
+    }
+    // Clear thumbnail and gallery caches
+    if (typeof DesignThumbnailService !== 'undefined') DesignThumbnailService.clearCache();
+    _customerDesignGallery = null;
+    window._designSearchCache = {};
+    // Clear cached design data from logo objects
+    primaryLogo._designData = null;
+    if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo._designData = null;
+    // Reset design search state
+    _designSearchState.allResults = [];
+    _designSearchState.filteredResults = [];
+    _designSearchState.activeTier = 'all';
+    _designSearchState.activeCompany = 'all';
+    _designSearchState.displayedCount = 0;
+    document.getElementById('primary-position').value = 'Left Chest';
+    document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
+    document.getElementById('primary-digitizing').checked = false;
+    // Reset patch setup checkbox
+    const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+    if (patchSetupCheckbox) {
+        patchSetupCheckbox.checked = false;
+        const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
+        if (wrapper) wrapper.classList.remove('checked');
+    }
+    // Re-enable position dropdown in case it was disabled by Full Back
+    document.getElementById('primary-position').disabled = false;
+    // Hide and reset Full Back stitch count input
+    const fbField = document.getElementById('fb-stitch-count-field');
+    if (fbField) fbField.style.display = 'none';
+    const fbInput = document.getElementById('fb-stitch-count');
+    if (fbInput) fbInput.value = 25000;
+    // Reset cap tier dropdown
+    const capTierEl = document.getElementById('cap-primary-stitches');
+    if (capTierEl) capTierEl.value = '8000';
+
+    // Reset additional logo toggles and globalAL state
+    globalAL.garment = { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false };
+    globalAL.cap = { enabled: false, position: 'AL-Cap', stitchCount: EMB_DEFAULTS.CAP_STITCH_COUNT, needsDigitizing: false };
+    _syncALArrays();
+
+    const garmentALSwitch = document.getElementById('garment-al-switch');
+    const garmentALLabel = document.getElementById('garment-al-label');
+    const garmentALConfig = document.getElementById('garment-al-config-new');
+    const capALSwitch = document.getElementById('cap-al-switch');
+    const capALLabel = document.getElementById('cap-al-label');
+    const capALConfig = document.getElementById('cap-al-config-new');
+    if (garmentALSwitch) garmentALSwitch.classList.remove('active');
+    if (garmentALLabel) garmentALLabel.classList.remove('active');
+    if (garmentALConfig) garmentALConfig.classList.remove('visible');
+    if (capALSwitch) capALSwitch.classList.remove('active');
+    if (capALLabel) capALLabel.classList.remove('active');
+    if (capALConfig) capALConfig.classList.remove('visible');
+    document.getElementById('garment-al-toggle').checked = false;
+    document.getElementById('cap-al-toggle').checked = false;
+
+    // Reset customer form fields
+    document.getElementById('customer-name').value = '';
+    document.getElementById('customer-email').value = '';
+    document.getElementById('company-name').value = '';
+    document.getElementById('customer-phone').value = '';
+    document.getElementById('customer-lookup').value = '';
+
+    // Reset notes
+    const notesEl = document.getElementById('notes');
+    if (notesEl) notesEl.value = '';
+    const notesSection = document.getElementById('notes-section');
+    if (notesSection) {
+        notesSection.classList.add('collapsed');
+        const notesBody = notesSection.querySelector('.notes-body');
+        const notesIcon = notesSection.querySelector('.notes-toggle-icon');
+        if (notesBody) notesBody.style.display = 'none';
+        if (notesIcon) notesIcon.style.transform = '';
+    }
+    updateNotesBadge();
+
+    // Reset LTM control panel
+    setLtmControlState('emb-ltm-panel', { enabled: true, displayMode: 'builtin' });
+    document.getElementById('emb-ltm-wrapper').style.display = 'none';
+
+    // Reset additional charges
+    document.getElementById('shipping-fee').value = '0';
+    const taxRateInput = document.getElementById('tax-rate-input');
+    if (taxRateInput) taxRateInput.value = '10.1';
+    document.getElementById('include-tax').checked = true;
+    document.getElementById('rush-fee').value = '';
+
+    // Reset Ship To fields
+    document.getElementById('ship-address').value = '';
+    document.getElementById('ship-city').value = '';
+    document.getElementById('ship-state').value = 'WA';
+    document.getElementById('ship-zip').value = '';
+    const taxStatus = document.getElementById('tax-lookup-status');
+    if (taxStatus) taxStatus.innerHTML = '';
+
+    // Reset Order Details fields
+    document.getElementById('po-number').value = '';
+    document.getElementById('order-number').value = '';
+    document.getElementById('customer-number').value = '';
+    document.getElementById('ship-method').value = 'UPS Ground';
+    document.getElementById('ship-method-other').value = '';
+    onShipMethodChange();
+    document.getElementById('date-order-placed').value = '';
+    document.getElementById('req-ship-date').value = '';
+    document.getElementById('drop-dead-date').value = '';
+    document.getElementById('payment-terms').value = '';
+    const odContent = document.getElementById('order-details-content');
+    const odChevron = document.getElementById('order-details-chevron');
+    const odBadge = document.getElementById('order-details-badge');
+    if (odContent) odContent.style.display = 'none';
+    if (odChevron) odChevron.style.transform = '';
+    if (odBadge) odBadge.style.display = 'none';
+    document.getElementById('discount-amount').value = '';
+    document.getElementById('discount-reason').value = '';
+    const reasonPreset = document.getElementById('discount-reason-preset');
+    if (reasonPreset) reasonPreset.value = '';
+    const reasonInput = document.getElementById('discount-reason');
+    if (reasonInput) reasonInput.style.display = 'none';
+    document.getElementById('art-charge').value = 0;
+    document.getElementById('art-charge').disabled = true;
+    document.getElementById('art-charge-toggle').checked = false;
+    const artChargeWrapper = document.getElementById('art-charge-wrapper');
+    if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
+    document.getElementById('graphic-design-hours').value = '';
+    // Reset artwork badge
+    const artworkBadge = document.getElementById('artwork-badge');
+    if (artworkBadge) {
+        artworkBadge.classList.add('hidden');
+        artworkBadge.style.display = 'none';
+    }
+
+    // Clear edit mode and import metadata
+    editingQuoteId = null;
+    editingRevision = null;
+    lastImportMetadata = null;
+
+    // Clear draft storage
+    if (embPersistence) {
+        embPersistence.clearDraft();
+    }
+
+    // Recalculate pricing (will show zeros)
+    recalculatePricing();
+    updateAdditionalCharges();
+
+    // Mark as saved (no unsaved changes)
+    markAsSaved();
+
+    // Focus search bar for immediate typing
+    const searchInput = document.getElementById('product-search');
+    if (searchInput) {
+        searchInput.focus();
+    }
+
+    showToast('Ready for new quote', 'success');
+}
+
+/**
+ * Update discount symbol when type changes ($ vs %)
+ */
+function updateDiscountType() {
+    const discountType = document.getElementById('discount-type')?.value;
+    const symbol = document.getElementById('discount-symbol');
+    const inputWrapper = document.getElementById('discount-input-wrapper');
+    const presetDropdown = document.getElementById('discount-preset');
+    const amountInput = document.getElementById('discount-amount');
+
+    if (discountType === 'percent') {
+        // Show preset dropdown, hide number input
+        if (inputWrapper) inputWrapper.style.display = 'none';
+        if (presetDropdown) presetDropdown.style.display = 'block';
+        // Set amount from preset (unless custom is selected)
+        if (presetDropdown && presetDropdown.value !== 'custom') {
+            if (amountInput) amountInput.value = presetDropdown.value;
+        }
+    } else {
+        // Show number input, hide preset dropdown
+        if (inputWrapper) inputWrapper.style.display = 'block';
+        if (presetDropdown) presetDropdown.style.display = 'none';
+        if (symbol) symbol.textContent = '$';
+    }
+
+    updateAdditionalCharges();
+}
+
+function handleDiscountPresetChange() {
+    const preset = document.getElementById('discount-preset')?.value;
+    const inputWrapper = document.getElementById('discount-input-wrapper');
+    const amountInput = document.getElementById('discount-amount');
+    const symbol = document.getElementById('discount-symbol');
+
+    if (preset === 'custom') {
+        // Show number input for custom entry
+        if (inputWrapper) inputWrapper.style.display = 'block';
+        if (symbol) symbol.textContent = '%';
+        if (amountInput) amountInput.focus();
+    } else {
+        // Use preset value
+        if (inputWrapper) inputWrapper.style.display = 'none';
+        if (amountInput) amountInput.value = preset;
+    }
+    updateFeeTableRows();
+}
+
+function handleDiscountReasonPresetChange() {
+    const preset = document.getElementById('discount-reason-preset')?.value;
+    const customInput = document.getElementById('discount-reason');
+
+    if (preset === 'custom') {
+        // Show custom input and focus it
+        if (customInput) {
+            customInput.style.display = 'block';
+            customInput.value = '';
+            customInput.focus();
+        }
+    } else {
+        // Hide custom input and use preset value
+        if (customInput) {
+            customInput.style.display = 'none';
+            customInput.value = preset;
+        }
+    }
+    updateFeeTableRows();
+}
+
+/**
+ * Calculate and update additional charges display badge
+ */
+function onLtmOverrideChange() {
+    // Now handled by initLtmControlListeners callback — kept for backward compat
+    recalculatePricing();
+    markAsUnsaved();
+}
+
+function updateAdditionalCharges() {
+    const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
+    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+    const graphicDesignCharge = graphicDesignHours * 75; // $75/hr (GRT-75)
+    const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
+    const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
+    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
+    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+
+    // Update graphic design total display
+    const graphicDesignTotalEl = document.getElementById('graphic-design-total');
+    if (graphicDesignTotalEl) {
+        graphicDesignTotalEl.textContent = graphicDesignCharge.toFixed(2);
+    }
+
+    const shippingFeeVal = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+
+    // Calculate total additional charges (before discount)
+    const totalCharges = artCharge + graphicDesignCharge + rushFee + sampleFee + shippingFeeVal;
+
+    // Calculate discount value
+    let discountValue = 0;
+    if (discountType === 'percent') {
+        // Get current subtotal from pricing summary for percentage calculation
+        const subtotalText = document.getElementById('subtotal')?.textContent || '$0.00';
+        const subtotal = parseFloat(subtotalText.replace(/[$,]/g, '')) || 0;
+        discountValue = subtotal * (discountAmount / 100);
+    } else {
+        discountValue = discountAmount;
+    }
+
+    // Net additional = charges - discount
+    const netAdditional = totalCharges - discountValue;
+
+    // Update badge
+    const badge = document.getElementById('charges-badge');
+    if (netAdditional !== 0) {
+        badge.style.display = 'inline';
+        badge.textContent = netAdditional >= 0
+            ? `+$${netAdditional.toFixed(2)}`
+            : `-$${Math.abs(netAdditional).toFixed(2)}`;
+        badge.style.background = netAdditional >= 0 ? '#22c55e' : '#dc2626';
+    } else {
+        badge.style.display = 'none';
+    }
+
+    // Update fee table rows (2026 refactor)
+    updateFeeTableRows();
+}
+
+/**
+ * Update fee table rows based on current input values
+ * Shows/hides rows in the products table based on fee values
+ */
+function updateFeeTableRows() {
+    // Art charge row
+    const artChargeRow = document.getElementById('art-charge-row');
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+    if (artChargeRow) {
+        if (artChargeToggle?.checked && artCharge > 0) {
+            artChargeRow.style.display = 'table-row';
+            document.getElementById('art-charge-unit').textContent = '$' + artCharge.toFixed(2);
+            document.getElementById('art-charge-total').textContent = '$' + artCharge.toFixed(2);
+        } else {
+            artChargeRow.style.display = 'none';
+        }
+    }
+
+    // Graphic design row
+    const graphicDesignRow = document.getElementById('graphic-design-row');
+    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designTotal = designHours * 75;
+    if (graphicDesignRow) {
+        if (designHours > 0) {
+            graphicDesignRow.style.display = 'table-row';
+            document.getElementById('design-hours-label').textContent = designHours;
+            document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
+            document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
+        } else {
+            graphicDesignRow.style.display = 'none';
+        }
+    }
+
+    // Rush fee row
+    const rushFeeRow = document.getElementById('rush-fee-row');
+    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    if (rushFeeRow) {
+        if (rushFee > 0) {
+            rushFeeRow.style.display = 'table-row';
+            document.getElementById('rush-fee-unit').textContent = '$' + rushFee.toFixed(2);
+            document.getElementById('rush-fee-total').textContent = '$' + rushFee.toFixed(2);
+        } else {
+            rushFeeRow.style.display = 'none';
+        }
+    }
+
+    // Discount row
+    const discountRow = document.getElementById('discount-row');
+    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+    const discountReason = document.getElementById('discount-reason')?.value || '';
+    if (discountRow) {
+        if (discountAmount > 0) {
+            discountRow.style.display = 'table-row';
+            let actualDiscount = discountAmount;
+            if (discountType === 'percent') {
+                const { discount } = calculateDiscountableSubtotal();
+                actualDiscount = discount;
+            }
+            const reasonLabel = document.getElementById('discount-reason-label');
+            if (reasonLabel) {
+                let labelParts = [];
+                if (discountType === 'percent') {
+                    labelParts.push(`${discountAmount}%`);
+                }
+                if (discountReason) {
+                    labelParts.push(discountReason);
+                }
+                reasonLabel.textContent = labelParts.length > 0 ? `(${labelParts.join(' - ')})` : '';
+            }
+            document.getElementById('discount-unit').textContent = '-$' + actualDiscount.toFixed(2);
+            document.getElementById('discount-total').textContent = '-$' + actualDiscount.toFixed(2);
+        } else {
+            discountRow.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Get additional charges data for saving to database
+ * @returns {Object} Additional charges object
+ */
+function getAdditionalCharges() {
+    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
+    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+
+    // Use shared helper for consistent discount calculation
+    const { discount: discountValue } = calculateDiscountableSubtotal();
+    const discountPercent = discountType === 'percent' ? discountAmount : 0;
+
+    // Graphic Design Services (GRT-75) @ $75/hr
+    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+    const graphicDesignCharge = graphicDesignHours * 75;
+
+    // DECG/DECC data now collected from service product rows (not fee rows)
+    // Use collectDECGItems() which reads from product table
+    const decgItems = collectDECGItems();
+    const decgItem = decgItems.find(i => i.type === 'DECG');
+    const deccItem = decgItems.find(i => i.type === 'DECC');
+
+    return {
+        artCharge: parseFloat(document.getElementById('art-charge')?.value) || 0,
+        graphicDesignHours: graphicDesignHours,
+        graphicDesignCharge: graphicDesignCharge,
+        rushFee: parseFloat(document.getElementById('rush-fee')?.value) || 0,
+        sampleFee: parseFloat(document.getElementById('sample-fee')?.value) || 0,
+        sampleQty: parseInt(document.getElementById('sample-qty')?.value) || 1,
+        discount: discountValue,
+        discountPercent: discountPercent,
+        discountReason: document.getElementById('discount-reason')?.value?.trim() || '',
+        // DECG/DECC (Customer-Supplied items) for PDF and shareable URLs - from service product rows
+        decgQty: decgItem?.quantity || 0,
+        decgUnit: decgItem?.unitPrice || 0,
+        decgTotal: decgItem?.total || 0,
+        deccQty: deccItem?.quantity || 0,
+        deccUnit: deccItem?.unitPrice || 0,
+        deccTotal: deccItem?.total || 0
+    };
+}
+
+/**
+ * Collect DECG (Customer-Supplied Garments) and DECC (Customer-Supplied Caps) data
+ * Now reads from service product rows in the product table
+ * Used for shareable URLs and PDF generation
+ * @returns {Array} Array of DECG/DECC items with type, quantity, unitPrice, total, stitchCount
+ */
+function collectDECGItems() {
+    const items = [];
+
+    // Find service product rows for DECG and DECC
+    const serviceRows = document.querySelectorAll('#product-tbody tr.service-product-row');
+    serviceRows.forEach(row => {
+        const serviceType = row.dataset.serviceType?.toUpperCase();
+        if (serviceType === 'DECG' || serviceType === 'DECC') {
+            const qtyInput = row.querySelector('.service-qty');
+            const qty = parseInt(qtyInput?.value) || 0;
+            // Use sell price override if set, otherwise original unit price
+            const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
+            const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
+            const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
+
+            if (qty > 0) {
+                items.push({
+                    type: serviceType,
+                    quantity: qty,
+                    unitPrice: unitPrice,
+                    total: qty * unitPrice,
+                    stitchCount: stitchCount,
+                    rowId: row.dataset.rowId,
+                    hasPriceOverride: overridePrice > 0
+                });
+            }
+        }
+    });
+
+    return items;
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+
+// showLoading(), showToast() → provided by quote-builder-utils.js
+
+// ============================================================
+// SHOPWORKS IMPORT FUNCTIONS
+// ============================================================
+
+// Store parsed data for confirmation
+let pendingShopWorksImport = null;
+
+// Store import metadata for Caspio save (designNumbers, warnings, unmatchedLines)
+let lastImportMetadata = null;
+
+// Store DECG/DECC items for stitch count modal
+let pendingDECGItems = null;
+
+// ============================================================
+// DECG STITCH COUNT MODAL FUNCTIONS
+// ============================================================
+
+// ============================================================
+// SERVICE PRICING REVIEW MODAL
+// Shows during ShopWorks import for AL/DECG/DECC/Monogram/FB
+// ============================================================
+
+// Promise resolve/reject for the review modal
+let _sprResolve = null;
+let _sprReject = null;
+let _sprItems = [];
+let _sprProductItems = [];
+let _sprEmbConfigOptions = null;
+
+/**
+ * Show the pricing review modal and return a Promise
+ * Supports both product items (SanMar products) and service items (AL/DECG/DECC/Monogram)
+ * @param {Array} serviceItems - Array of { type, quantity, stitchCount, isCap, shopWorksPrice, apiPrice, label }
+ * @param {Array} productItems - Array of { partNumber, color, sizes, unitPrice, isCap, sizePrices, totalQty, description }
+ * @returns {Promise<Object>} Resolves to { services: [...], products: [...] } or null if cancelled
+ */
+function showServicePricingReview(serviceItems, productItems, embConfigOptions) {
+    serviceItems = serviceItems || [];
+    productItems = productItems || [];
+    embConfigOptions = embConfigOptions || null;
+
+    if (serviceItems.length === 0 && productItems.length === 0 && !embConfigOptions) {
+        return Promise.resolve({ services: [], products: [], embConfig: null });
+    }
+
+    _sprItems = serviceItems;
+    _sprProductItems = productItems;
+    _sprEmbConfigOptions = embConfigOptions;
+
+    return new Promise((resolve, reject) => {
+        _sprResolve = resolve;
+        _sprReject = reject;
+
+        // === PRODUCTS SECTION ===
+        const productsSection = document.getElementById('spr-products-section');
+        const productsContainer = document.getElementById('spr-products-container');
+
+        if (productItems.length > 0) {
+            productsSection.style.display = '';
+            let pHtml = '';
+
+            productItems.forEach((prod, pIdx) => {
+                const swPrice = prod.unitPrice || 0;
+                const swAvail = swPrice > 0;
+                const apiAvail = prod.sizePrices != null;
+                const defaultSel = swAvail ? 'sw' : (apiAvail ? 'api' : 'custom');
+
+                pHtml += `<div class="spr-product-card" data-spr-pidx="${pIdx}">`;
+                pHtml += `<div class="spr-product-header">`;
+                pHtml += `<span class="spr-product-title">${escapeHtml(prod.partNumber)} ${escapeHtml(prod.color || '')}</span>`;
+                pHtml += `</div>`;
+
+                // Size breakdown as table with 4 columns: Sizes | ShopWorks | API | Custom
+                pHtml += `<div class="spr-product-sizes">`;
+                pHtml += `<table class="spr-table spr-product-table"><thead><tr>`;
+                pHtml += `<th>Sizes</th><th>ShopWorks</th><th>API</th><th>Custom</th>`;
+                pHtml += `</tr></thead><tbody>`;
+
+                const sizeGroups = _groupSizesForReview(prod.sizes, prod.sizePrices, swPrice);
+                sizeGroups.forEach((group, gIdx) => {
+                    pHtml += `<tr>`;
+                    // Size label column
+                    pHtml += `<td class="spr-size-label-cell">${escapeHtml(group.label)}</td>`;
+
+                    if (gIdx === 0) {
+                        // First row: radio buttons + prices
+                        // ShopWorks column
+                        pHtml += `<td class="spr-radio-cell">`;
+                        if (swAvail) {
+                            pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})"><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
+                        } else {
+                            pHtml += `<span class="spr-price-label disabled">$0.00</span>`;
+                        }
+                        pHtml += `</td>`;
+
+                        // API column
+                        pHtml += `<td class="spr-radio-cell">`;
+                        if (apiAvail) {
+                            pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})"><span class="spr-price-label">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span></label>`;
+                        } else {
+                            pHtml += `<span class="spr-unavailable">(unavailable)</span>`;
+                        }
+                        pHtml += `</td>`;
+
+                        // Custom column
+                        pHtml += `<td class="spr-radio-cell">`;
+                        pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})">`;
+                        pHtml += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-pcustom-${pIdx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomProductFocus(${pIdx})" oninput="onSprCustomProductFocus(${pIdx})"></label>`;
+                        pHtml += `</td>`;
+                    } else {
+                        // Subsequent rows: just prices (no radios), aligned under radio+price above
+                        pHtml += `<td class="spr-radio-cell"><span class="spr-price-label" style="padding-left:18px">$${swPrice.toFixed(2)}</span></td>`;
+                        pHtml += `<td class="spr-radio-cell"><span class="spr-price-label" style="padding-left:18px">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span></td>`;
+                        pHtml += `<td>&nbsp;</td>`;
+                    }
+                    pHtml += `</tr>`;
+                });
+
+                pHtml += `</tbody></table></div></div>`;
+            });
+
+            productsContainer.innerHTML = pHtml;
+        } else {
+            productsSection.style.display = 'none';
+            productsContainer.innerHTML = '';
+        }
+
+        // === SERVICES SECTION ===
+        const servicesSection = document.getElementById('spr-services-section');
+        const tbody = document.getElementById('spr-table-body');
+
+        if (serviceItems.length > 0) {
+            servicesSection.style.display = '';
+            let html = '';
+            let issueCount = 0;
+
+            serviceItems.forEach((item, idx) => {
+                const typeUpper = (item.type || '').toUpperCase();
+                const badgeClass = 'spr-type-' + (item.type || '').toLowerCase().replace(/[^a-z]/g, '');
+                const hasStitches = !['monogram'].includes((item.type || '').toLowerCase());
+                const swPrice = item.shopWorksPrice;
+                const apiPrice = item.apiPrice;
+                const swAvail = swPrice != null && swPrice > 0;
+                const apiAvail = apiPrice != null;
+
+                // Delta calculation
+                let deltaBadgeHtml = '';
+                if (swAvail && apiAvail && apiPrice > 0) {
+                    const deltaPct = ((swPrice - apiPrice) / apiPrice) * 100;
+                    const absPct = Math.abs(deltaPct);
+                    const deltaAmt = Math.abs(swPrice - apiPrice);
+                    let cls, label;
+                    if (absPct <= 5) { cls = 'ok'; label = 'OK'; }
+                    else if (absPct <= 15) { cls = 'review'; label = (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(0) + '%'; issueCount++; }
+                    else { cls = 'mismatch'; label = (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(0) + '%'; issueCount++; }
+                    const tooltip = cls !== 'ok' ? ` title="$${deltaAmt.toFixed(2)} difference"` : '';
+                    deltaBadgeHtml = `<span class="spr-delta-badge ${cls}"${tooltip}>${label}</span>`;
+                }
+
+                let defaultSel = apiAvail ? 'api' : (swAvail ? 'sw' : 'custom');
+
+                html += `<tr data-spr-idx="${idx}">`;
+                html += `<td><span class="spr-type-badge ${badgeClass}">${escapeHtml(typeUpper)}</span></td>`;
+                html += `<td>${item.quantity}</td>`;
+
+                if (hasStitches) {
+                    html += `<td><input type="number" class="spr-stitch-input" id="spr-stitch-${idx}" value="${item.stitchCount || 8000}" min="1000" max="200000" step="1000" onchange="onSprStitchChange(${idx})"></td>`;
+                } else {
+                    html += `<td style="text-align:center; color:#94a3b8;">&mdash;</td>`;
+                }
+
+                html += `<td class="spr-radio-cell">`;
+                if (swAvail) {
+                    html += `<label><input type="radio" name="spr-source-${idx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} onchange="onSprSourceChange(${idx})"><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
+                } else {
+                    html += `<span class="spr-price-label disabled">$0.00</span>`;
+                }
+                html += `</td>`;
+
+                html += `<td class="spr-radio-cell">`;
+                if (apiAvail) {
+                    html += `<label><input type="radio" name="spr-source-${idx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} onchange="onSprSourceChange(${idx})"><span class="spr-price-label" id="spr-api-price-${idx}">$${apiPrice.toFixed(2)}</span></label>`;
+                } else {
+                    html += `<span class="spr-unavailable">(unavailable)</span>`;
+                }
+                html += `</td>`;
+
+                html += `<td class="spr-radio-cell">`;
+                html += `<label><input type="radio" name="spr-source-${idx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprSourceChange(${idx})">`;
+                html += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-custom-${idx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomServiceFocus(${idx})" oninput="onSprCustomServiceFocus(${idx})"></label>`;
+                html += `</td>`;
+
+                html += `<td style="text-align:center;">${deltaBadgeHtml}</td>`;
+                html += `</tr>`;
+
+                // DECG/DECC per-item detail row (expandable if aggregated)
+                if ((typeUpper === 'DECG' || typeUpper === 'DECC') && item._sourceItems && item._sourceItems.length > 1) {
+                    html += `<tr class="spr-decg-detail"><td colspan="7">`;
+                    html += `<details><summary style="cursor:pointer; font-size:11px; color:#64748b;">${item._sourceItems.length} individual items</summary>`;
+                    html += `<table style="width:100%; margin-top:4px;">`;
+                    for (const si of item._sourceItems) {
+                        const siSw = si.unitPrice || 0;
+                        const siApi = item.apiPrice || 0;
+                        const siDelta = siApi > 0 ? ((siSw - siApi) / siApi * 100) : 0;
+                        const siCls = Math.abs(siDelta) <= 5 ? 'ok' : Math.abs(siDelta) <= 15 ? 'review' : 'mismatch';
+                        html += `<tr>`;
+                        html += `<td class="detail-label">Qty ${si.quantity || 1}</td>`;
+                        html += `<td>SW: $${siSw.toFixed(2)}</td>`;
+                        html += `<td>API: $${siApi.toFixed(2)}</td>`;
+                        html += `<td><span class="spr-delta-badge ${siCls}">${siDelta >= 0 ? '+' : ''}${siDelta.toFixed(0)}%</span></td>`;
+                        html += `</tr>`;
+                    }
+                    html += `</table></details></td></tr>`;
+                }
+            });
+
+            // Insert warning banner if there are pricing issues
+            const warningEl = document.getElementById('spr-delta-warning');
+            if (warningEl) warningEl.remove();
+            if (issueCount > 0) {
+                const warningDiv = document.createElement('div');
+                warningDiv.id = 'spr-delta-warning';
+                warningDiv.className = 'spr-delta-warning';
+                warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${issueCount} service item${issueCount > 1 ? 's have' : ' has'} significant price differences from 2026 pricing</span>`;
+                const tableWrapper = servicesSection.querySelector('.spr-table-wrapper');
+                servicesSection.insertBefore(warningDiv, tableWrapper);
+            }
+
+            tbody.innerHTML = html;
+        } else {
+            servicesSection.style.display = 'none';
+            tbody.innerHTML = '';
+        }
+
+        // === EMBROIDERY CONFIG SECTION ===
+        const embConfigSection = document.getElementById('spr-embconfig-section');
+        if (embConfigOptions) {
+            embConfigSection.style.display = '';
+
+            // Design info banner — enhanced with stitch count lookup + per-design assignment
+            const designBanner = document.getElementById('spr-design-info-banner');
+            const lookup = embConfigOptions.designLookup;
+            let autoGarmentTier = '8000';
+            let autoGarmentPosition = 'Left Chest';
+            let autoGarmentStitchCount = 8000;
+            let autoCapTier = '8000';
+            let hasFullBack = false;
+
+            // Build unified design list from parser + DB lookup + fallback
+            const rawDesignNums = embConfigOptions.designNumbersRaw || [];
+            const rawDesignLabels = embConfigOptions.designNumbers || [];
+            const fallbackDesigns = lookup?.fallbackDesigns || {};
+            const designEntries = []; // { num, label, dbInfo (or null), inDb, fallbackInfo (or null) }
+
+            for (let di = 0; di < rawDesignNums.length; di++) {
+                const num = rawDesignNums[di];
+                const label = rawDesignLabels[di] || `Design #${num}`;
+                const dbInfo = lookup?.designs?.[num] || null;
+                const fallbackInfo = !dbInfo ? (fallbackDesigns[num] || null) : null;
+                designEntries.push({ num, label, dbInfo, inDb: !!dbInfo, fallbackInfo });
+            }
+            // Also include DB-found designs not in parser list (rare edge case)
+            if (lookup?.designs) {
+                for (const [num, info] of Object.entries(lookup.designs)) {
+                    if (!designEntries.find(d => d.num === num)) {
+                        designEntries.push({ num, label: `Design #${num}`, dbInfo: info, inDb: true, fallbackInfo: null });
+                    }
+                }
+            }
+
+            // Extract FB price tiers from first Full Back design found
+            let fbPriceTiersFromLookup = null;
+
+            if (designEntries.length > 0) {
+                let bannerHtml = '';
+                const showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
+
+                if (showAssignment) {
+                    bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group" style="margin-right:4px;"></i>Design Logo Assignment</div>`;
+                }
+
+                // Smart auto-assign defaults
+                // Sort by stitch count descending for DB-found designs
+                const sortedEntries = [...designEntries];
+                if (sortedEntries.every(e => e.inDb)) {
+                    sortedEntries.sort((a, b) => (b.dbInfo?.maxStitchCount || 0) - (a.dbInfo?.maxStitchCount || 0));
+                }
+                const defaultAssignments = {};
+                if (showAssignment) {
+                    if (embConfigOptions.hasGarments && embConfigOptions.hasCaps) {
+                        // First/highest → garment, second/lowest → cap
+                        defaultAssignments[sortedEntries[0].num] = 'garment';
+                        if (sortedEntries.length >= 2) defaultAssignments[sortedEntries[1].num] = 'cap';
+                        for (let i = 2; i < sortedEntries.length; i++) defaultAssignments[sortedEntries[i].num] = 'none';
+                    } else if (embConfigOptions.hasGarments) {
+                        sortedEntries.forEach(e => { defaultAssignments[e.num] = 'garment'; });
+                    } else {
+                        sortedEntries.forEach(e => { defaultAssignments[e.num] = 'cap'; });
+                    }
+                }
+
+                // Track max stitch for garment auto-tier and FB detection
+                let maxStitchCount = 0;
+                let maxStitchTier = 'Standard';
+                let maxAsSurcharge = 0;
+
+                for (const entry of designEntries) {
+                    const { num, label, dbInfo, inDb, fallbackInfo } = entry;
+
+                    // Design entry row with optional thumbnail
+                    const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.dstPreviewUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
+                    const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
+
+                    bannerHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
+                    if (thumbUrl) {
+                        bannerHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" onerror="this.style.display='none'">`;
+                    }
+                    bannerHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
+                    bannerHtml += `<strong>#${escapeHtml(num)}</strong>`;
+                    if (designNameText) {
+                        bannerHtml += `<span style="color:#64748b;font-size:11px;font-style:italic;">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;
+                    }
+
+                    if (inDb) {
+                        const sc = dbInfo.maxStitchCount;
+                        const tier = dbInfo.maxStitchTier || 'Standard';
+                        const surcharge = dbInfo.maxAsSurcharge || 0;
+                        const scFormatted = sc.toLocaleString();
+
+                        bannerHtml += `<span style="color:#475569;">${escapeHtml(dbInfo.company || '')}</span>`;
+                        bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+
+                        let tierBadge = '';
+                        if (tier === 'Full Back') {
+                            tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                            if (!fbPriceTiersFromLookup && dbInfo.hasFBPricing) {
+                                const fbVariant = dbInfo.variants.find(v => v.fbPrice1_7 > 0);
+                                if (fbVariant) {
+                                    fbPriceTiersFromLookup = {
+                                        fbPrice1_7: fbVariant.fbPrice1_7,
+                                        fbPrice8_23: fbVariant.fbPrice8_23,
+                                        fbPrice24_47: fbVariant.fbPrice24_47,
+                                        fbPrice48_71: fbVariant.fbPrice48_71,
+                                        fbPrice72plus: fbVariant.fbPrice72plus
+                                    };
+                                }
+                            }
+                        } else if (surcharge > 0) {
+                            tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+                        } else {
+                            tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                        }
+                        bannerHtml += tierBadge;
+
+                        if (dbInfo.variants && dbInfo.variants.length > 1) {
+                            bannerHtml += `<span style="color:#94a3b8;font-size:11px;">(${dbInfo.variants.length} variants)</span>`;
+                        }
+                    } else if (fallbackInfo && fallbackInfo.hasStitchData) {
+                        // Fallback WITH stitch data — treat like master hit
+                        const sc = fallbackInfo.stitchCount;
+                        const tier = fallbackInfo.stitchTier || 'Standard';
+                        const surcharge = fallbackInfo.asSurcharge || 0;
+                        const scFormatted = sc.toLocaleString();
+
+                        bannerHtml += `<span style="color:#475569;">${escapeHtml(fallbackInfo.companyName || '')}</span>`;
+                        bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+
+                        let tierBadge = '';
+                        if (tier === 'Full Back') {
+                            tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                        } else if (surcharge > 0) {
+                            tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+                        } else {
+                            tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                        }
+                        bannerHtml += tierBadge;
+                        if (fallbackInfo.threadColors) {
+                            bannerHtml += `<span style="color:#94a3b8;font-size:11px;" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+                        }
+
+                        // Promote fallback to dbInfo-like shape for auto-tier logic
+                        entry.inDb = true;
+                        entry.dbInfo = {
+                            maxStitchCount: sc,
+                            maxStitchTier: tier,
+                            maxAsSurcharge: surcharge,
+                            company: fallbackInfo.companyName,
+                            hasFBPricing: false,
+                            variants: [{ stitchCount: sc, stitchTier: tier, asSurcharge: surcharge }]
+                        };
+                    } else if (fallbackInfo) {
+                        // Fallback WITHOUT stitch data — name/company/colors only
+                        if (fallbackInfo.companyName) {
+                            bannerHtml += `<span style="color:#475569;">${escapeHtml(fallbackInfo.companyName)}</span>`;
+                        }
+                        if (fallbackInfo.designName) {
+                            bannerHtml += `<span style="color:#64748b;font-size:11px;">${escapeHtml(fallbackInfo.designName)}</span>`;
+                        }
+                        bannerHtml += '<span style="background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">No stitch data</span>';
+                        if (fallbackInfo.threadColors) {
+                            bannerHtml += `<span style="color:#94a3b8;font-size:11px;" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+                        }
+                    } else {
+                        // Not found in either table
+                        const nameMatch = label.match(/—\s*(.+)/);
+                        if (nameMatch) {
+                            bannerHtml += `<span style="color:#475569;">${escapeHtml(nameMatch[1].trim())}</span>`;
+                        }
+                        bannerHtml += '<span style="background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Not in database</span>';
+                    }
+
+                    // Assignment dropdown (only for 2+ designs)
+                    if (showAssignment) {
+                        const defaultVal = defaultAssignments[num] || 'garment';
+                        bannerHtml += `<select id="spr-design-assign-${escapeHtml(num)}" data-design-num="${escapeHtml(num)}" class="spr-design-assign" style="margin-left:auto;padding:2px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;">`;
+                        if (embConfigOptions.hasGarments) bannerHtml += `<option value="garment"${defaultVal === 'garment' ? ' selected' : ''}>Garment Logo</option>`;
+                        if (embConfigOptions.hasCaps) bannerHtml += `<option value="cap"${defaultVal === 'cap' ? ' selected' : ''}>Cap Logo</option>`;
+                        bannerHtml += `<option value="both"${defaultVal === 'both' ? ' selected' : ''}>Both</option>`;
+                        bannerHtml += `<option value="none"${defaultVal === 'none' ? ' selected' : ''}>None (skip)</option>`;
+                        bannerHtml += `</select>`;
+                    }
+
+                    bannerHtml += `</div>`;
+                }
+
+                designBanner.style.display = '';
+                designBanner.style.background = '#eff6ff';
+                const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>';
+                designBanner.innerHTML = headerText + bannerHtml;
+
+                // Fetch design thumbnails for the banner (non-blocking)
+                if (typeof DesignThumbnailService !== 'undefined' && designEntries.length > 0) {
+                    const sprDesignNums = designEntries.map(e => e.num);
+                    DesignThumbnailService.fetchThumbnailsBatch(sprDesignNums).then(thumbMap => {
+                        for (const [dn, url] of Object.entries(thumbMap)) {
+                            if (url) {
+                                const slot = document.getElementById('spr-thumb-' + dn);
+                                if (slot) {
+                                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" class="spr-design-thumb" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.style.display=\'none\'">';
+                                    slot.style.display = 'inline-block';
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Function to recalculate auto-tiers from assignment dropdowns
+                function _recalcDesignAssignments() {
+                    let garmentDesignNum = null;
+                    let capDesignNum = null;
+
+                    if (showAssignment) {
+                        const selects = designBanner.querySelectorAll('.spr-design-assign');
+                        selects.forEach(sel => {
+                            const dNum = sel.dataset.designNum;
+                            const val = sel.value;
+                            if (val === 'garment' || val === 'both') {
+                                if (!garmentDesignNum) garmentDesignNum = dNum;
+                            }
+                            if (val === 'cap' || val === 'both') {
+                                if (!capDesignNum) capDesignNum = dNum;
+                            }
+                        });
+                    } else if (designEntries.length === 1) {
+                        // Single design — assign to whatever types exist
+                        garmentDesignNum = designEntries[0].num;
+                        capDesignNum = designEntries[0].num;
+                    }
+
+                    // Store assignment on embConfigOptions for later retrieval
+                    embConfigOptions._garmentDesignNum = garmentDesignNum;
+                    embConfigOptions._capDesignNum = capDesignNum;
+
+                    // Auto-set garment tier from assigned design
+                    autoGarmentTier = '8000';
+                    autoGarmentPosition = 'Left Chest';
+                    autoGarmentStitchCount = 8000;
+                    hasFullBack = false;
+                    embConfigOptions.fbPriceTiers = null;
+
+                    if (garmentDesignNum) {
+                        const gInfo = lookup?.designs?.[garmentDesignNum] || designEntries.find(e => e.num === garmentDesignNum)?.dbInfo;
+                        if (gInfo) {
+                            const sc = gInfo.maxStitchCount;
+                            const tier = gInfo.maxStitchTier || 'Standard';
+                            autoGarmentStitchCount = sc;
+                            if (tier === 'Full Back' || sc >= 25000) {
+                                autoGarmentTier = '25000';
+                                autoGarmentPosition = 'Full Back';
+                                hasFullBack = true;
+                                // Set FB price tiers from this specific design
+                                if (gInfo.hasFBPricing) {
+                                    const fbVariant = gInfo.variants.find(v => v.fbPrice1_7 > 0);
+                                    if (fbVariant) {
+                                        embConfigOptions.fbPriceTiers = {
+                                            fbPrice1_7: fbVariant.fbPrice1_7,
+                                            fbPrice8_23: fbVariant.fbPrice8_23,
+                                            fbPrice24_47: fbVariant.fbPrice24_47,
+                                            fbPrice48_71: fbVariant.fbPrice48_71,
+                                            fbPrice72plus: fbVariant.fbPrice72plus
+                                        };
+                                    }
+                                }
+                            } else {
+                                autoGarmentTier = mapStitchCountToTierValue(sc, '');
+                            }
+                        }
+                    }
+
+                    // Auto-set cap tier from assigned design
+                    autoCapTier = '8000';
+                    if (capDesignNum) {
+                        const cInfo = lookup?.designs?.[capDesignNum] || designEntries.find(e => e.num === capDesignNum)?.dbInfo;
+                        if (cInfo) {
+                            // For caps, use smallest variant stitch count
+                            let minCapStitch = Infinity;
+                            for (const v of cInfo.variants) {
+                                if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                            }
+                            if (minCapStitch < Infinity) {
+                                autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+                            }
+                        }
+                    }
+
+                    // Update the garment/cap tier dropdowns in the modal
+                    const gTierEl = document.getElementById('spr-garment-stitch-tier');
+                    const gPosEl = document.getElementById('spr-garment-position');
+                    const cTierEl = document.getElementById('spr-cap-stitch-tier');
+                    if (gTierEl) gTierEl.value = autoGarmentTier;
+                    if (gPosEl) gPosEl.value = autoGarmentPosition;
+                    if (cTierEl) cTierEl.value = autoCapTier;
+                }
+
+                // Wire up onchange for assignment dropdowns
+                if (showAssignment) {
+                    setTimeout(() => {
+                        const selects = designBanner.querySelectorAll('.spr-design-assign');
+                        selects.forEach(sel => {
+                            sel.addEventListener('change', _recalcDesignAssignments);
+                        });
+                    }, 0);
+                }
+
+                // Run initial assignment calculation
+                // (for single-design or initial defaults — sets autoGarmentTier/autoCapTier)
+                // Defer to after DOM update if using assignment dropdowns
+                if (!showAssignment) {
+                    // Legacy single-design or no-assignment path
+                    for (const entry of designEntries) {
+                        if (entry.inDb) {
+                            const sc = entry.dbInfo.maxStitchCount;
+                            const tier = entry.dbInfo.maxStitchTier || 'Standard';
+                            if (sc > maxStitchCount) {
+                                maxStitchCount = sc;
+                                maxStitchTier = tier;
+                                maxAsSurcharge = entry.dbInfo.maxAsSurcharge || 0;
+                            }
+                        }
+                    }
+                    autoGarmentStitchCount = maxStitchCount || 8000;
+                    if (maxStitchTier === 'Full Back' || maxStitchCount >= 25000) {
+                        autoGarmentTier = '25000';
+                        autoGarmentPosition = 'Full Back';
+                        hasFullBack = true;
+                        embConfigOptions.fbPriceTiers = fbPriceTiersFromLookup;
+                    } else if (maxStitchCount > 0) {
+                        autoGarmentTier = mapStitchCountToTierValue(maxStitchCount, '');
+                    }
+                    // Cap tier: use smallest variant
+                    let minCapStitch = Infinity;
+                    for (const entry of designEntries) {
+                        if (entry.inDb) {
+                            for (const v of entry.dbInfo.variants) {
+                                if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                            }
+                        }
+                    }
+                    if (minCapStitch < Infinity && minCapStitch !== maxStitchCount) {
+                        autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+                    }
+                    // Store single design assignment
+                    embConfigOptions._garmentDesignNum = designEntries[0]?.num || null;
+                    embConfigOptions._capDesignNum = designEntries[0]?.num || null;
+                } else {
+                    // Use default assignments to set initial tiers
+                    setTimeout(_recalcDesignAssignments, 0);
+                }
+
+            } else if (embConfigOptions.designInfo) {
+                // Fallback: show simple design text if lookup had no results and no raw design numbers
+                designBanner.style.display = '';
+                designBanner.innerHTML = `<i class="fas fa-palette" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
+            } else {
+                designBanner.style.display = 'none';
+            }
+
+            // Garment config — auto-set from design lookup
+            const garmentConfig = document.getElementById('spr-garment-config');
+            garmentConfig.style.display = embConfigOptions.hasGarments ? '' : 'none';
+            if (embConfigOptions.hasGarments) {
+                document.getElementById('spr-garment-position').value = autoGarmentPosition;
+                document.getElementById('spr-garment-stitch-tier').value = autoGarmentTier;
+                document.getElementById('spr-garment-digitizing').checked = embConfigOptions.digitizing || false;
+                // Sync Full Back UI if auto-detected
+                if (autoGarmentPosition === 'Full Back') {
+                    onSprGarmentPositionChange();
+                }
+            }
+
+            // Cap config — auto-set from design lookup
+            const capConfig = document.getElementById('spr-cap-config');
+            capConfig.style.display = embConfigOptions.hasCaps ? '' : 'none';
+            if (embConfigOptions.hasCaps) {
+                document.getElementById('spr-cap-embellishment').value = 'embroidery';
+                document.getElementById('spr-cap-stitch-tier').value = autoCapTier;
+                document.getElementById('spr-cap-stitch-tier-wrapper').style.display = '';
+                document.getElementById('spr-cap-digitizing').checked = embConfigOptions.digitizing || false;
+            }
+
+            // LTM row (only if qty <= 7)
+            const ltmRow = document.getElementById('spr-ltm-row');
+            if (embConfigOptions.totalQty > 0 && embConfigOptions.totalQty <= 7) {
+                ltmRow.style.display = '';
+                // Smart default: uncheck if all products have ShopWorks pricing
+                const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+                const ltmHint = document.getElementById('spr-ltm-hint');
+                if (embConfigOptions.allProductsHaveSwPrice) {
+                    ltmCheckbox.checked = false;
+                    ltmHint.textContent = 'ShopWorks prices may include LTM';
+                } else {
+                    ltmCheckbox.checked = true;
+                    ltmHint.textContent = '';
+                }
+            } else {
+                ltmRow.style.display = 'none';
+            }
+        } else {
+            embConfigSection.style.display = 'none';
+        }
+
+        // Show the modal
+        const modal = document.getElementById('service-pricing-review-modal');
+        modal.classList.add('active');
+    });
+}
+
+/**
+ * Group product sizes for the review modal display
+ * Standard sizes (same API price) grouped together, upcharge sizes shown separately
+ */
+function _groupSizesForReview(sizes, sizePrices, swPrice) {
+    if (!sizes || Object.keys(sizes).length === 0) return [];
+
+    // Build entries: { size, qty, apiPrice }
+    const entries = [];
+    for (const [size, qty] of Object.entries(sizes)) {
+        if (qty > 0) {
+            entries.push({
+                size,
+                qty,
+                apiPrice: sizePrices ? (sizePrices[size] || null) : null
+            });
+        }
+    }
+
+    if (entries.length === 0) return [];
+
+    // Group by API price (sizes with same price grouped together)
+    const priceGroups = {};
+    entries.forEach(e => {
+        const key = e.apiPrice != null ? e.apiPrice.toFixed(2) : 'null';
+        if (!priceGroups[key]) priceGroups[key] = [];
+        priceGroups[key].push(e);
+    });
+
+    const groups = [];
+    for (const [priceKey, items] of Object.entries(priceGroups)) {
+        const label = items.map(i => `${i.size}(${i.qty})`).join(' ');
+        groups.push({
+            label,
+            apiPrice: priceKey !== 'null' ? parseFloat(priceKey) : null
+        });
+    }
+
+    // Sort: standard (lower) prices first
+    groups.sort((a, b) => (a.apiPrice || 0) - (b.apiPrice || 0));
+    return groups;
+}
+
+/**
+ * Handle product source radio change — enable/disable custom input
+ */
+function onSprProductSourceChange(pIdx) {
+    const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
+    const customInput = document.getElementById(`spr-pcustom-${pIdx}`);
+    let selectedValue = '';
+    radios.forEach(r => { if (r.checked) selectedValue = r.value; });
+    if (selectedValue === 'custom') {
+        customInput.classList.remove('spr-muted');
+        customInput.focus();
+    } else {
+        customInput.classList.add('spr-muted');
+        customInput.value = '';
+    }
+    // Reactively update LTM default when pricing source changes
+    _updateSprLtmDefault();
+}
+
+function onSprCustomProductFocus(pIdx) {
+    const customRadio = document.querySelector(`input[name="spr-psource-${pIdx}"][value="custom"]`);
+    if (customRadio && !customRadio.checked) {
+        customRadio.checked = true;
+        onSprProductSourceChange(pIdx);
+    }
+}
+
+/**
+ * Handle radio source change — enable/disable custom input
+ */
+function onSprSourceChange(idx) {
+    const radios = document.querySelectorAll(`input[name="spr-source-${idx}"]`);
+    const customInput = document.getElementById(`spr-custom-${idx}`);
+    let selectedValue = '';
+    radios.forEach(r => { if (r.checked) selectedValue = r.value; });
+    if (selectedValue === 'custom') {
+        customInput.classList.remove('spr-muted');
+        customInput.focus();
+    } else {
+        customInput.classList.add('spr-muted');
+        customInput.value = '';
+    }
+}
+
+function onSprCustomServiceFocus(idx) {
+    const customRadio = document.querySelector(`input[name="spr-source-${idx}"][value="custom"]`);
+    if (customRadio && !customRadio.checked) {
+        customRadio.checked = true;
+        onSprSourceChange(idx);
+    }
+}
+
+// === SPR Embroidery Config Handlers ===
+
+function onSprGarmentPositionChange() {
+    const pos = document.getElementById('spr-garment-position').value;
+    const tierEl = document.getElementById('spr-garment-stitch-tier');
+    if (pos === 'Full Back') {
+        tierEl.value = '25000';
+    } else if (tierEl.value === '25000') {
+        tierEl.value = '8000';
+    }
+}
+
+function onSprGarmentStitchTierChange() {
+    const tier = document.getElementById('spr-garment-stitch-tier').value;
+    const posEl = document.getElementById('spr-garment-position');
+    if (tier === '25000') {
+        posEl.value = 'Full Back';
+    } else if (posEl.value === 'Full Back') {
+        posEl.value = 'Left Chest';
+    }
+}
+
+function onSprCapEmbellishmentChange() {
+    const type = document.getElementById('spr-cap-embellishment').value;
+    const stitchWrapper = document.getElementById('spr-cap-stitch-tier-wrapper');
+    stitchWrapper.style.display = (type === 'laser-patch') ? 'none' : '';
+}
+
+function _updateSprLtmDefault() {
+    if (!_sprEmbConfigOptions || _sprEmbConfigOptions.totalQty > 7) return;
+    const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+    const ltmHint = document.getElementById('spr-ltm-hint');
+    if (!ltmCheckbox) return;
+
+    // Check if ALL products currently have ShopWorks pricing selected
+    let allSw = true;
+    _sprProductItems.forEach((prod, pIdx) => {
+        const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
+        let selected = 'api';
+        radios.forEach(r => { if (r.checked) selected = r.value; });
+        if (selected !== 'sw') allSw = false;
+    });
+
+    if (allSw && _sprProductItems.length > 0) {
+        ltmCheckbox.checked = false;
+        ltmHint.textContent = 'ShopWorks prices may include LTM';
+    } else {
+        ltmCheckbox.checked = true;
+        ltmHint.textContent = '';
+    }
+}
+
+/**
+ * Handle stitch count change — recalculate API price live
+ */
+function onSprStitchChange(idx) {
+    const item = _sprItems[idx];
+    if (!item) return;
+
+    const input = document.getElementById(`spr-stitch-${idx}`);
+    const newStitch = parseInt(input.value) || 8000;
+    item.stitchCount = newStitch;
+
+    // Recalculate API price
+    const apiPriceEl = document.getElementById(`spr-api-price-${idx}`);
+    if (apiPriceEl && pricingCalculator) {
+        const newApiPrice = pricingCalculator.getServiceUnitPrice(
+            item.type.toLowerCase(), newStitch, item.quantity, item.isCap
+        );
+        if (newApiPrice != null) {
+            item.apiPrice = newApiPrice;
+            apiPriceEl.textContent = `$${newApiPrice.toFixed(2)}`;
+        } else {
+            item.apiPrice = null;
+            apiPriceEl.textContent = '(unavailable)';
+            apiPriceEl.className = 'spr-unavailable';
+        }
+    }
+}
+
+/**
+ * Cancel the service pricing review — resolve with null
+ */
+function cancelServicePricingReview() {
+    const modal = document.getElementById('service-pricing-review-modal');
+    modal.classList.remove('active');
+    _sprEmbConfigOptions = null;
+    if (_sprResolve) {
+        _sprResolve(null); // null = user cancelled
+        _sprResolve = null;
+        _sprReject = null;
+    }
+}
+
+/**
+ * Apply the user's chosen pricing and resolve the Promise
+ * Returns { services: [...], products: [...] }
+ */
+function applyServicePricingReview() {
+    // Collect service results
+    const serviceResults = [];
+    _sprItems.forEach((item, idx) => {
+        const radios = document.querySelectorAll(`input[name="spr-source-${idx}"]`);
+        let selectedSource = 'api';
+        radios.forEach(r => { if (r.checked) selectedSource = r.value; });
+
+        let unitPrice = 0;
+        if (selectedSource === 'sw') {
+            unitPrice = item.shopWorksPrice || 0;
+        } else if (selectedSource === 'api') {
+            unitPrice = item.apiPrice || 0;
+        } else if (selectedSource === 'custom') {
+            const customInput = document.getElementById(`spr-custom-${idx}`);
+            unitPrice = parseFloat(customInput.value) || 0;
+        }
+
+        const stitchInput = document.getElementById(`spr-stitch-${idx}`);
+        const stitchCount = stitchInput ? (parseInt(stitchInput.value) || 8000) : (item.stitchCount || 8000);
+
+        serviceResults.push({
+            type: item.type,
+            quantity: item.quantity,
+            unitPrice: unitPrice,
+            stitchCount: stitchCount,
+            isCap: item.isCap || false,
+            originalData: item.originalData || null
+        });
+    });
+
+    // Collect product results
+    const productResults = [];
+    _sprProductItems.forEach((prod, pIdx) => {
+        const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
+        let selectedSource = 'api';
+        radios.forEach(r => { if (r.checked) selectedSource = r.value; });
+
+        let overridePrice = 0; // 0 = use API (no override)
+        if (selectedSource === 'sw') {
+            overridePrice = prod.unitPrice || 0;
+        } else if (selectedSource === 'custom') {
+            const customInput = document.getElementById(`spr-pcustom-${pIdx}`);
+            overridePrice = parseFloat(customInput.value) || 0;
+        }
+        // 'api' → overridePrice stays 0 → no sellPriceOverride set
+
+        productResults.push({
+            ...prod,
+            selectedSource: selectedSource,
+            overridePrice: overridePrice
+        });
+    });
+
+    // Collect embroidery config if section was shown
+    let embConfig = null;
+    if (_sprEmbConfigOptions) {
+        // Resolve design assignments from dropdowns
+        let garmentDesignNumber = null;
+        let garmentDesignName = null;
+        let capDesignNumber = null;
+        let capDesignName = null;
+
+        if (_sprEmbConfigOptions._garmentDesignNum || _sprEmbConfigOptions._capDesignNum) {
+            // Read from assignment state (set by _recalcDesignAssignments or single-design path)
+            const assignSelects = document.querySelectorAll('.spr-design-assign');
+            if (assignSelects.length > 0) {
+                // Multi-design: read from dropdowns
+                assignSelects.forEach(sel => {
+                    const dNum = sel.dataset.designNum;
+                    const val = sel.value;
+                    const entry = (_sprEmbConfigOptions.designNumbers || []).find(l => l.includes('#' + dNum));
+                    const nameMatch = entry ? entry.match(/—\s*(.+)/) : null;
+                    const dName = nameMatch ? nameMatch[1].trim() : '';
+                    if (val === 'garment' || val === 'both') {
+                        if (!garmentDesignNumber) { garmentDesignNumber = dNum; garmentDesignName = dName; }
+                    }
+                    if (val === 'cap' || val === 'both') {
+                        if (!capDesignNumber) { capDesignNumber = dNum; capDesignName = dName; }
+                    }
+                });
+            } else {
+                // Single design: assign to whatever types exist
+                const singleNum = _sprEmbConfigOptions._garmentDesignNum;
+                const singleEntry = (_sprEmbConfigOptions.designNumbers || []).find(l => l.includes('#' + singleNum));
+                const singleNameMatch = singleEntry ? singleEntry.match(/—\s*(.+)/) : null;
+                const singleName = singleNameMatch ? singleNameMatch[1].trim() : '';
+                if (_sprEmbConfigOptions.hasGarments) { garmentDesignNumber = singleNum; garmentDesignName = singleName; }
+                if (_sprEmbConfigOptions.hasCaps) { capDesignNumber = singleNum; capDesignName = singleName; }
+            }
+        }
+
+        embConfig = {
+            garmentPosition: document.getElementById('spr-garment-position')?.value || 'Left Chest',
+            garmentStitchTier: parseInt(document.getElementById('spr-garment-stitch-tier')?.value) || 8000,
+            garmentDigitizing: document.getElementById('spr-garment-digitizing')?.checked || false,
+            capEmbellishment: document.getElementById('spr-cap-embellishment')?.value || 'embroidery',
+            capStitchTier: parseInt(document.getElementById('spr-cap-stitch-tier')?.value) || 8000,
+            capDigitizing: document.getElementById('spr-cap-digitizing')?.checked || false,
+            ltmEnabled: document.getElementById('spr-ltm-enabled')?.checked ?? true,
+            fbPriceTiers: _sprEmbConfigOptions?.fbPriceTiers || null,
+            garmentDesignNumber: garmentDesignNumber,
+            garmentDesignName: garmentDesignName,
+            capDesignNumber: capDesignNumber,
+            capDesignName: capDesignName
+        };
+    }
+
+    // Close modal
+    const modal = document.getElementById('service-pricing-review-modal');
+    modal.classList.remove('active');
+
+    if (_sprResolve) {
+        _sprResolve({ services: serviceResults, products: productResults, embConfig: embConfig });
+        _sprResolve = null;
+        _sprReject = null;
+    }
+}
+
+/**
+ * Open the DECG stitch count modal to confirm stitch counts
+ * @param {Array} decgItems - Array of DECG/DECC items from import
+ */
+function openDECGStitchModal(decgItems) {
+    if (!decgItems || decgItems.length === 0) return;
+
+    const modal = document.getElementById('decg-stitch-modal');
+    const itemsContainer = document.getElementById('decg-stitch-items');
+
+    // Build the items list HTML
+    let html = '';
+    decgItems.forEach((item, index) => {
+        const isDecc = item.serviceType === 'decc';
+        const badgeClass = isDecc ? 'badge-decc' : 'badge-decg';
+        const badgeText = isDecc ? 'DECC' : 'DECG';
+        const desc = item.description || (isDecc ? 'Customer cap' : 'Customer garment');
+        const currentPrice = item.calculatedUnitPrice || 0;
+
+        html += `
+            <div class="decg-stitch-item" data-index="${index}">
+                <span class="item-badge ${badgeClass}">${badgeText}</span>
+                <div class="item-info">
+                    <div class="item-desc">${escapeHtml(desc)}</div>
+                    <div class="item-qty">Qty: ${item.quantity} | Tier: ${item.tier || 'N/A'}</div>
+                </div>
+                <div class="stitch-input-group">
+                    <input type="number"
+                           id="decg-stitch-${index}"
+                           value="${item.stitchCount || 8000}"
+                           min="1000"
+                           max="200000"
+                           step="1000"
+                           onchange="updateDECGPreviewPrice(${index})">
+                    <span class="stitch-unit">stitches</span>
+                </div>
+                <div class="item-price" id="decg-price-${index}">$${currentPrice.toFixed(2)}</div>
+            </div>
+        `;
+    });
+
+    itemsContainer.innerHTML = html;
+    modal.classList.add('active');
+}
+
+/**
+ * Close the DECG stitch count modal
+ */
+function closeDECGStitchModal() {
+    const modal = document.getElementById('decg-stitch-modal');
+    modal.classList.remove('active');
+}
+
+/**
+ * Update the preview price when stitch count changes
+ * @param {number} index - Index of the DECG item
+ */
+async function updateDECGPreviewPrice(index) {
+    if (!pendingDECGItems || !pendingDECGItems[index]) return;
+
+    const input = document.getElementById(`decg-stitch-${index}`);
+    const priceEl = document.getElementById(`decg-price-${index}`);
+    const stitchCount = parseInt(input.value) || 8000;
+
+    const item = pendingDECGItems[index];
+    const isDecc = item.serviceType === 'decc';
+
+    try {
+        // Use EmbroideryPricingService to calculate new price
+        const pricingService = new window.EmbroideryPricingService();
+        const pricing = await pricingService.calculateDECGPrice(
+            item.quantity,
+            stitchCount,
+            isDecc ? 'cap' : 'garment'
+        );
+
+        priceEl.textContent = `$${pricing.unitPrice.toFixed(2)}`;
+        priceEl.style.color = '#059669';
+
+        // Update the pending item with new stitch count
+        pendingDECGItems[index].stitchCount = stitchCount;
+        pendingDECGItems[index].previewPrice = pricing.unitPrice;
+    } catch (error) {
+        console.error('Failed to calculate DECG price:', error);
+        priceEl.textContent = 'Error';
+        priceEl.style.color = '#dc2626';
+    }
+}
+
+/**
+ * Confirm stitch counts and recalculate DECG/DECC pricing
+ */
+async function confirmDECGStitches() {
+    if (!pendingDECGItems || pendingDECGItems.length === 0) {
+        closeDECGStitchModal();
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirm-stitches');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Calculating...';
+
+    try {
+        const pricingService = new window.EmbroideryPricingService();
+        let totalUpdated = 0;
+
+        // Recalculate each item with the entered stitch count
+        // Find matching service product rows in the product table
+        const serviceRows = document.querySelectorAll('#product-tbody tr.service-product-row');
+        const decgRows = Array.from(serviceRows).filter(r => r.dataset.serviceType === 'decg');
+        const deccRows = Array.from(serviceRows).filter(r => r.dataset.serviceType === 'decc');
+
+        for (let i = 0; i < pendingDECGItems.length; i++) {
+            const item = pendingDECGItems[i];
+            const input = document.getElementById(`decg-stitch-${i}`);
+            const stitchCount = parseInt(input.value) || 8000;
+            const isDecc = item.serviceType === 'decc';
+
+            const pricing = await pricingService.calculateDECGPrice(
+                item.quantity,
+                stitchCount,
+                isDecc ? 'cap' : 'garment'
+            );
+
+            // Find the matching service product row
+            const targetRows = isDecc ? deccRows : decgRows;
+            const serviceRow = targetRows[0]; // Use first matching row (usually only one DECG or DECC row)
+
+            if (serviceRow) {
+                const rowId = serviceRow.dataset.rowId;
+
+                // Update row data attributes
+                serviceRow.dataset.stitchCount = stitchCount.toString();
+                serviceRow.dataset.unitPrice = pricing.unitPrice.toString();
+
+                // Update the description to show new stitch count
+                const descEl = serviceRow.querySelector('.service-description');
+                if (descEl) {
+                    const baseDesc = isDecc ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments';
+                    descEl.textContent = `${baseDesc} (${(stitchCount / 1000).toFixed(0)}K stitches)`;
+                }
+
+                // Calculate total including LTM
+                const lineTotal = (pricing.unitPrice * item.quantity) + pricing.ltmFee;
+
+                // Update price and total cells
+                const priceCell = document.getElementById(`row-price-${rowId}`);
+                const totalCell = document.getElementById(`row-total-${rowId}`);
+                if (priceCell) priceCell.textContent = `$${pricing.unitPrice.toFixed(2)}`;
+                if (totalCell) totalCell.textContent = `$${lineTotal.toFixed(2)}`;
+
+                // Update quantity input if needed
+                const qtyInput = serviceRow.querySelector('.service-qty');
+                if (qtyInput) qtyInput.value = item.quantity;
+            }
+
+            // Update notes with new stitch count
+            const notesEl = document.getElementById('notes');
+            if (notesEl && stitchCount !== 8000) {
+                const stitchNote = `${isDecc ? 'DECC' : 'DECG'}: ${stitchCount.toLocaleString()} stitches @ $${pricing.unitPrice.toFixed(2)}/ea`;
+                // Append to notes if not already there
+                if (!notesEl.value.includes(stitchNote)) {
+                    notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + stitchNote;
+                }
+            }
+
+            totalUpdated++;
+        }
+
+        // Recalculate overall pricing
+        recalculatePricing();
+        markAsUnsaved();
+
+        closeDECGStitchModal();
+        showToast(`Updated pricing for ${totalUpdated} customer-supplied items`, 'success');
+
+    } catch (error) {
+        console.error('Failed to update DECG pricing:', error);
+        showToast('Failed to update pricing: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-calculator"></i> Recalculate Prices';
+    }
+}
+
+// ============================================================
+// IMPORT PROGRESS INDICATOR
+// ============================================================
+
+function updateImportProgress(step, total, message, detail = '') {
+    const overlay = document.getElementById('import-progress-overlay');
+    const bar = document.getElementById('import-progress-bar');
+    const status = document.getElementById('import-progress-status');
+    const detailEl = document.getElementById('import-progress-detail');
+    if (!overlay) return;
+    overlay.classList.add('active');
+    const pct = total > 0 ? Math.round((step / total) * 100) : 0;
+    bar.style.width = pct + '%';
+    status.textContent = message;
+    detailEl.textContent = detail;
+}
+
+function hideImportProgress() {
+    const overlay = document.getElementById('import-progress-overlay');
+    if (overlay) overlay.classList.remove('active');
+}
+
+// ============================================================
+// SHOPWORKS IMPORT MODAL FUNCTIONS
+// ============================================================
+
+/**
+ * Open the ShopWorks import modal
+ */
+function openShopWorksImportModal() {
+    const modal = document.getElementById('shopworks-import-modal');
+    modal.classList.add('active');
+
+    // Reset state
+    document.getElementById('shopworks-paste-area').value = '';
+    document.getElementById('shopworks-import-preview').classList.remove('active');
+    document.getElementById('btn-parse-import').style.display = '';
+    document.getElementById('btn-confirm-import').style.display = 'none';
+    pendingShopWorksImport = null;
+
+    // Focus textarea
+    setTimeout(() => {
+        document.getElementById('shopworks-paste-area').focus();
+    }, 100);
+}
+
+/**
+ * Close the ShopWorks import modal
+ */
+function closeShopWorksImportModal() {
+    const modal = document.getElementById('shopworks-import-modal');
+    modal.classList.remove('active');
+    pendingShopWorksImport = null;
+}
+
+/**
+ * Show the Add Non-SanMar Product modal, pre-filled from row data
+ */
+function showAddNonSanmarModal(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    const styleNumber = row.dataset.style || row.querySelector('.style-input')?.value?.trim().toUpperCase() || '';
+    const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : {};
+
+    // Pre-parse description from import data
+    const description = importData.description || '';
+    const parsed = parseShopWorksDescription(description, styleNumber);
+
+    // Fill modal fields
+    document.getElementById('ns-modal-row-id').value = rowId;
+    document.getElementById('ns-style-number').value = styleNumber;
+    document.getElementById('ns-brand').value = parsed.brand || importData.brand || '';
+    document.getElementById('ns-product-name').value = parsed.name || '';
+    document.getElementById('ns-category').value = parsed.category || '';
+    document.getElementById('ns-sell-price').value = importData.unitPrice || '';
+    document.getElementById('ns-default-colors').value = parsed.color || importData.color || '';
+
+    // Auto-fill available sizes based on detected category
+    if (parsed.category === 'Caps') {
+        document.getElementById('ns-available-sizes').value = 'OSFA';
+    } else {
+        document.getElementById('ns-available-sizes').value = 'S,M,L,XL,2XL,3XL';
+    }
+
+    // Collapse "More Options" by default
+    const moreSection = document.getElementById('ns-more-options');
+    const moreToggle = document.querySelector('.ns-more-options-toggle');
+    if (moreSection) moreSection.classList.remove('visible');
+    if (moreToggle) moreToggle.classList.remove('expanded');
+
+    // Show modal
+    const modal = document.getElementById('add-nonsanmar-modal');
+    modal.classList.add('active');
+
+    // Validate fields (enables/disables Save button)
+    validateNsModalFields();
+
+    // Focus the brand field (first editable field)
+    setTimeout(() => document.getElementById('ns-brand').focus(), 100);
+}
+
+/**
+ * Close the Add Non-SanMar Product modal
+ */
+function closeAddNonSanmarModal() {
+    const modal = document.getElementById('add-nonsanmar-modal');
+    modal.classList.remove('active');
+}
+
+/**
+ * Toggle "More Options" collapsible in the Add Non-SanMar modal
+ */
+function toggleNsMoreOptions(btn) {
+    const section = document.getElementById('ns-more-options');
+    const isExpanded = section.classList.toggle('visible');
+    btn.classList.toggle('expanded', isExpanded);
+}
+
+/**
+ * Live validation for the 3 required fields in the Non-SanMar modal.
+ * Enables/disables the Save button.
+ */
+function validateNsModalFields() {
+    const brand = document.getElementById('ns-brand').value.trim();
+    const name = document.getElementById('ns-product-name').value.trim();
+    const price = parseFloat(document.getElementById('ns-sell-price').value);
+    const saveBtn = document.getElementById('btn-save-nonsanmar');
+    const isValid = brand && name && price > 0;
+    saveBtn.disabled = !isValid;
+    saveBtn.title = isValid ? '' : 'Fill Brand, Product Name, and Sell Price';
+}
+
+/**
+ * Show a post-import summary banner above the product table.
+ * Lists non-SanMar products with price status indicators.
+ */
+function showImportSummaryBanner(sanMarCount, nonSanMarItems) {
+    // Remove any existing banner
+    const existing = document.getElementById('import-summary-banner');
+    if (existing) existing.remove();
+
+    const totalProducts = sanMarCount + nonSanMarItems.length;
+    if (totalProducts === 0) return;
+
+    const hasZeroPrice = nonSanMarItems.some(item => !item.price || item.price <= 0);
+    const bannerClass = hasZeroPrice ? 'banner-warning' : 'banner-success';
+
+    let html = `<div class="banner-title">Import Complete: ${totalProducts} product${totalProducts !== 1 ? 's' : ''} imported</div>`;
+    html += `<div class="banner-detail">`;
+    if (sanMarCount > 0) {
+        html += `&#8226; ${sanMarCount} SanMar product${sanMarCount !== 1 ? 's' : ''} &mdash; priced automatically<br>`;
+    }
+    if (nonSanMarItems.length > 0) {
+        const zeroCount = nonSanMarItems.filter(i => !i.price || i.price <= 0).length;
+        if (zeroCount > 0) {
+            html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; <strong>${zeroCount} need${zeroCount !== 1 ? '' : 's'} pricing</strong><br>`;
+        } else {
+            html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; using ShopWorks prices<br>`;
+        }
+        for (const item of nonSanMarItems) {
+            const priceOk = item.price && item.price > 0;
+            const icon = priceOk
+                ? '<span class="ns-price-ok">&#10003;</span>'
+                : '<span class="ns-price-warn">&#9888;</span>';
+            const priceStr = priceOk ? `$${item.price.toFixed(2)}` : '$0.00';
+            html += `<div class="banner-ns-item" data-row-id="${item.rowId}" onclick="scrollToProductRow(${item.rowId})">`;
+            html += `&nbsp;&nbsp;&#9656; ${escapeHtml(item.style)} (${escapeHtml(item.description)}) &mdash; ${priceStr} ${icon}`;
+            html += `</div>`;
+        }
+    }
+    html += `</div>`;
+    html += `<button class="btn-dismiss-banner" onclick="dismissImportBanner()" title="Dismiss">Dismiss</button>`;
+
+    const banner = document.createElement('div');
+    banner.id = 'import-summary-banner';
+    banner.className = `import-summary-banner ${bannerClass}`;
+    banner.innerHTML = html;
+
+    // Insert before the product table
+    const productTable = document.getElementById('product-table');
+    if (productTable && productTable.parentElement) {
+        productTable.parentElement.insertBefore(banner, productTable);
+    }
+
+    // Auto-dismiss after 30s (unless there are $0 products)
+    if (!hasZeroPrice) {
+        setTimeout(() => dismissImportBanner(), 30000);
+    }
+}
+
+/**
+ * Dismiss the import summary banner
+ */
+function dismissImportBanner() {
+    const banner = document.getElementById('import-summary-banner');
+    if (banner) {
+        banner.style.transition = 'opacity 0.2s';
+        banner.style.opacity = '0';
+        setTimeout(() => banner.remove(), 200);
+    }
+}
+
+/**
+ * Scroll to a specific product row and briefly highlight it
+ */
+function scrollToProductRow(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.style.transition = 'background 0.3s';
+    row.style.background = '#ede9fe';
+    setTimeout(() => { row.style.background = ''; }, 1500);
+}
+
+/**
+ * Save non-SanMar product to database and re-populate the row
+ */
+async function saveNonSanmarProduct() {
+    const rowId = parseInt(document.getElementById('ns-modal-row-id').value);
+    const styleNumber = document.getElementById('ns-style-number').value.trim();
+    const brand = document.getElementById('ns-brand').value.trim();
+    const productName = document.getElementById('ns-product-name').value.trim();
+    const category = document.getElementById('ns-category').value;
+    const sellPrice = parseFloat(document.getElementById('ns-sell-price').value) || 0;
+    const defaultColors = document.getElementById('ns-default-colors').value.trim();
+    const availableSizes = document.getElementById('ns-available-sizes').value.trim();
+
+    // Validate required fields
+    if (!brand) {
+        showToast('Brand is required', 'error');
+        document.getElementById('ns-brand').focus();
+        return;
+    }
+    if (!productName) {
+        showToast('Product Name is required', 'error');
+        document.getElementById('ns-product-name').focus();
+        return;
+    }
+    if (!sellPrice || sellPrice <= 0) {
+        showToast('Sell Price is required — cannot save a $0 product', 'error');
+        document.getElementById('ns-sell-price').focus();
+        return;
+    }
+
+    const saveBtn = document.getElementById('btn-save-nonsanmar');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+        const payload = {
+            StyleNumber: styleNumber,
+            Brand: brand,
+            ProductName: productName,
+            Category: category,
+            DefaultSellPrice: sellPrice,
+            DefaultColors: defaultColors,
+            AvailableSizes: availableSizes,
+            PricingMethod: 'FIXED',
+            IsActive: true
+        };
+
+        const response = await fetch(`${API_BASE}/api/non-sanmar-products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Save failed (${response.status})`);
+        }
+
+        const result = await response.json();
+        showToast(`${styleNumber} saved to database`, 'success');
+
+        // Close modal
+        closeAddNonSanmarModal();
+
+        // Re-populate the row with the saved product data
+        const row = document.getElementById(`row-${rowId}`);
+        if (row) {
+            populateNonSanmarRow(row, rowId, payload);
+
+            // If we have import data, re-apply color and sizes
+            const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : null;
+            if (importData) {
+                await reImportNonSanmarRow(row, rowId, importData);
+            }
+        }
+
+        recalculatePricing();
+
+    } catch (error) {
+        console.error('[saveNonSanmarProduct] Error:', error);
+        showToast('Failed to save: ' + error.message, 'error');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save & Apply';
+    }
+}
+
+/**
+ * Re-apply import data (color, sizes) to a non-SanMar row after it's been populated
+ */
+async function reImportNonSanmarRow(row, rowId, importData) {
+    // Select color if available
+    if (importData.color) {
+        const pickerDropdown = row.querySelector('.color-picker-dropdown');
+        if (pickerDropdown) {
+            const colorOption = pickerDropdown.querySelector(
+                `[data-color-name="${importData.color}"]`
+            );
+            if (colorOption) {
+                selectNonSanmarColor(rowId, colorOption);
+            } else {
+                // Color not in defaults — add it and select it
+                const optHtml = `<div class="color-picker-option selected"
+                    data-color-name="${escapeHtml(importData.color)}"
+                    data-catalog-color="${escapeHtml(importData.color)}"
+                    data-swatch-url="" data-hex="#ccc" data-image-url=""
+                    onclick="selectNonSanmarColor(${rowId}, this)">
+                    <span class="color-swatch" style="background-color:#ccc"></span>
+                    <span class="color-name">${escapeHtml(importData.color)}</span>
+                </div>`;
+                pickerDropdown.insertAdjacentHTML('afterbegin', optHtml);
+                selectNonSanmarColor(rowId, pickerDropdown.querySelector('.color-picker-option'));
+            }
+        }
+    }
+
+    // Set sizes from import data — including extended sizes as child rows
+    if (importData.sizes) {
+        const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
+
+        for (const [size, qty] of Object.entries(importData.sizes)) {
+            if (qty > 0) {
+                let internalSize = size;
+                if (size === 'LG') internalSize = 'L';
+                if (size === '2X') internalSize = '2XL';
+                if (size === 'XXXL' || size === '3X') internalSize = '3XL';
+                if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
+                if (size === '5X') internalSize = '5XL';
+                if (size === '6X') internalSize = '6XL';
+                // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
+
+                const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
+                const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
+                                      (sizeInput && sizeInput.disabled);
+
+                if (needsChildRow) {
+                    // Create child row for extended sizes (mirrors SanMar import path)
+                    createOrUpdateExtendedChildRow(rowId, internalSize, qty);
+
+                    // Set per-size sell price override on child row if available
+                    if (importData.sellPriceOverrides && importData.sellPriceOverrides[size]) {
+                        const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                        if (childRow) {
+                            childRow.dataset.sellPrice = importData.sellPriceOverrides[size].toString();
+                        }
+                    }
+
+                    // For 2XL/XXL: set parent row input so onSizeChange doesn't remove the child row
+                    if (internalSize === '2XL' || internalSize === 'XXL') {
+                        const parentXxlInput = row.querySelector('[data-size="2XL"]');
+                        if (parentXxlInput) {
+                            parentXxlInput.value = qty;
+                        }
+                    }
+                } else if (sizeInput && !sizeInput.disabled) {
+                    sizeInput.value = qty;
+                }
+            }
+        }
+        onSizeChange(rowId);
+    }
+}
+
+/**
+ * Parse pasted text and show preview
+ */
+async function parseAndPreviewShopWorks() {
+    const text = document.getElementById('shopworks-paste-area').value.trim();
+
+    if (!text) {
+        showToast('Please paste ShopWorks order text first', 'warning');
+        return;
+    }
+
+    try {
+        const parser = new ShopWorksImportParser();
+
+        // Load service codes from Caspio API for current pricing
+        await parser.loadServiceCodes();
+
+        const result = parser.parse(text);
+
+
+        // Consolidate products by partNumber + color (merges size-split SKUs like ST253, ST253_2X into one row)
+        result.products = parser.consolidateProducts(result.products);
+        pendingShopWorksImport = result;
+
+        result.products.forEach((p, i) => {
+            const totalQty = Object.values(p.sizes).reduce((sum, q) => sum + q, 0);
+        });
+
+        // Show preview
+        renderImportPreview(result);
+
+        // Show confirm button, hide parse button
+        document.getElementById('btn-parse-import').style.display = 'none';
+        document.getElementById('btn-confirm-import').style.display = '';
+
+    } catch (error) {
+        console.error('Failed to parse ShopWorks text:', error);
+        showToast('Failed to parse order text. Check format.', 'error');
+    }
+}
+
+/**
+ * Render the import preview
+ */
+function renderImportPreview(data) {
+    const preview = document.getElementById('shopworks-import-preview');
+    const grid = document.getElementById('preview-grid');
+    const products = document.getElementById('preview-products');
+    const services = document.getElementById('preview-services');
+    const warnings = document.getElementById('preview-warnings');
+
+    // Customer & order info grid
+    const pricingIcon = data.pricingSource === 'caspio' ? '✓' : '⚠';
+    const pricingColor = data.pricingSource === 'caspio' ? '#28a745' : '#ffc107';
+    grid.innerHTML = `
+        <div class="preview-item">
+            <div class="preview-item-label">Order #</div>
+            <div class="preview-item-value">${escapeHtml(data.orderId || 'N/A')}</div>
+        </div>
+        <div class="preview-item">
+            <div class="preview-item-label">Company</div>
+            <div class="preview-item-value">${escapeHtml(data.customer.company || 'N/A')}</div>
+        </div>
+        <div class="preview-item">
+            <div class="preview-item-label">Contact</div>
+            <div class="preview-item-value">${escapeHtml(data.customer.contactName || 'N/A')}</div>
+        </div>
+        <div class="preview-item">
+            <div class="preview-item-label">Sales Rep</div>
+            <div class="preview-item-value">${escapeHtml(data.salesRep.name || 'N/A')}</div>
+        </div>
+        <div class="preview-item">
+            <div class="preview-item-label">Pricing</div>
+            <div class="preview-item-value" style="color: ${pricingColor};">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>
+        </div>
+    `;
+
+    // Products list
+    let productsHtml = '';
+    if (data.products.length > 0) {
+        productsHtml = '<h5>Products (' + data.products.length + ')</h5><div class="preview-products-list">';
+        data.products.forEach((product, idx) => {
+            const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
+            productsHtml += `
+                <div class="preview-product-item">
+                    <input type="checkbox" class="product-include-check" data-product-index="${idx}" checked
+                           style="flex-shrink:0; width:16px; height:16px; cursor:pointer;" title="Uncheck to exclude from import">
+                    <span class="preview-product-style">${escapeHtml(product.partNumber)}</span>
+                    <span class="preview-product-desc">${escapeHtml(product.description || '')}</span>
+                    <span class="preview-product-qty">Qty: ${totalQty}</span>
+                </div>
+            `;
+        });
+        productsHtml += '</div>';
+    }
+
+    // DECG/DECC items (customer-supplied garments and caps)
+    if (data.decgItems.length > 0) {
+        const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
+        const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
+
+        if (decgGarments.length > 0) {
+            productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Garments (' + decgGarments.length + ')</h5><div class="preview-products-list">';
+            for (const decg of decgGarments) {
+                const ltmNote = decg.ltmFee > 0 ? ` + $${decg.ltmFee} LTM` : '';
+                const tierNote = decg.tier ? ` (Tier ${decg.tier})` : '';
+                const stitchNote = `${(decg.stitchCount || 8000).toLocaleString()} stitches`;
+                const sourceIcon = decg.pricingSource === 'decg-api' ? '✓' : '⚠';
+                productsHtml += `
+                    <div class="preview-product-item">
+                        <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
+                        <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')} <small style="color:#64748b;">${stitchNote}${tierNote}</small></span>
+                        <span class="preview-product-qty">${sourceIcon} Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
+                    </div>
+                `;
+            }
+            productsHtml += '</div>';
+        }
+
+        if (deccCaps.length > 0) {
+            productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Caps (' + deccCaps.length + ')</h5><div class="preview-products-list">';
+            for (const decc of deccCaps) {
+                const ltmNote = decc.ltmFee > 0 ? ` + $${decc.ltmFee} LTM` : '';
+                const tierNote = decc.tier ? ` (Tier ${decc.tier})` : '';
+                const stitchNote = `${(decc.stitchCount || 8000).toLocaleString()} stitches`;
+                const sourceIcon = decc.pricingSource === 'decg-api' ? '✓' : '⚠';
+                productsHtml += `
+                    <div class="preview-product-item">
+                        <span class="preview-product-style" style="background: #dbeafe; color: #1e40af;">DECC</span>
+                        <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')} <small style="color:#64748b;">${stitchNote}${tierNote}</small></span>
+                        <span class="preview-product-qty">${sourceIcon} Qty: ${decc.quantity} @ $${decc.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
+                    </div>
+                `;
+            }
+            productsHtml += '</div>';
+        }
+
+        // Add note about stitch count confirmation
+        productsHtml += '<p style="font-size: 11px; color: #64748b; margin-top: 8px; font-style: italic;"><i class="fas fa-info-circle"></i> After import, you\'ll be prompted to confirm stitch counts for accurate pricing</p>';
+    }
+
+    // Non-SanMar products (require manual pricing)
+    if (data.customProducts && data.customProducts.length > 0) {
+        productsHtml += '<h5 style="margin-top: 12px; color: #c2410c;">Non-SanMar Products - Manual Pricing Required (' + data.customProducts.length + ')</h5><div class="preview-products-list">';
+        for (const product of data.customProducts) {
+            const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;
+            productsHtml += `
+                <div class="preview-product-item" style="border-left: 3px solid #c2410c;">
+                    <span class="preview-product-style" style="background: #fed7aa; color: #c2410c;">${escapeHtml(product.partNumber)}</span>
+                    <span class="preview-product-desc">${escapeHtml(product.description || product.color || 'Unknown')}</span>
+                    <span class="preview-product-qty" style="color: #c2410c;">Qty: ${totalQty} - MANUAL</span>
+                </div>
+            `;
+        }
+        productsHtml += '</div>';
+    }
+    products.innerHTML = productsHtml;
+
+    // Services badges
+    let servicesHtml = '';
+    if (data.services.digitizing) {
+        const codes = data.services.digitizingCodes || ['DD'];
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing (${codes.join(', ')})</span>`;
+    }
+    if (data.services.patchSetup) {
+        servicesHtml += '<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($50)</span>';
+    }
+
+    // Handle new additionalLogos array
+    const additionalLogos = data.services.additionalLogos || [];
+    if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
+        additionalLogos.push(data.services.additionalLogo);
+    }
+    for (const al of additionalLogos) {
+        const typeLabel = al.type === 'fb' ? 'Full Back' :
+                         al.type === 'cb' ? 'Cap Back' :
+                         al.position || 'Additional Logo';
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-plus-circle"></i> ${escapeHtml(typeLabel)}</span>`;
+    }
+
+    if (data.services.monograms.length > 0) {
+        const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-font"></i> Monograms: ${totalNames} names</span>`;
+    }
+    if (data.services.designTransfer && data.services.designTransfer.length > 0) {
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-exchange-alt"></i> Design Transfer: $${data.services.designTransfer.reduce((s, dt) => s + (dt.unitPrice || 50), 0).toFixed(2)}</span>`;
+    }
+    if (data.services.contract && data.services.contract.length > 0) {
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-file-contract"></i> Contract: ${data.services.contract.length} item(s)</span>`;
+    }
+    if (data.services.sewing && data.services.sewing.length > 0) {
+        const totalSewQty = data.services.sewing.reduce((sum, s) => sum + (s.quantity || 0), 0);
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-scissors"></i> Sewing: ${totalSewQty} items</span>`;
+    }
+    if (data.services.weights && data.services.weights.length > 0) {
+        const totalWeightQty = data.services.weights.reduce((sum, w) => sum + (w.quantity || 0), 0);
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-weight-hanging"></i> Weight: ${totalWeightQty} items</span>`;
+    }
+    if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
+        const ceTypes = data.services.capEmbellishments.map(ce => ce.partNumber).join(', ');
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-hat-cowboy"></i> Cap Embellishment: ${escapeHtml(ceTypes)}</span>`;
+    }
+    if (data.services.rush) {
+        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
+    }
+    if (data.services.artCharges) {
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-palette"></i> Art Charge: $${data.services.artCharges.amount.toFixed(2)}</span>`;
+    }
+    if (data.services.graphicDesign) {
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-pencil-ruler"></i> Design: ${data.services.graphicDesign.hours} hrs</span>`;
+    }
+    if (data.services.ltmFee) {
+        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-exclamation-circle"></i> LTM Fee: $${data.services.ltmFee.amount.toFixed(2)}</span>`;
+    }
+
+    if (servicesHtml) {
+        services.innerHTML = '<h5>Services</h5><div class="preview-services-list">' + servicesHtml + '</div>';
+    } else {
+        services.innerHTML = '';
+    }
+
+    // Warnings - highlight DECG API failures prominently (CLAUDE.md rule #4)
+    if (data.warnings.length > 0 || data.notes.length > 0) {
+        let warningsHtml = '<h5><i class="fas fa-exclamation-triangle"></i> Notes & Warnings</h5>';
+
+        // Show DECG API failure as prominent error banner
+        if (data.decgApiFailed) {
+            warningsHtml += `
+                <div style="background: #fef2f2; border: 1px solid #ef4444; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; color: #b91c1c;">
+                    <strong><i class="fas fa-exclamation-circle"></i> DECG API Error:</strong> Unable to load current pricing from server.
+                    Prices shown are <em>fallback estimates</em> and may be incorrect.
+                    <strong>Verify DECG prices manually before sending quote.</strong>
+                </div>`;
+        }
+
+        warningsHtml += '<ul>';
+        for (const warning of data.warnings) {
+            // Skip the DECG warning since we displayed it prominently above
+            if (warning.includes('DECG API unavailable')) continue;
+            warningsHtml += `<li>${escapeHtml(warning)}</li>`;
+        }
+        for (const note of data.notes) {
+            warningsHtml += `<li>${escapeHtml(note)}</li>`;
+        }
+        warningsHtml += '</ul>';
+        warnings.innerHTML = warningsHtml;
+        warnings.style.display = '';
+    } else {
+        warnings.style.display = 'none';
+    }
+
+    // Build combined review list from multiple sources (invalid items, AS-GARM/CAP, LTM)
+    const allReviewItems = [...(data.reviewItems || [])];
+
+    // Add AS-GARM/AS-CAP stitch fees
+    if (data.services.additionalStitches && data.services.additionalStitches.length > 0) {
+        data.services.additionalStitches.forEach(s => {
+            allReviewItems.push({
+                partNumber: s.type === 'cap' ? 'AS-CAP' : 'AS-Garm',
+                description: s.description || 'Additional Stitches',
+                quantity: s.quantity,
+                unitPrice: s.unitPrice || 0,
+                source: 'additional-stitches'
+            });
+        });
+    }
+
+    // Add LTM fee
+    if (data.services.ltmFee) {
+        allReviewItems.push({
+            partNumber: 'LTM',
+            description: 'Less Than Minimum Fee',
+            quantity: 1,
+            unitPrice: data.services.ltmFee.amount || 0,
+            source: 'ltm'
+        });
+    }
+
+    // Show "Items for Review" section with checkboxes
+    if (allReviewItems.length > 0) {
+        let reviewHtml = '<h5 style="margin-top: 12px; color: #b45309;"><i class="fas fa-search"></i> Items for Review — Check to Import as Notes</h5>';
+        reviewHtml += '<div style="max-height: 150px; overflow-y: auto; padding: 4px 0;">';
+        allReviewItems.forEach((item, i) => {
+            const hasPrice = item.unitPrice > 0;
+            reviewHtml += `<label style="display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; cursor: pointer;">
+                <input type="checkbox" class="review-item-check" data-index="${i}" ${hasPrice ? 'checked' : ''}>
+                <span><strong>${escapeHtml(item.partNumber || '(no PN)')}</strong>: ${escapeHtml(item.description || '')}${hasPrice ? ' — $' + item.unitPrice.toFixed(2) + '/ea × ' + (item.quantity || 1) : ''}</span>
+            </label>`;
+        });
+        reviewHtml += '</div>';
+        warnings.innerHTML = (warnings.innerHTML || '') + reviewHtml;
+        warnings.style.display = '';
+    }
+
+    // Store combined list on data object for import step
+    data._allReviewItems = allReviewItems;
+
+    preview.classList.add('active');
+}
+
+/**
+ * Confirm and execute the import
+ */
+async function confirmShopWorksImport() {
+    if (!pendingShopWorksImport) {
+        showToast('No import data available', 'error');
+        return;
+    }
+
+    const data = pendingShopWorksImport;
+    const btn = document.getElementById('btn-confirm-import');
+
+    // Filter products by exclude checkboxes
+    const excludedIndices = new Set();
+    document.querySelectorAll('.product-include-check:not(:checked)').forEach(cb => {
+        excludedIndices.add(parseInt(cb.dataset.productIndex));
+    });
+    if (excludedIndices.size > 0) {
+        data.products = data.products.filter((_, idx) => !excludedIndices.has(idx));
+    }
+
+    // Show loading state
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Importing...';
+
+    try {
+        // Calculate total steps for progress
+        const totalProducts = (data.products?.length || 0) + (data.customProducts?.length || 0);
+        const totalSteps = totalProducts + 5; // +5 for customer, services, CRM, validation, cleanup
+        let currentStep = 0;
+
+        updateImportProgress(currentStep, totalSteps, 'Setting up customer info...', '');
+
+        // 1. Populate customer info
+        if (data.customer.contactName) {
+            document.getElementById('customer-name').value = data.customer.contactName;
+        }
+        if (data.customer.email) {
+            document.getElementById('customer-email').value = data.customer.email;
+        }
+        if (data.customer.company) {
+            document.getElementById('company-name').value = data.customer.company;
+        }
+
+        // Also populate customer lookup search field for easy CRM lookup
+        const customerLookupInput = document.getElementById('customer-lookup');
+        if (customerLookupInput && data.customer.email) {
+            customerLookupInput.value = data.customer.email;
+
+            // Direct API call to find customer by email (bypass debounced dropdown)
+            // This avoids timing issues with modal close/blur events
+            if (window.customerLookupInstance) {
+                try {
+                    const results = await window.customerLookupInstance.search(data.customer.email);
+
+                    if (results.length > 0) {
+                        // Auto-populate from first CRM match — only fill empty fields
+                        // Parser already populated these during import; CRM supplements, doesn't replace
+                        const contact = results[0];
+                        const nameEl = document.getElementById('customer-name');
+                        const emailEl = document.getElementById('customer-email');
+                        const companyEl = document.getElementById('company-name');
+                        const custNumEl = document.getElementById('customer-number');
+                        const phoneEl = document.getElementById('customer-phone');
+                        if (!nameEl.value.trim()) nameEl.value = contact.ct_NameFull || data.customer.contactName || '';
+                        if (!emailEl.value.trim()) emailEl.value = contact.ContactNumbersEmail || data.customer.email || '';
+                        if (!companyEl.value.trim()) companyEl.value = contact.CustomerCompanyName || data.customer.company || '';
+                        // Fill customer # (ShopWorks ID) from CRM if empty
+                        if (custNumEl && !custNumEl.value.trim() && contact.id_Customer) {
+                            custNumEl.value = contact.id_Customer;
+                        }
+                        if (phoneEl && !phoneEl.value.trim() && contact.Phone) {
+                            phoneEl.value = contact.Phone;
+                        }
+                        // Auto-fill Ship To from CRM contact address
+                        if (contact.State) {
+                            const stateInput = document.getElementById('ship-state');
+                            if (stateInput && !stateInput.value) stateInput.value = contact.State;
+                        }
+                        if (contact.City) {
+                            const cityInput = document.getElementById('ship-city');
+                            if (cityInput && !cityInput.value.trim()) cityInput.value = contact.City;
+                        }
+                        if (contact.Zip) {
+                            const zipInput = document.getElementById('ship-zip');
+                            if (zipInput && !zipInput.value.trim()) {
+                                zipInput.value = contact.Zip;
+                                lookupTaxRate(); // Auto-trigger tax lookup
+                            }
+                        }
+                        if (contact.Address) {
+                            const addrInput = document.getElementById('ship-address');
+                            if (addrInput && !addrInput.value.trim()) addrInput.value = contact.Address;
+                        }
+                        showToast('Customer info loaded from CRM', 'success');
+                    } else {
+                        // Show that lookup ran but found nothing - not an error
+                        showToast('Customer not found in CRM - using imported values', 'info');
+                    }
+                } catch (err) {
+                    console.warn('[ShopWorks Import] CRM lookup failed:', err);
+                    showToast('CRM lookup failed - using imported values', 'warning');
+                }
+            }
+
+            // Customer section is now always visible at top of sidebar — no need to expand
+        }
+
+        // 2. Select sales rep by email
+        if (data.salesRep.email) {
+            selectSalesRepByEmail(data.salesRep.email);
+        }
+
+        // 3. Digitizing is now configured in the Review Import Pricing modal (embroidery config section)
+
+        // 4. Handle patch setup + GRT-50 art charge fee
+        if (data.services.patchSetup) {
+            const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+            if (patchSetupCheckbox) {
+                patchSetupCheckbox.checked = true;
+                const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
+                if (wrapper) wrapper.classList.add('checked');
+            }
+            // Also set art charge input so GRT-50 fee is persisted on save
+            // (_saveFeeLineItems saves GRT-50 only when ArtCharge > 0)
+            const grt50Amount = data.services.grt50Amount || 150;
+            const artToggle = document.getElementById('art-charge-toggle');
+            const artInput = document.getElementById('art-charge');
+            if (artToggle && artInput) {
+                artToggle.checked = true;
+                artInput.disabled = false;
+                artInput.value = grt50Amount.toFixed(2);
+                const artWrapper = document.getElementById('art-charge-wrapper');
+                if (artWrapper) artWrapper.style.opacity = '1';
+                updateArtworkCharges();
+            }
+        }
+
+        // 5. Collect additional logos for service pricing review
+        const additionalLogos = data.services.additionalLogos || [];
+        // Add legacy single additionalLogo if exists and not already in array
+        if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
+            additionalLogos.push(data.services.additionalLogo);
+        }
+
+        // 6. Handle art charges
+        if (data.services.artCharges) {
+            const artToggle = document.getElementById('art-charge-toggle');
+            const artInput = document.getElementById('art-charge');
+            if (artToggle && artInput) {
+                artToggle.checked = true;
+                artInput.disabled = false;
+                artInput.value = data.services.artCharges.amount.toFixed(2);
+                updateArtworkCharges();
+            }
+        }
+
+        // 6b. Rush fee → fee table input
+        if (data.services.rush) {
+            const rushInput = document.getElementById('rush-fee');
+            if (rushInput) {
+                rushInput.value = data.services.rush.amount.toFixed(2);
+                rushInput.dispatchEvent(new Event('input'));
+            }
+        }
+
+        // 6c. Shipping fee
+        if (data.services.shipping) {
+            const shippingInput = document.getElementById('shipping-fee');
+            if (shippingInput) {
+                shippingInput.value = data.services.shipping.amount.toFixed(2);
+                shippingInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+
+        // 6d. Populate Order Details fields
+        if (data.purchaseOrderNumber) document.getElementById('po-number').value = data.purchaseOrderNumber;
+        if (data.orderId) document.getElementById('order-number').value = data.orderId;
+        if (data.customer.customerId) document.getElementById('customer-number').value = data.customer.customerId;
+        if (data.shipping?.method) {
+            const shipMethodEl = document.getElementById('ship-method');
+            const importedMethod = data.shipping.method;
+            // Check if imported value matches a predefined dropdown option
+            const matchingOption = Array.from(shipMethodEl.options).find(
+                opt => opt.value.toLowerCase() === importedMethod.toLowerCase()
+            );
+            if (matchingOption) {
+                shipMethodEl.value = matchingOption.value;
+            } else {
+                // Non-standard method — use "Other" with text input
+                shipMethodEl.value = 'Other';
+                document.getElementById('ship-method-other').value = importedMethod;
+            }
+            onShipMethodChange();
+        }
+        if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
+        if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = data.dateOrderPlaced;
+        if (data.reqShipDate) document.getElementById('req-ship-date').value = data.reqShipDate;
+        if (data.dropDeadDate) document.getElementById('drop-dead-date').value = data.dropDeadDate;
+        if (data.paymentTerms) document.getElementById('payment-terms').value = data.paymentTerms;
+
+        // Auto-expand Order Details panel if any field populated
+        const hasOrderDetails = data.purchaseOrderNumber || data.orderId || data.customer.customerId ||
+            data.shipping?.method || data.dateOrderPlaced || data.reqShipDate ||
+            data.dropDeadDate || data.paymentTerms;
+        if (hasOrderDetails) {
+            const odContent = document.getElementById('order-details-content');
+            const odChevron = document.getElementById('order-details-chevron');
+            const odBadge = document.getElementById('order-details-badge');
+            if (odContent) odContent.style.display = 'block';
+            if (odChevron) odChevron.style.transform = 'rotate(180deg)';
+            if (odBadge) odBadge.style.display = 'inline';
+        }
+
+        // 6e. Populate Ship To address and auto-lookup tax rate
+        if (data.shipping) {
+            if (data.shipping.street) document.getElementById('ship-address').value = data.shipping.street;
+            if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
+            if (data.shipping.state) document.getElementById('ship-state').value = data.shipping.state;
+            if (data.shipping.zip) document.getElementById('ship-zip').value = data.shipping.zip;
+
+            // Customer Pickup = local pickup at Milton, WA — auto-set for tax lookup
+            if (data.shipping.method && data.shipping.method.toLowerCase().includes('pickup') && !data.shipping.zip) {
+                document.getElementById('ship-state').value = 'WA';
+                document.getElementById('ship-zip').value = '98354';
+                document.getElementById('ship-city').value = 'Milton';
+            }
+
+            // Use DOR API to get precise tax rate from address
+            const lookupOk = await lookupTaxRate();
+            // If lookup failed and we have a back-calculated rate, use it as fallback
+            if (!lookupOk && data.orderSummary && data.orderSummary.taxRate) {
+                document.getElementById('tax-rate-input').value = data.orderSummary.taxRate.toFixed(1);
+                document.getElementById('include-tax').checked = true;
+                updateTaxCalculation();
+            }
+        } else if (data.orderSummary && data.orderSummary.taxRate) {
+            // Fallback: use back-calculated tax rate from Order Summary
+            const taxInput = document.getElementById('tax-rate-input');
+            if (taxInput) {
+                taxInput.value = data.orderSummary.taxRate.toFixed(1);
+            }
+            const taxCheckbox = document.getElementById('include-tax');
+            if (taxCheckbox) {
+                taxCheckbox.checked = true;
+            }
+            updateTaxCalculation();
+        }
+
+        // 7. Handle graphic design hours
+        if (data.services.graphicDesign) {
+            const designHoursInput = document.getElementById('graphic-design-hours');
+            if (designHoursInput) {
+                designHoursInput.value = data.services.graphicDesign.hours;
+                updateArtworkCharges();
+            }
+        }
+
+        // 8. Collect product items for pricing review (deferred import)
+        const productReviewItems = [];
+        const totalProductQty = data.products.reduce((sum, p) => {
+            return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
+        }, 0);
+
+        for (const product of data.products) {
+            const isCap = isCapProduct(product.partNumber, product.description || '');
+            let sizePrices = null;
+            if (pricingCalculator) {
+                try {
+                    sizePrices = await pricingCalculator.getProductSizePrices(
+                        product.partNumber, totalProductQty, isCap
+                    );
+                } catch (e) {
+                    console.warn(`[ShopWorks Import] Could not get API prices for ${product.partNumber}:`, e);
+                }
+            }
+
+            productReviewItems.push({
+                partNumber: product.partNumber,
+                color: product.color || '',
+                description: product.description || '',
+                sizes: product.sizes,
+                unitPrice: product.unitPrice || 0,
+                isCap: isCap,
+                sizePrices: sizePrices,
+                totalQty: Object.values(product.sizes || {}).reduce((s, q) => s + q, 0),
+                brand: product.brand || '',
+                // Pass through full product for importProductRow()
+                _importData: product
+            });
+        }
+
+        // 9. Collect all service items for pricing review modal
+        const serviceReviewItems = [];
+
+        // 9a. Collect AL items
+        if (additionalLogos.length > 0) {
+            const alQty = additionalLogos.reduce((sum, al) => sum + al.quantity, 0);
+            const firstAL = additionalLogos[0];
+            const alStitchCount = firstAL.stitchCount || 8000;
+            const swPrice = firstAL.unitPrice || 0;
+            const apiPrice = pricingCalculator
+                ? pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
+                : null;
+
+            serviceReviewItems.push({
+                type: 'AL',
+                quantity: alQty,
+                stitchCount: alStitchCount,
+                isCap: false,
+                shopWorksPrice: swPrice,
+                apiPrice: apiPrice,
+                label: 'Additional Logo',
+                originalData: { additionalLogos, needsDigitizing: firstAL.needsDigitizing }
+            });
+        }
+
+        // 9b. Collect DECG/DECC items
+        if (data.decgItems && data.decgItems.length > 0) {
+            const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
+            const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
+
+            if (decgGarments.length > 0) {
+                let totalQty = 0, avgStitchCount = 0;
+                decgGarments.forEach(d => {
+                    totalQty += d.quantity;
+                    avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+                });
+                avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
+
+                const swTotal = decgGarments.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
+                const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
+
+                const apiTotal = decgGarments.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
+                const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
+
+                serviceReviewItems.push({
+                    type: 'DECG',
+                    quantity: totalQty,
+                    stitchCount: avgStitchCount,
+                    isCap: false,
+                    shopWorksPrice: swAvg,
+                    apiPrice: apiAvg > 0 ? apiAvg : null,
+                    label: 'Customer-Supplied Garments',
+                    originalData: { items: decgGarments }
+                });
+            }
+
+            if (deccCaps.length > 0) {
+                let totalQty = 0, avgStitchCount = 0;
+                deccCaps.forEach(d => {
+                    totalQty += d.quantity;
+                    avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+                });
+                avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
+
+                const swTotal = deccCaps.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
+                const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
+
+                const apiTotal = deccCaps.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
+                const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
+
+                serviceReviewItems.push({
+                    type: 'DECC',
+                    quantity: totalQty,
+                    stitchCount: avgStitchCount,
+                    isCap: true,
+                    shopWorksPrice: swAvg,
+                    apiPrice: apiAvg > 0 ? apiAvg : null,
+                    label: 'Customer-Supplied Caps',
+                    originalData: { items: deccCaps }
+                });
+            }
+        }
+
+        // 9c. Collect Monogram items
+        if (data.services.monograms && data.services.monograms.length > 0) {
+            const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+            const monogramApiPrice = pricingCalculator
+                ? pricingCalculator.getServiceUnitPrice('monogram', 0, totalNames, false)
+                : 12.50;
+
+            serviceReviewItems.push({
+                type: 'Monogram',
+                quantity: totalNames,
+                stitchCount: 0,
+                isCap: false,
+                shopWorksPrice: 12.50,
+                apiPrice: monogramApiPrice,
+                label: 'Monogram/Name',
+                originalData: { monograms: data.services.monograms }
+            });
+        }
+
+        // 10. Build embroidery configuration options for the modal
+        const totalProductQtyForConfig = productReviewItems.reduce((sum, p) => {
+            return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
+        }, 0) + (data.decgItems ? data.decgItems.reduce((s, d) => s + d.quantity, 0) : 0);
+
+        const hasGarmentProducts = productReviewItems.some(p => !p.isCap) ||
+            (data.decgItems && data.decgItems.some(d => d.serviceType === 'decg'));
+        const hasCapProducts = productReviewItems.some(p => p.isCap) ||
+            (data.decgItems && data.decgItems.some(d => d.serviceType === 'decc'));
+        const allProductsHaveSwPrice = productReviewItems.length > 0 &&
+            productReviewItems.every(p => (p.unitPrice || 0) > 0);
+
+        // Extract design info from notes
+        let designInfo = null;
+        if (data.notes && data.notes.length > 0) {
+            const designMatch = data.notes.join(' ').match(/Design\s*#?\s*:?\s*(\d+)\s*[-–—]\s*(.+)/i);
+            if (designMatch) {
+                designInfo = `Design #${designMatch[1]} — ${designMatch[2].trim()}`;
+            }
+        }
+
+        // Look up design stitch counts from Digitized Designs database
+        let designLookup = null;
+        if (data.designNumbersRaw && data.designNumbersRaw.length > 0) {
+            currentStep++;
+            updateImportProgress(currentStep, totalSteps, 'Looking up design stitch counts...', data.designNumbersRaw.join(', '));
+            try {
+                const lookupUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/lookup?designs=${encodeURIComponent(data.designNumbersRaw.join(','))}`;
+                const lookupResp = await Promise.race([
+                    fetch(lookupUrl),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+                ]);
+                if (lookupResp.ok) {
+                    const lookupData = await lookupResp.json();
+                    if (lookupData.success) {
+                        designLookup = lookupData;
+                    }
+                }
+            } catch (err) {
+                console.warn('[ShopWorks Import] Design stitch lookup failed (will use manual selection):', err.message);
+            }
+
+            // Fallback: look up not-found designs in ShopWorks_Designs table
+            if (designLookup?.notFound?.length > 0) {
+                try {
+                    const fallbackUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/fallback?designs=${encodeURIComponent(designLookup.notFound.join(','))}`;
+                    const fbResp = await Promise.race([
+                        fetch(fallbackUrl),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                    ]);
+                    if (fbResp.ok) {
+                        const fbData = await fbResp.json();
+                        if (fbData.success && fbData.count > 0) {
+                            designLookup.fallbackDesigns = fbData.designs;
+                            designLookup.notFound = fbData.notFound; // update to truly-not-found
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[ShopWorks Import] Fallback design lookup failed (non-critical):', err.message);
+                }
+            }
+        }
+
+        const embConfigOptions = {
+            hasGarments: hasGarmentProducts,
+            hasCaps: hasCapProducts,
+            totalQty: totalProductQtyForConfig,
+            digitizing: data.services.digitizing || false,
+            designInfo: designInfo,
+            allProductsHaveSwPrice: allProductsHaveSwPrice,
+            designLookup: designLookup,
+            designNumbers: data.designNumbers || [],
+            designNumbersRaw: data.designNumbersRaw || []
+        };
+
+        // Show pricing review modal with embroidery config
+        hideImportProgress();  // overlay (z-index 10001) blocks modal (z-index 10000)
+        let reviewResults = null;
+        if (productReviewItems.length > 0 || serviceReviewItems.length > 0 || embConfigOptions.hasGarments || embConfigOptions.hasCaps) {
+            reviewResults = await showServicePricingReview(serviceReviewItems, productReviewItems, embConfigOptions);
+        }
+
+        // If user cancelled, abort entire import
+        if (reviewResults === null) {
+            closeShopWorksImportModal();
+            showToast('Import cancelled', 'info');
+            return;
+        }
+
+        const serviceResults = reviewResults ? reviewResults.services : [];
+        const productResults = reviewResults ? reviewResults.products : [];
+
+        // 10b. Apply embroidery configuration from modal
+        const embConfig = reviewResults ? reviewResults.embConfig : null;
+        if (embConfig) {
+            // Garment logo config
+            primaryLogo.position = embConfig.garmentPosition;
+            primaryLogo.stitchCount = embConfig.garmentStitchTier;
+            primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
+            document.getElementById('primary-position').value = embConfig.garmentPosition;
+            document.getElementById('primary-stitches').value = embConfig.garmentStitchTier;
+            const digitizingEl = document.getElementById('primary-digitizing');
+            if (digitizingEl) {
+                digitizingEl.checked = embConfig.garmentDigitizing;
+                const wrapper = digitizingEl.closest('.digitizing-checkbox');
+                if (wrapper) wrapper.classList.toggle('checked', embConfig.garmentDigitizing);
+            }
+            // Handle Full Back position sync
+            if (embConfig.garmentPosition === 'Full Back') {
+                document.getElementById('primary-position').disabled = true;
+                const fbField = document.getElementById('fb-stitch-count-field');
+                const fbInput = document.getElementById('fb-stitch-count');
+                if (fbField) fbField.style.display = '';
+                if (fbInput) fbInput.value = embConfig.garmentStitchTier;
+                // Attach design-specific FB tier pricing for pricing engine
+                primaryLogo.fbPriceTiers = embConfig.fbPriceTiers || null;
+            } else {
+                primaryLogo.fbPriceTiers = null;
+            }
+
+            // Cap config
+            if (embConfig.capEmbellishment) {
+                const capEmbEl = document.getElementById('cap-embellishment-type');
+                if (capEmbEl) {
+                    capEmbEl.value = embConfig.capEmbellishment;
+                    handleCapEmbellishmentChange();
+                }
+                if (typeof capPrimaryLogo !== 'undefined') {
+                    capPrimaryLogo.stitchCount = embConfig.capStitchTier;
+                    const capStitchEl = document.getElementById('cap-primary-stitches');
+                    if (capStitchEl) capStitchEl.value = embConfig.capStitchTier;
+                }
+                const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+                if (capDigitizingEl) {
+                    capDigitizingEl.checked = embConfig.capDigitizing;
+                    const wrapper = capDigitizingEl.closest('.digitizing-checkbox');
+                    if (wrapper) wrapper.classList.toggle('checked', embConfig.capDigitizing);
+                }
+            }
+
+            // LTM override
+            setLtmControlState('emb-ltm-panel', { enabled: embConfig.ltmEnabled });
+
+            // Store design number assignments on logo objects + update card headers + input fields
+            // Use cached design lookup data to avoid redundant API calls
+            const _importDesignLookup = _sprEmbConfigOptions?.designLookup;
+            if (embConfig.garmentDesignNumber) {
+                primaryLogo.designNumber = embConfig.garmentDesignNumber;
+                primaryLogo.designName = embConfig.garmentDesignName || '';
+                updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
+                const gdi = document.getElementById('garment-design-number');
+                if (gdi) gdi.value = embConfig.garmentDesignNumber;
+                const gcb = document.getElementById('garment-design-clear');
+                if (gcb) gcb.style.display = 'inline-flex';
+                // Use cached data if available (no API call), fallback to lookup
+                const gDesignData = _importDesignLookup?.designs?.[embConfig.garmentDesignNumber];
+                if (gDesignData) {
+                    applyDesignFromCache('garment', gDesignData);
+                } else {
+                    lookupDesignNumber('garment');
+                }
+            }
+            if (embConfig.capDesignNumber) {
+                capPrimaryLogo.designNumber = embConfig.capDesignNumber;
+                capPrimaryLogo.designName = embConfig.capDesignName || '';
+                updateLogoCardHeader('cap', embConfig.capDesignNumber);
+                const cdi = document.getElementById('cap-design-number');
+                if (cdi) cdi.value = embConfig.capDesignNumber;
+                const ccb = document.getElementById('cap-design-clear');
+                if (ccb) ccb.style.display = 'inline-flex';
+                const cDesignData = _importDesignLookup?.designs?.[embConfig.capDesignNumber];
+                if (cDesignData) {
+                    applyDesignFromCache('cap', cDesignData);
+                } else {
+                    lookupDesignNumber('cap');
+                }
+            }
+        }
+
+        // 11. Pre-merge extended-size products before import
+        // Parser returns LST700 and LST700_3XL as separate products — merge their sizes
+        // so importProductRow creates ONE parent row with proper child rows
+        const mergedProductResults = [];
+        const baseMap = new Map(); // "PARTNUM|COLOR" → index in mergedProductResults
+
+        for (const prodResult of productResults) {
+            const product = prodResult._importData;
+            const key = `${(product.partNumber || '').toUpperCase()}|${(product.color || '').toUpperCase()}`;
+
+            if (baseMap.has(key)) {
+                // Merge sizes into existing entry
+                const mergedEntry = mergedProductResults[baseMap.get(key)];
+                const baseProduct = mergedEntry._importData;
+                for (const [size, qty] of Object.entries(product.sizes || {})) {
+                    baseProduct.sizes[size] = (baseProduct.sizes[size] || 0) + qty;
+                }
+                // Preserve per-size sell price overrides from extended-size variants
+                // e.g., CC8C_2X has a different sell price than CC8C base
+                if (prodResult.overridePrice > 0) {
+                    if (!mergedEntry.sellPriceOverrides) mergedEntry.sellPriceOverrides = {};
+                    for (const size of Object.keys(product.sizes || {})) {
+                        mergedEntry.sellPriceOverrides[size] = prodResult.overridePrice;
+                    }
+                }
+            } else {
+                baseMap.set(key, mergedProductResults.length);
+                // Deep copy to avoid mutating original
+                const entry = {
+                    ...prodResult,
+                    _importData: { ...product, sizes: { ...(product.sizes || {}) } }
+                };
+                // Store base product's override price for its sizes too
+                if (prodResult.overridePrice > 0) {
+                    entry.sellPriceOverrides = {};
+                    for (const size of Object.keys(product.sizes || {})) {
+                        entry.sellPriceOverrides[size] = prodResult.overridePrice;
+                    }
+                }
+                mergedProductResults.push(entry);
+            }
+        }
+
+        // 12. Import products (deferred from step 8)
+        currentStep++;
+        updateImportProgress(currentStep, totalSteps, 'Importing products...', `0 of ${mergedProductResults.length}`);
+        let productsImported = 0;
+        for (let i = 0; i < mergedProductResults.length; i++) {
+            const prodResult = mergedProductResults[i];
+            try {
+                await importProductRow(prodResult._importData, prodResult.overridePrice || 0, prodResult.sellPriceOverrides || null);
+                productsImported++;
+            } catch (err) {
+                console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
+            }
+            currentStep++;
+            updateImportProgress(currentStep, totalSteps, 'Importing products...', `${i + 1} of ${mergedProductResults.length}: ${prodResult.partNumber || 'product'}`);
+            // Small delay between imports to reduce API rate limiting
+            if (i < mergedProductResults.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 150));
+            }
+        }
+
+        // 12. Process service results
+        currentStep++;
+        updateImportProgress(currentStep, totalSteps, 'Processing services...', '');
+        if (serviceResults && serviceResults.length > 0) {
+            for (const result of serviceResults) {
+                const typeUpper = result.type.toUpperCase();
+
+                if (typeUpper === 'AL') {
+                    if (data.products.length > 0 || (data.customProducts && data.customProducts.length > 0)) {
+                        globalAL.garment.enabled = true;
+                        globalAL.garment.position = 'AL';
+                        globalAL.garment.stitchCount = result.stitchCount;
+                        if (result.originalData && result.originalData.needsDigitizing) {
+                            globalAL.garment.needsDigitizing = true;
+                        }
+
+                        const alToggle = document.getElementById('garment-al-toggle');
+                        const alSwitch = document.getElementById('garment-al-switch');
+                        const alLabel = document.getElementById('garment-al-label');
+                        const alConfig = document.getElementById('garment-al-config-new');
+                        if (alToggle) alToggle.checked = true;
+                        if (alSwitch) alSwitch.classList.add('active');
+                        if (alLabel) alLabel.classList.add('active');
+                        if (alConfig) alConfig.classList.add('visible');
+
+                        const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                        if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
+
+                        if (result.originalData && result.originalData.additionalLogos && result.originalData.additionalLogos.length > 1) {
+                            const positions = result.originalData.additionalLogos.map(al => al.position || 'Additional Location');
+                            const notesEl = document.getElementById('notes');
+                            if (notesEl) {
+                                const alNote = `Additional logo positions: ${positions.join(', ')}`;
+                                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + alNote;
+                            }
+                        }
+
+                        _syncALArrays();
+                    }
+
+                    if (data.products.length === 0 && (!data.customProducts || data.customProducts.length === 0)) {
+                        createServiceProductRow('AL', {
+                            quantity: result.quantity,
+                            unitPrice: result.unitPrice,
+                            total: result.quantity * result.unitPrice,
+                            isCap: false,
+                            position: 'Additional Location'
+                        });
+                    }
+                } else if (typeUpper === 'DECG') {
+                    createServiceProductRow('DECG', {
+                        quantity: result.quantity,
+                        stitchCount: result.stitchCount,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: false
+                    });
+                } else if (typeUpper === 'DECC') {
+                    createServiceProductRow('DECC', {
+                        quantity: result.quantity,
+                        stitchCount: result.stitchCount,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: true
+                    });
+                } else if (typeUpper === 'MONOGRAM') {
+                    createServiceProductRow('Monogram', {
+                        quantity: result.quantity,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: false
+                    });
+
+                    if (result.originalData && result.originalData.monograms) {
+                        const nameDetails = result.originalData.monograms
+                            .filter(m => m.description)
+                            .map(m => m.description)
+                            .join('\n');
+                        if (nameDetails) {
+                            const notesEl = document.getElementById('notes');
+                            if (notesEl) {
+                                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                                                '--- Names/Monograms ---\n' + nameDetails;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 13. LTM fee handled via review items (preview checkboxes → notes)
+        // Previously targeted non-existent #additional-charges element
+
+        // 14. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
+        let customProductsImported = 0;
+        if (data.customProducts && data.customProducts.length > 0) {
+            for (const product of data.customProducts) {
+                await importProductRow(product, product.unitPrice || 0);
+                customProductsImported++;
+            }
+
+            showToast(`${customProductsImported} non-SanMar product(s) imported — verify pricing`, 'info', 5000);
+        }
+
+        // Hide variant-only parents (products with no standard sizes, only extended children)
+        hideVariantOnlyParents();
+
+        // 15. Populate notes from import (employee names, warnings, etc.)
+        if (data.notes && data.notes.length > 0) {
+            const notesEl = document.getElementById('notes');
+            if (notesEl) {
+                const importNotes = '--- ShopWorks Import Notes ---\n' + data.notes.join('\n');
+                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + importNotes;
+            }
+        }
+
+        // 16. Create service rows for sewing items (SEG/SECC)
+        if (data.services.sewing && data.services.sewing.length > 0) {
+            for (const s of data.services.sewing) {
+                const sewPartNumber = s.partNumber || (s.isCap ? 'SECC' : 'SEG');
+                createServiceProductRow(sewPartNumber, {
+                    quantity: s.quantity || 0,
+                    unitPrice: s.unitPrice || 10.00,
+                    total: (s.quantity || 0) * (s.unitPrice || 10.00),
+                    isCap: s.isCap || false
+                });
+            }
+        }
+
+        // 16b. Create service rows for weight items
+        if (data.services.weights && data.services.weights.length > 0) {
+            for (const w of data.services.weights) {
+                createServiceProductRow('WEIGHT', {
+                    quantity: w.quantity || 0,
+                    unitPrice: w.unitPrice || 6.25,
+                    total: (w.quantity || 0) * (w.unitPrice || 6.25),
+                    isCap: false
+                });
+            }
+        }
+
+        // 16c. Create service rows for design transfer items
+        if (data.services.designTransfer && data.services.designTransfer.length > 0) {
+            for (const dt of data.services.designTransfer) {
+                createServiceProductRow('DT', {
+                    quantity: dt.quantity || 1,
+                    unitPrice: dt.unitPrice || 50.00,
+                    total: (dt.quantity || 1) * (dt.unitPrice || 50.00),
+                    isCap: false
+                });
+            }
+        }
+
+        // 16d. Create service rows for contract items
+        if (data.services.contract && data.services.contract.length > 0) {
+            for (const ctr of data.services.contract) {
+                const ctrPN = ctr.isCap ? 'CTR-CAP' : 'CTR-GARMT';
+                createServiceProductRow(ctrPN, {
+                    quantity: ctr.quantity || 1,
+                    unitPrice: ctr.unitPrice || 0,
+                    total: (ctr.quantity || 1) * (ctr.unitPrice || 0),
+                    isCap: ctr.isCap || false
+                });
+            }
+        }
+
+        // 16e. Auto-set cap embellishment type if detected (3D-EMB or Laser Patch)
+        if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
+            const ce = data.services.capEmbellishments[0]; // Use first detected type
+            const capEmbEl = document.getElementById('cap-embellishment-type');
+            if (capEmbEl && ce.type) {
+                capEmbEl.value = ce.type;
+                handleCapEmbellishmentChange();
+            }
+        }
+
+        // 17. Import checked review items as notes (invalid items, AS-GARM/CAP, LTM)
+        if (data._allReviewItems && data._allReviewItems.length > 0) {
+            const checkedItems = [];
+            document.querySelectorAll('.review-item-check:checked').forEach(cb => {
+                const idx = parseInt(cb.dataset.index);
+                if (data._allReviewItems[idx]) checkedItems.push(data._allReviewItems[idx]);
+            });
+            if (checkedItems.length > 0) {
+                const notesEl = document.getElementById('notes');
+                if (notesEl) {
+                    const reviewNotes = checkedItems.map(item => {
+                        const priceStr = item.unitPrice > 0
+                            ? ` — $${item.unitPrice.toFixed(2)}/ea × ${item.quantity || 1}`
+                            : '';
+                        return `${item.partNumber || '(no PN)'}: ${item.description || ''}${priceStr}`;
+                    }).join('\n');
+                    notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                        '--- Imported Review Items ---\n' + reviewNotes;
+                }
+            }
+        }
+
+        // 18. Catch-all: dump any unprocessed service data into notes
+        const handledServiceKeys = [
+            'digitizing', 'digitizingCodes', 'digitizingCount', 'digitizingFees',
+            'patchSetup', 'additionalLogo', 'additionalLogos',
+            'artCharges', 'graphicDesign', 'monograms',
+            'rush', 'ltmFee', 'sewing', 'additionalStitches',
+            'shipping', 'weights',
+            'designTransfer', 'contract',
+            'capEmbellishments'
+        ];
+        const unhandled = Object.entries(data.services || {})
+            .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
+            .filter(([key, val]) => {
+                if (Array.isArray(val) && val.length === 0) return false;
+                if (val === false) return false;
+                if (typeof val === 'number' && val === 0) return false;
+                return true;
+            });
+        if (unhandled.length > 0) {
+            const notesEl = document.getElementById('notes');
+            if (notesEl) {
+                const lines = unhandled.map(([key, val]) => {
+                    if (Array.isArray(val)) {
+                        return val.map(item =>
+                            `${key.toUpperCase()}: ${item.description || item.partNumber || ''} — Qty: ${item.quantity || ''}, $${(item.unitPrice || 0).toFixed(2)}/ea`
+                        ).join('\n');
+                    }
+                    if (typeof val === 'object' && val.amount !== undefined) {
+                        return `${key.toUpperCase()}: $${val.amount.toFixed(2)}${val.description ? ' — ' + val.description : ''}`;
+                    }
+                    return `${key.toUpperCase()}: ${JSON.stringify(val)}`;
+                }).join('\n');
+                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                    '--- Unrecognized Services ---\n' + lines;
+            }
+        }
+
+        // Auto-show notes section if any notes were written (import notes, AL positions, monogram names, DECG stitch counts, sewing)
+        const finalNotesEl = document.getElementById('notes');
+        if (finalNotesEl && finalNotesEl.value.trim()) {
+            const section = document.getElementById('notes-section');
+            if (section && section.classList.contains('collapsed')) {
+                section.classList.remove('collapsed');
+                const body = section.querySelector('.notes-body');
+                const icon = section.querySelector('.notes-toggle-icon');
+                if (body) body.style.display = 'block';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            }
+            updateNotesBadge();
+        }
+
+        // Recalculate pricing
+        recalculatePricing();
+        markAsUnsaved();
+
+        // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
+        lastImportMetadata = {
+            designNumbers: data.designNumbers || [],
+            digitizingCodes: data.services?.digitizingCodes || [],
+            warnings: data.warnings || [],
+            reviewItems: (data.reviewItems || []).map(r => `${r.partNumber || '(no PN)'}: ${r.description || ''}`),
+            unmatchedLines: (data.unmatchedLines || []).map(u => `[${u.section}] ${u.line}`),
+            paidToDate: data.orderSummary?.paidToDate || 0,
+            balanceAmount: data.orderSummary?.balance || 0,
+            orderNotes: data.orderNotes || '',
+            swTotal: data.orderSummary?.total || 0,
+            swSubtotal: data.orderSummary?.subtotal || 0,
+            carrier: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.carrier).filter(Boolean).join(', ') : '',
+            trackingNumber: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.trackingNumber).filter(Boolean).join(', ') : '',
+            parsedServices: {
+                additionalLogos: data.services?.additionalLogos || [],
+                monograms: data.services?.monograms || [],
+                weights: data.services?.weights || [],
+                digitizingFees: data.services?.digitizingFees || [],
+                decgItems: data.decgItems || []
+            },
+            designLookup: designLookup || null
+        };
+
+        // Post-import validation: detect silently dropped rows
+        const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
+        const productRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row)');
+        const validProducts = Array.from(productRows).filter(r =>
+            r.dataset.color || r.dataset.nonSanmar === 'true'
+        ).length;
+        if (validProducts < expectedProducts) {
+            const dropped = expectedProducts - validProducts;
+            console.warn(`[ShopWorks Import] ${dropped} of ${expectedProducts} product rows may be incomplete (missing color). Check rows for issues.`);
+            showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
+        }
+
+        // Flag non-SanMar products with $0 pricing + collect for summary banner
+        const nonSanMarBannerItems = [];
+        document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
+            const nsRowId = parseInt(nsRow.dataset.rowId);
+            const sellPrice = parseFloat(nsRow.dataset.sellPrice) || 0;
+            const nsStyle = nsRow.dataset.style || '';
+            const nsDesc = nsRow.dataset.productName || nsRow.querySelector('[data-field="description"]')?.value || '';
+
+            nonSanMarBannerItems.push({
+                rowId: nsRowId,
+                style: nsStyle,
+                description: nsDesc,
+                price: sellPrice
+            });
+
+            // Update price cell with pencil icon affordance
+            updateNonSanmarPriceCell(nsRow, nsRowId);
+        });
+
+        // Finalize progress
+        updateImportProgress(totalSteps, totalSteps, 'Import complete!', '');
+
+        // Close modal and show success
+        hideImportProgress();
+        closeShopWorksImportModal();
+
+        // Show import summary banner (non-SanMar detail)
+        const sanMarProductCount = productsImported - nonSanMarBannerItems.filter(i =>
+            productResults.some(pr => pr.partNumber === i.style)
+        ).length;
+        // Count SanMar vs non-SanMar among all imported product rows
+        const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
+        const sanMarRowCount = Array.from(allImportedRows).filter(r => r.dataset.nonSanmar !== 'true').length;
+        if (nonSanMarBannerItems.length > 0) {
+            showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);
+        }
+
+        const summary = [];
+        if (productsImported > 0) {
+            const overrideCount = productResults.filter(p => p.overridePrice > 0).length;
+            summary.push(`${productsImported} products` + (overrideCount > 0 ? ` (${overrideCount} price override)` : ''));
+        }
+        if (customProductsImported > 0) summary.push(`${customProductsImported} non-SanMar`);
+        if (data.services.digitizing) summary.push('digitizing');
+        if (serviceResults && serviceResults.length > 0) {
+            const serviceTypes = serviceResults.map(r => r.type);
+            if (serviceTypes.includes('AL')) summary.push('additional logo(s)');
+            if (serviceTypes.includes('DECG') || serviceTypes.includes('DECC')) summary.push('customer-supplied items');
+            if (serviceTypes.includes('Monogram') || serviceTypes.includes('MONOGRAM')) summary.push('monogram/names');
+        }
+
+        showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
+
+        // Persistent warning if DECG prices used fallback values (API was down during parse)
+        if (data.decgApiFailed) {
+            showToast('DECG prices may be outdated — API was unavailable during import. Verify prices before sending.', 'warning');
+        }
+
+    } catch (error) {
+        console.error('Import failed:', error);
+        showToast('Import failed: ' + error.message, 'error');
+    } finally {
+        hideImportProgress();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
+    }
+}
+
+/**
+ * Select sales rep by email address
+ */
+function selectSalesRepByEmail(email) {
+    const select = document.getElementById('sales-rep');
+    if (!select || !email) return;
+
+    const lowerEmail = email.toLowerCase();
+    for (const option of select.options) {
+        if (option.value.toLowerCase() === lowerEmail) {
+            select.value = option.value;
+            return;
+        }
+    }
+}
+
+/**
+ * Import a single product row from ShopWorks data
+ */
+async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrides = null) {
+    const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
+
+    // Add a new row
+    addNewRow();
+    const row = document.querySelector('tr.new-row');
+    if (!row) throw new Error('Failed to create row');
+    row.classList.remove('new-row');  // Remove immediately to prevent collision with next import
+
+    const rowId = parseInt(row.dataset.rowId);
+    const styleInput = row.querySelector('.style-input');
+
+    // Store import data on the row (for non-SanMar "Add" modal pre-fill and re-import)
+    row.dataset.importData = JSON.stringify({
+        partNumber: product.partNumber,
+        color: product.color || '',
+        description: product.description || '',
+        sizes: product.sizes,
+        unitPrice: product.unitPrice || 0,
+        brand: product.brand || ''
+    });
+
+    // Store ShopWorks unit price for pricing audit (survives selectColor which only clears sellPrice)
+    row.dataset.swUnitPrice = (product.unitPrice || 0).toString();
+
+    // Set sell price override BEFORE any pricing calls (selectColor, onSizeChange, etc.)
+    if (sellPriceOverride > 0) {
+        row.dataset.sellPrice = sellPriceOverride.toString();
+    }
+
+    // 1. Set the style number and trigger load
+    if (product.partNumber) {
+        styleInput.value = product.partNumber;
+        await onStyleChange(styleInput, rowId);
+
+        // Re-apply — onStyleChange may overwrite sellPrice for non-SanMar products
+        if (sellPriceOverride > 0) {
+            row.dataset.sellPrice = sellPriceOverride.toString();
+        }
+    } else {
+        // Empty PN (e.g., "drinkware laser logo setup") — skip API lookup,
+        // go straight to notFound handler below
+        row.dataset.notFound = 'true';
+        row.dataset.style = product.description || 'Custom Item';
+        const descInput = row.querySelector('[data-field="description"]');
+        if (descInput) {
+            descInput.value = product.description || 'Custom Item';
+            descInput.readOnly = false;
+        }
+        row.dataset.productName = product.description || 'Custom Item';
+    }
+
+    // 2. Wait for colors to populate dropdown
+    await new Promise(resolve => setTimeout(resolve, 600));
+
+    // 3. Check if this row was populated as non-SanMar
+    const isNonSanmar = row.dataset.nonSanmar === 'true';
+
+    if (isNonSanmar) {
+        // Non-SanMar row — use simplified color/size import
+        await reImportNonSanmarRow(row, rowId, {
+            color: product.color,
+            sizes: product.sizes,
+            sellPriceOverrides: sellPriceOverrides
+        });
+        return row;
+    }
+
+    // Row is still "Not found" — force-import as non-SanMar so sizes work
+    if (row.dataset.notFound === 'true') {
+        // Auto-create non-SanMar product in Caspio for future imports
+        if (product.partNumber) {
+            try {
+                const parsed = parseShopWorksDescription(product.description || '', product.partNumber);
+                const createPayload = {
+                    StyleNumber: product.partNumber,
+                    Brand: parsed.brand || product.brand || 'Unknown',
+                    ProductName: parsed.name || product.description || product.partNumber,
+                    Category: parsed.category || '',
+                    DefaultSellPrice: sellPriceOverride || product.unitPrice || 0,
+                    DefaultColors: product.color || '',
+                    AvailableSizes: Object.keys(product.sizes || {}).join(','),
+                    PricingMethod: 'FIXED',
+                    Notes: 'Auto-created from ShopWorks import'
+                };
+                const resp = await fetch(`${APP_CONFIG.API.BASE_URL}/api/non-sanmar-products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(createPayload)
+                });
+                if (resp.ok) {
+                    showToast(`Auto-added ${product.partNumber} to product database`, 'success', 3000);
+                }
+                // If POST fails (duplicate, etc.), continue silently — force-import still works
+            } catch (e) {
+                console.warn(`[Import] Auto-create non-SanMar failed for ${product.partNumber}:`, e.message);
+            }
+        }
+
+        // Convert from "Not Found" to non-SanMar so size inputs get enabled
+        row.dataset.nonSanmar = 'true';
+        delete row.dataset.notFound;
+
+        // Remove the "Add" button (no longer needed since we're force-importing)
+        const addBtn = row.querySelector('.btn-add-nonsanmar');
+        if (addBtn) addBtn.remove();
+
+        // Set sell price from pricing review modal
+        if (sellPriceOverride > 0) {
+            row.dataset.sellPrice = sellPriceOverride.toString();
+        }
+
+        // Preserve ShopWorks description as ProductName for all output paths
+        const importData = JSON.parse(row.dataset.importData || '{}');
+        if (importData.description) {
+            const descInput = row.querySelector('[data-field="description"]');
+            if (descInput) descInput.value = importData.description;
+            row.dataset.productName = importData.description;
+        }
+
+        // Detect cap vs garment and enable appropriate size inputs
+        const isCap = isCapProduct(product.partNumber, product.description || '');
+        if (isCap) {
+            row.dataset.isCap = 'true';
+            const capBadge = document.getElementById(`cap-badge-${rowId}`);
+            if (capBadge) capBadge.style.display = 'inline-flex';
+        } else {
+            row.dataset.isCap = 'false';
+        }
+
+        // OSFA detection — works for caps, beanies, bags (independent of isCap)
+        const hasOSFA = product.sizes && product.sizes['OSFA'];
+        const sizeKeys = product.sizes ? Object.keys(product.sizes) : [];
+        const isOsfaOnly = hasOSFA && sizeKeys.length === 1;
+        if (isOsfaOnly) {
+            row.dataset.sizeCategory = 'osfa-only';
+            row.dataset.isOsfaOnly = 'true';
+            row.dataset.osfaQty = product.sizes['OSFA'];
+            row.dataset.availableSizes = JSON.stringify(['OSFA']);
+            if (isCap) row.dataset.capSizes = JSON.stringify(['OSFA']);
+            const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
+            if (qtyDisplay) qtyDisplay.textContent = product.sizes['OSFA'];
+        } else {
+            // Standard sizes (S, M, L, etc.) — enable all size inputs
+            row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+        }
+
+        // Reorder row into correct section (caps vs garments)
+        reorderRowByProductType(row);
+        updateCapLogoSectionVisibility();
+
+        // Now apply color and sizes — inputs are enabled so quantities will set
+        // For OSFA caps, sizes are already set above; reImportNonSanmarRow
+        // handles color and any non-OSFA sizes
+        const importColor = product.color || 'N/A';
+        row.dataset.color = importColor;
+        row.dataset.catalogColor = importColor;
+
+        await reImportNonSanmarRow(row, rowId, {
+            color: importColor,
+            sizes: product.sizes,
+            sellPriceOverrides: sellPriceOverrides
+        });
+
+        // Trigger size change to update qty display and pricing
+        onSizeChange(rowId);
+        return row;
+    }
+
+    // 4. SELECT COLOR for SanMar products (this enables size inputs!)
+    if (product.color) {
+        const pickerDropdown = row.querySelector('.color-picker-dropdown');
+        if (pickerDropdown) {
+            // Try exact match first on COLOR_NAME or CATALOG_COLOR
+            let colorOption = pickerDropdown.querySelector(
+                `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
+            );
+
+            // Fallback: partial/fuzzy match for abbreviated colors
+            // e.g., "Athletic Hthr" should match "Athletic Heather"
+            if (!colorOption) {
+                const options = pickerDropdown.querySelectorAll('.color-picker-option');
+                const searchColor = product.color.toLowerCase().replace(/\s+/g, '');
+                for (const opt of options) {
+                    const optColorName = (opt.dataset.colorName || '').toLowerCase().replace(/\s+/g, '');
+                    const optCatalogColor = (opt.dataset.catalogColor || '').toLowerCase().replace(/\s+/g, '');
+                    // Check COLOR_NAME or CATALOG_COLOR for fuzzy match
+                    if (optColorName.includes(searchColor) ||
+                        searchColor.includes(optColorName.split(/\s/)[0]) ||
+                        optColorName.startsWith(searchColor.substring(0, 5)) ||
+                        optCatalogColor.includes(searchColor) ||
+                        searchColor.includes(optCatalogColor)) {
+                        colorOption = opt;
+                        break;
+                    }
+                }
+            }
+
+            if (colorOption) {
+                selectColor(rowId, colorOption, true);
+                // Wait for detectAndAdjustSizeUI to complete
+                await new Promise(resolve => setTimeout(resolve, 300));
+                // Re-apply — selectColor() clears sellPrice for SanMar products (line 4668)
+                if (sellPriceOverride > 0) {
+                    row.dataset.sellPrice = sellPriceOverride.toString();
+                }
+            } else {
+                console.warn(`[ShopWorks Import] Color "${product.color}" not found for ${product.partNumber} — row may be excluded from quote output`);
+            }
+        }
+    }
+
+    // 5. Set sizes (inputs should now be enabled from selectColor)
+    // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
+    // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
+    const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
+
+    // Detect if this is a cap product for size mapping
+    const isCapRow = row.dataset.isCap === 'true' ||
+                     isCapProduct(product.partNumber, product.description || '');
+
+    // Cap size mapping: ShopWorks uses S, M, L but caps have S/M, M/L, L/XL, OSFA
+    const CAP_SIZE_MAP = {
+        'S': 'S/M',
+        'M': 'M/L',
+        'L': 'L/XL',
+        'XL': 'L/XL',
+        'S/M': 'S/M',
+        'M/L': 'M/L',
+        'L/XL': 'L/XL',
+        'SM/MD': 'S/M',
+        'LG/XL': 'L/XL',
+        'OSFA': 'OSFA',
+        'ONE SIZE': 'OSFA'
+    };
+
+    for (const [size, qty] of Object.entries(product.sizes)) {
+        if (qty > 0) {
+            // Map imported size to our internal format
+            let internalSize = size;
+            if (size === 'LG') internalSize = 'L';
+            if (size === '2X') internalSize = '2XL';
+            // XXL stays as 'XXL' — distinct size for Ladies/Womens products (589 products use _XXL, not _2XL)
+            if (size === 'XXXL' || size === '3X') internalSize = '3XL';
+            if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
+            if (size === '5X') internalSize = '5XL';
+            if (size === '6X') internalSize = '6XL';
+
+            // Apply cap size mapping if this is a cap
+            if (isCapRow && CAP_SIZE_MAP[internalSize.toUpperCase()]) {
+                const capSize = CAP_SIZE_MAP[internalSize.toUpperCase()];
+                internalSize = capSize;
+            }
+
+            // OSFA-only products (beanies, caps, bags): put qty in parent row directly
+            // Matches popup behavior at applyExtendedSizes() line 1804
+            if (internalSize === 'OSFA' && row.dataset.sizeCategory === 'osfa-only') {
+                row.dataset.osfaQty = qty;
+                row.dataset.isOsfaOnly = 'true';
+                document.getElementById(`row-qty-${rowId}`).textContent = qty;
+                continue;
+            }
+
+            // Check if this is an extended size that needs a child row
+            // These sizes are readonly/disabled in the parent row and must use child rows
+            const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
+            const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
+                                  (sizeInput && sizeInput.disabled);
+
+
+            if (needsChildRow) {
+                // Use the existing extended size function to create child row
+                createOrUpdateExtendedChildRow(rowId, internalSize, qty);
+
+                // Set per-size sell price override on child row if available
+                // recalculatePricing() already reads childRow.dataset.sellPrice (lines 6683-6710)
+                if (sellPriceOverrides && sellPriceOverrides[size]) {
+                    const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                    if (childRow) {
+                        childRow.dataset.sellPrice = sellPriceOverrides[size].toString();
+                    }
+                } else if (sellPriceOverride > 0) {
+                    // Fallback: use the flat override for all child rows
+                    const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                    if (childRow) {
+                        childRow.dataset.sellPrice = sellPriceOverride.toString();
+                    }
+                }
+
+                // For 2XL/XXL: Also set parent row's 2XL input so onSizeChange doesn't remove the child row
+                // onSizeChange checks parent input value and removes child row if value=0
+                if (internalSize === '2XL' || internalSize === 'XXL') {
+                    const parentXxlInput = row.querySelector('[data-size="2XL"]');
+                    if (parentXxlInput) {
+                        parentXxlInput.value = qty;
+                    }
+                }
+            } else if (sizeInput) {
+                // Standard size - set directly on parent row
+                sizeInput.value = qty;
+            } else {
+                console.warn(`[ShopWorks Import] No input found for size ${internalSize}`);
+            }
+        }
+    }
+
+    // 6. Trigger size change to recalculate
+    onSizeChange(rowId);
+    return row;
+}
+
+// ============================================================
+// DIAGNOSTIC TOOL — diagnoseQuote()
+// Captures current quote state, runs validation checks,
+// and copies compact JSON to clipboard for analysis
+// ============================================================
+async function diagnoseQuote() {
+    const allItems = collectProductsFromTable();
+    const products = allItems.filter(p => !p.isService);
+    const serviceItems = allItems.filter(p => p.isService);
+    const decgItems = collectDECGItems();
+
+    if (products.length === 0 && serviceItems.length === 0 && decgItems.length === 0) {
+        showToast('Add products before diagnosing', 'error');
+        return;
+    }
+
+    const checks = [];
+    let passCount = 0;
+    let warnCount = 0;
+    let failCount = 0;
+
+    function addCheck(name, status, detail) {
+        checks.push({ name, status, detail });
+        if (status === 'PASS') passCount++;
+        else if (status === 'WARN') warnCount++;
+        else failCount++;
+    }
+
+    try {
+        // Re-run pricing engine (same as recalculatePricing)
+        const garmentALForDiag = globalAL.garment.enabled ? [{
+            id: 'global-al-garment', position: 'AL',
+            stitchCount: globalAL.garment.stitchCount,
+            needsDigitizing: globalAL.garment.needsDigitizing
+        }] : [];
+        const capALForDiag = globalAL.cap.enabled ? [{
+            id: 'global-al-cap', position: 'AL-Cap',
+            stitchCount: globalAL.cap.stitchCount,
+            needsDigitizing: globalAL.cap.needsDigitizing
+        }] : [];
+
+        const logoConfigs = {
+            garment: { primary: { ...primaryLogo, id: 'primary' }, additional: garmentALForDiag },
+            cap: { primary: { ...capPrimaryLogo, id: 'cap-primary' }, additional: capALForDiag }
+        };
+        const allLogos = [{ ...primaryLogo, id: 'primary' }, ...garmentALForDiag];
+
+        let pricing;
+        if (products.length === 0) {
+            const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+            const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+            pricing = {
+                products: [], totalQuantity: decgQty, subtotal: decgTotal,
+                grandTotal: decgTotal,
+                tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+                ltmFee: 0, additionalServices: [], additionalStitchTotal: 0,
+                garmentStitchTotal: 0, capStitchTotal: 0,
+                garmentSetupFees: 0, capSetupFees: 0,
+                garmentQuantity: 0, capQuantity: 0
+            };
+        } else {
+            const ltmEnabledDiag = getLtmControlState('emb-ltm-panel').enabled;
+            pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled: ltmEnabledDiag });
+        }
+
+        // Include service item totals (same as recalculatePricing)
+        let serviceTotal = 0;
+        serviceItems.forEach(si => { serviceTotal += si.unitPrice * si.totalQuantity; });
+        if (serviceTotal > 0) {
+            pricing.subtotal += serviceTotal;
+            pricing.grandTotal += serviceTotal;
+        }
+
+        // Include DECG/DECC totals (same as recalculatePricing)
+        if (decgItems.length > 0) {
+            const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+            pricing.subtotal += decgServiceTotal;
+            pricing.grandTotal += decgServiceTotal;
+        }
+
+        // Include child row override deltas (same as recalculatePricing)
+        let childOverrideDelta = 0;
+        document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
+            const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+            if (childOverride <= 0) return;
+            const childRowId = childRow.dataset.rowId;
+            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+            const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
+            if (!childPriceCell) return;
+            const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
+            const calculatedPrice = parseFloat(currentText) || 0;
+            const qty = parseInt(childQtyCell?.textContent) || 0;
+            childOverrideDelta += (childOverride - calculatedPrice) * qty;
+        });
+        if (childOverrideDelta !== 0) {
+            pricing.subtotal += childOverrideDelta;
+            pricing.grandTotal += childOverrideDelta;
+        }
+
+        const additionalCharges = getAdditionalCharges();
+        const { baseSubtotal, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
+
+        // ---- CHECK 1: Line items sum to subtotal ----
+        let productLineTotal = 0;
+        if (pricing.products) {
+            pricing.products.forEach(pp => {
+                pp.lineItems.forEach(li => {
+                    const price = li.unitPriceWithLTM || li.unitPrice;
+                    productLineTotal += price * li.quantity;
+                });
+            });
+        }
+        productLineTotal += serviceTotal;
+        if (decgItems.length > 0) {
+            productLineTotal += decgItems.reduce((sum, d) => sum + d.total, 0);
+        }
+        productLineTotal += childOverrideDelta;
+        const subtotalDiff = Math.abs(productLineTotal - pricing.subtotal);
+        if (subtotalDiff < 0.02) {
+            addCheck('Line items sum to subtotal', 'PASS', `$${productLineTotal.toFixed(2)} == $${pricing.subtotal.toFixed(2)}`);
+        } else {
+            addCheck('Line items sum to subtotal', 'FAIL', `Product lines: $${productLineTotal.toFixed(2)}, Subtotal: $${pricing.subtotal.toFixed(2)}, diff: $${subtotalDiff.toFixed(2)}`);
+        }
+
+        // ---- CHECK 2: Grand total formula ----
+        const expectedGrand = pricing.subtotal + (pricing.setupFees || ((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)));
+        const actualGrand = pricing.grandTotal;
+        const grandDiff = Math.abs(expectedGrand - actualGrand);
+        if (grandDiff < 0.02) {
+            addCheck('Grand total formula', 'PASS', `subtotal($${pricing.subtotal.toFixed(2)}) + setup($${((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)).toFixed(2)}) = $${actualGrand.toFixed(2)}`);
+        } else {
+            addCheck('Grand total formula', 'WARN', `Expected: $${expectedGrand.toFixed(2)}, Got: $${actualGrand.toFixed(2)}, diff: $${grandDiff.toFixed(2)}`);
+        }
+
+        // ---- CHECK 3: DECG included in output paths ----
+        if (decgItems.length > 0) {
+            const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+            const grandIncludesDECG = pricing.grandTotal >= decgTotal - 0.01;
+            if (grandIncludesDECG) {
+                addCheck('DECG in grandTotal', 'PASS', `$${decgTotal.toFixed(2)} included in grandTotal $${pricing.grandTotal.toFixed(2)}`);
+            } else {
+                addCheck('DECG in grandTotal', 'FAIL', `DECG total $${decgTotal.toFixed(2)} NOT reflected in grandTotal $${pricing.grandTotal.toFixed(2)}`);
+            }
+        } else {
+            addCheck('DECG in grandTotal', 'PASS', 'No DECG items (N/A)');
+        }
+
+        // ---- CHECK 4: UI displayed total matches computed total ----
+        const displayedGrandText = document.getElementById('grand-total')?.textContent || '$0.00';
+        const displayedGrand = parseFloat(displayedGrandText.replace(/[$,]/g, '')) || 0;
+        const uiDiff = Math.abs(displayedGrand - pricing.grandTotal);
+        if (uiDiff < 0.02) {
+            addCheck('UI total matches computed', 'PASS', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}`);
+        } else {
+            addCheck('UI total matches computed', 'FAIL', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}, diff: $${uiDiff.toFixed(2)}`);
+        }
+
+        // ---- CHECK 5: AL module arrays in sync with globalAL ----
+        const garmentALEnabled = globalAL.garment.enabled;
+        const capALEnabled = globalAL.cap.enabled;
+        const garmentALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
+        const capALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
+
+        let alSyncOk = true;
+        let alDetail = [];
+        if (garmentALEnabled && garmentALInPricing.length === 0 && (pricing.garmentQuantity || 0) > 0) {
+            alSyncOk = false;
+            alDetail.push('Garment AL enabled but no AL in pricing results');
+        }
+        if (!garmentALEnabled && garmentALInPricing.length > 0) {
+            alSyncOk = false;
+            alDetail.push('Garment AL disabled but pricing has AL entries');
+        }
+        if (capALEnabled && capALInPricing.length === 0 && (pricing.capQuantity || 0) > 0) {
+            alSyncOk = false;
+            alDetail.push('Cap AL enabled but no AL in pricing results');
+        }
+        if (!capALEnabled && capALInPricing.length > 0) {
+            alSyncOk = false;
+            alDetail.push('Cap AL disabled but pricing has AL entries');
+        }
+        addCheck('AL sync with globalAL', alSyncOk ? 'PASS' : 'FAIL',
+            alSyncOk ? `Garment AL: ${garmentALEnabled ? 'ON' : 'OFF'}, Cap AL: ${capALEnabled ? 'ON' : 'OFF'}` : alDetail.join('; '));
+
+        // ---- CHECK 6: Expected ShopWorks fee part numbers ----
+        const expectedFees = [];
+        if ((pricing.garmentSetupFees || 0) > 0) expectedFees.push('DD (garment digitizing)');
+        if ((pricing.capSetupFees || 0) > 0) expectedFees.push('DD (cap digitizing)');
+        if ((pricing.garmentStitchTotal || 0) > 0) expectedFees.push('AS-Garm');
+        if ((pricing.capStitchTotal || 0) > 0) expectedFees.push('AS-CAP');
+        if (garmentALEnabled && garmentALInPricing.length > 0) expectedFees.push('AL');
+        if (capALEnabled && capALInPricing.length > 0) expectedFees.push('AL-Cap');
+        if (additionalCharges.artCharge > 0) expectedFees.push('GRT-50');
+        if (additionalCharges.graphicDesignCharge > 0) expectedFees.push('GRT-75');
+        if (additionalCharges.rushFee > 0) expectedFees.push('RUSH');
+        if (additionalCharges.discount > 0) expectedFees.push('DISCOUNT');
+        addCheck('ShopWorks fee part numbers', 'PASS', expectedFees.length > 0 ? expectedFees.join(', ') : 'No fees');
+
+        // ---- CHECK 7: Product count matches pricing product count ----
+        const tableProductCount = products.length;
+        const pricingProductCount = pricing.products ? pricing.products.length : 0;
+        if (tableProductCount === pricingProductCount) {
+            addCheck('Product count match', 'PASS', `${tableProductCount} products in table, ${pricingProductCount} in pricing engine`);
+        } else {
+            addCheck('Product count match', 'WARN', `Table: ${tableProductCount}, Pricing: ${pricingProductCount} (difference may be from color grouping)`);
+        }
+
+        // ---- CHECK 8: TotalAmount = grandTotal + fees - discount ----
+        const totalFees = (additionalCharges.artCharge || 0) +
+            (additionalCharges.graphicDesignCharge || 0) +
+            (additionalCharges.rushFee || 0) +
+            (additionalCharges.sampleFee || 0);
+        const expectedTotal = pricing.grandTotal + totalFees - (additionalCharges.discount || 0);
+        const displayedTotal = adjustedSubtotal;
+        const totalDiff = Math.abs(expectedTotal - displayedTotal);
+        if (totalDiff < 0.02) {
+            addCheck('TotalAmount formula', 'PASS', `grandTotal($${pricing.grandTotal.toFixed(2)}) + fees($${totalFees.toFixed(2)}) - discount($${(additionalCharges.discount || 0).toFixed(2)}) = $${displayedTotal.toFixed(2)}`);
+        } else {
+            addCheck('TotalAmount formula', 'FAIL', `Expected: $${expectedTotal.toFixed(2)}, Displayed: $${displayedTotal.toFixed(2)}, diff: $${totalDiff.toFixed(2)}`);
+        }
+
+        // Build diagnostic output
+        const diagnostic = {
+            timestamp: new Date().toISOString(),
+            quoteId: editingQuoteId || 'DRAFT',
+            checks: checks,
+            summary: { pass: passCount, warn: warnCount, fail: failCount, total: checks.length },
+            state: {
+                productCount: products.length,
+                serviceCount: serviceItems.length,
+                decgCount: decgItems.length,
+                totalQuantity: pricing.totalQuantity || 0,
+                subtotal: pricing.subtotal,
+                grandTotal: pricing.grandTotal,
+                adjustedSubtotal: adjustedSubtotal,
+                garmentQty: pricing.garmentQuantity || 0,
+                capQty: pricing.capQuantity || 0,
+                garmentTier: pricing.garmentTier || pricing.tier,
+                capTier: pricing.capTier || null,
+                ltmFee: pricing.ltmFee || 0,
+                garmentSetupFees: pricing.garmentSetupFees || 0,
+                capSetupFees: pricing.capSetupFees || 0,
+                garmentStitchTotal: pricing.garmentStitchTotal || 0,
+                capStitchTotal: pricing.capStitchTotal || 0,
+                garmentAL: garmentALEnabled ? { stitchCount: globalAL.garment.stitchCount, total: garmentALInPricing.reduce((s, a) => s + a.total, 0) } : null,
+                capAL: capALEnabled ? { stitchCount: globalAL.cap.stitchCount, total: capALInPricing.reduce((s, a) => s + a.total, 0) } : null,
+                fees: {
+                    artCharge: additionalCharges.artCharge || 0,
+                    graphicDesign: additionalCharges.graphicDesignCharge || 0,
+                    rushFee: additionalCharges.rushFee || 0,
+                    sampleFee: additionalCharges.sampleFee || 0,
+                    discount: additionalCharges.discount || 0
+                }
+            },
+            products: products.map(p => ({
+                style: p.style,
+                color: p.color,
+                qty: p.totalQuantity,
+                isCap: p.isCap || false,
+                sizes: p.sizeBreakdown
+            })),
+            decgItems: decgItems.map(d => ({
+                type: d.type,
+                qty: d.quantity,
+                unitPrice: d.unitPrice,
+                total: d.total
+            }))
+        };
+
+        // Copy to clipboard
+        const jsonStr = JSON.stringify(diagnostic, null, 2);
+        await navigator.clipboard.writeText(jsonStr);
+
+        // Show result summary as toast
+        const statusIcon = failCount > 0 ? 'error' : warnCount > 0 ? 'warning' : 'success';
+        const statusMsg = `Diagnosis: ${passCount} pass, ${warnCount} warn, ${failCount} fail — copied to clipboard`;
+        showToast(statusMsg, statusIcon === 'warning' ? 'success' : statusIcon);
+
+    } catch (error) {
+        console.error('[Diagnose] Error:', error);
+        showToast('Diagnosis error: ' + error.message, 'error');
+    }
+}
