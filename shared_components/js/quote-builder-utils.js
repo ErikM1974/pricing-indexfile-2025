@@ -853,6 +853,58 @@ function confirmNewQuote() {
     }
 }
 
+/**
+ * Mark quote as having unsaved changes. Shows badge.
+ * Requires `hasChanges` variable in builder scope.
+ */
+function markAsUnsaved() {
+    hasChanges = true;
+    const indicator = document.getElementById('unsaved-indicator');
+    if (indicator) indicator.style.display = 'inline';
+}
+
+/**
+ * Mark quote as saved. Hides badge.
+ */
+function markAsSaved() {
+    hasChanges = false;
+    const indicator = document.getElementById('unsaved-indicator');
+    if (indicator) indicator.style.display = 'none';
+}
+
+/**
+ * Check if there are unsaved changes.
+ * @returns {boolean}
+ */
+function hasUnsavedChanges() {
+    return hasChanges;
+}
+
+/**
+ * Setup global keyboard shortcuts (Ctrl+S save, Ctrl+P print, Escape close popups).
+ * Requires builder to define: saveQuote(), printQuote(), closeExtendedSizePopup()
+ */
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const sizePopup = document.getElementById('extended-size-popup');
+            if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                e.preventDefault();
+                if (typeof closeExtendedSizePopup === 'function') closeExtendedSizePopup();
+                return;
+            }
+        }
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            if (typeof saveQuote === 'function') saveQuote();
+        }
+        if (e.ctrlKey && e.key === 'p') {
+            e.preventDefault();
+            if (typeof printQuote === 'function') printQuote();
+        }
+    });
+}
+
 // ============================================
 // ORDER, SHIPPING & TAX FIELDS
 // ============================================

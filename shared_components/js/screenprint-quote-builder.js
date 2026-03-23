@@ -656,25 +656,7 @@ async function loadQuoteForEditing(quoteId) {
 // Unsaved Changes Tracking (UX Improvement)
 // ============================================
 
-function markAsUnsaved() {
-    hasChanges = true;
-    const indicator = document.getElementById('unsaved-indicator');
-    if (indicator) {
-        indicator.style.display = 'inline';
-    }
-}
-
-function markAsSaved() {
-    hasChanges = false;
-    const indicator = document.getElementById('unsaved-indicator');
-    if (indicator) {
-        indicator.style.display = 'none';
-    }
-}
-
-function hasUnsavedChanges() {
-    return hasChanges;
-}
+// markAsUnsaved(), markAsSaved(), hasUnsavedChanges() → moved to quote-builder-utils.js
 
 // ============================================
 // New Quote Functionality (UX Improvement)
@@ -2686,31 +2668,7 @@ function deleteRow(rowId) {
 // KEYBOARD NAVIGATION (Excel-style)
 // ============================================================
 
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-        // Escape = Close popups
-        if (e.key === 'Escape') {
-            const sizePopup = document.getElementById('extended-size-popup');
-            if (sizePopup && !sizePopup.classList.contains('hidden')) {
-                e.preventDefault();
-                closeExtendedSizePopup();
-                return;
-            }
-        }
-
-        // Ctrl+S = Save
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            saveQuote();
-        }
-
-        // Ctrl+P = Print
-        if (e.ctrlKey && e.key === 'p') {
-            e.preventDefault();
-            printQuote();
-        }
-    });
-}
+// setupKeyboardShortcuts() → moved to quote-builder-utils.js
 
 function handleCellKeydown(event, input) {
     const row = input.closest('tr');

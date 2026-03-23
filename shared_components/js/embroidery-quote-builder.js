@@ -5146,26 +5146,7 @@ function clearPriceOverride(rowId) {
 // KEYBOARD NAVIGATION (Excel-style)
 // ============================================================
 
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-        // Escape = Close popups
-        if (e.key === 'Escape') {
-            const sizePopup = document.getElementById('extended-size-popup');
-            if (sizePopup && !sizePopup.classList.contains('hidden')) {
-                e.preventDefault();
-                closeExtendedSizePopup();
-                return;
-            }
-        }
-
-        // Ctrl+S = Save
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            saveQuote();
-        }
-
-    });
-}
+// setupKeyboardShortcuts() → moved to quote-builder-utils.js (now includes Ctrl+P for print)
 
 function handleCellKeydown(event, input) {
     const row = input.closest('tr');
@@ -6846,32 +6827,7 @@ function toggleOrderDetails() {
  * Mark quote as having unsaved changes
  * Shows pulsing "Unsaved" badge in header
  */
-function markAsUnsaved() {
-    hasChanges = true;
-    const indicator = document.getElementById('unsaved-indicator');
-    if (indicator) {
-        indicator.style.display = 'inline';
-    }
-}
-
-/**
- * Mark quote as saved (no unsaved changes)
- * Hides the "Unsaved" badge
- */
-function markAsSaved() {
-    hasChanges = false;
-    const indicator = document.getElementById('unsaved-indicator');
-    if (indicator) {
-        indicator.style.display = 'none';
-    }
-}
-
-/**
- * Check if there are unsaved changes
- */
-function hasUnsavedChanges() {
-    return hasChanges;
-}
+// markAsUnsaved(), markAsSaved(), hasUnsavedChanges() → moved to quote-builder-utils.js
 
 /**
  * Setup event listeners for tracking unsaved changes
