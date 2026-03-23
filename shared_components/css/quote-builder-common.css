@@ -89,7 +89,1348 @@
        SPACING (2026-03-21 standardization)
        ============================================ */
     --builder-input-padding: 8px 12px;
+
+    /* ============================================
+       LEGACY BUILDER COLORS (backwards compatibility)
+       Used by builder-specific CSS files via var()
+       ============================================ */
+    --nwca-blue: #003f7f;
+    --nwca-green: #4cb354;
+    --nwca-red: #dc3545;
+    --border-color: #dee2e6;
+    --bg-light: #f8f9fa;
+    --bg-sidebar: #f1f3f5;
 }
+
+/* ============================================
+   RESET & BASE (2026-03-23 consolidation)
+   ============================================ */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* ============================================
+   MINIMUM ORDER WARNING BANNER (2026-03-23 consolidation)
+   ============================================ */
+#min-order-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#min-order-warning i {
+    color: #ffc107;
+    font-size: 1.2em;
+}
+
+#min-order-warning strong {
+    margin-right: 4px;
+}
+
+/* ============================================
+   COMPACT HEADER (2026-03-23 consolidation)
+   ============================================ */
+.power-header {
+    background: var(--nwca-blue);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.power-header .logo {
+    height: 40px;
+}
+
+.power-header .header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.power-header .btn-header {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.power-header .btn-header:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* New Quote Button - Green accent */
+.power-header .btn-new-quote {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+}
+
+.power-header .btn-new-quote:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+/* Unsaved Changes Badge (in header) */
+.unsaved-badge {
+    font-size: 11px;
+    color: #fbbf24;
+    margin-left: 8px;
+    animation: unsaved-pulse 2s infinite;
+}
+
+.unsaved-badge i {
+    font-size: 8px;
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+@keyframes unsaved-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ============================================
+   MAIN LAYOUT (2026-03-23 consolidation)
+   ============================================ */
+.power-main {
+    display: flex;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+}
+
+.power-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.power-sidebar {
+    width: 300px;
+    background: var(--bg-sidebar);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ============================================
+   PRODUCT GRID & SEARCH (2026-03-23 consolidation)
+   ============================================ */
+.product-grid-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
+    overflow: hidden;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 300px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 12px 10px 52px !important;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--nwca-blue);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-suggestions.show {
+    display: block;
+}
+
+.suggestion-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.suggestion-item:hover {
+    background: #f5f5f5;
+}
+
+.suggestion-item .style {
+    font-weight: 600;
+}
+
+.suggestion-item .name {
+    color: #666;
+    font-size: 13px;
+}
+
+.suggestion-item.selected {
+    background-color: #e3f2fd;
+}
+
+.suggestion-item .style strong {
+    color: #1976d2;
+    font-weight: 700;
+}
+
+/* ============================================
+   PRODUCT TABLE (2026-03-23 consolidation)
+   ============================================ */
+.product-table-wrapper {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: white;
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.product-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.product-table td {
+    padding: 4px;
+    border: 1px solid #e0e0e0;
+    vertical-align: middle;
+}
+
+.product-table tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.product-table tr:hover {
+    background: #fff8e1;
+}
+
+.product-table tr.new-row {
+    background: #e8f5e9;
+}
+
+/* ============================================
+   CHILD ROWS - Extended Sizes (2026-03-23 consolidation)
+   ============================================ */
+.product-table tr.child-row {
+    background: #fafafa;
+}
+
+.product-table tr.child-row td:first-child {
+    padding-left: 25px;
+}
+
+.product-table tr.child-row .style-display {
+    color: #888;
+    font-size: 12px;
+}
+
+.product-table tr.child-row .desc-display {
+    color: #666;
+    font-size: 12px;
+}
+
+.product-table tr.child-row td:nth-child(2) {
+    padding-left: 8px;
+}
+
+.product-table tr.child-row .cell-input,
+.product-table tr.child-row .cell-select {
+    background: #fafafa;
+}
+
+.product-table tr.child-row .size-input:disabled {
+    background: #f5f5f5;
+    color: #999;
+}
+
+.product-table tr.child-row .size-input:not([disabled]) {
+    background: #fff !important;
+    border: 2px solid #4CAF50 !important;
+    font-weight: bold;
+}
+
+.child-indicator {
+    font-size: 10px;
+    color: #ccc;
+    margin-right: 5px;
+}
+
+.child-color-picker .color-picker-selected {
+    background: #fafafa;
+    padding: 4px 6px;
+    height: 32px;
+}
+
+.child-color-picker .color-picker-selected:hover {
+    background: #f0f0f0;
+}
+
+.child-color-picker .color-swatch {
+    width: 18px;
+    height: 18px;
+}
+
+.child-color-picker .color-name {
+    font-size: 12px;
+}
+
+.product-table tr.child-row.different-color {
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+}
+
+.product-table tr.child-row.different-color td:first-child {
+    color: #856404;
+    font-weight: 600;
+}
+
+.product-table tr.parent-row {
+    border-left: 4px solid var(--nwca-blue);
+}
+
+.product-table tr.child-row {
+    border-left: 4px solid var(--nwca-blue);
+}
+
+.product-table tr.child-row td:first-child::before {
+    content: "\2514";
+    color: #999;
+    margin-right: 6px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.product-table tr.child-row:last-of-type,
+.product-table tr.child-row + tr:not(.child-row) {
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Size badge for extended sizes */
+.size-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--nwca-blue);
+    color: white;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.size-badge.upcharge {
+    background: #f59e0b;
+}
+
+.upcharge-indicator {
+    color: #f59e0b;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+/* ============================================
+   CELL INPUTS - Excel Style (2026-03-23 consolidation)
+   Default height: 40px (DTG overrides to 36px)
+   ============================================ */
+.cell-input {
+    width: 100%;
+    height: 40px;
+    border: none;
+    padding: 4px 8px;
+    font-size: 13px;
+    background: transparent;
+    text-align: center;
+}
+
+.cell-input:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: inset 0 0 0 2px var(--nwca-blue);
+}
+
+.cell-input.style-input {
+    text-align: left;
+    font-weight: 600;
+}
+
+.cell-input.desc-input {
+    text-align: left;
+    color: #666;
+}
+
+.cell-input.size-input {
+    text-align: center;
+}
+
+.cell-input.size-input::-webkit-inner-spin-button,
+.cell-input.size-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Size Input Validation States */
+.size-input.size-available {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.size-input.size-available:focus {
+    box-shadow: inset 0 0 0 2px #22c55e;
+}
+
+.size-input.size-unavailable {
+    background-color: #f0f0f0 !important;
+    color: #999 !important;
+    cursor: not-allowed;
+    border-color: #ddd !important;
+}
+
+.size-input.size-unavailable::placeholder {
+    color: #bbb;
+}
+
+/* Inventory Status Indicators */
+.size-input.inventory-ok {
+    border-left: 3px solid #22c55e;
+}
+
+.size-input.inventory-low {
+    border-left: 3px solid #f59e0b;
+}
+
+.size-input.inventory-out {
+    border-left: 3px solid #ef4444;
+    background: #fef2f2;
+}
+
+.cell-select {
+    width: 100%;
+    height: 40px;
+    border: none;
+    padding: 4px;
+    font-size: 13px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.cell-select:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--nwca-blue);
+}
+
+.cell-qty {
+    font-weight: 700;
+    text-align: center;
+    padding: 0 8px;
+    background: #e3f2fd;
+}
+
+.cell-price {
+    font-weight: 600;
+    text-align: right;
+    padding: 0 10px;
+    color: var(--nwca-green);
+    background: #e8f5e9;
+}
+
+.cell-total {
+    font-weight: 700;
+    text-align: right;
+    padding: 0 10px;
+    color: #145a32;
+    background: #c8e6c9;
+}
+
+.cell-actions {
+    text-align: center;
+}
+
+.btn-delete-row {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.btn-delete-row:hover {
+    color: var(--nwca-red);
+}
+
+/* ============================================
+   ADD ROW BUTTON (2026-03-23 consolidation)
+   ============================================ */
+.add-row-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    border-radius: 0 0 6px 6px;
+    cursor: pointer;
+    color: #666;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.add-row-btn:hover {
+    background: #e8f5e9;
+    border-color: var(--nwca-green);
+    color: var(--nwca-green);
+}
+
+/* ============================================
+   PRICING SIDEBAR (2026-03-23 consolidation)
+   ============================================ */
+.pricing-panel {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.pricing-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pricing-title i {
+    color: var(--nwca-green);
+}
+
+.pricing-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.pricing-row.total {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--nwca-blue);
+    border-top: 2px solid var(--nwca-blue);
+    border-bottom: none;
+    padding-top: 15px;
+    margin-top: 10px;
+}
+
+.pricing-row .label {
+    color: #666;
+}
+
+.pricing-row .value {
+    font-weight: 600;
+}
+
+.pricing-row.sub-breakdown {
+    padding: 4px 0 4px 16px;
+    font-size: 12px;
+    border-bottom: 1px dashed #e8e8e8;
+    background: #fafafa;
+}
+
+.pricing-row.sub-breakdown .label {
+    font-size: 12px;
+    color: #777;
+}
+
+.pricing-row.sub-breakdown .value.sub-value {
+    font-weight: 500;
+    font-size: 12px;
+    color: #555;
+}
+
+/* LTM Distribution Toggle Button */
+.ltm-value-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ltm-distribute-btn {
+    padding: 4px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #666;
+}
+
+.ltm-distribute-btn .btn-text {
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ltm-distribute-btn:hover {
+    border-color: var(--nwca-green);
+    color: var(--nwca-green);
+    background: #f0fdf4;
+}
+
+.ltm-distribute-btn.active {
+    background: var(--nwca-green);
+    border-color: var(--nwca-green);
+    color: white;
+}
+
+#ltm-fee.distributed {
+    color: var(--nwca-green);
+    font-style: italic;
+    font-size: 12px;
+}
+
+.tier-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--nwca-blue);
+    color: white;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ============================================
+   CUSTOMER INFO PANEL (2026-03-23 consolidation)
+   ============================================ */
+.customer-panel {
+    border-top: 1px solid var(--border-color);
+    padding: 15px 20px;
+    background: white;
+}
+
+.customer-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.customer-panel-header h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.customer-fields {
+    display: grid;
+    gap: 10px;
+}
+
+.customer-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.customer-field label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.customer-field input,
+.customer-field select {
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.customer-field input:focus,
+.customer-field select:focus {
+    outline: none;
+    border-color: var(--nwca-blue);
+}
+
+/* ============================================
+   ACTION BUTTONS (2026-03-23 consolidation)
+   ============================================ */
+.action-panel {
+    padding: 15px 20px;
+    background: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-action {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-primary-action {
+    background: var(--nwca-green);
+    color: white;
+}
+
+.btn-primary-action:hover {
+    background: #218838;
+}
+
+.btn-secondary-action {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.btn-secondary-action:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.action-row {
+    display: flex;
+    gap: 10px;
+}
+
+.action-row .btn-action {
+    flex: 1;
+}
+
+.btn-save-quote {
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--builder-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-save-quote:hover {
+    background: var(--builder-primary-dark);
+}
+
+.btn-save-quote:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+
+.btn-save-quote i {
+    font-size: 14px;
+}
+
+/* ============================================
+   COMING SOON ACCORDION (2026-03-23 consolidation)
+   ============================================ */
+.coming-soon-accordion {
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.coming-soon-header {
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.coming-soon-header:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.coming-soon-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.coming-soon-title i {
+    font-size: 16px;
+}
+
+.coming-soon-chevron {
+    transition: transform 0.3s ease;
+}
+
+.coming-soon-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+.coming-soon-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: rgba(255,255,255,0.95);
+}
+
+.coming-soon-content.open {
+    max-height: 600px;
+}
+
+.coming-soon-description {
+    padding: 15px;
+    color: #333;
+}
+
+.coming-soon-description p {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+.feature-list li i {
+    color: #667eea;
+    width: 20px;
+    text-align: center;
+}
+
+.coming-soon-note {
+    background: #e8f5e9;
+    padding: 10px;
+    border-radius: 6px;
+    color: #2e7d32 !important;
+    font-weight: 500;
+}
+
+.coming-soon-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+.coming-soon-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.coming-soon-badge-small {
+    background: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    margin-left: 5px;
+}
+
+.coming-soon-disabled .customer-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ============================================
+   MODAL OVERLAY (2026-03-23 consolidation)
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* ============================================
+   KEYBOARD HINT (2026-03-23 consolidation)
+   ============================================ */
+.keyboard-hint {
+    font-size: 11px;
+    color: #999;
+    text-align: center;
+    padding: 8px;
+    background: #f5f5f5;
+    border-top: 1px solid var(--border-color);
+}
+
+.keyboard-hint kbd {
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+/* ============================================
+   EXTENDED SIZE PICKER POPUP (2026-03-23 consolidation)
+   ============================================ */
+.size-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid var(--nwca-blue);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    z-index: 2000;
+    min-width: 480px;
+    max-width: 520px;
+}
+.size-popup.hidden { display: none; }
+
+.size-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--nwca-blue);
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+.size-popup-header h4 {
+    margin: 0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.size-popup-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+.size-popup-close:hover { opacity: 0.8; }
+
+.size-popup-hint {
+    font-size: 12px;
+    color: #666;
+    margin: 12px 16px 8px;
+    padding: 0;
+}
+
+.size-popup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 12px 16px;
+    min-height: 60px;
+}
+.size-popup-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+.size-popup-item label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--nwca-blue);
+    min-width: 45px;
+}
+.size-popup-item input {
+    width: 60px;
+    padding: 6px 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.size-popup-item input:focus {
+    border-color: var(--nwca-blue);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 63, 127, 0.2);
+}
+
+.pants-waist-group {
+    grid-column: 1 / -1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+.waist-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--nwca-blue);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    user-select: none;
+}
+.waist-header:hover { background: #002a56; }
+.waist-header i { width: 12px; text-align: center; }
+.waist-count {
+    margin-left: auto;
+    font-weight: normal;
+    font-size: 12px;
+    opacity: 0.8;
+}
+.waist-sizes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 10px;
+    background: #f8f9fa;
+}
+.waist-sizes .size-popup-item { margin: 0; }
+.size-popup-grid:has(.pants-waist-group) {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.size-popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px;
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 10px 10px;
+}
+.size-popup-cancel {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+.size-popup-cancel:hover { background: #f0f0f0; }
+.size-popup-apply {
+    padding: 10px 24px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.size-popup-apply:hover { background: #218838; }
+.size-popup-apply:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.size-popup-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    color: #666;
+    gap: 10px;
+}
+.size-popup-loading .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e0e0e0;
+    border-top-color: var(--nwca-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.size-popup-empty {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.xxxl-picker-btn {
+    cursor: pointer !important;
+    background: #e8f4fd !important;
+    border: 1px dashed var(--nwca-blue) !important;
+    color: var(--nwca-blue) !important;
+    font-weight: 600;
+}
+.xxxl-picker-btn:hover { background: #d0e8fa !important; }
+.xxxl-picker-btn::placeholder {
+    color: var(--nwca-blue);
+    opacity: 0.7;
+}
+
+.size-popup-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1999;
+}
+.size-popup-backdrop.hidden { display: none; }
+
+/* ============================================
+   OSFA STYLING (2026-03-23 consolidation)
+   ============================================ */
+.osfa-only-row td.size-disabled {
+    background-color: #f5f5f5;
+}
+
+.osfa-only-row td.size-disabled input {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.osfa-qty-input {
+    width: 60px !important;
+    text-align: center;
+    font-weight: 600;
+    background-color: #fff !important;
+    cursor: text !important;
+}
+
+/* ============================================
+   CAP BADGE (2026-03-23 consolidation)
+   ============================================ */
+.cap-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.cap-badge i {
+    font-size: 10px;
+}
+
+/* ============================================
+   DESCRIPTION CELL & PRICING BREAKDOWN (2026-03-23 consolidation)
+   ============================================ */
+.desc-cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 8px !important;
+}
+
+.desc-cell .desc-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.desc-cell .desc-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.pricing-breakdown {
+    font-size: 10px;
+    color: #666;
+    font-family: 'Consolas', 'Monaco', monospace;
+    padding-left: 2px;
+    display: none;
+    line-height: 1.4;
+}
+
+.pricing-breakdown.visible {
+    display: block;
+}
+
+.pricing-breakdown .breakdown-wrapper { cursor: help; }
+.pricing-breakdown .breakdown-icon { color: #999; }
+.pricing-breakdown .breakdown-pos { color: #374151; font-weight: 500; }
+.pricing-breakdown .breakdown-sep,
+.pricing-breakdown .breakdown-plus,
+.pricing-breakdown .breakdown-eq { color: #9ca3af; }
+.pricing-breakdown .breakdown-base { color: #2563eb; }
+.pricing-breakdown .breakdown-extra { color: #059669; }
+.pricing-breakdown .breakdown-al { color: #7c3aed; }
+.pricing-breakdown .breakdown-total { color: #111; font-weight: 600; }
 
 /* ============================================
    LOADING OVERLAY
