@@ -5756,6 +5756,7 @@ function updatePricingDisplay(pricing) {
     const totalQty = pricing.totalQuantity || 0;
     document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
+    updatePerUnitPrice((pricing.subtotal || 0) + (pricing.ltmFee || 0), pricing.totalQuantity || 0);
     document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
     // Minimum order warning banner (show when qty > 0 but <= 7)

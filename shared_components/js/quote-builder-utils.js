@@ -1195,6 +1195,31 @@ function setOrderShippingData(containerId, data) {
 }
 
 // ============================================
+// PER-UNIT PRICE DISPLAY
+// ============================================
+
+/**
+ * Update the per-unit price display in Quote Summary.
+ * Shows "$X.XX/piece" when there are products, hides when empty.
+ * Call this from recalculatePricing() or updatePricing() in each builder.
+ * @param {number} productsSubtotal - The products-only subtotal (before fees/tax)
+ * @param {number} totalPieces - Total quantity of all products
+ */
+function updatePerUnitPrice(productsSubtotal, totalPieces) {
+    const row = document.getElementById('per-unit-price-row');
+    const valueEl = document.getElementById('per-unit-price');
+    if (!row || !valueEl) return;
+
+    if (totalPieces > 0 && productsSubtotal > 0) {
+        const perUnit = productsSubtotal / totalPieces;
+        valueEl.textContent = '$' + perUnit.toFixed(2) + '/piece';
+        row.style.display = '';
+    } else {
+        row.style.display = 'none';
+    }
+}
+
+// ============================================
 // EMAIL QUOTE
 // ============================================
 
