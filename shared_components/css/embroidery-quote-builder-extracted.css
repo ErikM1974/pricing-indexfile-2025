@@ -13,152 +13,12 @@
  * Sections marked with EMBROIDERY-SPECIFIC should remain separate
  */
 
-/* ============================================
-   CSS VARIABLES
-   ============================================ */
-:root {
-    --nwca-blue: #003f7f;
-    /* Standardized green: #4cb354 matches --builder-primary (2026-01-29) */
-    --nwca-green: #4cb354;
-    --nwca-red: #dc3545;
-    --border-color: #dee2e6;
-    --bg-light: #f8f9fa;
-    --bg-sidebar: #f1f3f5;
+/* CSS Variables, Reset, Min Order Warning, Header, Main Layout — moved to quote-builder-common.css (2026-03-23) */
 
-    /* Shared modal theming (for quote-share-modal.css) */
-    --builder-primary: #4cb354;   /* Standardized to green (matches DTG, Screen Print) */
-    --builder-primary-dark: #3d9244;
-}
-
-/* ============================================
-   SHARED: Minimum Order Warning Banner
-   ============================================ */
-#min-order-warning {
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    color: #856404;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#min-order-warning i {
-    color: #ffc107;
-    font-size: 1.2em;
-}
-
-#min-order-warning strong {
-    margin-right: 4px;
-}
-
-/* ============================================
-   SHARED: Reset & Base
-   ============================================ */
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-
-/* ============================================
-   SHARED: Header
-   ============================================ */
-/* Compact Header */
-.power-header {
-    background: var(--nwca-blue);
-    color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.power-header .logo {
-    height: 40px;
-}
-
-.power-header .header-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.power-header .btn-header {
-    background: rgba(255,255,255,0.2);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.power-header .btn-header:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-/* New Quote Button - Green accent */
-.power-header .btn-new-quote {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border: none;
-}
-
-.power-header .btn-new-quote:hover {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-}
-
-/* Unsaved Changes Badge */
-.unsaved-badge {
-    font-size: 11px;
-    color: #fbbf24;
-    margin-left: 8px;
-    animation: unsaved-pulse 2s infinite;
-}
-
-.unsaved-badge i {
-    font-size: 8px;
-    vertical-align: middle;
-    margin-right: 2px;
-}
-
-@keyframes unsaved-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-}
-
-/* ============================================
-   SHARED: Main Layout
-   ============================================ */
-/* Main Layout */
-.power-main {
-    display: flex;
-    height: calc(100vh - 60px);
-    overflow: hidden;
-}
-
-.power-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
+/* EMBROIDERY-SPECIFIC: Sidebar overrides (resizable) */
 .power-sidebar {
-    width: 300px;
     min-width: 260px;
     max-width: 500px;
-    background: var(--bg-sidebar);
-    border-left: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
     position: relative;
 }
 
@@ -1005,251 +865,7 @@ body {
     cursor: pointer;
 }
 
-/* ============================================
-   SHARED: Product Grid & Search
-   ============================================ */
-/* Product Grid Section */
-.product-grid-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 15px 20px;
-    overflow: hidden;
-}
-
-.search-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.search-input-wrapper {
-    position: relative;
-    flex: 1;
-    max-width: 300px;
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px 12px 10px 52px !important;
-    border: 2px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--nwca-blue);
-}
-
-.search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-}
-
-.search-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 0 0 6px 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
-}
-
-.search-suggestions.show {
-    display: block;
-}
-
-.suggestion-item {
-    padding: 10px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-}
-
-.suggestion-item:hover {
-    background: #f5f5f5;
-}
-
-.suggestion-item .style {
-    font-weight: 600;
-}
-
-.suggestion-item .name {
-    color: #666;
-    font-size: 13px;
-}
-
-/* Keyboard navigation selection state */
-.suggestion-item.selected {
-    background-color: #e3f2fd;
-}
-
-/* Highlight matched text in search results */
-.suggestion-item .style strong {
-    color: #1976d2;
-    font-weight: 700;
-}
-
-/* ============================================
-   SHARED: Product Table
-   ============================================ */
-/* Excel-Style Product Table */
-.product-table-wrapper {
-    flex: 1;
-    overflow: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: white;
-}
-
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.product-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-/* .product-table th — moved to quote-builder-common.css (2026-03-21 consolidation) */
-
-/* th:first-child + column widths + backgrounds — moved to quote-builder-common.css (2026-03-21) */
-
-.product-table td {
-    padding: 4px;
-    border: 1px solid #e0e0e0;
-    vertical-align: middle;
-}
-
-.product-table tr:nth-child(even) {
-    background: #fafafa;
-}
-
-.product-table tr:hover {
-    background: #fff8e1;
-}
-
-.product-table tr.new-row {
-    background: #e8f5e9;
-}
-
-/* Child rows for extended sizes (2XL+) */
-.product-table tr.child-row {
-    background: #fafafa;
-}
-
-.product-table tr.child-row td:first-child {
-    padding-left: 25px;
-}
-
-/* Child row style display (part number) */
-.product-table tr.child-row .style-display {
-    color: #888;
-    font-size: 12px;
-}
-
-/* Child row description display (product name + size) */
-.product-table tr.child-row .desc-display {
-    color: #666;
-    font-size: 12px;
-}
-
-/* Add padding to child row description cell */
-.product-table tr.child-row td:nth-child(2) {
-    padding-left: 8px;
-}
-
-.product-table tr.child-row .cell-input,
-.product-table tr.child-row .cell-select {
-    background: #fafafa;
-}
-
-.product-table tr.child-row .size-input:disabled {
-    background: #f5f5f5;
-    color: #999;
-}
-
-/* Make editable input in child rows visually obvious with green border */
-.product-table tr.child-row .size-input:not([disabled]) {
-    background: #fff !important;
-    border: 2px solid #4CAF50 !important;
-    font-weight: bold;
-}
-
-.child-indicator {
-    font-size: 10px;
-    color: #ccc;
-    margin-right: 5px;
-}
-
-/* Child row color picker styling */
-.child-color-picker .color-picker-selected {
-    background: #fafafa;
-    padding: 4px 6px;
-    height: 32px;
-}
-
-.child-color-picker .color-picker-selected:hover {
-    background: #f0f0f0;
-}
-
-.child-color-picker .color-swatch {
-    width: 18px;
-    height: 18px;
-}
-
-.child-color-picker .color-name {
-    font-size: 12px;
-}
-
-/* Visual indicator when child has different color than parent */
-.product-table tr.child-row.different-color {
-    background: #fff3cd;
-    border-left: 3px solid #ffc107;
-}
-
-.product-table tr.child-row.different-color td:first-child {
-    color: #856404;
-    font-weight: 600;
-}
-
-/* Parent/Child Row Visual Grouping */
-.product-table tr.parent-row {
-    border-left: 4px solid var(--nwca-blue);
-}
-
-.product-table tr.child-row {
-    border-left: 4px solid var(--nwca-blue);
-}
-
-/* Tree structure indicator for child rows */
-.product-table tr.child-row td:first-child::before {
-    content: "\2514";
-    color: #999;
-    margin-right: 6px;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-/* Last child row gets bottom border */
-.product-table tr.child-row:last-of-type,
-.product-table tr.child-row + tr:not(.child-row) {
-    border-bottom: 2px solid var(--border-color);
-}
+/* Product Grid, Search, Product Table, Child Rows — moved to quote-builder-common.css (2026-03-23) */
 
 /* Variant-only parent: hidden when all standard sizes are empty (only child rows have data) */
 .product-table tr.variant-only-parent {
@@ -1280,131 +896,12 @@ body {
     font-size: 14px;
 }
 
-/* Size badge for extended sizes */
-.size-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    background: var(--nwca-blue);
-    color: white;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-}
+/* Size badges, Cell inputs, Cell select, Cell qty/price base — moved to quote-builder-common.css (2026-03-23) */
 
-.size-badge.upcharge {
-    background: #f59e0b;
-}
+/* Color picker styles in /shared_components/css/color-picker-shared.css */
 
-/* Upcharge indicator */
-.upcharge-indicator {
-    color: #f59e0b;
-    font-size: 11px;
-    font-weight: 600;
-    margin-left: 4px;
-}
-
-/* Cell inputs - Excel style */
-.cell-input {
-    width: 100%;
-    height: 40px;
-    border: none;
-    padding: 4px 8px;
-    font-size: 13px;
-    background: transparent;
-    text-align: center;
-}
-
-.cell-input:focus {
-    outline: none;
-    background: #fff;
-    box-shadow: inset 0 0 0 2px var(--nwca-blue);
-}
-
-.cell-input.style-input {
-    text-align: left;
-    font-weight: 600;
-}
-
-.cell-input.desc-input {
-    text-align: left;
-    color: #666;
-}
-
-.cell-input.size-input {
-    text-align: center;
-}
-
-.cell-input.size-input::-webkit-inner-spin-button,
-.cell-input.size-input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Size Input Validation States */
-.size-input.size-available {
-    border-color: #22c55e;
-    background: #f0fdf4;
-}
-
-.size-input.size-available:focus {
-    box-shadow: inset 0 0 0 2px #22c55e;
-}
-
-.size-input.size-unavailable {
-    background-color: #f0f0f0 !important;
-    color: #999 !important;
-    cursor: not-allowed;
-    border-color: #ddd !important;
-}
-
-.size-input.size-unavailable::placeholder {
-    color: #bbb;
-}
-
-/* Inventory Status Indicators */
-.size-input.inventory-ok {
-    border-left: 3px solid #22c55e;
-}
-
-.size-input.inventory-low {
-    border-left: 3px solid #f59e0b;
-}
-
-.size-input.inventory-out {
-    border-left: 3px solid #ef4444;
-    background: #fef2f2;
-}
-
-.cell-select {
-    width: 100%;
-    height: 40px;
-    border: none;
-    padding: 4px;
-    font-size: 13px;
-    background: transparent;
-    cursor: pointer;
-}
-
-.cell-select:focus {
-    outline: none;
-    box-shadow: inset 0 0 0 2px var(--nwca-blue);
-}
-
-/* Color picker styles now in /shared_components/css/color-picker-shared.css */
-
-.cell-qty {
-    font-weight: 700;
-    text-align: center;
-    padding: 0 8px;
-    background: #e3f2fd;
-}
-
+/* EMBROIDERY-SPECIFIC: Price override UI (clickable price cells) */
 .cell-price {
-    font-weight: 600;
-    text-align: right;
-    padding: 0 10px;
-    color: var(--nwca-green);
-    background: #e8f5e9;
     cursor: pointer;
     position: relative;
 }
@@ -1473,684 +970,19 @@ body {
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
 }
 
-.cell-total {
-    font-weight: 700;
-    text-align: right;
-    padding: 0 10px;
-    color: #145a32;
-    background: #c8e6c9;
-}
+/* cell-total, cell-actions, btn-delete-row, add-row-btn — moved to quote-builder-common.css (2026-03-23) */
 
-.cell-actions {
-    text-align: center;
-}
+/* Pricing Sidebar, LTM Toggle, Customer Panel — moved to quote-builder-common.css (2026-03-23) */
 
-.btn-delete-row {
-    background: none;
-    border: none;
-    color: #999;
-    cursor: pointer;
-    padding: 8px;
-    font-size: 14px;
-}
+/* Action Buttons — moved to quote-builder-common.css (2026-03-23) */
 
-.btn-delete-row:hover {
-    color: var(--nwca-red);
-}
+/* Coming Soon Accordion — moved to quote-builder-common.css (2026-03-23) */
 
-/* Add row button */
-.add-row-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    background: #f5f5f5;
-    border: 2px dashed #ccc;
-    border-radius: 0 0 6px 6px;
-    cursor: pointer;
-    color: #666;
-    font-size: 13px;
-    transition: all 0.2s;
-}
+/* Modal — moved to quote-builder-common.css (2026-03-23) */
 
-.add-row-btn:hover {
-    background: #e8f5e9;
-    border-color: var(--nwca-green);
-    color: var(--nwca-green);
-}
+/* Toast Notifications — moved to quote-builder-common.css (2026-03-23) */
 
-/* ============================================
-   SHARED: Pricing Sidebar
-   ============================================ */
-/* Pricing Sidebar */
-.pricing-panel {
-    padding: 20px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-.pricing-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.pricing-title i {
-    color: var(--nwca-green);
-}
-
-.pricing-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    font-size: 14px;
-    border-bottom: 1px solid #eee;
-}
-
-.pricing-row.total {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--nwca-blue);
-    border-top: 2px solid var(--nwca-blue);
-    border-bottom: none;
-    padding-top: 15px;
-    margin-top: 10px;
-}
-
-.pricing-row .label {
-    color: #666;
-}
-
-.pricing-row .value {
-    font-weight: 600;
-}
-
-/* Sub-breakdown rows for mixed quotes (caps + garments) */
-.pricing-row.sub-breakdown {
-    padding: 4px 0 4px 16px;
-    font-size: 12px;
-    border-bottom: 1px dashed #e8e8e8;
-    background: #fafafa;
-}
-
-.pricing-row.sub-breakdown .label {
-    font-size: 12px;
-    color: #777;
-}
-
-.pricing-row.sub-breakdown .value.sub-value {
-    font-weight: 500;
-    font-size: 12px;
-    color: #555;
-}
-
-/* LTM Distribution Toggle Button */
-.ltm-value-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ltm-distribute-btn {
-    padding: 4px 10px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    background: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    color: #666;
-}
-
-.ltm-distribute-btn .btn-text {
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.ltm-distribute-btn:hover {
-    border-color: var(--nwca-green);
-    color: var(--nwca-green);
-    background: #f0fdf4;
-}
-
-.ltm-distribute-btn.active {
-    background: var(--nwca-green);
-    border-color: var(--nwca-green);
-    color: white;
-}
-
-/* Distributed value style - shows per-unit amount */
-#ltm-fee.distributed {
-    color: var(--nwca-green);
-    font-style: italic;
-    font-size: 12px;
-}
-
-.tier-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    background: var(--nwca-blue);
-    color: white;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* ============================================
-   SHARED: Customer Panel
-   ============================================ */
-/* Customer Info Panel */
-.customer-panel {
-    border-top: 1px solid var(--border-color);
-    padding: 15px 20px;
-    background: white;
-}
-
-.customer-panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.customer-panel-header h4 {
-    margin: 0;
-    font-size: 14px;
-    color: #333;
-}
-
-.customer-fields {
-    display: grid;
-    gap: 10px;
-}
-
-.customer-field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.customer-field label {
-    font-size: 11px;
-    color: #666;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.customer-field input,
-.customer-field select {
-    padding: 8px 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 13px;
-}
-
-.customer-field input:focus,
-.customer-field select:focus {
-    outline: none;
-    border-color: var(--nwca-blue);
-}
-
-/* ============================================
-   SHARED: Action Buttons
-   ============================================ */
-/* Action Buttons */
-.action-panel {
-    padding: 15px 20px;
-    background: #2c3e50;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.btn-action {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s;
-}
-
-.btn-primary-action {
-    background: var(--nwca-green);
-    color: white;
-}
-
-.btn-primary-action:hover {
-    background: #218838;
-}
-
-.btn-secondary-action {
-    background: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.btn-secondary-action:hover {
-    background: rgba(255,255,255,0.2);
-}
-
-.action-row {
-    display: flex;
-    gap: 10px;
-}
-
-.action-row .btn-action {
-    flex: 1;
-}
-
-/* Save & Get Shareable Link Button */
-.btn-save-quote {
-    width: 100%;
-    padding: 12px 20px;
-    background: var(--builder-primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-save-quote:hover {
-    background: var(--builder-primary-dark);
-}
-
-.btn-save-quote:disabled {
-    background: #d1d5db;
-    cursor: not-allowed;
-}
-
-.btn-save-quote i {
-    font-size: 14px;
-}
-
-/* ============================================
-   SHARED: Coming Soon Accordion
-   ============================================ */
-/* Coming Soon Accordion */
-.coming-soon-accordion {
-    margin-top: 10px;
-    border-radius: 8px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.coming-soon-header {
-    width: 100%;
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.coming-soon-header:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-.coming-soon-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.coming-soon-title i {
-    font-size: 16px;
-}
-
-.coming-soon-chevron {
-    transition: transform 0.3s ease;
-}
-
-.coming-soon-chevron.rotated {
-    transform: rotate(180deg);
-}
-
-.coming-soon-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    background: rgba(255,255,255,0.95);
-}
-
-.coming-soon-content.open {
-    max-height: 600px;
-}
-
-.coming-soon-description {
-    padding: 15px;
-    color: #333;
-}
-
-.coming-soon-description p {
-    margin: 0 0 10px 0;
-    font-size: 13px;
-    color: #666;
-}
-
-.feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 15px 0;
-}
-
-.feature-list li {
-    padding: 8px 0;
-    font-size: 13px;
-    color: #555;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px dashed #e0e0e0;
-}
-
-.feature-list li:last-child {
-    border-bottom: none;
-}
-
-.feature-list li i {
-    color: #667eea;
-    width: 20px;
-    text-align: center;
-}
-
-.coming-soon-note {
-    background: #e8f5e9;
-    padding: 10px;
-    border-radius: 6px;
-    color: #2e7d32 !important;
-    font-weight: 500;
-}
-
-.coming-soon-disabled {
-    opacity: 0.5;
-    pointer-events: none;
-    position: relative;
-}
-
-.coming-soon-badge {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.coming-soon-badge-small {
-    background: rgba(102, 126, 234, 0.2);
-    color: #667eea;
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: 8px;
-    margin-left: 5px;
-}
-
-.coming-soon-disabled .customer-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* ============================================
-   SHARED: Modal
-   ============================================ */
-/* Logo Modal */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-.modal-overlay.show {
-    display: flex;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-}
-
-.modal-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h3 {
-    margin: 0;
-    font-size: 16px;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #666;
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.modal-footer {
-    padding: 15px 20px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    font-size: 13px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-/* ============================================
-   SHARED: Toast Notifications
-   ============================================ */
-/* Toast notifications */
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 3000;
-}
-
-.toast {
-    background: #333;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideIn 0.3s ease;
-}
-
-.toast.success {
-    background: var(--nwca-green);
-}
-
-.toast.error {
-    background: var(--nwca-red);
-}
-
-.toast.warning {
-    background: #fff3cd;
-    color: #856404;
-    border-left: 4px solid #ffc107;
-}
-
-/* ============================================
-   SHARED: OSFA Styling
-   ============================================ */
-/* OSFA-only row styling */
-.osfa-only-row td.size-disabled {
-    background-color: #f5f5f5;
-}
-
-.osfa-only-row td.size-disabled input {
-    background-color: #f5f5f5;
-    color: #999;
-    cursor: not-allowed;
-}
-
-.osfa-qty-input {
-    width: 60px !important;
-    text-align: center;
-    font-weight: 600;
-    background-color: #fff !important;
-    cursor: text !important;
-}
-
-/* Cap badge indicator */
-.desc-cell {
-    position: relative;
-}
-
-.cap-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 8px;
-    white-space: nowrap;
-    vertical-align: middle;
-}
-
-.cap-badge i {
-    font-size: 10px;
-}
-
-/* Pricing breakdown line in description cell */
-.desc-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 4px 8px !important;
-}
-
-.desc-cell .desc-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.desc-cell .desc-input {
-    flex: 1;
-    min-width: 0;
-}
-
-.pricing-breakdown {
-    font-size: 10px;
-    color: #666;
-    font-family: 'Consolas', 'Monaco', monospace;
-    padding-left: 2px;
-    display: none; /* Hidden until pricing is calculated */
-    line-height: 1.4;
-}
-
-.pricing-breakdown.visible {
-    display: block;
-}
-
-.pricing-breakdown .breakdown-wrapper {
-    cursor: help;
-}
-
-.pricing-breakdown .breakdown-icon {
-    color: #999;
-}
-
-.pricing-breakdown .breakdown-pos {
-    color: #374151;
-    font-weight: 500;
-}
-
-.pricing-breakdown .breakdown-sep,
-.pricing-breakdown .breakdown-plus,
-.pricing-breakdown .breakdown-eq {
-    color: #9ca3af;
-}
-
-.pricing-breakdown .breakdown-base {
-    color: #2563eb;
-}
-
-.pricing-breakdown .breakdown-extra {
-    color: #059669;
-}
-
-.pricing-breakdown .breakdown-al {
-    color: #7c3aed;
-}
-
-.pricing-breakdown .breakdown-total {
-    color: #111;
-    font-weight: 600;
-}
+/* OSFA, Cap Badge, Desc Cell, Pricing Breakdown — moved to quote-builder-common.css (2026-03-23) */
 
 /* ============================================
    EMBROIDERY-SPECIFIC: Per-Product Additional Logo
@@ -2336,21 +1168,11 @@ td.size-disabled input {
     cursor: not-allowed !important;
 }
 
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
+/* Animations (slideIn) — moved to quote-builder-common.css (2026-03-23) */
 
 /* ============================================
-   SHARED: Keyboard Hint
+   EMBROIDERY-SPECIFIC: Keyboard Hint (Extended Hover Reveal)
    ============================================ */
-/* Keyboard hint */
 /* Keyboard Hints - Hover Reveal (UX Improvement) */
 .keyboard-hint-container {
     position: relative;
@@ -2420,287 +1242,11 @@ td.size-disabled input {
     margin-right: 2px;
 }
 
-/* Legacy support */
-.keyboard-hint {
-    font-size: 11px;
-    color: #999;
-    text-align: center;
-    padding: 8px;
-    background: #f5f5f5;
-    border-top: 1px solid var(--border-color);
-}
+/* Keyboard Hint (base) — moved to quote-builder-common.css (2026-03-23) */
 
-.keyboard-hint kbd {
-    background: #e0e0e0;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: monospace;
-}
+/* Size Picker Popup — moved to quote-builder-common.css (2026-03-23) */
 
-/* ============================================
-   SHARED: Size Picker Popup
-   ============================================ */
-/* Extended Size Picker Popup */
-.size-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border: 2px solid var(--nwca-blue);
-    border-radius: 12px;
-    padding: 0;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    z-index: 2000;
-    min-width: 480px;
-    max-width: 520px;
-}
-.size-popup.hidden { display: none; }
-
-.size-popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: var(--nwca-blue);
-    color: white;
-    border-radius: 10px 10px 0 0;
-}
-.size-popup-header h4 {
-    margin: 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.size-popup-close {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-}
-.size-popup-close:hover { opacity: 0.8; }
-
-.size-popup-hint {
-    font-size: 12px;
-    color: #666;
-    margin: 12px 16px 8px;
-    padding: 0;
-}
-
-.size-popup-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 12px 16px;
-    min-height: 60px;
-}
-.size-popup-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-}
-.size-popup-item label {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--nwca-blue);
-    min-width: 45px;
-}
-.size-popup-item input {
-    width: 60px;
-    padding: 6px 8px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-}
-.size-popup-item input:focus {
-    border-color: var(--nwca-blue);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 63, 127, 0.2);
-}
-
-/* Pants waist group styles */
-.pants-waist-group {
-    grid-column: 1 / -1;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 4px;
-}
-.waist-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background: var(--nwca-blue);
-    color: white;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    user-select: none;
-}
-.waist-header:hover {
-    background: #002a56;
-}
-.waist-header i {
-    width: 12px;
-    text-align: center;
-}
-.waist-count {
-    margin-left: auto;
-    font-weight: normal;
-    font-size: 12px;
-    opacity: 0.8;
-}
-.waist-sizes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 10px;
-    background: #f8f9fa;
-}
-.waist-sizes .size-popup-item {
-    margin: 0;
-}
-/* Max height for pants popup grid with scroll */
-.size-popup-grid:has(.pants-waist-group) {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.size-popup-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 16px;
-    background: #f5f5f5;
-    border-top: 1px solid #e0e0e0;
-    border-radius: 0 0 10px 10px;
-}
-.size-popup-cancel {
-    padding: 10px 20px;
-    border: 1px solid #ccc;
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-}
-.size-popup-cancel:hover { background: #f0f0f0; }
-.size-popup-apply {
-    padding: 10px 24px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.size-popup-apply:hover { background: #218838; }
-.size-popup-apply:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-}
-
-/* Loading state for popup */
-.size-popup-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    color: #666;
-    gap: 10px;
-}
-.size-popup-loading .spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e0e0e0;
-    border-top-color: var(--nwca-blue);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-/* No sizes available message */
-.size-popup-empty {
-    padding: 20px;
-    text-align: center;
-    color: #666;
-    font-style: italic;
-}
-
-/* XXXL cell clickable style */
-.xxxl-picker-btn {
-    cursor: pointer !important;
-    background: #e8f4fd !important;
-    border: 1px dashed var(--nwca-blue) !important;
-    color: var(--nwca-blue) !important;
-    font-weight: 600;
-}
-.xxxl-picker-btn:hover {
-    background: #d0e8fa !important;
-}
-.xxxl-picker-btn::placeholder {
-    color: var(--nwca-blue);
-    opacity: 0.7;
-}
-
-/* Popup backdrop */
-.size-popup-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1999;
-}
-.size-popup-backdrop.hidden { display: none; }
-
-/* ============================================
-   SHARED: Loading State
-   ============================================ */
-/* Loading state */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255,255,255,0.9);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 5000;
-}
-
-.loading-overlay.show {
-    display: flex;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e0e0e0;
-    border-top-color: var(--nwca-blue);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+/* Loading State — moved to quote-builder-common.css (2026-03-23) */
 
 /* ============================================
    RESPONSIVE - Mobile Breakpoints
@@ -3956,3 +2502,194 @@ td.size-disabled input {
     margin-right: 10px;
     vertical-align: middle;
 }
+
+/* ============================================
+   DECG STITCH COUNT MODAL (extracted from inline <style> 2026-03-23)
+   ============================================ */
+.decg-stitch-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.decg-stitch-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+.decg-stitch-item .item-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.decg-stitch-item .badge-decg { background: #fef3c7; color: #92400e; }
+.decg-stitch-item .badge-decc { background: #dbeafe; color: #1e40af; }
+.decg-stitch-item .item-info { flex: 1; }
+.decg-stitch-item .item-desc { font-size: 13px; color: #334155; margin-bottom: 2px; }
+.decg-stitch-item .item-qty { font-size: 11px; color: #64748b; }
+.decg-stitch-item .stitch-input-group { display: flex; align-items: center; gap: 4px; }
+.decg-stitch-item input[type="number"] {
+    width: 80px;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: right;
+}
+.decg-stitch-item .stitch-unit { font-size: 12px; color: #64748b; }
+.decg-stitch-item .item-price { min-width: 70px; text-align: right; font-weight: 600; color: #059669; }
+
+/* ============================================
+   SERVICE PRICING REVIEW MODAL (extracted from inline <style> 2026-03-23)
+   ============================================ */
+.spr-table-wrapper { overflow-x: auto; margin-top: 8px; }
+.spr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.spr-table th {
+    background: #f1f5f9;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.spr-table th:nth-child(n+4) { text-align: center; }
+.spr-table td { padding: 10px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+.spr-table tbody tr:hover { background: #f8fafc; }
+.spr-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.spr-type-al { background: #dbeafe; color: #1e40af; }
+.spr-type-fb { background: #fce7f3; color: #9d174d; }
+.spr-type-monogram { background: #f3e8ff; color: #6b21a8; }
+.spr-type-decg { background: #fef3c7; color: #92400e; }
+.spr-type-decc { background: #cffafe; color: #155e75; }
+.spr-type-cb { background: #dbeafe; color: #1e40af; }
+.spr-type-cs { background: #dbeafe; color: #1e40af; }
+.spr-delta-badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 600; margin-left: 6px; white-space: nowrap; }
+.spr-delta-badge.ok { background: #dcfce7; color: #166534; }
+.spr-delta-badge.review { background: #fef3c7; color: #92400e; }
+.spr-delta-badge.mismatch { background: #fee2e2; color: #991b1b; }
+.spr-delta-warning {
+    padding: 8px 12px; margin-bottom: 10px; border-radius: 6px;
+    background: #fffbeb; border: 1px solid #fde68a;
+    font-size: 12px; color: #92400e;
+    display: flex; align-items: center; gap: 8px;
+}
+.spr-delta-warning i { color: #f59e0b; }
+.spr-decg-detail { font-size: 11px; color: #64748b; padding: 4px 10px 4px 28px; }
+.spr-decg-detail td { padding: 3px 8px; border-bottom: none; font-size: 11px; }
+.spr-decg-detail .detail-label { color: #94a3b8; }
+.spr-stitch-input {
+    width: 75px; padding: 5px 6px; border: 1px solid #cbd5e1;
+    border-radius: 4px; font-size: 13px; text-align: right;
+}
+.spr-stitch-input:focus { border-color: #0ea5e9; outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+.spr-radio-cell { text-align: center; white-space: nowrap; }
+.spr-radio-cell label { display: flex; align-items: center; gap: 4px; cursor: pointer; justify-content: center; }
+.spr-radio-cell input[type="radio"] { margin: 0; cursor: pointer; }
+.spr-price-label { font-weight: 500; color: #334155; }
+.spr-price-label.disabled { color: #94a3b8; text-decoration: line-through; }
+.spr-custom-input {
+    width: 70px; padding: 4px 6px; border: 1px solid #cbd5e1;
+    border-radius: 4px; font-size: 13px; text-align: right;
+}
+.spr-custom-input:disabled { background: #f1f5f9; color: #94a3b8; }
+.spr-custom-input.spr-muted { background: #f1f5f9; color: #94a3b8; opacity: 0.6; }
+.spr-custom-input:focus { border-color: #0ea5e9; outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+.spr-unavailable { font-size: 11px; color: #94a3b8; font-style: italic; }
+.spr-section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #64748b;
+    border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin: 14px 0 8px;
+}
+#spr-products-section .spr-section-label { margin-top: 0; }
+.spr-product-card { border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+.spr-product-header { padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+.spr-product-title { font-weight: 600; font-size: 13px; color: #1e293b; }
+.spr-product-sizes { padding: 0; }
+.spr-product-table th:nth-child(n+2) { text-align: center; }
+.spr-size-label-cell { font-weight: 500; font-size: 12px; color: #475569; }
+
+/* ============================================
+   NON-SANMAR PRODUCT MODAL (extracted from inline <style> 2026-03-23)
+   ============================================ */
+.ns-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ns-full-width { grid-column: 1 / -1; }
+.ns-form-group label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+.ns-form-group label small { font-weight: 400; color: #94a3b8; }
+.ns-required { color: #ef4444; }
+.ns-input {
+    width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1;
+    border-radius: 6px; font-size: 14px; box-sizing: border-box;
+}
+.ns-input:focus { border-color: #7c3aed; outline: none; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15); }
+.ns-input-readonly { background: #f1f5f9; color: #64748b; }
+.btn-add-nonsanmar {
+    display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px;
+    background: #7c3aed; color: white; border: none; border-radius: 5px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-add-nonsanmar:hover { background: #6d28d9; }
+.btn-add-nonsanmar i { font-size: 12px; }
+.non-sanmar-badge {
+    display: inline-block; padding: 1px 6px; margin-left: 4px;
+    background: #ede9fe; color: #7c3aed; border-radius: 3px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase; vertical-align: middle;
+}
+.import-summary-banner {
+    margin: 8px 0; padding: 12px 16px; border-radius: 8px;
+    border: 1px solid #d1d5db; font-size: 13px; line-height: 1.5;
+    position: relative; animation: bannerSlideIn 0.3s ease-out;
+}
+@keyframes bannerSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.import-summary-banner.banner-success { background: #f0fdf4; border-color: #86efac; }
+.import-summary-banner.banner-warning { background: #fffbeb; border-color: #fcd34d; }
+.import-summary-banner .banner-title { font-weight: 700; margin-bottom: 4px; color: #1e293b; }
+.import-summary-banner .banner-detail { color: #475569; font-size: 12px; }
+.import-summary-banner .banner-ns-item { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
+.import-summary-banner .banner-ns-item:hover { text-decoration: underline; }
+.import-summary-banner .banner-ns-item .ns-price-ok { color: #16a34a; }
+.import-summary-banner .banner-ns-item .ns-price-warn { color: #dc2626; }
+.import-summary-banner .btn-dismiss-banner {
+    position: absolute; top: 8px; right: 12px; background: none;
+    border: none; color: #94a3b8; cursor: pointer; font-size: 12px;
+    padding: 4px 8px; border-radius: 4px;
+}
+.import-summary-banner .btn-dismiss-banner:hover { background: rgba(0,0,0,0.05); color: #475569; }
+.ns-more-options-toggle {
+    display: flex; align-items: center; gap: 6px; background: none;
+    border: none; color: #7c3aed; font-size: 12px; font-weight: 600;
+    cursor: pointer; padding: 8px 0 4px; margin-top: 4px;
+}
+.ns-more-options-toggle:hover { color: #5b21b6; }
+.ns-more-options-toggle i { transition: transform 0.2s; }
+.ns-more-options-toggle.expanded i { transform: rotate(90deg); }
+.ns-more-options-section { display: none; padding-top: 8px; }
+.ns-more-options-section.visible { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ns-price-display { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.ns-price-display .fa-pencil-alt { font-size: 10px; color: #94a3b8; opacity: 0; transition: opacity 0.15s; }
+.ns-price-display:hover .fa-pencil-alt { opacity: 1; color: #7c3aed; }
+.ns-price-zero { background: #fef2f2 !important; }
+.ns-price-zero .ns-price-display { color: #dc2626; font-weight: 600; }
+.btn-add-nonsanmar-block { display: block; margin-top: 6px; }
+@keyframes btnPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(124, 58, 237, 0); }
+}
+.btn-add-nonsanmar.pulse { animation: btnPulse 1.5s ease-in-out 3; }

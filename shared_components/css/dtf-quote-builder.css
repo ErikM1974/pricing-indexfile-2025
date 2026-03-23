@@ -5,10 +5,10 @@
  * Two-column layout with sidebar
  */
 
+/* Reset, Loading, Header, Main Layout — moved to quote-builder-common.css (2026-03-23) */
+
 /* =============================================
-   CSS VARIABLES
-   Uses unified --builder-* variables from quote-builder-common.css
-   Updated 2026-01-29 for cross-builder standardization
+   DTF-SPECIFIC CSS VARIABLES
    ============================================= */
 :root {
     /* DTF-specific aliases pointing to standardized variables */
@@ -25,63 +25,13 @@
     --dtf-warning: var(--builder-warning, #d97706);
     --dtf-info: var(--builder-info, #2563eb);
 
-    /* Legacy variables for backwards compatibility */
-    --border-color: var(--builder-border, #dee2e6);
-    --bg-light: #f8f9fa;
-    --bg-sidebar: #f1f3f5;
+    /* DTF text colors */
     --text-dark: var(--builder-text-dark, #1f2937);
     --text-muted: var(--builder-text-muted, #6b7280);
 }
 
 /* =============================================
-   RESET & BASE
-   ============================================= */
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-
-/* =============================================
-   LOADING OVERLAY
-   ============================================= */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255,255,255,0.9);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.loading-overlay.active {
-    display: flex;
-}
-
-.loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid var(--dtf-primary-50);
-    border-top-color: var(--dtf-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* =============================================
-   ERROR BANNER
+   DTF-SPECIFIC: Error Banner
    ============================================= */
 .error-banner {
     background: var(--dtf-error);
@@ -99,59 +49,9 @@ body {
     display: none;
 }
 
-/* =============================================
-   HEADER
-   ============================================= */
-.power-header.dtf-header {
-    background: var(--dtf-header-bg);
-    color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.power-header .logo {
-    height: 40px;
-}
-
-.power-header .btn-header {
-    background: rgba(255,255,255,0.2);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
-}
-
-.power-header .btn-header:hover {
-    background: rgba(255,255,255,0.3);
-}
-
-/* =============================================
-   MAIN LAYOUT - TWO COLUMN
-   ============================================= */
-.power-main {
-    display: flex;
-    height: calc(100vh - 60px);
-    overflow: hidden;
-}
-
-.power-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
+/* DTF-SPECIFIC: Sidebar overrides (wider, auto-scroll) */
 .power-sidebar {
     width: 320px;
-    background: var(--bg-sidebar);
-    border-left: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
     overflow-y: auto;
 }
 
@@ -375,143 +275,9 @@ body {
     font-size: 10px;
 }
 
-/* =============================================
-   PRODUCT GRID SECTION
-   ============================================= */
-.product-grid-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 16px 20px;
-    overflow: hidden;
-}
+/* Product Grid & Search — now in quote-builder-common.css (2026-03-23) */
 
-/* Search Row */
-.search-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.search-input-wrapper {
-    flex: 1;
-    position: relative;
-    max-width: 400px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px 12px 10px 52px !important;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--dtf-primary);
-}
-
-.search-input:disabled {
-    background: #f3f4f6;
-    cursor: not-allowed;
-}
-
-.search-hint {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-/* Search Suggestions */
-.search-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 500;  /* Match --z-search-suggestions variable */
-    display: none;
-}
-
-.search-suggestions.active {
-    display: block;
-}
-
-.suggestion-item {
-    padding: 10px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #f3f4f6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.suggestion-item:hover,
-.suggestion-item.selected {
-    background: var(--dtf-primary-50);
-}
-
-.suggestion-item .style {
-    font-weight: 600;
-    color: var(--text-dark);
-}
-
-.suggestion-item .title {
-    color: var(--text-muted);
-    font-size: 12px;
-}
-
-/* =============================================
-   EXCEL-STYLE PRODUCT TABLE
-   ============================================= */
-.product-table-wrapper {
-    flex: 1;
-    overflow: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: white;
-    position: relative;
-}
-
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.product-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-/* .product-table th — moved to quote-builder-common.css (2026-03-21 consolidation) */
-
-/* th:first-child + column widths — moved to quote-builder-common.css (2026-03-21) */
-
-/* Column-specific th widths + backgrounds — moved to quote-builder-common.css (2026-03-21) */
-}
-
-.product-table td {
-    padding: 4px;
-    border: 1px solid #e5e7eb;
-    vertical-align: middle;
-}
+/* Product Table Base (wrapper, table, thead, td) — now in quote-builder-common.css (2026-03-23) */
 
 /* Style and Description column padding */
 .product-table td.style-col {
@@ -589,17 +355,7 @@ body {
     cursor: help;
 }
 
-.product-table tr:nth-child(even) {
-    background: #fafafa;
-}
-
-.product-table tr:hover {
-    background: #fff8e1;
-}
-
-.product-table tr.new-row {
-    background: var(--dtf-primary-50);
-}
+/* Product table row stripes, hover, new-row — now in quote-builder-common.css (2026-03-23) */
 
 /* Cell displays */
 .cell-display {
@@ -726,22 +482,7 @@ body {
     display: none;
 }
 
-/* Keyboard Hints */
-.keyboard-hint {
-    padding: 8px 0;
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.keyboard-hint kbd {
-    background: #f3f4f6;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 10px;
-    border: 1px solid #e5e7eb;
-}
+/* Keyboard Hint base — now in quote-builder-common.css (2026-03-23) */
 
 /* =============================================
    SIDEBAR PANELS
@@ -818,63 +559,16 @@ body {
     color: #9d174d;
 }
 
-/* Pricing Panel */
-.pricing-panel {
-    flex: 1;
-    background: white;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.pricing-title {
-    padding: 12px 14px;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text-dark);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.pricing-title i {
-    color: var(--dtf-primary);
-}
+/* Pricing Panel, Title, Row, Tier Badge — now in quote-builder-common.css (2026-03-23) */
 
 .pricing-panel .panel-title i {
     color: var(--dtf-primary);
-}
-
-.pricing-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 14px;
-    font-size: 13px;
-}
-
-.pricing-row .label {
-    color: var(--text-muted);
-}
-
-.pricing-row .value {
-    font-weight: 600;
-    color: var(--text-dark);
 }
 
 .pricing-divider {
     height: 1px;
     background: #e5e7eb;
     margin: 4px 14px;
-}
-
-.tier-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    background: var(--dtf-primary);
-    color: white;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
 }
 
 .ltm-row {
@@ -886,27 +580,7 @@ body {
     color: #92400e;
 }
 
-/* Minimum order warning (qty < 10) */
-#min-order-warning {
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    color: #856404;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#min-order-warning i {
-    color: #ffc107;
-    font-size: 1.2em;
-}
-
-#min-order-warning strong {
-    margin-right: 4px;
-}
+/* Min Order Warning — moved to quote-builder-common.css (2026-03-23) */
 
 /* Total Row (DTG Style) */
 .pricing-row.total {
@@ -1706,124 +1380,9 @@ body {
     font-size: 12px;
 }
 
-/* =============================================
-   LTM DISTRIBUTION TOGGLE (matches DTG pattern)
-   ============================================= */
-.ltm-value-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+/* LTM Distribution Toggle — now in quote-builder-common.css (2026-03-23) */
 
-.ltm-distribute-btn {
-    padding: 4px 10px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #666;
-}
-
-.ltm-distribute-btn .btn-text {
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.ltm-distribute-btn:hover {
-    border-color: var(--dtf-primary);
-    color: var(--dtf-primary);
-    background: #f0fdf4;
-}
-
-.ltm-distribute-btn.active {
-    background: var(--dtf-primary);
-    border-color: var(--dtf-primary);
-    color: white;
-}
-
-/* Distributed value style - shows per-unit amount */
-#ltm-fee.distributed {
-    color: var(--dtf-primary);
-    font-style: italic;
-    font-size: 12px;
-}
-
-/* =============================================
-   CHILD ROW STYLES (Extended Sizes)
-   Matches DTG/Embroidery pattern
-   ============================================= */
-
-/* Child row basic styling */
-.product-table tr.child-row {
-    background: #f8f9fa;
-}
-
-.product-table tr.child-row:hover {
-    background: #f0f0f0;
-}
-
-/* Child row indentation with └ symbol */
-.product-table tr.child-row td:first-child {
-    position: relative;
-    padding-left: 28px;
-}
-
-.product-table tr.child-row td:first-child::before {
-    content: "└";
-    position: absolute;
-    left: 10px;
-    color: #9ca3af;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-/* Child row style display */
-.product-table tr.child-row .style-display {
-    font-weight: 500;
-    color: #6b7280;
-    font-size: 12px;
-}
-
-.product-table tr.child-row .desc-display {
-    font-size: 11px;
-    color: #9ca3af;
-}
-
-/* Different color indicator (yellow warning) */
-.product-table tr.child-row.different-color {
-    background: #fff3cd;
-    border-left: 3px solid #ffc107;
-}
-
-.product-table tr.child-row.different-color td:first-child {
-    color: #856404;
-    font-weight: 600;
-}
-
-/* Child row color picker wrapper */
-.product-table tr.child-row .child-color-picker .color-picker-selected {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    padding: 4px 8px;
-}
-
-.product-table tr.child-row .child-color-picker .color-picker-selected:hover {
-    border-color: var(--dtf-primary);
-    background: #f9fafb;
-}
-
-/* Child row delete button */
-.product-table tr.child-row .btn-delete-row {
-    color: #9ca3af;
-}
-
-.product-table tr.child-row .btn-delete-row:hover {
-    color: #dc2626;
-    background: #fef2f2;
-}
+/* Child Row Styles — now in quote-builder-common.css (2026-03-23) */
 
 /* =============================================
    SAVE & SHARE SECTION (Sidebar Panel)
@@ -2180,15 +1739,7 @@ body {
     100% { background: transparent; }
 }
 
-/* --- Unsaved Changes Pulse --- */
-.unsaved-badge {
-    animation: unsaved-pulse 2s ease-in-out infinite;
-}
-
-@keyframes unsaved-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-}
+/* Unsaved badge — moved to quote-builder-common.css (2026-03-23) */
 
 /* --- Empty State Step Badges --- */
 .step-badge {
