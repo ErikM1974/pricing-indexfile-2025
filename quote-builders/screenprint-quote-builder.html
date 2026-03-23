@@ -385,13 +385,19 @@
                         <span class="value" id="pre-tax-subtotal">$0.00</span>
                     </div>
                     <div class="pricing-row" id="tax-toggle-row">
-                        <label class="d-flex align-items-center gap-2">
+                        <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
                             <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
-                            <span>Include WA Sales Tax (10.1%)</span>
+                            <span style="font-size: 12px;">Include Tax</span>
                         </label>
+                        <div class="d-flex align-items-center gap-1">
+                            <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                                   style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
+                                   onchange="updateTaxCalculation()" title="Tax rate %">
+                            <span style="font-size: 11px; color: #64748b;">%</span>
+                        </div>
                     </div>
                     <div class="pricing-row" id="tax-row">
-                        <span class="label text-muted">WA Sales Tax:</span>
+                        <span class="label text-muted">Sales Tax:</span>
                         <span class="value" id="tax-amount">$0.00</span>
                     </div>
                     <div class="pricing-row grand-total-row">
@@ -555,6 +561,9 @@
                             </select>
                         </div>
                     </div>
+                    <!-- Order & Shipping Fields (shared component) -->
+                    <div id="spc-order-fields" style="margin-top: 12px;"></div>
+
                     <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
@@ -570,6 +579,9 @@
                 </button>
                 <button class="btn-action btn-secondary-action" onclick="printQuote()">
                     <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="spcEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
+                    <i class="fas fa-envelope"></i> Email Quote
                 </button>
             </div>
         </div>
@@ -1323,6 +1335,9 @@
                 // Populate products from line items
                 await populateProducts(items);
 
+                // Restore order & shipping fields from saved session
+                setOrderShippingData('spc-order-fields', session);
+
                 // Recalculate pricing to update totals
                 recalculatePricing();
 
@@ -1427,6 +1442,11 @@
             document.getElementById('customer-email').value = '';
             document.getElementById('company-name').value = '';
             document.getElementById('customer-lookup').value = '';
+
+            // Reset order & shipping fields
+            setOrderShippingData('spc-order-fields', {});
+            const taxRateReset = document.getElementById('tax-rate-input');
+            if (taxRateReset) taxRateReset.value = '10.1';
 
             // Reset additional charges
             const rushFee = document.getElementById('rush-fee');
@@ -1542,6 +1562,17 @@
                         }
                     });
                 }
+
+                // Initialize order & shipping fields (shared component)
+                renderOrderShippingFields('spc-order-fields');
+                initOrderShippingListeners('spc-order-fields', {
+                    onShippingFeeChange: () => updateTaxCalculation(),
+                    onTaxRateChange: (rate) => {
+                        const rateInput = document.getElementById('tax-rate-input');
+                        if (rateInput) rateInput.value = rate;
+                        updateTaxCalculation();
+                    }
+                });
 
                 // Auto-focus search bar for immediate typing (UX improvement)
                 const searchInput = document.getElementById('product-search');
@@ -3935,15 +3966,21 @@
             }
             subtotal = Math.max(0, subtotal - discount);
 
+            // Add shipping fee (after discount — shipping not discountable)
+            const shippingFee = parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0;
+            subtotal += shippingFee;
+
             // Update the pre-tax subtotal display to show adjusted amount
             if (subtotalEl) {
                 subtotalEl.textContent = '$' + subtotal.toFixed(2);
             }
 
-            const taxRate = 0.101; // 10.1% WA sales tax
+            // Dynamic tax rate from ZIP lookup or manual input
+            const taxRateInput = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+            const taxRate = taxRateInput / 100;
 
             if (includeTax) {
-                const tax = subtotal * taxRate;
+                const tax = Math.round(subtotal * taxRate * 100) / 100;
                 const total = subtotal + tax;
                 taxRowEl.style.display = 'flex';
                 taxAmountEl.textContent = '$' + tax.toFixed(2);
@@ -4470,7 +4507,9 @@
                     discountReason: discountReason,
                     // LTM display preferences (2026-03-22)
                     ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
-                    ltmWaived: !getLtmControlState('spc-ltm-panel').enabled
+                    ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
+                    // Order & shipping fields (2026-03-22)
+                    ...getOrderShippingData('spc-order-fields')
                 };
 
                 let result;
@@ -4527,21 +4566,18 @@
             return saveAndGetLink();
         }
 
-        async function emailQuote() {
-            const products = collectProductsFromTable();
-            if (products.length === 0) {
-                showToast('Add products before emailing', 'error');
+        async function spcEmailQuote() {
+            const quoteId = editingQuoteId;
+            if (!quoteId) {
+                showToast('Please save the quote first before emailing', 'error');
                 return;
             }
-
-            const customerEmail = document.getElementById('customer-email').value;
-            if (!customerEmail) {
-                showToast('Enter customer email', 'error');
-                document.getElementById('customer-email').focus();
-                return;
-            }
-
-            showToast('Email functionality coming soon', 'info');
+            await emailQuote({
+                quoteId,
+                customerEmail: document.getElementById('customer-email')?.value?.trim(),
+                customerName: document.getElementById('customer-name')?.value?.trim(),
+                salesRepEmail: document.getElementById('sales-rep')?.value
+            });
         }
 
         // Toggle Coming Soon accordion

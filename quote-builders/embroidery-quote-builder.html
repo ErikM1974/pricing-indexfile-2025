@@ -8595,22 +8595,18 @@ Company:Absher Construction Company
             }
         }
 
-        async function emailQuote() {
-            const allItems = collectProductsFromTable();
-            const decgItems = collectDECGItems();
-            if (allItems.length === 0 && decgItems.length === 0) {
-                showToast('Add products before emailing', 'error');
+        async function embEmailQuote() {
+            const quoteId = editingQuoteId;
+            if (!quoteId) {
+                showToast('Please save the quote first before emailing', 'error');
                 return;
             }
-
-            const customerEmail = document.getElementById('customer-email').value;
-            if (!customerEmail) {
-                showToast('Enter customer email', 'error');
-                document.getElementById('customer-email').focus();
-                return;
-            }
-
-            showToast('Email functionality not yet available. Use Print to PDF and email manually.', 'info');
+            await emailQuote({
+                quoteId,
+                customerEmail: document.getElementById('customer-email')?.value?.trim(),
+                customerName: document.getElementById('customer-name')?.value?.trim(),
+                salesRepEmail: document.getElementById('sales-rep')?.value
+            });
         }
 
         // Toggle Coming Soon accordion

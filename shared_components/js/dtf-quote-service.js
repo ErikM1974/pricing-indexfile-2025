@@ -171,7 +171,9 @@ class DTFQuoteService {
                 DiscountReason: quoteData.discountReason || '',
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
-                LTM_Waived: quoteData.ltmWaived ? true : false
+                LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Shipping fee + notes (2026-03-22)
+                ShippingFee: parseFloat(quoteData.shippingFee) || 0
             };
 
             // Save session
@@ -636,7 +638,9 @@ class DTFQuoteService {
                 RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com',
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
-                LTM_Waived: quoteData.ltmWaived ? true : false
+                LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Shipping fee (2026-03-22)
+                ShippingFee: parseFloat(quoteData.shippingFee) || 0
             };
 
             // Update session via PUT

@@ -312,11 +312,17 @@
                         <div class="pricing-row" id="tax-toggle-row">
                             <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
                                 <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
-                                <span style="font-size: 12px;">Include WA Sales Tax (10.1%)</span>
+                                <span style="font-size: 12px;">Include Tax</span>
                             </label>
+                            <div class="d-flex align-items-center gap-1">
+                                <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                                       style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
+                                       onchange="updateTaxCalculation()" title="Tax rate %">
+                                <span style="font-size: 11px; color: #64748b;">%</span>
+                            </div>
                         </div>
                         <div class="pricing-row" id="tax-row">
-                            <span class="label text-muted">WA Sales Tax:</span>
+                            <span class="label text-muted">Sales Tax:</span>
                             <span class="value" id="tax-amount">$0.00</span>
                         </div>
                         <div class="pricing-row grand-total-row">
@@ -478,6 +484,9 @@
                                 </select>
                             </div>
                         </div>
+                        <!-- Order & Shipping Fields (shared component) -->
+                        <div id="dtg-order-fields" style="margin-top: 12px;"></div>
+
                         <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                             <i class="fas fa-link"></i> Save & Get Shareable Link
                         </button>
@@ -492,6 +501,9 @@
                 </button>
                 <button class="btn-action btn-secondary-action" onclick="printQuote()">
                     <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="dtgEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
+                    <i class="fas fa-envelope"></i> Email Quote
                 </button>
             </div>
         </div>
@@ -1022,6 +1034,14 @@
                 // Populate products from line items
                 await populateProducts(items);
 
+                // Restore order & shipping fields from saved session
+                setOrderShippingData('dtg-order-fields', session);
+                // Restore tax rate if saved
+                if (session.TaxRate) {
+                    const rateInput = document.getElementById('tax-rate-input');
+                    if (rateInput) rateInput.value = parseFloat(session.TaxRate) * 100 || 10.1;
+                }
+
                 // Recalculate pricing to update totals
                 recalculateAllPrices();
 
@@ -1109,6 +1129,11 @@
             setLtmControlState('dtg-ltm-panel', { enabled: true, displayMode: 'builtin' });
             const ltmWrapperReset = document.getElementById('dtg-ltm-wrapper');
             if (ltmWrapperReset) ltmWrapperReset.style.display = 'none';
+
+            // Reset order & shipping fields
+            setOrderShippingData('dtg-order-fields', {});
+            const taxRateReset = document.getElementById('tax-rate-input');
+            if (taxRateReset) taxRateReset.value = '10.1';
 
             // Reset additional charges
             const rushFee = document.getElementById('rush-fee');
@@ -1208,6 +1233,17 @@
                         }
                     });
                 }
+
+                // Initialize order & shipping fields (shared component)
+                renderOrderShippingFields('dtg-order-fields');
+                initOrderShippingListeners('dtg-order-fields', {
+                    onShippingFeeChange: () => updateTaxCalculation(),
+                    onTaxRateChange: (rate) => {
+                        const rateInput = document.getElementById('tax-rate-input');
+                        if (rateInput) rateInput.value = rate;
+                        updateTaxCalculation();
+                    }
+                });
 
                 // Auto-focus search bar for immediate typing (UX improvement)
                 const searchInput = document.getElementById('product-search');
@@ -3738,6 +3774,9 @@
             const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
             const discountType = document.getElementById('discount-type')?.value || 'fixed';
 
+            // Get shipping fee from order fields
+            const shippingFee = parseFloat(document.querySelector('#dtg-order-fields .os-shipping-fee')?.value) || 0;
+
             // Calculate adjusted subtotal
             let adjustedSubtotal = productsSubtotal + ltmValue + artCharge + designFee + rushFee;
 
@@ -3750,15 +3789,20 @@
                 }
             }
 
+            // Add shipping (after discount — shipping is not discountable)
+            adjustedSubtotal += shippingFee;
+
             // Update pre-tax subtotal display
             if (preTaxSubtotalEl) {
                 preTaxSubtotalEl.textContent = `$${adjustedSubtotal.toFixed(2)}`;
             }
 
-            const taxRate = 0.101; // 10.1% WA sales tax
+            // Dynamic tax rate from ZIP lookup or manual input
+            const taxRateInput = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+            const taxRate = taxRateInput / 100;
 
             if (includeTax && adjustedSubtotal > 0) {
-                const tax = adjustedSubtotal * taxRate;
+                const tax = Math.round(adjustedSubtotal * taxRate * 100) / 100;
                 const total = adjustedSubtotal + tax;
                 if (taxRowEl) taxRowEl.style.display = 'flex';
                 if (taxAmountEl) taxAmountEl.textContent = `$${tax.toFixed(2)}`;
@@ -4361,7 +4405,9 @@
                     discountReason: discountReason,
                     // LTM display preferences (2026-03-22)
                     ltmDisplayMode: getLtmControlState('dtg-ltm-panel').displayMode || 'builtin',
-                    ltmWaived: !getLtmControlState('dtg-ltm-panel').enabled
+                    ltmWaived: !getLtmControlState('dtg-ltm-panel').enabled,
+                    // Order & shipping fields (2026-03-22)
+                    ...getOrderShippingData('dtg-order-fields')
                 };
 
                 let result;
@@ -4418,7 +4464,19 @@
             return saveAndGetLink();
         }
 
-        // emailQuote() removed — placeholder, never called
+        async function dtgEmailQuote() {
+            const quoteId = editingQuoteId;
+            if (!quoteId) {
+                showToast('Please save the quote first before emailing', 'error');
+                return;
+            }
+            await emailQuote({
+                quoteId,
+                customerEmail: document.getElementById('customer-email')?.value?.trim(),
+                customerName: document.getElementById('customer-name')?.value?.trim(),
+                salesRepEmail: document.getElementById('sales-rep')?.value
+            });
+        }
 
         async function copyToClipboard() {
             const products = collectProductsFromTable();

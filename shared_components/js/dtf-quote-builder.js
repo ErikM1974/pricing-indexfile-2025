@@ -2402,7 +2402,10 @@ class DTFQuoteBuilder {
             discountReason: document.getElementById('discount-reason')?.value || '',
             // LTM display preferences (2026-03-22)
             ltmDisplayMode: getLtmControlState('dtf-ltm-panel').displayMode || 'builtin',
-            ltmWaived: !getLtmControlState('dtf-ltm-panel').enabled
+            ltmWaived: !getLtmControlState('dtf-ltm-panel').enabled,
+            // Shipping fee + notes (2026-03-22)
+            shippingFee: parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0,
+            notes: document.getElementById('dtf-notes')?.value?.trim() || ''
         };
 
         // Show saving state on button

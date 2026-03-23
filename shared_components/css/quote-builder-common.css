@@ -1455,6 +1455,48 @@ textarea:disabled {
 }
 
 /* ============================================
+   ORDER & SHIPPING PANEL
+   Shared order/shipping/notes fields
+   ============================================ */
+
+.order-shipping-panel {
+    margin-bottom: 12px;
+}
+
+.order-shipping-panel .charges-header {
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
+}
+
+.order-shipping-panel .charges-header:hover {
+    background: #e0efff;
+}
+
+.order-shipping-panel .charges-header i:first-child {
+    color: #3b82f6;
+}
+
+.btn-tax-lookup {
+    flex: 0 0 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f8fafc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    transition: background 0.15s, border-color 0.15s;
+    align-self: flex-end;
+}
+
+.btn-tax-lookup:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+/* ============================================
    UX OPTIMIZATION 2026 - Data Entry Improvements
    Added 2026-01-29 for consistent, efficient data entry
    ============================================ */

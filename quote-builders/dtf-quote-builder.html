@@ -594,12 +594,31 @@
                                         <option value="Delivery">Local Delivery</option>
                                     </select>
                                 </div>
+                                <!-- Shipping Fee -->
+                                <div class="customer-field">
+                                    <label class="quote-label" style="font-size: 11px;">Shipping Fee</label>
+                                    <div style="position: relative;">
+                                        <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;">$</span>
+                                        <input type="number" id="dtf-shipping-fee" min="0" step="0.01" placeholder="0.00" value="0"
+                                               class="quote-input" style="font-size: 12px; padding: 6px 8px 6px 22px;"
+                                               onchange="updateTaxCalculation()" oninput="updateTaxCalculation()">
+                                    </div>
+                                </div>
+                                <!-- Notes -->
+                                <div class="customer-field" style="margin-top: 4px;">
+                                    <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
+                                    <textarea id="dtf-notes" placeholder="Special instructions, employee names, etc."
+                                              class="quote-input" style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
+                    </button>
+                    <button type="button" onclick="dtfEmailQuote()" style="margin-top: 8px; width: 100%; padding: 10px; background: #eff6ff; color: #2563eb; border: 1px solid #93c5fd; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;">
+                        <i class="fas fa-envelope"></i> Email Quote
                     </button>
                 </div>
             </div>
@@ -770,6 +789,10 @@
                 discount = discountAmount;
             }
             subtotal = Math.max(0, subtotal - discount);
+
+            // Add shipping fee (after discount — shipping not discountable, taxable in WA)
+            const shippingFee = parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0;
+            subtotal += shippingFee;
 
             // Update the pre-tax subtotal display to show adjusted amount
             if (subtotalEl) {
@@ -972,6 +995,20 @@
             if (state === 'WA' && zip.length >= 5) {
                 lookupTaxRate();
             }
+        }
+
+        async function dtfEmailQuote() {
+            const quoteId = window.dtfQuoteBuilder?.editingQuoteId;
+            if (!quoteId) {
+                showToast('Please save the quote first before emailing', 'error');
+                return;
+            }
+            await emailQuote({
+                quoteId,
+                customerEmail: document.getElementById('customer-email')?.value?.trim(),
+                customerName: document.getElementById('customer-name')?.value?.trim(),
+                salesRepEmail: document.getElementById('sales-rep')?.value
+            });
         }
 
         function toggleOrderDetails() {
