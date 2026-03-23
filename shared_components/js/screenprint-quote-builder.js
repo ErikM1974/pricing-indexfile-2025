@@ -3104,6 +3104,7 @@ function updatePricingDisplay(pricing) {
     const totalQty = pricing.totalQuantity || 0;
     document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
+    updatePerUnitPrice(pricing.subtotal || 0, pricing.totalQuantity || 0);
 
     // Minimum order warning banner (show when qty > 0 but < 24)
     const minWarning = document.getElementById('min-order-warning');

@@ -1693,6 +1693,7 @@ class DTFQuoteBuilder {
 
         // Update subtotal and grand total
         document.getElementById('subtotal').textContent = `$${grandTotal.toFixed(2)}`;
+        updatePerUnitPrice(grandTotal, totalQty);
 
         // Update pre-tax subtotal for tax calculation
         const preTaxSubtotal = document.getElementById('pre-tax-subtotal');

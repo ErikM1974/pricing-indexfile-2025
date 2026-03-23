@@ -3040,6 +3040,7 @@ function updatePricingDisplay(pricing) {
     // Basic pricing info
     document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
     document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
+    updatePerUnitPrice(pricing.subtotal || 0, pricing.totalQuantity || 0);
     // Note: #grand-total was replaced by tax section - updateTaxCalculation() handles #grand-total-with-tax
 
     // Pricing tier
