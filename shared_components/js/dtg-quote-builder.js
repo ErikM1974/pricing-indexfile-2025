@@ -2893,10 +2893,40 @@ async function recalculatePricing() {
         // Calculate grand total — in builtin mode LTM is already in subtotal via inflated unit prices
         const grandTotal = (ltmDisplayMode === 'builtin') ? subtotal : subtotal + ltmFee;
 
+        // Compute per-piece savings for next tier nudge
+        // Use first product's pricing data (representative) to compare current vs next tier
+        let nextTierSavings = null;
+        if (pricedProducts.length > 0 && pricedProducts[0].prices) {
+            try {
+                const firstData = pricedProducts[0].prices;
+                const refSize = firstData['M'] ?? firstData['L'] ?? firstData['S'] ?? Object.values(firstData)[0];
+                const currentUnitPrice = refSize || 0;
+                // Get next tier price by requesting pricing at next tier boundary qty
+                const nextBreaks = [12, 24, 48, 72];
+                const nextBreak = nextBreaks.find(b => totalQty < b);
+                if (nextBreak && currentUnitPrice > 0) {
+                    const lastPricingData = await dtgPricingService.fetchPricingData(
+                        pricedProducts[0].product.style, pricedProducts[0].product.catalogColor
+                    );
+                    if (lastPricingData) {
+                        const nextPrices = dtgPricingService.calculateAllLocationPrices(
+                            lastPricingData.pricing || lastPricingData, nextBreak
+                        );
+                        const nextLocPrices = nextPrices?.[printLocation.combined];
+                        const nextRefPrice = nextLocPrices?.['M'] ?? nextLocPrices?.['L'] ?? nextLocPrices?.['S'] ?? (nextLocPrices ? Object.values(nextLocPrices)[0] : 0);
+                        if (nextRefPrice > 0 && currentUnitPrice > nextRefPrice) {
+                            nextTierSavings = currentUnitPrice - nextRefPrice;
+                        }
+                    }
+                }
+            } catch (e) { /* graceful fallback — nudge shows without savings */ }
+        }
+
         // Store LTM state for tax/discount calculations
         window.currentPricingData = window.currentPricingData || {};
         window.currentPricingData.ltmFee = ltmFee;
         window.currentPricingData.ltmDisplayMode = ltmDisplayMode;
+        window.currentPricingData.nextTierSavings = nextTierSavings;
 
         // Update pricing display sidebar
         updatePricingDisplay({
@@ -3041,6 +3071,7 @@ function updatePricingDisplay(pricing) {
     document.getElementById('total-qty').textContent = pricing.totalQuantity || 0;
     document.getElementById('subtotal').textContent = `$${(pricing.subtotal || 0).toFixed(2)}`;
     updatePerUnitPrice(pricing.subtotal || 0, pricing.totalQuantity || 0);
+    updateQuantityNudge(pricing.totalQuantity || 0, 'dtg', window.currentPricingData?.nextTierSavings);
     // Note: #grand-total was replaced by tax section - updateTaxCalculation() handles #grand-total-with-tax
 
     // Pricing tier

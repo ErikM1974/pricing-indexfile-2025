@@ -104,7 +104,9 @@ class ScreenPrintQuoteService {
                 TotalAmount: totalAmount,
                 Status: 'Open',
                 ExpiresAt: expiresAt,
-                Notes: JSON.stringify(printSetup),
+                Notes: JSON.stringify({ ...printSetup, userNotes: quoteData.notes || '' }),
+                // Sales rep (2026-03-23)
+                SalesRepEmail: quoteData.salesRep || '',
                 // Additional charges (2026 fee refactor)
                 ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
                 GraphicDesignHours: parseFloat(quoteData.graphicDesignHours) || 0,
@@ -116,6 +118,8 @@ class ScreenPrintQuoteService {
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Tax rate (2026-03-23)
+                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',
@@ -127,8 +131,7 @@ class ScreenPrintQuoteService {
                 ShipMethod: quoteData.shipMethod || '',
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
                 ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : '',
-                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : '',
-                Notes: quoteData.notes || ''
+                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : ''
             };
 
             // Save session
@@ -363,7 +366,7 @@ class ScreenPrintQuoteService {
                 LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),
                 TotalAmount: parseFloat(totalAmount.toFixed(2)),
                 ExpiresAt: expiresAt,
-                Notes: JSON.stringify(printSetup),
+                Notes: JSON.stringify({ ...printSetup, userNotes: quoteData.notes || '' }),
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                 RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com',
@@ -378,6 +381,8 @@ class ScreenPrintQuoteService {
                 // LTM display preferences (2026-03-22)
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
+                // Tax rate (2026-03-23)
+                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',

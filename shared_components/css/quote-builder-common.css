@@ -757,6 +757,19 @@ body {
     font-weight: 600;
 }
 
+/* Quantity Break Nudge */
+.quantity-nudge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 4px 0 6px;
+    border: 1px solid #fcd34d;
+    line-height: 1.4;
+}
+.quantity-nudge i { color: #d97706; }
+
 /* ============================================
    CUSTOMER INFO PANEL (2026-03-23 consolidation)
    ============================================ */

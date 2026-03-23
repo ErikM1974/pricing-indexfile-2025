@@ -5757,6 +5757,9 @@ function updatePricingDisplay(pricing) {
     document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
     updatePerUnitPrice((pricing.subtotal || 0) + (pricing.ltmFee || 0), pricing.totalQuantity || 0);
+    // EMB savings calculation skipped — pricing depends on stitch count, garment/cap mix, and multiple logo configs
+    // which make a simple tier comparison unreliable. Nudge still shows quantity needed.
+    updateQuantityNudge(pricing.totalQuantity || 0, 'emb', null);
     document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
     // Minimum order warning banner (show when qty > 0 but <= 7)
