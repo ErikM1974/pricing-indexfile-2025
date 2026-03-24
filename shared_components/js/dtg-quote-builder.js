@@ -2343,15 +2343,10 @@ function onSizeChange(rowId) {
             xxlInput.style.background = '#f5f5f5';
             xxlInput.style.color = '#999';
 
-            // Recalculate parent row qty display (without the now-disabled 2XL)
+            // Recalculate parent row qty display (standard sizes only — child rows display separately)
             let newTotal = 0;
             row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
                 newTotal += parseInt(input.value) || 0;
-            });
-            // Add child row quantities
-            document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`).forEach(childRow => {
-                const qtyDisplay = childRow.querySelector('.qty-display');
-                newTotal += parseInt(qtyDisplay?.textContent) || 0;
             });
             document.getElementById(`row-qty-${rowId}`).textContent = newTotal;
         } else {
