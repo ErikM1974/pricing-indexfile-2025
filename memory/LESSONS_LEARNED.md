@@ -29,6 +29,30 @@ Add new entries at the top of the relevant category.
 
 ---
 
+## Bug: SCP recalculatePricing() Crash — `primaryPricing` Out of Scope (2026-03-24)
+
+**Problem:** [Pricing Index] Screenprint quote builder sidebar showed Total Pieces: 0 and Products Subtotal: $0.00 despite rows having correct prices. Console repeated `ReferenceError: primaryPricing is not defined` on every size change.
+
+**Root Cause:** The nudge savings calculation (line 2957) referenced `primaryPricing` and `tierData` which were defined inside a `for (const product of productList)` loop but used after the loop closed. Block-scoped `const` variables aren't accessible outside their block. This was introduced when the quantity nudge with savings feature was added.
+
+**Solution:** Added `firstPricing`/`firstTierData` variables before the loop, captured them on first iteration, used them in the nudge calculation after the loop. (v2026.03.24.2)
+
+**Prevention:** When adding post-loop summary calculations that reference loop-scoped variables, always capture needed values in outer-scope variables. Test with products that have extended sizes (2XL+) since those trigger multiple recalculation cycles.
+
+---
+
+## Bug: Parent Row Qty Double-Counting — Second Code Path in 2XL Handler (2026-03-24)
+
+**Problem:** [Pricing Index] DTG and SCP parent row Qty included child row quantities when 2XL was entered, even after the initial fix (v2026.03.23.12) that corrected the primary `onSizeChange()` path.
+
+**Root Cause:** Two separate code paths update parent Qty: (1) the main `onSizeChange()` handler (fixed correctly), and (2) the 2XL-specific handler that creates/updates child rows. The second path at lines 2351-2355 (DTG) and 2388-2392 (SCP) explicitly added child row quantities back to the parent display — contradicting the fix in path #1.
+
+**Solution:** Removed the 4 lines in each builder that added child row quantities in the 2XL handler. Parent now shows standard sizes only (S+M+L+XL). (v2026.03.24.1)
+
+**Prevention:** When fixing display logic, grep for ALL places that update the same DOM element (e.g., `row-qty-{id}`). Multiple code paths updating the same element is a common source of inconsistency.
+
+---
+
 ## Bug: `sed` Line Deletion Breaks Multi-Line Statements — Orphaned Object Properties (2026-03-22)
 
 **Problem:** [Pricing Index] Using `sed -i '/console\.log/d'` to bulk-remove debug logs broke DTG and Screenprint builders with `SyntaxError: Unexpected token ':'`. Product search completely stopped working.
@@ -2560,3 +2584,12 @@ For best practices/patterns:
 **Root cause:** `detectAndAdjustSizeUI()` fetched `/api/sanmar-shopworks/import-format` on every color selection with ZERO caching. Same style+color triggered same API call repeatedly. Adding multiple products or re-selecting colors caused 10-20 requests/second.
 **Solution:** Added `sizeDetectionCache` (Map) and `productColorsCache` (Map) at top of embroidery-quote-builder.js. Both cap and garment paths check cache before API call. Same style+color never fetched twice in a session.
 **Prevention:** Any API call triggered by user interaction (click, change, input) should be cached if the data doesn't change within a session. Use Map with `${style}-${color}` keys.
+
+---
+
+### DTG/SCP Notes Field Overwrite (2026-03-23)
+**Project:** [Pricing Index] Quote Builders
+**Symptoms:** Saved DTG/SCP quotes lost print location, tier, and project name data. Re-editing a quote showed empty fields.
+**Root cause:** In `dtg-quote-service.js` and `screenprint-quote-service.js`, the `Notes` field was assigned twice in the save payload: first as `JSON.stringify({location, tier, projectName, ...})` then overwritten by `Notes: quoteData.notes || ''` (plain string). The second assignment destroyed the structured data.
+**Solution:** Merged user notes INTO the JSON object as `userNotes` property. Removed the duplicate assignment. Also added `TaxRate` and `SalesRepEmail` fields that were missing from DTG/DTF/SCP (only EMB saved them).
+**Prevention:** Never assign the same property twice in an object literal. Use `grep -n "Notes:" file.js | wc -l` to detect duplicates. When adding new fields to one builder's save payload, check all 4 builders for consistency.
