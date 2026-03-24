@@ -9,6 +9,9 @@
  * - 100% API-driven pricing
  */
 
+// API response cache (prevent 429 rate limit errors on extended size lookups)
+const sizeDetectionCache = new Map(); // key: "style-color" → extended sizes array
+
 class DTFQuoteBuilder {
     constructor() {
         // State
@@ -1204,13 +1207,20 @@ class DTFQuoteBuilder {
         let apiError = false;
 
         let rateLimited = false;
+        const cacheKey = `${styleNumber}-${catalogColor || ''}`;
         try {
-            if (!window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
-                throw new Error('ExtendedSizesConfig module not loaded');
+            if (sizeDetectionCache.has(cacheKey)) {
+                const cached = sizeDetectionCache.get(cacheKey);
+                extendedSizes = cached.filter(size => !['2XL', 'XXL'].includes(size));
+            } else {
+                if (!window.ExtendedSizesConfig?.getAvailableExtendedSizes) {
+                    throw new Error('ExtendedSizesConfig module not loaded');
+                }
+                const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber, catalogColor);
+                sizeDetectionCache.set(cacheKey, allExtended);
+                // Filter out 2XL/XXL since DTF has a dedicated column for it
+                extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
             }
-            const allExtended = await window.ExtendedSizesConfig.getAvailableExtendedSizes(styleNumber, catalogColor);
-            // Filter out 2XL/XXL since DTF has a dedicated column for it
-            extendedSizes = allExtended.filter(size => !['2XL', 'XXL'].includes(size));
         } catch (error) {
             console.error('[DTFQuoteBuilder] Failed to fetch extended sizes:', error);
             if (error.message === 'RATE_LIMITED') {
