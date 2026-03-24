@@ -1549,7 +1549,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
         state: customerData.state || '',
         zip: customerData.zip || customerData.zipCode || '',
         country: 'USA',
-        method: 'UPS Ground'
+        method: customerData.deliveryMethod === 'pickup' ? 'Customer Pickup' : 'UPS Ground'
       },
       // Billing block - proxy reads from orderData.billing (not Customer)
       billing: {
@@ -1565,11 +1565,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
       notes: [{
         type: 'Notes On Order',
         note: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.
-
+${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}
 Customer: ${customerData.firstName} ${customerData.lastName}
 Email: ${customerData.email}
 Phone: ${customerData.phone}
 Company: ${customerData.company || 'N/A'}
+Delivery: ${customerData.deliveryMethod === 'pickup' ? 'Customer Pickup - NW Custom Apparel, Milton, WA 98354' : 'Ship to: ' + (customerData.address1 || '') + ', ' + (customerData.city || '') + ', ' + (customerData.state || '') + ' ' + (customerData.zip || '')}
 Bill To: ${customerData.billingAddress1 || customerData.address1 || ''}, ${customerData.billingCity || customerData.city || ''}, ${customerData.billingState || customerData.state || ''} ${customerData.billingZip || customerData.zip || ''}
 Special Instructions: ${customerData.notes || 'None'}
 

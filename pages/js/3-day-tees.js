@@ -427,6 +427,61 @@
             }
 
             // ========================================
+            // Delivery Method Radio Handler (Ship vs Pickup)
+            // ========================================
+            const deliveryRadios = document.querySelectorAll('input[name="deliveryMethod"]');
+            deliveryRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const isPickup = this.value === 'pickup';
+                    state.deliveryMethod = this.value;
+
+                    const addressFields = document.getElementById('shippingAddressFields');
+                    const pickupNotice = document.getElementById('pickupNotice');
+                    const stateInput = document.getElementById('state');
+                    const zipInput = document.getElementById('zip');
+
+                    if (isPickup) {
+                        // Hide address fields, show pickup notice
+                        if (addressFields) addressFields.classList.add('d-none');
+                        if (pickupNotice) pickupNotice.classList.remove('d-none');
+
+                        // Auto-set Milton, WA for tax calculation (pickup location)
+                        if (stateInput) stateInput.value = 'WA';
+                        if (zipInput) zipInput.value = '98354';
+
+                        // Auto-uncheck "Same as shipping" since there's no shipping address to copy
+                        const sameAsShipping = document.getElementById('sameAsShipping');
+                        if (sameAsShipping && sameAsShipping.checked) {
+                            sameAsShipping.checked = false;
+                            sameAsShipping.dispatchEvent(new Event('change'));
+                        }
+                    } else {
+                        // Show address fields, hide pickup notice
+                        if (addressFields) addressFields.classList.remove('d-none');
+                        if (pickupNotice) pickupNotice.classList.add('d-none');
+
+                        // Clear auto-set values so user enters their own
+                        if (stateInput) stateInput.value = '';
+                        if (zipInput) zipInput.value = '';
+                    }
+
+                    // Update shipping labels in order summaries
+                    const labels = {
+                        'step2-shippingLabel': isPickup ? 'Pickup (FREE):' : 'Shipping (UPS Ground):',
+                        'step3-shippingLabel': isPickup ? 'Pickup (FREE):' : 'Shipping:'
+                    };
+                    Object.entries(labels).forEach(([id, text]) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = text;
+                    });
+
+                    // Recalculate pricing (shipping cost changes)
+                    recalculateAllPricing();
+                    console.log('[3DayTees] Delivery method changed to:', this.value);
+                });
+            });
+
+            // ========================================
             // State Field Change - Trigger Sales Tax Recalculation
             // ========================================
             const stateField = document.getElementById('state');
@@ -689,6 +744,7 @@
             frontLogo: null,              // Front logo file object (required)
             backLogo: null,               // Back logo file object (optional)
             inventoryCache: loadInventoryCacheFromStorage(),  // Load cached inventory from sessionStorage (5-minute TTL)
+            deliveryMethod: 'ship',       // 'ship' or 'pickup'
             orderTotals: {                // Calculated order totals (single source of truth)
                 subtotal: 0,
                 rushFee: 0,
@@ -1823,6 +1879,14 @@
 
                 if (shippingEl) shippingEl.textContent = `$${shipping.toFixed(2)}`;
                 if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
+
+                // Update shipping label based on delivery method
+                const shippingLabel = document.getElementById(`${prefix}-shippingLabel`);
+                if (shippingLabel) {
+                    shippingLabel.textContent = state.deliveryMethod === 'pickup'
+                        ? 'Pickup (FREE):'
+                        : (prefix === 'step2' ? 'Shipping (UPS Ground):' : 'Shipping:');
+                }
             }
 
             // Update both Step 2 and Step 3 order summaries
@@ -2347,7 +2411,7 @@
             // Tax calculated on line items total (grandSubtotal now includes rush fee)
             const salesTax = (grandSubtotal + ltmFee) * salesTaxRate;
 
-            const shipping = 30;
+            const shipping = state.deliveryMethod === 'pickup' ? 0 : 30;
             // Grand total now matches exactly: line items + LTM + tax + shipping
             const grandTotal = grandSubtotal + ltmFee + salesTax + shipping;
 
@@ -3009,16 +3073,18 @@
                 // Check if "Same as Shipping" is checked - if so, use shipping values for billing
                 const sameAsShipping = document.getElementById('sameAsShipping')?.checked;
 
+                const isPickup = state.deliveryMethod === 'pickup';
                 const customerData = {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value,
                     company: document.getElementById('company').value || '',
-                    address1: document.getElementById('address1').value,
-                    city: document.getElementById('city').value,
-                    state: document.getElementById('state').value,
-                    zip: document.getElementById('zip').value,
+                    deliveryMethod: state.deliveryMethod,
+                    address1: isPickup ? '' : document.getElementById('address1').value,
+                    city: isPickup ? 'Milton' : document.getElementById('city').value,
+                    state: isPickup ? 'WA' : document.getElementById('state').value,
+                    zip: isPickup ? '98354' : document.getElementById('zip').value,
                     notes: document.getElementById('notes').value || '',
                     // Billing address - use shipping values if "Same as Shipping" is checked
                     billingCompany: document.getElementById('company').value || '',
@@ -3407,8 +3473,8 @@
             // Calculate LTM fee for orders 6-23 pieces
             const ltmFee = (grandTotalQuantity >= 6 && grandTotalQuantity < 24) ? 75 : 0;
 
-            // Add shipping fee
-            const shipping = 30;
+            // Add shipping fee (free for pickup)
+            const shipping = state.deliveryMethod === 'pickup' ? 0 : 30;
 
             // Apply conditional sales tax (10.1% for WA only, includes LTM in taxable base)
             const stateField = document.getElementById('state');
@@ -3445,12 +3511,18 @@
                         { id: 'firstName', label: 'First Name', pattern: /^.{2,}$/, message: 'First name must be at least 2 characters' },
                         { id: 'lastName', label: 'Last Name', pattern: /^.{2,}$/, message: 'Last name must be at least 2 characters' },
                         { id: 'email', label: 'Email', pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Please enter a valid email address' },
-                        { id: 'phone', label: 'Phone', pattern: /^[\d\s\-\(\)]+$/, message: 'Please enter a valid phone number' },
-                        { id: 'address1', label: 'Street Address', pattern: /^.{5,}$/, message: 'Street address must be at least 5 characters' },
-                        { id: 'city', label: 'City', pattern: /^.{2,}$/, message: 'City must be at least 2 characters' },
-                        { id: 'state', label: 'State', pattern: /^[A-Za-z]{2}$/, message: 'State must be 2 letters (e.g., WA)' },
-                        { id: 'zip', label: 'ZIP Code', pattern: /^\d{5}$/, message: 'ZIP code must be 5 digits' }
+                        { id: 'phone', label: 'Phone', pattern: /^[\d\s\-\(\)]+$/, message: 'Please enter a valid phone number' }
                     ];
+
+                    // Only validate shipping address fields when shipping (not pickup)
+                    if (state.deliveryMethod !== 'pickup') {
+                        fieldsToValidate.push(
+                            { id: 'address1', label: 'Street Address', pattern: /^.{5,}$/, message: 'Street address must be at least 5 characters' },
+                            { id: 'city', label: 'City', pattern: /^.{2,}$/, message: 'City must be at least 2 characters' },
+                            { id: 'state', label: 'State', pattern: /^[A-Za-z]{2}$/, message: 'State must be 2 letters (e.g., WA)' },
+                            { id: 'zip', label: 'ZIP Code', pattern: /^\d{5}$/, message: 'ZIP code must be 5 digits' }
+                        );
+                    }
 
                     // Check if billing address validation is needed
                     const sameAsShipping = document.getElementById('sameAsShipping');
