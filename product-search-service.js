@@ -193,9 +193,8 @@ class ProductSearchService {
     async performSearch(params) {
         try {
             // Default parameters - increased to 48 for better initial display
-            // Empty status shows all products (Active, New, Coming soon, etc.)
+            // Omit status to let backend default to 'Active' (hides Discontinued)
             const defaultParams = {
-                status: '',
                 limit: 48,
                 page: 1
             };

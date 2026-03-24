@@ -493,8 +493,14 @@ class CatalogSearch {
             grid.innerHTML = smartFilterBadges;
         }
         
+        // Filter out discontinued products (safety net)
+        const activeProducts = results.products.filter(p =>
+            !p.productName?.toUpperCase().includes('DISCONTINUED') &&
+            !p.description?.toUpperCase().includes('DISCONTINUED')
+        );
+
         // Build product cards
-        const productsHTML = results.products.map(product => this.buildProductCard(product)).join('');
+        const productsHTML = activeProducts.map(product => this.buildProductCard(product)).join('');
         
         // Remove any loading indicators
         const loadingIndicator = grid.querySelector('.loading-more-indicator');
