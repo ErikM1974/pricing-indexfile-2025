@@ -2891,7 +2891,7 @@ app.get('/design/:designNumber', (req, res) => {
 // Art request detail page - staff-facing shareable link
 app.get('/art-request/:designId', (req, res) => {
   const designId = req.params.designId;
-  if (!designId || !/^\d+$/.test(designId)) {
+  if (!designId || !/^\d+(\.\d+)?$/.test(designId)) {
     return res.status(400).send('Invalid design ID');
   }
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');

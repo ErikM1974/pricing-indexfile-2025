@@ -50,6 +50,30 @@
                             var arr = data.contacts || data || [];
                             if (Array.isArray(arr) && arr.length > 0) return arr[0];
                             throw new Error('not found');
+                        })
+                        .catch(function () {
+                            // Fallback: company may only have art requests (no contact record yet).
+                            // Look up company name from art requests by Shopwork_customer_number.
+                            return fetch(API_BASE + '/api/artrequests?shopworksCustomerId=' + custId + '&limit=1')
+                                .then(function (r) { return r.ok ? r.json() : null; })
+                                .then(function (data) {
+                                    if (!data) throw new Error('not found');
+                                    var records = Array.isArray(data) ? data : (data.records || []);
+                                    if (records.length > 0 && records[0].CompanyName) {
+                                        return { CustomerCompanyName: records[0].CompanyName, id_Customer: custId };
+                                    }
+                                    // Last resort: try mockups table
+                                    return fetch(API_BASE + '/api/mockups?idCustomer=' + custId)
+                                        .then(function (r2) { return r2.ok ? r2.json() : null; })
+                                        .then(function (mData) {
+                                            if (!mData) throw new Error('not found');
+                                            var mRecs = mData.records || mData || [];
+                                            if (Array.isArray(mRecs) && mRecs.length > 0 && mRecs[0].Company_Name) {
+                                                return { CustomerCompanyName: mRecs[0].Company_Name, id_Customer: custId };
+                                            }
+                                            throw new Error('not found');
+                                        });
+                                });
                         });
                 }
                 return match;

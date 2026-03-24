@@ -2353,6 +2353,13 @@ body.ard-customer-view .ard-footer {
     z-index: 5;
     pointer-events: none;
 }
+.ard-mockup-indicator {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #059669;
+    padding: 4px 0 2px;
+}
 
 /* Customer confirmation screen */
 .ard-customer-confirmation {
