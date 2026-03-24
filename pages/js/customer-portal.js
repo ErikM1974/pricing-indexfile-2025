@@ -63,7 +63,7 @@
                                         return { CustomerCompanyName: records[0].CompanyName, id_Customer: custId };
                                     }
                                     // Last resort: try mockups table
-                                    return fetch(API_BASE + '/api/mockups?idCustomer=' + custId + '&limit=1')
+                                    return fetch(API_BASE + '/api/mockups?idCustomer=' + custId)
                                         .then(function (r2) { return r2.ok ? r2.json() : null; })
                                         .then(function (mData) {
                                             if (!mData) throw new Error('not found');
