@@ -48,7 +48,11 @@ These rules prevent disasters. **Violating any of these caused 71+ orphaned file
 **After fixing a bug or learning something new:**
 - Add entry to [LESSONS_LEARNED.md](/memory/LESSONS_LEARNED.md) with Problem/Root Cause/Solution/Prevention
 - Update relevant memory file if it's about: ManageOrders, Caspio API, Stripe, ShopWorks
-- Tag with project: `[Pricing Index]`, `[caspio-proxy]`, `[Python Inksoft]`, `[All]`
+- **LESSONS_LEARNED.md size limit: 300 lines max, 28-30 entries max**
+  - Before adding: run `wc -l` — if over 250 lines, archive the oldest resolved entry first
+  - Archive destination: `/memory/LESSONS_LEARNED_ARCHIVE.md` (no line limit)
+  - Keep only: recurring bugs, active architecture rules, gotchas likely to bite again
+  - Archive: one-time fixes, historical migrations, resolved bugs unlikely to recur
 
 ## Codebase Health (Auto-Enforced)
 
