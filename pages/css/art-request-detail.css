@@ -2312,13 +2312,15 @@ body.ard-customer-view .ard-footer {
 .ard-btn-customer-revise:hover { background: #dc3545; color: #fff; }
 
 /* Customer mockup selection */
-.ard-customer-selectable {
+.ard-customer-selectable,
+.ard-ae-selectable {
     cursor: pointer;
     transition: outline 0.2s, box-shadow 0.2s;
     border-radius: 8px;
     position: relative;
 }
-.ard-customer-selectable:hover {
+.ard-customer-selectable:hover,
+.ard-ae-selectable:hover {
     box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.3);
 }
 .ard-slot-selected {

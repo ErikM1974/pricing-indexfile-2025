@@ -164,7 +164,10 @@
       "Read(//c/Program Files \\(x86\\)/**)",
       "Bash(sed -i 's/ae-submit-form\\\\.js?v=7/ae-submit-form.js?v=8/g' dashboards/ae-dashboard.html)",
       "Bash(sed -i 's/mockup-submit-form\\\\.js?v=2/mockup-submit-form.js?v=3/g' dashboards/ae-dashboard.html)",
-      "Bash(sed -i 's/art-request-detail\\\\.js?v=14/art-request-detail.js?v=15/g' pages/art-request-detail.html)"
+      "Bash(sed -i 's/art-request-detail\\\\.js?v=14/art-request-detail.js?v=15/g' pages/art-request-detail.html)",
+      "Bash(for f:*)",
+      "Bash(for i:*)",
+      "Bash(do curl:*)"
     ],
     "deny": [],
     "ask": [],

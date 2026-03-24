@@ -331,6 +331,7 @@
         } else if (isAeView && statusLower.includes('awaitingapproval')) {
             document.getElementById('ard-action-bar').style.display = '';
             initActionBar();
+            initAeMockupSelection(req);
 
             // Copy Customer Link — show when mockup exists
             var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
@@ -1523,17 +1524,25 @@
         const approveBtn = document.getElementById('ard-btn-approve');
         const changesBtn = document.getElementById('ard-btn-changes');
 
-        // Enable buttons when name is selected
+        // Enable buttons when name is selected (approve also needs mockup selection)
         aeSelect.addEventListener('change', () => {
             const hasName = aeSelect.value !== '';
-            approveBtn.disabled = !hasName;
+            approveBtn.disabled = !(hasName && selectedMockupSlot);
             changesBtn.disabled = !hasName;
         });
 
         approveBtn.addEventListener('click', () => {
             const aeName = aeSelect.value;
             if (!aeName) return;
-            if (!confirm(`Approve this design as ${aeName}? This will mark the request as Completed.`)) return;
+            if (!selectedMockupSlot) {
+                showArdToast('Please click a mockup to select which one you\'re approving.', 'error');
+                return;
+            }
+            var slotLabel = 'Mockup';
+            MOCKUP_SLOTS.forEach(function (s) {
+                if (s.key === selectedMockupSlot) slotLabel = s.label;
+            });
+            if (!confirm(`Approve ${slotLabel} as ${aeName}?`)) return;
             approveDesign(designId, aeName);
         });
 
@@ -1797,6 +1806,73 @@
     }
 
     /**
+     * Make mockup gallery slots selectable for AE view (Awaiting Approval)
+     */
+    function initAeMockupSelection(req) {
+        var grid = document.getElementById('ard-mockups-grid');
+        if (!grid) return;
+
+        var thumbs = grid.querySelectorAll('.ard-gallery-thumb');
+        if (thumbs.length === 0) return;
+
+        var filledThumbs = [];
+        thumbs.forEach(function (thumb) {
+            var key = thumb.dataset.fieldKey;
+            if (key && req[key] && !isEmptySlot(req[key])) {
+                filledThumbs.push(thumb);
+            }
+        });
+
+        filledThumbs.forEach(function (thumb) {
+            thumb.classList.add('ard-ae-selectable');
+
+            var hint = document.createElement('div');
+            hint.className = 'ard-slot-select-hint';
+            hint.textContent = 'Click to select';
+            thumb.style.position = 'relative';
+            thumb.appendChild(hint);
+
+            thumb.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Deselect all
+                grid.querySelectorAll('.ard-slot-selected').forEach(function (el) {
+                    el.classList.remove('ard-slot-selected');
+                    var badge = el.querySelector('.ard-slot-select-badge');
+                    if (badge) badge.remove();
+                    var hintEl = el.querySelector('.ard-slot-select-hint');
+                    if (hintEl) hintEl.textContent = 'Click to select';
+                });
+
+                // Select this one
+                thumb.classList.add('ard-slot-selected');
+                var badge = document.createElement('div');
+                badge.className = 'ard-slot-select-badge';
+                badge.textContent = '\u2713 Selected';
+                thumb.appendChild(badge);
+
+                var hintEl = thumb.querySelector('.ard-slot-select-hint');
+                if (hintEl) hintEl.textContent = '';
+
+                selectedMockupSlot = thumb.dataset.fieldKey;
+
+                // Re-check if approve button should be enabled (needs name + mockup)
+                var aeSelect = document.getElementById('ard-ae-select');
+                var approveBtn = document.getElementById('ard-btn-approve');
+                if (approveBtn && aeSelect && aeSelect.value) {
+                    approveBtn.disabled = false;
+                }
+            });
+        });
+
+        // Auto-select if only one filled mockup
+        if (filledThumbs.length === 1) {
+            filledThumbs[0].click();
+        }
+    }
+
+    /**
      * Handle customer approval — update status + log note + notify
      */
     function handleCustomerApproval(req) {
@@ -2027,6 +2103,13 @@
         changesBtn.disabled = true;
         approveBtn.textContent = 'Approving...';
 
+        // Determine which mockup was selected
+        var slotLabel = 'Mockup';
+        MOCKUP_SLOTS.forEach(function (s) {
+            if (s.key === selectedMockupSlot) slotLabel = s.label;
+        });
+        var mockupUrl = selectedMockupSlot && currentRequest ? (currentRequest[selectedMockupSlot] || '') : '';
+
         try {
             // 1. Update status to Approved (Steve will finalize and mark Complete)
             const statusResp = await fetch(`${API_BASE}/api/art-requests/${id}/status`, {
@@ -2036,23 +2119,37 @@
             });
             if (!statusResp.ok) throw new Error(`Status update failed: ${statusResp.status}`);
 
-            // 2. Create approval note
+            // 2. Create approval note (includes which mockup was selected)
             const aeEmail = REP_MAP[aeName] || 'sales@nwcustomapparel.com';
+            var noteText = selectedMockupSlot
+                ? `Design approved by ${aeName} (${slotLabel})`
+                : `Design approved by ${aeName}`;
             const noteResp = await fetch(`${API_BASE}/api/art-requests/${id}/note`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     noteType: 'Status Update',
-                    noteText: `Design approved by ${aeName}`,
+                    noteText: noteText,
                     noteBy: aeEmail
                 })
             });
             if (!noteResp.ok) throw new Error(`Note creation failed: ${noteResp.status}`);
 
-            // 3. Send completion email to Steve (fire-and-forget)
+            // 3. Set Final_Approved_Mockup if a mockup was selected
+            if (mockupUrl && currentRequest.PK_ID) {
+                fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Final_Approved_Mockup: mockupUrl })
+                }).then(function () {
+                    currentRequest.Final_Approved_Mockup = mockupUrl;
+                }).catch(function () {});
+            }
+
+            // 4. Send completion email to Steve (fire-and-forget)
             sendAENotificationEmail('approved', aeName);
 
-            // 4. Push real-time notification for Steve's dashboard
+            // 5. Push real-time notification for Steve's dashboard
             pushArtNotification('approved', aeName);
 
             showSuccessMessage('Design approved! Steve will finalize and mark complete.');

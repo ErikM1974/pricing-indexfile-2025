@@ -376,6 +376,7 @@ var MockupSubmitForm = (function () {
                     + '<option value="Left Chest">Left Chest</option>'
                     + '<option value="Full Back">Full Back</option>'
                     + '<option value="Right Chest">Right Chest</option>'
+                    + '<option value="Center Chest">Center Chest</option>'
                     + '<option value="Cap Front">Cap Front</option>'
                     + '<option value="Cap Back">Cap Back</option>'
                     + '<option value="Left Side">Left Side</option>'
