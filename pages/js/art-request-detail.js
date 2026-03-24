@@ -111,7 +111,7 @@
     const pathParts = window.location.pathname.split('/');
     const designId = pathParts[pathParts.length - 1];
 
-    if (!designId || !/^\d+$/.test(designId)) {
+    if (!designId || !/^\d+(\.\d+)?$/.test(designId)) {
         showError('Invalid Design ID', 'Please check the URL and try again.');
         return;
     }
@@ -1518,6 +1518,22 @@
         });
     });
 
+    // ── Mockup Selection Indicator (shown near Approve button) ─────────
+    function updateMockupIndicator() {
+        var indicator = document.getElementById('ard-mockup-indicator');
+        if (!indicator) return;
+        if (!selectedMockupSlot) {
+            indicator.style.display = 'none';
+            return;
+        }
+        var slotLabel = 'Mockup';
+        MOCKUP_SLOTS.forEach(function (s) {
+            if (s.key === selectedMockupSlot) slotLabel = s.label;
+        });
+        indicator.textContent = '\u2713 Selected: ' + slotLabel;
+        indicator.style.display = '';
+    }
+
     // ── AE Action Bar ──────────────────────────────────────────────────
     function initActionBar() {
         const aeSelect = document.getElementById('ard-ae-select');
@@ -1740,16 +1756,19 @@
     }
 
     /**
-     * Make mockup gallery slots selectable for customer view
+     * Make mockup gallery slots selectable (shared by customer + AE views).
+     * @param {Object} req - art request data
+     * @param {Object} opts
+     * @param {string} opts.selectableClass - CSS class for selectable styling
+     * @param {Function} opts.onSelect - callback after a slot is selected (receives fieldKey)
      */
-    function initCustomerMockupSelection(req) {
+    function initMockupSelection(req, opts) {
         var grid = document.getElementById('ard-mockups-grid');
         if (!grid) return;
 
         var thumbs = grid.querySelectorAll('.ard-gallery-thumb');
         if (thumbs.length === 0) return;
 
-        // If only one mockup, auto-select it
         var filledThumbs = [];
         thumbs.forEach(function (thumb) {
             var key = thumb.dataset.fieldKey;
@@ -1759,14 +1778,16 @@
         });
 
         filledThumbs.forEach(function (thumb) {
-            thumb.classList.add('ard-customer-selectable');
-
-            // Add "Click to select" hint
-            var hint = document.createElement('div');
-            hint.className = 'ard-slot-select-hint';
-            hint.textContent = 'Click to select';
+            thumb.classList.add(opts.selectableClass);
             thumb.style.position = 'relative';
-            thumb.appendChild(hint);
+
+            // Add "Click to select" hint (only when multiple mockups)
+            if (filledThumbs.length > 1) {
+                var hint = document.createElement('div');
+                hint.className = 'ard-slot-select-hint';
+                hint.textContent = 'Click to select';
+                thumb.appendChild(hint);
+            }
 
             thumb.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1783,19 +1804,26 @@
 
                 // Select this one
                 thumb.classList.add('ard-slot-selected');
+
+                // Remove any existing badge before adding (prevents duplicates)
+                var oldBadge = thumb.querySelector('.ard-slot-select-badge');
+                if (oldBadge) oldBadge.remove();
+
                 var badge = document.createElement('div');
                 badge.className = 'ard-slot-select-badge';
-                badge.textContent = '✓ Selected';
+                badge.textContent = '\u2713 Selected';
                 thumb.appendChild(badge);
 
+                // Hide hint on selected thumb
                 var hintEl = thumb.querySelector('.ard-slot-select-hint');
-                if (hintEl) hintEl.textContent = '';
+                if (hintEl) hintEl.remove();
 
                 selectedMockupSlot = thumb.dataset.fieldKey;
 
-                // Enable approve button
-                var approveBtn = document.getElementById('ard-btn-customer-approve');
-                if (approveBtn) approveBtn.disabled = false;
+                // Update selected-mockup indicator
+                updateMockupIndicator();
+
+                if (opts.onSelect) opts.onSelect(thumb.dataset.fieldKey);
             });
         });
 
@@ -1805,71 +1833,28 @@
         }
     }
 
-    /**
-     * Make mockup gallery slots selectable for AE view (Awaiting Approval)
-     */
-    function initAeMockupSelection(req) {
-        var grid = document.getElementById('ard-mockups-grid');
-        if (!grid) return;
-
-        var thumbs = grid.querySelectorAll('.ard-gallery-thumb');
-        if (thumbs.length === 0) return;
-
-        var filledThumbs = [];
-        thumbs.forEach(function (thumb) {
-            var key = thumb.dataset.fieldKey;
-            if (key && req[key] && !isEmptySlot(req[key])) {
-                filledThumbs.push(thumb);
+    /** Wrappers for customer / AE views */
+    function initCustomerMockupSelection(req) {
+        initMockupSelection(req, {
+            selectableClass: 'ard-customer-selectable',
+            onSelect: function () {
+                var approveBtn = document.getElementById('ard-btn-customer-approve');
+                if (approveBtn) approveBtn.disabled = false;
             }
         });
+    }
 
-        filledThumbs.forEach(function (thumb) {
-            thumb.classList.add('ard-ae-selectable');
-
-            var hint = document.createElement('div');
-            hint.className = 'ard-slot-select-hint';
-            hint.textContent = 'Click to select';
-            thumb.style.position = 'relative';
-            thumb.appendChild(hint);
-
-            thumb.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Deselect all
-                grid.querySelectorAll('.ard-slot-selected').forEach(function (el) {
-                    el.classList.remove('ard-slot-selected');
-                    var badge = el.querySelector('.ard-slot-select-badge');
-                    if (badge) badge.remove();
-                    var hintEl = el.querySelector('.ard-slot-select-hint');
-                    if (hintEl) hintEl.textContent = 'Click to select';
-                });
-
-                // Select this one
-                thumb.classList.add('ard-slot-selected');
-                var badge = document.createElement('div');
-                badge.className = 'ard-slot-select-badge';
-                badge.textContent = '\u2713 Selected';
-                thumb.appendChild(badge);
-
-                var hintEl = thumb.querySelector('.ard-slot-select-hint');
-                if (hintEl) hintEl.textContent = '';
-
-                selectedMockupSlot = thumb.dataset.fieldKey;
-
-                // Re-check if approve button should be enabled (needs name + mockup)
+    function initAeMockupSelection(req) {
+        initMockupSelection(req, {
+            selectableClass: 'ard-ae-selectable',
+            onSelect: function () {
                 var aeSelect = document.getElementById('ard-ae-select');
                 var approveBtn = document.getElementById('ard-btn-approve');
                 if (approveBtn && aeSelect && aeSelect.value) {
                     approveBtn.disabled = false;
                 }
-            });
+            }
         });
-
-        // Auto-select if only one filled mockup
-        if (filledThumbs.length === 1) {
-            filledThumbs[0].click();
-        }
     }
 
     /**
@@ -2137,13 +2122,18 @@
 
             // 3. Set Final_Approved_Mockup if a mockup was selected
             if (mockupUrl && currentRequest.PK_ID) {
-                fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ Final_Approved_Mockup: mockupUrl })
-                }).then(function () {
+                try {
+                    var mockupResp = await fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ Final_Approved_Mockup: mockupUrl })
+                    });
+                    if (!mockupResp.ok) throw new Error('Status ' + mockupResp.status);
                     currentRequest.Final_Approved_Mockup = mockupUrl;
-                }).catch(function () {});
+                } catch (mockupErr) {
+                    console.error('Failed to save Final_Approved_Mockup:', mockupErr);
+                    showArdToast('Approved, but failed to save selected mockup. Tell Steve which mockup was chosen.', 'warn');
+                }
             }
 
             // 4. Send completion email to Steve (fire-and-forget)
@@ -2624,12 +2614,14 @@
         document.body.appendChild(overlay);
     }
 
-    function showArdToast(message) {
+    function showArdToast(message, type) {
+        var colors = { error: '#dc3545', warn: '#e67e22' };
+        var bg = colors[type] || '#059669';
         var toast = document.createElement('div');
         toast.textContent = message;
-        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#059669;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:' + bg + ';color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);max-width:90vw;text-align:center;';
         document.body.appendChild(toast);
-        setTimeout(function () { toast.remove(); }, 3000);
+        setTimeout(function () { toast.remove(); }, type ? 5000 : 3000);
     }
 
     // ── Art Charge History ────────────────────────────────────────────────
