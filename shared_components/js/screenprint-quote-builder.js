@@ -2830,6 +2830,8 @@ async function recalculatePricing() {
 
     let subtotal = 0;
     const pricedProducts = [];
+    let firstPricing = null;  // Capture first product's pricing for nudge savings calc
+    let firstTierData = null;
 
     try {
         // Process each product
@@ -2857,6 +2859,12 @@ async function recalculatePricing() {
             const tierData = primaryPricing.tiers.find(t =>
                 totalQty >= t.minQty && (t.maxQty === null || totalQty <= t.maxQty)
             ) || primaryPricing.tiers[0];
+
+            // Capture first product's pricing for nudge savings calculation
+            if (!firstPricing) {
+                firstPricing = primaryPricing;
+                firstTierData = tierData;
+            }
 
             // Get additional location pricing if back location enabled
             let additionalPricePerPiece = 0;
@@ -2954,12 +2962,12 @@ async function recalculatePricing() {
 
         // Compute per-piece savings for next tier nudge
         let nextTierSavings = null;
-        if (pricedProducts.length > 0 && primaryPricing?.tiers) {
+        if (pricedProducts.length > 0 && firstPricing?.tiers && firstTierData) {
             try {
-                const currentTierIdx = primaryPricing.tiers.indexOf(tierData);
-                if (currentTierIdx >= 0 && currentTierIdx < primaryPricing.tiers.length - 1) {
-                    const nextTier = primaryPricing.tiers[currentTierIdx + 1];
-                    const curPrice = tierData.prices?.['M'] ?? tierData.prices?.['L'] ?? Object.values(tierData.prices || {})[0] ?? 0;
+                const currentTierIdx = firstPricing.tiers.indexOf(firstTierData);
+                if (currentTierIdx >= 0 && currentTierIdx < firstPricing.tiers.length - 1) {
+                    const nextTier = firstPricing.tiers[currentTierIdx + 1];
+                    const curPrice = firstTierData.prices?.['M'] ?? firstTierData.prices?.['L'] ?? Object.values(firstTierData.prices || {})[0] ?? 0;
                     const nextPrice = nextTier.prices?.['M'] ?? nextTier.prices?.['L'] ?? Object.values(nextTier.prices || {})[0] ?? 0;
                     if (curPrice > nextPrice) nextTierSavings = curPrice - nextPrice;
                 }
