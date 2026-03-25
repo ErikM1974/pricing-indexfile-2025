@@ -388,8 +388,9 @@
 
     // ── Card Processing Pipeline ─────────────────────────────────────
 
-    // ── Sales Rep Filter ──────────────────────────────────────────────
-    var currentRepFilter = sessionStorage.getItem('ae_rep_filter') || 'All';
+    // ── Sales Rep Filter + Text Search ─────────────────────────────────
+    var currentRepFilter = sessionStorage.getItem('ae_dashboard_rep_filter') || 'All';
+    var currentSearchText = '';
 
     function injectRepFilter() {
         var viewTab = document.getElementById('view-tab');
@@ -399,9 +400,15 @@
         bar.id = 'ae-rep-filter-bar';
         bar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;';
 
+        var searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.id = 'ae-text-search';
+        searchInput.placeholder = 'Search company, design #...';
+        searchInput.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:200px;';
+
         var label = document.createElement('label');
-        label.textContent = 'Filter by Rep:';
-        label.style.cssText = 'font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;';
+        label.textContent = 'Rep:';
+        label.style.cssText = 'font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;margin-left:8px;';
 
         var select = document.createElement('select');
         select.id = 'ae-rep-filter-select';
@@ -422,10 +429,20 @@
 
         select.addEventListener('change', function () {
             currentRepFilter = this.value;
-            sessionStorage.setItem('ae_rep_filter', currentRepFilter);
-            applyRepFilter();
+            sessionStorage.setItem('ae_dashboard_rep_filter', currentRepFilter);
+            applyFilters();
         });
 
+        var searchTimer = null;
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(function () {
+                currentSearchText = searchInput.value.trim().toLowerCase();
+                applyFilters();
+            }, 200);
+        });
+
+        bar.appendChild(searchInput);
         bar.appendChild(label);
         bar.appendChild(select);
         bar.appendChild(countSpan);
@@ -448,7 +465,7 @@
         return repEl ? repEl.textContent.trim() : '';
     }
 
-    function applyRepFilter() {
+    function applyFilters() {
         var viewTab = document.getElementById('view-tab');
         if (!viewTab) return;
 
@@ -457,13 +474,24 @@
         var total = cards.length;
 
         cards.forEach(function (card) {
-            if (currentRepFilter === 'All') {
-                card.style.display = '';
-                shown++;
-                return;
+            var matchRep = true;
+            var matchSearch = true;
+            var matchStatus = true;
+
+            if (currentRepFilter !== 'All') {
+                matchRep = getCardRepName(card) === currentRepFilter;
             }
-            var repText = getCardRepName(card);
-            if (repText === currentRepFilter) {
+
+            if (currentSearchText) {
+                var cardText = card.textContent.toLowerCase();
+                matchSearch = cardText.indexOf(currentSearchText) !== -1;
+            }
+
+            if (currentStatusFilter) {
+                matchStatus = getCardStatus(card) === currentStatusFilter;
+            }
+
+            if (matchRep && matchSearch && matchStatus) {
                 card.style.display = '';
                 shown++;
             } else {
@@ -473,10 +501,77 @@
 
         var countSpan = document.getElementById('ae-rep-filter-count');
         if (countSpan) {
-            countSpan.textContent = currentRepFilter === 'All'
-                ? total + ' requests'
-                : shown + ' of ' + total + ' requests';
+            var isFiltered = currentRepFilter !== 'All' || currentSearchText || currentStatusFilter;
+            countSpan.textContent = isFiltered
+                ? shown + ' of ' + total + ' requests'
+                : total + ' requests';
         }
+    }
+
+    var currentStatusFilter = '';
+
+    function buildStatusSummary() {
+        var viewTab = document.getElementById('view-tab');
+        if (!viewTab || document.getElementById('ae-status-summary')) return;
+
+        var cards = viewTab.querySelectorAll('.art-card, .mockup-card, .card');
+        var counts = { needsReview: 0, submitted: 0, inProgress: 0, completed: 0, other: 0 };
+        cards.forEach(function (card) {
+            var statusEl = card.querySelector('.status-pill, [class*="status"]');
+            var statusText = statusEl ? statusEl.textContent.trim().toLowerCase() : '';
+            if (statusText.indexOf('awaiting') !== -1) counts.needsReview++;
+            else if (statusText.indexOf('submitted') !== -1) counts.submitted++;
+            else if (statusText.indexOf('progress') !== -1) counts.inProgress++;
+            else if (statusText.indexOf('completed') !== -1 || statusText.indexOf('approved') !== -1) counts.completed++;
+            else counts.other++;
+        });
+
+        var bar = document.createElement('div');
+        bar.id = 'ae-status-summary';
+        bar.style.cssText = 'display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;';
+
+        var pills = [
+            { label: 'Needs Review', count: counts.needsReview, bg: '#fff7ed', border: '#fed7aa', color: '#d97706' },
+            { label: 'Submitted', count: counts.submitted, bg: '#f8f5ff', border: '#e9e0f5', color: '#666' },
+            { label: 'In Progress', count: counts.inProgress, bg: '#eff6ff', border: '#bfdbfe', color: '#666' },
+            { label: 'Completed', count: counts.completed, bg: '#ecfdf5', border: '#a7f3d0', color: '#666' },
+            { label: 'Other', count: counts.other, bg: '#f9fafb', border: '#e5e7eb', color: '#666' }
+        ];
+
+        pills.forEach(function (p) {
+            if (p.count === 0) return;
+            var pill = document.createElement('div');
+            pill.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;background:' + p.bg + ';border:1px solid ' + p.border + ';';
+            pill.innerHTML = '<span style="font-weight:700;font-size:16px;color:' + p.color + ';">' + p.count + '</span>'
+                + '<span style="font-weight:500;color:#666;">' + p.label + '</span>';
+            pill.addEventListener('click', function () {
+                if (currentStatusFilter === p.label) {
+                    currentStatusFilter = '';
+                    pill.style.outline = '';
+                } else {
+                    currentStatusFilter = p.label;
+                    bar.querySelectorAll('div').forEach(function (d) { d.style.outline = ''; });
+                    pill.style.outline = '2px solid ' + p.color;
+                }
+                applyFilters();
+            });
+            bar.appendChild(pill);
+        });
+
+        var filterBar = document.getElementById('ae-rep-filter-bar');
+        if (filterBar) {
+            filterBar.parentNode.insertBefore(bar, filterBar);
+        }
+    }
+
+    function getCardStatus(card) {
+        var statusEl = card.querySelector('.status-pill, [class*="status"]');
+        var text = statusEl ? statusEl.textContent.trim().toLowerCase() : '';
+        if (text.indexOf('awaiting') !== -1) return 'Needs Review';
+        if (text.indexOf('submitted') !== -1) return 'Submitted';
+        if (text.indexOf('progress') !== -1) return 'In Progress';
+        if (text.indexOf('completed') !== -1 || text.indexOf('approved') !== -1) return 'Completed';
+        return 'Other';
     }
 
     function processCards() {
@@ -497,9 +592,10 @@
             addAuditIndicator(card);
         });
 
-        // Inject filter bar if not present, then apply filter
+        // Inject filter bar and status summary, then apply filters
         injectRepFilter();
-        applyRepFilter();
+        buildStatusSummary();
+        applyFilters();
     }
 
     // ── MutationObserver: Watch for Caspio gallery cards in view-tab ──
