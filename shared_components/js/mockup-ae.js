@@ -16,6 +16,24 @@ var MockupAeGallery = (function () {
 
     var containerId = null;
     var allMockups = [];
+    var currentRepFilter = sessionStorage.getItem('ae_mockup_rep_filter') || 'All';
+
+    var REP_EMAIL_MAP = {
+        'Taneisha': 'taneisha@nwcustomapparel.com',
+        'Nika': 'nika@nwcustomapparel.com',
+        'Ruthie': 'ruthie@nwcustomapparel.com',
+        'Erik': 'erik@nwcustomapparel.com'
+    };
+
+    function resolveRepName(email) {
+        if (!email) return '';
+        for (var name in REP_EMAIL_MAP) {
+            if (email.toLowerCase() === REP_EMAIL_MAP[name].toLowerCase()) return name;
+        }
+        var at = email.indexOf('@');
+        if (at > 0) return email.substring(0, at).charAt(0).toUpperCase() + email.substring(1, at);
+        return email;
+    }
 
     function init(containerIdParam) {
         containerId = containerIdParam;
@@ -91,14 +109,48 @@ var MockupAeGallery = (function () {
             + '<span style="font-weight:500;color:#666;">Approved</span></div>';
         html += '</div>';
 
-        // Card grid
+        // Rep filter bar
+        var repOptions = ['All', 'Taneisha', 'Nika', 'Ruthie', 'Erik'];
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;">';
+        html += '<label style="font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;">Filter by Rep:</label>';
+        html += '<select id="mockup-ae-rep-filter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;">';
+        repOptions.forEach(function (name) {
+            html += '<option value="' + name + '"' + (name === currentRepFilter ? ' selected' : '') + '>' + name + '</option>';
+        });
+        html += '</select>';
+        html += '<span id="mockup-ae-rep-count" style="font-size:12px;color:#94a3b8;margin-left:auto;"></span>';
+        html += '</div>';
+
+        // Card grid — filter by rep if needed
+        var displayMockups = currentRepFilter === 'All' ? allMockups : allMockups.filter(function (m) {
+            return resolveRepName(m.Submitted_By || '') === currentRepFilter;
+        });
+
         html += '<div class="mockup-grid">';
-        allMockups.forEach(function (m) {
+        displayMockups.forEach(function (m) {
             html += buildCard(m);
         });
         html += '</div>';
 
         container.innerHTML = html;
+
+        // Update count
+        var countSpan = document.getElementById('mockup-ae-rep-count');
+        if (countSpan) {
+            countSpan.textContent = currentRepFilter === 'All'
+                ? allMockups.length + ' mockups'
+                : displayMockups.length + ' of ' + allMockups.length + ' mockups';
+        }
+
+        // Wire rep filter change
+        var repSelect = document.getElementById('mockup-ae-rep-filter');
+        if (repSelect) {
+            repSelect.addEventListener('change', function () {
+                currentRepFilter = this.value;
+                sessionStorage.setItem('ae_mockup_rep_filter', currentRepFilter);
+                render();
+            });
+        }
 
         // Wire card clicks
         container.querySelectorAll('.mockup-card').forEach(function (card) {
@@ -152,7 +204,9 @@ var MockupAeGallery = (function () {
                 + '</div>';
         }
 
-        return '<div class="mockup-card" data-mockup-id="' + id + '" style="cursor:pointer;">'
+        var repName = resolveRepName(mockup.Submitted_By || '');
+
+        return '<div class="mockup-card" data-mockup-id="' + id + '" data-rep="' + escapeHtml(repName) + '" style="cursor:pointer;">'
             + '<div class="card-header">'
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
@@ -166,6 +220,7 @@ var MockupAeGallery = (function () {
             + '<div class="card-body">'
             + (designName ? '<div class="card-design-name">' + designName + '</div>' : '')
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
+            + (repName ? '<div class="card-meta-row"><span class="card-meta-label">REP</span> ' + escapeHtml(repName) + '</div>' : '')
             + '</div>'
             + '<div class="card-footer">'
             + '  <span class="card-date">' + submittedDate + '</span>'
