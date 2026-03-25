@@ -187,6 +187,43 @@
         }
     }
 
+    // ── Search Filter ─────────────────────────────────────────────────────
+    let ruthSearchText = '';
+
+    function injectSearchBar() {
+        if (document.getElementById('ruth-search-bar')) return;
+        const queueGrid = document.getElementById('queue-grid');
+        if (!queueGrid) return;
+
+        const bar = document.createElement('div');
+        bar.id = 'ruth-search-bar';
+        bar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'ruth-search-input';
+        input.placeholder = 'Search company, design #, rep...';
+        input.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:260px;';
+
+        const countSpan = document.createElement('span');
+        countSpan.id = 'ruth-search-count';
+        countSpan.style.cssText = 'font-size:12px;color:#94a3b8;margin-left:auto;';
+
+        let timer = null;
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
+            const el = this;
+            timer = setTimeout(function () {
+                ruthSearchText = el.value.trim().toLowerCase();
+                renderCards();
+            }, 200);
+        });
+
+        bar.appendChild(input);
+        bar.appendChild(countSpan);
+        queueGrid.parentNode.insertBefore(bar, queueGrid);
+    }
+
     // ── Render Cards ─────────────────────────────────────────────────────
     function renderCards() {
         const queueGrid = document.getElementById('queue-grid');
@@ -194,9 +231,29 @@
 
         if (!queueGrid || !completedGrid) return;
 
+        injectSearchBar();
+
         // Filter mockups
-        const queueMockups = allMockups.filter(m => QUEUE_STATUSES.includes(m.Status));
-        const completedMockups = allMockups.filter(m => COMPLETED_STATUSES.includes(m.Status));
+        let queueMockups = allMockups.filter(m => QUEUE_STATUSES.includes(m.Status));
+        let completedMockups = allMockups.filter(m => COMPLETED_STATUSES.includes(m.Status));
+
+        // Apply text search
+        if (ruthSearchText) {
+            const matchFn = m => {
+                const text = ((m.Company_Name || '') + ' ' + (m.Design_Number || '') + ' ' + (m.Design_Name || '') + ' ' + (m.Submitted_By || '')).toLowerCase();
+                return text.indexOf(ruthSearchText) !== -1;
+            };
+            queueMockups = queueMockups.filter(matchFn);
+            completedMockups = completedMockups.filter(matchFn);
+        }
+
+        // Update search count
+        const countSpan = document.getElementById('ruth-search-count');
+        if (countSpan) {
+            const total = allMockups.length;
+            const shown = queueMockups.length + completedMockups.length;
+            countSpan.textContent = ruthSearchText ? shown + ' of ' + total + ' mockups' : total + ' mockups';
+        }
 
         // Render queue
         if (queueMockups.length === 0) {

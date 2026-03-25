@@ -16,7 +16,8 @@ var MockupAeGallery = (function () {
 
     var containerId = null;
     var allMockups = [];
-    var currentRepFilter = sessionStorage.getItem('ae_mockup_rep_filter') || 'All';
+    var currentRepFilter = sessionStorage.getItem('ae_dashboard_rep_filter') || 'All';
+    var currentSearchText = '';
 
     var REP_EMAIL_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
@@ -109,10 +110,11 @@ var MockupAeGallery = (function () {
             + '<span style="font-weight:500;color:#666;">Approved</span></div>';
         html += '</div>';
 
-        // Rep filter bar
+        // Search + Rep filter bar
         var repOptions = ['All', 'Taneisha', 'Nika', 'Ruthie', 'Erik'];
         html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;">';
-        html += '<label style="font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;">Filter by Rep:</label>';
+        html += '<input type="text" id="mockup-ae-search" placeholder="Search company, design #..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:200px;">';
+        html += '<label style="font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;margin-left:8px;">Rep:</label>';
         html += '<select id="mockup-ae-rep-filter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;">';
         repOptions.forEach(function (name) {
             html += '<option value="' + name + '"' + (name === currentRepFilter ? ' selected' : '') + '>' + name + '</option>';
@@ -121,9 +123,15 @@ var MockupAeGallery = (function () {
         html += '<span id="mockup-ae-rep-count" style="font-size:12px;color:#94a3b8;margin-left:auto;"></span>';
         html += '</div>';
 
-        // Card grid — filter by rep if needed
-        var displayMockups = currentRepFilter === 'All' ? allMockups : allMockups.filter(function (m) {
-            return resolveRepName(m.Submitted_By || '') === currentRepFilter;
+        // Card grid — filter by rep + search
+        var displayMockups = allMockups.filter(function (m) {
+            var matchRep = currentRepFilter === 'All' || resolveRepName(m.Submitted_By || '') === currentRepFilter;
+            var matchSearch = !currentSearchText || (
+                (m.Company_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
+                (m.Design_Number || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
+                (m.Design_Name || '').toLowerCase().indexOf(currentSearchText) !== -1
+            );
+            return matchRep && matchSearch;
         });
 
         html += '<div class="mockup-grid">';
@@ -137,9 +145,10 @@ var MockupAeGallery = (function () {
         // Update count
         var countSpan = document.getElementById('mockup-ae-rep-count');
         if (countSpan) {
-            countSpan.textContent = currentRepFilter === 'All'
-                ? allMockups.length + ' mockups'
-                : displayMockups.length + ' of ' + allMockups.length + ' mockups';
+            var isFiltered = currentRepFilter !== 'All' || currentSearchText;
+            countSpan.textContent = isFiltered
+                ? displayMockups.length + ' of ' + allMockups.length + ' mockups'
+                : allMockups.length + ' mockups';
         }
 
         // Wire rep filter change
@@ -147,8 +156,22 @@ var MockupAeGallery = (function () {
         if (repSelect) {
             repSelect.addEventListener('change', function () {
                 currentRepFilter = this.value;
-                sessionStorage.setItem('ae_mockup_rep_filter', currentRepFilter);
+                sessionStorage.setItem('ae_dashboard_rep_filter', currentRepFilter);
                 render();
+            });
+        }
+
+        // Wire text search
+        var searchInput = document.getElementById('mockup-ae-search');
+        if (searchInput) {
+            var searchTimer = null;
+            searchInput.addEventListener('input', function () {
+                clearTimeout(searchTimer);
+                var input = this;
+                searchTimer = setTimeout(function () {
+                    currentSearchText = input.value.trim().toLowerCase();
+                    render();
+                }, 200);
             });
         }
 
