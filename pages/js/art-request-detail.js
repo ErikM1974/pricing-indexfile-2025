@@ -378,6 +378,8 @@
             }
             // Show AE status bar with actions for all statuses
             renderAeStatusBar(req, statusClean, notes);
+            // Init prev/next navigation between art requests
+            initAeNavigation(req);
         } else {
             renderSteveActions(req, statusClean, notes);
         }
@@ -464,6 +466,103 @@
             editBtn.addEventListener('click', function () {
                 openEditModal(req);
             });
+        }
+    }
+
+    // ── AE Prev/Next Navigation ─────────────────────────────────────────
+    function initAeNavigation(req) {
+        var navBar = document.getElementById('ard-nav-bar');
+        if (!navBar) return;
+
+        // Check sessionStorage for cached request list
+        var cacheKey = 'ae_nav_requests';
+        var cached = sessionStorage.getItem(cacheKey);
+        var requestList = null;
+        var cacheRendered = false;
+
+        if (cached) {
+            try { requestList = JSON.parse(cached); } catch (e) { requestList = null; }
+        }
+
+        if (requestList && requestList.length > 0) {
+            cacheRendered = renderNavigation(requestList);
+        }
+
+        // Also fetch fresh list in background (updates cache for next navigation)
+        var repFilter = sessionStorage.getItem('ae_rep_filter') || '';
+        var apiUrl = API_BASE + '/api/artrequests?select=ID_Design,CompanyName,Status&limit=500';
+        if (repFilter && repFilter !== 'All') {
+            var repEmailMap = {
+                'Taneisha': 'taneisha@nwcustomapparel.com',
+                'Nika': 'nika@nwcustomapparel.com',
+                'Ruthie': 'ruthie@nwcustomapparel.com',
+                'Erik': 'erik@nwcustomapparel.com'
+            };
+            if (repEmailMap[repFilter]) {
+                apiUrl += '&salesRep=' + encodeURIComponent(repEmailMap[repFilter]);
+            }
+        }
+
+        fetch(apiUrl).then(function (resp) {
+            if (!resp.ok) throw new Error('Failed to fetch');
+            return resp.json();
+        }).then(function (data) {
+            var list = (data.Result || data.records || data || []);
+            if (!Array.isArray(list) || list.length === 0) return;
+
+            // Sort by ID_Design descending (newest first)
+            list.sort(function (a, b) { return (b.ID_Design || 0) - (a.ID_Design || 0); });
+
+            // Store minimal data
+            var navList = list.map(function (r) {
+                return { id: r.ID_Design, company: r.CompanyName || '', status: r.Status || '' };
+            });
+            sessionStorage.setItem(cacheKey, JSON.stringify(navList));
+
+            // Render from fresh data if cache didn't render (stale or missing)
+            if (!cacheRendered) {
+                renderNavigation(navList);
+            }
+        }).catch(function (err) {
+            console.warn('AE nav fetch failed (non-blocking):', err);
+        });
+
+        function renderNavigation(list) {
+            var currentIdx = -1;
+            var currentId = parseInt(designId);
+            for (var i = 0; i < list.length; i++) {
+                if (parseInt(list[i].id) === currentId) {
+                    currentIdx = i;
+                    break;
+                }
+            }
+            if (currentIdx === -1) return false;
+
+            navBar.style.display = '';
+            var prevBtn = document.getElementById('ard-nav-prev');
+            var nextBtn = document.getElementById('ard-nav-next');
+            var posSpan = document.getElementById('ard-nav-position');
+
+            posSpan.textContent = (currentIdx + 1) + ' of ' + list.length;
+
+            if (currentIdx > 0) {
+                var prev = list[currentIdx - 1];
+                prevBtn.disabled = false;
+                prevBtn.innerHTML = '&larr; ' + escapeHtml(prev.company || '#' + prev.id);
+                prevBtn.addEventListener('click', function () {
+                    window.location.href = '/art-request/' + prev.id + '?view=ae';
+                });
+            }
+
+            if (currentIdx < list.length - 1) {
+                var next = list[currentIdx + 1];
+                nextBtn.disabled = false;
+                nextBtn.innerHTML = escapeHtml(next.company || '#' + next.id) + ' &rarr;';
+                nextBtn.addEventListener('click', function () {
+                    window.location.href = '/art-request/' + next.id + '?view=ae';
+                });
+            }
+            return true;
         }
     }
 

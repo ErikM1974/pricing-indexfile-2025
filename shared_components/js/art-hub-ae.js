@@ -388,6 +388,82 @@
 
     // ── Card Processing Pipeline ─────────────────────────────────────
 
+    // ── Sales Rep Filter ──────────────────────────────────────────────
+    var currentRepFilter = sessionStorage.getItem('ae_rep_filter') || 'All';
+
+    function injectRepFilter() {
+        var viewTab = document.getElementById('view-tab');
+        if (!viewTab || document.getElementById('ae-rep-filter-bar')) return;
+
+        var bar = document.createElement('div');
+        bar.id = 'ae-rep-filter-bar';
+        bar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;';
+
+        var label = document.createElement('label');
+        label.textContent = 'Filter by Rep:';
+        label.style.cssText = 'font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;';
+
+        var select = document.createElement('select');
+        select.id = 'ae-rep-filter-select';
+        select.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;';
+
+        var options = ['All', 'Taneisha', 'Nika', 'Ruthie', 'Erik'];
+        options.forEach(function (name) {
+            var opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            if (name === currentRepFilter) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        var countSpan = document.createElement('span');
+        countSpan.id = 'ae-rep-filter-count';
+        countSpan.style.cssText = 'font-size:12px;color:#94a3b8;margin-left:auto;';
+
+        select.addEventListener('change', function () {
+            currentRepFilter = this.value;
+            sessionStorage.setItem('ae_rep_filter', currentRepFilter);
+            applyRepFilter();
+        });
+
+        bar.appendChild(label);
+        bar.appendChild(select);
+        bar.appendChild(countSpan);
+        viewTab.insertBefore(bar, viewTab.firstChild);
+    }
+
+    function applyRepFilter() {
+        var viewTab = document.getElementById('view-tab');
+        if (!viewTab) return;
+
+        var cards = viewTab.querySelectorAll('.card');
+        var shown = 0;
+        var total = cards.length;
+
+        cards.forEach(function (card) {
+            if (currentRepFilter === 'All') {
+                card.style.display = '';
+                shown++;
+                return;
+            }
+            var repEl = card.querySelector('.rep-name');
+            var repText = repEl ? repEl.textContent.trim() : '';
+            if (repText === currentRepFilter) {
+                card.style.display = '';
+                shown++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        var countSpan = document.getElementById('ae-rep-filter-count');
+        if (countSpan) {
+            countSpan.textContent = currentRepFilter === 'All'
+                ? total + ' requests'
+                : shown + ' of ' + total + ' requests';
+        }
+    }
+
     function processCards() {
         var viewTab = document.getElementById('view-tab');
         if (!viewTab) return;
@@ -405,6 +481,10 @@
             injectAEFooter(card);
             addAuditIndicator(card);
         });
+
+        // Inject filter bar if not present, then apply filter
+        injectRepFilter();
+        applyRepFilter();
     }
 
     // ── MutationObserver: Watch for Caspio gallery cards in view-tab ──
