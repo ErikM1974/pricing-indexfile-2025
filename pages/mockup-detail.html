@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=28">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=29">
     <link rel="stylesheet" href="/pages/css/thread-color-picker.css?v=1">
 </head>
 <body>
@@ -37,6 +37,13 @@
 
     <!-- Content -->
     <main class="pmd-content" id="pmd-content" style="display:none;">
+
+        <!-- AE Navigation Bar (prev/next between mockups) -->
+        <div id="pmd-nav-bar" class="pmd-nav-bar" style="display:none;">
+            <button type="button" class="pmd-nav-btn" id="pmd-nav-prev" disabled>&larr; Previous</button>
+            <span class="pmd-nav-position" id="pmd-nav-position"></span>
+            <button type="button" class="pmd-nav-btn" id="pmd-nav-next" disabled>Next &rarr;</button>
+        </div>
 
         <!-- Title Row -->
         <div class="pmd-title-row">
@@ -240,6 +247,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/thread-color-picker.js?v=1"></script>
-    <script src="/pages/js/mockup-detail.js?v=46"></script>
+    <script src="/pages/js/mockup-detail.js?v=47"></script>
 </body>
 </html>

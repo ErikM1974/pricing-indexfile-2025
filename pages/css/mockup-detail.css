@@ -120,6 +120,40 @@ body {
     flex: 1;
 }
 
+/* ── AE Navigation Bar (prev/next) ────────────────────── */
+.pmd-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 14px;
+    margin: 0 0 10px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.pmd-nav-btn {
+    padding: 6px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #f8fafc;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #1e293b;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+.pmd-nav-btn:hover:not(:disabled) { background: #e2e8f0; border-color: #94a3b8; }
+.pmd-nav-btn:disabled { opacity: 0.35; cursor: default; }
+.pmd-nav-position { font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap; }
+@media (max-width: 500px) {
+    .pmd-nav-btn { max-width: 120px; font-size: 12px; padding: 5px 10px; }
+}
+
 /* ── Title Row ──────────────────────────────────────── */
 .pmd-title-row {
     display: flex;

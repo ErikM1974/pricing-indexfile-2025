@@ -86,6 +86,8 @@
         root.style.setProperty('--art-theme-bg-selected', '#fde2e8');
         root.style.setProperty('--art-theme-rgba-15', 'rgba(152,30,50,0.15)');
         root.style.setProperty('--art-theme-rgba-10', 'rgba(152,30,50,0.1)');
+        // Init prev/next navigation for AE view
+        initMockupNavigation();
     }
 
     // Adjust header and theme for customer view — NWCA green
@@ -138,6 +140,85 @@
         console.error('Failed to load mockup:', err);
         showError('Error Loading Mockup', err.message);
     });
+
+    // ── AE Prev/Next Navigation ─────────────────────────────────────────
+    function initMockupNavigation() {
+        var navBar = document.getElementById('pmd-nav-bar');
+        if (!navBar) return;
+
+        var REP_EMAIL_MAP = {
+            'Taneisha': 'taneisha@nwcustomapparel.com',
+            'Nika': 'nika@nwcustomapparel.com',
+            'Ruthie': 'ruthie@nwcustomapparel.com',
+            'Erik': 'erik@nwcustomapparel.com'
+        };
+
+        var cacheKey = 'ae_mockup_nav_list';
+        var cached = sessionStorage.getItem(cacheKey);
+        var navList = null;
+        var cacheRendered = false;
+
+        if (cached) {
+            try { navList = JSON.parse(cached); } catch (e) { navList = null; }
+        }
+        if (navList && navList.length > 0) {
+            cacheRendered = renderNav(navList);
+        }
+
+        // Fetch fresh list in background
+        var repFilter = sessionStorage.getItem('ae_mockup_rep_filter') || '';
+        var apiUrl = API_BASE + '/api/mockups?orderBy=Submitted_Date DESC&limit=500';
+        if (repFilter && repFilter !== 'All') {
+            if (REP_EMAIL_MAP[repFilter]) {
+                apiUrl += '&submittedBy=' + encodeURIComponent(REP_EMAIL_MAP[repFilter]);
+            }
+        }
+
+        fetch(apiUrl).then(function (r) {
+            if (!r.ok) throw new Error('Failed');
+            return r.json();
+        }).then(function (data) {
+            var records = data.records || [];
+            if (!records.length) return;
+            var list = records.map(function (m) {
+                return { id: m.ID, company: m.Company_Name || '', design: m.Design_Number || '' };
+            });
+            sessionStorage.setItem(cacheKey, JSON.stringify(list));
+            if (!cacheRendered) renderNav(list);
+        }).catch(function () {});
+
+        function renderNav(list) {
+            var currentId = parseInt(mockupId);
+            var idx = -1;
+            for (var i = 0; i < list.length; i++) {
+                if (parseInt(list[i].id) === currentId) { idx = i; break; }
+            }
+            if (idx === -1) return false;
+
+            navBar.style.display = '';
+            var prevBtn = document.getElementById('pmd-nav-prev');
+            var nextBtn = document.getElementById('pmd-nav-next');
+            document.getElementById('pmd-nav-position').textContent = (idx + 1) + ' of ' + list.length;
+
+            if (idx > 0) {
+                var prev = list[idx - 1];
+                prevBtn.disabled = false;
+                prevBtn.innerHTML = '&larr; ' + escapeHtml(prev.company || '#' + prev.id);
+                prevBtn.addEventListener('click', function () {
+                    window.location.href = '/mockup/' + prev.id + '?view=ae';
+                });
+            }
+            if (idx < list.length - 1) {
+                var next = list[idx + 1];
+                nextBtn.disabled = false;
+                nextBtn.innerHTML = escapeHtml(next.company || '#' + next.id) + ' &rarr;';
+                nextBtn.addEventListener('click', function () {
+                    window.location.href = '/mockup/' + next.id + '?view=ae';
+                });
+            }
+            return true;
+        }
+    }
 
     // ── Main Render ────────────────────────────────────────────────────────
     function render(mockup, notes) {
