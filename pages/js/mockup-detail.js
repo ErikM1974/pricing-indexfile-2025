@@ -264,7 +264,7 @@
                     + '<p class="pmd-customer-prompt">Please review the mockup(s) below and select the one you approve, or request changes.</p>'
                     + sentDateHtml
                     + '<div class="pmd-customer-btns">'
-                    + '<button class="pmd-action-btn pmd-action-btn--approve pmd-action-btn--lg" id="pmd-btn-customer-approve" disabled>Approve Selected Mockup</button>'
+                    + '<button class="pmd-action-btn pmd-action-btn--approve pmd-action-btn--lg" id="pmd-btn-customer-approve">Approve Selected Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise pmd-action-btn--lg" id="pmd-btn-customer-revise">Request Changes</button>'
                     + '</div>'
                     + '<button class="pmd-pdf-download-btn" id="pmd-btn-download-pdf" title="Download a PDF copy for your records">&#128196; Download PDF</button>'
@@ -311,7 +311,7 @@
                 }
 
                 aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:' + aeElapsedHtml + custElapsedHtml + '</span>'
-                    + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve" disabled>Approve Mockup</button>'
+                    + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve">Approve Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
                     + sendCopyButtons;
 
