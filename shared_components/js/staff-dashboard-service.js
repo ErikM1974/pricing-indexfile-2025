@@ -952,47 +952,62 @@ const StaffDashboardService = (function() {
 
     /**
      * Garment Tracker Configuration
-     * Tracks premium items and Richardson caps for sales incentive tracking
-     * NOTE: Bonus amounts are hidden from display but used for tooltip calculations
+     * Fetched from backend API — single source of truth in config/garment-tracker-config.js
+     * To swap products for a new quarter, edit that ONE file and redeploy backend.
      */
-    const GARMENT_TRACKER_CONFIG = {
-        // === Q1 2026: Jan 1 - Mar 31 ===
-        // Swap products each quarter. Erik provides new list at quarter start.
-        // Q1 data preserved in Caspio table (Quarter field = "2026-Q1").
+    let _garmentTrackerConfig = null;
 
-        // Premium items - tracked individually with bonus per item
-        premiumItems: [
-            { partNumber: 'CT104670', name: 'Carhartt Storm Defender Jacket', bonus: 5 },
-            { partNumber: 'EB550', name: 'Eddie Bauer Rain Jacket', bonus: 5 },
-            { partNumber: 'CT103828', name: 'Carhartt Duck Detroit Jacket', bonus: 5 },
-            { partNumber: 'CT102286', name: 'Carhartt Gilliam Vest', bonus: 3 },
-            { partNumber: 'NF0A52S7', name: 'North Face Dyno Backpack', bonus: 2 }
-        ],
+    /**
+     * Fetch garment tracker config from backend API (cached for session)
+     * @returns {Promise<Object>} Config with premiumItems, richardsonStyles, dateRange, etc.
+     */
+    async function getGarmentTrackerConfig() {
+        if (_garmentTrackerConfig) return _garmentTrackerConfig;
 
-        // Richardson SanMar caps - grouped as one total
-        richardsonStyles: [
-            '110', '111', '112', '112FP', '112FPR', '112PFP', '112PL', '112PT',
-            '115', '168', '168P', '169', '172', '173', '212', '220', '225', '256', '256P',
-            '312', '323FPC', '325', '326', '336', '355', '356',
-            '435', '511', '514', '514J', '840', '842', '870'
-        ],
-        richardsonBonus: 0.50, // Per cap
-
-        // Sales reps to track
-        trackedReps: ['Nika Lao', 'Taneisha Clark'],
-
-        // Order type filters (Custom Embroidery = 21, Order Type 41)
-        orderTypeIds: [21, 41],
-
-        // Date range - Q1 2026 (frozen for commission payout)
-        // Update to next quarter when Erik provides new products
-        getDateRange: function() {
-            return {
-                start: '2026-01-01',
-                end: '2026-03-31'
-            };
+        const url = `${API_CONFIG.baseURL}/garment-tracker/config`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch garment tracker config: ${response.status}`);
         }
-    };
+        const data = await response.json();
+        if (!data.success || !data.config) {
+            throw new Error('Invalid garment tracker config response');
+        }
+
+        // Transform premiumItems from backend format {partNumber: {name, bonus}}
+        // to frontend format [{partNumber, name, bonus}]
+        const cfg = data.config;
+        cfg.premiumItemsList = Object.entries(cfg.premiumItems).map(([partNumber, item]) => ({
+            partNumber,
+            name: item.name,
+            bonus: item.bonus
+        }));
+
+        // Add getDateRange helper for backward compatibility
+        cfg.getDateRange = function() {
+            return { start: cfg.dateRange.start, end: cfg.dateRange.end };
+        };
+
+        _garmentTrackerConfig = cfg;
+        console.log(`[GarmentTracker] Config loaded: ${cfg.quarter}, ${cfg.premiumItemsList.length} premium items`);
+        return cfg;
+    }
+
+    // Backward-compatible accessor (sync fallback if config already loaded)
+    const GARMENT_TRACKER_CONFIG = new Proxy({}, {
+        get: function(target, prop) {
+            if (!_garmentTrackerConfig) {
+                console.warn('[GarmentTracker] Config not yet loaded, returning empty');
+                if (prop === 'premiumItems') return [];
+                if (prop === 'richardsonStyles') return [];
+                if (prop === 'trackedReps') return [];
+                if (prop === 'getDateRange') return () => ({ start: '2026-01-01', end: '2026-03-31' });
+                return undefined;
+            }
+            if (prop === 'premiumItems') return _garmentTrackerConfig.premiumItemsList;
+            return _garmentTrackerConfig[prop];
+        }
+    });
 
     /**
      * Fetch line items for a specific order
@@ -1052,6 +1067,7 @@ const StaffDashboardService = (function() {
      * @returns {Promise<Object>} Tracker data with quantities and bonus totals
      */
     async function loadGarmentTrackerData() {
+        await getGarmentTrackerConfig(); // Ensure config is loaded before use
         const dateRange = GARMENT_TRACKER_CONFIG.getDateRange();
         const cacheKey = 'garmentTracker_2026';
         const cacheTTL = 30 * 60 * 1000; // 30 minutes
@@ -1075,10 +1091,11 @@ const StaffDashboardService = (function() {
         // Step 1: Fetch all invoiced orders for 2026
         const allOrders = await fetchOrders(dateRange.start, dateRange.end);
 
-        // Step 2: Filter to tracked reps AND order types 21 or 41
+        // Step 2: Filter to tracked reps, exclude InkSoft orders (type 31) and excluded customers
         const repOrders = allOrders.filter(order =>
             GARMENT_TRACKER_CONFIG.trackedReps.includes(order.CustomerServiceRep) &&
-            GARMENT_TRACKER_CONFIG.orderTypeIds.includes(order.id_OrderType)
+            !GARMENT_TRACKER_CONFIG.excludedOrderTypeIds.includes(order.id_OrderType) &&
+            !GARMENT_TRACKER_CONFIG.excludedCustomerIds.includes(order.id_Customer)
         );
 
         console.log(`[GarmentTracker] Found ${repOrders.length} matching orders from ${allOrders.length} total`);
@@ -1210,6 +1227,7 @@ const StaffDashboardService = (function() {
      * @returns {Promise<Object>} Tracker data aggregated by rep
      */
     async function loadGarmentTrackerFromTable() {
+        await getGarmentTrackerConfig(); // Ensure config is loaded before use
         const dateRange = GARMENT_TRACKER_CONFIG.getDateRange();
         // Filter by quarter date range (not just year) so each quarter shows only its data
         const whereClause = encodeURIComponent(`DateInvoiced>='${dateRange.start}' AND DateInvoiced<='${dateRange.end} 23:59:59'`);
