@@ -432,11 +432,27 @@
         viewTab.insertBefore(bar, viewTab.firstChild);
     }
 
+    function getCardRepName(card) {
+        // Cards use .card-meta-row with <span class="card-meta-label">REP</span> Name
+        var metaRows = card.querySelectorAll('.card-meta-row');
+        for (var i = 0; i < metaRows.length; i++) {
+            var label = metaRows[i].querySelector('.card-meta-label');
+            if (label && label.textContent.trim() === 'REP') {
+                // Rep name is the text after the label span
+                var fullText = metaRows[i].textContent.trim();
+                return fullText.replace(/^REP\s*/, '').trim();
+            }
+        }
+        // Fallback: check for .rep-name element (legacy)
+        var repEl = card.querySelector('.rep-name');
+        return repEl ? repEl.textContent.trim() : '';
+    }
+
     function applyRepFilter() {
         var viewTab = document.getElementById('view-tab');
         if (!viewTab) return;
 
-        var cards = viewTab.querySelectorAll('.card');
+        var cards = viewTab.querySelectorAll('.art-card, .mockup-card, .card');
         var shown = 0;
         var total = cards.length;
 
@@ -446,8 +462,7 @@
                 shown++;
                 return;
             }
-            var repEl = card.querySelector('.rep-name');
-            var repText = repEl ? repEl.textContent.trim() : '';
+            var repText = getCardRepName(card);
             if (repText === currentRepFilter) {
                 card.style.display = '';
                 shown++;
