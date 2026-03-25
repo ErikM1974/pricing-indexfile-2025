@@ -956,6 +956,10 @@ const StaffDashboardService = (function() {
      * NOTE: Bonus amounts are hidden from display but used for tooltip calculations
      */
     const GARMENT_TRACKER_CONFIG = {
+        // === Q1 2026: Jan 1 - Mar 31 ===
+        // Swap products each quarter. Erik provides new list at quarter start.
+        // Q1 data preserved in Caspio table (Quarter field = "2026-Q1").
+
         // Premium items - tracked individually with bonus per item
         premiumItems: [
             { partNumber: 'CT104670', name: 'Carhartt Storm Defender Jacket', bonus: 5 },
@@ -967,9 +971,10 @@ const StaffDashboardService = (function() {
 
         // Richardson SanMar caps - grouped as one total
         richardsonStyles: [
-            '112', '112FP', '112FPR', '112PFP', '112PL', '112PT', '115',
-            '168', '168P', '169', '173', '212', '220', '225', '256', '256P',
-            '312', '323FPC', '326', '336', '355', '356'
+            '110', '111', '112', '112FP', '112FPR', '112PFP', '112PL', '112PT',
+            '115', '168', '168P', '169', '172', '173', '212', '220', '225', '256', '256P',
+            '312', '323FPC', '325', '326', '336', '355', '356',
+            '435', '511', '514', '514J', '840', '842', '870'
         ],
         richardsonBonus: 0.50, // Per cap
 
@@ -979,11 +984,12 @@ const StaffDashboardService = (function() {
         // Order type filters (Custom Embroidery = 21, Order Type 41)
         orderTypeIds: [21, 41],
 
-        // Date range - 2026 YTD
+        // Date range - Q1 2026 (frozen for commission payout)
+        // Update to next quarter when Erik provides new products
         getDateRange: function() {
             return {
                 start: '2026-01-01',
-                end: formatDate(new Date())
+                end: '2026-03-31'
             };
         }
     };
@@ -1204,12 +1210,12 @@ const StaffDashboardService = (function() {
      * @returns {Promise<Object>} Tracker data aggregated by rep
      */
     async function loadGarmentTrackerFromTable() {
-        const year = new Date().getFullYear();
-        // DateInvoiced is Date/Time field, use YEAR() function
-        const whereClause = encodeURIComponent(`YEAR(DateInvoiced)=${year}`);
+        const dateRange = GARMENT_TRACKER_CONFIG.getDateRange();
+        // Filter by quarter date range (not just year) so each quarter shows only its data
+        const whereClause = encodeURIComponent(`DateInvoiced>='${dateRange.start}' AND DateInvoiced<='${dateRange.end} 23:59:59'`);
         const url = `${API_CONFIG.baseURL}/garment-tracker?q.where=${whereClause}`;
 
-        console.log(`[GarmentTracker] Loading from table for year ${year}`);
+        console.log(`[GarmentTracker] Loading from table for ${dateRange.start} to ${dateRange.end}`);
 
         const response = await fetch(url);
         const data = await response.json();
@@ -1238,7 +1244,8 @@ const StaffDashboardService = (function() {
                 ordersProcessed: records.length,
                 totalOrders: records.length,
                 fetchedAt: new Date().toISOString(),
-                source: 'table'
+                source: 'table',
+                dateRange: GARMENT_TRACKER_CONFIG.getDateRange()
             }
         };
 
@@ -1285,8 +1292,8 @@ const StaffDashboardService = (function() {
      * @returns {Promise<Array>} Array of existing records
      */
     async function fetchExistingGarmentRecords() {
-        const year = new Date().getFullYear();
-        const whereClause = encodeURIComponent(`YEAR(DateInvoiced)=${year}`);
+        const dateRange = GARMENT_TRACKER_CONFIG.getDateRange();
+        const whereClause = encodeURIComponent(`DateInvoiced>='${dateRange.start}' AND DateInvoiced<='${dateRange.end} 23:59:59'`);
         const url = `${API_CONFIG.baseURL}/garment-tracker?q.where=${whereClause}`;
 
         try {

@@ -1018,10 +1018,16 @@ const StaffDashboardInit = (function() {
         const config = StaffDashboardService.GARMENT_TRACKER_CONFIG;
         const reps = config.trackedReps;
 
-        // Update date range display
+        // Update date range display (shows quarter label)
         if (dateRangeEl && data.metadata?.dateRange) {
             const dr = data.metadata.dateRange;
-            dateRangeEl.textContent = `${StaffDashboardService.formatDateForDisplay(dr.start)} - ${StaffDashboardService.formatDateForDisplay(dr.end)}`;
+            const startDate = StaffDashboardService.formatDateForDisplay(dr.start);
+            const endDate = StaffDashboardService.formatDateForDisplay(dr.end);
+            // Determine quarter from start month
+            const startMonth = new Date(dr.start + 'T00:00:00').getMonth();
+            const quarter = Math.floor(startMonth / 3) + 1;
+            const year = new Date(dr.start + 'T00:00:00').getFullYear();
+            dateRangeEl.textContent = `Q${quarter} ${year} (${startDate} - ${endDate})`;
         }
 
         // Get first names for column headers
