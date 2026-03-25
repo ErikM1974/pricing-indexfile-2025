@@ -241,114 +241,96 @@ Archive populated with January 2026 data:
 
 Track quarterly garment sales (Richardson caps + premium items) by rep for bonus calculations and historical reporting. Unlike daily sales which aggregates by date, this stores order-level detail for individual garment items.
 
-### What Qualifies
+### Config — Single Source of Truth (2026-03-25)
+
+**File:** `caspio-pricing-proxy/config/garment-tracker-config.js`
+
+All quarter-specific settings live in ONE file. The backend route, sync script, and frontend all read from it. To change products for a new quarter, edit this file and deploy — nothing else.
+
+Contains: `quarter`, `dateRange`, `premiumItems`, `richardsonStyles`, `richardsonBonus`, `trackedReps`, `excludedOrderTypeIds`, `excludedCustomerIds`.
+
+**Frontend** fetches config via `GET /api/garment-tracker/config` (cached in memory for session).
+
+### What Qualifies (Q1 2026)
 
 **Richardson Caps** ($0.50 bonus each):
-- Styles: 110, 112, 111, 115, 172, 212, 220, 256, 312, 325, 326, 435, 511, 514, 514J, 840, 842, 870
+- 35 styles: 110, 111, 112, 112FP, 112FPR, 112PFP, 112PL, 112PT, 115, 168, 168P, 169, 172, 173, 212, 220, 225, 256, 256P, 312, 323FPC, 325, 326, 336, 355, 356, 435, 511, 514, 514J, 840, 842, 870
 
 **Premium Items** ($2-$5 bonus each):
 | Part Number | Item | Bonus |
 |-------------|------|-------|
-| CT104670 | Carhartt Firm Duck Vest | $5 |
-| EB550 | Eddie Bauer Down Jacket | $5 |
-| CT103828 | Carhartt Thermal Hoodie | $3 |
-| CT102286 | Carhartt Acrylic Beanie | $2 |
-| NF0A52S7 | North Face High Loft Beanie | $2 |
+| CT104670 | Carhartt Storm Defender Jacket | $5 |
+| EB550 | Eddie Bauer Rain Jacket | $5 |
+| CT103828 | Carhartt Duck Detroit Jacket | $5 |
+| CT102286 | Carhartt Gilliam Vest | $3 |
+| NF0A52S7 | North Face Dyno Backpack | $2 |
 
-### Caspio Table
+### Exclusions
 
-**Table Name:** `GarmentTrackerArchive`
+- **InkSoft orders** (order type 31) — webstore orders don't count toward rep commission
+- **Per-quarter customer exclusions** — e.g., Q1 2026: Rainier Pure Beef (customer 13500)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| PK_ID | Autonumber | Primary key |
-| OrderNumber | Number | ShopWorks order number |
-| DateInvoiced | Date/Time | Invoice date |
-| Quarter | Text | Quarter string (e.g., "2026-Q1") |
-| Year | Number | Year (e.g., 2026) |
-| RepName | Text | Sales rep name |
-| PartNumber | Text | Part/style number |
-| StyleCategory | Text | "Premium", "Richardson", or "Other" |
-| Quantity | Number | Item quantity |
-| BonusAmount | Currency | Calculated bonus |
-| ArchivedAt | Timestamp | Auto-set by Caspio |
-| CompositeKey | Formula (Unique) | `OrderNumber + '_' + PartNumber` |
-
-**Composite Key Formula:**
-```
-Convert(nvarchar(20), [@field:OrderNumber]) + '_' + [@field:PartNumber]
-```
-
-### API Endpoints
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/api/garment-tracker/archive?year=&quarter=&rep=` | Query archived data |
-| GET | `/api/garment-tracker/archive/summary?year=` | Aggregated summary by rep/quarter |
-| POST | `/api/garment-tracker/archive-from-live` | Copy from live GarmentTracker table |
-| POST | `/api/garment-tracker/archive-range` | Archive from ManageOrders (within 60 days) |
-| POST | `/api/garment-tracker/import` | Manual import for >60 day corrections |
-
-**Backend file:** `caspio-pricing-proxy/src/routes/garment-tracker.js`
-
-### Archiving Script
-
-**File:** `caspio-pricing-proxy/scripts/archive-garment-tracker.js`
-
-**Modes:**
-```bash
-# Default: Archive from live GarmentTracker table (recommended)
-npm run archive-garment-tracker
-
-# Archive date range from ManageOrders (within 60 days, uses line items)
-npm run archive-garment-tracker -- --start 2026-01-01 --end 2026-01-31
-
-# Archive from live table (explicit, same as default)
-npm run archive-garment-tracker -- --from-live
-```
-
-**Heroku Scheduler:** Run daily at 2:00 PM UTC (6 AM Pacific):
-```
-npm run archive-garment-tracker
-```
-
-### Archive Safety Nets (Two Layers)
-
-| Layer | Trigger | How |
-|-------|---------|-----|
-| **Heroku Scheduler** | Daily at 6 AM Pacific | Copies live table → archive via `archive-from-live` |
-| **Dashboard load** | Every time staff dashboard loads | Background `archive-from-live` call (fire-and-forget) |
-
-Both layers use `POST /api/garment-tracker/archive-from-live` which upserts (no duplicates).
-
-### Live Table vs Archive Table
+### Caspio Tables
 
 | Table | Purpose | Retention |
 |-------|---------|-----------|
 | `GarmentTracker` | Current quarter dashboard display | Cleared quarterly |
 | `GarmentTrackerArchive` | Historical records | Permanent |
 
-The live `GarmentTracker` table is populated by dashboard sync button and shows current quarter data. The archive preserves this data permanently.
+**Archive table fields:** PK_ID, OrderNumber, DateInvoiced, Quarter, Year, RepName, PartNumber, StyleCategory, Quantity, BonusAmount, ArchivedAt (auto), CompositeKey (formula: `OrderNumber + '_' + PartNumber`).
+
+### API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/garment-tracker/config` | **Current quarter config** (frontend fetches this) |
+| GET | `/api/garment-tracker/archive?year=&quarter=&rep=` | Query archived data |
+| GET | `/api/garment-tracker/archive/summary?year=` | Aggregated summary by rep/quarter |
+| POST | `/api/garment-tracker/archive-from-live` | Copy from live → archive |
+| POST | `/api/garment-tracker/archive-range` | Archive from ManageOrders (within 60 days) |
+| POST | `/api/garment-tracker/import` | Manual import for >60 day corrections |
+
+**Backend file:** `caspio-pricing-proxy/src/routes/garment-tracker.js`
+
+### Daily Scripts & Heroku Scheduler
+
+| Job | Command | Schedule (UTC) | Purpose |
+|-----|---------|---------------|---------|
+| **Sync** | `npm run sync-garment-tracker` | Daily 1:00 PM | Pulls new orders from ManageOrders → live table |
+| **Archive** | `npm run archive-garment-tracker` | Daily 2:00 PM | Copies live table → archive (permanent) |
+
+**Sync script:** `scripts/sync-garment-tracker.js` — looks back 7 days by default (overlap to catch delayed invoicing). Supports `--days N`, `--start DATE`, `--end DATE`.
+
+**Archive script:** `scripts/archive-garment-tracker.js` — uses `archive-from-live` endpoint (upserts, no duplicates).
 
 ### Data Flow
 
 ```
 ManageOrders (60-day limit)
-        ↓  Sync button on dashboard
-GarmentTracker (live, current year)
-        ↓  Dashboard load (background) + Daily script (Heroku Scheduler)
+        ↓  Daily sync script (1 PM UTC) + Dashboard sync button
+GarmentTracker (live, current quarter)
+        ↓  Daily archive script (2 PM UTC) + Dashboard load (background)
 GarmentTrackerArchive (permanent)
 ```
 
-### Bug Fix (2026-02-05)
+### Q2 Transition Checklist
 
-**Problem:** Daily archive script ran every day since Jan 25 but archived 0 records.
-**Root cause:** The `archive-range` endpoint tried to read `Part01`-`Part10` fields on ManageOrders order objects, but those fields don't exist — part numbers are on line items (separate API call). Also used exact matching instead of `startsWith` for size variants.
-**Fix:** Changed daily script default from `archive-range` (broken) to `archive-from-live` (working). Fixed `archive-range` to use `fetchLineItems()` with `startsWith` matching. Added dashboard-triggered archival as safety net.
+Edit ONE file: `caspio-pricing-proxy/config/garment-tracker-config.js`
+1. Change `quarter` → `'2026-Q2'`
+2. Change `dateRange` → `{ start: '2026-04-01', end: '2026-06-30' }`
+3. Swap `premiumItems` with new products (e.g., golf towels)
+4. Update `richardsonStyles` if adding/removing cap styles
+5. Update `excludedCustomerIds` for Q2 (or empty `[]`)
+6. Commit + deploy backend → frontend picks up changes automatically
+
+### Bug Fixes
+
+**2026-02-05:** Daily archive script archived 0 records. Root cause: `archive-range` tried to read Part fields on orders instead of line items. Fix: changed default to `archive-from-live`.
+
+**2026-03-25:** Dashboard totals stale/wrong. Root cause: No daily sync from ManageOrders — relied on manual sync button. Fix: Created `sync-garment-tracker.js` daily script. Also found 33 missing records (fell off ManageOrders 60-day window) and 46 InkSoft records that shouldn't count. Imported missing, deleted InkSoft, added exclusion filters.
 
 ### Quarterly Reporting
 
-To get quarterly summary by rep:
 ```bash
 curl "https://caspio-pricing-proxy.../api/garment-tracker/archive/summary?year=2026"
 ```
