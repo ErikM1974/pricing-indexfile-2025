@@ -376,6 +376,8 @@
                 backLinkAe.textContent = '\u2190 Back to AE Dashboard';
                 backLinkAe.href = '/dashboards/ae-dashboard.html';
             }
+            // Show AE status bar with actions for all statuses
+            renderAeStatusBar(req, statusClean, notes);
         } else {
             renderSteveActions(req, statusClean, notes);
         }
@@ -392,6 +394,241 @@
 
         // Status timeline
         renderStatusTimeline(notes);
+    }
+
+    // ── AE Status Bar (all statuses) ────────────────────────────────────
+    function renderAeStatusBar(req, statusClean, notes) {
+        var bar = document.getElementById('ard-ae-status-bar');
+        if (!bar) return;
+
+        var status = statusClean.toLowerCase().replace(/\s+/g, '');
+        var isCompleted = status === 'completed';
+        var isCancelled = status === 'cancel' || status === 'cancelled';
+        if (isCancelled) return;
+
+        bar.style.display = '';
+        var buttons = [];
+
+        // Edit Request button for all non-completed statuses
+        if (!isCompleted) {
+            buttons.push('<button type="button" class="ard-action-btn ard-ae-action-edit" id="ard-ae-btn-edit">Edit Request</button>');
+        }
+
+        // Status-specific buttons
+        if (status === 'submitted' || status === 'revisionrequested') {
+            buttons.unshift('<button type="button" class="ard-action-btn ard-action-working" id="ard-ae-btn-working">Mark In Progress</button>');
+        } else if (status.includes('inprogress')) {
+            // In progress — AE can prompt Steve to send for approval
+            buttons.unshift('<span class="ard-ae-status-label">In Progress — Steve is working on this</span>');
+        } else if (status === 'approved') {
+            buttons.unshift('<span class="ard-ae-status-label">\u2705 Approved — Waiting for Steve to finalize</span>');
+        }
+        // Note: awaitingapproval is handled by the existing ard-action-bar above
+
+        bar.innerHTML = '<div class="ard-ae-status-inner">' + buttons.join('') + '</div>';
+
+        // Wire up "Mark In Progress" button
+        var workingBtn = document.getElementById('ard-ae-btn-working');
+        if (workingBtn) {
+            workingBtn.addEventListener('click', function () {
+                workingBtn.disabled = true;
+                workingBtn.textContent = 'Updating...';
+                var repEmail = req.User_Email || req.Sales_Rep || '';
+                fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'In Progress' })
+                }).then(function (resp) {
+                    if (!resp.ok) throw new Error('Status ' + resp.status);
+                    return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'AE marked In Progress', noteBy: getLoggedInUser().noteBy })
+                    });
+                }).then(function () {
+                    workingBtn.textContent = 'Updated!';
+                    workingBtn.style.background = '#28a745';
+                    setTimeout(function () { location.reload(); }, 1200);
+                }).catch(function (err) {
+                    workingBtn.textContent = 'Error';
+                    workingBtn.style.background = '#dc3545';
+                    console.error('AE status update failed:', err);
+                    setTimeout(function () { workingBtn.textContent = 'Mark In Progress'; workingBtn.style.background = ''; workingBtn.disabled = false; }, 2000);
+                });
+            });
+        }
+
+        // Wire up "Edit Request" button
+        var editBtn = document.getElementById('ard-ae-btn-edit');
+        if (editBtn) {
+            editBtn.addEventListener('click', function () {
+                openEditModal(req);
+            });
+        }
+    }
+
+    // ── Edit Request Modal ─────────────────────────────────────────────
+    function openEditModal(req) {
+        var modal = document.getElementById('ard-edit-modal');
+        if (!modal) return;
+
+        // Populate fields with current values
+        var orderType = req.Order_Type && typeof req.Order_Type === 'object'
+            ? Object.values(req.Order_Type).join(', ') : (req.Order_Type || '');
+        var orderTypeSelect = document.getElementById('ard-edit-order-type');
+        for (var i = 0; i < orderTypeSelect.options.length; i++) {
+            if (orderTypeSelect.options[i].value === orderType) {
+                orderTypeSelect.selectedIndex = i;
+                break;
+            }
+        }
+
+        var dueDateRaw = req.Due_Date || '';
+        if (dueDateRaw) {
+            var d = new Date(dueDateRaw);
+            if (!isNaN(d)) {
+                document.getElementById('ard-edit-due-date').value = d.toISOString().split('T')[0];
+            }
+        }
+
+        document.getElementById('ard-edit-placement').value = req.Garment_Placement || '';
+
+        // Garment fields — parse "style - color" format
+        document.getElementById('ard-edit-garment1').value = formatGarmentField(req.Garment_1, req.Garment_Color_1);
+        document.getElementById('ard-edit-garment2').value = formatGarmentField(req.Garment_2, req.Garment_Color_2);
+        document.getElementById('ard-edit-garment3').value = formatGarmentField(req.Garment_3, req.Garment_Color_3);
+
+        document.getElementById('ard-edit-instructions').value = req.Instructions || '';
+        document.getElementById('ard-edit-thread-colors').value = req.Thread_Colors || '';
+        document.getElementById('ard-edit-additional').value = req.Additional_Instructions || '';
+        document.getElementById('ard-edit-prelim-charges').value = req.Prelim_Charges || req.Charge_Quoted || '';
+        document.getElementById('ard-edit-addl-services').value = req.Additional_Services || '';
+        document.getElementById('ard-edit-first-name').value = req.First_name || req.First_Name || '';
+        document.getElementById('ard-edit-last-name').value = req.Last_name || req.Last_Name || '';
+        document.getElementById('ard-edit-email').value = req.Email_Contact || req.Email || '';
+
+        modal.style.display = 'flex';
+
+        // Close handlers
+        document.getElementById('ard-edit-modal-close').onclick = function () { modal.style.display = 'none'; };
+        document.getElementById('ard-edit-cancel').onclick = function () { modal.style.display = 'none'; };
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        // Save handler
+        document.getElementById('ard-edit-save').onclick = function () {
+            saveEditModal(req);
+        };
+    }
+
+    function formatGarmentField(style, color) {
+        if (!style && !color) return '';
+        if (style && color) return style + ' - ' + color;
+        return style || color || '';
+    }
+
+    function parseGarmentField(val) {
+        if (!val || !val.trim()) return { style: '', color: '' };
+        var parts = val.split(' - ');
+        if (parts.length >= 2) return { style: parts[0].trim(), color: parts.slice(1).join(' - ').trim() };
+        return { style: val.trim(), color: '' };
+    }
+
+    function saveEditModal(originalReq) {
+        var saveBtn = document.getElementById('ard-edit-save');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        var g1 = parseGarmentField(document.getElementById('ard-edit-garment1').value);
+        var g2 = parseGarmentField(document.getElementById('ard-edit-garment2').value);
+        var g3 = parseGarmentField(document.getElementById('ard-edit-garment3').value);
+
+        var updates = {};
+        var fields = [
+            { key: 'Order_Type', el: 'ard-edit-order-type', orig: (originalReq.Order_Type && typeof originalReq.Order_Type === 'object' ? Object.values(originalReq.Order_Type).join(', ') : originalReq.Order_Type) || '' },
+            { key: 'Due_Date', el: 'ard-edit-due-date', orig: originalReq.Due_Date ? new Date(originalReq.Due_Date).toISOString().split('T')[0] : '' },
+            { key: 'Garment_Placement', el: 'ard-edit-placement', orig: originalReq.Garment_Placement || '' },
+            { key: 'Instructions', el: 'ard-edit-instructions', orig: originalReq.Instructions || '' },
+            { key: 'Thread_Colors', el: 'ard-edit-thread-colors', orig: originalReq.Thread_Colors || '' },
+            { key: 'Additional_Instructions', el: 'ard-edit-additional', orig: originalReq.Additional_Instructions || '' },
+            { key: 'Prelim_Charges', el: 'ard-edit-prelim-charges', orig: (originalReq.Prelim_Charges || originalReq.Charge_Quoted || '').toString() },
+            { key: 'Additional_Services', el: 'ard-edit-addl-services', orig: originalReq.Additional_Services || '' },
+            { key: 'First_Name', el: 'ard-edit-first-name', orig: originalReq.First_name || originalReq.First_Name || '' },
+            { key: 'Last_Name', el: 'ard-edit-last-name', orig: originalReq.Last_name || originalReq.Last_Name || '' },
+            { key: 'Email_Contact', el: 'ard-edit-email', orig: originalReq.Email_Contact || originalReq.Email || '' }
+        ];
+
+        fields.forEach(function (f) {
+            var newVal = document.getElementById(f.el).value.trim();
+            if (newVal !== f.orig) {
+                updates[f.key] = newVal;
+            }
+        });
+
+        // Garment fields — compare individually
+        if (g1.style !== (originalReq.Garment_1 || '')) updates.Garment_1 = g1.style;
+        if (g1.color !== (originalReq.Garment_Color_1 || '')) updates.Garment_Color_1 = g1.color;
+        if (g2.style !== (originalReq.Garment_2 || '')) updates.Garment_2 = g2.style;
+        if (g2.color !== (originalReq.Garment_Color_2 || '')) updates.Garment_Color_2 = g2.color;
+        if (g3.style !== (originalReq.Garment_3 || '')) updates.Garment_3 = g3.style;
+        if (g3.color !== (originalReq.Garment_Color_3 || '')) updates.Garment_Color_3 = g3.color;
+
+        if (Object.keys(updates).length === 0) {
+            document.getElementById('ard-edit-modal').style.display = 'none';
+            showToast('No changes to save', 'info');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+            return;
+        }
+
+        fetch(API_BASE + '/api/art-requests/' + designId + '/fields', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Save failed: ' + resp.status);
+            return resp.json();
+        }).then(function (data) {
+            // Log a note about what was changed
+            var changedList = data.updatedFields ? data.updatedFields.join(', ') : Object.keys(updates).join(', ');
+            return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    noteType: 'AE Edit',
+                    noteText: 'AE updated fields: ' + changedList,
+                    noteBy: getLoggedInUser().noteBy
+                })
+            }).catch(function () {}); // non-blocking
+        }).then(function () {
+            // Notify Steve (artist) about the edit
+            var company = originalReq.CompanyName || '';
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+                emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                    to_email: 'art@nwcustomapparel.com',
+                    to_name: 'Steve',
+                    design_id: designId,
+                    company_name: company,
+                    note_text: 'AE updated request details for ' + company + ' #' + designId + '. Please review the changes.',
+                    note_type: 'AE Edit',
+                    detail_link: SITE_ORIGIN + '/art-request/' + designId,
+                    from_name: getLoggedInUser().noteBy || 'AE'
+                }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                    console.warn('Edit notification email failed (non-blocking):', err);
+                });
+            }
+
+            document.getElementById('ard-edit-modal').style.display = 'none';
+            showToast('Request updated successfully', 'success');
+            setTimeout(function () { location.reload(); }, 800);
+        }).catch(function (err) {
+            console.error('Edit save failed:', err);
+            showToast('Failed to save: ' + err.message, 'error');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+        });
     }
 
     // ── Steve's Action Bar ────────────────────────────────────────────────
