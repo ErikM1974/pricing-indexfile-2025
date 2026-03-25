@@ -277,6 +277,11 @@
             completedGrid.innerHTML = completedMockups.map(m => buildCard(m, false)).join('');
         }
 
+        // Stagger card entry animations
+        document.querySelectorAll('.mockup-card').forEach((card, idx) => {
+            card.style.animationDelay = (idx * 0.05) + 's';
+        });
+
         // Attach event listeners to cards
         attachCardListeners();
 
@@ -309,7 +314,7 @@
             badges += `<span class="card-badge card-badge--due-soon">Due ${formatDateShort(dueDate)}</span>`;
         }
         if (dueDate && isOverdue(dueDate) && status !== 'Approved') {
-            badges += `<span class="card-badge card-badge--due-soon">OVERDUE</span>`;
+            badges += `<span class="card-badge card-badge--due-soon card-badge--overdue">OVERDUE</span>`;
         }
 
         // Quick action buttons for Ruth
@@ -356,8 +361,12 @@
 
         const workOrder = escapeHtml(mockup.Work_Order_Number || '');
 
+        // Status class for left border + hover glow
+        const statusSlug = (status || '').toLowerCase().replace(/\s+/g, '-');
+        const cardStatusClass = statusSlug ? `mockup-card--${statusSlug}` : '';
+
         return `
-        <div class="mockup-card" data-mockup-id="${id}" data-work-order="${workOrder}">
+        <div class="mockup-card ${cardStatusClass}" data-mockup-id="${id}" data-work-order="${workOrder}">
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
@@ -567,9 +576,26 @@
         }
     }
 
+    // ── Skeleton Loading ─────────────────────────────────────────────────
+    function showSkeletonCards() {
+        const queueGrid = document.getElementById('queue-grid');
+        if (!queueGrid || queueGrid.children.length > 0) return;
+        queueGrid.innerHTML = Array.from({ length: 6 }, () => `
+            <div class="skeleton-card">
+                <div class="skeleton-header"></div>
+                <div class="skeleton-body">
+                    <div class="skeleton-line skeleton-line--long"></div>
+                    <div class="skeleton-line skeleton-line--medium"></div>
+                    <div class="skeleton-line skeleton-line--short"></div>
+                    <div class="skeleton-line skeleton-line--pill"></div>
+                </div>
+            </div>`).join('');
+    }
+
     // ── Init ─────────────────────────────────────────────────────────────
     function init() {
         setCurrentDate();
+        showSkeletonCards();
         fetchMockups();
 
         // Poll for notifications every 30 seconds

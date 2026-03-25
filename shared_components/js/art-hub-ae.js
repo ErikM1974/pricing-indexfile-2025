@@ -574,15 +574,47 @@
         return 'Other';
     }
 
+    // ── Status Class: Add CSS class for left border + glow ──
+    function addStatusClass(card) {
+        var statusPill = card.querySelector('.status-pill');
+        if (!statusPill) return;
+        var text = statusPill.textContent.replace(/[^\w\s-]/g, '').trim().toLowerCase();
+        var classMap = {
+            'submitted': 'card--submitted',
+            'in progress': 'card--in-progress',
+            'awaiting approval': 'card--awaiting-approval',
+            'revision requested': 'card--revision-requested',
+            'approved': 'card--approved',
+            'completed': 'card--completed'
+        };
+        var cls = classMap[text];
+        if (cls) card.classList.add(cls);
+
+        if (text === 'awaiting approval') {
+            statusPill.classList.add('status-pill--awaiting');
+        }
+        var duePill = card.querySelector('.due-status-pill');
+        if (duePill && duePill.textContent.toLowerCase().indexOf('overdue') !== -1) {
+            duePill.classList.add('due-pill--overdue');
+        }
+    }
+
     function processCards() {
         var viewTab = document.getElementById('view-tab');
         if (!viewTab) return;
 
+        // Remove skeleton loading
+        viewTab.querySelectorAll('.skeleton-card, .skeleton-grid').forEach(function (s) { s.remove(); });
+
         var cards = viewTab.querySelectorAll('.card');
-        cards.forEach(function (card) {
+        cards.forEach(function (card, idx) {
             if (card.dataset.aeProcessed) return;
             card.dataset.aeProcessed = '1';
 
+            // Staggered entry animation
+            card.style.animationDelay = (idx * 0.05) + 's';
+
+            addStatusClass(card);
             addRequestTypeBadge(card);
             styleCardPills(card);
             calculateArtHours(card);

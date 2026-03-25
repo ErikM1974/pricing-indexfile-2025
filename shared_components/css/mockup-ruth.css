@@ -229,9 +229,108 @@ body {
     cursor: pointer;
 }
 
+/* ---------- Status Left Border Colors ---------- */
+.mockup-card--submitted          { border-left: 3px solid #7c3aed; }
+.mockup-card--in-progress        { border-left: 3px solid #2563eb; }
+.mockup-card--awaiting-approval  { border-left: 3px solid #d97706; }
+.mockup-card--revision-requested { border-left: 3px solid #dc2626; }
+.mockup-card--approved           { border-left: 3px solid #059669; }
+.mockup-card--completed          { border-left: 3px solid #22c55e; opacity: 0.8; }
+
+/* ---------- Card Hover Lift + Status Glow ---------- */
 .mockup-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px var(--art-theme-rgba-15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08);
+}
+.mockup-card--submitted:hover          { box-shadow: 0 8px 25px rgba(124,58,237,0.2); }
+.mockup-card--in-progress:hover        { box-shadow: 0 8px 25px rgba(37,99,235,0.2); }
+.mockup-card--awaiting-approval:hover  { box-shadow: 0 8px 25px rgba(217,119,6,0.2); }
+.mockup-card--revision-requested:hover { box-shadow: 0 8px 25px rgba(220,38,38,0.2); }
+.mockup-card--approved:hover           { box-shadow: 0 8px 25px rgba(5,150,105,0.2); }
+.mockup-card--completed:hover          { box-shadow: 0 8px 25px rgba(34,197,94,0.15); }
+
+/* ---------- Staggered Card Entry Animation ---------- */
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.mockup-card {
+    animation: fadeSlideUp 0.35s ease both;
+}
+
+/* ---------- Animated Status Badges ---------- */
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
+}
+@keyframes gentleShake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-2px); }
+    40%      { transform: translateX(2px); }
+    60%      { transform: translateX(-1px); }
+    80%      { transform: translateX(1px); }
+}
+.status-pill--awaiting-approval { animation: pulseGlow 2s ease-in-out infinite; }
+.card-badge--overdue            { animation: gentleShake 0.6s ease-in-out; animation-delay: 1s; }
+
+/* ---------- Skeleton Loading ---------- */
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.skeleton-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    min-height: 200px;
+}
+.skeleton-header {
+    height: 52px;
+    background: linear-gradient(90deg, var(--art-theme-rgba-10) 25%, var(--art-theme-rgba-15) 50%, var(--art-theme-rgba-10) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-body {
+    padding: 14px;
+}
+.skeleton-line {
+    height: 12px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-line--short  { width: 60%; }
+.skeleton-line--medium { width: 80%; }
+.skeleton-line--long   { width: 95%; }
+.skeleton-line--pill   { width: 30%; height: 20px; border-radius: 10px; }
+
+/* ---------- Thread Color Dots ---------- */
+.thread-dots {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #f3f4f6;
+}
+.thread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+}
+.thread-dots-label {
+    font-size: 9px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-right: 4px;
+    font-weight: 600;
 }
 
 .card-header {

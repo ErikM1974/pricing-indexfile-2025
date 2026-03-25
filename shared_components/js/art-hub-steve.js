@@ -840,8 +840,17 @@
         const galleryTab = document.getElementById('gallery-tab');
         if (!galleryTab) return;
 
+        // Remove skeleton loading when real cards arrive
+        galleryTab.querySelectorAll('.skeleton-card, .skeleton-grid').forEach(s => s.remove());
+
         const cards = galleryTab.querySelectorAll('.card');
-        cards.forEach(card => {
+        cards.forEach((card, idx) => {
+            // Staggered entry animation delay
+            card.style.animationDelay = (idx * 0.05) + 's';
+
+            // Add status class for left border color + hover glow
+            addStatusClass(card);
+
             addRequestTypeBadge(card);
             styleCardPills(card);
             calculateArtHours(card);
@@ -851,6 +860,37 @@
             addAuditIndicator(card);
         });
         buildSummaryBar();
+    }
+
+    // ── Status Class: Add CSS class based on card status for left border + glow ──
+    function addStatusClass(card) {
+        if (card.dataset.statusClassAdded) return;
+        const statusPill = card.querySelector('.status-pill');
+        if (!statusPill) return;
+        const text = statusPill.textContent.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase();
+        const classMap = {
+            'submitted': 'card--submitted',
+            'in progress': 'card--in-progress',
+            'awaiting approval': 'card--awaiting-approval',
+            'revision requested': 'card--revision-requested',
+            'approved': 'card--approved',
+            'completed': 'card--completed'
+        };
+        const cls = classMap[text];
+        if (cls) card.classList.add(cls);
+
+        // Add animated class for awaiting approval pill
+        if (text === 'awaiting approval') {
+            statusPill.classList.add('status-pill--awaiting');
+        }
+
+        // Add shake class for overdue due-date pills
+        const duePill = card.querySelector('.due-status-pill');
+        if (duePill && duePill.textContent.toLowerCase().includes('overdue')) {
+            duePill.classList.add('due-pill--overdue');
+        }
+
+        card.dataset.statusClassAdded = '1';
     }
 
     // ── Detail Form Styling: Sections, image thumbnails, field cleanup ──
@@ -1642,8 +1682,34 @@
         return container;
     }
 
+    // ── Skeleton Loading: Show placeholder cards while Caspio loads ──
+    function showSkeletonCards() {
+        const galleryTab = document.getElementById('gallery-tab');
+        if (!galleryTab || galleryTab.querySelector('.card')) return;
+        const grid = galleryTab.querySelector('[class*="grid"], [class*="Gallery"], table');
+        const target = grid || galleryTab;
+        const skeletonHtml = Array.from({ length: 6 }, () => `
+            <div class="skeleton-card">
+                <div class="skeleton-header"></div>
+                <div class="skeleton-body">
+                    <div class="skeleton-line skeleton-line--long"></div>
+                    <div class="skeleton-line skeleton-line--medium"></div>
+                    <div class="skeleton-line skeleton-line--short"></div>
+                    <div class="skeleton-line skeleton-line--pill"></div>
+                </div>
+            </div>`).join('');
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:10px;';
+        wrapper.innerHTML = skeletonHtml;
+        wrapper.className = 'skeleton-grid';
+        target.appendChild(wrapper);
+    }
+
     // ── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
+        // Show skeleton placeholders immediately
+        showSkeletonCards();
+
         // Restore saved tab preference
         const savedTab = localStorage.getItem('artistDashboardTab');
         if (savedTab && ['express', 'requirements'].includes(savedTab)) {
