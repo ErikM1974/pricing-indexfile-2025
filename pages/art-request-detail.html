@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=13">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=14">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2">
 </head>
 <body>
@@ -38,6 +38,13 @@
     <!-- Content -->
     <main class="ard-content" id="ard-content" style="display:none;">
 
+        <!-- AE Navigation Bar (prev/next between requests) -->
+        <div id="ard-nav-bar" class="ard-nav-bar" style="display:none;">
+            <button type="button" class="ard-nav-btn" id="ard-nav-prev" disabled>&larr; Previous</button>
+            <span class="ard-nav-position" id="ard-nav-position"></span>
+            <button type="button" class="ard-nav-btn" id="ard-nav-next" disabled>Next &rarr;</button>
+        </div>
+
         <!-- Status + Design ID Header -->
         <div class="ard-title-row">
             <h2 class="ard-design-id" id="ard-design-id"></h2>
@@ -58,6 +65,91 @@
             <button type="button" class="ard-action-btn ard-action-mockup" id="ard-btn-send-mockup">Send Mockup</button>
             <button type="button" class="ard-action-btn ard-action-complete" id="ard-btn-complete">Mark Complete</button>
             <button type="button" class="ard-action-btn ard-action-reopen" id="ard-btn-reopen" style="display:none;">Reopen</button>
+        </div>
+
+        <!-- AE Status Bar (shown for AE view on all non-completed statuses) -->
+        <div id="ard-ae-status-bar" class="ard-ae-status-bar" style="display:none;"></div>
+
+        <!-- Edit Request Modal -->
+        <div id="ard-edit-modal" class="ard-modal-overlay" style="display:none;">
+            <div class="ard-modal ard-edit-modal">
+                <div class="ard-modal-header">
+                    <h3>Edit Art Request</h3>
+                    <button type="button" class="ard-modal-close" id="ard-edit-modal-close">&times;</button>
+                </div>
+                <div class="ard-modal-body">
+                    <div class="ard-edit-grid">
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-order-type">Order Type</label>
+                            <select id="ard-edit-order-type">
+                                <option value="Embroidery">Embroidery</option>
+                                <option value="Screen Print">Screen Print</option>
+                                <option value="DTG">DTG</option>
+                                <option value="DTF">DTF</option>
+                                <option value="Vinyl">Vinyl</option>
+                                <option value="Laser Patch">Laser Patch</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-due-date">Due Date</label>
+                            <input type="date" id="ard-edit-due-date">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-placement">Garment Placement</label>
+                            <input type="text" id="ard-edit-placement" placeholder="e.g. Cap Front, Left Chest">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-garment1">Garment 1 (Style - Color)</label>
+                            <input type="text" id="ard-edit-garment1" placeholder="e.g. 112 - heather grey/royall">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-garment2">Garment 2 (Style - Color)</label>
+                            <input type="text" id="ard-edit-garment2" placeholder="Optional">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-garment3">Garment 3 (Style - Color)</label>
+                            <input type="text" id="ard-edit-garment3" placeholder="Optional">
+                        </div>
+                        <div class="ard-edit-field ard-edit-full-width">
+                            <label for="ard-edit-instructions">Instructions</label>
+                            <textarea id="ard-edit-instructions" rows="4" placeholder="Design instructions..."></textarea>
+                        </div>
+                        <div class="ard-edit-field ard-edit-full-width">
+                            <label for="ard-edit-thread-colors">Thread Colors</label>
+                            <textarea id="ard-edit-thread-colors" rows="3" placeholder="Thread color details..."></textarea>
+                        </div>
+                        <div class="ard-edit-field ard-edit-full-width">
+                            <label for="ard-edit-additional">Additional Instructions</label>
+                            <textarea id="ard-edit-additional" rows="3" placeholder="Any additional notes..."></textarea>
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-prelim-charges">Prelim Charges</label>
+                            <input type="text" id="ard-edit-prelim-charges" placeholder="e.g. $75.00">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-addl-services">Additional Services</label>
+                            <input type="text" id="ard-edit-addl-services" placeholder="Optional">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-first-name">Contact First Name</label>
+                            <input type="text" id="ard-edit-first-name">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-last-name">Contact Last Name</label>
+                            <input type="text" id="ard-edit-last-name">
+                        </div>
+                        <div class="ard-edit-field">
+                            <label for="ard-edit-email">Contact Email</label>
+                            <input type="email" id="ard-edit-email">
+                        </div>
+                    </div>
+                </div>
+                <div class="ard-modal-footer">
+                    <button type="button" class="ard-modal-btn ard-modal-btn--cancel" id="ard-edit-cancel">Cancel</button>
+                    <button type="button" class="ard-modal-btn ard-modal-btn--save" id="ard-edit-save">Save Changes</button>
+                </div>
+            </div>
         </div>
 
         <!-- Two-column layout -->
@@ -497,6 +589,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=8"></script>
-    <script src="/pages/js/art-request-detail.js?v=20260324"></script>
+    <script src="/pages/js/art-request-detail.js?v=20260325"></script>
 </body>
 </html>
