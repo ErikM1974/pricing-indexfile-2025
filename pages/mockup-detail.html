@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=29">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=30">
     <link rel="stylesheet" href="/pages/css/thread-color-picker.css?v=1">
 </head>
 <body>
@@ -243,10 +243,73 @@
         </div>
     </div>
 
+    <!-- Edit Mockup Modal (AE view) -->
+    <div id="pmd-edit-modal" class="pmd-edit-overlay" style="display:none;">
+        <div class="pmd-edit-modal">
+            <div class="pmd-edit-header">
+                <h3>Edit Mockup Request</h3>
+                <button type="button" class="pmd-edit-close" id="pmd-edit-close">&times;</button>
+            </div>
+            <div class="pmd-edit-body">
+                <div class="pmd-edit-grid">
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-design-name">Design Name</label>
+                        <input type="text" id="pmd-edit-design-name">
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-mockup-type">Application</label>
+                        <select id="pmd-edit-mockup-type">
+                            <option value="Shirt">Shirt</option>
+                            <option value="Cap">Cap</option>
+                            <option value="Polo">Polo</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-garment">Garment</label>
+                        <input type="text" id="pmd-edit-garment" placeholder="e.g. Black — Cotton">
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-placement">Placement</label>
+                        <input type="text" id="pmd-edit-placement" placeholder="e.g. Left Chest, Cap Front">
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-logo-width">Logo Width</label>
+                        <input type="text" id="pmd-edit-logo-width" placeholder="e.g. 3.5">
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-logo-height">Logo Height</label>
+                        <input type="text" id="pmd-edit-logo-height" placeholder="e.g. 2.5">
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-design-size">Design Size</label>
+                        <input type="text" id="pmd-edit-design-size" placeholder="e.g. 2.75d x 1.66 tall">
+                    </div>
+                    <div class="pmd-edit-field">
+                        <label for="pmd-edit-due-date">Due Date</label>
+                        <input type="date" id="pmd-edit-due-date">
+                    </div>
+                    <div class="pmd-edit-field pmd-edit-full">
+                        <label for="pmd-edit-thread-colors">Thread Colors</label>
+                        <textarea id="pmd-edit-thread-colors" rows="3"></textarea>
+                    </div>
+                    <div class="pmd-edit-field pmd-edit-full">
+                        <label for="pmd-edit-ae-notes">AE Instructions</label>
+                        <textarea id="pmd-edit-ae-notes" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="pmd-edit-footer">
+                <button type="button" class="pmd-edit-btn pmd-edit-btn--cancel" id="pmd-edit-cancel">Cancel</button>
+                <button type="button" class="pmd-edit-btn pmd-edit-btn--save" id="pmd-edit-save">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/thread-color-picker.js?v=1"></script>
-    <script src="/pages/js/mockup-detail.js?v=47"></script>
+    <script src="/pages/js/mockup-detail.js?v=48"></script>
 </body>
 </html>

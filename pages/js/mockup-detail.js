@@ -141,6 +141,120 @@
         showError('Error Loading Mockup', err.message);
     });
 
+    // ── AE Edit Mockup Modal ──────────────────────────────────────────
+    function openMockupEditModal(mockup) {
+        var modal = document.getElementById('pmd-edit-modal');
+        if (!modal) return;
+
+        document.getElementById('pmd-edit-design-name').value = mockup.Design_Name || '';
+        var typeSelect = document.getElementById('pmd-edit-mockup-type');
+        var typeVal = mockup.Mockup_Type || '';
+        for (var i = 0; i < typeSelect.options.length; i++) {
+            if (typeSelect.options[i].value === typeVal) { typeSelect.selectedIndex = i; break; }
+        }
+        document.getElementById('pmd-edit-garment').value = mockup.Garment_Info || '';
+        document.getElementById('pmd-edit-placement').value = mockup.Print_Location || '';
+        document.getElementById('pmd-edit-logo-width').value = mockup.Logo_Width || '';
+        document.getElementById('pmd-edit-logo-height').value = mockup.Logo_Height || '';
+        document.getElementById('pmd-edit-design-size').value = mockup.Design_Size || '';
+        var dueDate = mockup.Due_Date || '';
+        if (dueDate) {
+            var d = new Date(dueDate);
+            if (!isNaN(d)) document.getElementById('pmd-edit-due-date').value = d.toISOString().split('T')[0];
+        }
+        document.getElementById('pmd-edit-thread-colors').value = mockup.Thread_Colors || '';
+        document.getElementById('pmd-edit-ae-notes').value = mockup.AE_Notes || '';
+
+        modal.style.display = 'flex';
+
+        document.getElementById('pmd-edit-close').onclick = function () { modal.style.display = 'none'; };
+        document.getElementById('pmd-edit-cancel').onclick = function () { modal.style.display = 'none'; };
+        modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
+        document.getElementById('pmd-edit-save').onclick = function () { saveMockupEdit(mockup); };
+    }
+
+    function saveMockupEdit(originalMockup) {
+        var saveBtn = document.getElementById('pmd-edit-save');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        var fields = [
+            { key: 'Design_Name', el: 'pmd-edit-design-name', orig: originalMockup.Design_Name || '' },
+            { key: 'Mockup_Type', el: 'pmd-edit-mockup-type', orig: originalMockup.Mockup_Type || '' },
+            { key: 'Garment_Info', el: 'pmd-edit-garment', orig: originalMockup.Garment_Info || '' },
+            { key: 'Print_Location', el: 'pmd-edit-placement', orig: originalMockup.Print_Location || '' },
+            { key: 'Logo_Width', el: 'pmd-edit-logo-width', orig: originalMockup.Logo_Width || '' },
+            { key: 'Logo_Height', el: 'pmd-edit-logo-height', orig: originalMockup.Logo_Height || '' },
+            { key: 'Design_Size', el: 'pmd-edit-design-size', orig: originalMockup.Design_Size || '' },
+            { key: 'Due_Date', el: 'pmd-edit-due-date', orig: originalMockup.Due_Date ? new Date(originalMockup.Due_Date).toISOString().split('T')[0] : '' },
+            { key: 'Thread_Colors', el: 'pmd-edit-thread-colors', orig: originalMockup.Thread_Colors || '' },
+            { key: 'AE_Notes', el: 'pmd-edit-ae-notes', orig: originalMockup.AE_Notes || '' }
+        ];
+
+        var updates = {};
+        var changedNames = [];
+        fields.forEach(function (f) {
+            var newVal = document.getElementById(f.el).value.trim();
+            if (newVal !== f.orig) {
+                updates[f.key] = newVal;
+                changedNames.push(f.key);
+            }
+        });
+
+        if (Object.keys(updates).length === 0) {
+            document.getElementById('pmd-edit-modal').style.display = 'none';
+            showToast('No changes to save', 'info');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+            return;
+        }
+
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Save failed: ' + resp.status);
+            return resp.json();
+        }).then(function () {
+            // Log note about what changed
+            return fetch(API_BASE + '/api/mockup-notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Mockup_ID: parseInt(mockupId),
+                    Author: getLoggedInUser().email,
+                    Author_Name: getLoggedInUser().firstName,
+                    Note_Text: 'AE updated fields: ' + changedNames.join(', '),
+                    Note_Type: 'status_change'
+                })
+            }).catch(function () {});
+        }).then(function () {
+            // Notify Ruth
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+                emailjs.send(EMAILJS_SERVICE_ID, 'mockup_note_notification', {
+                    to_email: RUTH_EMAIL,
+                    to_name: 'Ruth',
+                    design_number: originalMockup.Design_Number || mockupId,
+                    company_name: originalMockup.Company_Name || '',
+                    note_text: 'AE updated mockup details: ' + changedNames.join(', '),
+                    note_type: 'AE Edit',
+                    detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId,
+                    from_name: getLoggedInUser().firstName || 'AE'
+                }, EMAILJS_PUBLIC_KEY).catch(function () {});
+            }
+            document.getElementById('pmd-edit-modal').style.display = 'none';
+            showToast('Request updated successfully', 'success');
+            setTimeout(function () { location.reload(); }, 800);
+        }).catch(function (err) {
+            console.error('Mockup edit save failed:', err);
+            showToast('Failed to save: ' + err.message, 'error');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+        });
+    }
+
     // ── AE Prev/Next Navigation ─────────────────────────────────────────
     function initMockupNavigation() {
         var navBar = document.getElementById('pmd-nav-bar');
@@ -265,6 +379,23 @@
 
         // Info fields
         renderInfoFields(mockup);
+
+        // AE Edit button (all non-completed statuses)
+        if (isAeView) {
+            var statusForEdit = (mockup.Status || '').toLowerCase();
+            if (statusForEdit !== 'completed') {
+                var editBar = document.createElement('div');
+                editBar.className = 'pmd-ae-edit-bar';
+                editBar.innerHTML = '<button type="button" class="pmd-ae-edit-btn" id="pmd-ae-edit-btn">Edit Request</button>';
+                var infoCard = document.getElementById('pmd-info-fields');
+                if (infoCard && infoCard.parentNode) {
+                    infoCard.parentNode.insertBefore(editBar, infoCard.nextSibling);
+                }
+                document.getElementById('pmd-ae-edit-btn').addEventListener('click', function () {
+                    openMockupEditModal(mockup);
+                });
+            }
+        }
 
         // Load stored EMB data from Caspio (shows swatches + results without re-parsing)
         loadStoredEmbData(mockup.PK_ID || mockup.ID);
