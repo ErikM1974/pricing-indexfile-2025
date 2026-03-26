@@ -11,7 +11,35 @@
     var invCache = {};
     var INV_CACHE_TTL = 5 * 60 * 1000;
     var isExpanded = false;
-    var currentRequestId = 0; // Track latest request to ignore stale responses
+    var currentRequestId = 0;
+    var colorMapCache = {}; // Maps style -> {COLOR_NAME -> CATALOG_COLOR}
+
+    // Lookup CATALOG_COLOR from COLOR_NAME via API (cached per style)
+    function lookupCatalogColor(styleNumber, colorName, callback) {
+        if (!styleNumber || !colorName) return callback(colorName);
+        var mapKey = styleNumber.toUpperCase();
+        if (colorMapCache[mapKey]) {
+            var mapped = colorMapCache[mapKey][colorName] || colorMapCache[mapKey][colorName.trim()] || colorName;
+            return callback(mapped);
+        }
+        // Fetch color swatches to build the mapping
+        fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=' + encodeURIComponent(styleNumber))
+            .then(function(r) { return r.json(); })
+            .then(function(colors) {
+                var map = {};
+                if (Array.isArray(colors)) {
+                    colors.forEach(function(c) {
+                        var cn = c.COLOR_NAME || c.colorName || '';
+                        var cc = c.CATALOG_COLOR || c.catalogColor || cn;
+                        map[cn] = cc;
+                        map[cn.trim()] = cc;
+                    });
+                }
+                colorMapCache[mapKey] = map;
+                callback(map[colorName] || map[colorName.trim()] || colorName);
+            })
+            .catch(function() { callback(colorName); });
+    }
 
     // Inject CSS
     var style = document.createElement('style');
@@ -83,8 +111,16 @@
                 }
             }
 
-            if (catalogColor || colorName) {
-                window.loadCalculatorInventory(style, catalogColor || colorName, colorName || catalogColor, swatchImg);
+            if (colorName || catalogColor) {
+                // Always resolve CATALOG_COLOR via lookup to handle abbreviations
+                var displayName = colorName || catalogColor;
+                if (!catalogColor || catalogColor === colorName) {
+                    lookupCatalogColor(style, displayName, function(resolvedCatalog) {
+                        window.loadCalculatorInventory(style, resolvedCatalog, displayName, swatchImg);
+                    });
+                } else {
+                    window.loadCalculatorInventory(style, catalogColor, displayName, swatchImg);
+                }
             }
         }, 150);
     });
@@ -96,15 +132,12 @@
             var colorEl = document.getElementById('currentColor');
             var colorName = colorEl ? colorEl.textContent.trim() : '';
             if (style && colorName && colorName !== 'Natural' && colorName !== 'Color') {
-                var colorObj = window.selectedColor || {};
-                window.loadCalculatorInventory(
-                    style,
-                    colorObj.CATALOG_COLOR || colorObj.catalogColor || colorName,
-                    colorName,
-                    colorObj.COLOR_SQUARE_IMAGE || colorObj.swatchUrl || ''
-                );
+                // Always resolve CATALOG_COLOR via lookup
+                lookupCatalogColor(style, colorName, function(resolvedCatalog) {
+                    window.loadCalculatorInventory(style, resolvedCatalog, colorName, '');
+                });
             }
-        }, 3000); // Wait for product to load
+        }, 3000);
     });
 
     function getStyleNumber() {
