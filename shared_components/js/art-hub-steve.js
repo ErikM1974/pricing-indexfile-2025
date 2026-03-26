@@ -840,10 +840,20 @@
         const galleryTab = document.getElementById('gallery-tab');
         if (!galleryTab) return;
 
+        // Remove skeleton loading when real cards arrive
+        galleryTab.querySelectorAll('.skeleton-card, .skeleton-grid').forEach(s => s.remove());
+
         const cards = galleryTab.querySelectorAll('.card');
-        cards.forEach(card => {
+        cards.forEach((card, idx) => {
+            // Staggered entry animation delay
+            card.style.animationDelay = (idx * 0.05) + 's';
+
             addRequestTypeBadge(card);
             styleCardPills(card);
+
+            // Add status class AFTER styleCardPills (needs pill CSS class for fallback)
+            addStatusClass(card);
+
             calculateArtHours(card);
             formatRepName(card);
             cleanEmptyFields(card);
@@ -851,6 +861,49 @@
             addAuditIndicator(card);
         });
         buildSummaryBar();
+    }
+
+    // ── Status Class: Add CSS class based on card status for left border + glow ──
+    function addStatusClass(card) {
+        if (card.dataset.statusClassAdded) return;
+        const statusPill = card.querySelector('.status-pill');
+        if (!statusPill) return;
+        const text = statusPill.textContent.replace(/[^\p{L}\p{N}\s-]/gu, '').trim().toLowerCase();
+        const classMap = {
+            'submitted': 'card--submitted',
+            'in progress': 'card--in-progress',
+            'awaiting approval': 'card--awaiting-approval',
+            'revision requested': 'card--revision-requested',
+            'approved': 'card--approved',
+            'completed': 'card--completed'
+        };
+        var cls = classMap[text];
+
+        // Fallback: check the status pill's CSS class (set by styleCardPills)
+        if (!cls) {
+            var pillClass = statusPill.className || '';
+            if (pillClass.indexOf('submitted') !== -1) cls = 'card--submitted';
+            else if (pillClass.indexOf('inprogress') !== -1) cls = 'card--in-progress';
+            else if (pillClass.indexOf('awaitingapproval') !== -1) cls = 'card--awaiting-approval';
+            else if (pillClass.indexOf('revisionrequested') !== -1) cls = 'card--revision-requested';
+            else if (pillClass.indexOf('approved') !== -1) cls = 'card--approved';
+            else if (pillClass.indexOf('completed') !== -1) cls = 'card--completed';
+        }
+
+        if (cls) card.classList.add(cls);
+
+        // Add animated class for awaiting approval pill
+        if (text === 'awaiting approval') {
+            statusPill.classList.add('status-pill--awaiting');
+        }
+
+        // Add shake class for overdue due-date pills
+        const duePill = card.querySelector('.due-status-pill');
+        if (duePill && duePill.textContent.toLowerCase().includes('overdue')) {
+            duePill.classList.add('due-pill--overdue');
+        }
+
+        card.dataset.statusClassAdded = '1';
     }
 
     // ── Detail Form Styling: Sections, image thumbnails, field cleanup ──
@@ -1526,7 +1579,10 @@
         const observer = new MutationObserver(() => {
             clearTimeout(debounce);
             debounce = setTimeout(() => {
-                processCards();
+                // Only process grid cards when grid is visible (not in board view)
+                if (!kanbanActive) {
+                    processCards();
+                }
                 processDetailForm();
             }, 300);
         });
@@ -1642,19 +1698,288 @@
         return container;
     }
 
+    // ── Kanban Board View (API-Driven) ──────────────────────────────────
+    var kanbanActive = false;
+    var kanbanData = null; // Cached API data
+
+    // Date cutoff: only show art requests from March 15, 2026+ (new status system)
+    var KANBAN_DATE_CUTOFF = '2026-03-15';
+
+    var KANBAN_COLUMNS = [
+        { id: 'submitted', label: 'Submitted', match: ['Submitted'] },
+        { id: 'in-progress', label: 'In Progress', match: ['In Progress'] },
+        { id: 'awaiting', label: 'Awaiting Approval', match: ['Awaiting Approval'] },
+        { id: 'revision', label: 'Revision Requested', match: ['Revision Requested'] },
+        { id: 'approved', label: 'Approved', match: ['Approved'] },
+        { id: 'completed', label: 'Completed', match: ['Completed'] }
+    ];
+
+    // Normalize raw Caspio status to canonical form
+    function normalizeStatus(raw) {
+        if (!raw || raw === '') return 'Submitted';
+        var s = String(raw).trim();
+        if (typeof raw === 'object') {
+            var vals = Object.values(raw);
+            s = vals.length > 0 ? String(vals[0]).trim() : 'Submitted';
+        }
+        var lower = s.toLowerCase();
+        if (lower === 'submitted' || lower === '') return 'Submitted';
+        if (lower === 'in progress') return 'In Progress';
+        if (lower === 'awaiting approval') return 'Awaiting Approval';
+        if (lower === 'completed' || lower === 'complete') return 'Completed';
+        if (lower === 'approved') return 'Approved';
+        if (lower.indexOf('revision') !== -1) return 'Revision Requested';
+        return 'Submitted'; // Fallback — never lose a card
+    }
+
+    // Calculate due date badge text and CSS class from Due_Date string
+    function getDueBadge(dueDateStr) {
+        if (!dueDateStr) return { text: '', cls: '' };
+        var due = new Date(dueDateStr);
+        if (isNaN(due.getTime())) return { text: '', cls: '' };
+
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        due.setHours(0, 0, 0, 0);
+
+        var diffDays = Math.round((due - today) / 86400000);
+
+        if (diffDays < 0) return { text: 'OVERDUE', cls: 'kanban-card-due--overdue' };
+        if (diffDays === 0) return { text: 'Due Today', cls: 'kanban-card-due--soon' };
+        if (diffDays === 1) return { text: 'Due Tomorrow', cls: 'kanban-card-due--soon' };
+        if (diffDays <= 7) {
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return { text: 'Due ' + months[due.getMonth()] + ' ' + due.getDate(), cls: 'kanban-card-due--ok' };
+        }
+        return { text: 'Upcoming', cls: 'kanban-card-due--ok' };
+    }
+
+    window.toggleKanbanView = function (view) {
+        var gridView = document.getElementById('steve-grid-view');
+        var boardView = document.getElementById('steve-kanban-board');
+        var toggleBtns = document.querySelectorAll('#steve-view-toggle .view-toggle-btn');
+        if (!gridView || !boardView) return;
+
+        kanbanActive = (view === 'board');
+        localStorage.setItem('steveViewPreference', view);
+
+        toggleBtns.forEach(function (btn) {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+
+        if (kanbanActive) {
+            gridView.style.display = 'none';
+            boardView.classList.add('active');
+            buildKanbanBoard();
+        } else {
+            gridView.style.display = '';
+            boardView.classList.remove('active');
+            // Process cards when switching back to grid (skipped while board was active)
+            processCards();
+        }
+    };
+
+    function buildKanbanBoard() {
+        var board = document.getElementById('steve-kanban-board');
+        if (!board) return;
+
+        // Show loading state
+        board.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">'
+            + '<i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:8px;"></i>'
+            + '<div>Loading art requests...</div></div>';
+
+        // Fetch from API with date cutoff
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
+        var url = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
+            + '&dateCreatedFrom=' + KANBAN_DATE_CUTOFF
+            + '&select=' + selectFields;
+
+        fetch(url)
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('API returned ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var requests = Array.isArray(data) ? data : [];
+                kanbanData = requests;
+                renderKanbanColumns(board, requests);
+            })
+            .catch(function (err) {
+                console.error('[Kanban] API fetch failed:', err);
+                board.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;">'
+                    + '<strong>Error loading Kanban:</strong> ' + escapeHtml(err.message)
+                    + '<br><button onclick="buildKanbanBoard()" style="margin-top:12px;padding:8px 16px;cursor:pointer;">Retry</button>'
+                    + '</div>';
+            });
+    }
+
+    var COMPLETED_SHOW_LIMIT = 5;
+
+    function renderCardHtml(req) {
+        var company = escapeHtml(req.CompanyName || 'Unknown');
+        var designNum = req.Design_Num_SW || '';
+        var designId = req.ID_Design || '';
+        var rep = escapeHtml(req.Sales_Rep || '');
+        var revCount = req.Revision_Count || 0;
+        var due = getDueBadge(req.Due_Date);
+
+        var orderType = '';
+        if (req.Order_Type) {
+            var ot = typeof req.Order_Type === 'object' ? Object.values(req.Order_Type)[0] : req.Order_Type;
+            orderType = String(ot || '');
+        }
+
+        var badges = '';
+        if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
+        if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
+
+        return '<div class="kanban-card" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '\', \'_blank\')">'
+            + '<div class="kanban-card-company">' + company + '</div>'
+            + (designNum ? '<div class="kanban-card-design">#' + escapeHtml(designNum) + '</div>' : '')
+            + '<div class="kanban-card-meta">'
+            + '<span class="kanban-card-rep">' + rep + '</span>'
+            + (due.text ? '<span class="kanban-card-due ' + due.cls + '">' + escapeHtml(due.text) + '</span>' : '')
+            + '</div>'
+            + (badges ? '<div class="kanban-card-badges">' + badges + '</div>' : '')
+            + '</div>';
+    }
+
+    // Toggle completed column collapse
+    window.toggleKanbanCollapse = function (colId, storageKey) {
+        var col = document.querySelector('.kanban-column--' + colId);
+        if (!col) return;
+        col.classList.toggle('kanban-column--collapsed');
+        var isCollapsed = col.classList.contains('kanban-column--collapsed');
+        localStorage.setItem(storageKey, isCollapsed ? '1' : '0');
+    };
+
+    // Show all cards in completed column
+    window.kanbanShowAll = function (colId) {
+        var col = document.querySelector('.kanban-column--' + colId);
+        if (!col) return;
+        col.querySelectorAll('.kanban-card[style*="display: none"]').forEach(function (c) {
+            c.style.display = '';
+        });
+        var showAllEl = col.querySelector('.kanban-show-all');
+        if (showAllEl) showAllEl.remove();
+    };
+
+    function renderKanbanColumns(board, requests) {
+        // Group requests into column buckets by normalized status
+        var buckets = {};
+        KANBAN_COLUMNS.forEach(function (col) { buckets[col.id] = []; });
+
+        requests.forEach(function (req) {
+            var status = normalizeStatus(req.Status);
+            var placed = false;
+
+            KANBAN_COLUMNS.forEach(function (col) {
+                if (!placed && col.match.indexOf(status) !== -1) {
+                    buckets[col.id].push(req);
+                    placed = true;
+                }
+            });
+
+            if (!placed) {
+                buckets['submitted'].push(req);
+            }
+        });
+
+        var completedCollapsed = localStorage.getItem('steveKanbanCompletedCollapsed') !== '0'; // Default: collapsed
+
+        // Render columns
+        board.innerHTML = KANBAN_COLUMNS.map(function (col) {
+            var colCards = buckets[col.id] || [];
+            var isCompleted = col.id === 'completed';
+            var isApproved = col.id === 'approved';
+            var isCollapsible = isCompleted || isApproved;
+
+            // For completed/approved: limit visible cards
+            var visibleCards = colCards;
+            var hiddenCount = 0;
+            if (isCompleted && colCards.length > COMPLETED_SHOW_LIMIT) {
+                visibleCards = colCards.slice(0, COMPLETED_SHOW_LIMIT);
+                hiddenCount = colCards.length - COMPLETED_SHOW_LIMIT;
+            }
+
+            var cardsHtml = visibleCards.length === 0
+                ? ''
+                : visibleCards.map(function (req) { return renderCardHtml(req); }).join('');
+
+            // Hidden cards (rendered but display:none)
+            if (hiddenCount > 0) {
+                cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (req) {
+                    return renderCardHtml(req).replace('class="kanban-card"', 'class="kanban-card" style="display: none"');
+                }).join('');
+                cardsHtml += '<div class="kanban-show-all" onclick="event.stopPropagation(); window.kanbanShowAll(\'' + col.id + '\')">Show all ' + colCards.length + ' items</div>';
+            }
+
+            // Collapse chevron for completed column
+            var chevron = isCompleted
+                ? '<span class="kanban-collapse-chevron" title="Click to collapse/expand">&#9660;</span>'
+                : '';
+
+            var collapseClass = (isCompleted && completedCollapsed) ? ' kanban-column--collapsed' : '';
+            var clickHandler = isCompleted
+                ? ' onclick="window.toggleKanbanCollapse(\'' + col.id + '\', \'steveKanbanCompletedCollapsed\')"'
+                : '';
+
+            return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'
+                + '<div class="kanban-column-header"' + clickHandler + '>'
+                + chevron
+                + '<span>' + col.label + '</span>'
+                + '<span class="kanban-column-count">' + colCards.length + '</span>'
+                + '</div>'
+                + '<div class="kanban-column-body">' + cardsHtml + '</div>'
+                + '</div>';
+        }).join('');
+    }
+
+    // ── Skeleton Loading: Show placeholder cards while Caspio loads ──
+    function showSkeletonCards() {
+        const galleryTab = document.getElementById('gallery-tab');
+        if (!galleryTab || galleryTab.querySelector('.card')) return;
+        const grid = galleryTab.querySelector('[class*="grid"], [class*="Gallery"], table');
+        const target = grid || galleryTab;
+        const skeletonHtml = Array.from({ length: 6 }, () => `
+            <div class="skeleton-card">
+                <div class="skeleton-header"></div>
+                <div class="skeleton-body">
+                    <div class="skeleton-line skeleton-line--long"></div>
+                    <div class="skeleton-line skeleton-line--medium"></div>
+                    <div class="skeleton-line skeleton-line--short"></div>
+                    <div class="skeleton-line skeleton-line--pill"></div>
+                </div>
+            </div>`).join('');
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:10px;';
+        wrapper.innerHTML = skeletonHtml;
+        wrapper.className = 'skeleton-grid';
+        target.appendChild(wrapper);
+    }
+
     // ── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
+        // Show skeleton placeholders immediately
+        showSkeletonCards();
+
         // Restore saved tab preference
         const savedTab = localStorage.getItem('artistDashboardTab');
         if (savedTab && ['express', 'requirements'].includes(savedTab)) {
             showTab(savedTab);
         }
 
+        // Always default to Grid view on page load
+
         initObserver();
         startNotificationPolling();
 
         document.addEventListener('DataPageReady', () => {
-            setTimeout(processCards, 500);
+            setTimeout(function () {
+                if (!kanbanActive) {
+                    processCards();
+                }
+            }, 500);
         });
 
         // Image modal close button

@@ -318,6 +318,182 @@ var MockupAeGallery = (function () {
         return { text: text, cssClass: cssClass };
     }
 
+    // ── Kanban Board View ───────────────────────────────────────────────
+    var kanbanActive = false;
+    var KANBAN_DATE_CUTOFF = new Date('2026-03-15');
+    var COMPLETED_SHOW_LIMIT = 5;
+
+    var KANBAN_COLUMNS = [
+        { id: 'submitted', label: 'Submitted', match: ['Submitted'] },
+        { id: 'in-progress', label: 'In Progress', match: ['In Progress'] },
+        { id: 'awaiting', label: 'Awaiting Approval', match: ['Awaiting Approval'] },
+        { id: 'revision', label: 'Revision Requested', match: ['Revision Requested'] },
+        { id: 'approved', label: 'Approved', match: ['Approved'] },
+        { id: 'completed', label: 'Completed', match: ['Completed'] }
+    ];
+
+    function normalizeStatus(raw) {
+        if (!raw || raw === '') return 'Submitted';
+        var s = String(raw).trim();
+        var lower = s.toLowerCase();
+        if (lower === 'submitted' || lower === '') return 'Submitted';
+        if (lower === 'in progress') return 'In Progress';
+        if (lower === 'awaiting approval') return 'Awaiting Approval';
+        if (lower === 'completed' || lower === 'complete') return 'Completed';
+        if (lower === 'approved') return 'Approved';
+        if (lower.indexOf('revision') !== -1) return 'Revision Requested';
+        return 'Submitted';
+    }
+
+    function getDueBadge(dueDateStr) {
+        if (!dueDateStr) return { text: '', cls: '' };
+        var due = new Date(dueDateStr);
+        if (isNaN(due.getTime())) return { text: '', cls: '' };
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        due.setHours(0, 0, 0, 0);
+        var diffDays = Math.round((due - today) / 86400000);
+        if (diffDays < 0) return { text: 'OVERDUE', cls: 'kanban-card-due--overdue' };
+        if (diffDays === 0) return { text: 'Due Today', cls: 'kanban-card-due--soon' };
+        if (diffDays === 1) return { text: 'Due Tomorrow', cls: 'kanban-card-due--soon' };
+        if (diffDays <= 7) {
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return { text: 'Due ' + months[due.getMonth()] + ' ' + due.getDate(), cls: 'kanban-card-due--ok' };
+        }
+        return { text: '', cls: '' };
+    }
+
+    function renderMockupKanbanCard(m, hidden) {
+        var company = escapeHtml(m.Company_Name || 'Unknown');
+        var designNum = escapeHtml(m.Design_Number || '');
+        var id = m.ID;
+        var due = getDueBadge(m.Due_Date);
+
+        var aeDisplay = '';
+        var sub = m.Submitted_By || '';
+        if (sub) {
+            var atIdx = sub.indexOf('@');
+            aeDisplay = atIdx > 0 ? sub.substring(0, atIdx) : sub;
+            aeDisplay = aeDisplay.charAt(0).toUpperCase() + aeDisplay.slice(1);
+        }
+
+        var badges = '';
+        var mockupType = m.Mockup_Type || '';
+        var revCount = m.Revision_Count || 0;
+        if (mockupType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(mockupType) + '</span>';
+        if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
+
+        var thumbHtml = '';
+        if (m.Box_Mockup_1) {
+            thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" onerror="this.style.display=\'none\'" alt="">';
+        }
+
+        var hiddenStyle = hidden ? ' style="display: none"' : '';
+        return '<div class="kanban-card" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.open(\'/mockup/' + id + '?view=ae\', \'_blank\')">'
+            + '<div class="kanban-card-company">' + company + '</div>'
+            + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
+            + '<div class="kanban-card-meta">'
+            + '<span class="kanban-card-rep">' + escapeHtml(aeDisplay) + '</span>'
+            + (due.text ? '<span class="kanban-card-due ' + due.cls + '">' + escapeHtml(due.text) + '</span>' : '')
+            + '</div>'
+            + (badges ? '<div class="kanban-card-badges">' + badges + '</div>' : '')
+            + thumbHtml
+            + '</div>';
+    }
+
+    window.toggleRuthAeKanbanView = function (view) {
+        var galleryView = document.getElementById('mockup-ae-gallery');
+        var boardView = document.getElementById('ruth-ae-kanban-board');
+        var toggleBtns = document.querySelectorAll('#ruth-ae-view-toggle .view-toggle-btn');
+        if (!galleryView || !boardView) return;
+
+        kanbanActive = (view === 'board');
+
+        toggleBtns.forEach(function (btn) {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+
+        if (kanbanActive) {
+            galleryView.style.display = 'none';
+            boardView.classList.add('active');
+            buildRuthAeKanbanBoard();
+        } else {
+            galleryView.style.display = '';
+            boardView.classList.remove('active');
+        }
+    };
+
+    // Collapse/expand helpers (shared via window)
+    window.toggleKanbanCollapse = window.toggleKanbanCollapse || function (colId, storageKey) {
+        var col = document.querySelector('.kanban-column--' + colId);
+        if (!col) return;
+        col.classList.toggle('kanban-column--collapsed');
+        localStorage.setItem(storageKey, col.classList.contains('kanban-column--collapsed') ? '1' : '0');
+    };
+    window.kanbanShowAll = window.kanbanShowAll || function (colId) {
+        var col = document.querySelector('.kanban-column--' + colId);
+        if (!col) return;
+        col.querySelectorAll('.kanban-card[style*="display: none"]').forEach(function (c) { c.style.display = ''; });
+        var link = col.querySelector('.kanban-show-all');
+        if (link) link.remove();
+    };
+
+    function buildRuthAeKanbanBoard() {
+        var board = document.getElementById('ruth-ae-kanban-board');
+        if (!board) return;
+
+        // Filter to date cutoff
+        var filtered = allMockups.filter(function (m) {
+            if (!m.Submitted_Date) return false;
+            return new Date(m.Submitted_Date) >= KANBAN_DATE_CUTOFF;
+        });
+
+        // Group into buckets
+        var buckets = {};
+        KANBAN_COLUMNS.forEach(function (col) { buckets[col.id] = []; });
+
+        filtered.forEach(function (m) {
+            var status = normalizeStatus(m.Status);
+            var placed = false;
+            KANBAN_COLUMNS.forEach(function (col) {
+                if (!placed && col.match.indexOf(status) !== -1) {
+                    buckets[col.id].push(m);
+                    placed = true;
+                }
+            });
+            if (!placed) buckets['submitted'].push(m);
+        });
+
+        var completedCollapsed = localStorage.getItem('ruthAeKanbanCompletedCollapsed') !== '0';
+
+        board.innerHTML = KANBAN_COLUMNS.map(function (col) {
+            var colCards = buckets[col.id] || [];
+            var isCompleted = col.id === 'completed';
+
+            var cardsHtml = '';
+            if (isCompleted && colCards.length > COMPLETED_SHOW_LIMIT) {
+                cardsHtml = colCards.slice(0, COMPLETED_SHOW_LIMIT).map(function (m) { return renderMockupKanbanCard(m, false); }).join('');
+                cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (m) { return renderMockupKanbanCard(m, true); }).join('');
+                cardsHtml += '<div class="kanban-show-all" onclick="event.stopPropagation(); window.kanbanShowAll(\'' + col.id + '\')">Show all ' + colCards.length + ' items</div>';
+            } else {
+                cardsHtml = colCards.map(function (m) { return renderMockupKanbanCard(m, false); }).join('');
+            }
+
+            var chevron = isCompleted ? '<span class="kanban-collapse-chevron">&#9660;</span>' : '';
+            var collapseClass = (isCompleted && completedCollapsed) ? ' kanban-column--collapsed' : '';
+            var clickHandler = isCompleted ? ' onclick="window.toggleKanbanCollapse(\'' + col.id + '\', \'ruthAeKanbanCompletedCollapsed\')"' : '';
+
+            return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'
+                + '<div class="kanban-column-header"' + clickHandler + '>'
+                + chevron
+                + '<span>' + col.label + '</span>'
+                + '<span class="kanban-column-count">' + colCards.length + '</span>'
+                + '</div>'
+                + '<div class="kanban-column-body">' + cardsHtml + '</div>'
+                + '</div>';
+        }).join('');
+    }
+
     return {
         init: init,
         filterByStatus: filterByStatus

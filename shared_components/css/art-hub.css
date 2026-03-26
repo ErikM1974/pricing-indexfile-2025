@@ -1227,10 +1227,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
        don't get 100+px of dead whitespace in a mixed-content row */
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.08);
-}
+/* Card hover moved to Status Left Border section below */
 
 .card-header {
     color: white;
@@ -1618,9 +1615,110 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     color: var(--art-theme);
 }
 
-/* ---------- Completed / Cancelled Card States ---------- */
-.card--completed { border-left: 3px solid #22c55e; opacity: 0.8; }
-.card--cancel    { border-left: 3px solid #9ca3af; opacity: 0.65; }
+/* ---------- Status Left Border Colors (All Cards) ---------- */
+.card--submitted          { border-left: 3px solid #7c3aed; }
+.card--in-progress        { border-left: 3px solid #2563eb; }
+.card--awaiting-approval  { border-left: 3px solid #d97706; }
+.card--revision-requested { border-left: 3px solid #dc2626; }
+.card--approved           { border-left: 3px solid #059669; }
+.card--completed          { border-left: 3px solid #22c55e; opacity: 0.8; }
+.card--cancel             { border-left: 3px solid #9ca3af; opacity: 0.65; }
+
+/* ---------- Card Hover Lift + Status Glow ---------- */
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08);
+}
+.card--submitted:hover          { box-shadow: 0 8px 25px rgba(124,58,237,0.2); }
+.card--in-progress:hover        { box-shadow: 0 8px 25px rgba(37,99,235,0.2); }
+.card--awaiting-approval:hover  { box-shadow: 0 8px 25px rgba(217,119,6,0.2); }
+.card--revision-requested:hover { box-shadow: 0 8px 25px rgba(220,38,38,0.2); }
+.card--approved:hover           { box-shadow: 0 8px 25px rgba(5,150,105,0.2); }
+.card--completed:hover          { box-shadow: 0 8px 25px rgba(34,197,94,0.15); }
+
+/* ---------- Staggered Card Entry Animation ---------- */
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.card {
+    animation: fadeSlideUp 0.35s ease both;
+}
+
+/* ---------- Animated Status Badges ---------- */
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
+}
+@keyframes gentleShake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-2px); }
+    40%      { transform: translateX(2px); }
+    60%      { transform: translateX(-1px); }
+    80%      { transform: translateX(1px); }
+}
+.status-pill--awaiting { animation: pulseGlow 2s ease-in-out infinite; }
+.due-pill--overdue     { animation: gentleShake 0.6s ease-in-out; animation-delay: 1s; }
+
+/* ---------- Skeleton Loading ---------- */
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.skeleton-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    min-height: 220px;
+}
+.skeleton-header {
+    height: 52px;
+    background: linear-gradient(90deg, #e5e7eb 25%, #d1d5db 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-body {
+    padding: 14px;
+}
+.skeleton-line {
+    height: 12px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-line--short  { width: 60%; }
+.skeleton-line--medium { width: 80%; }
+.skeleton-line--long   { width: 95%; }
+.skeleton-line--pill   { width: 30%; height: 20px; border-radius: 10px; }
+
+/* ---------- Thread Color Dots ---------- */
+.thread-dots {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #f3f4f6;
+}
+.thread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    flex-shrink: 0;
+}
+.thread-dots-label {
+    font-size: 9px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-right: 4px;
+    font-weight: 600;
+}
 
 /* ---------- Modal Overlay ---------- */
 .art-modal-overlay {
@@ -3855,3 +3953,50 @@ input.cbSearchButton {
     color: #059669;
     margin-right: 4px;
 }
+
+/* ==========================================================================
+   Kanban Board View
+   Toggle between grid (default) and board (kanban) layouts.
+   Used by: art-hub-steve.html, art-hub-ruth.html
+   ========================================================================== */
+
+/* ---------- View Toggle ---------- */
+.view-toggle {
+    display: inline-flex;
+    gap: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-left: auto;
+}
+.view-toggle-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    background: white;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+}
+.view-toggle-btn:not(:last-child) {
+    border-right: 1px solid #d1d5db;
+}
+.view-toggle-btn:hover {
+    background: #f3f4f6;
+}
+.view-toggle-btn.active {
+    background: var(--art-theme);
+    color: white;
+    border-color: var(--art-theme);
+}
+.view-toggle-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* Kanban styles moved to /shared_components/css/kanban.css */
