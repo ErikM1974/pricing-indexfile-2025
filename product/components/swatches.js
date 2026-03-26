@@ -1,7 +1,11 @@
 /**
  * Color Swatches Component
- * Handles color selection with visual swatches
+ * Handles color selection with visual swatches + inline inventory grid
  */
+
+const SANMAR_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar';
+const INVENTORY_CACHE = new Map();
+const INVENTORY_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export class ColorSwatches {
     constructor(container, onColorSelect) {
@@ -11,9 +15,12 @@ export class ColorSwatches {
         this.selectedColor = null;
         this.showAll = false;
         this.initialDisplayCount = 10; // Show 10 colors initially
+        this.styleNumber = null;
+        this.inventoryData = null;
+        this.inventoryVisible = true;
     }
 
-    update(colors) {
+    update(colors, styleNumber) {
         if (!colors || colors.length === 0) {
             this.container.innerHTML = '';
             return;
@@ -21,8 +28,11 @@ export class ColorSwatches {
 
         this.colors = colors;
         this.selectedColor = colors[0];
-        this.showAll = false; // Reset when colors update
+        this.styleNumber = styleNumber;
+        this.showAll = false;
         this.render();
+        // Auto-load inventory for the first color
+        this.loadInventory();
     }
 
     render() {
@@ -138,19 +148,132 @@ export class ColorSwatches {
 
     selectColor(color) {
         this.selectedColor = color;
-        
+        this.inventoryData = null; // Reset inventory for new color
+
         // Store scroll position to prevent jumping
         const scrollPos = window.scrollY;
-        
+
         // Re-render to update the selected color display
         this.render();
-        
+
         // Restore scroll position
         window.scrollTo(0, scrollPos);
-        
+
+        // Load inventory for new color
+        this.loadInventory();
+
         // Trigger callback
         if (this.onColorSelect) {
             this.onColorSelect(color);
         }
+    }
+
+    async loadInventory() {
+        if (!this.styleNumber || !this.selectedColor) return;
+
+        const catalogColor = this.selectedColor.CATALOG_COLOR || this.selectedColor.catalogColor || '';
+        const cacheKey = `${this.styleNumber}-${catalogColor}`;
+
+        const externalContainer = document.getElementById('inline-inventory');
+
+        // Check local cache
+        const cached = INVENTORY_CACHE.get(cacheKey);
+        if (cached && (Date.now() - cached.timestamp < INVENTORY_CACHE_TTL)) {
+            this.inventoryData = cached.data;
+            this.updateInventoryGrid();
+            return;
+        }
+
+        // Show loading state
+        if (externalContainer) {
+            externalContainer.innerHTML = '<div class="inventory-loading"><i class="fas fa-spinner fa-spin"></i> Loading inventory...</div>';
+        }
+
+        try {
+            const response = await fetch(`${SANMAR_API}/inventory/${encodeURIComponent(this.styleNumber)}?color=${encodeURIComponent(catalogColor)}`);
+            if (!response.ok) throw new Error('Inventory fetch failed');
+            const data = await response.json();
+            this.inventoryData = data;
+            INVENTORY_CACHE.set(cacheKey, { data, timestamp: Date.now() });
+            this.updateInventoryGrid();
+        } catch (error) {
+            console.error('Inventory load failed:', error);
+            if (externalContainer) {
+                externalContainer.innerHTML = '<div class="inventory-error">Unable to load inventory</div>';
+            }
+        }
+    }
+
+    updateInventoryGrid() {
+        const container = document.getElementById('inline-inventory');
+        if (container) {
+            container.innerHTML = this.renderInventoryGrid();
+        }
+    }
+
+    renderInventoryGrid() {
+        if (!this.inventoryData || !this.inventoryData.inventory || this.inventoryData.inventory.length === 0) {
+            return '<div class="inventory-empty">No inventory data available</div>';
+        }
+
+        const inv = this.inventoryData.inventory;
+        const colorName = this.selectedColor.COLOR_NAME || this.selectedColor.colorName || '';
+        const swatchImage = this.selectedColor.COLOR_SQUARE_IMAGE || this.selectedColor.colorSwatchImage || '';
+
+        // Get all warehouse names from first item (all items have same warehouses)
+        const warehouses = inv[0].warehouses || [];
+
+        // Build header row (sizes)
+        const sizeHeaders = inv.map(item => `<th>${item.size}</th>`).join('');
+
+        // Build warehouse rows
+        const warehouseRows = warehouses.map(wh => {
+            const cells = inv.map(item => {
+                const whData = item.warehouses.find(w => w.id === wh.id);
+                const qty = whData ? whData.qty : 0;
+                const cellClass = qty === 0 ? 'stock-out' : qty < 50 ? 'stock-low' : 'stock-good';
+                return `<td class="${cellClass}">${qty.toLocaleString()}</td>`;
+            }).join('');
+            return `<tr><td class="wh-name">${wh.name}</td>${cells}</tr>`;
+        }).join('');
+
+        // Build totals row
+        const totalCells = inv.map(item => {
+            const cls = item.totalQty === 0 ? 'stock-out' : item.totalQty < 50 ? 'stock-low' : 'stock-good';
+            return `<td class="total-cell ${cls}">${item.totalQty.toLocaleString()}</td>`;
+        }).join('');
+
+        return `
+            <div class="inventory-grid-container">
+                <div class="inventory-grid-header">
+                    <div class="inventory-header-left">
+                        ${swatchImage ? `<img src="${swatchImage}" alt="${colorName}" class="inventory-header-swatch">` : ''}
+                        <span class="inventory-header-color-name">${colorName}</span>
+                        <span class="inventory-header-divider">|</span>
+                        <span class="inventory-header-label"><i class="fas fa-warehouse"></i> Warehouse Inventory</span>
+                    </div>
+                    <span class="inventory-grand-total">${this.inventoryData.grandTotal.toLocaleString()} total units</span>
+                </div>
+                <div class="inventory-table-wrapper">
+                    <table class="inventory-grid-table">
+                        <thead>
+                            <tr>
+                                <th class="wh-header">Warehouse</th>
+                                ${sizeHeaders}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${warehouseRows}
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td class="wh-name">TOTAL</td>
+                                ${totalCells}
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        `;
     }
 }

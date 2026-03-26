@@ -222,7 +222,7 @@ class ProductPageApp {
         
         this.components.gallery.update(firstColor);
         this.components.info.update(product);
-        this.components.swatches.update(product.colors);
+        this.components.swatches.update(product.colors, product.styleNumber);
         this.components.decorationSelector.update(product.styleNumber, catalogColor);
         
         // Update breadcrumb
@@ -268,9 +268,8 @@ class ProductPageApp {
         // Update product resources for new color
         this.addProductResources();
         
-        // Load inventory
-        await this.loadInventory(product.styleNumber, catalogColor);
-        
+        // Inventory now auto-loads via swatches component on color click
+
         // Update URL
         this.updateUrl(product.styleNumber, catalogColor);
     }
@@ -389,12 +388,6 @@ class ProductPageApp {
         this.components.quoteModal.open(quoteData);
     }
 }
-
-// Global function for inventory button
-window.checkInventoryDetails = function(styleNumber, colorCode) {
-    // Navigate to inventory details page
-    window.location.href = `/inventory-details.html?style=${styleNumber}&color=${encodeURIComponent(colorCode)}`;
-};
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
