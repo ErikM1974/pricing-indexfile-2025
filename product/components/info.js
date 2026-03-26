@@ -45,8 +45,7 @@ export class ProductInfo {
         this.currentProduct = product;
         this.currentSelectedColor = selectedColor;
 
-        // Render Check Inventory button in the new location (below thumbnails)
-        this.renderInventoryButton(product.styleNumber, selectedColor);
+        // Inventory now shows inline in color swatches — no button needed
 
         // Fetch and calculate estimated price
         this.calculateAndDisplayPrice(product.styleNumber);
