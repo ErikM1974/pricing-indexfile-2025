@@ -522,18 +522,21 @@
                     aeElapsedHtml = ' <span class="approval-elapsed ' + aeElapsed.cssClass + '" style="margin-left:8px;" title="' + escapeHtml(formatDate(mockup.Approval_Sent_Date)) + '">(sent ' + escapeHtml(aeElapsed.text) + ')</span>';
                 }
 
-                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select a mockup to approve:' + aeElapsedHtml + custElapsedHtml + '</span>'
+                aeBar.innerHTML = '<span class="pmd-action-bar-label">Select mockup(s) to approve:' + aeElapsedHtml + custElapsedHtml + '</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--approve" id="pmd-btn-approve">Approve Mockup</button>'
                     + '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>'
                     + sendCopyButtons;
 
                 document.getElementById('pmd-btn-approve').addEventListener('click', function () {
-                    if (!selectedMockupSlot) {
-                        showToast('Please click a mockup image to select it first', 'error');
+                    if (selectedMockupSlots.length === 0) {
+                        showToast('Please click one or more mockup images to select them first', 'error');
                         return;
                     }
-                    var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === selectedMockupSlot; })[0];
-                    var approvalNote = 'AE approved ' + (slotLabel ? slotLabel.label : selectedMockupSlot);
+                    var slotLabels = selectedMockupSlots.map(function (key) {
+                        var slot = MOCKUP_SLOTS.filter(function (s) { return s.key === key; })[0];
+                        return slot ? slot.label : key;
+                    });
+                    var approvalNote = 'AE approved ' + slotLabels.join(', ');
                     handleStatusUpdate('Approved', approvalNote, this);
                 });
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
@@ -688,21 +691,24 @@
         }
     }
 
-    // ── Customer Approval ───────────────────────────────────────────────
-    var selectedMockupSlot = null;
+    // ── Mockup Selection (multi-select for AE, single for Customer) ─────
+    var selectedMockupSlots = [];
     var customerApprovalInProgress = false;
 
     function handleCustomerApproval(btnEl) {
         if (customerApprovalInProgress) return;
-        if (!selectedMockupSlot) {
+        if (selectedMockupSlots.length === 0) {
             showToast('Please click on a mockup to select it first', 'error');
             return;
         }
         customerApprovalInProgress = true;
         if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Submitting...'; }
 
-        var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === selectedMockupSlot; })[0];
-        var approvalNote = 'Customer approved ' + (slotLabel ? slotLabel.label : selectedMockupSlot);
+        var slotLabels = selectedMockupSlots.map(function (key) {
+            var slot = MOCKUP_SLOTS.filter(function (s) { return s.key === key; })[0];
+            return slot ? slot.label : key;
+        });
+        var approvalNote = 'Customer approved ' + slotLabels.join(', ');
 
         var body = {
             status: 'Approved',
@@ -1126,28 +1132,35 @@
                     }
 
                     if (isCustomerView) {
-                        // Customer view: click to select AND open lightbox for full-size view
+                        // Customer view: click to select (single) AND open lightbox for full-size view
                         (function (slotKey, el, imgUrl, imgLabel) {
                             el.addEventListener('click', function (e) {
                                 if (e.target.closest('.pmd-slot-download')) return; // let download handle itself
                                 grid.querySelectorAll('.pmd-gallery-slot').forEach(function (s) { s.classList.remove('pmd-slot-selected'); });
                                 el.classList.add('pmd-slot-selected');
-                                selectedMockupSlot = slotKey;
+                                selectedMockupSlots = [slotKey];
                                 var approveBtn = document.getElementById('pmd-btn-customer-approve');
                                 if (approveBtn) approveBtn.disabled = false;
                                 openLightbox(imgUrl, imgLabel);
                             });
                         })(slot.key, slotEl, url, slot.label);
                     } else if (aeCanSelect && !isRefFile) {
-                        // AE view: click to select which mockup to approve
+                        // AE view: click to toggle mockup selection (multi-select)
                         (function (slotKey, el) {
                             el.addEventListener('click', function (e) {
                                 if (e.target.closest('.pmd-slot-remove')) return;
-                                grid.querySelectorAll('.pmd-gallery-slot').forEach(function (s) { s.classList.remove('pmd-slot-selected'); });
-                                el.classList.add('pmd-slot-selected');
-                                selectedMockupSlot = slotKey;
+                                var idx = selectedMockupSlots.indexOf(slotKey);
+                                if (idx !== -1) {
+                                    // Deselect
+                                    selectedMockupSlots.splice(idx, 1);
+                                    el.classList.remove('pmd-slot-selected');
+                                } else {
+                                    // Select
+                                    selectedMockupSlots.push(slotKey);
+                                    el.classList.add('pmd-slot-selected');
+                                }
                                 var approveBtn = document.getElementById('pmd-btn-approve');
-                                if (approveBtn) approveBtn.disabled = false;
+                                if (approveBtn) approveBtn.disabled = (selectedMockupSlots.length === 0);
                             });
                         })(slot.key, slotEl);
                     } else {
@@ -1212,6 +1225,38 @@
 
             grid.appendChild(slotEl);
         });
+
+        // Auto-select filled mockup slots for AE view
+        if (aeCanSelect) {
+            var filledSlots = grid.querySelectorAll('.pmd-gallery-slot .pmd-slot-filled img');
+            filledSlots.forEach(function (img) {
+                var slotEl = img.closest('.pmd-gallery-slot');
+                if (slotEl) {
+                    var slotKey = null;
+                    MOCKUP_SLOTS.forEach(function (s) {
+                        if (slotEl.querySelector('[data-field-key="' + s.key + '"]') ||
+                            slotEl.querySelector('.pmd-slot-label') && slotEl.querySelector('.pmd-slot-label').textContent === s.label) {
+                            slotKey = s.key;
+                        }
+                    });
+                    // Match by slot label text
+                    if (!slotKey) {
+                        var labelEl = slotEl.querySelector('.pmd-slot-label');
+                        if (labelEl) {
+                            MOCKUP_SLOTS.forEach(function (s) {
+                                if (s.label === labelEl.textContent.trim()) slotKey = s.key;
+                            });
+                        }
+                    }
+                    if (slotKey && selectedMockupSlots.indexOf(slotKey) === -1) {
+                        selectedMockupSlots.push(slotKey);
+                        slotEl.classList.add('pmd-slot-selected');
+                    }
+                }
+            });
+            var approveBtn = document.getElementById('pmd-btn-approve');
+            if (approveBtn) approveBtn.disabled = (selectedMockupSlots.length === 0);
+        }
 
         // Thread editor container (below grid, one shared panel)
         var existingEditor = document.getElementById('pmd-thread-editor-container');
