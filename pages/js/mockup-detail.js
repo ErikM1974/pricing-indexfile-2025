@@ -3998,8 +3998,9 @@
 
     // ── EmailJS Notifications ─────────────────────────────────────────────
     function sendMockupNotification(params) {
-        if (typeof emailjs === 'undefined') return;
+        if (typeof emailjs === 'undefined') { console.warn('EmailJS not loaded — skipping notification to', params.to_email); return; }
         try {
+            console.log('Sending mockup notification to', params.to_email, '—', params.note_type);
             emailjs.init(EMAILJS_PUBLIC_KEY);
             emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
                 to_email: params.to_email,
@@ -4010,8 +4011,12 @@
                 note_type: params.note_type,
                 detail_link: params.detail_link,
                 from_name: params.from_name || 'Mockup System'
-            }).catch(function () { /* fire-and-forget */ });
-        } catch (e) { /* silent */ }
+            }).then(function () {
+                console.log('Mockup notification sent to', params.to_email);
+            }).catch(function (err) {
+                console.error('Mockup notification FAILED to', params.to_email, ':', err);
+            });
+        } catch (e) { console.error('Mockup notification error:', e); }
     }
 
     function sendApprovalNotification(aeEmail, message, subjectPrefix) {
@@ -4131,18 +4136,18 @@
                 detail_link: ruthLink,
                 from_name: isCustomerView ? 'Customer' : getAeDisplayName(currentMockup.Submitted_By)
             });
-            // If customer requested changes, also notify AE
-            if (isCustomerView) {
-                var aeEmail3 = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
-                sendMockupNotification({
-                    to_email: aeEmail3,
-                    to_name: getAeDisplayName(aeEmail3),
-                    note_text: 'Customer requested changes for ' + company + ' #' + design,
-                    note_type: 'Customer Revision Request',
-                    detail_link: aeLink,
-                    from_name: 'Customer'
-                });
-            }
+            // Always notify the submitting AE as confirmation
+            var aeEmail3 = currentMockup.Submitted_By || 'ae@nwcustomapparel.com';
+            sendMockupNotification({
+                to_email: aeEmail3,
+                to_name: getAeDisplayName(aeEmail3),
+                note_text: isCustomerView
+                    ? 'Customer requested changes for ' + company + ' #' + design
+                    : 'Your revision request was sent to Ruth for ' + company + ' #' + design,
+                note_type: isCustomerView ? 'Customer Revision Request' : 'Revision Confirmation',
+                detail_link: aeLink,
+                from_name: isCustomerView ? 'Customer' : 'Ruth \u2014 Digitizing'
+            });
         }
     }
 
