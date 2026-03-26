@@ -1300,6 +1300,9 @@
         </div>
         </div>
 
+        <!-- Warehouse Inventory (collapsible) -->
+        <div id="calculator-inventory-section" class="calc-inventory-section"></div>
+
         <!-- Order Information -->
         <div class="order-info-section" id="orderInfoSection" style="display: none;">
             <h3 class="order-info-title">Order Information</h3>
@@ -1946,12 +1949,17 @@
 
         // Update selected color
         function updateSelectedColor(color) {
-            
+
             const colorName = color.COLOR_NAME || color.color || 'Natural';
             document.getElementById('currentColor').textContent = colorName;
-            
+
             // Find matching product image from product-details data based on color
             updateMainImageForColor(colorName);
+
+            // Load warehouse inventory for this color
+            if (typeof loadCalculatorInventory === 'function' && currentProduct) {
+                loadCalculatorInventory(currentProduct.STYLE, color.CATALOG_COLOR || colorName, colorName, color.COLOR_SQUARE_IMAGE || color.swatchUrl);
+            }
         }
         
         // Update main product image for selected color
