@@ -2621,6 +2621,23 @@
             // 3. Send revision email to Steve (fire-and-forget)
             sendAENotificationEmail('revision', aeName, notes);
 
+            // 3b. Send confirmation email to the AE who requested the revision
+            const aeConfirmEmail = REP_MAP[aeName] || 'sales@nwcustomapparel.com';
+            if (typeof emailjs !== 'undefined') {
+                emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                    to_email: aeConfirmEmail,
+                    to_name: aeName,
+                    design_id: designId,
+                    company_name: currentRequest ? currentRequest.CompanyName : 'Unknown',
+                    note_text: 'Your revision request was sent to Steve for ' + (currentRequest ? currentRequest.CompanyName : '') + ' #' + designId,
+                    note_type: 'Revision Confirmation',
+                    detail_link: window.location.origin + '/art-request/' + designId + '?view=ae',
+                    from_name: 'Steve — Art Department'
+                }, EMAILJS_PUBLIC_KEY)
+                    .then(function () { console.log('AE revision confirmation sent to', aeConfirmEmail); })
+                    .catch(function (err) { console.warn('AE revision confirmation failed:', err); });
+            }
+
             // 4. Push real-time notification for Steve's dashboard
             pushArtNotification('revision', aeName);
 
