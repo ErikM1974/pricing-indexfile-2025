@@ -37,6 +37,9 @@
         { key: 'Box_Mockup_1', label: 'Mockup 1' },
         { key: 'Box_Mockup_2', label: 'Mockup 2' },
         { key: 'Box_Mockup_3', label: 'Mockup 3' },
+        { key: 'Box_Mockup_4', label: 'Mockup 4' },
+        { key: 'Box_Mockup_5', label: 'Mockup 5' },
+        { key: 'Box_Mockup_6', label: 'Mockup 6' },
         { key: 'Box_Reference_File', label: 'Reference File' }
     ];
 
@@ -1045,6 +1048,30 @@
             ? MOCKUP_SLOTS.filter(function (s) { return s.key !== 'Box_Reference_File' && mockup[s.key]; })
             : MOCKUP_SLOTS;
 
+        // Check if any of slots 4-6 have content
+        var hasExtraSlots = mockup.Box_Mockup_4 || mockup.Box_Mockup_5 || mockup.Box_Mockup_6;
+        var extraSlotKeys = ['Box_Mockup_4', 'Box_Mockup_5', 'Box_Mockup_6'];
+        var extraSlotsExpanded = hasExtraSlots; // Auto-expand if any have content
+
+        // Create toggle button for extra slots (Ruth/default view only, not customer)
+        var extraToggle = null;
+        var extraContainer = null;
+        if (!isCustomerView) {
+            extraContainer = document.createElement('div');
+            extraContainer.className = 'pmd-extra-slots-container';
+            extraContainer.style.display = extraSlotsExpanded ? '' : 'none';
+
+            extraToggle = document.createElement('button');
+            extraToggle.className = 'pmd-extra-slots-toggle';
+            extraToggle.innerHTML = (extraSlotsExpanded ? '<i class="fas fa-chevron-up"></i> Hide Extra Mockups' : '<i class="fas fa-chevron-down"></i> More Mockups (4-6)');
+            extraToggle.style.cssText = 'width:100%;padding:0.5rem;margin-top:0.5rem;border:1px dashed #ccc;border-radius:6px;background:#f9f9f9;cursor:pointer;color:#666;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;';
+            extraToggle.addEventListener('click', function () {
+                extraSlotsExpanded = !extraSlotsExpanded;
+                extraContainer.style.display = extraSlotsExpanded ? '' : 'none';
+                extraToggle.innerHTML = extraSlotsExpanded ? '<i class="fas fa-chevron-up"></i> Hide Extra Mockups' : '<i class="fas fa-chevron-down"></i> More Mockups (4-6)';
+            });
+        }
+
         slotsToRender.forEach(function (slot) {
             var url = mockup[slot.key];
             var isEmpty = !url || !url.trim();
@@ -1223,8 +1250,19 @@
                 slotEl.appendChild(threadStrip);
             }
 
-            grid.appendChild(slotEl);
+            // Route slots 4-6 to the collapsible extra container
+            if (extraContainer && extraSlotKeys.indexOf(slot.key) !== -1) {
+                extraContainer.appendChild(slotEl);
+            } else {
+                grid.appendChild(slotEl);
+            }
         });
+
+        // Add toggle + extra slots container to grid (after main slots, before reference)
+        if (extraToggle && extraContainer) {
+            grid.appendChild(extraToggle);
+            grid.appendChild(extraContainer);
+        }
 
         // Auto-select filled mockup slots for AE view
         if (aeCanSelect) {
