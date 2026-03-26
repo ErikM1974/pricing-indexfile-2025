@@ -64,8 +64,22 @@
                 var el = document.getElementById('currentColor');
                 if (el) colorName = el.textContent.trim();
             }
+
+            // Fallback: try to get CATALOG_COLOR from swatch element's data or title
             if (!catalogColor) {
-                catalogColor = swatch.title || colorName;
+                catalogColor = swatch.getAttribute('data-catalog-color') || swatch.title || colorName;
+            }
+
+            // If we only have COLOR_NAME (display name), also try currentColors array
+            if (!catalogColor || catalogColor === colorName) {
+                var colors = window.currentColors || [];
+                for (var i = 0; i < colors.length; i++) {
+                    if (colors[i].COLOR_NAME === colorName || colors[i].colorName === colorName) {
+                        catalogColor = colors[i].CATALOG_COLOR || colors[i].catalogColor || catalogColor;
+                        swatchImg = swatchImg || colors[i].COLOR_SQUARE_IMAGE || colors[i].swatchUrl || '';
+                        break;
+                    }
+                }
             }
 
             if (catalogColor || colorName) {
