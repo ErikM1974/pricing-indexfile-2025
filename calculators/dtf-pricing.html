@@ -820,8 +820,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- Warehouse Inventory (collapsible) -->
+        <div id="calculator-inventory-section" class="calc-inventory-section"></div>
     </div>
-    
+
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -1497,6 +1500,10 @@
                             });
                             swatch.style.border = '3px solid #4cb354';  // Updated to match DTG green
                         }
+                        // Load warehouse inventory
+                        if (typeof loadCalculatorInventory === 'function') {
+                            loadCalculatorInventory(currentStyleNumber || window.currentStyleNumber, color.CATALOG_COLOR || color.COLOR_NAME, color.COLOR_NAME, color.COLOR_SQUARE_IMAGE);
+                        }
                     });
 
                     swatchesContainer.appendChild(swatch);
@@ -1720,5 +1727,6 @@
             border-color: #4cb354 !important;
         }
     </style>
+<script src="/shared_components/js/calculator-inventory.js"></script>
 </body>
 </html>

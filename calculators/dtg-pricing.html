@@ -1599,6 +1599,9 @@
         </div>
         </div> <!-- End pricing-content-wrapper -->
 
+        <!-- Warehouse Inventory (collapsible) -->
+        <div id="calculator-inventory-section" class="calc-inventory-section"></div>
+
         <!-- DTG Product Recommendations Section -->
         <div class="dtg-recommendations-section">
             <h3 class="dtg-rec-title">
@@ -2857,6 +2860,10 @@
                             document.querySelectorAll('.color-swatch').forEach(s => s.style.border = '2px solid #e5e7eb');
                             swatch.style.border = '2px solid #4cb354';
                         }
+                        // Load warehouse inventory
+                        if (typeof loadCalculatorInventory === 'function') {
+                            loadCalculatorInventory(currentStyleNumber || window.currentStyleNumber, color.CATALOG_COLOR || color.COLOR_NAME, color.COLOR_NAME, color.COLOR_SQUARE_IMAGE);
+                        }
                     });
 
                     swatchesContainer.appendChild(swatch);
@@ -3040,5 +3047,6 @@
     </script>
 
     <!-- DTG Product Recommendations (inline implementation) -->
+<script src="/shared_components/js/calculator-inventory.js"></script>
 </body>
 </html>

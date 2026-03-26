@@ -17,7 +17,7 @@ export class ColorSwatches {
         this.initialDisplayCount = 10; // Show 10 colors initially
         this.styleNumber = null;
         this.inventoryData = null;
-        this.inventoryVisible = true;
+        this._inventoryRequestId = 0;
     }
 
     update(colors, styleNumber) {
@@ -172,7 +172,8 @@ export class ColorSwatches {
         if (!this.styleNumber || !this.selectedColor) return;
 
         const catalogColor = this.selectedColor.CATALOG_COLOR || this.selectedColor.catalogColor || '';
-        const cacheKey = `${this.styleNumber}-${catalogColor}`;
+        const cacheKey = `${this.styleNumber}::${catalogColor}`;
+        const requestId = ++this._inventoryRequestId;
 
         const externalContainer = document.getElementById('inline-inventory');
 
@@ -191,15 +192,18 @@ export class ColorSwatches {
 
         try {
             const response = await fetch(`${SANMAR_API}/inventory/${encodeURIComponent(this.styleNumber)}?color=${encodeURIComponent(catalogColor)}`);
-            if (!response.ok) throw new Error('Inventory fetch failed');
+            if (!response.ok) throw new Error(`Inventory fetch failed (HTTP ${response.status})`);
             const data = await response.json();
+            // Only update if this is still the latest request (ignore stale)
+            if (requestId !== this._inventoryRequestId) return;
             this.inventoryData = data;
             INVENTORY_CACHE.set(cacheKey, { data, timestamp: Date.now() });
             this.updateInventoryGrid();
         } catch (error) {
             console.error('Inventory load failed:', error);
+            if (requestId !== this._inventoryRequestId) return;
             if (externalContainer) {
-                externalContainer.innerHTML = '<div class="inventory-error">Unable to load inventory</div>';
+                externalContainer.innerHTML = '<div class="inventory-error">Unable to load inventory. Please try again.</div>';
             }
         }
     }
@@ -217,11 +221,13 @@ export class ColorSwatches {
         }
 
         const inv = this.inventoryData.inventory;
-        const colorName = this.selectedColor.COLOR_NAME || this.selectedColor.colorName || '';
-        const swatchImage = this.selectedColor.COLOR_SQUARE_IMAGE || this.selectedColor.colorSwatchImage || '';
+        const colorName = this.selectedColor ? (this.selectedColor.COLOR_NAME || this.selectedColor.colorName || '') : '';
+        const swatchImage = this.selectedColor ? (this.selectedColor.COLOR_SQUARE_IMAGE || this.selectedColor.colorSwatchImage || '') : '';
+        const grandTotal = (typeof this.inventoryData.grandTotal === 'number') ? this.inventoryData.grandTotal : 0;
 
         // Get all warehouse names from first item (all items have same warehouses)
-        const warehouses = inv[0].warehouses || [];
+        if (!inv[0] || !inv[0].warehouses) return '<div class="inventory-empty">Inventory format unavailable</div>';
+        const warehouses = inv[0].warehouses;
 
         // Build header row (sizes)
         const sizeHeaders = inv.map(item => `<th>${item.size}</th>`).join('');
@@ -252,7 +258,7 @@ export class ColorSwatches {
                         <span class="inventory-header-divider">|</span>
                         <span class="inventory-header-label"><i class="fas fa-warehouse"></i> Warehouse Inventory</span>
                     </div>
-                    <span class="inventory-grand-total">${this.inventoryData.grandTotal.toLocaleString()} total units</span>
+                    <span class="inventory-grand-total">${grandTotal.toLocaleString()} total units</span>
                 </div>
                 <div class="inventory-table-wrapper">
                     <table class="inventory-grid-table">
