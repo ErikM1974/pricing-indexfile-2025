@@ -7,7 +7,8 @@
     <title>Digitizing Mockup Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <style>:root { --art-theme: #6B46C1; --art-theme-dark: #553C9A; --art-theme-light: #8B5CF6; --art-theme-bg: #f8f5ff; --art-theme-bg-hover: #f3f0ff; --art-theme-bg-selected: #f3eaff; --art-theme-rgba-15: rgba(107,70,193,0.15); --art-theme-rgba-10: rgba(107,70,193,0.1); }</style>
-    <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=6">
+    <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=9">
+    <link rel="stylesheet" href="/shared_components/css/kanban.css?v=1">
 </head>
 <body>
     <!-- Header -->
@@ -49,7 +50,17 @@
 
             <!-- Queue Tab -->
             <div id="queue-tab" class="tab-pane active">
-                <h2 class="tab-title">Mockup Queue</h2>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                    <h2 class="tab-title" style="margin-bottom:0;">Mockup Queue</h2>
+                    <div class="view-toggle" id="ruth-view-toggle">
+                        <button class="view-toggle-btn active" data-view="grid" onclick="window.toggleKanbanView('grid')">
+                            <span class="view-toggle-icon">&#9638;</span> Grid
+                        </button>
+                        <button class="view-toggle-btn" data-view="board" onclick="window.toggleKanbanView('board')">
+                            <span class="view-toggle-icon">&#9783;</span> Board
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Status Summary Bar -->
                 <div id="status-summary" class="status-summary"></div>
@@ -61,7 +72,11 @@
                 </div>
 
                 <!-- Card Grid -->
-                <div id="queue-grid" class="mockup-grid"></div>
+                <div id="ruth-grid-view">
+                    <div id="queue-grid" class="mockup-grid"></div>
+                </div>
+                <!-- Kanban Board View -->
+                <div id="ruth-kanban-board" class="kanban-board"></div>
             </div>
 
             <!-- Completed Tab -->
@@ -157,6 +172,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/shared_components/js/mockup-ruth.js?v=7"></script>
+    <script src="/shared_components/js/mockup-ruth.js?v=8"></script>
 </body>
 </html>

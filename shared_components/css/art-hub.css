@@ -3953,3 +3953,50 @@ input.cbSearchButton {
     color: #059669;
     margin-right: 4px;
 }
+
+/* ==========================================================================
+   Kanban Board View
+   Toggle between grid (default) and board (kanban) layouts.
+   Used by: art-hub-steve.html, art-hub-ruth.html
+   ========================================================================== */
+
+/* ---------- View Toggle ---------- */
+.view-toggle {
+    display: inline-flex;
+    gap: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-left: auto;
+}
+.view-toggle-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    background: white;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+}
+.view-toggle-btn:not(:last-child) {
+    border-right: 1px solid #d1d5db;
+}
+.view-toggle-btn:hover {
+    background: #f3f4f6;
+}
+.view-toggle-btn.active {
+    background: var(--art-theme);
+    color: white;
+    border-color: var(--art-theme);
+}
+.view-toggle-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* Kanban styles moved to /shared_components/css/kanban.css */
