@@ -11,6 +11,7 @@
     var invCache = {};
     var INV_CACHE_TTL = 5 * 60 * 1000;
     var isExpanded = false;
+    var currentRequestId = 0; // Track latest request to ignore stale responses
 
     // Inject CSS
     var style = document.createElement('style');
@@ -132,10 +133,11 @@
             return;
         }
 
-        var cacheKey = styleNumber + '-' + catalogColor;
+        var cacheKey = styleNumber + '::' + catalogColor;
         var cached = invCache[cacheKey];
+        var requestId = ++currentRequestId; // Track this request
 
-        // Render bar immediately
+        // Render loading bar immediately
         renderBar(container, colorName, swatchUrl, null);
 
         if (cached && (Date.now() - cached.ts < INV_CACHE_TTL)) {
@@ -144,42 +146,47 @@
         }
 
         fetch(SANMAR_API + '/inventory/' + encodeURIComponent(styleNumber) + '?color=' + encodeURIComponent(catalogColor))
-            .then(function(r) { if (!r.ok) throw new Error('fail'); return r.json(); })
+            .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function(data) {
                 invCache[cacheKey] = { data: data, ts: Date.now() };
-                renderBar(container, colorName, swatchUrl, data);
+                // Only render if this is still the latest request (ignore stale)
+                if (requestId === currentRequestId) {
+                    renderBar(container, colorName, swatchUrl, data);
+                }
             })
-            .catch(function() {
-                container.innerHTML = renderBarHtml(colorName, swatchUrl, 0) +
-                    '<div class="calc-inv-error">Unable to load inventory</div>';
+            .catch(function(err) {
+                if (requestId === currentRequestId) {
+                    container.innerHTML = renderBarHtml(colorName, swatchUrl, 0) +
+                        '<div class="calc-inv-error">Unable to load inventory. Please try again.</div>';
+                }
             });
     };
 
+    // Global toggle function (avoids addEventListener leak on re-renders)
+    window._toggleCalcInventory = function() {
+        isExpanded = !isExpanded;
+        var container = document.getElementById('calculator-inventory-section');
+        if (!container) return;
+        var body = container.querySelector('.calc-inv-body');
+        var bar = container.querySelector('.calc-inv-bar');
+        var chevron = container.querySelector('.calc-inv-chevron');
+        if (body) body.classList.toggle('show');
+        if (bar) bar.classList.toggle('expanded');
+        if (chevron) chevron.classList.toggle('open');
+    };
+
     function renderBar(container, colorName, swatchUrl, data) {
-        var total = data ? data.grandTotal : 0;
+        var total = (data && typeof data.grandTotal === 'number') ? data.grandTotal : 0;
         var barHtml = renderBarHtml(colorName, swatchUrl, total);
         var bodyHtml = data ? renderTable(data) : '<div class="calc-inv-loading"><i class="fas fa-spinner fa-spin"></i> Loading inventory...</div>';
 
         container.innerHTML = barHtml +
             '<div class="calc-inv-body' + (isExpanded ? ' show' : '') + '">' + bodyHtml + '</div>';
-
-        var bar = container.querySelector('.calc-inv-bar');
-        var body = container.querySelector('.calc-inv-body');
-        var chevron = container.querySelector('.calc-inv-chevron');
-        if (bar) {
-            bar.addEventListener('click', function() {
-                isExpanded = !isExpanded;
-                body.classList.toggle('show');
-                bar.classList.toggle('expanded');
-                chevron.classList.toggle('open');
-            });
-            if (isExpanded) bar.classList.add('expanded');
-        }
     }
 
     function renderBarHtml(colorName, swatchUrl, total) {
         var swatchImg = swatchUrl ? '<img src="' + swatchUrl + '" alt="" class="calc-inv-swatch">' : '';
-        return '<div class="calc-inv-bar' + (isExpanded ? ' expanded' : '') + '">' +
+        return '<div class="calc-inv-bar' + (isExpanded ? ' expanded' : '') + '" onclick="window._toggleCalcInventory()">' +
             '<div class="calc-inv-bar-left">' +
             swatchImg +
             '<span class="calc-inv-color-name">' + escHtml(colorName || '') + '</span>' +
@@ -193,9 +200,10 @@
     }
 
     function renderTable(data) {
-        if (!data || !data.inventory || data.inventory.length === 0) return '<div class="calc-inv-loading">No inventory data</div>';
+        if (!data || !data.inventory || data.inventory.length === 0) return '<div class="calc-inv-loading">No inventory data available</div>';
         var inv = data.inventory;
-        var warehouses = inv[0].warehouses || [];
+        if (!inv[0] || !inv[0].warehouses) return '<div class="calc-inv-loading">Inventory format unavailable</div>';
+        var warehouses = inv[0].warehouses;
 
         var sizeHeaders = inv.map(function(item) { return '<th>' + item.size + '</th>'; }).join('');
         var whRows = warehouses.map(function(wh) {
