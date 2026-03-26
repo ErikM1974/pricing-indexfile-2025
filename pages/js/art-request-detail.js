@@ -358,11 +358,9 @@
                 }
             }
 
-            // Email Customer — show when mockup exists + customer email exists
-            if (contactEmail && mockupUrl) {
-                document.getElementById('ard-btn-share-customer').style.display = '';
-                initShareWithCustomer(req);
-            }
+            // Email Customer — always show (modal prompts for email if missing)
+            document.getElementById('ard-btn-share-customer').style.display = '';
+            initShareWithCustomer(req);
         }
 
         // Steve's Action Bar — hide when accessed via email link (?view=ae)
@@ -1990,6 +1988,20 @@
                                 noteBy: repAddr || 'sales@nwcustomapparel.com'
                             })
                         }).catch(function () { /* fire-and-forget */ });
+
+                        // Save email to Caspio if it was missing (so it's there for next time)
+                        if (!contactEmail && toEmail) {
+                            fetch(API_BASE + '/api/art-requests/' + designId, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ Email_Contact: toEmail })
+                            }).then(function () {
+                                contactEmail = toEmail;
+                                // Update the Contact Info display on the page
+                                var emailDisplayEl = document.querySelector('.ard-contact-email');
+                                if (emailDisplayEl) emailDisplayEl.textContent = toEmail;
+                            }).catch(function () { /* fire-and-forget */ });
+                        }
 
                         // Post notification
                         fetch(API_BASE + '/api/art-notifications', {
