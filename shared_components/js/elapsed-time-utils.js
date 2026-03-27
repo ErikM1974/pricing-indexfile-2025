@@ -15,9 +15,17 @@
      * @param {Date|string} date - The date to calculate from
      * @returns {{ text: string, cssClass: string }} | null if invalid date
      */
+    // Caspio strips the Z from ISO dates — append it to ensure UTC parsing
+    function ensureUTC(date) {
+        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(date) && !date.endsWith('Z') && date.indexOf('+') === -1 && date.indexOf('-', 10) === -1) {
+            return date + 'Z';
+        }
+        return date;
+    }
+
     function getElapsedText(date) {
         if (!date) return null;
-        var d = (date instanceof Date) ? date : new Date(date);
+        var d = (date instanceof Date) ? date : new Date(ensureUTC(date));
         if (isNaN(d.getTime())) return null;
 
         var now = new Date();
@@ -52,7 +60,7 @@
      */
     function getCompactElapsed(date) {
         if (!date) return null;
-        var d = (date instanceof Date) ? date : new Date(date);
+        var d = (date instanceof Date) ? date : new Date(ensureUTC(date));
         if (isNaN(d.getTime())) return null;
 
         var now = new Date();
