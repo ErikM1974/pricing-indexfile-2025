@@ -843,8 +843,36 @@
         // Remove skeleton loading when real cards arrive
         galleryTab.querySelectorAll('.skeleton-card, .skeleton-grid').forEach(s => s.remove());
 
+        // Inject archive toggle button if not present
+        if (!document.getElementById('archive-toggle-btn')) {
+            var gridView = galleryTab.querySelector('#steve-grid-view');
+            if (gridView) {
+                var toggleDiv = document.createElement('div');
+                toggleDiv.style.cssText = 'text-align:right;margin-bottom:8px;';
+                toggleDiv.innerHTML = '<button id="archive-toggle-btn" onclick="toggleArchive()" style="padding:6px 14px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#f9fafb;cursor:pointer;color:#666;">Show Archive</button>';
+                gridView.parentNode.insertBefore(toggleDiv, gridView);
+            }
+        }
+
         const cards = galleryTab.querySelectorAll('.card');
         cards.forEach((card, idx) => {
+            // Date filter: hide old cards unless archive is on
+            if (!showArchive) {
+                var dateField = card.querySelector('[data-field="Date_Created"], .cbResultSetDataCell');
+                var cardText = card.textContent || '';
+                // Check for date in card — look for common date patterns
+                var dateMatch = cardText.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+                if (dateMatch) {
+                    var parts = dateMatch[1].split('/');
+                    var cardDate = new Date(parts[2], parts[0] - 1, parts[1]);
+                    if (cardDate < new Date(KANBAN_DATE_CUTOFF)) {
+                        card.style.display = 'none';
+                        return;
+                    }
+                }
+            }
+            card.style.display = '';
+
             // Staggered entry animation delay
             card.style.animationDelay = (idx * 0.05) + 's';
 
@@ -1704,6 +1732,19 @@
 
     // Date cutoff: only show art requests from March 15, 2026+ (new status system)
     var KANBAN_DATE_CUTOFF = '2026-03-15';
+    var showArchive = false;
+
+    // Toggle archive visibility
+    window.toggleArchive = function () {
+        showArchive = !showArchive;
+        var btn = document.getElementById('archive-toggle-btn');
+        if (btn) {
+            btn.textContent = showArchive ? 'Hide Archive' : 'Show Archive';
+            btn.classList.toggle('archive-toggle--active', showArchive);
+        }
+        // Re-process cards to apply/remove date filter
+        processCards();
+    };
 
     var KANBAN_COLUMNS = [
         { id: 'submitted', label: 'Submitted', match: ['Submitted'] },
@@ -1833,8 +1874,12 @@
         if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
         if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
+        var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
+            ? ElapsedTimeUtils.getKanbanElapsedBadge(req.Status || '', req, 'art')
+            : '';
+
         return '<div class="kanban-card" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '\', \'_blank\')">'
-            + '<div class="kanban-card-company">' + company + '</div>'
+            + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + escapeHtml(designNum) + '</div>' : '')
             + '<div class="kanban-card-meta">'
             + '<span class="kanban-card-rep">' + rep + '</span>'

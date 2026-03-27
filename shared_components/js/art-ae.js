@@ -309,6 +309,10 @@ var ArtAeGallery = (function () {
             ? '<div class="card-meta-row"><span class="card-meta-label">REP</span> ' + salesRep + '</div>'
             : '';
 
+        var elapsedBadge = (typeof ElapsedTimeUtils !== 'undefined')
+            ? ElapsedTimeUtils.getStatusElapsedBadge(status, req, 'art')
+            : '';
+
         return '<div class="mockup-card art-card" data-design-id="' + designId + '" style="cursor:pointer;">'
             + '<div class="card-header" style="background:var(--art-theme, #981e32);">'
             + '  <div class="card-header-left">'
@@ -328,6 +332,7 @@ var ArtAeGallery = (function () {
             + contactHtml
             + repHtml
             + artChargeHtml
+            + (elapsedBadge ? '<div style="margin-top:6px;">' + elapsedBadge + '</div>' : '')
             + '</div>'
             + '<div class="card-footer">'
             + '  <span class="card-date">' + createdDate + '</span>'
@@ -460,8 +465,12 @@ var ArtAeGallery = (function () {
         if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
         if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
+        var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
+            ? ElapsedTimeUtils.getKanbanElapsedBadge(req.Status || '', req, 'art')
+            : '';
+
         return '<div class="kanban-card" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '?view=ae\', \'_blank\')">'
-            + '<div class="kanban-card-company">' + company + '</div>'
+            + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + escapeHtml(designNum) + '</div>' : '')
             + '<div class="kanban-card-meta">'
             + '<span class="kanban-card-rep">' + rep + '</span>'

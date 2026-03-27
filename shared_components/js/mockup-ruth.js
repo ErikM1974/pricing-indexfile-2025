@@ -319,32 +319,33 @@
             badges += `<span class="card-badge card-badge--due-soon card-badge--overdue">OVERDUE</span>`;
         }
 
-        // Quick action buttons for Ruth
+        // Quick action buttons for Ruth + elapsed time badge
         let actionsHtml = '';
+        const elapsedBadge = (typeof ElapsedTimeUtils !== 'undefined')
+            ? ElapsedTimeUtils.getStatusElapsedBadge(status, mockup, 'mockup')
+            : '';
+
         if (showActions) {
             const statusLower = status.toLowerCase();
             if (statusLower === 'submitted') {
                 actionsHtml = `
                     <div class="card-actions">
                         <button class="card-action-btn card-action-btn--start" data-id="${id}" data-action="start">Start Working</button>
+                        ${elapsedBadge}
                     </div>`;
             } else if (statusLower === 'in progress' || statusLower === 'revision requested') {
                 actionsHtml = `
                     <div class="card-actions">
                         <button class="card-action-btn card-action-btn--send" data-id="${id}" data-action="send-approval">Send for Approval</button>
+                        ${elapsedBadge}
                     </div>`;
             } else if (statusLower === 'awaiting approval') {
-                let elapsedLabel = 'Waiting for AE review...';
-                let elapsedClass = '';
-                if (mockup.Approval_Sent_Date) {
-                    const elapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
-                    elapsedLabel = 'Sent to AE ' + elapsed.text;
-                    elapsedClass = elapsed.cssClass;
-                }
                 actionsHtml = `
                     <div class="card-actions">
-                        <span class="approval-elapsed ${elapsedClass}" style="font-size:12px;padding:6px 0;">${escapeHtml(elapsedLabel)}</span>
+                        ${elapsedBadge || '<span class="elapsed-badge elapsed--waiting">Waiting for AE review...</span>'}
                     </div>`;
+            } else {
+                actionsHtml = elapsedBadge ? `<div class="card-actions">${elapsedBadge}</div>` : '';
             }
         }
 
@@ -697,9 +698,13 @@
                     thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" onerror="this.style.display=\'none\'" alt="">';
                 }
 
+                var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
+                    ? ElapsedTimeUtils.getKanbanElapsedBadge(col.id, m, 'mockup')
+                    : '';
+
                 var hiddenStyle = hidden ? ' style="display: none"' : '';
                 return '<div class="kanban-card" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.location.href=\'/mockup/' + id + '\'">'
-                    + '<div class="kanban-card-company">' + company + '</div>'
+                    + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
                     + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
                     + '<div class="kanban-card-meta">'
                     + '<span class="kanban-card-rep">' + escapeHtml(aeDisplay) + '</span>'
