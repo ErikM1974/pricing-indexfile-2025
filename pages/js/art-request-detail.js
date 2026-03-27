@@ -754,14 +754,30 @@
             if (!resp.ok) throw new Error('Save failed: ' + resp.status);
             return resp.json();
         }).then(function (data) {
-            // Log a note about what was changed
-            var changedList = data.updatedFields ? data.updatedFields.join(', ') : Object.keys(updates).join(', ');
+            // Log a note with actual content of what was changed
+            var noteLines = [];
+            if (updates.NOTES) {
+                noteLines.push('Updated Instructions:\n' + updates.NOTES);
+            }
+            var fieldLabels = {
+                Order_Type: 'Order Type', Due_Date: 'Due Date', Garment_Placement: 'Placement',
+                GarmentStyle: 'Garment 1', GarmentColor: 'Garment 1 Color',
+                Garm_Style_2: 'Garment 2', Garm_Color_2: 'Garment 2 Color',
+                Garm_Style_3: 'Garment 3', Garm_Color_3: 'Garment 3 Color',
+                Prelim_Charges: 'Prelim Charges', Additional_Services: 'Additional Services',
+                First_name: 'First Name', Last_name: 'Last Name',
+                Email_Contact: 'Email', Phone: 'Phone'
+            };
+            Object.keys(updates).filter(function(k) { return k !== 'NOTES'; }).forEach(function(k) {
+                noteLines.push((fieldLabels[k] || k) + ': ' + updates[k]);
+            });
+            var noteText = noteLines.join('\n');
             return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     noteType: 'AE Edit',
-                    noteText: 'AE updated fields: ' + changedList,
+                    noteText: noteText,
                     noteBy: getLoggedInUser().noteBy
                 })
             }).catch(function () {}); // non-blocking
