@@ -741,6 +741,7 @@
                 })
             }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
         }).then(function () {
+            if (typeof NWCAConfetti !== 'undefined') NWCAConfetti.fire();
             sendStatusNotifications('Approved');
             showCustomerConfirmation('approved');
         }).catch(function (err) {
@@ -946,6 +947,11 @@
                 })
             }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
         }).then(function () {
+            // Celebrate approvals and completions
+            if ((newStatus === 'Approved' || newStatus === 'Completed') && typeof NWCAConfetti !== 'undefined') {
+                NWCAConfetti.fire();
+            }
+
             // Fire-and-forget email notifications
             sendStatusNotifications(newStatus);
 

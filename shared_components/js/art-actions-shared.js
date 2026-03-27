@@ -444,6 +444,7 @@
 
                 this.textContent = 'Done!';
                 this.style.background = '#009900';
+                if (typeof NWCAConfetti !== 'undefined') NWCAConfetti.fire();
                 var totalMins = currentMins + mins;
                 setTimeout(function () {
                     removeModals();
