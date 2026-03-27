@@ -2259,7 +2259,10 @@
             // 4. Notify Steve + AE
             sendCustomerNotifications('approved', req);
 
-            // 5. Show confirmation
+            // 5. Celebrate!
+            if (typeof NWCAConfetti !== 'undefined') NWCAConfetti.fire();
+
+            // 6. Show confirmation
             showCustomerConfirmation('approved', req);
         }).catch(function (err) {
             console.error('Customer approval failed:', err);
@@ -2490,6 +2493,7 @@
             // 5. Push real-time notification for Steve's dashboard
             pushArtNotification('approved', aeName);
 
+            if (typeof NWCAConfetti !== 'undefined') NWCAConfetti.fire();
             showSuccessMessage('Design approved! Steve will finalize and mark complete.');
             disableActionBar();
             updateStatusBadge('Approved', 'ard-status-badge--approved');
