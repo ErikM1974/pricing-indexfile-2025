@@ -394,6 +394,14 @@
 
         // Status timeline
         renderStatusTimeline(notes);
+
+        // Auto-open Edit modal after reopen (so AE can update Due Date, etc.)
+        if (isAeView && iifeUrlParams.get('reopened') === '1') {
+            setTimeout(function () { openEditModal(req); }, 300);
+            // Clean up URL param without triggering reload
+            var cleanUrl = window.location.pathname + '?view=ae';
+            window.history.replaceState(null, '', cleanUrl);
+        }
     }
 
     // ── AE Status Bar (all statuses) ────────────────────────────────────
@@ -409,9 +417,11 @@
         bar.style.display = '';
         var buttons = [];
 
-        // Edit Request button for all non-completed statuses
+        // Edit Request button for all non-completed statuses; Reopen for completed
         if (!isCompleted) {
             buttons.push('<button type="button" class="ard-action-btn ard-ae-action-edit" id="ard-ae-btn-edit">Edit Request</button>');
+        } else {
+            buttons.push('<button type="button" class="ard-action-btn ard-action-reopen" id="ard-ae-btn-reopen">Reopen Request</button>');
         }
 
         // Status-specific buttons
@@ -463,6 +473,67 @@
         if (editBtn) {
             editBtn.addEventListener('click', function () {
                 openEditModal(req);
+            });
+        }
+
+        // Wire up "Reopen Request" button (AE view, completed status)
+        var aeReopenBtn = document.getElementById('ard-ae-btn-reopen');
+        if (aeReopenBtn) {
+            aeReopenBtn.addEventListener('click', function () {
+                if (!confirm('Reopen this art request? Status will be set to In Progress.')) return;
+                aeReopenBtn.disabled = true;
+                aeReopenBtn.textContent = 'Reopening...';
+                var aeUser = getLoggedInUser();
+                var company = req.CompanyName || '';
+                fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'In Progress' })
+                }).then(function (resp) {
+                    if (!resp.ok) throw new Error('Status ' + resp.status);
+                    return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ noteType: 'Status Change', noteText: 'AE reopened from Completed', noteBy: aeUser.noteBy })
+                    });
+                }).then(function () {
+                    // Notify Steve via email
+                    if (typeof emailjs !== 'undefined') {
+                        emailjs.init(EMAILJS_PUBLIC_KEY);
+                        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                            to_email: 'art@nwcustomapparel.com',
+                            to_name: 'Steve',
+                            design_id: designId,
+                            company_name: company,
+                            note_text: aeUser.firstName + ' reopened art request for ' + company + ' #' + designId + '. Additional changes are needed.',
+                            note_type: 'Reopened',
+                            detail_link: SITE_ORIGIN + '/art-request/' + designId,
+                            from_name: aeUser.noteBy
+                        }, EMAILJS_PUBLIC_KEY).catch(function (err) { console.warn('Reopen email to Steve failed:', err); });
+                        // Confirm to AE
+                        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                            to_email: aeUser.email,
+                            to_name: aeUser.firstName,
+                            design_id: designId,
+                            company_name: company,
+                            note_text: 'You reopened ' + company + ' #' + designId + '. Steve has been notified.',
+                            note_type: 'Reopen Confirmation',
+                            detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
+                            from_name: 'NWCA Art System'
+                        }, EMAILJS_PUBLIC_KEY).catch(function (err) { console.warn('Reopen AE confirmation email failed:', err); });
+                    }
+                    // Dashboard toast notification
+                    if (window.ArtActions) ArtActions.notifyReopen(designId);
+                    aeReopenBtn.textContent = 'Reopened!';
+                    aeReopenBtn.style.background = '#28a745';
+                    // Reload with ?reopened=1 to auto-open Edit modal for date updates
+                    setTimeout(function () { window.location.href = '/art-request/' + designId + '?view=ae&reopened=1'; }, 1200);
+                }).catch(function (err) {
+                    aeReopenBtn.textContent = 'Error';
+                    aeReopenBtn.style.background = '#dc3545';
+                    console.error('AE reopen failed:', err);
+                    setTimeout(function () { aeReopenBtn.textContent = 'Reopen Request'; aeReopenBtn.style.background = ''; aeReopenBtn.disabled = false; }, 2000);
+                });
             });
         }
     }
@@ -703,6 +774,7 @@
             var company = originalReq.CompanyName || '';
             if (typeof emailjs !== 'undefined') {
                 emailjs.init(EMAILJS_PUBLIC_KEY);
+                var aeUser = getLoggedInUser();
                 emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
                     to_email: 'art@nwcustomapparel.com',
                     to_name: 'Steve',
@@ -711,9 +783,22 @@
                     note_text: 'AE updated request details for ' + company + ' #' + designId + '. Please review the changes.',
                     note_type: 'AE Edit',
                     detail_link: SITE_ORIGIN + '/art-request/' + designId,
-                    from_name: getLoggedInUser().noteBy || 'AE'
+                    from_name: aeUser.noteBy || 'AE'
                 }, EMAILJS_PUBLIC_KEY).catch(function (err) {
-                    console.warn('Edit notification email failed (non-blocking):', err);
+                    console.warn('Edit notification email to Steve failed (non-blocking):', err);
+                });
+                // Confirm to AE
+                emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                    to_email: aeUser.email,
+                    to_name: aeUser.firstName,
+                    design_id: designId,
+                    company_name: company,
+                    note_text: 'Your edits to ' + company + ' #' + designId + ' have been saved and Steve has been notified.',
+                    note_type: 'AE Edit Confirmation',
+                    detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
+                    from_name: 'NWCA Art System'
+                }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                    console.warn('AE edit confirmation email failed (non-blocking):', err);
                 });
             }
 
