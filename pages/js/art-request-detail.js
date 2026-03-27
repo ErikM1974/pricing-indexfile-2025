@@ -662,13 +662,11 @@
         document.getElementById('ard-edit-placement').value = req.Garment_Placement || '';
 
         // Garment fields — parse "style - color" format
-        document.getElementById('ard-edit-garment1').value = formatGarmentField(req.Garment_1, req.Garment_Color_1);
-        document.getElementById('ard-edit-garment2').value = formatGarmentField(req.Garment_2, req.Garment_Color_2);
-        document.getElementById('ard-edit-garment3').value = formatGarmentField(req.Garment_3, req.Garment_Color_3);
+        document.getElementById('ard-edit-garment1').value = formatGarmentField(req.GarmentStyle, req.GarmentColor);
+        document.getElementById('ard-edit-garment2').value = formatGarmentField(req.Garm_Style_2, req.Garm_Color_2);
+        document.getElementById('ard-edit-garment3').value = formatGarmentField(req.Garm_Style_3, req.Garm_Color_3);
 
-        document.getElementById('ard-edit-instructions').value = req.Instructions || '';
-        document.getElementById('ard-edit-thread-colors').value = req.Thread_Colors || '';
-        document.getElementById('ard-edit-additional').value = req.Additional_Instructions || '';
+        document.getElementById('ard-edit-instructions').value = req.NOTES || '';
         document.getElementById('ard-edit-prelim-charges').value = req.Prelim_Charges || req.Charge_Quoted || '';
         document.getElementById('ard-edit-addl-services').value = req.Additional_Services || '';
         document.getElementById('ard-edit-first-name').value = req.First_name || req.First_Name || '';
@@ -717,13 +715,11 @@
             { key: 'Order_Type', el: 'ard-edit-order-type', orig: (originalReq.Order_Type && typeof originalReq.Order_Type === 'object' ? Object.values(originalReq.Order_Type).join(', ') : originalReq.Order_Type) || '' },
             { key: 'Due_Date', el: 'ard-edit-due-date', orig: originalReq.Due_Date ? new Date(originalReq.Due_Date).toISOString().split('T')[0] : '' },
             { key: 'Garment_Placement', el: 'ard-edit-placement', orig: originalReq.Garment_Placement || '' },
-            { key: 'Instructions', el: 'ard-edit-instructions', orig: originalReq.Instructions || '' },
-            { key: 'Thread_Colors', el: 'ard-edit-thread-colors', orig: originalReq.Thread_Colors || '' },
-            { key: 'Additional_Instructions', el: 'ard-edit-additional', orig: originalReq.Additional_Instructions || '' },
+            { key: 'NOTES', el: 'ard-edit-instructions', orig: originalReq.NOTES || '' },
             { key: 'Prelim_Charges', el: 'ard-edit-prelim-charges', orig: (originalReq.Prelim_Charges || originalReq.Charge_Quoted || '').toString() },
             { key: 'Additional_Services', el: 'ard-edit-addl-services', orig: originalReq.Additional_Services || '' },
-            { key: 'First_Name', el: 'ard-edit-first-name', orig: originalReq.First_name || originalReq.First_Name || '' },
-            { key: 'Last_Name', el: 'ard-edit-last-name', orig: originalReq.Last_name || originalReq.Last_Name || '' },
+            { key: 'First_name', el: 'ard-edit-first-name', orig: originalReq.First_name || '' },
+            { key: 'Last_name', el: 'ard-edit-last-name', orig: originalReq.Last_name || '' },
             { key: 'Email_Contact', el: 'ard-edit-email', orig: originalReq.Email_Contact || originalReq.Email || '' }
         ];
 
@@ -734,13 +730,13 @@
             }
         });
 
-        // Garment fields — compare individually
-        if (g1.style !== (originalReq.Garment_1 || '')) updates.Garment_1 = g1.style;
-        if (g1.color !== (originalReq.Garment_Color_1 || '')) updates.Garment_Color_1 = g1.color;
-        if (g2.style !== (originalReq.Garment_2 || '')) updates.Garment_2 = g2.style;
-        if (g2.color !== (originalReq.Garment_Color_2 || '')) updates.Garment_Color_2 = g2.color;
-        if (g3.style !== (originalReq.Garment_3 || '')) updates.Garment_3 = g3.style;
-        if (g3.color !== (originalReq.Garment_Color_3 || '')) updates.Garment_Color_3 = g3.color;
+        // Garment fields — compare individually (Caspio column names)
+        if (g1.style !== (originalReq.GarmentStyle || '')) updates.GarmentStyle = g1.style;
+        if (g1.color !== (originalReq.GarmentColor || '')) updates.GarmentColor = g1.color;
+        if (g2.style !== (originalReq.Garm_Style_2 || '')) updates.Garm_Style_2 = g2.style;
+        if (g2.color !== (originalReq.Garm_Color_2 || '')) updates.Garm_Color_2 = g2.color;
+        if (g3.style !== (originalReq.Garm_Style_3 || '')) updates.Garm_Style_3 = g3.style;
+        if (g3.color !== (originalReq.Garm_Color_3 || '')) updates.Garm_Color_3 = g3.color;
 
         if (Object.keys(updates).length === 0) {
             document.getElementById('ard-edit-modal').style.display = 'none';
