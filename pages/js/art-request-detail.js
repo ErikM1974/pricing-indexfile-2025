@@ -641,16 +641,6 @@
         if (!modal) return;
 
         // Populate fields with current values
-        var orderType = req.Order_Type && typeof req.Order_Type === 'object'
-            ? Object.values(req.Order_Type).join(', ') : (req.Order_Type || '');
-        var orderTypeSelect = document.getElementById('ard-edit-order-type');
-        for (var i = 0; i < orderTypeSelect.options.length; i++) {
-            if (orderTypeSelect.options[i].value === orderType) {
-                orderTypeSelect.selectedIndex = i;
-                break;
-            }
-        }
-
         var dueDateRaw = req.Due_Date || '';
         if (dueDateRaw) {
             var d = new Date(dueDateRaw);
@@ -667,7 +657,6 @@
         document.getElementById('ard-edit-garment3').value = formatGarmentField(req.Garm_Style_3, req.Garm_Color_3);
 
         document.getElementById('ard-edit-instructions').value = req.NOTES || '';
-        document.getElementById('ard-edit-prelim-charges').value = req.Prelim_Charges || req.Charge_Quoted || '';
         document.getElementById('ard-edit-addl-services').value = req.Additional_Services || '';
         document.getElementById('ard-edit-first-name').value = req.First_name || req.First_Name || '';
         document.getElementById('ard-edit-last-name').value = req.Last_name || req.Last_Name || '';
@@ -712,11 +701,9 @@
 
         var updates = {};
         var fields = [
-            { key: 'Order_Type', el: 'ard-edit-order-type', orig: (originalReq.Order_Type && typeof originalReq.Order_Type === 'object' ? Object.values(originalReq.Order_Type).join(', ') : originalReq.Order_Type) || '' },
             { key: 'Due_Date', el: 'ard-edit-due-date', orig: originalReq.Due_Date ? new Date(originalReq.Due_Date).toISOString().split('T')[0] : '' },
             { key: 'Garment_Placement', el: 'ard-edit-placement', orig: originalReq.Garment_Placement || '' },
             { key: 'NOTES', el: 'ard-edit-instructions', orig: originalReq.NOTES || '' },
-            { key: 'Prelim_Charges', el: 'ard-edit-prelim-charges', orig: (originalReq.Prelim_Charges || originalReq.Charge_Quoted || '').toString() },
             { key: 'Additional_Services', el: 'ard-edit-addl-services', orig: originalReq.Additional_Services || '' },
             { key: 'First_name', el: 'ard-edit-first-name', orig: originalReq.First_name || '' },
             { key: 'Last_name', el: 'ard-edit-last-name', orig: originalReq.Last_name || '' },
