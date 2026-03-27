@@ -744,7 +744,7 @@
 
         if (Object.keys(updates).length === 0) {
             document.getElementById('ard-edit-modal').style.display = 'none';
-            showToast('No changes to save', 'info');
+            showArdToast('No changes to save', 'info');
             saveBtn.disabled = false;
             saveBtn.textContent = 'Save Changes';
             return;
@@ -803,11 +803,11 @@
             }
 
             document.getElementById('ard-edit-modal').style.display = 'none';
-            showToast('Request updated successfully', 'success');
+            showArdToast('Request updated successfully', 'success');
             setTimeout(function () { location.reload(); }, 800);
         }).catch(function (err) {
             console.error('Edit save failed:', err);
-            showToast('Failed to save: ' + err.message, 'error');
+            showArdToast('Failed to save: ' + err.message, 'error');
             saveBtn.disabled = false;
             saveBtn.textContent = 'Save Changes';
         });
