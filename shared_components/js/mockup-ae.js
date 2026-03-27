@@ -205,17 +205,18 @@ var MockupAeGallery = (function () {
             badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
         }
 
-        // Highlight awaiting approval with a subtle CTA + elapsed time
+        // Elapsed time badge for all statuses + CTA for awaiting approval
+        var elapsedBadge = (typeof ElapsedTimeUtils !== 'undefined')
+            ? ElapsedTimeUtils.getStatusElapsedBadge(status, mockup, 'mockup')
+            : '';
         var ctaHtml = '';
         if (status === 'Awaiting Approval') {
-            var elapsedInfo = '';
-            if (mockup.Approval_Sent_Date) {
-                var elapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
-                elapsedInfo = ' <span class="approval-elapsed ' + elapsed.cssClass + '" style="font-weight:400;margin-left:4px;">(sent ' + escapeHtml(elapsed.text) + ')</span>';
-            }
             ctaHtml = '<div class="card-actions">'
-                + '<span style="font-size:12px;color:#d97706;font-weight:600;padding:6px 0;">&#9888; Needs your review' + elapsedInfo + '</span>'
+                + '<span style="font-size:12px;color:#d97706;font-weight:600;padding:6px 0;">&#9888; Needs your review</span>'
+                + (elapsedBadge ? '<div>' + elapsedBadge + '</div>' : '')
                 + '</div>';
+        } else if (elapsedBadge) {
+            ctaHtml = '<div class="card-actions">' + elapsedBadge + '</div>';
         }
 
         var thumbUrl = mockup.Box_Mockup_1 || '';
@@ -388,9 +389,13 @@ var MockupAeGallery = (function () {
             thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" onerror="this.style.display=\'none\'" alt="">';
         }
 
+        var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
+            ? ElapsedTimeUtils.getKanbanElapsedBadge(m.Status || '', m, 'mockup')
+            : '';
+
         var hiddenStyle = hidden ? ' style="display: none"' : '';
         return '<div class="kanban-card" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.open(\'/mockup/' + id + '?view=ae\', \'_blank\')">'
-            + '<div class="kanban-card-company">' + company + '</div>'
+            + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
             + '<div class="kanban-card-meta">'
             + '<span class="kanban-card-rep">' + escapeHtml(aeDisplay) + '</span>'
