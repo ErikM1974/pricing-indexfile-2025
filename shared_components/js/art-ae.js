@@ -16,13 +16,15 @@ var ArtAeGallery = (function () {
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
     var DAYS_DEFAULT = 90;
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup';
+    var DATE_CUTOFF = '2026-03-15';
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup';
 
     var containerId = null;
     var allRequests = [];
     var activeFilter = null;
     var searchTerm = '';
     var showAll = false;
+    var showArchive = false;
 
     function getDateFrom(days) {
         var cutoff = new Date();
@@ -49,8 +51,10 @@ var ArtAeGallery = (function () {
         var url = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
             + '&select=' + SELECT_FIELDS;
 
-        if (!showAll) {
-            url += '&dateCreatedFrom=' + getDateFrom(DAYS_DEFAULT);
+        if (showArchive) {
+            // Show all records when archive is on
+        } else {
+            url += '&dateCreatedFrom=' + DATE_CUTOFF;
         }
 
         fetch(url)
@@ -118,18 +122,18 @@ var ArtAeGallery = (function () {
 
         var html = '';
 
-        // Date range indicator
+        // Date range indicator with archive toggle
         html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
-        if (showAll) {
-            html += '<span style="font-size:13px;color:#6b7280;">Showing 200 most recent requests</span>'
-                + '<button onclick="ArtAeGallery.toggleDateRange()" '
-                + 'style="padding:4px 12px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;color:#981e32;">'
-                + 'Last 90 Days</button>';
+        if (showArchive) {
+            html += '<span style="font-size:13px;color:#6b7280;">Showing all requests including archive (' + allRequests.length + ')</span>'
+                + '<button onclick="ArtAeGallery.toggleArchive()" '
+                + 'style="padding:4px 12px;border:1px solid #981e32;border-radius:4px;background:#fef2f2;cursor:pointer;font-size:13px;font-family:inherit;color:#981e32;font-weight:600;">'
+                + 'Hide Archive</button>';
         } else {
-            html += '<span style="font-size:13px;color:#6b7280;">Showing last 90 days (' + allRequests.length + ' requests)</span>'
-                + '<button onclick="ArtAeGallery.toggleDateRange()" '
-                + 'style="padding:4px 12px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;color:#981e32;">'
-                + 'Show All</button>';
+            html += '<span style="font-size:13px;color:#6b7280;">Showing current requests (' + allRequests.length + ')</span>'
+                + '<button onclick="ArtAeGallery.toggleArchive()" '
+                + 'style="padding:4px 12px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;color:#666;">'
+                + 'Show Archive</button>';
         }
         html += '</div>';
 
@@ -217,6 +221,13 @@ var ArtAeGallery = (function () {
                 if (id) window.location.href = '/art-request/' + id + '?view=ae';
             });
         });
+    }
+
+    function toggleArchive() {
+        showArchive = !showArchive;
+        activeFilter = null;
+        searchTerm = '';
+        fetchRequests();
     }
 
     function toggleDateRange() {
@@ -580,7 +591,8 @@ var ArtAeGallery = (function () {
         init: init,
         filterByStatus: filterByStatus,
         clearFilter: clearFilter,
-        toggleDateRange: toggleDateRange
+        toggleDateRange: toggleDateRange,
+        toggleArchive: toggleArchive
     };
 
 })();
