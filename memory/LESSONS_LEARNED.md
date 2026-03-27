@@ -246,3 +246,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** Button rendered with `disabled` HTML attribute (`mockup-detail.js:314`). Disabled buttons don't fire click events, so the existing guard toast ("Please click a mockup image to select it first") never ran.
 **Solution:** Removed `disabled` from both AE (`:314`) and customer (`:267`) approve buttons. Click handlers already have proper guards for missing selection.
 **Prevention:** Never use `disabled` to enforce a workflow step if the click handler already has guard logic with user feedback. Use the handler's toast/error message instead.
+
+---
+
+### AE Edit Save Broken — PK_ID vs ID_Design Mismatch in Backend
+**Problem:** AE edits art request fields via Edit modal, clicks Save, gets console error or changes don't persist.
+**Root Cause:** Backend `PUT /api/art-requests/:designId/fields` (art.js:874) used `q.where=PK_ID=${designId}`, but the URL passes `ID_Design`. Every other endpoint in the file correctly uses `ID_Design`. Commit `cfcc1de` introduced the bug.
+**Solution:** Changed `PK_ID` to `ID_Design` in the WHERE clause (commit `2ed4724`).
+**Prevention:** ArtRequests endpoints ALWAYS use `ID_Design` for the WHERE clause. The URL param is the design ID, not the primary key. Check consistency across all endpoints in a route file.
