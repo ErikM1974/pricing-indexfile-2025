@@ -171,7 +171,8 @@
       "Bash(node -e \":*)",
       "Bash(# No limit at all — just idCustomer curl -s \"\"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/mockups?idCustomer=13605\"\")",
       "Bash(# Test art requests with limit=1 curl -s \"\"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/artrequests?shopworksCustomerId=13527&limit=1\"\")",
-      "Read(//c/Users/erik/**)"
+      "Read(//c/Users/erik/**)",
+      "Bash(heroku dyno:restart:*)"
     ],
     "deny": [],
     "ask": [],

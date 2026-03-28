@@ -254,3 +254,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** Backend `PUT /api/art-requests/:designId/fields` (art.js:874) used `q.where=PK_ID=${designId}`, but the URL passes `ID_Design`. Every other endpoint in the file correctly uses `ID_Design`. Commit `cfcc1de` introduced the bug.
 **Solution:** Changed `PK_ID` to `ID_Design` in the WHERE clause (commit `2ed4724`).
 **Prevention:** ArtRequests endpoints ALWAYS use `ID_Design` for the WHERE clause. The URL param is the design ID, not the primary key. Check consistency across all endpoints in a route file.
+
+---
+
+### SanMar Sync Upsert Bug — `makeCaspioRequest` Returns Array, Code Checks `.Result`
+**Problem:** Caspio SanMar tables had only 7 orders (should be hundreds). Backfill processes hung indefinitely. Every sync created duplicates instead of updating existing records.
+**Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
+**Solution:** Changed all 6 checks from `existing.Result.length` to `Array.isArray(existing) && existing.length > 0`. Also fixed backfill line item dedup (was blind POST with silent catch → proper GET/PUT/POST upsert).
+**Prevention:** `makeCaspioRequest` unwraps `.Result` — never check `.Result` on its return value. When writing Caspio upsert logic, always test with `Array.isArray()`. Add this to common-gotchas.md.
