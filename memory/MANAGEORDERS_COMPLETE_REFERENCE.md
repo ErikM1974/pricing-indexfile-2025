@@ -2,6 +2,9 @@
 
 The definitive guide to ShopWorks ManageOrders API usage across all NWCA projects. This document covers every field, endpoint, pattern, and gotcha discovered from production use.
 
+> **Official API docs**: `/memory/manageorders-api-guide-2024.pdf` (37 pages, v05.22.24)
+> Key sections: PULL API (p5-16), PUSH API (p17-37), Authentication (p2-4), Errors (p11)
+
 **Last Updated:** 2026-02-22
 **Applies To:** Pricing Index File 2025, caspio-pricing-proxy, Python Inksoft
 
