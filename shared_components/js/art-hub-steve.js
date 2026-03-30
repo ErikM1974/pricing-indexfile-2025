@@ -642,7 +642,7 @@
                         setTimeout(() => { b.textContent = 'Send Reminder'; b.style.background = ''; b.disabled = false; }, 2000);
                     }
                 }));
-            } else if (status.includes('inprogress') || status.includes('revisionrequested')) {
+            } else if (status.includes('submitted') || status.includes('inprogress') || status.includes('revisionrequested')) {
                 statusSection.btns.appendChild(btn('Send Mockup', 'approve', () => {
                     const companyEl = card.querySelector('.company-name');
                     ArtActions.showSendForApprovalModal(designId, companyEl ? companyEl.textContent.trim() : '', function (data) {

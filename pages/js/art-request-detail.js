@@ -844,7 +844,7 @@
             btnReopen.style.display = '';
         } else {
             // Hide Send Mockup if status doesn't allow it
-            var canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
+            var canSendMockup = status.includes('submitted') || status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
             if (!canSendMockup) btnMockup.style.display = 'none';
         }
 
