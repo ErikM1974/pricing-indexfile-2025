@@ -1651,6 +1651,25 @@
                     if (typeof refreshNotes === 'function') refreshNotes();
                     // Poll for AI vision analysis
                     pollForVisionAnalysis(3);
+
+                    // Notify Steve when AE adds additional art file via Box
+                    if (ADDITIONAL_ART_KEYS.indexOf(activeSlotKey) !== -1 && typeof emailjs !== 'undefined') {
+                        var boxAeUser = getLoggedInUser();
+                        var boxCompany = currentRequest.CompanyName || '';
+                        emailjs.init(EMAILJS_PUBLIC_KEY);
+                        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                            to_email: 'art@nwcustomapparel.com',
+                            to_name: 'Steve',
+                            design_id: designId,
+                            company_name: boxCompany,
+                            note_text: (boxAeUser.noteBy || 'AE') + ' uploaded an additional art file for ' + boxCompany + ' #' + designId + '. Please review.',
+                            note_type: 'Additional Art File Uploaded',
+                            detail_link: SITE_ORIGIN + '/art-request/' + designId,
+                            from_name: boxAeUser.noteBy || 'AE'
+                        }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                            console.warn('Additional art notification email failed (non-blocking):', err);
+                        });
+                    }
                 } catch (err) {
                     alert('Error: ' + err.message);
                     boxConfirm.disabled = false;
@@ -1745,6 +1764,25 @@
             if (typeof refreshNotes === 'function') refreshNotes();
             // Poll for AI vision analysis (fire-and-forget takes ~3-8 seconds)
             pollForVisionAnalysis(3);
+
+            // Notify Steve when AE uploads additional art file
+            if (ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1 && typeof emailjs !== 'undefined') {
+                var aeUser = getLoggedInUser();
+                var company = currentRequest.CompanyName || '';
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+                emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                    to_email: 'art@nwcustomapparel.com',
+                    to_name: 'Steve',
+                    design_id: designId,
+                    company_name: company,
+                    note_text: (aeUser.noteBy || 'AE') + ' uploaded an additional art file for ' + company + ' #' + designId + '. Please review.',
+                    note_type: 'Additional Art File Uploaded',
+                    detail_link: SITE_ORIGIN + '/art-request/' + designId,
+                    from_name: aeUser.noteBy || 'AE'
+                }, EMAILJS_PUBLIC_KEY).catch(function (err) {
+                    console.warn('Additional art notification email failed (non-blocking):', err);
+                });
+            }
         } catch (err) {
             alert('Upload failed: ' + err.message);
             renderMockupGallery(currentRequest);
