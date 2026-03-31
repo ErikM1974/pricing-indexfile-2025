@@ -1210,7 +1210,7 @@
                         })(slot.key, slotEl);
                     } else {
                         slotEl.addEventListener('click', function (e) {
-                            if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown') || e.target.closest('.pmd-slot-download')) return;
+                            if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-replace') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown') || e.target.closest('.pmd-slot-download')) return;
                             openLightbox(url, slot.label);
                         });
                     }
@@ -1250,7 +1250,7 @@
                     }
 
                     slotEl.addEventListener('click', function (e) {
-                        if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown') || e.target.closest('.pmd-slot-download')) return;
+                        if (e.target.closest('.pmd-slot-remove') || e.target.closest('.pmd-slot-replace') || e.target.closest('.pmd-slot-version-badge') || e.target.closest('.pmd-version-dropdown') || e.target.closest('.pmd-slot-download')) return;
                         window.open(url, '_blank');
                     });
                 }
