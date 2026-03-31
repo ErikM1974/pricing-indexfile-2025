@@ -373,15 +373,20 @@ var MockupSubmitForm = (function () {
             .catch(function () {
                 var select = document.getElementById('msf-placement');
                 select.innerHTML = '<option value="">Select placement...</option>'
-                    + '<option value="Left Chest">Left Chest</option>'
-                    + '<option value="Full Back">Full Back</option>'
-                    + '<option value="Right Chest">Right Chest</option>'
-                    + '<option value="Center Chest">Center Chest</option>'
-                    + '<option value="Cap Front">Cap Front</option>'
-                    + '<option value="Cap Back">Cap Back</option>'
-                    + '<option value="Left Side">Left Side</option>'
-                    + '<option value="Right Side">Right Side</option>'
-                    + '<option value="Monogram">Monogram</option>';
+                    + '<option value="Left Chest">Left Chest (LC)</option>'
+                    + '<option value="Full Back">Full Back (FB)</option>'
+                    + '<option value="Right Chest">Right Chest (RC)</option>'
+                    + '<option value="Center Chest">Center Chest (CC)</option>'
+                    + '<option value="Cap Front">Cap Front (CF)</option>'
+                    + '<option value="Cap Back">Cap Back (CB)</option>'
+                    + '<option value="Left Side">Left Side (CL)</option>'
+                    + '<option value="Right Side">Right Side (CR)</option>'
+                    + '<option value="Monogram">Monogram</option>'
+                    + '<option value="Left Panel">Left Panel (LP)</option>'
+                    + '<option value="Left Sleeve">Left Sleeve (LS)</option>'
+                    + '<option value="Right Sleeve">Right Sleeve (RS)</option>'
+                    + '<option value="Back of Neck">Back of Neck (BN)</option>'
+                    + '<option value="Other (see Notes)">Other (see Notes)</option>';
             });
     }
 
