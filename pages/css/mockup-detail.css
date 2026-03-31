@@ -681,6 +681,34 @@ body {
     opacity: 1;
 }
 
+.pmd-slot-replace {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(13,148,136,0.9);
+    color: white;
+    border: none;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+}
+
+.pmd-gallery-slot:hover .pmd-slot-replace {
+    opacity: 1;
+}
+
+.pmd-slot-replace:hover {
+    background: rgba(15,118,110,1);
+}
+
 .pmd-slot-download {
     position: absolute;
     bottom: 24px;

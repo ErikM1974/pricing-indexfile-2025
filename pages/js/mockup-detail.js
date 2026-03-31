@@ -1107,6 +1107,16 @@
                         e.stopPropagation();
                         showSlotPopover(slotEl, slot.key);
                     });
+                } else if (isRefFile && isAeView) {
+                    // AE can upload a missing reference file
+                    slotEl.innerHTML = '<div class="pmd-slot-empty">'
+                        + '<span class="pmd-slot-empty-icon">+</span>'
+                        + '<span>Add Reference File</span>'
+                        + '</div>';
+                    slotEl.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        showSlotPopover(slotEl, slot.key);
+                    });
                 } else {
                     slotEl.innerHTML = '<div class="pmd-slot-empty">'
                         + '<span class="pmd-slot-empty-icon">&#128247;</span>'
@@ -1121,6 +1131,7 @@
 
                 if (isImage) {
                     var showRemove = !isAeView && !isCustomerView;
+                    var showReplace = isAeView && isRefFile;
                     var showSelectBadge = isCustomerView || (aeCanSelect && !isRefFile);
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" loading="lazy"'
@@ -1129,6 +1140,7 @@
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
+                        + (showReplace ? '<button type="button" class="pmd-slot-replace" data-field-key="' + slot.key + '">&#9998; Replace</button>' : '')
                         + (showSelectBadge ? '<div class="pmd-slot-select-badge">' + (isCustomerView ? 'Click to view & select' : 'Click to select') + '</div>' : '')
                         + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
                         + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
@@ -1204,6 +1216,7 @@
                     }
                 } else {
                     var showRemoveNonImg = !isAeView && !isCustomerView;
+                    var showReplaceNonImg = isAeView && isRefFile;
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<div class="pmd-file-placeholder">'
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span>'
@@ -1211,6 +1224,7 @@
                         + '</div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemoveNonImg ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
+                        + (showReplaceNonImg ? '<button type="button" class="pmd-slot-replace" data-field-key="' + slot.key + '">&#9998; Replace</button>' : '')
                         + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
                         + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
                         + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>'
@@ -1415,6 +1429,17 @@
         popBox.addEventListener('click', function () {
             hideSlotPopover();
             openBoxPickerModal(activeSlotKey);
+        });
+
+        // Replace button — AE replaces reference file on filled slot
+        document.addEventListener('click', function (e) {
+            var replaceBtn = e.target.closest('.pmd-slot-replace');
+            if (replaceBtn) {
+                e.stopPropagation();
+                var fieldKey = replaceBtn.dataset.fieldKey;
+                var slotEl = replaceBtn.closest('.pmd-gallery-slot');
+                showSlotPopover(slotEl, fieldKey);
+            }
         });
 
         // Close popover on outside click
@@ -4102,6 +4127,21 @@
     }
 
     function sendUploadNotification(fieldKey, fileName) {
+        // AE replacing a reference file — notify Ruth
+        if (isAeView && fieldKey === 'Box_Reference_File') {
+            var company = currentMockup ? (currentMockup.Company_Name || '') : '';
+            var design = currentMockup ? (currentMockup.Design_Number || mockupId) : mockupId;
+            sendMockupNotification({
+                to_email: RUTH_EMAIL,
+                to_name: 'Ruth',
+                note_text: 'AE replaced the reference file for ' + company + ' #' + design
+                    + '. File: "' + (fileName || 'file') + '". Please review.',
+                note_type: 'Reference File Updated',
+                detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId,
+                from_name: getAeDisplayName(currentMockup ? currentMockup.Submitted_By : '')
+            });
+            return;
+        }
         // Only Ruth (default view) sends upload notifications to the AE
         if (isAeView || isCustomerView) return;
         if (!currentMockup) return;
