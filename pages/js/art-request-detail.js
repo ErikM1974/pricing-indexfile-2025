@@ -844,7 +844,7 @@
             btnReopen.style.display = '';
         } else {
             // Hide Send Mockup if status doesn't allow it
-            var canSendMockup = status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
+            var canSendMockup = status.includes('submitted') || status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
             if (!canSendMockup) btnMockup.style.display = 'none';
         }
 
@@ -1137,6 +1137,12 @@
         { key: 'BoxFileLink', label: 'Mockup 2' },
         { key: 'Company_Mockup', label: 'Mockup 3' }
     ];
+    // Additional art file slots — AE + Steve/Ruth can upload
+    const ADDITIONAL_ART_SLOTS = [
+        { key: 'Additional_Art_1', label: 'Art File 5' },
+        { key: 'Additional_Art_2', label: 'Art File 6' }
+    ];
+    const ADDITIONAL_ART_KEYS = ADDITIONAL_ART_SLOTS.map(function (s) { return s.key; });
     // Read-only artwork fields from AE uploads
     const READ_ONLY_FIELDS = [
         { key: 'File_Upload', label: 'Original Upload' },
@@ -1380,6 +1386,42 @@
             mockupsGrid.appendChild(noMockups);
         }
 
+        // Section 1.5: Additional Art Files (AE + Steve/Ruth, uploadable) — hidden for customer view
+        var additionalArtGrid = document.getElementById('ard-additional-art-grid');
+        var additionalArtSection = document.getElementById('ard-additional-art-section');
+        additionalArtGrid.innerHTML = '';
+
+        if (isCustomerView) {
+            additionalArtSection.style.display = 'none';
+        } else {
+            var hasAdditionalArt = false;
+            ADDITIONAL_ART_SLOTS.forEach(function (slot, index) {
+                var url = req[slot.key];
+                if (isEmptySlot(url)) {
+                    // Empty slot — show "+" add button
+                    var emptyEl = document.createElement('div');
+                    emptyEl.className = 'ard-slot-empty';
+                    emptyEl.dataset.fieldKey = slot.key;
+                    emptyEl.innerHTML = '<span class="ard-slot-empty-icon">+</span>'
+                        + '<span class="ard-slot-empty-text">Add Art File</span>'
+                        + '<span class="ard-slot-empty-label">' + escapeHtml(slot.label) + '</span>';
+                    emptyEl.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        showSlotPopover(emptyEl, slot.key);
+                    });
+                    additionalArtGrid.appendChild(emptyEl);
+                } else {
+                    hasAdditionalArt = true;
+                    var thumb = renderFilledThumb(url, slot, true);
+                    thumb.dataset.fieldKey = slot.key;
+                    additionalArtGrid.appendChild(thumb);
+                }
+            });
+            // Always show section (so users can upload even when empty)
+            additionalArtSection.style.display = '';
+            wireRemoveButtons(additionalArtGrid);
+        }
+
         // Section 2: Read-only artwork (only shows populated fields) — hidden for customer view
         var artworkGrid = document.getElementById('ard-artwork-grid');
         var artworkSection = document.getElementById('ard-artwork-section');
@@ -1449,7 +1491,9 @@
                 e.stopPropagation();
                 var fieldKey = btn.dataset.fieldKey;
                 var fieldLabel = btn.dataset.fieldLabel;
-                if (!confirm('Remove this mockup (' + fieldLabel + ')?')) return;
+                var isAdditionalArt = ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1;
+                var removeLabel = isAdditionalArt ? 'art file' : 'mockup';
+                if (!confirm('Remove this ' + removeLabel + ' (' + fieldLabel + ')?')) return;
 
                 var pkId = currentRequest.PK_ID;
                 if (!pkId) { alert('Cannot remove: missing PK_ID'); return; }
@@ -1468,10 +1512,13 @@
                     currentRequest[fieldKey] = '';
                     // Delete AI analysis for this slot (fire-and-forget)
                     fetch(API_BASE + '/api/art-requests/' + designId + '/analysis/' + encodeURIComponent(fieldKey), { method: 'DELETE' }).catch(function () {});
+                    var rmIsAdditionalArt = ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1;
+                    var rmNoteType = rmIsAdditionalArt ? 'Art File Removed' : 'Mockup Removed';
+                    var rmNoteText = rmIsAdditionalArt ? 'Removed art file from ' : 'Removed mockup from ';
                     return fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Mockup Removed', noteText: 'Removed mockup from ' + fieldLabel, noteBy: getLoggedInUser().noteBy })
+                        body: JSON.stringify({ noteType: rmNoteType, noteText: rmNoteText + fieldLabel, noteBy: getLoggedInUser().noteBy })
                     });
                 }).then(function () {
                     renderMockupGallery(currentRequest);
@@ -1590,10 +1637,13 @@
                     currentRequest[activeSlotKey] = mockupUrl;
 
                     // Log audit note
+                    var isAddlArt = ADDITIONAL_ART_KEYS.indexOf(activeSlotKey) !== -1;
+                    var noteLabel = isAddlArt ? 'Additional Art Added' : 'Mockup Added';
+                    var noteDesc = isAddlArt ? 'Added additional art file from Box: ' : 'Added mockup from Box: ';
                     fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ noteType: 'Mockup Added', noteText: 'Added mockup from Box: ' + selectedBoxFile.name, noteBy: getLoggedInUser().noteBy })
+                        body: JSON.stringify({ noteType: noteLabel, noteText: noteDesc + selectedBoxFile.name, noteBy: getLoggedInUser().noteBy })
                     }).catch(function () {});
 
                     closeBoxModal();
@@ -1661,7 +1711,10 @@
             formData.append('customerId', String(currentRequest.Shopwork_customer_number || currentRequest.id_customer || ''));
             formData.append('companyName', currentRequest.CompanyName || '');
 
-            var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup', {
+            var uploadEndpoint = ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1
+                ? '/api/art-requests/' + designId + '/upload-additional-art'
+                : '/api/art-requests/' + designId + '/upload-mockup';
+            var resp = await fetch(API_BASE + uploadEndpoint, {
                 method: 'POST',
                 body: formData
             });
