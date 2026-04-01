@@ -744,63 +744,89 @@
     const pageH = 279.4;
     const margin = 10;
     const contentW = pageW - margin * 2;
-    const footerH = 32; // Compact footer: just QR + BOX X OF Y
-    const footerY = pageH - margin - footerH;
+    const R = pageW - margin; // right edge
     let y = margin;
 
-    // ─── TOP SECTION: Order Info (compact) ────────────────
-
+    // ── Data extraction ──
     const orderNum = String(order.orderNumber || '');
     const company = order.company || '';
     const hasCompany = company && !company.startsWith('SanMar PO:');
     const shipDate = formatDate(order.requestedShipDate);
     const custPO = order.customerPO || '';
+    const orderType = order.orderType || '';
+    const terms = order.terms || '';
+    const salesRep = order.salesRep || '';
+    const paidStatus = order.paidStatus || '';
+    const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
 
-    // Row 1: Company (left) + Order ID (right)
-    if (hasCompany) {
-      doc.setFontSize(22);
-      doc.setFont('helvetica', 'bold');
-      const lines = doc.splitTextToSize(company, contentW * 0.55);
-      lines.forEach(line => { doc.text(line, margin, y + 7); y += 8; });
-    }
+    // ════════════════════════════════════════════════════════
+    // ZONE 1: HEADER — Company + QR + WO# (y = 10-30mm)
+    // ════════════════════════════════════════════════════════
 
+    // QR Code — top right corner (above WO#)
+    const qrSize = 18;
+    const qrX = R - qrSize;
+    try {
+      const qr = qrcode(0, 'M');
+      const poNum = currentData?.sanmarPO || currentData?.order?.customerPO || '';
+      const labelUrl = `${window.location.origin}/pages/box-labels.html?po=${poNum}`;
+      qr.addData(labelUrl);
+      qr.make();
+      doc.addImage(qr.createDataURL(4, 0), 'PNG', qrX, margin, qrSize, qrSize);
+    } catch (e) { /* QR failed */ }
+
+    // WO# — right side, next to QR (no "WO#" label)
     if (orderNum) {
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Order ID', pageW - margin, margin + 3, { align: 'right' });
-      doc.setFontSize(40);
+      doc.setFontSize(44);
       doc.setFont('helvetica', 'bold');
-      doc.text(orderNum, pageW - margin, margin + 14, { align: 'right' });
+      doc.text(orderNum, qrX - 3, margin + 14, { align: 'right' });
     }
 
-    // Row 2: Contact + PO (left) | Ship Date (right)
-    y = Math.max(y, margin + 16);
-    const leftCol = [];
-    if (order.contact) leftCol.push(`Contact: ${order.contact}`);
-    if (custPO) leftCol.push(`Cust PO: ${custPO}`);
-
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    leftCol.forEach(line => { doc.text(line, margin, y); y += 5; });
-
-    if (shipDate) {
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Req. Ship Date', pageW - margin, margin + 19, { align: 'right' });
-      doc.setFontSize(22);
+    // Company name — left side, 28pt
+    if (hasCompany) {
       doc.setFont('helvetica', 'bold');
-      doc.text(shipDate, pageW - margin, margin + 27, { align: 'right' });
+      // Try to fit on one line — shrink font if needed
+      const maxCompanyW = contentW * 0.52;
+      let companyFontSize = 28;
+      doc.setFontSize(companyFontSize);
+      while (companyFontSize > 18 && doc.getTextWidth(company) > maxCompanyW) {
+        companyFontSize -= 2;
+        doc.setFontSize(companyFontSize);
+      }
+      const companyLines = doc.splitTextToSize(company, maxCompanyW);
+      companyLines.forEach(line => { doc.text(line, margin, y + 9); y += companyFontSize * 0.38; });
     }
 
-    y = Math.max(y, margin + 30);
+    y = Math.max(y, margin + 18);
 
-    // ─── DESIGNS (if linked) ──────────────────────────────
+    // ════════════════════════════════════════════════════════
+    // ZONE 2: ORDER INFO (y ≈ 30-48mm)
+    // ════════════════════════════════════════════════════════
 
+    // Order Type | Terms | Paid Status (all inline, left-aligned)
+    const infoParts = [orderType, terms, paidStatus].filter(Boolean);
+    if (infoParts.length) {
+      doc.setFontSize(13);
+      doc.setFont('helvetica', 'normal');
+      const mainInfo = [orderType, terms].filter(Boolean).join('  |  ');
+      doc.text(mainInfo, margin, y);
+      // Paid status — smaller, black, appended after terms
+      if (paidStatus && mainInfo) {
+        const mainWidth = doc.getTextWidth(mainInfo);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`  —  ${paidStatus}`, margin + mainWidth, y);
+      } else if (paidStatus) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(paidStatus, margin, y);
+      }
+    }
+    y += 6;
+
+    // Design info
     if (order.designs?.length && order.designs[0]?.name) {
-      doc.setDrawColor(180);
-      doc.line(margin, y, pageW - margin, y);
-      y += 4;
-      doc.setFontSize(10);
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text('Design:', margin, y);
       doc.setFont('helvetica', 'normal');
@@ -809,26 +835,76 @@
       y += 5;
     }
 
-    // ─── CONTENTS ─────────────────────────────────────────
+    // Cust PO + Rep
+    const detailParts = [];
+    if (custPO) detailParts.push(`Cust PO: ${custPO}`);
+    if (salesRep) detailParts.push(`Rep: ${salesRep}`);
+    if (detailParts.length) {
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(detailParts.join('   |   '), margin, y);
+      y += 5;
+    }
 
-    doc.setDrawColor(100);
-    doc.setLineWidth(0.4);
-    doc.line(margin, y, pageW - margin, y);
+    // ════════════════════════════════════════════════════════
+    // ZONE 3: KEY METRICS BAR (y ≈ 48-62mm)
+    // ════════════════════════════════════════════════════════
+
+    y += 1;
+    doc.setDrawColor(80);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, R, y);
+    doc.setLineWidth(0.2);
+    y += 3;
+
+    // Pcs total (left, 18pt)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${totalPcs} pcs total`, margin, y + 5);
+
+    // Ship date (right, 28pt)
+    if (shipDate) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Req. Ship Date', R, y, { align: 'right' });
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.text(shipDate, R, y + 10, { align: 'right' });
+    }
+    y += 14;
+
+    doc.setDrawColor(80);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, R, y);
+    doc.setLineWidth(0.2);
+    y += 3;
+
+    // ════════════════════════════════════════════════════════
+    // ZONE 4: BOX IDENTIFIER (y ≈ 65-80mm) — above fold line
+    // ════════════════════════════════════════════════════════
+
+    doc.setFontSize(36);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2, y + 10, { align: 'center' });
+    y += 16;
+
+    doc.setDrawColor(80);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, R, y);
     doc.setLineWidth(0.2);
     y += 4;
 
-    const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
+    // ════════════════════════════════════════════════════════
+    // ZONE 5: CONTENTS (y ≈ 84mm → fills remaining space)
+    // ════════════════════════════════════════════════════════
+
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text('Contents', margin, y);
-    doc.setFontSize(11);
-    doc.text(`${totalPcs} pcs total`, pageW - margin, y, { align: 'right' });
-    y += 5;
+    y += 6;
 
-    // Calculate how much vertical space we have for items
-    const availableH = footerY - y - 4;
+    // Dynamic sizing based on item count
     const itemCount = (box.items || []).length;
-    // Dynamically size: if many items, use smaller fonts
     const compact = itemCount > 5;
     const styleFontSize = compact ? 10 : 11;
     const colorFontSize = compact ? 8 : 9;
@@ -836,10 +912,10 @@
     const gridHeadSize = compact ? 7 : 8;
     const gridPadding = compact ? 1.5 : 2;
     const itemSpacing = compact ? 3 : 4;
+    const maxY = pageH - margin - 15; // Leave 15mm for footer
 
     for (const item of (box.items || [])) {
-      // Safety: don't overflow into footer
-      if (y + 15 > footerY) break;
+      if (y + 15 > maxY) break;
 
       const style = item.style || item.Style_Number || '';
       const desc = item.description || item.Description || '';
@@ -847,14 +923,12 @@
       if (desc !== style && desc.endsWith(`. ${style}`)) displayDesc = desc.slice(0, -(style.length + 2));
       if (desc === style) displayDesc = '';
 
-      // Style + description
       doc.setFontSize(styleFontSize);
       doc.setFont('helvetica', 'bold');
       const styleLabel = displayDesc ? `${style} - ${displayDesc}` : style;
       doc.text(doc.splitTextToSize(styleLabel, contentW - 4)[0], margin + 1, y);
       y += styleFontSize * 0.4 + 1;
 
-      // Color + qty
       doc.setFontSize(colorFontSize);
       doc.setFont('helvetica', 'normal');
       doc.text(`${item.color || ''} — ${item.totalQty || 0} pcs`, margin + 1, y);
@@ -873,6 +947,14 @@
         }
         if (val > 0) { activeCols.push(s); activeVals.push(String(val)); }
       });
+
+      // OSFA/one-size items: if no standard sizes found, show a Qty box
+      if (activeCols.length === 0 && (item.totalQty || 0) > 0) {
+        // Check for OSFA or Other in sizes
+        const osfaVal = sizes['OSFA'] || sizes['Other'] || sizes['ONE SIZE'] || sizes['O/S'] || item.totalQty;
+        activeCols.push('Qty');
+        activeVals.push(String(osfaVal));
+      }
 
       if (activeCols.length > 0) {
         doc.autoTable({
@@ -898,30 +980,25 @@
       }
     }
 
-    // ─── FOOTER: QR + BOX X OF Y (compact, fixed) ────────
+    // ════════════════════════════════════════════════════════
+    // ZONE 6: FOOTER — minimal (OK if cut off when folded)
+    // ════════════════════════════════════════════════════════
 
-    doc.setDrawColor(100);
-    doc.setLineWidth(0.4);
-    doc.line(margin, footerY, pageW - margin, footerY);
-    doc.setLineWidth(0.2);
+    const footerY = pageH - margin - 10;
+    doc.setDrawColor(150);
+    doc.setLineWidth(0.3);
+    doc.line(margin, footerY, R, footerY);
 
-    // QR Code (bottom-left, smaller)
-    try {
-      const qr = qrcode(0, 'M');
-      const poNum = currentData?.sanmarPO || currentData?.order?.customerPO || '';
-      const labelUrl = `${window.location.origin}/pages/box-labels.html?po=${poNum}`;
-      qr.addData(labelUrl);
-      qr.make();
-      doc.addImage(qr.createDataURL(4, 0), 'PNG', margin, footerY + 3, 18, 18);
-      doc.setFontSize(6);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Scan to view', margin, footerY + 24);
-    } catch (e) { /* QR failed */ }
-
-    // BOX X OF Y — big, centered
-    doc.setFontSize(38);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2 + 10, footerY + 18, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120, 120, 120);
+    const footerParts = [];
+    if (custPO) footerParts.push(`Cust PO: ${custPO}`);
+    if (orderNum) footerParts.push(`WO# ${orderNum}`);
+    if (footerParts.length) {
+      doc.text(footerParts.join('   |   '), pageW / 2, footerY + 5, { align: 'center' });
+    }
+    doc.setTextColor(0, 0, 0);
   }
 
   // ==========================================
