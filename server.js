@@ -3058,66 +3058,69 @@ const FEE_PATTERNS = [
   /^SVC/i, /^FEE/i, /^MISC.*FEE/i, /^OVER.*RUN/i
 ];
 
-// Helper: Resolve SanMar partIds to size/color via inventory API, then consolidate items
+// Size normalization: SanMar uses XXL, we use 2XL
+const SIZE_NORMALIZE = { 'XXL': '2XL', 'XXXL': '3XL', 'XXXXL': '4XL', 'XXXXXL': '5XL' };
+function normalizeSize(size) {
+  return SIZE_NORMALIZE[size] || size;
+}
+
+// Helper: Resolve SanMar partIds to size/color via proxy, then consolidate items
 async function resolveAndConsolidateBoxItems(sanmarBoxes) {
-  // Step 1: Collect unique styles
+  // Step 1: Collect unique styles and all partIds
   const uniqueStyles = new Set();
+  const allPartIds = [];
   for (const box of sanmarBoxes) {
     for (const item of box.items || []) {
       if (item.supplierProductId) uniqueStyles.add(item.supplierProductId);
+      if (item.supplierPartId) allPartIds.push(item.supplierPartId);
     }
   }
 
-  // Step 2: Fetch inventory data for each style (partId → size/color map)
-  const partIdMap = {}; // { partId: { size, color, style } }
-  const styleDescriptions = {}; // { style: description }
+  console.log(`[BoxLabels] Resolving ${allPartIds.length} partIds across ${uniqueStyles.size} styles`);
 
-  console.log(`[BoxLabels] Resolving ${uniqueStyles.size} styles: ${[...uniqueStyles].join(', ')}`);
+  // Step 2: Call proxy's batch resolve endpoint (handles caching + SanMar API)
+  let partIdMap = {};
+  try {
+    const resolveResp = await Promise.race([
+      fetch(`${API_BASE_URL}/box-labels/resolve-parts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          partIds: allPartIds,
+          styles: [...uniqueStyles]
+        })
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Resolve timeout 20s')), 20000))
+    ]);
 
-  const inventoryPromises = [...uniqueStyles].map(async (style) => {
-    try {
-      const resp = await fetchWithTimeout(
-        `${API_BASE_URL}/sanmar/inventory/${style}`, 8000
-      );
-      if (resp.ok) {
-        const data = await resp.json();
-        styleDescriptions[style] = data.style || style;
-        for (const inv of (data.inventory || [])) {
-          if (inv.partId) {
-            partIdMap[inv.partId] = {
-              size: inv.size || '',
-              color: inv.color || '',
-              style: style
-            };
-          }
-        }
-        console.log(`[BoxLabels] Resolved ${style}: ${(data.inventory || []).length} parts`);
+    if (resolveResp.ok) {
+      const data = await resolveResp.json();
+      if (data.success && data.partMap) {
+        partIdMap = data.partMap;
+        console.log(`[BoxLabels] Resolved ${Object.keys(partIdMap).length} partIds`);
       }
-    } catch (e) {
-      console.log(`[BoxLabels] Inventory lookup failed for ${style}: ${e.message}`);
     }
-  });
-
-  await Promise.allSettled(inventoryPromises);
-  console.log(`[BoxLabels] PartId map has ${Object.keys(partIdMap).length} entries`);
+  } catch (e) {
+    console.log(`[BoxLabels] Part resolution failed: ${e.message}`);
+  }
 
   // Step 3: Consolidate items by style+color within each box
   const consolidatedBoxes = [];
   for (const box of sanmarBoxes) {
-    const grouped = {}; // key: "style|color" → { style, color, sizes: {}, totalQty }
+    const grouped = {};
 
     for (const item of (box.items || [])) {
       const partInfo = partIdMap[item.supplierPartId];
       const style = item.supplierProductId || 'Unknown';
       const color = partInfo?.color || '';
-      const size = partInfo?.size || '';
+      const size = partInfo?.size ? normalizeSize(partInfo.size) : '';
       const key = `${style}|${color}`;
 
       if (!grouped[key]) {
         grouped[key] = {
           style,
           color,
-          description: styleDescriptions[style] || style,
+          description: style, // Will be enriched later if we have product data
           sizes: {},
           totalQty: 0
         };
@@ -3180,48 +3183,53 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
       sanmarPO = identifier;
     }
 
-    // Step 1: Get SanMar shipment data (fast — direct SOAP call on proxy)
-    let shipResp = { status: 'fulfilled', value: null };
+    // Step 1: Fetch SanMar shipment + Caspio order lookup IN PARALLEL (both are fast)
+    const parallelFetches = [];
+
+    // SanMar shipment (if we have a PO)
     if (sanmarPO) {
-      console.log(`[BoxLabels] Fetching SanMar shipment for PO ${sanmarPO}...`);
-      try {
-        const r = await fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`, 15000);
-        shipResp = { status: 'fulfilled', value: r };
-        console.log(`[BoxLabels] SanMar shipment response: ${r.status}`);
-      } catch (e) {
-        console.log(`[BoxLabels] SanMar shipment failed: ${e.message}`);
-        shipResp = { status: 'rejected', reason: e };
-      }
+      parallelFetches.push(
+        fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`, 15000)
+          .then(async r => r.ok ? { type: 'shipment', data: await r.json() } : { type: 'shipment', data: null })
+          .catch(e => { console.log(`[BoxLabels] Shipment failed: ${e.message}`); return { type: 'shipment', data: null }; })
+      );
     }
 
-    // Step 2: If we have a work order, fetch ManageOrders data (parallel)
-    let orderResp = { status: 'fulfilled', value: null };
-    let lineItemsResp = { status: 'fulfilled', value: null };
-    if (orderNumber) {
-      console.log(`[BoxLabels] Fetching ManageOrders for WO# ${orderNumber}...`);
-      const results = await Promise.allSettled([
-        fetchWithTimeout(`${API_BASE_URL}/manageorders/orders/${orderNumber}`, 10000),
-        fetchWithTimeout(`${API_BASE_URL}/manageorders/lineitems/${orderNumber}`, 10000)
-      ]);
-      orderResp = results[0];
-      lineItemsResp = results[1];
-      console.log(`[BoxLabels] ManageOrders: order=${orderResp.status}, lineItems=${lineItemsResp.status}`);
+    // Caspio order lookup (by PO or by order ID)
+    if (sanmarPO) {
+      parallelFetches.push(
+        fetchWithTimeout(`${API_BASE_URL}/box-labels/order-by-po/${encodeURIComponent(sanmarPO)}`, 8000)
+          .then(async r => r.ok ? { type: 'order', data: await r.json() } : { type: 'order', data: null })
+          .catch(e => { console.log(`[BoxLabels] Caspio order failed: ${e.message}`); return { type: 'order', data: null }; })
+      );
+    } else if (orderNumber) {
+      parallelFetches.push(
+        fetchWithTimeout(`${API_BASE_URL}/box-labels/order/${orderNumber}`, 8000)
+          .then(async r => r.ok ? { type: 'order', data: await r.json() } : { type: 'order', data: null })
+          .catch(e => { console.log(`[BoxLabels] Caspio order failed: ${e.message}`); return { type: 'order', data: null }; })
+      );
     }
 
-    // Parse SanMar shipment boxes
+    const results = await Promise.all(parallelFetches);
+    console.log(`[BoxLabels] Parallel fetches complete: ${results.map(r => r.type).join(', ')}`);
+
+    // Parse results
     let sanmarBoxes = [];
-    if (shipResp.status === 'fulfilled' && shipResp.value?.ok) {
-      try {
-        const shipData = await shipResp.value.json();
-        if (shipData.success && shipData.data?.boxes) {
-          sanmarBoxes = shipData.data.boxes;
-        }
-      } catch (e) {
-        console.log(`[BoxLabels] SanMar shipment parse failed:`, e.message);
+    let caspioOrder = null;
+
+    for (const result of results) {
+      if (result.type === 'shipment' && result.data?.success && result.data?.data?.boxes) {
+        sanmarBoxes = result.data.data.boxes;
+        console.log(`[BoxLabels] Got ${sanmarBoxes.length} boxes from SanMar`);
+      }
+      if (result.type === 'order' && result.data?.success && result.data?.order) {
+        caspioOrder = result.data.order;
+        orderNumber = caspioOrder.orderNumber || orderNumber;
+        console.log(`[BoxLabels] Got order from Caspio: WO# ${orderNumber}, ${caspioOrder.company}`);
       }
     }
 
-    // If we still have no order number and no SanMar boxes, return helpful message
+    // If we still have no data, return helpful message
     if (!orderNumber && sanmarBoxes.length === 0) {
       return res.json({
         success: true,
@@ -3230,43 +3238,46 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
         unboxedItems: [],
         excludedItems: [],
         summary: { totalBoxes: 0, totalBoxedQty: 0, totalWOQty: 0, totalUnboxedQty: 0, mismatch: false },
-        message: `PO ${identifier}: No matching work order found. SanMar shipment data may not be available for this PO, or enter a Work Order# instead.`
+        message: `PO ${identifier}: No matching work order or SanMar shipment found. Try a different PO# or use Work Order# instead.`
       });
     }
 
-    // Parse ManageOrders data
+    // Build order info from Caspio data
     let order = {};
-    const orderVal = orderResp.status === 'fulfilled' ? orderResp.value : null;
-    if (orderVal?.ok) {
-      const od = await orderVal.json();
-      const o = od.data || od;
+    if (caspioOrder) {
       order = {
-        orderNumber: o.order_no || o.id_Order || orderNumber,
-        orderType: o.OrderType || o.ExtSource || '',
-        company: o.CustomerName || o.Company || '',
-        contact: `${o.ContactFirstName || ''} ${o.ContactLastName || ''}`.trim(),
-        contactEmail: o.ContactEmail || '',
-        customerPO: o.CustomerPurchaseOrder || sanmarPO || '',
-        requestedShipDate: o.date_Due || o.DateDue || '',
-        dropDeadDate: o.date_InHand || o.DateInHand || '',
-        salesRep: o.CustomerServiceRep || o.SalesRep || '',
+        orderNumber: caspioOrder.orderNumber || orderNumber,
+        orderType: '',
+        company: caspioOrder.company || '',
+        contact: caspioOrder.contact || '',
+        contactEmail: caspioOrder.contactEmail || '',
+        customerPO: caspioOrder.customerPO || sanmarPO || '',
+        requestedShipDate: '',
+        dropDeadDate: '',
+        salesRep: caspioOrder.salesRep || '',
         designs: []
       };
-      // Extract design info if available
-      if (o.DesignName || o.id_Design) {
+      if (caspioOrder.designName || caspioOrder.designNumber) {
         order.designs.push({
-          number: String(o.id_Design || ''),
-          name: o.DesignName || ''
+          number: String(caspioOrder.designNumber || ''),
+          name: caspioOrder.designName || ''
         });
       }
     }
 
-    // Parse line items and classify them
+    // Fetch line items from Caspio if we have an order number
     let allLineItems = [];
-    const lineItemsVal = lineItemsResp.status === 'fulfilled' ? lineItemsResp.value : null;
-    if (lineItemsVal?.ok) {
-      const lid = await lineItemsVal.json();
-      allLineItems = Array.isArray(lid) ? lid : (lid.data || []);
+    if (orderNumber) {
+      try {
+        const liResp = await fetchWithTimeout(`${API_BASE_URL}/box-labels/lineitems/${orderNumber}`, 8000);
+        if (liResp.ok) {
+          const liData = await liResp.json();
+          allLineItems = liData.lineItems || [];
+          console.log(`[BoxLabels] Got ${allLineItems.length} line items from Caspio`);
+        }
+      } catch (e) {
+        console.log(`[BoxLabels] Line items fetch failed: ${e.message}`);
+      }
     }
 
     // Build a set of SanMar product IDs for matching
