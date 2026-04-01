@@ -3068,6 +3068,14 @@ function isNonPhysicalItem(lineItem) {
   return false;
 }
 
+// Helper: fetch with timeout (for Heroku 30s limit)
+function fetchWithTimeout(url, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { signal: controller.signal })
+    .finally(() => clearTimeout(timer));
+}
+
 // GET /api/box-label-data/:identifier - Merge SanMar shipment + ManageOrders data
 app.get('/api/box-label-data/:identifier', async (req, res) => {
   const { identifier } = req.params;
@@ -3078,78 +3086,62 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     let sanmarPO = '';
 
     if (type === 'wo') {
-      // Looking up by ShopWorks work order number
       orderNumber = identifier;
-      const orderResp = await fetch(`${API_BASE_URL}/manageorders/orders/${orderNumber}`);
-      if (!orderResp.ok) throw new Error(`ManageOrders order ${orderNumber} not found`);
-      const orderData = await orderResp.json();
-      const o = orderData.data || orderData;
-      sanmarPO = o.CustomerPurchaseOrder || '';
     } else {
-      // Looking up by SanMar PO number
       sanmarPO = identifier;
-      // Try to find the matching ShopWorks order via SanMar_Orders Caspio table
-      try {
-        const matchResp = await fetch(`${API_BASE_URL}/SanMar_Orders?q.where=SanMar_PO='${identifier}'&q.select=ShopWorks_Order_No,Company_Name`);
-        if (matchResp.ok) {
-          const matchData = await matchResp.json();
-          const matches = Array.isArray(matchData) ? matchData : (matchData.Result || []);
-          if (matches.length > 0 && matches[0].ShopWorks_Order_No) {
-            orderNumber = String(matches[0].ShopWorks_Order_No);
-            console.log(`[BoxLabels] Matched PO ${identifier} to WO# ${orderNumber}`);
-          }
-        }
-      } catch (e) {
-        console.log(`[BoxLabels] SanMar_Orders lookup failed:`, e.message);
-      }
+      // Try SanMar_Orders table + ManageOrders PO search IN PARALLEL (race for speed)
+      const [matchResult, searchResult] = await Promise.allSettled([
+        fetchWithTimeout(`${API_BASE_URL}/SanMar_Orders?q.where=SanMar_PO='${identifier}'&q.select=ShopWorks_Order_No,Company_Name`, 8000)
+          .then(r => r.ok ? r.json() : null),
+        fetchWithTimeout(`${API_BASE_URL}/manageorders/orders?purchaseOrder=${identifier}`, 8000)
+          .then(r => r.ok ? r.json() : null)
+      ]);
 
-      // Fallback: try ManageOrders search by PO if no match found
-      if (!orderNumber) {
-        try {
-          const searchResp = await fetch(`${API_BASE_URL}/manageorders/orders?purchaseOrder=${identifier}`);
-          if (searchResp.ok) {
-            const searchData = await searchResp.json();
-            const orders = Array.isArray(searchData) ? searchData : (searchData.data || []);
-            if (orders.length > 0) {
-              orderNumber = String(orders[0].order_no || orders[0].id_Order || '');
-              console.log(`[BoxLabels] Found WO# ${orderNumber} via ManageOrders PO search`);
-            }
-          }
-        } catch (e) {
-          console.log(`[BoxLabels] ManageOrders PO search failed:`, e.message);
+      // Check SanMar_Orders match
+      if (matchResult.status === 'fulfilled' && matchResult.value) {
+        const matches = Array.isArray(matchResult.value) ? matchResult.value : (matchResult.value.Result || []);
+        if (matches.length > 0 && matches[0].ShopWorks_Order_No) {
+          orderNumber = String(matches[0].ShopWorks_Order_No);
+          console.log(`[BoxLabels] Matched PO ${identifier} to WO# ${orderNumber}`);
+        }
+      }
+      // Fallback: ManageOrders search
+      if (!orderNumber && searchResult.status === 'fulfilled' && searchResult.value) {
+        const orders = Array.isArray(searchResult.value) ? searchResult.value : (searchResult.value.data || []);
+        if (orders.length > 0) {
+          orderNumber = String(orders[0].order_no || orders[0].id_Order || '');
+          console.log(`[BoxLabels] Found WO# ${orderNumber} via ManageOrders PO search`);
         }
       }
     }
 
-    // Fetch ManageOrders data (order header + line items) in parallel
-    const fetchPromises = [];
-    if (orderNumber) {
-      fetchPromises.push(
-        fetch(`${API_BASE_URL}/manageorders/orders/${orderNumber}`).catch(() => null),
-        fetch(`${API_BASE_URL}/manageorders/lineitems/${orderNumber}`).catch(() => null)
-      );
-    } else {
-      fetchPromises.push(Promise.resolve(null), Promise.resolve(null));
-    }
-    const [orderResp, lineItemsResp] = await Promise.all(fetchPromises);
+    // Fetch ALL data in parallel: ManageOrders order + line items + SanMar shipment
+    const [orderResp, lineItemsResp, shipResp] = await Promise.allSettled([
+      orderNumber
+        ? fetchWithTimeout(`${API_BASE_URL}/manageorders/orders/${orderNumber}`, 10000).catch(() => null)
+        : Promise.resolve(null),
+      orderNumber
+        ? fetchWithTimeout(`${API_BASE_URL}/manageorders/lineitems/${orderNumber}`, 10000).catch(() => null)
+        : Promise.resolve(null),
+      sanmarPO
+        ? fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`, 12000).catch(() => null)
+        : Promise.resolve(null)
+    ]);
 
-    // Try SanMar shipment API (may not exist for non-SanMar orders)
+    // Parse SanMar shipment boxes
     let sanmarBoxes = [];
-    if (sanmarPO) {
+    if (shipResp.status === 'fulfilled' && shipResp.value?.ok) {
       try {
-        const shipResp = await fetch(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`);
-        if (shipResp.ok) {
-          const shipData = await shipResp.json();
-          if (shipData.success && shipData.data?.boxes) {
-            sanmarBoxes = shipData.data.boxes;
-          }
+        const shipData = await shipResp.value.json();
+        if (shipData.success && shipData.data?.boxes) {
+          sanmarBoxes = shipData.data.boxes;
         }
       } catch (e) {
-        console.log(`[BoxLabels] SanMar shipment lookup failed for PO ${sanmarPO}:`, e.message);
+        console.log(`[BoxLabels] SanMar shipment parse failed:`, e.message);
       }
     }
 
-    // If we still have no order number and no SanMar boxes, return helpful error
+    // If we still have no order number and no SanMar boxes, return helpful message
     if (!orderNumber && sanmarBoxes.length === 0) {
       return res.json({
         success: true,
@@ -3158,14 +3150,15 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
         unboxedItems: [],
         excludedItems: [],
         summary: { totalBoxes: 0, totalBoxedQty: 0, totalWOQty: 0, totalUnboxedQty: 0, mismatch: false },
-        message: `PO ${identifier} not found in SanMar_Orders or ManageOrders. The SanMar shipment API needs to be deployed to Heroku, or enter a Work Order# instead.`
+        message: `PO ${identifier}: No matching work order found. SanMar shipment data may not be available for this PO, or enter a Work Order# instead.`
       });
     }
 
     // Parse ManageOrders data
     let order = {};
-    if (orderResp?.ok) {
-      const od = await orderResp.json();
+    const orderVal = orderResp.status === 'fulfilled' ? orderResp.value : null;
+    if (orderVal?.ok) {
+      const od = await orderVal.json();
       const o = od.data || od;
       order = {
         orderNumber: o.order_no || o.id_Order || orderNumber,
@@ -3190,8 +3183,9 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
 
     // Parse line items and classify them
     let allLineItems = [];
-    if (lineItemsResp?.ok) {
-      const lid = await lineItemsResp.json();
+    const lineItemsVal = lineItemsResp.status === 'fulfilled' ? lineItemsResp.value : null;
+    if (lineItemsVal?.ok) {
+      const lid = await lineItemsVal.json();
       allLineItems = Array.isArray(lid) ? lid : (lid.data || []);
     }
 
