@@ -2822,7 +2822,7 @@
 
             closeChangesModal();
             showSuccessMessage('Revision request sent! Steve has been notified.');
-            disableActionBar();
+            disableForRevision();
             updateStatusBadge('Revision Requested', 'ard-status-badge--revision');
         } catch (err) {
             console.error('Request changes failed:', err);
@@ -2896,6 +2896,15 @@
         el.textContent = msg;
         el.style.display = 'block';
         setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    function disableForRevision() {
+        document.getElementById('ard-btn-approve').disabled = true;
+        document.getElementById('ard-btn-changes').disabled = true;
+        document.getElementById('ard-ae-select').disabled = true;
+        document.getElementById('ard-btn-approve').textContent = 'Awaiting Revision';
+        document.getElementById('ard-btn-approve').style.opacity = '0.6';
+        document.getElementById('ard-btn-changes').style.opacity = '0.6';
     }
 
     function disableActionBar() {
