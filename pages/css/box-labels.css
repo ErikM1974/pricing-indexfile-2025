@@ -215,6 +215,22 @@ body {
   color: var(--bl-gray-900);
 }
 
+/* Link Work Order bar */
+.bl-banner__link-wo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0 2px;
+  border-top: 1px dashed var(--bl-warning);
+  margin-top: 6px;
+}
+
+.bl-banner__link-wo-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bl-warning);
+}
+
 /* === TOTALS BAR === */
 .bl-totals {
   background: var(--bl-gray-800);
@@ -537,6 +553,13 @@ body {
   font-size: 18px;
   font-weight: 800;
   color: var(--bl-gray-900);
+  cursor: pointer;
+}
+
+.bl-size-cell:hover {
+  outline: 2px solid var(--bl-primary);
+  outline-offset: -1px;
+  border-radius: 4px;
 }
 
 .bl-size-cell--empty .bl-size-cell__value {

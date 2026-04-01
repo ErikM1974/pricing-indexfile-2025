@@ -68,6 +68,10 @@
 
     document.getElementById('splitCancelBtn').addEventListener('click', closeSplitModal);
     document.getElementById('splitConfirmBtn').addEventListener('click', confirmSplit);
+    document.getElementById('linkWOBtn').addEventListener('click', handleLinkWO);
+    document.getElementById('linkWOInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleLinkWO();
+    });
 
     // Auto-load from URL params (QR code scan support)
     const urlParams = new URLSearchParams(window.location.search);
@@ -96,6 +100,54 @@
 
   function getRepackerName() {
     return els.repackerName.value.trim() || 'Unknown';
+  }
+
+  // ==========================================
+  // Work Order Linking
+  // ==========================================
+  async function handleLinkWO() {
+    const woNum = document.getElementById('linkWOInput').value.trim();
+    if (!woNum) return;
+
+    try {
+      // Fetch order data from Caspio by work order number
+      const resp = await fetch(`${HEROKU_BASE}/api/box-labels/order/${woNum}`);
+      if (!resp.ok) throw new Error('Work order not found');
+
+      const data = await resp.json();
+      if (!data.success || !data.order) throw new Error('Work order not found in system');
+
+      // Merge order data into current state
+      const o = data.order;
+      currentData.order = {
+        ...currentData.order,
+        orderNumber: o.orderNumber || woNum,
+        company: o.company || currentData.order.company || '',
+        contact: o.contact || '',
+        contactEmail: o.contactEmail || '',
+        customerPO: o.customerPO || currentData.order.customerPO || '',
+        salesRep: o.salesRep || '',
+        designs: []
+      };
+      if (o.designName || o.designNumber) {
+        currentData.order.designs.push({
+          number: String(o.designNumber || ''),
+          name: o.designName || ''
+        });
+      }
+
+      // Re-render with the new order data
+      renderBanner(currentData.order);
+      document.getElementById('linkWOSection').style.display = 'none';
+
+      // Show success briefly
+      const linkBtn = document.getElementById('linkWOBtn');
+      linkBtn.textContent = 'Linked!';
+      linkBtn.style.background = '#16a34a';
+      setTimeout(() => { linkBtn.textContent = 'Link WO'; linkBtn.style.background = ''; }, 2000);
+    } catch (error) {
+      alert(`Could not find work order: ${woNum}\n${error.message}`);
+    }
   }
 
   // ==========================================
@@ -167,6 +219,10 @@
     document.getElementById('bannerCustPO').textContent = order.customerPO || '—';
     document.getElementById('bannerRep').textContent = order.salesRep || '—';
     els.orderBanner.style.display = 'block';
+
+    // Show "Link Work Order" section if no real order data
+    const hasOrderData = order.orderNumber && order.company && !order.company.startsWith('SanMar PO:');
+    document.getElementById('linkWOSection').style.display = hasOrderData ? 'none' : 'flex';
   }
 
   function renderTotals(summary) {
@@ -281,10 +337,11 @@
     return `<div class="bl-size-grid">${
       SIZE_COLUMNS.map(s => {
         const val = sizeMap[s] || 0;
-        if (val === 0 && !activeSizes.includes(s)) return ''; // Hide completely empty sizes
+        if (val === 0 && !activeSizes.includes(s)) return '';
         const hasValue = val > 0;
         return `
-          <div class="bl-size-cell ${hasValue ? 'bl-size-cell--has-value' : 'bl-size-cell--empty'}">
+          <div class="bl-size-cell ${hasValue ? 'bl-size-cell--has-value' : 'bl-size-cell--empty'}"
+               onclick="window.BL.editSizeQty(this, '${s}')" title="Click to edit">
             <div class="bl-size-cell__label">${s}</div>
             <div class="bl-size-cell__value">${hasValue ? val : '-'}</div>
           </div>
@@ -889,6 +946,65 @@
   }
 
   // ==========================================
+  // Inline Quantity Editing
+  // ==========================================
+  function editSizeQty(cellEl, sizeName) {
+    // Don't re-edit if already editing
+    if (cellEl.querySelector('input')) return;
+
+    const valueEl = cellEl.querySelector('.bl-size-cell__value');
+    const currentVal = parseInt(valueEl.textContent) || 0;
+
+    // Replace value with input
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.max = '999';
+    input.value = currentVal;
+    input.style.cssText = 'width:50px; text-align:center; font-size:16px; font-weight:700; padding:2px; border:2px solid #3b82f6; border-radius:4px;';
+    valueEl.textContent = '';
+    valueEl.appendChild(input);
+    input.focus();
+    input.select();
+
+    // Find the parent item card to update data
+    const itemCard = cellEl.closest('.bl-item-card');
+    const boxNumber = parseInt(itemCard?.dataset?.box) || 0;
+
+    function commitEdit() {
+      const newVal = Math.max(0, parseInt(input.value) || 0);
+      valueEl.textContent = newVal || '-';
+      cellEl.classList.toggle('bl-size-cell--has-value', newVal > 0);
+      cellEl.classList.toggle('bl-size-cell--empty', newVal === 0);
+
+      // Update the underlying data
+      if (currentData && boxNumber > 0) {
+        const box = currentData.boxes.find(b => b.boxNumber === boxNumber);
+        if (box) {
+          const contentId = itemCard.dataset.contentId;
+          const item = box.items.find((it, idx) => (it.contentId || `${boxNumber}-${idx}`) === contentId);
+          if (item && item.sizes) {
+            const oldVal = item.sizes[sizeName] || 0;
+            item.sizes[sizeName] = newVal;
+            item.totalQty = (item.totalQty || 0) - oldVal + newVal;
+            // Update the qty display on the card
+            const qtyEl = itemCard.querySelector('.bl-item-card__qty');
+            if (qtyEl) qtyEl.textContent = `${item.totalQty} pcs`;
+          }
+        }
+        recalcTotals();
+      }
+    }
+
+    input.addEventListener('blur', commitEdit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { input.blur(); }
+      if (e.key === 'Escape') { input.value = currentVal; input.blur(); }
+      e.stopPropagation(); // Don't trigger drag
+    });
+  }
+
+  // ==========================================
   // Public API (called from HTML onclick)
   // ==========================================
   window.BL = {
@@ -896,7 +1012,8 @@
     verifyBox,
     printBoxLabel,
     deleteBox,
-    openSplitModal
+    openSplitModal,
+    editSizeQty
   };
 
 })();
