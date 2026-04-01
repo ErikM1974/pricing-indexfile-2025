@@ -3078,19 +3078,16 @@ async function resolveAndConsolidateBoxItems(sanmarBoxes) {
 
   console.log(`[BoxLabels] Resolving ${allPartIds.length} partIds across ${uniqueStyles.size} styles`);
 
-  // Step 2: Call proxy's batch resolve endpoint (handles caching + SanMar API)
+  // Step 2: Resolve partIds via Caspio UNIQUE_KEY lookup (fast, <1s)
   let partIdMap = {};
   try {
     const resolveResp = await Promise.race([
       fetch(`${API_BASE_URL}/box-labels/resolve-parts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          partIds: allPartIds,
-          styles: [...uniqueStyles]
-        })
+        body: JSON.stringify({ partIds: allPartIds })
       }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Resolve timeout 20s')), 20000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Resolve timeout 10s')), 10000))
     ]);
 
     if (resolveResp.ok) {
@@ -3120,7 +3117,8 @@ async function resolveAndConsolidateBoxItems(sanmarBoxes) {
         grouped[key] = {
           style,
           color,
-          description: style, // Will be enriched later if we have product data
+          description: partInfo?.description || style,
+          brand: partInfo?.brand || '',
           sizes: {},
           totalQty: 0
         };
@@ -3175,6 +3173,25 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     let sanmarPO = '';
 
     console.log(`[BoxLabels] Lookup: identifier=${identifier}, type=${type}`);
+
+    // Hard timeout: send partial data after 25s instead of Heroku 503
+    let responded = false;
+    const hardTimeout = setTimeout(() => {
+      if (!responded && !res.headersSent) {
+        responded = true;
+        console.log(`[BoxLabels] Hard timeout (25s) for ${identifier} — sending partial data`);
+        res.json({
+          success: true,
+          partial: true,
+          order: { customerPO: identifier },
+          boxes: [],
+          unboxedItems: [],
+          excludedItems: [],
+          summary: { totalBoxes: 0, totalBoxedQty: 0, totalWOQty: 0, totalUnboxedQty: 0, mismatch: false },
+          message: 'Request took too long. Please try again — subsequent lookups are faster.'
+        });
+      }
+    }, 25000);
 
     if (type === 'wo') {
       orderNumber = identifier;
@@ -3231,6 +3248,8 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
 
     // If we still have no data, return helpful message
     if (!orderNumber && sanmarBoxes.length === 0) {
+      clearTimeout(hardTimeout);
+      responded = true;
       return res.json({
         success: true,
         order: { customerPO: sanmarPO },
@@ -3347,24 +3366,32 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
       }
     }
 
-    res.json({
-      success: true,
-      order,
-      sanmarPO: sanmarPO || identifier,
-      boxes: boxes.map(b => ({ ...b, totalBoxes })),
-      unboxedItems,
-      excludedItems,
-      summary: {
-        totalBoxes,
-        totalBoxedQty,
-        totalWOQty: totalWOQty || totalBoxedQty, // Fallback to boxed qty if no WO data
-        totalUnboxedQty: unboxedItems.reduce((s, i) => s + i.totalQty, 0),
-        mismatch: totalWOQty > 0 && totalBoxedQty !== totalWOQty
-      }
-    });
+    clearTimeout(hardTimeout);
+    if (!responded) {
+      responded = true;
+      res.json({
+        success: true,
+        order,
+        sanmarPO: sanmarPO || identifier,
+        boxes: boxes.map(b => ({ ...b, totalBoxes })),
+        unboxedItems,
+        excludedItems,
+        summary: {
+          totalBoxes,
+          totalBoxedQty,
+          totalWOQty: totalWOQty || totalBoxedQty,
+          totalUnboxedQty: unboxedItems.reduce((s, i) => s + i.totalQty, 0),
+          mismatch: totalWOQty > 0 && totalBoxedQty !== totalWOQty
+        }
+      });
+    }
   } catch (error) {
+    clearTimeout(hardTimeout);
     console.error('[BoxLabels] Error fetching box label data:', error);
-    res.status(500).json({ success: false, error: error.message });
+    if (!responded) {
+      responded = true;
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 });
 
