@@ -1047,10 +1047,10 @@ const StaffDashboardInit = (function() {
                     <tbody>
         `;
 
-        // Item group rows (grouped by bonus tier)
+        // Item group rows (grouped by bonus tier) with expandable child rows
         const itemGroups = config.itemGroups || [];
         if (itemGroups.length > 0) {
-            itemGroups.forEach(group => {
+            itemGroups.forEach((group, groupIdx) => {
                 // Sum quantities across all styles in this group
                 let groupTotal = 0;
                 const repQtys = reps.map(rep => {
@@ -1063,11 +1063,12 @@ const StaffDashboardInit = (function() {
                 });
                 const hasData = groupTotal > 0;
 
+                // Group summary row (clickable to expand)
                 html += `
-                    <tr class="${hasData ? '' : 'no-data'}" title="$${group.bonus.toFixed(2)} per item">
+                    <tr class="garment-group-row ${hasData ? '' : 'no-data'}" data-group-idx="${groupIdx}" title="$${group.bonus.toFixed(2)} per item — click to expand">
                         <td class="garment-name-col">
                             <div class="garment-info">
-                                <span class="garment-style">$${group.bonus.toFixed(2)}/pc</span>
+                                <span class="garment-style"><i class="fas fa-chevron-right garment-group-toggle"></i> $${group.bonus.toFixed(2)}/pc</span>
                                 <span class="garment-name">${escapeHtml(group.name)}</span>
                             </div>
                         </td>
@@ -1078,6 +1079,30 @@ const StaffDashboardInit = (function() {
                         <td class="total-col ${hasData ? 'has-qty' : ''}">${groupTotal || '-'}</td>
                     </tr>
                 `;
+
+                // Child rows for each individual style (hidden by default)
+                group.styles.forEach(style => {
+                    const itemInfo = config.premiumItems.find(i => i.partNumber === style);
+                    const itemName = itemInfo ? itemInfo.name : style;
+                    let styleTotal = 0;
+
+                    html += `
+                        <tr class="garment-child-row garment-group-${groupIdx}" style="display:none">
+                            <td class="garment-name-col">
+                                <div class="garment-info garment-child-info">
+                                    <span class="garment-style">${escapeHtml(style)}</span>
+                                    <span class="garment-name">${escapeHtml(itemName)}</span>
+                                </div>
+                            </td>
+                            ${reps.map(rep => {
+                                const qty = data.byRep[rep]?.premium[style] || 0;
+                                styleTotal += qty;
+                                return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
+                            }).join('')}
+                            <td class="total-col ${styleTotal > 0 ? 'has-qty' : ''}">${styleTotal || '-'}</td>
+                        </tr>
+                    `;
+                });
             });
         } else {
             // Fallback: individual premium item rows (legacy Q1 style)
@@ -1162,6 +1187,17 @@ const StaffDashboardInit = (function() {
         `;
 
         container.innerHTML = html;
+
+        // Attach expand/collapse handlers to group rows
+        container.querySelectorAll('.garment-group-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const idx = row.dataset.groupIdx;
+                const children = container.querySelectorAll(`.garment-group-${idx}`);
+                const toggle = row.querySelector('.garment-group-toggle');
+                const expanded = toggle.classList.toggle('expanded');
+                children.forEach(child => { child.style.display = expanded ? '' : 'none'; });
+            });
+        });
     }
 
     /**
