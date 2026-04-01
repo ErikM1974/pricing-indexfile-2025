@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Box Labels - NWCA Shipping &amp; Receiving</title>
+  <link rel="stylesheet" href="/pages/css/box-labels.css?v=20260401">
+</head>
+<body>
+  <!-- Sticky Header -->
+  <header class="bl-header">
+    <div class="bl-header__left">
+      <h1 class="bl-header__title">Box Labels</h1>
+      <div class="bl-header__search">
+        <input type="text" id="searchInput" class="bl-input bl-input--large" placeholder="Enter PO# or Work Order#" autocomplete="off">
+        <div class="bl-radio-group">
+          <label class="bl-radio"><input type="radio" name="searchType" value="po" checked> SanMar PO#</label>
+          <label class="bl-radio"><input type="radio" name="searchType" value="wo"> Work Order#</label>
+        </div>
+        <button id="lookupBtn" class="bl-btn bl-btn--primary bl-btn--large">Look Up</button>
+      </div>
+    </div>
+    <div class="bl-header__right">
+      <div class="bl-header__repacker">
+        <label for="repackerName">Repacker:</label>
+        <input type="text" id="repackerName" class="bl-input" placeholder="Your name" autocomplete="off">
+      </div>
+      <button id="printAllBtn" class="bl-btn bl-btn--success bl-btn--xl" disabled>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        PRINT ALL LABELS
+      </button>
+    </div>
+  </header>
+
+  <!-- Order Summary Banner (hidden until data loads) -->
+  <div id="orderBanner" class="bl-banner" style="display:none;">
+    <div class="bl-banner__row">
+      <span class="bl-banner__item"><strong>WO#</strong> <span id="bannerWO">—</span></span>
+      <span class="bl-banner__item"><strong>Company:</strong> <span id="bannerCompany">—</span></span>
+      <span class="bl-banner__item"><strong>Contact:</strong> <span id="bannerContact">—</span></span>
+      <span class="bl-banner__item"><strong>Ship Date:</strong> <span id="bannerShipDate">—</span></span>
+    </div>
+    <div class="bl-banner__row">
+      <span class="bl-banner__item"><strong>Design:</strong> <span id="bannerDesign">—</span></span>
+      <span class="bl-banner__item"><strong>Type:</strong> <span id="bannerType">—</span></span>
+      <span class="bl-banner__item"><strong>Cust PO:</strong> <span id="bannerCustPO">—</span></span>
+      <span class="bl-banner__item"><strong>Rep:</strong> <span id="bannerRep">—</span></span>
+    </div>
+  </div>
+
+  <!-- Totals Summary Bar -->
+  <div id="totalsBar" class="bl-totals" style="display:none;">
+    <span class="bl-totals__item">All Boxes: <strong id="totalBoxed">0</strong> pcs</span>
+    <span class="bl-totals__item">Work Order: <strong id="totalWO">0</strong> pcs</span>
+    <span class="bl-totals__item">Unboxed: <strong id="totalUnboxed">0</strong> pcs</span>
+    <span id="mismatchWarning" class="bl-totals__warning" style="display:none;">
+      ⚠ Quantity mismatch — check for short shipment
+    </span>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" class="bl-loading" style="display:none;">
+    <div class="bl-spinner"></div>
+    <p>Looking up shipment data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div id="errorState" class="bl-error" style="display:none;">
+    <p id="errorMessage"></p>
+    <button class="bl-btn bl-btn--primary" onclick="document.getElementById('errorState').style.display='none'">Dismiss</button>
+  </div>
+
+  <!-- Main Content: Two-column layout -->
+  <div id="mainContent" class="bl-main" style="display:none;">
+    <!-- Left Column: Boxes -->
+    <div class="bl-column bl-column--boxes">
+      <div class="bl-column__header">
+        <h2>Boxes</h2>
+        <div class="bl-column__actions">
+          <button id="expandAllBtn" class="bl-btn bl-btn--small">Expand All</button>
+          <button id="addBoxBtn" class="bl-btn bl-btn--small bl-btn--primary">+ New Box</button>
+        </div>
+      </div>
+      <div id="boxContainer" class="bl-box-container">
+        <!-- Box cards rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Right Column: Items Not In A Box -->
+    <div class="bl-column bl-column--unboxed">
+      <div class="bl-column__header">
+        <h2>Items Not In A Box</h2>
+      </div>
+
+      <div id="unboxedContainer" class="bl-unboxed-container">
+        <h3 class="bl-section-label">Other Vendor Items</h3>
+        <div id="unboxedItems" class="bl-item-list bl-droppable" data-box="0">
+          <!-- Unboxed item cards rendered by JS -->
+        </div>
+
+        <h3 class="bl-section-label">Excluded (fees/services)</h3>
+        <div id="excludedItems" class="bl-excluded-list">
+          <!-- Excluded items rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Drop zone for removing items from boxes -->
+      <div id="removeDropZone" class="bl-drop-zone" data-box="0">
+        Drag items here to remove from boxes
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Split Modal -->
+  <div id="splitModal" class="bl-modal" style="display:none;">
+    <div class="bl-modal__content">
+      <h3 id="splitModalTitle">Move items</h3>
+      <p id="splitModalSubtitle"></p>
+      <div id="splitModalSizes" class="bl-split-grid">
+        <!-- Size inputs rendered by JS -->
+      </div>
+      <div class="bl-modal__actions">
+        <button id="splitCancelBtn" class="bl-btn bl-btn--large">Cancel</button>
+        <button id="splitConfirmBtn" class="bl-btn bl-btn--primary bl-btn--large">Move Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="/pages/js/box-labels.js?v=20260401"></script>
+</body>
+</html>
