@@ -744,70 +744,95 @@
     const pageH = 279.4;
     const margin = 10;
     const contentW = pageW - margin * 2;
-    const footerH = 32; // Compact footer: just QR + BOX X OF Y
+    const footerH = 32;
     const footerY = pageH - margin - footerH;
     let y = margin;
 
-    // ─── TOP SECTION: Order Info (compact) ────────────────
+    // ─── TOP SECTION: Company + WO# (BIG — readable at 5 feet) ───
 
     const orderNum = String(order.orderNumber || '');
     const company = order.company || '';
     const hasCompany = company && !company.startsWith('SanMar PO:');
     const shipDate = formatDate(order.requestedShipDate);
     const custPO = order.customerPO || '';
+    const orderType = order.orderType || '';
+    const terms = order.terms || '';
+    const salesRep = order.salesRep || '';
 
-    // Row 1: Company (left) + Order ID (right)
+    // Row 1: Company name (left, 28pt) + WO# (right, 44pt)
     if (hasCompany) {
-      doc.setFontSize(22);
+      doc.setFontSize(28);
       doc.setFont('helvetica', 'bold');
-      const lines = doc.splitTextToSize(company, contentW * 0.55);
-      lines.forEach(line => { doc.text(line, margin, y + 7); y += 8; });
+      const companyLines = doc.splitTextToSize(company, contentW * 0.55);
+      companyLines.forEach(line => { doc.text(line, margin, y + 9); y += 10; });
     }
 
     if (orderNum) {
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text('Order ID', pageW - margin, margin + 3, { align: 'right' });
-      doc.setFontSize(40);
+      doc.text('WO#', pageW - margin, margin + 3, { align: 'right' });
+      doc.setFontSize(44);
       doc.setFont('helvetica', 'bold');
-      doc.text(orderNum, pageW - margin, margin + 14, { align: 'right' });
+      doc.text(orderNum, pageW - margin, margin + 17, { align: 'right' });
     }
 
-    // Row 2: Contact + PO (left) | Ship Date (right)
-    y = Math.max(y, margin + 16);
-    const leftCol = [];
-    if (order.contact) leftCol.push(`Contact: ${order.contact}`);
-    if (custPO) leftCol.push(`Cust PO: ${custPO}`);
+    y = Math.max(y, margin + 20);
 
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    leftCol.forEach(line => { doc.text(line, margin, y); y += 5; });
-
-    if (shipDate) {
-      doc.setFontSize(8);
+    // Row 2: Order Type + Terms (14pt — visible from moderate distance)
+    const infoLine = [orderType, terms].filter(Boolean).join('  |  ');
+    if (infoLine) {
+      doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
-      doc.text('Req. Ship Date', pageW - margin, margin + 19, { align: 'right' });
-      doc.setFontSize(22);
-      doc.setFont('helvetica', 'bold');
-      doc.text(shipDate, pageW - margin, margin + 27, { align: 'right' });
+      doc.text(infoLine, margin, y);
+      y += 6;
     }
 
-    y = Math.max(y, margin + 30);
-
-    // ─── DESIGNS (if linked) ──────────────────────────────
-
+    // Row 3: Design info (12pt)
     if (order.designs?.length && order.designs[0]?.name) {
-      doc.setDrawColor(180);
-      doc.line(margin, y, pageW - margin, y);
-      y += 4;
-      doc.setFontSize(10);
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.text('Design:', margin, y);
       doc.setFont('helvetica', 'normal');
       const d = order.designs[0];
-      doc.text(`${d.number ? d.number + '  ' : ''}${d.name}`, margin + 18, y);
+      doc.text(`${d.number ? d.number + '  ' : ''}${d.name}`, margin + 20, y);
+      y += 6;
+    }
+
+    // Row 4: Cust PO + Rep (11pt)
+    const detailParts = [];
+    if (custPO) detailParts.push(`Cust PO: ${custPO}`);
+    if (salesRep) detailParts.push(`Rep: ${salesRep}`);
+    if (detailParts.length) {
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(detailParts.join('   |   '), margin, y);
       y += 5;
     }
+
+    // ─── SHIP DATE BAR (big, with total pieces) ──────────
+
+    doc.setDrawColor(100);
+    doc.setLineWidth(0.4);
+    doc.line(margin, y, pageW - margin, y);
+    doc.setLineWidth(0.2);
+    y += 2;
+
+    const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
+
+    if (shipDate) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Req. Ship Date', margin, y + 3);
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.text(shipDate, margin + 38, y + 3);
+    }
+
+    // Total pieces (right side of ship date bar)
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${totalPcs} pcs`, pageW - margin, y + 3, { align: 'right' });
+    y += 12;
 
     // ─── CONTENTS ─────────────────────────────────────────
 
@@ -817,18 +842,13 @@
     doc.setLineWidth(0.2);
     y += 4;
 
-    const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.text('Contents', margin, y);
-    doc.setFontSize(11);
-    doc.text(`${totalPcs} pcs total`, pageW - margin, y, { align: 'right' });
     y += 5;
 
-    // Calculate how much vertical space we have for items
-    const availableH = footerY - y - 4;
+    // Dynamic sizing based on item count
     const itemCount = (box.items || []).length;
-    // Dynamically size: if many items, use smaller fonts
     const compact = itemCount > 5;
     const styleFontSize = compact ? 10 : 11;
     const colorFontSize = compact ? 8 : 9;
@@ -838,7 +858,6 @@
     const itemSpacing = compact ? 3 : 4;
 
     for (const item of (box.items || [])) {
-      // Safety: don't overflow into footer
       if (y + 15 > footerY) break;
 
       const style = item.style || item.Style_Number || '';
@@ -847,14 +866,12 @@
       if (desc !== style && desc.endsWith(`. ${style}`)) displayDesc = desc.slice(0, -(style.length + 2));
       if (desc === style) displayDesc = '';
 
-      // Style + description
       doc.setFontSize(styleFontSize);
       doc.setFont('helvetica', 'bold');
       const styleLabel = displayDesc ? `${style} - ${displayDesc}` : style;
       doc.text(doc.splitTextToSize(styleLabel, contentW - 4)[0], margin + 1, y);
       y += styleFontSize * 0.4 + 1;
 
-      // Color + qty
       doc.setFontSize(colorFontSize);
       doc.setFont('helvetica', 'normal');
       doc.text(`${item.color || ''} — ${item.totalQty || 0} pcs`, margin + 1, y);
@@ -898,14 +915,14 @@
       }
     }
 
-    // ─── FOOTER: QR + BOX X OF Y (compact, fixed) ────────
+    // ─── FOOTER: QR + BOX X OF Y + Cust PO ──────────────
 
     doc.setDrawColor(100);
     doc.setLineWidth(0.4);
     doc.line(margin, footerY, pageW - margin, footerY);
     doc.setLineWidth(0.2);
 
-    // QR Code (bottom-left, smaller)
+    // QR Code (bottom-left)
     try {
       const qr = qrcode(0, 'M');
       const poNum = currentData?.sanmarPO || currentData?.order?.customerPO || '';
@@ -921,7 +938,14 @@
     // BOX X OF Y — big, centered
     doc.setFontSize(38);
     doc.setFont('helvetica', 'bold');
-    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2 + 10, footerY + 18, { align: 'center' });
+    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2 + 10, footerY + 14, { align: 'center' });
+
+    // Cust PO in footer
+    if (custPO) {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Cust PO: ${custPO}`, pageW / 2 + 10, footerY + 22, { align: 'center' });
+    }
   }
 
   // ==========================================

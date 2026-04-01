@@ -262,3 +262,27 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
 **Solution:** Changed all 6 checks from `existing.Result.length` to `Array.isArray(existing) && existing.length > 0`. Also fixed backfill line item dedup (was blind POST with silent catch → proper GET/PUT/POST upsert).
 **Prevention:** `makeCaspioRequest` unwraps `.Result` — never check `.Result` on its return value. When writing Caspio upsert logic, always test with `Array.isArray()`. Add this to common-gotchas.md.
+
+---
+
+### Mockup Detail — Replace Button Downloads File Instead of Opening Popover
+**Problem:** AE clicks the teal "Replace" button on the reference file slot, but instead of opening the upload popover, the file URL opens in a new tab (download behavior).
+**Root Cause:** The slot's click handler (`slotEl.addEventListener('click', ...)`) calls `window.open(url, '_blank')` for non-image files and `openLightbox(url)` for images. The exclusion list (`e.target.closest(...)`) checked for `.pmd-slot-remove`, `.pmd-slot-download`, `.pmd-slot-version-badge`, and `.pmd-version-dropdown` — but NOT `.pmd-slot-replace`. So the Replace button's delegated click handler fired (opening popover), but the slot's direct click handler ALSO fired (opening URL).
+**Solution:** Added `.pmd-slot-replace` to the exclusion list in both slot click handlers (image path line 1213, non-image path line 1253).
+**Prevention:** When adding new interactive buttons inside gallery slots, ALWAYS add their class to the slot click handler's exclusion list. Both the image and non-image paths have separate exclusion lists that must stay in sync.
+
+---
+
+### Caspio Rejects q.pageSize < 5 — fetchAllCaspioPages Broke All Small-Limit Endpoints
+**Problem:** Art Hub detail page, Daily Sales Archive, and any endpoint using `limit=1` thru `limit=4` returned 500 after pagination fix deploy.
+**Root Cause:** Commit 30bbfba converted ALL `q.limit` to `q.pageSize` upfront. Caspio API rejects `q.pageSize < 5` with `IncorrectQueryParameter`.
+**Solution:** Keep `q.limit` for page 1 (universally compatible). Only switch to `q.pageSize` + `q.pageNumber` for pages 2+ (where the v3 conflict exists).
+**Prevention:** Never blindly replace `q.limit` with `q.pageSize`. Test with `limit=1` after any pagination changes. Caspio v2/v3 have different param support.
+
+---
+
+### SanMar→ShopWorks Style Normalization — _OSFA and _S/M Suffixes Not Stripped
+**Problem:** SanMar order matching failed for orders with `_OSFA`, `_S/M`, `_L/XL` part number suffixes. 36 orders had empty id_Order.
+**Root Cause:** The regex `/_\d?[xXsSmMlL]+$/i` only handled `_2X`/`_3XL` style suffixes. `NE1020_S/M`, `BG517_OSFA` stayed un-normalized, never matching SanMar's base style `NE1020`/`BG517`.
+**Solution:** Added `replace(/_(OSFA|S\/M|L\/XL|ONE SIZE)$/i, '')` before the existing regex. Also: backfill missing SanMar items via poSearch, paginate all Caspio queries, add live ManageOrders API fallback for orders missing from Caspio cache.
+**Prevention:** When adding new size suffix patterns to ShopWorks, update the normalization regex in `sanmar-orders.js` (3 instances — search `baseStyle =`).
