@@ -1047,45 +1047,81 @@ const StaffDashboardInit = (function() {
                     <tbody>
         `;
 
-        // Premium items rows
-        config.premiumItems.forEach(item => {
-            const totalQty = data.totals.premium[item.partNumber] || 0;
-            const hasData = totalQty > 0;
+        // Item group rows (grouped by bonus tier)
+        const itemGroups = config.itemGroups || [];
+        if (itemGroups.length > 0) {
+            itemGroups.forEach(group => {
+                // Sum quantities across all styles in this group
+                let groupTotal = 0;
+                const repQtys = reps.map(rep => {
+                    let qty = 0;
+                    group.styles.forEach(style => {
+                        qty += data.byRep[rep]?.premium[style] || 0;
+                    });
+                    groupTotal += qty;
+                    return qty;
+                });
+                const hasData = groupTotal > 0;
 
-            html += `
-                <tr class="${hasData ? '' : 'no-data'}" title="${item.bonus} per item">
-                    <td class="garment-name-col">
-                        <div class="garment-info">
-                            <span class="garment-style">${escapeHtml(item.partNumber)}</span>
-                            <span class="garment-name">${escapeHtml(item.name)}</span>
-                        </div>
-                    </td>
-                    ${reps.map(rep => {
-                        const qty = data.byRep[rep]?.premium[item.partNumber] || 0;
-                        return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
-                    }).join('')}
-                    <td class="total-col ${hasData ? 'has-qty' : ''}">${totalQty || '-'}</td>
-                </tr>
-            `;
-        });
+                html += `
+                    <tr class="${hasData ? '' : 'no-data'}" title="$${group.bonus.toFixed(2)} per item">
+                        <td class="garment-name-col">
+                            <div class="garment-info">
+                                <span class="garment-style">$${group.bonus.toFixed(2)}/pc</span>
+                                <span class="garment-name">${escapeHtml(group.name)}</span>
+                            </div>
+                        </td>
+                        ${reps.map((rep, idx) => {
+                            const qty = repQtys[idx];
+                            return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
+                        }).join('')}
+                        <td class="total-col ${hasData ? 'has-qty' : ''}">${groupTotal || '-'}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            // Fallback: individual premium item rows (legacy Q1 style)
+            config.premiumItems.forEach(item => {
+                const totalQty = data.totals.premium[item.partNumber] || 0;
+                const hasData = totalQty > 0;
 
-        // Richardson row (grouped)
-        const richardsonTotal = data.totals.richardson || 0;
-        html += `
-            <tr class="richardson-row ${richardsonTotal > 0 ? '' : 'no-data'}" title="${config.richardsonBonus} per cap">
-                <td class="garment-name-col">
-                    <div class="garment-info">
-                        <span class="garment-style">Richardson</span>
-                        <span class="garment-name">SanMar Caps (112, 168, etc.)</span>
-                    </div>
-                </td>
-                ${reps.map(rep => {
-                    const qty = data.byRep[rep]?.richardson || 0;
-                    return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
-                }).join('')}
-                <td class="total-col ${richardsonTotal > 0 ? 'has-qty' : ''}">${richardsonTotal || '-'}</td>
-            </tr>
-        `;
+                html += `
+                    <tr class="${hasData ? '' : 'no-data'}" title="$${item.bonus} per item">
+                        <td class="garment-name-col">
+                            <div class="garment-info">
+                                <span class="garment-style">${escapeHtml(item.partNumber)}</span>
+                                <span class="garment-name">${escapeHtml(item.name)}</span>
+                            </div>
+                        </td>
+                        ${reps.map(rep => {
+                            const qty = data.byRep[rep]?.premium[item.partNumber] || 0;
+                            return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
+                        }).join('')}
+                        <td class="total-col ${hasData ? 'has-qty' : ''}">${totalQty || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            // Richardson row (only if richardsonStyles exist)
+            if (config.richardsonStyles && config.richardsonStyles.length > 0) {
+                const richardsonTotal = data.totals.richardson || 0;
+                html += `
+                    <tr class="richardson-row ${richardsonTotal > 0 ? '' : 'no-data'}" title="$${config.richardsonBonus} per cap">
+                        <td class="garment-name-col">
+                            <div class="garment-info">
+                                <span class="garment-style">Richardson</span>
+                                <span class="garment-name">SanMar Caps (112, 168, etc.)</span>
+                            </div>
+                        </td>
+                        ${reps.map(rep => {
+                            const qty = data.byRep[rep]?.richardson || 0;
+                            return `<td class="rep-col ${qty > 0 ? 'has-qty' : ''}">${qty || '-'}</td>`;
+                        }).join('')}
+                        <td class="total-col ${richardsonTotal > 0 ? 'has-qty' : ''}">${richardsonTotal || '-'}</td>
+                    </tr>
+                `;
+            }
+        }
 
         // Bonus totals row at bottom with progress bars toward $500 goal
         const BONUS_GOAL = 500;

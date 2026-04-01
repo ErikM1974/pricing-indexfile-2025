@@ -1005,6 +1005,7 @@ const StaffDashboardService = (function() {
                 return undefined;
             }
             if (prop === 'premiumItems') return _garmentTrackerConfig.premiumItemsList;
+            if (prop === 'itemGroups') return _garmentTrackerConfig.itemGroups || [];
             return _garmentTrackerConfig[prop];
         }
     });
