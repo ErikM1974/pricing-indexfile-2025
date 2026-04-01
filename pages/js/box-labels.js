@@ -66,6 +66,18 @@
 
     document.getElementById('splitCancelBtn').addEventListener('click', closeSplitModal);
     document.getElementById('splitConfirmBtn').addEventListener('click', confirmSplit);
+
+    // Auto-load from URL params (QR code scan support)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('po')) {
+      els.searchInput.value = urlParams.get('po');
+      document.querySelector('input[name="searchType"][value="po"]').checked = true;
+      setTimeout(handleLookup, 300);
+    } else if (urlParams.get('wo')) {
+      els.searchInput.value = urlParams.get('wo');
+      document.querySelector('input[name="searchType"][value="wo"]').checked = true;
+      setTimeout(handleLookup, 300);
+    }
   }
 
   // ==========================================
@@ -107,6 +119,9 @@
 
       currentData = await resp.json();
       if (!currentData.success) throw new Error(currentData.error || 'Unknown error');
+
+      // Store PO for QR code
+      if (currentData.sanmarPO) currentData.sanmarPO = currentData.sanmarPO;
 
       // Show message if no data found
       if (currentData.message && (!currentData.boxes?.length) && (!currentData.unboxedItems?.length)) {
@@ -777,7 +792,8 @@
     // === QR CODE ===
     try {
       const qr = qrcode(0, 'M');
-      const labelUrl = `${window.location.origin}/pages/box-labels.html?shipment=${savedShipmentId || ''}&box=${boxIdx}`;
+      const poNum = currentData?.sanmarPO || currentData?.order?.customerPO || '';
+      const labelUrl = `${window.location.origin}/pages/box-labels.html?po=${poNum}`;
       qr.addData(labelUrl);
       qr.make();
       const qrDataUrl = qr.createDataURL(4, 0);

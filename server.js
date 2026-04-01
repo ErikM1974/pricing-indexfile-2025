@@ -3058,6 +3058,90 @@ const FEE_PATTERNS = [
   /^SVC/i, /^FEE/i, /^MISC.*FEE/i, /^OVER.*RUN/i
 ];
 
+// Helper: Resolve SanMar partIds to size/color via inventory API, then consolidate items
+async function resolveAndConsolidateBoxItems(sanmarBoxes) {
+  // Step 1: Collect unique styles
+  const uniqueStyles = new Set();
+  for (const box of sanmarBoxes) {
+    for (const item of box.items || []) {
+      if (item.supplierProductId) uniqueStyles.add(item.supplierProductId);
+    }
+  }
+
+  // Step 2: Fetch inventory data for each style (partId → size/color map)
+  const partIdMap = {}; // { partId: { size, color, style } }
+  const styleDescriptions = {}; // { style: description }
+
+  console.log(`[BoxLabels] Resolving ${uniqueStyles.size} styles: ${[...uniqueStyles].join(', ')}`);
+
+  const inventoryPromises = [...uniqueStyles].map(async (style) => {
+    try {
+      const resp = await fetchWithTimeout(
+        `${API_BASE_URL}/sanmar/inventory/${style}`, 8000
+      );
+      if (resp.ok) {
+        const data = await resp.json();
+        styleDescriptions[style] = data.style || style;
+        for (const inv of (data.inventory || [])) {
+          if (inv.partId) {
+            partIdMap[inv.partId] = {
+              size: inv.size || '',
+              color: inv.color || '',
+              style: style
+            };
+          }
+        }
+        console.log(`[BoxLabels] Resolved ${style}: ${(data.inventory || []).length} parts`);
+      }
+    } catch (e) {
+      console.log(`[BoxLabels] Inventory lookup failed for ${style}: ${e.message}`);
+    }
+  });
+
+  await Promise.allSettled(inventoryPromises);
+  console.log(`[BoxLabels] PartId map has ${Object.keys(partIdMap).length} entries`);
+
+  // Step 3: Consolidate items by style+color within each box
+  const consolidatedBoxes = [];
+  for (const box of sanmarBoxes) {
+    const grouped = {}; // key: "style|color" → { style, color, sizes: {}, totalQty }
+
+    for (const item of (box.items || [])) {
+      const partInfo = partIdMap[item.supplierPartId];
+      const style = item.supplierProductId || 'Unknown';
+      const color = partInfo?.color || '';
+      const size = partInfo?.size || '';
+      const key = `${style}|${color}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          style,
+          color,
+          description: styleDescriptions[style] || style,
+          sizes: {},
+          totalQty: 0
+        };
+      }
+
+      if (size) {
+        grouped[key].sizes[size] = (grouped[key].sizes[size] || 0) + item.quantity;
+      }
+      grouped[key].totalQty += item.quantity;
+    }
+
+    consolidatedBoxes.push({
+      boxNumber: box.boxNumber,
+      source: 'SanMar',
+      trackingNumber: box.trackingNumber || '',
+      carrier: box.carrier || '',
+      shipmentDate: box.shipmentDate || '',
+      items: Object.values(grouped)
+    });
+  }
+
+  return consolidatedBoxes;
+}
+
 function isNonPhysicalItem(lineItem) {
   const pn = (lineItem.PartNumber || '').toUpperCase();
   if (FEE_PATTERNS.some(p => p.test(pn))) return true;
@@ -3193,45 +3277,13 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
       }
     }
 
-    // Classify each ManageOrders line item
-    const boxes = [];
+    // Resolve partIds to size/color and consolidate items by style+color
+    const boxes = sanmarBoxes.length > 0
+      ? await resolveAndConsolidateBoxItems(sanmarBoxes)
+      : [];
+
     const unboxedItems = [];
     const excludedItems = [];
-
-    // First, build SanMar boxes with enriched item data
-    for (const box of sanmarBoxes) {
-      const enrichedItems = [];
-      for (const sanItem of box.items || []) {
-        // Find matching ManageOrders line item for description/color
-        const moMatch = allLineItems.find(li =>
-          (li.PartNumber || '').replace(/_\d+[Xx]$/, '') === sanItem.supplierProductId
-        );
-        enrichedItems.push({
-          style: sanItem.supplierProductId,
-          color: moMatch?.PartColor || '',
-          description: moMatch?.PartDescription || moMatch?.Description || sanItem.supplierProductId,
-          supplierPartId: sanItem.supplierPartId,
-          sizes: moMatch ? {
-            XS: moMatch.Size06 || 0, // Size06 can be XS for some products
-            S: moMatch.Size01 || 0,
-            M: moMatch.Size02 || 0,
-            L: moMatch.Size03 || 0,
-            XL: moMatch.Size04 || 0,
-            '2XL': moMatch.Size05 || 0,
-            '3XL': 0
-          } : { total: sanItem.quantity },
-          totalQty: sanItem.quantity
-        });
-      }
-      boxes.push({
-        boxNumber: box.boxNumber,
-        source: 'SanMar',
-        trackingNumber: box.trackingNumber || '',
-        carrier: box.carrier || '',
-        shipmentDate: box.shipmentDate || '',
-        items: enrichedItems
-      });
-    }
 
     // Then classify remaining ManageOrders line items
     for (const li of allLineItems) {
@@ -3271,18 +3323,32 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     const totalBoxedQty = boxes.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.totalQty, 0), 0);
     const totalWOQty = allLineItems.reduce((sum, li) => sum + (isNonPhysicalItem(li) ? 0 : (li.LineQuantity || 0)), 0);
 
+    // Fill in order info from SanMar shipment data if ManageOrders is empty
+    if (!order.orderNumber && boxes.length > 0) {
+      order.customerPO = sanmarPO || identifier;
+      order.company = `SanMar PO: ${sanmarPO || identifier}`;
+      // Use shipment date from first box
+      if (boxes[0]?.shipmentDate) {
+        order.requestedShipDate = boxes[0].shipmentDate;
+      }
+      if (boxes[0]?.carrier) {
+        order.orderType = boxes[0].carrier;
+      }
+    }
+
     res.json({
       success: true,
       order,
+      sanmarPO: sanmarPO || identifier,
       boxes: boxes.map(b => ({ ...b, totalBoxes })),
       unboxedItems,
       excludedItems,
       summary: {
         totalBoxes,
         totalBoxedQty,
-        totalWOQty,
+        totalWOQty: totalWOQty || totalBoxedQty, // Fallback to boxed qty if no WO data
         totalUnboxedQty: unboxedItems.reduce((s, i) => s + i.totalQty, 0),
-        mismatch: totalBoxedQty !== totalWOQty
+        mismatch: totalWOQty > 0 && totalBoxedQty !== totalWOQty
       }
     });
   } catch (error) {
