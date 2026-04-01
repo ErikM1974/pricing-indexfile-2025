@@ -784,14 +784,20 @@
 
     // Company name — left side, 28pt
     if (hasCompany) {
-      doc.setFontSize(28);
       doc.setFont('helvetica', 'bold');
-      const maxCompanyW = contentW * 0.5;
+      // Try to fit on one line — shrink font if needed
+      const maxCompanyW = contentW * 0.52;
+      let companyFontSize = 28;
+      doc.setFontSize(companyFontSize);
+      while (companyFontSize > 18 && doc.getTextWidth(company) > maxCompanyW) {
+        companyFontSize -= 2;
+        doc.setFontSize(companyFontSize);
+      }
       const companyLines = doc.splitTextToSize(company, maxCompanyW);
-      companyLines.forEach(line => { doc.text(line, margin, y + 9); y += 10; });
+      companyLines.forEach(line => { doc.text(line, margin, y + 9); y += companyFontSize * 0.38; });
     }
 
-    y = Math.max(y, margin + 20);
+    y = Math.max(y, margin + 18);
 
     // ════════════════════════════════════════════════════════
     // ZONE 2: ORDER INFO (y ≈ 30-48mm)
@@ -941,6 +947,14 @@
         }
         if (val > 0) { activeCols.push(s); activeVals.push(String(val)); }
       });
+
+      // OSFA/one-size items: if no standard sizes found, show a Qty box
+      if (activeCols.length === 0 && (item.totalQty || 0) > 0) {
+        // Check for OSFA or Other in sizes
+        const osfaVal = sizes['OSFA'] || sizes['Other'] || sizes['ONE SIZE'] || sizes['O/S'] || item.totalQty;
+        activeCols.push('Qty');
+        activeVals.push(String(osfaVal));
+      }
 
       if (activeCols.length > 0) {
         doc.autoTable({
