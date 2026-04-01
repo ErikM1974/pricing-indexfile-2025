@@ -12,6 +12,8 @@
   const API_BASE = window.location.origin;
   const HEROKU_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
   const SIZE_COLUMNS = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'Other'];
+  // SanMar uses XXL/XXXL, we normalize to 2XL/3XL
+  const SIZE_ALIASES = { 'XXL': '2XL', 'XXXL': '3XL', 'XXXXL': '4XL', 'XXXXXL': '5XL' };
   const BOX_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
 
   // ==========================================
@@ -256,7 +258,7 @@
   }
 
   function renderSizeGrid(sizes) {
-    // Handle both { S: 1, M: 2 } format and { Size_S: 1, Size_M: 2 } format
+    // Handle multiple formats: { S: 1 }, { Size_S: 1 }, { XXL: 1 }
     const sizeMap = {};
     if (sizes.Size_S !== undefined) {
       // Caspio format
@@ -265,7 +267,12 @@
         sizeMap[s] = sizes[key] || 0;
       });
     } else {
+      // Standard or SanMar format — check for aliases (XXL→2XL, etc.)
       SIZE_COLUMNS.forEach(s => { sizeMap[s] = sizes[s] || 0; });
+      // Also check SanMar aliases
+      for (const [alias, standard] of Object.entries(SIZE_ALIASES)) {
+        if (sizes[alias]) sizeMap[standard] = (sizeMap[standard] || 0) + sizes[alias];
+      }
     }
 
     const activeSizes = SIZE_COLUMNS.filter(s => sizeMap[s] > 0);
