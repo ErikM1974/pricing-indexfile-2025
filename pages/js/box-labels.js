@@ -775,14 +775,11 @@
       doc.addImage(qr.createDataURL(4, 0), 'PNG', qrX, margin, qrSize, qrSize);
     } catch (e) { /* QR failed */ }
 
-    // WO# — right side, below QR
+    // WO# — right side, next to QR (no "WO#" label)
     if (orderNum) {
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.text('WO#', qrX - 3, margin + 4, { align: 'right' });
       doc.setFontSize(44);
       doc.setFont('helvetica', 'bold');
-      doc.text(orderNum, qrX - 3, margin + 17, { align: 'right' });
+      doc.text(orderNum, qrX - 3, margin + 14, { align: 'right' });
     }
 
     // Company name — left side, 28pt
@@ -800,21 +797,24 @@
     // ZONE 2: ORDER INFO (y ≈ 30-48mm)
     // ════════════════════════════════════════════════════════
 
-    // Order Type | Terms (left) + Paid Status (right)
-    const infoLine = [orderType, terms].filter(Boolean).join('  |  ');
-    if (infoLine) {
+    // Order Type | Terms | Paid Status (all inline, left-aligned)
+    const infoParts = [orderType, terms, paidStatus].filter(Boolean);
+    if (infoParts.length) {
       doc.setFontSize(13);
       doc.setFont('helvetica', 'normal');
-      doc.text(infoLine, margin, y);
-    }
-    if (paidStatus) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      if (paidStatus === 'PAID') doc.setTextColor(0, 128, 0);
-      else if (paidStatus === 'NOT PAID') doc.setTextColor(200, 0, 0);
-      else doc.setTextColor(200, 130, 0);
-      doc.text(paidStatus, R, y, { align: 'right' });
-      doc.setTextColor(0, 0, 0);
+      const mainInfo = [orderType, terms].filter(Boolean).join('  |  ');
+      doc.text(mainInfo, margin, y);
+      // Paid status — smaller, black, appended after terms
+      if (paidStatus && mainInfo) {
+        const mainWidth = doc.getTextWidth(mainInfo);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`  —  ${paidStatus}`, margin + mainWidth, y);
+      } else if (paidStatus) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(paidStatus, margin, y);
+      }
     }
     y += 6;
 
