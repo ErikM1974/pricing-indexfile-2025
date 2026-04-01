@@ -92,6 +92,13 @@
 | `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |
 | `/pages/policies/dtg-artwork-checklist.html` | DTG artwork preparation checklist | — | ✅ Active |
 
+### Box Labels - Shipping & Receiving (NEW 2026-04-01)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/box-labels.html` | Box label management page — lookup, drag/drop, print labels | box-labels.js, box-labels.css, SortableJS, jsPDF, JsBarcode, qrcode-generator | ✅ Active |
+| `/pages/js/box-labels.js` | Box management logic — API calls, drag/drop, PDF generation | SortableJS CDN, jsPDF CDN, JsBarcode CDN | ✅ Active |
+| `/pages/css/box-labels.css` | Box labels page styling — production-floor UI | — | ✅ Active |
+
 ## 📊 Calculators & Quote Builders
 
 ### Unified Manual Pricing Calculator

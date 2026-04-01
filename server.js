@@ -3033,6 +3033,655 @@ app.post('/api/public/quote/:quoteId/accept', async (req, res) => {
   }
 });
 
+// ==========================================
+// Box Label Management - Shipment Receiving
+// ==========================================
+
+// Helper: Fetch from Caspio via proxy
+async function caspioFetch(tablePath, options = {}) {
+  const url = `${API_BASE_URL}/${tablePath}`;
+  const resp = await fetch(url, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Caspio ${options.method || 'GET'} ${tablePath} failed: ${resp.status} - ${text}`);
+  }
+  return resp.json();
+}
+
+// Known fee/non-physical part number patterns (not box items)
+const FEE_PATTERNS = [
+  /^SETUP/i, /^DIGI/i, /^ART/i, /^RUSH/i, /^DISC/i, /^SHIP/i,
+  /^TAX/i, /^MONO/i, /^HANDLING/i, /^CREDIT/i, /^ADJUST/i,
+  /^SVC/i, /^FEE/i, /^MISC.*FEE/i, /^OVER.*RUN/i
+];
+
+function isNonPhysicalItem(lineItem) {
+  const pn = (lineItem.PartNumber || '').toUpperCase();
+  if (FEE_PATTERNS.some(p => p.test(pn))) return true;
+  // No size data = likely a fee/service
+  const sizeTotal = (lineItem.Size01 || 0) + (lineItem.Size02 || 0) + (lineItem.Size03 || 0) +
+    (lineItem.Size04 || 0) + (lineItem.Size05 || 0) + (lineItem.Size06 || 0);
+  if (sizeTotal === 0 && (lineItem.LineQuantity || 0) <= 1) return true;
+  return false;
+}
+
+// GET /api/box-label-data/:identifier - Merge SanMar shipment + ManageOrders data
+app.get('/api/box-label-data/:identifier', async (req, res) => {
+  const { identifier } = req.params;
+  const type = req.query.type || 'po'; // 'po' = SanMar PO, 'wo' = ShopWorks Work Order
+
+  try {
+    let orderNumber = '';
+    let sanmarPO = '';
+
+    if (type === 'wo') {
+      // Looking up by ShopWorks work order number
+      orderNumber = identifier;
+      const orderResp = await fetch(`${API_BASE_URL}/manageorders/orders/${orderNumber}`);
+      if (!orderResp.ok) throw new Error(`ManageOrders order ${orderNumber} not found`);
+      const orderData = await orderResp.json();
+      const o = orderData.data || orderData;
+      sanmarPO = o.CustomerPurchaseOrder || '';
+    } else {
+      // Looking up by SanMar PO number
+      sanmarPO = identifier;
+      // Try to find the matching ShopWorks order via SanMar_Orders Caspio table
+      try {
+        const matchResp = await fetch(`${API_BASE_URL}/SanMar_Orders?q.where=SanMar_PO='${identifier}'&q.select=ShopWorks_Order_No,Company_Name`);
+        if (matchResp.ok) {
+          const matchData = await matchResp.json();
+          const matches = Array.isArray(matchData) ? matchData : (matchData.Result || []);
+          if (matches.length > 0 && matches[0].ShopWorks_Order_No) {
+            orderNumber = String(matches[0].ShopWorks_Order_No);
+            console.log(`[BoxLabels] Matched PO ${identifier} to WO# ${orderNumber}`);
+          }
+        }
+      } catch (e) {
+        console.log(`[BoxLabels] SanMar_Orders lookup failed:`, e.message);
+      }
+
+      // Fallback: try ManageOrders search by PO if no match found
+      if (!orderNumber) {
+        try {
+          const searchResp = await fetch(`${API_BASE_URL}/manageorders/orders?purchaseOrder=${identifier}`);
+          if (searchResp.ok) {
+            const searchData = await searchResp.json();
+            const orders = Array.isArray(searchData) ? searchData : (searchData.data || []);
+            if (orders.length > 0) {
+              orderNumber = String(orders[0].order_no || orders[0].id_Order || '');
+              console.log(`[BoxLabels] Found WO# ${orderNumber} via ManageOrders PO search`);
+            }
+          }
+        } catch (e) {
+          console.log(`[BoxLabels] ManageOrders PO search failed:`, e.message);
+        }
+      }
+    }
+
+    // Fetch ManageOrders data (order header + line items) in parallel
+    const fetchPromises = [];
+    if (orderNumber) {
+      fetchPromises.push(
+        fetch(`${API_BASE_URL}/manageorders/orders/${orderNumber}`).catch(() => null),
+        fetch(`${API_BASE_URL}/manageorders/lineitems/${orderNumber}`).catch(() => null)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve(null), Promise.resolve(null));
+    }
+    const [orderResp, lineItemsResp] = await Promise.all(fetchPromises);
+
+    // Try SanMar shipment API (may not exist for non-SanMar orders)
+    let sanmarBoxes = [];
+    if (sanmarPO) {
+      try {
+        const shipResp = await fetch(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`);
+        if (shipResp.ok) {
+          const shipData = await shipResp.json();
+          if (shipData.success && shipData.data?.boxes) {
+            sanmarBoxes = shipData.data.boxes;
+          }
+        }
+      } catch (e) {
+        console.log(`[BoxLabels] SanMar shipment lookup failed for PO ${sanmarPO}:`, e.message);
+      }
+    }
+
+    // If we still have no order number and no SanMar boxes, return helpful error
+    if (!orderNumber && sanmarBoxes.length === 0) {
+      return res.json({
+        success: true,
+        order: { customerPO: sanmarPO },
+        boxes: [],
+        unboxedItems: [],
+        excludedItems: [],
+        summary: { totalBoxes: 0, totalBoxedQty: 0, totalWOQty: 0, totalUnboxedQty: 0, mismatch: false },
+        message: `PO ${identifier} not found in SanMar_Orders or ManageOrders. The SanMar shipment API needs to be deployed to Heroku, or enter a Work Order# instead.`
+      });
+    }
+
+    // Parse ManageOrders data
+    let order = {};
+    if (orderResp?.ok) {
+      const od = await orderResp.json();
+      const o = od.data || od;
+      order = {
+        orderNumber: o.order_no || o.id_Order || orderNumber,
+        orderType: o.OrderType || o.ExtSource || '',
+        company: o.CustomerName || o.Company || '',
+        contact: `${o.ContactFirstName || ''} ${o.ContactLastName || ''}`.trim(),
+        contactEmail: o.ContactEmail || '',
+        customerPO: o.CustomerPurchaseOrder || sanmarPO || '',
+        requestedShipDate: o.date_Due || o.DateDue || '',
+        dropDeadDate: o.date_InHand || o.DateInHand || '',
+        salesRep: o.CustomerServiceRep || o.SalesRep || '',
+        designs: []
+      };
+      // Extract design info if available
+      if (o.DesignName || o.id_Design) {
+        order.designs.push({
+          number: String(o.id_Design || ''),
+          name: o.DesignName || ''
+        });
+      }
+    }
+
+    // Parse line items and classify them
+    let allLineItems = [];
+    if (lineItemsResp?.ok) {
+      const lid = await lineItemsResp.json();
+      allLineItems = Array.isArray(lid) ? lid : (lid.data || []);
+    }
+
+    // Build a set of SanMar product IDs for matching
+    const sanmarProductIds = new Set();
+    for (const box of sanmarBoxes) {
+      for (const item of box.items || []) {
+        sanmarProductIds.add(item.supplierProductId);
+      }
+    }
+
+    // Classify each ManageOrders line item
+    const boxes = [];
+    const unboxedItems = [];
+    const excludedItems = [];
+
+    // First, build SanMar boxes with enriched item data
+    for (const box of sanmarBoxes) {
+      const enrichedItems = [];
+      for (const sanItem of box.items || []) {
+        // Find matching ManageOrders line item for description/color
+        const moMatch = allLineItems.find(li =>
+          (li.PartNumber || '').replace(/_\d+[Xx]$/, '') === sanItem.supplierProductId
+        );
+        enrichedItems.push({
+          style: sanItem.supplierProductId,
+          color: moMatch?.PartColor || '',
+          description: moMatch?.PartDescription || moMatch?.Description || sanItem.supplierProductId,
+          supplierPartId: sanItem.supplierPartId,
+          sizes: moMatch ? {
+            XS: moMatch.Size06 || 0, // Size06 can be XS for some products
+            S: moMatch.Size01 || 0,
+            M: moMatch.Size02 || 0,
+            L: moMatch.Size03 || 0,
+            XL: moMatch.Size04 || 0,
+            '2XL': moMatch.Size05 || 0,
+            '3XL': 0
+          } : { total: sanItem.quantity },
+          totalQty: sanItem.quantity
+        });
+      }
+      boxes.push({
+        boxNumber: box.boxNumber,
+        source: 'SanMar',
+        trackingNumber: box.trackingNumber || '',
+        carrier: box.carrier || '',
+        shipmentDate: box.shipmentDate || '',
+        items: enrichedItems
+      });
+    }
+
+    // Then classify remaining ManageOrders line items
+    for (const li of allLineItems) {
+      const pn = li.PartNumber || '';
+      const basePn = pn.replace(/_\d+[Xx]$/, '');
+
+      if (isNonPhysicalItem(li)) {
+        excludedItems.push({
+          lineItemId: li.id_LineItem || li.PK_ID,
+          partNumber: pn,
+          description: li.PartDescription || li.Description || pn,
+          unitPrice: li.LineUnitPrice || 0,
+          reason: 'Non-physical (fee/service)'
+        });
+      } else if (!sanmarProductIds.has(basePn)) {
+        // Not in SanMar shipment = other vendor
+        unboxedItems.push({
+          lineItemId: li.id_LineItem || li.PK_ID,
+          style: pn,
+          color: li.PartColor || '',
+          description: li.PartDescription || li.Description || pn,
+          vendor: 'Other',
+          sizes: {
+            S: li.Size01 || 0,
+            M: li.Size02 || 0,
+            L: li.Size03 || 0,
+            XL: li.Size04 || 0,
+            '2XL': li.Size05 || 0,
+            '3XL': li.Size06 || 0
+          },
+          totalQty: li.LineQuantity || 0
+        });
+      }
+    }
+
+    const totalBoxes = boxes.length;
+    const totalBoxedQty = boxes.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.totalQty, 0), 0);
+    const totalWOQty = allLineItems.reduce((sum, li) => sum + (isNonPhysicalItem(li) ? 0 : (li.LineQuantity || 0)), 0);
+
+    res.json({
+      success: true,
+      order,
+      boxes: boxes.map(b => ({ ...b, totalBoxes })),
+      unboxedItems,
+      excludedItems,
+      summary: {
+        totalBoxes,
+        totalBoxedQty,
+        totalWOQty,
+        totalUnboxedQty: unboxedItems.reduce((s, i) => s + i.totalQty, 0),
+        mismatch: totalBoxedQty !== totalWOQty
+      }
+    });
+  } catch (error) {
+    console.error('[BoxLabels] Error fetching box label data:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/box-shipments - Import/save a shipment to Caspio
+app.post('/api/box-shipments', async (req, res) => {
+  try {
+    const { order, boxes, unboxedItems, excludedItems } = req.body;
+
+    // Create the Box_Shipments record
+    const shipment = await caspioFetch('Box_Shipments', {
+      method: 'POST',
+      body: JSON.stringify({
+        SanMar_PO: order.customerPO || '',
+        ShopWorks_Order_No: String(order.orderNumber || ''),
+        Company_Name: order.company || '',
+        Contact_Name: order.contact || '',
+        Customer_PO: order.customerPO || '',
+        Order_Type: order.orderType || '',
+        Req_Ship_Date: order.requestedShipDate || null,
+        Drop_Dead_Date: order.dropDeadDate || null,
+        Design_Number: order.designs?.[0]?.number ? parseInt(order.designs[0].number) : null,
+        Design_Name: order.designs?.[0]?.name || '',
+        Total_Boxes: boxes.length,
+        Carrier: boxes[0]?.carrier || '',
+        Status: 'Imported',
+        Imported_Date: new Date().toISOString(),
+        Modified_Date: new Date().toISOString(),
+        Modified_By: req.body.modifiedBy || '',
+        Total_WO_Qty: req.body.summary?.totalWOQty || 0,
+        Total_Boxed_Qty: req.body.summary?.totalBoxedQty || 0
+      })
+    });
+
+    const shipmentId = shipment.ID_Shipment || shipment.PK_ID || shipment.id;
+
+    // Create Box_Contents rows for each item in each box
+    const contentPromises = [];
+    for (const box of boxes) {
+      for (let i = 0; i < (box.items || []).length; i++) {
+        const item = box.items[i];
+        contentPromises.push(caspioFetch('Box_Contents', {
+          method: 'POST',
+          body: JSON.stringify({
+            Shipment_ID: shipmentId,
+            Box_Number: box.boxNumber,
+            Tracking_Number: box.trackingNumber || '',
+            Style_Number: item.style || '',
+            Description: item.description || '',
+            Color: item.color || '',
+            Size_XS: item.sizes?.XS || 0,
+            Size_S: item.sizes?.S || 0,
+            Size_M: item.sizes?.M || 0,
+            Size_L: item.sizes?.L || 0,
+            Size_XL: item.sizes?.XL || 0,
+            Size_2XL: item.sizes?.['2XL'] || 0,
+            Size_3XL: item.sizes?.['3XL'] || 0,
+            Size_4XL: item.sizes?.['4XL'] || 0,
+            Size_5XL: item.sizes?.['5XL'] || 0,
+            Size_Other: item.sizes?.Other || 0,
+            Total_Qty: item.totalQty || 0,
+            Is_Excluded: 'false',
+            Is_Verified: 'false',
+            Sort_Order: i + 1
+          })
+        }));
+      }
+    }
+
+    // Save unboxed items (Box_Number = 0)
+    for (const item of (unboxedItems || [])) {
+      contentPromises.push(caspioFetch('Box_Contents', {
+        method: 'POST',
+        body: JSON.stringify({
+          Shipment_ID: shipmentId,
+          Box_Number: 0,
+          Tracking_Number: '',
+          Style_Number: item.style || '',
+          Description: item.description || '',
+          Color: item.color || '',
+          Size_XS: item.sizes?.XS || 0,
+          Size_S: item.sizes?.S || 0,
+          Size_M: item.sizes?.M || 0,
+          Size_L: item.sizes?.L || 0,
+          Size_XL: item.sizes?.XL || 0,
+          Size_2XL: item.sizes?.['2XL'] || 0,
+          Size_3XL: item.sizes?.['3XL'] || 0,
+          Size_4XL: item.sizes?.['4XL'] || 0,
+          Size_5XL: item.sizes?.['5XL'] || 0,
+          Size_Other: item.sizes?.Other || 0,
+          Total_Qty: item.totalQty || 0,
+          Is_Excluded: 'false',
+          Is_Verified: 'false',
+          Sort_Order: 1
+        })
+      }));
+    }
+
+    // Save excluded items (Is_Excluded = true)
+    for (const item of (excludedItems || [])) {
+      contentPromises.push(caspioFetch('Box_Contents', {
+        method: 'POST',
+        body: JSON.stringify({
+          Shipment_ID: shipmentId,
+          Box_Number: 0,
+          Style_Number: item.partNumber || '',
+          Description: item.description || '',
+          Is_Excluded: 'true',
+          Is_Verified: 'false',
+          Total_Qty: 0,
+          Sort_Order: 99
+        })
+      }));
+    }
+
+    await Promise.all(contentPromises);
+
+    res.json({ success: true, shipmentId, message: `Shipment imported with ${boxes.length} boxes` });
+  } catch (error) {
+    console.error('[BoxLabels] Error saving shipment:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/box-shipments/:shipmentId - Get saved shipment with all box contents
+app.get('/api/box-shipments/:shipmentId', async (req, res) => {
+  try {
+    const { shipmentId } = req.params;
+
+    // Fetch shipment header
+    const shipments = await caspioFetch(`Box_Shipments?q.where=ID_Shipment=${shipmentId}`);
+    const shipment = Array.isArray(shipments) ? shipments[0] : (shipments.Result?.[0] || shipments);
+    if (!shipment) return res.status(404).json({ success: false, error: 'Shipment not found' });
+
+    // Fetch all contents for this shipment
+    const contents = await caspioFetch(`Box_Contents?q.where=Shipment_ID=${shipmentId}&q.orderBy=Box_Number,Sort_Order`);
+    const allItems = Array.isArray(contents) ? contents : (contents.Result || []);
+
+    // Group into boxes, unboxed, and excluded
+    const boxMap = {};
+    const unboxedItems = [];
+    const excludedItems = [];
+
+    for (const item of allItems) {
+      if (item.Is_Excluded === 'true') {
+        excludedItems.push(item);
+      } else if (item.Box_Number === 0 || !item.Box_Number) {
+        unboxedItems.push(item);
+      } else {
+        if (!boxMap[item.Box_Number]) {
+          boxMap[item.Box_Number] = {
+            boxNumber: item.Box_Number,
+            trackingNumber: item.Tracking_Number || '',
+            source: item.Tracking_Number ? 'SanMar' : 'Custom',
+            items: [],
+            isVerified: item.Is_Verified === 'true',
+            verifiedBy: item.Verified_By || '',
+            verifiedDate: item.Verified_Date || ''
+          };
+        }
+        boxMap[item.Box_Number].items.push(item);
+      }
+    }
+
+    const boxes = Object.values(boxMap).sort((a, b) => a.boxNumber - b.boxNumber);
+    const totalBoxes = boxes.length;
+
+    res.json({
+      success: true,
+      shipment,
+      boxes: boxes.map(b => ({ ...b, totalBoxes })),
+      unboxedItems,
+      excludedItems,
+      summary: {
+        totalBoxes,
+        totalBoxedQty: boxes.reduce((s, b) => s + b.items.reduce((s2, i) => s2 + (i.Total_Qty || 0), 0), 0),
+        totalWOQty: shipment.Total_WO_Qty || 0,
+        totalUnboxedQty: unboxedItems.reduce((s, i) => s + (i.Total_Qty || 0), 0)
+      }
+    });
+  } catch (error) {
+    console.error('[BoxLabels] Error fetching shipment:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/box-shipments - List recent shipments
+app.get('/api/box-shipments', async (req, res) => {
+  try {
+    const limit = req.query.limit || 20;
+    const shipments = await caspioFetch(`Box_Shipments?q.orderBy=Imported_Date%20DESC&q.pageSize=${limit}`);
+    const list = Array.isArray(shipments) ? shipments : (shipments.Result || []);
+    res.json({ success: true, shipments: list });
+  } catch (error) {
+    console.error('[BoxLabels] Error listing shipments:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// PUT /api/box-contents/:contentId - Update a box content item (move between boxes, update qty)
+app.put('/api/box-contents/:contentId', async (req, res) => {
+  try {
+    const { contentId } = req.params;
+    const updates = req.body;
+    await caspioFetch(`Box_Contents/${contentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    res.json({ success: true, message: 'Item updated' });
+  } catch (error) {
+    console.error('[BoxLabels] Error updating content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/box-contents - Add a new item to a box
+app.post('/api/box-contents', async (req, res) => {
+  try {
+    const result = await caspioFetch('Box_Contents', {
+      method: 'POST',
+      body: JSON.stringify(req.body)
+    });
+    res.json({ success: true, item: result });
+  } catch (error) {
+    console.error('[BoxLabels] Error creating content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// DELETE /api/box-contents/:contentId - Remove an item from a box
+app.delete('/api/box-contents/:contentId', async (req, res) => {
+  try {
+    await caspioFetch(`Box_Contents/${contentId}`, { method: 'DELETE' });
+    res.json({ success: true, message: 'Item removed' });
+  } catch (error) {
+    console.error('[BoxLabels] Error deleting content:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/box-contents/move - Move item between boxes (partial size split supported)
+app.post('/api/box-contents/move', async (req, res) => {
+  try {
+    const { contentId, fromBox, toBox, shipmentId, splitSizes } = req.body;
+
+    if (!contentId || toBox === undefined) {
+      return res.status(400).json({ success: false, error: 'contentId and toBox required' });
+    }
+
+    // If splitSizes provided, do a partial move (create new row in target box, reduce source)
+    if (splitSizes) {
+      // Fetch the source item
+      const items = await caspioFetch(`Box_Contents?q.where=Box_ID=${contentId}`);
+      const source = Array.isArray(items) ? items[0] : (items.Result?.[0] || items);
+      if (!source) return res.status(404).json({ success: false, error: 'Source item not found' });
+
+      // Create new item in target box with split quantities
+      const newItem = {
+        Shipment_ID: source.Shipment_ID,
+        Box_Number: toBox,
+        Tracking_Number: '',
+        Style_Number: source.Style_Number,
+        Description: source.Description,
+        Color: source.Color,
+        Size_XS: splitSizes.XS || 0,
+        Size_S: splitSizes.S || 0,
+        Size_M: splitSizes.M || 0,
+        Size_L: splitSizes.L || 0,
+        Size_XL: splitSizes.XL || 0,
+        Size_2XL: splitSizes['2XL'] || 0,
+        Size_3XL: splitSizes['3XL'] || 0,
+        Size_4XL: splitSizes['4XL'] || 0,
+        Size_5XL: splitSizes['5XL'] || 0,
+        Size_Other: splitSizes.Other || 0,
+        Total_Qty: Object.values(splitSizes).reduce((s, v) => s + (v || 0), 0),
+        Is_Excluded: 'false',
+        Is_Verified: 'false',
+        Sort_Order: 1
+      };
+      await caspioFetch('Box_Contents', { method: 'POST', body: JSON.stringify(newItem) });
+
+      // Reduce source item quantities
+      const updatedSource = {
+        Size_XS: (source.Size_XS || 0) - (splitSizes.XS || 0),
+        Size_S: (source.Size_S || 0) - (splitSizes.S || 0),
+        Size_M: (source.Size_M || 0) - (splitSizes.M || 0),
+        Size_L: (source.Size_L || 0) - (splitSizes.L || 0),
+        Size_XL: (source.Size_XL || 0) - (splitSizes.XL || 0),
+        Size_2XL: (source.Size_2XL || 0) - (splitSizes['2XL'] || 0),
+        Size_3XL: (source.Size_3XL || 0) - (splitSizes['3XL'] || 0),
+        Size_4XL: (source.Size_4XL || 0) - (splitSizes['4XL'] || 0),
+        Size_5XL: (source.Size_5XL || 0) - (splitSizes['5XL'] || 0),
+        Size_Other: (source.Size_Other || 0) - (splitSizes.Other || 0)
+      };
+      updatedSource.Total_Qty = Object.values(updatedSource).reduce((s, v) => s + (v || 0), 0);
+
+      // If source is now empty, delete it
+      if (updatedSource.Total_Qty <= 0) {
+        await caspioFetch(`Box_Contents/${contentId}`, { method: 'DELETE' });
+      } else {
+        await caspioFetch(`Box_Contents/${contentId}`, {
+          method: 'PUT',
+          body: JSON.stringify(updatedSource)
+        });
+      }
+
+      res.json({ success: true, message: 'Items split and moved' });
+    } else {
+      // Full move - just update the Box_Number
+      await caspioFetch(`Box_Contents/${contentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ Box_Number: toBox })
+      });
+      res.json({ success: true, message: 'Item moved to box ' + toBox });
+    }
+  } catch (error) {
+    console.error('[BoxLabels] Error moving item:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// PUT /api/box-shipments/:shipmentId/verify-box - Mark a box as verified
+app.put('/api/box-shipments/:shipmentId/verify-box', async (req, res) => {
+  try {
+    const { boxNumber, verifiedBy } = req.body;
+    const { shipmentId } = req.params;
+
+    // Update all items in this box
+    const contents = await caspioFetch(`Box_Contents?q.where=Shipment_ID=${shipmentId} AND Box_Number=${boxNumber}`);
+    const items = Array.isArray(contents) ? contents : (contents.Result || []);
+
+    const now = new Date().toISOString();
+    await Promise.all(items.map(item =>
+      caspioFetch(`Box_Contents/${item.Box_ID}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          Is_Verified: 'true',
+          Verified_By: verifiedBy || '',
+          Verified_Date: now
+        })
+      })
+    ));
+
+    // Update shipment modified date
+    await caspioFetch(`Box_Shipments/${shipmentId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ Modified_Date: now, Modified_By: verifiedBy || '' })
+    });
+
+    res.json({ success: true, message: `Box ${boxNumber} verified` });
+  } catch (error) {
+    console.error('[BoxLabels] Error verifying box:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/box-shipments/:shipmentId/add-box - Add a new empty box
+app.post('/api/box-shipments/:shipmentId/add-box', async (req, res) => {
+  try {
+    const { shipmentId } = req.params;
+
+    // Get current shipment to find next box number
+    const shipments = await caspioFetch(`Box_Shipments?q.where=ID_Shipment=${shipmentId}`);
+    const shipment = Array.isArray(shipments) ? shipments[0] : (shipments.Result?.[0] || shipments);
+    if (!shipment) return res.status(404).json({ success: false, error: 'Shipment not found' });
+
+    const newBoxNumber = (shipment.Total_Boxes || 0) + 1;
+
+    // Update total boxes count
+    await caspioFetch(`Box_Shipments/${shipmentId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        Total_Boxes: newBoxNumber,
+        Modified_Date: new Date().toISOString(),
+        Modified_By: req.body.modifiedBy || ''
+      })
+    });
+
+    res.json({ success: true, boxNumber: newBoxNumber, totalBoxes: newBoxNumber });
+  } catch (error) {
+    console.error('[BoxLabels] Error adding box:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
