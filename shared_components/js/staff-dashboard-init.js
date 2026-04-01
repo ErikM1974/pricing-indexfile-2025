@@ -1068,7 +1068,7 @@ const StaffDashboardInit = (function() {
                     <tr class="garment-group-row ${hasData ? '' : 'no-data'}" data-group-idx="${groupIdx}" title="$${group.bonus.toFixed(2)} per item — click to expand">
                         <td class="garment-name-col">
                             <div class="garment-info">
-                                <span class="garment-style"><i class="fas fa-chevron-right garment-group-toggle"></i> $${group.bonus.toFixed(2)}/pc</span>
+                                <span class="garment-style"><i class="fas fa-chevron-right garment-group-toggle"></i></span>
                                 <span class="garment-name">${escapeHtml(group.name)}</span>
                             </div>
                         </td>
