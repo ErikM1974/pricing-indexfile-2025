@@ -612,130 +612,159 @@
 
   function drawBoxLabel(doc, box, order, boxIdx, totalBoxes) {
     const pageW = 215.9;
-    const margin = 10;
+    const pageH = 279.4;
+    const margin = 12;
     const contentW = pageW - margin * 2;
+    const bottomReserved = 45; // Reserve bottom 45mm for tracking + QR + BOX X OF Y
+    const maxContentY = pageH - margin - bottomReserved;
     let y = margin;
 
-    // === BARCODE ===
-    try {
-      const canvas = document.createElement('canvas');
-      JsBarcode(canvas, String(order.orderNumber || '0'), {
-        format: 'CODE128',
-        width: 2,
-        height: 50,
-        displayValue: false,
-        margin: 0
-      });
-      doc.addImage(canvas.toDataURL(), 'PNG', margin, y, 80, 18);
-    } catch (e) { /* barcode failed, skip */ }
+    // ─── HEADER SECTION ───────────────────────────────────
 
-    // === ORDER ID (right side, huge) ===
-    doc.setFontSize(42);
-    doc.setFont('helvetica', 'bold');
-    doc.text(String(order.orderNumber || ''), pageW - margin, y + 16, { align: 'right' });
-
-    // Small "Order ID" label
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Order ID', pageW - margin, y + 4, { align: 'right' });
-
-    y += 24;
-
-    // === TYPE & REQ SHIP DATE ===
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Type: ${order.orderType || ''}`, margin, y);
-
-    doc.setFontSize(9);
-    doc.text('Req. Ship Date', pageW - margin, y - 4, { align: 'right' });
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text(formatDate(order.requestedShipDate) || '', pageW - margin, y + 5, { align: 'right' });
-    y += 12;
-
-    // === COMPANY ===
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    const companyLines = doc.splitTextToSize(order.company || '', contentW * 0.6);
-    companyLines.forEach(line => {
-      doc.text(line, margin, y);
-      y += 9;
-    });
-
-    // === CONTACT ===
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Contact: ${order.contact || ''}`, margin, y);
-
-    // Drop Dead Date (right side)
-    if (order.dropDeadDate) {
-      doc.setFontSize(9);
-      doc.text('Drop Dead Date', pageW - margin, y - 4, { align: 'right' });
-      doc.setFontSize(16);
+    // Order ID — large, top-right
+    const orderNum = String(order.orderNumber || '');
+    if (orderNum) {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Order ID', pageW - margin, y + 4, { align: 'right' });
+      doc.setFontSize(48);
       doc.setFont('helvetica', 'bold');
-      doc.text(formatDate(order.dropDeadDate), pageW - margin, y + 2, { align: 'right' });
+      doc.text(orderNum, pageW - margin, y + 18, { align: 'right' });
     }
-    y += 8;
 
-    // === CUST PO ===
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Cust PO: ${order.customerPO || ''}`, margin, y);
-    y += 8;
+    // Ship Date — below order ID, right side
+    const shipDate = formatDate(order.requestedShipDate);
+    if (shipDate) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Req. Ship Date', pageW - margin, y + 23, { align: 'right' });
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.text(shipDate, pageW - margin, y + 34, { align: 'right' });
+    }
 
-    // === SEPARATOR ===
-    doc.setDrawColor(200);
-    doc.line(margin, y, pageW - margin, y);
-    y += 6;
+    // Company — large, left side
+    const company = order.company || '';
+    if (company && !company.startsWith('SanMar PO:')) {
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      const companyLines = doc.splitTextToSize(company, contentW * 0.55);
+      companyLines.forEach(line => {
+        doc.text(line, margin, y + 6);
+        y += 10;
+      });
+      y -= 10; // undo last increment since we start from fixed position
+    }
 
-    // === DESIGNS ===
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Designs', margin, y);
-    y += 7;
+    // Left-side details
+    let leftY = margin + (company && !company.startsWith('SanMar PO:') ? 18 : 6);
 
-    if (order.designs?.length) {
+    if (order.contact) {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
+      doc.text(`Contact: ${order.contact}`, margin, leftY);
+      leftY += 7;
+    }
+
+    if (order.customerPO) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Cust PO: ${order.customerPO}`, margin, leftY);
+      leftY += 7;
+    }
+
+    if (order.orderType && order.orderType !== 'UPS') {
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Type: ${order.orderType}`, margin, leftY);
+      leftY += 6;
+    }
+
+    y = Math.max(leftY, margin + 38) + 2;
+
+    // ─── DESIGNS SECTION ──────────────────────────────────
+
+    if (order.designs?.length && order.designs[0]?.name) {
+      doc.setDrawColor(180);
+      doc.line(margin, y, pageW - margin, y);
+      y += 5;
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Designs', margin, y);
+      y += 6;
+
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'normal');
       order.designs.forEach(d => {
-        doc.text(`${d.number}  ${d.name}`, margin + 4, y);
+        const designText = d.number ? `${d.number}  ${d.name}` : d.name;
+        doc.text(designText, margin + 2, y);
         y += 7;
       });
+      y += 2;
+    } else {
+      y += 2;
     }
-    y += 2;
 
-    // === SEPARATOR ===
+    // ─── CONTENTS SECTION ─────────────────────────────────
+
+    doc.setDrawColor(180);
     doc.line(margin, y, pageW - margin, y);
-    y += 6;
+    y += 5;
 
-    // === CONTENTS ===
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Contents', margin, y);
-    y += 8;
+
+    // Total pieces count, right-aligned
+    const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
+    doc.setFontSize(12);
+    doc.text(`${totalPcs} pcs total`, pageW - margin, y, { align: 'right' });
+    y += 7;
 
     for (const item of (box.items || [])) {
-      // Style line
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`${item.style || item.Style_Number || ''} - ${item.description || item.Description || ''}`, margin + 2, y);
-      y += 6;
+      // Check if we have room for this item (style + color + grid = ~22mm)
+      if (y + 22 > maxContentY) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'italic');
+        doc.text('... continued (see full list via QR code)', margin + 2, y + 3);
+        break;
+      }
 
-      // Color line
-      doc.setFontSize(11);
+      // Style + Description (deduplicated)
+      const style = item.style || item.Style_Number || '';
+      const desc = item.description || item.Description || '';
+      // Remove duplicated style from description (e.g., "CS412 - CornerStone Polo. CS412" → "CS412 - CornerStone Polo")
+      let displayDesc = desc;
+      if (desc !== style && desc.endsWith(`. ${style}`)) {
+        displayDesc = desc.slice(0, -(style.length + 2));
+      }
+      if (desc === style) displayDesc = ''; // Don't show style as description
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      const styleLabel = displayDesc ? `${style} - ${displayDesc}` : style;
+      const truncated = doc.splitTextToSize(styleLabel, contentW - 4)[0]; // Single line
+      doc.text(truncated, margin + 2, y);
+      y += 5;
+
+      // Color + qty
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Color: ${item.color || item.Color || ''}`, margin + 2, y);
-      y += 6;
+      doc.text(`${item.color || ''} — ${item.totalQty || 0} pcs`, margin + 2, y);
+      y += 5;
 
       // Size grid table
       const sizes = item.sizes || item;
       const sizeData = SIZE_COLUMNS.map(s => {
         const key = sizes.Size_S !== undefined ?
           (s === '2XL' ? 'Size_2XL' : s === '3XL' ? 'Size_3XL' : s === '4XL' ? 'Size_4XL' : s === '5XL' ? 'Size_5XL' : `Size_${s}`) : s;
-        return sizes[key] || 0;
+        let val = sizes[key] || 0;
+        // Also check aliases
+        if (!val && SIZE_ALIASES[s]) val = sizes[SIZE_ALIASES[s]] || 0;
+        return val;
       });
 
-      // Only show sizes that have values
       const activeCols = [];
       const activeVals = [];
       SIZE_COLUMNS.forEach((s, i) => {
@@ -748,55 +777,60 @@
       if (activeCols.length > 0) {
         doc.autoTable({
           startY: y,
-          margin: { left: margin + 2, right: margin + 2 },
+          margin: { left: margin + 2 },
           head: [activeCols],
           body: [activeVals],
           theme: 'grid',
           styles: {
-            fontSize: 16,
+            fontSize: 14,
             fontStyle: 'bold',
             halign: 'center',
-            cellPadding: 3,
-            lineWidth: 0.5,
-            lineColor: [0, 0, 0]
+            cellPadding: 2,
+            lineWidth: 0.3,
+            lineColor: [80, 80, 80]
           },
           headStyles: {
-            fillColor: [240, 240, 240],
-            textColor: [60, 60, 60],
-            fontSize: 10,
-            fontStyle: 'bold'
+            fillColor: [230, 230, 230],
+            textColor: [40, 40, 40],
+            fontSize: 9,
+            fontStyle: 'bold',
+            cellPadding: 1.5
           },
           bodyStyles: {
             fillColor: [255, 255, 255],
             textColor: [0, 0, 0]
           },
-          tableWidth: Math.min(activeCols.length * 22, contentW - 4)
+          tableWidth: Math.min(activeCols.length * 20, contentW * 0.6)
         });
-        y = doc.lastAutoTable.finalY + 8;
+        y = doc.lastAutoTable.finalY + 5;
       } else {
-        y += 4;
-      }
-
-      // Check if we need a new page
-      if (y > 240) {
-        y = 240; // Truncate — label should fit on one page
-        break;
+        y += 3;
       }
     }
 
-    // === SEPARATOR ===
-    const bottomY = 250;
-    doc.setDrawColor(200);
-    doc.line(margin, bottomY - 8, pageW - margin, bottomY - 8);
+    // ─── BOTTOM SECTION (fixed position, never overlapped) ────
 
-    // === TRACKING ===
+    const footerY = pageH - margin - bottomReserved;
+
+    // Separator line
+    doc.setDrawColor(180);
+    doc.line(margin, footerY, pageW - margin, footerY);
+
+    // Tracking number
     if (box.trackingNumber) {
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Tracking: ${box.trackingNumber}`, margin, bottomY - 2);
+      doc.text(`Tracking: ${box.trackingNumber}`, margin, footerY + 5);
     }
 
-    // === QR CODE ===
+    // Carrier
+    if (box.carrier) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Carrier: ${box.carrier}`, margin, footerY + 9);
+    }
+
+    // QR Code (bottom-left)
     try {
       const qr = qrcode(0, 'M');
       const poNum = currentData?.sanmarPO || currentData?.order?.customerPO || '';
@@ -804,15 +838,16 @@
       qr.addData(labelUrl);
       qr.make();
       const qrDataUrl = qr.createDataURL(4, 0);
-      doc.addImage(qrDataUrl, 'PNG', margin, bottomY + 2, 22, 22);
+      doc.addImage(qrDataUrl, 'PNG', margin, footerY + 13, 20, 20);
       doc.setFontSize(7);
-      doc.text('Scan to view', margin, bottomY + 27);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Scan to view', margin, footerY + 36);
     } catch (e) { /* QR failed, skip */ }
 
-    // === BOX X OF Y (big, centered) ===
-    doc.setFontSize(32);
+    // BOX X OF Y (large, centered-right of QR)
+    doc.setFontSize(36);
     doc.setFont('helvetica', 'bold');
-    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2, bottomY + 14, { align: 'center' });
+    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2 + 10, footerY + 27, { align: 'center' });
   }
 
   // ==========================================
