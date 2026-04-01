@@ -3266,13 +3266,13 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     if (caspioOrder) {
       order = {
         orderNumber: caspioOrder.orderNumber || orderNumber,
-        orderType: '',
+        orderType: caspioOrder.orderType || '',
+        terms: caspioOrder.terms || '',
         company: caspioOrder.company || '',
         contact: caspioOrder.contact || '',
         contactEmail: caspioOrder.contactEmail || '',
         customerPO: caspioOrder.customerPO || sanmarPO || '',
-        requestedShipDate: '',
-        dropDeadDate: '',
+        requestedShipDate: caspioOrder.requestedShipDate || '',
         salesRep: caspioOrder.salesRep || '',
         designs: []
       };
