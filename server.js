@@ -3273,6 +3273,7 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
         contactEmail: caspioOrder.contactEmail || '',
         customerPO: caspioOrder.customerPO || sanmarPO || '',
         requestedShipDate: caspioOrder.requestedShipDate || '',
+        paidStatus: caspioOrder.paidStatus || '',
         salesRep: caspioOrder.salesRep || '',
         designs: []
       };

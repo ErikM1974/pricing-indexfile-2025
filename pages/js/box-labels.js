@@ -778,12 +778,27 @@
 
     y = Math.max(y, margin + 20);
 
-    // Row 2: Order Type + Terms (14pt — visible from moderate distance)
+    // Row 2: Order Type + Terms + Paid Status (14pt)
+    const paidStatus = order.paidStatus || '';
     const infoLine = [orderType, terms].filter(Boolean).join('  |  ');
-    if (infoLine) {
+    if (infoLine || paidStatus) {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
-      doc.text(infoLine, margin, y);
+      if (infoLine) doc.text(infoLine, margin, y);
+      // Paid status — small, right-aligned
+      if (paidStatus) {
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        if (paidStatus === 'PAID') {
+          doc.setTextColor(0, 128, 0); // green
+        } else if (paidStatus === 'NOT PAID') {
+          doc.setTextColor(200, 0, 0); // red
+        } else {
+          doc.setTextColor(200, 130, 0); // orange for PARTIAL
+        }
+        doc.text(paidStatus, pageW - margin, y, { align: 'right' });
+        doc.setTextColor(0, 0, 0); // reset to black
+      }
       y += 6;
     }
 
