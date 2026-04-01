@@ -776,25 +776,26 @@
       doc.setFontSize(44);
       doc.setFont('helvetica', 'bold');
       doc.text(orderNum, rightCol, margin + 17, { align: 'right' });
+      // Paid status directly under WO#
+      if (paidStatus) {
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        if (paidStatus === 'PAID') doc.setTextColor(0, 128, 0);
+        else if (paidStatus === 'NOT PAID') doc.setTextColor(200, 0, 0);
+        else doc.setTextColor(200, 130, 0);
+        doc.text(paidStatus, rightCol, margin + 23, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+      }
     }
 
-    y = Math.max(y, margin + 20);
+    y = Math.max(y, margin + 26);
 
-    // Row 2: Order Type + Terms (left) | Paid Status (right, below WO#)
+    // Row 2: Order Type + Terms (left)
     const infoLine = [orderType, terms].filter(Boolean).join('  |  ');
     if (infoLine) {
       doc.setFontSize(13);
       doc.setFont('helvetica', 'normal');
       doc.text(infoLine, margin, y);
-    }
-    if (paidStatus) {
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'bold');
-      if (paidStatus === 'PAID') doc.setTextColor(0, 128, 0);
-      else if (paidStatus === 'NOT PAID') doc.setTextColor(200, 0, 0);
-      else doc.setTextColor(200, 130, 0);
-      doc.text(paidStatus, rightCol, y, { align: 'right' });
-      doc.setTextColor(0, 0, 0);
     }
     y += 6;
 
@@ -831,23 +832,18 @@
 
     const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
 
-    // Ship date label + date (left)
+    // Ship date (right-aligned) + pcs total (left)
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${totalPcs} pcs total`, margin, y + 4);
+
     if (shipDate) {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text('Req. Ship Date', margin, y + 3);
-    }
-
-    // Total pieces (right-aligned, big)
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${totalPcs} pcs total`, rightCol, y + 4, { align: 'right' });
-
-    // Ship date value (centered, big)
-    if (shipDate) {
+      doc.text('Req. Ship Date', rightCol - 42, y + 1);
       doc.setFontSize(28);
       doc.setFont('helvetica', 'bold');
-      doc.text(shipDate, pageW / 2, y + 4, { align: 'center' });
+      doc.text(shipDate, rightCol, y + 4, { align: 'right' });
     }
     y += 13;
 
