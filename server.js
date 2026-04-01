@@ -3304,7 +3304,7 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     const sanmarProductIds = new Set();
     for (const box of sanmarBoxes) {
       for (const item of box.items || []) {
-        sanmarProductIds.add(item.supplierProductId);
+        sanmarProductIds.add((item.supplierProductId || '').toUpperCase());
       }
     }
 
@@ -3319,7 +3319,11 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     // Then classify remaining ManageOrders line items
     for (const li of allLineItems) {
       const pn = li.PartNumber || '';
-      const basePn = pn.replace(/_\d+[Xx]$/, '');
+      // Normalize: strip size suffixes to match SanMar base style
+      const basePn = pn.toUpperCase()
+        .replace(/_(OSFA|S\/M|M\/L|L\/XL|ONE SIZE)$/i, '')
+        .replace(/_\d?[xXsSmMlL]+$/i, '')
+        .replace(/_\d+$/, '');
 
       if (isNonPhysicalItem(li)) {
         excludedItems.push({
