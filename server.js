@@ -3068,12 +3068,14 @@ function isNonPhysicalItem(lineItem) {
   return false;
 }
 
-// Helper: fetch with timeout (for Heroku 30s limit)
+// Helper: fetch with timeout using Promise.race (for Heroku 30s limit)
 function fetchWithTimeout(url, timeoutMs = 10000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  return fetch(url, { signal: controller.signal })
-    .finally(() => clearTimeout(timer));
+  return Promise.race([
+    fetch(url),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Timeout after ${timeoutMs}ms: ${url}`)), timeoutMs)
+    )
+  ]);
 }
 
 // GET /api/box-label-data/:identifier - Merge SanMar shipment + ManageOrders data
@@ -3085,48 +3087,42 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     let orderNumber = '';
     let sanmarPO = '';
 
+    console.log(`[BoxLabels] Lookup: identifier=${identifier}, type=${type}`);
+
     if (type === 'wo') {
       orderNumber = identifier;
+      sanmarPO = '';
     } else {
       sanmarPO = identifier;
-      // Try SanMar_Orders table + ManageOrders PO search IN PARALLEL (race for speed)
-      const [matchResult, searchResult] = await Promise.allSettled([
-        fetchWithTimeout(`${API_BASE_URL}/SanMar_Orders?q.where=SanMar_PO='${identifier}'&q.select=ShopWorks_Order_No,Company_Name`, 8000)
-          .then(r => r.ok ? r.json() : null),
-        fetchWithTimeout(`${API_BASE_URL}/manageorders/orders?purchaseOrder=${identifier}`, 8000)
-          .then(r => r.ok ? r.json() : null)
-      ]);
+    }
 
-      // Check SanMar_Orders match
-      if (matchResult.status === 'fulfilled' && matchResult.value) {
-        const matches = Array.isArray(matchResult.value) ? matchResult.value : (matchResult.value.Result || []);
-        if (matches.length > 0 && matches[0].ShopWorks_Order_No) {
-          orderNumber = String(matches[0].ShopWorks_Order_No);
-          console.log(`[BoxLabels] Matched PO ${identifier} to WO# ${orderNumber}`);
-        }
-      }
-      // Fallback: ManageOrders search
-      if (!orderNumber && searchResult.status === 'fulfilled' && searchResult.value) {
-        const orders = Array.isArray(searchResult.value) ? searchResult.value : (searchResult.value.data || []);
-        if (orders.length > 0) {
-          orderNumber = String(orders[0].order_no || orders[0].id_Order || '');
-          console.log(`[BoxLabels] Found WO# ${orderNumber} via ManageOrders PO search`);
-        }
+    // Step 1: Get SanMar shipment data (fast — direct SOAP call on proxy)
+    let shipResp = { status: 'fulfilled', value: null };
+    if (sanmarPO) {
+      console.log(`[BoxLabels] Fetching SanMar shipment for PO ${sanmarPO}...`);
+      try {
+        const r = await fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`, 15000);
+        shipResp = { status: 'fulfilled', value: r };
+        console.log(`[BoxLabels] SanMar shipment response: ${r.status}`);
+      } catch (e) {
+        console.log(`[BoxLabels] SanMar shipment failed: ${e.message}`);
+        shipResp = { status: 'rejected', reason: e };
       }
     }
 
-    // Fetch ALL data in parallel: ManageOrders order + line items + SanMar shipment
-    const [orderResp, lineItemsResp, shipResp] = await Promise.allSettled([
-      orderNumber
-        ? fetchWithTimeout(`${API_BASE_URL}/manageorders/orders/${orderNumber}`, 10000).catch(() => null)
-        : Promise.resolve(null),
-      orderNumber
-        ? fetchWithTimeout(`${API_BASE_URL}/manageorders/lineitems/${orderNumber}`, 10000).catch(() => null)
-        : Promise.resolve(null),
-      sanmarPO
-        ? fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`, 12000).catch(() => null)
-        : Promise.resolve(null)
-    ]);
+    // Step 2: If we have a work order, fetch ManageOrders data (parallel)
+    let orderResp = { status: 'fulfilled', value: null };
+    let lineItemsResp = { status: 'fulfilled', value: null };
+    if (orderNumber) {
+      console.log(`[BoxLabels] Fetching ManageOrders for WO# ${orderNumber}...`);
+      const results = await Promise.allSettled([
+        fetchWithTimeout(`${API_BASE_URL}/manageorders/orders/${orderNumber}`, 10000),
+        fetchWithTimeout(`${API_BASE_URL}/manageorders/lineitems/${orderNumber}`, 10000)
+      ]);
+      orderResp = results[0];
+      lineItemsResp = results[1];
+      console.log(`[BoxLabels] ManageOrders: order=${orderResp.status}, lineItems=${lineItemsResp.status}`);
+    }
 
     // Parse SanMar shipment boxes
     let sanmarBoxes = [];
