@@ -758,6 +758,8 @@
     const orderType = order.orderType || '';
     const terms = order.terms || '';
     const salesRep = order.salesRep || '';
+    const paidStatus = order.paidStatus || '';
+    const rightCol = pageW - margin; // Right edge for right-aligned text
 
     // Row 1: Company name (left, 28pt) + WO# (right, 44pt)
     if (hasCompany) {
@@ -770,47 +772,41 @@
     if (orderNum) {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text('WO#', pageW - margin, margin + 3, { align: 'right' });
+      doc.text('WO#', rightCol, margin + 3, { align: 'right' });
       doc.setFontSize(44);
       doc.setFont('helvetica', 'bold');
-      doc.text(orderNum, pageW - margin, margin + 17, { align: 'right' });
+      doc.text(orderNum, rightCol, margin + 17, { align: 'right' });
     }
 
     y = Math.max(y, margin + 20);
 
-    // Row 2: Order Type + Terms + Paid Status (14pt)
-    const paidStatus = order.paidStatus || '';
+    // Row 2: Order Type + Terms (left) | Paid Status (right, below WO#)
     const infoLine = [orderType, terms].filter(Boolean).join('  |  ');
-    if (infoLine || paidStatus) {
-      doc.setFontSize(14);
+    if (infoLine) {
+      doc.setFontSize(13);
       doc.setFont('helvetica', 'normal');
-      if (infoLine) doc.text(infoLine, margin, y);
-      // Paid status — small, right-aligned
-      if (paidStatus) {
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        if (paidStatus === 'PAID') {
-          doc.setTextColor(0, 128, 0); // green
-        } else if (paidStatus === 'NOT PAID') {
-          doc.setTextColor(200, 0, 0); // red
-        } else {
-          doc.setTextColor(200, 130, 0); // orange for PARTIAL
-        }
-        doc.text(paidStatus, pageW - margin, y, { align: 'right' });
-        doc.setTextColor(0, 0, 0); // reset to black
-      }
-      y += 6;
+      doc.text(infoLine, margin, y);
     }
+    if (paidStatus) {
+      doc.setFontSize(13);
+      doc.setFont('helvetica', 'bold');
+      if (paidStatus === 'PAID') doc.setTextColor(0, 128, 0);
+      else if (paidStatus === 'NOT PAID') doc.setTextColor(200, 0, 0);
+      else doc.setTextColor(200, 130, 0);
+      doc.text(paidStatus, rightCol, y, { align: 'right' });
+      doc.setTextColor(0, 0, 0);
+    }
+    y += 6;
 
-    // Row 3: Design info (12pt)
+    // Row 3: Design info (11pt)
     if (order.designs?.length && order.designs[0]?.name) {
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text('Design:', margin, y);
       doc.setFont('helvetica', 'normal');
       const d = order.designs[0];
-      doc.text(`${d.number ? d.number + '  ' : ''}${d.name}`, margin + 20, y);
-      y += 6;
+      doc.text(`${d.number ? d.number + '  ' : ''}${d.name}`, margin + 18, y);
+      y += 5;
     }
 
     // Row 4: Cust PO + Rep (11pt)
@@ -824,8 +820,9 @@
       y += 5;
     }
 
-    // ─── SHIP DATE BAR (big, with total pieces) ──────────
+    // ─── SHIP DATE BAR ───────────────────────────────────
 
+    y += 1;
     doc.setDrawColor(100);
     doc.setLineWidth(0.4);
     doc.line(margin, y, pageW - margin, y);
@@ -834,20 +831,25 @@
 
     const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
 
+    // Ship date label + date (left)
     if (shipDate) {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
       doc.text('Req. Ship Date', margin, y + 3);
-      doc.setFontSize(28);
-      doc.setFont('helvetica', 'bold');
-      doc.text(shipDate, margin + 38, y + 3);
     }
 
-    // Total pieces (right side of ship date bar)
-    doc.setFontSize(16);
+    // Total pieces (right-aligned, big)
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(`${totalPcs} pcs`, pageW - margin, y + 3, { align: 'right' });
-    y += 12;
+    doc.text(`${totalPcs} pcs total`, rightCol, y + 4, { align: 'right' });
+
+    // Ship date value (centered, big)
+    if (shipDate) {
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.text(shipDate, pageW / 2, y + 4, { align: 'center' });
+    }
+    y += 13;
 
     // ─── CONTENTS ─────────────────────────────────────────
 
