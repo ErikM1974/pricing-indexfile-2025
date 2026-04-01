@@ -562,6 +562,18 @@ body {
   border-radius: 4px;
 }
 
+/* Split button on item cards */
+.bl-item-card__split {
+  margin-top: 6px;
+  font-size: 12px !important;
+  padding: 4px 10px !important;
+  opacity: 0.7;
+}
+
+.bl-item-card:hover .bl-item-card__split {
+  opacity: 1;
+}
+
 .bl-size-cell--empty .bl-size-cell__value {
   color: var(--bl-gray-200);
 }

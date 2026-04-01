@@ -298,6 +298,11 @@
     const sizeHtml = renderSizeGrid(item.sizes || item);
     const totalQty = item.totalQty || item.Total_Qty || 0;
 
+    // Count active sizes to decide whether to show split button
+    const sizes = item.sizes || {};
+    const activeSizeCount = Object.values(sizes).filter(v => v > 0).length;
+    const showSplit = activeSizeCount > 1 || totalQty > 1;
+
     return `
       <div class="bl-item-card" data-content-id="${contentId}" data-box="${boxNumber}">
         <div class="bl-item-card__header">
@@ -309,6 +314,7 @@
         </div>
         <div class="bl-item-card__desc">${escapeHtml(item.description || item.Description || '')}</div>
         ${sizeHtml}
+        ${showSplit && boxNumber > 0 ? `<button class="bl-btn bl-btn--small bl-btn--outline bl-item-card__split" onclick="event.stopPropagation(); window.BL.startSplit('${contentId}', ${boxNumber})">Split to another box</button>` : ''}
       </div>
     `;
   }
@@ -425,16 +431,31 @@
 
     if (fromBox === toBox) return; // No change
 
-    // Update the data-box attribute
+    // Update the data-box attribute on the DOM element
     itemEl.dataset.box = toBox;
 
-    // Remove the empty placeholder if items were dropped
+    // Remove empty placeholders
     const emptyPlaceholder = evt.to.querySelector('.bl-box-empty');
     if (emptyPlaceholder) emptyPlaceholder.remove();
-
-    // Add empty placeholder if source is now empty
     if (evt.from.children.length === 0) {
       evt.from.innerHTML = '<div class="bl-box-empty">Drop items here</div>';
+    }
+
+    // Update in-memory state so printing reflects the move
+    if (currentData) {
+      const sourceBox = currentData.boxes.find(b => b.boxNumber === fromBox);
+      const targetBox = currentData.boxes.find(b => b.boxNumber === toBox);
+
+      if (sourceBox && targetBox) {
+        // Find the item by contentId or index
+        const itemIdx = sourceBox.items.findIndex((it, idx) =>
+          (it.contentId || `${fromBox}-${idx}`) === contentId
+        );
+        if (itemIdx >= 0) {
+          const [movedItem] = sourceBox.items.splice(itemIdx, 1);
+          targetBox.items.push(movedItem);
+        }
+      }
     }
 
     // Save the move to backend (debounced)
@@ -564,20 +585,49 @@
   // ==========================================
   let splitState = {};
 
+  function startSplit(contentId, fromBox) {
+    if (!currentData) return;
+    const box = currentData.boxes.find(b => b.boxNumber === fromBox);
+    if (!box) return;
+
+    const item = box.items.find((it, idx) =>
+      (it.contentId || `${fromBox}-${idx}`) === contentId
+    );
+    if (!item) return;
+
+    // Ask which box to move to
+    const otherBoxes = currentData.boxes
+      .filter(b => b.boxNumber !== fromBox)
+      .map(b => b.boxNumber);
+
+    if (otherBoxes.length === 0) {
+      alert('Create a new box first, then split items into it.');
+      return;
+    }
+
+    // Default to the next box
+    const toBox = otherBoxes[0];
+    openSplitModal(contentId, item, fromBox, toBox);
+  }
+
   function openSplitModal(contentId, item, fromBox, toBox) {
     splitState = { contentId, item, fromBox, toBox };
 
-    document.getElementById('splitModalTitle').textContent =
-      `Move items: Box ${fromBox} → Box ${toBox}`;
-    document.getElementById('splitModalSubtitle').textContent =
-      `${item.style || item.Style_Number} - ${item.color || item.Color}`;
+    // Build box selector
+    const otherBoxes = currentData.boxes.filter(b => b.boxNumber !== fromBox);
+    const boxOptions = otherBoxes.map(b =>
+      `<option value="${b.boxNumber}" ${b.boxNumber === toBox ? 'selected' : ''}>Box ${b.boxNumber}</option>`
+    ).join('');
 
-    const sizes = item.sizes || item;
+    document.getElementById('splitModalTitle').textContent = `Split items from Box ${fromBox}`;
+    document.getElementById('splitModalSubtitle').innerHTML =
+      `<strong>${escapeHtml(item.style || '')} - ${escapeHtml(item.color || '')}</strong><br>` +
+      `Move to: <select id="splitTargetBox" style="padding:4px 8px; font-size:14px; border-radius:4px; border:1px solid #ccc;">${boxOptions}</select>`;
+
+    const sizes = item.sizes || {};
     const grid = document.getElementById('splitModalSizes');
     grid.innerHTML = SIZE_COLUMNS.map(s => {
-      const key = sizes.Size_S !== undefined ?
-        (s === '2XL' ? 'Size_2XL' : s === '3XL' ? 'Size_3XL' : `Size_${s}`) : s;
-      const avail = sizes[key] || 0;
+      const avail = sizes[s] || 0;
       if (avail === 0) return '';
       return `
         <div class="bl-split-cell">
@@ -596,7 +646,10 @@
     splitState = {};
   }
 
-  async function confirmSplit() {
+  function confirmSplit() {
+    const targetBoxSelect = document.getElementById('splitTargetBox');
+    const toBox = targetBoxSelect ? parseInt(targetBoxSelect.value) : splitState.toBox;
+
     const splitSizes = {};
     els.splitModal.querySelectorAll('input[data-size]').forEach(input => {
       const val = parseInt(input.value) || 0;
@@ -609,26 +662,45 @@
       return;
     }
 
-    // Update local state and re-render
-    closeSplitModal();
+    // Update in-memory state
+    if (currentData) {
+      const sourceBox = currentData.boxes.find(b => b.boxNumber === splitState.fromBox);
+      const targetBox = currentData.boxes.find(b => b.boxNumber === toBox);
+      const sourceItem = splitState.item;
 
-    if (savedShipmentId) {
-      try {
-        await fetch(`${API_BASE}/api/box-contents/move`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contentId: splitState.contentId,
-            fromBox: splitState.fromBox,
-            toBox: splitState.toBox,
-            shipmentId: savedShipmentId,
-            splitSizes
-          })
-        });
-      } catch (err) {
-        console.error('[BoxLabels] Split save failed:', err);
+      if (sourceBox && targetBox && sourceItem) {
+        // Create new item in target box with split quantities
+        const newItem = {
+          style: sourceItem.style,
+          color: sourceItem.color,
+          description: sourceItem.description,
+          brand: sourceItem.brand,
+          sizes: { ...splitSizes },
+          totalQty: Object.values(splitSizes).reduce((s, v) => s + v, 0)
+        };
+        targetBox.items.push(newItem);
+
+        // Reduce source item quantities
+        for (const [size, qty] of Object.entries(splitSizes)) {
+          sourceItem.sizes[size] = (sourceItem.sizes[size] || 0) - qty;
+          if (sourceItem.sizes[size] <= 0) delete sourceItem.sizes[size];
+        }
+        sourceItem.totalQty = Object.values(sourceItem.sizes).reduce((s, v) => s + (v || 0), 0);
+
+        // Remove source item if empty
+        if (sourceItem.totalQty <= 0) {
+          const idx = sourceBox.items.indexOf(sourceItem);
+          if (idx >= 0) sourceBox.items.splice(idx, 1);
+        }
       }
     }
+
+    closeSplitModal();
+
+    // Re-render everything with updated state
+    renderBoxes(currentData.boxes);
+    initAllDragDrop();
+    recalcTotals();
   }
 
   // ==========================================
@@ -1013,6 +1085,7 @@
     printBoxLabel,
     deleteBox,
     openSplitModal,
+    startSplit,
     editSizeQty
   };
 
