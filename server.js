@@ -3344,27 +3344,29 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
     // Enrich box items with ManageOrders size data (for items like 632_M/L caps)
     // SanMar doesn't report sizes for OSFA/hat items, but ManageOrders has the size suffix
     if (boxes.length > 0 && allLineItems.length > 0) {
-      // Build map: base style + color → size suffix from ManageOrders PartNumber
-      const moSizeMap = new Map(); // "632|Grey" → "M/L"
+      // Build maps: style+color → size, and style-only → size (fallback)
+      const moSizeByColor = new Map(); // "TM1MU426|quishaGrey" → "L/XL"
+      const moSizeByStyle = new Map(); // "TM1MU426" → "L/XL" (first match, fallback)
       for (const li of allLineItems) {
         const pn = (li.PartNumber || '').toUpperCase();
-        // Extract size suffix: _M/L, _S/M, _L/XL, _OSFA etc
         const suffixMatch = pn.match(/_(OSFA|S\/M|M\/L|L\/XL|ONE SIZE|S|M|L|XL|\d?[xX][lL]+)$/i);
         if (!suffixMatch) continue;
         const basePn = pn.slice(0, pn.length - suffixMatch[0].length);
         const sizeSuffix = suffixMatch[1];
         const color = (li.PartColor || '').toLowerCase();
-        moSizeMap.set(`${basePn}|${color}`, sizeSuffix);
+        moSizeByColor.set(`${basePn}|${color}`, sizeSuffix);
+        if (!moSizeByStyle.has(basePn)) moSizeByStyle.set(basePn, sizeSuffix);
       }
 
       // Enrich box items that have no sizes
       for (const box of boxes) {
         for (const item of (box.items || [])) {
           const hasSizes = Object.values(item.sizes || {}).some(v => v > 0);
-          if (hasSizes) continue; // Already has size data from SanMar
+          if (hasSizes) continue;
           const baseStyle = (item.style || '').toUpperCase();
           const color = (item.color || '').toLowerCase();
-          const moSize = moSizeMap.get(`${baseStyle}|${color}`);
+          // Try exact match (style+color), then fallback to style-only
+          const moSize = moSizeByColor.get(`${baseStyle}|${color}`) || moSizeByStyle.get(baseStyle);
           if (moSize && item.totalQty > 0) {
             item.sizes[moSize] = item.totalQty;
           }

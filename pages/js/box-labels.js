@@ -843,9 +843,9 @@
       y += 5;
     }
 
-    // Cust PO + Rep
+    // PO Number + Rep
     const detailParts = [];
-    if (custPO) detailParts.push(`Cust PO: ${custPO}`);
+    if (custPO) detailParts.push(`PO Number: ${custPO}`);
     if (salesRep) detailParts.push(`Rep: ${salesRep}`);
     if (detailParts.length) {
       doc.setFontSize(11);
@@ -1001,7 +1001,7 @@
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120, 120, 120);
     const footerParts = [];
-    if (custPO) footerParts.push(`Cust PO: ${custPO}`);
+    if (custPO) footerParts.push(`PO Number: ${custPO}`);
     if (orderNum) footerParts.push(`WO# ${orderNum}`);
     if (footerParts.length) {
       doc.text(footerParts.join('   |   '), pageW / 2, footerY + 5, { align: 'center' });
