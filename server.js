@@ -3195,7 +3195,22 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
 
     if (type === 'wo') {
       orderNumber = identifier;
-      sanmarPO = '';
+      // Resolve WO# → SanMar PO from SanMar_Orders table (id_Order → SanMar_PO)
+      try {
+        const woLookupResp = await fetchWithTimeout(
+          `${API_BASE_URL}/sanmar-orders/lookup?woId=${identifier}`, 5000
+        );
+        if (woLookupResp.ok) {
+          const woData = await woLookupResp.json();
+          const found = (woData?.orders || [])[0];
+          if (found?.SanMar_PO) {
+            sanmarPO = found.SanMar_PO;
+            console.log(`[BoxLabels] WO# ${identifier} → SanMar PO ${sanmarPO}`);
+          }
+        }
+      } catch (e) {
+        console.log(`[BoxLabels] WO→PO lookup failed: ${e.message}`);
+      }
     } else {
       sanmarPO = identifier;
     }
