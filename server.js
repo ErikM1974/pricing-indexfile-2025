@@ -3193,18 +3193,23 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
       }
     }, 25000);
 
+    let allSanmarPOs = []; // Support multiple POs per work order
+
     if (type === 'wo') {
       orderNumber = identifier;
-      // Resolve WO# → SanMar PO from SanMar_Orders table (id_Order → SanMar_PO)
+      // Resolve WO# → ALL SanMar POs from SanMar_Orders table
       try {
         const woLookupResp = await fetchWithTimeout(
           `${API_BASE_URL}/sanmar-orders/lookup?woId=${identifier}`, 5000
         );
         if (woLookupResp.ok) {
           const woData = await woLookupResp.json();
-          const found = (woData?.orders || [])[0];
-          if (found?.SanMar_PO) {
-            sanmarPO = found.SanMar_PO;
+          const allMatches = woData?.orders || [];
+          allSanmarPOs = allMatches.map(o => o.SanMar_PO).filter(Boolean);
+          sanmarPO = allSanmarPOs[0] || '';
+          if (allSanmarPOs.length > 1) {
+            console.log(`[BoxLabels] WO# ${identifier} → ${allSanmarPOs.length} SanMar POs: ${allSanmarPOs.join(', ')}`);
+          } else if (sanmarPO) {
             console.log(`[BoxLabels] WO# ${identifier} → SanMar PO ${sanmarPO}`);
           }
         }
@@ -3213,16 +3218,17 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
       }
     } else {
       sanmarPO = identifier;
+      allSanmarPOs = [identifier];
     }
 
-    // Step 1: Fetch SanMar shipment + Caspio order lookup IN PARALLEL (both are fast)
+    // Step 1: Fetch SanMar shipments + Caspio order lookup IN PARALLEL
     const parallelFetches = [];
 
-    // SanMar shipment (if we have a PO)
-    if (sanmarPO) {
+    // SanMar shipments — fetch for ALL POs (one work order can have multiple SanMar POs)
+    for (const po of allSanmarPOs) {
       parallelFetches.push(
-        fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${sanmarPO}`, 15000)
-          .then(async r => r.ok ? { type: 'shipment', data: await r.json() } : { type: 'shipment', data: null })
+        fetchWithTimeout(`${API_BASE_URL}/sanmar-shipments/po/${po}`, 15000)
+          .then(async r => r.ok ? { type: 'shipment', po, data: await r.json() } : { type: 'shipment', po, data: null })
           .catch(e => { console.log(`[BoxLabels] Shipment failed: ${e.message}`); return { type: 'shipment', data: null }; })
       );
     }
@@ -3251,8 +3257,15 @@ app.get('/api/box-label-data/:identifier', async (req, res) => {
 
     for (const result of results) {
       if (result.type === 'shipment' && result.data?.success && result.data?.data?.boxes) {
-        sanmarBoxes = result.data.data.boxes;
-        console.log(`[BoxLabels] Got ${sanmarBoxes.length} boxes from SanMar`);
+        // Merge boxes from multiple SanMar POs
+        const newBoxes = result.data.data.boxes;
+        // Renumber boxes to avoid duplicates when merging multiple POs
+        const offset = sanmarBoxes.length;
+        for (const box of newBoxes) {
+          box.boxNumber = offset + box.boxNumber;
+        }
+        sanmarBoxes.push(...newBoxes);
+        console.log(`[BoxLabels] Got ${newBoxes.length} boxes from SanMar PO ${result.po || '?'} (total: ${sanmarBoxes.length})`);
       }
       if (result.type === 'order' && result.data?.success && result.data?.order) {
         caspioOrder = result.data.order;
