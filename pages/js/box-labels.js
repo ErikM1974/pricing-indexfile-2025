@@ -706,6 +706,14 @@
   // ==========================================
   // PDF Generation
   // ==========================================
+  function buildLabelFilename(order, boxInfo) {
+    const po = currentData?.sanmarPO || order?.customerPO || 'PO';
+    const company = (order?.company || 'Unknown').replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-');
+    const woNum = order?.orderNumber || '';
+    const suffix = boxInfo || 'all-boxes';
+    return `BoxLabel-${po}-${company}${woNum ? '-WO' + woNum : ''}-${suffix}.pdf`;
+  }
+
   function printAllLabels() {
     if (!currentData?.boxes?.length) return;
     const { jsPDF } = window.jspdf;
@@ -719,8 +727,8 @@
       drawBoxLabel(doc, box, currentData.order, idx + 1, totalBoxes);
     });
 
-    doc.autoPrint();
-    window.open(doc.output('bloburl'), '_blank');
+    const filename = buildLabelFilename(currentData.order, totalBoxes + 'boxes');
+    doc.save(filename);
   }
 
   function printBoxLabel(boxNumber) {
@@ -735,8 +743,8 @@
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
     drawBoxLabel(doc, box, currentData.order, boxIdx, totalBoxes);
 
-    doc.autoPrint();
-    window.open(doc.output('bloburl'), '_blank');
+    const filename = buildLabelFilename(currentData.order, 'box' + boxIdx);
+    doc.save(filename);
   }
 
   function drawBoxLabel(doc, box, order, boxIdx, totalBoxes) {
