@@ -286,3 +286,19 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** The regex `/_\d?[xXsSmMlL]+$/i` only handled `_2X`/`_3XL` style suffixes. `NE1020_S/M`, `BG517_OSFA` stayed un-normalized, never matching SanMar's base style `NE1020`/`BG517`.
 **Solution:** Added `replace(/_(OSFA|S\/M|L\/XL|ONE SIZE)$/i, '')` before the existing regex. Also: backfill missing SanMar items via poSearch, paginate all Caspio queries, add live ManageOrders API fallback for orders missing from Caspio cache.
 **Prevention:** When adding new size suffix patterns to ShopWorks, update the normalization regex in `sanmar-orders.js` (3 instances — search `baseStyle =`).
+
+---
+
+### Caspio v3 Pagination: q.limit + q.pageNumber = Overlapping Pages
+**Problem:** `fetchAllCaspioPages` returned only 1000 of 2794 ManageOrders_LineItems. Style index had 634 styles instead of 715.
+**Root Cause:** Caspio v3 API: `q.limit` + `q.pageNumber` causes overlapping pages. Pages 2+ return partial duplicates of page 1.
+**Solution:** Use `q.pageSize` (not `q.limit`) for pagination. Delete `q.limit` before paginating. Fixed in `caspio.js:fetchAllCaspioPages`.
+**Prevention:** Never use `q.limit` with `q.pageNumber` on Caspio v3. Always `q.pageSize`.
+
+---
+
+### SanMar PO↔ShopWorks WO Number Correlation
+**Problem:** Style matching produced 39 false positives — repeat customers (Absher, RPD, Hops N Drops) matched to older orders with same styles.
+**Root Cause:** Single-style score:1 matches with no way to distinguish between 5+ orders for the same customer with the same style.
+**Solution:** PO numbers correlate with WO numbers: `WO ≈ PO + 28856 (±200)`. Used as tiebreaker when multiple MO orders have same style score. Validated across 263 orders from ShopWorks PDF reconciliation.
+**Prevention:** When tiebreaking style matches, use PO↔WO proximity, not dates. The offset may drift over time — re-validate quarterly with a ShopWorks PDF export.
