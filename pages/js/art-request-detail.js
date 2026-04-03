@@ -1133,9 +1133,9 @@
     // ── Mockup Gallery (Unified Two-Section) ────────────────────────────
     // Writable mockup slots Steve controls
     const MOCKUP_SLOTS = [
-        { key: 'Box_File_Mockup', label: 'Mockup' },
-        { key: 'BoxFileLink', label: 'Mockup 2' },
-        { key: 'Company_Mockup', label: 'Mockup 3' }
+        { key: 'Box_File_Mockup', label: 'Mockup', noteKey: 'Mockup_1_Note' },
+        { key: 'BoxFileLink', label: 'Mockup 2', noteKey: 'Mockup_2_Note' },
+        { key: 'Company_Mockup', label: 'Mockup 3', noteKey: 'Mockup_3_Note' }
     ];
     // Additional art file slots — AE + Steve/Ruth can upload
     const ADDITIONAL_ART_SLOTS = [
@@ -1313,7 +1313,13 @@
                     showSlotPopover(emptyEl, slot.key);
                 });
 
-                mockupsGrid.appendChild(emptyEl);
+                // Note input below empty slot
+                var emptyWrapper = document.createElement('div');
+                emptyWrapper.className = 'ard-mockup-slot-wrapper';
+                emptyWrapper.appendChild(emptyEl);
+                var emptyNoteInput = createMockupNoteInput(slot, req);
+                if (emptyNoteInput) emptyWrapper.appendChild(emptyNoteInput);
+                mockupsGrid.appendChild(emptyWrapper);
             } else {
                 // Filled slot — thumbnail with remove + drag
                 var thumb = renderFilledThumb(url, slot, !isCustomerView);
@@ -1369,7 +1375,13 @@
                     }
                 }
 
-                mockupsGrid.appendChild(thumb);
+                // Note input below filled slot
+                var filledWrapper = document.createElement('div');
+                filledWrapper.className = 'ard-mockup-slot-wrapper';
+                filledWrapper.appendChild(thumb);
+                var filledNoteInput = createMockupNoteInput(slot, req);
+                if (filledNoteInput) filledWrapper.appendChild(filledNoteInput);
+                mockupsGrid.appendChild(filledWrapper);
             }
         });
 
@@ -1503,6 +1515,11 @@
 
                 var body = {};
                 body[fieldKey] = '';
+                // Also clear associated mockup note
+                var slotWithNote = MOCKUP_SLOTS.find(function (s) { return s.key === fieldKey; });
+                if (slotWithNote && slotWithNote.noteKey) {
+                    body[slotWithNote.noteKey] = '';
+                }
                 fetch(API_BASE + '/api/artrequests/' + pkId, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -1510,6 +1527,7 @@
                 }).then(function (resp) {
                     if (!resp.ok) throw new Error('Failed to clear mockup: ' + resp.status);
                     currentRequest[fieldKey] = '';
+                    if (slotWithNote && slotWithNote.noteKey) currentRequest[slotWithNote.noteKey] = '';
                     // Delete AI analysis for this slot (fire-and-forget)
                     fetch(API_BASE + '/api/art-requests/' + designId + '/analysis/' + encodeURIComponent(fieldKey), { method: 'DELETE' }).catch(function () {});
                     var rmIsAdditionalArt = ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1;
@@ -1533,22 +1551,98 @@
         });
     }
 
+    /** Save a per-mockup note (blur auto-save) */
+    function saveMockupNote(noteKey, value) {
+        var pkId = currentRequest.PK_ID;
+        if (!pkId || !noteKey) return;
+        var trimmed = (value || '').trim();
+        if (trimmed === (currentRequest[noteKey] || '')) return; // unchanged
+
+        var body = {};
+        body[noteKey] = trimmed;
+        fetch(API_BASE + '/api/artrequests/' + pkId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Save note failed: ' + resp.status);
+            currentRequest[noteKey] = trimmed;
+            // Flash green border
+            var inp = document.querySelector('.ard-mockup-note-input[data-note-key="' + noteKey + '"]');
+            if (inp) {
+                inp.classList.add('ard-note-saved');
+                setTimeout(function () { inp.classList.remove('ard-note-saved'); }, 1200);
+            }
+        }).catch(function (err) {
+            console.error('Mockup note save error:', err);
+            var inp = document.querySelector('.ard-mockup-note-input[data-note-key="' + noteKey + '"]');
+            if (inp) {
+                inp.classList.add('ard-note-error');
+                setTimeout(function () { inp.classList.remove('ard-note-error'); }, 1200);
+            }
+        });
+    }
+
+    /** Create a mockup note input element for a slot */
+    function createMockupNoteInput(slot, req) {
+        if (!slot.noteKey) return null;
+        if (isCustomerView) return null;
+
+        // AE view: read-only display
+        if (isAeView) {
+            var noteVal = req[slot.noteKey] || '';
+            if (!noteVal) return null;
+            var disp = document.createElement('div');
+            disp.className = 'ard-mockup-note-display';
+            disp.textContent = noteVal;
+            return disp;
+        }
+
+        // Artist/Steve view: editable input
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'ard-mockup-note-input';
+        input.dataset.noteKey = slot.noteKey;
+        input.value = req[slot.noteKey] || '';
+        input.maxLength = 255;
+        input.placeholder = 'Add note (e.g. Resized, Changed color)';
+        input.addEventListener('blur', function () {
+            saveMockupNote(slot.noteKey, input.value);
+        });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        });
+        // Prevent click/mousedown from triggering lightbox or popover
+        input.addEventListener('click', function (e) { e.stopPropagation(); });
+        input.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+        return input;
+    }
+
     /** Swap two mockup slot values (optimistic UI + Caspio PUT) */
     async function swapMockupSlots(fromIdx, toIdx) {
         var fromField = MOCKUP_SLOTS[fromIdx].key;
         var toField = MOCKUP_SLOTS[toIdx].key;
         var fromUrl = currentRequest[fromField] || '';
         var toUrl = currentRequest[toField] || '';
+        // Also swap notes
+        var fromNoteKey = MOCKUP_SLOTS[fromIdx].noteKey;
+        var toNoteKey = MOCKUP_SLOTS[toIdx].noteKey;
+        var fromNote = fromNoteKey ? (currentRequest[fromNoteKey] || '') : '';
+        var toNote = toNoteKey ? (currentRequest[toNoteKey] || '') : '';
 
         // Optimistic UI
         currentRequest[fromField] = toUrl;
         currentRequest[toField] = fromUrl;
+        if (fromNoteKey) currentRequest[fromNoteKey] = toNote;
+        if (toNoteKey) currentRequest[toNoteKey] = fromNote;
         renderMockupGallery(currentRequest);
 
         try {
             var body = {};
             body[fromField] = toUrl;
             body[toField] = fromUrl;
+            if (fromNoteKey) body[fromNoteKey] = toNote;
+            if (toNoteKey) body[toNoteKey] = fromNote;
             var resp = await fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -1559,6 +1653,8 @@
             // Revert on failure
             currentRequest[fromField] = fromUrl;
             currentRequest[toField] = toUrl;
+            if (fromNoteKey) currentRequest[fromNoteKey] = fromNote;
+            if (toNoteKey) currentRequest[toNoteKey] = toNote;
             renderMockupGallery(currentRequest);
             alert('Could not reorder mockups: ' + err.message);
         }

@@ -3999,4 +3999,16 @@ input.cbSearchButton {
     line-height: 1;
 }
 
+/* ── Per-Mockup Notes (approval modal) ────────────────────────────── */
+.approval-file-note {
+    font-size: 10px;
+    font-style: italic;
+    color: #6b7280;
+    padding: 2px 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
 /* Kanban styles moved to /shared_components/css/kanban.css */

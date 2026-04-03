@@ -2816,3 +2816,51 @@ body {
     .pmd-customer-view .pmd-gallery-grid { grid-template-columns: 1fr; }
     .pmd-timeline-steps { min-width: 340px; font-size: 0.7rem; }
 }
+
+/* ── Per-Mockup Notes ─────────────────────────────────────────────── */
+.pmd-mockup-slot-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+.pmd-mockup-note-input {
+    width: 100%;
+    padding: 4px 8px;
+    margin-top: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    color: #374151;
+    background: #f9fafb;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.pmd-mockup-note-input:focus {
+    border-color: #3b82f6;
+    background: #fff;
+}
+.pmd-mockup-note-input::placeholder {
+    color: #9ca3af;
+    font-style: italic;
+}
+.pmd-mockup-note-input.pmd-note-saved {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+.pmd-mockup-note-input.pmd-note-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+.pmd-mockup-note-display {
+    margin-top: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-style: italic;
+    color: #6b7280;
+    background: #f3f4f6;
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

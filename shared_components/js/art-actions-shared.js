@@ -225,6 +225,16 @@
                 var imagesHtml = urls.map(function (url, i) {
                     return '<div style="display:inline-block;margin:8px;"><img src="' + url + '" alt="Mockup ' + (i + 1) + '" style="max-width:260px;border-radius:8px;border:1px solid #e5e7eb;"></div>';
                 }).join('');
+                // Build mockup notes HTML for email
+                var notesArr = data.mockupNotes || [];
+                var notesHtml = '';
+                if (notesArr.length > 0) {
+                    notesHtml = '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 18px;margin-bottom:20px;">'
+                        + '<p style="font-size:13px;color:#92400e;font-weight:600;margin:0 0 6px 0;">Artist Notes:</p>'
+                        + notesArr.map(function (n) { return '<p style="font-size:13px;color:#333;margin:0 0 4px 0;line-height:1.4;">' + n + '</p>'; }).join('')
+                        + '</div>';
+                }
+
                 templateId = 'art_approval_request';
                 templateParams = {
                     to_email: repEmail,
@@ -238,7 +248,8 @@
                     from_name: 'Art Department',
                     mockup_url: urls[0] || '',
                     mockup_images_html: imagesHtml,
-                    mockup_count: urls.length
+                    mockup_count: urls.length,
+                    mockup_notes_html: notesHtml
                 };
             }
 
@@ -893,9 +904,9 @@
         var prevFileCount = 0;
 
         var prevFileFields = [
-            { key: 'Box_File_Mockup', label: 'Mockup' },
-            { key: 'BoxFileLink', label: 'Mockup 2' },
-            { key: 'Company_Mockup', label: 'Mockup 3' }
+            { key: 'Box_File_Mockup', label: 'Mockup', noteKey: 'Mockup_1_Note' },
+            { key: 'BoxFileLink', label: 'Mockup 2', noteKey: 'Mockup_2_Note' },
+            { key: 'Company_Mockup', label: 'Mockup 3', noteKey: 'Mockup_3_Note' }
         ];
 
         if (artReqData) {
@@ -909,11 +920,13 @@
                 fileCard.className = 'approval-file-card approval-file-selectable';
                 fileCard.dataset.mockupUrl = url.trim();
                 fileCard.title = 'Click to select this mockup';
+                var noteVal = field.noteKey ? (artReqData[field.noteKey] || '') : '';
                 fileCard.innerHTML =
                     '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
                     + ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
                     + '<div class="approval-file-placeholder" style="display:none;">File</div>'
                     + '<div class="approval-file-label">' + escapeHtml(field.label) + '</div>'
+                    + (noteVal ? '<div class="approval-file-note">' + escapeHtml(noteVal) + '</div>' : '')
                     + '<div class="approval-file-check">\u2713</div>';
 
                 fileCard.addEventListener('click', function () {
@@ -1080,6 +1093,16 @@
                 });
             }
 
+            // Build mockup notes for email
+            var mockupNoteFields = [
+                { label: 'Mockup 1', key: 'Mockup_1_Note' },
+                { label: 'Mockup 2', key: 'Mockup_2_Note' },
+                { label: 'Mockup 3', key: 'Mockup_3_Note' }
+            ];
+            var noteLines = mockupNoteFields
+                .filter(function (f) { return artReqMeta[f.key] && artReqMeta[f.key].trim(); })
+                .map(function (f) { return '<strong>' + f.label + ':</strong> ' + escapeHtml(artReqMeta[f.key].trim()); });
+
             sendNotificationEmail(designId, 'approval', {
                 message: message,
                 revisionCount: revCount,
@@ -1087,7 +1110,8 @@
                 salesRep: artReqMeta.Sales_Rep,
                 companyName: artReqMeta.CompanyName,
                 mockupUrls: mockupUrls,
-                ccEmails: ccEmails
+                ccEmails: ccEmails,
+                mockupNotes: noteLines
             });
 
             var repResolved = resolveRep(artReqMeta.Sales_Rep);

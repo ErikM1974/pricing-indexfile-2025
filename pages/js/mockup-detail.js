@@ -34,9 +34,9 @@
     }
 
     var MOCKUP_SLOTS = [
-        { key: 'Box_Mockup_1', label: 'Mockup 1' },
-        { key: 'Box_Mockup_2', label: 'Mockup 2' },
-        { key: 'Box_Mockup_3', label: 'Mockup 3' },
+        { key: 'Box_Mockup_1', label: 'Mockup 1', noteKey: 'Mockup_1_Note' },
+        { key: 'Box_Mockup_2', label: 'Mockup 2', noteKey: 'Mockup_2_Note' },
+        { key: 'Box_Mockup_3', label: 'Mockup 3', noteKey: 'Mockup_3_Note' },
         { key: 'Box_Mockup_4', label: 'Mockup 4' },
         { key: 'Box_Mockup_5', label: 'Mockup 5' },
         { key: 'Box_Mockup_6', label: 'Mockup 6' },
@@ -1039,6 +1039,71 @@
             + '</div>';
     }
 
+    // ── Per-Mockup Notes ──────────────────────────────────────────────────
+    /** Save a per-mockup note (blur auto-save) */
+    function saveMockupNote(noteKey, value) {
+        if (!mockupId || !noteKey) return;
+        var trimmed = (value || '').trim();
+        if (trimmed === (currentMockup[noteKey] || '')) return;
+
+        var body = {};
+        body[noteKey] = trimmed;
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function (resp) {
+            if (!resp.ok) throw new Error('Save note failed: ' + resp.status);
+            currentMockup[noteKey] = trimmed;
+            var inp = document.querySelector('.pmd-mockup-note-input[data-note-key="' + noteKey + '"]');
+            if (inp) {
+                inp.classList.add('pmd-note-saved');
+                setTimeout(function () { inp.classList.remove('pmd-note-saved'); }, 1200);
+            }
+        }).catch(function (err) {
+            console.error('Mockup note save error:', err);
+            var inp = document.querySelector('.pmd-mockup-note-input[data-note-key="' + noteKey + '"]');
+            if (inp) {
+                inp.classList.add('pmd-note-error');
+                setTimeout(function () { inp.classList.remove('pmd-note-error'); }, 1200);
+            }
+        });
+    }
+
+    /** Create a mockup note input element for a slot */
+    function createMockupNoteInput(slot, mockup) {
+        if (!slot.noteKey) return null;
+        if (isCustomerView) return null;
+
+        // AE view: read-only display
+        if (isAeView) {
+            var noteVal = mockup[slot.noteKey] || '';
+            if (!noteVal) return null;
+            var disp = document.createElement('div');
+            disp.className = 'pmd-mockup-note-display';
+            disp.textContent = noteVal;
+            return disp;
+        }
+
+        // Ruth/artist view: editable input
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'pmd-mockup-note-input';
+        input.dataset.noteKey = slot.noteKey;
+        input.value = mockup[slot.noteKey] || '';
+        input.maxLength = 255;
+        input.placeholder = 'Add note (e.g. Resized, Changed color)';
+        input.addEventListener('blur', function () {
+            saveMockupNote(slot.noteKey, input.value);
+        });
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        });
+        input.addEventListener('click', function (e) { e.stopPropagation(); });
+        input.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+        return input;
+    }
+
     // ── Gallery Rendering ──────────────────────────────────────────────────
     function renderGallery(mockup) {
         var grid = document.getElementById('pmd-gallery-grid');
@@ -1270,11 +1335,23 @@
                 slotEl.appendChild(threadStrip);
             }
 
+            // Wrap slot with optional note input
+            var noteInput = createMockupNoteInput(slot, mockup);
+            var wrapper;
+            if (noteInput) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'pmd-mockup-slot-wrapper';
+                wrapper.appendChild(slotEl);
+                wrapper.appendChild(noteInput);
+            } else {
+                wrapper = slotEl;
+            }
+
             // Route slots 4-6 to the collapsible extra container
             if (extraContainer && extraSlotKeys.indexOf(slot.key) !== -1) {
-                extraContainer.appendChild(slotEl);
+                extraContainer.appendChild(wrapper);
             } else {
-                grid.appendChild(slotEl);
+                grid.appendChild(wrapper);
             }
         });
 
@@ -1393,6 +1470,11 @@
     function removeSlotFile(fieldKey) {
         var updateBody = {};
         updateBody[fieldKey] = '';
+        // Also clear associated mockup note
+        var slotWithNote = MOCKUP_SLOTS.find(function (s) { return s.key === fieldKey; });
+        if (slotWithNote && slotWithNote.noteKey) {
+            updateBody[slotWithNote.noteKey] = '';
+        }
 
         fetch(API_BASE + '/api/mockups/' + mockupId, {
             method: 'PUT',
@@ -1401,6 +1483,7 @@
         }).then(function (resp) {
             if (!resp.ok) throw new Error('Failed to remove file');
             currentMockup[fieldKey] = '';
+            if (slotWithNote && slotWithNote.noteKey) currentMockup[slotWithNote.noteKey] = '';
             renderGallery(currentMockup);
             showToast('File removed', 'info');
         }).catch(function (err) {
