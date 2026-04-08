@@ -52,6 +52,7 @@
     var mockupId = null;
     var mockupVersions = [];
     var boxPanelFiles = [];
+    var reviseAttachedFiles = [];
     var dragSource = null;
     var storedEmbRecords = {};       // keyed by Mockup_Slot: "1", "2", "3"
     var activeThreadEditorSlot = null; // which slot's editor is open
@@ -3569,7 +3570,31 @@
         }
 
         generalNotes.value = '';
+        reviseAttachedFiles = [];
+        var fileList = document.getElementById('pmd-revise-file-list');
+        fileList.innerHTML = '';
+        var fileInput = document.getElementById('pmd-revise-file-input');
+        fileInput.value = '';
         overlay.classList.add('show');
+
+        // Wire up file upload dropzone
+        var dropzone = document.getElementById('pmd-revise-dropzone');
+        dropzone.onclick = function () { fileInput.click(); };
+        fileInput.onchange = function () {
+            if (fileInput.files && fileInput.files[0]) {
+                addReviseFile(fileInput.files[0]);
+                fileInput.value = '';
+            }
+        };
+        dropzone.ondragover = function (e) { e.preventDefault(); dropzone.classList.add('dragover'); };
+        dropzone.ondragleave = function () { dropzone.classList.remove('dragover'); };
+        dropzone.ondrop = function (e) {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                addReviseFile(e.dataTransfer.files[0]);
+            }
+        };
 
         // Focus first slot textarea or general notes
         var firstSlotTextarea = slotsContainer.querySelector('.pmd-revise-slot-textarea');
@@ -3598,17 +3623,74 @@
             }
 
             var combinedNotes = parts.join('\n');
-            if (!combinedNotes) {
-                showToast('Please describe the changes needed for at least one mockup', 'error');
+            if (!combinedNotes && reviseAttachedFiles.length === 0) {
+                showToast('Please describe the changes needed or attach a file', 'error');
                 return;
             }
-            closeReviseModal();
-            handleStatusUpdate('Revision Requested', combinedNotes, this);
+
+            var btn = this;
+
+            // Upload attached file first, then submit
+            if (reviseAttachedFiles.length > 0) {
+                btn.disabled = true;
+                btn.textContent = 'Uploading file...';
+                var formData = new FormData();
+                formData.append('file', reviseAttachedFiles[0]);
+                formData.append('slot', 'Box_Reference_File');
+                formData.append('companyName', currentMockup.Company_Name || '');
+                fetch(API_BASE + '/api/mockups/' + mockupId + '/upload-file', {
+                    method: 'POST',
+                    body: formData
+                }).then(function (resp) {
+                    if (!resp.ok) return resp.json().then(function (d) { throw new Error(d.error || 'Upload failed'); });
+                    return resp.json();
+                }).then(function () {
+                    if (combinedNotes) {
+                        combinedNotes += '\n';
+                    }
+                    combinedNotes += 'Attached file: ' + reviseAttachedFiles[0].name;
+                    closeReviseModal();
+                    handleStatusUpdate('Revision Requested', combinedNotes, btn);
+                }).catch(function (err) {
+                    showToast('File upload failed: ' + err.message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Request Changes';
+                });
+            } else {
+                closeReviseModal();
+                handleStatusUpdate('Revision Requested', combinedNotes, btn);
+            }
+        });
+    }
+
+    function addReviseFile(file) {
+        if (file.size > 20 * 1024 * 1024) {
+            showToast('File too large (max 20MB)', 'error');
+            return;
+        }
+        reviseAttachedFiles = [file];
+        renderReviseFileChips();
+    }
+
+    function renderReviseFileChips() {
+        var fileList = document.getElementById('pmd-revise-file-list');
+        fileList.innerHTML = '';
+        reviseAttachedFiles.forEach(function (f, idx) {
+            var chip = document.createElement('span');
+            chip.className = 'pmd-revise-file-chip';
+            chip.innerHTML = '<i class="fas fa-paperclip"></i> ' + escapeHtml(f.name)
+                + ' <span class="pmd-revise-file-chip-remove" data-idx="' + idx + '">&times;</span>';
+            chip.querySelector('.pmd-revise-file-chip-remove').onclick = function () {
+                reviseAttachedFiles.splice(idx, 1);
+                renderReviseFileChips();
+            };
+            fileList.appendChild(chip);
         });
     }
 
     function closeReviseModal() {
         document.getElementById('pmd-revise-overlay').classList.remove('show');
+        reviseAttachedFiles = [];
     }
 
     // ── Version Helpers ────────────────────────────────────────────────────

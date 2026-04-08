@@ -2775,6 +2775,76 @@ body.ard-customer-view .ard-footer {
     box-shadow: 0 0 0 2px rgba(45,106,46,0.15);
 }
 
+/* ── Changes Modal Upload ──────────────────────────── */
+.ard-changes-upload-section {
+    margin-top: 16px;
+}
+
+.ard-changes-upload-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.ard-changes-dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.ard-changes-dropzone:hover,
+.ard-changes-dropzone.dragover {
+    border-color: #f59e0b;
+    background-color: rgba(245,158,11,0.04);
+}
+
+.ard-changes-dropzone-icon {
+    display: block;
+    font-size: 20px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+.ard-changes-dropzone-text {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.ard-changes-file-list {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.ard-changes-file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.ard-changes-file-chip-remove {
+    cursor: pointer;
+    color: #9ca3af;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.ard-changes-file-chip-remove:hover {
+    color: #dc3545;
+}
+
 /* ── AI Vision Analysis Section ──────────────────────────── */
 .ard-vision-section {
     grid-column: 1 / -1;

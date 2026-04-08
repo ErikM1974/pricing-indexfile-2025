@@ -457,6 +457,15 @@
             <div id="ard-changes-slots"></div>
             <label class="ard-changes-label">General notes (optional)</label>
             <textarea id="ard-changes-notes" rows="3" placeholder="Any overall feedback..." class="ard-changes-textarea"></textarea>
+            <div class="ard-changes-upload-section">
+                <label class="ard-changes-upload-label">Attach art files (optional, up to 2)</label>
+                <div class="ard-changes-dropzone" id="ard-changes-dropzone">
+                    <i class="fas fa-cloud-upload-alt ard-changes-dropzone-icon"></i>
+                    <span class="ard-changes-dropzone-text">Click or drag files here (max 20MB each)</span>
+                    <input type="file" id="ard-changes-file-input" accept=".png,.jpg,.jpeg,.pdf,.ai,.eps,.svg,.psd,.tif,.tiff" multiple style="display:none;">
+                </div>
+                <div class="ard-changes-file-list" id="ard-changes-file-list"></div>
+            </div>
             <div class="ard-changes-actions">
                 <button class="ard-changes-btn-cancel" id="ard-changes-cancel">Cancel</button>
                 <button class="ard-changes-btn-submit" id="ard-changes-submit">Submit Revision Request</button>

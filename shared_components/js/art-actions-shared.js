@@ -124,7 +124,7 @@
             .then(function (resp) { return resp.ok ? resp.json() : []; })
             .then(function (reqs) {
                 if (!reqs || !reqs.length) return;
-                var salesRep = reqs[0].User_Email || reqs[0].Sales_Rep;
+                var salesRep = reqs[0].Sales_Rep || reqs[0].User_Email;
                 var companyName = reqs[0].CompanyName || '';
                 var rep = resolveRep(salesRep);
 
@@ -176,7 +176,7 @@
                 if (resp.ok) {
                     var reqs = await resp.json();
                     if (reqs && reqs.length > 0) {
-                        salesRep = reqs[0].User_Email || reqs[0].Sales_Rep;
+                        salesRep = reqs[0].Sales_Rep || reqs[0].User_Email;
                         companyName = reqs[0].CompanyName;
                     }
                 }
@@ -738,7 +738,8 @@
         document.getElementById('approval-minutes').value = '0';
         document.getElementById('approval-cost').textContent = '= $0.00';
         document.getElementById('approval-files').innerHTML = '';
-        document.getElementById('approval-no-files').style.display = 'none';
+        var noFilesEl = document.getElementById('approval-no-files');
+        if (noFilesEl) noFilesEl.style.display = 'none';
         document.getElementById('approval-recipient').textContent = '';
         document.getElementById('approval-cc-row').style.display = 'none';
         document.getElementById('approval-cc-toggle').checked = false;
@@ -779,7 +780,7 @@
         }
 
         // Recipient + CC
-        var salesRep = artReqData ? (artReqData.User_Email || artReqData.Sales_Rep) : '';
+        var salesRep = artReqData ? (artReqData.Sales_Rep || artReqData.User_Email) : '';
         var rep = resolveRep(salesRep);
         document.getElementById('approval-recipient').textContent = 'Sending to: ' + rep.displayName + ' (' + rep.email + ')';
 
@@ -794,12 +795,12 @@
                     '<input type="checkbox" class="approval-cc-rep" value="' + escapeHtml(r) + '" disabled> ' + escapeHtml(r) +
                 '</label>';
             }).join('');
-            ccToggle.addEventListener('change', function () {
+            ccToggle.onchange = function () {
                 ccOptions.querySelectorAll('.approval-cc-rep').forEach(function (cb) {
                     cb.disabled = !ccToggle.checked;
                     if (!ccToggle.checked) cb.checked = false;
                 });
-            });
+            };
         }
 
         // Art time
@@ -833,6 +834,7 @@
         if (boxPasteInput) boxPasteInput.value = '';
         modal.dataset.selectedBoxFileId = '';
         modal.dataset.selectedBoxFileUrl = '';
+        modal.dataset.existingMockupUrl = '';
 
         (async function loadBoxFiles() {
             try {

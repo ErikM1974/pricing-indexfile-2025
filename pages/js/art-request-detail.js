@@ -182,7 +182,7 @@
 
         // Info fields
         setText('ard-company', req.CompanyName);
-        const repEmail = req.User_Email || req.Sales_Rep || '';
+        const repEmail = req.Sales_Rep || req.User_Email || '';
         const repResolved = resolveRepName(repEmail);
         setText('ard-sales-rep', repResolved);
         // Order_Type can be an object like {'6':'Transfer'} from Caspio
@@ -443,7 +443,7 @@
             workingBtn.addEventListener('click', function () {
                 workingBtn.disabled = true;
                 workingBtn.textContent = 'Updating...';
-                var repEmail = req.User_Email || req.Sales_Rep || '';
+                var repEmail = req.Sales_Rep || req.User_Email || '';
                 fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -848,7 +848,7 @@
             if (!canSendMockup) btnMockup.style.display = 'none';
         }
 
-        var repEmail = req.User_Email || req.Sales_Rep || '';
+        var repEmail = req.Sales_Rep || req.User_Email || '';
         var company = req.CompanyName || '';
 
         btnWorking.addEventListener('click', function () {
@@ -1107,7 +1107,7 @@
                 }).catch(function () {});
                 if (typeof refreshNotes === 'function') refreshNotes();
                 // Notify AE that final mockup is production-ready
-                var aeEmail = currentRequest.User_Email || currentRequest.Sales_Rep || '';
+                var aeEmail = currentRequest.Sales_Rep || currentRequest.User_Email || '';
                 var company = currentRequest.CompanyName || '';
                 if (aeEmail && typeof emailjs !== 'undefined') {
                     emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -1143,6 +1143,7 @@
         { key: 'Additional_Art_2', label: 'Art File 6' }
     ];
     const ADDITIONAL_ART_KEYS = ADDITIONAL_ART_SLOTS.map(function (s) { return s.key; });
+    var changesAttachedFiles = [];
     // Read-only artwork fields from AE uploads
     const READ_ONLY_FIELDS = [
         { key: 'File_Upload', label: 'Original Upload' },
@@ -2192,7 +2193,7 @@
         var contactEmail = req.Email_Contact || req.Email || '';
         var contactName = ((req.First_name || req.First_Name || '') + ' ' + (req.Last_name || req.Last_Name || '')).trim();
         var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
-        var repEmail = req.User_Email || req.Sales_Rep || '';
+        var repEmail = req.Sales_Rep || req.User_Email || '';
         var repName = resolveRepName(repEmail);
         var repAddr = REP_MAP[repName] || repEmail;
 
@@ -2683,7 +2684,7 @@
         });
 
         // Notify AE
-        var repEmail = req.User_Email || req.Sales_Rep || '';
+        var repEmail = req.Sales_Rep || req.User_Email || '';
         var repName = resolveRepName(repEmail);
         var repAddr = REP_MAP[repName] || repEmail;
         if (repAddr) {
@@ -2803,8 +2804,36 @@
         }
 
         generalNotes.value = '';
+        changesAttachedFiles = [];
+        var fileList = document.getElementById('ard-changes-file-list');
+        fileList.innerHTML = '';
+        var fileInput = document.getElementById('ard-changes-file-input');
+        fileInput.value = '';
         document.getElementById('ard-changes-overlay').style.display = 'block';
         document.getElementById('ard-changes-modal').style.display = 'block';
+
+        // Wire up file upload dropzone
+        var dropzone = document.getElementById('ard-changes-dropzone');
+        dropzone.onclick = function () { fileInput.click(); };
+        fileInput.onchange = function () {
+            if (fileInput.files) {
+                for (var fi = 0; fi < fileInput.files.length; fi++) {
+                    addChangesFile(fileInput.files[fi]);
+                }
+                fileInput.value = '';
+            }
+        };
+        dropzone.ondragover = function (e) { e.preventDefault(); dropzone.classList.add('dragover'); };
+        dropzone.ondragleave = function () { dropzone.classList.remove('dragover'); };
+        dropzone.ondrop = function (e) {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files) {
+                for (var fi = 0; fi < e.dataTransfer.files.length; fi++) {
+                    addChangesFile(e.dataTransfer.files[fi]);
+                }
+            }
+        };
 
         // Focus first slot textarea or general notes
         var firstSlotTextarea = slotsContainer.querySelector('.ard-revise-slot-textarea');
@@ -2848,7 +2877,7 @@
             }
 
             var combinedNotes = parts.join('\n');
-            if (!combinedNotes) {
+            if (!combinedNotes && changesAttachedFiles.length === 0) {
                 if (firstSlotTextarea) {
                     firstSlotTextarea.style.borderColor = '#dc3545';
                 } else {
@@ -2857,13 +2886,85 @@
                 return;
             }
             const aeName = document.getElementById('ard-ae-select').value;
-            requestChanges(designId, aeName, combinedNotes);
+
+            // Upload attached files first, then submit
+            if (changesAttachedFiles.length > 0) {
+                var btn = newSubmit;
+                btn.disabled = true;
+                btn.textContent = 'Uploading files...';
+                uploadChangesFiles(changesAttachedFiles.slice(), combinedNotes).then(function (updatedNotes) {
+                    requestChanges(designId, aeName, updatedNotes);
+                }).catch(function (err) {
+                    showToast('File upload failed: ' + err.message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Revision Request';
+                });
+            } else {
+                requestChanges(designId, aeName, combinedNotes);
+            }
         });
+    }
+
+    function addChangesFile(file) {
+        if (file.size > 20 * 1024 * 1024) {
+            showToast('File too large (max 20MB)', 'error');
+            return;
+        }
+        if (changesAttachedFiles.length >= 2) {
+            showToast('Maximum 2 files allowed', 'error');
+            return;
+        }
+        changesAttachedFiles.push(file);
+        renderChangesFileChips();
+    }
+
+    function renderChangesFileChips() {
+        var fileList = document.getElementById('ard-changes-file-list');
+        fileList.innerHTML = '';
+        changesAttachedFiles.forEach(function (f, idx) {
+            var chip = document.createElement('span');
+            chip.className = 'ard-changes-file-chip';
+            chip.innerHTML = '<i class="fas fa-paperclip"></i> ' + escapeHtml(f.name)
+                + ' <span class="ard-changes-file-chip-remove" data-idx="' + idx + '">&times;</span>';
+            chip.querySelector('.ard-changes-file-chip-remove').onclick = function () {
+                changesAttachedFiles.splice(idx, 1);
+                renderChangesFileChips();
+            };
+            fileList.appendChild(chip);
+        });
+    }
+
+    async function uploadChangesFiles(files, combinedNotes) {
+        var fileNames = [];
+        for (var i = 0; i < files.length; i++) {
+            var formData = new FormData();
+            formData.append('file', files[i]);
+            formData.append('pkId', String(currentRequest.PK_ID));
+            formData.append('customerId', String(currentRequest.Shopwork_customer_number || currentRequest.id_customer || ''));
+            formData.append('companyName', currentRequest.CompanyName || '');
+            var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-additional-art', {
+                method: 'POST',
+                body: formData
+            });
+            if (!resp.ok) {
+                var errData = await resp.json().catch(function () { return {}; });
+                throw new Error(errData.error || 'Upload failed for ' + files[i].name);
+            }
+            fileNames.push(files[i].name);
+        }
+        if (fileNames.length > 0) {
+            if (combinedNotes) {
+                combinedNotes += '\n';
+            }
+            combinedNotes += 'Attached: ' + fileNames.join(', ');
+        }
+        return combinedNotes;
     }
 
     function closeChangesModal() {
         document.getElementById('ard-changes-overlay').style.display = 'none';
         document.getElementById('ard-changes-modal').style.display = 'none';
+        changesAttachedFiles = [];
     }
 
     async function requestChanges(id, aeName, notes) {
@@ -3132,7 +3233,7 @@
                 // Notify sales rep if checked
                 var notifyEl = document.getElementById('ard-note-notify');
                 if (notifyEl && notifyEl.checked && currentRequest) {
-                    var repEmail = currentRequest.User_Email || currentRequest.Sales_Rep || '';
+                    var repEmail = currentRequest.Sales_Rep || currentRequest.User_Email || '';
                     var repName = resolveRepName(repEmail);
                     if (repEmail && typeof emailjs !== 'undefined') {
                         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {

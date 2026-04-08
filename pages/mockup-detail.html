@@ -177,6 +177,15 @@
                 <div id="pmd-revise-slots"></div>
                 <label for="pmd-revise-notes">General notes (optional)</label>
                 <textarea id="pmd-revise-notes" placeholder="Any overall feedback..."></textarea>
+                <div class="pmd-revise-upload-section">
+                    <label class="pmd-revise-upload-label">Attach reference file (optional)</label>
+                    <div class="pmd-revise-dropzone" id="pmd-revise-dropzone">
+                        <i class="fas fa-cloud-upload-alt pmd-revise-dropzone-icon"></i>
+                        <span class="pmd-revise-dropzone-text">Click or drag file here (max 20MB)</span>
+                        <input type="file" id="pmd-revise-file-input" accept=".png,.jpg,.jpeg,.pdf,.ai,.eps,.svg,.psd,.tif,.tiff" style="display:none;">
+                    </div>
+                    <div class="pmd-revise-file-list" id="pmd-revise-file-list"></div>
+                </div>
             </div>
             <div class="pmd-modal-footer">
                 <button class="pmd-box-cancel-btn" id="pmd-revise-cancel">Cancel</button>

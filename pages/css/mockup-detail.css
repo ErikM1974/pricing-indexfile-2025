@@ -1436,6 +1436,76 @@ body {
     box-shadow: 0 0 0 2px rgba(107,33,168,0.15);
 }
 
+/* ── Revise Modal Upload ────────────────────────────── */
+.pmd-revise-upload-section {
+    margin-top: 16px;
+}
+
+.pmd-revise-upload-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.pmd-revise-dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.pmd-revise-dropzone:hover,
+.pmd-revise-dropzone.dragover {
+    border-color: var(--art-theme, #6b21a8);
+    background-color: rgba(107,33,168,0.04);
+}
+
+.pmd-revise-dropzone-icon {
+    display: block;
+    font-size: 20px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+.pmd-revise-dropzone-text {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.pmd-revise-file-list {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.pmd-revise-file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3e8ff;
+    color: #6b21a8;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.pmd-revise-file-chip-remove {
+    cursor: pointer;
+    color: #9ca3af;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.pmd-revise-file-chip-remove:hover {
+    color: #dc3545;
+}
+
 /* ── Box Files Panel ────────────────────────────────── */
 .pmd-box-file-count {
     font-size: 12px;
