@@ -297,8 +297,8 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### SanMar PO↔ShopWorks WO Number Correlation
-**Problem:** Style matching produced 39 false positives — repeat customers (Absher, RPD, Hops N Drops) matched to older orders with same styles.
-**Root Cause:** Single-style score:1 matches with no way to distinguish between 5+ orders for the same customer with the same style.
-**Solution:** PO numbers correlate with WO numbers: `WO ≈ PO + 28856 (±200)`. Used as tiebreaker when multiple MO orders have same style score. Validated across 263 orders from ShopWorks PDF reconciliation.
-**Prevention:** When tiebreaking style matches, use PO↔WO proximity, not dates. The offset may drift over time — re-validate quarterly with a ShopWorks PDF export.
+### Art Hub Email Recipient Priority — Sales_Rep Before User_Email
+**Problem:** Steve reported mockups were being sent to him instead of the sales rep. AEs got wrong recipient on revision requests.
+**Root Cause:** 7 locations in `art-request-detail.js` and 4 in `art-actions-shared.js` used `User_Email || Sales_Rep` — `User_Email` is often the artist's email, not the rep.
+**Solution:** Swapped to `Sales_Rep || User_Email` everywhere. `Sales_Rep` is the correct field for routing emails to reps.
+**Prevention:** Always use `Sales_Rep` as primary recipient for rep-facing emails. `User_Email` is a fallback only.

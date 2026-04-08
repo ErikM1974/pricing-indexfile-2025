@@ -1312,3 +1312,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root cause:** `Notes` field assigned twice — first as JSON, then overwritten by plain string.
 **Solution:** Merged user notes INTO the JSON object as `userNotes` property. Added missing `TaxRate` and `SalesRepEmail` fields.
 **Prevention:** Never assign the same property twice in an object literal.
+
+---
+
+### SanMar PO↔ShopWorks WO Number Correlation (archived 2026-04-08)
+**Problem:** Style matching produced 39 false positives — repeat customers matched to older orders with same styles.
+**Root Cause:** Single-style score:1 matches with no way to distinguish between 5+ orders for the same customer with the same style.
+**Solution:** PO numbers correlate with WO numbers: `WO ≈ PO + 28856 (±200)`. Used as tiebreaker.
+**Prevention:** When tiebreaking style matches, use PO↔WO proximity, not dates.

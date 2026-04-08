@@ -1139,8 +1139,8 @@
     ];
     // Additional art file slots — AE + Steve/Ruth can upload
     const ADDITIONAL_ART_SLOTS = [
-        { key: 'Additional_Art_1', label: 'Art File 5' },
-        { key: 'Additional_Art_2', label: 'Art File 6' }
+        { key: 'Additional_Art_1', label: 'Art File 5', noteKey: 'Additional_Art_1_Note' },
+        { key: 'Additional_Art_2', label: 'Art File 6', noteKey: 'Additional_Art_2_Note' }
     ];
     const ADDITIONAL_ART_KEYS = ADDITIONAL_ART_SLOTS.map(function (s) { return s.key; });
     var changesAttachedFiles = [];
@@ -1422,12 +1422,22 @@
                         e.stopPropagation();
                         showSlotPopover(emptyEl, slot.key);
                     });
-                    additionalArtGrid.appendChild(emptyEl);
+                    var emptyWrapper = document.createElement('div');
+                    emptyWrapper.className = 'ard-mockup-slot-wrapper';
+                    emptyWrapper.appendChild(emptyEl);
+                    var emptyNoteInput = createMockupNoteInput(slot, req);
+                    if (emptyNoteInput) emptyWrapper.appendChild(emptyNoteInput);
+                    additionalArtGrid.appendChild(emptyWrapper);
                 } else {
                     hasAdditionalArt = true;
                     var thumb = renderFilledThumb(url, slot, true);
                     thumb.dataset.fieldKey = slot.key;
-                    additionalArtGrid.appendChild(thumb);
+                    var filledWrapper = document.createElement('div');
+                    filledWrapper.className = 'ard-mockup-slot-wrapper';
+                    filledWrapper.appendChild(thumb);
+                    var filledNoteInput = createMockupNoteInput(slot, req);
+                    if (filledNoteInput) filledWrapper.appendChild(filledNoteInput);
+                    additionalArtGrid.appendChild(filledWrapper);
                 }
             });
             // Always show section (so users can upload even when empty)
@@ -1517,7 +1527,8 @@
                 var body = {};
                 body[fieldKey] = '';
                 // Also clear associated mockup note
-                var slotWithNote = MOCKUP_SLOTS.find(function (s) { return s.key === fieldKey; });
+                var slotWithNote = MOCKUP_SLOTS.find(function (s) { return s.key === fieldKey; })
+                    || ADDITIONAL_ART_SLOTS.find(function (s) { return s.key === fieldKey; });
                 if (slotWithNote && slotWithNote.noteKey) {
                     body[slotWithNote.noteKey] = '';
                 }
