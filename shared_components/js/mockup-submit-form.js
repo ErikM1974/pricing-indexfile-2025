@@ -29,6 +29,10 @@ var MockupSubmitForm = (function () {
     var customerLookup = null;
     var selectedContact = null;
 
+    // Garment style/color state — up to 4 rows
+    var garmentRows = [{ style: '', color: '', colors: [], swatch: '' }];
+    var styleSearchTimers = {};
+
     // ── Init ───────────────────────────────────────────────────────────────
     function init(containerIdParam) {
         containerId = containerIdParam;
@@ -42,6 +46,7 @@ var MockupSubmitForm = (function () {
         initSalesRep();
         loadLocations();
         loadThreadColors();
+        renderGarmentRows();
     }
 
     // ── Build Form HTML ────────────────────────────────────────────────────
@@ -129,26 +134,28 @@ var MockupSubmitForm = (function () {
             + '      </div>'
             + '    </div>'
 
-            // Garment Info + Fabric Type
-            + '    <div class="msf-row">'
-            + '      <div class="msf-field">'
-            + '        <label class="msf-field-label">Garment/Cap Colors</label>'
-            + '        <input type="text" class="msf-input" id="msf-garment-colors" placeholder="e.g., Navy Blue, Black">'
-            + '      </div>'
-            + '      <div class="msf-field">'
-            + '        <label class="msf-field-label">Fabric/Garment Type</label>'
-            + '        <select class="msf-select" id="msf-fabric-type">'
-            + '          <option value="">Select type...</option>'
-            + '          <option value="Twill">Twill</option>'
-            + '          <option value="Pique">Pique</option>'
-            + '          <option value="Fleece">Fleece</option>'
-            + '          <option value="Knit">Knit</option>'
-            + '          <option value="Nylon">Nylon</option>'
-            + '          <option value="Cotton">Cotton</option>'
-            + '          <option value="Polyester">Polyester</option>'
-            + '          <option value="Other">Other</option>'
-            + '        </select>'
-            + '      </div>'
+            // Garment Style/Color Rows (up to 4)
+            + '    <div class="msf-field">'
+            + '      <label class="msf-field-label">Garment Styles &amp; Colors</label>'
+            + '      <div id="msf-garment-rows"></div>'
+            + '      <button type="button" class="msf-add-garment-btn" id="msf-add-garment-btn">+ Add Another Garment</button>'
+            + '      <span class="msf-field-hint">Type a style number (e.g. PC54) to search SanMar products, then pick a color</span>'
+            + '    </div>'
+
+            // Fabric Type (kept separate)
+            + '    <div class="msf-field" style="max-width:300px;">'
+            + '      <label class="msf-field-label">Fabric/Garment Type</label>'
+            + '      <select class="msf-select" id="msf-fabric-type">'
+            + '        <option value="">Select type...</option>'
+            + '        <option value="Twill">Twill</option>'
+            + '        <option value="Pique">Pique</option>'
+            + '        <option value="Fleece">Fleece</option>'
+            + '        <option value="Knit">Knit</option>'
+            + '        <option value="Nylon">Nylon</option>'
+            + '        <option value="Cotton">Cotton</option>'
+            + '        <option value="Polyester">Polyester</option>'
+            + '        <option value="Other">Other</option>'
+            + '      </select>'
             + '    </div>'
 
             // Width x Height
@@ -306,12 +313,217 @@ var MockupSubmitForm = (function () {
         repInput.placeholder = 'Enter your name';
     }
 
+    // ── Garment Style/Color Rows ──────────────────────────────────────────
+    function renderGarmentRows() {
+        var container = document.getElementById('msf-garment-rows');
+        if (!container) return;
+        container.innerHTML = '';
+
+        garmentRows.forEach(function (row, idx) {
+            var rowEl = document.createElement('div');
+            rowEl.className = 'msf-garment-row';
+            rowEl.setAttribute('data-idx', idx);
+
+            var styleWrap = document.createElement('div');
+            styleWrap.className = 'msf-garment-style-wrap';
+
+            var styleInput = document.createElement('input');
+            styleInput.type = 'text';
+            styleInput.className = 'msf-input msf-garment-style';
+            styleInput.placeholder = 'Style # (e.g. PC54)';
+            styleInput.value = row.style;
+            styleInput.setAttribute('data-idx', idx);
+            styleInput.autocomplete = 'off';
+
+            var styleDropdown = document.createElement('div');
+            styleDropdown.className = 'msf-garment-style-dropdown';
+            styleDropdown.id = 'msf-style-dd-' + idx;
+
+            styleWrap.appendChild(styleInput);
+            styleWrap.appendChild(styleDropdown);
+
+            var colorSelect = document.createElement('select');
+            colorSelect.className = 'msf-select msf-garment-color';
+            colorSelect.setAttribute('data-idx', idx);
+            colorSelect.innerHTML = '<option value="">Select color...</option>';
+            if (row.colors && row.colors.length > 0) {
+                row.colors.forEach(function (c) {
+                    var opt = document.createElement('option');
+                    opt.value = c.COLOR_NAME;
+                    opt.textContent = c.COLOR_NAME;
+                    if (c.COLOR_NAME === row.color) opt.selected = true;
+                    colorSelect.appendChild(opt);
+                });
+            }
+
+            var swatchEl = document.createElement('div');
+            swatchEl.className = 'msf-garment-swatch';
+            swatchEl.id = 'msf-swatch-' + idx;
+            if (row.swatch) {
+                swatchEl.innerHTML = '<img src="' + escapeHtml(row.swatch) + '" alt="swatch">';
+            }
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'msf-garment-remove';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.title = 'Remove garment';
+            removeBtn.setAttribute('data-idx', idx);
+            if (garmentRows.length <= 1) removeBtn.style.visibility = 'hidden';
+
+            rowEl.appendChild(styleWrap);
+            rowEl.appendChild(colorSelect);
+            rowEl.appendChild(swatchEl);
+            rowEl.appendChild(removeBtn);
+            container.appendChild(rowEl);
+
+            // Wire style autocomplete
+            styleInput.addEventListener('input', function () {
+                var i = parseInt(this.getAttribute('data-idx'));
+                garmentRows[i].style = this.value;
+                garmentRows[i].color = '';
+                garmentRows[i].colors = [];
+                garmentRows[i].swatch = '';
+                searchStyles(i, this.value.trim());
+            });
+
+            // Wire color change
+            colorSelect.addEventListener('change', function () {
+                var i = parseInt(this.getAttribute('data-idx'));
+                var selectedColor = this.value;
+                garmentRows[i].color = selectedColor;
+                // Find swatch
+                var colorObj = garmentRows[i].colors.find(function (c) { return c.COLOR_NAME === selectedColor; });
+                var swatchDiv = document.getElementById('msf-swatch-' + i);
+                if (colorObj && colorObj.COLOR_SQUARE_IMAGE) {
+                    garmentRows[i].swatch = colorObj.COLOR_SQUARE_IMAGE;
+                    swatchDiv.innerHTML = '<img src="' + escapeHtml(colorObj.COLOR_SQUARE_IMAGE) + '" alt="swatch">';
+                } else {
+                    garmentRows[i].swatch = '';
+                    swatchDiv.innerHTML = '';
+                }
+            });
+
+            // Wire remove
+            removeBtn.addEventListener('click', function () {
+                var i = parseInt(this.getAttribute('data-idx'));
+                garmentRows.splice(i, 1);
+                renderGarmentRows();
+                updateAddBtnVisibility();
+            });
+        });
+
+        updateAddBtnVisibility();
+    }
+
+    function updateAddBtnVisibility() {
+        var addBtn = document.getElementById('msf-add-garment-btn');
+        if (addBtn) addBtn.style.display = garmentRows.length >= 4 ? 'none' : '';
+    }
+
+    function searchStyles(idx, term) {
+        var dd = document.getElementById('msf-style-dd-' + idx);
+        if (!dd) return;
+
+        if (term.length < 2) {
+            dd.style.display = 'none';
+            return;
+        }
+
+        // Debounce
+        if (styleSearchTimers[idx]) clearTimeout(styleSearchTimers[idx]);
+        styleSearchTimers[idx] = setTimeout(function () {
+            dd.style.display = 'block';
+            dd.innerHTML = '<div class="msf-style-loading">Searching...</div>';
+
+            fetch(API_BASE + '/api/stylesearch?term=' + encodeURIComponent(term))
+                .then(function (resp) {
+                    if (!resp.ok) throw new Error('Style search failed');
+                    return resp.json();
+                })
+                .then(function (results) {
+                    dd.innerHTML = '';
+                    if (!results || results.length === 0) {
+                        dd.innerHTML = '<div class="msf-style-loading">No matches</div>';
+                        return;
+                    }
+                    results.slice(0, 15).forEach(function (item) {
+                        var opt = document.createElement('div');
+                        opt.className = 'msf-style-option';
+                        opt.textContent = item.label || item.value;
+                        opt.addEventListener('click', function () {
+                            selectStyle(idx, item.value, item.label);
+                            dd.style.display = 'none';
+                        });
+                        dd.appendChild(opt);
+                    });
+                })
+                .catch(function () {
+                    dd.innerHTML = '<div class="msf-style-loading">Search failed</div>';
+                });
+        }, 300);
+    }
+
+    function selectStyle(idx, styleNumber, label) {
+        garmentRows[idx].style = styleNumber;
+        garmentRows[idx].color = '';
+        garmentRows[idx].colors = [];
+        garmentRows[idx].swatch = '';
+
+        // Update input
+        var inputs = document.querySelectorAll('.msf-garment-style');
+        if (inputs[idx]) inputs[idx].value = styleNumber;
+
+        // Load colors for this style
+        var colorSelect = document.querySelectorAll('.msf-garment-color')[idx];
+        if (colorSelect) colorSelect.innerHTML = '<option value="">Loading colors...</option>';
+
+        fetch(API_BASE + '/api/product-colors?styleNumber=' + encodeURIComponent(styleNumber))
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Color fetch failed');
+                return resp.json();
+            })
+            .then(function (data) {
+                var colors = data.colors || [];
+                garmentRows[idx].colors = colors;
+                if (colorSelect) {
+                    colorSelect.innerHTML = '<option value="">Select color (' + colors.length + ' available)...</option>';
+                    colors.forEach(function (c) {
+                        var opt = document.createElement('option');
+                        opt.value = c.COLOR_NAME;
+                        opt.textContent = c.COLOR_NAME;
+                        colorSelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(function () {
+                if (colorSelect) colorSelect.innerHTML = '<option value="">Failed to load colors</option>';
+            });
+    }
+
+    function initGarmentAddBtn() {
+        var addBtn = document.getElementById('msf-add-garment-btn');
+        if (!addBtn) return;
+        addBtn.addEventListener('click', function () {
+            if (garmentRows.length >= 4) return;
+            garmentRows.push({ style: '', color: '', colors: [], swatch: '' });
+            renderGarmentRows();
+        });
+    }
+
     // ── Wire Events ────────────────────────────────────────────────────────
     function wireEvents() {
         // Close dropdowns on outside click
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.msf-thread-picker')) hideThreadDropdown();
+            // Close style dropdowns
+            if (!e.target.closest('.msf-garment-style-wrap')) {
+                document.querySelectorAll('.msf-garment-style-dropdown').forEach(function (dd) { dd.style.display = 'none'; });
+            }
         });
+
+        // Garment add button
+        initGarmentAddBtn();
 
         // Thread color search
         var threadInput = document.getElementById('msf-thread-search');
@@ -617,14 +829,18 @@ var MockupSubmitForm = (function () {
         return parts.join('\n');
     }
 
-    // ── Build Garment Info ─────────────────────────────────────────────────
+    // ── Build Garment Info (backward-compat summary string) ───────────────
     function buildGarmentInfo() {
-        var colors = document.getElementById('msf-garment-colors').value.trim();
-        var fabric = document.getElementById('msf-fabric-type').value;
         var parts = [];
-        if (colors) parts.push(colors);
-        if (fabric) parts.push(fabric);
-        return parts.join(' — ');
+        garmentRows.forEach(function (row, idx) {
+            if (row.style || row.color) {
+                var desc = (row.style || '?') + ' / ' + (row.color || '?');
+                parts.push('Style ' + (idx + 1) + ': ' + desc);
+            }
+        });
+        var fabric = document.getElementById('msf-fabric-type').value;
+        if (fabric) parts.push('Fabric: ' + fabric);
+        return parts.join('; ');
     }
 
     // ── Build Size Specs ───────────────────────────────────────────────────
@@ -677,6 +893,14 @@ var MockupSubmitForm = (function () {
                     Mockup_Type: Array.from(document.querySelectorAll('.msf-mockup-type-cb:checked')).map(function(cb) { return cb.value; }).join(', '),
                     Print_Location: document.getElementById('msf-placement').value,
                     Garment_Info: buildGarmentInfo(),
+                    Garment_Style_1: garmentRows[0] ? garmentRows[0].style : '',
+                    Garment_Color_1: garmentRows[0] ? garmentRows[0].color : '',
+                    Garment_Style_2: garmentRows[1] ? garmentRows[1].style : '',
+                    Garment_Color_2: garmentRows[1] ? garmentRows[1].color : '',
+                    Garment_Style_3: garmentRows[2] ? garmentRows[2].style : '',
+                    Garment_Color_3: garmentRows[2] ? garmentRows[2].color : '',
+                    Garment_Style_4: garmentRows[3] ? garmentRows[3].style : '',
+                    Garment_Color_4: garmentRows[3] ? garmentRows[3].color : '',
                     Size_Specs: buildSizeSpecs(),
                     Due_Date: document.getElementById('msf-due-date').value || null,
                     Work_Order_Number: document.getElementById('msf-work-order').value.trim(),
@@ -859,6 +1083,7 @@ var MockupSubmitForm = (function () {
         referenceFiles = [];
         selectedContact = null;
         currentRequestType = 'New Digitizing';
+        garmentRows = [{ style: '', color: '', colors: [], swatch: '' }];
 
         var container = document.getElementById(containerId);
         container.innerHTML = buildFormHtml();
@@ -867,6 +1092,7 @@ var MockupSubmitForm = (function () {
         initCompanyAutocomplete();
         initSalesRep();
         loadLocations();
+        renderGarmentRows();
         // Thread colors already cached in allThreadColors
     }
 

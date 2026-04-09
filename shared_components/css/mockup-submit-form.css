@@ -572,9 +572,104 @@
 .msf-toast--error { background: #dc2626; }
 .msf-toast--info { background: var(--art-theme); }
 
+/* ── Garment Style/Color Rows ──────────────────────── */
+.msf-garment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 40px 32px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.msf-garment-style-wrap {
+    position: relative;
+}
+.msf-garment-style-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    z-index: 50;
+}
+.msf-style-option {
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+}
+.msf-style-option:hover {
+    background: var(--art-theme-bg, #f0ebff);
+    color: var(--art-theme-dark, #5b3aad);
+}
+.msf-style-loading {
+    padding: 10px 12px;
+    color: #888;
+    font-size: 13px;
+    text-align: center;
+}
+.msf-garment-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.msf-garment-swatch img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.msf-garment-remove {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.msf-garment-remove:hover {
+    background: #fca5a5;
+}
+.msf-add-garment-btn {
+    border: 1px dashed #d1d5db;
+    background: transparent;
+    color: var(--art-theme, #6B46C1);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-top: 4px;
+}
+.msf-add-garment-btn:hover {
+    border-color: var(--art-theme, #6B46C1);
+    background: var(--art-theme-bg, #f0ebff);
+}
+
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 600px) {
     .msf-ruth-banner { flex-direction: column; text-align: center; }
     .msf-row { grid-template-columns: 1fr; }
     .msf-submit-row { flex-direction: column; }
+    .msf-garment-row { grid-template-columns: 1fr; }
+    .msf-garment-swatch { width: 32px; height: 32px; }
 }

@@ -1809,6 +1809,19 @@
     }
 
     // ── Info Fields ────────────────────────────────────────────────────────
+    function buildGarmentDisplayValue(mockup) {
+        var parts = [];
+        for (var i = 1; i <= 4; i++) {
+            var style = mockup['Garment_Style_' + i];
+            var color = mockup['Garment_Color_' + i];
+            if (style || color) {
+                parts.push((style || '') + (style && color ? ' / ' : '') + (color || ''));
+            }
+        }
+        if (parts.length > 0) return parts.join(', ');
+        return mockup.Garment_Info || '';
+    }
+
     function renderInfoFields(mockup) {
         var container = document.getElementById('pmd-info-fields');
         if (!container) return;
@@ -1844,7 +1857,7 @@
                 { label: 'Design Name', value: mockup.Design_Name },
                 { label: 'Company', value: mockup.Company_Name },
                 { label: 'Application', value: mockup.Mockup_Type },
-                { label: 'Garment', value: mockup.Garment_Info },
+                { label: 'Garment', value: buildGarmentDisplayValue(mockup) },
                 { label: 'Placement', value: mockup.Print_Location },
                 { label: 'Logo Dimensions', value: logoDimensions },
                 { label: 'Design Size', value: mockup.Design_Size },
