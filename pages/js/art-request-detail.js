@@ -2131,6 +2131,12 @@
             if (e.key === 'Escape') {
                 closeLightbox();
                 closeChangesModal();
+                // Close edit modal if open
+                var editModal = document.getElementById('ard-edit-modal');
+                if (editModal && editModal.style.display !== 'none') editModal.style.display = 'none';
+                // Close any art-actions-shared modals
+                var artModals = document.querySelectorAll('.art-modal-overlay');
+                artModals.forEach(function (m) { m.remove(); });
             }
         });
     });
@@ -2902,8 +2908,9 @@
             if (changesAttachedFiles.length > 0) {
                 var btn = newSubmit;
                 btn.disabled = true;
-                btn.textContent = 'Uploading files...';
+                btn.innerHTML = '<span class="ard-btn-spinner"></span>Uploading ' + changesAttachedFiles.length + ' file' + (changesAttachedFiles.length > 1 ? 's' : '') + '...';
                 uploadChangesFiles(changesAttachedFiles.slice(), combinedNotes).then(function (updatedNotes) {
+                    btn.innerHTML = '<span class="ard-btn-spinner"></span>Submitting...';
                     requestChanges(designId, aeName, updatedNotes);
                 }).catch(function (err) {
                     showToast('File upload failed: ' + err.message, 'error');

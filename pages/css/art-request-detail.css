@@ -403,7 +403,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.15s, transform 0.15s;
     background: #f8fafc;
     position: relative;
 }
@@ -509,7 +509,7 @@ body {
 .ard-box-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.5);
     z-index: 1000;
 }
 .ard-box-modal {
@@ -871,13 +871,14 @@ body {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
+    transition: background 0.2s, opacity 0.2s, transform 0.1s;
     background: linear-gradient(135deg, #28a745, #218838);
     color: white;
 }
 
 .ard-btn-approve:hover:not(:disabled) {
     background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: translateY(-1px);
 }
 
 .ard-btn-approve:disabled {
@@ -893,13 +894,14 @@ body {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
+    transition: background 0.2s, opacity 0.2s, transform 0.1s;
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
 }
 
 .ard-btn-changes:hover:not(:disabled) {
     background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-1px);
 }
 
 .ard-btn-changes:disabled {
@@ -1066,6 +1068,19 @@ body {
 
 .ard-changes-btn-submit:hover { background: linear-gradient(135deg, #d97706, #b45309); }
 .ard-changes-btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Inline button spinner for upload states */
+.ard-btn-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: ard-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
 
 /* ── Success Message ─────────────────────────────────── */
 .ard-success-msg {
@@ -1601,11 +1616,11 @@ body {
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s, opacity 0.15s, filter 0.15s, transform 0.1s;
     color: #fff;
 }
 
-.ard-action-btn:hover { opacity: 0.9; }
+.ard-action-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
 .ard-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .ard-action-working  { background: #16a34a; }
@@ -1707,7 +1722,7 @@ body.ae-view .ard-status-step.active .ard-status-label {
 .ard-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.5);
     z-index: 1100;
     display: flex;
     justify-content: center;

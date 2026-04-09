@@ -175,7 +175,7 @@ body {
 
 /* ── Edit Mockup Modal ────────────────────────────────── */
 .pmd-edit-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
     z-index: 1100; display: flex; justify-content: center; align-items: center;
 }
 .pmd-edit-modal {
@@ -505,9 +505,13 @@ body {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s, transform 0.1s;
     font-family: inherit;
     white-space: nowrap;
+}
+.pmd-action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
 }
 
 .pmd-action-btn--primary {
@@ -625,6 +629,7 @@ body {
     font-weight: 500;
     gap: 6px;
     height: 100%;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.15s, transform 0.15s;
 }
 
 .pmd-slot-empty-icon {
@@ -1504,6 +1509,19 @@ body {
 
 .pmd-revise-file-chip-remove:hover {
     color: #dc3545;
+}
+
+/* Inline button spinner for upload states */
+.pmd-btn-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: pmd-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
 }
 
 /* ── Box Files Panel ────────────────────────────────── */

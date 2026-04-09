@@ -3646,7 +3646,7 @@
             // Upload attached file first, then submit
             if (reviseAttachedFiles.length > 0) {
                 btn.disabled = true;
-                btn.textContent = 'Uploading file...';
+                btn.innerHTML = '<span class="pmd-btn-spinner"></span>Uploading file...';
                 var formData = new FormData();
                 formData.append('file', reviseAttachedFiles[0]);
                 formData.append('slot', 'Box_Reference_File');
@@ -3770,7 +3770,16 @@
         });
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'Escape') {
+                closeLightbox();
+                closeReviseModal();
+                // Close edit overlay if open
+                var editOverlay = document.querySelector('.pmd-edit-overlay');
+                if (editOverlay) editOverlay.style.display = 'none';
+                // Close any art-actions-shared modals
+                var artModals = document.querySelectorAll('.art-modal-overlay');
+                artModals.forEach(function (m) { m.remove(); });
+            }
         });
 
         if (downloadBtn) {
