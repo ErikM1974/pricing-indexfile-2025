@@ -513,6 +513,75 @@
     letter-spacing: -0.01em;
 }
 
+/* ── Category Accent Borders ─────────────────────────── */
+.tool-category--pricing { border-left: 3px solid var(--wsu-crimson); }
+.tool-category--art     { border-left: 3px solid #10b981; }
+.tool-category--crm     { border-left: 3px solid #8b5cf6; }
+.tool-category--admin   { border-left: 3px solid #3b82f6; }
+.tool-category--design  { border-left: 3px solid #f59e0b; }
+
+/* ── Gradient Button Classes (replaces inline styles) ── */
+.tool-btn--green {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-color: #059669;
+}
+.tool-btn--green:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    border-color: #047857;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+.tool-btn--blue {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border-color: #1d4ed8;
+}
+.tool-btn--blue:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    border-color: #1e40af;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+.tool-btn--purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border-color: #7c3aed;
+}
+.tool-btn--purple:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border-color: #6d28d9;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+.tool-btn--cyan {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+    border-color: #0891b2;
+}
+.tool-btn--cyan:hover {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+    border-color: #0e7490;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+.tool-btn--gray {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    border-color: #4b5563;
+}
+.tool-btn--gray:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    border-color: #374151;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
 /* Tool Dropdown */
 .tool-dropdown {
     position: relative;

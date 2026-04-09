@@ -512,6 +512,15 @@ body {
     color: #fbcfe8;
 }
 
+/* Category accent borders in dark mode */
+.tool-category--pricing { border-left-color: var(--accent-blue); }
+.tool-category--art     { border-left-color: #34d399; }
+.tool-category--crm     { border-left-color: #a78bfa; }
+.tool-category--admin   { border-left-color: #60a5fa; }
+.tool-category--design  { border-left-color: #fbbf24; }
+
+/* Gradient buttons keep their colors in dark mode (already high contrast) */
+
 /* =====================================================
    METRICS CARDS - DARK MODE
    ===================================================== */

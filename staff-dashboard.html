@@ -34,16 +34,7 @@
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
 
-    <!-- 2026 Price Increase Alert Banner -->
-    <div class="price-alert-banner" id="priceAlertBanner">
-        <div class="price-alert-content">
-            <i class="fas fa-info-circle"></i>
-            <span><strong>2026 Pricing Update:</strong> Due to SanMar cost increases, all decoration services have been adjusted 5-7% effective January 5, 2026. Quote builders reflect current pricing.</span>
-        </div>
-        <button class="price-alert-close" onclick="dismissPriceAlert()" aria-label="Dismiss">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
+    <!-- Price alert removed 2026-04-09 (was stale Jan 5 notice) -->
 
     <div class="dashboard-container">
         <!-- =====================================================
@@ -274,11 +265,10 @@
                     </div>
 
                     <div class="quick-access-grid">
-                        <!-- Ask Barnaby (Quote Grid) -->
+                        <!-- ── Ask Barnaby (Quote Builders) ─────────────── -->
                         <div class="tool-category barnaby-theme">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon barnaby-icon">
-                                    <!-- Walking Bigfoot silhouette - Barnaby the Sasquatch -->
                                     <svg viewBox="0 0 32 32" fill="currentColor" class="barnaby-svg">
                                         <ellipse cx="16" cy="5" rx="4" ry="4.5"/>
                                         <path d="M12 9c-1 0-2 1-2 2v7l-4 3v7h4v-5l3-2v10h4V17h2v14h4V21l3 2v5h4v-7l-4-3V11c0-1-1-2-2-2h-2l1 5-3-1v-4h-6v4l-3 1 1-5h-2z"/>
@@ -287,80 +277,58 @@
                                 <span class="tool-category-title">Ask Barnaby</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn">Emb / Cap / Patch</a>
-                                <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn">DTG</a>
-                                <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn">Screen Print</a>
-                                <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn">DTF</a>
+                                <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn"><i class="fas fa-tshirt"></i> Emb / Cap / Patch</a>
+                                <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn"><i class="fas fa-print"></i> DTG</a>
+                                <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn"><i class="fas fa-layer-group"></i> Screen Print</a>
+                                <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn"><i class="fas fa-fire"></i> DTF</a>
                                 <a href="/dashboards/quote-management.html" class="tool-btn barnaby-accent">
                                     <i class="fas fa-list-alt"></i> Quote Management
                                 </a>
                             </div>
                         </div>
 
-                        <!-- Manual Pricing -->
-                        <div class="tool-category">
+                        <!-- ── Pricing Tools (Manual + Contract + Customer Supplied) ── -->
+                        <div class="tool-category tool-category--pricing">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-calculator"></i>
                                 </div>
-                                <span class="tool-category-title">Manual Pricing</span>
+                                <span class="tool-category-title">Pricing Tools</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/calculators/manual-pricing.html" class="tool-btn">Manual Pricing 2026</a>
-                                <a href="/calculators/compare-pricing.html" class="tool-btn">Pricing by Style</a>
-                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn">Service Prices</a>
-                                <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn">Additional Logo</a>
-                                <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn">Additional Stitch Pricing & Affected Customers</a>
+                                <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator"></i> Manual Pricing 2026</a>
+                                <a href="/calculators/compare-pricing.html" class="tool-btn"><i class="fas fa-search-dollar"></i> Pricing by Style</a>
+                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list"></i> Service Prices</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn"><i class="fas fa-plus-circle"></i> Additional Logo</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn"><i class="fas fa-ruler"></i> Stitch Pricing</a>
+                                <a href="/calculators/dtg-contract/" class="tool-btn"><i class="fas fa-handshake"></i> Contract DTG</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-cemb" class="tool-btn"><i class="fas fa-handshake"></i> Contract Embroidery</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=decg" class="tool-btn"><i class="fas fa-box-open"></i> Customer Supplied Emb (DECG)</a>
+                                <a href="/calculators/screenprint-customer/" class="tool-btn"><i class="fas fa-box-open"></i> Customer Supplied Screen Print</a>
                             </div>
                         </div>
 
-                        <!-- Contract (Wholesale / B2B) -->
-                        <div class="tool-category contract-theme">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-handshake"></i>
-                                </div>
-                                <span class="tool-category-title">Contract Pricing</span>
-                            </div>
-                            <div class="tool-buttons">
-                                <a href="/calculators/dtg-contract/" class="tool-btn">Contract DTG</a>
-                                <a href="/calculators/embroidery-pricing-all/?tab=al-cemb" class="tool-btn">Contract Embroidery</a>
-                            </div>
-                        </div>
-
-                        <!-- Customer Supplied Retail (Walk-In Service) -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                                <span class="tool-category-title">Customer Supplied Retail</span>
-                            </div>
-                            <div class="tool-buttons">
-                                <a href="/calculators/embroidery-pricing-all/?tab=decg" class="tool-btn">Embroidery (DECG)</a>
-                                <a href="/calculators/screenprint-customer/" class="tool-btn">Screen Print</a>
-                            </div>
-                        </div>
-
-                        <!-- Specialty -->
-                        <div class="tool-category">
+                        <!-- ── Specialty & Quick Links ──────────────────── -->
+                        <div class="tool-category tool-category--pricing">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <span class="tool-category-title">Specialty</span>
+                                <span class="tool-category-title">Specialty & Quick Links</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/calculators/embroidered-emblem/" class="tool-btn">Emblems</a>
-                                <a href="/calculators/laser-tumbler-polarcamel.html" class="tool-btn">Laser Tumbler</a>
-                                <a href="/calculators/sticker-manual-pricing.html" class="tool-btn">Stickers</a>
-                                <a href="/calculators/webstores.html" class="tool-btn">Webstore</a>
-                                <a href="/calculators/richardson-2025.html" class="tool-btn">Richardson Non-Sanmar</a>
+                                <a href="/calculators/embroidered-emblem/" class="tool-btn"><i class="fas fa-certificate"></i> Emblems</a>
+                                <a href="/calculators/laser-tumbler-polarcamel.html" class="tool-btn"><i class="fas fa-mug-hot"></i> Laser Tumbler</a>
+                                <a href="/calculators/sticker-manual-pricing.html" class="tool-btn"><i class="fas fa-sticky-note"></i> Stickers</a>
+                                <a href="/calculators/webstores.html" class="tool-btn"><i class="fas fa-store"></i> Webstore</a>
+                                <a href="/calculators/richardson-2025.html" class="tool-btn"><i class="fas fa-hat-cowboy"></i> Richardson Non-Sanmar</a>
+                                <a href="/pages/3-day-tees.html" class="tool-btn tool-btn--green"><i class="fas fa-clock"></i> 3-Day Tees</a>
+                                <a href="/pages/top-sellers-showcase.html" class="tool-btn"><i class="fas fa-trophy"></i> Top Sellers</a>
                             </div>
                         </div>
 
-                        <!-- Design Library -->
-                        <div class="tool-category">
+                        <!-- ── Design Library ──────────────────────────── -->
+                        <div class="tool-category tool-category--design">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-swatchbook"></i>
@@ -374,8 +342,8 @@
                             </div>
                         </div>
 
-                        <!-- Art Department -->
-                        <div class="tool-category">
+                        <!-- ── Art Department ──────────────────────────── -->
+                        <div class="tool-category tool-category--art">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-palette"></i>
@@ -384,78 +352,33 @@
                             </div>
                             <div class="tool-buttons">
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette"></i> AE Dashboard</a>
-                                <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-user"></i> Steve's Queue</a>
-                                <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-user"></i> Ruth's Queue</a>
-                                <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-drafting-compass"></i> DST Stitch Viewer</a>
+                                <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-paint-brush"></i> Steve's Queue</a>
+                                <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass"></i> Ruth's Queue</a>
+                                <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-microscope"></i> DST Stitch Viewer</a>
                                 <a href="/pages/mockup-generator.html" class="tool-btn"><i class="fas fa-magic"></i> Mockup Generator</a>
-                                <a href="/dashboards/portal-directory.html" class="tool-btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border-color: #059669;"><i class="fas fa-globe"></i> Customer Portals</a>
+                                <a href="/dashboards/portal-directory.html" class="tool-btn tool-btn--green"><i class="fas fa-globe"></i> Customer Portals</a>
                             </div>
                         </div>
 
-                        <!-- Forms -->
-                        <div class="tool-category">
+                        <!-- ── Forms, Shipping & Reference ─────────────── -->
+                        <div class="tool-category tool-category--admin">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
-                                    <i class="fas fa-file-alt"></i>
+                                    <i class="fas fa-clipboard"></i>
                                 </div>
-                                <span class="tool-category-title">Forms</span>
+                                <span class="tool-category-title">Forms, Shipping & Reference</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/calculators/digitizingform.html" class="tool-btn tool-btn--legacy" title="Legacy form — use Submit Artwork under Art Department instead">Digitizing (Legacy)</a>
-                                <a href="/calculators/purchasingform.html" class="tool-btn">Purchasing</a>
+                                <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart"></i> Purchasing</a>
                                 <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font"></i> Monogram Dashboard</a>
+                                <a href="/pages/box-labels.html" class="tool-btn tool-btn--blue"><i class="fas fa-box"></i> Box Labels</a>
+                                <a href="/pages/data-entry-guide.html" class="tool-btn"><i class="fas fa-book-open"></i> Data Entry Guide</a>
+                                <a href="/dashboards/reports/price-audit-report.html" class="tool-btn"><i class="fas fa-chart-bar"></i> Price Audit Report</a>
                             </div>
                         </div>
 
-                        <!-- Training & Reference -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <span class="tool-category-title">Training & Reference</span>
-                            </div>
-                            <div class="tool-buttons">
-                                <a href="/pages/data-entry-guide.html" class="tool-btn">Data Entry Guide</a>
-                                <a href="/dashboards/reports/price-audit-report.html" class="tool-btn">Price Audit Report</a>
-                            </div>
-                        </div>
-
-                        <!-- Shipping & Receiving -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                                <span class="tool-category-title">Shipping & Receiving</span>
-                            </div>
-                            <div class="tool-buttons">
-                                <a href="/pages/box-labels.html" class="tool-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border-color: #1d4ed8;">
-                                    <i class="fas fa-box"></i> Box Labels
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Quick Links -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-link"></i>
-                                </div>
-                                <span class="tool-category-title">Quick Links</span>
-                            </div>
-                            <div class="tool-buttons">
-                                <a href="/pages/3-day-tees.html" class="tool-btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border-color: #059669;">
-                                    <i class="fas fa-clock"></i> 3-Day Tees
-                                </a>
-                                <a href="/pages/top-sellers-showcase.html" class="tool-btn">
-                                    <i class="fas fa-star"></i> Top Sellers
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- CRM (Role-based access via Caspio authentication) -->
-                        <div class="tool-category">
+                        <!-- ── CRM (Role-based access) ─────────────────── -->
+                        <div class="tool-category tool-category--crm">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-address-book"></i>
@@ -463,19 +386,19 @@
                                 <span class="tool-category-title">CRM</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/dashboards/taneisha-crm.html" onclick="navigateToCRM(event, '/dashboards/taneisha-crm.html')" class="tool-btn crm-link" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-color: #7c3aed;">
+                                <a href="/dashboards/taneisha-crm.html" onclick="navigateToCRM(event, '/dashboards/taneisha-crm.html')" class="tool-btn crm-link tool-btn--purple">
                                     <i class="fas fa-user-tie"></i> Taneisha's Accounts
                                 </a>
-                                <a href="/dashboards/nika-crm.html" onclick="navigateToCRM(event, '/dashboards/nika-crm.html')" class="tool-btn crm-link" style="background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border-color: #0891b2;">
+                                <a href="/dashboards/nika-crm.html" onclick="navigateToCRM(event, '/dashboards/nika-crm.html')" class="tool-btn crm-link tool-btn--cyan">
                                     <i class="fas fa-user-tie"></i> Nika's Accounts
                                 </a>
-                                <a href="/dashboards/house-accounts.html" onclick="navigateToCRM(event, '/dashboards/house-accounts.html')" class="tool-btn crm-link" style="background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border-color: #4b5563;">
+                                <a href="/dashboards/house-accounts.html" onclick="navigateToCRM(event, '/dashboards/house-accounts.html')" class="tool-btn crm-link tool-btn--gray">
                                     <i class="fas fa-home"></i> House Accounts
                                 </a>
                             </div>
                         </div>
 
-                        <!-- Recent Policies (collapsed by default) -->
+                        <!-- ── Recent Policies (collapsed by default) ──── -->
                         <div class="tool-category policies-category">
                             <div class="tool-category-header collapsible-header" data-toggle="policies">
                                 <div class="tool-category-icon">
@@ -927,21 +850,7 @@
                 StaffDashboardEmployees.renderAnniversaryList('anniversaryList');
             }
 
-            // Check if price alert was dismissed this session
-            if (sessionStorage.getItem('priceAlertDismissed_2026') === 'true') {
-                const banner = document.getElementById('priceAlertBanner');
-                if (banner) banner.classList.add('hidden');
-            }
         });
-
-        // Price Alert Banner - Dismiss functionality
-        function dismissPriceAlert() {
-            const banner = document.getElementById('priceAlertBanner');
-            if (banner) {
-                banner.classList.add('hidden');
-                sessionStorage.setItem('priceAlertDismissed_2026', 'true');
-            }
-        }
 
         // =====================================================
         // CELEBRATION DROPDOWN FUNCTIONS
