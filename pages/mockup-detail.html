@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=35">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=36">
     <link rel="stylesheet" href="/pages/css/thread-color-picker.css?v=1">
 </head>
 <body>
@@ -194,6 +194,23 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="pmd-modal-overlay" id="pmd-delete-overlay">
+        <div class="pmd-modal pmd-modal--delete">
+            <div class="pmd-modal-header pmd-modal-header--delete">Delete Mockup Request</div>
+            <div class="pmd-modal-body">
+                <p class="pmd-delete-warning">This will permanently delete this mockup request and all associated data (notes, versions, design files). This cannot be undone.</p>
+                <div class="pmd-delete-info" id="pmd-delete-info"></div>
+                <label for="pmd-delete-reason">Reason for deletion (optional)</label>
+                <textarea id="pmd-delete-reason" placeholder="e.g. Duplicate entry, already have this design..."></textarea>
+            </div>
+            <div class="pmd-modal-footer">
+                <button class="pmd-box-cancel-btn" id="pmd-delete-cancel">Cancel</button>
+                <button class="pmd-action-btn pmd-action-btn--delete" id="pmd-delete-confirm">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Send to Customer Modal (AE view) -->
     <div class="pmd-modal-overlay" id="pmd-send-customer-overlay">
         <div class="pmd-modal pmd-modal--send-customer">
@@ -320,6 +337,6 @@
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/thread-color-picker.js?v=1"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
-    <script src="/pages/js/mockup-detail.js?v=56"></script>
+    <script src="/pages/js/mockup-detail.js?v=57"></script>
 </body>
 </html>

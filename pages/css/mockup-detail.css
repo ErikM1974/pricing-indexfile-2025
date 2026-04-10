@@ -559,6 +559,16 @@ body {
     background: #dc2626;
 }
 
+.pmd-action-btn--delete {
+    background: #dc2626;
+    color: white;
+    margin-left: auto;
+}
+
+.pmd-action-btn--delete:hover {
+    background: #b91c1c;
+}
+
 .pmd-action-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1393,6 +1403,42 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+/* ── Delete Modal ───────────────────────────────────── */
+.pmd-modal--delete {
+    width: 460px;
+}
+
+.pmd-modal-header--delete {
+    background: #dc2626;
+}
+
+.pmd-delete-warning {
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.pmd-delete-info {
+    margin-bottom: 16px;
+}
+
+.pmd-delete-info-row {
+    font-size: 14px;
+    padding: 4px 0;
+    color: #374151;
+}
+
+.pmd-delete-info-row strong {
+    display: inline-block;
+    width: 110px;
+    color: #111827;
 }
 
 /* ── Per-Mockup Revision Slots ───────────────────── */

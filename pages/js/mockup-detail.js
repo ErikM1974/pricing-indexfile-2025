@@ -561,10 +561,24 @@
             } else if (hasMockups) {
                 // Other status but mockups exist — show send + copy buttons
                 aeBar.style.display = '';
+                var aeDeleteHtml = (statusLower === 'submitted' || statusLower === 'inprogress' || statusLower === 'revisionrequested')
+                    ? '<button class="pmd-action-btn pmd-action-btn--delete" id="pmd-btn-ae-delete">Delete Request</button>' : '';
                 aeBar.innerHTML = '<span class="pmd-action-bar-label">Mockup actions:' + custElapsedHtml + '</span>'
-                    + sendCopyButtons;
+                    + sendCopyButtons + aeDeleteHtml;
+                var aeDeleteBtn = document.getElementById('pmd-btn-ae-delete');
+                if (aeDeleteBtn) {
+                    aeDeleteBtn.addEventListener('click', function () { openDeleteModal(); });
+                }
             } else {
-                aeBar.style.display = 'none';
+                // No mockups yet — show delete for early statuses (e.g. duplicate submission)
+                if (statusLower === 'submitted' || statusLower === 'inprogress' || statusLower === 'revisionrequested') {
+                    aeBar.style.display = '';
+                    aeBar.innerHTML = '<span class="pmd-action-bar-label">No mockups yet</span>'
+                        + '<button class="pmd-action-btn pmd-action-btn--delete" id="pmd-btn-ae-delete">Delete Request</button>';
+                    document.getElementById('pmd-btn-ae-delete').addEventListener('click', function () { openDeleteModal(); });
+                } else {
+                    aeBar.style.display = 'none';
+                }
             }
 
             // Attach send/copy/reopen listeners if buttons exist
@@ -595,19 +609,30 @@
             // Ruth's view
             aeBar.style.display = 'none';
 
+            // Delete button HTML (shared across Submitted / In Progress / Revision Requested)
+            var deleteButtonHtml = '<button class="pmd-action-btn pmd-action-btn--delete" id="pmd-btn-delete">Delete Request</button>';
+
             if (statusLower === 'submitted') {
                 ruthBar.style.display = '';
                 ruthBar.innerHTML = '<span class="pmd-action-bar-label">Ready to start?</span>'
-                    + '<button class="pmd-action-btn pmd-action-btn--start" id="pmd-btn-start">Start Working</button>';
+                    + '<button class="pmd-action-btn pmd-action-btn--start" id="pmd-btn-start">Start Working</button>'
+                    + deleteButtonHtml;
                 document.getElementById('pmd-btn-start').addEventListener('click', function () {
                     handleStatusUpdate('In Progress', null, this);
+                });
+                document.getElementById('pmd-btn-delete').addEventListener('click', function () {
+                    openDeleteModal();
                 });
             } else if (statusLower === 'inprogress' || statusLower === 'revisionrequested') {
                 ruthBar.style.display = '';
                 ruthBar.innerHTML = '<span class="pmd-action-bar-label">Ready for review?</span>'
-                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send">Send for Approval</button>';
+                    + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send">Send for Approval</button>'
+                    + deleteButtonHtml;
                 document.getElementById('pmd-btn-send').addEventListener('click', function () {
                     handleStatusUpdate('Awaiting Approval', null, this);
+                });
+                document.getElementById('pmd-btn-delete').addEventListener('click', function () {
+                    openDeleteModal();
                 });
             } else if (statusLower === 'awaitingapproval') {
                 ruthBar.style.display = '';
@@ -3553,6 +3578,82 @@
                 btn.disabled = false;
                 btn.textContent = 'Add Note';
             });
+        });
+    }
+
+    // ── Delete Mockup Modal ────────────────────────────────────────────────
+    function openDeleteModal() {
+        var overlay = document.getElementById('pmd-delete-overlay');
+        var infoDiv = document.getElementById('pmd-delete-info');
+        var reasonField = document.getElementById('pmd-delete-reason');
+
+        // Show design info so user confirms the right one
+        var company = (currentMockup.Company_Name || 'Unknown');
+        var designNum = (currentMockup.Design_Number || currentMockup.ID || '');
+        var designName = (currentMockup.Design_Name || '');
+        infoDiv.innerHTML = '<div class="pmd-delete-info-row"><strong>Company:</strong> ' + escapeHtml(company) + '</div>'
+            + '<div class="pmd-delete-info-row"><strong>Design #:</strong> ' + escapeHtml(String(designNum)) + '</div>'
+            + (designName ? '<div class="pmd-delete-info-row"><strong>Design Name:</strong> ' + escapeHtml(designName) + '</div>' : '');
+
+        reasonField.value = '';
+        overlay.classList.add('show');
+        reasonField.focus();
+
+        // Wire up cancel
+        document.getElementById('pmd-delete-cancel').onclick = function () {
+            overlay.classList.remove('show');
+        };
+
+        // Wire up confirm
+        document.getElementById('pmd-delete-confirm').onclick = function () {
+            handleDeleteMockup(this);
+        };
+
+        // Close on overlay click
+        overlay.onclick = function (e) {
+            if (e.target === overlay) overlay.classList.remove('show');
+        };
+
+        // Close on Escape
+        var escHandler = function (e) {
+            if (e.key === 'Escape') {
+                overlay.classList.remove('show');
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+    }
+
+    function handleDeleteMockup(btnEl) {
+        var reason = (document.getElementById('pmd-delete-reason').value || '').trim();
+        btnEl.disabled = true;
+        btnEl.textContent = 'Deleting...';
+
+        fetch(API_BASE + '/api/mockups/' + mockupId, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function (resp) {
+            if (!resp.ok) {
+                return resp.json().then(function (data) {
+                    throw new Error(data.error || 'Failed to delete mockup');
+                });
+            }
+            return resp.json();
+        })
+        .then(function (data) {
+            document.getElementById('pmd-delete-overlay').classList.remove('show');
+            showToast('Mockup request deleted successfully', 'success');
+            // Redirect back to dashboard after brief delay
+            setTimeout(function () {
+                var backLink = document.getElementById('pmd-back-link');
+                window.location.href = backLink ? backLink.href : '/art-hub-ruth.html';
+            }, 1200);
+        })
+        .catch(function (err) {
+            btnEl.disabled = false;
+            btnEl.textContent = 'Delete Permanently';
+            showToast('Failed to delete: ' + err.message, 'error');
         });
     }
 
