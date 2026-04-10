@@ -1342,6 +1342,9 @@ body {
     border-radius: 12px;
     width: 500px;
     max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     overflow: hidden;
 }
@@ -1360,6 +1363,9 @@ body {
 
 .pmd-modal-body {
     padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .pmd-modal-body textarea {
