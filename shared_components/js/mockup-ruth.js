@@ -359,7 +359,7 @@
 
         const thumbUrl = mockup.Box_Mockup_1 || '';
         const thumbHtml = thumbUrl
-            ? `<div class="card-thumb"><img src="${escapeHtml(thumbUrl)}" alt="Mockup preview" loading="lazy" onerror="this.parentElement.style.display='none';"></div>`
+            ? `<div class="card-thumb"><img src="${escapeHtml(thumbUrl)}" alt="Mockup preview" loading="lazy" data-original-src="${escapeHtml(thumbUrl)}" onerror="if(this.getAttribute('data-original-src').indexOf('/shared/static/')!==-1&&!this.dataset.proxyAttempted){this.dataset.proxyAttempted='1';this.src=(window.APP_CONFIG&&window.APP_CONFIG.API&&window.APP_CONFIG.API.BASE_URL||'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com')+'/api/box/shared-image?url='+encodeURIComponent(this.getAttribute('data-original-src'));return;}this.parentElement.style.display='none';"></div>`
             : '';
 
         const workOrder = escapeHtml(mockup.Work_Order_Number || '');
@@ -695,7 +695,7 @@
 
                 var thumbHtml = '';
                 if (m.Box_Mockup_1) {
-                    thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" onerror="this.style.display=\'none\'" alt="">';
+                    thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" data-original-src="' + escapeHtml(m.Box_Mockup_1) + '" onerror="if(this.getAttribute(\'data-original-src\').indexOf(\'/shared/static/\')!==-1&&!this.dataset.proxyAttempted){this.dataset.proxyAttempted=\'1\';this.src=(window.APP_CONFIG&&window.APP_CONFIG.API&&window.APP_CONFIG.API.BASE_URL||\'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com\')+\'/api/box/shared-image?url=\'+encodeURIComponent(this.getAttribute(\'data-original-src\'));return;}this.style.display=\'none\'" alt="">';
                 }
 
                 var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')

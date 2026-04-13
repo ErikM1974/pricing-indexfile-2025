@@ -15,6 +15,19 @@
     var IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
     var INKSOFT_API = 'https://inksoft-transform-8a3dc4e38097.herokuapp.com';
 
+    /** Handle image error — try Box proxy fallback for broken shared/static URLs */
+    function handleBoxImageError(img) {
+        var originalSrc = img.getAttribute('data-original-src') || img.src;
+        var placeholder = img.nextElementSibling;
+        if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
+            img.dataset.proxyAttempted = '1';
+            img.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
+            return;
+        }
+        img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
+    }
+
     // ── EmailJS Config ──────────────────────────────────────────────────
     var EMAILJS_SERVICE_ID = 'service_jgrave3';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
@@ -1226,7 +1239,7 @@
                     var showSelectBadge = isCustomerView || (aeCanSelect && !isRefFile);
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" loading="lazy"'
-                        + ' onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+                        + ' data-original-src="' + escapeHtml(url) + '">'
                         + '<div class="pmd-file-placeholder" style="display:none;">'
                         + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
@@ -1240,6 +1253,8 @@
                         + '<line x1="12" y1="15" x2="12" y2="3"></line>'
                         + '</svg>' + (isCustomerView ? '<span>Download</span>' : '') + '</button>'
                         + '</div>';
+                    var slotImg = slotEl.querySelector('img');
+                    if (slotImg) slotImg.addEventListener('error', function () { handleBoxImageError(slotImg); });
 
                     // Revision badge on filled mockup slots
                     if (statusLower === 'revisionrequested' && !isRefFile) {

@@ -275,7 +275,8 @@ var ArtAeGallery = (function () {
         if (thumbUrl) {
             thumbHtml = '<div class="card-thumb">'
                 + '<img src="' + escapeHtml(thumbUrl) + '" alt="Mockup" loading="lazy"'
-                + ' onerror="this.parentElement.style.display=\'none\';">'
+                + ' data-original-src="' + escapeHtml(thumbUrl) + '"'
+                + ' onerror="if(this.getAttribute(\'data-original-src\').indexOf(\'/shared/static/\')!==-1&&!this.dataset.proxyAttempted){this.dataset.proxyAttempted=\'1\';this.src=(window.APP_CONFIG&&window.APP_CONFIG.API&&window.APP_CONFIG.API.BASE_URL||\'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com\')+\'/api/box/shared-image?url=\'+encodeURIComponent(this.getAttribute(\'data-original-src\'));return;}this.parentElement.style.display=\'none\';">'
                 + '</div>';
         }
 

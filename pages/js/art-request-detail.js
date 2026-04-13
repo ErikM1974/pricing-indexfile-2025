@@ -1046,9 +1046,11 @@
 
         if (isImage) {
             card.innerHTML = '<img src="' + escapeHtml(finalUrl) + '" alt="Final Approved Mockup" loading="lazy"'
-                + ' onerror="this.style.display=\'none\';">'
-                + '<div class="ard-final-mockup-badge">✅ Production Ready</div>'
+                + ' data-original-src="' + escapeHtml(finalUrl) + '">'
+                + '<div class="ard-final-mockup-badge">\u2705 Production Ready</div>'
                 + (sourceLabel ? '<div class="ard-final-mockup-source">From: ' + escapeHtml(sourceLabel) + '</div>' : '');
+            var finalImg = card.querySelector('img');
+            if (finalImg) finalImg.addEventListener('error', function () { handleImageError(finalImg); });
         } else {
             var fileIcon = getFileTypeIcon(ext ? ext.toUpperCase() : '');
             card.innerHTML = '<div class="ard-gallery-placeholder">' + fileIcon
@@ -1058,7 +1060,12 @@
 
         card.addEventListener('click', function () {
             if (isImage) {
-                openLightbox(finalUrl, 'Final Approved Mockup');
+                var fImg = card.querySelector('img');
+                var fDisplayUrl = (fImg && fImg.dataset.proxyAttempted) ? fImg.src : finalUrl;
+                if (fDisplayUrl.indexOf('/api/box/shared-image') !== -1) {
+                    fDisplayUrl += (fDisplayUrl.indexOf('?') !== -1 ? '&' : '?') + 'full=1';
+                }
+                openLightbox(fDisplayUrl, 'Final Approved Mockup');
             } else {
                 window.open(finalUrl, '_blank');
             }
@@ -1267,6 +1274,11 @@
             + '<div class="ard-rev-title">Changes Requested by ' + escapeHtml(authorName) + '</div>'
             + feedbackHtml
             + '</div>';
+        // Wire up Box proxy fallback for revision banner thumbnails
+        banner.querySelectorAll('img.ard-rev-thumb').forEach(function (img) {
+            img.setAttribute('data-original-src', img.src);
+            img.addEventListener('error', function () { handleImageError(img); });
+        });
     }
 
     function renderMockupGallery(req) {
@@ -1465,6 +1477,27 @@
         }
     }
 
+    /**
+     * Handle image load failure — try Box proxy fallback for broken shared/static URLs.
+     * If the original URL is a Box shared/static link, retry via our backend proxy.
+     */
+    function handleImageError(img) {
+        var originalSrc = img.getAttribute('data-original-src') || img.src;
+        var placeholder = img.nextElementSibling;
+
+        // Check if this is a Box shared/static URL that we can proxy
+        if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
+            img.dataset.proxyAttempted = '1';
+            var proxyUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
+            img.src = proxyUrl;
+            return; // Let the proxy attempt load; if it also fails, we'll fall through again
+        }
+
+        // Final fallback — show file type badge
+        img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
+    }
+
     /** Render a filled gallery thumbnail for a file */
     function renderFilledThumb(url, field, showRemove) {
         var thumb = document.createElement('div');
@@ -1482,10 +1515,13 @@
         if (isImage) {
             thumb.innerHTML = removeBtnHtml
                 + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
-                + ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                + ' data-original-src="' + escapeHtml(url) + '">'
                 + '<div class="ard-gallery-placeholder" style="display:none;">'
                 + '<span class="ard-gallery-ext-badge">' + escapeHtml(extLabel) + '</span></div>'
                 + '<div class="ard-gallery-label">' + escapeHtml(field.label) + '</div>';
+            // Wire up error handler (avoids inline onerror)
+            var imgEl = thumb.querySelector('img');
+            if (imgEl) imgEl.addEventListener('error', function () { handleImageError(imgEl); });
         } else {
             var fileIcon = getFileTypeIcon(extLabel);
             thumb.innerHTML = removeBtnHtml
@@ -1498,7 +1534,14 @@
         thumb.addEventListener('click', function (e) {
             if (e.target.closest('.ard-gallery-remove')) return;
             if (isImage) {
-                openLightbox(url, field.label);
+                // Use the current img src (may be proxy URL if fallback kicked in)
+                var imgEl = thumb.querySelector('img');
+                var displayUrl = (imgEl && imgEl.dataset.proxyAttempted) ? imgEl.src : url;
+                // For lightbox, request full-size via proxy if using shared-image endpoint
+                if (displayUrl.indexOf('/api/box/shared-image') !== -1) {
+                    displayUrl += (displayUrl.indexOf('?') !== -1 ? '&' : '?') + 'full=1';
+                }
+                openLightbox(displayUrl, field.label);
             } else {
                 window.open(url, '_blank');
             }
@@ -2111,8 +2154,19 @@
     // ── Lightbox ────────────────────────────────────────────────────────
     function openLightbox(url, label) {
         const lightbox = document.getElementById('ard-lightbox');
-        document.getElementById('ard-lightbox-img').src = url;
+        const lightboxImg = document.getElementById('ard-lightbox-img');
         document.getElementById('ard-lightbox-label').textContent = label || '';
+
+        // Add proxy fallback for lightbox image too
+        lightboxImg.onerror = function () {
+            if (url.indexOf('/shared/static/') !== -1 && !lightboxImg.dataset.proxyAttempted) {
+                lightboxImg.dataset.proxyAttempted = '1';
+                lightboxImg.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
+            }
+        };
+        lightboxImg.removeAttribute('data-proxy-attempted');
+        lightboxImg.src = url;
+
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }

@@ -48,6 +48,19 @@
         return div.innerHTML;
     }
 
+    /** Handle image load failure — try Box proxy fallback for broken shared/static URLs */
+    function handleBoxImageError(img) {
+        var originalSrc = img.getAttribute('data-original-src') || img.src;
+        var placeholder = img.nextElementSibling;
+        if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
+            img.dataset.proxyAttempted = '1';
+            img.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
+            return;
+        }
+        img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
+    }
+
     function formatNoteDate(dateStr) {
         if (!dateStr) return '--';
         try {
@@ -866,7 +879,8 @@
                     var extBadge = ext ? '<div class="box-file-ext-badge">' + escapeHtml(ext.toUpperCase()) + '</div>' : '';
                     card.innerHTML =
                         (file.thumbnailUrl
-                            ? '<img src="' + escapeHtml(file.thumbnailUrl) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                            ? '<img src="' + escapeHtml(file.thumbnailUrl) + '" alt="' + escapeHtml(file.name) + '" loading="lazy"'
+                              + ' data-original-src="' + escapeHtml(file.thumbnailUrl) + '">'
                               + '<div class="box-file-placeholder" style="display:none;">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
                             : '<div class="box-file-placeholder">' + escapeHtml(ext.toUpperCase() || 'FILE') + '</div>'
                         )
@@ -874,6 +888,8 @@
                         + '<div class="box-file-name">' + escapeHtml(file.name) + '</div>'
                         + '<div class="box-file-meta">' + escapeHtml(sizeLabel) + '</div>'
                         + '<div class="box-file-check">\u2713</div>';
+                    var boxCardImg = card.querySelector('img');
+                    if (boxCardImg) boxCardImg.addEventListener('error', function () { handleBoxImageError(boxCardImg); });
 
                     card.addEventListener('click', function () {
                         boxGrid.querySelectorAll('.box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
@@ -925,11 +941,13 @@
                 var noteVal = field.noteKey ? (artReqData[field.noteKey] || '') : '';
                 fileCard.innerHTML =
                     '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
-                    + ' onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                    + ' data-original-src="' + escapeHtml(url) + '">'
                     + '<div class="approval-file-placeholder" style="display:none;">File</div>'
                     + '<div class="approval-file-label">' + escapeHtml(field.label) + '</div>'
                     + (noteVal ? '<div class="approval-file-note">' + escapeHtml(noteVal) + '</div>' : '')
                     + '<div class="approval-file-check">\u2713</div>';
+                var cardImg = fileCard.querySelector('img');
+                if (cardImg) cardImg.addEventListener('error', function () { handleBoxImageError(cardImg); });
 
                 fileCard.addEventListener('click', function () {
                     // Deselect any Box file card
