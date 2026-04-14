@@ -64,10 +64,23 @@
             var path = url.split('?')[0].split('#')[0];
             var lastDot = path.lastIndexOf('.');
             if (lastDot === -1) return '';
-            return path.substring(lastDot + 1).toLowerCase();
+            var ext = path.substring(lastDot + 1).toLowerCase();
+            // Guard: real extensions are short and don't contain slashes (filters out API proxy URLs)
+            if (ext.length > 10 || ext.indexOf('/') !== -1) return '';
+            return ext;
         } catch (e) {
             return '';
         }
+    }
+
+    /** Normalize Box proxy URLs: fix HTTP→HTTPS and ensure consistent API_BASE origin */
+    function normalizeBoxProxyUrl(url) {
+        if (!url) return url;
+        var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
+        if (thumbMatch) {
+            return API_BASE + '/api/box/thumbnail/' + thumbMatch[1];
+        }
+        return url;
     }
 
     // ── Smart Back Navigation ──────────────────────────────────────────
@@ -1032,8 +1045,9 @@
         section.style.display = '';
         container.innerHTML = '';
 
+        finalUrl = normalizeBoxProxyUrl(finalUrl);
         var ext = getFileExtension(finalUrl);
-        var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+        var isImage = ext === '' || IMAGE_EXTENSIONS.indexOf(ext) !== -1;
 
         var card = document.createElement('div');
         card.className = 'ard-final-mockup-card';
@@ -1500,11 +1514,12 @@
 
     /** Render a filled gallery thumbnail for a file */
     function renderFilledThumb(url, field, showRemove) {
+        url = normalizeBoxProxyUrl(url);
         var thumb = document.createElement('div');
         thumb.className = 'ard-gallery-thumb';
         var ext = getFileExtension(url);
-        var extLabel = ext ? ext.toUpperCase() : 'FILE';
-        var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+        var extLabel = ext ? ext.toUpperCase() : 'IMG';
+        var isImage = ext === '' || IMAGE_EXTENSIONS.indexOf(ext) !== -1;
 
         var removeBtnHtml = '';
         if (showRemove) {

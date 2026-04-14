@@ -1320,3 +1320,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** Single-style score:1 matches with no way to distinguish between 5+ orders for the same customer with the same style.
 **Solution:** PO numbers correlate with WO numbers: `WO ≈ PO + 28856 (±200)`. Used as tiebreaker.
 **Prevention:** When tiebreaking style matches, use PO↔WO proximity, not dates.
+
+---
+
+### SCP recalculatePricing() Crash — primaryPricing Out of Scope (archived 2026-04-13)
+**Problem:** Screenprint sidebar showed Total Pieces: 0 and $0.00. `ReferenceError: primaryPricing is not defined`.
+**Root Cause:** Nudge savings calc referenced loop-scoped `const` variables after the loop closed.
+**Solution:** Capture needed values in outer-scope variables before the loop.
+**Prevention:** Post-loop summaries must use outer-scope captures. Test with extended sizes (2XL+).

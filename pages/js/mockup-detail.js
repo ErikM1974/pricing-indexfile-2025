@@ -15,6 +15,16 @@
     var IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
     var INKSOFT_API = 'https://inksoft-transform-8a3dc4e38097.herokuapp.com';
 
+    /** Normalize Box proxy URLs: fix HTTP→HTTPS and ensure consistent API_BASE origin */
+    function normalizeBoxProxyUrl(url) {
+        if (!url) return url;
+        var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
+        if (thumbMatch) {
+            return API_BASE + '/api/box/thumbnail/' + thumbMatch[1];
+        }
+        return url;
+    }
+
     /** Handle image error — try Box proxy fallback for broken shared/static URLs */
     function handleBoxImageError(img) {
         var originalSrc = img.getAttribute('data-original-src') || img.src;
@@ -1183,7 +1193,7 @@
         }
 
         slotsToRender.forEach(function (slot) {
-            var url = mockup[slot.key];
+            var url = normalizeBoxProxyUrl(mockup[slot.key]);
             var isEmpty = !url || !url.trim();
             isRefFile = slot.key === 'Box_Reference_File';
             var slotEl = document.createElement('div');
@@ -1231,7 +1241,7 @@
             } else {
                 // Show filled slot
                 var ext = getFileExtension(url);
-                var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
+                var isImage = ext === '' || IMAGE_EXTENSIONS.indexOf(ext) !== -1;
 
                 if (isImage) {
                     var showRemove = !isAeView && !isCustomerView;
@@ -1241,7 +1251,7 @@
                         + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" loading="lazy"'
                         + ' data-original-src="' + escapeHtml(url) + '">'
                         + '<div class="pmd-file-placeholder" style="display:none;">'
-                        + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span></div>'
+                        + '<span class="pmd-file-ext-badge">' + (ext ? ext.toUpperCase() : 'IMG') + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
                         + (showReplace ? '<button type="button" class="pmd-slot-replace" data-field-key="' + slot.key + '">&#9998; Replace</button>' : '')
@@ -1325,7 +1335,7 @@
                     var showReplaceNonImg = isAeView && isRefFile;
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<div class="pmd-file-placeholder">'
-                        + '<span class="pmd-file-ext-badge">' + ext.toUpperCase() + '</span>'
+                        + '<span class="pmd-file-ext-badge">' + (ext ? ext.toUpperCase() : 'FILE') + '</span>'
                         + '<span style="font-size:12px;color:#666;">' + escapeHtml(slot.label) + '</span>'
                         + '</div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
@@ -3853,11 +3863,12 @@
             item.addEventListener('click', function (e) {
                 e.stopPropagation();
                 dropdown.remove();
-                var vExt = getFileExtension(v.File_URL);
-                if (IMAGE_EXTENSIONS.indexOf(vExt) !== -1) {
-                    openLightbox(v.File_URL, 'v' + v.Version_Number + ' \u2014 ' + (v.File_Name || ''));
+                var vUrl = normalizeBoxProxyUrl(v.File_URL);
+                var vExt = getFileExtension(vUrl);
+                if (vExt === '' || IMAGE_EXTENSIONS.indexOf(vExt) !== -1) {
+                    openLightbox(vUrl, 'v' + v.Version_Number + ' \u2014 ' + (v.File_Name || ''));
                 } else {
-                    window.open(v.File_URL, '_blank');
+                    window.open(vUrl, '_blank');
                 }
             });
             dropdown.appendChild(item);
@@ -3937,7 +3948,13 @@
 
     function downloadImage(url, filename) {
         var safeName = (filename || 'mockup').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'mockup';
-        fetch(url)
+        // Convert Box thumbnail proxy URL to full-res download endpoint
+        var downloadUrl = url;
+        var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
+        if (thumbMatch) {
+            downloadUrl = API_BASE + '/api/box/download/' + thumbMatch[1];
+        }
+        fetch(downloadUrl)
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Download failed');
                 return resp.blob();
@@ -4117,7 +4134,10 @@
         if (!url) return '';
         var cleanUrl = url.split('?')[0].split('#')[0];
         var parts = cleanUrl.split('.');
-        return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
+        var ext = parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
+        // Guard: real extensions are short and don't contain slashes (filters out API proxy URLs)
+        if (ext.length > 10 || ext.indexOf('/') !== -1) return '';
+        return ext;
     }
 
     function getAeDisplayName(email) {
@@ -4183,10 +4203,10 @@
         var mockupCount = 0;
         MOCKUP_SLOTS.forEach(function (slot) {
             if (slot.key === 'Box_Reference_File') return;
-            var url = currentMockup[slot.key];
+            var url = normalizeBoxProxyUrl(currentMockup[slot.key]);
             if (!url) return;
             var ext = getFileExtension(url);
-            if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
+            if (ext !== '' && IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
             mockupCount++;
             previewHtml += '<div class="pmd-send-preview-item">'
                 + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" class="pmd-send-preview-thumb">'
@@ -4271,8 +4291,9 @@
         var hasMockup = false;
         MOCKUP_SLOTS.forEach(function (slot) {
             if (slot.key === 'Box_Reference_File') return;
-            var url = currentMockup[slot.key];
-            if (url && IMAGE_EXTENSIONS.indexOf(getFileExtension(url)) !== -1) hasMockup = true;
+            var url = normalizeBoxProxyUrl(currentMockup[slot.key]);
+            var urlExt = getFileExtension(url);
+            if (url && (urlExt === '' || IMAGE_EXTENSIONS.indexOf(urlExt) !== -1)) hasMockup = true;
         });
         if (!hasMockup) {
             showToast('No mockup images to send. Upload images first.', 'error');
@@ -4304,10 +4325,10 @@
             var mockupCount = 0;
             MOCKUP_SLOTS.forEach(function (slot) {
                 if (slot.key === 'Box_Reference_File') return;
-                var url = currentMockup[slot.key];
+                var url = normalizeBoxProxyUrl(currentMockup[slot.key]);
                 if (!url) return;
                 var ext = getFileExtension(url);
-                if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
+                if (ext !== '' && IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
                 mockupCount++;
             });
             var mockupImagesHtml = '<div style="text-align:center;margin:20px 0;">'
@@ -4401,10 +4422,10 @@
             var mockupCount = 0;
             MOCKUP_SLOTS.forEach(function (slot) {
                 if (slot.key === 'Box_Reference_File') return;
-                var url = currentMockup[slot.key];
+                var url = normalizeBoxProxyUrl(currentMockup[slot.key]);
                 if (!url) return;
                 var ext = getFileExtension(url);
-                if (IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
+                if (ext !== '' && IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
                 mockupCount++;
                 mockupImagesHtml += '<div style="margin-bottom:12px;text-align:center;">'
                     + '<p style="font-size:13px;color:#666;margin:0 0 6px 0;font-weight:600;">' + slot.label + '</p>'

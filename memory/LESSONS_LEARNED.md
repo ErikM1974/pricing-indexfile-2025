@@ -8,14 +8,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Quote Builder Calculations
 
-### SCP recalculatePricing() Crash — primaryPricing Out of Scope
-**Problem:** Screenprint sidebar showed Total Pieces: 0 and $0.00. `ReferenceError: primaryPricing is not defined`.
-**Root Cause:** Nudge savings calc referenced loop-scoped `const` variables after the loop closed.
-**Solution:** Capture needed values in outer-scope variables before the loop.
-**Prevention:** Post-loop summaries must use outer-scope captures. Test with extended sizes (2XL+).
-
----
-
 ### Parent Row Qty Double-Counting — Second Code Path in 2XL Handler
 **Problem:** DTG/SCP parent Qty included child row quantities even after fixing `onSizeChange()`.
 **Root Cause:** TWO code paths update parent Qty — the 2XL handler explicitly added child quantities back.
@@ -302,3 +294,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** 7 locations in `art-request-detail.js` and 4 in `art-actions-shared.js` used `User_Email || Sales_Rep` — `User_Email` is often the artist's email, not the rep.
 **Solution:** Swapped to `Sales_Rep || User_Email` everywhere. `Sales_Rep` is the correct field for routing emails to reps.
 **Prevention:** Always use `Sales_Rep` as primary recipient for rep-facing emails. `User_Email` is a fallback only.
+
+---
+
+### Box Mockup Images Not Loading — Shared/Static URLs Return 404
+**Problem:** Mockup images across Art Hub (art request detail, mockup detail, AE/Ruth dashboards, approval modals) showed broken images or "JPG" badge placeholders.
+**Root Cause:** Box `download_url` values using `/content/` or shared/static URLs intermittently return 404. The original `onerror` handler only showed a fallback badge, never retried via an alternate path.
+**Solution:** Added proxy fallback in `renderFilledThumb()` onerror: when a Box URL fails, retry via backend `/api/box/shared-image` proxy endpoint. Applied across 6 files (art-request-detail.js, mockup-detail.js, art-actions-shared.js, art-ae.js, mockup-ae.js, mockup-ruth.js).
+**Prevention:** Box download URLs are unreliable for direct browser loading. Always implement a proxy fallback for Box image URLs. The backend proxy can use authenticated API access which succeeds where public URLs fail.
