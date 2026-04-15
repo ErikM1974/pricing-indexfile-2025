@@ -842,23 +842,28 @@
         var btnWorking = document.getElementById('ard-btn-working');
         var btnComplete = document.getElementById('ard-btn-complete');
         var btnMockup = document.getElementById('ard-btn-send-mockup');
+        var btnReminder = document.getElementById('ard-btn-send-reminder');
         var btnReopen = document.getElementById('ard-btn-reopen');
 
         if (isCompleted) {
             btnWorking.style.display = 'none';
             btnComplete.style.display = 'none';
             btnMockup.style.display = 'none';
+            btnReminder.style.display = 'none';
             btnReopen.style.display = '';
         } else if (isApproved) {
             // Approved by AE/Customer — Steve gets final review + Mark Complete
             btnWorking.style.display = 'none';
             btnMockup.style.display = 'none';
+            btnReminder.style.display = 'none';
             btnComplete.style.display = '';
             btnReopen.style.display = '';
         } else {
             // Hide Send Mockup if status doesn't allow it
             var canSendMockup = status.includes('submitted') || status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
             if (!canSendMockup) btnMockup.style.display = 'none';
+            // Show Send Reminder alongside Send Mockup when awaiting approval
+            if (status.includes('awaitingapproval')) btnReminder.style.display = '';
         }
 
         var repEmail = req.Sales_Rep || req.User_Email || '';
@@ -929,19 +934,19 @@
                 }
             }
         }
-        if (isAwaitingApproval) {
-            btnMockup.textContent = reminderCount > 0 ? 'Send Reminder (' + reminderCount + ' sent)' : 'Send Reminder';
-            btnMockup.title = 'Re-send mockup notification to sales rep';
-            btnMockup.setAttribute('data-reminder-count', reminderCount);
+        if (isAwaitingApproval && reminderCount > 0) {
+            btnReminder.textContent = 'Send Reminder (' + reminderCount + ' sent)';
         }
 
+        // Send Mockup always opens the full approval modal (with mockup images)
         btnMockup.addEventListener('click', function () {
-            if (isAwaitingApproval) {
-                var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
-                ArtActions.sendMockupReminder(designId, mockupUrl, repEmail, company, btnMockup);
-            } else {
-                ArtActions.showSendForApprovalModal(designId, company);
-            }
+            ArtActions.showSendForApprovalModal(designId, company);
+        });
+
+        // Send Reminder just pings the sales rep (no images, quick nudge)
+        btnReminder.addEventListener('click', function () {
+            var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+            ArtActions.sendMockupReminder(designId, mockupUrl, repEmail, company, btnReminder);
         });
 
         btnReopen.addEventListener('click', function () {

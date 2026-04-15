@@ -1627,6 +1627,7 @@ body {
 .ard-action-log-time { background: #0891b2; }
 .ard-action-complete { background: #dc2626; }
 .ard-action-mockup   { background: #ea580c; }
+.ard-action-reminder { background: #d97706; }
 .ard-action-reopen   { background: #d97706; }
 
 /* ── AE View (?view=ae) — maroon theme matching AE Dashboard ── */
