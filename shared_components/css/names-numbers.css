@@ -431,6 +431,16 @@ body {
 .roster-table .row-actions {
     width: 36px;
     text-align: center;
+    position: sticky;
+    right: 0;
+    background: var(--nn-card-bg);
+    box-shadow: -2px 0 4px rgba(0,0,0,0.05);
+}
+.roster-table thead th.row-actions {
+    position: sticky;
+    right: 0;
+    background: #f8fafc;
+    z-index: 2;
 }
 
 .row-delete-btn {
