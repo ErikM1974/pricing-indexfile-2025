@@ -525,6 +525,12 @@ cap-embroidery-fix.css
 | `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
 | `/dashboards/monogram-dashboard.html` | Monogram orders dashboard | monogram-dashboard.css, monogram-dashboard.js | ✅ Active |
 | `/dashboards/css/monogram-dashboard.css` | Monogram dashboard styles (NWCA green theme) | CSS variables | ✅ Active |
+| `/dashboards/names-numbers-dashboard.html` | Names & Numbers roster dashboard | names-numbers-dashboard.js, names-numbers.css | ✅ Active |
+| `/pages/names-numbers.html` | Names & Numbers roster form (team names, numbers, sizes) | names-numbers-controller.js, names-numbers-service.js | ✅ Active |
+| `/shared_components/js/names-numbers-controller.js` | Roster form UI controller (tabs, groups, table, OCR, import) | names-numbers-service.js | ✅ Active |
+| `/shared_components/js/names-numbers-service.js` | Roster API service (CRUD, Excel parse, OCR) | APP_CONFIG | ✅ Active |
+| `/shared_components/js/names-numbers-dashboard.js` | Roster dashboard logic (search, filter, KPIs) | names-numbers-service.js | ✅ Active |
+| `/shared_components/css/names-numbers.css` | Names & Numbers shared styles (blue theme) | CSS variables | ✅ Active |
 | `/dashboards/staff-login.html` | Staff authentication login page | — | ✅ Active |
 | `/dashboards/staff-portal-simple.html` | Simplified staff portal | — | ✅ Active |
 | `/dashboards/staff-portal-final.html` | Final staff portal layout | — | ✅ Active |

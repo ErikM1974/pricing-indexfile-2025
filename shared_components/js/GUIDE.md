@@ -173,6 +173,9 @@
 | `jds-api-service.js` | JDS supplier API service |
 | `monogram-form-service.js` | Monogram form API service |
 | `monogram-form-controller.js` | Monogram form UI controller |
+| `names-numbers-service.js` | Names & Numbers roster API service (CRUD, Excel parse, OCR) |
+| `names-numbers-controller.js` | Names & Numbers roster form UI controller (tabs, groups, import) |
+| `names-numbers-dashboard.js` | Names & Numbers dashboard logic (search, filter, KPIs) |
 
 ## UI Components & Utilities
 

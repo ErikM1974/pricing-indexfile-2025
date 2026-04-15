@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Names & Numbers Dashboard - NWCA</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="/shared_components/css/names-numbers.css?v=20260415" rel="stylesheet">
+    <style>
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .kpi-card {
+            background: var(--nn-card-bg); border: 1px solid var(--nn-border); border-radius: 0.75rem;
+            padding: 1rem 1.25rem; text-align: center;
+        }
+        .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--nn-primary); }
+        .kpi-label { font-size: 0.8rem; color: var(--nn-text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.25rem; }
+        .dashboard-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .dashboard-table thead th {
+            background: #f8fafc; padding: 0.6rem 0.75rem; text-align: left;
+            font-weight: 600; font-size: 0.8rem; color: var(--nn-text-secondary);
+            text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 2px solid var(--nn-border);
+        }
+        .dashboard-table tbody td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--nn-border); }
+        .dashboard-table tbody tr:hover { background: #f8fafc; cursor: pointer; }
+        .dashboard-table .actions { display: flex; gap: 0.4rem; }
+        .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: end; }
+        .filter-bar .form-group { min-width: 180px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Staff Dashboard</a>
+                    <span>/</span>
+                    <span>Names & Numbers Dashboard</span>
+                </nav>
+            </div>
+            <div class="header-right">
+                <a href="/pages/names-numbers.html" class="btn-primary"><i class="fas fa-plus"></i> New Roster</a>
+                <a href="/staff-dashboard.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title"><i class="fas fa-users"></i> Names & Numbers Dashboard</h1>
+                <p class="page-subtitle">Manage all team rosters</p>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-row" id="kpiRow">
+            <div class="kpi-card"><div class="kpi-value" id="kpiTotal">-</div><div class="kpi-label">Total Rosters</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiDraft">-</div><div class="kpi-label">Draft</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiSubmitted">-</div><div class="kpi-label">Submitted</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiInProd">-</div><div class="kpi-label">In Production</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="kpiCompleted">-</div><div class="kpi-label">Completed</div></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+            <div class="form-group">
+                <label>Search</label>
+                <input type="text" id="filterSearch" placeholder="Roster name or company...">
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="filterStatus">
+                    <option value="">All</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Submitted">Submitted</option>
+                    <option value="In Production">In Production</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sales Rep</label>
+                <input type="text" id="filterRep" placeholder="Rep name...">
+            </div>
+            <button type="button" class="btn-primary" id="filterBtn" style="align-self: end;"><i class="fas fa-search"></i> Filter</button>
+            <button type="button" class="btn-secondary" id="clearFilterBtn" style="align-self: end;">Clear</button>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card">
+            <div class="roster-table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Roster Name</th>
+                            <th>Company</th>
+                            <th>Order #</th>
+                            <th>People</th>
+                            <th>Sales Rep</th>
+                            <th>Status</th>
+                            <th>Modified</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboardBody">
+                        <tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--nn-text-secondary);">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="/shared_components/js/names-numbers-service.js?v=20260415"></script>
+    <script src="/shared_components/js/names-numbers-dashboard.js?v=20260415"></script>
+</body>
+</html>
