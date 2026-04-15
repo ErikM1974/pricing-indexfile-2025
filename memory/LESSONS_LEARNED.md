@@ -8,14 +8,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Quote Builder Calculations
 
-### Parent Row Qty Double-Counting — Second Code Path in 2XL Handler
-**Problem:** DTG/SCP parent Qty included child row quantities even after fixing `onSizeChange()`.
-**Root Cause:** TWO code paths update parent Qty — the 2XL handler explicitly added child quantities back.
-**Solution:** Removed child quantity addition from 2XL handler in each builder.
-**Prevention:** Grep for ALL places that update the same DOM element. Multiple paths = inconsistency.
-
----
-
 ### DTF Garment Base Cost From Arbitrary Record — Pricing Inversion
 **Problem:** DTF showed Long Sleeve cheaper than Short Sleeve (prices inverted).
 **Root Cause:** `firstDetail.CASE_PRICE` from `/api/product-details` returns unsorted per-color x size records.
@@ -302,3 +294,20 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** Box `download_url` values using `/content/` or shared/static URLs intermittently return 404. The original `onerror` handler only showed a fallback badge, never retried via an alternate path.
 **Solution:** Added proxy fallback in `renderFilledThumb()` onerror: when a Box URL fails, retry via backend `/api/box/shared-image` proxy endpoint. Applied across 6 files (art-request-detail.js, mockup-detail.js, art-actions-shared.js, art-ae.js, mockup-ae.js, mockup-ruth.js).
 **Prevention:** Box download URLs are unreliable for direct browser loading. Always implement a proxy fallback for Box image URLs. The backend proxy can use authenticated API access which succeeds where public URLs fail.
+
+---
+
+### Box Proxy Thumbnail URLs — getFileExtension Returns Garbage, HTTP Mixed Content
+**Problem:** Reference File images showed purple badge "COM/API/BOX/THUMBNAIL/2196733276592" instead of image. Downloads blocked as "can't be downloaded securely."
+**Root Cause 1:** `getFileExtension()` returned everything after last `.` in proxy URLs — `com/api/box/thumbnail/...` is not a valid extension but code treated it as non-image.
+**Root Cause 2:** Backend stored proxy URLs as HTTP (Heroku `req.protocol` behind LB). HTTPS page blocks HTTP resources.
+**Solution:** Guard in `getFileExtension()` (reject ext with `/` or >10 chars). Added `normalizeBoxProxyUrl()` to rebuild with HTTPS API_BASE. Download redirects to `/api/box/download/:id` for full-res.
+**Prevention:** Any `getFileExtension()` must guard against API endpoint URLs. Any URL stored by backend must use `config.app.publicUrl` or be normalized client-side.
+
+---
+
+### Send Mockup Button Missing in "Awaiting Approval" Status
+**Problem:** Steve couldn't re-send mockups after uploading new ones. The "Send Mockup" button was renamed to "Send Reminder" when status was "Awaiting Approval."
+**Root Cause:** Single button element (`ard-btn-send-mockup`) was repurposed — label changed to "Send Reminder" and click handler switched to `sendMockupReminder()` instead of `showSendForApprovalModal()`.
+**Solution:** Added separate `ard-btn-send-reminder` button. "Send Mockup" always opens the full approval modal. "Send Reminder" only appears alongside during "Awaiting Approval."
+**Prevention:** Don't repurpose buttons by renaming — add separate elements when two distinct actions are needed.

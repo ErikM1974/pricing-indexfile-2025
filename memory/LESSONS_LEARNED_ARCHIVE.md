@@ -1323,6 +1323,14 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 
 ---
 
+### Parent Row Qty Double-Counting — Second Code Path in 2XL Handler (archived 2026-04-14)
+**Problem:** DTG/SCP parent Qty included child row quantities even after fixing `onSizeChange()`.
+**Root Cause:** TWO code paths update parent Qty — the 2XL handler explicitly added child quantities back.
+**Solution:** Removed child quantity addition from 2XL handler in each builder.
+**Prevention:** Grep for ALL places that update the same DOM element. Multiple paths = inconsistency.
+
+---
+
 ### SCP recalculatePricing() Crash — primaryPricing Out of Scope (archived 2026-04-13)
 **Problem:** Screenprint sidebar showed Total Pieces: 0 and $0.00. `ReferenceError: primaryPricing is not defined`.
 **Root Cause:** Nudge savings calc referenced loop-scoped `const` variables after the loop closed.

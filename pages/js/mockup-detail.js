@@ -586,8 +586,13 @@
                 aeBar.style.display = '';
                 var aeDeleteHtml = (statusLower === 'submitted' || statusLower === 'inprogress' || statusLower === 'revisionrequested')
                     ? '<button class="pmd-action-btn pmd-action-btn--delete" id="pmd-btn-ae-delete">Delete Request</button>' : '';
+                var aeReviseHtml = '<button class="pmd-action-btn pmd-action-btn--revise" id="pmd-btn-revise">Request Changes</button>';
                 aeBar.innerHTML = '<span class="pmd-action-bar-label">Mockup actions:' + custElapsedHtml + '</span>'
-                    + sendCopyButtons + aeDeleteHtml;
+                    + aeReviseHtml + sendCopyButtons + aeDeleteHtml;
+                var aeReviseBtn = document.getElementById('pmd-btn-revise');
+                if (aeReviseBtn) {
+                    aeReviseBtn.addEventListener('click', function () { openReviseModal(); });
+                }
                 var aeDeleteBtn = document.getElementById('pmd-btn-ae-delete');
                 if (aeDeleteBtn) {
                     aeDeleteBtn.addEventListener('click', function () { openDeleteModal(); });
