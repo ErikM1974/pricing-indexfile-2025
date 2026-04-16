@@ -175,7 +175,13 @@
       "Bash(heroku dyno:restart:*)",
       "Bash(find /c/Users/erik -type f \\\\\\(-name *.html -o -name *art* \\\\\\))",
       "Bash(heroku run:*)",
-      "Bash(node -e \"require\\(''react-icons/fa''\\)\")"
+      "Bash(node -e \"require\\(''react-icons/fa''\\)\")",
+      "Bash(sed -i \"s/art-request-detail\\\\.css?v=15/art-request-detail.css?v=16/g\" pages/art-request-detail.html)",
+      "Bash(sed -i \"s/art-request-detail\\\\.js?v=20260403/art-request-detail.js?v=20260408/g\" pages/art-request-detail.html)",
+      "Bash(sed -i \"s/mockup-detail\\\\.css?v=32/mockup-detail.css?v=33/g\" pages/mockup-detail.html)",
+      "Bash(sed -i \"s/mockup-detail\\\\.js?v=53/mockup-detail.js?v=54/g\" pages/mockup-detail.html)",
+      "Bash(sed -i \"s/art-actions-shared\\\\.js?v=9/art-actions-shared.js?v=10/g\" dashboards/art-hub-steve.html)",
+      "Bash(pip show *)"
     ],
     "deny": [],
     "ask": [],
