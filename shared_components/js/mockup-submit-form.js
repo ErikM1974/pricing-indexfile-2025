@@ -919,6 +919,11 @@ var MockupSubmitForm = (function () {
                     Garment_Color_3: garmentRows[2] ? garmentRows[2].color : '',
                     Garment_Style_4: garmentRows[3] ? garmentRows[3].style : '',
                     Garment_Color_4: garmentRows[3] ? garmentRows[3].color : '',
+                    // Save dimensions to Logo_Width / Logo_Height (same fields Ruth edits
+                    // inline on the detail page). Keeps Size_Specs populated too for
+                    // back-compat with any legacy reports that read it.
+                    Logo_Width: (document.getElementById('msf-width').value || '').trim(),
+                    Logo_Height: (document.getElementById('msf-height').value || '').trim(),
                     Size_Specs: buildSizeSpecs(),
                     Due_Date: document.getElementById('msf-due-date').value || null,
                     Work_Order_Number: document.getElementById('msf-work-order').value.trim(),
