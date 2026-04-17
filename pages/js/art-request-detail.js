@@ -398,6 +398,15 @@
             renderSteveActions(req, statusClean, notes);
         }
 
+        // Per-tile Copy Link + Email buttons on each filled mockup — shown for
+        // both AE and Steve views (not customer). Initialized here so Steve's
+        // view also gets them outside the AE-only "awaitingapproval" branch.
+        if (!isCustomerView) {
+            // Wire share modal once (no-op if already wired by AE branch above)
+            initShareWithCustomer(req);
+            addTileShareActions(req);
+        }
+
         // Revision feedback banner (shows above gallery for Revision Requested)
         renderRevisionBanner(req, notes);
 
@@ -2416,7 +2425,12 @@
     // Set by openShareModalFor() below and read by the send handler.
     var _shareContext = null;
 
+    // Guard: share modal listeners should only be wired once per page load
+    // (this function may be called from both the AE view path and the Steve view path)
+    var _shareWired = false;
     function initShareWithCustomer(req) {
+        if (_shareWired) return; // idempotent
+        _shareWired = true;
         var overlay = document.getElementById('share-customer-overlay');
         var modal = document.getElementById('share-customer-modal');
         var btn = document.getElementById('ard-btn-share-customer');
@@ -2734,10 +2748,11 @@
 
     /**
      * Add per-tile "Copy Link" + "Email" action buttons to each filled mockup
-     * thumbnail. AE view only. Each button sends/copies a link to ONLY that
-     * specific mockup via ?view=customer&mockup=<slotKey>.
+     * thumbnail. Shown for AE and Steve views (hidden from customer view).
+     * Each button sends/copies a link to ONLY that specific mockup via
+     * ?view=customer&mockup=<slotKey>.
      */
-    function addAeTileShareActions(req) {
+    function addTileShareActions(req) {
         var grid = document.getElementById('ard-mockups-grid');
         if (!grid) return;
 
@@ -2852,7 +2867,7 @@
             }
         });
         // Add per-tile Copy Link + Email buttons once selection is initialized
-        addAeTileShareActions(req);
+        addTileShareActions(req);
     }
 
     /**

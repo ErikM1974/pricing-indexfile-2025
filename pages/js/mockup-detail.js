@@ -714,6 +714,33 @@
             // Delete button HTML (shared across Submitted / In Progress / Revision Requested)
             var deleteButtonHtml = '<button class="pmd-action-btn pmd-action-btn--delete" id="pmd-btn-delete">Delete Request</button>';
 
+            // Ruth can also send a customer approval link / email when mockups exist.
+            // Matches the AE-side pattern so Ruth isn't blocked waiting for the AE to do it.
+            var ruthHasMockups = MOCKUP_SLOTS.some(function (s) { return mockup[s.key]; });
+            var ruthSendCopyHtml = ruthHasMockups
+                ? '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-ruth-send-customer" title="Send approval email to customer">Send to Customer</button>'
+                + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-ruth-copy-link" title="Copy customer approval link">Copy Customer Link</button>'
+                : '';
+
+            // Wire the send/copy handlers (call AFTER ruthBar.innerHTML is set for the current status)
+            function wireRuthSendCopy() {
+                var rSend = document.getElementById('pmd-btn-ruth-send-customer');
+                var rCopy = document.getElementById('pmd-btn-ruth-copy-link');
+                if (rSend) {
+                    rSend.addEventListener('click', function () { openSendToCustomerModal(); });
+                }
+                if (rCopy) {
+                    rCopy.addEventListener('click', function () {
+                        var customerUrl = window.location.origin + '/mockup/' + mockupId + '?view=customer';
+                        navigator.clipboard.writeText(customerUrl).then(function () {
+                            showToast('Customer link copied to clipboard!', 'success');
+                        }).catch(function () {
+                            prompt('Copy this link:', customerUrl);
+                        });
+                    });
+                }
+            }
+
             if (statusLower === 'submitted') {
                 ruthBar.style.display = '';
                 ruthBar.innerHTML = '<span class="pmd-action-bar-label">Ready to start?</span>'
@@ -729,6 +756,7 @@
                 ruthBar.style.display = '';
                 ruthBar.innerHTML = '<span class="pmd-action-bar-label">Ready for review?</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send">Send for Approval</button>'
+                    + ruthSendCopyHtml
                     + deleteButtonHtml;
                 document.getElementById('pmd-btn-send').addEventListener('click', function () {
                     handleStatusUpdate('Awaiting Approval', null, this);
@@ -736,6 +764,7 @@
                 document.getElementById('pmd-btn-delete').addEventListener('click', function () {
                     openDeleteModal();
                 });
+                wireRuthSendCopy();
             } else if (statusLower === 'awaitingapproval') {
                 ruthBar.style.display = '';
                 // Find when approval was sent
@@ -798,24 +827,33 @@
                         }, 5000);
                     });
                 });
+                // Ruth can also send directly during Awaiting Approval (e.g. if AE is slow)
+                if (ruthSendCopyHtml) {
+                    ruthBar.insertAdjacentHTML('beforeend', ruthSendCopyHtml);
+                    wireRuthSendCopy();
+                }
             } else if (statusLower === 'approved') {
                 ruthBar.style.display = '';
                 ruthBar.innerHTML = '<span class="pmd-action-bar-label">\u2705 Approved \u2014 Ready for final review</span>'
                     + '<button class="pmd-action-btn pmd-action-btn--complete" id="pmd-btn-mark-complete">Mark Complete</button>'
-                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>';
+                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>'
+                    + ruthSendCopyHtml;
                 document.getElementById('pmd-btn-mark-complete').addEventListener('click', function () {
                     openMarkCompleteModal(this);
                 });
                 document.getElementById('pmd-btn-reopen').addEventListener('click', function () {
                     handleReopen(this, 'Ruth');
                 });
+                wireRuthSendCopy();
             } else if (statusLower === 'completed') {
                 ruthBar.style.display = '';
                 ruthBar.innerHTML = '<span class="pmd-action-bar-label">This mockup is completed</span>'
-                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>';
+                    + '<button class="pmd-action-btn pmd-action-btn--reopen" id="pmd-btn-reopen">Reopen for Changes</button>'
+                    + ruthSendCopyHtml;
                 document.getElementById('pmd-btn-reopen').addEventListener('click', function () {
                     handleReopen(this, 'Ruth');
                 });
+                wireRuthSendCopy();
             } else {
                 ruthBar.style.display = 'none';
             }
