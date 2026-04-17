@@ -1006,10 +1006,32 @@ body {
     border-radius: 4px;
 }
 
+.ard-lightbox-download {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.95);
+    color: #0f172a;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.ard-lightbox-download:hover { background: #fff; }
+.ard-lightbox-download:active { transform: translateY(1px); }
+.ard-lightbox-download:disabled { opacity: 0.55; cursor: wait; }
+.ard-lightbox-download svg { flex-shrink: 0; }
+
 .ard-lightbox-label {
     color: rgba(255,255,255,0.85);
     font-size: 14px;
-    margin-top: 12px;
+    margin-top: 10px;
     text-align: center;
 }
 

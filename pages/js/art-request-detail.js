@@ -2239,6 +2239,54 @@
             });
     }
 
+    // ── Download helpers (for lightbox Download button) ─────────────────
+    function sanitizeForFilename(s) {
+        return String(s)
+            .replace(/[,.\/\\:*?"<>|]/g, '')   // strip filesystem-unfriendly chars
+            .replace(/\s+/g, '_')                // spaces → underscores
+            .replace(/_+/g, '_')                 // collapse repeats
+            .replace(/^_+|_+$/g, '')             // trim leading/trailing
+            .slice(0, 60);                       // keep reasonable length
+    }
+
+    function buildDownloadFilename(label) {
+        var req = currentRequest || {};
+        var parts = [];
+        if (req.CompanyName) parts.push(sanitizeForFilename(req.CompanyName));
+        if (req.Design_Num_SW) parts.push(sanitizeForFilename(String(req.Design_Num_SW)));
+        else if (req.ID_Design) parts.push('Req' + req.ID_Design);
+        if (label) parts.push(sanitizeForFilename(label));
+        return parts.filter(Boolean).join('_') || 'mockup';
+    }
+
+    async function downloadLightboxImage(url, filenameBase) {
+        var dlBtn = document.getElementById('ard-lightbox-download');
+        if (dlBtn) dlBtn.disabled = true;
+        try {
+            var resp = await fetch(url);
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            var blob = await resp.blob();
+            var extMap = {
+                'image/jpeg': 'jpg',
+                'image/png':  'png',
+                'image/gif':  'gif',
+                'image/webp': 'webp'
+            };
+            var ext = extMap[blob.type] || 'jpg';
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = (filenameBase || 'mockup') + '.' + ext;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+        } catch (err) {
+            alert('Download failed: ' + err.message);
+        } finally {
+            if (dlBtn) dlBtn.disabled = false;
+        }
+    }
+
     // ── Lightbox ────────────────────────────────────────────────────────
     function openLightbox(url, label) {
         const lightbox = document.getElementById('ard-lightbox');
@@ -2268,6 +2316,14 @@
         lightboxImg.removeAttribute('data-large-failed');
         lightboxImg.src = lightboxUrl;
 
+        // Stash the URL + sensible filename on the Download button for the click handler
+        var dlBtn = document.getElementById('ard-lightbox-download');
+        if (dlBtn) {
+            dlBtn.dataset.downloadUrl = lightboxUrl;
+            dlBtn.dataset.downloadName = buildDownloadFilename(label);
+            dlBtn.disabled = false;
+        }
+
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
@@ -2282,6 +2338,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ard-lightbox-close').addEventListener('click', closeLightbox);
         document.getElementById('ard-lightbox-backdrop').addEventListener('click', closeLightbox);
+        var dlBtn = document.getElementById('ard-lightbox-download');
+        if (dlBtn) {
+            dlBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                downloadLightboxImage(dlBtn.dataset.downloadUrl, dlBtn.dataset.downloadName);
+            });
+        }
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeLightbox();
