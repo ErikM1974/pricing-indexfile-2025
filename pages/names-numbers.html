@@ -8,7 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="/shared_components/css/names-numbers.css?v=20260415" rel="stylesheet">
+    <link href="/shared_components/css/names-numbers.css?v=20260417" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -145,31 +145,35 @@
                         <label for="groupName">Group Name</label>
                         <input type="text" id="groupName" placeholder="e.g. Player Hoodies">
                     </div>
-                    <div class="form-group">
-                        <label for="garmentStyle">Garment Style</label>
-                        <input type="text" id="garmentStyle" placeholder="e.g. ST254, PC54">
-                    </div>
-                    <div class="form-group">
-                        <label for="garmentColor">Garment Color</label>
-                        <input type="text" id="garmentColor" placeholder="e.g. Black, Red">
-                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Columns</label>
-                    <div class="column-picker" id="columnPicker">
-                        <label><input type="checkbox" value="name" checked> Name</label>
-                        <label><input type="checkbox" value="number"> Jersey #</label>
-                        <label><input type="checkbox" value="size" checked> Size</label>
-                        <label><input type="checkbox" value="nickname"> Nickname</label>
-                        <label><input type="checkbox" value="backLine1"> Back Line 1</label>
-                        <label><input type="checkbox" value="backLine2"> Back Line 2</label>
-                        <label><input type="checkbox" value="backLine3"> Back Line 3</label>
-                        <label><input type="checkbox" value="backLine4"> Back Line 4</label>
-                        <label><input type="checkbox" value="frontPrint"> Front Print</label>
-                        <label><input type="checkbox" value="backPrint"> Back Print</label>
-                        <label><input type="checkbox" value="qty"> Qty</label>
-                        <label><input type="checkbox" value="notes"> Notes</label>
+
+                <div class="config-section">
+                    <div class="config-section-header">
+                        <label>Garments in this order</label>
+                        <button type="button" class="btn-sm btn-secondary" id="addGarmentBtn">
+                            <i class="fas fa-plus"></i> Add Garment
+                        </button>
                     </div>
+                    <div class="config-section-hint">
+                        Each garment becomes a size column on every row. Toggle Back/Front Print, Qty, or Back Lines (1–4) to add more columns per garment.
+                    </div>
+                    <div id="garmentsEditor" class="garments-editor"></div>
+                </div>
+
+                <div class="config-section">
+                    <label>Person columns</label>
+                    <div class="config-section-hint">These apply to the whole row (not per garment).</div>
+                    <div id="personColumnPicker" class="column-picker"></div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header">
+                        <label>Custom columns</label>
+                        <button type="button" class="btn-sm btn-secondary" id="addCustomColumnBtn">
+                            <i class="fas fa-plus"></i> Add Custom Column
+                        </button>
+                    </div>
+                    <div id="customColumnsEditor" class="custom-columns-editor"></div>
                 </div>
             </div>
         </div>
@@ -191,6 +195,14 @@
                     <i class="fas fa-plus"></i> Add 5 Rows
                 </button>
             </div>
+        </div>
+
+        <!-- Size Breakdown (auto-generated from entered sizes) -->
+        <div class="card size-breakdown-card" id="sizeBreakdownCard" style="display: none;">
+            <div class="card-header">
+                <span class="card-title"><i class="fas fa-chart-bar"></i> Size Breakdown</span>
+            </div>
+            <div id="sizeBreakdownBody" class="size-breakdown-body"></div>
         </div>
 
         <!-- Empty State (shown when no groups) -->
@@ -285,14 +297,17 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Garment Style</label>
-                        <input type="text" id="newGroupStyle" placeholder="e.g. ST254">
+                        <label>First Garment — Style (optional)</label>
+                        <input type="text" id="newGroupStyle" placeholder="e.g. PC54, ST254">
                     </div>
                     <div class="form-group">
-                        <label>Garment Color</label>
-                        <input type="text" id="newGroupColor" placeholder="e.g. Black">
+                        <label>First Garment — Color (optional)</label>
+                        <input type="text" id="newGroupColor" placeholder="e.g. Navy, Black">
                     </div>
                 </div>
+                <p style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--nn-text-secondary);">
+                    <i class="fas fa-info-circle"></i> You can add more garments (e.g. T-shirt + Hoodie) after the group is created.
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="addGroupCancelBtn">Cancel</button>
@@ -305,7 +320,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- Scripts -->
-    <script src="/shared_components/js/names-numbers-service.js?v=20260415"></script>
-    <script src="/shared_components/js/names-numbers-controller.js?v=20260415"></script>
+    <script src="/shared_components/js/names-numbers-service.js?v=20260417"></script>
+    <script src="/shared_components/js/names-numbers-controller.js?v=20260417"></script>
 </body>
 </html>

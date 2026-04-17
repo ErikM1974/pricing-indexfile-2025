@@ -1,25 +1,92 @@
 /**
  * Names & Numbers Controller
  * UI logic, state management, tab/group system, import handlers
+ *
+ * DATA MODEL (v2 — multi-garment):
+ *   group = {
+ *     id, name,
+ *     garments: [{ id, label, style, color, hasBackPrint, hasFrontPrint, hasQty, hasBackLines }],
+ *     personColumns: ['name','firstName','number','fullName','nickname','notes'],
+ *     customColumns: [{ id, label }],
+ *     defaults: { }
+ *   }
+ *   row = {
+ *     groupId, lineNumber,
+ *     name, firstName, number, fullName, nickname, notes,   // person fields (flat)
+ *     garmentData: { [garmentId]: { size, backPrint, frontPrint, qty, backLine1-4 } },
+ *     custom: { [customColId]: value }
+ *   }
+ *
+ * Legacy rosters (single garmentStyle/garmentColor + flat columns[]) are auto-migrated
+ * on load via migrateLegacyGroup() / migrateLegacyRow().
  */
 
-const COLUMN_DEFS = {
-    name:      { label: 'Last Name',    width: '140px' },
-    firstName: { label: 'First Name',   width: '120px' },
-    number:    { label: 'Jersey #',     width: '80px' },
-    size:      { label: 'Size',         width: '100px' },
-    nickname:  { label: 'Nickname',     width: '120px' },
-    backLine1: { label: 'Back Line 1',  width: '150px' },
-    backLine2: { label: 'Back Line 2',  width: '150px' },
-    backLine3: { label: 'Back Line 3',  width: '120px' },
-    backLine4: { label: 'Back Line 4',  width: '180px' },
-    frontPrint:{ label: 'Front Print',  width: '180px' },
-    backPrint: { label: 'Back Print',   width: '180px' },
-    qty:       { label: 'Qty',          width: '70px' },
-    notes:     { label: 'Notes',        width: '180px' }
+const PERSON_COLUMN_DEFS = {
+    name:      { label: 'Last Name',   width: '140px' },
+    firstName: { label: 'First Name',  width: '120px' },
+    number:    { label: 'Jersey #',    width: '80px'  },
+    fullName:  { label: 'Full Name',   width: '180px' },
+    nickname:  { label: 'Nickname',    width: '120px' },
+    notes:     { label: 'Notes',       width: '200px' }
 };
 
-const DEFAULT_COLUMNS = ['name', 'number', 'size'];
+const GARMENT_FIELD_DEFS = {
+    size:       { label: 'Size',        width: '110px', toggle: null },
+    backPrint:  { label: 'Back Print',  width: '150px', toggle: 'hasBackPrint'  },
+    frontPrint: { label: 'Front Print', width: '150px', toggle: 'hasFrontPrint' },
+    qty:        { label: 'Qty',         width: '70px',  toggle: 'hasQty'        },
+    backLine1:  { label: 'Back Line 1', width: '140px', toggle: 'hasBackLines'  },
+    backLine2:  { label: 'Back Line 2', width: '140px', toggle: 'hasBackLines'  },
+    backLine3:  { label: 'Back Line 3', width: '140px', toggle: 'hasBackLines'  },
+    backLine4:  { label: 'Back Line 4', width: '140px', toggle: 'hasBackLines'  }
+};
+
+const DEFAULT_PERSON_COLUMNS = ['name', 'number'];
+
+function randomId(prefix) {
+    return (prefix || 'id') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 5);
+}
+
+function migrateLegacyGroup(g) {
+    if (g && Array.isArray(g.garments)) return g;
+    const oldCols = Array.isArray(g.columns) ? g.columns : [];
+    const personCols = oldCols.filter(c => PERSON_COLUMN_DEFS[c]);
+    if (personCols.length === 0) personCols.push('name');
+
+    return {
+        id: g.id || randomId('group'),
+        name: g.name || 'Group',
+        garments: [{
+            id: randomId('g'),
+            label: 'Garment',
+            style: g.garmentStyle || '',
+            color: g.garmentColor || '',
+            hasBackPrint:  oldCols.includes('backPrint'),
+            hasFrontPrint: oldCols.includes('frontPrint'),
+            hasQty:        oldCols.includes('qty'),
+            hasBackLines:  oldCols.some(c => /^backLine/.test(c))
+        }],
+        personColumns: personCols,
+        customColumns: [],
+        defaults: g.defaults || {}
+    };
+}
+
+function migrateLegacyRow(row, group) {
+    if (row && row.garmentData && typeof row.garmentData === 'object') {
+        if (!row.custom) row.custom = {};
+        return row;
+    }
+    const gid = group.garments[0]?.id;
+    const gd = {};
+    ['size','backPrint','frontPrint','qty','backLine1','backLine2','backLine3','backLine4'].forEach(k => {
+        if (row[k] != null && row[k] !== '') gd[k] = row[k];
+        delete row[k];
+    });
+    row.garmentData = gid ? { [gid]: gd } : {};
+    row.custom = row.custom || {};
+    return row;
+}
 
 class NamesNumbersController {
     constructor() {
@@ -87,12 +154,8 @@ class NamesNumbersController {
         document.getElementById('toggleConfigBtn').addEventListener('click', () => this.toggleGroupConfig());
         document.getElementById('deleteGroupBtn').addEventListener('click', () => this.deleteActiveGroup());
         document.getElementById('groupName').addEventListener('change', () => this.saveGroupConfig());
-        document.getElementById('garmentStyle').addEventListener('change', () => this.saveGroupConfig());
-        document.getElementById('garmentColor').addEventListener('change', () => this.saveGroupConfig());
-        document.getElementById('columnPicker').addEventListener('change', () => {
-            this.saveGroupConfig();
-            this.renderTable();
-        });
+        // Garment + custom column + person column wiring happens per-render in
+        // renderGarmentsEditor / renderCustomColumnsEditor / renderPersonColumnPicker.
 
         // Row actions
         document.getElementById('addRowBtn').addEventListener('click', () => this.addRows(1));
@@ -127,16 +190,25 @@ class NamesNumbersController {
     // ============================================
 
     addGroup(group) {
-        if (!group.id) {
-            group.id = 'group-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+        if (!group.id) group.id = randomId('group');
+        if (!Array.isArray(group.garments) || group.garments.length === 0) {
+            group.garments = [{
+                id: randomId('g'),
+                label: 'Garment',
+                style: group.garmentStyle || '',
+                color: group.garmentColor || '',
+                hasBackPrint: false, hasFrontPrint: false, hasQty: false, hasBackLines: false
+            }];
         }
-        if (!group.columns || group.columns.length === 0) {
-            group.columns = [...DEFAULT_COLUMNS];
+        if (!Array.isArray(group.personColumns) || group.personColumns.length === 0) {
+            group.personColumns = [...DEFAULT_PERSON_COLUMNS];
         }
-        if (!group.columnLabels) {
-            group.columnLabels = group.columns.map(c => COLUMN_DEFS[c]?.label || c);
-        }
+        if (!Array.isArray(group.customColumns)) group.customColumns = [];
         if (!group.defaults) group.defaults = {};
+        // Strip legacy fields to prevent confusion on re-save
+        delete group.garmentStyle; delete group.garmentColor;
+        delete group.columns; delete group.columnLabels;
+
         this.groups.push(group);
         this.activeGroupId = group.id;
         this.isDirty = true;
@@ -152,15 +224,20 @@ class NamesNumbersController {
             this.showToast('Please enter a group name', 'error');
             return;
         }
+        const style = document.getElementById('newGroupStyle').value.trim();
+        const color = document.getElementById('newGroupColor').value.trim();
         this.addGroup({
             name,
-            garmentStyle: document.getElementById('newGroupStyle').value.trim(),
-            garmentColor: document.getElementById('newGroupColor').value.trim(),
-            columns: [...DEFAULT_COLUMNS]
+            garments: [{
+                id: randomId('g'),
+                label: style || 'Garment',
+                style, color,
+                hasBackPrint: false, hasFrontPrint: false, hasQty: false, hasBackLines: false
+            }],
+            personColumns: [...DEFAULT_PERSON_COLUMNS, 'fullName'],
+            customColumns: []
         });
-        // Add 5 empty rows
         this.addRows(5);
-        // Reset modal
         document.getElementById('newGroupName').value = '';
         document.getElementById('newGroupStyle').value = '';
         document.getElementById('newGroupColor').value = '';
@@ -236,31 +313,179 @@ class NamesNumbersController {
         panel.style.display = '';
         document.getElementById('groupConfigTitle').textContent = `${group.name} — Settings`;
         document.getElementById('groupName').value = group.name || '';
-        document.getElementById('garmentStyle').value = group.garmentStyle || '';
-        document.getElementById('garmentColor').value = group.garmentColor || '';
 
-        // Set column checkboxes
-        document.querySelectorAll('#columnPicker input[type="checkbox"]').forEach(cb => {
-            cb.checked = group.columns.includes(cb.value);
+        this.renderPersonColumnPicker(group);
+        this.renderGarmentsEditor(group);
+        this.renderCustomColumnsEditor(group);
+    }
+
+    renderPersonColumnPicker(group) {
+        const host = document.getElementById('personColumnPicker');
+        if (!host) return;
+        host.innerHTML = Object.entries(PERSON_COLUMN_DEFS).map(([key, def]) => {
+            const checked = group.personColumns.includes(key) ? 'checked' : '';
+            return `<label><input type="checkbox" value="${key}" ${checked}> ${this.escapeHtml(def.label)}</label>`;
+        }).join('');
+        host.querySelectorAll('input').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const g = this.getActiveGroup();
+                if (!g) return;
+                this.collectTableData();
+                const selected = [];
+                host.querySelectorAll('input:checked').forEach(i => selected.push(i.value));
+                g.personColumns = selected.length > 0 ? selected : ['name'];
+                this.isDirty = true;
+                this.renderTable();
+            });
         });
+    }
+
+    renderGarmentsEditor(group) {
+        const host = document.getElementById('garmentsEditor');
+        if (!host) return;
+        host.innerHTML = group.garments.map((g, idx) => `
+            <div class="garment-row" data-garment-id="${g.id}">
+                <div class="garment-row-header">
+                    <span class="garment-row-idx">Garment ${idx + 1}</span>
+                    <button type="button" class="btn-sm btn-danger garment-delete-btn" title="Remove garment" ${group.garments.length === 1 ? 'disabled' : ''}>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="garment-row-fields">
+                    <input type="text" class="gf-label" placeholder="Label (e.g. T-Shirt)" value="${this.escapeAttr(g.label || '')}">
+                    <input type="text" class="gf-style" placeholder="Style (e.g. PC54)" value="${this.escapeAttr(g.style || '')}">
+                    <input type="text" class="gf-color" placeholder="Color (e.g. Navy)" value="${this.escapeAttr(g.color || '')}">
+                </div>
+                <div class="garment-row-toggles">
+                    <label><input type="checkbox" class="gf-backPrint"  ${g.hasBackPrint  ? 'checked' : ''}> Back Print</label>
+                    <label><input type="checkbox" class="gf-frontPrint" ${g.hasFrontPrint ? 'checked' : ''}> Front Print</label>
+                    <label><input type="checkbox" class="gf-qty"        ${g.hasQty        ? 'checked' : ''}> Qty</label>
+                    <label><input type="checkbox" class="gf-backLines"  ${g.hasBackLines  ? 'checked' : ''}> Back Lines (1–4)</label>
+                </div>
+            </div>
+        `).join('');
+
+        host.querySelectorAll('.garment-row').forEach(rowEl => {
+            const id = rowEl.dataset.garmentId;
+            const garment = group.garments.find(g => g.id === id);
+            if (!garment) return;
+
+            const bind = (sel, key, isCheckbox) => {
+                const el = rowEl.querySelector(sel);
+                if (!el) return;
+                el.addEventListener('change', () => {
+                    this.collectTableData();
+                    garment[key] = isCheckbox ? el.checked : el.value.trim();
+                    this.isDirty = true;
+                    this.renderTable();
+                    if (key === 'label') this.renderGarmentsEditor(group);
+                });
+            };
+            bind('.gf-label', 'label', false);
+            bind('.gf-style', 'style', false);
+            bind('.gf-color', 'color', false);
+            bind('.gf-backPrint',  'hasBackPrint',  true);
+            bind('.gf-frontPrint', 'hasFrontPrint', true);
+            bind('.gf-qty',        'hasQty',        true);
+            bind('.gf-backLines',  'hasBackLines',  true);
+
+            const delBtn = rowEl.querySelector('.garment-delete-btn');
+            if (delBtn) {
+                delBtn.addEventListener('click', () => {
+                    if (group.garments.length === 1) return;
+                    if (!confirm(`Remove garment "${garment.label || 'Garment'}"? Sizes and prints entered for it will be cleared.`)) return;
+                    this.collectTableData();
+                    group.garments = group.garments.filter(g => g.id !== id);
+                    this.rows.forEach(r => {
+                        if (r.groupId === group.id && r.garmentData) delete r.garmentData[id];
+                    });
+                    this.isDirty = true;
+                    this.renderGarmentsEditor(group);
+                    this.renderTable();
+                });
+            }
+        });
+
+        const addBtn = document.getElementById('addGarmentBtn');
+        if (addBtn && !addBtn._bound) {
+            addBtn._bound = true;
+            addBtn.addEventListener('click', () => {
+                const g = this.getActiveGroup();
+                if (!g) return;
+                this.collectTableData();
+                g.garments.push({
+                    id: randomId('g'),
+                    label: 'Garment ' + (g.garments.length + 1),
+                    style: '', color: '',
+                    hasBackPrint: false, hasFrontPrint: false, hasQty: false, hasBackLines: false
+                });
+                this.isDirty = true;
+                this.renderGarmentsEditor(g);
+                this.renderTable();
+            });
+        }
+    }
+
+    renderCustomColumnsEditor(group) {
+        const host = document.getElementById('customColumnsEditor');
+        if (!host) return;
+        if (group.customColumns.length === 0) {
+            host.innerHTML = '<p class="custom-cols-empty">No custom columns. Use these for customer-specific fields like "Name for pickup" or "Special instructions".</p>';
+        } else {
+            host.innerHTML = group.customColumns.map(cc => `
+                <div class="custom-col-row" data-col-id="${cc.id}">
+                    <input type="text" class="cc-label" placeholder="Column label" value="${this.escapeAttr(cc.label || '')}">
+                    <button type="button" class="btn-sm btn-danger cc-delete-btn" title="Remove column">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            host.querySelectorAll('.custom-col-row').forEach(rowEl => {
+                const id = rowEl.dataset.colId;
+                const cc = group.customColumns.find(c => c.id === id);
+                if (!cc) return;
+                rowEl.querySelector('.cc-label').addEventListener('change', e => {
+                    this.collectTableData();
+                    cc.label = e.target.value.trim();
+                    this.isDirty = true;
+                    this.renderTable();
+                });
+                rowEl.querySelector('.cc-delete-btn').addEventListener('click', () => {
+                    if (!confirm(`Remove column "${cc.label || 'Custom'}"? Its data will be cleared.`)) return;
+                    this.collectTableData();
+                    group.customColumns = group.customColumns.filter(c => c.id !== id);
+                    this.rows.forEach(r => {
+                        if (r.groupId === group.id && r.custom) delete r.custom[id];
+                    });
+                    this.isDirty = true;
+                    this.renderCustomColumnsEditor(group);
+                    this.renderTable();
+                });
+            });
+        }
+
+        const addBtn = document.getElementById('addCustomColumnBtn');
+        if (addBtn && !addBtn._bound) {
+            addBtn._bound = true;
+            addBtn.addEventListener('click', () => {
+                const g = this.getActiveGroup();
+                if (!g) return;
+                const label = prompt('Column label (e.g. "Name for pickup"):');
+                if (!label || !label.trim()) return;
+                this.collectTableData();
+                g.customColumns.push({ id: randomId('cc'), label: label.trim() });
+                this.isDirty = true;
+                this.renderCustomColumnsEditor(g);
+                this.renderTable();
+            });
+        }
     }
 
     saveGroupConfig() {
         const group = this.getActiveGroup();
         if (!group) return;
-
         group.name = document.getElementById('groupName').value.trim() || group.name;
-        group.garmentStyle = document.getElementById('garmentStyle').value.trim();
-        group.garmentColor = document.getElementById('garmentColor').value.trim();
-
-        // Get selected columns
-        const cols = [];
-        document.querySelectorAll('#columnPicker input[type="checkbox"]:checked').forEach(cb => {
-            cols.push(cb.value);
-        });
-        group.columns = cols.length > 0 ? cols : ['name'];
-        group.columnLabels = group.columns.map(c => COLUMN_DEFS[c]?.label || c);
-
         this.isDirty = true;
         this.renderTabs();
     }
@@ -281,21 +506,87 @@ class NamesNumbersController {
     // Data Table
     // ============================================
 
+    /**
+     * Builds the flat column descriptor list for the active group.
+     * Returns: [{ kind:'person'|'garment'|'custom', key, label, width, garmentId?, field? }]
+     */
+    buildColumnDescriptors(group) {
+        const cols = [];
+        group.personColumns.forEach(key => {
+            const def = PERSON_COLUMN_DEFS[key];
+            if (def) cols.push({ kind: 'person', key, label: def.label, width: def.width });
+        });
+        group.garments.forEach(g => {
+            Object.entries(GARMENT_FIELD_DEFS).forEach(([field, def]) => {
+                if (def.toggle && !g[def.toggle]) return;
+                cols.push({
+                    kind: 'garment',
+                    garmentId: g.id,
+                    field,
+                    label: def.label,
+                    width: def.width,
+                    garmentLabel: g.label || 'Garment'
+                });
+            });
+        });
+        group.customColumns.forEach(cc => {
+            cols.push({ kind: 'custom', key: cc.id, label: cc.label || 'Custom', width: '160px' });
+        });
+        return cols;
+    }
+
     renderTable() {
         const group = this.getActiveGroup();
         if (!group) {
             document.getElementById('tableCard').style.display = 'none';
+            const breakdown = document.getElementById('sizeBreakdownCard');
+            if (breakdown) breakdown.style.display = 'none';
             return;
         }
         document.getElementById('tableCard').style.display = '';
 
-        const cols = group.columns;
+        const descriptors = this.buildColumnDescriptors(group);
+        const multiGarment = group.garments.length > 1;
 
-        // Header
-        const thead = document.getElementById('rosterTableHead').querySelector('tr');
-        thead.innerHTML = '<th class="row-number">#</th>' +
-            cols.map(c => `<th style="min-width:${COLUMN_DEFS[c]?.width || '120px'}">${this.escapeHtml(COLUMN_DEFS[c]?.label || c)}</th>`).join('') +
-            '<th class="row-actions"></th>';
+        // Two-row header when multi-garment: garment bands on top, fields below.
+        const thead = document.getElementById('rosterTableHead');
+        thead.innerHTML = '';
+
+        if (multiGarment) {
+            const topRow = document.createElement('tr');
+            const bottomRow = document.createElement('tr');
+
+            topRow.innerHTML = '<th class="row-number" rowspan="2">#</th>';
+            // Person columns span rows
+            group.personColumns.forEach(key => {
+                const def = PERSON_COLUMN_DEFS[key];
+                topRow.innerHTML += `<th class="col-person" rowspan="2" style="min-width:${def.width}">${this.escapeHtml(def.label)}</th>`;
+            });
+            // Garment bands
+            group.garments.forEach((g, gi) => {
+                const fieldCount = Object.entries(GARMENT_FIELD_DEFS).filter(([f, d]) => !d.toggle || g[d.toggle]).length;
+                if (fieldCount === 0) return;
+                topRow.innerHTML += `<th class="col-garment-band garment-band-${gi % 4}" colspan="${fieldCount}">${this.escapeHtml(g.label || 'Garment')}${g.style ? ` <span class="garment-band-style">${this.escapeHtml(g.style)}${g.color ? ' / ' + this.escapeHtml(g.color) : ''}</span>` : ''}</th>`;
+                Object.entries(GARMENT_FIELD_DEFS).forEach(([field, def]) => {
+                    if (def.toggle && !g[def.toggle]) return;
+                    bottomRow.innerHTML += `<th class="col-garment garment-band-${gi % 4}" style="min-width:${def.width}">${this.escapeHtml(def.label)}</th>`;
+                });
+            });
+            // Custom columns span rows
+            group.customColumns.forEach(cc => {
+                topRow.innerHTML += `<th class="col-custom" rowspan="2" style="min-width:160px">${this.escapeHtml(cc.label || 'Custom')}</th>`;
+            });
+            topRow.innerHTML += '<th class="row-actions" rowspan="2"></th>';
+
+            thead.appendChild(topRow);
+            thead.appendChild(bottomRow);
+        } else {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<th class="row-number">#</th>' +
+                descriptors.map(d => `<th class="col-${d.kind}" style="min-width:${d.width}">${this.escapeHtml(d.label)}</th>`).join('') +
+                '<th class="row-actions"></th>';
+            thead.appendChild(tr);
+        }
 
         // Body
         const tbody = document.getElementById('rosterTableBody');
@@ -303,14 +594,29 @@ class NamesNumbersController {
         tbody.innerHTML = '';
 
         rows.forEach((row, idx) => {
+            if (!row.garmentData) row.garmentData = {};
+            if (!row.custom) row.custom = {};
+
             const tr = document.createElement('tr');
             tr.dataset.idx = idx;
 
             let html = `<td class="row-number">${idx + 1}</td>`;
-            cols.forEach(col => {
-                const val = row[col] || '';
-                html += `<td><input type="text" data-col="${col}" value="${this.escapeAttr(val)}"
-                    ${group.defaults[col] && !val ? `placeholder="${this.escapeAttr(group.defaults[col])}"` : ''}></td>`;
+            descriptors.forEach(d => {
+                let val = '';
+                let dataAttrs = '';
+                if (d.kind === 'person') {
+                    val = row[d.key] || '';
+                    dataAttrs = `data-kind="person" data-key="${d.key}"`;
+                } else if (d.kind === 'garment') {
+                    val = (row.garmentData[d.garmentId] && row.garmentData[d.garmentId][d.field]) || '';
+                    dataAttrs = `data-kind="garment" data-garment-id="${d.garmentId}" data-field="${d.field}"`;
+                } else if (d.kind === 'custom') {
+                    val = row.custom[d.key] || '';
+                    dataAttrs = `data-kind="custom" data-key="${d.key}"`;
+                }
+                const placeholder = (d.kind === 'person' && group.defaults[d.key] && !val)
+                    ? `placeholder="${this.escapeAttr(group.defaults[d.key])}"` : '';
+                html += `<td class="col-${d.kind}${d.kind === 'garment' ? ' garment-band-' + (group.garments.findIndex(g => g.id === d.garmentId) % 4) : ''}"><input type="text" ${dataAttrs} value="${this.escapeAttr(val)}" ${placeholder}></td>`;
             });
             html += `<td class="row-actions"><button type="button" class="row-delete-btn" data-idx="${idx}" title="Remove row"><i class="fas fa-times"></i></button></td>`;
 
@@ -318,19 +624,18 @@ class NamesNumbersController {
             tbody.appendChild(tr);
         });
 
-        // Bind delete buttons
         tbody.querySelectorAll('.row-delete-btn').forEach(btn => {
             btn.addEventListener('click', () => this.deleteRow(parseInt(btn.dataset.idx, 10)));
         });
-
-        // Bind input changes for dirty tracking
         tbody.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => { this.isDirty = true; });
+            input.addEventListener('change', () => this.renderSizeBreakdown());
         });
 
-        // Footer
         const tfoot = document.getElementById('rosterTableFoot').querySelector('tr');
-        tfoot.innerHTML = `<td colspan="${cols.length + 2}">Total: ${rows.length} rows</td>`;
+        tfoot.innerHTML = `<td colspan="${descriptors.length + 2}">Total: ${rows.length} ${rows.length === 1 ? 'person' : 'people'}</td>`;
+
+        this.renderSizeBreakdown();
     }
 
     collectTableData() {
@@ -338,14 +643,30 @@ class NamesNumbersController {
         if (!group) return;
 
         const tbody = document.getElementById('rosterTableBody');
+        if (!tbody) return;
         const tableRows = tbody.querySelectorAll('tr');
         const activeRows = this.getActiveRows();
 
         tableRows.forEach((tr, idx) => {
             if (idx >= activeRows.length) return;
             const row = activeRows[idx];
-            tr.querySelectorAll('input[data-col]').forEach(input => {
-                row[input.dataset.col] = input.value.trim();
+            if (!row.garmentData) row.garmentData = {};
+            if (!row.custom) row.custom = {};
+
+            tr.querySelectorAll('input[data-kind]').forEach(input => {
+                const kind = input.dataset.kind;
+                const val = input.value.trim();
+                if (kind === 'person') {
+                    row[input.dataset.key] = val;
+                } else if (kind === 'garment') {
+                    const gid = input.dataset.garmentId;
+                    if (!row.garmentData[gid]) row.garmentData[gid] = {};
+                    if (val) row.garmentData[gid][input.dataset.field] = val;
+                    else delete row.garmentData[gid][input.dataset.field];
+                } else if (kind === 'custom') {
+                    if (val) row.custom[input.dataset.key] = val;
+                    else delete row.custom[input.dataset.key];
+                }
             });
         });
     }
@@ -361,11 +682,15 @@ class NamesNumbersController {
         const startNum = existing.length + 1;
 
         for (let i = 0; i < count; i++) {
-            const row = { groupId: this.activeGroupId, lineNumber: startNum + i };
-            // Apply defaults
+            const row = {
+                groupId: this.activeGroupId,
+                lineNumber: startNum + i,
+                garmentData: {},
+                custom: {}
+            };
             if (group.defaults) {
                 for (const [key, val] of Object.entries(group.defaults)) {
-                    row[key] = val;
+                    if (PERSON_COLUMN_DEFS[key]) row[key] = val;
                 }
             }
             this.rows.push(row);
@@ -374,6 +699,74 @@ class NamesNumbersController {
         this.isDirty = true;
         this.renderTable();
         this.renderTabs();
+    }
+
+    renderSizeBreakdown() {
+        const card = document.getElementById('sizeBreakdownCard');
+        const body = document.getElementById('sizeBreakdownBody');
+        if (!card || !body) return;
+
+        const group = this.getActiveGroup();
+        if (!group) { card.style.display = 'none'; return; }
+
+        const rows = this.getActiveRows();
+        if (rows.length === 0) { card.style.display = 'none'; return; }
+
+        // Per-garment size counts from live DOM (so breakdown tracks unsaved edits)
+        const tbody = document.getElementById('rosterTableBody');
+        const counts = {};    // { garmentId: { size: count } }
+        const totals = {};    // { garmentId: count }
+
+        group.garments.forEach(g => { counts[g.id] = {}; totals[g.id] = 0; });
+
+        tbody.querySelectorAll('input[data-kind="garment"][data-field="size"]').forEach(input => {
+            const gid = input.dataset.garmentId;
+            const size = input.value.trim();
+            if (!size || !counts[gid]) return;
+            counts[gid][size] = (counts[gid][size] || 0) + 1;
+            totals[gid] += 1;
+        });
+
+        const hasAny = Object.values(totals).some(n => n > 0);
+        if (!hasAny) { card.style.display = 'none'; return; }
+
+        card.style.display = '';
+        body.innerHTML = group.garments.map((g, gi) => {
+            if (totals[g.id] === 0) return '';
+            const sorted = Object.entries(counts[g.id]).sort((a, b) => this.sizeRank(a[0]) - this.sizeRank(b[0]));
+            return `
+                <div class="breakdown-garment garment-band-${gi % 4}">
+                    <div class="breakdown-garment-header">
+                        <strong>${this.escapeHtml(g.label || 'Garment')}</strong>
+                        ${g.style ? `<span class="breakdown-garment-meta">${this.escapeHtml(g.style)}${g.color ? ' / ' + this.escapeHtml(g.color) : ''}</span>` : ''}
+                        <span class="breakdown-garment-total">Total: ${totals[g.id]}</span>
+                    </div>
+                    <ul class="breakdown-size-list">
+                        ${sorted.map(([size, n]) => `<li><span class="breakdown-size">${this.escapeHtml(size)}</span> <span class="breakdown-count">${n}</span></li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }).join('');
+    }
+
+    sizeRank(size) {
+        const s = (size || '').toUpperCase().trim();
+        const order = [
+            'YXS','YS','YOUTH EXTRA SMALL','YOUTH SMALL',
+            'YM','YOUTH MEDIUM',
+            'YL','YOUTH LARGE',
+            'YXL','YOUTH EXTRA LARGE',
+            'AXS','ADULT EXTRA SMALL','XS',
+            'AS','ADULT SMALL','S',
+            'AM','ADULT MEDIUM','M',
+            'AL','ADULT LARGE','L',
+            'AXL','ADULT EXTRA LARGE','XL',
+            '2XL','XXL','ADULT 2XL','ADULT XXL',
+            '3XL','XXXL',
+            '4XL','5XL','6XL','OSFA','ONE SIZE'
+        ];
+        const idx = order.indexOf(s);
+        return idx === -1 ? 999 : idx;
     }
 
     deleteRow(idx) {
@@ -416,8 +809,12 @@ class NamesNumbersController {
 
             // Clear existing data if this is a fresh roster
             if (this.groups.length === 0 || confirm(`Replace current data with ${result.totalGroups} groups and ${result.totalRows} rows from Excel?`)) {
-                this.groups = result.groups;
-                this.rows = result.rows;
+                // Normalize to v2 shape (backend may still return legacy)
+                this.groups = (result.groups || []).map(migrateLegacyGroup);
+                this.rows = (result.rows || []).map(row => {
+                    const g = this.groups.find(gg => gg.id === row.groupId);
+                    return g ? migrateLegacyRow(row, g) : row;
+                });
                 this.activeGroupId = this.groups.length > 0 ? this.groups[0].id : null;
 
                 // Auto-fill roster name from filename
@@ -450,8 +847,7 @@ class NamesNumbersController {
         }
 
         if (!this.activeGroupId) {
-            // Auto-create a group
-            this.addGroup({ name: 'Roster', columns: [...DEFAULT_COLUMNS] });
+            this.addGroup({ name: 'Roster' });
         }
 
         this.collectTableData();
@@ -461,34 +857,37 @@ class NamesNumbersController {
         let startNum = existing.length + 1;
 
         const group = this.getActiveGroup();
+        const firstGarmentId = group.garments[0]?.id;
 
+        // Map parsed columns: position 0 = last name, 1 = jersey #, 2 = size (first garment)
         for (const line of lines) {
-            // Split by tab or comma
-            const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+            const parts = (line.includes('\t') ? line.split('\t') : line.split(',')).map(p => p.trim());
             const row = {
                 groupId: this.activeGroupId,
-                lineNumber: startNum++
+                lineNumber: startNum++,
+                garmentData: {},
+                custom: {}
             };
+            if (parts[0]) row.name = parts[0];
+            if (parts[1]) row.number = parts[1];
+            if (parts[2] && firstGarmentId) row.garmentData[firstGarmentId] = { size: parts[2] };
 
-            // Map parts to columns based on group config
-            const cols = group.columns;
-            parts.forEach((part, i) => {
-                if (i < cols.length) {
-                    row[cols[i]] = part.trim();
-                }
-            });
-
-            // Apply defaults for any missing fields
             if (group.defaults) {
                 for (const [key, val] of Object.entries(group.defaults)) {
-                    if (!row[key]) row[key] = val;
+                    if (PERSON_COLUMN_DEFS[key] && !row[key]) row[key] = val;
                 }
             }
 
             this.rows.push(row);
         }
 
+        // Auto-enable columns the paste actually used
+        if (!group.personColumns.includes('name')) group.personColumns.unshift('name');
+        const anyHasNumber = lines.some(l => (l.includes('\t') ? l.split('\t') : l.split(',')).length >= 2);
+        if (anyHasNumber && !group.personColumns.includes('number')) group.personColumns.push('number');
+
         this.isDirty = true;
+        this.loadGroupConfig();
         this.renderTable();
         this.renderTabs();
         this.closeModal('pasteModal');
@@ -561,30 +960,87 @@ class NamesNumbersController {
                 return;
             }
 
-            // Store OCR results for import
+            // Detect shape: v2 (garments array) or v1 (flat entries). Normalize to v2.
+            const detectedGarments = Array.isArray(result.garments) && result.garments.length > 0
+                ? result.garments.map(g => ({
+                    label: g.label || 'Garment',
+                    hasBackPrint:  !!g.hasBackPrint,
+                    hasFrontPrint: !!g.hasFrontPrint,
+                    hasQty:        !!g.hasQty
+                }))
+                : [{ label: 'Garment', hasBackPrint: result.entries.some(e => e.backPrint), hasFrontPrint: false, hasQty: false }];
+
             this._ocrEntries = result.entries;
+            this._ocrGarments = detectedGarments;
             this._ocrTeamName = result.teamName;
             this._ocrGroupName = result.groupName;
 
-            // Show preview table
-            let html = `<p style="margin-bottom:0.5rem;"><strong>${result.totalExtracted} entries extracted</strong>`;
+            // Build preview HTML: editable garment labels + entries table
+            let html = `<p style="margin-bottom:0.5rem;"><strong>${result.entries.length} ${result.entries.length === 1 ? 'entry' : 'entries'} extracted</strong>`;
             if (result.teamName) html += ` — ${this.escapeHtml(result.teamName)}`;
             html += `</p>`;
-            html += '<table class="roster-table" style="font-size:0.8rem;"><thead><tr><th>#</th><th>Name</th><th>#</th><th>Size</th><th>Notes</th></tr></thead><tbody>';
-            result.entries.forEach((entry, i) => {
+
+            html += `<div class="ocr-garments-preview">
+                <div class="ocr-garments-label">Detected garments (edit labels or remove unused before importing):</div>
+                <div id="ocrGarmentsList">${detectedGarments.map((g, i) => `
+                    <div class="ocr-garment-chip" data-idx="${i}">
+                        <input type="text" class="ocr-garment-label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
+                        <label><input type="checkbox" class="ocr-garment-backPrint" ${g.hasBackPrint ? 'checked' : ''}> Back Print</label>
+                        <button type="button" class="ocr-garment-remove" ${detectedGarments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times"></i></button>
+                    </div>
+                `).join('')}</div>
+            </div>`;
+
+            // Entries table preview (collapsed if many)
+            const sampleCount = Math.min(result.entries.length, 10);
+            html += `<div class="ocr-entries-preview">
+                <div class="ocr-entries-label">Entries preview (first ${sampleCount} of ${result.entries.length}):</div>
+                <table class="roster-table" style="font-size:0.8rem;"><thead><tr>
+                    <th>#</th><th>Name</th>
+                    ${detectedGarments.map(g => `<th>${this.escapeHtml(g.label)}</th>`).join('')}
+                    ${detectedGarments.some(g => g.hasBackPrint) ? '<th>Back Print</th>' : ''}
+                    <th>Full Name</th>
+                </tr></thead><tbody>`;
+            result.entries.slice(0, sampleCount).forEach((entry, i) => {
                 html += `<tr>
                     <td>${i + 1}</td>
                     <td>${this.escapeHtml(entry.name || '')}</td>
-                    <td>${this.escapeHtml(entry.number || '')}</td>
-                    <td>${this.escapeHtml(entry.size || '')}</td>
-                    <td>${this.escapeHtml(entry.notes || '')}</td>
+                    ${detectedGarments.map(g => {
+                        const size = (entry.sizes && entry.sizes[g.label]) || (detectedGarments.length === 1 ? entry.size : '') || '';
+                        return `<td>${this.escapeHtml(size)}</td>`;
+                    }).join('')}
+                    ${detectedGarments.some(g => g.hasBackPrint) ? `<td>${this.escapeHtml(entry.backPrint || (entry.backPrints ? Object.values(entry.backPrints).find(Boolean) : '') || '')}</td>` : ''}
+                    <td>${this.escapeHtml(entry.fullName || '')}</td>
                 </tr>`;
             });
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
 
             results.innerHTML = html;
             results.style.display = '';
             importBtn.style.display = '';
+
+            // Wire garment preview editing
+            results.querySelectorAll('.ocr-garment-label').forEach(input => {
+                input.addEventListener('change', e => {
+                    const idx = parseInt(e.target.closest('.ocr-garment-chip').dataset.idx, 10);
+                    if (this._ocrGarments[idx]) this._ocrGarments[idx].label = e.target.value.trim();
+                });
+            });
+            results.querySelectorAll('.ocr-garment-backPrint').forEach(input => {
+                input.addEventListener('change', e => {
+                    const idx = parseInt(e.target.closest('.ocr-garment-chip').dataset.idx, 10);
+                    if (this._ocrGarments[idx]) this._ocrGarments[idx].hasBackPrint = e.target.checked;
+                });
+            });
+            results.querySelectorAll('.ocr-garment-remove').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    if (this._ocrGarments.length === 1) return;
+                    const idx = parseInt(e.target.closest('.ocr-garment-chip').dataset.idx, 10);
+                    this._ocrGarments.splice(idx, 1);
+                    // Re-run the processing render to refresh indices — lazy approach: re-invoke
+                    this._refreshOcrPreview();
+                });
+            });
         } catch (err) {
             processing.style.display = 'none';
             results.innerHTML = `<p style="color: var(--nn-error-text);">Error: ${this.escapeHtml(err.message)}</p>`;
@@ -592,12 +1048,68 @@ class NamesNumbersController {
         }
     }
 
+    _refreshOcrPreview() {
+        // Re-render the OCR preview table (e.g. after removing a garment)
+        const results = document.getElementById('ocrResults');
+        if (!results || !this._ocrEntries) return;
+
+        // Rebuild just the entries table portion
+        const sampleCount = Math.min(this._ocrEntries.length, 10);
+        const garments = this._ocrGarments;
+
+        // Rebuild garment chips
+        const list = document.getElementById('ocrGarmentsList');
+        if (list) {
+            list.innerHTML = garments.map((g, i) => `
+                <div class="ocr-garment-chip" data-idx="${i}">
+                    <input type="text" class="ocr-garment-label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
+                    <label><input type="checkbox" class="ocr-garment-backPrint" ${g.hasBackPrint ? 'checked' : ''}> Back Print</label>
+                    <button type="button" class="ocr-garment-remove" ${garments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+            list.querySelectorAll('.ocr-garment-label').forEach(input => {
+                input.addEventListener('change', e => {
+                    const idx = parseInt(e.target.closest('.ocr-garment-chip').dataset.idx, 10);
+                    if (this._ocrGarments[idx]) this._ocrGarments[idx].label = e.target.value.trim();
+                });
+            });
+            list.querySelectorAll('.ocr-garment-backPrint').forEach(input => {
+                input.addEventListener('change', e => {
+                    const idx = parseInt(e.target.closest('.ocr-garment-chip').dataset.idx, 10);
+                    if (this._ocrGarments[idx]) this._ocrGarments[idx].hasBackPrint = e.target.checked;
+                });
+            });
+            list.querySelectorAll('.ocr-garment-remove').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    if (this._ocrGarments.length === 1) return;
+                    const idx = parseInt(e.target.closest('.ocr-garment-chip').dataset.idx, 10);
+                    this._ocrGarments.splice(idx, 1);
+                    this._refreshOcrPreview();
+                });
+            });
+        }
+    }
+
     handleOcrImport() {
         if (!this._ocrEntries || this._ocrEntries.length === 0) return;
 
+        const detected = this._ocrGarments || [{ label: 'Garment', hasBackPrint: false }];
+
+        // Create a new group configured to match the detected garments
         if (!this.activeGroupId) {
             const groupName = this._ocrGroupName || this._ocrTeamName || 'OCR Import';
-            this.addGroup({ name: groupName, columns: ['name', 'number', 'size'] });
+            const garments = detected.map((g, i) => ({
+                id: randomId('g'),
+                label: g.label || 'Garment',
+                style: '', color: '',
+                hasBackPrint:  !!g.hasBackPrint,
+                hasFrontPrint: !!g.hasFrontPrint,
+                hasQty:        !!g.hasQty,
+                hasBackLines:  false
+            }));
+            const personColumns = [...DEFAULT_PERSON_COLUMNS];
+            if (this._ocrEntries.some(e => e.fullName)) personColumns.push('fullName');
+            this.addGroup({ name: groupName, garments, personColumns, customColumns: [] });
         }
 
         // Auto-fill roster name from OCR
@@ -606,29 +1118,73 @@ class NamesNumbersController {
         }
 
         this.collectTableData();
+        const group = this.getActiveGroup();
         const existing = this.getActiveRows();
         let startNum = existing.length + 1;
 
+        // Build a label -> garmentId map for mapping OCR sizes/backPrints
+        const labelToGid = {};
+        group.garments.forEach((g, i) => {
+            labelToGid[(g.label || '').toLowerCase()] = g.id;
+            if (detected[i]) labelToGid[(detected[i].label || '').toLowerCase()] = g.id;
+        });
+
         for (const entry of this._ocrEntries) {
-            this.rows.push({
+            const row = {
                 groupId: this.activeGroupId,
                 lineNumber: startNum++,
                 name: entry.name || '',
                 number: entry.number || '',
-                size: entry.size || '',
-                backPrint: entry.backPrint || '',
-                notes: entry.notes || ''
-            });
+                fullName: entry.fullName || '',
+                notes: entry.notes || '',
+                garmentData: {},
+                custom: {}
+            };
+
+            // v2 shape: entry.sizes = { "T-shirt": "Youth Medium", "Hoodie": "Adult Small" }
+            if (entry.sizes && typeof entry.sizes === 'object') {
+                Object.entries(entry.sizes).forEach(([label, size]) => {
+                    const gid = labelToGid[(label || '').toLowerCase()] || group.garments[0]?.id;
+                    if (gid && size) {
+                        if (!row.garmentData[gid]) row.garmentData[gid] = {};
+                        row.garmentData[gid].size = size;
+                    }
+                });
+            } else if (entry.size && group.garments[0]) {
+                // v1 shape fallback: single size -> first garment
+                row.garmentData[group.garments[0].id] = { size: entry.size };
+            }
+
+            // Back prints — same pattern
+            if (entry.backPrints && typeof entry.backPrints === 'object') {
+                Object.entries(entry.backPrints).forEach(([label, bp]) => {
+                    const gid = labelToGid[(label || '').toLowerCase()] || group.garments[0]?.id;
+                    if (gid && bp) {
+                        if (!row.garmentData[gid]) row.garmentData[gid] = {};
+                        row.garmentData[gid].backPrint = bp;
+                    }
+                });
+            } else if (entry.backPrint) {
+                // Apply to first garment that has Back Print enabled, else first garment
+                const target = group.garments.find(g => g.hasBackPrint) || group.garments[0];
+                if (target) {
+                    if (!row.garmentData[target.id]) row.garmentData[target.id] = {};
+                    row.garmentData[target.id].backPrint = entry.backPrint;
+                }
+            }
+
+            this.rows.push(row);
         }
 
         this.isDirty = true;
+        this.loadGroupConfig();
         this.renderTable();
         this.renderTabs();
         this.closeModal('ocrModal');
         this.showToast(`Imported ${this._ocrEntries.length} names from OCR`, 'success');
 
-        // Cleanup
         this._ocrEntries = null;
+        this._ocrGarments = null;
         this._ocrTeamName = null;
         this._ocrGroupName = null;
     }
@@ -709,9 +1265,15 @@ class NamesNumbersController {
             document.getElementById('salesRep').value = r.SalesRep || '';
             document.getElementById('rosterNotes').value = r.Notes || '';
 
-            // Parse JSON fields
+            // Parse JSON fields + migrate legacy shapes to v2
             try { this.groups = JSON.parse(r.GroupsJSON || '[]'); } catch { this.groups = []; }
             try { this.rows = JSON.parse(r.RosterJSON || '[]'); } catch { this.rows = []; }
+
+            this.groups = this.groups.map(migrateLegacyGroup);
+            this.rows = this.rows.map(row => {
+                const g = this.groups.find(gg => gg.id === row.groupId);
+                return g ? migrateLegacyRow(row, g) : row;
+            });
 
             this.activeGroupId = this.groups.length > 0 ? this.groups[0].id : null;
             this.isDirty = false;
@@ -796,18 +1358,51 @@ class NamesNumbersController {
     exportExcel() {
         this.collectTableData();
 
-        // Build CSV per group (simple export — full XLSX would need SheetJS on frontend)
+        const esc = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
         let csv = '';
+
         this.groups.forEach(group => {
+            const descriptors = this.buildColumnDescriptors(group);
             const groupRows = this.rows.filter(r => r.groupId === group.id);
-            csv += `\n--- ${group.name} (${group.garmentStyle} ${group.garmentColor}) ---\n`;
-            csv += group.columns.map(c => COLUMN_DEFS[c]?.label || c).join(',') + '\n';
+            const garmentSummary = group.garments.map(g => `${g.label}${g.style ? ' ' + g.style : ''}${g.color ? ' ' + g.color : ''}`).join(' + ');
+
+            csv += `\n--- ${group.name}${garmentSummary ? ' (' + garmentSummary + ')' : ''} ---\n`;
+
+            // Header — multi-garment uses "Garment: Field" syntax to disambiguate
+            const headerCells = descriptors.map(d => {
+                if (d.kind === 'garment' && group.garments.length > 1) return `${d.garmentLabel}: ${d.label}`;
+                return d.label;
+            });
+            csv += headerCells.map(esc).join(',') + '\n';
+
+            // Rows
             groupRows.forEach(row => {
-                csv += group.columns.map(c => `"${(row[c] || '').replace(/"/g, '""')}"`).join(',') + '\n';
+                const cells = descriptors.map(d => {
+                    if (d.kind === 'person') return row[d.key] || '';
+                    if (d.kind === 'garment') return (row.garmentData && row.garmentData[d.garmentId] && row.garmentData[d.garmentId][d.field]) || '';
+                    if (d.kind === 'custom') return (row.custom && row.custom[d.key]) || '';
+                    return '';
+                });
+                csv += cells.map(esc).join(',') + '\n';
+            });
+
+            // Size breakdown per garment
+            group.garments.forEach(g => {
+                const counts = {};
+                let total = 0;
+                groupRows.forEach(r => {
+                    const size = r.garmentData?.[g.id]?.size;
+                    if (size) { counts[size] = (counts[size] || 0) + 1; total++; }
+                });
+                if (total === 0) return;
+                csv += `\n${g.label} totals (${total}):\n`;
+                Object.entries(counts)
+                    .sort((a, b) => this.sizeRank(a[0]) - this.sizeRank(b[0]))
+                    .forEach(([size, n]) => { csv += `${esc(size)},${n}\n`; });
             });
         });
 
-        const blob = new Blob([csv], { type: 'text/csv' });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -825,6 +1420,8 @@ class NamesNumbersController {
         document.getElementById('emptyState').style.display = hasGroups ? 'none' : '';
         document.getElementById('tableCard').style.display = hasGroups ? '' : 'none';
         document.getElementById('groupConfig').style.display = hasGroups ? '' : 'none';
+        const breakdown = document.getElementById('sizeBreakdownCard');
+        if (breakdown && !hasGroups) breakdown.style.display = 'none';
     }
 
     updateStatusBadge(status) {

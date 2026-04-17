@@ -330,27 +330,152 @@ body {
     color: var(--nn-text-secondary);
 }
 
+.config-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--nn-border);
+}
+.config-section:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+.config-section > label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--nn-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.35rem;
+}
+.config-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.config-section-header label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--nn-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.config-section-hint {
+    font-size: 0.75rem;
+    color: var(--nn-text-secondary);
+    margin-bottom: 0.6rem;
+}
+
+/* Garments editor */
+.garments-editor { display: flex; flex-direction: column; gap: 0.6rem; }
+.garment-row {
+    background: var(--nn-card-bg);
+    border: 1px solid var(--nn-border);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.75rem;
+}
+.garment-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.45rem;
+}
+.garment-row-idx {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--nn-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.garment-row-fields {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+}
+.garment-row-fields input {
+    width: 100%;
+    border: 1px solid var(--nn-border);
+    border-radius: 0.375rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+.garment-row-fields input:focus {
+    outline: none;
+    border-color: var(--nn-primary);
+    box-shadow: var(--nn-focus-shadow);
+}
+.garment-row-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.garment-row-toggles label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    padding: 0.2rem 0.45rem;
+    background: var(--nn-bg);
+    border: 1px solid var(--nn-border);
+    border-radius: 0.3rem;
+    cursor: pointer;
+    color: var(--nn-text-secondary);
+}
+.garment-row-toggles label:has(input:checked) {
+    border-color: var(--nn-primary);
+    background: #eff6ff;
+    color: var(--nn-primary-dark);
+}
+.garment-delete-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Custom columns editor */
+.custom-columns-editor { display: flex; flex-direction: column; gap: 0.4rem; }
+.custom-cols-empty {
+    font-size: 0.8rem;
+    color: var(--nn-text-secondary);
+    font-style: italic;
+    padding: 0.4rem 0;
+}
+.custom-col-row {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+.custom-col-row .cc-label {
+    flex: 1;
+    border: 1px solid var(--nn-border);
+    border-radius: 0.375rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+.custom-col-row .cc-label:focus {
+    outline: none;
+    border-color: var(--nn-primary);
+    box-shadow: var(--nn-focus-shadow);
+}
+
+/* Person column picker (checkbox chips) */
 .column-picker {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.4rem;
 }
-
 .column-picker label {
     display: flex;
     align-items: center;
     gap: 0.3rem;
     font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.55rem;
     background: var(--nn-card-bg);
     border: 1px solid var(--nn-border);
-    border-radius: 0.25rem;
+    border-radius: 0.3rem;
     cursor: pointer;
 }
 .column-picker label:has(input:checked) {
     border-color: var(--nn-primary);
     background: #eff6ff;
+    color: var(--nn-primary-dark);
 }
 .column-picker input[type="checkbox"] { accent-color: var(--nn-primary); }
 
@@ -462,6 +587,169 @@ body {
     color: var(--nn-text-secondary);
     border-top: 2px solid var(--nn-border);
 }
+
+/* Garment band colors — repeating 4-color palette for up to many garments */
+.garment-band-0 { --band-bg: #eff6ff; --band-border: #93c5fd; --band-text: #1e40af; }
+.garment-band-1 { --band-bg: #fef3c7; --band-border: #fcd34d; --band-text: #92400e; }
+.garment-band-2 { --band-bg: #dcfce7; --band-border: #86efac; --band-text: #166534; }
+.garment-band-3 { --band-bg: #fce7f3; --band-border: #f9a8d4; --band-text: #9d174d; }
+
+.roster-table thead th.col-garment-band {
+    background: var(--band-bg);
+    color: var(--band-text);
+    border-left: 2px solid var(--band-border);
+    border-right: 2px solid var(--band-border);
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 0.45rem 0.75rem;
+}
+.garment-band-style {
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: var(--nn-text-secondary);
+    margin-left: 0.35rem;
+}
+.roster-table thead th.col-garment {
+    background: color-mix(in srgb, var(--band-bg) 55%, #fff);
+    border-left: 1px solid var(--band-border);
+    border-right: 1px solid var(--band-border);
+}
+.roster-table tbody td.col-garment {
+    background: color-mix(in srgb, var(--band-bg) 28%, #fff);
+    border-left: 1px solid var(--band-border);
+    border-right: 1px solid var(--band-border);
+}
+.roster-table tbody tr:hover td.col-garment {
+    background: color-mix(in srgb, var(--band-bg) 45%, #fff);
+}
+
+/* Sticky row-number on horizontal scroll (person columns stay inline — multi-col sticky
+   requires dynamic offset calculation that produces flicker on resize). */
+@media (min-width: 900px) {
+    .roster-table thead th.row-number,
+    .roster-table tbody td.row-number {
+        position: sticky; left: 0;
+        z-index: 2;
+    }
+    .roster-table thead th.row-number { background: #f8fafc; z-index: 4; }
+    .roster-table tbody td.row-number { background: var(--nn-card-bg); }
+}
+
+/* Size Breakdown Card */
+.size-breakdown-card { margin-top: 1rem; }
+.size-breakdown-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.85rem;
+}
+.breakdown-garment {
+    background: var(--band-bg);
+    border: 1px solid var(--band-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 0.9rem;
+}
+.breakdown-garment-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
+    border-bottom: 1px solid var(--band-border);
+    color: var(--band-text);
+}
+.breakdown-garment-header strong { font-size: 1rem; }
+.breakdown-garment-meta {
+    font-size: 0.78rem;
+    color: var(--nn-text-secondary);
+}
+.breakdown-garment-total {
+    margin-left: auto;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.breakdown-size-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.15rem 1rem;
+    font-size: 0.88rem;
+}
+.breakdown-size-list li {
+    display: contents;
+}
+.breakdown-size { color: var(--nn-text); }
+.breakdown-count {
+    font-weight: 600;
+    color: var(--band-text);
+    text-align: right;
+}
+
+/* OCR multi-garment preview */
+.ocr-garments-preview {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid var(--nn-border);
+    border-radius: 0.5rem;
+}
+.ocr-garments-label, .ocr-entries-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--nn-text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+#ocrGarmentsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.ocr-garment-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    background: var(--nn-card-bg);
+    border: 1px solid var(--nn-border);
+    border-radius: 0.375rem;
+}
+.ocr-garment-chip .ocr-garment-label {
+    flex: 1;
+    border: 1px solid var(--nn-border);
+    border-radius: 0.25rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+}
+.ocr-garment-chip .ocr-garment-label:focus {
+    outline: none;
+    border-color: var(--nn-primary);
+    box-shadow: var(--nn-focus-shadow);
+}
+.ocr-garment-chip label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--nn-text-secondary);
+    white-space: nowrap;
+}
+.ocr-garment-remove {
+    background: none;
+    border: 1px solid var(--nn-border);
+    width: 26px; height: 26px;
+    border-radius: 0.25rem;
+    color: var(--nn-text-secondary);
+    cursor: pointer;
+}
+.ocr-garment-remove:hover { color: #dc2626; border-color: #dc2626; }
+.ocr-garment-remove:disabled { opacity: 0.3; cursor: not-allowed; }
+.ocr-entries-preview { margin-top: 1rem; }
 
 /* ============================================
    IMPORT MODALS
@@ -686,24 +974,37 @@ body {
 @media print {
     .header, .page-header-actions, .import-toolbar,
     .group-config, .tab-add-btn, .row-delete-btn,
-    .btn-primary, .btn-secondary, .toast,
-    .search-panel, .modal-overlay { display: none !important; }
+    .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-sm, .btn-icon,
+    .toast, .search-panel, .modal-overlay { display: none !important; }
 
     body { background: #fff; }
     .main-container { max-width: 100%; padding: 0; }
-    .card { border: none; box-shadow: none; padding: 0; }
+    .card { border: none; box-shadow: none; padding: 0; margin-bottom: 0.5rem; }
 
     .roster-table { font-size: 11px; }
-    .roster-table thead th { background: #eee; }
+    .roster-table thead th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .roster-table tbody td.col-garment,
+    .roster-table thead th.col-garment,
+    .roster-table thead th.col-garment-band,
+    .breakdown-garment {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .roster-table tbody td input {
+        border: none;
+        background: transparent;
+        padding: 0.15rem 0.35rem;
+    }
     .tab-bar { display: none; }
 
-    .print-group-title {
-        font-size: 14px;
-        font-weight: bold;
-        margin: 1rem 0 0.5rem;
-        border-bottom: 2px solid #000;
-        padding-bottom: 0.25rem;
+    .size-breakdown-card { page-break-inside: avoid; margin-top: 0.75rem; }
+    .size-breakdown-body {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
     }
+    .breakdown-garment { padding: 0.4rem 0.6rem; font-size: 10px; }
+    .breakdown-garment-header strong { font-size: 11px; }
+    .breakdown-size-list { font-size: 10px; }
 }
 
 /* ============================================
