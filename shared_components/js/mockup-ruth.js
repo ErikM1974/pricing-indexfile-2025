@@ -381,6 +381,18 @@
 
         const workOrder = escapeHtml(mockup.Work_Order_Number || '');
 
+        // AE-provided dimensions — shows Ruth what size to digitize without opening the card
+        let dimensions = '';
+        if (mockup.Logo_Width && mockup.Logo_Height) {
+            dimensions = `${mockup.Logo_Width}" × ${mockup.Logo_Height}"`;
+        } else if (mockup.Logo_Width) {
+            dimensions = `${mockup.Logo_Width}" wide`;
+        } else if (mockup.Logo_Height) {
+            dimensions = `${mockup.Logo_Height}" tall`;
+        } else if (mockup.Size_Specs) {
+            dimensions = mockup.Size_Specs; // fallback for legacy records that only have the combined string
+        }
+
         // Status class for left border + hover glow
         const statusSlug = (status || '').toLowerCase().replace(/\s+/g, '-');
         const cardStatusClass = statusSlug ? `mockup-card--${statusSlug}` : '';
@@ -404,6 +416,7 @@
                     ${aeDisplay ? `<div class="card-meta-row"><span class="card-meta-label">From:</span> ${escapeHtml(aeDisplay)}</div>` : ''}
                     ${mockup.Garment_Info ? `<div class="card-meta-row"><span class="card-meta-label">Garment:</span> ${escapeHtml(mockup.Garment_Info)}</div>` : ''}
                     ${mockup.Print_Location ? `<div class="card-meta-row"><span class="card-meta-label">Location:</span> ${escapeHtml(mockup.Print_Location)}</div>` : ''}
+                    ${dimensions ? `<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ${escapeHtml(dimensions)}</div>` : ''}
                 </div>
                 ${badges ? `<div class="card-badges">${badges}</div>` : ''}
             </div>
@@ -714,8 +727,14 @@
                 var mockupType = m.Mockup_Type || '';
                 var revCount = m.Revision_Count || 0;
                 var isRushM = isRush(m.Is_Rush);
+                var kanbanDim = '';
+                if (m.Logo_Width && m.Logo_Height) kanbanDim = m.Logo_Width + '" × ' + m.Logo_Height + '"';
+                else if (m.Logo_Width) kanbanDim = m.Logo_Width + '" wide';
+                else if (m.Logo_Height) kanbanDim = m.Logo_Height + '" tall';
+                else if (m.Size_Specs) kanbanDim = m.Size_Specs;
                 if (isRushM) badges += '<span class="kanban-card-badge kanban-card-badge--rush">&#128293; RUSH</span>';
                 if (mockupType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(mockupType) + '</span>';
+                if (kanbanDim) badges += '<span class="kanban-card-badge kanban-card-badge--dim">📐 ' + escapeHtml(kanbanDim) + '</span>';
                 if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
                 var thumbHtml = '';

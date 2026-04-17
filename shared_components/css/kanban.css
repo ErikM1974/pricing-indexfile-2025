@@ -205,6 +205,7 @@
 }
 .kanban-card-badge--rev { background: #fef2f2; color: #dc2626; }
 .kanban-card-badge--type { background: #eff6ff; color: #2563eb; }
+.kanban-card-badge--dim { background: #ecfdf5; color: #047857; font-family: 'Courier New', monospace; }
 .kanban-card-badge--rush {
     background: #dc2626 !important;
     color: #fff !important;
