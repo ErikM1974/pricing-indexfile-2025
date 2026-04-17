@@ -113,6 +113,14 @@ class NamesNumbersController {
         this.bindEvents();
         this.checkURLParameters();
         this.updateUI();
+        this.updateBreadcrumb();
+    }
+
+    updateBreadcrumb(label) {
+        const el = document.getElementById('breadcrumbCurrent');
+        if (!el) return;
+        const name = (label != null ? label : document.getElementById('rosterName').value).trim();
+        el.textContent = name || 'New Roster';
     }
 
     checkURLParameters() {
@@ -127,6 +135,10 @@ class NamesNumbersController {
         // Header actions
         document.getElementById('searchBtn').addEventListener('click', () => this.toggleSearch());
         document.getElementById('newRosterBtn').addEventListener('click', () => this.resetAll());
+
+        // Keep breadcrumb in sync as the user types the roster name
+        const rosterNameEl = document.getElementById('rosterName');
+        if (rosterNameEl) rosterNameEl.addEventListener('input', () => this.updateBreadcrumb());
 
         // Search
         document.getElementById('searchGoBtn').addEventListener('click', () => this.doSearch());
@@ -164,6 +176,12 @@ class NamesNumbersController {
         // Save/actions
         document.getElementById('saveDraftBtn').addEventListener('click', () => this.save('Draft'));
         document.getElementById('saveSubmitBtn').addEventListener('click', () => this.save('Submitted'));
+        document.getElementById('saveAndReturnBtn').addEventListener('click', () => {
+            this._returnToDashboardAfterSave = true;
+            // Keep current status if already submitted, otherwise save as Draft
+            const currentStatus = document.getElementById('statusBadge').textContent.trim();
+            this.save(currentStatus === 'Submitted' ? 'Submitted' : 'Draft');
+        });
         document.getElementById('printBtn').addEventListener('click', () => window.print());
         document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportExcel());
 
@@ -1247,6 +1265,14 @@ class NamesNumbersController {
 
             this.isDirty = false;
             this.updateStatusBadge(status);
+            this.updateBreadcrumb(data.RosterName);
+
+            // If the caller asked to return to dashboard after save, do it now
+            if (this._returnToDashboardAfterSave) {
+                this._returnToDashboardAfterSave = false;
+                // Brief delay so the toast is visible before navigating
+                setTimeout(() => { window.location.href = '/dashboards/names-numbers-dashboard.html'; }, 600);
+            }
         } catch (err) {
             this.showToast('Save failed: ' + err.message, 'error');
         }
@@ -1286,6 +1312,7 @@ class NamesNumbersController {
             this.isDirty = false;
 
             this.updateStatusBadge(r.Status || 'Draft');
+            this.updateBreadcrumb(r.RosterName);
             this.renderTabs();
             this.loadGroupConfig();
             this.renderTable();
@@ -1451,6 +1478,7 @@ class NamesNumbersController {
         });
 
         this.updateStatusBadge('Draft');
+        this.updateBreadcrumb('New Roster');
 
         // Clear URL params
         window.history.replaceState({}, '', window.location.pathname);

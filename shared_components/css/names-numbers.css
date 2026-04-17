@@ -66,6 +66,22 @@ body {
 }
 .breadcrumb a { color: var(--nn-primary); text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb #breadcrumbCurrent { color: var(--nn-text); font-weight: 500; }
+
+/* Action bar at the bottom of the form */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.action-bar-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
 
 .header-right { display: flex; align-items: center; gap: 1rem; }
 .current-date { font-size: 0.875rem; color: var(--nn-text-secondary); }

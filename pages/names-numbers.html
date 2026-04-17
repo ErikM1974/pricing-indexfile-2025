@@ -8,7 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="/shared_components/css/names-numbers.css?v=202604171" rel="stylesheet">
+    <link href="/shared_components/css/names-numbers.css?v=202604172" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -20,13 +20,15 @@
                 <nav class="breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
-                    <span>Names & Numbers</span>
+                    <a href="/dashboards/names-numbers-dashboard.html">Names & Numbers</a>
+                    <span>/</span>
+                    <span id="breadcrumbCurrent">New Roster</span>
                 </nav>
             </div>
             <div class="header-right">
                 <span class="current-date" id="currentDate"></span>
-                <a href="/staff-dashboard.html" class="btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back
+                <a href="/dashboards/names-numbers-dashboard.html" class="btn-secondary" title="Back to all rosters">
+                    <i class="fas fa-arrow-left"></i> All Rosters
                 </a>
             </div>
         </div>
@@ -213,16 +215,19 @@
         </div>
 
         <!-- Action Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-            <div style="display: flex; gap: 0.5rem;">
+        <div class="action-bar">
+            <div class="action-bar-group">
                 <button type="button" class="btn-primary" id="saveDraftBtn">
                     <i class="fas fa-save"></i> Save Draft
                 </button>
                 <button type="button" class="btn-success" id="saveSubmitBtn">
                     <i class="fas fa-check"></i> Save & Submit
                 </button>
+                <button type="button" class="btn-secondary" id="saveAndReturnBtn" title="Save and go back to the rosters list">
+                    <i class="fas fa-check-double"></i> Save & Back to Dashboard
+                </button>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div class="action-bar-group">
                 <button type="button" class="btn-secondary" id="printBtn">
                     <i class="fas fa-print"></i> Print
                 </button>
@@ -320,7 +325,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- Scripts -->
-    <script src="/shared_components/js/names-numbers-service.js?v=202604171"></script>
-    <script src="/shared_components/js/names-numbers-controller.js?v=202604171"></script>
+    <script src="/shared_components/js/names-numbers-service.js?v=202604172"></script>
+    <script src="/shared_components/js/names-numbers-controller.js?v=202604172"></script>
 </body>
 </html>
