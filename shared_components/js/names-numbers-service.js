@@ -8,6 +8,32 @@ class NamesNumbersService {
             || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     }
 
+    // Fetch with a single 500ms-delayed retry for transient failures
+    // (Heroku cold start, brief network blip, rare Caspio token flip that slips past backend retry).
+    // 404 is treated as final — don't retry "not found".
+    async _fetchWithRetry(url, init) {
+        let lastErr;
+        for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+                const resp = await fetch(url, init);
+                if (resp.status === 404) {
+                    const body = await resp.json().catch(() => ({}));
+                    const msg = body.error || 'Not found';
+                    const err = new Error(msg);
+                    err.status = 404;
+                    throw err;
+                }
+                if (!resp.ok) throw new Error(`Request failed: ${resp.status}`);
+                return resp.json();
+            } catch (err) {
+                lastErr = err;
+                if (err.status === 404 || attempt === 1) break;
+                await new Promise(r => setTimeout(r, 500));
+            }
+        }
+        throw lastErr;
+    }
+
     // =====================
     // CRUD Operations
     // =====================
@@ -24,15 +50,11 @@ class NamesNumbersService {
 
         const qs = params.toString();
         const url = `${this.API_BASE}/api/rosters${qs ? '?' + qs : ''}`;
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`Failed to fetch rosters: ${resp.status}`);
-        return resp.json();
+        return this._fetchWithRetry(url);
     }
 
     async getRoster(id) {
-        const resp = await fetch(`${this.API_BASE}/api/rosters/${id}`);
-        if (!resp.ok) throw new Error(`Failed to fetch roster: ${resp.status}`);
-        return resp.json();
+        return this._fetchWithRetry(`${this.API_BASE}/api/rosters/${id}`);
     }
 
     async createRoster(data) {

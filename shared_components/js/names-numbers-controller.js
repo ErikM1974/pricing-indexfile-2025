@@ -127,7 +127,12 @@ class NamesNumbersController {
         const params = new URLSearchParams(window.location.search);
         const loadId = params.get('load');
         if (loadId) {
-            this.loadRoster(parseInt(loadId, 10));
+            const parsed = parseInt(loadId, 10);
+            if (Number.isInteger(parsed) && parsed > 0) {
+                this.loadRoster(parsed);
+            } else {
+                this.showToast(`Invalid roster ID in URL: ${loadId}`, 'error');
+            }
         }
     }
 
@@ -1279,6 +1284,14 @@ class NamesNumbersController {
     }
 
     async loadRoster(id) {
+        if (!Number.isInteger(id) || id <= 0) {
+            this.showToast('Invalid roster ID', 'error');
+            return;
+        }
+        // Dedupe: don't fire a second fetch for the same roster if one is already in flight
+        if (this._loadingRosterId === id) return;
+        this._loadingRosterId = id;
+
         try {
             const result = await this.service.getRoster(id);
             if (!result.success || !result.roster) {
@@ -1320,6 +1333,8 @@ class NamesNumbersController {
             this.showToast('Roster loaded', 'success');
         } catch (err) {
             this.showToast('Failed to load roster: ' + err.message, 'error');
+        } finally {
+            this._loadingRosterId = null;
         }
     }
 
