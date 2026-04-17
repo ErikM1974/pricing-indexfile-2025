@@ -932,8 +932,11 @@ var MockupSubmitForm = (function () {
                     Sales_Rep: document.getElementById('msf-sales-rep').value.trim(),
                     Request_Type: currentRequestType,
                     Box_Folder_ID: folderId || '',
-                    Is_Rush: !!isRush,
-                    Rush_Requested_At: isRush ? new Date().toISOString() : null
+                    Is_Rush: !!isRush
+                    // Rush_Requested_At intentionally omitted — it's a Caspio Timestamp
+                    // field (read-only via REST). Caspio auto-populates it if the field
+                    // type supports it; otherwise it stays null. Sending a value caused
+                    // the AlterReadOnlyData 500 error (fixed 2026-04-17).
                 };
 
                 return fetch(API_BASE + '/api/mockups', {
