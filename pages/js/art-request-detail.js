@@ -184,6 +184,9 @@
             revBadge.style.display = 'inline-block';
         }
 
+        // Rush toggle (renders for every request — clickable to mark/clear rush)
+        renderRushToggle(req);
+
         // Request type badge (Mockup)
         if (req.Request_Type && req.Request_Type.toLowerCase() === 'mockup') {
             const typeBadge = document.createElement('span');
@@ -415,6 +418,71 @@
             var cleanUrl = window.location.pathname + '?view=ae';
             window.history.replaceState(null, '', cleanUrl);
         }
+    }
+
+    // ── Rush flag normalizer — handles Y / Yes / true / True / 1 ─────────
+    function isRushy(v) {
+        if (window.ArtActions && typeof window.ArtActions.isRush === 'function') return window.ArtActions.isRush(v);
+        if (!v && v !== 0) return false;
+        if (typeof v === 'boolean') return v;
+        const s = String(v).trim().toLowerCase();
+        return s === 'yes' || s === 'y' || s === 'true' || s === '1';
+    }
+
+    // ── Rush toggle (mark / unmark) ──────────────────────────────────────
+    function renderRushToggle(req) {
+        const btn = document.getElementById('ard-rush-toggle');
+        if (!btn) return;
+        const isRush = isRushy(req.Is_Rush);
+        btn.innerHTML = isRush
+            ? '\uD83D\uDD25 RUSH ACTIVE <span class="ard-rush-toggle-hint">(click to clear)</span>'
+            : '\uD83D\uDD25 Mark as Rush';
+        btn.classList.toggle('ard-rush-toggle--active', isRush);
+        btn.style.display = 'inline-flex';
+
+        // Remove any prior click handler by cloning
+        const clone = btn.cloneNode(true);
+        btn.parentNode.replaceChild(clone, btn);
+        clone.addEventListener('click', async function () {
+            const turnOn = !isRush;
+            if (!confirm(turnOn
+                ? 'Mark this request as RUSH? Steve will be DM\'d and the AE will get a confirmation email.'
+                : 'Clear RUSH status? Steve\'s Slack DM will note this.')) return;
+
+            clone.disabled = true;
+            clone.textContent = '\u2026';
+            try {
+                const resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/fields', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Is_Rush: !!turnOn,
+                        Rush_Requested_At: turnOn ? new Date().toISOString() : null
+                    })
+                });
+                if (!resp.ok) throw new Error('API ' + resp.status);
+                // Fire rush confirmation if turning on
+                if (turnOn && window.ArtActions && typeof window.ArtActions.sendRushConfirmation === 'function') {
+                    const u = getLoggedInUser();
+                    window.ArtActions.sendRushConfirmation({
+                        designId: designId,
+                        designName: 'Design #' + designId,
+                        company: req.CompanyName || 'Unknown',
+                        recipient: 'Steve',
+                        aeName: u.name,
+                        aeEmail: u.email,
+                        salesRepEmail: req.Sales_Rep || req.User_Email || u.email,
+                        detailPath: '/art-request/' + designId + '?view=ae'
+                    });
+                }
+                req.Is_Rush = !!turnOn;
+                renderRushToggle(req); // re-render
+            } catch (err) {
+                alert('Failed to update rush status: ' + err.message);
+                clone.disabled = false;
+                renderRushToggle(req);
+            }
+        });
     }
 
     // ── AE Status Bar (all statuses) ────────────────────────────────────

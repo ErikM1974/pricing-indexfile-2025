@@ -295,6 +295,48 @@ body {
     color: #dc2626;
 }
 
+.pmd-rush-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    background: #fff;
+    color: #dc2626;
+    border: 1.5px dashed #dc2626;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+}
+
+.pmd-rush-toggle:hover { background: #fee2e2; }
+.pmd-rush-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pmd-rush-toggle-hint {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+.pmd-rush-toggle--active {
+    background: #dc2626;
+    color: #fff;
+    border-style: solid;
+    border-color: #991b1b;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+    animation: pmd-rush-pulse 1.6s ease-in-out infinite;
+}
+
+.pmd-rush-toggle--active .pmd-rush-toggle-hint { color: #fecaca; }
+
+@keyframes pmd-rush-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2); }
+    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35); }
+}
+
 /* ── ShopWorks Art Done Badge ──────────────────────── */
 .pmd-sw-badge {
     display: inline-flex;

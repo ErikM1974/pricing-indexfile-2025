@@ -19,6 +19,15 @@
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // ── Rush flag normalizer — handles Y / Yes / true / True / 1 ─────
+    function isRush(v) {
+        if (window.ArtActions && typeof window.ArtActions.isRush === 'function') return window.ArtActions.isRush(v);
+        if (!v && v !== 0) return false;
+        if (typeof v === 'boolean') return v;
+        var s = String(v).trim().toLowerCase();
+        return s === 'yes' || s === 'y' || s === 'true' || s === '1';
+    }
+
     // ── Logged-in user identity (from staff portal session) ──────────
     function getLoggedInUser() {
         var name = sessionStorage.getItem('nwca_user_name') || '';
@@ -1830,13 +1839,26 @@
             + '<div>Loading art requests...</div></div>';
 
         // Fetch from API with date cutoff
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
-        var url = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
-            + '&dateCreatedFrom=' + KANBAN_DATE_CUTOFF
-            + '&select=' + selectFields;
+        // Note: Is_Rush is optional — added once the Caspio column exists.
+        // If the select references a column Caspio doesn't have, the API 500s.
+        // We fetch with Is_Rush and transparently fall back without it on 500.
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush';
+        var selectFieldsFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
+        var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
+            + '&dateCreatedFrom=' + KANBAN_DATE_CUTOFF;
+        var url = baseUrl + '&select=' + selectFields;
 
         fetch(url)
             .then(function (resp) {
+                if (resp.status === 500) {
+                    // Likely Is_Rush column not yet provisioned — retry without it
+                    console.warn('[Kanban] fetch 500 with Is_Rush — retrying without it');
+                    return fetch(baseUrl + '&select=' + selectFieldsFallback)
+                        .then(function (r2) {
+                            if (!r2.ok) throw new Error('API returned ' + r2.status);
+                            return r2.json();
+                        });
+                }
                 if (!resp.ok) throw new Error('API returned ' + resp.status);
                 return resp.json();
             })
@@ -1870,7 +1892,9 @@
             orderType = String(ot || '');
         }
 
+        var isRushReq = isRush(req.Is_Rush);
         var badges = '';
+        if (isRushReq) badges += '<span class="kanban-card-badge kanban-card-badge--rush">&#128293; RUSH</span>';
         if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
         if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
@@ -1878,7 +1902,8 @@
             ? ElapsedTimeUtils.getKanbanElapsedBadge(req.Status || '', req, 'art')
             : '';
 
-        return '<div class="kanban-card" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '\', \'_blank\')">'
+        var rushCls = isRushReq ? ' kanban-card--rush' : '';
+        return '<div class="kanban-card' + rushCls + '" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '\', \'_blank\')">'
             + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + escapeHtml(designNum) + '</div>' : '')
             + '<div class="kanban-card-meta">'
@@ -1928,6 +1953,13 @@
             if (!placed) {
                 buckets['submitted'].push(req);
             }
+        });
+
+        // Rush-first sort within each column (preserves Date_Created DESC as tiebreaker)
+        KANBAN_COLUMNS.forEach(function (col) {
+            (buckets[col.id] || []).sort(function (a, b) {
+                return (isRush(a.Is_Rush) ? 0 : 1) - (isRush(b.Is_Rush) ? 0 : 1);
+            });
         });
 
         var completedCollapsed = localStorage.getItem('steveKanbanCompletedCollapsed') !== '0'; // Default: collapsed

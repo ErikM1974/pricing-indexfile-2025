@@ -1251,3 +1251,64 @@ input[name^="cbParamVirtual"] {
     #screenshot-fill-overlay { animation: none !important; }
     .ssf-field-row { opacity: 1; transform: none; }
 }
+
+/* ── Rush toggle on Steve's Caspio form ─────────────────────── */
+.ae-rush-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.ae-rush-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #fff;
+    color: #dc2626;
+    border: 2px dashed #dc2626;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+}
+
+.ae-rush-toggle:hover { background: #fee2e2; }
+
+.ae-rush-toggle .ae-rush-icon {
+    font-size: 20px;
+    filter: grayscale(1);
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+.ae-rush-toggle .ae-rush-label { font-weight: 700; }
+
+.ae-rush-toggle .ae-rush-hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: #7a1228;
+    margin-left: 6px;
+}
+
+.ae-rush-toggle--active {
+    background: #dc2626;
+    color: #fff;
+    border-style: solid;
+    border-color: #991b1b;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+    animation: ae-rush-pulse 1.6s ease-in-out infinite;
+}
+
+.ae-rush-toggle--active .ae-rush-icon { filter: none; opacity: 1; }
+.ae-rush-toggle--active .ae-rush-hint { color: #fecaca; }
+
+@keyframes ae-rush-pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15); }
+    50%       { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0.25); }
+}

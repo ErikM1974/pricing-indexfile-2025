@@ -17,6 +17,14 @@
     let currentFilter = 'queue'; // 'queue' | 'completed' | 'all'
     let lastNotificationPoll = Date.now();
 
+    // ── Rush flag normalizer — handles Y / Yes / true / True / 1 ─────────
+    function isRush(v) {
+        if (!v && v !== 0) return false;
+        if (typeof v === 'boolean') return v;
+        const s = String(v).trim().toLowerCase();
+        return s === 'yes' || s === 'y' || s === 'true' || s === '1';
+    }
+
     // ── Status Helpers ───────────────────────────────────────────────────
     const QUEUE_STATUSES = ['Submitted', 'In Progress', 'Awaiting Approval', 'Revision Requested'];
     const COMPLETED_STATUSES = ['Approved'];
@@ -257,6 +265,11 @@
             countSpan.textContent = ruthSearchText ? shown + ' of ' + total + ' mockups' : total + ' mockups';
         }
 
+        // Rush-first sort within queue (preserves Submitted_Date ordering as tiebreaker since allMockups was fetched DESC)
+        queueMockups.sort(function (a, b) {
+            return (isRush(a.Is_Rush) ? 0 : 1) - (isRush(b.Is_Rush) ? 0 : 1);
+        });
+
         // Render queue
         if (queueMockups.length === 0) {
             queueGrid.innerHTML = `
@@ -306,6 +319,10 @@
 
         // Badges
         let badges = '';
+        const isRushMockup = isRush(mockup.Is_Rush);
+        if (isRushMockup) {
+            badges += `<span class="card-badge card-badge--rush">&#128293; RUSH</span>`;
+        }
         if (mockupType) {
             badges += `<span class="card-badge">${mockupType}</span>`;
         }
@@ -367,9 +384,10 @@
         // Status class for left border + hover glow
         const statusSlug = (status || '').toLowerCase().replace(/\s+/g, '-');
         const cardStatusClass = statusSlug ? `mockup-card--${statusSlug}` : '';
+        const rushClass = isRushMockup ? ' mockup-card--rush' : '';
 
         return `
-        <div class="mockup-card ${cardStatusClass}" data-mockup-id="${id}" data-work-order="${workOrder}">
+        <div class="mockup-card ${cardStatusClass}${rushClass}" data-mockup-id="${id}" data-work-order="${workOrder}">
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
@@ -659,6 +677,11 @@
                 return col.match.indexOf(m.Status) !== -1;
             });
 
+            // Rush-first within each column
+            colCards.sort(function (a, b) {
+                return (isRush(a.Is_Rush) ? 0 : 1) - (isRush(b.Is_Rush) ? 0 : 1);
+            });
+
             var isCompleted = col.id === 'completed';
 
             // Build card HTML
@@ -690,6 +713,8 @@
                 var badges = '';
                 var mockupType = m.Mockup_Type || '';
                 var revCount = m.Revision_Count || 0;
+                var isRushM = isRush(m.Is_Rush);
+                if (isRushM) badges += '<span class="kanban-card-badge kanban-card-badge--rush">&#128293; RUSH</span>';
                 if (mockupType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(mockupType) + '</span>';
                 if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
@@ -703,7 +728,8 @@
                     : '';
 
                 var hiddenStyle = hidden ? ' style="display: none"' : '';
-                return '<div class="kanban-card" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.location.href=\'/mockup/' + id + '\'">'
+                var rushCls = isRushM ? ' kanban-card--rush' : '';
+                return '<div class="kanban-card' + rushCls + '" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.location.href=\'/mockup/' + id + '\'">'
                     + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
                     + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
                     + '<div class="kanban-card-meta">'

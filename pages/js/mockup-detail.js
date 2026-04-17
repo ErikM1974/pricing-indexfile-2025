@@ -385,6 +385,9 @@
             revBadge.style.display = '';
         }
 
+        // Rush toggle (mark / unmark)
+        renderRushToggle(mockup);
+
         // Action bars
         renderActionBars(mockup, notes);
 
@@ -460,6 +463,77 @@
                 showFindOrderModal(mockup.Company_Name);
             });
         }
+    }
+
+    // ── Rush flag normalizer — handles Y / Yes / true / True / 1 ───────────
+    function isRushy(v) {
+        if (window.ArtActions && typeof window.ArtActions.isRush === 'function') return window.ArtActions.isRush(v);
+        if (!v && v !== 0) return false;
+        if (typeof v === 'boolean') return v;
+        var s = String(v).trim().toLowerCase();
+        return s === 'yes' || s === 'y' || s === 'true' || s === '1';
+    }
+
+    // ── Rush Toggle (mark / unmark) ────────────────────────────────────────
+    function renderRushToggle(mockup) {
+        var btn = document.getElementById('pmd-rush-toggle');
+        if (!btn) return;
+        var isRush = isRushy(mockup.Is_Rush);
+        btn.innerHTML = isRush
+            ? '\uD83D\uDD25 RUSH ACTIVE <span class="pmd-rush-toggle-hint">(click to clear)</span>'
+            : '\uD83D\uDD25 Mark as Rush';
+        btn.classList.toggle('pmd-rush-toggle--active', isRush);
+        btn.style.display = 'inline-flex';
+
+        var clone = btn.cloneNode(true);
+        btn.parentNode.replaceChild(clone, btn);
+        clone.addEventListener('click', function () {
+            var turnOn = !isRush;
+            if (!confirm(turnOn
+                ? 'Mark this mockup as RUSH? Ruth will be DM\'d and the AE will get a confirmation email.'
+                : 'Clear RUSH status?')) return;
+
+            clone.disabled = true;
+            clone.textContent = '\u2026';
+
+            fetch(API_BASE + '/api/mockups/' + mockupId, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Is_Rush: !!turnOn,
+                    Rush_Requested_At: turnOn ? new Date().toISOString() : null
+                })
+            })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('API ' + resp.status);
+                if (turnOn && window.ArtActions && typeof window.ArtActions.sendRushConfirmation === 'function') {
+                    var aeEmail = (mockup.Submitted_By) || 'art@nwcustomapparel.com';
+                    var aeName = aeEmail.indexOf('@') > 0 ? aeEmail.substring(0, aeEmail.indexOf('@')) : aeEmail;
+                    var salesRepEmail = '';
+                    if (window.ArtActions.resolveRep && mockup.Sales_Rep) {
+                        var r = window.ArtActions.resolveRep(mockup.Sales_Rep);
+                        salesRepEmail = r && r.email ? r.email : '';
+                    }
+                    window.ArtActions.sendRushConfirmation({
+                        designId: mockupId,
+                        designName: mockup.Design_Name || mockup.Design_Number || '#' + mockupId,
+                        company: mockup.Company_Name || '',
+                        recipient: 'Ruth',
+                        aeName: aeName.charAt(0).toUpperCase() + aeName.slice(1),
+                        aeEmail: aeEmail,
+                        salesRepEmail: salesRepEmail,
+                        detailPath: '/mockup/' + mockupId + '?view=ae'
+                    });
+                }
+                mockup.Is_Rush = !!turnOn;
+                renderRushToggle(mockup);
+            })
+            .catch(function (err) {
+                alert('Failed to update rush status: ' + err.message);
+                clone.disabled = false;
+                renderRushToggle(mockup);
+            });
+        });
     }
 
     // ── Action Bars ────────────────────────────────────────────────────────

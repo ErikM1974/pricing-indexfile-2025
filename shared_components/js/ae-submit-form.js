@@ -227,6 +227,10 @@
         if (window.__artSubmitNotified[designId]) return; // prevent duplicate sends
         window.__artSubmitNotified[designId] = true;
 
+        // Rush state captured on submit click (see styleRushCheckbox)
+        var wasRush = !!window.__rushStateOnSubmit;
+        window.__rushStateOnSubmit = false; // reset for next submission
+
         // Toast notification (existing)
         fetch(API_BASE + '/api/art-notifications', {
             method: 'POST',
@@ -271,6 +275,20 @@
                     detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () { /* fire-and-forget */ });
+            }
+
+            // Rush confirmation (extra email when rush was flagged on submit)
+            if (wasRush && window.ArtActions && typeof window.ArtActions.sendRushConfirmation === 'function') {
+                window.ArtActions.sendRushConfirmation({
+                    designId: designId,
+                    designName: 'Design #' + designId,
+                    company: companyName || 'Unknown',
+                    recipient: 'Steve',
+                    aeName: submitterName,
+                    aeEmail: submitterEmail,
+                    salesRepEmail: submitterEmail, // Steve flow: sales rep = submitter
+                    detailPath: '/art-request/' + designId + '?view=ae'
+                });
             }
         }
     }
@@ -1218,6 +1236,54 @@
         toggleContainer.parentElement.insertBefore(strip, toggleContainer.nextSibling);
     }
 
+    // ── Rush Checkbox Styling + State Capture ──────────────────────
+    // The Caspio DataPage renders an Is_Rush Yes/No checkbox as
+    // [name="InsertRecordIs_Rush"]. We visually promote it to a big red
+    // toggle and stash its state on submit so notifyNewSubmission() knows
+    // whether to fire the rush confirmation email.
+    function styleRushCheckbox() {
+        var input = document.querySelector('input[name="InsertRecordIs_Rush"]');
+        if (!input || input.dataset.rushStyled === '1') return;
+        input.dataset.rushStyled = '1';
+
+        var fieldCell = input.closest('.cbFormFieldCell') || input.parentElement;
+        if (!fieldCell) return;
+
+        // Hide Caspio's default label cell (the "Is Rush:" text)
+        var labelCell = findLabelCellForInput('Is_Rush');
+        if (labelCell) labelCell.style.display = 'none';
+
+        // Wrap the checkbox in a custom-styled label
+        var wrap = document.createElement('label');
+        wrap.className = 'ae-rush-toggle';
+        wrap.innerHTML = '<span class="ae-rush-icon">&#128293;</span>'
+            + '<span class="ae-rush-label">Rush Order</span>'
+            + '<span class="ae-rush-hint">Tick if Steve needs this ASAP</span>';
+        // Move the actual checkbox into the wrapper (kept but visually hidden)
+        input.classList.add('ae-rush-checkbox');
+        wrap.insertBefore(input, wrap.firstChild);
+        fieldCell.innerHTML = '';
+        fieldCell.appendChild(wrap);
+
+        // Reflect active state on the wrapper
+        var syncState = function () {
+            wrap.classList.toggle('ae-rush-toggle--active', input.checked);
+        };
+        input.addEventListener('change', syncState);
+        syncState();
+    }
+
+    function captureRushOnSubmit() {
+        var submitBtn = document.querySelector('input[id*="Submit"], input[type="submit"], button[type="submit"]');
+        if (!submitBtn || submitBtn.dataset.rushHooked === '1') return;
+        submitBtn.dataset.rushHooked = '1';
+
+        submitBtn.addEventListener('click', function () {
+            var input = document.querySelector('input[name="InsertRecordIs_Rush"]');
+            window.__rushStateOnSubmit = !!(input && input.checked);
+        }, true); // capture phase so we stash before Caspio submits
+    }
+
     document.addEventListener('DataPageReady', function () {
         setTimeout(function () {
             restructureFormLayout();
@@ -1230,6 +1296,8 @@
             attachColorDropdownListeners();
             startImagePolling();
             watchForFormSubmission();
+            styleRushCheckbox();
+            captureRushOnSubmit();
         }, 500);
     });
 

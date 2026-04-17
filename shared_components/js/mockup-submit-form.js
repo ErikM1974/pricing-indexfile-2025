@@ -28,6 +28,7 @@ var MockupSubmitForm = (function () {
     var currentRequestType = 'New Digitizing'; // or 'Mockup Request'
     var customerLookup = null;
     var selectedContact = null;
+    var isRush = false;
 
     // Garment style/color state — up to 4 rows
     var garmentRows = [{ style: '', color: '', colors: [], swatch: '' }];
@@ -211,7 +212,14 @@ var MockupSubmitForm = (function () {
             + '      <div id="msf-file-preview-area"></div>'
             + '    </div>'
 
-            // Submit
+            // Rush toggle + Submit
+            + '    <div class="msf-rush-row">'
+            + '      <button type="button" class="msf-rush-toggle" id="msf-rush-toggle" aria-pressed="false">'
+            + '        <span class="msf-rush-icon">&#128293;</span>'
+            + '        <span class="msf-rush-label">Rush Order</span>'
+            + '        <span class="msf-rush-hint">Click if Ruth needs this ASAP</span>'
+            + '      </button>'
+            + '    </div>'
             + '    <div class="msf-submit-row">'
             + '      <button type="button" class="msf-submit-btn" id="msf-submit-btn">Submit Request</button>'
             + '      <span class="msf-submit-status" id="msf-submit-status"></span>'
@@ -563,6 +571,16 @@ var MockupSubmitForm = (function () {
             }
         });
 
+        // Rush toggle
+        var rushBtn = document.getElementById('msf-rush-toggle');
+        if (rushBtn) {
+            rushBtn.addEventListener('click', function () {
+                isRush = !isRush;
+                rushBtn.classList.toggle('msf-rush-toggle--active', isRush);
+                rushBtn.setAttribute('aria-pressed', isRush ? 'true' : 'false');
+            });
+        }
+
         // Submit
         document.getElementById('msf-submit-btn').addEventListener('click', handleSubmit);
     }
@@ -908,7 +926,9 @@ var MockupSubmitForm = (function () {
                     Submitted_By: getSubmitterEmail(),
                     Sales_Rep: document.getElementById('msf-sales-rep').value.trim(),
                     Request_Type: currentRequestType,
-                    Box_Folder_ID: folderId || ''
+                    Box_Folder_ID: folderId || '',
+                    Is_Rush: !!isRush,
+                    Rush_Requested_At: isRush ? new Date().toISOString() : null
                 };
 
                 return fetch(API_BASE + '/api/mockups', {
@@ -979,6 +999,27 @@ var MockupSubmitForm = (function () {
                             }).catch(function () {});
                         }
                     } catch (e) { /* silent */ }
+                }
+
+                // Step 5b: Rush confirmation email (if rush)
+                if (isRush && window.ArtActions && typeof window.ArtActions.sendRushConfirmation === 'function') {
+                    var aeEmail = getSubmitterEmail();
+                    var salesRepVal = document.getElementById('msf-sales-rep').value.trim();
+                    var salesRepEmail = '';
+                    if (window.ArtActions.resolveRep && salesRepVal) {
+                        var resolved = window.ArtActions.resolveRep(salesRepVal);
+                        salesRepEmail = resolved && resolved.email ? resolved.email : '';
+                    }
+                    window.ArtActions.sendRushConfirmation({
+                        designId: newId,
+                        designName: document.getElementById('msf-design-name').value.trim() || designNumber || 'NEW',
+                        company: companyName,
+                        recipient: 'Ruth',
+                        aeName: getSubmitterName(),
+                        aeEmail: aeEmail,
+                        salesRepEmail: salesRepEmail,
+                        detailPath: '/mockup/' + (newId || '') + '?view=ae'
+                    });
                 }
 
                 // Step 6: Show success

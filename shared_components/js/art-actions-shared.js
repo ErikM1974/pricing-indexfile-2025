@@ -289,6 +289,60 @@
         }
     }
 
+    // ── Rush Flag Normalizer ──────────────────────────────────────────
+    // Caspio YES/NO columns return different values depending on access path:
+    //   - Via REST API: typically true/false (boolean)
+    //   - Via DataPage form with CheckedValue="Y": the string "Y"
+    //   - Legacy writes from our code may have used "Yes"
+    // This helper treats any rush-indicating value as true.
+    function isRush(val) {
+        if (!val && val !== 0) return false;
+        if (typeof val === 'boolean') return val;
+        var s = String(val).trim().toLowerCase();
+        return s === 'yes' || s === 'y' || s === 'true' || s === '1';
+    }
+
+    // ── Rush Confirmation Email ───────────────────────────────────────
+    // Sends the AE a confirmation that their rush notice was delivered,
+    // and CCs the sales rep if different. Slack DM to Steve/Ruth is handled
+    // by Zapier watching Is_Rush=Yes on the respective Caspio table.
+    function sendRushConfirmation(params) {
+        if (typeof emailjs === 'undefined') {
+            console.warn('[Rush] EmailJS not loaded — skipping confirmation');
+            return Promise.resolve();
+        }
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+
+        var ccEmail = '';
+        if (params.salesRepEmail && params.salesRepEmail !== params.aeEmail) {
+            ccEmail = params.salesRepEmail;
+        }
+
+        var templateParams = {
+            to_email: params.aeEmail,
+            to_name: params.aeName || 'Sales Rep',
+            cc_email: ccEmail,
+            ae_name: params.aeName || 'Sales Rep',
+            design_name: params.designName || params.designId || '',
+            company: params.company || '',
+            recipient: params.recipient || '',
+            detail_link: SITE_ORIGIN + (params.detailPath || ''),
+            rush_time: new Date().toLocaleString('en-US', {
+                timeZone: 'America/Los_Angeles',
+                month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+            }),
+            from_name: 'NWCA Art Department'
+        };
+
+        return emailjs.send(EMAILJS_SERVICE_ID, 'template_rush_confirm', templateParams)
+            .then(function () {
+                console.log('[Rush] Confirmation email sent to', params.aeEmail, ccEmail ? '(cc ' + ccEmail + ')' : '');
+            })
+            .catch(function (err) {
+                console.warn('[Rush] Confirmation email failed (non-blocking):', err);
+            });
+    }
+
     // ── Approval Modal Total Helper ───────────────────────────────────
 
     function updateApprovalTotal() {
@@ -1313,6 +1367,8 @@
         // Helpers
         logArtCharge: logArtCharge,
         sendNotificationEmail: sendNotificationEmail,
+        sendRushConfirmation: sendRushConfirmation,
+        isRush: isRush,
         resolveRep: resolveRep,
         escapeHtml: escapeHtml,
         formatNoteDate: formatNoteDate,

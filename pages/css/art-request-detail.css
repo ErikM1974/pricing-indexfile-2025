@@ -153,6 +153,48 @@ body {
     border: 1px solid #e67e22;
 }
 
+.ard-rush-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    background: #fff;
+    color: #dc2626;
+    border: 1.5px dashed #dc2626;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+}
+
+.ard-rush-toggle:hover { background: #fee2e2; }
+.ard-rush-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ard-rush-toggle-hint {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+.ard-rush-toggle--active {
+    background: #dc2626;
+    color: #fff;
+    border-style: solid;
+    border-color: #991b1b;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+    animation: ard-rush-pulse 1.6s ease-in-out infinite;
+}
+
+.ard-rush-toggle--active .ard-rush-toggle-hint { color: #fecaca; }
+
+@keyframes ard-rush-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2); }
+    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35); }
+}
+
 .ard-type-badge--mockup {
     display: inline-block;
     padding: 4px 10px;
