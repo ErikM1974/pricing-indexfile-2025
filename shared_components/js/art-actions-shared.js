@@ -303,9 +303,10 @@
     }
 
     // ── Rush Confirmation Email ───────────────────────────────────────
-    // Sends the AE a confirmation that their rush notice was delivered,
-    // and CCs the sales rep if different. Slack DM to Steve/Ruth is handled
-    // by Zapier watching Is_Rush=Yes on the respective Caspio table.
+    // Sends TWO emails per rush:
+    //   1. Confirmation to the submitting AE (CC sales rep if different)
+    //   2. Notification to Steve (art@) or Ruth (ruth@) based on recipient param
+    // Slack DM to Steve/Ruth is handled separately by Zapier watching Is_Rush=Yes.
     function sendRushConfirmation(params) {
         if (typeof emailjs === 'undefined') {
             console.warn('[Rush] EmailJS not loaded — skipping confirmation');
@@ -318,10 +319,7 @@
             ccEmail = params.salesRepEmail;
         }
 
-        var templateParams = {
-            to_email: params.aeEmail,
-            to_name: params.aeName || 'Sales Rep',
-            cc_email: ccEmail,
+        var baseParams = {
             ae_name: params.aeName || 'Sales Rep',
             design_name: params.designName || params.designId || '',
             company: params.company || '',
@@ -334,13 +332,38 @@
             from_name: 'NWCA Art Department'
         };
 
-        return emailjs.send(EMAILJS_SERVICE_ID, 'template_rush_confirm', templateParams)
+        // Send 1: AE confirmation (+ sales rep CC if different)
+        var aeParams = Object.assign({}, baseParams, {
+            to_email: params.aeEmail,
+            to_name: params.aeName || 'Sales Rep',
+            cc_email: ccEmail
+        });
+        var aeSend = emailjs.send(EMAILJS_SERVICE_ID, 'template_rush_confirm', aeParams)
             .then(function () {
-                console.log('[Rush] Confirmation email sent to', params.aeEmail, ccEmail ? '(cc ' + ccEmail + ')' : '');
+                console.log('[Rush] AE confirmation sent to', params.aeEmail, ccEmail ? '(cc ' + ccEmail + ')' : '');
             })
             .catch(function (err) {
-                console.warn('[Rush] Confirmation email failed (non-blocking):', err);
+                console.warn('[Rush] AE confirmation failed (non-blocking):', err);
             });
+
+        // Send 2: recipient notification (Steve or Ruth)
+        var recipientEmail = params.recipient === 'Steve'
+            ? 'art@nwcustomapparel.com'
+            : 'ruth@nwcustomapparel.com';
+        var recipientParams = Object.assign({}, baseParams, {
+            to_email: recipientEmail,
+            to_name: params.recipient || 'Art Team',
+            cc_email: '' // no sales-rep CC on the recipient's copy
+        });
+        var recipientSend = emailjs.send(EMAILJS_SERVICE_ID, 'template_rush_confirm', recipientParams)
+            .then(function () {
+                console.log('[Rush] Recipient notification sent to', recipientEmail);
+            })
+            .catch(function (err) {
+                console.warn('[Rush] Recipient notification failed (non-blocking):', err);
+            });
+
+        return Promise.all([aeSend, recipientSend]);
     }
 
     // ── Approval Modal Total Helper ───────────────────────────────────
