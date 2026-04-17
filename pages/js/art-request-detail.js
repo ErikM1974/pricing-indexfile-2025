@@ -362,7 +362,7 @@
                             copyLinkBtn.style.background = '#059669';
                             copyLinkBtn.style.color = '#fff';
                             setTimeout(function () {
-                                copyLinkBtn.textContent = 'Copy Customer Link';
+                                copyLinkBtn.textContent = 'Copy Full Request Link';
                                 copyLinkBtn.style.background = '';
                                 copyLinkBtn.style.color = '';
                             }, 3000);
@@ -2411,6 +2411,11 @@
     }
 
     // ── Share with Customer ────────────────────────────────────────────
+    // Tracks what's being shared when the modal is opened (either a specific mockup
+    // slot via per-tile button, or the whole request via the bottom button).
+    // Set by openShareModalFor() below and read by the send handler.
+    var _shareContext = null;
+
     function initShareWithCustomer(req) {
         var overlay = document.getElementById('share-customer-overlay');
         var modal = document.getElementById('share-customer-modal');
@@ -2423,25 +2428,44 @@
         var messageInput = document.getElementById('share-customer-message');
         var previewSection = document.getElementById('share-customer-preview');
         var previewImg = document.getElementById('share-customer-preview-img');
+        var previewLabel = document.querySelector('.share-customer-modal__preview-label');
+        var modalTitle = document.querySelector('.share-customer-modal__title');
         var repInfo = document.getElementById('share-customer-rep-info');
 
         var contactEmail = req.Email_Contact || req.Email || '';
         var contactName = ((req.First_name || req.First_Name || '') + ' ' + (req.Last_name || req.Last_Name || '')).trim();
-        var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+        var defaultMockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
         var repEmail = req.Sales_Rep || req.User_Email || '';
         var repName = resolveRepName(repEmail);
         var repAddr = REP_MAP[repName] || repEmail;
 
         function openModal() {
+            // Resolve what we're sharing: a specific slot (from a per-tile button)
+            // or the full request (default, from the bottom button).
+            var ctx = _shareContext || { slotKey: null, label: null, url: defaultMockupUrl };
+            var isPerSlot = !!ctx.slotKey;
+
             emailInput.value = contactEmail;
             nameInput.value = contactName;
-            messageInput.value = 'Your mockup is ready for review. Please take a look and let us know if you\'d like any changes.';
-            if (mockupUrl) {
-                previewImg.src = mockupUrl;
+            messageInput.value = 'Your ' + (isPerSlot ? (ctx.label || 'mockup') : 'mockup') +
+                ' is ready for review. Please take a look and let us know if you\'d like any changes.';
+
+            if (ctx.url) {
+                previewImg.src = ctx.url;
                 previewSection.style.display = '';
+                if (previewLabel) {
+                    previewLabel.textContent = isPerSlot ? (ctx.label + ' Preview') : 'Mockup Preview';
+                }
             } else {
                 previewSection.style.display = 'none';
             }
+
+            if (modalTitle) {
+                modalTitle.textContent = isPerSlot
+                    ? ('Send ' + ctx.label + ' to Customer')
+                    : 'Send Full Request to Customer';
+            }
+
             repInfo.textContent = 'Sending as ' + (repName || 'Sales Rep') + ' (' + repAddr + ')';
             overlay.style.display = 'block';
             modal.style.display = 'block';
@@ -2452,12 +2476,25 @@
         function closeModal() {
             overlay.style.display = 'none';
             modal.style.display = 'none';
+            _shareContext = null; // clear per-slot context when modal closes
         }
 
-        btn.addEventListener('click', openModal);
+        // Bottom button: send full request (all mockups)
+        btn.addEventListener('click', function () {
+            _shareContext = null; // full-request mode
+            openModal();
+        });
         closeBtn.addEventListener('click', closeModal);
         cancelBtn.addEventListener('click', closeModal);
         overlay.addEventListener('click', closeModal);
+
+        // Expose a function per-tile buttons can call to open the modal pre-loaded
+        // with a specific mockup slot.
+        window.__artReqOpenShareFor = function (slotKey, slotLabel) {
+            var slotUrl = (req && req[slotKey]) || '';
+            _shareContext = { slotKey: slotKey, label: slotLabel || 'Mockup', url: slotUrl };
+            openModal();
+        };
 
         sendBtn.addEventListener('click', function () {
             var toEmail = emailInput.value.trim();
@@ -2469,13 +2506,20 @@
             sendBtn.disabled = true;
             sendBtn.textContent = 'Sending...';
 
+            // Resolve mockup URL + approval-page URL from current share context
+            var ctx = _shareContext || { slotKey: null, label: null, url: defaultMockupUrl };
+            var emailMockupUrl = ctx.url || defaultMockupUrl;
+            var approvalUrl = SITE_ORIGIN + '/art-request/' + designId + '?view=customer';
+            if (ctx.slotKey) approvalUrl += '&mockup=' + encodeURIComponent(ctx.slotKey);
+
             var templateParams = {
                 to_email: toEmail,
                 to_name: toName || 'Valued Customer',
                 company_name: req.CompanyName || '',
                 design_number: designId,
                 message: message,
-                mockup_url: mockupUrl,
+                mockup_url: emailMockupUrl,
+                approval_url: approvalUrl,
                 from_name: repName || 'Northwest Custom Apparel',
                 rep_email: repAddr || 'sales@nwcustomapparel.com',
                 rep_phone: '253-922-5793'
@@ -2688,8 +2732,105 @@
         }
     }
 
+    /**
+     * Add per-tile "Copy Link" + "Email" action buttons to each filled mockup
+     * thumbnail. AE view only. Each button sends/copies a link to ONLY that
+     * specific mockup via ?view=customer&mockup=<slotKey>.
+     */
+    function addAeTileShareActions(req) {
+        var grid = document.getElementById('ard-mockups-grid');
+        if (!grid) return;
+
+        grid.querySelectorAll('.ard-gallery-thumb').forEach(function (thumb) {
+            var slotKey = thumb.dataset.fieldKey;
+            if (!slotKey || !req[slotKey] || isEmptySlot(req[slotKey])) return;
+            if (thumb.querySelector('.ard-tile-actions')) return; // already wired
+
+            // Resolve the slot's label (Mockup / Mockup 2 / Mockup 3)
+            var slotLabel = 'Mockup';
+            MOCKUP_SLOTS.forEach(function (s) { if (s.key === slotKey) slotLabel = s.label; });
+
+            var actionsRow = document.createElement('div');
+            actionsRow.className = 'ard-tile-actions';
+            actionsRow.innerHTML =
+                '<button type="button" class="ard-tile-btn ard-tile-copy" title="Copy customer approval link for ' + escapeHtml(slotLabel) + '">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                        '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>' +
+                        '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>' +
+                    '</svg>' +
+                    '<span>Copy Link</span>' +
+                '</button>' +
+                '<button type="button" class="ard-tile-btn ard-tile-email" title="Email ' + escapeHtml(slotLabel) + ' to customer">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                        '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>' +
+                        '<polyline points="22,6 12,13 2,6"></polyline>' +
+                    '</svg>' +
+                    '<span>Email</span>' +
+                '</button>';
+            thumb.appendChild(actionsRow);
+
+            // Copy link handler — per-mockup URL with ?mockup=<slotKey>
+            var copyBtn = actionsRow.querySelector('.ard-tile-copy');
+            copyBtn.addEventListener('click', function (e) {
+                e.stopPropagation(); // don't trigger thumb-click → lightbox
+                e.preventDefault();
+                var customerUrl = SITE_ORIGIN + '/art-request/' + designId +
+                    '?view=customer&mockup=' + encodeURIComponent(slotKey);
+                var fallback = function () { prompt('Copy this link:', customerUrl); };
+                var showCopied = function () {
+                    var labelSpan = copyBtn.querySelector('span');
+                    var orig = labelSpan ? labelSpan.textContent : 'Copy Link';
+                    if (labelSpan) labelSpan.textContent = 'Copied!';
+                    copyBtn.classList.add('ard-tile-btn--copied');
+                    setTimeout(function () {
+                        if (labelSpan) labelSpan.textContent = orig;
+                        copyBtn.classList.remove('ard-tile-btn--copied');
+                    }, 2000);
+                };
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(customerUrl).then(showCopied).catch(fallback);
+                } else {
+                    fallback();
+                }
+            });
+
+            // Email handler — open share modal pre-loaded with this slot
+            var emailBtn = actionsRow.querySelector('.ard-tile-email');
+            emailBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                if (typeof window.__artReqOpenShareFor === 'function') {
+                    window.__artReqOpenShareFor(slotKey, slotLabel);
+                }
+            });
+        });
+    }
+
     /** Wrappers for customer / AE views */
     function initCustomerMockupSelection(req) {
+        // If ?mockup=<slotKey> is in the URL, AE sent a per-mockup link — show only
+        // that one slot and hide the others. Customer approves that specific mockup.
+        var urlParams = new URLSearchParams(window.location.search);
+        var targetSlot = urlParams.get('mockup');
+        var validKeys = MOCKUP_SLOTS.map(function (s) { return s.key; });
+        if (targetSlot && validKeys.indexOf(targetSlot) !== -1 && req[targetSlot] && !isEmptySlot(req[targetSlot])) {
+            var grid = document.getElementById('ard-mockups-grid');
+            if (grid) {
+                grid.querySelectorAll('.ard-mockup-slot-wrapper').forEach(function (wrapper) {
+                    var thumb = wrapper.querySelector('.ard-gallery-thumb, .ard-slot-empty');
+                    var key = thumb && thumb.dataset.fieldKey;
+                    if (key !== targetSlot) wrapper.style.display = 'none';
+                });
+                // Make grid a single centered column since only one mockup shows
+                grid.style.gridTemplateColumns = '1fr';
+                grid.style.maxWidth = '500px';
+                grid.style.margin = '0 auto';
+            }
+            // Simpler customer prompt — no need to "click to select"
+            var prompt_ = document.querySelector('.ard-customer-prompt');
+            if (prompt_) prompt_.textContent = 'Please review the mockup below, then approve or request changes.';
+        }
+
         initMockupSelection(req, {
             selectableClass: 'ard-customer-selectable',
             onSelect: function () {
@@ -2710,6 +2851,8 @@
                 }
             }
         });
+        // Add per-tile Copy Link + Email buttons once selection is initialized
+        addAeTileShareActions(req);
     }
 
     /**

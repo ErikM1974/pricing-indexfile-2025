@@ -413,6 +413,51 @@ body {
     text-overflow: ellipsis;
 }
 
+/* ── Per-tile Share Actions (AE view) ────────────────────────────────── */
+/* Small Copy-Link + Email button row shown on each filled mockup thumb so
+   the AE can send the customer a link to a SPECIFIC mockup (not all 3). */
+.ard-tile-actions {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+.ard-tile-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: #fff;
+    color: #334155;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    padding: 5px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 0;  /* allow flex shrinking */
+}
+.ard-tile-btn span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ard-tile-btn:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+.ard-tile-btn--copied {
+    background: #059669 !important;
+    color: #fff !important;
+    border-color: #059669 !important;
+}
+.ard-tile-btn svg { flex-shrink: 0; }
+
 /* ── Gallery Sections ───────────────────────────────── */
 .ard-gallery-section-label {
     font-size: 10px;
