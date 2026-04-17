@@ -930,13 +930,20 @@ class NamesNumbersController {
         const results = document.getElementById('ocrResults');
         const importBtn = document.getElementById('ocrImportBtn');
 
-        // Show preview
-        const reader = new FileReader();
-        reader.onload = e => {
-            preview.innerHTML = `<img src="${e.target.result}" alt="Uploaded roster">`;
+        // Show preview — image renders inline; PDF shows a file chip
+        const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+        if (isPdf) {
+            const sizeKb = Math.round(file.size / 1024);
+            preview.innerHTML = `<div class="ocr-pdf-chip"><i class="fas fa-file-pdf"></i><div><strong>${this.escapeHtml(file.name)}</strong><div class="ocr-pdf-meta">PDF · ${sizeKb} KB</div></div></div>`;
             preview.style.display = '';
-        };
-        reader.readAsDataURL(file);
+        } else {
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Uploaded roster">`;
+                preview.style.display = '';
+            };
+            reader.readAsDataURL(file);
+        }
 
         // Show processing
         processing.style.display = '';

@@ -8,7 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="/shared_components/css/names-numbers.css?v=20260417" rel="stylesheet">
+    <link href="/shared_components/css/names-numbers.css?v=202604171" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -109,13 +109,13 @@
                 <i class="fas fa-file-excel"></i> Upload Excel
             </button>
             <button type="button" class="btn-secondary" id="ocrBtn">
-                <i class="fas fa-camera"></i> Upload Image (OCR)
+                <i class="fas fa-camera"></i> Upload Image / PDF (OCR)
             </button>
             <button type="button" class="btn-secondary" id="pasteNamesBtn">
                 <i class="fas fa-paste"></i> Paste Names
             </button>
             <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;">
-            <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;">
+            <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display:none;">
         </div>
 
         <!-- Tab Bar -->
@@ -258,14 +258,14 @@
     <div class="modal-overlay" id="ocrModal">
         <div class="modal">
             <div class="modal-header">
-                <span class="modal-title"><i class="fas fa-camera"></i> Upload Image for OCR</span>
+                <span class="modal-title"><i class="fas fa-camera"></i> Upload Image or PDF for OCR</span>
                 <button type="button" class="modal-close" id="ocrModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="ocr-drop-zone" id="ocrDropZone">
                     <i class="fas fa-cloud-upload-alt"></i>
-                    <p><strong>Drag & drop an image here</strong></p>
-                    <p>or click to browse (JPEG, PNG, GIF, WebP)</p>
+                    <p><strong>Drag & drop an image or PDF here</strong></p>
+                    <p>or click to browse (JPEG, PNG, GIF, WebP, or PDF)</p>
                 </div>
                 <div class="ocr-preview" id="ocrPreview" style="display: none;"></div>
                 <div class="ocr-processing" id="ocrProcessing" style="display: none;">
@@ -320,7 +320,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- Scripts -->
-    <script src="/shared_components/js/names-numbers-service.js?v=20260417"></script>
-    <script src="/shared_components/js/names-numbers-controller.js?v=20260417"></script>
+    <script src="/shared_components/js/names-numbers-service.js?v=202604171"></script>
+    <script src="/shared_components/js/names-numbers-controller.js?v=202604171"></script>
 </body>
 </html>
