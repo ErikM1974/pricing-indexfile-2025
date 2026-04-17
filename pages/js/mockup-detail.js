@@ -4000,6 +4000,15 @@
         }
     }
 
+    // Box thumbnail proxy defaults to 256x256. In the lightbox we want the large
+    // (1024x1024 JPG) variant via Box Representations. Gallery thumbs stay small.
+    function upgradeBoxThumbUrl(url) {
+        if (!url) return url;
+        if (url.indexOf('/api/box/thumbnail/') === -1) return url;
+        if (url.indexOf('size=large') !== -1) return url;
+        return url + (url.indexOf('?') !== -1 ? '&' : '?') + 'size=large';
+    }
+
     function openLightbox(url, label) {
         var lightbox = document.getElementById('pmd-lightbox');
         var img = document.getElementById('pmd-lightbox-img');
@@ -4008,12 +4017,20 @@
         img.style.display = '';
         labelEl.textContent = label || '';
 
+        var largeUrl = upgradeBoxThumbUrl(url);
+        var fellBack = false;
         img.onerror = function () {
+            // If the large variant failed (rep not ready), fall back to the original URL once
+            if (!fellBack && largeUrl !== url) {
+                fellBack = true;
+                img.src = url;
+                return;
+            }
             img.style.display = 'none';
             labelEl.textContent = 'Image could not be loaded \u2014 link may have expired';
         };
 
-        img.src = url;
+        img.src = largeUrl;
         lightbox.classList.add('show');
         document.body.style.overflow = 'hidden';
     }

@@ -311,10 +311,25 @@
     }
 
     // ── Lightbox for Mockup Preview ──────────────────────────────────
+    function upgradeBoxThumbUrl(url) {
+        // Box thumbnail proxy serves 256x256 by default. For the lightbox, request
+        // the large variant (1024x1024 JPG via Representations). Gallery thumbs stay small.
+        if (!url) return url;
+        if (url.indexOf('/api/box/thumbnail/') === -1) return url;
+        if (url.indexOf('size=large') !== -1) return url;
+        return url + (url.indexOf('?') !== -1 ? '&' : '?') + 'size=large';
+    }
+
     function openAELightbox(url, label) {
         var lb = document.getElementById('ae-lightbox');
         if (!lb) return;
-        document.getElementById('ae-lightbox-img').src = url;
+        var img = document.getElementById('ae-lightbox-img');
+        var largeUrl = upgradeBoxThumbUrl(url);
+        // If the large variant fails (representation not ready), fall back to the small one
+        img.onerror = function () {
+            if (img.src === largeUrl && largeUrl !== url) img.src = url;
+        };
+        img.src = largeUrl;
         document.getElementById('ae-lightbox-label').textContent = label || '';
         lb.style.display = 'flex';
         document.body.style.overflow = 'hidden';

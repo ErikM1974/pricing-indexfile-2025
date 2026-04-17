@@ -360,11 +360,25 @@
     }
 
     // ── Image Modal (migrated from Caspio Footer) ─────────────────────
+    // Upgrade Box thumbnail proxy URLs to their large (1024x1024) variant when
+    // rendering in the modal. Gallery cards keep the small 256x256 version for speed.
+    function upgradeBoxThumbUrl(url) {
+        if (!url) return url;
+        if (url.indexOf('/api/box/thumbnail/') === -1) return url;
+        if (url.indexOf('size=large') !== -1) return url;
+        return url + (url.indexOf('?') !== -1 ? '&' : '?') + 'size=large';
+    }
+
     window.showModal = function (src) {
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('modalImage');
         if (modal && modalImg) {
-            modalImg.src = src;
+            const largeUrl = upgradeBoxThumbUrl(src);
+            // Fall back to small if large representation isn't ready
+            modalImg.onerror = function () {
+                if (modalImg.src === largeUrl && largeUrl !== src) modalImg.src = src;
+            };
+            modalImg.src = largeUrl;
             modal.classList.add('show');
         }
     };

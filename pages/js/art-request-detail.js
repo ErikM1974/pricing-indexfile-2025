@@ -2245,15 +2245,28 @@
         const lightboxImg = document.getElementById('ard-lightbox-img');
         document.getElementById('ard-lightbox-label').textContent = label || '';
 
+        // Upgrade Box proxy thumbnail URLs (which serve 256x256 by default) to the
+        // large variant (1024x1024 JPG via Box Representations). Gallery thumbnails
+        // stay small; only the lightbox pulls the large version.
+        var lightboxUrl = url;
+        if (lightboxUrl.indexOf('/api/box/thumbnail/') !== -1 && lightboxUrl.indexOf('size=large') === -1) {
+            lightboxUrl += (lightboxUrl.indexOf('?') !== -1 ? '&' : '?') + 'size=large';
+        }
+
         // Add proxy fallback for lightbox image too
         lightboxImg.onerror = function () {
             if (url.indexOf('/shared/static/') !== -1 && !lightboxImg.dataset.proxyAttempted) {
                 lightboxImg.dataset.proxyAttempted = '1';
                 lightboxImg.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
+            } else if (lightboxUrl.indexOf('size=large') !== -1 && !lightboxImg.dataset.largeFailed) {
+                // Large variant failed (rep not ready) — fall back to the default small version
+                lightboxImg.dataset.largeFailed = '1';
+                lightboxImg.src = url;
             }
         };
         lightboxImg.removeAttribute('data-proxy-attempted');
-        lightboxImg.src = url;
+        lightboxImg.removeAttribute('data-large-failed');
+        lightboxImg.src = lightboxUrl;
 
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
