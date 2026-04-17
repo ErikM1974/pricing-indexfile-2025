@@ -133,6 +133,24 @@ body {
 .tab-button:hover { background: #e0e0e0; }
 .tab-button.active { background: var(--art-theme); color: white; }
 
+/* Tab-styled <a> that navigates to another page (e.g. Names & Numbers).
+   Shares the .tab-button base styling; adds an external-arrow hint. */
+.tab-button-link {
+    text-decoration: none;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.tab-button-link::after {
+    content: "\2197";  /* ↗ */
+    font-size: 12px;
+    opacity: 0.55;
+    margin-left: 2px;
+}
+.tab-button-link:hover { background: #e0e0e0; color: #000; }
+.tab-button-link:hover::after { opacity: 0.85; }
+
 .tab-badge {
     display: inline-block;
     background: rgba(255,255,255,0.3);

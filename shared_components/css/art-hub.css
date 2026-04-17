@@ -87,6 +87,25 @@ body {
     color: white;
 }
 
+/* Tab button that navigates to another page rather than switching an in-page tab.
+   Used for Names & Numbers, Monogram Dashboard, etc. Styled like a tab but
+   hinted as a link via the external-arrow and slightly lighter default color. */
+.tab-button-link {
+    text-decoration: none;
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.tab-button-link::after {
+    content: "\2197";  /* ↗ north-east arrow — subtle "opens another page" hint */
+    font-size: 12px;
+    opacity: 0.55;
+    margin-left: 2px;
+}
+.tab-button-link:hover { background: #e0e0e0; color: #000; }
+.tab-button-link:hover::after { opacity: 0.85; }
+
 /* ---------- Tab Content ---------- */
 .tab-content {
     background: white;

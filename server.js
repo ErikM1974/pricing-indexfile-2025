@@ -827,10 +827,6 @@ app.get('/announcements-manage.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'announcements-manage.html'));
 });
 
-app.get('/design-name-generator.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tools', 'design-name-generator.html'));
-});
-
 // Serve the standardized embroidery pricing page
 app.get('/embroidery-pricing-standardized.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'embroidery-pricing-standardized.html'));
