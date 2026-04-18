@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Bradley's Transfers - Supacolor Queue</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
+</head>
+<body>
+    <div class="minimal-header">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+             alt="Northwest Custom Apparel" class="logo">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <a href="/staff-dashboard.html" class="back-link">&larr; Staff Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Tab Container -->
+    <div class="tab-container">
+        <!-- Tab Buttons (cross-links to other art dashboards) -->
+        <div class="tab-buttons">
+            <button class="tab-button active">Transfer Queue</button>
+            <a class="tab-button tab-button-link" href="/dashboards/art-hub-steve.html">Steve's Queue</a>
+            <a class="tab-button tab-button-link" href="/dashboards/art-hub-ruth.html">Ruth's Queue</a>
+            <a class="tab-button tab-button-link" href="/art-tools/ae-art-dashboard.html">AE Dashboard</a>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <!-- Header row: title + action buttons -->
+                <div class="bt-header-row">
+                    <div>
+                        <h2 class="tab-title" style="margin-bottom:4px;">
+                            <i class="fas fa-truck" style="color:#4a6fa5;"></i> Supacolor Transfer Queue
+                        </h2>
+                        <div class="bt-subtitle">Heat-transfer orders for T-shirts &middot; Bradley's purchasing queue</div>
+                    </div>
+                    <div class="bt-header-actions">
+                        <button id="bt-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button id="bt-new-transfer-btn" class="bt-btn bt-btn--primary">
+                            <i class="fas fa-plus"></i> New Transfer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Stats Chips -->
+                <div id="bt-stats-row" class="bt-stats-row">
+                    <div class="bt-stat-chip bt-stat-chip--requested" data-status="Requested">
+                        <span class="bt-stat-count" id="bt-stat-requested">&mdash;</span>
+                        <span class="bt-stat-label">Requested</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--ordered" data-status="Ordered">
+                        <span class="bt-stat-count" id="bt-stat-ordered">&mdash;</span>
+                        <span class="bt-stat-label">Ordered</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--po" data-status="PO_Created">
+                        <span class="bt-stat-count" id="bt-stat-po">&mdash;</span>
+                        <span class="bt-stat-label">PO Created</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--shipped" data-status="Shipped">
+                        <span class="bt-stat-count" id="bt-stat-shipped">&mdash;</span>
+                        <span class="bt-stat-label">Shipped</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--received" data-status="Received">
+                        <span class="bt-stat-count" id="bt-stat-received">&mdash;</span>
+                        <span class="bt-stat-label">Received</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--rush" id="bt-stat-rush-chip" data-rush="true">
+                        <span class="bt-stat-count" id="bt-stat-rush">&mdash;</span>
+                        <span class="bt-stat-label">Rush</span>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="bt-filter-bar">
+                    <div class="bt-filter-group">
+                        <label class="bt-filter-label">Status:</label>
+                        <select id="bt-filter-status" class="bt-filter-input">
+                            <option value="">All Active</option>
+                            <option value="Requested">Requested</option>
+                            <option value="Ordered">Ordered</option>
+                            <option value="PO_Created">PO Created</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Received">Received</option>
+                            <option value="On_Hold">On Hold</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="bt-filter-group">
+                        <label class="bt-filter-label">Search:</label>
+                        <input type="text" id="bt-filter-search" class="bt-filter-input" placeholder="Company, design #, transfer ID...">
+                    </div>
+                    <div class="bt-filter-group">
+                        <label class="bt-filter-label">Rep:</label>
+                        <select id="bt-filter-rep" class="bt-filter-input">
+                            <option value="">All Reps</option>
+                        </select>
+                    </div>
+                    <div class="bt-filter-group bt-filter-toggle">
+                        <label>
+                            <input type="checkbox" id="bt-filter-rush-only"> Rush only
+                        </label>
+                    </div>
+                    <button id="bt-filter-clear" class="bt-btn bt-btn--link">Clear</button>
+                    <div class="bt-filter-meta" id="bt-result-count">Loading...</div>
+                </div>
+
+                <!-- Grid View -->
+                <div id="bt-grid" class="bt-grid">
+                    <div class="bt-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading transfers...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Transfer Modal (placeholder — full implementation in Phase 2 via transfer-actions-shared.js) -->
+    <div id="bt-new-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-plus-circle"></i> New Transfer Order</h3>
+                <button class="bt-modal-close" id="bt-new-modal-close">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Manual transfer entry &mdash; use for artwork that bypassed Art Hub.
+                    If the design is in Art Hub, use the "Send to Supacolor" button there instead (cleaner traceability).
+                </div>
+                <form id="bt-new-transfer-form" class="bt-form">
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Design Number *</label>
+                            <input type="text" name="Design_Number" required placeholder="e.g. 61234">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Design ID (optional)</label>
+                            <input type="number" name="Design_ID" placeholder="ArtRequests ID_Design">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Company Name *</label>
+                            <input type="text" name="Company_Name" required>
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Customer Name</label>
+                            <input type="text" name="Customer_Name">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Sales Rep Email *</label>
+                            <input type="email" name="Sales_Rep_Email" required>
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Sales Rep Name</label>
+                            <input type="text" name="Sales_Rep_Name">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Quantity *</label>
+                            <input type="number" name="Quantity" required min="1">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Transfer Size</label>
+                            <input type="text" name="Transfer_Size" placeholder="e.g. 11x14">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Press Count</label>
+                            <input type="number" name="Press_Count" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Working File URL (Box link)</label>
+                            <input type="url" name="Working_File_URL" placeholder="https://app.box.com/s/...">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>File Type</label>
+                            <select name="Working_File_Type">
+                                <option value="">-- select --</option>
+                                <option value="AI">AI</option>
+                                <option value="CDR">CDR</option>
+                                <option value="PDF">PDF</option>
+                                <option value="JPEG">JPEG</option>
+                                <option value="PNG">PNG</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>File Notes / Special Instructions</label>
+                            <textarea name="File_Notes" rows="3" placeholder="Pantone colors, sizing notes, etc."></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--inline">
+                            <label>
+                                <input type="checkbox" name="Is_Rush" id="bt-new-rush-toggle"> This is a RUSH order
+                            </label>
+                        </div>
+                        <div class="bt-form-field" id="bt-new-rush-details" style="display:none;">
+                            <label>Needed By</label>
+                            <input type="date" name="Needed_By_Date">
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" id="bt-new-modal-cancel">Cancel</button>
+                        <button type="submit" class="bt-btn bt-btn--primary">
+                            <i class="fas fa-paper-plane"></i> Create Transfer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="bt-toast-container" class="bt-toast-container"></div>
+
+    <script src="/dashboards/js/bradley-transfers.js?v=1"></script>
+</body>
+</html>

@@ -544,6 +544,12 @@ cap-embroidery-fix.css
 | `/dashboards/art-hub-coordinator.html` | ~~DELETED~~ Coordinator workflow (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-hub-ruth.html` | Art hub — Ruth's personalized view | — | ✅ Active |
 | `/dashboards/art-hub-steve.html` | Art hub — Steve's personalized view | art-hub.css, art-hub-steve.js | ✅ Active |
+| `/dashboards/bradley-transfers.html` | **NEW** Bradley's Supacolor transfer queue (heat-transfer orders to subcontractor) | bradley-transfers.js, bradley-transfers.css, art-hub.css, caspio-pricing-proxy /api/transfer-orders | ✅ Active |
+| `/dashboards/js/bradley-transfers.js` | **NEW** Transfer queue controller — poll API, filter/sort, create transfer modal | /api/transfer-orders, /api/transfer-orders/stats | ✅ Active |
+| `/dashboards/css/bradley-transfers.css` | **NEW** Transfer queue styles (navy theme, rush pulse, status chips, modal) | — | ✅ Active |
+| `/pages/transfer-detail.html` | **NEW** Single-transfer detail page with status transition buttons (Mark Ordered / Add PO / Ship / Receive / Cancel / Rush) + activity timeline | transfer-detail.js, transfer-detail.css, bradley-transfers.css, /api/transfer-orders/:id | ✅ Active |
+| `/pages/js/transfer-detail.js` | **NEW** Transfer detail controller — fetches record + notes, status machine, 6 modals, localStorage-based user identity | /api/transfer-orders/:id (+ /status, /rush, /notes) | ✅ Active |
+| `/pages/css/transfer-detail.css` | **NEW** Transfer detail page styles (header card, 2-col grid, timeline, action buttons) | — | ✅ Active |
 | `/shared_components/css/art-hub.css` | **NEW** Shared art hub dashboard styles (CSS custom props for theming) | — | ✅ Active |
 | `/shared_components/js/art-actions-shared.js` | **NEW** Shared art action modals (Log Time, Mark Complete, Send Mockup) — used by art-hub-steve.js + art-request-detail.js | art-hub.css, caspio-proxy API, EmailJS | ✅ Active |
 | `/shared_components/js/art-hub-steve.js` | Steve's gallery card processing + notes panel — delegates modals to art-actions-shared.js | art-hub.css, art-actions-shared.js, caspio-proxy API | ✅ Active |

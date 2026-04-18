@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Transfer Order Details</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
+    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=1">
+</head>
+<body>
+    <div class="minimal-header">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+             alt="Northwest Custom Apparel" class="logo">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <a href="/dashboards/bradley-transfers.html" class="back-link">&larr; Transfer Queue</a>
+            <span class="td-user-chip" id="td-user-chip">
+                <i class="fas fa-user"></i>
+                <span id="td-user-display">Not signed in</span>
+                <button class="bt-btn bt-btn--link bt-btn--small" id="td-change-user-btn">Change</button>
+            </span>
+        </div>
+    </div>
+
+    <div class="td-container">
+        <!-- Loading state -->
+        <div id="td-loading" class="td-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading transfer...
+        </div>
+
+        <!-- Error state -->
+        <div id="td-error" class="td-error" style="display:none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Unable to load transfer</h2>
+            <div id="td-error-message"></div>
+            <a href="/dashboards/bradley-transfers.html" class="bt-btn bt-btn--primary">Back to Queue</a>
+        </div>
+
+        <!-- Main detail view -->
+        <div id="td-main" class="td-main" style="display:none;">
+            <!-- Header Card -->
+            <div class="td-header-card">
+                <div class="td-header-top">
+                    <div>
+                        <div class="td-id" id="td-id">ST-XXXXXX-XXXX</div>
+                        <h1 class="td-company" id="td-company">Loading...</h1>
+                        <div class="td-subtitle" id="td-subtitle"></div>
+                    </div>
+                    <div class="td-header-badges" id="td-header-badges"></div>
+                </div>
+                <div class="td-header-meta" id="td-header-meta"></div>
+            </div>
+
+            <!-- Two-column layout -->
+            <div class="td-grid">
+                <!-- LEFT COLUMN -->
+                <div class="td-col-left">
+                    <!-- Artwork Panel -->
+                    <div class="td-card">
+                        <div class="td-card-header">
+                            <h3><i class="fas fa-file-image"></i> Working File</h3>
+                        </div>
+                        <div class="td-card-body" id="td-artwork-panel">
+                            <div class="td-empty-panel">No working file attached.</div>
+                        </div>
+                    </div>
+
+                    <!-- Specs Panel -->
+                    <div class="td-card">
+                        <div class="td-card-header">
+                            <h3><i class="fas fa-ruler-combined"></i> Order Specs</h3>
+                            <button class="bt-btn bt-btn--link bt-btn--small" id="td-edit-specs-btn">
+                                <i class="fas fa-pen"></i> Edit
+                            </button>
+                        </div>
+                        <div class="td-card-body" id="td-specs-panel"></div>
+                    </div>
+
+                    <!-- Supacolor / PO Panel -->
+                    <div class="td-card">
+                        <div class="td-card-header">
+                            <h3><i class="fas fa-receipt"></i> Order Tracking</h3>
+                        </div>
+                        <div class="td-card-body" id="td-tracking-panel"></div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="td-col-right">
+                    <!-- Action Panel -->
+                    <div class="td-card">
+                        <div class="td-card-header">
+                            <h3><i class="fas fa-bolt"></i> Actions</h3>
+                        </div>
+                        <div class="td-card-body" id="td-actions-panel"></div>
+                    </div>
+
+                    <!-- Notes/Timeline Panel -->
+                    <div class="td-card">
+                        <div class="td-card-header">
+                            <h3><i class="fas fa-comments"></i> Activity Timeline</h3>
+                        </div>
+                        <div class="td-card-body">
+                            <div class="td-comment-form">
+                                <textarea id="td-comment-input" placeholder="Add a comment..." rows="2"></textarea>
+                                <button class="bt-btn bt-btn--primary bt-btn--small" id="td-add-comment-btn">
+                                    <i class="fas fa-paper-plane"></i> Post
+                                </button>
+                            </div>
+                            <div class="td-timeline" id="td-timeline"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Modals ───────────────────────────────────────────────── -->
+
+    <!-- User Identification Modal -->
+    <div id="td-user-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:400px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-user-circle"></i> Who are you?</h3>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Tell us who you are so we can track who changed what.
+                    Saved in your browser — ask once per device.
+                </div>
+                <form id="td-user-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Your Name *</label>
+                            <input type="text" name="userName" required placeholder="e.g. Bradley">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Your Email *</label>
+                            <input type="email" name="userEmail" required placeholder="you@nwcustomapparel.com">
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="submit" class="bt-btn bt-btn--primary">Save &amp; Continue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mark Ordered Modal -->
+    <div id="td-ordered-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:500px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-paper-plane"></i> Mark as Ordered</h3>
+                <button class="bt-modal-close" data-close="td-ordered-modal">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Enter the Supacolor order number once you've placed the order on supacolor.com.
+                </div>
+                <form id="td-ordered-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Supacolor Order # *</label>
+                            <input type="text" name="supacolorOrderNumber" required placeholder="e.g. SC-99999">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Supacolor Order URL (optional)</label>
+                            <input type="url" name="supacolorOrderUrl" placeholder="https://supacolor.com/...">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Estimated Ship Date (optional)</label>
+                            <input type="date" name="estimatedShipDate">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Notes (optional)</label>
+                            <textarea name="notes" rows="2" placeholder="Any extra context..."></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" data-close="td-ordered-modal">Cancel</button>
+                        <button type="submit" class="bt-btn bt-btn--primary">Mark Ordered</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add PO Number Modal -->
+    <div id="td-po-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:500px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-file-invoice-dollar"></i> Add ShopWorks PO</h3>
+                <button class="bt-modal-close" data-close="td-po-modal">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Enter the PO number you created in ShopWorks for this transfer order.
+                </div>
+                <form id="td-po-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>ShopWorks PO # *</label>
+                            <input type="text" name="shopworksPO" required placeholder="e.g. 41000">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Notes (optional)</label>
+                            <textarea name="notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" data-close="td-po-modal">Cancel</button>
+                        <button type="submit" class="bt-btn bt-btn--primary">Save PO</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mark Shipped Modal -->
+    <div id="td-shipped-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:500px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-truck"></i> Mark as Shipped</h3>
+                <button class="bt-modal-close" data-close="td-shipped-modal">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <form id="td-shipped-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Tracking Number (optional)</label>
+                            <input type="text" name="trackingNumber" placeholder="UPS / FedEx / USPS tracking">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Estimated Delivery (optional)</label>
+                            <input type="date" name="estimatedShipDate">
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Notes (optional)</label>
+                            <textarea name="notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" data-close="td-shipped-modal">Cancel</button>
+                        <button type="submit" class="bt-btn bt-btn--primary">Mark Shipped</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div id="td-cancel-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:500px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-times-circle"></i> Cancel Transfer</h3>
+                <button class="bt-modal-close" data-close="td-cancel-modal">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro" style="background:#fee2e2; border-left-color:#dc2626; color:#991b1b;">
+                    <strong>This cannot be undone via the UI.</strong> Cancellation is logged in the activity timeline.
+                </div>
+                <form id="td-cancel-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Cancel Reason *</label>
+                            <textarea name="reason" rows="3" required placeholder="Why is this being cancelled?"></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" data-close="td-cancel-modal">Keep Transfer</button>
+                        <button type="submit" class="bt-btn bt-btn--danger">Cancel Transfer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rush Toggle Modal -->
+    <div id="td-rush-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:500px;">
+            <div class="bt-modal-header">
+                <h3 id="td-rush-modal-title"><i class="fas fa-bolt"></i> Mark as Rush</h3>
+                <button class="bt-modal-close" data-close="td-rush-modal">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <form id="td-rush-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;" id="td-rush-reason-row">
+                        <div class="bt-form-field">
+                            <label>Reason for rush *</label>
+                            <textarea name="reason" rows="2" placeholder="Customer deadline, event date, etc."></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" data-close="td-rush-modal">Cancel</button>
+                        <button type="submit" class="bt-btn bt-btn--primary" id="td-rush-submit-btn">Mark Rush</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Specs Modal -->
+    <div id="td-specs-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-pen"></i> Edit Order Specs</h3>
+                <button class="bt-modal-close" data-close="td-specs-modal">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <form id="td-specs-form" class="bt-form">
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Quantity</label>
+                            <input type="number" name="Quantity" min="1">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Transfer Size</label>
+                            <input type="text" name="Transfer_Size" placeholder="e.g. 11x14">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Press Count</label>
+                            <input type="number" name="Press_Count" min="1">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Width (in)</label>
+                            <input type="number" name="Transfer_Width_In" step="0.25">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Height (in)</label>
+                            <input type="number" name="Transfer_Height_In" step="0.25">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Needed By</label>
+                            <input type="date" name="Needed_By_Date">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Working File URL (Box)</label>
+                            <input type="url" name="Working_File_URL">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>File Notes</label>
+                            <textarea name="File_Notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>Special Instructions</label>
+                            <textarea name="Special_Instructions" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" data-close="td-specs-modal">Cancel</button>
+                        <button type="submit" class="bt-btn bt-btn--primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="bt-toast-container" class="bt-toast-container"></div>
+
+    <script src="/pages/js/transfer-detail.js?v=1"></script>
+</body>
+</html>
