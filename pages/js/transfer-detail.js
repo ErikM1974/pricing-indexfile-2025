@@ -260,28 +260,62 @@
     function renderArtworkPanel() {
         var r = state.record;
         var panel = $('td-artwork-panel');
-        if (!r.Working_File_URL) {
-            panel.innerHTML = '<div class="td-empty-panel">No working file attached yet. Use <strong>Edit</strong> in the specs panel to add a Box URL.</div>';
+
+        // Collect up to 3 files (primary + 2 additional)
+        var files = [];
+        if (r.Working_File_URL) {
+            files.push({
+                url: r.Working_File_URL,
+                name: r.Working_File_Name || 'Primary file',
+                type: r.Working_File_Type || '',
+                label: 'Primary'
+            });
+        }
+        if (r.Additional_File_1_URL) {
+            files.push({
+                url: r.Additional_File_1_URL,
+                name: r.Additional_File_1_Name || 'Additional file 1',
+                type: '',
+                label: 'Additional 1'
+            });
+        }
+        if (r.Additional_File_2_URL) {
+            files.push({
+                url: r.Additional_File_2_URL,
+                name: r.Additional_File_2_Name || 'Additional file 2',
+                type: '',
+                label: 'Additional 2'
+            });
+        }
+
+        if (files.length === 0) {
+            panel.innerHTML = '<div class="td-empty-panel">No working files attached. Only Steve can attach files via the "Send to Supacolor" button on the mockup or his dashboard.</div>';
             return;
         }
 
-        var isImage = /\.(jpe?g|png|gif|webp)$/i.test(r.Working_File_Name || r.Working_File_URL);
         var html = '';
-        if (isImage) {
-            html += '<img src="' + escapeHtml(r.Working_File_URL) + '" alt="Working file preview" class="td-artwork-preview" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\';">';
-            html += '<div class="td-empty-panel" style="display:none;">Preview unavailable. Use the download link below.</div>';
-        }
-        html += '<div class="td-artwork-file">' +
-                    '<div>' +
-                        '<div class="td-artwork-filename">' + escapeHtml(r.Working_File_Name || 'working-file') + '</div>' +
-                        '<div class="td-artwork-meta">' + escapeHtml(r.Working_File_Type || 'file') + '</div>' +
+        files.forEach(function (f, idx) {
+            var isImage = /\.(jpe?g|png|gif|webp)$/i.test(f.name);
+            html += '<div class="td-artwork-file-group" style="margin-bottom:' + (idx < files.length - 1 ? '12px' : '0') + ';">';
+            if (isImage) {
+                html += '<img src="' + escapeHtml(f.url) + '" alt="' + escapeHtml(f.name) + '" class="td-artwork-preview" onerror="this.style.display=\'none\';">';
+            }
+            html += '<div class="td-artwork-file">' +
+                        '<div style="flex:1; min-width:0;">' +
+                            '<div class="td-artwork-filename">' +
+                                '<span class="td-artwork-badge">' + escapeHtml(f.label) + '</span> ' +
+                                escapeHtml(f.name) +
+                            '</div>' +
+                            (f.type ? '<div class="td-artwork-meta">' + escapeHtml(f.type) + '</div>' : '') +
+                        '</div>' +
+                        '<div class="td-artwork-actions">' +
+                            '<a href="' + escapeHtml(f.url) + '" target="_blank" rel="noopener" class="bt-btn bt-btn--secondary bt-btn--small">' +
+                                '<i class="fas fa-external-link-alt"></i> Open' +
+                            '</a>' +
+                        '</div>' +
                     '</div>' +
-                    '<div class="td-artwork-actions">' +
-                        '<a href="' + escapeHtml(r.Working_File_URL) + '" target="_blank" rel="noopener" class="bt-btn bt-btn--secondary bt-btn--small">' +
-                            '<i class="fas fa-external-link-alt"></i> Open' +
-                        '</a>' +
-                    '</div>' +
-                '</div>';
+                    '</div>';
+        });
         panel.innerHTML = html;
     }
 
@@ -608,7 +642,7 @@
         var r = state.record;
         var form = $('td-specs-form');
         form.reset();
-        ['Quantity','Transfer_Size','Press_Count','Transfer_Width_In','Transfer_Height_In','Needed_By_Date','Working_File_URL','File_Notes','Special_Instructions']
+        ['Quantity','Transfer_Size','Press_Count','Transfer_Width_In','Transfer_Height_In','Needed_By_Date','File_Notes','Special_Instructions']
             .forEach(function (key) {
                 var el = form.querySelector('[name="' + key + '"]');
                 if (el && r[key] !== undefined && r[key] !== null) {

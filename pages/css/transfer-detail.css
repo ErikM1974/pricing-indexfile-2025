@@ -181,6 +181,30 @@
     display: flex;
     gap: 6px;
 }
+.td-artwork-file-group {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+.td-artwork-file-group:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+.td-artwork-file-group .td-artwork-preview {
+    max-height: 200px;
+    margin-bottom: 8px;
+}
+.td-artwork-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--bt-theme-light);
+    color: var(--bt-theme-dark);
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-right: 4px;
+}
 
 /* ── Specs Panel ─────────────────────────────────────────────── */
 .td-specs-grid {

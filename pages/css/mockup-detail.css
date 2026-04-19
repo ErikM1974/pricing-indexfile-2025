@@ -1875,6 +1875,13 @@ body {
 .pmd-action-btn--copy:hover {
     background: #e0e0e0;
 }
+.pmd-action-btn--supacolor {
+    background: #4a6fa5;
+    color: white;
+}
+.pmd-action-btn--supacolor:hover {
+    background: #33537d;
+}
 .pmd-action-btn--complete {
     background: #16a34a;
     color: #fff;

@@ -181,9 +181,15 @@
                     </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field">
-                            <label>Working File URL (Box link)</label>
-                            <input type="url" name="Working_File_URL" placeholder="https://app.box.com/s/...">
+                            <label>Primary File URL (Box link) *</label>
+                            <input type="url" name="Working_File_URL" placeholder="https://app.box.com/s/..." required>
                         </div>
+                        <div class="bt-form-field">
+                            <label>Primary File Name</label>
+                            <input type="text" name="Working_File_Name" placeholder="e.g. ABC_Logo.ai">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
                         <div class="bt-form-field">
                             <label>File Type</label>
                             <select name="Working_File_Type">
@@ -194,6 +200,26 @@
                                 <option value="JPEG">JPEG</option>
                                 <option value="PNG">PNG</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Additional File 1 URL (optional)</label>
+                            <input type="url" name="Additional_File_1_URL" placeholder="https://app.box.com/s/...">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Additional File 1 Name</label>
+                            <input type="text" name="Additional_File_1_Name">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label>Additional File 2 URL (optional)</label>
+                            <input type="url" name="Additional_File_2_URL" placeholder="https://app.box.com/s/...">
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Additional File 2 Name</label>
+                            <input type="text" name="Additional_File_2_Name">
                         </div>
                     </div>
                     <div class="bt-form-row">
@@ -227,6 +253,6 @@
     <!-- Toast container -->
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/bradley-transfers.js?v=1"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=2"></script>
 </body>
 </html>

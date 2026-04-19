@@ -921,6 +921,29 @@
         var btnMockup = document.getElementById('ard-btn-send-mockup');
         var btnReminder = document.getElementById('ard-btn-send-reminder');
         var btnReopen = document.getElementById('ard-btn-reopen');
+        var btnSupa = document.getElementById('ard-btn-send-supacolor');
+
+        // Send to Supacolor — always visible in Steve's action bar (no gating per plan decision #2)
+        if (btnSupa && window.TransferActions) {
+            btnSupa.addEventListener('click', function () {
+                var designNumber = req.Design_Number || req.DesignNumber || req.Design_Num_SW;
+                if (!designNumber) {
+                    alert('This art request has no Design Number — cannot locate Box files.');
+                    return;
+                }
+                window.TransferActions.openSendModal({
+                    designNumber: String(designNumber),
+                    designId: req.ID_Design || req.PK_ID || designId,
+                    prefill: {
+                        Company_Name: req.CompanyName || req.Company_Name || '',
+                        Customer_Name: req.CustomerName || req.Customer_Name || '',
+                        Sales_Rep_Email: req.Sales_Rep || req.User_Email || '',
+                        Sales_Rep_Name: req.Sales_Rep_Name || ''
+                    },
+                    requestedBy: { email: 'steve@nwcustomapparel.com', name: 'Steve Deland' }
+                });
+            });
+        }
 
         if (isCompleted) {
             btnWorking.style.display = 'none';

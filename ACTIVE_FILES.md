@@ -550,6 +550,9 @@ cap-embroidery-fix.css
 | `/pages/transfer-detail.html` | **NEW** Single-transfer detail page with status transition buttons (Mark Ordered / Add PO / Ship / Receive / Cancel / Rush) + activity timeline | transfer-detail.js, transfer-detail.css, bradley-transfers.css, /api/transfer-orders/:id | ✅ Active |
 | `/pages/js/transfer-detail.js` | **NEW** Transfer detail controller — fetches record + notes, status machine, 6 modals, localStorage-based user identity | /api/transfer-orders/:id (+ /status, /rush, /notes) | ✅ Active |
 | `/pages/css/transfer-detail.css` | **NEW** Transfer detail page styles (header card, 2-col grid, timeline, action buttons) | — | ✅ Active |
+| `/shared_components/js/transfer-actions-shared.js` | **NEW** Box file picker modal + `window.TransferActions.openSendModal()` — shared by mockup-detail, art-request-detail, Steve's dashboard | /api/box/folder-files, /api/box/shared-link, /api/transfer-orders, transfer-actions.css | ✅ Active |
+| `/shared_components/css/transfer-actions.css` | **NEW** Self-contained modal styling for Send to Supacolor picker (navy theme, toasts) | — | ✅ Active |
+| `/dashboards/js/steve-send-supacolor.js` | **NEW** Steve's dashboard header button handler — prompts for design #, looks up ArtRequest, opens shared modal | transfer-actions-shared.js, /api/artrequests | ✅ Active |
 | `/shared_components/css/art-hub.css` | **NEW** Shared art hub dashboard styles (CSS custom props for theming) | — | ✅ Active |
 | `/shared_components/js/art-actions-shared.js` | **NEW** Shared art action modals (Log Time, Mark Complete, Send Mockup) — used by art-hub-steve.js + art-request-detail.js | art-hub.css, caspio-proxy API, EmailJS | ✅ Active |
 | `/shared_components/js/art-hub-steve.js` | Steve's gallery card processing + notes panel — delegates modals to art-actions-shared.js | art-hub.css, art-actions-shared.js, caspio-proxy API | ✅ Active |

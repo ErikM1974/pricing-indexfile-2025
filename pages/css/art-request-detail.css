@@ -1738,6 +1738,8 @@ body {
 .ard-action-mockup   { background: #ea580c; }
 .ard-action-reminder { background: #d97706; }
 .ard-action-reopen   { background: #d97706; }
+.ard-action-supacolor { background: #4a6fa5; }
+.ard-action-supacolor:hover { background: #33537d; }
 
 /* ── AE View (?view=ae) — maroon theme matching AE Dashboard ── */
 body.ae-view .ard-header {

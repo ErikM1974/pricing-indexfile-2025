@@ -611,9 +611,10 @@
                 custElapsedHtml = ' <span class="approval-elapsed pmd-customer-elapsed ' + custElapsed.cssClass + '" title="Sent to customer ' + escapeHtml(formatDate(mockup.Customer_Approval_Sent_Date)) + '">(customer sent ' + escapeHtml(custElapsed.text) + ')</span>';
             }
 
-            // Send to Customer + Copy Link buttons (shared across statuses)
+            // Send to Customer + Copy Link + Send to Supacolor buttons (shared across statuses)
             var sendCopyButtons = '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send-customer" title="Send approval email to customer">Send to Customer</button>'
-                + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
+                + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>'
+                + '<button class="pmd-action-btn pmd-action-btn--supacolor" id="pmd-btn-send-supacolor" title="Pick Box files and send to Bradley for Supacolor"><span style="display:inline-flex;align-items:center;gap:6px;">&#128230; Send to Supacolor</span></button>';
 
             if (statusLower === 'awaitingapproval') {
                 aeBar.style.display = '';
@@ -683,13 +684,19 @@
                 }
             }
 
-            // Attach send/copy/reopen listeners if buttons exist
+            // Attach send/copy/reopen/supacolor listeners if buttons exist
             var sendBtn = document.getElementById('pmd-btn-send-customer');
             var copyBtn = document.getElementById('pmd-btn-copy-link');
             var reopenBtn = document.getElementById('pmd-btn-reopen');
+            var supaBtn = document.getElementById('pmd-btn-send-supacolor');
             if (sendBtn) {
                 sendBtn.addEventListener('click', function () {
                     openSendToCustomerModal();
+                });
+            }
+            if (supaBtn) {
+                supaBtn.addEventListener('click', function () {
+                    openSendToSupacolorModal();
                 });
             }
             if (copyBtn) {
@@ -720,14 +727,19 @@
             var ruthSendCopyHtml = ruthHasMockups
                 ? '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-ruth-send-customer" title="Send approval email to customer">Send to Customer</button>'
                 + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-ruth-copy-link" title="Copy customer approval link">Copy Customer Link</button>'
+                + '<button class="pmd-action-btn pmd-action-btn--supacolor" id="pmd-btn-ruth-send-supacolor" title="Pick Box files and send to Bradley for Supacolor"><span style="display:inline-flex;align-items:center;gap:6px;">&#128230; Send to Supacolor</span></button>'
                 : '';
 
-            // Wire the send/copy handlers (call AFTER ruthBar.innerHTML is set for the current status)
+            // Wire the send/copy/supacolor handlers (call AFTER ruthBar.innerHTML is set for the current status)
             function wireRuthSendCopy() {
                 var rSend = document.getElementById('pmd-btn-ruth-send-customer');
                 var rCopy = document.getElementById('pmd-btn-ruth-copy-link');
+                var rSupa = document.getElementById('pmd-btn-ruth-send-supacolor');
                 if (rSend) {
                     rSend.addEventListener('click', function () { openSendToCustomerModal(); });
+                }
+                if (rSupa) {
+                    rSupa.addEventListener('click', function () { openSendToSupacolorModal(); });
                 }
                 if (rCopy) {
                     rCopy.addEventListener('click', function () {
@@ -4291,6 +4303,52 @@
     }
 
     // ── Send to Customer Modal ────────────────────────────────────────────
+    // ── Send to Supacolor (delegates to shared TransferActions helper) ──
+    function openSendToSupacolorModal() {
+        if (!currentMockup) {
+            showToast('Mockup not loaded yet.', 'error');
+            return;
+        }
+        if (!window.TransferActions || !window.TransferActions.openSendModal) {
+            showToast('Transfer helper not loaded. Refresh the page and try again.', 'error');
+            return;
+        }
+
+        var m = currentMockup;
+        var designNumber = m.Design_Number || m.DesignNumber;
+        if (!designNumber) {
+            showToast('This mockup has no Design Number — cannot locate Box files.', 'error');
+            return;
+        }
+
+        // Current viewer identity — prefer stored localStorage, fall back to mockup context
+        var user = null;
+        var storedEmail = localStorage.getItem('transfer_user_email');
+        var storedName = localStorage.getItem('transfer_user_name');
+        if (storedEmail && storedName) {
+            user = { email: storedEmail, name: storedName };
+        } else if (isAeView && m.Submitted_By) {
+            // AE view — use the art request submitter as a reasonable default
+            user = { email: m.Submitted_By, name: m.Submitted_By.split('@')[0] };
+        }
+
+        window.TransferActions.openSendModal({
+            designNumber: String(designNumber),
+            designId: m.ID_Design || m.id_Design || undefined,
+            mockupId: m.ID || m.PK_ID || undefined,
+            prefill: {
+                Company_Name: m.Company_Name || '',
+                Customer_Name: m.Customer_Name || '',
+                Sales_Rep_Email: m.Sales_Rep || m.User_Email || '',
+                Sales_Rep_Name: m.Sales_Rep_Name || ''
+            },
+            requestedBy: user,  // may be null — modal will prompt
+            onSuccess: function (record) {
+                showToast('Transfer ' + (record.ID_Transfer || '') + ' created. Bradley has been notified.', 'success');
+            }
+        });
+    }
+
     function openSendToCustomerModal() {
         if (!currentMockup) return;
 
