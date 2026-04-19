@@ -1,0 +1,309 @@
+/* Supacolor Orders Dashboard
+ * Companion to bradley-transfers.css — uses .bt-* classes for shared elements
+ * (header, stats chips, filter bar, modal, toast). Adds Supacolor-specific
+ * .sc-* classes for the table layout, view toggle, paste zone, and pagination.
+ */
+
+/* ── Filter bar growth ─────────────────────────────────────────────── */
+.bt-filter-group--grow { flex: 1; }
+.bt-filter-group--grow .bt-filter-input { width: 100%; }
+
+/* ── Stat chip extras ──────────────────────────────────────────────── */
+.bt-stat-chip--cancelled { border-left: 4px solid #c0392b; }
+.bt-stat-chip--cancelled .bt-stat-count { color: #c0392b; }
+.bt-stat-chip--total { border-left: 4px solid #4a6fa5; }
+.bt-stat-chip--total .bt-stat-count { color: #4a6fa5; }
+
+/* ── Active/Closed view toggle ─────────────────────────────────────── */
+.sc-view-toggle {
+    display: inline-flex;
+    background: #f1f3f5;
+    border-radius: 6px;
+    padding: 3px;
+    margin: 12px 0;
+}
+.sc-toggle-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6c757d;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.sc-toggle-btn:hover { color: #343a40; }
+.sc-toggle-btn.active {
+    background: #fff;
+    color: #2c3e50;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── Table layout (mimics Supacolor's clean row layout) ────────────── */
+.sc-table-wrap {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+.sc-table {
+    display: block;
+    width: 100%;
+}
+.sc-row {
+    display: grid;
+    grid-template-columns: 110px 110px 1fr 110px 130px 24px;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f3f5;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.1s ease;
+}
+.sc-row:last-child { border-bottom: none; }
+.sc-row:hover:not(.sc-row--header) { background: #f8f9fa; }
+
+.sc-row--header {
+    background: #f8f9fa;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    cursor: default;
+    pointer-events: none;
+}
+
+.sc-cell { font-size: 14px; color: #2c3e50; }
+.sc-cell--job {
+    font-weight: 600;
+    color: #4a6fa5;
+    font-variant-numeric: tabular-nums;
+}
+.sc-cell--po {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 12px;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+}
+.sc-row--header .sc-cell--po {
+    background: transparent;
+    padding: 0;
+    font-family: inherit;
+    font-size: 11px;
+}
+.sc-cell--desc {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sc-cell--shipped {
+    color: #6c757d;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+.sc-cell--chevron {
+    color: #adb5bd;
+    text-align: right;
+}
+
+/* Status badges */
+.sc-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.sc-status-badge--open {
+    background: #fff4e6;
+    color: #d68910;
+    border: 1px solid #ffe0b2;
+}
+.sc-status-badge--closed {
+    background: #f0f4f8;
+    color: #495057;
+    border: 1px solid #e2e8f0;
+}
+.sc-status-badge--cancelled {
+    background: #fff5f5;
+    color: #c0392b;
+    border: 1px solid #ffd6d6;
+}
+
+/* ── Pagination ────────────────────────────────────────────────────── */
+.sc-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 4px;
+    margin-top: 8px;
+}
+.sc-page-btn {
+    padding: 6px 14px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.sc-page-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+}
+.sc-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.sc-page-info {
+    font-size: 13px;
+    color: #6c757d;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Backfill modal: paste zone ────────────────────────────────────── */
+.sc-paste-zone {
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 16px;
+    background: #f8f9fa;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+}
+.sc-paste-zone:hover,
+.sc-paste-zone:focus,
+.sc-paste-zone--dragover {
+    border-color: #4a6fa5;
+    background: #f0f4f8;
+}
+
+.sc-paste-empty {
+    text-align: center;
+    color: #6c757d;
+}
+.sc-paste-empty i {
+    font-size: 36px;
+    color: #adb5bd;
+    margin-bottom: 12px;
+    display: block;
+}
+.sc-paste-empty p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+.sc-paste-empty .sc-paste-hint {
+    font-size: 12px;
+    color: #adb5bd;
+}
+
+.sc-paste-preview {
+    max-width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Status banner inside modal */
+.sc-extract-status {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.sc-extract-status--info {
+    background: #e7f5ff;
+    color: #1971c2;
+    border: 1px solid #d0ebff;
+}
+.sc-extract-status--success {
+    background: #ebfbee;
+    color: #2f9e44;
+    border: 1px solid #c3fae8;
+}
+.sc-extract-status--error {
+    background: #fff5f5;
+    color: #c92a2a;
+    border: 1px solid #ffe3e3;
+}
+.sc-extract-status i { margin-right: 6px; }
+
+/* Preview table inside modal */
+.sc-extract-results {
+    margin-top: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+}
+.sc-preview-table { display: block; }
+.sc-preview-row {
+    display: grid;
+    grid-template-columns: 90px 110px 1fr 90px 110px;
+    gap: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #f1f3f5;
+    color: #495057;
+}
+.sc-preview-row:last-child { border-bottom: none; }
+.sc-preview-row--header {
+    background: #f8f9fa;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    position: sticky;
+    top: 0;
+}
+
+/* Empty state */
+.bt-empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: #6c757d;
+}
+.bt-empty i {
+    font-size: 48px;
+    color: #adb5bd;
+    margin-bottom: 16px;
+    display: block;
+}
+.bt-empty p {
+    margin: 0;
+    font-size: 15px;
+}
+.bt-empty--error i { color: #e74c3c; }
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .sc-row {
+        grid-template-columns: 90px 1fr 90px 24px;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .sc-cell--po, .sc-cell--shipped { display: none; }
+    .sc-cell--desc { font-size: 13px; }
+    .sc-preview-row {
+        grid-template-columns: 70px 1fr 80px;
+    }
+    .sc-preview-row > div:nth-child(2),
+    .sc-preview-row > div:nth-child(5) { display: none; }
+}

@@ -684,6 +684,11 @@
     /**
      * Persist any pending extraction extras onto the record via a general PUT.
      * Non-blocking — if it fails, log and continue (status transition already succeeded).
+     *
+     * Also mirrors the data into Supacolor_Jobs (the local Supacolor mirror) via
+     * an idempotent upsert keyed on Supacolor_Job_Number. This keeps the new
+     * Supacolor Orders dashboard current without manual paste — going-forward
+     * jobs auto-appear there as Bradley marks them Ordered/Shipped.
      */
     async function flushPendingExtraction() {
         var extras = state.pendingExtraction || {};
@@ -694,7 +699,54 @@
         } catch (err) {
             console.warn('Failed to save extraction extras (non-blocking):', err);
         }
+
+        // Also mirror to Supacolor_Jobs (best-effort, non-blocking)
+        await mirrorToSupacolorJobs(extras);
+
         state.pendingExtraction = {};
+    }
+
+    /**
+     * Upsert the same data into Supacolor_Jobs so the Supacolor Orders dashboard
+     * picks it up automatically. Idempotent — re-runs are safe (only fills empty fields
+     * unless ?force=true). Silent on failure: existing transfer flow is unaffected.
+     */
+    async function mirrorToSupacolorJobs(extras) {
+        // Find the Supacolor job number from current state or extras
+        var jobNumber = (state.record && state.record.Supacolor_Order_Number) ||
+                        extras.Supacolor_Order_Number;
+        if (!jobNumber) return; // Nothing to mirror without a job key
+
+        var payload = {
+            Supacolor_Job_Number: String(jobNumber),
+            Backfill_Source: 'live'
+        };
+        // Map Transfer_Orders columns → Supacolor_Jobs columns
+        if (extras.Carrier)            payload.Carrier = extras.Carrier;
+        if (extras.Shipping_Method)    payload.Shipping_Method = extras.Shipping_Method;
+        if (extras.Supacolor_Total != null) payload.Total = extras.Supacolor_Total;
+        // Carry through anything already on the record that we know about
+        if (state.record) {
+            if (state.record.Tracking_Number && !payload.Tracking_Number) payload.Tracking_Number = state.record.Tracking_Number;
+            if (state.record.Estimated_Ship_Date && !payload.Date_Shipped) payload.Date_Shipped = state.record.Estimated_Ship_Date;
+            if (state.record.Company_Name && !payload.Description) payload.Description = state.record.Company_Name;
+        }
+
+        try {
+            var resp = await fetch(API_BASE + '/api/supacolor-jobs/upsert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            var data = await resp.json();
+            if (resp.ok && data.success) {
+                console.log('Mirrored to Supacolor_Jobs (' + (data.action || 'ok') + '):', payload.Supacolor_Job_Number);
+            } else {
+                console.warn('Supacolor_Jobs mirror non-ok:', data);
+            }
+        } catch (err) {
+            console.warn('Supacolor_Jobs mirror failed (non-blocking):', err);
+        }
     }
 
     function openRushModal(markingRush) {

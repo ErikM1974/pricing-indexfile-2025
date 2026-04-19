@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Supacolor Orders - Local Mirror</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=1">
+</head>
+<body>
+    <div class="minimal-header">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+             alt="Northwest Custom Apparel" class="logo">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <a href="/staff-dashboard.html" class="back-link">&larr; Staff Dashboard</a>
+        </div>
+    </div>
+
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active">Supacolor Orders</button>
+            <a class="tab-button tab-button-link" href="/dashboards/bradley-transfers.html">Bradley's Transfers</a>
+            <a class="tab-button tab-button-link" href="/dashboards/art-hub-steve.html">Steve's Queue</a>
+            <a class="tab-button tab-button-link" href="/dashboards/art-hub-ruth.html">Ruth's Queue</a>
+        </div>
+
+        <div class="tab-content">
+            <div class="tab-pane active">
+                <!-- Header row -->
+                <div class="bt-header-row">
+                    <div>
+                        <h2 class="tab-title" style="margin-bottom:4px;">
+                            <i class="fas fa-list-alt" style="color:#4a6fa5;"></i> Supacolor Orders
+                        </h2>
+                        <div class="bt-subtitle">Local mirror of Supacolor jobs &middot; Your orders at a glance</div>
+                    </div>
+                    <div class="bt-header-actions">
+                        <button id="sc-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button id="sc-backfill-btn" class="bt-btn bt-btn--primary">
+                            <i class="fas fa-paste"></i> Backfill from Screenshot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Chips -->
+                <div id="sc-stats-row" class="bt-stats-row">
+                    <div class="bt-stat-chip bt-stat-chip--ordered" data-status="Open">
+                        <span class="bt-stat-count" id="sc-stat-open">&mdash;</span>
+                        <span class="bt-stat-label">Open</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--received" data-status="Closed">
+                        <span class="bt-stat-count" id="sc-stat-closed">&mdash;</span>
+                        <span class="bt-stat-label">Closed</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--cancelled" data-status="Cancelled">
+                        <span class="bt-stat-count" id="sc-stat-cancelled">&mdash;</span>
+                        <span class="bt-stat-label">Cancelled</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--total" id="sc-stat-total-chip">
+                        <span class="bt-stat-count" id="sc-stat-total">&mdash;</span>
+                        <span class="bt-stat-label">Total</span>
+                    </div>
+                </div>
+
+                <!-- Active/Closed Toggle -->
+                <div class="sc-view-toggle">
+                    <button class="sc-toggle-btn active" data-view="active">Active</button>
+                    <button class="sc-toggle-btn" data-view="closed">Closed</button>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="bt-filter-bar">
+                    <div class="bt-filter-group">
+                        <label class="bt-filter-label">
+                            <i class="fas fa-filter"></i> Status:
+                        </label>
+                        <select id="sc-filter-status" class="bt-filter-input">
+                            <option value="">All Statuses</option>
+                            <option value="Open">Open</option>
+                            <option value="Closed">Closed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="bt-filter-group bt-filter-group--grow">
+                        <label class="bt-filter-label">
+                            <i class="fas fa-search"></i> Search:
+                        </label>
+                        <input type="text" id="sc-filter-search" class="bt-filter-input"
+                               placeholder="Search by job #, PO, or description...">
+                    </div>
+                    <button id="sc-filter-clear" class="bt-btn bt-btn--link">Clear</button>
+                    <div class="bt-filter-meta" id="sc-result-count">Loading...</div>
+                </div>
+
+                <!-- Jobs Table -->
+                <div id="sc-table-wrap" class="sc-table-wrap">
+                    <div class="bt-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading Supacolor jobs...
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="sc-pagination" class="sc-pagination" style="display:none;">
+                    <button class="sc-page-btn" id="sc-page-prev">
+                        <i class="fas fa-chevron-left"></i> Prev
+                    </button>
+                    <span class="sc-page-info" id="sc-page-info">Page 1 of 1</span>
+                    <button class="sc-page-btn" id="sc-page-next">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backfill Modal: paste jobs list screenshot -->
+    <div id="sc-backfill-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-paste"></i> Backfill from Screenshot</h3>
+                <button class="bt-modal-close" id="sc-backfill-modal-close">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Paste a screenshot of the Supacolor <strong>Jobs list</strong> page (integrate.supacolor.com/dashboard/jobs).
+                    Each row will be extracted and added to your local mirror. Existing jobs (matched by job #) won't be duplicated.
+                </div>
+
+                <div class="sc-paste-zone" id="sc-paste-zone" tabindex="0">
+                    <div class="sc-paste-empty" id="sc-paste-empty">
+                        <i class="fas fa-image"></i>
+                        <p><strong>Click here, then press Ctrl+V</strong> to paste your screenshot</p>
+                        <p class="sc-paste-hint">Or drag & drop an image file</p>
+                    </div>
+                    <img id="sc-paste-preview" class="sc-paste-preview" style="display:none;" alt="Pasted screenshot preview">
+                    <input type="file" id="sc-paste-file" accept="image/*" style="display:none;">
+                </div>
+
+                <div id="sc-extract-status" class="sc-extract-status" style="display:none;"></div>
+
+                <div id="sc-extract-results" class="sc-extract-results" style="display:none;"></div>
+
+                <div class="bt-form-actions">
+                    <button type="button" class="bt-btn bt-btn--secondary" id="sc-backfill-cancel">Cancel</button>
+                    <button type="button" class="bt-btn bt-btn--primary" id="sc-backfill-import" disabled>
+                        <i class="fas fa-cloud-upload-alt"></i> Import Jobs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="sc-toast-container" class="bt-toast-container"></div>
+
+    <script src="/dashboards/js/supacolor-orders.js?v=1"></script>
+</body>
+</html>

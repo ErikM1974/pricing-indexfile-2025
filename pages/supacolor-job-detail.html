@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Supacolor Job — Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=1">
+    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=1">
+</head>
+<body>
+    <div class="minimal-header">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+             alt="Northwest Custom Apparel" class="logo">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <a href="/dashboards/supacolor-orders.html" class="back-link">&larr; Supacolor Jobs</a>
+        </div>
+    </div>
+
+    <div class="sjd-container" id="sjd-container">
+        <!-- Page header: job number + status + actions -->
+        <div class="sjd-page-header">
+            <div class="sjd-page-header-left">
+                <a href="/dashboards/supacolor-orders.html" class="sjd-back-link">
+                    <i class="fas fa-arrow-left"></i> Jobs
+                </a>
+                <h1 class="sjd-job-title">
+                    <span id="sjd-job-number">Loading…</span>
+                    <span class="sjd-status-badge" id="sjd-status-badge"></span>
+                </h1>
+            </div>
+            <div class="sjd-page-header-right">
+                <button id="sjd-paste-btn" class="bt-btn bt-btn--primary">
+                    <i class="fas fa-paste"></i> Paste Detail Screenshot
+                </button>
+                <button id="sjd-edit-btn" class="bt-btn bt-btn--secondary" title="Edit job fields">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+            </div>
+        </div>
+
+        <div id="sjd-loading" class="sjd-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading job…
+        </div>
+
+        <div id="sjd-content" style="display:none;">
+            <!-- Job Details Card -->
+            <section class="sjd-card">
+                <div class="sjd-card-header">Job Details</div>
+                <div class="sjd-card-body sjd-job-details">
+                    <div class="sjd-detail-line">
+                        <span class="sjd-detail-label">PO:</span>
+                        <span class="sjd-po-pill" id="sjd-po">—</span>
+                    </div>
+                    <div class="sjd-description" id="sjd-description">—</div>
+                    <div class="sjd-meta">
+                        <span class="sjd-meta-item">
+                            <span class="sjd-meta-label">Location:</span>
+                            <span id="sjd-location">—</span>
+                        </span>
+                        <span class="sjd-meta-item">
+                            <span class="sjd-meta-label">Created by</span>
+                            <span id="sjd-created-by">—</span>
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Timeline Card -->
+            <section class="sjd-card">
+                <div class="sjd-card-header">Timeline</div>
+                <div class="sjd-card-body">
+                    <div class="sjd-timeline">
+                        <div class="sjd-timeline-step" id="sjd-step-entered">
+                            <div class="sjd-timeline-dot"></div>
+                            <div class="sjd-timeline-label">Entered</div>
+                            <div class="sjd-timeline-date" id="sjd-date-entered">—</div>
+                        </div>
+                        <div class="sjd-timeline-bar"></div>
+                        <div class="sjd-timeline-step" id="sjd-step-requested">
+                            <div class="sjd-timeline-dot"></div>
+                            <div class="sjd-timeline-label">Requested Ship</div>
+                            <div class="sjd-timeline-date" id="sjd-date-requested">—</div>
+                        </div>
+                        <div class="sjd-timeline-bar"></div>
+                        <div class="sjd-timeline-step" id="sjd-step-shipped">
+                            <div class="sjd-timeline-dot"></div>
+                            <div class="sjd-timeline-label">Shipped</div>
+                            <div class="sjd-timeline-date" id="sjd-date-shipped">—</div>
+                            <div class="sjd-timeline-sub" id="sjd-shipped-sub"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Joblines Card -->
+            <section class="sjd-card">
+                <div class="sjd-card-header">
+                    Joblines (<span id="sjd-jobline-count">0</span>)
+                </div>
+                <div class="sjd-card-body">
+                    <div id="sjd-joblines" class="sjd-joblines">
+                        <div class="sjd-empty-mini">No joblines captured yet.</div>
+                    </div>
+                    <div class="sjd-totals" id="sjd-totals" style="display:none;">
+                        <div class="sjd-total-row">
+                            <span>Subtotal</span>
+                            <span id="sjd-subtotal">—</span>
+                        </div>
+                        <div class="sjd-total-row sjd-total-row--final">
+                            <span>Total</span>
+                            <span id="sjd-total">—</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shipping Card -->
+            <section class="sjd-card">
+                <div class="sjd-card-header">
+                    <i class="fas fa-map-marker-alt"></i> Shipping
+                    <span class="sjd-shipping-method" id="sjd-shipping-method"></span>
+                </div>
+                <div class="sjd-card-body sjd-shipping">
+                    <div class="sjd-ship-section">
+                        <div class="sjd-ship-label">Address</div>
+                        <div class="sjd-ship-name" id="sjd-ship-name">—</div>
+                        <div class="sjd-ship-address" id="sjd-ship-address">—</div>
+                    </div>
+                    <div class="sjd-ship-section">
+                        <div class="sjd-ship-label">Contact</div>
+                        <div id="sjd-ship-contact">—</div>
+                        <div id="sjd-ship-phone">—</div>
+                        <div id="sjd-ship-email">—</div>
+                    </div>
+                    <div class="sjd-ship-section" id="sjd-tracking-section" style="display:none;">
+                        <div class="sjd-ship-label">Tracking</div>
+                        <a id="sjd-tracking-link" href="#" target="_blank" rel="noopener">
+                            <span id="sjd-tracking-number"></span>
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <div class="sjd-carrier-line" id="sjd-carrier-line"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Linked Transfer Orders Card -->
+            <section class="sjd-card" id="sjd-linked-card" style="display:none;">
+                <div class="sjd-card-header">
+                    <i class="fas fa-link"></i> Linked Transfer Orders
+                </div>
+                <div class="sjd-card-body">
+                    <div id="sjd-linked-list" class="sjd-linked-list"></div>
+                </div>
+            </section>
+
+            <!-- History Card -->
+            <section class="sjd-card">
+                <div class="sjd-card-header">
+                    History (<span id="sjd-history-count">0</span>)
+                </div>
+                <div class="sjd-card-body">
+                    <div id="sjd-history" class="sjd-history">
+                        <div class="sjd-empty-mini">No history events captured yet.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Backfill source meta -->
+            <div class="sjd-meta-footer">
+                <span id="sjd-backfill-source"></span>
+                <span id="sjd-last-updated"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paste Detail Screenshot Modal -->
+    <div id="sjd-paste-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-paste"></i> Paste Job Detail Screenshot</h3>
+                <button class="bt-modal-close" id="sjd-paste-modal-close">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Paste a screenshot of the Supacolor <strong>job detail page</strong> (integrate.supacolor.com/dashboard/jobs/<em>number</em>).
+                    All visible fields — joblines, timeline, shipping, payment, history — will be extracted and filled in.
+                </div>
+                <div class="bt-modal-intro" style="background:#fff8e1; border-left:4px solid #ffc107; color:#856404;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>By default, only empty fields are filled.</strong> Check the box below to overwrite manually-edited values.
+                    <label style="display:block; margin-top:8px; font-weight:normal;">
+                        <input type="checkbox" id="sjd-overwrite"> Overwrite existing fields with extracted values
+                    </label>
+                </div>
+
+                <div class="sc-paste-zone" id="sjd-paste-zone" tabindex="0">
+                    <div class="sc-paste-empty" id="sjd-paste-empty">
+                        <i class="fas fa-image"></i>
+                        <p><strong>Click here, then press Ctrl+V</strong> to paste your screenshot</p>
+                        <p class="sc-paste-hint">Or drag &amp; drop an image file</p>
+                    </div>
+                    <img id="sjd-paste-preview" class="sc-paste-preview" style="display:none;" alt="Pasted screenshot preview">
+                    <input type="file" id="sjd-paste-file" accept="image/*" style="display:none;">
+                </div>
+
+                <div id="sjd-extract-status" class="sc-extract-status" style="display:none;"></div>
+
+                <div id="sjd-extract-summary" class="sjd-extract-summary" style="display:none;"></div>
+
+                <div class="bt-form-actions">
+                    <button type="button" class="bt-btn bt-btn--secondary" id="sjd-paste-cancel">Cancel</button>
+                    <button type="button" class="bt-btn bt-btn--primary" id="sjd-paste-apply" disabled>
+                        <i class="fas fa-check"></i> Apply to Job
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="sjd-toast-container" class="bt-toast-container"></div>
+
+    <script src="/pages/js/supacolor-job-detail.js?v=1"></script>
+</body>
+</html>

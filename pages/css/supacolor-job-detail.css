@@ -1,0 +1,489 @@
+/* Supacolor Job Detail
+ * Mirrors Supacolor's clean card-based detail view.
+ * Companion to supacolor-orders.css (uses .sc-status-badge).
+ */
+
+.sjd-container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+}
+
+/* Page header (job number + actions) */
+.sjd-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.sjd-page-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.sjd-back-link {
+    color: #4a6fa5;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+.sjd-back-link:hover { text-decoration: underline; }
+
+.sjd-job-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.sjd-status-badge {
+    /* extends .sc-status-badge */
+    font-size: 11px;
+    padding: 4px 12px;
+}
+
+.sjd-page-header-right {
+    display: flex;
+    gap: 8px;
+}
+
+/* Loading */
+.sjd-loading {
+    text-align: center;
+    padding: 80px 20px;
+    color: #6c757d;
+    font-size: 15px;
+}
+.sjd-loading i { margin-right: 8px; }
+
+/* Card */
+.sjd-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+.sjd-card-header {
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sjd-card-body {
+    padding: 18px 20px;
+}
+
+/* Job Details card */
+.sjd-job-details .sjd-detail-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.sjd-detail-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6c757d;
+}
+.sjd-po-pill {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 13px;
+    background: #f1f3f5;
+    color: #495057;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+.sjd-description {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 12px;
+}
+.sjd-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #495057;
+    padding-top: 8px;
+    border-top: 1px solid #f1f3f5;
+}
+.sjd-meta-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.sjd-meta-label {
+    color: #6c757d;
+}
+
+/* Timeline */
+.sjd-timeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 8px 12px;
+}
+.sjd-timeline-step {
+    flex: 0 0 auto;
+    text-align: center;
+    min-width: 110px;
+    position: relative;
+}
+.sjd-timeline-bar {
+    flex: 1 1 auto;
+    height: 2px;
+    background: #e9ecef;
+    margin-top: -28px;
+}
+.sjd-timeline-dot {
+    width: 12px;
+    height: 12px;
+    background: #cbd5e0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 1px #cbd5e0;
+}
+.sjd-timeline-step--filled .sjd-timeline-dot {
+    background: #2f9e44;
+    box-shadow: 0 0 0 1px #2f9e44;
+}
+.sjd-timeline-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.sjd-timeline-date {
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+.sjd-timeline-step:not(.sjd-timeline-step--filled) .sjd-timeline-date {
+    color: #adb5bd;
+    font-weight: normal;
+}
+.sjd-timeline-sub {
+    font-size: 12px;
+    margin-top: 2px;
+    color: #6c757d;
+}
+.sjd-timeline-sub--ontime { color: #2f9e44; }
+.sjd-timeline-sub--early  { color: #1971c2; }
+.sjd-timeline-sub--late   { color: #c92a2a; }
+
+/* Joblines */
+.sjd-joblines {
+    display: flex;
+    flex-direction: column;
+}
+.sjd-line {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f3f5;
+    align-items: flex-start;
+}
+.sjd-line:last-child { border-bottom: none; }
+.sjd-line:first-child { padding-top: 0; }
+
+.sjd-line-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #f8f9fa;
+    border: 1px solid #f1f3f5;
+}
+.sjd-line-thumb--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-size: 22px;
+}
+.sjd-line-body {
+    min-width: 0;
+}
+.sjd-line-code {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a6fa5;
+    margin-bottom: 2px;
+}
+.sjd-line-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+.sjd-line-detail {
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.4;
+}
+.sjd-line-detail--tracking {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+}
+.sjd-line-color {
+    font-size: 12px;
+    color: #495057;
+    margin-top: 2px;
+    font-weight: 500;
+}
+.sjd-line-pricing {
+    text-align: right;
+    min-width: 100px;
+}
+.sjd-line-total {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a202c;
+    font-variant-numeric: tabular-nums;
+}
+.sjd-line-qtyprice {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Totals */
+.sjd-totals {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #e9ecef;
+}
+.sjd-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 14px;
+    color: #495057;
+    font-variant-numeric: tabular-nums;
+}
+.sjd-total-row--final {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f3f5;
+}
+
+/* Shipping */
+.sjd-shipping-method {
+    margin-left: 8px;
+    font-weight: normal;
+    color: #6c757d;
+    font-size: 12px;
+}
+.sjd-shipping {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+.sjd-ship-section {
+    font-size: 13px;
+    color: #495057;
+    line-height: 1.6;
+}
+.sjd-ship-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.sjd-ship-name {
+    font-weight: 600;
+    color: #1a202c;
+}
+.sjd-ship-address div {
+    color: #495057;
+}
+.sjd-tracking-section a {
+    color: #4a6fa5;
+    text-decoration: none;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.sjd-tracking-section a:hover { text-decoration: underline; }
+.sjd-carrier-line {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+/* Linked Transfer Orders */
+.sjd-linked-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sjd-linked-item {
+    display: grid;
+    grid-template-columns: 130px 1fr 100px 16px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: #fafbfc;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.1s ease;
+}
+.sjd-linked-item:hover {
+    border-color: #4a6fa5;
+    background: #fff;
+}
+.sjd-linked-id {
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 12px;
+    color: #4a6fa5;
+    font-weight: 600;
+}
+.sjd-linked-design {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+.sjd-linked-company {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* History */
+.sjd-history {
+    display: flex;
+    flex-direction: column;
+}
+.sjd-history-item {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f3f5;
+    align-items: flex-start;
+}
+.sjd-history-item:last-child { border-bottom: none; }
+.sjd-history-item:first-child { padding-top: 0; }
+
+.sjd-history-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f0f4f8;
+    color: #4a6fa5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+.sjd-history-type {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+.sjd-history-detail {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.sjd-history-time {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* Empty mini state inside cards */
+.sjd-empty-mini {
+    color: #adb5bd;
+    font-size: 13px;
+    padding: 8px 0;
+    text-align: center;
+}
+
+/* Footer meta line */
+.sjd-meta-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding: 0 4px;
+    font-size: 11px;
+    color: #adb5bd;
+}
+
+/* Extraction summary inside paste modal */
+.sjd-extract-summary {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    font-size: 13px;
+}
+.sjd-summary-section {
+    margin-bottom: 10px;
+}
+.sjd-summary-section:last-child { margin-bottom: 0; }
+.sjd-summary-section ul {
+    margin: 4px 0 0 0;
+    padding-left: 20px;
+    color: #495057;
+}
+.sjd-summary-section li {
+    margin-bottom: 2px;
+}
+.sjd-summary-section code {
+    background: #fff;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #c92a2a;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+    .sjd-shipping { grid-template-columns: 1fr; }
+    .sjd-job-title { font-size: 22px; }
+    .sjd-timeline { flex-wrap: wrap; gap: 16px; }
+    .sjd-timeline-bar { display: none; }
+    .sjd-page-header-right { width: 100%; justify-content: flex-end; }
+    .sjd-linked-item { grid-template-columns: 1fr; gap: 4px; }
+}
