@@ -25,7 +25,11 @@
         transferId: null,
         record: null,
         notes: [],
-        user: null // { email, name }
+        user: null, // { email, name }
+        // Extracted-from-screenshot values that aren't shown in the modal forms —
+        // saved to the record alongside a status transition (Carrier, Shipping_Method,
+        // Supacolor_Total, ShopWorks_PO_Number). Cleared after save.
+        pendingExtraction: {}
     };
 
     // ── Helpers ──────────────────────────────────────────────────────
@@ -358,10 +362,20 @@
                 displayVal +
             '</div>';
         }
+        // Format total amount as currency if present
+        var totalDisplay = null;
+        if (r.Supacolor_Total !== null && r.Supacolor_Total !== undefined && r.Supacolor_Total !== '') {
+            var n = parseFloat(r.Supacolor_Total);
+            if (!isNaN(n)) totalDisplay = '$' + n.toFixed(2);
+        }
+
         var html = row('Supacolor Order #', r.Supacolor_Order_Number, r.Supacolor_Order_URL) +
                    row('ShopWorks PO #', r.ShopWorks_PO_Number) +
                    row('Est. Ship Date', r.Estimated_Ship_Date ? formatDate(r.Estimated_Ship_Date) : null) +
-                   row('Tracking #', r.Tracking_Number);
+                   row('Shipping Method', r.Shipping_Method) +
+                   row('Carrier', r.Carrier) +
+                   row('Tracking #', r.Tracking_Number) +
+                   row('Supacolor Total', totalDisplay);
 
         // Add timeline of who did what
         if (r.Sent_To_Supacolor_By) {
@@ -604,12 +618,17 @@
     /**
      * Apply extracted data to the named form (ordered or shipped).
      * Only fills empty inputs — never overwrites Bradley's manual edits.
+     * Also stashes "silent" record-level fields (Carrier, Shipping_Method,
+     * Supacolor_Total, ShopWorks_PO_Number) into state.pendingExtraction so
+     * they get saved alongside the status transition.
      */
     function applyExtraction(target, data, thumbUri) {
         var form = $('td-' + target + '-form');
         if (!form) return;
 
         var filled = [];
+        var silent = [];
+
         function setIfEmpty(fieldName, value) {
             if (!value) return;
             var el = form.querySelector('[name="' + fieldName + '"]');
@@ -619,28 +638,63 @@
             filled.push(fieldName);
         }
 
+        function stashSilent(recordField, value) {
+            if (value === null || value === undefined || value === '') return;
+            // Don't overwrite if the record already has a value (don't clobber on re-paste)
+            if (state.record && state.record[recordField]) return;
+            state.pendingExtraction[recordField] = value;
+            silent.push(recordField);
+        }
+
         if (target === 'ordered') {
             setIfEmpty('supacolorOrderNumber', data.supacolorJobNumber);
             setIfEmpty('estimatedShipDate', data.estimatedShipDate);
-            // URL to the Supacolor job page (best guess from job #)
             if (data.supacolorJobNumber) {
                 setIfEmpty('supacolorOrderUrl', 'https://integrate.supacolor.com/dashboard/jobs/' + data.supacolorJobNumber);
             }
+            // Silent record-level extras (shown in Tracking Panel after save)
+            stashSilent('Carrier', data.carrier);
+            stashSilent('Shipping_Method', data.shippingMethod);
+            stashSilent('Supacolor_Total', data.totalAmount);
+            stashSilent('ShopWorks_PO_Number', data.shopworksPO);
         } else if (target === 'shipped') {
             setIfEmpty('trackingNumber', data.trackingNumber);
             setIfEmpty('estimatedShipDate', data.actualShipDate || data.estimatedShipDate);
+            // Shipped-page may still show carrier/method — capture them too if new
+            stashSilent('Carrier', data.carrier);
+            stashSilent('Shipping_Method', data.shippingMethod);
         }
 
-        if (filled.length === 0) {
+        var totalFilled = filled.length + silent.length;
+        if (totalFilled === 0) {
             renderPasteStatus(target, 'error',
                 'Screenshot read, but no matching fields found. Fill manually below.',
                 thumbUri);
             return;
         }
 
-        var msg = 'Auto-filled ' + filled.length + ' field' + (filled.length === 1 ? '' : 's') +
-                  ' from Supacolor: ' + filled.join(', ') + '. Review, then submit.';
+        var parts = [];
+        if (filled.length) parts.push(filled.join(', ') + ' (in form)');
+        if (silent.length) parts.push(silent.join(', ') + ' (saved on submit)');
+        var msg = 'Auto-filled ' + totalFilled + ' field' + (totalFilled === 1 ? '' : 's') +
+                  ' from Supacolor: ' + parts.join(' · ') + '. Review, then submit.';
         renderPasteStatus(target, 'success', msg, thumbUri);
+    }
+
+    /**
+     * Persist any pending extraction extras onto the record via a general PUT.
+     * Non-blocking — if it fails, log and continue (status transition already succeeded).
+     */
+    async function flushPendingExtraction() {
+        var extras = state.pendingExtraction || {};
+        if (Object.keys(extras).length === 0) return;
+        try {
+            await apiPut('/api/transfer-orders/' + encodeURIComponent(state.transferId), extras);
+            console.log('Saved extraction extras:', Object.keys(extras).join(', '));
+        } catch (err) {
+            console.warn('Failed to save extraction extras (non-blocking):', err);
+        }
+        state.pendingExtraction = {};
     }
 
     function openRushModal(markingRush) {
@@ -692,6 +746,10 @@
             });
             closeModal('td-ordered-modal');
             showToast('Marked as Ordered.', 'success');
+
+            // Save silent extraction extras (Carrier, Shipping_Method, Supacolor_Total,
+            // ShopWorks_PO_Number) before reloading so the tracking panel shows them.
+            await flushPendingExtraction();
             await load();
 
             // Fire EmailJS notification — sales rep + Steve (non-blocking)
@@ -740,6 +798,9 @@
             });
             closeModal('td-shipped-modal');
             showToast('Marked as Shipped.', 'success');
+
+            // Save silent extraction extras (Carrier, Shipping_Method) if any were pasted
+            await flushPendingExtraction();
             await load();
         } catch (err) {
             console.error(err);
