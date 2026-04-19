@@ -423,6 +423,7 @@
         try {
             var result = await extractJobDetail(dataUri);
             var d = result.data || {};
+            console.log('[SupacolorJobDetail] Vision raw response:', d);
 
             // Sanity: if extracted job number doesn't match this job, warn
             var current = state.job.Supacolor_Job_Number;
@@ -434,16 +435,29 @@
                     'error'
                 );
             } else {
+                var jlCount = (d.joblines || []).length;
+                var histCount = (d.history || []).length;
+                var thinExtraction = (jlCount === 0 && histCount === 0);
                 var summary = [];
                 if (d.subtotal != null || d.total != null) summary.push('Total: ' + formatMoney(d.total != null ? d.total : d.subtotal));
-                if (d.joblines) summary.push(d.joblines.length + ' joblines');
-                if (d.history)  summary.push(d.history.length + ' history events');
+                summary.push(jlCount + ' joblines');
+                summary.push(histCount + ' history events');
                 if (d.trackingNumber) summary.push('Tracking: ' + d.trackingNumber);
-                showExtractStatus(
-                    '<i class="fas fa-check-circle"></i> Extracted in ' + (result.duration || 0) + 'ms. ' +
-                    summary.join(' · '),
-                    'success'
-                );
+
+                if (thinExtraction) {
+                    showExtractStatus(
+                        '<i class="fas fa-exclamation-triangle"></i> Vision extracted ' + (result.duration || 0) + 'ms — ' +
+                        '<strong>but found 0 joblines and 0 history events.</strong> ' +
+                        'The screenshot may be too small or cropped. Try a fresh full-page screenshot of the entire job detail page.',
+                        'error'
+                    );
+                } else {
+                    showExtractStatus(
+                        '<i class="fas fa-check-circle"></i> Extracted in ' + (result.duration || 0) + 'ms · ' +
+                        summary.join(' · '),
+                        'success'
+                    );
+                }
             }
 
             state.pendingExtraction = d;
@@ -456,7 +470,7 @@
             $('sjd-paste-apply').disabled = false;
 
         } catch (err) {
-            console.error('Extraction failed:', err);
+            console.error('[SupacolorJobDetail] Extraction failed:', err);
             showExtractStatus(
                 '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Extraction failed'),
                 'error'
@@ -482,7 +496,9 @@
         if (d.paymentStatus) jobFields.push('Payment: ' + escapeHtml(d.paymentStatus));
 
         if (jobFields.length) {
-            parts.push('<div class="sjd-summary-section"><strong>Job fields:</strong><ul><li>' + jobFields.join('</li><li>') + '</li></ul></div>');
+            parts.push('<div class="sjd-summary-section"><strong>Job fields (' + jobFields.length + '):</strong><ul><li>' + jobFields.join('</li><li>') + '</li></ul></div>');
+        } else {
+            parts.push('<div class="sjd-summary-section sjd-summary-empty"><strong>⚠ No job fields extracted.</strong></div>');
         }
         if (d.joblines && d.joblines.length) {
             parts.push('<div class="sjd-summary-section"><strong>' + d.joblines.length + ' joblines:</strong><ul>' +
@@ -490,12 +506,16 @@
                     return '<li>' + escapeHtml(l.itemCode || '') + ' — ' + escapeHtml(l.description || '') +
                         (l.lineTotal != null ? ' (' + formatMoney(l.lineTotal) + ')' : '') + '</li>';
                 }).join('') + '</ul></div>');
+        } else {
+            parts.push('<div class="sjd-summary-section sjd-summary-empty"><strong>⚠ 0 joblines extracted.</strong> Vision missed the line items — try re-pasting or zoom into the joblines section.</div>');
         }
         if (d.history && d.history.length) {
             parts.push('<div class="sjd-summary-section"><strong>' + d.history.length + ' history events:</strong><ul>' +
                 d.history.map(function (h) {
                     return '<li>' + escapeHtml(h.eventType || '') + (h.eventAt ? ' — ' + escapeHtml(h.eventAt) : '') + '</li>';
                 }).join('') + '</ul></div>');
+        } else {
+            parts.push('<div class="sjd-summary-section sjd-summary-empty"><strong>⚠ 0 history events extracted.</strong></div>');
         }
         return parts.join('');
     }
@@ -540,9 +560,17 @@
                 if (jobPayload[k] === undefined) delete jobPayload[k];
             });
 
-            await upsertJob(jobPayload, force);
+            console.log('[SupacolorJobDetail] Extraction:', d);
+            console.log('[SupacolorJobDetail] Job upsert payload:', jobPayload);
+
+            var upsertResult = await upsertJob(jobPayload, force);
+            console.log('[SupacolorJobDetail] Upsert result:', upsertResult);
+            var jobAction = (upsertResult && upsertResult.action) || 'updated';
+            var fieldsWritten = (upsertResult && upsertResult.updatedFields) ? upsertResult.updatedFields.length :
+                                (jobAction === 'inserted' ? Object.keys(jobPayload).length : 0);
 
             // 2. Replace joblines (always replace — joblines are derived from screenshot, no manual edits)
+            var joblinesWritten = 0;
             if (d.joblines && d.joblines.length) {
                 var lines = d.joblines.map(function (l, i) {
                     return {
@@ -557,10 +585,14 @@
                         Line_Total: l.lineTotal != null ? l.lineTotal : null
                     };
                 });
-                await replaceJoblines(state.idJob, lines);
+                console.log('[SupacolorJobDetail] Joblines payload:', lines);
+                var jlResult = await replaceJoblines(state.idJob, lines);
+                console.log('[SupacolorJobDetail] Joblines result:', jlResult);
+                joblinesWritten = (jlResult && jlResult.inserted) || lines.length;
             }
 
             // 3. Replace history (same logic — full replace from screenshot)
+            var historyWritten = 0;
             if (d.history && d.history.length) {
                 var events = d.history.map(function (h) {
                     return {
@@ -569,10 +601,23 @@
                         Event_At: h.eventAt || null
                     };
                 });
-                await replaceHistory(state.idJob, events);
+                console.log('[SupacolorJobDetail] History payload:', events);
+                var hResult = await replaceHistory(state.idJob, events);
+                console.log('[SupacolorJobDetail] History result:', hResult);
+                historyWritten = (hResult && hResult.inserted) || events.length;
             }
 
-            showToast('Job updated from screenshot', 'success');
+            // Build a detailed success summary
+            var summary = [];
+            if (fieldsWritten > 0)    summary.push(fieldsWritten + ' field' + (fieldsWritten === 1 ? '' : 's'));
+            if (joblinesWritten > 0)  summary.push(joblinesWritten + ' jobline' + (joblinesWritten === 1 ? '' : 's'));
+            if (historyWritten > 0)   summary.push(historyWritten + ' history event' + (historyWritten === 1 ? '' : 's'));
+            var totalWritten = fieldsWritten + joblinesWritten + historyWritten;
+            var summaryMsg = totalWritten > 0
+                ? 'Saved: ' + summary.join(', ')
+                : 'Nothing was saved — all fields were already filled. Check "Overwrite" to force-update.';
+
+            showToast(summaryMsg, totalWritten > 0 ? 'success' : 'error');
             closePasteModal();
 
             // Reload from server
@@ -583,7 +628,7 @@
             render();
 
         } catch (err) {
-            console.error('Apply failed:', err);
+            console.error('[SupacolorJobDetail] Apply failed:', err);
             showToast('Apply failed: ' + (err.message || 'unknown error'), 'error');
             btn.disabled = false;
             btn.innerHTML = orig;

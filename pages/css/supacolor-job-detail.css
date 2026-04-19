@@ -477,6 +477,13 @@
     font-size: 12px;
     color: #c92a2a;
 }
+.sjd-summary-empty {
+    background: #fff5f5;
+    border-left: 3px solid #ffa8a8;
+    padding: 8px 12px;
+    color: #c92a2a;
+    border-radius: 3px;
+}
 
 /* Responsive */
 @media (max-width: 720px) {
