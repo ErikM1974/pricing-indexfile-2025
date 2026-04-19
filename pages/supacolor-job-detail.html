@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
     <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=1">
-    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=1">
+    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=2">
 </head>
 <body>
     <div class="minimal-header">
@@ -39,6 +39,9 @@
                 </button>
                 <button id="sjd-edit-btn" class="bt-btn bt-btn--secondary" title="Edit job fields">
                     <i class="fas fa-pen"></i> Edit
+                </button>
+                <button id="sjd-delete-btn" class="bt-btn bt-btn--danger" title="Delete this job from the local mirror">
+                    <i class="fas fa-trash"></i> Delete
                 </button>
             </div>
         </div>
@@ -222,9 +225,49 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="sjd-delete-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content sjd-delete-modal-content">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-exclamation-triangle" style="color:#c92a2a;"></i> Delete Job</h3>
+                <button class="bt-modal-close" id="sjd-delete-modal-close">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="sjd-delete-warning">
+                    Permanently delete job <strong id="sjd-delete-job-label"></strong> from the local mirror?
+                </div>
+                <div class="sjd-delete-cascade">
+                    This will also delete:
+                    <ul>
+                        <li><strong id="sjd-delete-jobline-count">0</strong> jobline(s)</li>
+                        <li><strong id="sjd-delete-history-count">0</strong> history event(s)</li>
+                    </ul>
+                </div>
+                <div class="sjd-delete-note">
+                    <i class="fas fa-info-circle"></i>
+                    Linked Transfer Orders are <strong>not</strong> affected — they live in a separate table.
+                    The Supacolor.com record is also untouched. You can re-import this job by pasting its detail screenshot again.
+                </div>
+                <div id="sjd-delete-open-warning" class="sjd-delete-open-warning" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    This job is still <strong>Open</strong>. Confirm to delete anyway:
+                    <label style="display:block; margin-top:8px;">
+                        <input type="checkbox" id="sjd-delete-open-confirm"> Yes, I want to delete this open job
+                    </label>
+                </div>
+                <div class="bt-form-actions">
+                    <button type="button" class="bt-btn bt-btn--secondary" id="sjd-delete-cancel">Cancel</button>
+                    <button type="button" class="bt-btn bt-btn--danger" id="sjd-delete-confirm">
+                        <i class="fas fa-trash"></i> Delete Permanently
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast container -->
     <div id="sjd-toast-container" class="bt-toast-container"></div>
 
-    <script src="/pages/js/supacolor-job-detail.js?v=1"></script>
+    <script src="/pages/js/supacolor-job-detail.js?v=2"></script>
 </body>
 </html>

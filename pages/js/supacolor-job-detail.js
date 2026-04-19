@@ -139,6 +139,15 @@
         return data;
     }
 
+    async function deleteJob(idJob) {
+        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(idJob), {
+            method: 'DELETE'
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
     // ── Render ─────────────────────────────────────────────────────────
     function render() {
         var j = state.job;
@@ -603,6 +612,55 @@
         showToast('Edit fields directly via screenshot paste, or use Caspio admin for now.', 'info');
     }
 
+    // ── Delete flow ────────────────────────────────────────────────────
+    function openDeleteModal() {
+        if (!state.job) return;
+        var j = state.job;
+        $('sjd-delete-job-label').textContent = '#' + (j.Supacolor_Job_Number || j.ID_Job) +
+            (j.Description ? ' (' + j.Description + ')' : '');
+        $('sjd-delete-jobline-count').textContent = (state.joblines || []).length;
+        $('sjd-delete-history-count').textContent = (state.history || []).length;
+
+        // Open status warning + extra confirmation checkbox
+        var openWarning = $('sjd-delete-open-warning');
+        var openConfirm = $('sjd-delete-open-confirm');
+        var deleteBtn = $('sjd-delete-confirm');
+        if (j.Status === 'Open') {
+            openWarning.style.display = '';
+            openConfirm.checked = false;
+            deleteBtn.disabled = true;
+            openConfirm.onchange = function () { deleteBtn.disabled = !openConfirm.checked; };
+        } else {
+            openWarning.style.display = 'none';
+            deleteBtn.disabled = false;
+        }
+
+        $('sjd-delete-modal').style.display = 'flex';
+    }
+    function closeDeleteModal() {
+        $('sjd-delete-modal').style.display = 'none';
+    }
+
+    async function confirmDelete() {
+        var btn = $('sjd-delete-confirm');
+        var orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting…';
+        try {
+            await deleteJob(state.idJob);
+            showToast('Job deleted', 'success');
+            // Brief delay so toast shows before navigating away
+            setTimeout(function () {
+                window.location.href = '/dashboards/supacolor-orders.html';
+            }, 600);
+        } catch (err) {
+            console.error('Delete failed:', err);
+            showToast('Delete failed: ' + (err.message || 'unknown error'), 'error');
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    }
+
     // ── Init ───────────────────────────────────────────────────────────
     async function init() {
         var params = new URLSearchParams(window.location.search);
@@ -615,11 +673,18 @@
         // Wire UI
         $('sjd-paste-btn').addEventListener('click', openPasteModal);
         $('sjd-edit-btn').addEventListener('click', openEditPlaceholder);
+        $('sjd-delete-btn').addEventListener('click', openDeleteModal);
         $('sjd-paste-modal-close').addEventListener('click', closePasteModal);
         $('sjd-paste-cancel').addEventListener('click', closePasteModal);
         $('sjd-paste-apply').addEventListener('click', applyPendingExtraction);
         $('sjd-paste-modal').addEventListener('click', function (e) {
             if (e.target === $('sjd-paste-modal')) closePasteModal();
+        });
+        $('sjd-delete-modal-close').addEventListener('click', closeDeleteModal);
+        $('sjd-delete-cancel').addEventListener('click', closeDeleteModal);
+        $('sjd-delete-confirm').addEventListener('click', confirmDelete);
+        $('sjd-delete-modal').addEventListener('click', function (e) {
+            if (e.target === $('sjd-delete-modal')) closeDeleteModal();
         });
 
         var pasteZone = $('sjd-paste-zone');

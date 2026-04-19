@@ -487,3 +487,62 @@
     .sjd-page-header-right { width: 100%; justify-content: flex-end; }
     .sjd-linked-item { grid-template-columns: 1fr; gap: 4px; }
 }
+
+/* Danger button (used by Delete) */
+.bt-btn--danger {
+    background: #fff;
+    color: #c92a2a;
+    border: 1px solid #ffc9c9;
+}
+.bt-btn--danger:hover {
+    background: #fff5f5;
+    border-color: #ff8787;
+}
+.bt-btn--danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Delete confirmation modal */
+.sjd-delete-modal-content { max-width: 520px; }
+.sjd-delete-warning {
+    font-size: 15px;
+    color: #1a202c;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+.sjd-delete-cascade {
+    background: #fff5f5;
+    border: 1px solid #ffd6d6;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #495057;
+    margin-bottom: 12px;
+}
+.sjd-delete-cascade ul {
+    margin: 6px 0 0 0;
+    padding-left: 22px;
+}
+.sjd-delete-cascade li { margin-bottom: 2px; }
+.sjd-delete-note {
+    background: #e7f5ff;
+    border: 1px solid #d0ebff;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #1971c2;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+.sjd-delete-note i { margin-right: 6px; }
+.sjd-delete-open-warning {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #856404;
+    margin-bottom: 12px;
+}
+.sjd-delete-open-warning i { margin-right: 6px; }
