@@ -29,6 +29,22 @@
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     var MAX_FILES = 3;
 
+    // EmailJS (shared with art-actions-shared.js)
+    var EMAILJS_SERVICE_ID = 'service_jgrave3';
+    var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+
+    // Fixed recipient routing
+    var BRADLEY_EMAIL = 'bradley@nwcustomapparel.com';
+    var STEVE_EMAIL = 'steve@nwcustomapparel.com';
+
+    // SITE_ORIGIN: non-Heroku domain for email links (per MEMORY.md gotcha —
+    // use customer-facing origin, never the herokuapp.com slug)
+    var SITE_ORIGIN = (function () {
+        var o = (typeof window !== 'undefined' && window.location && window.location.origin) || '';
+        if (/herokuapp\.com/i.test(o)) return 'https://teamnwca.com';
+        return o || 'https://teamnwca.com';
+    })();
+
     // ── State ────────────────────────────────────────────────────────
     var modalState = {
         injected: false,
@@ -61,6 +77,192 @@
         var ext = (name.split('.').pop() || '').toUpperCase();
         var map = { JPG: 'JPEG', JPEG: 'JPEG', PNG: 'PNG', AI: 'AI', CDR: 'CDR', PDF: 'PDF', PSD: 'PSD', EPS: 'EPS' };
         return map[ext] || ext;
+    }
+
+    // ── EmailJS notifications ────────────────────────────────────────
+    /**
+     * Build the shared EmailJS parameter payload for a transfer record.
+     * All 4 transfer_* templates use this base set, plus template-specific overrides.
+     */
+    function buildEmailParams(record, overrides) {
+        var params = {
+            id_transfer: record.ID_Transfer || '',
+            design_number: record.Design_Number || '',
+            company_name: record.Company_Name || '',
+            customer_name: record.Customer_Name || '',
+            rep_name: record.Sales_Rep_Name || record.Sales_Rep_Email || '',
+            rep_email: record.Sales_Rep_Email || '',
+            quantity: record.Quantity || '—',
+            transfer_size: record.Transfer_Size || '—',
+            press_count: record.Press_Count || '—',
+            needed_by_date: record.Needed_By_Date
+                ? new Date(String(record.Needed_By_Date).split('T')[0] + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : '—',
+            detail_link: SITE_ORIGIN + '/pages/transfer-detail.html?id=' + encodeURIComponent(record.ID_Transfer || ''),
+            supacolor_num: record.Supacolor_Order_Number || '—',
+            shopworks_po: record.ShopWorks_PO_Number || '—',
+            estimated_ship_date: record.Estimated_Ship_Date
+                ? new Date(String(record.Estimated_Ship_Date).split('T')[0] + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : '—',
+            rush_reason: record.Rush_Reason || '',
+            current_status: record.Status || '—',
+            // Defaults for conditional blocks — overrides can replace
+            rush_subject_suffix: '',
+            rush_banner_html: '',
+            notes_block_html: '',
+            special_block_html: '',
+            files_html: buildFilesHtml(record),
+            cc_email: ''
+        };
+        if (overrides) {
+            Object.keys(overrides).forEach(function (k) { params[k] = overrides[k]; });
+        }
+        return params;
+    }
+
+    /**
+     * Pre-render the files list as HTML for inclusion in emails.
+     * Supports primary + up to 2 additional files.
+     */
+    function buildFilesHtml(record) {
+        var files = [];
+        if (record.Working_File_URL) {
+            files.push({
+                label: 'Primary' + (record.Working_File_Type ? ' (' + record.Working_File_Type + ')' : ''),
+                name: record.Working_File_Name || 'primary file',
+                url: record.Working_File_URL
+            });
+        }
+        if (record.Additional_File_1_URL) {
+            files.push({
+                label: 'Additional 1',
+                name: record.Additional_File_1_Name || 'file 2',
+                url: record.Additional_File_1_URL
+            });
+        }
+        if (record.Additional_File_2_URL) {
+            files.push({
+                label: 'Additional 2',
+                name: record.Additional_File_2_Name || 'file 3',
+                url: record.Additional_File_2_URL
+            });
+        }
+        if (files.length === 0) {
+            return '<div style="padding:10px 12px;background:#fef3c7;border:1px solid #fbbf24;border-radius:6px;font-size:13px;color:#92400e;">No working files attached.</div>';
+        }
+        return files.map(function (f) {
+            return '<div style="padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:6px;font-size:13px;">' +
+                   '<strong>' + escapeHtml(f.label) + ':</strong> ' + escapeHtml(f.name) +
+                   ' · <a href="' + escapeHtml(f.url) + '" style="color:#4a6fa5;">Open in Box →</a></div>';
+        }).join('');
+    }
+
+    /**
+     * Build the rush banner HTML block (or empty string).
+     */
+    function buildRushBanner(record) {
+        if (!record.Is_Rush) return '';
+        var reason = record.Rush_Reason ? '<br/>' + escapeHtml(record.Rush_Reason) : '';
+        return '<div style="background:#fee2e2;border-left:4px solid #dc2626;padding:10px 14px;margin:12px 0;border-radius:4px;"><strong style="color:#991b1b;">⚡ RUSH ORDER</strong>' + reason + '</div>';
+    }
+
+    /**
+     * Fire an EmailJS send, non-blocking. Always resolves (never throws)
+     * so a notification failure doesn't break the main user flow.
+     */
+    function sendEmail(templateId, params) {
+        if (typeof window === 'undefined' || !window.emailjs) {
+            console.warn('EmailJS not loaded — skipping ' + templateId);
+            return Promise.resolve({ skipped: true });
+        }
+        return window.emailjs.send(EMAILJS_SERVICE_ID, templateId, params, EMAILJS_PUBLIC_KEY)
+            .then(function (resp) {
+                console.log('EmailJS ' + templateId + ' sent:', resp && resp.status);
+                return resp;
+            })
+            .catch(function (err) {
+                console.warn('EmailJS ' + templateId + ' failed (non-blocking):', err);
+                return { error: err };
+            });
+    }
+
+    /**
+     * Send the transfer_requested notification (Steve → Bradley).
+     * CC the requester so they have a paper trail.
+     */
+    function sendTransferRequestedEmail(record, requestedBy) {
+        var overrides = {
+            to_email: BRADLEY_EMAIL,
+            to_name: 'Bradley',
+            cc_email: requestedBy && requestedBy.email ? requestedBy.email : '',
+            requested_by_name: requestedBy && requestedBy.name ? requestedBy.name : 'Art Department'
+        };
+        if (record.Is_Rush) {
+            overrides.rush_subject_suffix = ' 🚨 RUSH';
+            overrides.rush_banner_html = buildRushBanner(record);
+        }
+        if (record.File_Notes) {
+            overrides.notes_block_html = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">File Notes</h3>' +
+                '<div style="white-space:pre-wrap;background:#fffbeb;padding:10px 14px;border-left:3px solid #f59e0b;border-radius:4px;font-size:13px;">' +
+                escapeHtml(record.File_Notes) + '</div>';
+        }
+        if (record.Special_Instructions) {
+            overrides.special_block_html = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Special Instructions</h3>' +
+                '<div style="white-space:pre-wrap;background:#eff6ff;padding:10px 14px;border-left:3px solid #3b82f6;border-radius:4px;font-size:13px;">' +
+                escapeHtml(record.Special_Instructions) + '</div>';
+        }
+        return sendEmail('transfer_requested', buildEmailParams(record, overrides));
+    }
+
+    /**
+     * Send the transfer_ordered notification (Bradley → Sales Rep, CC Steve).
+     */
+    function sendTransferOrderedEmail(record, actor) {
+        if (!record.Sales_Rep_Email) {
+            console.warn('No Sales_Rep_Email — skipping transfer_ordered');
+            return Promise.resolve();
+        }
+        var overrides = {
+            to_email: record.Sales_Rep_Email,
+            to_name: record.Sales_Rep_Name || record.Sales_Rep_Email,
+            cc_email: STEVE_EMAIL,
+            actor_name: actor && actor.name ? actor.name : 'Bradley',
+            actor_email: actor && actor.email ? actor.email : BRADLEY_EMAIL
+        };
+        return sendEmail('transfer_ordered', buildEmailParams(record, overrides));
+    }
+
+    /**
+     * Send the transfer_received notification (Bradley/Michaela → Sales Rep, CC Steve).
+     */
+    function sendTransferReceivedEmail(record, actor) {
+        if (!record.Sales_Rep_Email) {
+            console.warn('No Sales_Rep_Email — skipping transfer_received');
+            return Promise.resolve();
+        }
+        var overrides = {
+            to_email: record.Sales_Rep_Email,
+            to_name: record.Sales_Rep_Name || record.Sales_Rep_Email,
+            cc_email: STEVE_EMAIL,
+            actor_name: actor && actor.name ? actor.name : 'Warehouse',
+            actor_email: actor && actor.email ? actor.email : '',
+            received_date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        };
+        return sendEmail('transfer_received', buildEmailParams(record, overrides));
+    }
+
+    /**
+     * Send the transfer_rush notification (→ Bradley, CC Sales Rep).
+     */
+    function sendTransferRushEmail(record, actor) {
+        var overrides = {
+            to_email: BRADLEY_EMAIL,
+            to_name: 'Bradley',
+            cc_email: record.Sales_Rep_Email || '',
+            actor_name: actor && actor.name ? actor.name : 'Art Department',
+            actor_email: actor && actor.email ? actor.email : ''
+        };
+        return sendEmail('transfer_rush', buildEmailParams(record, overrides));
     }
 
     // ── User identity ────────────────────────────────────────────────
@@ -498,6 +700,9 @@
             closeModal();
             showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley.', 'success');
 
+            // Fire EmailJS notification (non-blocking) — Bradley + CC requester
+            sendTransferRequestedEmail(createData.record, user);
+
             if (typeof opts.onSuccess === 'function') {
                 opts.onSuccess(createData.record);
             }
@@ -544,6 +749,11 @@
         openSendModal: openSendModal,
         getTransferForMockup: getTransferForMockup,
         getTransferById: getTransferById,
-        showToast: showToast
+        showToast: showToast,
+        // Notification helpers (called from transfer-detail.js on status changes)
+        sendTransferRequestedEmail: sendTransferRequestedEmail,
+        sendTransferOrderedEmail: sendTransferOrderedEmail,
+        sendTransferReceivedEmail: sendTransferReceivedEmail,
+        sendTransferRushEmail: sendTransferRushEmail
     };
 })();

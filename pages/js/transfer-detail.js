@@ -526,6 +526,11 @@
             });
             showToast(successMsg, 'success');
             await load();
+
+            // Fire EmailJS notification on Received transition (non-blocking)
+            if (newStatus === 'Received' && window.TransferActions && window.TransferActions.sendTransferReceivedEmail) {
+                window.TransferActions.sendTransferReceivedEmail(state.record, state.user);
+            }
         } catch (err) {
             console.error(err);
             showToast('Failed: ' + err.message, 'error');
@@ -549,6 +554,11 @@
             closeModal('td-ordered-modal');
             showToast('Marked as Ordered.', 'success');
             await load();
+
+            // Fire EmailJS notification — sales rep + Steve (non-blocking)
+            if (window.TransferActions && window.TransferActions.sendTransferOrderedEmail) {
+                window.TransferActions.sendTransferOrderedEmail(state.record, state.user);
+            }
         } catch (err) {
             console.error(err);
             showToast('Failed: ' + err.message, 'error');
@@ -632,6 +642,11 @@
             closeModal('td-rush-modal');
             showToast(markingRush ? 'Marked as RUSH.' : 'Rush cleared.', 'success');
             await load();
+
+            // Fire EmailJS rush alert only when flipping ON (not when clearing)
+            if (markingRush && window.TransferActions && window.TransferActions.sendTransferRushEmail) {
+                window.TransferActions.sendTransferRushEmail(state.record, state.user);
+            }
         } catch (err) {
             console.error(err);
             showToast('Failed: ' + err.message, 'error');
