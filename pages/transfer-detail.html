@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
-    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=2">
+    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=3">
 </head>
 <body>
     <div class="minimal-header">
@@ -163,11 +163,22 @@
                 <div class="bt-modal-intro">
                     Enter the Supacolor order number once you've placed the order on supacolor.com.
                 </div>
+
+                <!-- Paste screenshot to auto-fill (Phase 2.5) -->
+                <div class="td-paste-zone" id="td-ordered-paste-zone" tabindex="0" data-target="ordered">
+                    <i class="fas fa-paste"></i>
+                    <div class="td-paste-text">
+                        <strong>Paste a Supacolor screenshot (Ctrl+V)</strong>
+                        <span class="td-paste-hint">Claude will auto-fill Job # and Ship Date</span>
+                    </div>
+                </div>
+                <div id="td-ordered-paste-status" class="td-paste-status" style="display:none;"></div>
+
                 <form id="td-ordered-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
                             <label>Supacolor Order # *</label>
-                            <input type="text" name="supacolorOrderNumber" required placeholder="e.g. SC-99999">
+                            <input type="text" name="supacolorOrderNumber" required placeholder="e.g. 637713">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
@@ -238,6 +249,16 @@
                 <button class="bt-modal-close" data-close="td-shipped-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
+                <!-- Paste screenshot to auto-fill (Phase 2.5) -->
+                <div class="td-paste-zone" id="td-shipped-paste-zone" tabindex="0" data-target="shipped">
+                    <i class="fas fa-paste"></i>
+                    <div class="td-paste-text">
+                        <strong>Paste a Supacolor screenshot (Ctrl+V)</strong>
+                        <span class="td-paste-hint">Claude will auto-fill Tracking # and Delivery Date</span>
+                    </div>
+                </div>
+                <div id="td-shipped-paste-status" class="td-paste-status" style="display:none;"></div>
+
                 <form id="td-shipped-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
@@ -382,6 +403,6 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2"></script>
-    <script src="/pages/js/transfer-detail.js?v=3"></script>
+    <script src="/pages/js/transfer-detail.js?v=4"></script>
 </body>
 </html>

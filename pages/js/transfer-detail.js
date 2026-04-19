@@ -496,12 +496,151 @@
     // ── Modal helpers ────────────────────────────────────────────────
     function openModal(id) {
         $(id).style.display = 'flex';
+        // Focus the paste zone if this modal has one — enables Ctrl+V immediately
+        var pasteZone = document.querySelector('#' + id + ' .td-paste-zone');
+        if (pasteZone) setTimeout(function () { pasteZone.focus(); }, 50);
     }
 
     function closeModal(id) {
         $(id).style.display = 'none';
         var form = document.querySelector('#' + id + ' form');
         if (form) form.reset();
+        // Clear any lingering paste status message
+        var status = document.querySelector('#' + id + ' .td-paste-status');
+        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+        var zone = document.querySelector('#' + id + ' .td-paste-zone');
+        if (zone) zone.classList.remove('td-paste-zone--active');
+    }
+
+    // ── Supacolor Screenshot Auto-Fill ──────────────────────────────
+    /**
+     * POST the pasted image to /api/vision/extract-supacolor and return the
+     * extracted fields. Any error rejects so callers can show a status message.
+     */
+    async function extractSupacolor(dataUri) {
+        var resp = await fetch(API_BASE + '/api/vision/extract-supacolor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: dataUri })
+        });
+        var json = await resp.json();
+        if (!resp.ok || !json.success) {
+            throw new Error(json.error || ('HTTP ' + resp.status));
+        }
+        return json.data;
+    }
+
+    /**
+     * Render a status banner inside the target modal.
+     * state: 'loading' | 'success' | 'error'. iconHtml is optional FA classes.
+     */
+    function renderPasteStatus(target, state, message, thumbUri) {
+        var el = $('td-' + target + '-paste-status');
+        if (!el) return;
+        var icon = state === 'loading'
+            ? '<i class="fas fa-spinner fa-spin td-paste-status-icon"></i>'
+            : state === 'success'
+                ? '<i class="fas fa-check-circle td-paste-status-icon"></i>'
+                : '<i class="fas fa-exclamation-triangle td-paste-status-icon"></i>';
+        var thumb = thumbUri ? '<img src="' + thumbUri + '" class="td-paste-thumb" alt="">' : '';
+        el.className = 'td-paste-status td-paste-status--' + state;
+        el.innerHTML = icon + '<span>' + message + '</span>' + thumb;
+        el.style.display = '';
+    }
+
+    /**
+     * Attach paste handler to a modal's paste zone. `target` is 'ordered' or 'shipped'.
+     * Applies extracted fields to the correct form.
+     */
+    function setupPasteZone(target) {
+        var zone = $('td-' + target + '-paste-zone');
+        if (!zone) return;
+
+        // One handler on the MODAL catches both clicks inside the zone AND paste events
+        var modal = $('td-' + target + '-modal');
+        if (!modal || modal.__pasteWired) return;
+        modal.__pasteWired = true;
+
+        modal.addEventListener('paste', async function (e) {
+            // Only when modal is visible
+            if (modal.style.display === 'none') return;
+            var items = (e.clipboardData || window.clipboardData || {}).items;
+            if (!items) return;
+            var imageItem = null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type && items[i].type.indexOf('image') === 0) {
+                    imageItem = items[i];
+                    break;
+                }
+            }
+            if (!imageItem) return; // let the default paste happen (e.g. text into an input)
+            e.preventDefault();
+
+            var file = imageItem.getAsFile();
+            if (!file) return;
+
+            // Read as base64 data URI
+            var reader = new FileReader();
+            reader.onload = async function () {
+                var dataUri = reader.result;
+                zone.classList.add('td-paste-zone--active');
+                renderPasteStatus(target, 'loading', 'Extracting with Claude…', dataUri);
+
+                try {
+                    var data = await extractSupacolor(dataUri);
+                    applyExtraction(target, data, dataUri);
+                } catch (err) {
+                    console.error('Supacolor extraction failed:', err);
+                    renderPasteStatus(target, 'error',
+                        'Could not read screenshot: ' + (err.message || 'unknown error') +
+                        '. You can still fill the fields manually below.',
+                        dataUri);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Apply extracted data to the named form (ordered or shipped).
+     * Only fills empty inputs — never overwrites Bradley's manual edits.
+     */
+    function applyExtraction(target, data, thumbUri) {
+        var form = $('td-' + target + '-form');
+        if (!form) return;
+
+        var filled = [];
+        function setIfEmpty(fieldName, value) {
+            if (!value) return;
+            var el = form.querySelector('[name="' + fieldName + '"]');
+            if (!el) return;
+            if (el.value && el.value.trim()) return; // don't overwrite user input
+            el.value = value;
+            filled.push(fieldName);
+        }
+
+        if (target === 'ordered') {
+            setIfEmpty('supacolorOrderNumber', data.supacolorJobNumber);
+            setIfEmpty('estimatedShipDate', data.estimatedShipDate);
+            // URL to the Supacolor job page (best guess from job #)
+            if (data.supacolorJobNumber) {
+                setIfEmpty('supacolorOrderUrl', 'https://integrate.supacolor.com/dashboard/jobs/' + data.supacolorJobNumber);
+            }
+        } else if (target === 'shipped') {
+            setIfEmpty('trackingNumber', data.trackingNumber);
+            setIfEmpty('estimatedShipDate', data.actualShipDate || data.estimatedShipDate);
+        }
+
+        if (filled.length === 0) {
+            renderPasteStatus(target, 'error',
+                'Screenshot read, but no matching fields found. Fill manually below.',
+                thumbUri);
+            return;
+        }
+
+        var msg = 'Auto-filled ' + filled.length + ' field' + (filled.length === 1 ? '' : 's') +
+                  ' from Supacolor: ' + filled.join(', ') + '. Review, then submit.';
+        renderPasteStatus(target, 'success', msg, thumbUri);
     }
 
     function openRushModal(markingRush) {
@@ -781,6 +920,10 @@
         $('td-cancel-form').addEventListener('submit', handleCancelSubmit);
         $('td-rush-form').addEventListener('submit', handleRushSubmit);
         $('td-specs-form').addEventListener('submit', handleSpecsSubmit);
+
+        // Wire Supacolor screenshot paste handlers on the Ordered + Shipped modals
+        setupPasteZone('ordered');
+        setupPasteZone('shipped');
 
         $('td-edit-specs-btn').addEventListener('click', openSpecsModal);
         $('td-add-comment-btn').addEventListener('click', handleCommentSubmit);
