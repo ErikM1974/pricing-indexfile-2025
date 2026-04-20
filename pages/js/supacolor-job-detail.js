@@ -148,6 +148,17 @@
         return data;
     }
 
+    async function updateJobStatus(idJob, status) {
+        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(idJob), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Status: status })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
     // ── Render ─────────────────────────────────────────────────────────
     function render() {
         var j = state.job;
@@ -660,6 +671,56 @@
         showToast('Edit fields directly via screenshot paste, or use Caspio admin for now.', 'info');
     }
 
+    // ── Change Status flow ─────────────────────────────────────────────
+    function openStatusModal() {
+        if (!state.job) return;
+        var j = state.job;
+        $('sjd-status-job-label').textContent = '#' + (j.Supacolor_Job_Number || j.ID_Job);
+
+        // Pre-select the current status; treat anything that isn't Closed/Cancelled
+        // as "Open" (covers Ganged, In Production, etc.) to match filter semantics.
+        var current = (j.Status === 'Closed' || j.Status === 'Cancelled') ? j.Status : 'Open';
+        var radios = document.querySelectorAll('input[name="sjd-status-choice"]');
+        radios.forEach(function (r) { r.checked = (r.value === current); });
+        updateStatusSaveBtn();
+
+        $('sjd-status-modal').style.display = 'flex';
+    }
+    function closeStatusModal() {
+        $('sjd-status-modal').style.display = 'none';
+    }
+    function updateStatusSaveBtn() {
+        var picked = document.querySelector('input[name="sjd-status-choice"]:checked');
+        var currentStored = state.job && state.job.Status;
+        var currentNormalized = (currentStored === 'Closed' || currentStored === 'Cancelled') ? currentStored : 'Open';
+        // Enable Save only when user picked a different value than currently shown
+        $('sjd-status-save').disabled = !picked || picked.value === currentNormalized;
+    }
+    async function saveStatus() {
+        var picked = document.querySelector('input[name="sjd-status-choice"]:checked');
+        if (!picked) return;
+        var newStatus = picked.value;
+        var btn = $('sjd-status-save');
+        var orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+        try {
+            await updateJobStatus(state.idJob, newStatus);
+            showToast('Status changed to ' + newStatus, 'success');
+            closeStatusModal();
+            var data = await fetchJob(state.idJob);
+            state.job = data.job;
+            state.joblines = data.joblines || [];
+            state.history = data.history || [];
+            render();
+        } catch (err) {
+            console.error('Status change failed:', err);
+            showToast('Status change failed: ' + (err.message || 'unknown error'), 'error');
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    }
+
     // ── Delete flow ────────────────────────────────────────────────────
     function openDeleteModal() {
         if (!state.job) return;
@@ -720,8 +781,18 @@
 
         // Wire UI
         $('sjd-paste-btn').addEventListener('click', openPasteModal);
+        $('sjd-status-btn').addEventListener('click', openStatusModal);
         $('sjd-edit-btn').addEventListener('click', openEditPlaceholder);
         $('sjd-delete-btn').addEventListener('click', openDeleteModal);
+        $('sjd-status-modal-close').addEventListener('click', closeStatusModal);
+        $('sjd-status-cancel').addEventListener('click', closeStatusModal);
+        $('sjd-status-save').addEventListener('click', saveStatus);
+        $('sjd-status-modal').addEventListener('click', function (e) {
+            if (e.target === $('sjd-status-modal')) closeStatusModal();
+        });
+        document.querySelectorAll('input[name="sjd-status-choice"]').forEach(function (r) {
+            r.addEventListener('change', updateStatusSaveBtn);
+        });
         $('sjd-paste-modal-close').addEventListener('click', closePasteModal);
         $('sjd-paste-cancel').addEventListener('click', closePasteModal);
         $('sjd-paste-apply').addEventListener('click', applyPendingExtraction);

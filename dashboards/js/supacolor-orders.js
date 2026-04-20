@@ -20,7 +20,7 @@
         allJobs: [],
         filteredJobs: [],
         stats: {},
-        filters: { status: '', search: '', view: 'active' }, // view: active|closed
+        filters: { status: '', search: '', view: 'active' }, // view: active|closed|cancelled|all
         currentPage: 1,
         pollTimer: null,
         pendingBackfill: null,  // extracted jobs awaiting import confirmation (list-view path)
@@ -148,10 +148,14 @@
         var search = f.search.toLowerCase().trim();
 
         state.filteredJobs = state.allJobs.filter(function (j) {
-            // View toggle: active = anything that isn't Closed/Cancelled
-            // (covers Open, Ganged, In Production, etc.); closed = Closed + Cancelled only
-            if (f.view === 'active' && (j.Status === 'Closed' || j.Status === 'Cancelled')) return false;
-            if (f.view === 'closed' && j.Status !== 'Closed' && j.Status !== 'Cancelled') return false;
+            // View filter (driven by the clickable stat cards):
+            //   active    = anything that isn't Closed/Cancelled (Open, Ganged, etc.)
+            //   closed    = Closed only (Cancelled has its own bucket now)
+            //   cancelled = Cancelled only
+            //   all       = no view filter
+            if (f.view === 'active'    && (j.Status === 'Closed' || j.Status === 'Cancelled')) return false;
+            if (f.view === 'closed'    && j.Status !== 'Closed') return false;
+            if (f.view === 'cancelled' && j.Status !== 'Cancelled') return false;
 
             // Explicit status filter overrides view
             if (f.status && j.Status !== f.status) return false;
@@ -565,14 +569,26 @@
             applyFilters();
         });
 
-        // View toggle
-        document.querySelectorAll('.sc-toggle-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.sc-toggle-btn').forEach(function (b) { b.classList.remove('active'); });
-                btn.classList.add('active');
-                state.filters.view = btn.dataset.view;
-                applyFilters();
+        // Clickable stat cards = view filter
+        var statsRow = $('sc-stats-row');
+        function selectViewChip(view) {
+            state.filters.view = view;
+            statsRow.querySelectorAll('.bt-stat-chip--clickable').forEach(function (c) {
+                c.classList.toggle('selected', c.dataset.view === view);
             });
+            applyFilters();
+        }
+        statsRow.addEventListener('click', function (e) {
+            var chip = e.target.closest('.bt-stat-chip--clickable');
+            if (!chip || !chip.dataset.view) return;
+            selectViewChip(chip.dataset.view);
+        });
+        statsRow.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var chip = e.target.closest('.bt-stat-chip--clickable');
+            if (!chip || !chip.dataset.view) return;
+            e.preventDefault();
+            selectViewChip(chip.dataset.view);
         });
 
         // Refresh

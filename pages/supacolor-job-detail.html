@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
     <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=1">
-    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=3">
+    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=4">
 </head>
 <body>
     <div class="minimal-header">
@@ -36,6 +36,9 @@
             <div class="sjd-page-header-right">
                 <button id="sjd-paste-btn" class="bt-btn bt-btn--primary">
                     <i class="fas fa-paste"></i> Paste Detail Screenshot
+                </button>
+                <button id="sjd-status-btn" class="bt-btn bt-btn--secondary" title="Change job status">
+                    <i class="fas fa-exchange-alt"></i> Change Status
                 </button>
                 <button id="sjd-edit-btn" class="bt-btn bt-btn--secondary" title="Edit job fields">
                     <i class="fas fa-pen"></i> Edit
@@ -265,9 +268,48 @@
         </div>
     </div>
 
+    <!-- Change Status Modal -->
+    <div id="sjd-status-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width: 440px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-exchange-alt"></i> Change Status</h3>
+                <button class="bt-modal-close" id="sjd-status-modal-close">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro">
+                    Change the local status for <strong id="sjd-status-job-label"></strong>.
+                    This updates the mirror only — Supacolor.com is unchanged.
+                </div>
+                <div class="sjd-status-options">
+                    <label class="sjd-status-option">
+                        <input type="radio" name="sjd-status-choice" value="Open">
+                        <span class="sc-status-badge sc-status-badge--open">Open</span>
+                        <span class="sjd-status-hint">Active / in progress (includes Ganged)</span>
+                    </label>
+                    <label class="sjd-status-option">
+                        <input type="radio" name="sjd-status-choice" value="Closed">
+                        <span class="sc-status-badge sc-status-badge--closed">Closed</span>
+                        <span class="sjd-status-hint">Shipped and complete</span>
+                    </label>
+                    <label class="sjd-status-option">
+                        <input type="radio" name="sjd-status-choice" value="Cancelled">
+                        <span class="sc-status-badge sc-status-badge--cancelled">Cancelled</span>
+                        <span class="sjd-status-hint">Job was cancelled</span>
+                    </label>
+                </div>
+                <div class="bt-form-actions">
+                    <button type="button" class="bt-btn bt-btn--secondary" id="sjd-status-cancel">Cancel</button>
+                    <button type="button" class="bt-btn bt-btn--primary" id="sjd-status-save" disabled>
+                        <i class="fas fa-check"></i> Save Status
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast container -->
     <div id="sjd-toast-container" class="bt-toast-container"></div>
 
-    <script src="/pages/js/supacolor-job-detail.js?v=4"></script>
+    <script src="/pages/js/supacolor-job-detail.js?v=5"></script>
 </body>
 </html>

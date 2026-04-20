@@ -553,3 +553,39 @@
     margin-bottom: 12px;
 }
 .sjd-delete-open-warning i { margin-right: 6px; }
+
+/* Change Status modal */
+.sjd-status-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 14px 0 18px;
+}
+.sjd-status-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.sjd-status-option:hover {
+    border-color: #4a6fa5;
+    background: #f8f9fa;
+}
+.sjd-status-option input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+.sjd-status-option input[type="radio"]:checked ~ * { }
+.sjd-status-option:has(input:checked) {
+    border-color: #4a6fa5;
+    background: #eef3fb;
+}
+.sjd-status-hint {
+    font-size: 12px;
+    color: #6c757d;
+    flex: 1;
+}

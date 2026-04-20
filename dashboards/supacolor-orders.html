@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=1">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=2">
 </head>
 <body>
     <div class="minimal-header">
@@ -48,30 +48,24 @@
                     </div>
                 </div>
 
-                <!-- Stats Chips -->
+                <!-- Stats Chips (clickable = view filter) -->
                 <div id="sc-stats-row" class="bt-stats-row">
-                    <div class="bt-stat-chip bt-stat-chip--ordered" data-status="Active">
+                    <div class="bt-stat-chip bt-stat-chip--ordered bt-stat-chip--clickable selected" data-view="active" role="button" tabindex="0" title="Show active jobs">
                         <span class="bt-stat-count" id="sc-stat-open">&mdash;</span>
                         <span class="bt-stat-label">Active</span>
                     </div>
-                    <div class="bt-stat-chip bt-stat-chip--received" data-status="Closed">
+                    <div class="bt-stat-chip bt-stat-chip--received bt-stat-chip--clickable" data-view="closed" role="button" tabindex="0" title="Show closed jobs">
                         <span class="bt-stat-count" id="sc-stat-closed">&mdash;</span>
                         <span class="bt-stat-label">Closed</span>
                     </div>
-                    <div class="bt-stat-chip bt-stat-chip--cancelled" data-status="Cancelled">
+                    <div class="bt-stat-chip bt-stat-chip--cancelled bt-stat-chip--clickable" data-view="cancelled" role="button" tabindex="0" title="Show cancelled jobs">
                         <span class="bt-stat-count" id="sc-stat-cancelled">&mdash;</span>
                         <span class="bt-stat-label">Cancelled</span>
                     </div>
-                    <div class="bt-stat-chip bt-stat-chip--total" id="sc-stat-total-chip">
+                    <div class="bt-stat-chip bt-stat-chip--total bt-stat-chip--clickable" id="sc-stat-total-chip" data-view="all" role="button" tabindex="0" title="Show all jobs">
                         <span class="bt-stat-count" id="sc-stat-total">&mdash;</span>
                         <span class="bt-stat-label">Total</span>
                     </div>
-                </div>
-
-                <!-- Active/Closed Toggle -->
-                <div class="sc-view-toggle">
-                    <button class="sc-toggle-btn active" data-view="active">Active</button>
-                    <button class="sc-toggle-btn" data-view="closed">Closed</button>
                 </div>
 
                 <!-- Filter Bar -->
@@ -159,6 +153,6 @@
     <!-- Toast container -->
     <div id="sc-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/supacolor-orders.js?v=4"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=5"></script>
 </body>
 </html>
