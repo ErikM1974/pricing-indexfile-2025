@@ -415,18 +415,24 @@
             if (e.target === $('sc-backfill-modal')) closeBackfillModal();
         });
 
-        // Paste zone — Ctrl+V handler
+        // Paste zone — Ctrl+V handler. Listener on document (not the zone)
+        // so it fires regardless of where focus is when Ctrl+V hits — avoids
+        // the setTimeout-focus race where the first Ctrl+V lands on the
+        // trigger button (outside the modal) and silently no-ops.
         var pasteZone = $('sc-paste-zone');
-        pasteZone.addEventListener('paste', function (e) {
-            var items = (e.clipboardData || window.clipboardData).items;
+        var backfillModal = $('sc-backfill-modal');
+        document.addEventListener('paste', function (e) {
+            if (backfillModal.style.display === 'none') return;
+            var items = (e.clipboardData || window.clipboardData || {}).items;
+            if (!items) return;
             for (var i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image/') === 0) {
+                if (items[i].type && items[i].type.indexOf('image/') === 0) {
                     e.preventDefault();
                     handlePastedImage(items[i].getAsFile());
                     return;
                 }
             }
-            showExtractStatus('No image in clipboard. Take a screenshot first.', 'error');
+            // No image in clipboard — let default paste happen
         });
 
         // Drag & drop

@@ -733,16 +733,23 @@
         });
 
         var pasteZone = $('sjd-paste-zone');
-        pasteZone.addEventListener('paste', function (e) {
-            var items = (e.clipboardData || window.clipboardData).items;
+        // Paste listener on document (not the zone) so it fires regardless of
+        // where focus is when Ctrl+V hits — avoids the setTimeout-focus race
+        // where the first Ctrl+V lands on the trigger button (outside the
+        // modal) and silently no-ops.
+        var pasteModal = $('sjd-paste-modal');
+        document.addEventListener('paste', function (e) {
+            if (pasteModal.style.display === 'none') return;
+            var items = (e.clipboardData || window.clipboardData || {}).items;
+            if (!items) return;
             for (var i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image/') === 0) {
+                if (items[i].type && items[i].type.indexOf('image/') === 0) {
                     e.preventDefault();
                     handlePastedImage(items[i].getAsFile());
                     return;
                 }
             }
-            showExtractStatus('No image in clipboard.', 'error');
+            // No image in clipboard — let default paste happen (e.g. text into an input)
         });
         pasteZone.addEventListener('dragover', function (e) { e.preventDefault(); pasteZone.classList.add('sc-paste-zone--dragover'); });
         pasteZone.addEventListener('dragleave', function () { pasteZone.classList.remove('sc-paste-zone--dragover'); });
