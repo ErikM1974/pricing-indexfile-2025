@@ -23,7 +23,8 @@
         filters: { status: '', search: '', view: 'active' }, // view: active|closed
         currentPage: 1,
         pollTimer: null,
-        pendingBackfill: null  // extracted jobs awaiting import confirmation
+        pendingBackfill: null,  // extracted jobs awaiting import confirmation (list-view path)
+        pendingSingleJob: null  // { stub, detail } — when paste was a single-job detail screenshot
     };
 
     function $(id) { return document.getElementById(id); }
@@ -89,6 +90,52 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jobs: jobs })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
+    // Single-job detail extraction + save — mirrors the flow in supacolor-job-detail.js
+    async function extractJobDetail(base64Image) {
+        var resp = await fetch(API_BASE + '/api/vision/extract-supacolor-job-detail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
+    async function upsertJob(payload, force) {
+        var url = API_BASE + '/api/supacolor-jobs/upsert' + (force ? '?force=true' : '');
+        var resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
+    async function replaceJoblines(idJob, joblines) {
+        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + idJob + '/joblines', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ joblines: joblines })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
+    async function replaceHistory(idJob, history) {
+        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + idJob + '/history/replace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ history: history })
         });
         var data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
@@ -210,6 +257,7 @@
     function closeBackfillModal() {
         $('sc-backfill-modal').style.display = 'none';
         state.pendingBackfill = null;
+        state.pendingSingleJob = null;
     }
 
     function resetBackfillModal() {
@@ -222,6 +270,7 @@
         $('sc-extract-results').innerHTML = '';
         $('sc-backfill-import').disabled = true;
         state.pendingBackfill = null;
+        state.pendingSingleJob = null;
     }
 
     function showExtractStatus(html, kind) {
@@ -251,18 +300,76 @@
         $('sc-paste-preview').style.display = '';
         $('sc-backfill-import').disabled = true;
 
-        // Run extraction
+        // Run BOTH extractors in parallel — same image. If the user pasted a
+        // single-job detail screenshot, the detail extractor returns full data
+        // (joblines, history, shipping, etc). If they pasted a multi-row list,
+        // the detail extractor returns error/empty and we fall through to the
+        // existing list-backfill flow.
         showExtractStatus('<i class="fas fa-spinner fa-spin"></i> Reading screenshot with Claude Vision…', 'info');
         try {
-            var result = await extractJobsList(dataUri);
-            var jobs = (result.data && result.data.jobs) || [];
+            var both = await Promise.all([
+                extractJobsList(dataUri),
+                extractJobDetail(dataUri).catch(function () { return null; })
+            ]);
+            var listResult = both[0];
+            var detailResult = both[1];
 
-            if (jobs.length === 0) {
-                showExtractStatus('No job rows detected in this screenshot. Make sure you pasted the Jobs list page.', 'error');
+            var jobs = (listResult.data && listResult.data.jobs) || [];
+            var detail = (detailResult && detailResult.data) || null;
+            var isSingle = jobs.length === 1 && detail && detail.supacolorJobNumber;
+
+            if (jobs.length === 0 && !isSingle) {
+                showExtractStatus('No job rows detected in this screenshot. Make sure you pasted the Supacolor jobs list or a single job detail page.', 'error');
                 return;
             }
 
-            // Map vision output → DB column names
+            if (isSingle) {
+                // Single-job rich path
+                state.pendingBackfill = null;
+                state.pendingSingleJob = { stub: jobs[0], detail: detail };
+
+                var jlCount = (detail.joblines || []).length;
+                var histCount = (detail.history || []).length;
+                var fieldCount = 0;
+                ['poNumber','description','status','location','createdByName','dateEntered',
+                 'requestedShipDate','dateShipped','subtotal','total','paymentStatus',
+                 'paymentMethod','carrier','shippingMethod','trackingNumber','shipToName',
+                 'shipToAddress','shipToContact','shipToPhone','shipToEmail'].forEach(function (k) {
+                    if (detail[k] != null && detail[k] !== '') fieldCount++;
+                });
+
+                showExtractStatus(
+                    '<i class="fas fa-check-circle"></i> Single job detected: <strong>#' +
+                    escapeHtml(detail.supacolorJobNumber) + '</strong> — ' +
+                    fieldCount + ' fields, ' + jlCount + ' joblines, ' + histCount + ' history events. ' +
+                    'Review below and click Import.',
+                    'success'
+                );
+
+                $('sc-extract-results').style.display = '';
+                $('sc-extract-results').innerHTML =
+                    '<div class="sc-preview-table">' +
+                        '<div class="sc-preview-row sc-preview-row--header">' +
+                            '<div>Job #</div><div>PO</div><div>Description</div><div>Status</div><div>Shipped</div>' +
+                        '</div>' +
+                        '<div class="sc-preview-row">' +
+                            '<div>#' + escapeHtml(detail.supacolorJobNumber) + '</div>' +
+                            '<div>' + escapeHtml(detail.poNumber || '') + '</div>' +
+                            '<div>' + escapeHtml(detail.description || '') + '</div>' +
+                            '<div>' + escapeHtml(detail.status || '') + '</div>' +
+                            '<div>' + escapeHtml(formatDate(detail.dateShipped)) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="margin-top:12px;font-size:13px;color:#475569;">' +
+                        '<strong>Will also import:</strong> ' +
+                        jlCount + ' joblines, ' + histCount + ' history events, plus shipping/payment details.' +
+                    '</div>';
+
+                $('sc-backfill-import').disabled = false;
+                return;
+            }
+
+            // Multi-job list path — existing behavior
             var mapped = jobs.map(function (j) {
                 var row = {
                     Supacolor_Job_Number: j.supacolorJobNumber || j.jobNumber,
@@ -276,14 +383,14 @@
             }).filter(function (r) { return r.Supacolor_Job_Number; });
 
             state.pendingBackfill = mapped;
+            state.pendingSingleJob = null;
 
             showExtractStatus(
                 '<i class="fas fa-check-circle"></i> Extracted <strong>' + mapped.length +
-                '</strong> job rows in ' + (result.duration || 0) + 'ms. Review below and click Import.',
+                '</strong> job rows in ' + (listResult.duration || 0) + 'ms. Review below and click Import.',
                 'success'
             );
 
-            // Render preview
             $('sc-extract-results').style.display = '';
             $('sc-extract-results').innerHTML =
                 '<div class="sc-preview-table">' +
@@ -313,25 +420,102 @@
     }
 
     async function importPendingBackfill() {
-        if (!state.pendingBackfill || state.pendingBackfill.length === 0) return;
+        var hasSingle = !!state.pendingSingleJob;
+        var hasList = state.pendingBackfill && state.pendingBackfill.length > 0;
+        if (!hasSingle && !hasList) return;
+
         var btn = $('sc-backfill-import');
         btn.disabled = true;
         var origHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing…';
 
         try {
-            var result = await bulkUpsertJobs(state.pendingBackfill);
-            var s = result.summary || {};
-            var msg = (s.inserted || 0) + ' new, ' + (s.patched || 0) + ' updated, ' + (s.noop || 0) + ' unchanged';
-            if (s.errored) msg += ', ' + s.errored + ' failed';
-            showToast('Import complete: ' + msg, s.errored ? 'error' : 'success');
+            if (hasSingle) {
+                // Single-job rich import — same sequence as supacolor-job-detail.js applyPendingExtraction
+                var d = state.pendingSingleJob.detail;
+                var jobPayload = {
+                    Supacolor_Job_Number: d.supacolorJobNumber,
+                    PO_Number: d.poNumber || undefined,
+                    Description: d.description || undefined,
+                    Status: d.status || undefined,
+                    Location: d.location || undefined,
+                    Created_By_Name: d.createdByName || undefined,
+                    Date_Entered: d.dateEntered || undefined,
+                    Requested_Ship_Date: d.requestedShipDate || undefined,
+                    Date_Shipped: d.dateShipped || undefined,
+                    Subtotal: (d.subtotal != null ? d.subtotal : undefined),
+                    Total: (d.total != null ? d.total : undefined),
+                    Payment_Status: d.paymentStatus || undefined,
+                    Payment_Method: d.paymentMethod || undefined,
+                    Carrier: d.carrier || undefined,
+                    Shipping_Method: d.shippingMethod || undefined,
+                    Tracking_Number: d.trackingNumber || undefined,
+                    Ship_To_Name: d.shipToName || undefined,
+                    Ship_To_Address: d.shipToAddress || undefined,
+                    Ship_To_Contact: d.shipToContact || undefined,
+                    Ship_To_Phone: d.shipToPhone || undefined,
+                    Ship_To_Email: d.shipToEmail || undefined,
+                    Backfill_Source: 'screenshot'
+                };
+                Object.keys(jobPayload).forEach(function (k) {
+                    if (jobPayload[k] === undefined) delete jobPayload[k];
+                });
+
+                var upsertResult = await upsertJob(jobPayload, false);
+                var idJob = upsertResult && upsertResult.job && upsertResult.job.ID_Job;
+
+                var joblinesWritten = 0;
+                if (idJob && d.joblines && d.joblines.length) {
+                    var lines = d.joblines.map(function (l, i) {
+                        return {
+                            Line_Order: l.lineOrder || (i + 1),
+                            Line_Type: l.lineType || 'TRANSFER',
+                            Item_Code: l.itemCode || '',
+                            Description: l.description || null,
+                            Detail_Line: l.detailLine || null,
+                            Color: l.color || null,
+                            Quantity: l.quantity != null ? l.quantity : null,
+                            Unit_Price: l.unitPrice != null ? l.unitPrice : null,
+                            Line_Total: l.lineTotal != null ? l.lineTotal : null
+                        };
+                    });
+                    var jlResult = await replaceJoblines(idJob, lines);
+                    joblinesWritten = (jlResult && jlResult.inserted) || lines.length;
+                }
+
+                var historyWritten = 0;
+                if (idJob && d.history && d.history.length) {
+                    var events = d.history.map(function (h) {
+                        return {
+                            Event_Type: h.eventType || 'Event',
+                            Event_Detail: h.eventDetail || null,
+                            Event_At: h.eventAt || null
+                        };
+                    });
+                    var hResult = await replaceHistory(idJob, events);
+                    historyWritten = (hResult && hResult.inserted) || events.length;
+                }
+
+                showToast(
+                    'Imported #' + d.supacolorJobNumber + ' — ' +
+                    joblinesWritten + ' joblines, ' + historyWritten + ' history events',
+                    'success'
+                );
+            } else {
+                // Multi-job list path — existing behavior
+                var result = await bulkUpsertJobs(state.pendingBackfill);
+                var s = result.summary || {};
+                var msg = (s.inserted || 0) + ' new, ' + (s.patched || 0) + ' updated, ' + (s.noop || 0) + ' unchanged';
+                if (s.errored) msg += ', ' + s.errored + ' failed';
+                showToast('Import complete: ' + msg, s.errored ? 'error' : 'success');
+            }
 
             closeBackfillModal();
             // Refresh the dashboard
             await Promise.all([fetchJobs(), fetchStats()]);
             applyFilters();
         } catch (err) {
-            console.error('Bulk upsert failed:', err);
+            console.error('Import failed:', err);
             showToast('Import failed: ' + (err.message || 'unknown error'), 'error');
             btn.disabled = false;
             btn.innerHTML = origHtml;
