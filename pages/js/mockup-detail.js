@@ -4094,11 +4094,16 @@
 
     function downloadImage(url, filename) {
         var safeName = (filename || 'mockup').replace(/[^a-zA-Z0-9_\- ]/g, '').trim() || 'mockup';
-        // Convert Box thumbnail proxy URL to full-res download endpoint
+        // Route the download through our Box proxy so the browser never fetches Box
+        // directly (Box rejects cross-origin cookieless fetches with 404-class).
+        // - Proxy thumbnail URLs → /api/box/download/:id (raw stream)
+        // - Legacy Box shared/static URLs → /api/box/shared-image?full=1
         var downloadUrl = url;
         var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
         if (thumbMatch) {
             downloadUrl = API_BASE + '/api/box/download/' + thumbMatch[1];
+        } else if (url.indexOf('.box.com/shared/static/') !== -1 || url.indexOf('.box.com/s/') !== -1) {
+            downloadUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
         }
         fetch(downloadUrl)
             .then(function (resp) {

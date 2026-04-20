@@ -8,28 +8,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Quote Builder Calculations
 
-### DTF Garment Base Cost From Arbitrary Record — Pricing Inversion
-**Problem:** DTF showed Long Sleeve cheaper than Short Sleeve (prices inverted).
-**Root Cause:** `firstDetail.CASE_PRICE` from `/api/product-details` returns unsorted per-color x size records.
-**Solution:** Use `blankBundle.sizes` from BLANK pricing-bundle which aggregates correctly.
-**Prevention:** Never use `firstDetail.CASE_PRICE` — use pricing-bundle or base-item-costs endpoints.
-
----
-
-### DTF Parent Row Qty Double-Counts Child Rows
-**Problem:** Parent Qty=70 but Total=$585 didn't match. Standard qty was 45, child had 25.
-**Root Cause:** `onSizeChange()` added child quantities to parent display, but pricing only uses standard sizes.
-**Solution:** Removed child row aggregation. Parent shows standard sizes only; children display independently.
-**Prevention:** Parent Qty = standard sizes only. `getTotalQuantity()` is truth for combined totals.
-
----
-
-### Extra Stitch Charges Double-Counted in Unit Price AND Line Item
-**Problem:** J790 @ 9K stitches: $74.25 in matrix PLUS separate AS-GARM line item. Customer pays twice.
-**Root Cause:** `calculateProductPrice()` included stitch cost AND pricing engine created separate fee.
-**Solution:** Pass `0` for stitch cost — show ONLY as separate AS-GARM/AS-CAP line items.
-**Prevention:** Extra charges NEVER embedded in unit price. Always separate fee line items.
-
 ---
 
 ### 1-Cent Tax Rounding Error in Quote PDF Totals
@@ -54,13 +32,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** Different methods, stitch counts, stitch rates, and industry standard.
 **Solution:** `garmentTier = getTier(garmentQty)`, `capTier = getTier(capQty)` — never combine.
 **Prevention:** Each type under threshold gets separate $50 LTM fee.
-
----
-
-### Wrong Pricing Displayed Silently
-**Problem:** Incorrect prices shown to customers with no error visible.
-**Root Cause:** API failed but code used cached/fallback data silently.
-**Prevention:** Rule #4: NO Silent API Failures. Wrong pricing is WORSE than showing an error.
 
 ---
 
@@ -306,8 +277,24 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### Send Mockup Button Missing in "Awaiting Approval" Status
-**Problem:** Steve couldn't re-send mockups after uploading new ones. The "Send Mockup" button was renamed to "Send Reminder" when status was "Awaiting Approval."
-**Root Cause:** Single button element (`ard-btn-send-mockup`) was repurposed — label changed to "Send Reminder" and click handler switched to `sendMockupReminder()` instead of `showSendForApprovalModal()`.
-**Solution:** Added separate `ard-btn-send-reminder` button. "Send Mockup" always opens the full approval modal. "Send Reminder" only appears alongside during "Awaiting Approval."
-**Prevention:** Don't repurpose buttons by renaming — add separate elements when two distinct actions are needed.
+### Rate Limiter Mounted at /api Leaks Counter to Unrelated Routes (2026-04-19)
+**Problem:** Pasting a Supacolor screenshot into the new dashboard returned 429 "Too many requests to ManageOrders endpoints" — but the request was to `/api/vision/extract-supacolor-jobs-list`, nowhere near manageorders.
+**Root Cause:** `app.use('/api', manageOrdersLimiter, manageOrdersRoutes)` runs the limiter middleware for EVERY `/api/*` request that falls through to that line, regardless of whether `manageOrdersRoutes` ends up handling it. The 30/min counter incremented on Bradley's transfer flow + dashboard polling + everything else, leaving no budget for the actual vision call.
+**Solution:** Add `skip: (req) => !req.path.startsWith('/manageorders/')` to the limiter config so only true ManageOrders paths count against the budget. (Inside `app.use('/api', ...)`, `req.path` is the post-mount path, e.g. `/vision/extract-...`.)
+**Prevention:** When mounting a rate limiter alongside a router via `app.use(prefix, limiter, router)`, scope the limiter with a `skip` filter that matches only the routes the router actually handles. Otherwise the counter bleeds into every later `/api/*` route. Apply the same pattern to other broad-mount limiters: `pc54InventoryLimiter`, `sanmarLimiter`, etc.
+
+---
+
+### Mockup Approval Email Showed "Not specified" for Design Size (2026-04-20)
+**Problem:** Nika's mockup email for Button Veterinary #33672 showed `DESIGN SIZE: Not specified` to the customer. Record had `Design_Size=""`, `Logo_Width=""`, `Logo_Height=""` — all three blank.
+**Root Cause:** `mockup-detail.js` sent `design_size: designSize || 'Not specified'` and the modal input only pre-filled from `Design_Size`, ignoring the separately-stored `Logo_Width`/`Logo_Height` on the same record.
+**Solution:** Pre-fill chain in the Send-to-Customer modal: `Design_Size` → `Logo_Width × Logo_Height` → blank. Email fallback changed to `'N/A'` (short, fits the 50%-width cell). No validation block — Ruth fills design size during digitizing, not the AE at send-time.
+**Prevention:** When a single email field has multiple possible sources on the record, walk the fallback chain in the code that populates it. Friendly fallback strings ("N/A") beat clinical ones ("Not specified") when customers see them.
+
+---
+
+### Art Request Mockup Download 404 — Wrong Endpoint + Legacy URL Format (2026-04-20)
+**Problem:** Taneisha (#52844, #52818) and Nika (#52846) got "Download failed" alerts on the art-request lightbox. The lightbox IMAGE rendered fine — only the Download button failed.
+**Root Cause (3 layers):** (1) `downloadLightboxImage()` fetched `/api/box/thumbnail/<id>?size=large`, which 404s when Box's "large" rep isn't ready. (2) `ArtRequests.Box_File_Mockup` stores TWO URL formats: the new proxy URL `/api/box/thumbnail/<id>` AND legacy Box shared/static URLs (`https://northwestcustomapparel.box.com/shared/static/…`). The regex `/\/api\/box\/thumbnail\/(\d+)/` only matches the proxy format — for shared/static URLs the code fell through and did `fetch(boxSharedStaticUrl)` directly from the browser, which Box rejects (cookieless cross-origin → 404-class). The lightbox IMAGE has an `onerror` fallback to `/api/box/shared-image?url=…`, but the download handler didn't. (3) For #52844/#52846 the Box files were actually deleted.
+**Solution:** Added a second rewrite branch in `downloadLightboxImage()` (and `mockup-detail.js downloadImage()`): if URL contains `.box.com/shared/static/` or `.box.com/s/`, route through `API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1'` — backend endpoint already exists and resolves via Box `/shared_items` API, then streams full file content. Proxy URLs still use `/api/box/download/:id`.
+**Prevention:** When a Caspio field stores URLs from multiple eras (pre/post migration), every consumer must handle both shapes. Mirror fallback logic between IMAGE rendering (img.onerror) and DOWNLOAD handlers — a URL that displays may still fail to download if the download path is narrower. Never `fetch()` a Box-domain URL directly from a non-Box origin.

@@ -1336,3 +1336,42 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** Nudge savings calc referenced loop-scoped `const` variables after the loop closed.
 **Solution:** Capture needed values in outer-scope variables before the loop.
 **Prevention:** Post-loop summaries must use outer-scope captures. Test with extended sizes (2XL+).
+
+---
+
+### DTF Garment Base Cost From Arbitrary Record — Pricing Inversion (archived 2026-04-19)
+**Problem:** DTF showed Long Sleeve cheaper than Short Sleeve (prices inverted).
+**Root Cause:** `firstDetail.CASE_PRICE` from `/api/product-details` returns unsorted per-color x size records.
+**Solution:** Use `blankBundle.sizes` from BLANK pricing-bundle which aggregates correctly.
+**Prevention:** Never use `firstDetail.CASE_PRICE` — use pricing-bundle or base-item-costs endpoints.
+
+---
+
+### DTF Parent Row Qty Double-Counts Child Rows (archived 2026-04-19)
+**Problem:** Parent Qty=70 but Total=$585 didn't match. Standard qty was 45, child had 25.
+**Root Cause:** `onSizeChange()` added child quantities to parent display, but pricing only uses standard sizes.
+**Solution:** Removed child row aggregation. Parent shows standard sizes only; children display independently.
+**Prevention:** Parent Qty = standard sizes only. `getTotalQuantity()` is truth for combined totals.
+
+---
+
+### Extra Stitch Charges Double-Counted in Unit Price AND Line Item (archived 2026-04-19)
+**Problem:** J790 @ 9K stitches: $74.25 in matrix PLUS separate AS-GARM line item. Customer pays twice.
+**Root Cause:** `calculateProductPrice()` included stitch cost AND pricing engine created separate fee.
+**Solution:** Pass `0` for stitch cost — show ONLY as separate AS-GARM/AS-CAP line items.
+**Prevention:** Extra charges NEVER embedded in unit price. Always separate fee line items.
+
+---
+
+### Wrong Pricing Displayed Silently (archived 2026-04-20)
+**Problem:** Incorrect prices shown to customers with no error visible.
+**Root Cause:** API failed but code used cached/fallback data silently.
+**Prevention:** Rule #4: NO Silent API Failures. Wrong pricing is WORSE than showing an error.
+
+---
+
+### Send Mockup Button Missing in "Awaiting Approval" Status (archived 2026-04-20)
+**Problem:** Steve couldn't re-send mockups after uploading new ones. The "Send Mockup" button was renamed to "Send Reminder" when status was "Awaiting Approval."
+**Root Cause:** Single button element (`ard-btn-send-mockup`) was repurposed — label changed to "Send Reminder" and click handler switched to `sendMockupReminder()` instead of `showSendForApprovalModal()`.
+**Solution:** Added separate `ard-btn-send-reminder` button. "Send Mockup" always opens the full approval modal. "Send Reminder" only appears alongside during "Awaiting Approval."
+**Prevention:** Don't repurpose buttons by renaming — add separate elements when two distinct actions are needed.

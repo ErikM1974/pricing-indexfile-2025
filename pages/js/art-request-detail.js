@@ -2295,12 +2295,16 @@
         var dlBtn = document.getElementById('ard-lightbox-download');
         if (dlBtn) dlBtn.disabled = true;
         try {
-            // Rewrite /api/box/thumbnail/<id>[?size=large] → /api/box/download/<id>.
-            // Thumbnail endpoint can 404 when Box reps aren't ready; /download streams the raw file.
+            // Route the download through our Box proxy so the browser never fetches
+            // Box directly (Box rejects cross-origin cookieless fetches with 404-class).
+            // - Proxy thumbnail URLs → /api/box/download/:id (raw stream)
+            // - Legacy Box shared/static URLs → /api/box/shared-image?full=1 (resolves via shared_items API)
             var downloadUrl = url;
             var m = url.match(/\/api\/box\/thumbnail\/(\d+)/);
             if (m) {
                 downloadUrl = API_BASE + '/api/box/download/' + m[1];
+            } else if (url.indexOf('.box.com/shared/static/') !== -1 || url.indexOf('.box.com/s/') !== -1) {
+                downloadUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
             }
             var resp = await fetch(downloadUrl);
             if (!resp.ok) {
