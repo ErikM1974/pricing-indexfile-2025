@@ -158,7 +158,10 @@
         // Status badge
         var badge = $('sjd-status-badge');
         var status = j.Status || 'Unknown';
-        var statusClass = status === 'Open' ? 'open' : status === 'Closed' ? 'closed' : 'cancelled';
+        // Closed → green, Cancelled → red, everything else (Open, Ganged, etc.) → blue "active"
+        var statusClass = status === 'Closed' ? 'closed'
+                        : status === 'Cancelled' ? 'cancelled'
+                        : 'open';
         badge.className = 'sjd-status-badge sc-status-badge sc-status-badge--' + statusClass;
         badge.textContent = status;
 

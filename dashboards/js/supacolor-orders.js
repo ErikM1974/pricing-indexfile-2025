@@ -148,9 +148,10 @@
         var search = f.search.toLowerCase().trim();
 
         state.filteredJobs = state.allJobs.filter(function (j) {
-            // View toggle: active = Open only; closed = Closed + Cancelled
-            if (f.view === 'active' && j.Status !== 'Open') return false;
-            if (f.view === 'closed' && j.Status === 'Open') return false;
+            // View toggle: active = anything that isn't Closed/Cancelled
+            // (covers Open, Ganged, In Production, etc.); closed = Closed + Cancelled only
+            if (f.view === 'active' && (j.Status === 'Closed' || j.Status === 'Cancelled')) return false;
+            if (f.view === 'closed' && j.Status !== 'Closed' && j.Status !== 'Cancelled') return false;
 
             // Explicit status filter overrides view
             if (f.status && j.Status !== f.status) return false;
@@ -174,10 +175,13 @@
     }
 
     function renderStats() {
-        $('sc-stat-open').textContent       = state.stats.Open || 0;
+        // Backend now returns stats.Active (covers Open + Ganged + others);
+        // fall back to stats.Open for a clean cut-over if proxy is older.
+        var active = state.stats.Active != null ? state.stats.Active : (state.stats.Open || 0);
+        $('sc-stat-open').textContent       = active;
         $('sc-stat-closed').textContent     = state.stats.Closed || 0;
         $('sc-stat-cancelled').textContent  = state.stats.Cancelled || 0;
-        var total = (state.stats.Open || 0) + (state.stats.Closed || 0) + (state.stats.Cancelled || 0);
+        var total = active + (state.stats.Closed || 0) + (state.stats.Cancelled || 0);
         $('sc-stat-total').textContent = total;
     }
 
@@ -200,8 +204,11 @@
         var pageJobs = jobs.slice(start, start + PAGE_SIZE);
 
         var rows = pageJobs.map(function (j) {
-            var statusClass = j.Status === 'Open' ? 'open' :
-                              j.Status === 'Closed' ? 'closed' : 'cancelled';
+            // Closed → green, Cancelled → red, everything else (Open, Ganged,
+            // In Production, etc.) → blue "active" styling
+            var statusClass = j.Status === 'Closed' ? 'closed'
+                            : j.Status === 'Cancelled' ? 'cancelled'
+                            : 'open';
             var detailUrl = '/pages/supacolor-job-detail.html?id=' + encodeURIComponent(j.ID_Job);
 
             return '<a href="' + detailUrl + '" class="sc-row">' +
