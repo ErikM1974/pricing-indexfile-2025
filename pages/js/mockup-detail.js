@@ -4376,8 +4376,17 @@
                 + '</div>';
         }).join('');
 
-        // Pre-fill design size from saved data
-        sizeInput.value = currentMockup.Design_Size || '';
+        // Pre-fill design size — prefer explicit Design_Size, else build from
+        // Logo_Width × Logo_Height so the customer email never shows "Not specified".
+        var preSize = currentMockup.Design_Size || '';
+        if (!preSize) {
+            var lw = currentMockup.Logo_Width || '';
+            var lh = currentMockup.Logo_Height || '';
+            if (lw && lh)      preSize = lw + '" x ' + lh + '"';
+            else if (lw)       preSize = lw + '" wide';
+            else if (lh)       preSize = lh + '" tall';
+        }
+        sizeInput.value = preSize;
 
         // Pre-fill contact from previously saved data
         if (currentMockup.Customer_Name || currentMockup.Customer_Email) {
@@ -4478,6 +4487,8 @@
             emailInput.focus();
             return;
         }
+        // Design size is optional — Ruth confirms it during digitizing.
+        // When blank, the email shows "To be confirmed by production" rather than "Not specified".
 
         // Check at least one mockup image exists
         var hasMockup = false;
@@ -4547,7 +4558,7 @@
                 cc_emails: ccEmails,
                 company_name: currentMockup.Company_Name || '',
                 design_number: currentMockup.Design_Number || '',
-                design_size: designSize || 'Not specified',
+                design_size: designSize || 'N/A',
                 placement: currentMockup.Print_Location || 'Not specified',
                 work_order: currentMockup.Work_Order_Number || '',
                 sales_rep_name: getAeDisplayName(currentMockup.Submitted_By),
