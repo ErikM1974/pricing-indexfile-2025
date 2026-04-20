@@ -2295,8 +2295,20 @@
         var dlBtn = document.getElementById('ard-lightbox-download');
         if (dlBtn) dlBtn.disabled = true;
         try {
-            var resp = await fetch(url);
-            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            // Rewrite /api/box/thumbnail/<id>[?size=large] → /api/box/download/<id>.
+            // Thumbnail endpoint can 404 when Box reps aren't ready; /download streams the raw file.
+            var downloadUrl = url;
+            var m = url.match(/\/api\/box\/thumbnail\/(\d+)/);
+            if (m) {
+                downloadUrl = API_BASE + '/api/box/download/' + m[1];
+            }
+            var resp = await fetch(downloadUrl);
+            if (!resp.ok) {
+                if (resp.status === 404) {
+                    throw new Error('This mockup file no longer exists in Box. It may have been deleted — please re-upload the mockup.');
+                }
+                throw new Error('HTTP ' + resp.status);
+            }
             var blob = await resp.blob();
             var extMap = {
                 'image/jpeg': 'jpg',
