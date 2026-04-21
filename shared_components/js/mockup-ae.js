@@ -113,7 +113,7 @@ var MockupAeGallery = (function () {
         // Search + Rep filter bar
         var repOptions = ['All', 'Taneisha', 'Nika', 'Ruthie', 'Erik'];
         html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;">';
-        html += '<input type="text" id="mockup-ae-search" placeholder="Search company, design #..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:200px;">';
+        html += '<input type="text" id="mockup-ae-search" placeholder="Search company, design #, or ID..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:220px;">';
         html += '<label style="font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;margin-left:8px;">Rep:</label>';
         html += '<select id="mockup-ae-rep-filter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;">';
         repOptions.forEach(function (name) {
@@ -129,7 +129,8 @@ var MockupAeGallery = (function () {
             var matchSearch = !currentSearchText || (
                 (m.Company_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
                 (m.Design_Number || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
-                (m.Design_Name || '').toLowerCase().indexOf(currentSearchText) !== -1
+                (m.Design_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
+                String(m.ID || '').indexOf(currentSearchText) !== -1
             );
             return matchRep && matchSearch;
         });

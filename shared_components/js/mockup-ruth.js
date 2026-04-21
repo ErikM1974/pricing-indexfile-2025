@@ -211,7 +211,7 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.id = 'ruth-search-input';
-        input.placeholder = 'Search company, design #, rep...';
+        input.placeholder = 'Search company, design #, rep, or ID...';
         input.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:260px;';
 
         const countSpan = document.createElement('span');
@@ -250,7 +250,7 @@
         // Apply text search
         if (ruthSearchText) {
             const matchFn = m => {
-                const text = ((m.Company_Name || '') + ' ' + (m.Design_Number || '') + ' ' + (m.Design_Name || '') + ' ' + (m.Submitted_By || '')).toLowerCase();
+                const text = ((m.Company_Name || '') + ' ' + (m.Design_Number || '') + ' ' + (m.Design_Name || '') + ' ' + (m.Submitted_By || '') + ' ' + (m.ID || '')).toLowerCase();
                 return text.indexOf(ruthSearchText) !== -1;
             };
             queueMockups = queueMockups.filter(matchFn);
@@ -662,7 +662,7 @@
         // Apply search filter
         if (ruthSearchText) {
             kanbanMockups = kanbanMockups.filter(function (m) {
-                var text = ((m.Company_Name || '') + ' ' + (m.Design_Number || '') + ' ' + (m.Design_Name || '') + ' ' + (m.Submitted_By || '')).toLowerCase();
+                var text = ((m.Company_Name || '') + ' ' + (m.Design_Number || '') + ' ' + (m.Design_Name || '') + ' ' + (m.Submitted_By || '') + ' ' + (m.ID || '')).toLowerCase();
                 return text.indexOf(ruthSearchText) !== -1;
             });
         }

@@ -858,6 +858,55 @@
         setTimeout(function () { card.style.boxShadow = ''; }, 2000);
     }
 
+    // ── Text Search (Steve's gallery) ───────────────────────────────────
+    // Searches card.textContent, which includes company name, Design_Num_SW
+    // (`.design-num`) and ID_Design (`.id-design`) rendered by the Caspio
+    // DataPage. Works on top of the archive date filter.
+    var currentSteveSearchText = '';
+
+    function injectSearchBar() {
+        if (document.getElementById('steve-search-bar')) return;
+        var galleryTab = document.getElementById('gallery-tab');
+        if (!galleryTab) return;
+
+        var bar = document.createElement('div');
+        bar.id = 'steve-search-bar';
+        bar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;';
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'steve-text-search';
+        input.placeholder = 'Search company, design #, or ID...';
+        input.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:260px;';
+
+        var countSpan = document.createElement('span');
+        countSpan.id = 'steve-search-count';
+        countSpan.style.cssText = 'font-size:12px;color:#94a3b8;margin-left:auto;';
+
+        var searchTimer = null;
+        input.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(function () {
+                currentSteveSearchText = input.value.trim().toLowerCase();
+                processCards();
+            }, 200);
+        });
+
+        bar.appendChild(input);
+        bar.appendChild(countSpan);
+
+        // Insert as the first child of #gallery-tab so it sits above archive toggle + cards
+        galleryTab.insertBefore(bar, galleryTab.firstChild);
+    }
+
+    function updateSteveSearchCount(shown, total) {
+        var countSpan = document.getElementById('steve-search-count');
+        if (!countSpan) return;
+        countSpan.textContent = currentSteveSearchText
+            ? shown + ' of ' + total + ' matches'
+            : '';
+    }
+
     // ── MutationObserver: Watch for Caspio gallery cards ────────────────
     function processCards() {
         const galleryTab = document.getElementById('gallery-tab');
@@ -865,6 +914,8 @@
 
         // Remove skeleton loading when real cards arrive
         galleryTab.querySelectorAll('.skeleton-card, .skeleton-grid').forEach(s => s.remove());
+
+        injectSearchBar();
 
         // Inject archive toggle button if not present
         if (!document.getElementById('archive-toggle-btn')) {
@@ -878,6 +929,7 @@
         }
 
         const cards = galleryTab.querySelectorAll('.card');
+        var searchShown = 0;
         cards.forEach((card, idx) => {
             // Date filter: hide old cards unless archive is on
             if (!showArchive) {
@@ -894,6 +946,16 @@
                     }
                 }
             }
+
+            // Text search filter — runs on top of archive date filter
+            if (currentSteveSearchText) {
+                var haystack = (card.textContent || '').toLowerCase();
+                if (haystack.indexOf(currentSteveSearchText) === -1) {
+                    card.style.display = 'none';
+                    return;
+                }
+            }
+            searchShown++;
             card.style.display = '';
 
             // Staggered entry animation delay
@@ -911,6 +973,7 @@
             injectQuickActions(card);
             addAuditIndicator(card);
         });
+        updateSteveSearchCount(searchShown, cards.length);
         buildSummaryBar();
     }
 

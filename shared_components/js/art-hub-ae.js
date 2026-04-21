@@ -403,8 +403,8 @@
         var searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.id = 'ae-text-search';
-        searchInput.placeholder = 'Search company, design #...';
-        searchInput.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:200px;';
+        searchInput.placeholder = 'Search company, design #, or ID...';
+        searchInput.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:220px;';
 
         var label = document.createElement('label');
         label.textContent = 'Rep:';
