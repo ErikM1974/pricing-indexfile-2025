@@ -17,7 +17,7 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Final_Approved_Mockup,File_Upload,CDN_Link,CDN_Link_Two,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup';
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup';
 
     var containerId = null;
     var allRequests = [];
@@ -269,10 +269,8 @@ var ArtAeGallery = (function () {
         var actualArt = req.Amount_Art_Billed;
         var notes = req.NOTES || '';
 
-        // Thumbnail — prefer Steve's finished mockup, fall back to AE's original
-        var thumbUrl = (window.ArtActions && window.ArtActions.pickArtRequestThumbnail)
-            ? window.ArtActions.pickArtRequestThumbnail(req)
-            : (req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '');
+        // Thumbnail
+        var thumbUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
         var thumbHtml = '';
         if (thumbUrl) {
             thumbHtml = '<div class="card-thumb">'
@@ -289,9 +287,6 @@ var ArtAeGallery = (function () {
         }
         if (revCount > 0) {
             badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
-        }
-        if (window.ArtActions && window.ArtActions.isArtRequestMockupMissing && window.ArtActions.isArtRequestMockupMissing(req)) {
-            badges += '<span class="card-badge card-badge--missing-mockup" title="Status says mockup was sent, but no mockup file is attached">\u26A0 No mockup</span>';
         }
 
         // Due date urgency

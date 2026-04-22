@@ -4030,28 +4030,6 @@ input.cbSearchButton {
     max-width: 100%;
 }
 
-/* Missing-mockup badge — shown when status is past "In Progress" but no mockup URL is set.
-   Works on Steve's Caspio .pill strip, plus the AE/Ruth .card-badge strips. */
-.card-badge--missing-mockup {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
-    white-space: nowrap;
-    margin-left: 6px;
-    line-height: 1.4;
-    vertical-align: middle;
-}
-.pill.card-badge--missing-mockup {
-    /* On Steve's Caspio cards, match the .pill sizing used by status pills */
-    padding: 3px 10px;
-    font-size: 12px;
-}
-
 /* Kanban styles moved to /shared_components/css/kanban.css */
 
 /* ── Broken Mockups Health Check Widget ─────────────────────────────── */

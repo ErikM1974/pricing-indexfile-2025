@@ -205,9 +205,6 @@ var MockupAeGallery = (function () {
         if (revCount > 0) {
             badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
         }
-        if (window.ArtActions && window.ArtActions.isDigitizingMockupMissing && window.ArtActions.isDigitizingMockupMissing(mockup)) {
-            badges += '<span class="card-badge card-badge--missing-mockup" title="Status says mockup was sent, but Ruth has not uploaded a mockup file">\u26A0 No mockup</span>';
-        }
 
         // Elapsed time badge for all statuses + CTA for awaiting approval
         var elapsedBadge = (typeof ElapsedTimeUtils !== 'undefined')
@@ -223,9 +220,7 @@ var MockupAeGallery = (function () {
             ctaHtml = '<div class="card-actions">' + elapsedBadge + '</div>';
         }
 
-        var thumbUrl = (window.ArtActions && window.ArtActions.pickDigitizingThumbnail)
-            ? window.ArtActions.pickDigitizingThumbnail(mockup)
-            : (mockup.Box_Mockup_1 || '');
+        var thumbUrl = mockup.Box_Mockup_1 || '';
         var thumbHtml = '';
         if (thumbUrl) {
             thumbHtml = '<div class="card-thumb">'

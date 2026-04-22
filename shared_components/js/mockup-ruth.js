@@ -374,14 +374,10 @@
             aeDisplay = aeDisplay.charAt(0).toUpperCase() + aeDisplay.slice(1);
         }
 
-        const thumbUrl = (window.ArtActions && window.ArtActions.pickDigitizingThumbnail)
-            ? window.ArtActions.pickDigitizingThumbnail(mockup)
-            : (mockup.Box_Mockup_1 || '');
+        const thumbUrl = mockup.Box_Mockup_1 || '';
         const thumbHtml = thumbUrl
             ? `<div class="card-thumb"><img src="${escapeHtml(thumbUrl)}" alt="Mockup preview" loading="lazy" data-original-src="${escapeHtml(thumbUrl)}" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display='none';}"></div>`
             : '';
-        const isMockupMissing = window.ArtActions && window.ArtActions.isDigitizingMockupMissing
-            && window.ArtActions.isDigitizingMockupMissing(mockup);
 
         const workOrder = escapeHtml(mockup.Work_Order_Number || '');
 
@@ -422,7 +418,7 @@
                     ${mockup.Print_Location ? `<div class="card-meta-row"><span class="card-meta-label">Location:</span> ${escapeHtml(mockup.Print_Location)}</div>` : ''}
                     ${dimensions ? `<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ${escapeHtml(dimensions)}</div>` : ''}
                 </div>
-                ${badges || isMockupMissing ? `<div class="card-badges">${badges}${isMockupMissing ? '<span class="card-badge card-badge--missing-mockup" title="Status says mockup was sent, but no mockup file is attached">\u26A0 No mockup</span>' : ''}</div>` : ''}
+                ${badges ? `<div class="card-badges">${badges}</div>` : ''}
             </div>
             <div class="card-footer">
                 <span class="card-date">${submittedDate}</span>

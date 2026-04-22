@@ -97,54 +97,6 @@
         if (placeholder) placeholder.style.display = 'flex';
     }
 
-    /**
-     * Thumbnail priority helpers — let dashboard cards show the FINISHED mockup
-     * (Steve's/Ruth's uploaded work) instead of the AE's submitted artwork,
-     * falling back to the original only when no mockup exists yet.
-     */
-    function pickAeArtwork(req) {
-        return (req && (req.File_Upload || req.CDN_Link || req.CDN_Link_Two || req.CDN_Link_Three || req.CDN_Link_Four)) || '';
-    }
-
-    function pickArtRequestThumbnail(req) {
-        if (!req) return '';
-        var status = req.Status || '';
-        var mockup = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
-        if (status === 'Completed') return req.Final_Approved_Mockup || mockup || pickAeArtwork(req);
-        if (status === 'Approved' || status === 'Awaiting Approval' || status === 'Revision Requested') {
-            return mockup || pickAeArtwork(req);
-        }
-        // Submitted / In Progress / other — Steve needs to see the AE's source
-        return pickAeArtwork(req) || mockup;
-    }
-
-    function pickDigitizingThumbnail(mockup) {
-        if (!mockup) return '';
-        var mainMockup = mockup.Box_Mockup_1 || '';
-        var status = mockup.Status || '';
-        if (mainMockup) return mainMockup;
-        // Show the AE's reference while Ruth is still in early phases
-        if (status === 'Submitted' || status === 'In Progress') return mockup.Box_Reference_File || '';
-        return '';
-    }
-
-    function isArtRequestMockupMissing(req) {
-        if (!req) return false;
-        var status = req.Status || '';
-        var needsMockup = status === 'Awaiting Approval' || status === 'Revision Requested'
-            || status === 'Approved' || status === 'Completed';
-        if (!needsMockup) return false;
-        return !(req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || req.Final_Approved_Mockup);
-    }
-
-    function isDigitizingMockupMissing(mockup) {
-        if (!mockup) return false;
-        var status = mockup.Status || '';
-        var needsMockup = status === 'Awaiting Approval' || status === 'Revision Requested' || status === 'Approved';
-        if (!needsMockup) return false;
-        return !mockup.Box_Mockup_1;
-    }
-
     function formatNoteDate(dateStr) {
         if (!dateStr) return '--';
         try {
@@ -1483,11 +1435,6 @@
         removeModals: removeModals,
         updateApprovalTotal: updateApprovalTotal,
         handleBoxImageError: handleBoxImageError,
-        pickArtRequestThumbnail: pickArtRequestThumbnail,
-        pickDigitizingThumbnail: pickDigitizingThumbnail,
-        pickAeArtwork: pickAeArtwork,
-        isArtRequestMockupMissing: isArtRequestMockupMissing,
-        isDigitizingMockupMissing: isDigitizingMockupMissing,
         REP_EMAIL_MAP: REP_EMAIL_MAP,
         API_BASE: API_BASE
     };
