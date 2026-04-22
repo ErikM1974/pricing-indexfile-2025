@@ -1597,8 +1597,8 @@
     }
 
     /**
-     * Handle image load failure — try Box proxy fallback for broken shared/static URLs.
-     * If the original URL is a Box shared/static link, retry via our backend proxy.
+     * Handle image load failure — try Box proxy fallback for broken shared/static URLs,
+     * or detect a 404 on our proxy URL (file truly gone from Box) and surface a "broken" slot.
      */
     function handleImageError(img) {
         var originalSrc = img.getAttribute('data-original-src') || img.src;
@@ -1612,9 +1612,76 @@
             return; // Let the proxy attempt load; if it also fails, we'll fall through again
         }
 
+        // Proxy URL failure — HEAD check to tell "Box file missing (404)" from transient errors
+        if (originalSrc.indexOf('/api/box/thumbnail/') !== -1 && !img.dataset.headChecked) {
+            img.dataset.headChecked = '1';
+            fetch(originalSrc, { method: 'HEAD' })
+                .then(function (resp) {
+                    if (resp.status === 404) {
+                        var thumb = img.closest('.ard-gallery-thumb');
+                        if (thumb) markSlotBroken(thumb);
+                        return;
+                    }
+                    // Non-404 — fall through to placeholder badge
+                    img.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                })
+                .catch(function () {
+                    img.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                });
+            return;
+        }
+
         // Final fallback — show file type badge
         img.style.display = 'none';
         if (placeholder) placeholder.style.display = 'flex';
+    }
+
+    /** Swap a filled gallery thumb into the "broken file" state (staff or customer variant) */
+    function markSlotBroken(thumb) {
+        if (!thumb || thumb.dataset.brokenRendered === '1') return;
+        thumb.dataset.brokenRendered = '1';
+        thumb.classList.add('is-broken');
+
+        var fieldKey = thumb.dataset.fieldKey || '';
+        var fieldLabel = thumb.querySelector('.ard-gallery-label');
+        var labelText = fieldLabel ? fieldLabel.textContent : 'Mockup';
+        var isAdditionalArt = ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1;
+        var kindWord = isAdditionalArt ? 'art file' : 'mockup';
+
+        if (isCustomerView) {
+            // Soft customer copy — never expose "deleted"
+            var rep = (currentRequest && (currentRequest.Sales_Rep || currentRequest.User_Email)) || '';
+            var repName = rep ? resolveRepName(rep) : 'your account rep';
+            thumb.innerHTML = '<div class="ard-gallery-broken-icon">&#9888;</div>'
+                + '<div class="ard-gallery-broken-title">Mockup is being updated</div>'
+                + '<div class="ard-gallery-broken-msg">Please contact ' + escapeHtml(repName)
+                + ' at <a href="tel:+12539225793">253-922-5793</a></div>'
+                + '<div class="ard-gallery-label">' + escapeHtml(labelText) + '</div>';
+            return;
+        }
+
+        // Staff view: red card + Re-upload button that reuses the empty-slot popover
+        thumb.innerHTML = '<div class="ard-gallery-broken-icon">&#9888;</div>'
+            + '<div class="ard-gallery-broken-title">File missing from Box</div>'
+            + '<div class="ard-gallery-broken-msg">The ' + escapeHtml(kindWord)
+            + ' file no longer exists. Re-upload to fix.</div>'
+            + '<button type="button" class="ard-gallery-reupload-btn" data-field-key="'
+            + escapeHtml(fieldKey) + '">Re-upload</button>'
+            + '<div class="ard-gallery-label">' + escapeHtml(labelText) + '</div>';
+
+        var btn = thumb.querySelector('.ard-gallery-reupload-btn');
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (typeof showSlotPopover === 'function') {
+                    showSlotPopover(thumb, fieldKey);
+                }
+            });
+        }
+        // Clicking anywhere else on the broken thumb should not open lightbox
+        thumb.onclick = null;
     }
 
     /** Render a filled gallery thumbnail for a file */
@@ -1653,6 +1720,8 @@
 
         thumb.addEventListener('click', function (e) {
             if (e.target.closest('.ard-gallery-remove')) return;
+            if (e.target.closest('.ard-gallery-reupload-btn')) return;
+            if (thumb.classList.contains('is-broken')) return; // Broken files can't be opened
             if (isImage) {
                 // Use the current img src (may be proxy URL if fallback kicked in)
                 var imgEl = thumb.querySelector('img');
@@ -2309,7 +2378,8 @@
             var resp = await fetch(downloadUrl);
             if (!resp.ok) {
                 if (resp.status === 404) {
-                    throw new Error('This mockup file no longer exists in Box. It may have been deleted — please re-upload the mockup.');
+                    showBoxFileMissingModal(url);
+                    return;
                 }
                 throw new Error('HTTP ' + resp.status);
             }
@@ -2333,6 +2403,66 @@
         } finally {
             if (dlBtn) dlBtn.disabled = false;
         }
+    }
+
+    /**
+     * Modal shown when the Box file for a lightbox-open mockup returns 404.
+     * Staff see a "Re-upload mockup" action; customers get a soft contact-rep message.
+     * Finds the matching gallery slot and flips it to the broken state so the AE can
+     * repair it inline after closing the modal.
+     */
+    function showBoxFileMissingModal(url) {
+        // Flip the matching gallery slot to broken state (so Re-upload button is visible after close)
+        try {
+            var match = (url || '').match(/\/api\/box\/thumbnail\/(\d+)/);
+            if (match) {
+                var fileId = match[1];
+                document.querySelectorAll('.ard-gallery-thumb img').forEach(function (imgEl) {
+                    var src = imgEl.getAttribute('data-original-src') || imgEl.src;
+                    if (src.indexOf('/api/box/thumbnail/' + fileId) !== -1) {
+                        var t = imgEl.closest('.ard-gallery-thumb');
+                        if (t) markSlotBroken(t);
+                    }
+                });
+            }
+        } catch (_) { /* best-effort */ }
+
+        // Close the lightbox so the modal is visible
+        var lightbox = document.getElementById('ard-lightbox');
+        if (lightbox) lightbox.style.display = 'none';
+
+        // Build modal
+        var existing = document.getElementById('ard-box-missing-modal');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'ard-box-missing-modal';
+        overlay.className = 'ard-modal-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;display:flex;align-items:center;justify-content:center;';
+
+        var body;
+        if (isCustomerView) {
+            var rep = (currentRequest && (currentRequest.Sales_Rep || currentRequest.User_Email)) || '';
+            var repName = rep ? resolveRepName(rep) : 'your account rep';
+            body = '<div style="background:#fff;padding:24px 28px;border-radius:10px;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.25);">'
+                + '<div style="font-size:18px;font-weight:600;color:#333;margin-bottom:12px;">Mockup is being updated</div>'
+                + '<div style="color:#555;line-height:1.5;margin-bottom:20px;">This mockup is being updated. Please contact '
+                + escapeHtml(repName) + ' at <a href="tel:+12539225793" style="color:#4a7c59;">253-922-5793</a>.</div>'
+                + '<div style="text-align:right;"><button type="button" id="ard-box-missing-close" class="ard-btn-primary" style="padding:8px 18px;background:#4a7c59;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;">Close</button></div>'
+                + '</div>';
+        } else {
+            body = '<div style="background:#fff;padding:24px 28px;border-radius:10px;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,.25);">'
+                + '<div style="font-size:18px;font-weight:600;color:#c0392b;margin-bottom:12px;">&#9888; File missing from Box</div>'
+                + '<div style="color:#555;line-height:1.5;margin-bottom:20px;">The mockup file no longer exists in Box. It was likely deleted. The broken slot in the gallery now has a <strong>Re-upload</strong> button &mdash; use that to replace the file.</div>'
+                + '<div style="text-align:right;"><button type="button" id="ard-box-missing-close" style="padding:8px 18px;background:#4a7c59;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;">Got it</button></div>'
+                + '</div>';
+        }
+        overlay.innerHTML = body;
+        document.body.appendChild(overlay);
+
+        function close() { overlay.remove(); }
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+        document.getElementById('ard-box-missing-close').addEventListener('click', close);
     }
 
     // ── Lightbox ────────────────────────────────────────────────────────

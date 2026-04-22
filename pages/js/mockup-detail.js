@@ -25,7 +25,10 @@
         return url;
     }
 
-    /** Handle image error — try Box proxy fallback for broken shared/static URLs */
+    /**
+     * Handle image error — try Box proxy fallback for broken shared/static URLs,
+     * or detect a 404 on our proxy URL (file truly gone from Box) and surface a "broken" state.
+     */
     function handleBoxImageError(img) {
         var originalSrc = img.getAttribute('data-original-src') || img.src;
         var placeholder = img.nextElementSibling;
@@ -34,8 +37,46 @@
             img.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
             return;
         }
+
+        // Proxy URL failure — HEAD check to distinguish missing-file 404 from transient errors
+        if (originalSrc.indexOf('/api/box/thumbnail/') !== -1 && !img.dataset.headChecked) {
+            img.dataset.headChecked = '1';
+            fetch(originalSrc, { method: 'HEAD' })
+                .then(function (resp) {
+                    if (resp.status === 404) {
+                        var thumb = img.closest('.pmd-gallery-slot, .pmd-box-panel-item, .pmd-lightbox-content, .pmd-slot');
+                        if (thumb) markMockupSlotBroken(thumb, img);
+                        return;
+                    }
+                    img.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                })
+                .catch(function () {
+                    img.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                });
+            return;
+        }
+
         img.style.display = 'none';
         if (placeholder) placeholder.style.display = 'flex';
+    }
+
+    /** Flip a mockup slot/thumb to "File missing" state with a Re-upload helper */
+    function markMockupSlotBroken(container, img) {
+        if (!container || container.dataset.brokenRendered === '1') return;
+        container.dataset.brokenRendered = '1';
+        container.classList.add('is-broken');
+        // Hide only the broken image; keep labels intact
+        if (img) img.style.display = 'none';
+
+        var slotKey = container.dataset.slotKey || (img && img.dataset && img.dataset.slotKey) || '';
+        var overlay = document.createElement('div');
+        overlay.className = 'pmd-slot-broken-overlay';
+        overlay.innerHTML = '<div class="pmd-slot-broken-icon">&#9888;</div>'
+            + '<div class="pmd-slot-broken-title">File missing from Box</div>'
+            + '<div class="pmd-slot-broken-msg">This mockup file no longer exists. Re-upload to fix.</div>';
+        container.appendChild(overlay);
     }
 
     // ── EmailJS Config ──────────────────────────────────────────────────
@@ -4107,7 +4148,14 @@
         }
         fetch(downloadUrl)
             .then(function (resp) {
-                if (!resp.ok) throw new Error('Download failed');
+                if (!resp.ok) {
+                    if (resp.status === 404) {
+                        var err = new Error('BOX_FILE_NOT_FOUND');
+                        err.code = 'BOX_FILE_NOT_FOUND';
+                        throw err;
+                    }
+                    throw new Error('Download failed');
+                }
                 return resp.blob();
             })
             .then(function (blob) {
@@ -4125,7 +4173,11 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(a.href);
             })
-            .catch(function () {
+            .catch(function (err) {
+                if (err && err.code === 'BOX_FILE_NOT_FOUND') {
+                    showToast('This mockup file no longer exists in Box — please re-upload it.', 'error');
+                    return;
+                }
                 window.open(url, '_blank');
             });
     }
@@ -4981,22 +5033,44 @@
         });
     }
 
-    function deleteBoxFile(fileId) {
-        showToast('Deleting file...', 'info');
+    function deleteBoxFile(fileId, force) {
+        showToast(force ? 'Force-deleting file...' : 'Deleting file...', 'info');
 
-        fetch(API_BASE + '/api/box/file/' + fileId, {
-            method: 'DELETE'
-        }).then(function (resp) {
-            if (!resp.ok) throw new Error('Delete failed');
-            return resp.json();
-        }).then(function () {
-            showToast('File deleted from Box', 'success');
-            if (currentMockup.Box_Folder_ID) {
-                loadBoxPanelFiles(currentMockup.Box_Folder_ID);
-            }
-        }).catch(function (err) {
-            showToast('Delete failed: ' + err.message, 'error');
-        });
+        var url = API_BASE + '/api/box/file/' + fileId + (force ? '?force=true' : '');
+        fetch(url, { method: 'DELETE' })
+            .then(function (resp) {
+                if (resp.status === 409) {
+                    return resp.json().then(function (data) {
+                        var refs = (data && Array.isArray(data.references)) ? data.references : [];
+                        var lines = refs.map(function (r) {
+                            var design = r.designId ? ' (Design #' + r.designId + ')' : '';
+                            return '\u2022 ' + (r.table || 'record') + design + ' — ' + (r.slot || '');
+                        }).join('\n');
+                        var proceed = confirm('This file is still referenced by ' + refs.length + ' record'
+                            + (refs.length === 1 ? '' : 's')
+                            + ':\n\n' + (lines || '(details unavailable)')
+                            + '\n\nDeleting will break those mockups. Delete anyway?');
+                        if (proceed) {
+                            deleteBoxFile(fileId, true);
+                        } else {
+                            showToast('Delete cancelled — file is still in use', 'info');
+                        }
+                        return null;
+                    });
+                }
+                if (!resp.ok) throw new Error('Delete failed');
+                return resp.json();
+            })
+            .then(function (data) {
+                if (data === null) return; // 409 branch already handled
+                showToast('File deleted from Box', 'success');
+                if (currentMockup.Box_Folder_ID) {
+                    loadBoxPanelFiles(currentMockup.Box_Folder_ID);
+                }
+            })
+            .catch(function (err) {
+                showToast('Delete failed: ' + err.message, 'error');
+            });
     }
 
     function clearAllDropHighlights() {

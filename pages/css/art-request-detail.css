@@ -401,6 +401,69 @@ body {
     background: #dc3545;
 }
 
+/* Broken state — shown when Box proxy returns 404 for a mockup file */
+.ard-gallery-thumb.is-broken {
+    border: 2px solid #dc3545;
+    background: #fff5f5;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 10px 6px;
+    text-align: center;
+}
+.ard-gallery-broken-icon {
+    font-size: 28px;
+    color: #dc3545;
+    margin-bottom: 6px;
+}
+.ard-gallery-broken-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #c0392b;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+.ard-gallery-broken-msg {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+.ard-gallery-broken-msg a {
+    color: #4a7c59;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.ard-gallery-reupload-btn {
+    background: #4a7c59;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: background 0.15s;
+}
+.ard-gallery-reupload-btn:hover {
+    background: #3d6849;
+}
+/* Customer view: soften the broken card (no red alarm color) */
+.ard-customer-view .ard-gallery-thumb.is-broken {
+    border-color: #d0d7de;
+    background: #f8f9fa;
+}
+.ard-customer-view .ard-gallery-broken-icon {
+    color: #d0b300;
+}
+.ard-customer-view .ard-gallery-broken-title {
+    color: #555;
+}
+
 .ard-gallery-label {
     font-size: 11px;
     color: #666;

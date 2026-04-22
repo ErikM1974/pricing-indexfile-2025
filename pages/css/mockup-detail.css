@@ -1804,6 +1804,44 @@ body {
 .pmd-customer-view .pmd-gallery-slot {
     cursor: pointer;
 }
+
+/* Broken state — shown when Box proxy returns 404 for a mockup file */
+.pmd-slot-broken-overlay {
+    position: absolute;
+    inset: 0;
+    background: #fff5f5;
+    border: 2px solid #dc3545;
+    border-radius: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    text-align: center;
+    z-index: 3;
+    pointer-events: none;
+}
+.pmd-gallery-slot.is-broken,
+.pmd-box-panel-item.is-broken {
+    position: relative;
+}
+.pmd-slot-broken-icon {
+    font-size: 26px;
+    color: #dc3545;
+    margin-bottom: 4px;
+}
+.pmd-slot-broken-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #c0392b;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+.pmd-slot-broken-msg {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.35;
+}
 .pmd-customer-view .pmd-slot-filled img {
     transition: opacity 0.15s;
 }

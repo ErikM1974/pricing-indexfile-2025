@@ -48,7 +48,11 @@
         return div.innerHTML;
     }
 
-    /** Handle image load failure — try Box proxy fallback for broken shared/static URLs */
+    /**
+     * Handle image load failure — try Box proxy fallback for broken shared/static URLs,
+     * or detect a 404 on our proxy URL (file truly gone from Box). Exposed via ArtActions
+     * so inline onerror handlers across art-ae/mockup-ae/mockup-ruth can reuse it.
+     */
     function handleBoxImageError(img) {
         var originalSrc = img.getAttribute('data-original-src') || img.src;
         var placeholder = img.nextElementSibling;
@@ -57,6 +61,38 @@
             img.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
             return;
         }
+
+        // Proxy URL failure — HEAD check to distinguish missing-file 404 from transient errors.
+        // On 404, flip the parent card into a "File missing" state instead of a generic badge.
+        if (originalSrc.indexOf('/api/box/thumbnail/') !== -1 && !img.dataset.headChecked) {
+            img.dataset.headChecked = '1';
+            fetch(originalSrc, { method: 'HEAD' })
+                .then(function (resp) {
+                    if (resp.status === 404) {
+                        img.style.display = 'none';
+                        var card = img.closest('.art-card, .mockup-card, .gallery-card, [data-mockup-id], [data-design-id]') || img.parentElement;
+                        if (card && !card.dataset.brokenRendered) {
+                            card.dataset.brokenRendered = '1';
+                            var label = document.createElement('div');
+                            label.className = 'art-box-missing-badge';
+                            label.style.cssText = 'background:#fff5f5;color:#c0392b;border:1px dashed #dc3545;border-radius:4px;padding:6px 10px;font-size:11px;font-weight:600;text-align:center;margin:4px 0;';
+                            label.textContent = '\u26a0 File missing \u2014 re-upload';
+                            (card.querySelector('.art-card-body, .mockup-card-body') || card).appendChild(label);
+                        } else if (placeholder) {
+                            placeholder.style.display = 'flex';
+                        }
+                        return;
+                    }
+                    img.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                })
+                .catch(function () {
+                    img.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                });
+            return;
+        }
+
         img.style.display = 'none';
         if (placeholder) placeholder.style.display = 'flex';
     }
@@ -1398,6 +1434,7 @@
         createOverlay: createOverlay,
         removeModals: removeModals,
         updateApprovalTotal: updateApprovalTotal,
+        handleBoxImageError: handleBoxImageError,
         REP_EMAIL_MAP: REP_EMAIL_MAP,
         API_BASE: API_BASE
     };
