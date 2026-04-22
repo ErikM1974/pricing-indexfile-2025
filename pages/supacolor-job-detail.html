@@ -34,8 +34,11 @@
                 </h1>
             </div>
             <div class="sjd-page-header-right">
-                <button id="sjd-paste-btn" class="bt-btn bt-btn--primary">
-                    <i class="fas fa-paste"></i> Paste Detail Screenshot
+                <button id="sjd-api-refresh-btn" class="bt-btn bt-btn--primary" title="Pull the latest detail + history from Supacolor's API">
+                    <i class="fas fa-cloud-download-alt"></i> Refresh from API
+                </button>
+                <button id="sjd-paste-btn" class="bt-btn bt-btn--secondary" title="Fallback: paste a screenshot if the API is down">
+                    <i class="fas fa-paste"></i> Paste Screenshot
                 </button>
                 <button id="sjd-status-btn" class="bt-btn bt-btn--secondary" title="Change job status">
                     <i class="fas fa-exchange-alt"></i> Change Status
@@ -310,6 +313,6 @@
     <!-- Toast container -->
     <div id="sjd-toast-container" class="bt-toast-container"></div>
 
-    <script src="/pages/js/supacolor-job-detail.js?v=5"></script>
+    <script src="/pages/js/supacolor-job-detail.js?v=6"></script>
 </body>
 </html>

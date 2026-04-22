@@ -42,7 +42,10 @@
                         <button id="sc-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
-                        <button id="sc-backfill-btn" class="bt-btn bt-btn--primary">
+                        <button id="sc-api-sync-btn" class="bt-btn bt-btn--primary" title="Pull the latest jobs from Supacolor's API">
+                            <i class="fas fa-cloud-download-alt"></i> Refresh from Supacolor API
+                        </button>
+                        <button id="sc-backfill-btn" class="bt-btn bt-btn--secondary" title="Fallback: paste a screenshot if the API is down">
                             <i class="fas fa-paste"></i> Backfill from Screenshot
                         </button>
                     </div>
@@ -153,6 +156,6 @@
     <!-- Toast container -->
     <div id="sc-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/supacolor-orders.js?v=5"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=6"></script>
 </body>
 </html>

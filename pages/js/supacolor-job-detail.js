@@ -159,6 +159,16 @@
         return data;
     }
 
+    // Direct OAuth2 API sync for a single job — replaces paste-OCR for normal refreshes.
+    async function syncJobFromSupacolorApi(jobNumber) {
+        var resp = await fetch(API_BASE + '/api/supacolor-jobs/sync/' + encodeURIComponent(jobNumber), {
+            method: 'POST'
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
+        return data;
+    }
+
     // ── Render ─────────────────────────────────────────────────────────
     function render() {
         var j = state.job;
@@ -780,6 +790,36 @@
         }
 
         // Wire UI
+        $('sjd-api-refresh-btn').addEventListener('click', async function () {
+            if (!state.job || !state.job.Supacolor_Job_Number) {
+                showToast('Cannot refresh — no Supacolor job number on this record', 'error');
+                return;
+            }
+            var btn = $('sjd-api-refresh-btn');
+            var orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing…';
+            try {
+                var result = await syncJobFromSupacolorApi(state.job.Supacolor_Job_Number);
+                showToast(
+                    'Refreshed #' + result.jobNumber + ' — ' +
+                    result.joblinesReplaced + ' joblines, ' + result.historyReplaced + ' history events (' + result.action + ')',
+                    'success'
+                );
+                // Reload from Caspio to render the freshly-synced data
+                var data = await fetchJob(state.idJob);
+                state.job = data.job;
+                state.joblines = data.joblines || [];
+                state.history = data.history || [];
+                render();
+            } catch (err) {
+                console.error('[SupacolorJobDetail] API refresh failed:', err);
+                showToast('API refresh failed: ' + (err.message || 'unknown error'), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        });
         $('sjd-paste-btn').addEventListener('click', openPasteModal);
         $('sjd-status-btn').addEventListener('click', openStatusModal);
         $('sjd-edit-btn').addEventListener('click', openEditPlaceholder);
