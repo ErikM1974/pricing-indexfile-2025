@@ -2468,14 +2468,6 @@
         return map[field] || field;
     }
 
-    // Reusable — mirror art-actions-shared.escapeHtml so this widget is self-contained.
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        var div = document.createElement('div');
-        div.textContent = String(str);
-        return div.innerHTML;
-    }
-
     // ── Expose globals for HTML onclick attributes ────────────────────
     window.showTab = showTab;
 })();
