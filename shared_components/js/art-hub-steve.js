@@ -972,9 +972,134 @@
             cleanEmptyFields(card);
             injectQuickActions(card);
             addAuditIndicator(card);
+            decorateCardThumbnail(card);
         });
         updateSteveSearchCount(searchShown, cards.length);
         buildSummaryBar();
+    }
+
+    // ── Card Thumbnail Decorator ────────────────────────────────────────
+    // Caspio renders the AE's original upload in the card thumbnail; once Steve
+    // has uploaded a mockup we prefer to show THAT instead. Plus inject a
+    // "⚠ No mockup" badge when status is past In Progress but all mockup slots
+    // are empty (data integrity signal).
+    var steveArtRequestCache = { byId: new Map(), fetchedAt: 0, inFlight: null };
+    var STEVE_RECORDS_TTL_MS = 60 * 1000;
+    var STEVE_RECORDS_FIELDS = 'PK_ID,ID_Design,Status,Box_File_Mockup,BoxFileLink,Company_Mockup,Final_Approved_Mockup,File_Upload,CDN_Link,CDN_Link_Two,CDN_Link_Three,CDN_Link_Four';
+
+    function ensureSteveArtRequestsLoaded() {
+        var now = Date.now();
+        if (steveArtRequestCache.byId.size > 0 && now - steveArtRequestCache.fetchedAt < STEVE_RECORDS_TTL_MS) {
+            return Promise.resolve(steveArtRequestCache.byId);
+        }
+        if (steveArtRequestCache.inFlight) return steveArtRequestCache.inFlight;
+
+        steveArtRequestCache.inFlight = fetch(API_BASE + '/api/artrequests?limit=200&orderBy=Date_Created%20DESC&select=' + encodeURIComponent(STEVE_RECORDS_FIELDS))
+            .then(function (resp) { return resp.ok ? resp.json() : []; })
+            .then(function (rows) {
+                var map = new Map();
+                (Array.isArray(rows) ? rows : []).forEach(function (r) {
+                    if (r && r.ID_Design != null) map.set(String(r.ID_Design), r);
+                });
+                steveArtRequestCache = { byId: map, fetchedAt: Date.now(), inFlight: null };
+                return map;
+            })
+            .catch(function (err) {
+                console.warn('Thumbnail decorator: ArtRequests fetch failed:', err.message);
+                steveArtRequestCache.inFlight = null;
+                return new Map();
+            });
+        return steveArtRequestCache.inFlight;
+    }
+
+    function decorateCardThumbnail(card) {
+        if (!card || card.dataset.thumbnailDecorated === '1') return;
+        // Caspio card exposes design ID in .id-design ("ID: 52851"). Older versions used .card-id.
+        var idEl = card.querySelector('.id-design') || card.querySelector('.card-id');
+        if (!idEl) return;
+        var designId = idEl.textContent.replace(/[^0-9]/g, '');
+        if (!designId) return;
+
+        ensureSteveArtRequestsLoaded().then(function (map) {
+            var record = map.get(String(designId));
+            if (!record) return; // Archive rows or records older than limit — skip
+
+            applyThumbnailDecoration(card, record);
+            card.dataset.thumbnailDecorated = '1';
+        });
+    }
+
+    function applyThumbnailDecoration(card, record) {
+        var preferred = window.ArtActions && window.ArtActions.pickArtRequestThumbnail
+            ? window.ArtActions.pickArtRequestThumbnail(record)
+            : '';
+
+        // Caspio cards render up to 4 <div class="image-wrapper"><img ...></div> blocks inside
+        // an .image-container. Hidden ones have inline style="display: none;". When Steve has
+        // a mockup, swap the FIRST visible wrapper's img to point at the mockup (preferred)
+        // and hide the rest. If no wrapper is visible yet, unhide the first one and use it.
+        if (preferred) {
+            var wrappers = card.querySelectorAll('.image-container .image-wrapper');
+            if (wrappers.length) {
+                var target = null;
+                wrappers.forEach(function (w) {
+                    var visible = w.style.display !== 'none';
+                    if (!target && visible) target = w;
+                });
+                if (!target && wrappers.length) {
+                    target = wrappers[0];
+                    target.style.display = '';
+                }
+                // Hide the rest (so we show only the mockup, not a mix of originals + mockup)
+                wrappers.forEach(function (w) {
+                    if (w !== target) w.style.display = 'none';
+                });
+                if (target) {
+                    var img = target.querySelector('img');
+                    if (img && img.src !== preferred && img.getAttribute('data-original-src') !== preferred) {
+                        img.setAttribute('data-original-src', preferred);
+                        img.src = preferred;
+                        // Remove the Caspio onclick (which shows the raw preferred URL in a modal)
+                        // and re-add with our upgradeBoxThumbUrl pipeline so it uses large variant.
+                        img.onclick = function () { if (typeof showModal === 'function') showModal(this.src); };
+                        // Clear the old onerror that just hides the parent — we want the Box 404
+                        // handler to kick in instead (surfaces the "broken mockup" state).
+                        img.onerror = null;
+                        if (!img.dataset.errorHandlerAttached) {
+                            img.dataset.errorHandlerAttached = '1';
+                            img.addEventListener('error', function () {
+                                if (window.ArtActions && window.ArtActions.handleBoxImageError) {
+                                    window.ArtActions.handleBoxImageError(img);
+                                } else {
+                                    target.style.display = 'none';
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        // Missing-mockup badge — inject next to the status pill so it lives in the same strip
+        if (window.ArtActions && window.ArtActions.isArtRequestMockupMissing
+            && window.ArtActions.isArtRequestMockupMissing(record)
+            && !card.querySelector('.card-badge--missing-mockup')) {
+            var badge = document.createElement('span');
+            badge.className = 'pill card-badge card-badge--missing-mockup';
+            badge.textContent = '\u26A0 No mockup';
+            badge.title = 'Status is "' + (record.Status || '') + '" but no mockup has been uploaded. Open the request and upload a mockup.';
+            var statusPill = card.querySelector('.status-pill');
+            if (statusPill && statusPill.parentNode) {
+                statusPill.parentNode.insertBefore(badge, statusPill.nextSibling);
+            } else {
+                var anchor = card.querySelector('.company-name') || card;
+                if (anchor && anchor.parentNode) {
+                    anchor.parentNode.insertBefore(badge, anchor.nextSibling);
+                } else {
+                    card.appendChild(badge);
+                }
+            }
+        }
     }
 
     // ── Status Class: Add CSS class based on card status for left border + glow ──
