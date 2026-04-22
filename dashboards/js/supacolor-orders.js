@@ -142,14 +142,6 @@
         return data;
     }
 
-    // Direct OAuth2 API sync — replaces the paste-OCR flow for normal operations.
-    async function syncAllFromSupacolorApi() {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/sync/all', { method: 'POST' });
-        var data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'HTTP ' + resp.status);
-        return data;
-    }
-
     // ── Filtering ──────────────────────────────────────────────────────
     function applyFilters() {
         var f = state.filters;
@@ -617,34 +609,6 @@
         });
         $('sc-page-next').addEventListener('click', function () {
             state.currentPage++; render();
-        });
-
-        // Refresh from Supacolor API (primary flow — paste-OCR is fallback)
-        $('sc-api-sync-btn').addEventListener('click', async function () {
-            var btn = $('sc-api-sync-btn');
-            var orig = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing…';
-            try {
-                var result = await syncAllFromSupacolorApi();
-                var secs = result.durationMs ? (result.durationMs / 1000).toFixed(1) + 's' : '';
-                var processed = result.processed || 0;
-                var total = result.fetched || 0;
-                var msg = 'Synced ' + processed + '/' + total + ' jobs in ' + secs +
-                    ' — ' + (result.inserted || 0) + ' new, ' + (result.patched || 0) + ' updated, ' +
-                    (result.noop || 0) + ' unchanged';
-                if (result.errored) msg += ', ' + result.errored + ' failed';
-                if (result.timedOut) msg += ' (hit 25s cap — run again to continue)';
-                showToast(msg, result.errored ? 'error' : result.timedOut ? 'info' : 'success');
-                await Promise.all([fetchJobs(), fetchStats()]);
-                applyFilters();
-            } catch (err) {
-                console.error('Supacolor API sync failed:', err);
-                showToast('Supacolor API sync failed: ' + (err.message || 'unknown error'), 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = orig;
-            }
         });
 
         // Backfill modal

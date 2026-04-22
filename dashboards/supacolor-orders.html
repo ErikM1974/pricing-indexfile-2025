@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=2">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=3">
 </head>
 <body>
     <div class="minimal-header">
@@ -39,15 +39,18 @@
                         <div class="bt-subtitle">Local mirror of Supacolor jobs &middot; Your orders at a glance</div>
                     </div>
                     <div class="bt-header-actions">
-                        <button id="sc-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
+                        <button id="sc-refresh-btn" class="bt-btn bt-btn--primary" title="Reload the jobs list">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
-                        <button id="sc-api-sync-btn" class="bt-btn bt-btn--primary" title="Pull the latest jobs from Supacolor's API">
-                            <i class="fas fa-cloud-download-alt"></i> Refresh from Supacolor API
-                        </button>
-                        <button id="sc-backfill-btn" class="bt-btn bt-btn--secondary" title="Fallback: paste a screenshot if the API is down">
-                            <i class="fas fa-paste"></i> Backfill from Screenshot
-                        </button>
+                        <div class="sc-fallback-group" title="Fallback: paste a screenshot if Supacolor's API is down">
+                            <button id="sc-backfill-btn" class="sc-fallback-btn">
+                                <i class="fas fa-paste"></i> Paste screenshot
+                            </button>
+                            <span class="sc-fallback-note">backup if API fails</span>
+                        </div>
+                    </div>
+                    <div class="bt-subnote">
+                        Jobs sync automatically from Supacolor every 10&nbsp;min &middot; dashboard refreshes every 60&nbsp;s
                     </div>
                 </div>
 
@@ -156,6 +159,6 @@
     <!-- Toast container -->
     <div id="sc-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/supacolor-orders.js?v=6"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=7"></script>
 </body>
 </html>

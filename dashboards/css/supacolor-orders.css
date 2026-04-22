@@ -8,6 +8,54 @@
 .bt-filter-group--grow { flex: 1; }
 .bt-filter-group--grow .bt-filter-input { width: 100%; }
 
+/* ── Fallback screenshot group (backup if API fails) ───────────────── */
+.sc-fallback-group {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    margin-left: 4px;
+}
+.sc-fallback-btn {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.sc-fallback-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #9ca3af;
+}
+.sc-fallback-btn i {
+    font-size: 11px;
+}
+.sc-fallback-note {
+    font-size: 10px;
+    color: #9ca3af;
+    font-style: italic;
+    letter-spacing: 0.02em;
+}
+
+/* ── Auto-sync subnote (under the action row) ──────────────────────── */
+.bt-subnote {
+    grid-column: 1 / -1;
+    width: 100%;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 6px;
+    text-align: right;
+    font-style: italic;
+}
+
 /* ── Stat chip extras ──────────────────────────────────────────────── */
 .bt-stat-chip--cancelled { border-left: 4px solid #c0392b; }
 .bt-stat-chip--cancelled .bt-stat-count { color: #c0392b; }
