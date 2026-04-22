@@ -1614,7 +1614,62 @@ const customers = await response.json();
 | `NWCA-TEST-` | Test orders | `NWCA-TEST-12345` |
 | `NWCA-3DT-` | 3-Day Tees | `NWCA-3DT-010125-12345` |
 | `SAMPLE-` | Sample orders | `SAMPLE-0115-1-347` |
+| `OF-` | Online Order Form (all flows — staff-direct + shared customer link, globally sequential) | `OF-0001`, `OF-0042` |
 | (InkSoft ID) | InkSoft orders | `12345678` |
+
+---
+
+## Online Order Form (ExtSource: `NWCA-OrderForm`)
+
+**Added:** 2026-04-21 · **Updated:** 2026-04-22 (switched to `OF-NNNN` global-sequential format)
+
+New browser form at `/pages/order-form.html`. Staff-facing by default; supports a **shareable customer link** (`/order-form/OF-NNNN`) where staff pre-fill what they know and the customer fills the rest.
+
+**Routing:**
+- Frontend: `pages/order-form.html` + `pages/order-form/` (React via CDN + Babel standalone)
+- Backend: `server.js`
+  - `POST /api/order-form-drafts` — allocate an `OF-NNNN` ID via `/api/quote-sequence/OF` + save partial state to `quote_sessions`, `Status: "Draft"`
+  - `POST /api/submit-order-form` — push to ShopWorks via caspio-proxy `/api/manageorders/orders/create`. If no `draftId` present, allocates a fresh `OF-NNNN` and pre-creates a `quote_sessions` row first.
+  - `GET /order-form/:draftId` — short share link, redirects to `/pages/order-form.html?draftId=...`
+- Storage: reuses `quote_sessions` / `quote_items` (same tables as 3-Day Tees + quote builders); `Notes` column holds the form-state JSON blob (mirrors `CustomerDataJSON` pattern)
+
+**ID format (both flows identical):** `OF-NNNN` — zero-padded 4 digits, globally sequential, allocated via the proxy's `/api/quote-sequence/OF` endpoint (same race-safe counter Embroidery uses — see `shared_components/js/embroidery-quote-service.js:69`). Grows past 9999 naturally as more digits. Fallback to `OF-<timestamp>` if the counter endpoint is down. Year-scoped at the counter (resets Jan 1) — idempotency check on `Status === 'Processed'` catches any accidental cross-year collision.
+
+**Payload differentiators vs 3-Day Tees:**
+- `ExtSource: "NWCA-OrderForm"` (the proxy's hardcoded `ONSITE_DEFAULTS.ExtSource` actually overrides this to `"NWCA"` at push time — filter via `CustomerPurchaseOrder` prefix `OF-…` or the Notes header instead)
+- `ExtOrderID` = `OF-NNNN` (identical shape for staff-direct and share-link submits — after proxy prepends, becomes `NWCA-OF-0042` in ShopWorks)
+- `rushOrder: false`
+- `payments: []` (paid offline via invoice — no Stripe)
+- `taxTotal: 0`, `cur_Shipping: 0` (OnSite calculates; tax flags set by proxy)
+- `idCustomer: 2791`, `idOrderType: 6` (webstore routing — real contact goes in `ContactNameFirst/Last/Email/Phone`)
+- Decorations map: `embroidery/screenprint → designTypeId 3`, `dtg → 45`, `dtf → 3`
+- Size handling: server does `orderFormSizeSuffix()` (in `server.js`) — `2XL → _2X`, `3XL → _3XL`, etc. Same conventions as §Size Modifier Reference.
+- Artwork uploaded to `POST /api/files/upload` on caspio-proxy (same as 3-Day Tees), hosted URL sent as `imageUrl` + `mediaUrl`.
+
+**Customer-view locks (when opened via `/order-form/OF-…`):**
+- Sales Rep dropdown: disabled
+- PO # input: readonly
+- Per-line Price column: hidden (pricing handled offline by sales)
+- Everything else: editable (customer can correct staff typos)
+
+**Status progression in `quote_sessions`:**
+`Draft` → (customer opens + edits, optional) → `Processed` (pushed to ShopWorks) or `Processed - ShopWorks Failed` (push failed, manual retry).
+
+**Idempotency:** submit endpoint checks `quote_sessions.Status === 'Processed'` for the `draftId` before pushing — returns `mode: 'already-processed'` if so.
+
+**Gotchas learned during initial rollout (2026-04-22):**
+
+1. **`ExtSource` is hardcoded at the proxy.** `manageorders-push-client.js` line 72 sets `ExtSource: ONSITE_DEFAULTS.ExtSource` regardless of what the caller sends. Payloads with `extSource: "NWCA-OrderForm"` still arrive at OnSite as `ExtSource: "NWCA"`. For per-integration filtering, key off `CustomerPurchaseOrder` prefix (`OF-…`, `WEB-OF-…`, `3DT-…`) or the Notes header (`Source: NWCA-OrderForm`). OnSite's "APISource" setting is also blank at the connection level — there's no server-side consumer.
+
+2. **Proxy expects specific camelCase date field names.** manageorders-push-client.js reads `orderData.orderDate`, `orderData.requestedShipDate`, `orderData.dropDeadDate` and converts them to `date_OrderPlaced` / `date_OrderRequestedToShip` / `date_OrderDropDead` (MM/DD/YYYY). **NOT** `dateOrdered`/`dateRequestedToShip`/`dateDue` — those silently drop to `null`. First Order Form push had `date_OrderRequestedToShip: null` because I used the wrong camelCase.
+
+3. **Caspio `PUT /quote_sessions?filter=QuoteID='…'` silently no-ops.** The URL is accepted with 200 OK, but the Status change is NOT persisted. MUST use the PK_ID path: `PUT /quote_sessions/{PK_ID}`. Server.js now does a filter GET first to read PK_ID, then a PK-based PUT for the Status flip. Direct-curl test confirmed `/quote_sessions/{PK_ID}` works for both `Status` alone and `Status + Notes` together.
+
+4. **Caspio `GET /quote_sessions?filter=...` is cached ~5min.** A customer reloading `/order-form/OF-...` within a few minutes of submit may still see `Status: "Draft"` on the public endpoint, even though the underlying row is `Processed`. Direct `GET /quote_sessions/{PK_ID}` is fresh. The Order Form UI surfaces the submit result from the live response — not from re-fetch — so the user always sees the correct success/fail state on the current page. A full reload before the cache expires is the only visible symptom.
+
+5. **`id_Artist: 224` is the integration default, not a 3-Day Tees artifact.** Set at OnSite connection level ("Artist Created By: 224"). Every order through this integration inherits it unless `designs[n].artistId` is explicitly passed. Safe to leave for the Order Form.
+
+6. **Size Translation Table in OnSite integration config confirms size suffixes.** Webstore `2XL` → modifier `_2X`; `3XL`/`4XL`/`5XL`/`6XL`/`XS` → full-form `_3XL`/`_4XL`/`_5XL`/`_6XL`/`_XS`. `server.js` `orderFormSizeSuffix()` produces matching SKUs (e.g. `PC54_2X` for 2XL). Verified in live push JSON.
 
 ---
 
@@ -1635,6 +1690,8 @@ const customers = await response.json();
 | Project | File | Purpose |
 |---------|------|---------|
 | Pricing Index | `/server.js:1046-1337` | 3-Day Tees order creation |
+| Pricing Index | `/server.js:~1654-1840` | Online Order Form submit + draft + share route |
+| Pricing Index | `/pages/order-form/shopworks.js` | Order Form browser client (routes to `/api/submit-order-form`) |
 | Pricing Index | `/shared_components/js/manageorders-*.js` | PULL API services |
 | caspio-proxy | `/src/routes/manageorders.js` | PULL API routes |
 | caspio-proxy | `/lib/manageorders-push-client.js` | PUSH API client |

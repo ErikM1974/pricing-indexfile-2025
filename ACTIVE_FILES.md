@@ -87,6 +87,19 @@
 | `/pages/dtg-compatible-products.html` | DTG-compatible products listing | — | ✅ Active |
 | `/pages/sample-cart.html` | Sample ordering cart page | — | ✅ Active |
 | `/pages/order-confirmation.html` | Order confirmation page | — | ✅ Active |
+| `/pages/order-form.html` | **NEW** Online order form (embroidery/screenprint/DTG/DTF) — paper-style layout, pushes to ShopWorks ManageOrders | order-form/*.css, order-form/*.js, order-form/components/*.jsx | ✅ Active |
+| `/pages/order-form/init.js` | Order form tweak defaults (accent/font/layout) | — | ✅ Active |
+| `/pages/order-form/shopworks.js` | Order Form submit client — routes to `/api/submit-order-form` on server.js (mirrors 3-Day Tees flow) | — | ✅ Active |
+| `/pages/order-form/app.jsx` | Order form root React component (form state, print toolbar) | components/* | ✅ Active |
+| `/pages/order-form/components/paper-form.jsx` | Paper-style order form (info grid, garment table, footer) | common.jsx, line-items.jsx | ✅ Active |
+| `/pages/order-form/components/line-items.jsx` | Product combobox + sizes/decoration helpers | data.js | ✅ Active |
+| `/pages/order-form/components/artwork.jsx` | Drag-drop artwork uploader with placement chips + PMS colors | — | ✅ Active |
+| `/pages/order-form/components/print-sheet.jsx` | Print-only paper form layout | common.jsx | ✅ Active |
+| `/pages/order-form/components/common.jsx` | Shared icons, logo, field/section wrappers | — | ✅ Active |
+| `/pages/order-form/components/tweaks.jsx` | Accent/font/layout tweaks panel | — | ✅ Active |
+| `/pages/order-form/styles.css` | Order form base styles | — | ✅ Active |
+| `/pages/order-form/paper.css` | Order form paper-layout styles | — | ✅ Active |
+| `/pages/order-form/print.css` | Order form print layout | — | ✅ Active |
 | `/pages/top-sellers-product.css` | Top sellers product page styles | — | ✅ Active |
 | `/pages/css/policies-hub.css` | Policies hub page styles | — | ✅ Active |
 | `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Order Form — Northwest Custom Apparel</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Work+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="order-form/styles.css?v=20260422-2" />
+<link rel="stylesheet" href="order-form/paper.css?v=20260422-2" />
+<link rel="stylesheet" href="order-form/print.css?v=20260422-2" />
+</head>
+<body class="layout-single">
+
+<div id="root"></div>
+
+<!-- Tweak defaults (extracted from inline per NWCA no-inline-code rule) -->
+<script src="order-form/init.js?v=20260422-2"></script>
+
+<!-- React + Babel (prototype-fidelity: matches design bundle) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="order-form/shopworks.js?v=20260422-2"></script>
+
+<script type="text/babel" data-presets="react" src="order-form/components/common.jsx?v=20260422-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/line-items.jsx?v=20260422-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/artwork.jsx?v=20260422-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/tweaks.jsx?v=20260422-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/print-sheet.jsx?v=20260422-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/paper-form.jsx?v=20260422-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/app.jsx?v=20260422-2"></script>
+
+</body>
+</html>

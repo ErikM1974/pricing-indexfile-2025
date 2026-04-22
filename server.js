@@ -32,6 +32,11 @@ dotenv.config();
 // 3-DAY TEES
 //   L1271 POST /api/submit-3day-order
 //
+// ONLINE ORDER FORM
+//   L1654 POST /api/order-form-drafts    — save draft to quote_sessions w/ OF- prefix
+//   L1710 POST /api/submit-order-form    — push to ShopWorks (ExtSource: NWCA-OrderForm)
+//   L1840 GET  /order-form/:draftId      — short share link → redirects to /pages/order-form.html?draftId=…
+//
 // CRM & AUTH
 //   L508  POST /api/crm-session
 //   L543  GET  /crm-logout
@@ -358,6 +363,7 @@ const strictLimiter = rateLimit({
 
 // Apply strict limiting to order submission endpoints
 app.use('/api/submit-3day-order', strictLimiter);
+app.use('/api/submit-order-form', strictLimiter);
 app.use('/api/stripe/create-checkout-session', strictLimiter);
 
 // CRITICAL: Stripe webhook needs raw body for signature verification
@@ -1649,6 +1655,406 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
       message: error.message
     });
   }
+});
+
+// ============================================================================
+// Online Order Form — submit to ShopWorks via caspio-pricing-proxy ManageOrders PUSH
+// Mirrors the 3-Day Tees flow (server.js submit-3day-order) but:
+//   - ExtSource = "NWCA-OrderForm" (so OnSite can filter these apart)
+//   - No Stripe payment block (orders are paid offline via invoice)
+//   - TaxTotal: 0 — lets OnSite calculate
+//   - Accepts the order-form React state (info/rows/ship/orderNotes/files)
+//   - Uses OF-MMDD-nn as ExtOrderID when submitted via a customer share link
+// ============================================================================
+
+// Part-number size-suffix helper (matches memory/MANAGEORDERS_COMPLETE_REFERENCE.md §Size Modifier Reference).
+// Keep in sync with the proxy's manageorders-push-client normalizer — the proxy also appends suffixes,
+// but we append here too so logs at this layer show the final SKU form.
+function orderFormSizeSuffix(partNumber, size) {
+  if (!partNumber || !size) return partNumber || '';
+  const base = String(partNumber).trim();
+  const s = String(size).trim().toUpperCase();
+  // 2XL uses short form _2X — verified from 15,152-row ShopWorks CSV
+  if (s === '2XL' || s === 'XXL') {
+    // XXL is ladies/womens ONLY — can't disambiguate here without gender context,
+    // so default to the men's/unisex _2X which covers 2,123 products.
+    return `${base}_2X`;
+  }
+  if (['XS','3XL','4XL','5XL','6XL','7XL','LT','XLT','2XLT','3XLT','4XLT','OSFA','YS','YM','YL','YXL'].includes(s)) {
+    return `${base}_${s}`;
+  }
+  return base; // S, M, L, XL → no suffix
+}
+
+// Generate Order Form order ID — OF-NNNN (globally sequential, zero-padded to 4 digits).
+// Reuses the proxy's race-safe counter endpoint that Embroidery uses (same as EMB-2026-N).
+// Response shape: { prefix: "OF", year: 2026, sequence: 42 } → we return "OF-0042".
+// Falls back to OF-<timestamp> if the counter endpoint is unreachable so a push never 500s.
+// NOTE: The endpoint is year-scoped (resets Jan 1). At year-rollover the sequence restarts
+// at 1 — if OF-0001 from the prior year is still in quote_sessions, the idempotency check
+// on Status=Processed will catch any accidental re-use. Revisit this if we actually hit it.
+async function generateOrderFormDraftId() {
+  try {
+    const r = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote-sequence/OF');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const n = Number(j && j.sequence);
+    if (!Number.isFinite(n) || n <= 0) throw new Error('Bad sequence response: ' + JSON.stringify(j));
+    return `OF-${String(n).padStart(4, '0')}`;
+  } catch (err) {
+    console.warn('[Order Form] quote-sequence endpoint failed, falling back to timestamp:', err.message);
+    return `OF-${Date.now()}`;
+  }
+}
+
+// POST /api/order-form-drafts — Save a draft to Caspio quote_sessions so staff can share the link with a customer.
+// Reuses the existing quote_sessions table with QuoteID prefix "OF-".
+app.post('/api/order-form-drafts', async (req, res) => {
+  try {
+    const { info = {}, rows = [], ship = {}, orderNotes = '', files = [] } = req.body || {};
+
+    const draftId = await generateOrderFormDraftId();
+    const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
+
+    // staffFilled = which fields the staff already filled — customer view should leave these alone.
+    const staffFilled = Object.keys(info).filter(k => info[k] !== '' && info[k] != null);
+
+    const sessionData = {
+      QuoteID: draftId,
+      SessionID: `orderform_${Date.now()}`,
+      Status: 'Draft',
+      CustomerName: [info.buyerFirst, info.buyerLast].filter(Boolean).join(' '),
+      CompanyName: info.company || '',
+      CustomerEmail: info.email || '',
+      Phone: info.phone || '',
+      TotalQuantity: 0,
+      SubtotalAmount: 0,
+      LTMFeeTotal: 0,
+      TotalAmount: 0,
+      ExpiresAt: formattedExpiresAt,
+      Notes: JSON.stringify({ info, rows, ship, orderNotes, files, staffFilled })
+    };
+
+    const apiUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions';
+    const r = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sessionData)
+    });
+
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('[Order Form Draft] Caspio save failed:', txt);
+      return res.status(502).json({ success: false, error: 'Failed to save draft', detail: txt });
+    }
+
+    console.log('[Order Form Draft] ✓ Saved:', draftId);
+    res.json({ success: true, draftId });
+  } catch (err) {
+    console.error('[Order Form Draft] Error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/submit-order-form — Submit an order-form to ShopWorks.
+// Accepts the frontend state verbatim + optional draftId for share-link flow.
+app.post('/api/submit-order-form', async (req, res) => {
+  try {
+    const {
+      info = {},
+      rows = [],
+      ship = {},
+      orderNotes = '',
+      files = [],
+      draftId         // present when submitted from a shared customer link
+    } = req.body || {};
+
+    if (!info.email && !info.company) {
+      return res.status(400).json({ success: false, error: 'Missing contact info (email or company required)' });
+    }
+
+    const isDryRun = req.query.dryRun === '1' || req.query.dryRun === 'true';
+
+    // Every Order Form submission (staff-direct OR customer-via-share-link) uses the same
+    // globally-sequential OF-NNNN format. For shared-link submits we reuse the draft's existing ID;
+    // for direct submits we allocate a fresh one now (skipped in dry-run so sequence numbers aren't burned).
+    let extOrderId = draftId || (isDryRun ? 'OF-DRYRUN' : null);
+    let draftPkId = null;
+
+    if (draftId) {
+      // Share-link path: look up PK_ID + idempotency check on Draft→Processed.
+      // Must use PK_ID path for PUT later (Caspio ?filter= PUT silently no-ops).
+      try {
+        const safeId = String(draftId).replace(/[^A-Z0-9\-]/gi, '');
+        const existing = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeId}'`);
+        if (Array.isArray(existing) && existing[0]) {
+          draftPkId = existing[0].PK_ID || null;
+          if (existing[0].Status === 'Processed') {
+            return res.json({ success: true, mode: 'already-processed', extOrderId, message: 'Already pushed' });
+          }
+        }
+      } catch (e) {
+        console.warn('[Order Form Submit] Idempotency check skipped:', e.message);
+      }
+    } else if (!isDryRun) {
+      // Direct-staff path: allocate a fresh OF-NNNN and create a Draft quote_sessions row upfront
+      // (Status flips to Processed after the push result is known, in the PK_ID PUT block below).
+      // Skipped in dry-run so we don't burn sequence numbers or pollute quote_sessions during debugging.
+      extOrderId = await generateOrderFormDraftId();
+      try {
+        const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
+        const sessionData = {
+          QuoteID: extOrderId,
+          SessionID: `orderform_${Date.now()}`,
+          Status: 'Draft', // flipped to Processed in the Status PUT block after the push result is known
+          CustomerName: [info.buyerFirst, info.buyerLast].filter(Boolean).join(' '),
+          CompanyName: info.company || '',
+          CustomerEmail: info.email || '',
+          Phone: info.phone || '',
+          TotalQuantity: 0,
+          SubtotalAmount: 0,
+          LTMFeeTotal: 0,
+          TotalAmount: 0,
+          ExpiresAt: formattedExpiresAt,
+          Notes: JSON.stringify({ info, rows, ship, orderNotes, files, staffFilled: [], submitFlow: 'staff-direct' })
+        };
+        const createResp = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionData)
+        });
+        if (createResp.ok) {
+          // NOTE: proxy's POST response has a bogus `PK_ID: "records"` (literal string from Location
+          // header tail — it's the collection endpoint URL). Always query back to get the real PK.
+          // Small delay helps Caspio be ready for the filter query on the just-inserted row.
+          await new Promise(r => setTimeout(r, 500));
+          try {
+            const existing = await makeApiRequest(`/quote_sessions?filter=QuoteID='${extOrderId}'`);
+            if (Array.isArray(existing) && existing[0] && typeof existing[0].PK_ID === 'number') {
+              draftPkId = existing[0].PK_ID;
+            }
+          } catch (_) { /* non-fatal */ }
+        } else {
+          console.warn('[Order Form Submit] Could not pre-save direct submit record:', createResp.status);
+        }
+      } catch (e) {
+        console.warn('[Order Form Submit] Direct-submit pre-save failed (non-fatal):', e.message);
+      }
+    }
+
+    // --- Build lineItems (one row × qty-bearing size = one line item) ---
+    const SIZES = ['XS','S','M','L','XL','2XL','3XL','4XL'];
+    const lineItems = [];
+    rows.forEach(r => {
+      if (!r || (!r.style && !r.desc && !r.sizes)) return;
+      const partBase = (r.style || 'MISC').trim();
+      const desc = r.desc || r.style || 'Custom Apparel';
+      const color = r.colorName || r.color || '';        // display name — proxy stores as PartColor
+      const catalogColor = r.catalogColor || r.color || ''; // CATALOG_COLOR for inventory mapping
+      const price = Number(r.price || 0) || 0;
+      SIZES.forEach(sz => {
+        const qty = parseInt(r.sizes?.[sz] || 0, 10);
+        if (!qty) return;
+        lineItems.push({
+          partNumber: orderFormSizeSuffix(partBase, sz),
+          description: desc,
+          color: color,
+          catalogColor: catalogColor,
+          size: sz,
+          quantity: qty,
+          price: price
+        });
+      });
+      const other = parseInt(r.otherSize || 0, 10);
+      if (other) {
+        lineItems.push({
+          partNumber: partBase,
+          description: desc,
+          color: color,
+          catalogColor: catalogColor,
+          size: 'Other',
+          quantity: other,
+          price: price
+        });
+      }
+    });
+
+    // --- Designs: one per decoration method present in rows, artwork URLs attached ---
+    // DesignType IDs per memory/MANAGEORDERS_COMPLETE_REFERENCE.md:
+    //   3 = standard embroidery/screenprint, 45 = DTG
+    const DESIGN_TYPE_ID = { embroidery: 3, screenprint: 3, dtg: 45, dtf: 3 };
+    const DESIGN_LABEL   = { embroidery: 'Embroidery', screenprint: 'Screen Print', dtg: 'DTG', dtf: 'DTF Transfer' };
+    const methodsUsed = [...new Set(rows.map(r => r && r.deco).filter(Boolean))];
+    const designs = methodsUsed.map((method) => {
+      const hostedFiles = files.filter(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))));
+      return {
+        name: `${info.company || 'Order'} — ${DESIGN_LABEL[method] || method}`,
+        externalId: `${extOrderId}-${method.toUpperCase()}`,
+        productColor: [...new Set(rows.filter(r => r.deco === method).map(r => r.colorName || r.color).filter(Boolean))].join(', '),
+        designTypeId: DESIGN_TYPE_ID[method] || 3,
+        locations: (hostedFiles.length ? hostedFiles : [{ name: 'placeholder' }]).map((f, i) => ({
+          location: (f.placements && f.placements[0]) || 'Left Chest',
+          colors: f.colors || '',
+          code: f.designNo || `${method.slice(0,3).toUpperCase()}-${i + 1}`,
+          imageUrl: f.hostedUrl || f.preview || '',
+          customField01: f.hostedUrl || f.preview || '',
+          notes: f.colors ? `Colors: ${f.colors}` : ''
+        }))
+      };
+    });
+
+    // --- Attachments: only hosted URLs (not base64 previews) ---
+    const attachments = files
+      .filter(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))))
+      .map(f => ({
+        mediaUrl: f.hostedUrl || f.preview,
+        mediaName: f.name || 'artwork',
+        linkNote: (f.placements || []).join(', ')
+      }));
+
+    // --- Notes ---
+    const notesBlocks = [];
+    const headerNote = `ONLINE ORDER FORM\nSource: NWCA-OrderForm${draftId ? `\nDraft/Share Link: ${draftId}` : ''}\n\nCustomer: ${info.buyerFirst || ''} ${info.buyerLast || ''}\nCompany: ${info.company || 'N/A'}\nEmail: ${info.email || ''}\nPhone: ${info.phone || ''}\nPO: ${info.po || 'N/A'}\nSales Rep: ${info.salesRep || 'N/A'}\nDate Due: ${info.dateDue || 'N/A'}\n\nOrder Notes: ${orderNotes || 'None'}`;
+    notesBlocks.push({ type: 'Notes On Order', note: headerNote });
+    if (info.artNotes || attachments.length) {
+      const artLines = [];
+      if (info.artNotes) artLines.push(info.artNotes);
+      if (files.length) {
+        artLines.push(files.map(f => `${f.name || 'file'}${f.designNo ? ' (#' + f.designNo + ')' : ''}: ${(f.placements || []).join(', ')}${f.colors ? ' — Colors: ' + f.colors : ''}`).join('\n'));
+      }
+      notesBlocks.push({ type: 'Notes To Art', note: artLines.join('\n\n') });
+    }
+
+    // --- Canonical camelCase payload — same shape proxy's manageorders-push-client expects ---
+    const manageOrdersPayload = {
+      orderNumber: extOrderId,
+      customerPurchaseOrder: info.po || extOrderId,
+      customer: {
+        company: info.company || '',
+        firstName: info.buyerFirst || '',
+        lastName: info.buyerLast || '',
+        email: info.email || '',
+        phone: info.phone || ''
+      },
+      lineItems,
+      designs,
+      attachments,
+      shipping: {
+        company: info.company || '',
+        firstName: info.buyerFirst || '',
+        lastName: info.buyerLast || '',
+        address1: ship.address || info.address || '',
+        address2: '',
+        city: ship.city || info.city || '',
+        state: ship.state || info.state || '',
+        zip: ship.zip || info.zip || '',
+        country: 'USA',
+        method: ship.method === 'willcall' ? 'Customer Pickup' : (ship.method === 'other' ? 'Other' : 'UPS Ground')
+      },
+      billing: {
+        company: info.company || '',
+        address1: info.address || '',
+        address2: '',
+        city: info.city || '',
+        state: info.state || '',
+        zip: info.zip || '',
+        country: 'USA'
+      },
+      notes: notesBlocks,
+      rushOrder: false,
+      // Tax: let OnSite calculate per-location rate. Flags (sts_EnableTax01-04=1) are set by the proxy.
+      taxTotal: 0,
+      cur_Shipping: 0,
+      totals: {
+        subtotal: 0, rushFee: 0, salesTax: 0, shipping: 0, grandTotal: 0
+      },
+      payments: [],
+      // Source/sales-rep fields — the proxy maps CustomerServiceRep → ShopWorks CSR
+      extSource: 'NWCA-OrderForm',
+      salesRep: info.salesRep || '',
+      // Payment terms — one of: "Prepaid" (default) | "Pay On Pickup"
+      terms: info.terms || 'Prepaid',
+      // Proxy expects camelCase names matching manageorders-push-client: orderDate, requestedShipDate, dropDeadDate
+      orderDate: info.dateIn || new Date().toISOString().slice(0, 10),
+      requestedShipDate: info.dateDue || info.dateIn || new Date().toISOString().slice(0, 10),
+      dropDeadDate: info.dateDue || '',
+      // Webstore customer routing — real customer info in Contact fields (per MANAGEORDERS_COMPLETE_REFERENCE §5)
+      idCustomer: 2791,
+      idOrderType: 6
+    };
+
+    console.log('[Order Form Submit] Pushing', extOrderId, 'lines:', lineItems.length, 'designs:', designs.length);
+
+    // Dry-run short-circuit: returns the payload without pushing. For debugging + smoke tests.
+    if (req.query.dryRun === '1' || req.query.dryRun === 'true') {
+      console.log('[Order Form Submit] dryRun=1 — not forwarding to ManageOrders');
+      return res.json({ success: true, mode: 'dry-run', extOrderId, payload: manageOrdersPayload });
+    }
+
+    const MANAGEORDERS_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create';
+    const response = await fetch(MANAGEORDERS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(manageOrdersPayload)
+    });
+    const result = await response.json().catch(() => ({}));
+
+    const ok = response.ok && result.success !== false;
+    const shopWorksId = result.orderNumber || result.shopWorksId || null;
+
+    // Update Caspio quote_sessions status (audit trail — both share-link AND staff-direct flows).
+    // MUST use PK_ID path — ?filter=QuoteID='…' is accepted with 200 but silently no-ops (proxy quirk).
+    // NOTE: the public GET via filter is also cached ~5min, so a reload right after submit may still
+    // show "Draft" briefly. The submit response itself is authoritative for the UI.
+    if (draftPkId) {
+      // Use makeApiRequest (known-good Caspio PUT pattern, same as /api/quote_sessions/:id route uses).
+      // Only PUT Status — Caspio's Notes column has a ~500-char limit; the form state from the Draft
+      // INSERT stays intact. shopWorksId is visible in server logs + ShopWorks UI.
+      const newStatus = ok ? 'Processed' : 'Processed - ShopWorks Failed';
+      try {
+        // Single retry with 1.5s delay for transient post-INSERT write races.
+        let success = false;
+        try {
+          await makeApiRequest(`/quote_sessions/${draftPkId}`, 'PUT', { Status: newStatus });
+          success = true;
+        } catch (firstErr) {
+          await new Promise(r => setTimeout(r, 1500));
+          await makeApiRequest(`/quote_sessions/${draftPkId}`, 'PUT', { Status: newStatus });
+          success = true;
+        }
+        if (success) console.log('[Order Form Submit] ✓', extOrderId, 'marked', newStatus, shopWorksId ? ('→ SW#' + shopWorksId) : '');
+      } catch (e) {
+        console.warn('[Order Form Submit] Status PUT failed after retry:', e.message);
+      }
+    } else {
+      console.warn('[Order Form Submit] No PK_ID for', extOrderId, '— status not updated in Caspio');
+    }
+
+    if (ok) {
+      console.log('[Order Form Submit] ✓ Pushed', extOrderId, '→', shopWorksId);
+      return res.json({ success: true, extOrderId, shopWorksId, mode: 'live' });
+    } else {
+      console.error('[Order Form Submit] Push failed:', result);
+      return res.status(502).json({ success: false, extOrderId, error: result.error || 'ShopWorks submission failed', detail: result });
+    }
+  } catch (err) {
+    console.error('[Order Form Submit] Error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /order-form/:draftId — Short share link. Redirects to the page with ?draftId=...
+// so the order-form HTML's relative asset paths (order-form/styles.css, etc.) resolve correctly.
+// ID format: OF-NNNN (globally sequential, allocated via /api/quote-sequence/OF) or
+// OF-<timestamp> when the counter falls back. Both match ^OF-\d+$.
+app.get('/order-form/:draftId', (req, res) => {
+  const draftId = req.params.draftId;
+  if (!draftId || !/^OF-\d+$/.test(draftId)) {
+    return res.status(400).send('Invalid order-form draft ID format');
+  }
+  res.redirect(302, `/pages/order-form.html?draftId=${encodeURIComponent(draftId)}`);
 });
 
 // Monitoring API endpoints (if enabled)
