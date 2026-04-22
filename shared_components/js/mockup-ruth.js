@@ -27,7 +27,10 @@
 
     // ── Status Helpers ───────────────────────────────────────────────────
     const QUEUE_STATUSES = ['Submitted', 'In Progress', 'Awaiting Approval', 'Revision Requested'];
-    const COMPLETED_STATUSES = ['Approved'];
+    // Both 'Approved' and 'Completed' are valid final statuses in the data model.
+    // Kanban columns already treat them as separate end-states; this list unions them
+    // for the Completed tab so no records fall through the cracks.
+    const COMPLETED_STATUSES = ['Approved', 'Completed'];
 
     function getStatusClass(status) {
         const s = (status || '').toLowerCase().replace(/\s+/g, '-');
@@ -161,7 +164,7 @@
             else if (s === 'in progress') counts.inProgress++;
             else if (s === 'awaiting approval') counts.awaitingApproval++;
             else if (s === 'revision requested') counts.revisionRequested++;
-            else if (s === 'approved') counts.approved++;
+            else if (s === 'approved' || s === 'completed') counts.approved++;
         });
 
         // Update badge counts on tabs
@@ -329,10 +332,10 @@
         if (revCount > 0) {
             badges += `<span class="card-badge card-badge--revision">Rev ${revCount}</span>`;
         }
-        if (dueDate && isDueSoon(dueDate) && status !== 'Approved') {
+        if (dueDate && isDueSoon(dueDate) && status !== 'Approved' && status !== 'Completed') {
             badges += `<span class="card-badge card-badge--due-soon">Due ${formatDateShort(dueDate)}</span>`;
         }
-        if (dueDate && isOverdue(dueDate) && status !== 'Approved') {
+        if (dueDate && isOverdue(dueDate) && status !== 'Approved' && status !== 'Completed') {
             badges += `<span class="card-badge card-badge--due-soon card-badge--overdue">OVERDUE</span>`;
         }
 
