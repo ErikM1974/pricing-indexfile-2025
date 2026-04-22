@@ -437,6 +437,72 @@ body {
     text-decoration: none;
     white-space: nowrap;
 }
+/* Identifier row (Design # · Box ID + Copy) — helps staff find the file in Box manually */
+.ard-gallery-broken-ids {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 6px;
+    font-size: 10px;
+    color: #777;
+    margin: 0 0 10px;
+    padding: 6px 8px;
+    background: #fff;
+    border: 1px solid #f1c7be;
+    border-radius: 4px;
+    max-width: 100%;
+}
+.ard-gallery-broken-id-label {
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    font-size: 9px;
+}
+.ard-gallery-broken-id-value {
+    color: #333;
+    font-weight: 600;
+    font-size: 11px;
+    user-select: all;
+}
+.ard-gallery-broken-id-file {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 10px;
+    word-break: break-all;
+}
+.ard-gallery-broken-id-link {
+    color: #c0392b;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+.ard-gallery-broken-id-link:hover {
+    color: #8e2a1e;
+    text-decoration-style: solid;
+}
+.ard-gallery-broken-id-sep {
+    color: #ccc;
+}
+.ard-gallery-broken-copy {
+    background: #fff;
+    color: #c0392b;
+    border: 1px solid #c0392b;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1.4;
+}
+.ard-gallery-broken-copy:hover {
+    background: #c0392b;
+    color: #fff;
+}
+.ard-customer-view .ard-gallery-broken-ids {
+    display: none;
+}
 .ard-gallery-reupload-btn {
     background: #4a7c59;
     color: #fff;

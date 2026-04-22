@@ -1662,11 +1662,36 @@
             return;
         }
 
+        // Pull identifiers so staff can search Box for the missing file
+        // (trash, renamed/moved files, etc.) instead of re-uploading blind.
+        var imgForUrl = thumb.querySelector('img');
+        var originalSrc = imgForUrl ? (imgForUrl.getAttribute('data-original-src') || imgForUrl.src) : '';
+        var fileIdMatch = originalSrc.match(/\/api\/box\/thumbnail\/(\d+)/);
+        var boxFileId = fileIdMatch ? fileIdMatch[1] : '';
+        var swDesignNum = (currentRequest && currentRequest.Design_Num_SW) || '';
+
+        var idsHtml = '';
+        if (swDesignNum || boxFileId) {
+            idsHtml = '<div class="ard-gallery-broken-ids">';
+            if (swDesignNum) {
+                idsHtml += '<span class="ard-gallery-broken-id-label">Design #</span>'
+                    + '<span class="ard-gallery-broken-id-value">' + escapeHtml(swDesignNum) + '</span>';
+            }
+            if (boxFileId) {
+                if (swDesignNum) idsHtml += '<span class="ard-gallery-broken-id-sep">·</span>';
+                idsHtml += '<span class="ard-gallery-broken-id-label">Box ID</span>'
+                    + '<a href="https://app.box.com/file/' + escapeHtml(boxFileId) + '" target="_blank" rel="noopener" class="ard-gallery-broken-id-value ard-gallery-broken-id-file ard-gallery-broken-id-link" title="Open in Box (or Restore from trash)">' + escapeHtml(boxFileId) + '</a>'
+                    + '<button type="button" class="ard-gallery-broken-copy" data-copy="' + escapeHtml(boxFileId) + '" title="Copy Box File ID">Copy</button>';
+            }
+            idsHtml += '</div>';
+        }
+
         // Staff view: red card + Re-upload button that reuses the empty-slot popover
         thumb.innerHTML = '<div class="ard-gallery-broken-icon">&#9888;</div>'
             + '<div class="ard-gallery-broken-title">File missing from Box</div>'
             + '<div class="ard-gallery-broken-msg">The ' + escapeHtml(kindWord)
             + ' file no longer exists. Re-upload to fix.</div>'
+            + idsHtml
             + '<button type="button" class="ard-gallery-reupload-btn" data-field-key="'
             + escapeHtml(fieldKey) + '">Re-upload</button>'
             + '<div class="ard-gallery-label">' + escapeHtml(labelText) + '</div>';
@@ -1677,6 +1702,22 @@
                 e.stopPropagation();
                 if (typeof showSlotPopover === 'function') {
                     showSlotPopover(thumb, fieldKey);
+                }
+            });
+        }
+        var copyBtn = thumb.querySelector('.ard-gallery-broken-copy');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var val = copyBtn.getAttribute('data-copy') || '';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(val).then(function () {
+                        var orig = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(function () { copyBtn.textContent = orig; }, 1200);
+                    }).catch(function () {
+                        copyBtn.textContent = 'Copy failed';
+                    });
                 }
             });
         }
@@ -2285,10 +2326,15 @@
 
                 gridEl.style.display = 'grid';
                 var imageExts = ['jpg','jpeg','png','gif','bmp','tiff','tif','svg'];
+                // Images first, then newest first within each group — mockups are usually
+                // the most recently uploaded file, so they float to the top.
                 files.sort(function (a, b) {
                     var aImg = imageExts.indexOf((a.extension || '').toLowerCase()) !== -1 ? 0 : 1;
                     var bImg = imageExts.indexOf((b.extension || '').toLowerCase()) !== -1 ? 0 : 1;
-                    return aImg - bImg;
+                    if (aImg !== bImg) return aImg - bImg;
+                    var aDate = a.modified_at ? new Date(a.modified_at).getTime() : 0;
+                    var bDate = b.modified_at ? new Date(b.modified_at).getTime() : 0;
+                    return bDate - aDate;
                 });
 
                 files.forEach(function (file) {
@@ -2312,6 +2358,9 @@
                     else if (ext === 'pdf') phClass += ' ph-pdf';
 
                     var thumbSrc = file.thumbnailUrl ? API_BASE + file.thumbnailUrl : '';
+                    // Full filename on hover — card is truncated; this lets staff read the
+                    // whole name without guessing from the ellipsis.
+                    card.title = file.name;
                     card.innerHTML =
                         (thumbSrc
                             ? '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(file.name) + '" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
@@ -2451,9 +2500,29 @@
                 + '<div style="text-align:right;"><button type="button" id="ard-box-missing-close" class="ard-btn-primary" style="padding:8px 18px;background:#4a7c59;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;">Close</button></div>'
                 + '</div>';
         } else {
+            // Surface identifiers staff can use to search Box (trash, renamed files, etc.)
+            var modalFileId = '';
+            var modalMatch = (url || '').match(/\/api\/box\/thumbnail\/(\d+)/);
+            if (modalMatch) modalFileId = modalMatch[1];
+            var modalDesignNum = (currentRequest && currentRequest.Design_Num_SW) || '';
+            var modalIdsHtml = '';
+            if (modalDesignNum || modalFileId) {
+                modalIdsHtml = '<div style="background:#fff7f5;border:1px solid #f1c7be;border-radius:6px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#555;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">';
+                if (modalDesignNum) {
+                    modalIdsHtml += '<span style="color:#888;">Design #</span><strong style="color:#333;">' + escapeHtml(modalDesignNum) + '</strong>';
+                }
+                if (modalFileId) {
+                    if (modalDesignNum) modalIdsHtml += '<span style="color:#bbb;">·</span>';
+                    modalIdsHtml += '<span style="color:#888;">Box ID</span>'
+                        + '<a href="https://app.box.com/file/' + escapeHtml(modalFileId) + '" target="_blank" rel="noopener" style="background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #eed9d3;font-size:12px;color:#c0392b;font-family:ui-monospace,Menlo,Consolas,monospace;text-decoration:none;user-select:all;" title="Open in Box (or Restore from trash)">' + escapeHtml(modalFileId) + '</a>'
+                        + '<button type="button" id="ard-box-missing-copy" data-copy="' + escapeHtml(modalFileId) + '" style="padding:3px 10px;background:#fff;color:#c0392b;border:1px solid #c0392b;border-radius:4px;cursor:pointer;font-size:12px;">Copy</button>';
+                }
+                modalIdsHtml += '</div>';
+            }
             body = '<div style="background:#fff;padding:24px 28px;border-radius:10px;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,.25);">'
                 + '<div style="font-size:18px;font-weight:600;color:#c0392b;margin-bottom:12px;">&#9888; File missing from Box</div>'
-                + '<div style="color:#555;line-height:1.5;margin-bottom:20px;">The mockup file no longer exists in Box. It was likely deleted. The broken slot in the gallery now has a <strong>Re-upload</strong> button &mdash; use that to replace the file.</div>'
+                + '<div style="color:#555;line-height:1.5;margin-bottom:12px;">The mockup file no longer exists in Box. It was likely deleted, moved, or sent to trash. Use the IDs below to search Box, or hit <strong>Re-upload</strong> in the gallery slot to replace it.</div>'
+                + modalIdsHtml
                 + '<div style="text-align:right;"><button type="button" id="ard-box-missing-close" style="padding:8px 18px;background:#4a7c59;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;">Got it</button></div>'
                 + '</div>';
         }
@@ -2463,6 +2532,22 @@
         function close() { overlay.remove(); }
         overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
         document.getElementById('ard-box-missing-close').addEventListener('click', close);
+        var modalCopyBtn = document.getElementById('ard-box-missing-copy');
+        if (modalCopyBtn) {
+            modalCopyBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var val = modalCopyBtn.getAttribute('data-copy') || '';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(val).then(function () {
+                        var orig = modalCopyBtn.textContent;
+                        modalCopyBtn.textContent = 'Copied!';
+                        setTimeout(function () { modalCopyBtn.textContent = orig; }, 1200);
+                    }).catch(function () {
+                        modalCopyBtn.textContent = 'Copy failed';
+                    });
+                }
+            });
+        }
     }
 
     // ── Lightbox ────────────────────────────────────────────────────────

@@ -71,12 +71,57 @@
         if (img) img.style.display = 'none';
 
         var slotKey = container.dataset.slotKey || (img && img.dataset && img.dataset.slotKey) || '';
+
+        // Pull identifiers so staff can search Box for the missing file
+        var originalSrc = img ? (img.getAttribute('data-original-src') || img.src || '') : '';
+        var fileIdMatch = originalSrc.match(/\/api\/box\/thumbnail\/(\d+)/);
+        var boxFileId = fileIdMatch ? fileIdMatch[1] : '';
+        var designNum = (currentMockup && (currentMockup.Design_Number || currentMockup.ID)) || '';
+
+        var esc = (typeof escapeHtml === 'function')
+            ? escapeHtml
+            : function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
+
+        var idsHtml = '';
+        if (designNum || boxFileId) {
+            idsHtml = '<div class="pmd-slot-broken-ids">';
+            if (designNum) {
+                idsHtml += '<span class="pmd-slot-broken-id-label">Design #</span>'
+                    + '<span class="pmd-slot-broken-id-value">' + esc(designNum) + '</span>';
+            }
+            if (boxFileId) {
+                if (designNum) idsHtml += '<span class="pmd-slot-broken-id-sep">·</span>';
+                idsHtml += '<span class="pmd-slot-broken-id-label">Box ID</span>'
+                    + '<a href="https://app.box.com/file/' + esc(boxFileId) + '" target="_blank" rel="noopener" class="pmd-slot-broken-id-value pmd-slot-broken-id-file pmd-slot-broken-id-link" title="Open in Box (or Restore from trash)">' + esc(boxFileId) + '</a>'
+                    + '<button type="button" class="pmd-slot-broken-copy" data-copy="' + esc(boxFileId) + '" title="Copy Box File ID">Copy</button>';
+            }
+            idsHtml += '</div>';
+        }
+
         var overlay = document.createElement('div');
         overlay.className = 'pmd-slot-broken-overlay';
         overlay.innerHTML = '<div class="pmd-slot-broken-icon">&#9888;</div>'
             + '<div class="pmd-slot-broken-title">File missing from Box</div>'
-            + '<div class="pmd-slot-broken-msg">This mockup file no longer exists. Re-upload to fix.</div>';
+            + '<div class="pmd-slot-broken-msg">This mockup file no longer exists. Re-upload to fix.</div>'
+            + idsHtml;
         container.appendChild(overlay);
+
+        var copyBtn = overlay.querySelector('.pmd-slot-broken-copy');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var val = copyBtn.getAttribute('data-copy') || '';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(val).then(function () {
+                        var orig = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(function () { copyBtn.textContent = orig; }, 1200);
+                    }).catch(function () {
+                        copyBtn.textContent = 'Copy failed';
+                    });
+                }
+            });
+        }
     }
 
     // ── EmailJS Config ──────────────────────────────────────────────────
@@ -1925,6 +1970,13 @@
                     return;
                 }
 
+                // Newest first — mockups are usually the most recently uploaded file.
+                files.sort(function (a, b) {
+                    var aDate = a.modified_at ? new Date(a.modified_at).getTime() : 0;
+                    var bDate = b.modified_at ? new Date(b.modified_at).getTime() : 0;
+                    return bDate - aDate;
+                });
+
                 files.forEach(function (file) {
                     var ext = getFileExtension(file.name);
                     var isImage = IMAGE_EXTENSIONS.indexOf(ext) !== -1;
@@ -1933,6 +1985,7 @@
 
                     var item = document.createElement('div');
                     item.className = 'pmd-box-file-item';
+                    item.title = file.name;
                     item.innerHTML = '<div class="pmd-box-file-icon" style="background:' + iconBg + ';color:' + iconColor + ';">'
                         + ext.toUpperCase().substring(0, 3)
                         + '</div>'
@@ -4880,6 +4933,13 @@
                     countEl.textContent = '';
                     return;
                 }
+
+                // Newest first — mockups are usually the most recently uploaded file.
+                boxPanelFiles.sort(function (a, b) {
+                    var aDate = a.modified_at ? new Date(a.modified_at).getTime() : 0;
+                    var bDate = b.modified_at ? new Date(b.modified_at).getTime() : 0;
+                    return bDate - aDate;
+                });
 
                 countEl.textContent = '(' + boxPanelFiles.length + ')';
                 renderBoxPanelFiles(boxPanelFiles);
