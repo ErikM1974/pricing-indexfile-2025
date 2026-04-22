@@ -2127,6 +2127,7 @@
 
         initObserver();
         startNotificationPolling();
+        loadBrokenMockupsWidget(); // Health check: surface art requests whose Box files are gone
 
         document.addEventListener('DataPageReady', () => {
             setTimeout(function () {
@@ -2293,6 +2294,186 @@
         if (headerArea) {
             headerArea.appendChild(badge);
         }
+    }
+
+    // ── Broken Mockups Health Check Widget ─────────────────────────────
+    // Polls /api/art-requests/broken-mockups on page load. If any art requests
+    // have Box files that return 404, surfaces a red banner + modal list so
+    // Steve can proactively re-upload before Nika/customers stumble on them.
+
+    var brokenMockupsData = null;
+
+    function loadBrokenMockupsWidget() {
+        var widget = document.getElementById('steve-broken-mockups-widget');
+        if (!widget) return;
+
+        widget.style.display = '';
+        widget.innerHTML = '<div class="broken-mockups-loading">'
+            + '<span class="broken-mockups-spinner"></span>'
+            + 'Checking mockup files in Box...'
+            + '</div>';
+
+        fetch(API_BASE + '/api/art-requests/broken-mockups')
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                brokenMockupsData = data;
+                renderBrokenMockupsWidget(data);
+            })
+            .catch(function (err) {
+                console.warn('Broken mockups check failed:', err.message);
+                widget.style.display = 'none';
+            });
+    }
+
+    function renderBrokenMockupsWidget(data) {
+        var widget = document.getElementById('steve-broken-mockups-widget');
+        if (!widget) return;
+
+        if (!data || data.broken === 0) {
+            widget.innerHTML = '';
+            widget.style.display = 'none';
+            return;
+        }
+
+        var label = data.broken === 1
+            ? '<strong>1</strong> art request has a missing Box file'
+            : '<strong>' + data.broken + '</strong> art requests have missing Box files';
+
+        widget.innerHTML = '<div class="broken-mockups-banner">'
+            + '<div class="broken-mockups-icon">\u26a0</div>'
+            + '<div class="broken-mockups-text">'
+            + '<div class="broken-mockups-title">Broken Box mockups detected</div>'
+            + '<div class="broken-mockups-sub">' + label
+            + ' (scanned ' + data.checked + ' records). '
+            + 'Re-upload to fix before customers see them.</div>'
+            + '</div>'
+            + '<button type="button" class="broken-mockups-btn" id="broken-mockups-review-btn">'
+            + 'Review Broken (' + data.broken + ')</button>'
+            + '</div>';
+
+        document.getElementById('broken-mockups-review-btn').addEventListener('click', openBrokenMockupsModal);
+    }
+
+    function openBrokenMockupsModal() {
+        if (!brokenMockupsData) return;
+
+        var existing = document.getElementById('broken-mockups-modal');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'broken-mockups-modal';
+        overlay.className = 'broken-mockups-overlay';
+
+        var rows = brokenMockupsData.results.map(function (r) {
+            var dateStr = '';
+            if (r.dateCreated) {
+                try {
+                    var d = new Date(r.dateCreated);
+                    if (!isNaN(d.getTime())) {
+                        dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            var rep = r.salesRep ? (ArtActions.resolveRep(r.salesRep).displayName || r.salesRep) : '';
+            var slotLabels = (r.brokenSlots || [])
+                .map(function (s) { return friendlySlotLabel(s.field); })
+                .join(', ');
+            var statusClass = 'broken-status--' + (r.status || '').toLowerCase().replace(/\s+/g, '-');
+
+            return '<tr class="broken-mockups-row">'
+                + '<td class="broken-mockups-cell">'
+                + '<a href="/art-request/' + encodeURIComponent(r.designId)
+                + '" target="_blank" class="broken-mockups-link">#'
+                + escapeHtml(String(r.designId)) + '</a>'
+                + '</td>'
+                + '<td class="broken-mockups-cell">' + escapeHtml(r.companyName || '(no name)') + '</td>'
+                + '<td class="broken-mockups-cell">' + escapeHtml(rep || '\u2014') + '</td>'
+                + '<td class="broken-mockups-cell">'
+                + '<span class="broken-status-pill ' + statusClass + '">'
+                + escapeHtml(r.status || '\u2014') + '</span>'
+                + '</td>'
+                + '<td class="broken-mockups-cell broken-mockups-cell--muted">' + escapeHtml(dateStr) + '</td>'
+                + '<td class="broken-mockups-cell broken-mockups-cell--muted">' + escapeHtml(slotLabels) + '</td>'
+                + '<td class="broken-mockups-cell">'
+                + '<a href="/art-request/' + encodeURIComponent(r.designId)
+                + '" target="_blank" class="broken-mockups-action-btn">Open \u2192</a>'
+                + '</td>'
+                + '</tr>';
+        }).join('');
+
+        var cachedNote = brokenMockupsData.cached
+            ? ' (cached up to 10 min \u2014 <a href="#" id="broken-mockups-refresh" class="broken-mockups-refresh-link">refresh now</a>)'
+            : '';
+
+        overlay.innerHTML = '<div class="broken-mockups-modal">'
+            + '<div class="broken-mockups-modal-header">'
+            + '<h3>Broken Box Mockups (' + brokenMockupsData.broken + ')</h3>'
+            + '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close">&times;</button>'
+            + '</div>'
+            + '<div class="broken-mockups-modal-sub">'
+            + 'Scanned ' + brokenMockupsData.checked + ' active art requests '
+            + '(' + brokenMockupsData.uniqueFileIds + ' Box files checked)' + cachedNote + '. '
+            + 'Each row links to the art request \u2014 click Open, then use the Re-upload button on the broken slot.'
+            + '</div>'
+            + '<div class="broken-mockups-modal-body">'
+            + '<table class="broken-mockups-table">'
+            + '<thead><tr>'
+            + '<th>Design</th><th>Company</th><th>Rep</th><th>Status</th><th>Created</th><th>Broken slots</th><th></th>'
+            + '</tr></thead>'
+            + '<tbody>' + rows + '</tbody>'
+            + '</table>'
+            + '</div>'
+            + '</div>';
+
+        document.body.appendChild(overlay);
+
+        function close() { overlay.remove(); document.body.style.overflow = ''; }
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+        document.getElementById('broken-mockups-modal-close').addEventListener('click', close);
+        document.addEventListener('keydown', function escListener(e) {
+            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escListener); }
+        });
+
+        var refreshLink = document.getElementById('broken-mockups-refresh');
+        if (refreshLink) {
+            refreshLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                refreshLink.textContent = 'refreshing...';
+                fetch(API_BASE + '/api/art-requests/broken-mockups?refresh=true')
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        brokenMockupsData = data;
+                        renderBrokenMockupsWidget(data);
+                        close();
+                        if (data.broken > 0) openBrokenMockupsModal();
+                    })
+                    .catch(function () { refreshLink.textContent = 'refresh failed'; });
+            });
+        }
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function friendlySlotLabel(field) {
+        var map = {
+            Box_File_Mockup: 'Mockup 1',
+            BoxFileLink: 'Mockup 2',
+            Company_Mockup: 'Mockup 3',
+            Additional_Art_1: 'Art File 5',
+            Additional_Art_2: 'Art File 6'
+        };
+        return map[field] || field;
+    }
+
+    // Reusable — mirror art-actions-shared.escapeHtml so this widget is self-contained.
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        var div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
     }
 
     // ── Expose globals for HTML onclick attributes ────────────────────
