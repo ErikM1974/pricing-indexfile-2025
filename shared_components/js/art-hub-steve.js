@@ -972,6 +972,7 @@
             cleanEmptyFields(card);
             injectQuickActions(card);
             addAuditIndicator(card);
+            injectMissingBadge(card);
         });
         updateSteveSearchCount(searchShown, cards.length);
         buildSummaryBar();
@@ -2302,6 +2303,9 @@
     // Steve can proactively re-upload before Nika/customers stumble on them.
 
     var brokenMockupsData = null;
+    // Map<string designId, Array<{field, fileId}>> — lets per-card logic check
+    // "is this card's design one of the broken ones?" in O(1) without re-scanning results.
+    var brokenDesignIds = new Map();
 
     function loadBrokenMockupsWidget() {
         var widget = document.getElementById('steve-broken-mockups-widget');
@@ -2320,12 +2324,66 @@
             })
             .then(function (data) {
                 brokenMockupsData = data;
+                // Populate the per-card lookup map before any card render.
+                brokenDesignIds = new Map();
+                (data.results || []).forEach(function (r) {
+                    if (r && r.designId != null) {
+                        brokenDesignIds.set(String(r.designId), r.brokenSlots || []);
+                    }
+                });
                 renderBrokenMockupsWidget(data);
+                // processCards() may have already run before this fetch resolved —
+                // sweep existing cards now so badges appear without waiting for the
+                // next Caspio mutation.
+                applyMissingBadgesToAllCards();
             })
             .catch(function (err) {
                 console.warn('Broken mockups check failed:', err.message);
                 widget.style.display = 'none';
             });
+    }
+
+    function applyMissingBadgesToAllCards() {
+        var galleryTab = document.getElementById('gallery-tab');
+        if (!galleryTab) return;
+        galleryTab.querySelectorAll('.card').forEach(injectMissingBadge);
+    }
+
+    /**
+     * Inject a red "File missing" corner badge on a card if its design is on the
+     * broken-mockups list. Click opens the detail page in a new tab, where Task 1's
+     * broken-slot card surfaces the Design # + Box File ID for manual Box recovery.
+     * Idempotent via dataset flag.
+     */
+    function injectMissingBadge(card) {
+        if (!card || card.dataset.missingBadgeAdded === '1') return;
+        if (!brokenDesignIds || brokenDesignIds.size === 0) return;
+
+        var idEl = card.querySelector('.id-design');
+        if (!idEl) return;
+        var designId = idEl.textContent.replace(/[^0-9]/g, '');
+        if (!designId || !brokenDesignIds.has(designId)) return;
+
+        card.dataset.missingBadgeAdded = '1';
+
+        var slots = brokenDesignIds.get(designId) || [];
+        var slotCount = slots.length;
+        var tooltip = slotCount === 1
+            ? 'Mockup file missing from Box — click to recover'
+            : slotCount + ' mockup files missing from Box — click to recover';
+
+        var badge = document.createElement('a');
+        badge.className = 'card-missing-badge';
+        badge.href = '/art-request/' + encodeURIComponent(designId);
+        badge.target = '_blank';
+        badge.rel = 'noopener';
+        badge.title = tooltip;
+        badge.innerHTML = '<span class="card-missing-badge-icon">\u26a0</span>'
+            + '<span class="card-missing-badge-text">File missing</span>';
+        // Don't let the badge click bubble up to any card-level handlers.
+        badge.addEventListener('click', function (e) { e.stopPropagation(); });
+
+        card.appendChild(badge);
     }
 
     function renderBrokenMockupsWidget(data) {
