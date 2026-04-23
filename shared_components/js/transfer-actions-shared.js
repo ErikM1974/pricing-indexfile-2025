@@ -113,6 +113,7 @@
             notes_block_html: '',
             special_block_html: '',
             files_html: buildFilesHtml(record),
+            print_specs_html: buildPrintSpecsHtml(record),
             cc_email: ''
         };
         if (overrides) {
@@ -156,6 +157,47 @@
                    '<strong>' + escapeHtml(f.label) + ':</strong> ' + escapeHtml(f.name) +
                    ' · <a href="' + escapeHtml(f.url) + '" style="color:#4a6fa5;">Open in Box →</a></div>';
         }).join('');
+    }
+
+    /**
+     * Pre-render the Print Specs block for inclusion in the transfer_requested email.
+     * Returns '' when none of the 5 Print Specs fields are set (legacy transfers
+     * stay clean — no empty block in the email). Mirrors the style of the existing
+     * File Notes / Special Instructions blocks.
+     */
+    function buildPrintSpecsHtml(record) {
+        if (!record) return '';
+        var has = record.Transfer_Type || record.Fabric_Target || record.Primary_Color ||
+                  record.Additional_Colors || (record.Color_Count && record.Color_Count > 0);
+        if (!has) return '';
+
+        var rows = [];
+        if (record.Transfer_Type) {
+            rows.push('<tr><td style="padding:4px 0;color:#6b7280;width:140px;font-size:13px;">Transfer Type</td>' +
+                      '<td style="padding:4px 0;font-size:13px;"><strong>' + escapeHtml(record.Transfer_Type) + '</strong></td></tr>');
+        }
+        if (record.Fabric_Target) {
+            rows.push('<tr><td style="padding:4px 0;color:#6b7280;font-size:13px;">Fabric</td>' +
+                      '<td style="padding:4px 0;font-size:13px;">' + escapeHtml(record.Fabric_Target) + '</td></tr>');
+        }
+        if (record.Color_Count && record.Color_Count > 0) {
+            rows.push('<tr><td style="padding:4px 0;color:#6b7280;font-size:13px;"># of Colors</td>' +
+                      '<td style="padding:4px 0;font-size:13px;">' + escapeHtml(String(record.Color_Count)) + '</td></tr>');
+        }
+        if (record.Primary_Color) {
+            rows.push('<tr><td style="padding:4px 0;color:#6b7280;font-size:13px;">Primary Color</td>' +
+                      '<td style="padding:4px 0;font-size:13px;"><strong>' + escapeHtml(record.Primary_Color) + '</strong></td></tr>');
+        }
+        if (record.Additional_Colors) {
+            // white-space:pre-wrap so one-per-line PMS entries keep their line breaks
+            rows.push('<tr><td style="padding:4px 0;color:#6b7280;font-size:13px;vertical-align:top;">Additional Colors</td>' +
+                      '<td style="padding:4px 0;font-size:13px;white-space:pre-wrap;">' + escapeHtml(record.Additional_Colors) + '</td></tr>');
+        }
+
+        return '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Print Specs</h3>' +
+               '<div style="background:#f0fdf4;padding:10px 14px;border-left:3px solid #22c55e;border-radius:4px;">' +
+               '<table style="width:100%;border-collapse:collapse;">' + rows.join('') + '</table>' +
+               '</div>';
     }
 
     /**
