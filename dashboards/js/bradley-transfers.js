@@ -25,8 +25,10 @@
             status: '',
             search: '',
             rep: '',
-            rushOnly: false
+            rushOnly: false,
+            requesterEmails: []  // list of aliases to match (set by ?view= handler)
         },
+        viewMode: 'default',     // 'default' | 'steve'
         pollTimer: null
     };
 
@@ -248,12 +250,25 @@
         var f = state.filters;
         var list = state.allTransfers.slice();
 
+        // Steve view shows all statuses by default (he needs to find completed ones too),
+        // but respects an explicit status filter if the dropdown is set.
+        var suppressTerminalFilter = state.viewMode === 'steve';
+
         if (f.status) {
             list = list.filter(function (t) { return t.Status === f.status; });
-        } else {
+        } else if (!suppressTerminalFilter) {
             // Default: hide terminal statuses unless explicitly selected
             list = list.filter(function (t) {
                 return t.Status !== 'Received' && t.Status !== 'Cancelled';
+            });
+        }
+
+        // Requester filter — drives ?view=steve (matches any alias in the list)
+        if (f.requesterEmails && f.requesterEmails.length) {
+            var reqSet = f.requesterEmails.map(function (e) { return e.toLowerCase(); });
+            list = list.filter(function (t) {
+                var by = String(t.Requested_By || '').toLowerCase();
+                return reqSet.indexOf(by) >= 0;
             });
         }
 
@@ -428,8 +443,39 @@
         } catch (_) { /* ignore malformed / blocked sessionStorage */ }
     }
 
+    // ── View mode (URL-driven) ──────────────────────────────────────
+    // ?view=steve → filters to Steve's submissions only + retitles the page.
+    // No UI toggle — it's link-based. Bradley's queue (no param) remains the default.
+    function applyViewModeFromUrl() {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var view = (params.get('view') || '').toLowerCase();
+            if (view === 'steve') {
+                state.viewMode = 'steve';
+                // Steve's email is art@nwcustomapparel.com (shared art dept alias —
+                // no individual steve@ address exists).
+                state.filters.requesterEmails = ['art@nwcustomapparel.com'];
+
+                // Retitle the queue section + tab button
+                var titleEl = document.querySelector('.tab-title');
+                if (titleEl) titleEl.innerHTML = '<i class="fas fa-paint-brush" style="color:#4a6fa5;"></i> Steve\u2019s Transfer Submissions';
+                var subtitleEl = document.querySelector('.bt-subtitle');
+                if (subtitleEl) subtitleEl.textContent = 'Transfers Steve sent to Bradley — follow them through to shipment';
+                var tabActive = document.querySelector('.tab-button.active');
+                if (tabActive) tabActive.textContent = "Steve's Transfers";
+
+                // Hide "New Transfer" button — Steve doesn't create manual entries here
+                var newBtn = document.getElementById('bt-new-transfer-btn');
+                if (newBtn) newBtn.style.display = 'none';
+            }
+        } catch (err) {
+            console.warn('[bradley-transfers] applyViewModeFromUrl failed:', err.message);
+        }
+    }
+
     // ── Wire Up ──────────────────────────────────────────────────────
     function init() {
+        applyViewModeFromUrl();
         // Filter inputs
         $('bt-filter-status').addEventListener('change', function (e) {
             state.filters.status = e.target.value;

@@ -35,7 +35,8 @@
 
     // Fixed recipient routing
     var BRADLEY_EMAIL = 'bradley@nwcustomapparel.com';
-    var STEVE_EMAIL = 'steve@nwcustomapparel.com';
+    // Steve uses the shared art dept alias — no individual steve@ address exists.
+    var STEVE_EMAIL = 'art@nwcustomapparel.com';
 
     // SITE_ORIGIN: non-Heroku domain for email links (per MEMORY.md gotcha —
     // use customer-facing origin, never the herokuapp.com slug)
