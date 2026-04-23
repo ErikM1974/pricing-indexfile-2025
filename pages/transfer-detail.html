@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
-    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=4">
+    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=5">
 </head>
 <body>
     <div class="minimal-header">
@@ -85,6 +85,15 @@
                             <h3><i class="fas fa-receipt"></i> Order Tracking</h3>
                         </div>
                         <div class="td-card-body" id="td-tracking-panel"></div>
+                    </div>
+
+                    <!-- Live Supacolor Status (populated from Supacolor_Jobs once linked) -->
+                    <div class="td-card" id="td-supacolor-live-card" style="display:none;">
+                        <div class="td-card-header">
+                            <h3><i class="fas fa-satellite-dish"></i> Live Supacolor Status</h3>
+                            <span class="td-card-header-hint">Synced from Supacolor API</span>
+                        </div>
+                        <div class="td-card-body" id="td-supacolor-live-panel"></div>
                     </div>
                 </div>
 
@@ -480,6 +489,6 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=3"></script>
-    <script src="/pages/js/transfer-detail.js?v=8"></script>
+    <script src="/pages/js/transfer-detail.js?v=9"></script>
 </body>
 </html>

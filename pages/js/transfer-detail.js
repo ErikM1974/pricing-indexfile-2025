@@ -257,8 +257,112 @@
         renderArtworkPanel();
         renderSpecsPanel();
         renderTrackingPanel();
+        renderSupacolorLiveStatus();  // Part D.1 — fetches + renders linked Supacolor_Jobs
         renderActionsPanel();
         renderTimeline();
+    }
+
+    // ── Carrier tracking URL helpers ─────────────────────────────────
+    function trackingUrl(carrier, tracking) {
+        if (!tracking) return '';
+        var c = (carrier || '').toLowerCase();
+        if (c.indexOf('fedex') >= 0) return 'https://www.fedex.com/fedextrack/?tracknumbers=' + encodeURIComponent(tracking);
+        if (c.indexOf('ups') >= 0) return 'https://www.ups.com/track?tracknum=' + encodeURIComponent(tracking);
+        if (c.indexOf('usps') >= 0) return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + encodeURIComponent(tracking);
+        if (c.indexOf('dhl') >= 0) return 'https://www.dhl.com/en/express/tracking.html?AWB=' + encodeURIComponent(tracking);
+        return '';  // unknown carrier — fall back to plain text
+    }
+
+    // Visible, user-friendly label for a Supacolor status.
+    function supacolorStatusLabel(s) {
+        if (!s) return 'Unknown';
+        // Keep raw values the backend mapper already produced (Open / Closed / Cancelled,
+        // plus any passthroughs like Dispatched / Ganged / Ready / In Production).
+        return s;
+    }
+
+    function supacolorStatusClass(s) {
+        var n = (s || '').toLowerCase();
+        if (n.indexOf('cancel') >= 0) return 'td-status-dot--cancelled';
+        if (n.indexOf('dispatch') >= 0 || n.indexOf('shipped') >= 0 || n === 'closed') return 'td-status-dot--shipped';
+        if (n.indexOf('ready') >= 0 || n.indexOf('production') >= 0 || n.indexOf('ganged') >= 0) return 'td-status-dot--active';
+        return 'td-status-dot--open';
+    }
+
+    // ── D.1 — Live Supacolor Status card ────────────────────────────
+    async function renderSupacolorLiveStatus() {
+        var r = state.record;
+        var card = $('td-supacolor-live-card');
+        var panel = $('td-supacolor-live-panel');
+        if (!card || !panel) return;
+
+        // Hide the card unless we have a linked Supacolor job#
+        var num = r.Supacolor_Order_Number;
+        if (!num) {
+            card.style.display = 'none';
+            panel.innerHTML = '';
+            return;
+        }
+
+        // Render a loading stub immediately so the card appears
+        card.style.display = '';
+        panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0;"><i class="fas fa-spinner fa-spin"></i> Loading live status...</div>';
+
+        try {
+            var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(num));
+            if (resp.status === 404) {
+                panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#92400e;">' +
+                    '<i class="fas fa-info-circle"></i> Supacolor job <strong>#' + escapeHtml(num) + '</strong> not yet synced. ' +
+                    'The 10-min API sync will catch it shortly, or click "Mark as Ordered" again to re-trigger.' +
+                    '</div>';
+                return;
+            }
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            var data = await resp.json();
+            if (!data.success || !data.job) throw new Error(data.error || 'No job data');
+
+            var job = data.job;
+            var tracking = job.Tracking_Number || '';
+            var carrier = job.Carrier || '';
+            var trackUrl = trackingUrl(carrier, tracking);
+            var caspioId = job.ID_Job;
+
+            var rows = [];
+            rows.push('<div class="td-live-status">' +
+                '<span class="td-status-dot ' + supacolorStatusClass(job.Status) + '"></span>' +
+                '<span class="td-live-status-label">' + escapeHtml(supacolorStatusLabel(job.Status)) + '</span>' +
+                '<span class="td-live-status-jobnum">Supacolor #' + escapeHtml(num) + '</span>' +
+                '</div>');
+
+            rows.push('<dl class="td-specs-grid" style="margin-top:10px;">');
+            if (job.Date_Entered) rows.push('<dt>Entered</dt><dd>' + escapeHtml(formatDate(job.Date_Entered)) + '</dd>');
+            if (job.Requested_Ship_Date) rows.push('<dt>Requested Ship</dt><dd>' + escapeHtml(formatDate(job.Requested_Ship_Date)) + '</dd>');
+            if (job.Date_Shipped) rows.push('<dt>Shipped</dt><dd><strong>' + escapeHtml(formatDate(job.Date_Shipped)) + '</strong></dd>');
+            if (carrier) rows.push('<dt>Carrier</dt><dd>' + escapeHtml(carrier) + (job.Shipping_Method ? ' &middot; ' + escapeHtml(job.Shipping_Method) : '') + '</dd>');
+            if (tracking) {
+                var trackDisplay = trackUrl
+                    ? '<a href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener">' + escapeHtml(tracking) + ' <i class="fas fa-external-link-alt" style="font-size:10px;"></i></a>'
+                    : escapeHtml(tracking);
+                rows.push('<dt>Tracking</dt><dd>' + trackDisplay + '</dd>');
+            }
+            rows.push('</dl>');
+
+            if (caspioId) {
+                rows.push('<div style="margin-top:10px; text-align:right;">' +
+                    '<a href="/pages/supacolor-job-detail.html?id=' + encodeURIComponent(caspioId) + '" class="bt-btn bt-btn--link bt-btn--small">' +
+                        'View full Supacolor job <i class="fas fa-arrow-right"></i>' +
+                    '</a>' +
+                    '</div>');
+            }
+
+            panel.innerHTML = rows.join('');
+        } catch (err) {
+            console.error('[transfer-detail] Live Supacolor fetch failed:', err);
+            panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#991b1b;">' +
+                '<i class="fas fa-exclamation-triangle"></i> Unable to load live Supacolor status. ' +
+                'Open the Supacolor Orders dashboard to view directly.' +
+                '</div>';
+        }
     }
 
     function renderArtworkPanel() {
@@ -824,6 +928,30 @@
             // ShopWorks_PO_Number) before reloading so the tracking panel shows them.
             await flushPendingExtraction();
             await load();
+
+            // Auto-link: pull the matching Supacolor_Jobs record via deep-sync endpoint
+            // (already built — /api/supacolor-jobs/sync/:jobNumber replaces detail + joblines + history).
+            // Non-blocking — if it 404s (typo, or Supacolor API hasn't surfaced the job yet),
+            // the existing 10-min active-sync cron will eventually catch it.
+            var supaNum = (fd.get('supacolorOrderNumber') || '').trim();
+            if (supaNum) {
+                fetch(API_BASE + '/api/supacolor-jobs/sync/' + encodeURIComponent(supaNum), { method: 'POST' })
+                    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+                    .then(function (res) {
+                        if (!res.ok) {
+                            console.warn('[transfer-detail] Supacolor sync after Ordered: not ok', res.data);
+                            showToast('Ordered. Supacolor sync deferred — 10-min cron will pick it up.', 'info');
+                        } else {
+                            showToast('Supacolor job #' + supaNum + ' linked.', 'success');
+                            // Reload so the new Live Supacolor Status card (Part D.1) shows the linked data
+                            load();
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('[transfer-detail] Supacolor sync after Ordered failed:', err);
+                        // Silent — the 10-min cron is the backup
+                    });
+            }
 
             // Fire EmailJS notification — sales rep + Steve (non-blocking)
             if (window.TransferActions && window.TransferActions.sendTransferOrderedEmail) {
