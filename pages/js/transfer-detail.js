@@ -442,6 +442,12 @@
         });
         actions.push({ id: 'td-act-cancel', icon: 'times-circle', label: 'Cancel Transfer', variant: 'danger', modal: 'td-cancel-modal' });
 
+        // Hard-delete: only available before Bradley has placed a Supacolor order.
+        // For legitimate mid-flight backouts, use Cancel (preserves audit trail).
+        if (status === 'Requested' || status === 'On_Hold') {
+            actions.push({ id: 'td-act-delete', icon: 'trash', label: 'Delete (mistake)', variant: 'danger-outline', modal: 'td-delete-modal' });
+        }
+
         panel.innerHTML = '<div class="td-actions-grid">' +
             actions.map(function (a) {
                 return '<button class="td-action-btn td-action-btn--' + a.variant + '" data-id="' + a.id + '"' +
@@ -879,6 +885,41 @@
         }
     }
 
+    async function handleDeleteSubmit(e) {
+        e.preventDefault();
+        await ensureUserIdentified();
+        var fd = new FormData(e.target);
+        if (!fd.get('confirm')) {
+            showToast('Please check the confirmation box.', 'error');
+            return;
+        }
+        try {
+            // ?hard=true removes the Transfer_Orders row + cascades Transfer_Notes.
+            // Does NOT touch Supacolor_Jobs (that's Supacolor's API-owned data).
+            // Backend enforces status guard: rejects 400 if Status not in (Requested, On_Hold).
+            await apiDelete(
+                '/api/transfer-orders/' + encodeURIComponent(state.transferId) + '?hard=true',
+                {
+                    author: state.user.email,
+                    authorName: state.user.name,
+                    reason: fd.get('reason')
+                }
+            );
+            closeModal('td-delete-modal');
+            // Stash a toast for the queue page to show after redirect
+            try {
+                sessionStorage.setItem('bt_flash_toast', JSON.stringify({
+                    type: 'success',
+                    msg: 'Transfer ' + state.transferId + ' deleted.'
+                }));
+            } catch (_) { /* sessionStorage may be blocked — ignore */ }
+            window.location.href = '/dashboards/bradley-transfers.html';
+        } catch (err) {
+            console.error(err);
+            showToast('Delete failed: ' + err.message, 'error');
+        }
+    }
+
     async function handleRushSubmit(e) {
         e.preventDefault();
         await ensureUserIdentified();
@@ -1031,6 +1072,7 @@
         $('td-po-form').addEventListener('submit', handlePoSubmit);
         $('td-shipped-form').addEventListener('submit', handleShippedSubmit);
         $('td-cancel-form').addEventListener('submit', handleCancelSubmit);
+        $('td-delete-form').addEventListener('submit', handleDeleteSubmit);
         $('td-rush-form').addEventListener('submit', handleRushSubmit);
         $('td-specs-form').addEventListener('submit', handleSpecsSubmit);
 

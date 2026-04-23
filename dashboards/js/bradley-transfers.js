@@ -86,6 +86,25 @@
         return data.record;
     }
 
+    async function hardDeleteTransfer(idTransfer, body) {
+        // ?hard=true tells the backend to physically remove the Transfer_Orders row
+        // + cascade Transfer_Notes. Does NOT touch Supacolor_Jobs (separate API-owned table).
+        // Backend enforces status guard (Requested / On_Hold only).
+        var resp = await fetch(
+            API_BASE + '/api/transfer-orders/' + encodeURIComponent(idTransfer) + '?hard=true',
+            {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }
+        );
+        var data = await resp.json();
+        if (!resp.ok || !data.success) {
+            throw new Error(data.error || 'HTTP ' + resp.status);
+        }
+        return data;
+    }
+
     // ── Rendering ────────────────────────────────────────────────────
     function renderStats() {
         var s = state.stats;
@@ -150,10 +169,21 @@
         var rushClass = isRush(t) ? ' bt-card--rush' : '';
         var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt"></i> RUSH</span>' : '';
 
+        // Delete menu only available pre-Supacolor (before Bradley places the order).
+        // After that, Cancel (from detail page) is the correct action.
+        var canDelete = t.Status === 'Requested' || t.Status === 'On_Hold';
+        var deleteMenu = canDelete ?
+            '<button class="bt-card-menu-btn" data-action="delete" title="Delete (mistake)" aria-label="Delete transfer">' +
+                '<i class="fas fa-trash"></i>' +
+            '</button>' : '';
+
         return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
             '<div class="bt-card-header">' +
                 '<span class="bt-card-id">' + escapeHtml(t.ID_Transfer || '') + '</span>' +
-                '<span class="bt-card-age ' + ageClass(ageHours) + '">' + formatAge(ageHours) + '</span>' +
+                '<div class="bt-card-header-right">' +
+                    '<span class="bt-card-age ' + ageClass(ageHours) + '">' + formatAge(ageHours) + '</span>' +
+                    deleteMenu +
+                '</div>' +
             '</div>' +
             '<div>' +
                 '<h3 class="bt-card-title">' + escapeHtml(t.Company_Name || 'No company') + '</h3>' +
@@ -198,9 +228,15 @@
         grid.innerHTML = list.map(renderCard).join('');
         $('bt-result-count').textContent = list.length + ' transfer' + (list.length === 1 ? '' : 's');
 
-        // Wire up card clicks
+        // Wire up card clicks — delete button takes priority; rest of card navigates.
         grid.querySelectorAll('.bt-card').forEach(function (card) {
-            card.addEventListener('click', function () {
+            card.addEventListener('click', function (e) {
+                var deleteBtn = e.target.closest('.bt-card-menu-btn[data-action="delete"]');
+                if (deleteBtn) {
+                    e.stopPropagation();
+                    openDeleteModal(card.getAttribute('data-id'));
+                    return;
+                }
                 var id = card.getAttribute('data-id');
                 window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(id);
             });
@@ -339,6 +375,59 @@
         }
     }
 
+    // ── Delete modal ─────────────────────────────────────────────────
+    var deleteTargetId = null;
+
+    function openDeleteModal(idTransfer) {
+        deleteTargetId = idTransfer;
+        $('bt-delete-modal-target').textContent = idTransfer || 'This transfer';
+        $('bt-delete-form').reset();
+        $('bt-delete-modal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+        deleteTargetId = null;
+        $('bt-delete-modal').style.display = 'none';
+    }
+
+    async function handleDeleteSubmit(e) {
+        e.preventDefault();
+        if (!deleteTargetId) return;
+        var fd = new FormData(e.target);
+        if (!fd.get('confirm')) {
+            showToast('Please check the confirmation box.', 'error');
+            return;
+        }
+        // Reuse identity set by transfer-detail.html, else default to Bradley (this is his queue)
+        var email = localStorage.getItem('transfer_user_email') || 'bradley@nwcustomapparel.com';
+        var name = localStorage.getItem('transfer_user_name') || 'Bradley Wright';
+        var idToDelete = deleteTargetId;
+        try {
+            await hardDeleteTransfer(idToDelete, {
+                author: email,
+                authorName: name,
+                reason: fd.get('reason')
+            });
+            closeDeleteModal();
+            showToast('Transfer ' + idToDelete + ' deleted.', 'success');
+            await refresh();
+        } catch (err) {
+            console.error('Delete failed:', err);
+            showToast('Delete failed: ' + err.message, 'error');
+        }
+    }
+
+    // Flash toast reader — catches messages stashed by transfer-detail.html before redirect.
+    function readFlashToast() {
+        try {
+            var raw = sessionStorage.getItem('bt_flash_toast');
+            if (!raw) return;
+            sessionStorage.removeItem('bt_flash_toast');
+            var msg = JSON.parse(raw);
+            if (msg && msg.msg) showToast(msg.msg, msg.type || 'info');
+        } catch (_) { /* ignore malformed / blocked sessionStorage */ }
+    }
+
     // ── Wire Up ──────────────────────────────────────────────────────
     function init() {
         // Filter inputs
@@ -399,6 +488,17 @@
             $('bt-new-rush-details').style.display = e.target.checked ? '' : 'none';
         });
         $('bt-new-transfer-form').addEventListener('submit', handleNewTransferSubmit);
+
+        // Delete modal wiring
+        $('bt-delete-modal-close').addEventListener('click', closeDeleteModal);
+        $('bt-delete-modal-cancel').addEventListener('click', closeDeleteModal);
+        $('bt-delete-modal').addEventListener('click', function (e) {
+            if (e.target === $('bt-delete-modal')) closeDeleteModal();
+        });
+        $('bt-delete-form').addEventListener('submit', handleDeleteSubmit);
+
+        // Catch any flash toast stashed by transfer-detail before redirect (e.g., "deleted")
+        readFlashToast();
 
         // Initial load + poll
         refresh();

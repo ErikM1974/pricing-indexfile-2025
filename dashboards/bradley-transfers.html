@@ -8,7 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2">
 </head>
 <body>
     <div class="minimal-header">
@@ -250,9 +250,44 @@
         </div>
     </div>
 
+    <!-- Delete confirmation modal (hard-delete, for mistakes) -->
+    <div id="bt-delete-modal" class="bt-modal" style="display:none;">
+        <div class="bt-modal-content" style="max-width:480px;">
+            <div class="bt-modal-header">
+                <h3><i class="fas fa-trash"></i> Permanently Delete Transfer</h3>
+                <button class="bt-modal-close" id="bt-delete-modal-close">&times;</button>
+            </div>
+            <div class="bt-modal-body">
+                <div class="bt-modal-intro" style="background:#fee2e2; border-left-color:#dc2626; color:#991b1b;">
+                    <strong id="bt-delete-modal-target">This transfer</strong> will be <strong>removed entirely</strong>. No audit trail is kept. Use this only for test entries, duplicates, or mistakes. For real cancellations, open the transfer and use "Cancel Transfer" instead.
+                </div>
+                <form id="bt-delete-form" class="bt-form">
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label>Reason (for your records) *</label>
+                            <textarea name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..."></textarea>
+                        </div>
+                    </div>
+                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                        <div class="bt-form-field">
+                            <label style="font-weight:normal; display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                                <input type="checkbox" name="confirm" required style="margin-top:3px;">
+                                <span>I understand this <strong>cannot be recovered</strong>.</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="bt-form-actions">
+                        <button type="button" class="bt-btn bt-btn--secondary" id="bt-delete-modal-cancel">Keep Transfer</button>
+                        <button type="submit" class="bt-btn bt-btn--danger">Delete Permanently</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast container -->
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/bradley-transfers.js?v=2"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=3"></script>
 </body>
 </html>
