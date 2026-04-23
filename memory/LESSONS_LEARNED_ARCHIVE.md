@@ -1375,3 +1375,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** Single button element (`ard-btn-send-mockup`) was repurposed — label changed to "Send Reminder" and click handler switched to `sendMockupReminder()` instead of `showSendForApprovalModal()`.
 **Solution:** Added separate `ard-btn-send-reminder` button. "Send Mockup" always opens the full approval modal. "Send Reminder" only appears alongside during "Awaiting Approval."
 **Prevention:** Don't repurpose buttons by renaming — add separate elements when two distinct actions are needed.
+
+---
+
+### Mockup Detail — Replace Button Downloads File Instead of Opening Popover (archived 2026-04-23)
+**Problem:** AE clicks the teal "Replace" button on the reference file slot, but instead of opening the upload popover, the file URL opens in a new tab (download behavior).
+**Root Cause:** The slot's click handler (`slotEl.addEventListener('click', ...)`) calls `window.open(url, '_blank')` for non-image files and `openLightbox(url)` for images. The exclusion list (`e.target.closest(...)`) checked for `.pmd-slot-remove`, `.pmd-slot-download`, `.pmd-slot-version-badge`, and `.pmd-version-dropdown` — but NOT `.pmd-slot-replace`. So the Replace button's delegated click handler fired (opening popover), but the slot's direct click handler ALSO fired (opening URL).
+**Solution:** Added `.pmd-slot-replace` to the exclusion list in both slot click handlers (image path line 1213, non-image path line 1253).
+**Prevention:** When adding new interactive buttons inside gallery slots, ALWAYS add their class to the slot click handler's exclusion list. Both the image and non-image paths have separate exclusion lists that must stay in sync.

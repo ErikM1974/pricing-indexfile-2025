@@ -2760,6 +2760,22 @@ function getScreenPrintTier(qty) {
     return SCREENPRINT_TIERS[SCREENPRINT_TIERS.length - 1];
 }
 
+// Find the pricing tier from the Caspio tiers array for a given qty.
+// Clamps to the top tier when qty exceeds all tier maxes — otherwise a
+// capped top tier (e.g. ScreenPrint's 145-576) silently reprices anything
+// above the cap at the worst tier.
+function findPricingTier(tiers, qty) {
+    if (!tiers || tiers.length === 0) return null;
+    const sorted = [...tiers].sort((a, b) => a.minQty - b.minQty);
+    const match = sorted.find(t =>
+        qty >= t.minQty && (t.maxQty == null || qty <= t.maxQty)
+    );
+    if (match) return match;
+    const top = sorted[sorted.length - 1];
+    if (qty > (top.maxQty ?? Infinity)) return top;
+    return sorted[0];
+}
+
 async function recalculatePricing() {
     // Collect products from table (parent rows only)
     const productList = collectProductsFromTable();
@@ -2856,9 +2872,8 @@ async function recalculatePricing() {
             }
 
             // Find the tier data for this quantity
-            const tierData = primaryPricing.tiers.find(t =>
-                totalQty >= t.minQty && (t.maxQty === null || totalQty <= t.maxQty)
-            ) || primaryPricing.tiers[0];
+            const tierData = findPricingTier(primaryPricing.tiers, totalQty);
+            if (!tierData) continue;
 
             // Capture first product's pricing for nudge savings calculation
             if (!firstPricing) {
@@ -2872,9 +2887,7 @@ async function recalculatePricing() {
                 const backColors = printConfig.backColors.toString();
                 const additionalPricing = pricingData.additionalLocationPricing?.[backColors];
                 if (additionalPricing && additionalPricing.tiers) {
-                    const additionalTier = additionalPricing.tiers.find(t =>
-                        totalQty >= t.minQty && (t.maxQty === null || totalQty <= t.maxQty)
-                    ) || additionalPricing.tiers[0];
+                    const additionalTier = findPricingTier(additionalPricing.tiers, totalQty);
                     additionalPricePerPiece = additionalTier?.pricePerPiece || 0;
                 }
             }
