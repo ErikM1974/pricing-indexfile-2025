@@ -225,7 +225,12 @@
     // ── Fetch & Render ─────────────────────────────────────────────────────
     Promise.all([
         fetch(API_BASE + '/api/mockups/' + mockupId).then(function (r) {
-            if (!r.ok) throw new Error('Mockup not found');
+            if (r.status === 404) {
+                var e = new Error('This mockup request no longer exists — it was deleted by Ruth or an AE.');
+                e.code = 'DELETED';
+                throw e;
+            }
+            if (!r.ok) throw new Error('Server error (HTTP ' + r.status + ')');
             return r.json();
         }),
         fetch(API_BASE + '/api/mockup-notes/' + mockupId).then(function (r) {
@@ -265,7 +270,13 @@
         }
     }).catch(function (err) {
         console.error('Failed to load mockup:', err);
-        showError('Error Loading Mockup', err.message);
+        if (err.code === 'DELETED') {
+            // Drop stale prev/next cache so the user doesn't walk into another dead ID
+            try { sessionStorage.removeItem('ae_mockup_nav_list'); } catch (e) {}
+            showError('Mockup Deleted', err.message + ' Head back to the dashboard to see current mockups.');
+        } else {
+            showError('Error Loading Mockup', err.message);
+        }
     });
 
     // ── AE Edit Mockup Modal ──────────────────────────────────────────
@@ -462,9 +473,96 @@
     }
 
     // ── Main Render ────────────────────────────────────────────────────────
+    /** Normalize Caspio Yes/No field to a JS boolean — field can arrive as true, "Y", "Yes", "true", "1". */
+    function isSoftDeleted(mockup) {
+        var v = mockup && mockup.Is_Deleted;
+        if (v === true) return true;
+        if (typeof v === 'string') {
+            var s = v.trim().toLowerCase();
+            return s === 'y' || s === 'yes' || s === 'true' || s === '1';
+        }
+        return false;
+    }
+
+    /** Format an ISO date string like "2026-04-15T22:40:27" to "Apr 15, 2026". Caspio strips trailing Z. */
+    function formatDeletedDate(raw) {
+        if (!raw) return '';
+        var s = String(raw);
+        if (!/Z$/.test(s) && /T/.test(s)) s += 'Z';
+        var d = new Date(s);
+        if (isNaN(d.getTime())) return raw;
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderDeletedBanner(mockup) {
+        var content = document.getElementById('pmd-content');
+        if (!content) return;
+
+        // Always tear down a previous banner so re-renders don't stack.
+        var existing = document.getElementById('pmd-deleted-banner');
+        if (existing) existing.remove();
+
+        if (!isSoftDeleted(mockup)) return;
+
+        var deletedBy = mockup.Deleted_By || 'someone';
+        var deletedAt = formatDeletedDate(mockup.Deleted_At);
+
+        var banner = document.createElement('div');
+        banner.id = 'pmd-deleted-banner';
+        banner.setAttribute('role', 'alert');
+        banner.style.cssText = 'margin:0 0 16px;padding:14px 18px;background:#fff8e1;border:1px solid #f5d76e;border-left:4px solid #f1a52b;border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;';
+
+        var left = document.createElement('div');
+        left.style.cssText = 'flex:1;min-width:220px;color:#5f3e00;font-size:14px;line-height:1.4;';
+        left.innerHTML =
+            '<strong style="color:#6b4300;">This mockup was deleted.</strong> '
+            + 'By ' + escapeHtml(deletedBy)
+            + (deletedAt ? ' on ' + escapeHtml(deletedAt) : '')
+            + '. Restore it to make the request active again.';
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Restore';
+        btn.style.cssText = 'padding:8px 16px;background:#f1a52b;color:#fff;border:none;border-radius:5px;font-weight:600;font-size:13px;cursor:pointer;';
+        btn.addEventListener('click', function () { handleRestoreMockup(btn); });
+
+        // Hide the restore button in customer view — customers can't undelete anything.
+        if (isCustomerView) btn.style.display = 'none';
+
+        banner.appendChild(left);
+        banner.appendChild(btn);
+        content.insertBefore(banner, content.firstChild);
+    }
+
+    function handleRestoreMockup(btnEl) {
+        if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Restoring...'; }
+        fetch(API_BASE + '/api/mockups/' + mockupId + '/restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function (resp) {
+            if (!resp.ok) {
+                return resp.json().then(function (data) {
+                    throw new Error(data && data.error ? data.error : 'Restore failed');
+                }).catch(function () { throw new Error('Restore failed (HTTP ' + resp.status + ')'); });
+            }
+            return resp.json();
+        })
+        .then(function () {
+            window.location.reload();
+        })
+        .catch(function (err) {
+            if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Restore'; }
+            showToast('Restore failed: ' + err.message, 'error');
+        });
+    }
+
     function render(mockup, notes) {
         document.getElementById('pmd-loading').style.display = 'none';
         document.getElementById('pmd-content').style.display = '';
+
+        // Soft-deleted banner (tears down + re-renders each render)
+        renderDeletedBanner(mockup);
 
         // Title
         var designId = mockup.Design_Number || ('Mockup #' + mockup.ID);
@@ -4424,6 +4522,13 @@
         errorEl.style.display = '';
         document.getElementById('pmd-error-title').textContent = title || 'Error';
         document.getElementById('pmd-error-msg').textContent = message || '';
+
+        // Show a context-appropriate back link (hidden in customer view).
+        var backLink = document.getElementById('pmd-error-back');
+        if (backLink && !isCustomerView) {
+            backLink.href = isAeView ? '/dashboards/ae-dashboard.html' : '/dashboards/art-hub-ruth.html';
+            backLink.style.display = 'inline-block';
+        }
     }
 
     // ── Send to Customer Modal ────────────────────────────────────────────
