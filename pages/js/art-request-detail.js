@@ -154,6 +154,19 @@
         }
         currentRequest = artRequests[0];
         render(currentRequest, notes || [], charges || []);
+
+        // D.5 — Inline transfer badge, if a linked transfer exists for this design.
+        // Non-blocking — if TransferActions hasn't loaded or no transfer found, badge slot stays empty.
+        try {
+            if (window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
+                window.TransferActions.renderTransferStatusBadge({
+                    targetEl: '#ard-transfer-status',
+                    designNumber: currentRequest.Design_Number || currentRequest.Design_Num_SW
+                });
+            }
+        } catch (badgeErr) {
+            console.warn('[art-request-detail] transfer badge skipped:', badgeErr.message);
+        }
     })
     .catch(err => {
         console.error('Failed to load art request:', err);

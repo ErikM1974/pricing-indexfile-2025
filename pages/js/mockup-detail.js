@@ -249,6 +249,20 @@
         currentMockup = mockupData.record;
         currentMockup._notes = notesData.notes || [];
         render(currentMockup, currentMockup._notes);
+
+        // D.5 — Inject inline transfer badge if this mockup has a linked transfer.
+        // Non-blocking: if TransferActions isn't loaded yet, just skip.
+        try {
+            if (window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
+                window.TransferActions.renderTransferStatusBadge({
+                    targetEl: '#pmd-transfer-status',
+                    mockupId: currentMockup.ID || currentMockup.PK_ID,
+                    designNumber: currentMockup.Design_Number
+                });
+            }
+        } catch (badgeErr) {
+            console.warn('[mockup-detail] transfer badge skipped:', badgeErr.message);
+        }
     }).catch(function (err) {
         console.error('Failed to load mockup:', err);
         showError('Error Loading Mockup', err.message);

@@ -793,11 +793,104 @@
         }
     }
 
+    // ── D.5 — Inline transfer status badge ────────────────────────────
+    // Renders a small pill showing the transfer's current status + a click-through
+    // to transfer-detail. If linked to a Supacolor job, also shows tracking #.
+    //
+    // Usage from mockup-detail / art-request-detail:
+    //   TransferActions.renderTransferStatusBadge({ targetEl: '#pmd-header', mockupId: ..., designNumber: ... });
+    //
+    // Takes the first non-cancelled transfer matched by mockupId OR designNumber.
+    // Returns a Promise<boolean> — true if a badge was rendered, false if no transfer exists.
+
+    function statusBadgeMeta(status) {
+        // Map Transfer_Orders.Status → { label, color, icon }
+        var map = {
+            'Requested':  { label: 'Submitted to Bradley',        color: '#f59e0b', bg: '#fef3c7', icon: 'paper-plane' },
+            'Ordered':    { label: 'Ordered from Supacolor',      color: '#3b82f6', bg: '#dbeafe', icon: 'shopping-cart' },
+            'PO_Created': { label: 'PO Created',                  color: '#8b5cf6', bg: '#ede9fe', icon: 'file-invoice-dollar' },
+            'Shipped':    { label: 'Shipped',                     color: '#22c55e', bg: '#dcfce7', icon: 'truck' },
+            'Received':   { label: 'Received at NWCA',            color: '#16a34a', bg: '#d1fae5', icon: 'check-circle' },
+            'On_Hold':    { label: 'On Hold',                     color: '#94a3b8', bg: '#f1f5f9', icon: 'pause' },
+            'Cancelled':  { label: 'Cancelled',                   color: '#94a3b8', bg: '#f1f5f9', icon: 'times-circle' }
+        };
+        return map[status] || { label: status || 'Unknown', color: '#64748b', bg: '#f1f5f9', icon: 'circle' };
+    }
+
+    function trackingUrlFromCarrier(carrier, tracking) {
+        if (!tracking) return '';
+        var c = String(carrier || '').toLowerCase();
+        var t = encodeURIComponent(tracking);
+        if (c.indexOf('fedex') >= 0) return 'https://www.fedex.com/fedextrack/?tracknumbers=' + t;
+        if (c.indexOf('ups') >= 0) return 'https://www.ups.com/track?tracknum=' + t;
+        if (c.indexOf('usps') >= 0) return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + t;
+        if (c.indexOf('dhl') >= 0) return 'https://www.dhl.com/en/express/tracking.html?AWB=' + t;
+        return '';
+    }
+
+    async function findTransferForBadge(opts) {
+        // Prefer the (more specific) mockupId match; fall back to designNumber.
+        if (opts.mockupId) {
+            var byMockup = await getTransferForMockup(opts.mockupId);
+            if (byMockup) return byMockup;
+        }
+        if (opts.designNumber) {
+            try {
+                var resp = await fetch(API_BASE + '/api/transfer-orders?designNumber=' + encodeURIComponent(opts.designNumber) + '&pageSize=5&orderBy=Requested_At%20DESC');
+                if (!resp.ok) return null;
+                var data = await resp.json();
+                if (!data.success) return null;
+                var records = data.records || [];
+                var active = records.filter(function (r) { return r.Status !== 'Cancelled'; });
+                return active[0] || records[0] || null;
+            } catch (err) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    function badgeHtml(transfer) {
+        var meta = statusBadgeMeta(transfer.Status);
+        var trackUrl = trackingUrlFromCarrier(transfer.Carrier, transfer.Tracking_Number);
+        var trackingBlock = '';
+        if (transfer.Tracking_Number) {
+            var carrierLabel = transfer.Carrier ? escapeHtml(transfer.Carrier) + ' ' : '';
+            var trackTxt = carrierLabel + escapeHtml(transfer.Tracking_Number);
+            trackingBlock = trackUrl
+                ? '<a class="tas-transfer-badge-track" href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fas fa-truck"></i> ' + trackTxt + '</a>'
+                : '<span class="tas-transfer-badge-track"><i class="fas fa-truck"></i> ' + trackTxt + '</span>';
+        }
+        var detailLink = SITE_ORIGIN + '/pages/transfer-detail.html?id=' + encodeURIComponent(transfer.ID_Transfer || '');
+        return '<a href="' + escapeHtml(detailLink) + '" class="tas-transfer-badge" style="--badge-color:' + meta.color + ';--badge-bg:' + meta.bg + ';" title="View transfer detail">' +
+            '<i class="fas fa-' + meta.icon + '"></i>' +
+            '<span class="tas-transfer-badge-id">' + escapeHtml(transfer.ID_Transfer || '') + '</span>' +
+            '<span class="tas-transfer-badge-status">' + escapeHtml(meta.label) + '</span>' +
+            trackingBlock +
+            '</a>';
+    }
+
+    async function renderTransferStatusBadge(opts) {
+        if (!opts || !opts.targetEl) return false;
+        var container = typeof opts.targetEl === 'string' ? document.querySelector(opts.targetEl) : opts.targetEl;
+        if (!container) return false;
+
+        var transfer = await findTransferForBadge(opts);
+        if (!transfer || !transfer.ID_Transfer) {
+            container.innerHTML = '';
+            return false;
+        }
+
+        container.innerHTML = badgeHtml(transfer);
+        return true;
+    }
+
     // ── Export ───────────────────────────────────────────────────────
     window.TransferActions = {
         openSendModal: openSendModal,
         getTransferForMockup: getTransferForMockup,
         getTransferById: getTransferById,
+        renderTransferStatusBadge: renderTransferStatusBadge,
         showToast: showToast,
         // Notification helpers (called from transfer-detail.js on status changes)
         sendTransferRequestedEmail: sendTransferRequestedEmail,

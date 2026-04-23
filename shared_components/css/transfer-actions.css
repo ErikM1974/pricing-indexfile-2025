@@ -121,6 +121,57 @@
     color: var(--tas-text);
 }
 
+/* ── Inline transfer status badge (D.5) ──────────────────── */
+/* Injected into mockup-detail / art-request-detail header by
+   TransferActions.renderTransferStatusBadge(). Clicks through to transfer-detail. */
+.tas-transfer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--badge-bg, #f1f5f9);
+    color: var(--badge-color, #64748b);
+    border: 1px solid var(--badge-color, #64748b);
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    max-width: 100%;
+    flex-wrap: wrap;
+}
+.tas-transfer-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    color: var(--badge-color, #64748b);
+}
+.tas-transfer-badge i { color: var(--badge-color, #64748b); }
+.tas-transfer-badge-id {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+    opacity: 0.85;
+}
+.tas-transfer-badge-status {
+    font-weight: 600;
+}
+.tas-transfer-badge-track {
+    margin-left: 6px;
+    padding-left: 10px;
+    border-left: 1px solid currentColor;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+    opacity: 0.9;
+    text-decoration: none;
+    color: inherit;
+}
+.tas-transfer-badge-track:hover {
+    text-decoration: underline;
+    color: inherit;
+}
+
 /* ── Radio group (Fabric Target) ──────────────────────────── */
 .tas-radio-group {
     display: flex;
