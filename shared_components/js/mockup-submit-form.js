@@ -946,6 +946,20 @@ var MockupSubmitForm = (function () {
                 });
             })
             .then(function (resp) {
+                // 409 DUPLICATE_MOCKUP — backend dedup guard refused because a live row
+                // already exists for (Design_Number, Company_Name). Parse out existingId
+                // and rethrow with a code the catch handler recognizes.
+                if (resp.status === 409) {
+                    return resp.json().then(function (data) {
+                        var e = new Error(data && data.error
+                            ? data.error
+                            : 'A mockup request for this design + company already exists.');
+                        e.code = 'DUPLICATE_MOCKUP';
+                        e.existingId = data && data.existingId;
+                        e.existingStatus = data && data.existingStatus;
+                        throw e;
+                    });
+                }
                 if (!resp.ok) throw new Error('Failed to create mockup record');
                 return resp.json();
             })
@@ -1035,9 +1049,26 @@ var MockupSubmitForm = (function () {
             })
             .catch(function (err) {
                 console.error('Submit error:', err);
-                showToast('Submission failed: ' + err.message, 'error');
                 btn.disabled = false;
                 statusEl.textContent = '';
+
+                // DUPLICATE_MOCKUP — nicer UX: confirm dialog with direct nav to the
+                // existing request instead of making the AE dig through the queue.
+                if (err.code === 'DUPLICATE_MOCKUP' && err.existingId) {
+                    var statusLabel = err.existingStatus ? ' (status: ' + err.existingStatus + ')' : '';
+                    var goOpen = window.confirm(
+                        'A mockup request for this design + company already exists' + statusLabel + '.\n\n'
+                        + 'Open the existing request (#' + err.existingId + ') instead?'
+                    );
+                    if (goOpen) {
+                        window.location.href = '/mockup/' + err.existingId + '?view=ae';
+                    } else {
+                        showToast('Edit the Design Number or Company Name to submit a new request.', 'info');
+                    }
+                    return;
+                }
+
+                showToast('Submission failed: ' + err.message, 'error');
             });
     }
 
