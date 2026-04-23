@@ -222,10 +222,52 @@
                             <input type="text" name="Additional_File_2_Name">
                         </div>
                     </div>
+                    <!-- Print Specs (Supacolor-aligned) -->
+                    <div class="bt-form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="bt-form-field">
+                            <label>Transfer Type</label>
+                            <select name="Transfer_Type">
+                                <option value="">—</option>
+                                <option value="Supa-Classic">Supa-Classic</option>
+                                <option value="Full Color Gang Sheet">Full Color Gang Sheet</option>
+                                <option value="DTF">DTF (Direct to Film)</option>
+                                <option value="One Color">One Color</option>
+                                <option value="Supa-Soft">Supa-Soft</option>
+                                <option value="Reflective">Reflective</option>
+                                <option value="Glow in Dark">Glow in Dark</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Fabric Target</label>
+                            <select name="Fabric_Target">
+                                <option value="">—</option>
+                                <option value="Dark">Dark</option>
+                                <option value="Light">Light</option>
+                                <option value="Either">Either</option>
+                            </select>
+                        </div>
+                        <div class="bt-form-field">
+                            <label># of Colors</label>
+                            <input type="number" name="Color_Count" min="1" max="8">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>Primary Color / PMS</label>
+                            <input type="text" name="Primary_Color" placeholder="e.g. PMS 186C, Rich Black, Safety Yellow">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>Additional Colors (one per line)</label>
+                            <textarea name="Additional_Colors" rows="2" placeholder="PMS 2945C&#10;PMS 1235C"></textarea>
+                        </div>
+                    </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field bt-form-field--full">
                             <label>File Notes / Special Instructions</label>
-                            <textarea name="File_Notes" rows="3" placeholder="Pantone colors, sizing notes, etc."></textarea>
+                            <textarea name="File_Notes" rows="3" placeholder="Print direction, sizing notes, etc."></textarea>
                         </div>
                     </div>
                     <div class="bt-form-row">
@@ -288,6 +330,6 @@
     <!-- Toast container -->
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/bradley-transfers.js?v=3"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=4"></script>
 </body>
 </html>

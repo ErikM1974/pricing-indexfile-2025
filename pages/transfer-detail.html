@@ -412,6 +412,48 @@
                             <input type="date" name="Needed_By_Date">
                         </div>
                     </div>
+                    <!-- Print Specs (Supacolor-aligned structured fields) -->
+                    <div class="bt-form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="bt-form-field">
+                            <label>Transfer Type</label>
+                            <select name="Transfer_Type">
+                                <option value="">—</option>
+                                <option value="Supa-Classic">Supa-Classic</option>
+                                <option value="Full Color Gang Sheet">Full Color Gang Sheet</option>
+                                <option value="DTF">DTF (Direct to Film)</option>
+                                <option value="One Color">One Color</option>
+                                <option value="Supa-Soft">Supa-Soft</option>
+                                <option value="Reflective">Reflective</option>
+                                <option value="Glow in Dark">Glow in Dark</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="bt-form-field">
+                            <label>Fabric Target</label>
+                            <select name="Fabric_Target">
+                                <option value="">—</option>
+                                <option value="Dark">Dark</option>
+                                <option value="Light">Light</option>
+                                <option value="Either">Either</option>
+                            </select>
+                        </div>
+                        <div class="bt-form-field">
+                            <label># of Colors</label>
+                            <input type="number" name="Color_Count" min="1" max="8">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>Primary Color / PMS</label>
+                            <input type="text" name="Primary_Color" placeholder="e.g. PMS 186C, Rich Black, Safety Yellow">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field bt-form-field--full">
+                            <label>Additional Colors (one per line)</label>
+                            <textarea name="Additional_Colors" rows="2"></textarea>
+                        </div>
+                    </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field bt-form-field--full">
                             <label>File Notes</label>
@@ -437,7 +479,7 @@
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="/shared_components/js/transfer-actions-shared.js?v=2"></script>
-    <script src="/pages/js/transfer-detail.js?v=7"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=3"></script>
+    <script src="/pages/js/transfer-detail.js?v=8"></script>
 </body>
 </html>

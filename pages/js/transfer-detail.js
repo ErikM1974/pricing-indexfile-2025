@@ -337,6 +337,21 @@
         if (r.Needed_By_Date) parts.push('<dt>Needed By</dt><dd>' + escapeHtml(formatDate(r.Needed_By_Date)) + '</dd>');
         parts.push('</dl>');
 
+        // Print Specs — structured fields Bradley needs for the Supacolor order page.
+        // Only render the block if any of the fields are set (legacy transfers won't have them).
+        var hasPrintSpecs = r.Transfer_Type || r.Fabric_Target || r.Primary_Color || r.Additional_Colors || r.Color_Count;
+        if (hasPrintSpecs) {
+            parts.push('<dl class="td-specs-grid td-specs-grid--print">');
+            if (r.Transfer_Type) parts.push('<dt>Transfer Type</dt><dd><strong>' + escapeHtml(r.Transfer_Type) + '</strong></dd>');
+            if (r.Fabric_Target) parts.push('<dt>Fabric</dt><dd>' + escapeHtml(r.Fabric_Target) + '</dd>');
+            if (r.Color_Count) parts.push('<dt># of Colors</dt><dd>' + escapeHtml(r.Color_Count) + '</dd>');
+            if (r.Primary_Color) parts.push('<dt>Primary Color</dt><dd>' + escapeHtml(r.Primary_Color) + '</dd>');
+            if (r.Additional_Colors) {
+                parts.push('<dt>Additional Colors</dt><dd style="white-space:pre-wrap;">' + escapeHtml(r.Additional_Colors) + '</dd>');
+            }
+            parts.push('</dl>');
+        }
+
         if (r.File_Notes) {
             parts.push('<div class="td-specs-notes"><strong>File Notes</strong>' + escapeHtml(r.File_Notes) + '</div>');
         }
@@ -950,7 +965,8 @@
         var r = state.record;
         var form = $('td-specs-form');
         form.reset();
-        ['Quantity','Transfer_Size','Press_Count','Transfer_Width_In','Transfer_Height_In','Needed_By_Date','File_Notes','Special_Instructions']
+        ['Quantity','Transfer_Size','Press_Count','Transfer_Width_In','Transfer_Height_In','Needed_By_Date','File_Notes','Special_Instructions',
+         'Transfer_Type','Fabric_Target','Color_Count','Primary_Color','Additional_Colors']
             .forEach(function (key) {
                 var el = form.querySelector('[name="' + key + '"]');
                 if (el && r[key] !== undefined && r[key] !== null) {
@@ -972,7 +988,7 @@
         var payload = {};
         fd.forEach(function (value, key) {
             if (value === '' || value === null) return;
-            if (key === 'Quantity' || key === 'Press_Count') {
+            if (key === 'Quantity' || key === 'Press_Count' || key === 'Color_Count') {
                 payload[key] = parseInt(value, 10);
             } else if (key === 'Transfer_Width_In' || key === 'Transfer_Height_In') {
                 payload[key] = parseFloat(value);

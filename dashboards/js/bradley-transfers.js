@@ -352,7 +352,7 @@
         data.forEach(function (value, key) {
             if (key === 'Is_Rush') {
                 payload.Is_Rush = true;
-            } else if (key === 'Quantity' || key === 'Press_Count' || key === 'Design_ID') {
+            } else if (key === 'Quantity' || key === 'Press_Count' || key === 'Design_ID' || key === 'Color_Count') {
                 if (value) payload[key] = parseInt(value, 10);
             } else if (value) {
                 payload[key] = value;

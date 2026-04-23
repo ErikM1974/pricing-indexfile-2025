@@ -392,6 +392,54 @@
                                 '</div>' +
                             '</fieldset>' +
 
+                            // ── PRINT SPECS SECTION (Supacolor-aligned) ──
+                            // Structured versions of what used to live in File_Notes free-text.
+                            // Bradley can read these straight off the detail page and type
+                            // them into supacolor.com without translation.
+                            '<fieldset class="tas-fieldset">' +
+                                '<legend>Print Specs <span class="tas-muted">(what Supacolor needs)</span></legend>' +
+                                '<div class="tas-form-row tas-form-row--3col">' +
+                                    '<div class="tas-form-field">' +
+                                        '<label for="tas-transfer-type">Transfer Type *</label>' +
+                                        '<select id="tas-transfer-type" name="Transfer_Type" required>' +
+                                            '<option value="">— pick one —</option>' +
+                                            '<option value="Supa-Classic">Supa-Classic</option>' +
+                                            '<option value="Full Color Gang Sheet">Full Color Gang Sheet</option>' +
+                                            '<option value="DTF">DTF (Direct to Film)</option>' +
+                                            '<option value="One Color">One Color</option>' +
+                                            '<option value="Supa-Soft">Supa-Soft</option>' +
+                                            '<option value="Reflective">Reflective</option>' +
+                                            '<option value="Glow in Dark">Glow in Dark</option>' +
+                                            '<option value="Other">Other</option>' +
+                                        '</select>' +
+                                    '</div>' +
+                                    '<div class="tas-form-field">' +
+                                        '<label>Fabric Target</label>' +
+                                        '<div class="tas-radio-group">' +
+                                            '<label class="tas-radio"><input type="radio" name="Fabric_Target" value="Dark" checked> Dark</label>' +
+                                            '<label class="tas-radio"><input type="radio" name="Fabric_Target" value="Light"> Light</label>' +
+                                            '<label class="tas-radio"><input type="radio" name="Fabric_Target" value="Either"> Either</label>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="tas-form-field">' +
+                                        '<label for="tas-color-count"># of Colors</label>' +
+                                        '<input type="number" id="tas-color-count" name="Color_Count" min="1" max="8" value="1">' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="tas-form-row">' +
+                                    '<div class="tas-form-field tas-form-field--full">' +
+                                        '<label for="tas-primary-color">Primary Color / PMS</label>' +
+                                        '<input type="text" id="tas-primary-color" name="Primary_Color" placeholder="e.g. PMS 186C, Rich Black, Safety Yellow...">' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="tas-form-row">' +
+                                    '<div class="tas-form-field tas-form-field--full">' +
+                                        '<label for="tas-additional-colors">Additional Colors (one per line)</label>' +
+                                        '<textarea id="tas-additional-colors" name="Additional_Colors" rows="2" placeholder="PMS 2945C\nPMS 1235C"></textarea>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</fieldset>' +
+
                             '<div class="tas-form-actions">' +
                                 '<button type="button" class="tas-btn tas-btn--secondary tas-modal-cancel">Cancel</button>' +
                                 '<button type="submit" class="tas-btn tas-btn--primary" id="tas-submit-btn" disabled>' +
@@ -660,7 +708,7 @@
                 if (v === '' || v === null) return;
                 if (k === 'Is_Rush') {
                     payload.Is_Rush = true;
-                } else if (k === 'Quantity' || k === 'Press_Count') {
+                } else if (k === 'Quantity' || k === 'Press_Count' || k === 'Color_Count') {
                     payload[k] = parseInt(v, 10);
                 } else if (k === 'Transfer_Width_In' || k === 'Transfer_Height_In') {
                     payload[k] = parseFloat(v);
