@@ -2489,14 +2489,26 @@
                            || url.indexOf('.box.com/s/') !== -1;
 
             if (!m && !isBoxShared) {
-                var aFallback = document.createElement('a');
-                aFallback.href = url;
-                aFallback.target = '_blank';
-                aFallback.rel = 'noopener';
-                aFallback.download = (filenameBase || 'artwork');
-                document.body.appendChild(aFallback);
-                aFallback.click();
-                aFallback.remove();
+                // Non-Box cross-origin URL (CDN_Link_*, File_Upload — e.g. cdn.caspio.com).
+                // v1 (2026-04-23) used <a download target="_blank"> + programmatic .click(),
+                // but that silently failed: browsers IGNORE the `download` attribute for
+                // cross-origin URLs AND treat programmatic clicks on target="_blank"
+                // anchors as popups — which Chrome/Edge silently block when the click
+                // isn't strictly part of a synchronous user-gesture chain.
+                //
+                // v2 (2026-04-24, reported by Steve 8:13 AM): use window.open directly
+                // from the click handler's user-gesture context. This is what line 1789
+                // of this file already does successfully for non-image file clicks.
+                // User can right-click → Save As in the new tab to save the image.
+                var opened = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!opened) {
+                    alert(
+                        'Your browser blocked opening the download in a new tab.\n\n' +
+                        'Workarounds:\n' +
+                        '  1) Allow popups for teamnwca.com in your browser settings, OR\n' +
+                        '  2) Right-click the image in the lightbox and pick "Save image as…"'
+                    );
+                }
                 return;
             }
 
