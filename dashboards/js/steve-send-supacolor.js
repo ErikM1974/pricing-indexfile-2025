@@ -54,6 +54,12 @@
                 prefill.Sales_Rep_Email = art.Sales_Rep || art.User_Email;
                 prefill.Sales_Rep_Name = art.Sales_Rep_Name || prefill.Sales_Rep_Email;
             }
+        } else {
+            // L6 — Previously silent: user saw an empty modal and wondered why no
+            // prefill. Now they get a console breadcrumb for debugging, and the
+            // modal still opens so they can fill details manually.
+            console.warn('[steve-send-supacolor] No ArtRequest found for Design #' + designNumber +
+                ' — opening modal with empty prefill. User must fill Company / Rep manually.');
         }
 
         window.TransferActions.openSendModal({

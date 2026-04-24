@@ -23,8 +23,11 @@
     function getLoggedInUser() {
         var name = sessionStorage.getItem('nwca_user_name') || '';
         var email = sessionStorage.getItem('nwca_user_email') || '';
-        // Use name for noteBy so notes show "Erik" not "art@nwcustomapparel.com"
-        var displayName = name || (email ? email.split('@')[0] : 'Staff');
+        // Use name for noteBy so notes show "Erik" not "art@nwcustomapparel.com".
+        // L4 — If email lacks '@' (malformed sessionStorage), split returns the whole
+        // string and we use it as-is rather than a misleading prefix.
+        var emailPrefix = email && email.indexOf('@') !== -1 ? email.split('@')[0] : email;
+        var displayName = name || emailPrefix || 'Staff';
         return {
             name: name || 'Staff',
             email: email || 'art@nwcustomapparel.com',
@@ -2126,11 +2129,23 @@
     }
 
     /** Upload a local file to Box, then save URL to a specific Caspio field */
+    // M11 — Global upload lock. Without this, rapid-fire uploads to multiple
+    // slots could interleave writes to currentRequest[fieldKey] — the swap logic
+    // below depends on currentRequest being stable, and two in-flight uploads
+    // could corrupt slot mapping.
+    var _uploadInProgress = false;
+
     async function uploadFileToSlot(file, fieldKey) {
         if (file.size > 20 * 1024 * 1024) {
             alert('File too large (max 20MB)');
             return;
         }
+
+        if (_uploadInProgress) {
+            showArdToast('Please wait for the current upload to finish before starting another.', 'warn');
+            return;
+        }
+        _uploadInProgress = true;
 
         // Show spinner on the slot
         var slotEl = document.querySelector('[data-field-key="' + fieldKey + '"]');
@@ -2207,6 +2222,9 @@
         } catch (err) {
             alert('Upload failed: ' + err.message);
             renderMockupGallery(currentRequest);
+        } finally {
+            // M11 — Always release the upload lock
+            _uploadInProgress = false;
         }
     }
 
@@ -2219,7 +2237,13 @@
             loadVisionAnalysis();
             setTimeout(function () {
                 var newCount = document.querySelectorAll('.ard-vision-card').length;
-                if (newCount > prevCount || attempt >= maxAttempts) return; // Done or give up
+                if (newCount > prevCount) return; // Done — new analysis card appeared
+                if (attempt >= maxAttempts) {
+                    // M10 — Previously exited silently. Now log so debugging a "Vision
+                    // analysis never appeared" report has a trail in the console.
+                    console.warn('[pollForVisionAnalysis] Gave up after ' + maxAttempts + ' attempts — analysis may still be processing server-side.');
+                    return;
+                }
                 check();
             }, 3000);
         }
@@ -2904,17 +2928,27 @@
                         closeModal();
                         showSuccessMessage('Mockup sent to ' + toEmail);
 
-                        // Re-enable as "Send Again" after 30s
+                        // L5 — Visible countdown on the "Sent!" button so the user
+                        // sees the cooldown tick down rather than staring at a
+                        // frozen green button for 30 silent seconds. Re-enables as
+                        // "Send Again" when the timer reaches 0.
                         btn.disabled = true;
-                        btn.textContent = 'Sent!';
                         btn.style.background = '#28a745';
                         btn.style.color = '#fff';
-                        setTimeout(function () {
-                            btn.disabled = false;
-                            btn.textContent = 'Send Again';
-                            btn.style.background = '';
-                            btn.style.color = '';
-                        }, 30000);
+                        var remaining = 30;
+                        btn.textContent = 'Sent! (' + remaining + 's)';
+                        var tickInterval = setInterval(function () {
+                            remaining--;
+                            if (remaining <= 0) {
+                                clearInterval(tickInterval);
+                                btn.disabled = false;
+                                btn.textContent = 'Send Again';
+                                btn.style.background = '';
+                                btn.style.color = '';
+                            } else {
+                                btn.textContent = 'Sent! (' + remaining + 's)';
+                            }
+                        }, 1000);
                     })
                     .catch(function (err) {
                         console.error('Share email failed:', err);

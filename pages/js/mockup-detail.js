@@ -1597,14 +1597,18 @@
                     var showRemove = !isAeView && !isCustomerView;
                     var showReplace = isAeView && isRefFile;
                     var showSelectBadge = isCustomerView || (aeCanSelect && !isRefFile);
+                    // M14 — Escape every interpolated value defensively. slot.key is
+                    // config-controlled in practice, but making the contract consistent
+                    // means a future contributor can't accidentally introduce XSS by
+                    // piping user data through slot config.
                     slotEl.innerHTML = '<div class="pmd-slot-filled">'
                         + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" loading="lazy"'
                         + ' data-original-src="' + escapeHtml(url) + '">'
                         + '<div class="pmd-file-placeholder" style="display:none;">'
-                        + '<span class="pmd-file-ext-badge">' + (ext ? ext.toUpperCase() : 'IMG') + '</span></div>'
+                        + '<span class="pmd-file-ext-badge">' + escapeHtml(ext ? ext.toUpperCase() : 'IMG') + '</span></div>'
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
-                        + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
-                        + (showReplace ? '<button type="button" class="pmd-slot-replace" data-field-key="' + slot.key + '">&#9998; Replace</button>' : '')
+                        + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + escapeHtml(slot.key) + '">&times;</button>' : '')
+                        + (showReplace ? '<button type="button" class="pmd-slot-replace" data-field-key="' + escapeHtml(slot.key) + '">&#9998; Replace</button>' : '')
                         + (showSelectBadge ? '<div class="pmd-slot-select-badge">' + (isCustomerView ? 'Click to view & select' : 'Click to select') + '</div>' : '')
                         + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
                         + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
@@ -3102,8 +3106,17 @@
         });
     }
 
+    // M12 — Version counter for the loadStoredEmbData ↔ renderAllSlotSwatches race.
+    // Rapid user actions (e.g. Upload EMB → refresh while the initial load was still
+    // in flight) could overwrite freshly-parsed thread data with the older fetch's
+    // response. Each call bumps the version; only the latest version's response is
+    // allowed to overwrite the global.
+    var _embLoadVersion = 0;
+
     function loadStoredEmbData(mockupIdVal) {
         if (!mockupIdVal) return;
+
+        var myVersion = ++_embLoadVersion;
 
         fetch(API_BASE + '/api/emb-designs/by-mockup/' + mockupIdVal)
         .then(function (resp) {
@@ -3111,6 +3124,7 @@
             return resp.json();
         })
         .then(function (data) {
+            if (myVersion !== _embLoadVersion) return; // Superseded by a newer load
             if (!data || !data.records || data.records.length === 0) return;
 
             // Distribute records by Mockup_Slot

@@ -573,7 +573,11 @@
             var resp = await fetch(API_BASE + '/api/box/folder-files?designNumber=' + encodeURIComponent(designNumber));
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
-            if (!data.success) throw new Error(data.error || 'Box lookup failed');
+            if (!data.success) {
+                // M7 — Log the full response body so debugging isn't discarded
+                console.error('[transfer-actions] Box API returned success=false:', data);
+                throw new Error(data.error || 'Box lookup failed');
+            }
 
             if (!data.found || data.files.length === 0) {
                 banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No Box folder found for design #' + escapeHtml(designNumber);
@@ -602,10 +606,13 @@
     }
 
     function renderFilesList(files) {
+        // M6 — Drop inline `onerror=` attribute. If the DOM mutated mid-load, the inline
+        // handler could read a now-null `nextElementSibling` and throw. Bind the fallback
+        // programmatically after the row is constructed.
         var html = files.map(function (f) {
             var thumbUrl = f.thumbnailUrl ? (API_BASE + f.thumbnailUrl) : null;
             var thumbHtml = thumbUrl
-                ? '<img src="' + escapeHtml(thumbUrl) + '" alt="" class="tas-file-thumb" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
+                ? '<img src="' + escapeHtml(thumbUrl) + '" alt="" class="tas-file-thumb" data-has-fallback="1">' +
                   '<div class="tas-file-icon" style="display:none;"><i class="fas fa-file"></i></div>'
                 : '<div class="tas-file-icon"><i class="fas fa-file"></i></div>';
             var modifiedAt = f.modified_at ? new Date(f.modified_at).toLocaleDateString() : '';
@@ -623,7 +630,18 @@
             '</label>';
         }).join('');
 
-        $('#tas-files-list').innerHTML = html;
+        var listEl = $('#tas-files-list');
+        if (!listEl) return;
+        listEl.innerHTML = html;
+
+        // Bind onerror fallback for each thumbnail (M6)
+        listEl.querySelectorAll('img.tas-file-thumb[data-has-fallback]').forEach(function (img) {
+            img.addEventListener('error', function () {
+                img.style.display = 'none';
+                var sibling = img.nextElementSibling;
+                if (sibling) sibling.style.display = 'flex';
+            });
+        });
 
         // Wire checkbox change events for max-3 enforcement
         $$('#tas-files-list .tas-file-check').forEach(function (cb) {

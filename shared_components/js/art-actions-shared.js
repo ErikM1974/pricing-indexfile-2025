@@ -271,8 +271,20 @@
                 var aQh = Math.ceil(aMins / 15) * 0.25;
                 var aCost = (aQh * 75).toFixed(2);
                 var urls = data.mockupUrls || [];
+                // L3 — Escape URLs and notes before interpolating into email HTML.
+                // A URL containing `"` or `>` (e.g. a Box shared link with a weird
+                // suffix) would break the img tag and open an injection surface.
+                // Artist notes are user-entered and MUST be escaped.
+                function escapeEmailHtml(s) {
+                    return String(s == null ? '' : s)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                }
                 var imagesHtml = urls.map(function (url, i) {
-                    return '<div style="display:inline-block;margin:8px;"><img src="' + url + '" alt="Mockup ' + (i + 1) + '" style="max-width:260px;border-radius:8px;border:1px solid #e5e7eb;"></div>';
+                    return '<div style="display:inline-block;margin:8px;"><img src="' + escapeEmailHtml(url) + '" alt="Mockup ' + (i + 1) + '" style="max-width:260px;border-radius:8px;border:1px solid #e5e7eb;"></div>';
                 }).join('');
                 // Build mockup notes HTML for email
                 var notesArr = data.mockupNotes || [];
@@ -280,7 +292,7 @@
                 if (notesArr.length > 0) {
                     notesHtml = '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 18px;margin-bottom:20px;">'
                         + '<p style="font-size:13px;color:#92400e;font-weight:600;margin:0 0 6px 0;">Artist Notes:</p>'
-                        + notesArr.map(function (n) { return '<p style="font-size:13px;color:#333;margin:0 0 4px 0;line-height:1.4;">' + n + '</p>'; }).join('')
+                        + notesArr.map(function (n) { return '<p style="font-size:13px;color:#333;margin:0 0 4px 0;line-height:1.4;">' + escapeEmailHtml(n) + '</p>'; }).join('')
                         + '</div>';
                 }
 

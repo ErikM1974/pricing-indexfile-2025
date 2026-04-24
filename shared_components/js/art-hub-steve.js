@@ -1907,9 +1907,19 @@
         }
     };
 
+    // M1 — Kanban fetch abort controller. Rapid Grid↔Board toggles used to leave
+    // stale fetches racing; whichever resolved last won, potentially clobbering
+    // a fresh render with old data. This cancels prior in-flight fetches on re-entry.
+    var _kanbanAbortController = null;
+
     function buildKanbanBoard() {
         var board = document.getElementById('steve-kanban-board');
         if (!board) return;
+
+        // Cancel any in-flight Kanban fetch from a previous toggle
+        if (_kanbanAbortController) _kanbanAbortController.abort();
+        _kanbanAbortController = new AbortController();
+        var signal = _kanbanAbortController.signal;
 
         // Show loading state
         board.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">'
@@ -1926,12 +1936,12 @@
             + '&dateCreatedFrom=' + KANBAN_DATE_CUTOFF;
         var url = baseUrl + '&select=' + selectFields;
 
-        fetch(url)
+        fetch(url, { signal: signal })
             .then(function (resp) {
                 if (resp.status === 500) {
                     // Likely Is_Rush column not yet provisioned — retry without it
                     console.warn('[Kanban] fetch 500 with Is_Rush — retrying without it');
-                    return fetch(baseUrl + '&select=' + selectFieldsFallback)
+                    return fetch(baseUrl + '&select=' + selectFieldsFallback, { signal: signal })
                         .then(function (r2) {
                             if (!r2.ok) throw new Error('API returned ' + r2.status);
                             return r2.json();
@@ -1941,16 +1951,36 @@
                 return resp.json();
             })
             .then(function (data) {
+                // M3 — Validate shape explicitly. Both primary and fallback endpoints
+                // should return an array; if not, render empty with a diagnostic note
+                // instead of silently showing a blank board.
+                if (!Array.isArray(data)) {
+                    console.warn('[Kanban] API returned non-array response:', data);
+                }
                 var requests = Array.isArray(data) ? data : [];
                 kanbanData = requests;
                 renderKanbanColumns(board, requests);
             })
             .catch(function (err) {
+                if (err && err.name === 'AbortError') return; // Superseded by a newer fetch
                 console.error('[Kanban] API fetch failed:', err);
-                board.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;">'
-                    + '<strong>Error loading Kanban:</strong> ' + escapeHtml(err.message)
-                    + '<br><button onclick="buildKanbanBoard()" style="margin-top:12px;padding:8px 16px;cursor:pointer;">Retry</button>'
-                    + '</div>';
+                // M2 — Build error banner with textContent, not innerHTML, so a malicious
+                // err.message can never inject HTML. The Retry wire-up uses a delegated
+                // listener (M5-style) instead of inline onclick.
+                board.innerHTML = '';
+                var wrap = document.createElement('div');
+                wrap.style.cssText = 'text-align:center;padding:40px;color:#dc2626;';
+                var strong = document.createElement('strong');
+                strong.textContent = 'Error loading Kanban: ';
+                wrap.appendChild(strong);
+                wrap.appendChild(document.createTextNode(err.message || String(err)));
+                wrap.appendChild(document.createElement('br'));
+                var retryBtn = document.createElement('button');
+                retryBtn.textContent = 'Retry';
+                retryBtn.style.cssText = 'margin-top:12px;padding:8px 16px;cursor:pointer;';
+                retryBtn.addEventListener('click', buildKanbanBoard);
+                wrap.appendChild(retryBtn);
+                board.appendChild(wrap);
             });
     }
 
@@ -1981,7 +2011,9 @@
             : '';
 
         var rushCls = isRushReq ? ' kanban-card--rush' : '';
-        return '<div class="kanban-card' + rushCls + '" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '\', \'_blank\')">'
+        // M5 — Escape designId in data-attr (no inline onclick). Click is handled by
+        // a delegated listener on the board root — see attachKanbanBoardDelegation().
+        return '<div class="kanban-card' + rushCls + '" data-design-id="' + escapeHtml(String(designId)) + '" role="button" tabindex="0">'
             + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + escapeHtml(designNum) + '</div>' : '')
             + '<div class="kanban-card-meta">'
@@ -1990,6 +2022,55 @@
             + '</div>'
             + (badges ? '<div class="kanban-card-badges">' + badges + '</div>' : '')
             + '</div>';
+    }
+
+    // M5 — Delegated click + keyboard handler for Kanban cards.
+    // Replaces inline `onclick="window.open(...)"` which broke if designId had quotes
+    // and was a minor XSS vector. Attached once on DOMContentLoaded; stays wired across
+    // re-renders since it's on the board element, not per-card.
+    var _kanbanDelegationWired = false;
+    function attachKanbanBoardDelegation() {
+        if (_kanbanDelegationWired) return;
+        var board = document.getElementById('steve-kanban-board');
+        if (!board) return;
+        _kanbanDelegationWired = true;
+
+        function handleCardActivate(e) {
+            // Show-All link → show hidden cards in that column
+            var showAll = e.target.closest('.kanban-show-all');
+            if (showAll) {
+                e.stopPropagation();
+                var colId = showAll.dataset.columnId;
+                if (colId) window.kanbanShowAll(colId);
+                return;
+            }
+
+            // Column header (completed) → toggle collapse
+            var header = e.target.closest('.kanban-column-header[data-toggle-column]');
+            if (header) {
+                var toggleId = header.dataset.toggleColumn;
+                var storageKey = header.dataset.storageKey;
+                if (toggleId && storageKey) window.toggleKanbanCollapse(toggleId, storageKey);
+                return;
+            }
+
+            // Card click → open detail page
+            var card = e.target.closest('.kanban-card');
+            if (!card) return;
+            var designId = card.dataset.designId;
+            if (!designId) return;
+            window.open('/art-request/' + encodeURIComponent(designId), '_blank');
+        }
+
+        board.addEventListener('click', handleCardActivate);
+        board.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                if (e.target.classList && e.target.classList.contains('kanban-card')) {
+                    e.preventDefault();
+                    handleCardActivate(e);
+                }
+            }
+        });
     }
 
     // Toggle completed column collapse
@@ -2066,7 +2147,8 @@
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (req) {
                     return renderCardHtml(req).replace('class="kanban-card"', 'class="kanban-card" style="display: none"');
                 }).join('');
-                cardsHtml += '<div class="kanban-show-all" onclick="event.stopPropagation(); window.kanbanShowAll(\'' + col.id + '\')">Show all ' + colCards.length + ' items</div>';
+                // M5 — Data attribute instead of inline onclick
+                cardsHtml += '<div class="kanban-show-all" data-column-id="' + escapeHtml(col.id) + '">Show all ' + colCards.length + ' items</div>';
             }
 
             // Collapse chevron for completed column
@@ -2075,12 +2157,13 @@
                 : '';
 
             var collapseClass = (isCompleted && completedCollapsed) ? ' kanban-column--collapsed' : '';
-            var clickHandler = isCompleted
-                ? ' onclick="window.toggleKanbanCollapse(\'' + col.id + '\', \'steveKanbanCompletedCollapsed\')"'
+            // M5 — Data attributes instead of inline onclick
+            var collapseAttrs = isCompleted
+                ? ' data-toggle-column="' + escapeHtml(col.id) + '" data-storage-key="steveKanbanCompletedCollapsed"'
                 : '';
 
             return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'
-                + '<div class="kanban-column-header"' + clickHandler + '>'
+                + '<div class="kanban-column-header"' + collapseAttrs + '>'
                 + chevron
                 + '<span>' + col.label + '</span>'
                 + '<span class="kanban-column-count">' + colCards.length + '</span>'
@@ -2088,6 +2171,9 @@
                 + '<div class="kanban-column-body">' + cardsHtml + '</div>'
                 + '</div>';
         }).join('');
+
+        // Ensure delegated listeners are wired (idempotent)
+        attachKanbanBoardDelegation();
     }
 
     // ── Skeleton Loading: Show placeholder cards while Caspio loads ──
@@ -2353,10 +2439,19 @@
             });
     }
 
+    // M4 — Debounce against MutationObserver race. Cards are injected by Caspio
+    // asynchronously, and the broken-mockups fetch resolves in parallel. Calling
+    // this synchronously from both paths created a race where some cards got
+    // badged twice or not at all. 50ms debounce coalesces bursts into a single sweep.
+    var _applyBadgesTimer = null;
     function applyMissingBadgesToAllCards() {
-        var galleryTab = document.getElementById('gallery-tab');
-        if (!galleryTab) return;
-        galleryTab.querySelectorAll('.card').forEach(injectMissingBadge);
+        if (_applyBadgesTimer) clearTimeout(_applyBadgesTimer);
+        _applyBadgesTimer = setTimeout(function () {
+            _applyBadgesTimer = null;
+            var galleryTab = document.getElementById('gallery-tab');
+            if (!galleryTab) return;
+            galleryTab.querySelectorAll('.card').forEach(injectMissingBadge);
+        }, 50);
     }
 
     /**

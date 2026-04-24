@@ -18,13 +18,26 @@ var ThreadColorPicker = (function() {
 
     function init() {
         if (modal) return Promise.resolve();
-        return fetch(API_BASE + '/api/embroidery/palette')
-            .then(function(r) { return r.json(); })
+        // L2 — 10-second timeout so a dead API doesn't hang the modal forever.
+        // Previously if Heroku was down, fetch would hang indefinitely.
+        var timeoutId;
+        var timeoutPromise = new Promise(function (_, reject) {
+            timeoutId = setTimeout(function () {
+                reject(new Error('Thread palette API timed out (10s)'));
+            }, 10000);
+        });
+        var fetchPromise = fetch(API_BASE + '/api/embroidery/palette')
+            .then(function(r) {
+                if (!r.ok) throw new Error('Thread palette API returned HTTP ' + r.status);
+                return r.json();
+            })
             .then(function(data) {
                 if (!data.success) throw new Error(data.error || 'Failed to load palette');
                 palette = data;
                 _buildModal();
             });
+        return Promise.race([fetchPromise, timeoutPromise])
+            .finally(function () { clearTimeout(timeoutId); });
     }
 
     function open(runIndex, currentColor, onSelect) {
@@ -143,7 +156,10 @@ var ThreadColorPicker = (function() {
 
     function _renderGrid() {
         grid.innerHTML = '';
-        if (!palette || !palette.colors) return;
+        // L1 — Re-check palette.colors at use time. The initial guard above is fine
+        // but if palette is mutated to null/empty by another code path between the
+        // check and filter, we'd throw. Cheap defense.
+        if (!palette || !Array.isArray(palette.colors) || palette.colors.length === 0) return;
 
         var filtered = palette.colors.filter(function(c) {
             if (activeFamily !== 'All' && c.family !== activeFamily) return false;
