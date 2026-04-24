@@ -2724,7 +2724,6 @@
     var _shareWired = false;
     function initShareWithCustomer(req) {
         if (_shareWired) return; // idempotent
-        _shareWired = true;
         var overlay = document.getElementById('share-customer-overlay');
         var modal = document.getElementById('share-customer-modal');
         var btn = document.getElementById('ard-btn-share-customer');
@@ -2739,6 +2738,18 @@
         var previewLabel = document.querySelector('.share-customer-modal__preview-label');
         var modalTitle = document.querySelector('.share-customer-modal__title');
         var repInfo = document.getElementById('share-customer-rep-info');
+
+        // Guard: bail if ANY required element is missing. Earlier fix only guarded
+        // `overlay`, but a missing close/cancel/send btn would still throw on
+        // addEventListener below and kill render() silently. _shareWired is NOT set
+        // to true until we know the wire-up will succeed — so a later retry is possible
+        // if the DOM is repaired (e.g. re-injected after SPA nav).
+        if (!overlay || !modal || !btn || !closeBtn || !cancelBtn || !sendBtn ||
+            !emailInput || !nameInput || !messageInput) {
+            console.warn('[initShareWithCustomer] required share-modal elements missing; skipping wire-up');
+            return;
+        }
+        _shareWired = true;
 
         var contactEmail = req.Email_Contact || req.Email || '';
         var contactName = ((req.First_name || req.First_Name || '') + ' ' + (req.Last_name || req.Last_Name || '')).trim();
@@ -3398,6 +3409,11 @@
         changesBtn.disabled = true;
         approveBtn.textContent = 'Approving...';
 
+        // Capture critical globals at function entry — currentRequest can be mutated
+        // across async boundaries (e.g. concurrent page reload). Reading it after each
+        // await risks writing to a stale record.
+        const pkIdAtStart = currentRequest && currentRequest.PK_ID;
+
         // Determine which mockup was selected
         var slotLabel = 'Mockup';
         MOCKUP_SLOTS.forEach(function (s) {
@@ -3430,16 +3446,22 @@
             });
             if (!noteResp.ok) throw new Error(`Note creation failed: ${noteResp.status}`);
 
-            // 3. Set Final_Approved_Mockup if a mockup was selected
-            if (mockupUrl && currentRequest.PK_ID) {
+            // 3. Set Final_Approved_Mockup if a mockup was selected.
+            // Use captured pkIdAtStart (not currentRequest.PK_ID) to protect against
+            // currentRequest being mutated/cleared by a concurrent page reload between
+            // the status update await above and the mockup save await below.
+            if (mockupUrl && pkIdAtStart) {
                 try {
-                    var mockupResp = await fetch(API_BASE + '/api/artrequests/' + currentRequest.PK_ID, {
+                    var mockupResp = await fetch(API_BASE + '/api/artrequests/' + pkIdAtStart, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ Final_Approved_Mockup: mockupUrl })
                     });
                     if (!mockupResp.ok) throw new Error('Status ' + mockupResp.status);
-                    currentRequest.Final_Approved_Mockup = mockupUrl;
+                    // Only write back to currentRequest if it's still the same record
+                    if (currentRequest && currentRequest.PK_ID === pkIdAtStart) {
+                        currentRequest.Final_Approved_Mockup = mockupUrl;
+                    }
                 } catch (mockupErr) {
                     console.error('Failed to save Final_Approved_Mockup:', mockupErr);
                     showArdToast('Approved, but failed to save selected mockup. Tell Steve which mockup was chosen.', 'warn');
@@ -3623,13 +3645,26 @@
     }
 
     async function uploadChangesFiles(files, combinedNotes) {
+        // Capture currentRequest fields at function entry — they can become null if
+        // the user navigates away mid-upload. Without this guard, the FormData append
+        // of currentRequest.PK_ID throws a TypeError and the whole modal flow crashes
+        // silently (file appears to upload but never attaches).
+        var req = currentRequest;
+        if (!req || !req.PK_ID) {
+            showArdToast('Cannot upload: record context was lost. Please reload the page.', 'error');
+            throw new Error('MISSING_REQUEST_CONTEXT');
+        }
+        var pkId = String(req.PK_ID);
+        var customerId = String(req.Shopwork_customer_number || req.id_customer || '');
+        var companyName = req.CompanyName || '';
+
         var fileNames = [];
         for (var i = 0; i < files.length; i++) {
             var formData = new FormData();
             formData.append('file', files[i]);
-            formData.append('pkId', String(currentRequest.PK_ID));
-            formData.append('customerId', String(currentRequest.Shopwork_customer_number || currentRequest.id_customer || ''));
-            formData.append('companyName', currentRequest.CompanyName || '');
+            formData.append('pkId', pkId);
+            formData.append('customerId', customerId);
+            formData.append('companyName', companyName);
             var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-additional-art', {
                 method: 'POST',
                 body: formData

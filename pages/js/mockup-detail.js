@@ -1870,7 +1870,17 @@
     }
 
     // ── Gallery Interactions (Upload Popover) ──────────────────────────────
+    // Idempotence guard: initGalleryInteractions is called from render() (line ~650)
+    // which runs on every page data fetch. Without this guard, the document-level
+    // click listeners below stack up on each render — after N renders, clicking a
+    // Replace button fires the handler N times, and the outside-click close handler
+    // hideSlotPopover() fires N times per click. Pure listener wiring, no state
+    // resets needed, so early-return is safe.
+    var _galleryInteractionsWired = false;
     function initGalleryInteractions() {
+        if (_galleryInteractionsWired) return;
+        _galleryInteractionsWired = true;
+
         var popUpload = document.getElementById('pmd-pop-upload');
         var popBox = document.getElementById('pmd-pop-box');
         var fileInput = document.getElementById('pmd-slot-file-input');
@@ -4343,7 +4353,12 @@
                     showToast('This mockup file no longer exists in Box — please re-upload it.', 'error');
                     return;
                 }
-                window.open(url, '_blank');
+                // Do NOT fall back to `window.open(url)` with the raw Box URL — that URL
+                // is cross-origin without auth and will open as a blank/403/404 page,
+                // leaving the user confused. Surface a real error toast instead.
+                // (Same bug class as the art-request-detail download fix on 2026-04-23.)
+                console.error('[downloadImage] fetch failed:', err);
+                showToast('Download failed — please refresh and try again. If it keeps failing, contact Erik.', 'error');
             });
     }
 
