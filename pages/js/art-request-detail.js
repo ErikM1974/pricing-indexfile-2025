@@ -131,11 +131,14 @@
 
     // Defensive: clean up any stale modal overlays that could be lingering from a
     // prior interaction (e.g. a half-opened Send Mockup modal that didn't clean up).
-    // A leftover `.art-modal-overlay` (z-index 10000, full-screen) silently swallows
-    // every click on the page below it — which would explain "Mark Complete does nothing."
-    document.querySelectorAll('.art-modal-overlay, #quick-action-overlay').forEach(function (el) {
-        el.remove();
-    });
+    // A leftover overlay (z-index 10000, full-screen) silently swallows every click
+    // on the page below it. ONLY target `#quick-action-overlay` — that's the sole
+    // dynamically-created overlay (from art-actions-shared.js createOverlay()) that
+    // can be orphaned. Static HTML overlays like `share-customer-overlay`,
+    // `approval-overlay`, `find-order-overlay` also carry class `art-modal-overlay`
+    // and MUST NOT be removed or the page's own features break.
+    var staleQuickOverlay = document.getElementById('quick-action-overlay');
+    if (staleQuickOverlay) staleQuickOverlay.remove();
 
     // Store request data globally within IIFE for action handlers
     let currentRequest = null;
