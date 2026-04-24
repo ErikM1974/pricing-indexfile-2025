@@ -595,3 +595,251 @@
     .tas-form-row--rush { grid-template-columns: 1fr; }
     .tas-context { flex-direction: column; gap: 8px; }
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   v3 paste-links modal (2026-04-24) — Steve pastes Box URLs, the
+   backend's /analyze-link fills in everything else via filename
+   parse + image metadata + Claude vision on mockups.
+   Older .tas-file-row / .tas-line-row / .tas-mode-toggle classes
+   above are now unused but harmless (no DOM refs).
+   ───────────────────────────────────────────────────────────────── */
+
+.tas-modal-content--paste { max-width: 640px; }
+
+.tas-link-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.tas-link-row {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: border-color 0.15s ease;
+}
+.tas-link-row:focus-within { border-color: var(--tas-theme, #4a6fa5); }
+
+.tas-link-row-input-line {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.tas-link-input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    background: white;
+}
+.tas-link-input:focus {
+    outline: none;
+    border-color: var(--tas-theme, #4a6fa5);
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.15);
+}
+
+.tas-row-remove,
+.tas-row-remove-placeholder {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+.tas-row-remove {
+    border: 1px solid #fca5a5;
+    background: #fff;
+    color: #dc2626;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+.tas-row-remove:hover { background: #fee2e2; border-color: #dc2626; }
+
+/* Status blocks below input (analyzing / error / result card) */
+
+.tas-row-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.tas-row-status--busy { background: #eff6ff; color: #1e40af; }
+.tas-row-status--err { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+.tas-row-card {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    border-left: 3px solid #4a6fa5;
+}
+.tas-row-card--mockup { border-left-color: #a855f7; }
+.tas-row-card--transfer { border-left-color: #22c55e; }
+
+.tas-row-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+.tas-row-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    background: #f1f5f9;
+    color: #475569;
+}
+.tas-row-card--mockup .tas-row-badge { background: #f3e8ff; color: #6b21a8; }
+.tas-row-card--transfer .tas-row-badge { background: #dcfce7; color: #14532d; }
+
+.tas-row-filename {
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 500;
+    word-break: break-all;
+    flex: 1;
+    min-width: 0;
+}
+
+.tas-row-meta {
+    font-size: 12px;
+    color: #64748b;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+}
+
+.tas-row-place {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #14532d;
+    font-weight: 500;
+}
+.tas-row-place i { color: #16a34a; margin-right: 4px; }
+
+.tas-row-warn {
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #fef3c7;
+    border-left: 3px solid #f59e0b;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #92400e;
+}
+.tas-row-warn i { margin-right: 4px; }
+
+/* "+ Paste another link" button */
+
+.tas-add-row-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    color: #475569;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 14px;
+}
+.tas-add-row-btn:hover {
+    border-color: var(--tas-theme, #4a6fa5);
+    color: var(--tas-theme, #4a6fa5);
+    background: #f8fafc;
+}
+
+/* Aggregate "Extracted from mockup" summary panel */
+
+.tas-mockup-summary {
+    background: #fafaf9;
+    border: 1px solid #e7e5e4;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+.tas-mockup-summary-head {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #57534e;
+    margin-bottom: 8px;
+}
+.tas-mockup-summary-head i { color: #a855f7; margin-right: 4px; }
+
+.tas-mockup-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.tas-mockup-summary-table td {
+    padding: 4px 0;
+    vertical-align: top;
+}
+.tas-mockup-summary-table td.tas-label {
+    color: #78716c;
+    font-weight: 500;
+    width: 90px;
+    padding-right: 10px;
+}
+
+.tas-crm-check {
+    font-size: 11px;
+    color: #16a34a;
+    margin-left: 6px;
+}
+.tas-crm-check i { margin-right: 2px; }
+
+.tas-crm-miss {
+    font-size: 11px;
+    color: #ca8a04;
+    margin-left: 6px;
+}
+
+/* Rush checkbox — simpler than the old rush+date+reason layout */
+
+.tas-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #7c2d12;
+}
+.tas-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+.tas-muted { color: #9ca3af; font-weight: normal; }
+
+/* Mobile tweaks */
+
+@media (max-width: 700px) {
+    .tas-modal-content--paste { max-width: 100%; }
+    .tas-mockup-summary-table td.tas-label { width: auto; display: block; }
+    .tas-mockup-summary-table tr td:nth-child(2) { padding-bottom: 8px; }
+}

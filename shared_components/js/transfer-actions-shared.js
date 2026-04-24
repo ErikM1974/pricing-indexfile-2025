@@ -47,12 +47,16 @@
     })();
 
     // ── State ────────────────────────────────────────────────────────
+    // v3 paste-links modal (2026-04-24): Steve pastes 1..N Box URLs and the
+    // backend's /api/transfer-orders/analyze-link cracks each one into
+    // {filename parse, image metadata, mockup vision, sales rep resolve}.
+    // We just hold the per-row analysis state here.
     var modalState = {
         injected: false,
         opts: null,
-        files: [],
-        selectedFileIds: []
+        linkRows: [] // [{ id, url, status: 'idle'|'analyzing'|'ok'|'err', analysis, error }]
     };
+    var _rowIdCounter = 0;
 
     // ── DOM helpers ──────────────────────────────────────────────────
     function $(sel, root) { return (root || document).querySelector(sel); }
@@ -442,556 +446,310 @@
         }, 4000);
     }
 
-    // ── Modal HTML ───────────────────────────────────────────────────
+    // ── Modal HTML (v3 paste-links) ──────────────────────────────────
+    // Steve pastes 1..N Box URLs. Each URL is analyzed automatically via
+    // /api/transfer-orders/analyze-link → filename parse + image metadata
+    // + (for mockups) Claude vision extraction + sales rep resolve.
+    // Steve types nothing else beyond the optional Rush checkbox.
+
     function injectModal() {
         if (modalState.injected) return;
         var html =
             '<div id="tas-modal" class="tas-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="tas-modal-title">' +
                 '<div class="tas-modal-backdrop"></div>' +
-                '<div class="tas-modal-content">' +
+                '<div class="tas-modal-content tas-modal-content--paste">' +
                     '<div class="tas-modal-header">' +
                         '<h3 id="tas-modal-title"><i class="fas fa-paper-plane"></i> Send to Supacolor</h3>' +
                         '<button type="button" class="tas-modal-close" aria-label="Close">&times;</button>' +
                     '</div>' +
                     '<div class="tas-modal-body">' +
+                        '<div class="tas-modal-intro">' +
+                            'Paste Box links for this job \u2014 transfer file(s) and the mockup. ' +
+                            'Filenames and mockup scan fill in everything else.' +
+                        '</div>' +
                         '<form id="tas-send-form" class="tas-form">' +
-
-                            // ── MODE TOGGLE ──
-                            '<div class="tas-mode-toggle" role="tablist">' +
-                                '<label class="tas-mode-option tas-mode-option--new tas-mode-option--active" data-mode="new">' +
-                                    '<input type="radio" name="Mode" value="new" checked>' +
-                                    '<i class="fas fa-file-upload"></i> New Design' +
+                            '<div id="tas-link-rows" class="tas-link-rows"></div>' +
+                            '<button type="button" id="tas-add-row" class="tas-add-row-btn">' +
+                                '<i class="fas fa-plus"></i> Paste another link' +
+                            '</button>' +
+                            '<div id="tas-mockup-summary" class="tas-mockup-summary" style="display:none;"></div>' +
+                            '<div class="tas-form-row tas-form-row--rush">' +
+                                '<label class="tas-checkbox-label">' +
+                                    '<input type="checkbox" id="tas-rush" name="Is_Rush"> ' +
+                                    '<strong>\ud83d\udea8 RUSH order</strong>' +
+                                    '<span class="tas-muted"> \u2014 Bradley sees a red flag on his queue</span>' +
                                 '</label>' +
-                                '<label class="tas-mode-option tas-mode-option--reorder" data-mode="reorder">' +
-                                    '<input type="radio" name="Mode" value="reorder">' +
-                                    '<i class="fas fa-redo"></i> Reorder' +
-                                '</label>' +
                             '</div>' +
-                            '<div class="tas-mode-hint" id="tas-mode-hint">' +
-                                'New artwork — pick files from Box, add one or more transfer lines.' +
-                            '</div>' +
-
-                            '<div class="tas-context" id="tas-context"></div>' +
-
-                            // ── REORDER: Supacolor Order Number (visible only in Reorder mode) ──
-                            '<div class="tas-form-row" id="tas-supacolor-number-row">' +
-                                '<div class="tas-form-field tas-form-field--full">' +
-                                    '<label for="tas-supacolor-number">Supacolor Order # *</label>' +
-                                    '<input type="text" id="tas-supacolor-number" name="Supacolor_Order_Number" placeholder="e.g. 640003">' +
-                                    '<div class="tas-hint">Bradley will look up the existing artwork in Supacolor with this number.</div>' +
-                                '</div>' +
-                            '</div>' +
-
-                            // ── FILE PICKER (hidden in Reorder mode) ──
-                            '<fieldset class="tas-fieldset" id="tas-files-fieldset">' +
-                                '<legend>Files <span class="tas-muted" id="tas-file-counter">(0 / 3 selected)</span></legend>' +
-                                '<div class="tas-folder-banner" id="tas-folder-banner">' +
-                                    '<i class="fas fa-folder-open"></i> <span id="tas-folder-name">Loading your Box folder...</span>' +
-                                '</div>' +
-                                '<div id="tas-files-list" class="tas-files-list">' +
-                                    '<div class="tas-loading"><i class="fas fa-spinner fa-spin"></i> Loading files...</div>' +
-                                '</div>' +
-                                '<div class="tas-hint">Tip: Steve normally picks the layered AI + a flattened print-ready file. Pick up to <strong>3</strong>.</div>' +
-                            '</fieldset>' +
-
-                            // ── TRANSFER LINES (repeater) ──
-                            '<fieldset class="tas-fieldset">' +
-                                '<legend>Transfer Lines <span class="tas-muted" id="tas-line-counter">(1 line)</span></legend>' +
-                                '<div id="tas-lines" class="tas-lines"></div>' +
-                                '<button type="button" class="tas-add-line-btn" id="tas-add-line-btn">' +
-                                    '<i class="fas fa-plus"></i> Add another transfer line' +
-                                '</button>' +
-                                '<datalist id="tas-size-options">' +
-                                    '<option value="8x10">' +
-                                    '<option value="11x14">' +
-                                    '<option value="12x12">' +
-                                    '<option value="Adult Full Front">' +
-                                    '<option value="Left Chest">' +
-                                    '<option value="Sleeve">' +
-                                '</datalist>' +
-                            '</fieldset>' +
-
-                            // ── JOB-LEVEL FIELDS (Primary Color, Special Instructions, Rush) ──
-                            '<fieldset class="tas-fieldset">' +
-                                '<legend>Job Info</legend>' +
-                                '<div class="tas-form-row" id="tas-primary-color-row">' +
-                                    '<div class="tas-form-field tas-form-field--full">' +
-                                        '<label for="tas-primary-color">Primary Color / PMS <span class="tas-muted">(optional)</span></label>' +
-                                        '<input type="text" id="tas-primary-color" name="Primary_Color" placeholder="e.g. PMS 186C — only if customer has strict brand colors">' +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="tas-form-row">' +
-                                    '<div class="tas-form-field tas-form-field--full">' +
-                                        '<label for="tas-special">Special Instructions <span class="tas-muted">(gang runs, matching samples, etc.)</span></label>' +
-                                        '<textarea id="tas-special" name="Special_Instructions" rows="2"></textarea>' +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="tas-form-row tas-form-row--rush">' +
-                                    '<div class="tas-form-field tas-form-field--inline">' +
-                                        '<label><input type="checkbox" id="tas-rush" name="Is_Rush"> <strong>This is a RUSH order</strong></label>' +
-                                    '</div>' +
-                                    '<div class="tas-form-field" id="tas-rush-details" style="display:none;">' +
-                                        '<label for="tas-needed-by">Needed by</label>' +
-                                        '<input type="date" id="tas-needed-by" name="Needed_By_Date">' +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="tas-form-row" id="tas-rush-reason-row" style="display:none;">' +
-                                    '<div class="tas-form-field tas-form-field--full">' +
-                                        '<label for="tas-rush-reason">Rush reason</label>' +
-                                        '<input type="text" id="tas-rush-reason" name="Rush_Reason" placeholder="Customer event date, deadline...">' +
-                                    '</div>' +
-                                '</div>' +
-                            '</fieldset>' +
-
                             '<div class="tas-form-actions">' +
                                 '<button type="button" class="tas-btn tas-btn--secondary tas-modal-cancel">Cancel</button>' +
                                 '<button type="submit" class="tas-btn tas-btn--primary" id="tas-submit-btn" disabled>' +
-                                    '<i class="fas fa-paper-plane"></i> Send to Supacolor' +
+                                    '<i class="fas fa-paper-plane"></i> Send to Bradley' +
                                 '</button>' +
                             '</div>' +
                         '</form>' +
                     '</div>' +
                 '</div>' +
             '</div>';
-
         var wrapper = document.createElement('div');
         wrapper.innerHTML = html;
         document.body.appendChild(wrapper.firstElementChild);
-
         wireModalEvents();
         modalState.injected = true;
     }
 
-    // ── Transfer line repeater ────────────────────────────────────────
-    // Single source of truth for rendering individual transfer lines.
-    // Each row: Qty (required), Transfer Size, Press Count, W, H, File Notes.
-    // First row is non-removable; subsequent rows get a [x] button.
-    function buildLineRowHtml(index, values) {
-        var v = values || {};
-        var firstClass = index === 0 ? ' tas-line-row--first' : '';
-        return '<div class="tas-line-row' + firstClass + '" data-line-index="' + index + '">' +
-                '<div class="tas-line-row__header">' +
-                    '<span>Line ' + (index + 1) + '</span>' +
-                    '<button type="button" class="tas-line-row__remove" aria-label="Remove line">' +
-                        '<i class="fas fa-times"></i> Remove' +
-                    '</button>' +
-                '</div>' +
-                '<div class="tas-form-row tas-form-row--3col">' +
-                    '<div class="tas-form-field">' +
-                        '<label>Quantity *</label>' +
-                        '<input type="number" class="tas-line-qty" data-field="Quantity" min="1" required value="' + escapeHtml(v.Quantity || '') + '">' +
-                    '</div>' +
-                    '<div class="tas-form-field">' +
-                        '<label>Transfer Size</label>' +
-                        '<input type="text" class="tas-line-size" data-field="Transfer_Size" placeholder="e.g. 11x14" list="tas-size-options" value="' + escapeHtml(v.Transfer_Size || '') + '">' +
-                    '</div>' +
-                    '<div class="tas-form-field">' +
-                        '<label>Press Count</label>' +
-                        '<input type="number" class="tas-line-press" data-field="Press_Count" min="1" value="' + escapeHtml(v.Press_Count || '1') + '">' +
-                    '</div>' +
-                '</div>' +
-                '<div class="tas-form-row">' +
-                    '<div class="tas-form-field">' +
-                        '<label>Width (in)</label>' +
-                        '<input type="number" class="tas-line-width" data-field="Transfer_Width_In" step="0.25" value="' + escapeHtml(v.Transfer_Width_In || '') + '">' +
-                    '</div>' +
-                    '<div class="tas-form-field">' +
-                        '<label>Height (in)</label>' +
-                        '<input type="number" class="tas-line-height" data-field="Transfer_Height_In" step="0.25" value="' + escapeHtml(v.Transfer_Height_In || '') + '">' +
-                    '</div>' +
-                '</div>' +
-                '<div class="tas-form-row">' +
-                    '<div class="tas-form-field tas-form-field--full">' +
-                        '<label>File Notes <span class="tas-muted">(Pantone, print direction, line-specific notes)</span></label>' +
-                        '<textarea class="tas-line-notes" data-field="File_Notes" rows="2">' + escapeHtml(v.File_Notes || '') + '</textarea>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
-    }
-
-    function renderLines(lines) {
-        var container = $('#tas-lines');
-        if (!container) return;
-        var arr = (Array.isArray(lines) && lines.length > 0) ? lines : [{}];
-        container.innerHTML = arr.map(function (l, i) { return buildLineRowHtml(i, l); }).join('');
-        updateLineCounter();
-        wireLineRowEvents();
-    }
-
-    function addLineRow() {
-        var container = $('#tas-lines');
-        if (!container) return;
-        var index = container.querySelectorAll('.tas-line-row').length;
-        container.insertAdjacentHTML('beforeend', buildLineRowHtml(index, {}));
-        updateLineCounter();
-        wireLineRowEvents();
-        updateSubmitButton();
-    }
-
-    function removeLineRow(index) {
-        var container = $('#tas-lines');
-        if (!container) return;
-        var rows = container.querySelectorAll('.tas-line-row');
-        if (rows.length <= 1) return; // Never remove the last line
-        if (rows[index]) rows[index].remove();
-        // Renumber remaining rows
-        container.querySelectorAll('.tas-line-row').forEach(function (row, i) {
-            row.setAttribute('data-line-index', i);
-            var label = row.querySelector('.tas-line-row__header span');
-            if (label) label.textContent = 'Line ' + (i + 1);
-            row.classList.toggle('tas-line-row--first', i === 0);
-        });
-        updateLineCounter();
-        updateSubmitButton();
-    }
-
-    function wireLineRowEvents() {
-        $$('#tas-lines .tas-line-row__remove').forEach(function (btn) {
-            // Replace to avoid double-wiring after re-render
-            btn.onclick = function () {
-                var row = btn.closest('.tas-line-row');
-                if (!row) return;
-                var idx = parseInt(row.getAttribute('data-line-index'), 10);
-                removeLineRow(idx);
-            };
-        });
-        $$('#tas-lines .tas-line-qty').forEach(function (input) {
-            input.oninput = updateSubmitButton;
-        });
-    }
-
-    function updateLineCounter() {
-        var count = document.querySelectorAll('#tas-lines .tas-line-row').length;
-        var el = $('#tas-line-counter');
-        if (el) el.textContent = '(' + count + ' line' + (count === 1 ? '' : 's') + ')';
-    }
-
-    function collectLines() {
-        var rows = $$('#tas-lines .tas-line-row');
-        var out = [];
-        rows.forEach(function (row) {
-            var line = {};
-            row.querySelectorAll('[data-field]').forEach(function (input) {
-                var v = input.value;
-                if (v === '' || v === null || v === undefined) return;
-                var field = input.getAttribute('data-field');
-                if (field === 'Quantity' || field === 'Press_Count') {
-                    var n = parseInt(v, 10);
-                    if (!Number.isNaN(n)) line[field] = n;
-                } else if (field === 'Transfer_Width_In' || field === 'Transfer_Height_In') {
-                    var f = parseFloat(v);
-                    if (!Number.isNaN(f)) line[field] = f;
-                } else {
-                    line[field] = v;
-                }
-            });
-            // Skip empty rows (no qty)
-            if (line.Quantity && line.Quantity > 0) out.push(line);
-        });
-        return out;
-    }
-
-    // ── Mode toggle (New Design vs Reorder) ───────────────────────────
-    function setMode(mode) {
+    function wireModalEvents() {
         var modal = $('#tas-modal');
         if (!modal) return;
-        modalState.mode = (mode === 'reorder') ? 'reorder' : 'new';
-        modal.classList.toggle('tas-mode-reorder', modalState.mode === 'reorder');
-
-        // Visual toggle of option chips
-        $$('.tas-mode-option', modal).forEach(function (opt) {
-            var isActive = opt.getAttribute('data-mode') === modalState.mode;
-            opt.classList.toggle('tas-mode-option--active', isActive);
-            var input = opt.querySelector('input[type="radio"]');
-            if (input) input.checked = isActive;
-        });
-
-        // Hint text
-        var hint = $('#tas-mode-hint');
-        if (hint) {
-            hint.textContent = modalState.mode === 'reorder'
-                ? 'Reorder — enter the existing Supacolor order # below. No new artwork needed; Bradley has it on file.'
-                : 'New artwork — pick files from Box, add one or more transfer lines.';
-        }
-
-        updateSubmitButton();
-    }
-
-    function wireModalEvents() {
-        // H9 — Guard each $() lookup. Previously any missing element would throw
-        // on .addEventListener and abort modal wiring (cancel / close / submit
-        // all dead, no way for user to escape the modal).
-        var tasModal = $('#tas-modal');
-        if (!tasModal) {
-            console.warn('[transfer-actions] #tas-modal not injected, skipping wireModalEvents');
-            return;
-        }
-
         var closeBtn = $('#tas-modal .tas-modal-close');
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-        $$('.tas-modal-cancel', tasModal).forEach(function (btn) {
-            btn.addEventListener('click', closeModal);
-        });
-
+        $$('.tas-modal-cancel', modal).forEach(function (b) { b.addEventListener('click', closeModal); });
         var backdrop = $('#tas-modal .tas-modal-backdrop');
         if (backdrop) backdrop.addEventListener('click', closeModal);
-
-        // Rush toggle reveals needed-by + reason fields
-        var rushToggle = $('#tas-rush');
-        var rushDetails = $('#tas-rush-details');
-        var rushReasonRow = $('#tas-rush-reason-row');
-        if (rushToggle && rushDetails && rushReasonRow) {
-            rushToggle.addEventListener('change', function (e) {
-                var show = e.target.checked;
-                rushDetails.style.display = show ? '' : 'none';
-                rushReasonRow.style.display = show ? '' : 'none';
-            });
-        }
-
-        // Mode toggle (New Design / Reorder)
-        $$('.tas-mode-option', tasModal).forEach(function (opt) {
-            opt.addEventListener('click', function () {
-                var mode = opt.getAttribute('data-mode');
-                setMode(mode);
-            });
-        });
-
-        // Add-another-line button
-        var addLineBtn = $('#tas-add-line-btn');
-        if (addLineBtn) addLineBtn.addEventListener('click', addLineRow);
-
-        // Supacolor_Order_Number live-validate for reorder mode
-        var supacolorInput = $('#tas-supacolor-number');
-        if (supacolorInput) supacolorInput.addEventListener('input', updateSubmitButton);
-
-        var sendForm = $('#tas-send-form');
-        if (sendForm) sendForm.addEventListener('submit', handleSubmit);
-
-        // Escape key closes
+        var addBtn = $('#tas-add-row');
+        if (addBtn) addBtn.addEventListener('click', function () { addLinkRow(true); });
+        var form = $('#tas-send-form');
+        if (form) form.addEventListener('submit', handleSubmit);
         document.addEventListener('keydown', function (e) {
             var m = $('#tas-modal');
-            if (e.key === 'Escape' && m && m.style.display !== 'none') {
-                closeModal();
-            }
+            if (e.key === 'Escape' && m && m.style.display !== 'none') closeModal();
         });
     }
 
-    // ── File Picker ──────────────────────────────────────────────────
-    function renderContext(opts) {
-        var prefill = opts.prefill || {};
-        var parts = [];
-        parts.push('<div><span class="tas-context-label">Design #</span><strong>' + escapeHtml(opts.designNumber) + '</strong></div>');
-        if (prefill.Company_Name) {
-            parts.push('<div><span class="tas-context-label">Company</span>' + escapeHtml(prefill.Company_Name) + '</div>');
-        }
-        if (prefill.Customer_Name) {
-            parts.push('<div><span class="tas-context-label">Customer</span>' + escapeHtml(prefill.Customer_Name) + '</div>');
-        }
-        if (prefill.Sales_Rep_Name || prefill.Sales_Rep_Email) {
-            parts.push('<div><span class="tas-context-label">Rep</span>' + escapeHtml(prefill.Sales_Rep_Name || prefill.Sales_Rep_Email) + '</div>');
-        }
-        $('#tas-context').innerHTML = parts.join('');
+    // ── Link-row repeater ─────────────────────────────────────────────
+
+    function newLinkRow() {
+        _rowIdCounter++;
+        return { id: 'tas-link-' + _rowIdCounter, url: '', status: 'idle', analysis: null, error: null };
     }
 
-    async function loadBoxFiles(designNumber) {
-        var list = $('#tas-files-list');
-        var banner = $('#tas-folder-name');
-        list.innerHTML = '<div class="tas-loading"><i class="fas fa-spinner fa-spin"></i> Loading files from Box...</div>';
-        banner.textContent = 'Looking up folder for design #' + designNumber + '...';
+    function addLinkRow(focusAfter) {
+        modalState.linkRows.push(newLinkRow());
+        renderLinkRows();
+        if (focusAfter) {
+            var last = modalState.linkRows[modalState.linkRows.length - 1];
+            var input = document.querySelector('input[data-row-id="' + last.id + '"]');
+            if (input) input.focus();
+        }
+    }
 
-        try {
-            var resp = await fetch(API_BASE + '/api/box/folder-files?designNumber=' + encodeURIComponent(designNumber));
-            if (!resp.ok) throw new Error('HTTP ' + resp.status);
-            var data = await resp.json();
-            if (!data.success) {
-                // M7 — Log the full response body so debugging isn't discarded
-                console.error('[transfer-actions] Box API returned success=false:', data);
-                throw new Error(data.error || 'Box lookup failed');
-            }
+    function removeLinkRow(rowId) {
+        modalState.linkRows = modalState.linkRows.filter(function (r) { return r.id !== rowId; });
+        if (modalState.linkRows.length === 0) addLinkRow();
+        renderLinkRows();
+        updateSubmitButton();
+        renderMockupSummary();
+    }
 
-            if (!data.found || data.files.length === 0) {
-                banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No Box folder found for design #' + escapeHtml(designNumber);
-                list.innerHTML = '<div class="tas-empty">' +
-                    '<i class="fas fa-folder-minus"></i>' +
-                    '<div>No files found.</div>' +
-                    '<div class="tas-hint">Expected folder name starting with "' + escapeHtml(designNumber) + '" under Steve\'s art folder.</div>' +
-                    '</div>';
-                modalState.files = [];
-                return;
-            }
+    function renderLinkRows() {
+        var container = $('#tas-link-rows');
+        if (!container) return;
+        container.innerHTML = modalState.linkRows.map(renderLinkRowHtml).join('');
+        wireLinkRowEvents();
+    }
 
-            banner.innerHTML = '<i class="fas fa-folder-open"></i> ' + escapeHtml(data.folderName) +
-                ' &middot; <span class="tas-muted">' + data.files.length + ' file' + (data.files.length === 1 ? '' : 's') + '</span>';
-            modalState.files = data.files;
-            renderFilesList(data.files);
+    function renderLinkRowHtml(row) {
+        var canRemove = modalState.linkRows.length > 1;
+        var removeBtn = canRemove
+            ? '<button type="button" class="tas-row-remove" data-action="remove-row" data-row-id="' + escapeHtml(row.id) + '" aria-label="Remove">&times;</button>'
+            : '<span class="tas-row-remove-placeholder"></span>';
 
-        } catch (err) {
-            console.error('Box folder fetch failed:', err);
-            banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Could not load Box folder';
-            list.innerHTML = '<div class="tas-error">' +
-                '<i class="fas fa-times-circle"></i> ' + escapeHtml(err.message || 'Unknown error') +
+        var statusBlock = '';
+        if (row.status === 'analyzing') {
+            statusBlock = '<div class="tas-row-status tas-row-status--busy"><i class="fas fa-spinner fa-spin"></i> Analyzing\u2026</div>';
+        } else if (row.status === 'err') {
+            statusBlock = '<div class="tas-row-status tas-row-status--err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(row.error || 'Analysis failed') + '</div>';
+        } else if (row.status === 'ok' && row.analysis) {
+            statusBlock = renderAnalysisCard(row.analysis);
+        }
+
+        return '<div class="tas-link-row" data-row-id="' + escapeHtml(row.id) + '">' +
+            '<div class="tas-link-row-input-line">' +
+                '<input type="url" class="tas-link-input" placeholder="https://\u2026box.com/s/\u2026 or /file/\u2026" value="' + escapeHtml(row.url) + '" data-row-id="' + escapeHtml(row.id) + '">' +
+                removeBtn +
+            '</div>' +
+            statusBlock +
+        '</div>';
+    }
+
+    function renderAnalysisCard(a) {
+        var parsed = a.filenameParsed || {};
+        var type = parsed.type || 'file';
+        var badgeIcon = type === 'mockup' ? 'image' : 'file-image';
+        var badgeLabel = type === 'mockup' ? 'Mockup' : 'Transfer';
+
+        var sizeStr = a.sizeBytes ? formatBytes(a.sizeBytes) : '';
+        var pxStr = (a.pixelWidth && a.pixelHeight) ? (a.pixelWidth + '\u00d7' + a.pixelHeight + 'px') : '';
+        var dpiStr = a.dpiX ? (a.dpiX + 'dpi') : '';
+        var physStr = (a.physicalWidthIn && a.physicalHeightIn)
+            ? (a.physicalWidthIn + '" \u00d7 ' + a.physicalHeightIn + '"')
+            : '';
+        var metaLine = [a.mimeType || 'file', sizeStr, pxStr, dpiStr, physStr].filter(Boolean).join(' \u00b7 ');
+
+        var placementLine = '';
+        if (type === 'transfer' && parsed.placementLabel) {
+            placementLine = '<div class="tas-row-place"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(parsed.placementLabel) + '</div>';
+        }
+
+        var mismatchWarning = '';
+        if (a.dimensionMismatch) {
+            mismatchWarning = '<div class="tas-row-warn"><i class="fas fa-exclamation-triangle"></i> ' +
+                'Filename says ' + escapeHtml(a.dimensionMismatch.claimed) + ' but file is actually ' + escapeHtml(a.dimensionMismatch.actual) + '. Fix the filename or re-export before sending.' +
                 '</div>';
-            modalState.files = [];
         }
+
+        return '<div class="tas-row-card tas-row-card--' + escapeHtml(type) + '">' +
+            '<div class="tas-row-head">' +
+                '<span class="tas-row-badge"><i class="fas fa-' + escapeHtml(badgeIcon) + '"></i> ' + escapeHtml(badgeLabel) + '</span>' +
+                '<span class="tas-row-filename">' + escapeHtml(a.fileName || '') + '</span>' +
+            '</div>' +
+            '<div class="tas-row-meta">' + escapeHtml(metaLine) + '</div>' +
+            placementLine +
+            mismatchWarning +
+        '</div>';
     }
 
-    function renderFilesList(files) {
-        // M6 — Drop inline `onerror=` attribute. If the DOM mutated mid-load, the inline
-        // handler could read a now-null `nextElementSibling` and throw. Bind the fallback
-        // programmatically after the row is constructed.
-        var html = files.map(function (f) {
-            var thumbUrl = f.thumbnailUrl ? (API_BASE + f.thumbnailUrl) : null;
-            var thumbHtml = thumbUrl
-                ? '<img src="' + escapeHtml(thumbUrl) + '" alt="" class="tas-file-thumb" data-has-fallback="1">' +
-                  '<div class="tas-file-icon" style="display:none;"><i class="fas fa-file"></i></div>'
-                : '<div class="tas-file-icon"><i class="fas fa-file"></i></div>';
-            var modifiedAt = f.modified_at ? new Date(f.modified_at).toLocaleDateString() : '';
-            return '<label class="tas-file-row" data-file-id="' + escapeHtml(f.id) + '">' +
-                '<input type="checkbox" class="tas-file-check" data-file-id="' + escapeHtml(f.id) + '" data-file-name="' + escapeHtml(f.name) + '">' +
-                thumbHtml +
-                '<div class="tas-file-meta">' +
-                    '<div class="tas-file-name">' + escapeHtml(f.name) + '</div>' +
-                    '<div class="tas-file-sub">' +
-                        escapeHtml((f.extension || '').toUpperCase()) +
-                        (f.size ? ' &middot; ' + formatBytes(f.size) : '') +
-                        (modifiedAt ? ' &middot; modified ' + escapeHtml(modifiedAt) : '') +
-                    '</div>' +
-                '</div>' +
-            '</label>';
-        }).join('');
+    function renderMockupSummary() {
+        var container = $('#tas-mockup-summary');
+        if (!container) return;
 
-        var listEl = $('#tas-files-list');
-        if (!listEl) return;
-        listEl.innerHTML = html;
+        var mockupAnalysis = modalState.linkRows
+            .map(function (r) { return r.analysis; })
+            .find(function (a) { return a && a.filenameParsed && a.filenameParsed.type === 'mockup'; });
 
-        // Bind onerror fallback for each thumbnail (M6)
-        listEl.querySelectorAll('img.tas-file-thumb[data-has-fallback]').forEach(function (img) {
-            img.addEventListener('error', function () {
-                img.style.display = 'none';
-                var sibling = img.nextElementSibling;
-                if (sibling) sibling.style.display = 'flex';
-            });
-        });
-
-        // Wire checkbox change events for max-3 enforcement
-        $$('#tas-files-list .tas-file-check').forEach(function (cb) {
-            cb.addEventListener('change', onFileCheckChange);
-        });
-    }
-
-    function onFileCheckChange() {
-        var checked = $$('#tas-files-list .tas-file-check:checked');
-        if (checked.length > MAX_FILES) {
-            // Undo this check
-            this.checked = false;
-            showToast('Maximum ' + MAX_FILES + ' files. Uncheck one first.', 'error');
+        if (!mockupAnalysis) {
+            container.style.display = 'none';
+            container.innerHTML = '';
             return;
         }
-        modalState.selectedFileIds = checked.map(function (cb) {
-            return { id: cb.getAttribute('data-file-id'), name: cb.getAttribute('data-file-name') };
-        });
-        updateFileCounter();
-        updateSubmitButton();
 
-        // Visual selected state
-        $$('#tas-files-list .tas-file-row').forEach(function (row) {
-            var rowCheck = $('.tas-file-check', row);
-            row.classList.toggle('tas-file-row--selected', rowCheck.checked);
+        if (mockupAnalysis.mockupVisionError) {
+            container.style.display = '';
+            container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot"></i> Mockup scan</div>' +
+                '<div class="tas-row-warn">Couldn\'t auto-read this mockup. Bradley will still get the Box link but no pre-filled sales rep / garment info.</div>';
+            return;
+        }
+
+        if (!mockupAnalysis.mockupVision) {
+            container.style.display = 'none';
+            return;
+        }
+
+        var v = mockupAnalysis.mockupVision;
+        var rep = mockupAnalysis.salesRepMatch;
+        var repLine = v.salesRep
+            ? (rep
+                ? escapeHtml(v.salesRep) + ' <span class="tas-crm-check"><i class="fas fa-check-circle"></i> ' + escapeHtml(rep.email) + '</span>'
+                : escapeHtml(v.salesRep) + ' <span class="tas-crm-miss"><i class="fas fa-question-circle"></i> not in CRM</span>')
+            : '<span class="tas-muted">(not detected)</span>';
+
+        var rows = [
+            { label: 'Design', value: escapeHtml(v.designNumber || '\u2014') },
+            { label: 'Customer', value: escapeHtml(v.customerName || '\u2014') },
+            { label: 'Sales Rep', value: repLine },
+            { label: 'Garment', value: escapeHtml(v.garmentColorStyle || '\u2014') },
+            { label: 'Transfer', value: escapeHtml(v.transferType || '\u2014') }
+        ];
+        container.style.display = '';
+        container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot"></i> Extracted from mockup</div>' +
+            '<table class="tas-mockup-summary-table">' +
+            rows.map(function (r) { return '<tr><td class="tas-label">' + r.label + '</td><td>' + r.value + '</td></tr>'; }).join('') +
+            '</table>';
+    }
+
+    function wireLinkRowEvents() {
+        $$('.tas-row-remove[data-action="remove-row"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                removeLinkRow(this.getAttribute('data-row-id'));
+            });
+        });
+        $$('.tas-link-input').forEach(function (input) {
+            input.addEventListener('paste', function (e) {
+                var rowId = this.getAttribute('data-row-id');
+                // Let the paste land, then analyze on next tick
+                setTimeout(function () { onLinkChange(rowId); }, 20);
+            });
+            input.addEventListener('blur', function () {
+                onLinkChange(this.getAttribute('data-row-id'));
+            });
+            input.addEventListener('input', function () {
+                var rowId = this.getAttribute('data-row-id');
+                var row = modalState.linkRows.find(function (r) { return r.id === rowId; });
+                if (row) row.url = this.value;
+            });
         });
     }
 
-    function updateFileCounter() {
-        var count = modalState.selectedFileIds.length;
-        $('#tas-file-counter').textContent = '(' + count + ' / ' + MAX_FILES + ' selected)';
+    function onLinkChange(rowId) {
+        var row = modalState.linkRows.find(function (r) { return r.id === rowId; });
+        if (!row) return;
+        var input = document.querySelector('input[data-row-id="' + rowId + '"]');
+        if (input) row.url = (input.value || '').trim();
+        if (!row.url) {
+            row.status = 'idle'; row.analysis = null; row.error = null;
+            renderLinkRows(); updateSubmitButton(); renderMockupSummary();
+            return;
+        }
+        if (row.status === 'analyzing') return;
+        // Skip re-analyze if URL hasn't changed and previous analysis succeeded
+        if (row.status === 'ok' && row.analysis && row.analysis.sharedLink === row.url) return;
+        analyzeRow(row.id);
+    }
+
+    async function analyzeRow(rowId) {
+        var row = modalState.linkRows.find(function (r) { return r.id === rowId; });
+        if (!row || !row.url) return;
+        row.status = 'analyzing';
+        row.error = null;
+        renderLinkRows();
+
+        try {
+            var resp = await fetch(API_BASE + '/api/transfer-orders/analyze-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: row.url })
+            });
+            var data = await resp.json();
+            if (!resp.ok || !data.success) throw new Error(data.error || ('HTTP ' + resp.status));
+            row.status = 'ok';
+            row.analysis = data;
+        } catch (err) {
+            console.warn('[transfer-actions] analyze-link failed:', err);
+            row.status = 'err';
+            row.error = err.message || 'Analysis failed';
+        }
+        renderLinkRows();
+        updateSubmitButton();
+        renderMockupSummary();
     }
 
     function updateSubmitButton() {
-        // Validation depends on mode. Submit enabled when:
-        //   - At least one line has a valid Quantity (>0)
-        //   - New Design mode: at least 1 Box file selected
-        //   - Reorder mode: Supacolor_Order_Number filled
-        var lines = collectLines();
-        var hasValidLine = lines.length > 0;
         var btn = $('#tas-submit-btn');
         if (!btn) return;
-
-        var valid = hasValidLine;
-        if (modalState.mode === 'reorder') {
-            var sNum = $('#tas-supacolor-number');
-            valid = valid && sNum && sNum.value.trim().length > 0;
-        } else {
-            valid = valid && modalState.selectedFileIds.length > 0;
-        }
-        btn.disabled = !valid;
+        var hasTransfer = modalState.linkRows.some(function (r) {
+            return r.status === 'ok' && r.analysis && r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'transfer';
+        });
+        btn.disabled = !hasTransfer;
     }
 
     // ── Open / Close ─────────────────────────────────────────────────
+
     function openSendModal(opts) {
-        if (!opts || !opts.designNumber) {
-            console.error('TransferActions.openSendModal: missing designNumber');
-            return;
-        }
+        opts = opts || {};
         injectModal();
         modalState.opts = opts;
-        modalState.selectedFileIds = [];
-        // enableLines controls whether the user can add multiple transfer lines.
-        // Default: true (Steve's dashboard). Legacy callers (mockup-detail,
-        // art-request-detail) can pass { enableLines: false } to stay single-line.
-        modalState.enableLines = (opts.enableLines !== false);
-
-        // Reset form
-        var form = $('#tas-send-form');
-        form.reset();
-        $('#tas-rush-details').style.display = 'none';
-        $('#tas-rush-reason-row').style.display = 'none';
-        updateFileCounter();
-
-        // Set initial mode (New Design unless caller asked for reorder)
-        setMode(opts.mode === 'reorder' ? 'reorder' : 'new');
-
-        // Render lines (prefill from opts.prefillLines, or single row from opts.prefill for legacy callers)
-        var initialLines;
-        if (Array.isArray(opts.prefillLines) && opts.prefillLines.length > 0) {
-            initialLines = opts.prefillLines;
-        } else if (opts.prefill && (opts.prefill.Quantity || opts.prefill.Transfer_Size)) {
-            initialLines = [{
-                Quantity: opts.prefill.Quantity,
-                Transfer_Size: opts.prefill.Transfer_Size,
-                Press_Count: opts.prefill.Press_Count,
-                File_Notes: opts.prefill.File_Notes
-            }];
-        } else {
-            initialLines = [{}];
-        }
-        renderLines(initialLines);
-
-        // Toggle single-line layout for legacy callers
-        var linesContainer = $('#tas-lines');
-        if (linesContainer) {
-            linesContainer.parentElement.classList.toggle('tas-lines--single', !modalState.enableLines);
-        }
-        var addBtn = $('#tas-add-line-btn');
-        if (addBtn) addBtn.style.display = modalState.enableLines ? '' : 'none';
-
-        // Prefill Supacolor # (reorder direct-launch)
-        if (opts.prefillSupacolorNumber) {
-            var sNum = $('#tas-supacolor-number');
-            if (sNum) sNum.value = opts.prefillSupacolorNumber;
-        }
-
-        // Fill in context (Design #, Company, Customer, Rep)
-        renderContext(opts);
-
+        modalState.linkRows = [];
+        addLinkRow(false);
+        var rushEl = $('#tas-rush');
+        if (rushEl) rushEl.checked = false;
+        var summary = $('#tas-mockup-summary');
+        if (summary) { summary.style.display = 'none'; summary.innerHTML = ''; }
         updateSubmitButton();
-
-        // Show modal
         $('#tas-modal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
-
-        // Fetch Box files (only useful in New Design mode, but always load
-        // so toggling to New Design after reorder doesn't show a stale state)
-        loadBoxFiles(opts.designNumber);
+        setTimeout(function () {
+            var firstInput = document.querySelector('.tas-link-input');
+            if (firstInput) firstInput.focus();
+        }, 80);
     }
 
     function closeModal() {
@@ -1001,15 +759,13 @@
     }
 
     // ── Submit ───────────────────────────────────────────────────────
+
     async function handleSubmit(e) {
         e.preventDefault();
-        var opts = modalState.opts;
+        var opts = modalState.opts || {};
         var user = getCurrentUser(opts);
 
         if (!user) {
-            // Prompt for identity — simple inline fallback. mockup-detail and
-            // Steve's dashboard will typically pass requestedBy explicitly, so
-            // this is the edge case.
             var name = prompt('Your full name (for the audit trail):');
             if (!name) return;
             var email = prompt('Your email address:');
@@ -1019,120 +775,100 @@
             user = { name: name, email: email };
         }
 
-        var submitBtn = $('#tas-submit-btn');
-        submitBtn.disabled = true;
+        var good = modalState.linkRows.filter(function (r) { return r.status === 'ok' && r.analysis; });
+        var transfers = good
+            .filter(function (r) { return r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'transfer'; })
+            .map(function (r) { return r.analysis; });
+        var mockups = good
+            .filter(function (r) { return r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'mockup'; })
+            .map(function (r) { return r.analysis; });
 
-        var isReorder = (modalState.mode === 'reorder');
-        var lines = collectLines();
-        if (lines.length === 0) {
-            showToast('Add at least one transfer line with a quantity.', 'error');
-            submitBtn.disabled = false;
+        if (transfers.length === 0) {
+            showToast('Need at least one transfer file before sending.', 'error');
             return;
         }
 
+        var submitBtn = $('#tas-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending\u2026';
+
         try {
-            var linked = [];
+            var primary = transfers[0];
+            var parsed = primary.filenameParsed;
+            var mockup = mockups[0];
+            var vision = mockup && mockup.mockupVision ? mockup.mockupVision : null;
+            var repMatch = mockup && mockup.salesRepMatch ? mockup.salesRepMatch : null;
 
-            // 1. Create shared links for Box files — only in New Design mode.
-            //    Reorders don't need new artwork (Supacolor has it on file).
-            if (!isReorder) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating shared links...';
-                var linkPromises = modalState.selectedFileIds.map(function (f) {
-                    return fetch(API_BASE + '/api/box/shared-link', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fileId: f.id })
-                    }).then(function (r) { return r.json(); })
-                      .then(function (data) {
-                          if (!data.success) throw new Error(data.error || 'Shared link failed');
-                          return { id: f.id, name: f.name, url: data.sharedLink };
-                      });
-                });
-                linked = await Promise.all(linkPromises);
-            }
+            var isRush = !!($('#tas-rush') && $('#tas-rush').checked);
 
-            // 2. Build transfer payload
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating transfer...';
+            // Build one line per transfer file — dimensions come from actual
+            // image metadata (source of truth) with a filename fallback.
+            var lines = transfers.map(function (t) {
+                var p = t.filenameParsed || {};
+                var w = t.physicalWidthIn || p.filenameWidth || null;
+                var h = t.physicalHeightIn || p.filenameHeight || null;
+                var notesParts = [p.placementLabel];
+                if (t.pixelWidth && t.pixelHeight) {
+                    notesParts.push(t.pixelWidth + '\u00d7' + t.pixelHeight + 'px');
+                }
+                if (t.dpiX) notesParts.push(t.dpiX + 'dpi');
+                return {
+                    Quantity: null,             // Bradley fills from sales rep order
+                    Transfer_Size: (w && h) ? (w + 'x' + h) : null,
+                    Press_Count: null,
+                    Transfer_Width_In: w,
+                    Transfer_Height_In: h,
+                    File_Notes: notesParts.filter(Boolean).join(' \u00b7 ')
+                };
+            });
 
             var payload = {
-                Design_Number: opts.designNumber,
+                Design_Number: parsed.designNumber,
+                Company_Name: parsed.customer,
+                Customer_Name: (vision && vision.customerName) || parsed.customer,
+                Sales_Rep_Name: repMatch ? repMatch.name : (vision ? vision.salesRep : ''),
+                Sales_Rep_Email: repMatch ? repMatch.email : '',
+                Transfer_Type: vision ? vision.transferType : null,
+                Status: 'Requested',
+                Is_Rush: isRush,
+                Is_Reorder: false,
                 Requested_By: user.email,
                 Requested_By_Name: user.name,
-                Status: 'Requested',
-                Is_Reorder: isReorder,
-                lines: lines
+                lines: lines,
+                Working_File_URL: primary.sharedLink,
+                Working_File_Name: primary.fileName,
+                Working_File_Type: primary.mimeType,
+                Box_File_ID: primary.fileId
             };
-            if (opts.designId) payload.Design_ID = opts.designId;
-            if (opts.mockupId) payload.Mockup_ID = opts.mockupId;
-
-            // Prefill pass-through (denormalized columns)
-            if (opts.prefill) {
-                ['Company_Name','Customer_Name','Sales_Rep_Email','Sales_Rep_Name']
-                    .forEach(function (k) { if (opts.prefill[k]) payload[k] = opts.prefill[k]; });
+            if (mockup) {
+                payload.Additional_File_1_URL = mockup.sharedLink;
+                payload.Additional_File_1_Name = mockup.fileName;
+            }
+            if (transfers[1]) {
+                payload.Additional_File_2_URL = transfers[1].sharedLink;
+                payload.Additional_File_2_Name = transfers[1].fileName;
             }
 
-            // Job-level fields from the form
-            var rushEl = $('#tas-rush');
-            payload.Is_Rush = !!(rushEl && rushEl.checked);
-            var neededBy = $('#tas-needed-by');
-            if (neededBy && neededBy.value) payload.Needed_By_Date = neededBy.value;
-            var rushReason = $('#tas-rush-reason');
-            if (rushReason && rushReason.value) payload.Rush_Reason = rushReason.value;
-            var specialEl = $('#tas-special');
-            if (specialEl && specialEl.value) payload.Special_Instructions = specialEl.value;
-            var primaryColorEl = $('#tas-primary-color');
-            if (!isReorder && primaryColorEl && primaryColorEl.value) {
-                payload.Primary_Color = primaryColorEl.value;
-            }
-            var supacolorEl = $('#tas-supacolor-number');
-            if (isReorder && supacolorEl && supacolorEl.value) {
-                payload.Supacolor_Order_Number = supacolorEl.value.trim();
-            }
-
-            // Denormalized working-file columns (kept for backward compat with
-            // Bradley's queue / detail page legacy-view code paths). Only applies
-            // to New Design mode — reorders carry no files.
-            if (!isReorder) {
-                if (linked[0]) {
-                    payload.Working_File_URL = linked[0].url;
-                    payload.Working_File_Name = linked[0].name;
-                    payload.Working_File_Type = fileTypeFromName(linked[0].name);
-                    payload.Box_File_ID = linked[0].id;
-                }
-                if (linked[1]) {
-                    payload.Additional_File_1_URL = linked[1].url;
-                    payload.Additional_File_1_Name = linked[1].name;
-                }
-                if (linked[2]) {
-                    payload.Additional_File_2_URL = linked[2].url;
-                    payload.Additional_File_2_Name = linked[2].name;
-                }
-            }
-
-            // Dry-run path (append ?dryRun=1 to URL for local verification without hitting API).
-            // Logs the full payload and would-be email params, shows a toast, skips network.
+            // Dry-run short-circuit for local verification
             if (/[?&]dryRun=1\b/.test(window.location.search)) {
                 console.log('[DRYRUN] POST /api/transfer-orders', payload);
                 var fakeRecord = Object.assign({ ID_Transfer: 'ST-DRYRUN-0000' }, payload);
                 delete fakeRecord.lines;
-                // Simulate rush overrides that sendTransferRequestedEmail() would add —
-                // otherwise dry-run shows empty rush_* params even when rush is checked.
-                var dryRunOverrides = { to_email: BRADLEY_EMAIL, cc_email: user.email, _dryRun: true, _lines: lines };
-                if (fakeRecord.Is_Rush) {
-                    dryRunOverrides.rush_subject_suffix = ' 🚨 RUSH';
-                    dryRunOverrides.rs_sfx = ' 🚨 RUSH';
-                    dryRunOverrides.rush_banner_html = buildRushBanner(fakeRecord);
+                fakeRecord._lines = lines;
+                var overrides = { to_email: BRADLEY_EMAIL, cc_email: user.email };
+                if (isRush) {
+                    overrides.rush_subject_suffix = ' \ud83d\udea8 RUSH';
+                    overrides.rs_sfx = ' \ud83d\udea8 RUSH';
+                    overrides.rush_banner_html = buildRushBanner(fakeRecord);
                 }
-                console.log('[DRYRUN] transfer_requested email params:',
-                    buildEmailParams(fakeRecord, dryRunOverrides));
+                console.log('[DRYRUN] transfer_requested params:', buildEmailParams(fakeRecord, overrides));
                 closeModal();
-                showToast('DRY RUN — payload logged to console. No network call.', 'info');
+                showToast('DRY RUN \u2014 payload logged to console.', 'info');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Supacolor';
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Bradley';
                 return;
             }
 
-            // 3. POST to transfer-orders
             var createResp = await fetch(API_BASE + '/api/transfer-orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1144,30 +880,22 @@
             }
 
             closeModal();
-            var msg = 'Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley';
-            if (isReorder) msg += ' (Reorder #' + payload.Supacolor_Order_Number + ')';
-            if (lines.length > 1) msg += ' · ' + lines.length + ' lines';
-            showToast(msg + '.', 'success');
+            var linesStr = lines.length > 1 ? (' (' + lines.length + ' transfers)') : '';
+            showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley' + linesStr + '.', 'success');
 
-            // Attach returned lines to the record so the email builder can render them.
             var recordForEmail = Object.assign({}, createData.record, { _lines: createData.lines || lines });
-
-            // Fire EmailJS notification (non-blocking) — Bradley + CC requester
             sendTransferRequestedEmail(recordForEmail, user);
 
-            if (typeof opts.onSuccess === 'function') {
-                opts.onSuccess(createData.record);
-            }
+            if (typeof opts.onSuccess === 'function') opts.onSuccess(createData.record);
 
         } catch (err) {
-            console.error('Send to Supacolor failed:', err);
+            console.error('[transfer-actions] send failed:', err);
             showToast('Failed: ' + err.message, 'error');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Supacolor';
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Bradley';
         }
     }
-
     // ── Read helpers (for status badge on mockup-detail etc.) ────────
     async function getTransferForMockup(mockupId) {
         try {
