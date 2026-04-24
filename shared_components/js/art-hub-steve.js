@@ -2138,26 +2138,33 @@
             }, 500);
         });
 
-        // Image modal close button
-        document.getElementById('imageModalClose')?.addEventListener('click', () => {
-            document.getElementById('imageModal').classList.remove('show');
-        });
+        // Image modal close button — guard BOTH the close button AND the modal access in the callback
+        // (H2) Asymmetric guard: `?.` on close button but then unguarded modal access in the callback
+        // would still throw if the modal was missing.
+        var imageModalClose = document.getElementById('imageModalClose');
+        var imageModal = document.getElementById('imageModal');
+        if (imageModalClose && imageModal) {
+            imageModalClose.addEventListener('click', function () {
+                imageModal.classList.remove('show');
+            });
+        }
 
         // Close image modal when clicking outside
-        window.addEventListener('click', function (event) {
-            if (event.target === document.getElementById('imageModal')) {
-                document.getElementById('imageModal').classList.remove('show');
-            }
-        });
+        if (imageModal) {
+            window.addEventListener('click', function (event) {
+                if (event.target === imageModal) imageModal.classList.remove('show');
+            });
+        }
 
-        // Notes panel: overlay click to close
-        document.getElementById('notes-overlay').addEventListener('click', closeNotesPanel);
+        // Notes panel: overlay click, close button, submit — (H1) guard each to stop init-chain crashes
+        var notesOverlay = document.getElementById('notes-overlay');
+        if (notesOverlay) notesOverlay.addEventListener('click', closeNotesPanel);
 
-        // Notes panel: close button
-        document.getElementById('notes-panel-close').addEventListener('click', closeNotesPanel);
+        var notesPanelClose = document.getElementById('notes-panel-close');
+        if (notesPanelClose) notesPanelClose.addEventListener('click', closeNotesPanel);
 
-        // Notes panel: submit button
-        document.getElementById('note-submit-btn').addEventListener('click', submitNote);
+        var noteSubmitBtn = document.getElementById('note-submit-btn');
+        if (noteSubmitBtn) noteSubmitBtn.addEventListener('click', submitNote);
 
         // Notes panel: Escape key to close
         document.addEventListener('keydown', function (event) {

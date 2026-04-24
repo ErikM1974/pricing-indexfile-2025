@@ -503,24 +503,44 @@
     }
 
     function wireModalEvents() {
-        $('#tas-modal .tas-modal-close').addEventListener('click', closeModal);
-        $$('.tas-modal-cancel', $('#tas-modal')).forEach(function (btn) {
+        // H9 — Guard each $() lookup. Previously any missing element would throw
+        // on .addEventListener and abort modal wiring (cancel / close / submit
+        // all dead, no way for user to escape the modal).
+        var tasModal = $('#tas-modal');
+        if (!tasModal) {
+            console.warn('[transfer-actions] #tas-modal not injected, skipping wireModalEvents');
+            return;
+        }
+
+        var closeBtn = $('#tas-modal .tas-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        $$('.tas-modal-cancel', tasModal).forEach(function (btn) {
             btn.addEventListener('click', closeModal);
         });
-        $('#tas-modal .tas-modal-backdrop').addEventListener('click', closeModal);
+
+        var backdrop = $('#tas-modal .tas-modal-backdrop');
+        if (backdrop) backdrop.addEventListener('click', closeModal);
 
         // Rush toggle reveals needed-by + reason fields
-        $('#tas-rush').addEventListener('change', function (e) {
-            var show = e.target.checked;
-            $('#tas-rush-details').style.display = show ? '' : 'none';
-            $('#tas-rush-reason-row').style.display = show ? '' : 'none';
-        });
+        var rushToggle = $('#tas-rush');
+        var rushDetails = $('#tas-rush-details');
+        var rushReasonRow = $('#tas-rush-reason-row');
+        if (rushToggle && rushDetails && rushReasonRow) {
+            rushToggle.addEventListener('change', function (e) {
+                var show = e.target.checked;
+                rushDetails.style.display = show ? '' : 'none';
+                rushReasonRow.style.display = show ? '' : 'none';
+            });
+        }
 
-        $('#tas-send-form').addEventListener('submit', handleSubmit);
+        var sendForm = $('#tas-send-form');
+        if (sendForm) sendForm.addEventListener('submit', handleSubmit);
 
         // Escape key closes
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && $('#tas-modal').style.display !== 'none') {
+            var m = $('#tas-modal');
+            if (e.key === 'Escape' && m && m.style.display !== 'none') {
                 closeModal();
             }
         });

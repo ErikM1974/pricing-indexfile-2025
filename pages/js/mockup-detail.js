@@ -284,31 +284,49 @@
         var modal = document.getElementById('pmd-edit-modal');
         if (!modal) return;
 
-        document.getElementById('pmd-edit-design-name').value = mockup.Design_Name || '';
-        var typeSelect = document.getElementById('pmd-edit-mockup-type');
-        var typeVal = mockup.Mockup_Type || '';
-        for (var i = 0; i < typeSelect.options.length; i++) {
-            if (typeSelect.options[i].value === typeVal) { typeSelect.selectedIndex = i; break; }
+        // H6 — Helpers that gracefully skip missing fields instead of throwing.
+        // Previously every child access (.value = ...) would crash the whole function
+        // if any one child was missing, leaving the modal in a half-set broken state.
+        function safeSet(id, value) {
+            var el = document.getElementById(id);
+            if (el) el.value = value;
         }
-        document.getElementById('pmd-edit-garment').value = mockup.Garment_Info || '';
-        document.getElementById('pmd-edit-placement').value = mockup.Print_Location || '';
-        document.getElementById('pmd-edit-logo-width').value = mockup.Logo_Width || '';
-        document.getElementById('pmd-edit-logo-height').value = mockup.Logo_Height || '';
-        document.getElementById('pmd-edit-design-size').value = mockup.Design_Size || '';
+        function safeOn(id, handler) {
+            var el = document.getElementById(id);
+            if (el) el.onclick = handler;
+        }
+
+        safeSet('pmd-edit-design-name', mockup.Design_Name || '');
+
+        var typeSelect = document.getElementById('pmd-edit-mockup-type');
+        if (typeSelect) {
+            var typeVal = mockup.Mockup_Type || '';
+            for (var i = 0; i < typeSelect.options.length; i++) {
+                if (typeSelect.options[i].value === typeVal) { typeSelect.selectedIndex = i; break; }
+            }
+        }
+
+        safeSet('pmd-edit-garment', mockup.Garment_Info || '');
+        safeSet('pmd-edit-placement', mockup.Print_Location || '');
+        safeSet('pmd-edit-logo-width', mockup.Logo_Width || '');
+        safeSet('pmd-edit-logo-height', mockup.Logo_Height || '');
+        safeSet('pmd-edit-design-size', mockup.Design_Size || '');
+
         var dueDate = mockup.Due_Date || '';
         if (dueDate) {
             var d = new Date(dueDate);
-            if (!isNaN(d)) document.getElementById('pmd-edit-due-date').value = d.toISOString().split('T')[0];
+            if (!isNaN(d)) safeSet('pmd-edit-due-date', d.toISOString().split('T')[0]);
         }
-        document.getElementById('pmd-edit-thread-colors').value = mockup.Thread_Colors || '';
-        document.getElementById('pmd-edit-ae-notes').value = mockup.AE_Notes || '';
+
+        safeSet('pmd-edit-thread-colors', mockup.Thread_Colors || '');
+        safeSet('pmd-edit-ae-notes', mockup.AE_Notes || '');
 
         modal.style.display = 'flex';
 
-        document.getElementById('pmd-edit-close').onclick = function () { modal.style.display = 'none'; };
-        document.getElementById('pmd-edit-cancel').onclick = function () { modal.style.display = 'none'; };
+        safeOn('pmd-edit-close', function () { modal.style.display = 'none'; });
+        safeOn('pmd-edit-cancel', function () { modal.style.display = 'none'; });
         modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
-        document.getElementById('pmd-edit-save').onclick = function () { saveMockupEdit(mockup); };
+        safeOn('pmd-edit-save', function () { saveMockupEdit(mockup); });
     }
 
     function saveMockupEdit(originalMockup) {
@@ -1338,13 +1356,18 @@
             showToast('Status updated to "' + newStatus + '"', 'success');
             setTimeout(function () { location.reload(); }, 800);
         }).catch(function (err) {
-            statusUpdateInProgress = false;
             console.error('Status update error:', err);
             showToast('Failed to update status: ' + err.message, 'error');
             if (btnEl) {
                 btnEl.disabled = false;
                 btnEl.textContent = 'Retry';
             }
+        }).finally(function () {
+            // H4 — Always reset the flag, even on unexpected throws in the success
+            // chain. Previously only reset in .catch(), so a throw in .then() after
+            // the fetch succeeded would leave the button permanently disabled until
+            // page reload.
+            statusUpdateInProgress = false;
         });
     }
 

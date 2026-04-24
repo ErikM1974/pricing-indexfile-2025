@@ -2018,6 +2018,19 @@
                 boxConfirm.disabled = true;
                 boxConfirm.textContent = 'Creating link...';
 
+                // H7 — Deadlock timeout: if the fetch chain hangs (not errors — just
+                // never resolves), the button would stay disabled indefinitely and
+                // the user would have to refresh. 30-second timeout re-enables it.
+                var deadlockTimeout = setTimeout(function () {
+                    boxConfirm.disabled = false;
+                    boxConfirm.textContent = 'Timed out — try again';
+                    boxConfirm.style.background = '#dc3545';
+                    setTimeout(function () {
+                        boxConfirm.textContent = 'Select File';
+                        boxConfirm.style.background = '';
+                    }, 3000);
+                }, 30000);
+
                 try {
                     // Create shared link
                     var linkResp = await fetch(API_BASE + '/api/box/shared-link', {
@@ -2052,6 +2065,7 @@
                         body: JSON.stringify({ noteType: noteLabel, noteText: noteDesc + selectedBoxFile.name, noteBy: getLoggedInUser().noteBy })
                     }).catch(function () {});
 
+                    clearTimeout(deadlockTimeout); // H7 — success path
                     closeBoxModal();
                     renderMockupGallery(currentRequest);
                     if (typeof refreshNotes === 'function') refreshNotes();
@@ -2077,6 +2091,7 @@
                         });
                     }
                 } catch (err) {
+                    clearTimeout(deadlockTimeout); // H7 — error path
                     alert('Error: ' + err.message);
                     boxConfirm.disabled = false;
                     boxConfirm.textContent = 'Select File';
@@ -3463,8 +3478,16 @@
                         currentRequest.Final_Approved_Mockup = mockupUrl;
                     }
                 } catch (mockupErr) {
+                    // H8 — Promote to error severity (red) so the AE notices. Previously
+                    // amber 'warn' alongside the green "Approved!" success banner was
+                    // easy to miss. Include the slot label so Steve can recover without
+                    // asking the AE which mockup they chose.
                     console.error('Failed to save Final_Approved_Mockup:', mockupErr);
-                    showArdToast('Approved, but failed to save selected mockup. Tell Steve which mockup was chosen.', 'warn');
+                    showArdToast(
+                        'APPROVED — but the selected mockup (' + slotLabel + ') did not save to the record. ' +
+                        'Please message Steve with the Design # and tell him which mockup is final.',
+                        'error'
+                    );
                 }
             }
 

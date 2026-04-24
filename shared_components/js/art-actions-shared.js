@@ -1293,14 +1293,25 @@
      * Wire up approval modal event listeners.
      * Call this on DOMContentLoaded from any page that has the approval modal HTML.
      */
+    var _approvalListenersWired = false;
     function initApprovalModalListeners() {
+        // H10 — Idempotence. This function is called from 4 pages' DOMContentLoaded
+        // handlers AND from SPA-ish re-renders. Without this guard, each call stacks
+        // new listeners on the same elements → Escape closes the modal N times,
+        // Submit fires N times, Cost updates fire N times.
+        if (_approvalListenersWired) return;
+
         var overlay = document.getElementById('approval-overlay');
         var closeBtn = document.getElementById('approval-modal-close');
         var cancelBtn = document.getElementById('approval-cancel');
         var submitBtn = document.getElementById('approval-submit');
         var minsInput = document.getElementById('approval-minutes');
+        var plusBtn = document.getElementById('approval-plus');
+        var minusBtn = document.getElementById('approval-minus');
+        var costEl = document.getElementById('approval-cost');
 
-        if (!overlay || !submitBtn) return; // Modal HTML not present on this page
+        if (!overlay || !submitBtn || !minsInput) return; // Modal HTML not present on this page
+        _approvalListenersWired = true;
 
         overlay.addEventListener('click', closeApprovalModal);
         if (closeBtn) closeBtn.addEventListener('click', closeApprovalModal);
@@ -1310,15 +1321,15 @@
         function updateApprovalCost() {
             var mins = parseInt(minsInput.value) || 0;
             var qh = Math.ceil(mins / 15) * 0.25;
-            document.getElementById('approval-cost').textContent = '= $' + (qh * 75).toFixed(2);
+            if (costEl) costEl.textContent = '= $' + (qh * 75).toFixed(2);
             updateApprovalTotal();
         }
         minsInput.addEventListener('input', updateApprovalCost);
-        document.getElementById('approval-plus').addEventListener('click', function () {
+        if (plusBtn) plusBtn.addEventListener('click', function () {
             minsInput.value = (parseInt(minsInput.value) || 0) + 15;
             updateApprovalCost();
         });
-        document.getElementById('approval-minus').addEventListener('click', function () {
+        if (minusBtn) minusBtn.addEventListener('click', function () {
             var v = (parseInt(minsInput.value) || 0) - 15;
             minsInput.value = v < 0 ? 0 : v;
             updateApprovalCost();
