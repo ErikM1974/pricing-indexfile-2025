@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 
 // Load environment variables
+// Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
 dotenv.config();
 
 // =============================================================================
