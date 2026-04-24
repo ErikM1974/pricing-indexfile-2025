@@ -45,6 +45,42 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    // Carrier → tracking-URL mapping. Duplicated (intentionally) from
+    // shared_components/js/transfer-actions-shared.js where the same function
+    // is scoped inside an IIFE and not exported. Keeping a local copy avoids
+    // dragging in the whole transfer module for 10 lines of logic.
+    function trackingUrlFromCarrier(carrier, tracking) {
+        if (!tracking) return '';
+        var c = String(carrier || '').toLowerCase();
+        var t = encodeURIComponent(tracking);
+        if (c.indexOf('fedex') >= 0) return 'https://www.fedex.com/fedextrack/?tracknumbers=' + t;
+        if (c.indexOf('ups') >= 0) return 'https://www.ups.com/track?tracknum=' + t;
+        if (c.indexOf('usps') >= 0) return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + t;
+        if (c.indexOf('dhl') >= 0) return 'https://www.dhl.com/en/express/tracking.html?AWB=' + t;
+        return ''; // unknown carrier → no clickable link (text still shown)
+    }
+
+    // Build the Shipped cell content — date on top, tracking pill below.
+    // Tracking pill is a <span> (not nested <a>) with a delegated click handler
+    // in renderTable() to open the carrier page without triggering row navigation.
+    function shippedCellHtml(j) {
+        var dateHtml = '<div class="sc-ship-date">' + escapeHtml(formatDate(j.Date_Shipped)) + '</div>';
+        if (!j.Tracking_Number) return dateHtml;
+
+        var carrierLabel = j.Carrier ? escapeHtml(j.Carrier) : 'Tracking';
+        var trackingUrl = trackingUrlFromCarrier(j.Carrier, j.Tracking_Number);
+        var pillClass = 'sc-track-pill' + (trackingUrl ? ' sc-track-pill--link' : '');
+        var pillAttrs = trackingUrl
+            ? ' data-track-url="' + escapeHtml(trackingUrl) + '" title="Open in ' + carrierLabel + ' tracking"'
+            : '';
+        return dateHtml +
+            '<span class="' + pillClass + '"' + pillAttrs + '>' +
+                '<i class="fas fa-truck"></i> ' +
+                escapeHtml(carrierLabel) + ' ' +
+                escapeHtml(j.Tracking_Number) +
+            '</span>';
+    }
+
     // ── API ────────────────────────────────────────────────────────────
     async function fetchJobs() {
         try {
@@ -224,7 +260,7 @@
                         escapeHtml(j.Status || '') +
                     '</span>' +
                 '</div>' +
-                '<div class="sc-cell sc-cell--shipped">' + escapeHtml(formatDate(j.Date_Shipped)) + '</div>' +
+                '<div class="sc-cell sc-cell--shipped">' + shippedCellHtml(j) + '</div>' +
                 '<div class="sc-cell sc-cell--chevron"><i class="fas fa-chevron-right"></i></div>' +
             '</a>';
         }).join('');
@@ -241,6 +277,17 @@
                 '</div>' +
                 rows +
             '</div>';
+
+        // Delegated click handler for tracking pills — open carrier page in a new
+        // tab and stop the click from bubbling to the row's <a href="...detail">.
+        wrap.querySelectorAll('.sc-track-pill--link').forEach(function (pill) {
+            pill.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var url = this.getAttribute('data-track-url');
+                if (url) window.open(url, '_blank', 'noopener');
+            });
+        });
 
         // Result count + pagination
         var showStart = start + 1;

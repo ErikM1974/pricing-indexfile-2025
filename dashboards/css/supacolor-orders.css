@@ -153,6 +153,44 @@
     color: #6c757d;
     font-size: 13px;
     font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    justify-content: center;
+}
+.sc-ship-date {
+    line-height: 1.2;
+}
+/* Tracking pill under the shipped date. Clickable when carrier is known
+   (opens carrier tracking page in new tab); static text otherwise. */
+.sc-track-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #eef2ff;
+    color: #4338ca;
+    font-variant-numeric: tabular-nums;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sc-track-pill i {
+    font-size: 10px;
+    opacity: 0.8;
+}
+.sc-track-pill--link {
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.sc-track-pill--link:hover {
+    background: #c7d2fe;
+    color: #3730a3;
 }
 .sc-cell--chevron {
     color: #adb5bd;
