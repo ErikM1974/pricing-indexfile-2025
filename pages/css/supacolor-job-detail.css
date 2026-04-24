@@ -239,6 +239,16 @@
     background: #f8f9fa;
     border: 1px solid #f1f3f5;
 }
+/* Clickable thumb (has Thumbnail_URL) — hover scales + cursor hints zoom.
+   Placeholder thumbs (SHIPPING/FEE) intentionally skip this. */
+.sjd-line-thumb--clickable {
+    cursor: zoom-in;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sjd-line-thumb--clickable:hover {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
 .sjd-line-thumb--placeholder {
     display: flex;
     align-items: center;

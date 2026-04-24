@@ -258,8 +258,24 @@
         }
 
         container.innerHTML = lines.map(function (line) {
+            // Clickable thumbnails stamp data-* with the URL + line context so a
+            // single delegated handler (below) can open the lightbox without
+            // per-row closures. Placeholder thumbs (SHIPPING/FEE rows) stay
+            // non-clickable — nothing to zoom.
+            // Detail_Line often has a newline ("Mixed color fabric\n13.5\" Width | WE_A3") —
+            // normalize to " · " for single-line display in the modal meta.
+            var detailForMeta = (line.Detail_Line || '').replace(/\s*\n\s*/g, ' · ');
             var thumb = line.Thumbnail_URL
-                ? '<img class="sjd-line-thumb" src="' + escapeHtml(line.Thumbnail_URL) + '" alt="" onerror="this.style.display=\'none\'">'
+                ? '<img class="sjd-line-thumb sjd-line-thumb--clickable"' +
+                  ' src="' + escapeHtml(line.Thumbnail_URL) + '"' +
+                  ' data-thumb-url="' + escapeHtml(line.Thumbnail_URL) + '"' +
+                  ' data-item-code="' + escapeHtml(line.Item_Code || '') + '"' +
+                  ' data-description="' + escapeHtml(line.Description || '') + '"' +
+                  ' data-detail="' + escapeHtml(detailForMeta) + '"' +
+                  ' data-color="' + escapeHtml(line.Color || '') + '"' +
+                  ' data-quantity="' + escapeHtml(line.Quantity != null ? String(line.Quantity) : '') + '"' +
+                  ' alt="" title="Click to view larger"' +
+                  ' onerror="this.style.display=\'none\'">'
                 : '<div class="sjd-line-thumb sjd-line-thumb--placeholder">' +
                     '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '"></i>' +
                   '</div>';
@@ -286,6 +302,51 @@
                 '</div>' +
             '</div>';
         }).join('');
+
+        // Wire thumbnail click → lightbox (openGeneric).
+        // Requires product-thumbnail-modal.js to be loaded (see supacolor-job-detail.html).
+        container.querySelectorAll('.sjd-line-thumb--clickable').forEach(function (img) {
+            img.addEventListener('click', function () {
+                if (!window.productThumbnailModal) return;
+                var url = this.getAttribute('data-thumb-url');
+                var itemCode = this.getAttribute('data-item-code') || '';
+                var description = this.getAttribute('data-description') || '';
+                var detail = this.getAttribute('data-detail') || '';
+                var color = this.getAttribute('data-color') || '';
+                var quantity = this.getAttribute('data-quantity') || '';
+
+                var metaLines = [];
+                if (itemCode) metaLines.push({ label: 'Item Code', value: itemCode });
+                if (quantity) metaLines.push({ label: 'Quantity', value: quantity });
+                // Supacolor transfers typically populate Detail_Line (width, material);
+                // fall back to Color for screenprint-style rows that use that column instead.
+                if (detail) metaLines.push({ label: 'Detail', value: detail });
+                else if (color) metaLines.push({ label: 'Color', value: color });
+
+                // Build a readable filename: "WE319816-Washington-Rock-Quarries-13-5.jpg"
+                // Guess extension from URL (fallback .jpg).
+                var extMatch = String(url || '').match(/\.(jpe?g|png|gif|webp|svg)(?:[?#]|$)/i);
+                var ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
+                var slug = description.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 50);
+                var filename = (itemCode || 'supacolor-image') + (slug ? '-' + slug : '') + '.' + ext;
+
+                // Route the download through our backend proxy so the response lands
+                // with Content-Disposition: attachment and honors the <a download> attr.
+                // Supacolor's CDN blocks direct fetch (CORS) and serves Content-Disposition:
+                // inline, which made the old direct-URL path fall back to a new-tab open.
+                var downloadUrl = API_BASE + '/api/supacolor-jobs/proxy-image' +
+                    '?url=' + encodeURIComponent(url) +
+                    '&name=' + encodeURIComponent(filename);
+
+                window.productThumbnailModal.openGeneric({
+                    imageUrl: url,          // preview in modal uses the direct CDN URL
+                    title: description || itemCode || 'Transfer artwork',
+                    metaLines: metaLines,
+                    downloadUrl: downloadUrl,
+                    downloadFilename: filename
+                });
+            });
+        });
 
         // Totals
         var j = state.job;

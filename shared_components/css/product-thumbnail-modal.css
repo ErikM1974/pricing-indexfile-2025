@@ -1,0 +1,177 @@
+/* Product Thumbnail Modal — standalone extract from quote-builder-common.css
+ *
+ * Rules copied from quote-builder-common.css lines 2995-3116 (2026-01-29 original).
+ * Extracted 2026-04-24 so non-quote-builder pages (supacolor-job-detail) can use
+ * the modal without pulling in all quote-builder-specific CSS.
+ *
+ * NEW in 2026-04-24: .product-image-modal-actions, .product-image-modal-download,
+ * .product-image-modal-details .meta-label — for the download button + generic
+ * meta-line layout added alongside openGeneric() in product-thumbnail-modal.js.
+ *
+ * Quote builders continue to load quote-builder-common.css which has the ORIGINAL
+ * rules — CSS cascade resolves identical rules to the same values, so loading
+ * both files is harmless (just a byte duplicate).
+ */
+
+/* ============================================
+   PRODUCT IMAGE MODAL (click thumbnail to see larger)
+   ============================================ */
+
+.product-image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-modal, 1000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image-modal.hidden {
+    display: none;
+}
+
+.product-image-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+.product-image-modal-content {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    max-width: 480px;
+    width: 90%;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: productModalSlideIn 0.2s ease;
+}
+
+@keyframes productModalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.product-image-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    z-index: 2;
+}
+
+.product-image-modal-close:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.product-image-modal-image {
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    background: #f8f9fa;
+}
+
+.product-image-modal-details {
+    text-align: center;
+}
+
+.product-image-modal-details h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.product-image-modal-details p {
+    margin: 6px 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.product-image-modal-details p span {
+    color: #334155;
+    font-weight: 500;
+}
+
+/* ============================================
+   NEW (2026-04-24): Generic meta-line layout + Download button
+   Used by openGeneric() — supacolor-job-detail and future consumers.
+   ============================================ */
+
+.product-image-modal-details .meta-label {
+    color: #64748b;
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.product-image-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.product-image-modal-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: #4a6fa5;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.product-image-modal-download:hover {
+    background: #3d5e8f;
+    color: white;
+    text-decoration: none;
+}
+
+.product-image-modal-download i {
+    font-size: 13px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .product-image-modal-content {
+        max-width: 95%;
+        margin: 10px;
+        padding: 16px;
+    }
+
+    .product-image-modal-image {
+        max-height: 280px;
+    }
+}
