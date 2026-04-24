@@ -204,14 +204,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### AE Edit Save Broken — PK_ID vs ID_Design Mismatch in Backend
-**Problem:** AE edits art request fields via Edit modal, clicks Save, gets console error or changes don't persist.
-**Root Cause:** Backend `PUT /api/art-requests/:designId/fields` (art.js:874) used `q.where=PK_ID=${designId}`, but the URL passes `ID_Design`. Every other endpoint in the file correctly uses `ID_Design`. Commit `cfcc1de` introduced the bug.
-**Solution:** Changed `PK_ID` to `ID_Design` in the WHERE clause (commit `2ed4724`).
-**Prevention:** ArtRequests endpoints ALWAYS use `ID_Design` for the WHERE clause. The URL param is the design ID, not the primary key. Check consistency across all endpoints in a route file.
-
----
-
 ### SanMar Sync Upsert Bug — `makeCaspioRequest` Returns Array, Code Checks `.Result`
 **Problem:** Caspio SanMar tables had only 7 orders (should be hundreds). Backfill processes hung indefinitely. Every sync created duplicates instead of updating existing records.
 **Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
@@ -298,3 +290,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** `downloadLightboxImage()` in `pages/js/art-request-detail.js` only routed Box URLs through the proxy (`/api/box/thumbnail/NNN` → `/api/box/download/NNN`, or `.box.com/shared/static/` → `/api/box/shared-image`). The "Artwork 1–4" tiles come from `READ_ONLY_FIELDS` (`CDN_Link`, `CDN_Link_Two/Three/Four`, `File_Upload`) which store **Cloudinary/Caspio CDN URLs**, not Box URLs. Those fell through to raw `fetch(url)` which hit cross-origin CORS → `TypeError: Failed to fetch`. Image `<img src>` rendered fine (CORS doesn't apply to image tags), so the lightbox image looked normal — only Download broke.
 **Solution:** Added a third branch that detects non-Box URLs and uses an anchor-tag open (`<a href download target=_blank>`) instead of `fetch()`. Browsers bypass CORS for plain navigations, so the image opens in a new tab and the user saves it natively.
 **Prevention:** When proxying downloads, enumerate ALL URL shapes a field can hold — not just the current-generation one. Legacy fields (`CDN_Link_*`, `File_Upload`) predate the Box-proxy era. For cross-origin resources you can't `fetch()`, fall back to anchor-tag navigation rather than swallowing the error.
+
+---
+
+### "Defensive" Cleanup Selector Nuked Static Overlays — Mark Complete Silently Broke (2026-04-23)
+**Problem:** Steve reported "Mark Complete does nothing" on art-request-detail. After an initial fix-deploy, testing live found it *still* broken — page showed "Error Loading" banner and the whole render chain was crashing silently. Two other features (Find Order, Send for Approval, Share with Customer) were also dead.
+**Root Cause:** To mitigate a theorized orphan-overlay scenario I added `document.querySelectorAll('.art-modal-overlay, #quick-action-overlay').forEach(el => el.remove())` on page boot. The selector matched FOUR legitimate static HTML overlays that share class `art-modal-overlay`: `#find-order-overlay`, `#approval-overlay` (×2), `#share-customer-overlay`. Cleanup wiped them. Then `initShareWithCustomer()` at art-request-detail.js:2794 called `overlay.addEventListener('click', ...)` on the now-null share overlay → TypeError → outer `.catch` in render() painted the "Error Loading" banner, and `renderSteveActions()` (which wires up Mark Complete) never got to run.
+**Solution:** Narrow the selector to ONLY the dynamically-created overlay: `var el = document.getElementById('quick-action-overlay'); if (el) el.remove();`. That's the single overlay created by `art-actions-shared.js createOverlay()` that can be orphaned. Static HTML overlays MUST be left alone.
+**Prevention:** **Never use a shared CSS class as a DOM-cleanup selector when static HTML elements also carry that class.** Use specific IDs for dynamic cleanup. Before adding any `querySelectorAll('.shared-class').forEach(remove)`, run `grep -rn 'class="[^"]*shared-class' --include='*.html'` to see every pre-declared element that selector will delete. Bonus lesson: a "defensive" fix that hasn't been ruled out with data can make things worse — prefer a try/catch around the suspect caller over reaching into the DOM.
