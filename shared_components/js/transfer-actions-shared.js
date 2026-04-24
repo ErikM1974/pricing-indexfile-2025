@@ -141,6 +141,12 @@
                 : '—',
             rush_reason: record.Rush_Reason || '',
             current_status: record.Status || '—',
+            // v3 additions (2026-04-24): pulled from mockup vision extraction.
+            // transfer_type is persisted on Transfer_Orders; garment_info is
+            // transient — only populated via overrides at submit time because
+            // we don't store Garment_Color_Style to Caspio.
+            transfer_type: record.Transfer_Type || '',
+            garment_info: '',
             // Defaults for conditional blocks — overrides can replace
             rush_subject_suffix: '',
             rs_sfx: '', // Short alias (EmailJS subject field has ~60-char template limit)
@@ -337,8 +343,15 @@
     /**
      * Send the transfer_requested notification (Steve → Bradley).
      * CC the requester so they have a paper trail.
+     *
+     * @param {object} record - Transfer_Orders row (as created)
+     * @param {object} requestedBy - { email, name } of submitter
+     * @param {object} [visionExtras] - v3 mockup vision data (optional). When
+     *   provided, enriches the email with garment + transfer type (fields we
+     *   don't persist to Caspio — see buildEmailParams header comment).
+     *   Shape: { garmentColorStyle: string, transferType: string }
      */
-    function sendTransferRequestedEmail(record, requestedBy) {
+    function sendTransferRequestedEmail(record, requestedBy, visionExtras) {
         var overrides = {
             to_email: BRADLEY_EMAIL,
             to_name: 'Bradley',
@@ -359,6 +372,20 @@
             overrides.special_block_html = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Special Instructions</h3>' +
                 '<div style="white-space:pre-wrap;background:#eff6ff;padding:10px 14px;border-left:3px solid #3b82f6;border-radius:4px;font-size:13px;">' +
                 escapeHtml(record.Special_Instructions) + '</div>';
+        }
+        // v3 overrides: only populated when the caller has the mockup vision
+        // extraction in hand (i.e. the initial submit from handleSubmit — the
+        // only path that currently provides visionExtras).
+        if (visionExtras) {
+            if (visionExtras.garmentColorStyle) {
+                overrides.garment_info = visionExtras.garmentColorStyle;
+            }
+            // transferType is already baked into record.Transfer_Type via the
+            // submit payload, so buildEmailParams reads it from the record.
+            // Allow an override here too in case a caller wants to force it.
+            if (visionExtras.transferType) {
+                overrides.transfer_type = visionExtras.transferType;
+            }
         }
         return sendEmail('transfer_requested', buildEmailParams(record, overrides));
     }
@@ -861,6 +888,12 @@
                     overrides.rs_sfx = ' \ud83d\udea8 RUSH';
                     overrides.rush_banner_html = buildRushBanner(fakeRecord);
                 }
+                // v3: mirror the mockup-vision enrichment that the real path
+                // does via sendTransferRequestedEmail's visionExtras arg.
+                if (vision) {
+                    if (vision.garmentColorStyle) overrides.garment_info = vision.garmentColorStyle;
+                    if (vision.transferType) overrides.transfer_type = vision.transferType;
+                }
                 console.log('[DRYRUN] transfer_requested params:', buildEmailParams(fakeRecord, overrides));
                 closeModal();
                 showToast('DRY RUN \u2014 payload logged to console.', 'info');
@@ -884,7 +917,13 @@
             showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley' + linesStr + '.', 'success');
 
             var recordForEmail = Object.assign({}, createData.record, { _lines: createData.lines || lines });
-            sendTransferRequestedEmail(recordForEmail, user);
+            // v3: pass mockup vision extras so the submit email includes
+            // garment + transfer type (fields we don't persist to Caspio).
+            var visionExtras = vision ? {
+                garmentColorStyle: vision.garmentColorStyle,
+                transferType: vision.transferType
+            } : null;
+            sendTransferRequestedEmail(recordForEmail, user, visionExtras);
 
             if (typeof opts.onSuccess === 'function') opts.onSuccess(createData.record);
 
