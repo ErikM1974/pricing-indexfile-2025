@@ -201,6 +201,52 @@ git push origin main --tags
 git push heroku main
 ```
 
+### Step 10.5: Verify Heroku Serves Fresh Content (Auto-Restart if Stale)
+
+**Why this exists**: We've observed repeatedly (2026-04-23 and 2026-04-24) that Heroku reports `Released vNNN` and the git push completes successfully, yet the live dyno keeps serving the **previous slug** — sometimes for several minutes, sometimes indefinitely until a manual `heroku ps:restart`. Root cause appears to be session affinity on a single-dyno setup (see the `heroku-session-affinity` cookie in every response). Without this step, the `/deploy` success message is misleading — the user refreshes, sees old code, and wastes time debugging what's actually a stale-slug issue.
+
+**Skip condition**: If Step 1.5 reported no JS/CSS cache-bumps (i.e., no frontend changes), there's nothing to verify — skip to Step 11.
+
+**Procedure**:
+
+1. Pick ONE representative cache-bumped JS file from Step 1.5. First choice: `pages/js/art-request-detail.js` if it was bumped (most common). Otherwise the first file in the bumped list.
+
+2. Extract the NEW version value from the local HTML that hosts it. Example:
+```bash
+# If art-request-detail.js was bumped
+NEW_VERSION=$(grep -oP 'art-request-detail\.js\?v=\K[^"]+' pages/art-request-detail.html | head -1)
+echo "Expected live version: $NEW_VERSION"
+```
+
+3. Initial pause for natural slug propagation (~5s), then curl-check the live URL that serves that HTML. Use a unique cache-bust query param:
+```bash
+sleep 5
+LIVE_URL="https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/52833"
+LIVE_VERSION=$(curl -s "${LIVE_URL}?_=$(date +%s)" | grep -oP 'art-request-detail\.js\?v=\K[^"]+' | head -1)
+```
+
+4. Compare. If `LIVE_VERSION` equals `NEW_VERSION` → live site is fresh, proceed to Step 11.
+
+5. If mismatch, poll once every 5 seconds for up to 20 seconds total (using Monitor with an until-loop or run_in_background). If it catches up naturally within that window → proceed.
+
+6. **If still stale after 25 seconds**: Heroku isn't propagating on its own. Auto-restart the dyno:
+```bash
+heroku ps:restart --app sanmar-inventory-app
+```
+Report to user: `⚠ Heroku served stale slug after release — auto-restarting dyno.`
+
+7. After `ps:restart`, poll again (every 5s for up to 90s) until `LIVE_VERSION == NEW_VERSION`. Once matched, report `✓ Dyno restarted; live site now serving $NEW_VERSION` and proceed to Step 11.
+
+8. **Escalation path** (rare): if after the restart the site is still stale for 90+ seconds, try a scale cycle:
+```bash
+heroku ps:scale web=0 --app sanmar-inventory-app
+sleep 5
+heroku ps:scale web=1 --app sanmar-inventory-app
+```
+Then poll for up to 60 more seconds. If still stale after that, stop and tell the user: `⚠ Live site is stuck serving $LIVE_VERSION. Investigate manually — possibly a bad release or platform issue.`
+
+**Important**: Never skip this step on frontend deploys. The stale-slug issue is silent to Heroku's build logs but visible to end users.
+
 ### Step 11: Return to Develop Branch
 
 ```bash
@@ -256,6 +302,7 @@ Use AskUserQuestion with options:
 | Merge conflict | Abort merge, return to develop, show manual resolution steps |
 | Push fails | Show error, suggest `git pull` first |
 | Heroku push fails | Show error, suggest checking Heroku login status |
+| Heroku released but live dyno serves stale slug | Step 10.5 auto-runs `heroku ps:restart`; if that fails too, auto-escalates to `ps:scale web=0` + `web=1` cycle |
 
 ## Example Output
 
@@ -283,13 +330,18 @@ Starting deployment...
 
        [User confirms: Yes, proceed]
 
-[5/12] Switching to main... done
-[6/12] Pulling latest main... already up to date
-[7/12] Merging develop into main... done
-[8/12] Creating version tag... v2025.12.23.1
-[9/12] Pushing main to GitHub... done
-[10/12] Pushing to Heroku... done
-[11/12] Returning to develop... done
+[5/13]  Switching to main... done
+[6/13]  Pulling latest main... already up to date
+[7/13]  Merging develop into main... done
+[8/13]  Creating version tag... v2025.12.23.1
+[9/13]  Pushing main to GitHub... done
+[10/13] Pushing to Heroku... done
+[10.5/13] Verifying live content freshness...
+         Expected: art-request-detail.js?v=20260424c
+         Live:     art-request-detail.js?v=20260424b (stale)
+         ⚠ Stale slug detected — running heroku ps:restart...
+         ✓ Dyno restarted; live site now serving 20260424c
+[11/13] Returning to develop... done
 
 DEPLOY SUCCESSFUL! Version v2025.12.23.1 is now live.
 ```
