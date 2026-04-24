@@ -426,6 +426,166 @@
     to { transform: translateX(0); opacity: 1; }
 }
 
+/* ── Mode toggle (New Design vs Reorder) ───────────────────── */
+.tas-mode-toggle {
+    display: flex;
+    gap: 0;
+    margin: 0 0 16px;
+    padding: 4px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    border: 1px solid var(--tas-border);
+}
+.tas-mode-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tas-text-muted);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+}
+.tas-mode-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.tas-mode-option--active {
+    background: white;
+    color: var(--tas-theme);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.tas-mode-option--reorder.tas-mode-option--active {
+    color: #16a34a;
+}
+.tas-mode-hint {
+    font-size: 12px;
+    color: var(--tas-text-muted);
+    margin: -4px 0 12px;
+    padding: 8px 12px;
+    background: #f9fafb;
+    border-left: 3px solid var(--tas-border);
+    border-radius: 4px;
+}
+.tas-mode-reorder .tas-mode-hint {
+    background: #f0fdf4;
+    border-left-color: #16a34a;
+    color: #166534;
+}
+
+/* Reorder-mode conditional visibility.
+ * When the modal root has .tas-mode-reorder: hide files + PMS; show Supacolor# field.
+ * When it doesn't: hide Supacolor# field; show files + PMS. */
+#tas-files-fieldset,
+#tas-primary-color-row { display: block; }
+#tas-supacolor-number-row { display: none; }
+.tas-mode-reorder #tas-files-fieldset,
+.tas-mode-reorder #tas-primary-color-row { display: none; }
+.tas-mode-reorder #tas-supacolor-number-row { display: block; }
+
+/* ── Line repeater ──────────────────────────────────────────── */
+.tas-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.tas-line-row {
+    border: 1px solid var(--tas-border);
+    border-radius: 8px;
+    padding: 12px 14px 10px;
+    background: #fafafa;
+    position: relative;
+}
+.tas-line-row__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tas-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.tas-line-row__remove {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--tas-rush);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.tas-line-row__remove:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+}
+.tas-line-row--first .tas-line-row__remove { display: none; }
+
+.tas-add-line-btn {
+    background: white;
+    border: 1px dashed var(--tas-theme);
+    color: var(--tas-theme);
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+}
+.tas-add-line-btn:hover {
+    background: var(--tas-theme-light);
+}
+
+/* When lines are disabled (enableLines:false, legacy single-line callers) */
+.tas-lines--single .tas-add-line-btn,
+.tas-lines--single .tas-line-row__header { display: none; }
+.tas-lines--single .tas-line-row {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+/* ── Reorder badge on detail page + Bradley queue ─────────── */
+.tas-reorder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.tas-line-count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #eaf0f9;
+    color: var(--tas-theme-dark);
+    font-size: 11px;
+    font-weight: 600;
+}
+
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 700px) {
     .tas-modal { padding: 8px; }

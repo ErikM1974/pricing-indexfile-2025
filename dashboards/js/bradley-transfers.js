@@ -48,7 +48,7 @@
     // ── API ──────────────────────────────────────────────────────────
     async function fetchTransfers() {
         try {
-            var resp = await fetch(API_BASE + '/api/transfer-orders?pageSize=500&orderBy=Requested_At%20DESC');
+            var resp = await fetch(API_BASE + '/api/transfer-orders?pageSize=500&orderBy=Requested_At%20DESC&includeLineCount=true');
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
             if (!data.success) throw new Error(data.error || 'API returned success=false');
@@ -170,6 +170,10 @@
         var ageHours = getAgeHours(t.Requested_At);
         var rushClass = isRush(t) ? ' bt-card--rush' : '';
         var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt"></i> RUSH</span>' : '';
+        var reorderBadge = t.Is_Reorder ? '<span class="tas-reorder-badge"><i class="fas fa-redo"></i> REORDER</span>' : '';
+        var lineCountPill = (t.line_count && t.line_count > 1)
+            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol"></i> ' + t.line_count + ' lines</span>'
+            : '';
 
         // Delete menu only available pre-Supacolor (before Bradley places the order).
         // After that, Cancel (from detail page) is the correct action.
@@ -178,6 +182,12 @@
             '<button class="bt-card-menu-btn" data-action="delete" title="Delete (mistake)" aria-label="Delete transfer">' +
                 '<i class="fas fa-trash"></i>' +
             '</button>' : '';
+
+        // For reorders, prominently surface the Supacolor #; hide the (empty) Qty/Size fields
+        // since they live in the child lines table and can't be summarized cleanly on one line.
+        var qtyDisplay = (t.line_count && t.line_count > 1)
+            ? t.line_count + ' lines'
+            : ((t.Quantity || '—') + (t.Transfer_Size ? ' &middot; ' + escapeHtml(t.Transfer_Size) : ''));
 
         return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
             '<div class="bt-card-header">' +
@@ -196,8 +206,7 @@
             '</div>' +
             '<div class="bt-card-meta">' +
                 '<span class="bt-card-meta-label">Qty:</span>' +
-                '<span class="bt-card-meta-value">' + (t.Quantity || '—') +
-                    (t.Transfer_Size ? ' &middot; ' + escapeHtml(t.Transfer_Size) : '') + '</span>' +
+                '<span class="bt-card-meta-value">' + qtyDisplay + '</span>' +
                 '<span class="bt-card-meta-label">Rep:</span>' +
                 '<span class="bt-card-meta-value">' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email || '—') + '</span>' +
                 (t.Supacolor_Order_Number ?
@@ -210,6 +219,8 @@
             '<div class="bt-card-footer">' +
                 '<span class="bt-badge ' + statusBadgeClass(t.Status) + '">' + escapeHtml(statusLabel(t.Status || 'Requested')) + '</span>' +
                 rushBadge +
+                reorderBadge +
+                lineCountPill +
             '</div>' +
         '</div>';
     }

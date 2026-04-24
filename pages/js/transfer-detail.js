@@ -25,6 +25,7 @@
         transferId: null,
         record: null,
         notes: [],
+        lines: [], // Transfer_Order_Lines child rows (v2026.04.24 multi-line support)
         user: null, // { email, name }
         // Extracted-from-screenshot values that aren't shown in the modal forms —
         // saved to the record alongside a status transition (Carrier, Shipping_Method,
@@ -244,6 +245,12 @@
         if (isRush(r)) {
             badgesHtml += '<span class="bt-badge bt-badge--rush" style="font-size:12px;"><i class="fas fa-bolt"></i> RUSH</span>';
         }
+        if (r.Is_Reorder) {
+            badgesHtml += '<span class="tas-reorder-badge" style="font-size:12px;"><i class="fas fa-redo"></i> REORDER</span>';
+        }
+        if (state.lines && state.lines.length > 1) {
+            badgesHtml += '<span class="tas-line-count-pill" style="font-size:12px;"><i class="fas fa-list-ol"></i> ' + state.lines.length + ' lines</span>';
+        }
         $('td-header-badges').innerHTML = badgesHtml;
 
         // Header meta
@@ -397,7 +404,11 @@
         }
 
         if (files.length === 0) {
-            panel.innerHTML = '<div class="td-empty-panel">No working files attached. Only Steve can attach files via the "Send to Supacolor" button on the mockup or his dashboard.</div>';
+            if (r.Is_Reorder) {
+                panel.innerHTML = '<div class="td-empty-panel" style="background:#f0fdf4;border-left:3px solid #16a34a;padding:10px 14px;color:#166534;"><i class="fas fa-info-circle"></i> Reorder — artwork is already on file at Supacolor under order #' + escapeHtml(r.Supacolor_Order_Number || 'n/a') + '. No files attached here.</div>';
+            } else {
+                panel.innerHTML = '<div class="td-empty-panel">No working files attached. Only Steve can attach files via the "Send to Supacolor" button on the mockup or his dashboard.</div>';
+            }
             return;
         }
 
@@ -427,38 +438,90 @@
         panel.innerHTML = html;
     }
 
+    /**
+     * Render order-level specs panel.
+     *
+     * Source of truth priority for transfer lines:
+     *   1. state.lines (new v2026.04.24 child rows from Transfer_Order_Lines)
+     *   2. Synthesized legacy-single-line from Transfer_Orders top-level cols
+     *      (Quantity/Transfer_Size/etc.) — keeps pre-multi-line orders rendering.
+     */
     function renderSpecsPanel() {
         var r = state.record;
         var parts = [];
-        parts.push('<dl class="td-specs-grid">');
-        parts.push('<dt>Quantity</dt><dd>' + escapeHtml(r.Quantity || '—') + '</dd>');
-        parts.push('<dt>Transfer Size</dt><dd>' + escapeHtml(r.Transfer_Size || '—') +
-            (r.Transfer_Width_In || r.Transfer_Height_In ?
-                ' <span style="color:#6b7280; font-size:12px;">(' +
-                (r.Transfer_Width_In || '?') + '&quot; × ' + (r.Transfer_Height_In || '?') + '&quot;)</span>'
-                : '') + '</dd>');
-        parts.push('<dt>Press Count</dt><dd>' + escapeHtml(r.Press_Count || '—') + '</dd>');
-        if (r.Needed_By_Date) parts.push('<dt>Needed By</dt><dd>' + escapeHtml(formatDate(r.Needed_By_Date)) + '</dd>');
-        parts.push('</dl>');
 
-        // Print Specs — structured fields Bradley needs for the Supacolor order page.
-        // Only render the block if any of the fields are set (legacy transfers won't have them).
-        var hasPrintSpecs = r.Transfer_Type || r.Fabric_Target || r.Primary_Color || r.Additional_Colors || r.Color_Count;
-        if (hasPrintSpecs) {
-            parts.push('<dl class="td-specs-grid td-specs-grid--print">');
-            if (r.Transfer_Type) parts.push('<dt>Transfer Type</dt><dd><strong>' + escapeHtml(r.Transfer_Type) + '</strong></dd>');
-            if (r.Fabric_Target) parts.push('<dt>Fabric</dt><dd>' + escapeHtml(r.Fabric_Target) + '</dd>');
-            if (r.Color_Count) parts.push('<dt># of Colors</dt><dd>' + escapeHtml(r.Color_Count) + '</dd>');
-            if (r.Primary_Color) parts.push('<dt>Primary Color</dt><dd>' + escapeHtml(r.Primary_Color) + '</dd>');
-            if (r.Additional_Colors) {
-                parts.push('<dt>Additional Colors</dt><dd style="white-space:pre-wrap;">' + escapeHtml(r.Additional_Colors) + '</dd>');
-            }
-            parts.push('</dl>');
+        // Derive the list of lines to display (new child rows, or legacy single-row fallback).
+        var lines = (state.lines && state.lines.length > 0) ? state.lines : null;
+        if (!lines && (r.Quantity || r.Transfer_Size)) {
+            lines = [{
+                Line_Order: 1,
+                Quantity: r.Quantity,
+                Transfer_Size: r.Transfer_Size,
+                Press_Count: r.Press_Count,
+                Transfer_Width_In: r.Transfer_Width_In,
+                Transfer_Height_In: r.Transfer_Height_In,
+                File_Notes: r.File_Notes
+            }];
         }
 
-        if (r.File_Notes) {
-            parts.push('<div class="td-specs-notes"><strong>File Notes</strong>' + escapeHtml(r.File_Notes) + '</div>');
+        // Reorder banner (top of specs panel) — makes it obvious artwork is on file at Supacolor.
+        if (r.Is_Reorder) {
+            var num = r.Supacolor_Order_Number ? escapeHtml(r.Supacolor_Order_Number) : '(not provided)';
+            parts.push('<div class="td-reorder-banner" style="background:#dcfce7;border-left:4px solid #16a34a;padding:12px 16px;border-radius:4px;margin-bottom:14px;">' +
+                '<strong style="color:#166534;font-size:14px;"><i class="fas fa-redo"></i> REORDER — Supacolor #' + num + '</strong>' +
+                '<div style="color:#166534;font-size:12px;margin-top:3px;">Artwork already on file at Supacolor.</div>' +
+                '</div>');
         }
+
+        // Multi-line table (1 row = 1 line; degrades cleanly to single row for legacy records).
+        if (lines && lines.length > 0) {
+            var totalQty = lines.reduce(function (s, l) {
+                var q = parseInt(l.Quantity, 10);
+                return s + (Number.isNaN(q) ? 0 : q);
+            }, 0);
+            var header = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+                '<strong style="font-size:14px;">Transfer Lines</strong>' +
+                '<span style="font-size:12px;color:#6b7280;">' + lines.length + ' line' + (lines.length === 1 ? '' : 's') +
+                    ' · Total Qty: <strong>' + totalQty + '</strong></span>' +
+                '</div>';
+            var rows = lines.map(function (l, i) {
+                var dim = (l.Transfer_Width_In || l.Transfer_Height_In)
+                    ? ' <span style="color:#6b7280;font-size:12px;">(' + escapeHtml((l.Transfer_Width_In || '?') + '" × ' + (l.Transfer_Height_In || '?') + '")') + '</span>'
+                    : '';
+                var notes = l.File_Notes
+                    ? '<div style="margin-top:4px;font-size:12px;color:#6b7280;white-space:pre-wrap;">' + escapeHtml(l.File_Notes) + '</div>'
+                    : '';
+                return '<tr>' +
+                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-weight:600;width:50px;">#' + (i + 1) + '</td>' +
+                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;font-weight:700;">' + escapeHtml(l.Quantity || '?') + '</td>' +
+                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">' + escapeHtml(l.Transfer_Size || '—') + dim + '</td>' +
+                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">' + escapeHtml(l.Press_Count || '1') + notes + '</td>' +
+                '</tr>';
+            }).join('');
+            parts.push(header +
+                '<table style="width:100%;border-collapse:collapse;background:white;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;font-size:13px;margin-bottom:12px;">' +
+                    '<thead><tr style="background:#f9fafb;">' +
+                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Line</th>' +
+                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Qty</th>' +
+                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Size (W × H)</th>' +
+                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Press / Notes</th>' +
+                    '</tr></thead>' +
+                    '<tbody>' + rows + '</tbody>' +
+                '</table>');
+        }
+
+        // Needed By date (job-level)
+        if (r.Needed_By_Date) {
+            parts.push('<dl class="td-specs-grid"><dt>Needed By</dt><dd>' + escapeHtml(formatDate(r.Needed_By_Date)) + '</dd></dl>');
+        }
+
+        // Primary Color (PMS) — the only field kept from the old Print Specs block.
+        // Legacy Transfer_Type/Fabric_Target/Color_Count/Additional_Colors no longer
+        // rendered (they're still in Caspio but unused in the UI going forward).
+        if (r.Primary_Color) {
+            parts.push('<div class="td-specs-notes" style="background:#f0fdf4;border-left-color:#22c55e;"><strong style="color:#166534;">Primary Color / PMS</strong>' + escapeHtml(r.Primary_Color) + '</div>');
+        }
+
         if (r.Special_Instructions) {
             parts.push('<div class="td-specs-notes" style="background:#eff6ff; border-left-color:#3b82f6;"><strong style="color:#1e40af;">Special Instructions</strong>' + escapeHtml(r.Special_Instructions) + '</div>');
         }
@@ -1170,6 +1233,7 @@
             var data = await apiGet('/api/transfer-orders/' + encodeURIComponent(state.transferId));
             state.record = data.record;
             state.notes = data.notes || [];
+            state.lines = Array.isArray(data.lines) ? data.lines : [];
             $('td-loading').style.display = 'none';
             $('td-error').style.display = 'none';
             $('td-main').style.display = '';

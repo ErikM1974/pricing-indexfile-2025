@@ -67,6 +67,9 @@
             designId: art ? (art.ID_Design || art.PK_ID) : undefined,
             prefill: prefill,
             requestedBy: STEVE_USER,
+            // Steve's dashboard is the canonical multi-line caller — enable the line repeater.
+            // Mockup-detail and art-request-detail callers default to enableLines:false (single-line).
+            enableLines: true,
             onSuccess: function (record) {
                 console.log('Transfer created:', record.ID_Transfer);
             }
