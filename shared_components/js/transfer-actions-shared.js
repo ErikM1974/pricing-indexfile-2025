@@ -491,14 +491,27 @@
                     '</div>' +
                     '<div class="tas-modal-body">' +
                         '<div class="tas-modal-intro">' +
-                            'Paste Box links for this job \u2014 transfer file(s) and the mockup. ' +
-                            'Filenames and mockup scan fill in everything else.' +
+                            'Search your Box art folder by design # or company name. Click a folder to pick the transfer + mockup files.' +
                         '</div>' +
                         '<form id="tas-send-form" class="tas-form">' +
-                            '<div id="tas-link-rows" class="tas-link-rows"></div>' +
-                            '<button type="button" id="tas-add-row" class="tas-add-row-btn">' +
-                                '<i class="fas fa-plus"></i> Paste another link' +
-                            '</button>' +
+                            // ── Picker: search box + folder/file results ──
+                            '<div class="tas-picker">' +
+                                '<div class="tas-picker-search">' +
+                                    '<i class="fas fa-search tas-picker-search-icon"></i>' +
+                                    '<input type="text" id="tas-picker-search-input" class="tas-picker-search-input" placeholder="Search design # or company (e.g. 39721 or Asphalt Patch)" autocomplete="off">' +
+                                    '<button type="button" id="tas-picker-clear" class="tas-picker-clear" style="display:none;" aria-label="Clear">&times;</button>' +
+                                '</div>' +
+                                '<div id="tas-picker-results" class="tas-picker-results"></div>' +
+                                '<div id="tas-picker-recent" class="tas-picker-recent"></div>' +
+                            '</div>' +
+                            // ── Fallback: paste URL directly ──
+                            '<details id="tas-paste-details" class="tas-paste-details">' +
+                                '<summary>Or paste a Box link manually</summary>' +
+                                '<div id="tas-link-rows" class="tas-link-rows"></div>' +
+                                '<button type="button" id="tas-add-row" class="tas-add-row-btn">' +
+                                    '<i class="fas fa-plus"></i> Paste another link' +
+                                '</button>' +
+                            '</details>' +
                             '<div id="tas-mockup-summary" class="tas-mockup-summary" style="display:none;"></div>' +
                             '<div class="tas-form-row tas-form-row--rush">' +
                                 '<label class="tas-checkbox-label">' +
@@ -536,10 +549,254 @@
         if (addBtn) addBtn.addEventListener('click', function () { addLinkRow(true); });
         var form = $('#tas-send-form');
         if (form) form.addEventListener('submit', handleSubmit);
+
+        // Picker: debounced search on keyup
+        var searchInput = $('#tas-picker-search-input');
+        var clearBtn = $('#tas-picker-clear');
+        if (searchInput) {
+            var searchDebounce;
+            searchInput.addEventListener('input', function () {
+                var q = searchInput.value.trim();
+                clearBtn.style.display = q ? '' : 'none';
+                clearTimeout(searchDebounce);
+                if (q.length < 2) {
+                    renderRecentFolders();
+                    $('#tas-picker-results').innerHTML = '';
+                    return;
+                }
+                searchDebounce = setTimeout(function () { pickerSearch(q); }, 300);
+            });
+        }
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                clearBtn.style.display = 'none';
+                $('#tas-picker-results').innerHTML = '';
+                renderRecentFolders();
+                searchInput.focus();
+            });
+        }
+
+        // When Steve opens the "Or paste a Box link manually" fallback,
+        // make sure there's at least one empty paste row to type into.
+        var pasteDetails = $('#tas-paste-details');
+        if (pasteDetails) {
+            pasteDetails.addEventListener('toggle', function () {
+                if (pasteDetails.open && modalState.linkRows.length === 0) {
+                    addLinkRow(true);
+                }
+            });
+        }
+
         document.addEventListener('keydown', function (e) {
             var m = $('#tas-modal');
             if (e.key === 'Escape' && m && m.style.display !== 'none') closeModal();
         });
+    }
+
+    // ── Picker: search + folder/file browse ──────────────────────────
+
+    var RECENT_FOLDERS_KEY = 'tas-recent-folders';
+    var RECENT_FOLDERS_MAX = 5;
+
+    function getRecentFolders() {
+        try {
+            var raw = localStorage.getItem(RECENT_FOLDERS_KEY);
+            if (!raw) return [];
+            var parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) { return []; }
+    }
+
+    function recordRecentFolder(folder) {
+        if (!folder || !folder.id || !folder.name) return;
+        var list = getRecentFolders().filter(function (f) { return f.id !== folder.id; });
+        list.unshift({ id: folder.id, name: folder.name, at: Date.now() });
+        list = list.slice(0, RECENT_FOLDERS_MAX);
+        try { localStorage.setItem(RECENT_FOLDERS_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    function renderRecentFolders() {
+        var container = $('#tas-picker-recent');
+        if (!container) return;
+        var list = getRecentFolders();
+        if (!list.length) {
+            container.innerHTML = '';
+            return;
+        }
+        container.innerHTML = '<div class="tas-picker-recent-label">Recent folders</div>' +
+            '<div class="tas-picker-recent-pills">' +
+            list.map(function (f) {
+                return '<button type="button" class="tas-picker-pill" data-folder-id="' + escapeHtml(f.id) + '" data-folder-name="' + escapeHtml(f.name) + '">' +
+                    '<i class="fas fa-folder"></i> ' + escapeHtml(f.name) +
+                    '</button>';
+            }).join('') +
+            '</div>';
+        $$('#tas-picker-recent .tas-picker-pill').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                loadFolderFiles(this.getAttribute('data-folder-id'), this.getAttribute('data-folder-name'));
+            });
+        });
+    }
+
+    async function pickerSearch(query) {
+        var results = $('#tas-picker-results');
+        var recent = $('#tas-picker-recent');
+        if (recent) recent.innerHTML = '';
+        results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Searching Box...</div>';
+        try {
+            var resp = await fetch(API_BASE + '/api/box/search?query=' + encodeURIComponent(query) + '&type=folder&limit=20');
+            var data = await resp.json();
+            if (!resp.ok || !data.success) throw new Error(data.error || 'search failed');
+            renderSearchResults(data.entries || []);
+        } catch (err) {
+            console.warn('[tas picker] search failed:', err);
+            results.innerHTML = '<div class="tas-picker-err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Search failed') + '</div>';
+        }
+    }
+
+    function renderSearchResults(entries) {
+        var results = $('#tas-picker-results');
+        if (!entries.length) {
+            results.innerHTML = '<div class="tas-picker-empty">No folders match. Try a different design # or company name.</div>';
+            return;
+        }
+        results.innerHTML = '<div class="tas-picker-results-label">' + entries.length + ' folder' + (entries.length === 1 ? '' : 's') + ' found</div>' +
+            '<div class="tas-picker-folder-list">' +
+            entries.map(function (e) {
+                return '<button type="button" class="tas-picker-folder" data-folder-id="' + escapeHtml(e.id) + '" data-folder-name="' + escapeHtml(e.name) + '">' +
+                    '<i class="fas fa-folder"></i>' +
+                    '<span>' + escapeHtml(e.name) + '</span>' +
+                    '<i class="fas fa-chevron-right tas-picker-folder-arrow"></i>' +
+                    '</button>';
+            }).join('') +
+            '</div>';
+        $$('#tas-picker-results .tas-picker-folder').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                loadFolderFiles(this.getAttribute('data-folder-id'), this.getAttribute('data-folder-name'));
+            });
+        });
+    }
+
+    async function loadFolderFiles(folderId, folderName) {
+        var results = $('#tas-picker-results');
+        var recent = $('#tas-picker-recent');
+        if (recent) recent.innerHTML = '';
+        results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Loading files...</div>';
+        recordRecentFolder({ id: folderId, name: folderName });
+        try {
+            var resp = await fetch(API_BASE + '/api/box/folder-files?folderId=' + encodeURIComponent(folderId));
+            var data = await resp.json();
+            if (!resp.ok || !data.success) throw new Error(data.error || 'folder-files failed');
+            renderFileGrid(folderId, folderName, data.files || []);
+        } catch (err) {
+            console.warn('[tas picker] folder load failed:', err);
+            results.innerHTML = '<div class="tas-picker-err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Load failed') + '</div>';
+        }
+    }
+
+    function renderFileGrid(folderId, folderName, files) {
+        var results = $('#tas-picker-results');
+        // Filter out obviously irrelevant files — .psd sources are too big to send,
+        // Steve usually sends .png transfers + .jpg mockups. Keep them in the list
+        // but sort so PNG/JPG float to the top.
+        var sorted = files.slice().sort(function (a, b) {
+            var aExt = String(a.extension || '').toLowerCase();
+            var bExt = String(b.extension || '').toLowerCase();
+            var order = { png: 1, jpg: 2, jpeg: 2, pdf: 3, gif: 4, webp: 5, psd: 10, ai: 10 };
+            var aRank = order[aExt] || 20;
+            var bRank = order[bExt] || 20;
+            if (aRank !== bRank) return aRank - bRank;
+            // Within a rank, newer first
+            return (b.modified_at || '').localeCompare(a.modified_at || '');
+        });
+
+        results.innerHTML =
+            '<div class="tas-picker-folder-header">' +
+                '<button type="button" class="tas-picker-back" id="tas-picker-back-btn"><i class="fas fa-arrow-left"></i> Back</button>' +
+                '<span class="tas-picker-folder-title"><i class="fas fa-folder-open"></i> ' + escapeHtml(folderName) + '</span>' +
+            '</div>' +
+            (sorted.length === 0
+                ? '<div class="tas-picker-empty">No files in this folder.</div>'
+                : '<div class="tas-picker-file-grid">' +
+                    sorted.map(function (f) {
+                        var thumb = f.thumbnailUrl
+                            ? '<img src="' + escapeHtml(API_BASE + f.thumbnailUrl) + '" alt="" class="tas-picker-file-thumb" onerror="this.style.display=\'none\'">'
+                            : '<div class="tas-picker-file-thumb tas-picker-file-thumb--placeholder"><i class="fas fa-file"></i></div>';
+                        var ext = String(f.extension || '').toUpperCase();
+                        var size = f.size ? formatBytes(f.size) : '';
+                        var modified = f.modified_at ? new Date(f.modified_at).toLocaleDateString() : '';
+                        return '<button type="button" class="tas-picker-file" data-file-id="' + escapeHtml(f.id) + '" data-file-name="' + escapeHtml(f.name) + '">' +
+                            thumb +
+                            '<div class="tas-picker-file-meta">' +
+                                '<div class="tas-picker-file-name">' + escapeHtml(f.name) + '</div>' +
+                                '<div class="tas-picker-file-sub">' + escapeHtml(ext) + (size ? ' \u00b7 ' + size : '') + (modified ? ' \u00b7 ' + escapeHtml(modified) : '') + '</div>' +
+                            '</div>' +
+                            '<i class="fas fa-plus-circle tas-picker-file-add"></i>' +
+                        '</button>';
+                    }).join('') +
+                '</div>'
+            );
+
+        var backBtn = $('#tas-picker-back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function () {
+                $('#tas-picker-results').innerHTML = '';
+                renderRecentFolders();
+                var searchInput = $('#tas-picker-search-input');
+                if (searchInput && searchInput.value.trim().length >= 2) {
+                    pickerSearch(searchInput.value.trim());
+                }
+            });
+        }
+        $$('#tas-picker-results .tas-picker-file').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                selectFileFromPicker(this.getAttribute('data-file-id'), this.getAttribute('data-file-name'), this);
+            });
+        });
+    }
+
+    /**
+     * When Steve picks a file from the folder view:
+     *  1. Mark the button as "added" (so he sees it worked + doesn't double-click)
+     *  2. Generate a Box shared link via /api/box/shared-link
+     *  3. Create a new link row with that URL
+     *  4. Trigger analyze on that row (filename parse + metadata + vision)
+     *  5. Open the <details> fallback so the user can see the analyzed card
+     */
+    async function selectFileFromPicker(fileId, fileName, btnEl) {
+        if (btnEl && btnEl.classList.contains('tas-picker-file--added')) return; // double-click guard
+        if (btnEl) {
+            btnEl.classList.add('tas-picker-file--added');
+            var addIcon = btnEl.querySelector('.tas-picker-file-add');
+            if (addIcon) addIcon.className = 'fas fa-check-circle tas-picker-file-add tas-picker-file-add--done';
+        }
+
+        try {
+            var resp = await fetch(API_BASE + '/api/box/shared-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileId: fileId })
+            });
+            var data = await resp.json();
+            if (!resp.ok || !data.success || !data.sharedLink) {
+                throw new Error(data.error || 'shared-link generation failed');
+            }
+            // Open the paste-details panel so the analyzed result is visible
+            var details = $('#tas-paste-details');
+            if (details) details.open = true;
+            // Add the URL to a new row and trigger analyze
+            var row = newLinkRow();
+            row.url = data.sharedLink;
+            modalState.linkRows.push(row);
+            renderLinkRows();
+            // Kick analyze (sets status='analyzing', renders, then writes result)
+            analyzeRow(row.id);
+        } catch (err) {
+            console.warn('[tas picker] shared-link failed:', err);
+            showToast('Failed to generate Box shared link: ' + err.message, 'error');
+            if (btnEl) btnEl.classList.remove('tas-picker-file--added');
+        }
     }
 
     // ── Link-row repeater ─────────────────────────────────────────────
@@ -765,17 +1022,33 @@
         injectModal();
         modalState.opts = opts;
         modalState.linkRows = [];
-        addLinkRow(false);
+        // Don't pre-populate a blank URL row — the picker is primary now.
+        // If Steve opens the <details> "paste manually" fallback, it'll show
+        // a fresh row at that point. Old renders get cleared here.
+        renderLinkRows();
         var rushEl = $('#tas-rush');
         if (rushEl) rushEl.checked = false;
         var summary = $('#tas-mockup-summary');
         if (summary) { summary.style.display = 'none'; summary.innerHTML = ''; }
+        var pasteDetails = $('#tas-paste-details');
+        if (pasteDetails) pasteDetails.open = false;
+        var searchInput = $('#tas-picker-search-input');
+        if (searchInput) {
+            searchInput.value = '';
+            var clearBtn = $('#tas-picker-clear');
+            if (clearBtn) clearBtn.style.display = 'none';
+        }
+        var results = $('#tas-picker-results');
+        if (results) results.innerHTML = '';
+        // Show recent folders (if any) as pills below the search box
+        renderRecentFolders();
         updateSubmitButton();
         $('#tas-modal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        // Focus the search input for instant typing
         setTimeout(function () {
-            var firstInput = document.querySelector('.tas-link-input');
-            if (firstInput) firstInput.focus();
+            var si = $('#tas-picker-search-input');
+            if (si) si.focus();
         }, 80);
     }
 
