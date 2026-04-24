@@ -427,6 +427,8 @@
      * @param {string} companyName - Company name (for notification)
      */
     async function showArtTimeModal(designId, repEmail, companyName, onSuccess) {
+      try {
+        console.log('[ArtActions.showArtTimeModal] opening for designId=', designId);
         removeModals();
 
         var currentMins = 0;
@@ -600,6 +602,13 @@
                 console.error('Complete action failed:', err);
             }
         });
+      } catch (fatalErr) {
+        // Surface silent failures that previously left the Mark Complete button
+        // doing "nothing" from the user's perspective. Now staff see what broke.
+        console.error('[ArtActions.showArtTimeModal] fatal:', fatalErr);
+        alert('Could not open Mark Complete dialog: ' + (fatalErr && fatalErr.message ? fatalErr.message : 'unknown error')
+              + '\n\nPlease reload the page and try again. If this keeps happening, send Erik the browser console output (F12).');
+      }
     }
 
     /**

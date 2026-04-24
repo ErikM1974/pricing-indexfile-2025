@@ -129,6 +129,14 @@
         return;
     }
 
+    // Defensive: clean up any stale modal overlays that could be lingering from a
+    // prior interaction (e.g. a half-opened Send Mockup modal that didn't clean up).
+    // A leftover `.art-modal-overlay` (z-index 10000, full-screen) silently swallows
+    // every click on the page below it — which would explain "Mark Complete does nothing."
+    document.querySelectorAll('.art-modal-overlay, #quick-action-overlay').forEach(function (el) {
+        el.remove();
+    });
+
     // Store request data globally within IIFE for action handlers
     let currentRequest = null;
 
@@ -982,7 +990,7 @@
         var repEmail = req.Sales_Rep || req.User_Email || '';
         var company = req.CompanyName || '';
 
-        btnWorking.addEventListener('click', function () {
+        if (btnWorking) btnWorking.addEventListener('click', function () {
             btnWorking.disabled = true;
             btnWorking.textContent = 'Updating...';
             fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
@@ -1034,7 +1042,8 @@
             });
         }
 
-        btnComplete.addEventListener('click', function () {
+        if (btnComplete) btnComplete.addEventListener('click', function () {
+            console.log('[art-request-detail] Mark Complete clicked — opening modal for', designId);
             ArtActions.showArtTimeModal(designId, repEmail, company);
         });
 
@@ -1047,22 +1056,22 @@
                 }
             }
         }
-        if (isAwaitingApproval && reminderCount > 0) {
+        if (isAwaitingApproval && reminderCount > 0 && btnReminder) {
             btnReminder.textContent = 'Send Reminder (' + reminderCount + ' sent)';
         }
 
         // Send Mockup always opens the full approval modal (with mockup images)
-        btnMockup.addEventListener('click', function () {
+        if (btnMockup) btnMockup.addEventListener('click', function () {
             ArtActions.showSendForApprovalModal(designId, company);
         });
 
         // Send Reminder just pings the sales rep (no images, quick nudge)
-        btnReminder.addEventListener('click', function () {
+        if (btnReminder) btnReminder.addEventListener('click', function () {
             var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
             ArtActions.sendMockupReminder(designId, mockupUrl, repEmail, company, btnReminder);
         });
 
-        btnReopen.addEventListener('click', function () {
+        if (btnReopen) btnReopen.addEventListener('click', function () {
             if (!confirm('Reopen this art request?')) return;
             btnReopen.disabled = true;
             btnReopen.textContent = 'Reopening...';
@@ -2430,13 +2439,28 @@
             // Box directly (Box rejects cross-origin cookieless fetches with 404-class).
             // - Proxy thumbnail URLs → /api/box/download/:id (raw stream)
             // - Legacy Box shared/static URLs → /api/box/shared-image?full=1 (resolves via shared_items API)
-            var downloadUrl = url;
+            // - Anything else (legacy CDN_Link_* fields / Cloudinary / Caspio CDN) → can't
+            //   fetch() cross-origin due to CORS, so fall back to an anchor-tag open so the
+            //   browser handles the save naturally (user right-clicks or browser honors download).
             var m = url.match(/\/api\/box\/thumbnail\/(\d+)/);
-            if (m) {
-                downloadUrl = API_BASE + '/api/box/download/' + m[1];
-            } else if (url.indexOf('.box.com/shared/static/') !== -1 || url.indexOf('.box.com/s/') !== -1) {
-                downloadUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
+            var isBoxShared = url.indexOf('.box.com/shared/static/') !== -1
+                           || url.indexOf('.box.com/s/') !== -1;
+
+            if (!m && !isBoxShared) {
+                var aFallback = document.createElement('a');
+                aFallback.href = url;
+                aFallback.target = '_blank';
+                aFallback.rel = 'noopener';
+                aFallback.download = (filenameBase || 'artwork');
+                document.body.appendChild(aFallback);
+                aFallback.click();
+                aFallback.remove();
+                return;
             }
+
+            var downloadUrl = m
+                ? API_BASE + '/api/box/download/' + m[1]
+                : API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
             var resp = await fetch(downloadUrl);
             if (!resp.ok) {
                 if (resp.status === 404) {
