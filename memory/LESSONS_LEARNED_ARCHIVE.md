@@ -1399,3 +1399,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** Backend `PUT /api/art-requests/:designId/fields` (art.js:874) used `q.where=PK_ID=${designId}`, but the URL passes `ID_Design`. Every other endpoint in the file correctly uses `ID_Design`. Commit `cfcc1de` introduced the bug.
 **Solution:** Changed `PK_ID` to `ID_Design` in the WHERE clause (commit `2ed4724`).
 **Prevention:** ArtRequests endpoints ALWAYS use `ID_Design` for the WHERE clause. The URL param is the design ID, not the primary key. Check consistency across all endpoints in a route file.
+
+---
+
+### Mockup Approval Email Showed "Not specified" for Design Size (archived 2026-04-24)
+**Problem:** Nika's mockup email for Button Veterinary #33672 showed `DESIGN SIZE: Not specified` to the customer. Record had `Design_Size=""`, `Logo_Width=""`, `Logo_Height=""` — all three blank.
+**Root Cause:** `mockup-detail.js` sent `design_size: designSize || 'Not specified'` and the modal input only pre-filled from `Design_Size`, ignoring the separately-stored `Logo_Width`/`Logo_Height` on the same record.
+**Solution:** Pre-fill chain in the Send-to-Customer modal: `Design_Size` → `Logo_Width × Logo_Height` → blank. Email fallback changed to `'N/A'` (short, fits the 50%-width cell).
+**Prevention:** When a single email field has multiple possible sources on the record, walk the fallback chain in the code that populates it. Friendly fallback strings ("N/A") beat clinical ones ("Not specified") when customers see them.

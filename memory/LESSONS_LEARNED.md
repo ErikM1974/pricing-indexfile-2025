@@ -269,14 +269,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### Mockup Approval Email Showed "Not specified" for Design Size (2026-04-20)
-**Problem:** Nika's mockup email for Button Veterinary #33672 showed `DESIGN SIZE: Not specified` to the customer. Record had `Design_Size=""`, `Logo_Width=""`, `Logo_Height=""` — all three blank.
-**Root Cause:** `mockup-detail.js` sent `design_size: designSize || 'Not specified'` and the modal input only pre-filled from `Design_Size`, ignoring the separately-stored `Logo_Width`/`Logo_Height` on the same record.
-**Solution:** Pre-fill chain in the Send-to-Customer modal: `Design_Size` → `Logo_Width × Logo_Height` → blank. Email fallback changed to `'N/A'` (short, fits the 50%-width cell). No validation block — Ruth fills design size during digitizing, not the AE at send-time.
-**Prevention:** When a single email field has multiple possible sources on the record, walk the fallback chain in the code that populates it. Friendly fallback strings ("N/A") beat clinical ones ("Not specified") when customers see them.
-
----
-
 ### Box Mockup Files Deleted From Box UI — Defense in Depth (2026-04-20 → 2026-04-22)
 **Problem (recurring):** Mockup images break in art request gallery + customer approval view. Box returns 404 for fileIds still referenced by Caspio. Steve previously had to manually re-link 21 designs. Thumbnails show generic IMG badge; download alerts "This mockup file no longer exists in Box". **Secondary issue (same day):** the post-upload HEAD verify rejected legitimate uploads when Box's eventual-consistency window (0.5–3s) exceeded the retry ceiling — staff saw "Uploaded file could not be verified in Box. Please try again." on files that actually uploaded fine.
 **Root Cause:** Upload flow is correct (stores proxy URL `/api/box/thumbnail/{fileId}` from Box's authoritative response). Files get deleted **after** upload via Box web UI cleanup — `BOX_ART_FOLDER_ID` ("Steve Art Box 2020") is a shared-access folder. Secondary path: `DELETE /api/box/file/:fileId` had no reference guard. Secondary verify-too-strict: single-attempt (later 3-attempt `[0,500,1500]`) HEAD didn't cover Box's index propagation tail.
@@ -298,3 +290,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** To mitigate a theorized orphan-overlay scenario I added `document.querySelectorAll('.art-modal-overlay, #quick-action-overlay').forEach(el => el.remove())` on page boot. The selector matched FOUR legitimate static HTML overlays that share class `art-modal-overlay`: `#find-order-overlay`, `#approval-overlay` (×2), `#share-customer-overlay`. Cleanup wiped them. Then `initShareWithCustomer()` at art-request-detail.js:2794 called `overlay.addEventListener('click', ...)` on the now-null share overlay → TypeError → outer `.catch` in render() painted the "Error Loading" banner, and `renderSteveActions()` (which wires up Mark Complete) never got to run.
 **Solution:** Narrow the selector to ONLY the dynamically-created overlay: `var el = document.getElementById('quick-action-overlay'); if (el) el.remove();`. That's the single overlay created by `art-actions-shared.js createOverlay()` that can be orphaned. Static HTML overlays MUST be left alone.
 **Prevention:** **Never use a shared CSS class as a DOM-cleanup selector when static HTML elements also carry that class.** Use specific IDs for dynamic cleanup. Before adding any `querySelectorAll('.shared-class').forEach(remove)`, run `grep -rn 'class="[^"]*shared-class' --include='*.html'` to see every pre-declared element that selector will delete. Bonus lesson: a "defensive" fix that hasn't been ruled out with data can make things worse — prefer a try/catch around the suspect caller over reaching into the DOM.
+
+---
+
+### Heroku Dyno Serves Stale Slug After Successful Release (2026-04-24)
+**Problem:** After `git push heroku main` completed and Heroku reported `Released v797`, the live site kept serving the previous slug — `/art-request/:id` returned HTML with `?v=20260423b` even though the repo on Heroku had `?v=20260424a`. `Last-Modified` header showed the prior deploy time. Browser hard-reloads, cache-bust query params, and `Cache-Control: no-cache` all failed to fix it. Only `heroku ps:restart` cleared it (took ~15s after restart to serve fresh content).
+**Root Cause:** Heroku builds a new slug and marks the release live in metadata, but the running dyno keeps serving the previous slug until either (a) a dyno cycle (~24h), (b) a dyno crash, or (c) a manual restart. Cause is suspected to be Node's in-process module cache + slug-file mtime caching in Express `sendFile`. Content-Length and Etag stayed identical across the old and new slug because the only change was a 1-char version string (same byte count).
+**Solution:** Run `heroku ps:restart --app sanmar-inventory-app` immediately after deploy if served content doesn't match pushed content within 30 seconds.
+**Prevention:** After every `/deploy`, verify live content with `curl -s <production-url> | grep '?v='` against the local file. If mismatched → `heroku ps:restart`. Can add this as a final automated step in the deploy skill. Do NOT chase this with browser cache-bust tricks — the issue is server-side.
