@@ -548,6 +548,194 @@
     margin-top: 3px;
 }
 
+/* ── Live Supacolor — full inline detail (D.1 expanded v3.2) ─── */
+.td-subsection-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bt-text-muted);
+    margin: 14px 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.td-subsection-title i {
+    font-size: 11px;
+    color: var(--bt-text-muted);
+}
+.td-po-badge {
+    display: inline-block;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    background: #f1f5f9;
+    border: 1px solid var(--bt-border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--bt-text);
+}
+
+/* Joblines */
+.td-jobline-section { margin-top: 4px; }
+.td-jobline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.td-jobline {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--bt-border);
+    border-radius: 6px;
+}
+.td-jobline-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #f1f5f9;
+    border: 1px solid var(--bt-border);
+}
+.td-jobline-thumb--clickable { cursor: zoom-in; transition: transform 0.15s ease; }
+.td-jobline-thumb--clickable:hover { transform: scale(1.05); }
+.td-jobline-thumb--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 18px;
+}
+.td-jobline-body { min-width: 0; }
+.td-jobline-code {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+    color: #6366f1;
+    font-weight: 600;
+}
+.td-jobline-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bt-text);
+    line-height: 1.3;
+}
+.td-jobline-detail {
+    font-size: 11px;
+    color: var(--bt-text-muted);
+    margin-top: 2px;
+    white-space: pre-wrap;
+}
+.td-jobline-detail--tracking {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+}
+.td-jobline-color {
+    font-size: 11px;
+    color: var(--bt-text-muted);
+    margin-top: 2px;
+}
+.td-jobline-pricing { text-align: right; white-space: nowrap; }
+.td-jobline-total {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bt-text);
+}
+.td-jobline-qtyprice {
+    font-size: 11px;
+    color: var(--bt-text-muted);
+}
+.td-jobline-totals {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #f9fafb;
+    border-radius: 6px;
+    border: 1px solid var(--bt-border);
+}
+.td-jobline-totals-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--bt-text-muted);
+    padding: 2px 0;
+}
+.td-jobline-totals-row--grand {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bt-text);
+    border-top: 1px solid var(--bt-border);
+    padding-top: 6px;
+    margin-top: 4px;
+}
+
+/* Shipping block */
+.td-shipping-section { margin-top: 4px; }
+.td-shipping-block {
+    background: #f9fafb;
+    border: 1px solid var(--bt-border);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.td-shipping-name { font-weight: 600; color: var(--bt-text); }
+.td-shipping-address { color: var(--bt-text); margin-top: 2px; }
+.td-shipping-address div { font-size: 12px; }
+.td-shipping-contact {
+    font-size: 12px;
+    color: var(--bt-text-muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.td-shipping-contact i {
+    width: 12px;
+    color: #94a3b8;
+}
+
+/* History */
+.td-history-section { margin-top: 4px; }
+.td-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.td-history-event {
+    padding: 6px 10px;
+    background: #f9fafb;
+    border-left: 2px solid var(--bt-border);
+    border-radius: 0 4px 4px 0;
+    font-size: 12px;
+}
+.td-history-when {
+    font-size: 10px;
+    color: var(--bt-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 2px;
+}
+.td-history-what { color: var(--bt-text); line-height: 1.4; }
+.td-history-more { margin-top: 6px; }
+.td-history-more summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--bt-link, #3b82f6);
+    padding: 4px 0;
+    user-select: none;
+}
+.td-history-more[open] summary { margin-bottom: 6px; }
+
+/* Deep-link footer */
+.td-supacolor-deeplink {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--bt-border);
+    text-align: right;
+}
+
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 900px) {
     .td-grid { grid-template-columns: 1fr; }
@@ -557,4 +745,6 @@
     .td-company { font-size: 20px; }
     .td-header-top { flex-direction: column; align-items: stretch; }
     .td-header-badges { flex-direction: row; align-items: center; }
+    .td-jobline { grid-template-columns: 40px 1fr auto; gap: 8px; }
+    .td-jobline-thumb { width: 40px; height: 40px; }
 }

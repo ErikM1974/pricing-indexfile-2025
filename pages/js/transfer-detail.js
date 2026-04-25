@@ -300,6 +300,188 @@
     }
 
     // ── D.1 — Live Supacolor Status card ────────────────────────────
+    function formatMoney(n) {
+        if (n === null || n === undefined || n === '') return '';
+        var num = Number(n);
+        if (isNaN(num)) return '';
+        return '$' + num.toFixed(2);
+    }
+
+    function renderSupacolorHeaderStrip(job) {
+        // PO + Description + Created by + Location — compact strip below status row.
+        var rows = [];
+        rows.push('<dl class="td-specs-grid" style="margin-top:10px;">');
+        if (job.PO_Number) rows.push('<dt>PO</dt><dd><span class="td-po-badge">' + escapeHtml(job.PO_Number) + '</span></dd>');
+        if (job.Description) rows.push('<dt>Description</dt><dd>' + escapeHtml(job.Description) + '</dd>');
+        if (job.Created_By_Name) rows.push('<dt>Created by</dt><dd>' + escapeHtml(job.Created_By_Name) + '</dd>');
+        if (job.Location) rows.push('<dt>Location</dt><dd>' + escapeHtml(job.Location) + '</dd>');
+        rows.push('</dl>');
+        return rows.join('');
+    }
+
+    function renderSupacolorJoblines(joblines, job) {
+        if (!joblines || !joblines.length) return '';
+        var html = ['<div class="td-jobline-section">',
+            '<div class="td-subsection-title"><i class="fas fa-list"></i> Joblines (' + joblines.length + ')</div>',
+            '<div class="td-jobline-list">'];
+
+        joblines.forEach(function (line) {
+            var detailForMeta = (line.Detail_Line || '').replace(/\s*\n\s*/g, ' · ');
+            var thumb = line.Thumbnail_URL
+                ? '<img class="td-jobline-thumb td-jobline-thumb--clickable"' +
+                  ' src="' + escapeHtml(line.Thumbnail_URL) + '"' +
+                  ' data-thumb-url="' + escapeHtml(line.Thumbnail_URL) + '"' +
+                  ' data-item-code="' + escapeHtml(line.Item_Code || '') + '"' +
+                  ' data-description="' + escapeHtml(line.Description || '') + '"' +
+                  ' data-detail="' + escapeHtml(detailForMeta) + '"' +
+                  ' data-color="' + escapeHtml(line.Color || '') + '"' +
+                  ' data-quantity="' + escapeHtml(line.Quantity != null ? String(line.Quantity) : '') + '"' +
+                  ' alt="" title="Click to view larger"' +
+                  ' onerror="this.style.display=\'none\'">'
+                : '<div class="td-jobline-thumb td-jobline-thumb--placeholder">' +
+                    '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '"></i>' +
+                  '</div>';
+
+            var qtyPrice = (line.Quantity != null && line.Unit_Price != null)
+                ? line.Quantity + ' × ' + formatMoney(line.Unit_Price)
+                : '';
+            var detailLine = line.Detail_Line || '';
+            var detailClass = (line.Line_Type === 'SHIPPING') ? 'td-jobline-detail td-jobline-detail--tracking' : 'td-jobline-detail';
+
+            html.push('<div class="td-jobline">',
+                thumb,
+                '<div class="td-jobline-body">',
+                    (line.Item_Code ? '<div class="td-jobline-code">' + escapeHtml(line.Item_Code) + '</div>' : ''),
+                    '<div class="td-jobline-name">' + escapeHtml(line.Description || '') + '</div>',
+                    (detailLine ? '<div class="' + detailClass + '">' + escapeHtml(detailLine) + '</div>' : ''),
+                    (line.Color ? '<div class="td-jobline-color">' + escapeHtml(line.Color) + '</div>' : ''),
+                '</div>',
+                '<div class="td-jobline-pricing">',
+                    '<div class="td-jobline-total">' + escapeHtml(formatMoney(line.Line_Total) || '') + '</div>',
+                    (qtyPrice ? '<div class="td-jobline-qtyprice">' + escapeHtml(qtyPrice) + '</div>' : ''),
+                '</div>',
+            '</div>');
+        });
+
+        html.push('</div>');
+
+        if (job && (job.Subtotal != null || job.Total != null)) {
+            html.push('<div class="td-jobline-totals">');
+            if (job.Subtotal != null) {
+                html.push('<div class="td-jobline-totals-row"><span>Subtotal</span><span>' + escapeHtml(formatMoney(job.Subtotal) || '—') + '</span></div>');
+            }
+            if (job.Total != null) {
+                html.push('<div class="td-jobline-totals-row td-jobline-totals-row--grand"><span>Total</span><span>' + escapeHtml(formatMoney(job.Total) || '—') + '</span></div>');
+            }
+            html.push('</div>');
+        }
+
+        html.push('</div>');
+        return html.join('');
+    }
+
+    function renderSupacolorShipping(job) {
+        var hasAny = job.Ship_To_Name || job.Ship_To_Address || job.Ship_To_Contact || job.Ship_To_Phone || job.Ship_To_Email;
+        if (!hasAny) return '';
+
+        var addrLines = '';
+        if (job.Ship_To_Address) {
+            addrLines = String(job.Ship_To_Address).split(/\r?\n|, /)
+                .map(function (l) { return l.trim(); })
+                .filter(function (l) { return l; })
+                .map(function (l) { return '<div>' + escapeHtml(l) + '</div>'; })
+                .join('');
+        }
+
+        var rows = [];
+        rows.push('<div class="td-shipping-section">');
+        rows.push('<div class="td-subsection-title"><i class="fas fa-map-marker-alt"></i> Shipping</div>');
+        rows.push('<div class="td-shipping-block">');
+        if (job.Ship_To_Name) rows.push('<div class="td-shipping-name">' + escapeHtml(job.Ship_To_Name) + '</div>');
+        if (addrLines) rows.push('<div class="td-shipping-address">' + addrLines + '</div>');
+        if (job.Ship_To_Contact) rows.push('<div class="td-shipping-contact"><i class="fas fa-user"></i> ' + escapeHtml(job.Ship_To_Contact) + '</div>');
+        if (job.Ship_To_Phone) rows.push('<div class="td-shipping-contact"><i class="fas fa-phone"></i> ' + escapeHtml(job.Ship_To_Phone) + '</div>');
+        if (job.Ship_To_Email) rows.push('<div class="td-shipping-contact"><i class="fas fa-envelope"></i> ' + escapeHtml(job.Ship_To_Email) + '</div>');
+        rows.push('</div>');
+        rows.push('</div>');
+        return rows.join('');
+    }
+
+    function renderSupacolorHistory(history) {
+        if (!history || !history.length) return '';
+        // Newest first; show 5, collapse the rest into <details>.
+        var sorted = history.slice().sort(function (a, b) {
+            var ta = a.Event_At ? new Date(normalizeDate(a.Event_At)).getTime() : 0;
+            var tb = b.Event_At ? new Date(normalizeDate(b.Event_At)).getTime() : 0;
+            return tb - ta;
+        });
+        var first = sorted.slice(0, 5);
+        var rest = sorted.slice(5);
+
+        function eventHtml(ev) {
+            return '<div class="td-history-event">' +
+                '<div class="td-history-when">' + escapeHtml(formatDateTime(ev.Event_At)) + '</div>' +
+                '<div class="td-history-what">' +
+                    '<strong>' + escapeHtml(ev.Event_Type || '') + '</strong>' +
+                    (ev.Event_Detail ? ' &mdash; ' + escapeHtml(ev.Event_Detail) : '') +
+                '</div>' +
+            '</div>';
+        }
+
+        var rows = [];
+        rows.push('<div class="td-history-section">');
+        rows.push('<div class="td-subsection-title"><i class="fas fa-history"></i> History</div>');
+        rows.push('<div class="td-history-list">');
+        rows.push(first.map(eventHtml).join(''));
+        rows.push('</div>');
+        if (rest.length) {
+            rows.push('<details class="td-history-more">');
+            rows.push('<summary>Show ' + rest.length + ' older event' + (rest.length === 1 ? '' : 's') + '</summary>');
+            rows.push('<div class="td-history-list">' + rest.map(eventHtml).join('') + '</div>');
+            rows.push('</details>');
+        }
+        rows.push('</div>');
+        return rows.join('');
+    }
+
+    function wireSupacolorThumbnailClicks(panel) {
+        if (!panel) return;
+        panel.querySelectorAll('.td-jobline-thumb--clickable').forEach(function (img) {
+            img.addEventListener('click', function () {
+                if (!window.productThumbnailModal) return;
+                var url = this.getAttribute('data-thumb-url');
+                var itemCode = this.getAttribute('data-item-code') || '';
+                var description = this.getAttribute('data-description') || '';
+                var detail = this.getAttribute('data-detail') || '';
+                var color = this.getAttribute('data-color') || '';
+                var quantity = this.getAttribute('data-quantity') || '';
+
+                var metaLines = [];
+                if (itemCode) metaLines.push({ label: 'Item Code', value: itemCode });
+                if (quantity) metaLines.push({ label: 'Quantity', value: quantity });
+                if (detail) metaLines.push({ label: 'Detail', value: detail });
+                else if (color) metaLines.push({ label: 'Color', value: color });
+
+                var extMatch = String(url || '').match(/\.(jpe?g|png|gif|webp|svg)(?:[?#]|$)/i);
+                var ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
+                var slug = description.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 50);
+                var filename = (itemCode || 'supacolor-image') + (slug ? '-' + slug : '') + '.' + ext;
+
+                var downloadUrl = API_BASE + '/api/supacolor-jobs/proxy-image' +
+                    '?url=' + encodeURIComponent(url) +
+                    '&name=' + encodeURIComponent(filename);
+
+                window.productThumbnailModal.openGeneric({
+                    imageUrl: url,
+                    title: description || itemCode || 'Transfer artwork',
+                    metaLines: metaLines,
+                    downloadUrl: downloadUrl,
+                    downloadFilename: filename
+                });
+            });
+        });
+    }
+
     async function renderSupacolorLiveStatus() {
         var r = state.record;
         var card = $('td-supacolor-live-card');
@@ -357,15 +539,52 @@
             }
             rows.push('</dl>');
 
+            // Header strip (PO + Description + Created by + Location)
+            rows.push(renderSupacolorHeaderStrip(job));
+
+            // Placeholder for joblines/shipping/history — filled by the second fetch below
+            rows.push('<div id="td-supacolor-detail-slot"></div>');
+
             if (caspioId) {
-                rows.push('<div style="margin-top:10px; text-align:right;">' +
+                rows.push('<div class="td-supacolor-deeplink">' +
                     '<a href="/pages/supacolor-job-detail.html?id=' + encodeURIComponent(caspioId) + '" class="bt-btn bt-btn--link bt-btn--small">' +
-                        'View full Supacolor job <i class="fas fa-arrow-right"></i>' +
+                        'Open in Supacolor dashboard <i class="fas fa-arrow-right"></i>' +
                     '</a>' +
-                    '</div>');
+                '</div>');
             }
 
             panel.innerHTML = rows.join('');
+
+            // Second fetch: full job (joblines + history). Best-effort — failure leaves
+            // the header data intact and shows a small inline notice.
+            if (caspioId) {
+                var slot = $('td-supacolor-detail-slot');
+                if (slot) {
+                    slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; font-size:12px;"><i class="fas fa-spinner fa-spin"></i> Loading joblines & shipping...</div>';
+                    fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(caspioId))
+                        .then(function (r2) {
+                            if (!r2.ok) throw new Error('HTTP ' + r2.status);
+                            return r2.json();
+                        })
+                        .then(function (full) {
+                            if (!full || !full.success) throw new Error((full && full.error) || 'No job detail');
+                            var fullJob = full.job || job;
+                            var html = '';
+                            html += renderSupacolorJoblines(full.joblines, fullJob);
+                            html += renderSupacolorShipping(fullJob);
+                            html += renderSupacolorHistory(full.history);
+                            slot.innerHTML = html;
+                            wireSupacolorThumbnailClicks(slot);
+                        })
+                        .catch(function (err) {
+                            console.error('[transfer-detail] full Supacolor fetch failed:', err);
+                            slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; color:#991b1b; font-size:12px;">' +
+                                '<i class="fas fa-exclamation-triangle"></i> Couldn\'t load joblines/shipping. ' +
+                                'Try the dedicated Supacolor dashboard.' +
+                                '</div>';
+                        });
+                }
+            }
         } catch (err) {
             console.error('[transfer-detail] Live Supacolor fetch failed:', err);
             panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#991b1b;">' +
